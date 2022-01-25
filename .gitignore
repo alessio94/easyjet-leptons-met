@@ -2,13 +2,14 @@ __pycache__
 *~
 *.pyc
 *.h5
+*.root
 *.csv
 *.pdf
 *.png
 *.svg
 *.log
-*.DS_Store
 build/*
 run/*
 plots/*
+*.DS_Store
 .vscode/*

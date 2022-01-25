@@ -1,6 +1,6 @@
 ///////////////////////// -*- C++ -*- /////////////////////////////
-// DileptonFinder.h
-// Header file for algorithm class DileptonFinder
+// DileptonFinderAlg.h
+// Header file for algorithm class DileptonFinderAlg
 //
 // This algorithm does two things:
 // * First, it checks if there are two leptons in the specified

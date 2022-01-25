@@ -1,8 +1,14 @@
 ///////////////////////// -*- C++ -*- /////////////////////////////
-// SayHelloTool.h
-// Header file for class SayHelloTool
+// NTrkVertexCounter.h
+// Header file for algorithm class NTrkVertexCounter
+//
+// This is an algorithm that will count the number of vertices given
+// the number of NTrk, the minimum number of tracks.
+//
 // Author: T.J.Khoo<khoo@cern.ch>
 ///////////////////////////////////////////////////////////////////
+
+// Always protect against multiple includes!
 #ifndef PLOTTING_SAYHELLOTOOL_H
 #define PLOTTING_SAYHELLOTOOL_H
 

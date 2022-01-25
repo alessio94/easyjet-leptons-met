@@ -14,9 +14,8 @@ find_package( AthAnalysis 22.2 REQUIRED )
 atlas_ctest_setup()
 
 # Set up a work directory project:
-atlas_project( WorkDir 1.0.0
-   USE AthAnalysis ${AthAnalysis_VERSION}
-   PROJECT_ROOT ${CMAKE_SOURCE_DIR}/../ )
+atlas_project( HH4bAnalysis 1.0.0
+   USE AthAnalysis ${AthAnalysis_VERSION} )
 
 # Set up the runtime environment setup script(s):
 lcg_generate_env( SH_FILE ${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh )

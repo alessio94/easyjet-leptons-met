@@ -1,6 +1,6 @@
 # HH4bAnalysis
 
-$HH \to b\bar{b}b\bar{b}$ Analysis Framework initiated by Humboldt-Universität zu Berlin ERC Project.
+HH to 4b Analysis Framework initiated by Humboldt-Universität zu Berlin ERC Project.
 
 # Installation
 
@@ -8,12 +8,12 @@ $HH \to b\bar{b}b\bar{b}$ Analysis Framework initiated by Humboldt-Universität 
 
 First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel free to make an alias with `export WORKDIR=.`) clone the repository (you are also welcome to fork a copy in case you might want to develop on top and contribute to improving it!):
 ```
-# Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g.
+# Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
 git clone ssh://git@gitlab.cern.ch:7999/viruelas/HH4bAnalysis.git
 ```
 Now, compile the package
 ```
-mkdir build run
+mkdir build
 cd build
 setupATLAS
 asetup AthAnalysis,22.2.55
@@ -26,7 +26,7 @@ source */setup.sh
 
 If you would rather work on a local computer, numbered `AthAnalysis` releases are available as Docker containers [on dockerhub](https://hub.docker.com/r/atlas/athanalysis/). Naturally, you will have to install [Docker](https://www.docker.com).
 
-Once you have installed Docker, pull your desired image (here we use 22.2.55 throughout), then launch the container. Preferably, do this in `$WORKDIR`.
+ Preferably, do this in `$WORKDIR`.
 ```
 docker pull atlas/athanalysis:22.2.55
 docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:22.2.55
