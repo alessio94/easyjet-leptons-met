@@ -37,3 +37,14 @@ This will start up an interactive terminal inside the container, which has read/
 The terminal itself begins in an empty directory, `/workdir`. *The `delegated` suffix for these mounted volumes helps optimise the read/write access for better responsiveness.* Within this terminal, you can follow the instructions to source the `/release_setup.sh` script, in place of `setupATLAS; asetup`.
 
 If you encounter any issues, some relevant instructions are available at https://atlassoftwaredocs.web.cern.ch/athena/dev-setup/. The `AthAnalysis` containers do not require `cvmfs` access, but you may need to experiment with the command line arguments when launching the container.
+
+## Restore the setup
+
+If you come back to this in a new shell session, you can recover the setup with:
+```
+cd $WORKDIR/build
+setupATLAS
+asetup AthAnalysis,22.2.55
+source */setup.sh
+```
+*If you are working in a container, source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*

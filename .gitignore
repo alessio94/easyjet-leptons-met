@@ -1,15 +1,26 @@
-__pycache__
-*~
-*.pyc
+# build artifacts
+/build/
+/athena/
+__pycache__/
+.asetup*
+
+# binary files
 *.h5
 *.root
 *.csv
+*.pyc
 *.pdf
 *.png
 *.svg
+
+# log files
 *.log
-build/*
-run/*
-plots/*
+*.out
+
+# workspace directories
+/run/
+/plots/
+
+# macOS and VSCode related files
 *.DS_Store
 .vscode/*
