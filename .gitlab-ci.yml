@@ -18,7 +18,7 @@ stages:
   - build
   - test
 
-linting:
+linter-job:
   stage: linting
   script:
     - echo "No linter has been setup. "
