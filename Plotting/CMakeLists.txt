@@ -18,6 +18,7 @@ atlas_add_component( Plotting
     # PathResolver
     xAODEventInfo
     xAODTracking
+    xAODJet
  )
 
 # Install python modules, joboptions, and share content
