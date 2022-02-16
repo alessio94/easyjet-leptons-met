@@ -65,13 +65,6 @@ def main():
             default="variable-hists.root",
             help="Output file name",
         )
-        parser.add_argument(
-            "-c",
-            "--variablesConfig",
-            type=str,
-            # required=True,
-            help="Path to the variables config file",
-        )
         args = ConfigFlags.fillFromArgs([], parser)
         # Lock the flags so that the configuration of job subcomponents cannot
         # modify them silently/unpredictably.
