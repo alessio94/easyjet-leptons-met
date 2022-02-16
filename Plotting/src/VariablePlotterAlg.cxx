@@ -47,7 +47,7 @@ namespace MSA
     ATH_MSG_DEBUG("Executing " << name());
 
     const xAOD::JetContainer *jets(nullptr);
-    ATH_CHECK(evtStore()->retrieve(jets, "AntiKt4EMPFlowJets"));
+    ATH_CHECK(evtStore()->retrieve(jets, "AnalysisJets"));
     if (jets == nullptr)
     {
       ATH_MSG_ERROR("Got null pointer for JetContainer!");
@@ -62,6 +62,8 @@ namespace MSA
       bookHistograms()
   {
     ATH_CHECK(book(TH1D("JetPt", "Jet pT [GeV]", m_jetPt.nbinsx, m_jetPt.xmin, m_jetPt.xmax)));
+    ATH_CHECK(book(TH1D("JetEta", "Jet eta", m_jetEta.nbinsx, m_jetEta.xmin, m_jetEta.xmax)));
+    ATH_CHECK(book(TH1D("JetPhi", "Jet phi", m_jetPhi.nbinsx, m_jetPhi.xmin, m_jetPhi.xmax)));
 
     return StatusCode::SUCCESS;
   }
@@ -75,6 +77,8 @@ namespace MSA
     for (const xAOD::Jet *jet : jets)
     {
       hist("JetPt")->Fill(jet->pt() * invGeV);
+      hist("JetEta")->Fill(jet->eta());
+      hist("JetPhi")->Fill(jet->phi());
     }
 
     return StatusCode::SUCCESS;

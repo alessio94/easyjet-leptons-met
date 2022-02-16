@@ -44,7 +44,9 @@ namespace MSA
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed
     // to define a single histogram.
-    HistSpec1D m_jetPt{this, "JetPtHist", 100, 0, 500., "Histogram: jet pt [GeV]"};
+    HistSpec1D m_jetPt{this, "JetPtHist", 100, 0, 500, "Histogram: jet pt [GeV]"};
+    HistSpec1D m_jetEta{this, "JetEtaHist", 100, -6, 6, "Histogram: jet eta"};
+    HistSpec1D m_jetPhi{this, "JetPhiHist", 100, -4, 4, "Histogram: jet phi"};
   };
 }
 

@@ -66,7 +66,11 @@ def main():
             help="Output file name",
         )
         parser.add_argument(
-            "--var", type=str, default="pt", help="Variables used for histogramming"
+            "-c",
+            "--variablesConfig",
+            type=str,
+            # required=True,
+            help="Path to the variables config file",
         )
         args = ConfigFlags.fillFromArgs([], parser)
         # Lock the flags so that the configuration of job subcomponents cannot

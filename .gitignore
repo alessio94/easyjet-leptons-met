@@ -20,6 +20,7 @@ __pycache__/
 # workspace directories
 /run/
 /plots/
+/data/
 
 # macOS and VSCode related files
 *.DS_Store
