@@ -9,8 +9,8 @@ atlas_install_headers( Plotting )
 
 # Build the Athena component library
 atlas_add_component( Plotting
-  Plotting/HistSpec.h
-  src/*Alg.cxx src/NTrkVertexCounter.cxx src/components/*.cxx
+  src/*.cxx 
+  src/components/*.cxx
   LINK_LIBRARIES
     GaudiKernel
     AthenaBaseComps
@@ -18,6 +18,7 @@ atlas_add_component( Plotting
     # PathResolver
     xAODEventInfo
     xAODTracking
+    xAODJet
  )
 
 # Install python modules, joboptions, and share content

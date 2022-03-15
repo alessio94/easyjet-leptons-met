@@ -1,27 +1,22 @@
 #!/bin/env python
 ################################################################################
-# DileptonMassPlotterConfig.py
-# A simple starter CA file to illustrate histogramming in Athena
+# VariablePlotterConfig.py
+# A simple CA file to create histograms of variables
 #
-# Author: TJ Khoo
+# Author: Victor Ruelas
 
 # Basic setup
 from AthenaCommon import Logging
 
-pileuplog = Logging.logging.getLogger("DileptonMassPlotterConfig")
+pileuplog = Logging.logging.getLogger("VariablePlotterConfig")
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 # Generate the algorithm to do the histogramming.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def DileptonMassPlotterCfg(flags, outfname):
+def VariablePlotterCfg(flags, outfname):
     cfg = ComponentAccumulator()
-    # The default sequence created by providing `sequence`
-    # to the CA constructor also ignores filters
-    # Need to make sure the algs act in sequence, else the
-    # filter result may be skipped
-    cfg.addSequence(CompFactory.AthSequencer("MuMuSequence", Sequential=True))
 
     # Every CA should include all its dependencies, apart from the global ones
     # included in the main function.
@@ -37,22 +32,13 @@ def DileptonMassPlotterCfg(flags, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
-    # Add the algs to the MuMuSequence to allow filtering
-    cfg.addEventAlgo(
-        CompFactory.MSA.DileptonFinderAlg(
-            "DimuonFinder", LeptonsInKey="Muons", LeptonsOutKey="MuonPair"
-        ),
-        "MuMuSequence",
+    variableplotteralg = CompFactory.MSA.VariablePlotterAlg(
+        "VariablePlotter",
+        RootStreamName="ANALYSIS",
+        RootDirName="variables",
     )
-    cfg.addEventAlgo(
-        CompFactory.MSA.MllPlotterAlg(
-            "MmumuPlotter",
-            LeptonPairKey="MuonPair",
-            RootStreamName="ANALYSIS",
-            RootDirName="Zmumu",
-        ),
-        "MuMuSequence",
-    )
+
+    cfg.addEventAlgo(variableplotteralg)
 
     return cfg
 
@@ -74,7 +60,10 @@ def main():
         # Generate a parser and add an output file argument, then retrieve the args
         parser = ConfigFlags.getArgumentParser()
         parser.add_argument(
-            "--outFile", type=str, default="mll-hists.root", help="Output file name"
+            "--outFile",
+            type=str,
+            default="variable-hists.root",
+            help="Output file name",
         )
         args = ConfigFlags.fillFromArgs([], parser)
         # Lock the flags so that the configuration of job subcomponents cannot
@@ -101,10 +90,8 @@ def main():
 
         cfg.merge(PoolReadCfg(ConfigFlags))
 
-        # Add our DileptonMassPlotter CA, calling the function defined above.
-        cfg.merge(
-            DileptonMassPlotterCfg(ConfigFlags, outfname=args.outFile), "AthAlgSeq"
-        )
+        # Add our VariablePlotter CA, calling the function defined above.
+        cfg.merge(VariablePlotterCfg(ConfigFlags, outfname=args.outFile))
 
         # Print the full job configuration
         cfg.printConfig()

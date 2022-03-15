@@ -9,8 +9,8 @@
 ///////////////////////////////////////////////////////////////////
 
 // Always protect against multiple includes!
-#ifndef PLOTTING_SAYHELLOTOOL_H
-#define PLOTTING_SAYHELLOTOOL_H
+#ifndef PLOTTING_NTRKVERTEXCOUNTER_H
+#define PLOTTING_NTRKVERTEXCOUNTER_H
 
 // STL includes
 #include <string>

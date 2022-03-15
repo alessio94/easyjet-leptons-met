@@ -62,11 +62,7 @@ namespace MSA
     ATH_MSG_DEBUG("Executing " << name());
 
     const xAOD::EventInfo *eventInfo(nullptr);
-    // When there is only one object in StoreGate, we can skip the key
-    // Having said that, it is strictly better to specify a known one,
-    // as behaviour can be undefined if there is unexpectedly more than one.
-    // E.g. sometimes analyses might copy the EventInfo for systematics
-    ATH_CHECK(evtStore()->retrieve(eventInfo));
+    ATH_CHECK(evtStore()->retrieve(eventInfo, "EventInfo"));
     if (eventInfo == nullptr)
     {
       ATH_MSG_ERROR("Got null pointer for EventInfo!");
