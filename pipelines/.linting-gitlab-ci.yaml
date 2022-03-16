@@ -1,0 +1,31 @@
+.linter_template: &linter_template
+  stage: linting
+  image: python:3.8-slim
+  script:
+    - mkdir coverage_files/
+    - pip install flake8
+    - flake8 --exclude=pipelines .
+  artifacts:
+    when: always
+    paths:
+      - coverage_files/
+
+.black_check_template: &black_check_template
+  stage: linting
+  image: python:3.8-slim
+  script:
+    - pip install black==21.5b1
+    - black --check .
+
+.linting_rules_template: &linting_rules_template
+  rules:
+    - if: $CI_COMMIT_BRANCH != ''
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+linter:
+  <<: *linter_template
+  <<: *linting_rules_template
+
+black:
+  <<: *black_check_template
+  <<: *linting_rules_template
