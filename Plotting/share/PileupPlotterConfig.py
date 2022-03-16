@@ -1,15 +1,16 @@
 #!/bin/env python
-################################################################################
+###############################################################################
 # PileupPlotterConfig.py
 # A simple starter ComponentAccumulator (CA) file to make pileup histograms
 #
 
 # Basic setup
 from AthenaCommon import Logging
-
-pileuplog = Logging.logging.getLogger("PileupPlotterConfig")
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+
+pileuplog = Logging.logging.getLogger("PileupPlotterConfig")
+
 
 # ComponentAccumulators can be filled with tools as well as algorithms.
 # For customisation, we add an argument to the function
@@ -78,10 +79,16 @@ def main():
         # Generate a parser and add an output file argument, then retrieve the args
         parser = ConfigFlags.getArgumentParser()
         parser.add_argument(
-            "--outFile", type=str, default="pileup-hists.root", help="Output file name"
+            "--outFile",
+            type=str,
+            default="pileup-hists.root",
+            help="Output file name",
         )
         parser.add_argument(
-            "--nTrkMin", type=int, default=2, help="Minimum NTrks for vertex counting"
+            "--nTrkMin",
+            type=int,
+            default=2,
+            help="Minimum NTrks for vertex counting",
         )
         args = ConfigFlags.fillFromArgs([], parser)
         # Lock the flags so that the configuration of job subcomponents cannot
@@ -94,8 +101,9 @@ def main():
 
         cfg = MainServicesCfg(ConfigFlags)
 
-        # Add the components for reading in POOL files -- this is a specialised ROOT format
-        # storing structured objects like the ATLAS physics objects (jets etc)
+        # Add the components for reading in POOL files -- this is a specialised
+        # ROOT format storing structured objects like the
+        # ATLAS physics objects (jets etc)
         from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
 
         cfg.merge(PoolReadCfg(ConfigFlags))

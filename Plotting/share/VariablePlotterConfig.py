@@ -7,10 +7,11 @@
 
 # Basic setup
 from AthenaCommon import Logging
-
-pileuplog = Logging.logging.getLogger("VariablePlotterConfig")
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+
+pileuplog = Logging.logging.getLogger("VariablePlotterConfig")
+
 
 # Generate the algorithm to do the histogramming.
 # AthAlgSequence does not respect filter decisions,
@@ -84,8 +85,9 @@ def main():
         else:
             cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
 
-        # Add the components for reading in POOL files -- this is a specialised ROOT format
-        # storing structured objects like the ATLAS physics objects (jets etc)
+        # Add the components for reading in POOL files -- this is a specialised
+        # ROOT format storing structured objects like the
+        # ATLAS physics objects (jets etc)
         from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
 
         cfg.merge(PoolReadCfg(ConfigFlags))
