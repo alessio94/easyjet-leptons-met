@@ -19,8 +19,14 @@
 
 .cppcheck: &cpp_check_template
   stage: linting
+  image: atlas/athanalysis:22.2.55
   script:
-    - cppcheck --enable=warning,portability --xml-version=2 .
+    - mkdir cppcheck/
+    - cppcheck --enable=warning,portability --xml-version=2 . 2>cppcheck/results.xml
+  artifacts:
+    when: always
+    paths:
+      - cppcheck/
 
 .linting_rules_template: &linting_rules_template
   rules:
