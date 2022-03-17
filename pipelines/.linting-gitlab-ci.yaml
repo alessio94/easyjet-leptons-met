@@ -1,4 +1,4 @@
-.python_linter_template: &python_linter_template
+.flake8_check_template: &flake8_check_template
   stage: linting
   image: python:3.8-slim
   before_script:
@@ -44,8 +44,8 @@
     - if: $CI_COMMIT_BRANCH != ''
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-linter:
-  <<: *python_linter_template
+flake8:
+  <<: *flake8_check_template
   <<: *linting_rules_template
 
 black:
