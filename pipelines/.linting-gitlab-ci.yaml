@@ -28,11 +28,12 @@
   stage: linting
   image: atlas/athanalysis:22.2.55
   tags:
-    - afs
+    - cvmfs
   before_script:
     - source /release_setup.sh
   script:
-    - /afs/cern.ch/atlas/offline/external/cppcheck/cppcheck --enable=warning,portability --xml-version=2 . 2>cppcheck-results.xml
+    - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck-2.6/bin/cppcheck \
+    --enable=warning,portability --xml-version=2 . 2>cppcheck-results.xml
   artifacts:
     when: on_failure
     paths:
