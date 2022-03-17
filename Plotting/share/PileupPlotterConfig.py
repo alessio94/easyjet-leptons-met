@@ -1,5 +1,5 @@
 #!/bin/env python
-####################################################################################################
+###############################################################################
 # PileupPlotterConfig.py
 # A simple starter ComponentAccumulator (CA) file to make pileup histograms
 #
