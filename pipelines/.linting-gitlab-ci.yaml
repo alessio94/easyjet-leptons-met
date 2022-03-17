@@ -20,9 +20,11 @@
 .cppcheck: &cpp_check_template
   stage: linting
   image: atlas/athanalysis:22.2.55
+  before_script:
+    - source /release_setup.sh
   script:
     - mkdir cppcheck/
-    - cppcheck --enable=warning,portability --xml-version=2 . 2>cppcheck/results.xml
+    - cppcheck --enable=warning,portability --xml-version=2 . 2>results.xml
   artifacts:
     when: always
     paths:
