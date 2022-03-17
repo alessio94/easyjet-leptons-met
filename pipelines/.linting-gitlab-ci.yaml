@@ -1,29 +1,43 @@
 .python_linter_template: &python_linter_template
   stage: linting
   image: python:3.8-slim
-  script:
-    - mkdir coverage_files/
+  before_script:
     - pip install flake8
-    - flake8 --exclude=pipelines .
+  script:
+    - flake8 . > flake8-results.txt
   artifacts:
-    when: always
+    when: on_failure
     paths:
-      - coverage_files/
+      - flake8-results.txt
+    expire_in: 1 week
 
 .black_check_template: &black_check_template
   stage: linting
   image: python:3.8-slim
-  script:
+  before_script:
     - pip install black==21.5b1
-    - black --check .
+  script:
+    - black --check . > black-results.txt
+  artifacts:
+    when: on_failure
+    paths:
+      - flake8-results.txt
+    expire_in: 1 week
 
 .cppcheck: &cpp_check_template
   stage: linting
   image: atlas/athanalysis:22.2.55
+  tags:
+    - afs
   before_script:
     - source /release_setup.sh
   script:
-    - cppcheck --enable=warning,portability --xml-version=2 .
+    - /afs/cern.ch/atlas/offline/external/cppcheck/cppcheck --enable=warning,portability --xml-version=2 . 2>cppcheck-results.xml
+  artifacts:
+    when: on_failure
+    paths:
+      - cppcheck-results.xml
+    expire_in: 1 week
 
 .linting_rules_template: &linting_rules_template
   rules:
