@@ -23,12 +23,7 @@
   before_script:
     - source /release_setup.sh
   script:
-    - mkdir cppcheck/
-    - cppcheck --enable=warning,portability --xml-version=2 . 2>results.xml
-  artifacts:
-    when: always
-    paths:
-      - cppcheck/
+    - cppcheck --enable=warning,portability --xml-version=2 .
 
 .linting_rules_template: &linting_rules_template
   rules:
