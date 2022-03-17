@@ -5,8 +5,8 @@
 #
 
 # Set the minimum required CMake version:
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
-project( HH4bAnalysis VERSION 1.0 )
+cmake_minimum_required( VERSION 3.7 FATAL_ERROR )
+project( HH4bAnalysis VERSION 1.0.0 )
 
 find_package( AthAnalysis 22.2 REQUIRED )
 

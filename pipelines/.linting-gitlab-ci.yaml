@@ -1,4 +1,4 @@
-.linter_template: &linter_template
+.python_linter_template: &python_linter_template
   stage: linting
   image: python:3.8-slim
   script:
@@ -17,15 +17,29 @@
     - pip install black==21.5b1
     - black --check .
 
+.cppcheck: &cpp_check_template
+  stage: linting
+  script:
+    - mkdir cppcheck/
+    - cppcheck --enable=warning,portability --xml-version=2 . 2>results.xml
+  artifacts:
+    when: always
+    paths:
+      - cppcheck/
+
 .linting_rules_template: &linting_rules_template
   rules:
     - if: $CI_COMMIT_BRANCH != ''
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 linter:
-  <<: *linter_template
+  <<: *python_linter_template
   <<: *linting_rules_template
 
 black:
   <<: *black_check_template
+  <<: *linting_rules_template
+
+cppcheck:
+  <<: *cpp_check_template
   <<: *linting_rules_template
