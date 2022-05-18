@@ -62,7 +62,7 @@ def main():
         parser.add_argument(
             "--outFile",
             type=str,
-            default="variable-hists.root",
+            default="analysis-variables.root",
             help="Output file name",
         )
         args = ConfigFlags.fillFromArgs([], parser)

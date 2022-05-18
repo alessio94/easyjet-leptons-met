@@ -96,9 +96,9 @@ namespace MSA
   StatusCode VariablePlotterAlg ::
       bookTTree()
   {
-    ATH_CHECK(book(TTree("AnalysisVariables", "EvenInfo and jet variables ntuple")));
+    ATH_CHECK(book(TTree("analysisvariables", "EvenInfo and jet variables ntuple")));
 
-    TTree *mytree = tree("AnalysisVariables");
+    TTree *mytree = tree("analysisvariables");
     mytree->Branch("RunNumber", &m_runNumber);
     mytree->Branch("EventNumber", &m_eventNumber);
     mytree->Branch("JetEta", &m_jetEta);
@@ -125,7 +125,7 @@ namespace MSA
       m_jetE.push_back(jet->e());
     }
 
-    tree("AnalysisVariables")->Fill();
+    tree("analysisvariables")->Fill();
 
     return StatusCode::SUCCESS;
   }
