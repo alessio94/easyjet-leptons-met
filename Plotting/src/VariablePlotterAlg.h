@@ -15,9 +15,12 @@
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
 #include <xAODJet/JetContainer.h>
+#include <xAODEventInfo/EventInfo.h>
 
 // A header from this package's installed Library
 #include "Plotting/HistSpec.h"
+
+#include <memory> // for unique_ptr
 
 namespace MSA
 {
@@ -36,17 +39,33 @@ namespace MSA
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
   private:
+    StatusCode bookTTree();
+
+    // Call in execute to fill the EventInfo and jet variables
+    StatusCode fillVariableTTree(const xAOD::EventInfo *, const xAOD::JetContainer &);
+
     StatusCode bookHistograms();
 
     // Call in execute to fill histograms
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
 
+    // output variables for the current event
+    unsigned int m_runNumber = 0;         ///< Run number
+    unsigned long long m_eventNumber = 0; ///< Event number
+
+    // Jet 4-momentum variables
+    // Use smaprt pointers with unique_ptr
+    std::unique_ptr<std::vector<float>> m_jetEta;
+    std::unique_ptr<std::vector<float>> m_jetPhi;
+    std::unique_ptr<std::vector<float>> m_jetPt;
+    std::unique_ptr<std::vector<float>> m_jetE;
+
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed
     // to define a single histogram.
-    HistSpec1D m_jetPt{this, "JetPtHist", 100, 0, 500, "Histogram: jet pt [GeV]"};
-    HistSpec1D m_jetEta{this, "JetEtaHist", 100, -6, 6, "Histogram: jet eta"};
-    HistSpec1D m_jetPhi{this, "JetPhiHist", 100, -4, 4, "Histogram: jet phi"};
+    HistSpec1D m_jetPtHist{this, "JetPtHist", 100, 0, 500, "Histogram: jet pt [GeV]"};
+    HistSpec1D m_jetEtaHist{this, "JetEtaHist", 100, -6, 6, "Histogram: jet eta"};
+    HistSpec1D m_jetPhiHist{this, "JetPhiHist", 100, -4, 4, "Histogram: jet phi"};
   };
 }
 
