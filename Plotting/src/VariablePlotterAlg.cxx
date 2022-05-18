@@ -61,7 +61,7 @@ namespace MSA
       ATH_MSG_ERROR("Got null pointer for JetContainer!");
       return StatusCode::FAILURE;
     }
-    ATH_CHECK(fillVariableTTree(eventInfo, *jets));
+    ATH_CHECK(fillVariableTTree(*eventInfo, *jets));
     ATH_CHECK(fillVariableHistogram(*jets));
 
     return StatusCode::SUCCESS;
@@ -101,32 +101,28 @@ namespace MSA
     TTree *mytree = tree("AnalysisVariables");
     mytree->Branch("RunNumber", &m_runNumber);
     mytree->Branch("EventNumber", &m_eventNumber);
-    m_jetEta = std::make_unique<std::vector<float>>(SG::VIEW_ELEMENTS);
     mytree->Branch("JetEta", &m_jetEta);
-    m_jetPhi = std::make_unique<std::vector<float>>(SG::VIEW_ELEMENTS);
     mytree->Branch("JetPhi", &m_jetPhi);
-    m_jetPt = std::make_unique<std::vector<float>>(SG::VIEW_ELEMENTS);
     mytree->Branch("JetPt", &m_jetPt);
-    m_jetE = std::make_unique<std::vector<float>>(SG::VIEW_ELEMENTS);
     mytree->Branch("JetE", &m_jetE);
 
     return StatusCode::SUCCESS;
   }
 
   StatusCode VariablePlotterAlg ::
-      fillVariableTTree(const xAOD::EventInfo *eventInfo, const xAOD::JetContainer &jets)
+      fillVariableTTree(const xAOD::EventInfo &eventInfo, const xAOD::JetContainer &jets)
   {
     ATH_MSG_DEBUG("Filling EventInfo and jet variables.");
-    m_runNumber = eventInfo->runNumber();
-    m_eventNumber = eventInfo->eventNumber();
+    m_runNumber = eventInfo.runNumber();
+    m_eventNumber = eventInfo.eventNumber();
 
     // Being lazy here and not checking for pointer validity!
     for (const xAOD::Jet *jet : jets)
     {
-      m_jetEta->push_back(jet->eta());
-      m_jetPhi->push_back(jet->phi());
-      m_jetPt->push_back(jet->pt());
-      m_jetE->push_back(jet->e());
+      m_jetEta.push_back(jet->eta());
+      m_jetPhi.push_back(jet->phi());
+      m_jetPt.push_back(jet->pt());
+      m_jetE.push_back(jet->e());
     }
 
     tree("AnalysisVariables")->Fill();

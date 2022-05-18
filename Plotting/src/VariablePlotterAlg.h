@@ -42,7 +42,7 @@ namespace MSA
     StatusCode bookTTree();
 
     // Call in execute to fill the EventInfo and jet variables
-    StatusCode fillVariableTTree(const xAOD::EventInfo *, const xAOD::JetContainer &);
+    StatusCode fillVariableTTree(const xAOD::EventInfo &, const xAOD::JetContainer &);
 
     StatusCode bookHistograms();
 
@@ -50,15 +50,13 @@ namespace MSA
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
 
     // output variables for the current event
-    unsigned int m_runNumber = 0;         ///< Run number
-    unsigned long long m_eventNumber = 0; ///< Event number
-
+    unsigned int m_runNumber = 0;
+    unsigned long long m_eventNumber = 0;
     // Jet 4-momentum variables
-    // Use smaprt pointers with unique_ptr
-    std::unique_ptr<std::vector<float>> m_jetEta;
-    std::unique_ptr<std::vector<float>> m_jetPhi;
-    std::unique_ptr<std::vector<float>> m_jetPt;
-    std::unique_ptr<std::vector<float>> m_jetE;
+    std::vector<float> m_jetEta;
+    std::vector<float> m_jetPhi;
+    std::vector<float> m_jetPt;
+    std::vector<float> m_jetE;
 
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed
