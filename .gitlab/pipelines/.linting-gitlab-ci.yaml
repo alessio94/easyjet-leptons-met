@@ -1,0 +1,42 @@
+.flake8_check_template: &flake8_check_template
+  stage: linting
+  image: python:3.8-slim
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 .
+
+.black_check_template: &black_check_template
+  stage: linting
+  image: python:3.8-slim
+  before_script:
+    - pip install black==22.3.0
+  script:
+    - black --check .
+
+.cppcheck: &cpp_check_template
+  stage: linting
+  image: atlas/athanalysis:22.2.55
+  tags:
+    - cvmfs
+  before_script:
+    - source /release_setup.sh
+  script:
+    - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck-2.7/bin/cppcheck --enable=warning,portability --xml-version=2 .
+
+.linting_rules_template: &linting_rules_template
+  rules:
+    - if: $CI_COMMIT_BRANCH != ''
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+flake8:
+  <<: *flake8_check_template
+  <<: *linting_rules_template
+
+black:
+  <<: *black_check_template
+  <<: *linting_rules_template
+
+cppcheck:
+  <<: *cpp_check_template
+  <<: *linting_rules_template
