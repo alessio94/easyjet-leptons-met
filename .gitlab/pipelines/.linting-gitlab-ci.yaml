@@ -4,25 +4,15 @@
   before_script:
     - pip install flake8
   script:
-    - flake8 . > flake8-results.txt
-  artifacts:
-    when: on_failure
-    paths:
-      - flake8-results.txt
-    expire_in: 1 week
+    - flake8 .
 
 .black_check_template: &black_check_template
   stage: linting
   image: python:3.8-slim
   before_script:
-    - pip install black==21.5b1
+    - pip install black==22.3.0
   script:
-    - black --check . > black-results.txt
-  artifacts:
-    when: on_failure
-    paths:
-      - flake8-results.txt
-    expire_in: 1 week
+    - black --check .
 
 .cppcheck: &cpp_check_template
   stage: linting
@@ -32,12 +22,7 @@
   before_script:
     - source /release_setup.sh
   script:
-    - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck-2.6/bin/cppcheck --enable=warning,portability --xml-version=2 . 2>cppcheck-results.xml
-  artifacts:
-    when: on_failure
-    paths:
-      - cppcheck-results.xml
-    expire_in: 1 week
+    - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck-2.6/bin/cppcheck --enable=warning,portability --xml-version=2 . 2
 
 .linting_rules_template: &linting_rules_template
   rules:
