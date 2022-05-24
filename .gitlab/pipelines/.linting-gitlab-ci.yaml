@@ -22,7 +22,7 @@
   before_script:
     - source /release_setup.sh
   script:
-    - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck-2.6/bin/cppcheck --enable=warning,portability --xml-version=2 .
+    - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck-2.7/bin/cppcheck --enable=warning,portability --xml-version=2 .
 
 .linting_rules_template: &linting_rules_template
   rules:
