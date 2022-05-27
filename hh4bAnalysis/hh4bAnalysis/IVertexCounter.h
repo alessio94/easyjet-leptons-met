@@ -8,8 +8,8 @@
 // Author: T.J.Khoo<khoo@cern.ch>
 ///////////////////////////////////////////////////////////////////
 // Always protect against multiple includes!
-#ifndef PLOTTING_IVERTEXCOUNTER_H
-#define PLOTTING_IVERTEXCOUNTER_H
+#ifndef HH4BANALYSIS_IVERTEXCOUNTER_H
+#define HH4BANALYSIS_IVERTEXCOUNTER_H
 
 #include "AsgTools/IAsgTool.h"
 #include "xAODTracking/VertexContainer.h"
@@ -31,4 +31,4 @@ namespace MSA
   };
 }
 
-#endif // PLOTTING_ISVERTEXCOUNTER_H
+#endif // HH4BANALYSIS_ISVERTEXCOUNTER_H

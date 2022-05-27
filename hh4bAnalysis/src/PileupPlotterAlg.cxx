@@ -9,7 +9,7 @@
 #include "PileupPlotterAlg.h"
 
 // Tool interface header
-#include "Plotting/IVertexCounter.h"
+#include "hh4bAnalysis/IVertexCounter.h"
 // ROOT histograms
 #include <TH1D.h>
 

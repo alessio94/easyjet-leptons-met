@@ -10,8 +10,8 @@
 ///////////////////////////////////////////////////////////////////
 
 // Always protect against multiple includes!
-#ifndef PLOTTING_PILEUPPLOTTERALG
-#define PLOTTING_PILEUPPLOTTERALG
+#ifndef HH4BANALYSIS_PILEUPPLOTTERALG
+#define HH4BANALYSIS_PILEUPPLOTTERALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <AsgTools/ToolHandle.h>
@@ -20,7 +20,7 @@
 #include "xAODTracking/VertexContainer.h"
 
 // A header from this package's installed Library
-#include "Plotting/HistSpec.h"
+#include "hh4bAnalysis/HistSpec.h"
 
 namespace MSA
 {

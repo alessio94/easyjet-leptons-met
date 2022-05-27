@@ -5,8 +5,8 @@
 // Author: T.J.Khoo<khoo@cern.ch>
 ///////////////////////////////////////////////////////////////////
 // Always protect against multiple includes!
-#ifndef PLOTTING_HISTSPEC_H
-#define PLOTTING_HISTSPEC_H
+#ifndef HH4BANALYSIS_HISTSPEC_H
+#define HH4BANALYSIS_HISTSPEC_H
 
 #include <cstddef>
 #include <string>
