@@ -21,7 +21,7 @@ namespace MSA
   class IVertexCounter : virtual public asg::IAsgTool
   {
     //Declare the interface that the class provides
-    ASG_TOOL_INTERFACE(MFA::IVertexCounter)
+    ASG_TOOL_INTERFACE(MSA::IVertexCounter)
 
   public:
     /// \brief Count vertices in a supplied container.

@@ -1,15 +1,16 @@
 # Declare the package
-atlas_subdir( hh4bAnalysis )
+atlas_subdir( HH4bAnalysis )
 
 # Find an external package (i.e. ROOT)
 find_package( ROOT COMPONENTS Core Tree Hist REQUIRED )
 
 # Install the interface headers
-atlas_install_headers( hh4bAnalysis )
+atlas_install_headers( HH4bAnalysis )
 
 # Build the Athena component library
-atlas_add_component( hh4bAnalysis
+atlas_add_component( HH4bAnalysis
   src/*.cxx 
+  src/tools/*.cxx 
   src/components/*.cxx
   LINK_LIBRARIES
     GaudiKernel

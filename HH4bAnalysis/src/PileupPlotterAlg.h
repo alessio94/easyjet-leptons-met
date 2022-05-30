@@ -20,7 +20,7 @@
 #include "xAODTracking/VertexContainer.h"
 
 // A header from this package's installed Library
-#include "hh4bAnalysis/HistSpec.h"
+#include "HH4bAnalysis/HistSpec.h"
 
 namespace MSA
 {

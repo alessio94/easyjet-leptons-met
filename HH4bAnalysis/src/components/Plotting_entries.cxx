@@ -1,4 +1,4 @@
-#include "../NTrkVertexCounter.h"
+#include "../tools/NTrkVertexCounter.h"
 #include "../PileupPlotterAlg.h"
 #include "../VariablePlotterAlg.h"
 

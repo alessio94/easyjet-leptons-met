@@ -19,7 +19,7 @@
 #include "AsgTools/AsgTool.h"
 
 // Local includes
-#include "hh4bAnalysis/IVertexCounter.h"
+#include "HH4bAnalysis/IVertexCounter.h"
 
 // EDM includes
 #include "xAODTracking/VertexContainer.h"
