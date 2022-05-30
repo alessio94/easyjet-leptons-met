@@ -22,7 +22,7 @@
 
 #include <memory> // for unique_ptr
 
-namespace MSA
+namespace HH4B
 {
 
   /// \brief An algorithm for plotting dilepton masses

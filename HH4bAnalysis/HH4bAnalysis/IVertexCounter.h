@@ -15,13 +15,13 @@
 #include "xAODTracking/VertexContainer.h"
 
 // Encapsulate in namespace to avoid name clashes
-namespace MSA
+namespace HH4B
 {
 
   class IVertexCounter : virtual public asg::IAsgTool
   {
     //Declare the interface that the class provides
-    ASG_TOOL_INTERFACE(MSA::IVertexCounter)
+    ASG_TOOL_INTERFACE(HH4B::IVertexCounter)
 
   public:
     /// \brief Count vertices in a supplied container.

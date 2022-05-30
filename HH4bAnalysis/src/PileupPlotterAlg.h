@@ -22,7 +22,7 @@
 // A header from this package's installed Library
 #include "HH4bAnalysis/HistSpec.h"
 
-namespace MSA
+namespace HH4B
 {
 
   /// \brief Forward declare the tool interface for templating, as
@@ -64,7 +64,7 @@ namespace MSA
     HistSpec1D m_actualMuSpec{this, "ActualMuHist", 10, 0., 200., "Histogram: Actual interactions/bunch crossing"};
 
     /// \brief A tool used to count vertices
-    ToolHandle<MSA::IVertexCounter> m_vertexCounter{this, "VertexCounter", "", "A tool for counting vertices"};
+    ToolHandle<HH4B::IVertexCounter> m_vertexCounter{this, "VertexCounter", "", "A tool for counting vertices"};
   };
 }
 

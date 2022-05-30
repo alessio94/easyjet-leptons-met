@@ -16,7 +16,7 @@
 // method implementations
 //
 
-namespace MSA
+namespace HH4B
 {
   // Better units for plotting
   using Gaudi::Units::GeV;

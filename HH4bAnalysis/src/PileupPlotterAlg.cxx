@@ -17,7 +17,7 @@
 // method implementations
 //
 
-namespace MSA
+namespace HH4B
 {
   PileupPlotterAlg ::
       PileupPlotterAlg(const std::string &name, ISvcLocator *pSvcLocator)

@@ -12,7 +12,7 @@
 #include <string>
 #include "Gaudi/Property.h"
 
-namespace MSA
+namespace HH4B
 {
   /// Declare structs for holding information that is naturally structured
   struct HistSpec1D
