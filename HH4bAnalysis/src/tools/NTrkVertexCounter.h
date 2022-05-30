@@ -26,7 +26,7 @@
 
 // Forward declaration
 
-namespace MSA
+namespace HH4B
 {
 
   class NTrkVertexCounter final
@@ -72,5 +72,5 @@ namespace MSA
     size_t m_minNtrks;
   };
 
-} //> end namespace MSA
+} //> end namespace HH4B
 #endif //> !HH4BANALYSIS_NTRKVERTEXCOUNTER_H
