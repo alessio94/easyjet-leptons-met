@@ -1,9 +1,8 @@
 ///////////////////////// -*- C++ -*- /////////////////////////////
 // VariablePlotterAlg.h
 //
-// This is an algorithm that will run in the event loop.
-// The framework will call the "execute" method on each event.
-// It can in turn call tools that typically do specialised tasks
+// This is an algorithm that will create histograms of different
+// variables.
 //
 // Author: Victor Ruelas<victor.hugo.ruelas.rivera@cern.ch>
 ///////////////////////////////////////////////////////////////////
@@ -39,24 +38,10 @@ namespace HH4B
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
   private:
-    StatusCode bookTTree();
-
-    // Call in execute to fill the EventInfo and jet variables
-    StatusCode fillVariableTTree(const xAOD::EventInfo &, const xAOD::JetContainer &);
-
     StatusCode bookHistograms();
 
     // Call in execute to fill histograms
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
-
-    // output variables for the current event
-    unsigned int m_runNumber = 0;
-    unsigned long long m_eventNumber = 0;
-    // Jet 4-momentum variables
-    std::vector<float> m_jetEta;
-    std::vector<float> m_jetPhi;
-    std::vector<float> m_jetPt;
-    std::vector<float> m_jetE;
 
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed

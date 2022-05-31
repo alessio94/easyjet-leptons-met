@@ -1,7 +1,7 @@
 #!/bin/env python
 ################################################################################
-# VariablePlotterConfig.py
-# A simple CA file to create histograms of variables
+# VariableDumperConfig.py
+# A simple CA file to create a tree of variables
 #
 # Author: Victor Ruelas
 
@@ -10,20 +10,20 @@ from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-pileuplog = Logging.logging.getLogger("VariablePlotterConfig")
+pileuplog = Logging.logging.getLogger("VariableDumperConfig")
 
 
 # Generate the algorithm to do the histogramming.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def VariablePlotterCfg(flags, outfname):
+def VariableDumperCfg(flags, outfname):
     cfg = ComponentAccumulator()
 
     # Every CA should include all its dependencies, apart from the global ones
     # included in the main function.
     #
     # Add an instance of THistSvc, to create the output file and associated stream.
-    # This is needed so that the alg can register its output histograms.
+    # This is needed so that the alg can register its output TTree.
     # The syntax for the output is:
     #   Stream name: "ANALYSIS" (default assumed by AthHistogramAlgorithm)
     #   Output file name: specified by setting "DATAFILE"
@@ -33,13 +33,13 @@ def VariablePlotterCfg(flags, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
-    variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
-        "VariablePlotter",
+    variabledumperalg = CompFactory.HH4B.VariableDumperAlg(
+        "VariableDumper",
         RootStreamName="ANALYSIS",
-        RootDirName="Variables",
+        RootDirName="Analysis",
     )
 
-    cfg.addEventAlgo(variableplotteralg)
+    cfg.addEventAlgo(variabledumperalg)
 
     return cfg
 
@@ -63,7 +63,7 @@ def main():
         parser.add_argument(
             "--outFile",
             type=str,
-            default="variable-hists.root",
+            default="analysis-variables.root",
             help="Output file name",
         )
         args = ConfigFlags.fillFromArgs([], parser)
@@ -92,8 +92,8 @@ def main():
 
         cfg.merge(PoolReadCfg(ConfigFlags))
 
-        # Add our VariablePlotter CA, calling the function defined above.
-        cfg.merge(VariablePlotterCfg(ConfigFlags, outfname=args.outFile))
+        # Add our VariableDumper CA, calling the function defined above.
+        cfg.merge(VariableDumperCfg(ConfigFlags, outfname=args.outFile))
 
         # Print the full job configuration
         cfg.printConfig()
