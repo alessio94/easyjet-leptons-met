@@ -5,6 +5,8 @@
 #
 # Author: Victor Ruelas
 
+import sys
+
 # Basic setup
 from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
@@ -13,10 +15,32 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 pileuplog = Logging.logging.getLogger("VariableDumperConfig")
 
 
+def checkArgs(flags, args):
+    is_input_mc = flags.Input.isMC
+    if "StreamDAOD_PHYSLITE" in flags.Input.ProcessingTags:
+        input_stream_format = "DAOD_PHYSLITE"
+    elif "StreamDAOD_PHYS" in flags.Input.ProcessingTags:
+        input_stream_format = "DAOD_PHYS"
+    else:
+        input_stream_format = "other"
+
+    if args.daod_physlite and input_stream_format != "DAOD_PHYSLITE":
+        print(
+            f"Input file is {input_stream_format} but --daod-physlite flag was {'given' if args.daod_physlite else 'not given'}"
+        )
+        sys.exit(-1)
+
+    if args.mc is not is_input_mc:
+        print(
+            f"Input file is {'MC' if is_input_mc else 'Data'} but --mc flag was {'given' if args.mc else 'not given'}"
+        )
+        sys.exit(-1)
+
+
 # Generate the algorithm to do the histogramming.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def VariableDumperCfg(flags, outfname):
+def VariableDumperCfg(flags, daodphyslite, outfname):
     cfg = ComponentAccumulator()
 
     # Every CA should include all its dependencies, apart from the global ones
@@ -61,6 +85,16 @@ def main():
         # Generate a parser and add an output file argument, then retrieve the args
         parser = ConfigFlags.getArgumentParser()
         parser.add_argument(
+            "--mc",
+            action="store_true",
+            help="Input is Monte Carlo",
+        )
+        parser.add_argument(
+            "--daod-physlite",
+            action="store_true",
+            help="Input is DAOD_PHYSLITE",
+        )
+        parser.add_argument(
             "--outFile",
             type=str,
             default="analysis-variables.root",
@@ -71,6 +105,8 @@ def main():
         # modify them silently/unpredictably.
         ConfigFlags.lock()
 
+        checkArgs(ConfigFlags, args)
+        
         # Get a ComponentAccumulator setting up the standard components
         # needed to run an Athena job.
         from AthenaConfiguration.MainServicesConfig import MainServicesCfg
@@ -93,7 +129,11 @@ def main():
         cfg.merge(PoolReadCfg(ConfigFlags))
 
         # Add our VariableDumper CA, calling the function defined above.
-        cfg.merge(VariableDumperCfg(ConfigFlags, outfname=args.outFile))
+        cfg.merge(
+            VariableDumperCfg(
+                ConfigFlags, daodphyslite=args.daod_physlite, outfname=args.outFile
+            )
+        )
 
         # Print the full job configuration
         cfg.printConfig()
