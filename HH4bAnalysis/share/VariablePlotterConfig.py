@@ -37,6 +37,12 @@ def VariablePlotterCfg(flags, outfname):
         "VariablePlotter",
         RootStreamName="ANALYSIS",
         RootDirName="Variables",
+        RootDirName="variables",
+
+  m_CutFileName;
+  m_taggerName;
+  m_OP;
+  m_jetAuthor;
     )
 
     cfg.addEventAlgo(variableplotteralg)

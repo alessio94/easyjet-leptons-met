@@ -16,6 +16,9 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEventInfo/EventInfo.h>
 
+#include <AsgTools/ToolHandle.h>
+#include "FTagAnalysisInterfaces/IBTaggingSelectionTool.h"
+
 // A header from this package's installed Library
 #include "HH4bAnalysis/HistSpec.h"
 
@@ -43,6 +46,25 @@ namespace HH4B
     // Call in execute to fill histograms
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
 
+<<<<<<< Updated upstream
+=======
+    // output variables for the current event
+    unsigned int m_runNumber = 0;
+    unsigned long long m_eventNumber = 0;
+    // Jet 4-momentum variables
+    std::vector<float> m_jetEta;
+    std::vector<float> m_jetPhi;
+    std::vector<float> m_jetPt;
+    std::vector<float> m_jetE;
+    std::vector<float> m_JetPtBtag77;
+
+    ToolHandle<IBTaggingSelectionTool> m_btagSelTool;
+    std::string m_CutFileName;
+    std::string m_taggerName;
+    std::string m_OP;
+    std::string m_jetAuthor;
+
+>>>>>>> Stashed changes
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed
     // to define a single histogram.
