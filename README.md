@@ -9,7 +9,11 @@ HH to 4b Analysis Framework initiated by Humboldt-Universität zu Berlin ERC Pro
 First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel free to make an alias with `export WORKDIR=.`) clone the repository (you are also welcome to fork a copy in case you might want to develop on top and contribute to improving it!):
 ```
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
+<<<<<<< HEAD
 git clone ssh://git@gitlab.cern.ch:7999/hub_zn_hep/hh4b-analysis.git
+=======
+git clone ssh://git@gitlab.cern.ch:7999/hub-zn-hep/hh4b-analysis.git
+>>>>>>> 236d53d82da1fcabb53a557fec6f3a44d90bac40
 ```
 Now, compile the package
 ```

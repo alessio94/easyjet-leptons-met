@@ -50,7 +50,7 @@ namespace HH4B
     const xAOD::EventInfo *eventInfo(nullptr);
     const xAOD::JetContainer *jets(nullptr);
     ATH_CHECK(evtStore()->retrieve(eventInfo, "EventInfo"));
-    ATH_CHECK(evtStore()->retrieve(jets, "AnalysisJets"));
+    ATH_CHECK(evtStore()->retrieve(jets, "AntiKt4EMPFlowJets"));
     if (eventInfo == nullptr)
     {
       ATH_MSG_ERROR("Got null pointer for EventInfo!");
