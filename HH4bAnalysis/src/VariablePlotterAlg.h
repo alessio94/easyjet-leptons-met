@@ -9,8 +9,8 @@
 ///////////////////////////////////////////////////////////////////
 
 // Always protect against multiple includes!
-#ifndef PLOTTING_VARIABLEPLOTTERALG
-#define PLOTTING_VARIABLEPLOTTERALG
+#ifndef HH4BANALYSIS_VARIABLEPLOTTERALG
+#define HH4BANALYSIS_VARIABLEPLOTTERALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
@@ -18,11 +18,11 @@
 #include <xAODEventInfo/EventInfo.h>
 
 // A header from this package's installed Library
-#include "Plotting/HistSpec.h"
+#include "HH4bAnalysis/HistSpec.h"
 
 #include <memory> // for unique_ptr
 
-namespace MSA
+namespace HH4B
 {
 
   /// \brief An algorithm for plotting dilepton masses

@@ -8,20 +8,20 @@
 // Author: T.J.Khoo<khoo@cern.ch>
 ///////////////////////////////////////////////////////////////////
 // Always protect against multiple includes!
-#ifndef PLOTTING_IVERTEXCOUNTER_H
-#define PLOTTING_IVERTEXCOUNTER_H
+#ifndef HH4BANALYSIS_IVERTEXCOUNTER_H
+#define HH4BANALYSIS_IVERTEXCOUNTER_H
 
 #include "AsgTools/IAsgTool.h"
 #include "xAODTracking/VertexContainer.h"
 
 // Encapsulate in namespace to avoid name clashes
-namespace MSA
+namespace HH4B
 {
 
   class IVertexCounter : virtual public asg::IAsgTool
   {
     //Declare the interface that the class provides
-    ASG_TOOL_INTERFACE(MFA::IVertexCounter)
+    ASG_TOOL_INTERFACE(HH4B::IVertexCounter)
 
   public:
     /// \brief Count vertices in a supplied container.
@@ -31,4 +31,4 @@ namespace MSA
   };
 }
 
-#endif // PLOTTING_ISVERTEXCOUNTER_H
+#endif // HH4BANALYSIS_ISVERTEXCOUNTER_H

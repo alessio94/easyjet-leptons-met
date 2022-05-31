@@ -9,7 +9,7 @@
 #include "PileupPlotterAlg.h"
 
 // Tool interface header
-#include "Plotting/IVertexCounter.h"
+#include "HH4bAnalysis/IVertexCounter.h"
 // ROOT histograms
 #include <TH1D.h>
 
@@ -17,7 +17,7 @@
 // method implementations
 //
 
-namespace MSA
+namespace HH4B
 {
   PileupPlotterAlg ::
       PileupPlotterAlg(const std::string &name, ISvcLocator *pSvcLocator)

@@ -7,7 +7,7 @@
 // EDM includes
 #include "xAODTracking/VertexContainer.h"
 
-namespace MSA {
+namespace HH4B {
 
     ///////////////////////////////////////////////////////////////////
     // Construct

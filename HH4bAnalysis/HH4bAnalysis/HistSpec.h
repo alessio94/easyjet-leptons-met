@@ -5,14 +5,14 @@
 // Author: T.J.Khoo<khoo@cern.ch>
 ///////////////////////////////////////////////////////////////////
 // Always protect against multiple includes!
-#ifndef PLOTTING_HISTSPEC_H
-#define PLOTTING_HISTSPEC_H
+#ifndef HH4BANALYSIS_HISTSPEC_H
+#define HH4BANALYSIS_HISTSPEC_H
 
 #include <cstddef>
 #include <string>
 #include "Gaudi/Property.h"
 
-namespace MSA
+namespace HH4B
 {
   /// Declare structs for holding information that is naturally structured
   struct HistSpec1D
