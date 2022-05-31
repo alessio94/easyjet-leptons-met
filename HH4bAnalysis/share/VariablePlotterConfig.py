@@ -33,7 +33,7 @@ def VariablePlotterCfg(flags, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
-    variableplotteralg = CompFactory.MSA.VariablePlotterAlg(
+    variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
         "VariablePlotter",
         RootStreamName="ANALYSIS",
         RootDirName="variables",

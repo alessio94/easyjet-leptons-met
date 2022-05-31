@@ -10,8 +10,8 @@
 ///////////////////////////////////////////////////////////////////
 
 // Always protect against multiple includes!
-#ifndef PLOTTING_PILEUPPLOTTERALG
-#define PLOTTING_PILEUPPLOTTERALG
+#ifndef HH4BANALYSIS_PILEUPPLOTTERALG
+#define HH4BANALYSIS_PILEUPPLOTTERALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <AsgTools/ToolHandle.h>
@@ -20,9 +20,9 @@
 #include "xAODTracking/VertexContainer.h"
 
 // A header from this package's installed Library
-#include "Plotting/HistSpec.h"
+#include "HH4bAnalysis/HistSpec.h"
 
-namespace MSA
+namespace HH4B
 {
 
   /// \brief Forward declare the tool interface for templating, as
@@ -64,7 +64,7 @@ namespace MSA
     HistSpec1D m_actualMuSpec{this, "ActualMuHist", 10, 0., 200., "Histogram: Actual interactions/bunch crossing"};
 
     /// \brief A tool used to count vertices
-    ToolHandle<MSA::IVertexCounter> m_vertexCounter{this, "VertexCounter", "", "A tool for counting vertices"};
+    ToolHandle<HH4B::IVertexCounter> m_vertexCounter{this, "VertexCounter", "", "A tool for counting vertices"};
   };
 }
 

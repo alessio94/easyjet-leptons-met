@@ -9,8 +9,8 @@
 ///////////////////////////////////////////////////////////////////
 
 // Always protect against multiple includes!
-#ifndef PLOTTING_NTRKVERTEXCOUNTER_H
-#define PLOTTING_NTRKVERTEXCOUNTER_H
+#ifndef HH4BANALYSIS_NTRKVERTEXCOUNTER_H
+#define HH4BANALYSIS_NTRKVERTEXCOUNTER_H
 
 // STL includes
 #include <string>
@@ -19,14 +19,14 @@
 #include "AsgTools/AsgTool.h"
 
 // Local includes
-#include "Plotting/IVertexCounter.h"
+#include "HH4bAnalysis/IVertexCounter.h"
 
 // EDM includes
 #include "xAODTracking/VertexContainer.h"
 
 // Forward declaration
 
-namespace MSA
+namespace HH4B
 {
 
   class NTrkVertexCounter final
@@ -72,5 +72,5 @@ namespace MSA
     size_t m_minNtrks;
   };
 
-} //> end namespace MSA
-#endif //> !PLOTTING_NTRKVERTEXCOUNTER_H
+} //> end namespace HH4B
+#endif //> !HH4BANALYSIS_NTRKVERTEXCOUNTER_H

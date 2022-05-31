@@ -18,7 +18,7 @@ def NTrkVtxCounterCfg(flags, ntrkmin):
     cfg = ComponentAccumulator()
     # Set a private tool (CA can hold one, or a list)
     cfg.setPrivateTools(
-        CompFactory.MSA.NTrkVertexCounter(f"CountVtx{ntrkmin}Trk", NTrk_Min=ntrkmin)
+        CompFactory.HH4B.NTrkVertexCounter(f"CountVtx{ntrkmin}Trk", NTrk_Min=ntrkmin)
     )
     return cfg
 
@@ -50,7 +50,7 @@ def PileupPlotterCfg(flags, ntrkmin, outfname):
     # We also specify the output "stream" (matching that defined
     # in THistSvc) and a directory to hold the hists
     countvxtool = cfg.popToolsAndMerge(NTrkVtxCounterCfg(flags, ntrkmin))
-    pualg = CompFactory.MSA.PileupPlotterAlg(
+    pualg = CompFactory.HH4B.PileupPlotterAlg(
         "PUAlg_" + dirname,
         VertexCounter=countvxtool,
         RootStreamName="ANALYSIS",
