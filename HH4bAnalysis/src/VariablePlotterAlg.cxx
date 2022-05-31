@@ -26,23 +26,8 @@ namespace HH4B
 
   VariablePlotterAlg ::
       VariablePlotterAlg(const std::string &name, ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator), m_btagSelTool("BTaggingSelectionTool", this)
-
+      : AthHistogramAlgorithm(name, pSvcLocator)
   {
-
-    // Property name, member variable, documentation string
-    // declareProperty("NTrk_Min", m_minNtrks, "Minimum NTrks for vertex counting");
-
-    // declareProperty("TaggerName", m_BtagTagger);
-    // declareProperty("BtaggingOperatingPoint", m_BtagWP);
-    // // declareProperty("JetAuthor", jetcollBTag);
-    // //  declareProperty("MinPt", m_BtagMinPt);
-    // declareProperty("FlvTagCutDefinitionsFileName", m_bTaggingCalibrationFilePath);
-
-    declareProperty("FlvTagCutDefinitionsFileName", m_CutFileName = "", "name of the files containing official cut definitions (uses PathResolver)");
-    declareProperty("TaggerName", m_taggerName = "", "tagging algorithm name");
-    declareProperty("OperatingPoint", m_OP = "", "operating point");
-    declareProperty("JetAuthor", m_jetAuthor = "", "jet collection");
   }
 
   StatusCode VariablePlotterAlg ::
@@ -52,14 +37,7 @@ namespace HH4B
 
     ATH_MSG_DEBUG("Booking histograms.");
     ATH_CHECK(bookHistograms());
-
-    // ATH_CHECK(m_btagSelTool.retrieve());
-
-    // ATH_CHECK(m_btagSelTool.setProperty("FlvTagCutDefinitionsFileName", "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root ")); // this is the CDI file
-    // ATH_CHECK(m_btagSelTool.setProperty("TaggerName", "DL1r"));
-    // ATH_CHECK(m_btagSelTool.setProperty("OperatingPoint", "FixedCutBEff_77"));
-    // ATH_CHECK(m_btagSelTool.setProperty("JetAuthor", "AntiKt4EMPLowJets"));
-    if ATH_CHECK(m_btagSelTool.initialize());
+    ATH_CHECK(m_btagSelTool.retrieve());
 
     return StatusCode::SUCCESS;
   }

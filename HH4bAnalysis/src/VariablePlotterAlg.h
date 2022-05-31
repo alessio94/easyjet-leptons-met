@@ -46,10 +46,6 @@ namespace HH4B
     // Call in execute to fill histograms
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
 
-<<<<<<< Updated upstream
-=======
-    // output variables for the current event
-    unsigned int m_runNumber = 0;
     unsigned long long m_eventNumber = 0;
     // Jet 4-momentum variables
     std::vector<float> m_jetEta;
@@ -58,16 +54,10 @@ namespace HH4B
     std::vector<float> m_jetE;
     std::vector<float> m_JetPtBtag77;
 
-    ToolHandle<IBTaggingSelectionTool> m_btagSelTool;
-    std::string m_CutFileName;
-    std::string m_taggerName;
-    std::string m_OP;
-    std::string m_jetAuthor;
+    ToolHandle<IBTaggingSelectionTool> m_btagSelTool{this , "BTaggingSelectionTool", {}, "Tool to select b-jets" };
 
->>>>>>> Stashed changes
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed
-    // to define a single histogram.
     HistSpec1D m_jetPtHist{this, "JetPtHist", 100, 0, 500, "Histogram: jet pt [GeV]"};
     HistSpec1D m_jetEtaHist{this, "JetEtaHist", 100, -6, 6, "Histogram: jet eta"};
     HistSpec1D m_jetPhiHist{this, "JetPhiHist", 100, -4, 4, "Histogram: jet phi"};

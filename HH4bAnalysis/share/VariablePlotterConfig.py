@@ -30,19 +30,28 @@ def VariablePlotterCfg(flags, outfname):
     #   File I/O option: specified by setting "OPT" and passed to the TFile constructor
     #      "RECREATE" will (over)write the specified file name with a new file
     cfg.addService(
-        CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
+        CompFactory.THistSvc(
+            Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"]
+        )
+    )
+
+    # Associator = CompFactory.JetParticleShrinkingConeAssociation
+    # Define and configure a tool instance
+    # Properties can be set as keyword arguments to the tool constructor
+    # btagTool = CompFactory.IBTaggingSelectionTool
+    bTagSelectionTool = CompFactory.BTaggingSelectionTool(
+        "bTagSelectionTool",
+        FlvTagCutDefinitionsFileName="xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root",
+        TaggerName="DL1dv00",
+        OperatingPoint="FixedCutBEff_77",
+        JetAuthor="AntiKt4EMPLowJets",
     )
 
     variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
         "VariablePlotter",
         RootStreamName="ANALYSIS",
         RootDirName="Variables",
-        RootDirName="variables",
-
-  m_CutFileName;
-  m_taggerName;
-  m_OP;
-  m_jetAuthor;
+        BTaggingSelectionTool=bTagSelectionTool,
     )
 
     cfg.addEventAlgo(variableplotteralg)
@@ -89,7 +98,9 @@ def main():
                 CompFactory.AthenaHiveEventLoopMgr(EventPrintoutInterval=500)
             )
         else:
-            cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
+            cfg.addService(
+                CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500)
+            )
 
         # Add the components for reading in POOL files -- this is a specialised
         # ROOT format storing structured objects like the
