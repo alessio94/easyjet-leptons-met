@@ -33,8 +33,41 @@ namespace HH4B
     ATH_MSG_DEBUG("Attempting to retrieve IVertexCounter \"" << m_vertexCounter.name() << "\"");
     ATH_CHECK(m_vertexCounter.retrieve());
 
+    if (m_EventInfoKey.empty())
+    {
+      ATH_MSG_ERROR("No input collection provided for EventInfo!");
+      return StatusCode::FAILURE;
+    }
+    if (m_VerticesKey.empty())
+    {
+      ATH_MSG_ERROR("No input collection provided for Vertexing!");
+      return StatusCode::FAILURE;
+    }
+
+    ATH_CHECK(m_EventInfoKey.initialize());
+    ATH_CHECK(m_VerticesKey.initialize());
+
+    ATH_MSG_INFO("Will search \"" << m_EventInfoKey.key() << "\" for event info");
+    ATH_MSG_INFO("Will search \"" << m_VerticesKey.key() << "\" for vertexing info");
+
     ATH_MSG_DEBUG("Booking histograms.");
     ATH_CHECK(bookHistograms());
+
+    return StatusCode::SUCCESS;
+  }
+
+  StatusCode PileupPlotterAlg ::
+      execute()
+  {
+    ATH_MSG_DEBUG("Executing " << name());
+
+    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
+    ATH_CHECK(eventInfo.isValid());
+    ATH_CHECK(fillMuHistograms(*eventInfo));
+
+    SG::ReadHandle<xAOD::VertexContainer> vertices(m_VerticesKey);
+    ATH_CHECK(vertices.isValid());
+    ATH_CHECK(fillNVtxHistograms(*vertices));
 
     return StatusCode::SUCCESS;
   }
@@ -52,32 +85,6 @@ namespace HH4B
                         m_avgMuSpec.nbinsx, m_avgMuSpec.xmin, m_avgMuSpec.xmax)));
     ATH_CHECK(book(TH1D("ActualMu", "Actual number of interactions per bunch crossing",
                         m_actualMuSpec.nbinsx, m_actualMuSpec.xmin, m_actualMuSpec.xmax)));
-
-    return StatusCode::SUCCESS;
-  }
-
-  StatusCode PileupPlotterAlg ::
-      execute()
-  {
-    ATH_MSG_DEBUG("Executing " << name());
-
-    const xAOD::EventInfo *eventInfo(nullptr);
-    ATH_CHECK(evtStore()->retrieve(eventInfo, "EventInfo"));
-    if (eventInfo == nullptr)
-    {
-      ATH_MSG_ERROR("Got null pointer for EventInfo!");
-      return StatusCode::FAILURE;
-    }
-    ATH_CHECK(fillMuHistograms(*eventInfo));
-
-    const xAOD::VertexContainer *vertices(nullptr);
-    ATH_CHECK(evtStore()->retrieve(vertices, "PrimaryVertices"));
-    if (vertices == nullptr)
-    {
-      ATH_MSG_ERROR("Got null pointer for PrimaryVertices!");
-      return StatusCode::FAILURE;
-    }
-    ATH_CHECK(fillNVtxHistograms(*vertices));
 
     return StatusCode::SUCCESS;
   }

@@ -55,6 +55,9 @@ namespace HH4B
     StatusCode fillNVtxHistograms(const xAOD::VertexContainer &);
 
     // Member variables for configuration
+    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{this, "EventInfoKey", "", "EventInfo container for plotting pileup"};
+    SG::ReadHandleKey<xAOD::VertexContainer> m_VerticesKey{this, "VerticesKey", "", "Vertex container used for plotting"};
+
     // We use a special templated class to more easily define the properties needed
     // to define a single histogram.
     HistSpec1D m_nVtxSpec{this, "NVtxHist", 10, 0., 20., "Histogram: Number of primary vertices"};

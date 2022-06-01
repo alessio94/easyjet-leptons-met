@@ -9,6 +9,8 @@ from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+from utils.argsHelper import checkArgs
+
 pileuplog = Logging.logging.getLogger("PileupPlotterConfig")
 
 
@@ -52,6 +54,8 @@ def PileupPlotterCfg(flags, ntrkmin, outfname):
     countvxtool = cfg.popToolsAndMerge(NTrkVtxCounterCfg(flags, ntrkmin))
     pualg = CompFactory.HH4B.PileupPlotterAlg(
         "PUAlg_" + dirname,
+        EventInfoKey="EventInfo",
+        VerticesKey="PrimaryVertices",
         VertexCounter=countvxtool,
         RootStreamName="ANALYSIS",
         RootDirName=dirname,
@@ -90,10 +94,22 @@ def main():
             default=2,
             help="Minimum NTrks for vertex counting",
         )
+        parser.add_argument(
+            "--mc",
+            action="store_true",
+            help="Input is Monte Carlo",
+        )
+        parser.add_argument(
+            "--daod-physlite",
+            action="store_true",
+            help="Input is DAOD_PHYSLITE",
+        )
         args = ConfigFlags.fillFromArgs([], parser)
         # Lock the flags so that the configuration of job subcomponents cannot
         # modify them silently/unpredictably.
         ConfigFlags.lock()
+
+        checkArgs(ConfigFlags, args, parser)
 
         # Get a ComponentAccumulator setting up the standard components
         # needed to run an Athena job.

@@ -43,7 +43,7 @@ namespace HH4B
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
 
     // Member variables for configuration
-    SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to dump"};
+    SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to plot"};
 
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed
