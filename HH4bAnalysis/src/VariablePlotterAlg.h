@@ -14,7 +14,6 @@
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
 #include <xAODJet/JetContainer.h>
-#include <xAODEventInfo/EventInfo.h>
 
 // A header from this package's installed Library
 #include "HH4bAnalysis/HistSpec.h"
@@ -42,6 +41,9 @@ namespace HH4B
 
     // Call in execute to fill histograms
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
+
+    // Member variables for configuration
+    SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to dump"};
 
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed
