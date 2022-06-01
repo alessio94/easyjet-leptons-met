@@ -18,7 +18,7 @@ VariableDumperConfig.py --filesInput mc.myinputfile.pool.root --threads=1 --evtM
 To process DAOD_PHYSLITE the `--daod-physlite` flag is needed:
 
 ```
-VariableDumperConfig.py --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --threads=1 --evtMax 10 --mc
+VariableDumperConfig.py --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --threads=1 --evtMax 10 --mc --daod-physlite
 ```
 
 
