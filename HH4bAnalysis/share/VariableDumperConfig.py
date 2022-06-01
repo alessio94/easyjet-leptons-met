@@ -5,36 +5,14 @@
 #
 # Author: Victor Ruelas
 
-import sys
-
 # Basic setup
 from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-pileuplog = Logging.logging.getLogger("VariableDumperConfig")
+from utils.argsHelper import checkArgs
 
-
-def checkArgs(flags, args):
-    is_input_mc = flags.Input.isMC
-    if "StreamDAOD_PHYSLITE" in flags.Input.ProcessingTags:
-        input_stream_format = "DAOD_PHYSLITE"
-    elif "StreamDAOD_PHYS" in flags.Input.ProcessingTags:
-        input_stream_format = "DAOD_PHYS"
-    else:
-        input_stream_format = "other"
-
-    if args.daod_physlite and input_stream_format != "DAOD_PHYSLITE":
-        print(
-            f"Input file is {input_stream_format} but --daod-physlite flag was {'given' if args.daod_physlite else 'not given'}"
-        )
-        sys.exit(-1)
-
-    if args.mc is not is_input_mc:
-        print(
-            f"Input file is {'MC' if is_input_mc else 'Data'} but --mc flag was {'given' if args.mc else 'not given'}"
-        )
-        sys.exit(-1)
+variabledumperlog = Logging.logging.getLogger("VariableDumperConfig")
 
 
 # Generate the algorithm to do the histogramming.
@@ -57,13 +35,17 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
-    variabledumperalg = CompFactory.HH4B.VariableDumperAlg(
-        "VariableDumper",
-        RootStreamName="ANALYSIS",
-        RootDirName="Analysis",
+    cfg.addEventAlgo(
+        CompFactory.HH4B.VariableDumperAlg(
+            "VariableDumper",
+            EventInfoKey="EventInfo",
+            JetsKey="AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets",
+            # MuonsKey="AnalysisMuons" if daodphyslite else "Muons", # Needs to be implemented
+            # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons", # Needs to be implemented
+            RootStreamName="ANALYSIS",
+            RootDirName="Analysis",
+        )
     )
-
-    cfg.addEventAlgo(variabledumperalg)
 
     return cfg
 
@@ -85,6 +67,12 @@ def main():
         # Generate a parser and add an output file argument, then retrieve the args
         parser = ConfigFlags.getArgumentParser()
         parser.add_argument(
+            "--outFile",
+            type=str,
+            default="analysis-variables.root",
+            help="Output file name",
+        )
+        parser.add_argument(
             "--mc",
             action="store_true",
             help="Input is Monte Carlo",
@@ -94,19 +82,13 @@ def main():
             action="store_true",
             help="Input is DAOD_PHYSLITE",
         )
-        parser.add_argument(
-            "--outFile",
-            type=str,
-            default="analysis-variables.root",
-            help="Output file name",
-        )
         args = ConfigFlags.fillFromArgs([], parser)
         # Lock the flags so that the configuration of job subcomponents cannot
         # modify them silently/unpredictably.
         ConfigFlags.lock()
 
-        checkArgs(ConfigFlags, args)
-        
+        checkArgs(ConfigFlags, args, parser)
+
         # Get a ComponentAccumulator setting up the standard components
         # needed to run an Athena job.
         from AthenaConfiguration.MainServicesConfig import MainServicesCfg
