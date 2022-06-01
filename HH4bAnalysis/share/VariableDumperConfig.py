@@ -40,8 +40,9 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
             "VariableDumper",
             EventInfoKey="EventInfo",
             JetsKey="AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets",
-            # MuonsKey="AnalysisMuons" if daodphyslite else "Muons", # Needs to be implemented
-            # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons", # Needs to be implemented
+            # Needs to be implemented
+            # MuonsKey="AnalysisMuons" if daodphyslite else "Muons",
+            # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",
             RootStreamName="ANALYSIS",
             RootDirName="Analysis",
         )

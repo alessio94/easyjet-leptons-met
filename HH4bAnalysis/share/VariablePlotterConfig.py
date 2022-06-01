@@ -38,8 +38,9 @@ def VariablePlotterCfg(flags, daodphyslite, outfname):
     variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
         "VariablePlotter",
         JetsKey="AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets",
-        # MuonsKey="AnalysisMuons" if daodphyslite else "Muons", # Needs to be implemented
-        # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons", # Needs to be implemented
+        # Needs to be implemented
+        # MuonsKey="AnalysisMuons" if daodphyslite else "Muons",
+        # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",
         RootStreamName="ANALYSIS",
         RootDirName="Variables",
     )
