@@ -34,17 +34,19 @@ def VariablePlotterCfg(flags, outfname):
             Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"]
         )
     )
-
-    # Associator = CompFactory.JetParticleShrinkingConeAssociation
+    # Jet container name for DAOD_PHYS: AntiKt4EMPFlowJets,
+    # Jet container name for DAOD_PHYSLITE: AnalysisJets,
+    jetContainerName = "AntiKt4EMPFlowJets"
     # Define and configure a tool instance
     # Properties can be set as keyword arguments to the tool constructor
-    # btagTool = CompFactory.IBTaggingSelectionTool
     bTagSelectionTool = CompFactory.BTaggingSelectionTool(
         "bTagSelectionTool",
         FlvTagCutDefinitionsFileName="xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root",
         TaggerName="DL1dv00",
         OperatingPoint="FixedCutBEff_77",
-        JetAuthor="AntiKt4EMPLowJets",
+        JetAuthor="AntiKt4EMPFlowJets",
+        MinPt=20e3,
+        MaxEta=2.5,
     )
 
     variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
@@ -52,6 +54,7 @@ def VariablePlotterCfg(flags, outfname):
         RootStreamName="ANALYSIS",
         RootDirName="Variables",
         BTaggingSelectionTool=bTagSelectionTool,
+        jetContainerName=jetContainerName,
     )
 
     cfg.addEventAlgo(variableplotteralg)

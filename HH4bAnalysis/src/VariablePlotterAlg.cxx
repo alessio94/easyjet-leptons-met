@@ -28,13 +28,13 @@ namespace HH4B
       VariablePlotterAlg(const std::string &name, ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
+    declareProperty("jetContainerName", m_jetContainerName, "Name of the Jet container");
   }
 
   StatusCode VariablePlotterAlg ::
       initialize()
   {
     ATH_MSG_DEBUG("Initialising " << name());
-
     ATH_MSG_DEBUG("Booking histograms.");
     ATH_CHECK(bookHistograms());
     ATH_CHECK(m_btagSelTool.retrieve());
@@ -48,7 +48,7 @@ namespace HH4B
     ATH_MSG_DEBUG("Executing " << name());
 
     const xAOD::JetContainer *jets(nullptr);
-    ATH_CHECK(evtStore()->retrieve(jets, "AntiKt4EMPFlowJets"));
+    ATH_CHECK(evtStore()->retrieve(jets, m_jetContainerName));
     if (jets == nullptr)
     {
       ATH_MSG_ERROR("Got null pointer for JetContainer!");
@@ -66,6 +66,7 @@ namespace HH4B
     ATH_CHECK(book(TH1D("JetEta", "Jet eta", m_jetEtaHist.nbinsx, m_jetEtaHist.xmin, m_jetEtaHist.xmax)));
     ATH_CHECK(book(TH1D("JetPhi", "Jet phi", m_jetPhiHist.nbinsx, m_jetPhiHist.xmin, m_jetPhiHist.xmax)));
 
+    ATH_CHECK(book(TH1D("BTagJetPt", "Jet pT [GeV]", m_bTagJetPtHist.nbinsx, m_bTagJetPtHist.xmin, m_bTagJetPtHist.xmax)));
     return StatusCode::SUCCESS;
   }
 
@@ -80,6 +81,10 @@ namespace HH4B
       hist("JetPt")->Fill(jet->pt() * invGeV);
       hist("JetEta")->Fill(jet->eta());
       hist("JetPhi")->Fill(jet->phi());
+      if (m_btagSelTool->accept(*jet))
+      {
+        hist("BTagJetPt")->Fill(jet->pt() * invGeV);
+      }
     }
 
     return StatusCode::SUCCESS;
