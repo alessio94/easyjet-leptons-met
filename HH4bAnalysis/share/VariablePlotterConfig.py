@@ -41,7 +41,9 @@ def VariablePlotterCfg(flags, outfname):
     # Properties can be set as keyword arguments to the tool constructor
     bTagSelectionTool = CompFactory.BTaggingSelectionTool(
         "bTagSelectionTool",
-        FlvTagCutDefinitionsFileName="xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root",
+        FlvTagCutDefinitionsFileName=(
+            "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
+        ),
         TaggerName="DL1dv00",
         OperatingPoint="FixedCutBEff_77",
         JetAuthor="AntiKt4EMPFlowJets",
