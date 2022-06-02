@@ -15,6 +15,9 @@
 
 #include <xAODJet/JetContainer.h>
 
+#include <AsgTools/ToolHandle.h>
+#include "FTagAnalysisInterfaces/IBTaggingSelectionTool.h"
+
 // A header from this package's installed Library
 #include "HH4bAnalysis/HistSpec.h"
 
@@ -42,15 +45,26 @@ namespace HH4B
     // Call in execute to fill histograms
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
 
+    unsigned long long m_eventNumber = 0;
+
+    // Jet 4-momentum variables
+    std::vector<float> m_jetEta;
+    std::vector<float> m_jetPhi;
+    std::vector<float> m_jetPt;
+    std::vector<float> m_jetE;
+
+    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue", "someInfo"};
+    ToolHandle<IBTaggingSelectionTool> m_btagSelTool{this, "BTaggingSelectionTool", {}, "Tool to select b-jets"};
+
     // Member variables for configuration
     SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to plot"};
 
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed
-    // to define a single histogram.
     HistSpec1D m_jetPtHist{this, "JetPtHist", 100, 0, 500, "Histogram: jet pt [GeV]"};
     HistSpec1D m_jetEtaHist{this, "JetEtaHist", 100, -6, 6, "Histogram: jet eta"};
     HistSpec1D m_jetPhiHist{this, "JetPhiHist", 100, -4, 4, "Histogram: jet phi"};
+    HistSpec1D m_bTagJetPtHist{this, "BTagJetPtHist", 100, 0, 500, "Histogram: btagged jets pt [GeV]"};
   };
 }
 

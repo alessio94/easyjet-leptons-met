@@ -47,6 +47,7 @@ namespace HH4B
 
     ATH_MSG_DEBUG("Booking histograms.");
     ATH_CHECK(bookHistograms());
+    ATH_CHECK(m_btagSelTool.retrieve());
 
     return StatusCode::SUCCESS;
   }
@@ -71,6 +72,7 @@ namespace HH4B
     ATH_CHECK(book(TH1D("JetEta", "Jet eta", m_jetEtaHist.nbinsx, m_jetEtaHist.xmin, m_jetEtaHist.xmax)));
     ATH_CHECK(book(TH1D("JetPhi", "Jet phi", m_jetPhiHist.nbinsx, m_jetPhiHist.xmin, m_jetPhiHist.xmax)));
 
+    ATH_CHECK(book(TH1D("BTagJetPt", "Jet pT [GeV]", m_bTagJetPtHist.nbinsx, m_bTagJetPtHist.xmin, m_bTagJetPtHist.xmax)));
     return StatusCode::SUCCESS;
   }
 
@@ -85,6 +87,10 @@ namespace HH4B
       hist("JetPt")->Fill(jet->pt() * invGeV);
       hist("JetEta")->Fill(jet->eta());
       hist("JetPhi")->Fill(jet->phi());
+      if (m_btagSelTool->accept(*jet))
+      {
+        hist("BTagJetPt")->Fill(jet->pt() * invGeV);
+      }
     }
 
     return StatusCode::SUCCESS;

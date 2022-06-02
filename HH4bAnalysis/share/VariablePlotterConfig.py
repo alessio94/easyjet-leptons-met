@@ -35,14 +35,31 @@ def VariablePlotterCfg(flags, daodphyslite, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
+    jetContainerName = "AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets"
+
+    # Define and configure a tool instance
+    # Properties can be set as keyword arguments to the tool constructor
+    bTagSelectionTool = CompFactory.BTaggingSelectionTool(
+        "bTagSelectionTool",
+        FlvTagCutDefinitionsFileName=(
+            "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
+        ),
+        TaggerName="DL1dv00",
+        OperatingPoint="FixedCutBEff_77",
+        JetAuthor=jetContainerName,
+        MinPt=20e3,
+        MaxEta=2.5,
+    )
+
     variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
         "VariablePlotter",
-        JetsKey="AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets",
+        JetsKey=jetContainerName,
         # Needs to be implemented
         # MuonsKey="AnalysisMuons" if daodphyslite else "Muons",
         # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",
         RootStreamName="ANALYSIS",
         RootDirName="Variables",
+        BTaggingSelectionTool=bTagSelectionTool,
     )
 
     cfg.addEventAlgo(variableplotteralg)
@@ -113,7 +130,9 @@ def main():
         # Add our VariablePlotter CA, calling the function defined above.
         cfg.merge(
             VariablePlotterCfg(
-                ConfigFlags, daodphyslite=args.daod_physlite, outfname=args.outFile
+                ConfigFlags,
+                daodphyslite=args.daod_physlite,
+                outfname=args.outFile,
             )
         )
 
