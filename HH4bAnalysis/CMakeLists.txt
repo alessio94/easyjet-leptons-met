@@ -20,6 +20,7 @@ atlas_add_component( HH4bAnalysis
     xAODEventInfo
     xAODTracking
     xAODJet
+    xAODMuon
     FTagAnalysisInterfacesLib
  )
 

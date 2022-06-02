@@ -35,14 +35,17 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
+    reco4JetContainerName = "AnalysisJetsBTAG" if daodphyslite else "AntiKt4EMPFlowJets"
+    reco10JetContainerName = (
+        "AnalysisLargeRRecoJets"
+        if daodphyslite
+        else "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets"
+    )
     truth4JetContainerName = "?" if daodphyslite else "AntiKt4TruthDressedWZJets"
     truth10JetContainerName = (
         "?" if daodphyslite else "AntiKt10TruthTrimmedPtFrac5SmallR20Jets"
     )
-    reco4JetContainerName = "AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets"
-    reco10JetContainerName = (
-        "?" if daodphyslite else "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets"
-    )
+    muonsContainerName = "AnalysisMuons" if daodphyslite else "Muons"
 
     # Define and configure a tool instance
     # Properties can be set as keyword arguments to the tool constructor
@@ -63,11 +66,12 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
             "VariableDumper",
             EventInfoKey="EventInfo",
             Reco4JetsKey=reco4JetContainerName,
+            Reco10JetsKey=reco10JetContainerName,
+            MuonsKey=muonsContainerName,
             # Needs to be implemented
-            # MuonsKey="AnalysisMuons" if daodphyslite else "Muons",
             # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",
             RootStreamName="ANALYSIS",
-            RootDirName="Analysis",
+            # RootDirName="Reco",
             BTaggingSelectionTool=bTagSelectionTool,
         )
     )
