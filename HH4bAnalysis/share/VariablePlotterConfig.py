@@ -10,13 +10,15 @@ from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-pileuplog = Logging.logging.getLogger("VariablePlotterConfig")
+from utils.argsHelper import checkArgs
+
+variableplotterlog = Logging.logging.getLogger("VariablePlotterConfig")
 
 
 # Generate the algorithm to do the histogramming.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def VariablePlotterCfg(flags, outfname):
+def VariablePlotterCfg(flags, daodphyslite, outfname):
     cfg = ComponentAccumulator()
 
     # Every CA should include all its dependencies, apart from the global ones
@@ -53,6 +55,10 @@ def VariablePlotterCfg(flags, outfname):
 
     variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
         "VariablePlotter",
+        JetsKey="AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets",
+        # Needs to be implemented
+        # MuonsKey="AnalysisMuons" if daodphyslite else "Muons",
+        # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",
         RootStreamName="ANALYSIS",
         RootDirName="Variables",
         BTaggingSelectionTool=bTagSelectionTool,
@@ -86,10 +92,22 @@ def main():
             default="variable-hists.root",
             help="Output file name",
         )
+        parser.add_argument(
+            "--mc",
+            action="store_true",
+            help="Input is Monte Carlo",
+        )
+        parser.add_argument(
+            "--daod-physlite",
+            action="store_true",
+            help="Input is DAOD_PHYSLITE",
+        )
         args = ConfigFlags.fillFromArgs([], parser)
         # Lock the flags so that the configuration of job subcomponents cannot
         # modify them silently/unpredictably.
         ConfigFlags.lock()
+
+        checkArgs(ConfigFlags, args, parser)
 
         # Get a ComponentAccumulator setting up the standard components
         # needed to run an Athena job.
@@ -115,7 +133,11 @@ def main():
         cfg.merge(PoolReadCfg(ConfigFlags))
 
         # Add our VariablePlotter CA, calling the function defined above.
-        cfg.merge(VariablePlotterCfg(ConfigFlags, outfname=args.outFile))
+        cfg.merge(
+            VariablePlotterCfg(
+                ConfigFlags, daodphyslite=args.daod_physlite, outfname=args.outFile
+            )
+        )
 
         # Print the full job configuration
         cfg.printConfig()

@@ -15,8 +15,6 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEventInfo/EventInfo.h>
 
-#include <memory> // for unique_ptr
-
 namespace HH4B
 {
 
@@ -38,6 +36,10 @@ namespace HH4B
 
     // Call in execute to fill the EventInfo and jet variables
     StatusCode fillVariableTTree(const xAOD::EventInfo &, const xAOD::JetContainer &);
+
+    // Member variables for configuration
+    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{this, "EventInfoKey", "", "EventInfo container to dump"};
+    SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to dump"};
 
     // output variables for the current event
     unsigned int m_runNumber = 0;

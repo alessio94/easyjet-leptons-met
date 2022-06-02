@@ -35,6 +35,17 @@ namespace HH4B
       initialize()
   {
     ATH_MSG_DEBUG("Initialising " << name());
+
+    if (m_JetsKey.empty())
+    {
+      ATH_MSG_ERROR("No input collection provided for Jets!");
+      return StatusCode::FAILURE;
+    }
+
+    ATH_CHECK(m_JetsKey.initialize());
+
+    ATH_MSG_INFO("Will search \"" << m_JetsKey.key() << "\" for jets info");
+
     ATH_MSG_DEBUG("Booking histograms.");
     ATH_CHECK(bookHistograms());
     ATH_CHECK(m_btagSelTool.retrieve());
@@ -47,13 +58,9 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Executing " << name());
 
-    const xAOD::JetContainer *jets(nullptr);
-    ATH_CHECK(evtStore()->retrieve(jets, m_jetContainerName));
-    if (jets == nullptr)
-    {
-      ATH_MSG_ERROR("Got null pointer for JetContainer!");
-      return StatusCode::FAILURE;
-    }
+    SG::ReadHandle<xAOD::JetContainer> jets(m_JetsKey);
+    ATH_CHECK(jets.isValid());
+
     ATH_CHECK(fillVariableHistogram(*jets));
 
     return StatusCode::SUCCESS;

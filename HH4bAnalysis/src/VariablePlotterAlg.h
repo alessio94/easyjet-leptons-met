@@ -14,7 +14,6 @@
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
 #include <xAODJet/JetContainer.h>
-#include <xAODEventInfo/EventInfo.h>
 
 #include <AsgTools/ToolHandle.h>
 #include "FTagAnalysisInterfaces/IBTaggingSelectionTool.h"
@@ -57,6 +56,9 @@ namespace HH4B
 
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue", "someInfo"};
     ToolHandle<IBTaggingSelectionTool> m_btagSelTool{this, "BTaggingSelectionTool", {}, "Tool to select b-jets"};
+
+    // Member variables for configuration
+    SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to plot"};
 
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed

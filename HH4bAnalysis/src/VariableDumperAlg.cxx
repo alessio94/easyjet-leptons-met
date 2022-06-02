@@ -25,6 +25,23 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Initialising " << name());
 
+    if (m_EventInfoKey.empty())
+    {
+      ATH_MSG_ERROR("No input collection provided for EventInfo!");
+      return StatusCode::FAILURE;
+    }
+    if (m_JetsKey.empty())
+    {
+      ATH_MSG_ERROR("No input collection provided for Jets!");
+      return StatusCode::FAILURE;
+    }
+
+    ATH_CHECK(m_EventInfoKey.initialize());
+    ATH_CHECK(m_JetsKey.initialize());
+
+    ATH_MSG_INFO("Will search \"" << m_EventInfoKey.key() << "\" for event info");
+    ATH_MSG_INFO("Will search \"" << m_JetsKey.key() << "\" for jets info");
+
     ATH_MSG_DEBUG("Booking tree.");
     ATH_CHECK(bookTTree());
 
@@ -36,20 +53,11 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Executing " << name());
 
-    const xAOD::EventInfo *eventInfo(nullptr);
-    const xAOD::JetContainer *jets(nullptr);
-    ATH_CHECK(evtStore()->retrieve(eventInfo, "EventInfo"));
-    ATH_CHECK(evtStore()->retrieve(jets, "AntiKt4EMPFlowJets"));
-    if (eventInfo == nullptr)
-    {
-      ATH_MSG_ERROR("Got null pointer for EventInfo!");
-      return StatusCode::FAILURE;
-    }
-    if (jets == nullptr)
-    {
-      ATH_MSG_ERROR("Got null pointer for JetContainer!");
-      return StatusCode::FAILURE;
-    }
+    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
+    SG::ReadHandle<xAOD::JetContainer> jets(m_JetsKey);
+    ATH_CHECK(eventInfo.isValid());
+    ATH_CHECK(jets.isValid());
+
     ATH_CHECK(fillVariableTTree(*eventInfo, *jets));
 
     return StatusCode::SUCCESS;
