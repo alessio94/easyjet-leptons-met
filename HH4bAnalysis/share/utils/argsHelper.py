@@ -4,7 +4,6 @@ import sys
 
 
 def checkArgs(flags, args, parser):
-    is_input_mc = flags.Input.isMC
     if "StreamDAOD_PHYSLITE" in flags.Input.ProcessingTags:
         input_stream_format = "DAOD_PHYSLITE"
     elif "StreamDAOD_PHYS" in flags.Input.ProcessingTags:
@@ -19,6 +18,7 @@ def checkArgs(flags, args, parser):
         )
         sys.exit(-1)
 
+    is_input_mc = flags.Input.isMC
     if args.mc is not is_input_mc:
         print(
             f"Input file is {'MC' if is_input_mc else 'Data'} but --mc flag was "
