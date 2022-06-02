@@ -32,9 +32,7 @@ def VariablePlotterCfg(flags, daodphyslite, outfname):
     #   File I/O option: specified by setting "OPT" and passed to the TFile constructor
     #      "RECREATE" will (over)write the specified file name with a new file
     cfg.addService(
-        CompFactory.THistSvc(
-            Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"]
-        )
+        CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
     jetContainerName = "AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets"
@@ -120,9 +118,7 @@ def main():
                 CompFactory.AthenaHiveEventLoopMgr(EventPrintoutInterval=500)
             )
         else:
-            cfg.addService(
-                CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500)
-            )
+            cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
 
         # Add the components for reading in POOL files -- this is a specialised
         # ROOT format storing structured objects like the
