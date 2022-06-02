@@ -35,16 +35,40 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
+    truth4JetContainerName = "?" if daodphyslite else "AntiKt4TruthDressedWZJets"
+    truth10JetContainerName = (
+        "?" if daodphyslite else "AntiKt10TruthTrimmedPtFrac5SmallR20Jets"
+    )
+    reco4JetContainerName = "AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets"
+    reco10JetContainerName = (
+        "?" if daodphyslite else "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets"
+    )
+
+    # Define and configure a tool instance
+    # Properties can be set as keyword arguments to the tool constructor
+    bTagSelectionTool = CompFactory.BTaggingSelectionTool(
+        "bTagSelectionTool",
+        FlvTagCutDefinitionsFileName=(
+            "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
+        ),
+        TaggerName="DL1dv00",
+        OperatingPoint="FixedCutBEff_77",
+        JetAuthor=reco4JetContainerName,
+        MinPt=20e3,
+        MaxEta=2.5,
+    )
+
     cfg.addEventAlgo(
         CompFactory.HH4B.VariableDumperAlg(
             "VariableDumper",
             EventInfoKey="EventInfo",
-            JetsKey="AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets",
+            Reco4JetsKey=reco4JetContainerName,
             # Needs to be implemented
             # MuonsKey="AnalysisMuons" if daodphyslite else "Muons",
             # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",
             RootStreamName="ANALYSIS",
             RootDirName="Analysis",
+            BTaggingSelectionTool=bTagSelectionTool,
         )
     )
 

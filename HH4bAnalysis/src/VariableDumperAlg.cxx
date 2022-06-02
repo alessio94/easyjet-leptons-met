@@ -30,17 +30,19 @@ namespace HH4B
       ATH_MSG_ERROR("No input collection provided for EventInfo!");
       return StatusCode::FAILURE;
     }
-    if (m_JetsKey.empty())
+    if (m_Reco4JetsKey.empty())
     {
       ATH_MSG_ERROR("No input collection provided for Jets!");
       return StatusCode::FAILURE;
     }
 
     ATH_CHECK(m_EventInfoKey.initialize());
-    ATH_CHECK(m_JetsKey.initialize());
+    ATH_CHECK(m_Reco4JetsKey.initialize());
 
     ATH_MSG_INFO("Will search \"" << m_EventInfoKey.key() << "\" for event info");
-    ATH_MSG_INFO("Will search \"" << m_JetsKey.key() << "\" for jets info");
+    ATH_MSG_INFO("Will search \"" << m_Reco4JetsKey.key() << "\" for jets info");
+
+    ATH_CHECK(m_btagSelTool.retrieve());
 
     ATH_MSG_DEBUG("Booking tree.");
     ATH_CHECK(bookTTree());
@@ -54,7 +56,7 @@ namespace HH4B
     ATH_MSG_DEBUG("Executing " << name());
 
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    SG::ReadHandle<xAOD::JetContainer> jets(m_JetsKey);
+    SG::ReadHandle<xAOD::JetContainer> jets(m_Reco4JetsKey);
     ATH_CHECK(eventInfo.isValid());
     ATH_CHECK(jets.isValid());
 
@@ -71,10 +73,16 @@ namespace HH4B
     TTree *mytree = tree("Variables");
     mytree->Branch("RunNumber", &m_runNumber);
     mytree->Branch("EventNumber", &m_eventNumber);
-    mytree->Branch("JetEta", &m_jetEta);
-    mytree->Branch("JetPhi", &m_jetPhi);
-    mytree->Branch("JetPt", &m_jetPt);
-    mytree->Branch("JetE", &m_jetE);
+    mytree->Branch("Reco4JetEta", &m_reco4JetEta);
+    mytree->Branch("Reco4JetPhi", &m_reco4JetPhi);
+    mytree->Branch("Reco4JetPt", &m_reco4JetPt);
+    mytree->Branch("Reco4JetE", &m_reco4JetE);
+    mytree->Branch("Reco4JetM", &m_reco4JetM);
+    mytree->Branch("Reco4BTagJetEta", &m_reco4BTagJetEta);
+    mytree->Branch("Reco4BTagJetPhi", &m_reco4BTagJetPhi);
+    mytree->Branch("Reco4BTagJetPt", &m_reco4BTagJetPt);
+    mytree->Branch("Reco4BTagJetE", &m_reco4BTagJetE);
+    mytree->Branch("Reco4BTagJetM", &m_reco4BTagJetM);
 
     return StatusCode::SUCCESS;
   }
@@ -89,10 +97,19 @@ namespace HH4B
     // Being lazy here and not checking for pointer validity!
     for (const xAOD::Jet *jet : jets)
     {
-      m_jetEta.push_back(jet->eta());
-      m_jetPhi.push_back(jet->phi());
-      m_jetPt.push_back(jet->pt());
-      m_jetE.push_back(jet->e());
+      m_reco4JetEta.push_back(jet->eta());
+      m_reco4JetPhi.push_back(jet->phi());
+      m_reco4JetPt.push_back(jet->pt());
+      m_reco4JetE.push_back(jet->e());
+      m_reco4JetM.push_back(jet->m());
+      if (m_btagSelTool->accept(*jet))
+      {
+        m_reco4BTagJetEta.push_back(jet->eta());
+        m_reco4BTagJetPhi.push_back(jet->phi());
+        m_reco4BTagJetPt.push_back(jet->pt());
+        m_reco4BTagJetE.push_back(jet->e());
+        m_reco4BTagJetM.push_back(jet->m());
+      }
     }
 
     tree("Variables")->Fill();

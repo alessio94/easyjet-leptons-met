@@ -34,15 +34,15 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Initialising " << name());
 
-    if (m_JetsKey.empty())
+    if (m_Reco4JetsKey.empty())
     {
       ATH_MSG_ERROR("No input collection provided for Jets!");
       return StatusCode::FAILURE;
     }
 
-    ATH_CHECK(m_JetsKey.initialize());
+    ATH_CHECK(m_Reco4JetsKey.initialize());
 
-    ATH_MSG_INFO("Will search \"" << m_JetsKey.key() << "\" for jets info");
+    ATH_MSG_INFO("Will search \"" << m_Reco4JetsKey.key() << "\" for jets info");
 
     ATH_MSG_DEBUG("Booking histograms.");
     ATH_CHECK(bookHistograms());
@@ -55,7 +55,7 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Executing " << name());
 
-    SG::ReadHandle<xAOD::JetContainer> jets(m_JetsKey);
+    SG::ReadHandle<xAOD::JetContainer> jets(m_Reco4JetsKey);
     ATH_CHECK(jets.isValid());
 
     ATH_CHECK(fillVariableHistogram(*jets));

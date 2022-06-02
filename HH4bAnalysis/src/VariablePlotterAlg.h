@@ -21,8 +21,6 @@
 // A header from this package's installed Library
 #include "HH4bAnalysis/HistSpec.h"
 
-#include <memory> // for unique_ptr
-
 namespace HH4B
 {
 
@@ -45,19 +43,11 @@ namespace HH4B
     // Call in execute to fill histograms
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
 
-    unsigned long long m_eventNumber = 0;
-
-    // Jet 4-momentum variables
-    std::vector<float> m_jetEta;
-    std::vector<float> m_jetPhi;
-    std::vector<float> m_jetPt;
-    std::vector<float> m_jetE;
-
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue", "someInfo"};
     ToolHandle<IBTaggingSelectionTool> m_btagSelTool{this, "BTaggingSelectionTool", {}, "Tool to select b-jets"};
 
     // Member variables for configuration
-    SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to plot"};
+    SG::ReadHandleKey<xAOD::JetContainer> m_Reco4JetsKey{this, "Reco4JetsKey", "", "Jets container to plot"};
 
     // Member variables for configuration
     // We use a special templated class to more easily define the properties needed

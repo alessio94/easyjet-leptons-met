@@ -15,6 +15,9 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEventInfo/EventInfo.h>
 
+#include <AsgTools/ToolHandle.h>
+#include "FTagAnalysisInterfaces/IBTaggingSelectionTool.h"
+
 namespace HH4B
 {
 
@@ -37,18 +40,28 @@ namespace HH4B
     // Call in execute to fill the EventInfo and jet variables
     StatusCode fillVariableTTree(const xAOD::EventInfo &, const xAOD::JetContainer &);
 
+    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue", "someInfo"};
+    ToolHandle<IBTaggingSelectionTool> m_btagSelTool{this, "BTaggingSelectionTool", {}, "Tool to select b-jets"};
+
     // Member variables for configuration
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{this, "EventInfoKey", "", "EventInfo container to dump"};
-    SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to dump"};
+    SG::ReadHandleKey<xAOD::JetContainer> m_Reco4JetsKey{this, "Reco4JetsKey", "", "Reconstructed small R jets container to dump"};
 
     // output variables for the current event
     unsigned int m_runNumber = 0;
     unsigned long long m_eventNumber = 0;
     // Jet 4-momentum variables
-    std::vector<float> m_jetEta;
-    std::vector<float> m_jetPhi;
-    std::vector<float> m_jetPt;
-    std::vector<float> m_jetE;
+    std::vector<float> m_reco4JetEta;
+    std::vector<float> m_reco4JetPhi;
+    std::vector<float> m_reco4JetPt;
+    std::vector<float> m_reco4JetE;
+    std::vector<float> m_reco4JetM;
+    // b-tagged jet 4-momentum variables
+    std::vector<float> m_reco4BTagJetEta;
+    std::vector<float> m_reco4BTagJetPhi;
+    std::vector<float> m_reco4BTagJetPt;
+    std::vector<float> m_reco4BTagJetE;
+    std::vector<float> m_reco4BTagJetM;
   };
 }
 
