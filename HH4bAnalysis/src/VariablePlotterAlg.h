@@ -46,8 +46,7 @@ namespace HH4B
     StatusCode fillVariableHistogram(const xAOD::JetContainer &);
 
     unsigned long long m_eventNumber = 0;
-    // name of the jet container
-    std::string m_jetContainerName;
+
     // Jet 4-momentum variables
     std::vector<float> m_jetEta;
     std::vector<float> m_jetPhi;

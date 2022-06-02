@@ -28,7 +28,6 @@ namespace HH4B
       VariablePlotterAlg(const std::string &name, ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
-    declareProperty("jetContainerName", m_jetContainerName, "Name of the Jet container");
   }
 
   StatusCode VariablePlotterAlg ::

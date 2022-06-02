@@ -36,9 +36,9 @@ def VariablePlotterCfg(flags, daodphyslite, outfname):
             Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"]
         )
     )
-    # Jet container name for DAOD_PHYS: AntiKt4EMPFlowJets,
-    # Jet container name for DAOD_PHYSLITE: AnalysisJets,
-    jetContainerName = "AntiKt4EMPFlowJets"
+
+    jetContainerName = "AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets"
+
     # Define and configure a tool instance
     # Properties can be set as keyword arguments to the tool constructor
     bTagSelectionTool = CompFactory.BTaggingSelectionTool(
@@ -48,21 +48,20 @@ def VariablePlotterCfg(flags, daodphyslite, outfname):
         ),
         TaggerName="DL1dv00",
         OperatingPoint="FixedCutBEff_77",
-        JetAuthor="AntiKt4EMPFlowJets",
+        JetAuthor=jetContainerName,
         MinPt=20e3,
         MaxEta=2.5,
     )
 
     variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
         "VariablePlotter",
-        JetsKey="AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets",
+        JetsKey=jetContainerName,
         # Needs to be implemented
         # MuonsKey="AnalysisMuons" if daodphyslite else "Muons",
         # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",
         RootStreamName="ANALYSIS",
         RootDirName="Variables",
         BTaggingSelectionTool=bTagSelectionTool,
-        jetContainerName=jetContainerName,
     )
 
     cfg.addEventAlgo(variableplotteralg)
@@ -135,7 +134,9 @@ def main():
         # Add our VariablePlotter CA, calling the function defined above.
         cfg.merge(
             VariablePlotterCfg(
-                ConfigFlags, daodphyslite=args.daod_physlite, outfname=args.outFile
+                ConfigFlags,
+                daodphyslite=args.daod_physlite,
+                outfname=args.outFile,
             )
         )
 
