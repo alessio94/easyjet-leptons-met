@@ -11,6 +11,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 from utils.argsHelper import checkArgs
+from utils.containerNameHelper import getContainerName
 
 variabledumperlog = Logging.logging.getLogger("VariableDumperConfig")
 
@@ -35,17 +36,12 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
-    reco4JetContainerName = "AnalysisJetsBTAG" if daodphyslite else "AntiKt4EMPFlowJets"
-    reco10JetContainerName = (
-        "AnalysisLargeRRecoJets"
-        if daodphyslite
-        else "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets"
-    )
-    truth4JetContainerName = "?" if daodphyslite else "AntiKt4TruthDressedWZJets"
-    truth10JetContainerName = (
-        "?" if daodphyslite else "AntiKt10TruthTrimmedPtFrac5SmallR20Jets"
-    )
-    muonsContainerName = "AnalysisMuons" if daodphyslite else "Muons"
+    reco4JetContainerName = getContainerName("Reco4PFlowJets", daodphyslite)
+    reco10JetContainerName = getContainerName("Reco10PFlowJets", daodphyslite)
+    # truth4JetContainerName = getContainerName("Truth4Jets", daodphyslite)
+    # truth10JetContainerName = getContainerName("Truth10Jets", daodphyslite)
+    muonsContainerName = getContainerName("Muons", daodphyslite)
+    # electronsContainerName = getContainerName("Electrons", daodphyslite)
 
     # Define and configure a tool instance
     # Properties can be set as keyword arguments to the tool constructor
@@ -68,8 +64,6 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
             Reco4JetsKey=reco4JetContainerName,
             Reco10JetsKey=reco10JetContainerName,
             MuonsKey=muonsContainerName,
-            # Needs to be implemented
-            # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",
             RootStreamName="ANALYSIS",
             # RootDirName="Reco",
             BTaggingSelectionTool=bTagSelectionTool,
