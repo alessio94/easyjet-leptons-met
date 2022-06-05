@@ -167,6 +167,17 @@ namespace HH4B
       fillReco4JetsTree(const xAOD::JetContainer &jets)
   {
     ATH_MSG_DEBUG("Filling small R jets tree.");
+    m_reco4JetEta.clear();
+    m_reco4JetPhi.clear();
+    m_reco4JetPt.clear();
+    m_reco4JetE.clear();
+    m_reco4JetM.clear();
+
+    m_reco4BTagJetEta.clear();
+    m_reco4BTagJetPhi.clear();
+    m_reco4BTagJetPt.clear();
+    m_reco4BTagJetE.clear();
+    m_reco4BTagJetM.clear();
 
     // Being lazy here and not checking for pointer validity!
     for (const xAOD::Jet *jet : jets)
@@ -195,6 +206,11 @@ namespace HH4B
       fillReco10JetsTree(const xAOD::JetContainer &jets)
   {
     ATH_MSG_DEBUG("Filling large R jets tree.");
+    m_reco10JetEta.clear();
+    m_reco10JetPhi.clear();
+    m_reco10JetPt.clear();
+    m_reco10JetE.clear();
+    m_reco10JetM.clear();
 
     // Being lazy here and not checking for pointer validity!
     for (const xAOD::Jet *jet : jets)
@@ -215,6 +231,11 @@ namespace HH4B
       fillMuonsTree(const xAOD::MuonContainer &muons)
   {
     ATH_MSG_DEBUG("Filling muons tree.");
+    m_muonEta.clear();
+    m_muonPhi.clear();
+    m_muonPt.clear();
+    m_muonE.clear();
+    m_muonM.clear();
 
     // Being lazy here and not checking for pointer validity!
     for (const xAOD::Muon *jet : muons)
