@@ -24,14 +24,13 @@ namespace HH4B
   // so optimise by multiplying by reciprocals.
   static const float invGeV = 1. / GeV;
 
-  VariablePlotterAlg ::
-      VariablePlotterAlg(const std::string &name, ISvcLocator *pSvcLocator)
+  VariablePlotterAlg ::VariablePlotterAlg(const std::string &name,
+                                          ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
   }
 
-  StatusCode VariablePlotterAlg ::
-      initialize()
+  StatusCode VariablePlotterAlg ::initialize()
   {
     ATH_MSG_DEBUG("Initialising " << name());
 
@@ -52,8 +51,7 @@ namespace HH4B
     return StatusCode::SUCCESS;
   }
 
-  StatusCode VariablePlotterAlg ::
-      execute()
+  StatusCode VariablePlotterAlg ::execute()
   {
     ATH_MSG_DEBUG("Executing " << name());
 
@@ -65,19 +63,22 @@ namespace HH4B
     return StatusCode::SUCCESS;
   }
 
-  StatusCode VariablePlotterAlg ::
-      bookHistograms()
+  StatusCode VariablePlotterAlg ::bookHistograms()
   {
-    ATH_CHECK(book(TH1D("JetPt", "Jet pT [GeV]", m_jetPtHist.nbinsx, m_jetPtHist.xmin, m_jetPtHist.xmax)));
-    ATH_CHECK(book(TH1D("JetEta", "Jet eta", m_jetEtaHist.nbinsx, m_jetEtaHist.xmin, m_jetEtaHist.xmax)));
-    ATH_CHECK(book(TH1D("JetPhi", "Jet phi", m_jetPhiHist.nbinsx, m_jetPhiHist.xmin, m_jetPhiHist.xmax)));
+    ATH_CHECK(book(TH1D("JetPt", "Jet pT [GeV]", m_jetPtHist.nbinsx,
+                        m_jetPtHist.xmin, m_jetPtHist.xmax)));
+    ATH_CHECK(book(TH1D("JetEta", "Jet eta", m_jetEtaHist.nbinsx,
+                        m_jetEtaHist.xmin, m_jetEtaHist.xmax)));
+    ATH_CHECK(book(TH1D("JetPhi", "Jet phi", m_jetPhiHist.nbinsx,
+                        m_jetPhiHist.xmin, m_jetPhiHist.xmax)));
 
-    ATH_CHECK(book(TH1D("BTagJetPt", "Jet pT [GeV]", m_bTagJetPtHist.nbinsx, m_bTagJetPtHist.xmin, m_bTagJetPtHist.xmax)));
+    ATH_CHECK(book(TH1D("BTagJetPt", "Jet pT [GeV]", m_bTagJetPtHist.nbinsx,
+                        m_bTagJetPtHist.xmin, m_bTagJetPtHist.xmax)));
     return StatusCode::SUCCESS;
   }
 
-  StatusCode VariablePlotterAlg ::
-      fillVariableHistogram(const xAOD::JetContainer &jets)
+  StatusCode
+  VariablePlotterAlg ::fillVariableHistogram(const xAOD::JetContainer &jets)
   {
     ATH_MSG_DEBUG("Filling Variable histograms.");
 

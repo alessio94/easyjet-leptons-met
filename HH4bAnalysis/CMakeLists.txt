@@ -4,8 +4,8 @@ atlas_subdir( HH4bAnalysis )
 # Find an external package (i.e. ROOT)
 find_package( ROOT COMPONENTS Core Tree Hist REQUIRED )
 
-# Install the interface headers
-atlas_install_headers( HH4bAnalysis )
+# We don't want any warnings in compilation
+add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component( HH4bAnalysis
