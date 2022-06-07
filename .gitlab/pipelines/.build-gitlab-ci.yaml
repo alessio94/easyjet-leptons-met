@@ -1,0 +1,11 @@
+compile:
+  stage: build
+  script:
+    - mkdir -p build # -p checks if it already exists
+    - cd build
+    - cmake .. | tee cmake.log
+    - make clean # make sure we don't have residual compilation results
+    - make -j $(nproc) 2>&1 | tee -a cmake.log # dump the log files
+  artifacts:
+    paths:
+      - build
