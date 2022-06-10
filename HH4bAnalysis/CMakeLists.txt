@@ -21,6 +21,7 @@ atlas_add_component( HH4bAnalysis
     xAODTracking
     xAODJet
     xAODMuon
+    SystematicsHandlesLib
     FTagAnalysisInterfacesLib
  )
 

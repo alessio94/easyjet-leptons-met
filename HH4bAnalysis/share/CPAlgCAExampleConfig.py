@@ -49,15 +49,15 @@ def CPPileupConfig(ConfigFlags, outfname):
     # Create a pile-up analysis sequence
     from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
 
-    # dataType = "mc" if ConfigFlags.Input.isMC else "data"
-    # pileupSequence = makePileupAnalysisSequence(dataType)
-    # pileupSequence.configure(inputName={}, outputName={})
+    dataType = "mc" if ConfigFlags.Input.isMC else "data"
+    pileupSequence = makePileupAnalysisSequence(dataType)
+    pileupSequence.configure(inputName={}, outputName={})
     # print(pileupSequence)  # For debugging
     # Convert to new configurables
-    # pileupSequenceCnv, algsCnv = convertSequenceAndGetAlgs(pileupSequence)
-    # cfg.addSequence(pileupSequenceCnv)
-    # for alg in algsCnv:
-    #     cfg.addEventAlgo(alg, pileupSequenceCnv.getName())
+    pileupSequenceCnv, algsCnv = convertSequenceAndGetAlgs(pileupSequence)
+    cfg.addSequence(pileupSequenceCnv)
+    for alg in algsCnv:
+        cfg.addEventAlgo(alg, pileupSequenceCnv.getName())
 
     treeMaker = CompFactory.getComp("CP::TreeMakerAlg")("TreeMaker")
     treeMaker.TreeName = "muons"

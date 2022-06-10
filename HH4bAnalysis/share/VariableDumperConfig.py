@@ -15,11 +15,49 @@ from utils.containerNameHelper import getContainerName
 
 variabledumperlog = Logging.logging.getLogger("VariableDumperConfig")
 
+# Convert old style configurable to new via CompFactory
+# Services and public tools will not be handled and would need to be
+# added directly to the top-level CA
+def convertComp(comp):
+    newcomp = CompFactory.getComp(comp.getType())(comp.getName())
+    for p, v in comp.getProperties().items():
+        if v != "<no value>":
+            # Has a componentType, indicating handle
+            # Could use this to flag and store any
+            # services or public tools
+            if hasattr(v, "componentType"):
+                setattr(newcomp, p, v.toStringProperty())
+            # Has a name, but not a componentType (indicating component)
+            elif hasattr(v, "getName"):
+                setattr(newcomp, p, convertComp(v))
+            else:
+                setattr(newcomp, p, v)
+    return newcomp
+
+
+# Assume flat, recursion to get all sequences is
+# probably tedious but might be needed
+def convertSequenceAndGetAlgs(seq):
+    newseq = CompFactory.AthSequencer(seq.name())
+    newalgs = []
+    for alg in seq:
+        newalgs.append(convertComp(alg))
+    return newseq, newalgs
+
 
 # Generate the algorithm to do the histogramming.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
 def VariableDumperCfg(flags, daodphyslite, outfname):
+    dataType = "mc" if flags.Input.isMC else "data"
+
+    reco4JetContainerName = getContainerName("Reco4PFlowJets", daodphyslite)
+    reco10JetContainerName = getContainerName("Reco10PFlowJets", daodphyslite)
+    # truth4JetContainerName = getContainerName("Truth4Jets", daodphyslite)
+    # truth10JetContainerName = getContainerName("Truth10Jets", daodphyslite)
+    muonsContainerName = getContainerName("Muons", daodphyslite)
+    # electronsContainerName = getContainerName("Electrons", daodphyslite)
+
     cfg = ComponentAccumulator()
 
     # Every CA should include all its dependencies, apart from the global ones
@@ -35,40 +73,187 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     cfg.addService(
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
+    # Create SystematicsSvc explicitly:
+    cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
 
-    reco4JetContainerName = getContainerName("Reco4PFlowJets", daodphyslite)
-    reco10JetContainerName = getContainerName("Reco10PFlowJets", daodphyslite)
-    # truth4JetContainerName = getContainerName("Truth4Jets", daodphyslite)
-    # truth10JetContainerName = getContainerName("Truth10Jets", daodphyslite)
-    muonsContainerName = getContainerName("Muons", daodphyslite)
-    # electronsContainerName = getContainerName("Electrons", daodphyslite)
+    # Create a pile-up analysis sequence
+    from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
+
+    pileupSequence = makePileupAnalysisSequence(dataType)
+    pileupSequence.configure(inputName="EventInfo", outputName="EventInfo_%SYS%")
+    # print(pileupSequence)  # For debugging
+    # Convert to new configurables
+    pileupSequenceCnv, algsCnv = convertSequenceAndGetAlgs(pileupSequence)
+    cfg.addSequence(pileupSequenceCnv)
+    for alg in algsCnv:
+        cfg.addEventAlgo(alg, pileupSequenceCnv.getName())
+
+    # Include, and then set up the muon analysis algorithm sequence:
+    from MuonAnalysisAlgorithms.MuonAnalysisSequence import makeMuonAnalysisSequence
+
+    muonLooseSequence = makeMuonAnalysisSequence(
+        dataType,
+        deepCopyOutput=True,
+        shallowViewOutput=False,
+        workingPoint="Loose.NonIso",
+        postfix="loose",
+    )
+    muonLooseSequence.configure(
+        inputName=muonsContainerName, outputName="AnalysisMuonsLoose_%SYS%"
+    )
+    # print(muonLooseSequence)  # For debugging
+    # Convert to new configurables
+    muonLooseSequenceCnv, algsCnv = convertSequenceAndGetAlgs(muonLooseSequence)
+    cfg.addSequence(muonLooseSequenceCnv)
+    for alg in algsCnv:
+        cfg.addEventAlgo(alg, muonLooseSequenceCnv.getName())
+
+    from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
+
+    jetSequence = makeJetAnalysisSequence(
+        dataType,
+        reco4JetContainerName,
+        postfix="smallR",
+        deepCopyOutput=True,
+        shallowViewOutput=False,
+        runGhostMuonAssociation=False,
+        runFJvtUpdate=False,
+        runFJvtSelection=False,
+        runJvtSelection=False,
+    )
+
+    from FTagAnalysisAlgorithms.FTagAnalysisSequence import makeFTagAnalysisSequence
+
+    makeFTagAnalysisSequence(
+        jetSequence,
+        dataType,
+        reco4JetContainerName,
+        btagWP="FixedCutBEff_77",
+        btagger="DL1r",  # DL1dv00 not available in makeFTagAnalysisSequence CDI
+        generator="default",  # Pythia8 not available in makeFTagAnalysisSequence CDI
+        postfix="",
+        preselection=None,
+        kinematicSelection=False,
+        noEfficiency=False,
+        legacyRecommendations=True,
+        enableCutflow=False,
+        minPt=20000,
+    )
+
+    jetSequence.configure(
+        inputName=reco4JetContainerName, outputName="AnalysisJetsBTAG_%SYS%"
+    )
+
+    # print(jetSequence)  # For debugging
+    # Convert to new configurables
+    jetSequenceCnv, algsCnv = convertSequenceAndGetAlgs(jetSequence)
+    cfg.addSequence(jetSequenceCnv)
+    for alg in algsCnv:
+        cfg.addEventAlgo(alg, jetSequenceCnv.getName())
 
     # Define and configure a tool instance
     # Properties can be set as keyword arguments to the tool constructor
-    bTagSelectionTool = CompFactory.BTaggingSelectionTool(
-        "bTagSelectionTool",
-        FlvTagCutDefinitionsFileName=(
-            "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
-        ),
-        TaggerName="DL1dv00",
-        OperatingPoint="FixedCutBEff_77",
-        JetAuthor=reco4JetContainerName,
-        MinPt=20e3,
-        MaxEta=2.5,
+    # bTagSelectionTool = CompFactory.BTaggingSelectionTool(
+    #     "bTagSelectionTool",
+    #     FlvTagCutDefinitionsFileName=(
+    #         "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
+    #     ),
+    #     TaggerName="DL1dv00",
+    #     OperatingPoint="FixedCutBEff_77",
+    #     JetAuthor=reco4JetContainerName,
+    #     MinPt=20e3,
+    #     MaxEta=2.5,
+    # )
+
+    from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
+
+    largeRrecojetSequence = makeJetAnalysisSequence(
+        dataType,
+        reco10JetContainerName,
+        postfix="largeR",
+        deepCopyOutput=True,
+        shallowViewOutput=False,
+        runGhostMuonAssociation=False,
+        largeRMass="Comb",
     )
+
+    largeRrecojetSequence.configure(
+        inputName=reco10JetContainerName, outputName="AnalysisLargeRRecoJets_%SYS%"
+    )
+    # print(largeRrecojetSequence)  # For debugging
+    # Convert to new configurables
+    largeRrecojetSequenceCnv, algsCnv = convertSequenceAndGetAlgs(largeRrecojetSequence)
+    cfg.addSequence(largeRrecojetSequenceCnv)
+    for alg in algsCnv:
+        cfg.addEventAlgo(alg, largeRrecojetSequenceCnv.getName())
 
     cfg.addEventAlgo(
         CompFactory.HH4B.VariableDumperAlg(
             "VariableDumper",
             EventInfoKey="EventInfo",
-            Reco4JetsKey=reco4JetContainerName,
-            Reco10JetsKey=reco10JetContainerName,
-            MuonsKey=muonsContainerName,
             RootStreamName="ANALYSIS",
             # RootDirName="Reco",
-            BTaggingSelectionTool=bTagSelectionTool,
+            # BTaggingSelectionTool=bTagSelectionTool,
         )
     )
+
+    # Create analysis mini-ntuple
+    treeMaker = CompFactory.getComp("CP::TreeMakerAlg")("TreeMaker")
+    treeMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    # Add event info
+    cfg.addEventAlgo(treeMaker)
+    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
+        "NTupleMakerEventInfo"
+    )
+    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    ntupleMaker.Branches = [
+        "EventInfo.runNumber     -> runNumber",
+        "EventInfo.eventNumber   -> eventNumber",
+        # "EventInfo.mcEventWeight   -> mcEventWeight", # Having some issues retrieving this value
+    ]
+    cfg.addEventAlgo(ntupleMaker)
+    # Add muons info
+    # Having some issues wit the muons
+    # ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMakerMuons")
+    # ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    # ntupleMaker.Branches = [
+    #     "AnalysisMuonsLoose_NOSYS.m  -> mu_m",
+    #     "AnalysisMuonsLoose_NOSYS.pt  -> mu_pt",
+    #     "AnalysisMuonsLoose_NOSYS.eta -> mu_eta",
+    #     "AnalysisMuonsLoose_NOSYS.phi -> mu_phi",
+    #     # "AnalysisMuonsLoose_%SYS%.pt  -> mu_%SYS%_pt",
+    # ]
+    # cfg.addEventAlgo(ntupleMaker)
+    # Add small R jet info
+    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
+        "NTupleMakerSmallRJets"
+    )
+    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    ntupleMaker.Branches = [
+        "AnalysisJetsBTAG_NOSYS.m  -> recojet_antikt4_m",
+        "AnalysisJetsBTAG_NOSYS.pt  -> recojet_antikt4_pt",
+        "AnalysisJetsBTAG_NOSYS.eta -> recojet_antikt4_eta",
+        "AnalysisJetsBTAG_NOSYS.phi -> recojet_antikt4_phi",
+        # "AnalysisJetsBTAG_%SYS%.pt  -> recojet_antikt4_%SYS%_pt",
+    ]
+    cfg.addEventAlgo(ntupleMaker)
+    # Add large R jet info
+    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
+        "NTupleMakerLargeRJets"
+    )
+    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    ntupleMaker.Branches = [
+        "AnalysisLargeRRecoJets_NOSYS.m  -> recojet_antikt10_m",
+        "AnalysisLargeRRecoJets_NOSYS.pt  -> recojet_antikt10_pt",
+        "AnalysisLargeRRecoJets_NOSYS.eta -> recojet_antikt10_eta",
+        "AnalysisLargeRRecoJets_NOSYS.phi -> recojet_antikt10_phi",
+        # "AnalysisLargeRRecoJets_%SYS%.pt  -> recojet_antikt10_%SYS%_pt",
+    ]
+    cfg.addEventAlgo(ntupleMaker)
+    # Fill tree
+    treeFiller = CompFactory.getComp("CP::TreeFillerAlg")("TreeFiller")
+    treeFiller.TreeName = "AnalysisMiniTree_NOSYS"
+    cfg.addEventAlgo(treeFiller)
 
     return cfg
 
