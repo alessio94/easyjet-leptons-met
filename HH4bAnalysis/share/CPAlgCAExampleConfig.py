@@ -1,9 +1,11 @@
 # Basic setup, similar to HelloWorldConfig
 from AthenaCommon import Logging
 
-catestlog = Logging.logging.getLogger("CPAlgCATestConfig")
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+
+catestlog = Logging.logging.getLogger("CPAlgCATestConfig")
+
 
 # Convert old style configurable to new via CompFactory
 # Services and public tools will not be handled and would need to be
@@ -117,7 +119,8 @@ def main():
 
         cfg = MainServicesCfg(ConfigFlags)
 
-        # Add the components for reading in POOL files -- this is a specialised ROOT format
+        # Add the components for reading in POOL files -- this is a
+        # specialised ROOT format
         # storing structured objects like the ATLAS physics objects (jets etc)
         from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
 

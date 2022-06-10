@@ -15,6 +15,7 @@ from utils.containerNameHelper import getContainerName
 
 variabledumperlog = Logging.logging.getLogger("VariableDumperConfig")
 
+
 # Convert old style configurable to new via CompFactory
 # Services and public tools will not be handled and would need to be
 # added directly to the top-level CA
@@ -209,7 +210,8 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     ntupleMaker.Branches = [
         "EventInfo.runNumber     -> runNumber",
         "EventInfo.eventNumber   -> eventNumber",
-        # "EventInfo.mcEventWeight   -> mcEventWeight", # Having some issues retrieving this value
+        # Having some issues retrieving this value
+        # "EventInfo.mcEventWeight   -> mcEventWeight",
     ]
     cfg.addEventAlgo(ntupleMaker)
     # Add muons info
