@@ -99,7 +99,7 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         postfix="loose",
     )
     muonLooseSequence.configure(
-        inputName=muonsContainerName, outputName="AnalysisMuonsLoose_%SYS%"
+        inputName=muonsContainerName, outputName="AnalysisMuons_%SYS%"
     )
     # print(muonLooseSequence)  # For debugging
     # Convert to new configurables
@@ -217,11 +217,11 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     # ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMakerMuons")
     # ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
     # ntupleMaker.Branches = [
-    #     "AnalysisMuonsLoose_NOSYS.m  -> mu_m",
-    #     "AnalysisMuonsLoose_NOSYS.pt  -> mu_pt",
-    #     "AnalysisMuonsLoose_NOSYS.eta -> mu_eta",
-    #     "AnalysisMuonsLoose_NOSYS.phi -> mu_phi",
-    #     # "AnalysisMuonsLoose_%SYS%.pt  -> mu_%SYS%_pt",
+    #     "AnalysisMuons_NOSYS.m  -> mu_m",
+    #     "AnalysisMuons_NOSYS.pt  -> mu_pt",
+    #     "AnalysisMuons_NOSYS.eta -> mu_eta",
+    #     "AnalysisMuons_NOSYS.phi -> mu_phi",
+    #     # "AnalysisMuons_%SYS%.pt  -> mu_%SYS%_pt",
     # ]
     # cfg.addEventAlgo(ntupleMaker)
     # Add small R jet info

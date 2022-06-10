@@ -45,7 +45,7 @@ namespace HH4B
     // CP::SysReadHandle<xAOD::EventInfo> m_eventInfoHandle{
     //     this, "EventInfoInKey", "EventInfo_%SYS%", "the event info collection to run on"};
     CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{
-        this, "muons", "AnalysisMuonsLoose_%SYS%", "the muon collection to run on"};
+        this, "muons", "AnalysisMuons_%SYS%", "the muon collection to run on"};
     CP::SysReadHandle<xAOD::JetContainer> m_jetsmallRHandle{this, "jetsmallR", "AnalysisJetsBTAG_%SYS%", "the small-R jet collection to run on"};
     CP::SysReadHandle<xAOD::JetContainer> m_jetlargeRHandle{this, "jetlargeR", "AnalysisLargeRRecoJets_%SYS%", "the large-R jet collection to run on"};
 
