@@ -5,7 +5,14 @@ atlas_subdir( HH4bAnalysis )
 find_package( ROOT COMPONENTS Core Tree Hist REQUIRED )
 
 # We don't want any warnings in compilation
-add_compile_options(-Werror)
+# disabling for now until framework is more mature
+# add_compile_options(-Werror) 
+
+# Install the interface headers
+atlas_add_library ( HH4bAnalysisLib
+  INTERFACE
+  PUBLIC_HEADERS HH4bAnalysis
+)
 
 # Build the Athena component library
 atlas_add_component( HH4bAnalysis
