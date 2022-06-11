@@ -15,6 +15,8 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
+#include <xAODEgamma/PhotonContainer.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 
@@ -42,11 +44,21 @@ namespace HH4B
     ToolHandle<IBTaggingSelectionTool> m_btagSelTool{this, "BTaggingSelectionTool", {}, "Tool to select b-jets"};
 
     CP::SysListHandle m_systematicsList{this};
+
     // CP::SysReadHandle<xAOD::EventInfo> m_eventInfoHandle{
     //     this, "EventInfoInKey", "EventInfo_%SYS%", "the event info collection to run on"};
+
+    CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{
+        this, "electrons", "AnalysisElectrons_%SYS%", "the electron collection to run on"};
+
+    CP::SysReadHandle<xAOD::PhotonContainer> m_photonHandle{
+        this, "photons", "AnalysisPhotons_%SYS%", "the photon collection to run on"};
+
     CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{
         this, "muons", "AnalysisMuons_%SYS%", "the muon collection to run on"};
+
     CP::SysReadHandle<xAOD::JetContainer> m_jetsmallRHandle{this, "jetsmallR", "AnalysisJetsBTAG_%SYS%", "the small-R jet collection to run on"};
+
     CP::SysReadHandle<xAOD::JetContainer> m_jetlargeRHandle{this, "jetlargeR", "AnalysisLargeRRecoJets_%SYS%", "the large-R jet collection to run on"};
 
     // Member variables for configuration

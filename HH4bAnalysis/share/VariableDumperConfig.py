@@ -12,38 +12,35 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 
 from utils.argsHelper import checkArgs
 from utils.containerNameHelper import getContainerName
+from utils.convertOldConfigHelper import convertSequenceAndGetAlgs
 
 variabledumperlog = Logging.logging.getLogger("VariableDumperConfig")
 
 
-# Convert old style configurable to new via CompFactory
-# Services and public tools will not be handled and would need to be
-# added directly to the top-level CA
-def convertComp(comp):
-    newcomp = CompFactory.getComp(comp.getType())(comp.getName())
-    for p, v in comp.getProperties().items():
-        if v != "<no value>":
-            # Has a componentType, indicating handle
-            # Could use this to flag and store any
-            # services or public tools
-            if hasattr(v, "componentType"):
-                setattr(newcomp, p, v.toStringProperty())
-            # Has a name, but not a componentType (indicating component)
-            elif hasattr(v, "getName"):
-                setattr(newcomp, p, convertComp(v))
-            else:
-                setattr(newcomp, p, v)
-    return newcomp
-
-
-# Assume flat, recursion to get all sequences is
-# probably tedious but might be needed
-def convertSequenceAndGetAlgs(seq):
-    newseq = CompFactory.AthSequencer(seq.name())
-    newalgs = []
-    for alg in seq:
-        newalgs.append(convertComp(alg))
-    return newseq, newalgs
+def pileupConfigFiles(dataType):
+    """Return the PRW config files and lumicalc files"""
+    if dataType == "data":
+        prwfiles = []
+        lumicalcfiles = []
+    else:
+        lumicalcfiles = [
+            # These need to be updated for release 22 data?
+            "GoodRunsLists/data15_13TeV/20170619/PHYS_StandardGRL_All_Good_25ns_276262-284484_OflLumi-13TeV-008.root",
+            "GoodRunsLists/data16_13TeV/20180129/PHYS_StandardGRL_All_Good_25ns_297730-311481_OflLumi-13TeV-009.root",
+            "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.lumicalc.OflLumi-13TeV-010.root",
+            "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root",
+        ]
+        if dataType == "mc":
+            prwfiles = [
+                # These need to be updated for the specific sample that is given to the job
+                # be taken from cvmfs
+                # "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PileupReweighting/share/DSID364xxx/pileup_mc20d_dsid364701_FS.root"
+            ]
+        else:
+            # We don't have a PRW file that works properly for the AFII file so we don't apply it in
+            # this case
+            prwfiles = []
+    return prwfiles, lumicalcfiles
 
 
 # Generate the algorithm to do the histogramming.
@@ -57,9 +54,18 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     # truth4JetContainerName = getContainerName("Truth4Jets", daodphyslite)
     # truth10JetContainerName = getContainerName("Truth10Jets", daodphyslite)
     muonsContainerName = getContainerName("Muons", daodphyslite)
-    # electronsContainerName = getContainerName("Electrons", daodphyslite)
+    electronsContainerName = getContainerName("Electrons", daodphyslite)
+    photonsContainerName = getContainerName("Photons", daodphyslite)
 
     cfg = ComponentAccumulator()
+
+    # # Skip events with no primary vertex:
+    # vertexSelectionAlg = CompFactory.getComp("CP::VertexSelectionAlg")(
+    #     "PrimaryVertexSelectorAlg"
+    # )
+    # vertexSelectionAlg.VertexContainer = "PrimaryVertices"
+    # vertexSelectionAlg.MinVertices = 1
+    # cfg.addEventAlgo(vertexSelectionAlg)
 
     # Every CA should include all its dependencies, apart from the global ones
     # included in the main function.
@@ -77,37 +83,82 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     # Create SystematicsSvc explicitly:
     cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
 
+    # Include, and then set up the pileup analysis sequence:
+    prwfiles, lumicalcfiles = pileupConfigFiles(dataType)
+
     # Create a pile-up analysis sequence
     from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
 
-    pileupSequence = makePileupAnalysisSequence(dataType)
-    pileupSequence.configure(inputName="EventInfo", outputName="EventInfo_%SYS%")
+    pileupSequence = makePileupAnalysisSequence(
+        dataType,
+        userPileupConfigs=prwfiles,
+        userLumicalcFiles=lumicalcfiles,
+    )
+    pileupSequence.configure(inputName={}, outputName={})
     # print(pileupSequence)  # For debugging
     # Convert to new configurables
-    pileupSequenceCnv, algsCnv = convertSequenceAndGetAlgs(pileupSequence)
+    pileupSequenceCnv, algsCnv = convertSequenceAndGetAlgs(CompFactory, pileupSequence)
     cfg.addSequence(pileupSequenceCnv)
     for alg in algsCnv:
         cfg.addEventAlgo(alg, pileupSequenceCnv.getName())
 
+    # Include, and then set up the electron analysis sequence:
+    from EgammaAnalysisAlgorithms.ElectronAnalysisSequence import (
+        makeElectronAnalysisSequence,
+    )
+
+    electronSequence = makeElectronAnalysisSequence(
+        dataType, workingPoint="LooseLHElectron.NonIso", postfix="loose"
+    )
+    electronSequence.configure(
+        inputName=electronsContainerName, outputName="AnalysisElectrons_%SYS%"
+    )
+    # print(electronSequence)  # For debugging
+    # Convert to new configurables
+    electronSequenceCnv, electronAlgsCnv = convertSequenceAndGetAlgs(
+        CompFactory, electronSequence
+    )
+    cfg.addSequence(electronSequenceCnv)
+    for electronAlg in electronAlgsCnv:
+        cfg.addEventAlgo(electronAlg, electronSequenceCnv.getName())
+
+    # Include, and then set up the photon analysis sequence:
+    from EgammaAnalysisAlgorithms.PhotonAnalysisSequence import (
+        makePhotonAnalysisSequence,
+    )
+
+    photonSequence = makePhotonAnalysisSequence(
+        dataType, workingPoint="Loose.Undefined", postfix="loose"
+    )
+    photonSequence.configure(
+        inputName=photonsContainerName, outputName="AnalysisPhotons_%SYS%"
+    )
+    # print(photonSequence)  # For debugging
+    # Convert to new configurables
+    photonSequenceCnv, photonAlgsCnv = convertSequenceAndGetAlgs(
+        CompFactory, photonSequence
+    )
+    cfg.addSequence(photonSequenceCnv)
+    for photonAlg in photonAlgsCnv:
+        cfg.addEventAlgo(photonAlg, photonSequenceCnv.getName())
+
     # Include, and then set up the muon analysis algorithm sequence:
     from MuonAnalysisAlgorithms.MuonAnalysisSequence import makeMuonAnalysisSequence
 
-    muonLooseSequence = makeMuonAnalysisSequence(
+    muonSequence = makeMuonAnalysisSequence(
         dataType,
-        deepCopyOutput=True,
-        shallowViewOutput=False,
         workingPoint="Loose.NonIso",
         postfix="loose",
     )
-    muonLooseSequence.configure(
+    muonSequence.configure(
         inputName=muonsContainerName, outputName="AnalysisMuons_%SYS%"
     )
     # print(muonLooseSequence)  # For debugging
     # Convert to new configurables
-    muonLooseSequenceCnv, algsCnv = convertSequenceAndGetAlgs(muonLooseSequence)
-    cfg.addSequence(muonLooseSequenceCnv)
-    for alg in algsCnv:
-        cfg.addEventAlgo(alg, muonLooseSequenceCnv.getName())
+    muonSequenceCnv, muonAlgsCnv = convertSequenceAndGetAlgs(CompFactory, muonSequence)
+    cfg.addSequence(muonSequenceCnv)
+    for muonAlg in muonAlgsCnv:
+        cfg.addEventAlgo(muonAlg, muonSequenceCnv.getName())
 
     from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
 
@@ -147,10 +198,10 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
 
     # print(jetSequence)  # For debugging
     # Convert to new configurables
-    jetSequenceCnv, algsCnv = convertSequenceAndGetAlgs(jetSequence)
+    jetSequenceCnv, jetAlgsCnv = convertSequenceAndGetAlgs(CompFactory, jetSequence)
     cfg.addSequence(jetSequenceCnv)
-    for alg in algsCnv:
-        cfg.addEventAlgo(alg, jetSequenceCnv.getName())
+    for jetAlg in jetAlgsCnv:
+        cfg.addEventAlgo(jetAlg, jetSequenceCnv.getName())
 
     # Define and configure a tool instance
     # Properties can be set as keyword arguments to the tool constructor
@@ -183,10 +234,12 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     )
     # print(largeRrecojetSequence)  # For debugging
     # Convert to new configurables
-    largeRrecojetSequenceCnv, algsCnv = convertSequenceAndGetAlgs(largeRrecojetSequence)
+    largeRrecojetSequenceCnv, largeJetAlgsCnv = convertSequenceAndGetAlgs(
+        CompFactory, largeRrecojetSequence
+    )
     cfg.addSequence(largeRrecojetSequenceCnv)
-    for alg in algsCnv:
-        cfg.addEventAlgo(alg, largeRrecojetSequenceCnv.getName())
+    for largeJetAlg in largeJetAlgsCnv:
+        cfg.addEventAlgo(largeJetAlg, largeRrecojetSequenceCnv.getName())
 
     cfg.addEventAlgo(
         CompFactory.HH4B.VariableDumperAlg(
@@ -201,6 +254,7 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     # Create analysis mini-ntuple
     treeMaker = CompFactory.getComp("CP::TreeMakerAlg")("TreeMaker")
     treeMaker.TreeName = "AnalysisMiniTree_NOSYS"
+
     # Add event info
     cfg.addEventAlgo(treeMaker)
     ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
@@ -214,6 +268,33 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         # "EventInfo.mcEventWeight   -> mcEventWeight",
     ]
     cfg.addEventAlgo(ntupleMaker)
+
+    # Add electrons info
+    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
+        "NTupleMakerElectrons"
+    )
+    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    ntupleMaker.Branches = [
+        "AnalysisElectrons_NOSYS.m  -> el_m",
+        "AnalysisElectrons_NOSYS.pt  -> el_pt",
+        "AnalysisElectrons_NOSYS.eta -> el_eta",
+        "AnalysisElectrons_NOSYS.phi -> el_phi",
+        # "AnalysisElectrons_%SYS%.pt  -> el_%SYS%_pt",
+    ]
+    cfg.addEventAlgo(ntupleMaker)
+
+    # Add photons info
+    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMakerPhotons")
+    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    ntupleMaker.Branches = [
+        "AnalysisPhotons_NOSYS.m  -> ph_m",
+        "AnalysisPhotons_NOSYS.pt  -> ph_pt",
+        "AnalysisPhotons_NOSYS.eta -> ph_eta",
+        "AnalysisPhotons_NOSYS.phi -> ph_phi",
+        # "AnalysisPhotons_%SYS%.pt  -> ph_%SYS%_pt",
+    ]
+    cfg.addEventAlgo(ntupleMaker)
+
     # Add muons info
     # Having some issues wit the muons
     # ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMakerMuons")
@@ -226,6 +307,7 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     #     # "AnalysisMuons_%SYS%.pt  -> mu_%SYS%_pt",
     # ]
     # cfg.addEventAlgo(ntupleMaker)
+
     # Add small R jet info
     ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
         "NTupleMakerSmallRJets"
@@ -239,6 +321,7 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         # "AnalysisJetsBTAG_%SYS%.pt  -> recojet_antikt4_%SYS%_pt",
     ]
     cfg.addEventAlgo(ntupleMaker)
+
     # Add large R jet info
     ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
         "NTupleMakerLargeRJets"
@@ -252,6 +335,7 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         # "AnalysisLargeRRecoJets_%SYS%.pt  -> recojet_antikt10_%SYS%_pt",
     ]
     cfg.addEventAlgo(ntupleMaker)
+
     # Fill tree
     treeFiller = CompFactory.getComp("CP::TreeFillerAlg")("TreeFiller")
     treeFiller.TreeName = "AnalysisMiniTree_NOSYS"

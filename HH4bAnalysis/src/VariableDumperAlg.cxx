@@ -32,6 +32,8 @@ namespace HH4B
     }
 
     // m_systematicsList.addHandle(m_eventInfoHandle);
+    m_systematicsList.addHandle(m_electronHandle);
+    m_systematicsList.addHandle(m_photonHandle);
     m_systematicsList.addHandle(m_muonHandle);
     m_systematicsList.addHandle(m_jetsmallRHandle);
     m_systematicsList.addHandle(m_jetlargeRHandle);
@@ -57,14 +59,21 @@ namespace HH4B
       SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
       ATH_CHECK(eventInfo.isValid());
 
+      const xAOD::ElectronContainer *electrons(nullptr);
+      ATH_CHECK(m_electronHandle.retrieve(electrons, sys));
+      // do something with electrons
+      const xAOD::PhotonContainer *photons(nullptr);
+      ATH_CHECK(m_photonHandle.retrieve(photons, sys));
+      // do something with electrons
       const xAOD::MuonContainer *muons(nullptr);
       ATH_CHECK(m_muonHandle.retrieve(muons, sys));
-
-      const xAOD::JetContainer *AntiKt4RecoJets(nullptr);
-      ANA_CHECK(m_jetsmallRHandle.retrieve(AntiKt4RecoJets, sys));
-
-      const xAOD::JetContainer *AntiKt10RecoJets(nullptr);
-      ANA_CHECK(m_jetlargeRHandle.retrieve(AntiKt10RecoJets, sys));
+      // do something with muons
+      const xAOD::JetContainer *antiKt4RecoJets(nullptr);
+      ANA_CHECK(m_jetsmallRHandle.retrieve(antiKt4RecoJets, sys));
+      // do something with antiKt4RecoJets
+      const xAOD::JetContainer *antiKt10RecoJets(nullptr);
+      ANA_CHECK(m_jetlargeRHandle.retrieve(antiKt10RecoJets, sys));
+      // do something with antiKt10RecoJets
     }
 
     return StatusCode::SUCCESS;
