@@ -155,7 +155,7 @@ def makeEventAlgorithmsSequence(dataType):
 
     # Config:
     GRLFiles = [
-        "GoodRunsLists/data16_13TeV/20180129/data16_13TeV.periodAllYear_DetStatus-v89-pro21-01_DQDefects-00-02-04_PHYS_StandardGRL_All_Good_25ns.xml"
+        # "GoodRunsLists/data16_13TeV/20180129/data16_13TeV.periodAllYear_DetStatus-v89-pro21-01_DQDefects-00-02-04_PHYS_StandardGRL_All_Good_25ns.xml"
     ]
 
     algSeq = AlgSequence()
@@ -263,8 +263,8 @@ def pileupConfigFiles(dataType):
                 # "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PileupReweighting/mc16_13TeV/pileup_mc16a_dsid410501_FS.root"
             ]
         else:
-            # We don't have a PRW file that works properly for the AFII file so we don't apply it in
-            # this case
+            # We don't have a PRW file that works properly for the AFII file
+            # so we don't apply it in this case
             prwfiles = []
     return prwfiles, lumicalcfiles
 

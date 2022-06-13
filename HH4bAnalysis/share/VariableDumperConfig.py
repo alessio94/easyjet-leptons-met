@@ -32,13 +32,12 @@ def pileupConfigFiles(dataType):
         ]
         if dataType == "mc":
             prwfiles = [
-                # These need to be updated for the specific sample that is given to the job
-                # be taken from cvmfs
+                # Need to be updated and are job specific?
                 # "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PileupReweighting/share/DSID364xxx/pileup_mc20d_dsid364701_FS.root"
             ]
         else:
-            # We don't have a PRW file that works properly for the AFII file so we don't apply it in
-            # this case
+            # We don't have a PRW file that works properly for the AFII file
+            # so we don't apply it in this case
             prwfiles = []
     return prwfiles, lumicalcfiles
 
