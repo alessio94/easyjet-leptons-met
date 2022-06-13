@@ -31,7 +31,6 @@ namespace HH4B
       return StatusCode::FAILURE;
     }
 
-    // m_systematicsList.addHandle(m_eventInfoHandle);
     m_systematicsList.addHandle(m_electronHandle);
     m_systematicsList.addHandle(m_photonHandle);
     m_systematicsList.addHandle(m_muonHandle);

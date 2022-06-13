@@ -45,8 +45,8 @@ namespace HH4B
 
     CP::SysListHandle m_systematicsList{this};
 
-    // CP::SysReadHandle<xAOD::EventInfo> m_eventInfoHandle{
-    //     this, "EventInfoInKey", "EventInfo_%SYS%", "the event info collection to run on"};
+    // Member variables for configuration
+    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{this, "EventInfoKey", "", "EventInfo container to dump"};
 
     CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{
         this, "electrons", "AnalysisElectrons_%SYS%", "the electron collection to run on"};
@@ -60,9 +60,6 @@ namespace HH4B
     CP::SysReadHandle<xAOD::JetContainer> m_jetsmallRHandle{this, "jetsmallR", "AnalysisJetsBTAG_%SYS%", "the small-R jet collection to run on"};
 
     CP::SysReadHandle<xAOD::JetContainer> m_jetlargeRHandle{this, "jetlargeR", "AnalysisLargeRRecoJets_%SYS%", "the large-R jet collection to run on"};
-
-    // Member variables for configuration
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{this, "EventInfoKey", "", "EventInfo container to dump"};
 
     // output variables for the current event
     unsigned int m_runNumber = 0;

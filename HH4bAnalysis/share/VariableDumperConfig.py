@@ -24,11 +24,11 @@ def pileupConfigFiles(dataType):
         lumicalcfiles = []
     else:
         lumicalcfiles = [
-            # These need to be updated for release 22 data?
-            "GoodRunsLists/data15_13TeV/20170619/PHYS_StandardGRL_All_Good_25ns_276262-284484_OflLumi-13TeV-008.root",
-            "GoodRunsLists/data16_13TeV/20180129/PHYS_StandardGRL_All_Good_25ns_297730-311481_OflLumi-13TeV-009.root",
-            "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.lumicalc.OflLumi-13TeV-010.root",
-            "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root",
+            # These need to be updated for release 22 data
+            # "GoodRunsLists/data15_13TeV/20170619/PHYS_StandardGRL_All_Good_25ns_276262-284484_OflLumi-13TeV-008.root",
+            # "GoodRunsLists/data16_13TeV/20180129/PHYS_StandardGRL_All_Good_25ns_297730-311481_OflLumi-13TeV-009.root",
+            # "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.lumicalc.OflLumi-13TeV-010.root",
+            # "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root",
         ]
         if dataType == "mc":
             prwfiles = [
@@ -51,21 +51,11 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
 
     reco4JetContainerName = getContainerName("Reco4PFlowJets", daodphyslite)
     reco10JetContainerName = getContainerName("Reco10PFlowJets", daodphyslite)
-    # truth4JetContainerName = getContainerName("Truth4Jets", daodphyslite)
-    # truth10JetContainerName = getContainerName("Truth10Jets", daodphyslite)
     muonsContainerName = getContainerName("Muons", daodphyslite)
     electronsContainerName = getContainerName("Electrons", daodphyslite)
     photonsContainerName = getContainerName("Photons", daodphyslite)
 
     cfg = ComponentAccumulator()
-
-    # # Skip events with no primary vertex:
-    # vertexSelectionAlg = CompFactory.getComp("CP::VertexSelectionAlg")(
-    #     "PrimaryVertexSelectorAlg"
-    # )
-    # vertexSelectionAlg.VertexContainer = "PrimaryVertices"
-    # vertexSelectionAlg.MinVertices = 1
-    # cfg.addEventAlgo(vertexSelectionAlg)
 
     # Every CA should include all its dependencies, apart from the global ones
     # included in the main function.
@@ -93,6 +83,7 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         dataType,
         userPileupConfigs=prwfiles,
         userLumicalcFiles=lumicalcfiles,
+        autoConfig=False,
     )
     pileupSequence.configure(inputName={}, outputName={})
     # print(pileupSequence)  # For debugging
@@ -108,7 +99,18 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     )
 
     electronSequence = makeElectronAnalysisSequence(
-        dataType, workingPoint="LooseLHElectron.NonIso", postfix="loose"
+        dataType,
+        workingPoint="LooseLHElectron.NonIso",
+        postfix="loose",
+        deepCopyOutput=False,
+        shallowViewOutput=True,
+        recomputeLikelihood=False,
+        chargeIDSelection=False,
+        isolationCorrection=False,
+        crackVeto=False,
+        ptSelectionOutput=False,
+        enableCutflow=False,
+        enableKinematicHistograms=False,
     )
     electronSequence.configure(
         inputName=electronsContainerName, outputName="AnalysisElectrons_%SYS%"
@@ -128,7 +130,18 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     )
 
     photonSequence = makePhotonAnalysisSequence(
-        dataType, workingPoint="Loose.Undefined", postfix="loose"
+        dataType,
+        workingPoint="Loose.Undefined",
+        postfix="loose",
+        deepCopyOutput=False,
+        shallowViewOutput=True,
+        crackVeto=False,
+        enableCleaning=True,
+        cleaningAllowLate=False,
+        recomputeIsEM=False,
+        ptSelectionOutput=False,
+        enableCutflow=False,
+        enableKinematicHistograms=False,
     )
     photonSequence.configure(
         inputName=photonsContainerName, outputName="AnalysisPhotons_%SYS%"
@@ -149,6 +162,12 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         dataType,
         workingPoint="Loose.NonIso",
         postfix="loose",
+        deepCopyOutput=False,
+        shallowViewOutput=True,
+        ptSelectionOutput=False,
+        qualitySelectionOutput=True,
+        enableCutflow=False,
+        enableKinematicHistograms=False,
     )
     muonSequence.configure(
         inputName=muonsContainerName, outputName="AnalysisMuons_%SYS%"
@@ -164,11 +183,13 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
 
     jetSequence = makeJetAnalysisSequence(
         dataType,
-        reco4JetContainerName,
+        jetCollection=reco4JetContainerName,
         postfix="smallR",
-        deepCopyOutput=True,
-        shallowViewOutput=False,
-        runGhostMuonAssociation=False,
+        deepCopyOutput=False,
+        shallowViewOutput=True,
+        runGhostMuonAssociation=True,
+        enableCutflow=False,
+        enableKinematicHistograms=False,
         runFJvtUpdate=False,
         runFJvtSelection=False,
         runJvtSelection=False,
@@ -179,7 +200,7 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     makeFTagAnalysisSequence(
         jetSequence,
         dataType,
-        reco4JetContainerName,
+        jetCollection=reco4JetContainerName,
         btagWP="FixedCutBEff_77",
         btagger="DL1r",  # DL1dv00 not available in makeFTagAnalysisSequence CDI
         generator="default",  # Pythia8 not available in makeFTagAnalysisSequence CDI
@@ -191,11 +212,9 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         enableCutflow=False,
         minPt=20000,
     )
-
     jetSequence.configure(
         inputName=reco4JetContainerName, outputName="AnalysisJetsBTAG_%SYS%"
     )
-
     # print(jetSequence)  # For debugging
     # Convert to new configurables
     jetSequenceCnv, jetAlgsCnv = convertSequenceAndGetAlgs(CompFactory, jetSequence)
@@ -223,12 +242,13 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
         dataType,
         reco10JetContainerName,
         postfix="largeR",
-        deepCopyOutput=True,
-        shallowViewOutput=False,
+        deepCopyOutput=False,
+        shallowViewOutput=True,
         runGhostMuonAssociation=False,
+        enableCutflow=False,
+        enableKinematicHistograms=False,
         largeRMass="Comb",
     )
-
     largeRrecojetSequence.configure(
         inputName=reco10JetContainerName, outputName="AnalysisLargeRRecoJets_%SYS%"
     )
@@ -241,104 +261,121 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     for largeJetAlg in largeJetAlgsCnv:
         cfg.addEventAlgo(largeJetAlg, largeRrecojetSequenceCnv.getName())
 
+    # Include, and then set up the overlap analysis algorithm sequence:
+    from AsgAnalysisAlgorithms.OverlapAnalysisSequence import (
+        makeOverlapAnalysisSequence,
+    )
+
+    overlapSequence = makeOverlapAnalysisSequence(
+        dataType,
+        inputLabel="",
+        outputLabel="passesOR",
+        linkOverlapObjects=False,
+        doEleEleOR=False,
+        doMuPFJetOR=True,
+        doTaus=False,
+        doElectrons=True,
+        doMuons=True,
+        doJets=True,
+        doPhotons=True,
+        doFatJets=True,
+        enableUserPriority=False,
+        bJetLabel="",
+        boostedLeptons=False,
+        postfix="",
+        shallowViewOutput=True,
+        enableCutflow=False,
+    )
+    overlapSequence.configure(
+        inputName={
+            "electrons": "AnalysisElectrons_%SYS%",
+            "photons": "AnalysisPhotons_%SYS%",
+            "muons": "AnalysisMuons_%SYS%",
+            "jets": "AnalysisJetsBTAG_%SYS%",
+            "fatJets": "AnalysisLargeRRecoJets_%SYS%",
+            # 'taus'      : 'AnalysisTauJets_%SYS%'
+        },
+        outputName={
+            "electrons": "AnalysisElectronsOR_%SYS%",
+            "photons": "AnalysisPhotonsOR_%SYS%",
+            "muons": "AnalysisMuonsOR_%SYS%",
+            "jets": "AnalysisJetsBTAGOR_%SYS%",
+            "fatJets": "AnalysisLargeRRecoJetsOR_%SYS%",
+            # 'taus'      : 'AnalysisTauJetsOR_%SYS%'
+        },
+    )
+    # print(overlapSequence)  # For debugging
+    # Convert to new configurables
+    overlapSequenceCnv, overlapAlgsCnv = convertSequenceAndGetAlgs(
+        CompFactory, overlapSequence
+    )
+    cfg.addSequence(overlapSequenceCnv)
+    for overlapAlg in overlapAlgsCnv:
+        cfg.addEventAlgo(overlapAlg, overlapSequenceCnv.getName())
+
     cfg.addEventAlgo(
         CompFactory.HH4B.VariableDumperAlg(
             "VariableDumper",
             EventInfoKey="EventInfo",
             RootStreamName="ANALYSIS",
-            # RootDirName="Reco",
             # BTaggingSelectionTool=bTagSelectionTool,
         )
     )
 
     # Create analysis mini-ntuple
     treeMaker = CompFactory.getComp("CP::TreeMakerAlg")("TreeMaker")
-    treeMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    treeMaker.TreeName = "AnalysisMiniTree"
 
     # Add event info
     cfg.addEventAlgo(treeMaker)
-    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
-        "NTupleMakerEventInfo"
-    )
-    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
+    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMaker")
+    ntupleMaker.TreeName = "AnalysisMiniTree"
     ntupleMaker.Branches = [
         "EventInfo.runNumber     -> runNumber",
         "EventInfo.eventNumber   -> eventNumber",
-        # Having some issues retrieving this value
+        # we currently don't have any pileup calib files setup
+        # 'EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%',
         # "EventInfo.mcEventWeight   -> mcEventWeight",
-    ]
-    cfg.addEventAlgo(ntupleMaker)
-
-    # Add electrons info
-    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
-        "NTupleMakerElectrons"
-    )
-    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
-    ntupleMaker.Branches = [
-        "AnalysisElectrons_NOSYS.m  -> el_m",
-        "AnalysisElectrons_NOSYS.pt  -> el_pt",
-        "AnalysisElectrons_NOSYS.eta -> el_eta",
-        "AnalysisElectrons_NOSYS.phi -> el_phi",
-        # "AnalysisElectrons_%SYS%.pt  -> el_%SYS%_pt",
-    ]
-    cfg.addEventAlgo(ntupleMaker)
-
-    # Add photons info
-    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMakerPhotons")
-    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
-    ntupleMaker.Branches = [
-        "AnalysisPhotons_NOSYS.m  -> ph_m",
-        "AnalysisPhotons_NOSYS.pt  -> ph_pt",
-        "AnalysisPhotons_NOSYS.eta -> ph_eta",
-        "AnalysisPhotons_NOSYS.phi -> ph_phi",
-        # "AnalysisPhotons_%SYS%.pt  -> ph_%SYS%_pt",
-    ]
-    cfg.addEventAlgo(ntupleMaker)
-
-    # Add muons info
-    # Having some issues wit the muons
-    # ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMakerMuons")
-    # ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
-    # ntupleMaker.Branches = [
-    #     "AnalysisMuons_NOSYS.m  -> mu_m",
-    #     "AnalysisMuons_NOSYS.pt  -> mu_pt",
-    #     "AnalysisMuons_NOSYS.eta -> mu_eta",
-    #     "AnalysisMuons_NOSYS.phi -> mu_phi",
-    #     # "AnalysisMuons_%SYS%.pt  -> mu_%SYS%_pt",
-    # ]
-    # cfg.addEventAlgo(ntupleMaker)
-
-    # Add small R jet info
-    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
-        "NTupleMakerSmallRJets"
-    )
-    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
-    ntupleMaker.Branches = [
-        "AnalysisJetsBTAG_NOSYS.m  -> recojet_antikt4_m",
-        "AnalysisJetsBTAG_NOSYS.pt  -> recojet_antikt4_pt",
-        "AnalysisJetsBTAG_NOSYS.eta -> recojet_antikt4_eta",
-        "AnalysisJetsBTAG_NOSYS.phi -> recojet_antikt4_phi",
-        # "AnalysisJetsBTAG_%SYS%.pt  -> recojet_antikt4_%SYS%_pt",
-    ]
-    cfg.addEventAlgo(ntupleMaker)
-
-    # Add large R jet info
-    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")(
-        "NTupleMakerLargeRJets"
-    )
-    ntupleMaker.TreeName = "AnalysisMiniTree_NOSYS"
-    ntupleMaker.Branches = [
-        "AnalysisLargeRRecoJets_NOSYS.m  -> recojet_antikt10_m",
-        "AnalysisLargeRRecoJets_NOSYS.pt  -> recojet_antikt10_pt",
-        "AnalysisLargeRRecoJets_NOSYS.eta -> recojet_antikt10_eta",
-        "AnalysisLargeRRecoJets_NOSYS.phi -> recojet_antikt10_phi",
-        # "AnalysisLargeRRecoJets_%SYS%.pt  -> recojet_antikt10_%SYS%_pt",
+        "AnalysisElectrons_%SYS%.pt  -> el_%SYS%_pt",
+        "AnalysisElectrons_%SYS%.eta -> el_%SYS%_eta",
+        "AnalysisElectrons_%SYS%.phi -> el_%SYS%_phi",
+        "AnalysisElectronsOR_%SYS%.eta -> el_OR_%SYS%_eta",
+        "AnalysisElectronsOR_%SYS%.phi -> el_OR_%SYS%_phi",
+        "AnalysisElectronsOR_%SYS%.pt  -> el_OR_%SYS%_pt",
+        "AnalysisPhotons_%SYS%.pt  -> ph_%SYS%_pt",
+        "AnalysisPhotons_%SYS%.eta -> ph_%SYS%_eta",
+        "AnalysisPhotons_%SYS%.phi -> ph_%SYS%_phi",
+        "AnalysisPhotonsOR_%SYS%.eta -> ph_OR_%SYS%_eta",
+        "AnalysisPhotonsOR_%SYS%.phi -> ph_OR_%SYS%_phi",
+        "AnalysisPhotonsOR_%SYS%.pt  -> ph_OR_%SYS%_pt",
+        "AnalysisMuons_%SYS%.pt  -> mu_%SYS%_pt",
+        "AnalysisMuons_%SYS%.eta -> mu_%SYS%_eta",
+        "AnalysisMuons_%SYS%.phi -> mu_%SYS%_phi",
+        "AnalysisMuonsOR_%SYS%.eta -> mu_OR_%SYS%_eta",
+        "AnalysisMuonsOR_%SYS%.phi -> mu_OR_%SYS%_phi",
+        "AnalysisMuonsOR_%SYS%.pt  -> mu_OR_%SYS%_pt",
+        "AnalysisJetsBTAG_%SYS%.m  -> recojet_antikt4_%SYS%_m",
+        "AnalysisJetsBTAG_%SYS%.pt  -> recojet_antikt4_%SYS%_pt",
+        "AnalysisJetsBTAG_%SYS%.eta -> recojet_antikt4_%SYS%_eta",
+        "AnalysisJetsBTAG_%SYS%.phi -> recojet_antikt4_%SYS%_phi",
+        "AnalysisJetsBTAGOR_%SYS%.m  -> recojet_antikt4_OR_%SYS%_m",
+        "AnalysisJetsBTAGOR_%SYS%.pt  -> recojet_antikt4_OR_%SYS%_pt",
+        "AnalysisJetsBTAGOR_%SYS%.eta -> recojet_antikt4_OR_%SYS%_eta",
+        "AnalysisJetsBTAGOR_%SYS%.phi -> recojet_antikt4_OR_%SYS%_phi",
+        "AnalysisLargeRRecoJets_%SYS%.m  -> recojet_antikt10_%SYS%_m",
+        "AnalysisLargeRRecoJets_%SYS%.pt  -> recojet_antikt10_%SYS%_pt",
+        "AnalysisLargeRRecoJets_%SYS%.eta -> recojet_antikt10_%SYS%_eta",
+        "AnalysisLargeRRecoJets_%SYS%.phi -> recojet_antikt10_%SYS%_phi",
+        "AnalysisLargeRRecoJetsOR_%SYS%.m  -> recojet_antikt10_OR_%SYS%_m",
+        "AnalysisLargeRRecoJetsOR_%SYS%.pt  -> recojet_antikt10_OR_%SYS%_pt",
+        "AnalysisLargeRRecoJetsOR_%SYS%.eta -> recojet_antikt10_OR_%SYS%_eta",
+        "AnalysisLargeRRecoJetsOR_%SYS%.phi -> recojet_antikt10_OR_%SYS%_phi",
     ]
     cfg.addEventAlgo(ntupleMaker)
 
     # Fill tree
     treeFiller = CompFactory.getComp("CP::TreeFillerAlg")("TreeFiller")
-    treeFiller.TreeName = "AnalysisMiniTree_NOSYS"
+    treeFiller.TreeName = "AnalysisMiniTree"
     cfg.addEventAlgo(treeFiller)
 
     return cfg
