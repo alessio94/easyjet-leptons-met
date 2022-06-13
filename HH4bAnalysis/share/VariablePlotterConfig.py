@@ -35,7 +35,7 @@ def VariablePlotterCfg(flags, daodphyslite, outfname):
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
-    jetContainerName = "AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets"
+    reco4JetContainerName = "AnalysisJets" if daodphyslite else "AntiKt4EMPFlowJets"
 
     # Define and configure a tool instance
     # Properties can be set as keyword arguments to the tool constructor
@@ -46,14 +46,14 @@ def VariablePlotterCfg(flags, daodphyslite, outfname):
         ),
         TaggerName="DL1dv00",
         OperatingPoint="FixedCutBEff_77",
-        JetAuthor=jetContainerName,
+        JetAuthor=reco4JetContainerName,
         MinPt=20e3,
         MaxEta=2.5,
     )
 
     variableplotteralg = CompFactory.HH4B.VariablePlotterAlg(
         "VariablePlotter",
-        JetsKey=jetContainerName,
+        Reco4JetsKey=reco4JetContainerName,
         # Needs to be implemented
         # MuonsKey="AnalysisMuons" if daodphyslite else "Muons",
         # ElectronsKey="AnalysisElectrons" if daodphyslite else "Electrons",

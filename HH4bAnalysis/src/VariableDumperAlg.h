@@ -12,8 +12,16 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
-#include <xAODJet/JetContainer.h>
 #include <xAODEventInfo/EventInfo.h>
+#include <xAODJet/JetContainer.h>
+#include <xAODMuon/MuonContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
+#include <xAODEgamma/PhotonContainer.h>
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+
+#include <AsgTools/ToolHandle.h>
+#include "FTagAnalysisInterfaces/IBTaggingSelectionTool.h"
 
 namespace HH4B
 {
@@ -32,23 +40,31 @@ namespace HH4B
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
   private:
-    StatusCode bookTTree();
+    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue", "someInfo"};
+    ToolHandle<IBTaggingSelectionTool> m_btagSelTool{this, "BTaggingSelectionTool", {}, "Tool to select b-jets"};
 
-    // Call in execute to fill the EventInfo and jet variables
-    StatusCode fillVariableTTree(const xAOD::EventInfo &, const xAOD::JetContainer &);
+    CP::SysListHandle m_systematicsList{this};
 
     // Member variables for configuration
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{this, "EventInfoKey", "", "EventInfo container to dump"};
-    SG::ReadHandleKey<xAOD::JetContainer> m_JetsKey{this, "JetsKey", "", "Jets container to dump"};
+
+    CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{
+        this, "electrons", "AnalysisElectrons_%SYS%", "the electron collection to run on"};
+
+    CP::SysReadHandle<xAOD::PhotonContainer> m_photonHandle{
+        this, "photons", "AnalysisPhotons_%SYS%", "the photon collection to run on"};
+
+    CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{
+        this, "muons", "AnalysisMuons_%SYS%", "the muon collection to run on"};
+
+    CP::SysReadHandle<xAOD::JetContainer> m_jetsmallRHandle{this, "jetsmallR", "AnalysisJetsBTAG_%SYS%", "the small-R jet collection to run on"};
+
+    CP::SysReadHandle<xAOD::JetContainer> m_jetlargeRHandle{this, "jetlargeR", "AnalysisLargeRRecoJets_%SYS%", "the large-R jet collection to run on"};
 
     // output variables for the current event
     unsigned int m_runNumber = 0;
     unsigned long long m_eventNumber = 0;
-    // Jet 4-momentum variables
-    std::vector<float> m_jetEta;
-    std::vector<float> m_jetPhi;
-    std::vector<float> m_jetPt;
-    std::vector<float> m_jetE;
+    float m_mcEventWeight = 0;
   };
 }
 

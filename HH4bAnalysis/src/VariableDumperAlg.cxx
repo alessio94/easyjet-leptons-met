@@ -30,20 +30,17 @@ namespace HH4B
       ATH_MSG_ERROR("No input collection provided for EventInfo!");
       return StatusCode::FAILURE;
     }
-    if (m_JetsKey.empty())
-    {
-      ATH_MSG_ERROR("No input collection provided for Jets!");
-      return StatusCode::FAILURE;
-    }
+
+    m_systematicsList.addHandle(m_electronHandle);
+    m_systematicsList.addHandle(m_photonHandle);
+    m_systematicsList.addHandle(m_muonHandle);
+    m_systematicsList.addHandle(m_jetsmallRHandle);
+    m_systematicsList.addHandle(m_jetlargeRHandle);
 
     ATH_CHECK(m_EventInfoKey.initialize());
-    ATH_CHECK(m_JetsKey.initialize());
+    ATH_CHECK(m_systematicsList.initialize());
 
     ATH_MSG_INFO("Will search \"" << m_EventInfoKey.key() << "\" for event info");
-    ATH_MSG_INFO("Will search \"" << m_JetsKey.key() << "\" for jets info");
-
-    ATH_MSG_DEBUG("Booking tree.");
-    ATH_CHECK(bookTTree());
 
     return StatusCode::SUCCESS;
   }
@@ -53,51 +50,31 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Executing " << name());
 
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    SG::ReadHandle<xAOD::JetContainer> jets(m_JetsKey);
-    ATH_CHECK(eventInfo.isValid());
-    ATH_CHECK(jets.isValid());
-
-    ATH_CHECK(fillVariableTTree(*eventInfo, *jets));
-
-    return StatusCode::SUCCESS;
-  }
-
-  StatusCode VariableDumperAlg ::
-      bookTTree()
-  {
-    ATH_CHECK(book(TTree("Variables", "EvenInfo and jet variables tree")));
-
-    TTree *mytree = tree("Variables");
-    mytree->Branch("RunNumber", &m_runNumber);
-    mytree->Branch("EventNumber", &m_eventNumber);
-    mytree->Branch("JetEta", &m_jetEta);
-    mytree->Branch("JetPhi", &m_jetPhi);
-    mytree->Branch("JetPt", &m_jetPt);
-    mytree->Branch("JetE", &m_jetE);
-
-    return StatusCode::SUCCESS;
-  }
-
-  StatusCode VariableDumperAlg ::
-      fillVariableTTree(const xAOD::EventInfo &eventInfo, const xAOD::JetContainer &jets)
-  {
-    ATH_MSG_DEBUG("Filling EventInfo and jet variables.");
-    m_runNumber = eventInfo.runNumber();
-    m_eventNumber = eventInfo.eventNumber();
-
-    // Being lazy here and not checking for pointer validity!
-    for (const xAOD::Jet *jet : jets)
+    for (const auto &sys : m_systematicsList.systematicsVector())
     {
-      m_jetEta.push_back(jet->eta());
-      m_jetPhi.push_back(jet->phi());
-      m_jetPt.push_back(jet->pt());
-      m_jetE.push_back(jet->e());
+      std::string sysname;
+      ATH_CHECK(m_systematicsList.service().makeSystematicsName(sysname, "%SYS%", sys));
+      // ATH_MSG_INFO("Will apply sysname \"" << sysname << "\" for event");
+      SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
+      ATH_CHECK(eventInfo.isValid());
+
+      const xAOD::ElectronContainer *electrons(nullptr);
+      ATH_CHECK(m_electronHandle.retrieve(electrons, sys));
+      // do something with electrons
+      const xAOD::PhotonContainer *photons(nullptr);
+      ATH_CHECK(m_photonHandle.retrieve(photons, sys));
+      // do something with electrons
+      const xAOD::MuonContainer *muons(nullptr);
+      ATH_CHECK(m_muonHandle.retrieve(muons, sys));
+      // do something with muons
+      const xAOD::JetContainer *antiKt4RecoJets(nullptr);
+      ANA_CHECK(m_jetsmallRHandle.retrieve(antiKt4RecoJets, sys));
+      // do something with antiKt4RecoJets
+      const xAOD::JetContainer *antiKt10RecoJets(nullptr);
+      ANA_CHECK(m_jetlargeRHandle.retrieve(antiKt10RecoJets, sys));
+      // do something with antiKt10RecoJets
     }
 
-    tree("Variables")->Fill();
-
     return StatusCode::SUCCESS;
   }
-
 }
