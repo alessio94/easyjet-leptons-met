@@ -29,16 +29,15 @@
 namespace HH4B
 {
 
-  class NTrkVertexCounter final
-      : virtual public IVertexCounter,
-        public asg::AsgTool
+  class NTrkVertexCounter final : virtual public IVertexCounter,
+                                  public asg::AsgTool
   {
     ASG_TOOL_CLASS(NTrkVertexCounter, IVertexCounter)
 
     ///////////////////////////////////////////////////////////////////
     // Public methods:
     ///////////////////////////////////////////////////////////////////
-  public:
+public:
     /// Constructor with parameters:
     NTrkVertexCounter(const std::string &name);
     ~NTrkVertexCounter(){};
@@ -56,7 +55,7 @@ namespace HH4B
     ///////////////////////////////////////////////////////////////////
     // Private methods:
     ///////////////////////////////////////////////////////////////////
-  private:
+private:
     bool accept(const xAOD::Vertex &) const;
 
     /// Default constructor:

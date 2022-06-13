@@ -8,9 +8,9 @@
 #ifndef HH4BANALYSIS_HISTSPEC_H
 #define HH4BANALYSIS_HISTSPEC_H
 
+#include "Gaudi/Property.h"
 #include <cstddef>
 #include <string>
-#include "Gaudi/Property.h"
 
 namespace HH4B
 {
@@ -36,12 +36,15 @@ namespace HH4B
     template <class OWNER>
     HistSpec1D(OWNER *parent, const std::string &_histname,
                unsigned int _nbinsx, float _xmin, float _xmax,
-               const std::string &_histdescr) : histname{_histname},
-                                                histdescr{_histdescr}
+               const std::string &_histdescr)
+        : histname{_histname}, histdescr{_histdescr}
     {
-      parent->declareProperty(histname + "_nBinsx", nbinsx = _nbinsx, "Number of x bins for " + histname);
-      parent->declareProperty(histname + "_xMin", xmin = _xmin, "Minimum x value for " + histname);
-      parent->declareProperty(histname + "_xMax", xmax = _xmax, "Maximum x value for " + histname);
+      parent->declareProperty(histname + "_nBinsx", nbinsx = _nbinsx,
+                              "Number of x bins for " + histname);
+      parent->declareProperty(histname + "_xMin", xmin = _xmin,
+                              "Minimum x value for " + histname);
+      parent->declareProperty(histname + "_xMax", xmax = _xmax,
+                              "Maximum x value for " + histname);
     }
 
   }; // end HistSpec1D
@@ -69,16 +72,22 @@ namespace HH4B
     HistSpec2D(OWNER *parent, const std::string &_histname,
                unsigned int _nbinsx, float _xmin, float _xmax,
                unsigned int _nbinsy, float _ymin, float _ymax,
-               const std::string &_histdescr) : histname{_histname},
-                                                histdescr{_histdescr}
+               const std::string &_histdescr)
+        : histname{_histname}, histdescr{_histdescr}
     {
-      parent->declareProperty(histname + "_nBinsx", nbinsx = _nbinsx, "Number of x bins for " + histname);
-      parent->declareProperty(histname + "_xMin", xmin = _xmin, "Minimum x value for " + histname);
-      parent->declareProperty(histname + "_xMax", xmax = _xmax, "Maximum x value for " + histname);
+      parent->declareProperty(histname + "_nBinsx", nbinsx = _nbinsx,
+                              "Number of x bins for " + histname);
+      parent->declareProperty(histname + "_xMin", xmin = _xmin,
+                              "Minimum x value for " + histname);
+      parent->declareProperty(histname + "_xMax", xmax = _xmax,
+                              "Maximum x value for " + histname);
       //
-      parent->declareProperty(histname + "_nBinsy", nbinsy = _nbinsy, "Number of y bins for " + histname);
-      parent->declareProperty(histname + "_yMin", ymin = _ymin, "Minimum y value for " + histname);
-      parent->declareProperty(histname + "_yMax", ymax = _ymax, "Maximum y value for " + histname);
+      parent->declareProperty(histname + "_nBinsy", nbinsy = _nbinsy,
+                              "Number of y bins for " + histname);
+      parent->declareProperty(histname + "_yMin", ymin = _ymin,
+                              "Minimum y value for " + histname);
+      parent->declareProperty(histname + "_yMax", ymax = _ymax,
+                              "Maximum y value for " + histname);
     }
 
   }; // end HistSpec2D
@@ -114,21 +123,38 @@ namespace HH4B
     //     whereas we fix the eta,phi ranges by detector acceptance
     template <class OWNER>
     HistSpecJetKine(OWNER *parent, const std::string &_histname,
-                    const std::string &_histdescr,
-                    unsigned int nbins = 100, unsigned int nbins_phi = 128,
-                    float min_pt = 0., float max_pt = 500.,
-                    float min_m = 0., float max_m = 200.) : histname{_histname},
-                                                            histdescr{_histdescr},
-                                                            // Initialisers for the individual hists -- 1D
-                                                            ptHist{parent, _histname + "_pt", nbins, min_pt, max_pt, _histdescr + " -- pT hist"},
-                                                            etaHist{parent, _histname + "_eta", nbins, min_eta, max_eta, _histdescr + " -- eta hist"},
-                                                            phiHist{parent, _histname + "_phi", nbins_phi, min_phi, max_phi, _histdescr + " -- phi hist"},
-                                                            mHist{parent, _histname + "_m", nbins, min_m, max_m, _histdescr + " -- m hist"},
-                                                            // Initialisers for the individual hists -- 2D
-                                                            ptVsEtaHist{parent, _histname + "_pt_vs_eta",
-                                                                        nbins, min_eta, max_eta, nbins, min_pt, max_pt, _histdescr + " -- pT vs eta hist"},
-                                                            etaPhiMap{parent, _histname + "_phi_vs_eta",
-                                                                      nbins, min_eta, max_eta, nbins_phi, min_phi, max_phi, _histdescr + " -- phi vs eta hist"}
+                    const std::string &_histdescr, unsigned int nbins = 100,
+                    unsigned int nbins_phi = 128, float min_pt = 0.,
+                    float max_pt = 500., float min_m = 0., float max_m = 200.)
+        : histname{_histname}, histdescr{_histdescr},
+          // Initialisers for the individual hists -- 1D
+          ptHist{parent, _histname + "_pt",         nbins, min_pt,
+                 max_pt, _histdescr + " -- pT hist"},
+          etaHist{parent,  _histname + "_eta",         nbins, min_eta,
+                  max_eta, _histdescr + " -- eta hist"},
+          phiHist{parent,  _histname + "_phi",         nbins_phi, min_phi,
+                  max_phi, _histdescr + " -- phi hist"},
+          mHist{parent, _histname + "_m",         nbins, min_m,
+                max_m,  _histdescr + " -- m hist"},
+          // Initialisers for the individual hists -- 2D
+          ptVsEtaHist{parent,
+                      _histname + "_pt_vs_eta",
+                      nbins,
+                      min_eta,
+                      max_eta,
+                      nbins,
+                      min_pt,
+                      max_pt,
+                      _histdescr + " -- pT vs eta hist"},
+          etaPhiMap{parent,
+                    _histname + "_phi_vs_eta",
+                    nbins,
+                    min_eta,
+                    max_eta,
+                    nbins_phi,
+                    min_phi,
+                    max_phi,
+                    _histdescr + " -- phi vs eta hist"}
     {
     }
 

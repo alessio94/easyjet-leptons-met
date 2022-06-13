@@ -20,10 +20,10 @@ namespace HH4B
 
   class IVertexCounter : virtual public asg::IAsgTool
   {
-    //Declare the interface that the class provides
+    // Declare the interface that the class provides
     ASG_TOOL_INTERFACE(HH4B::IVertexCounter)
 
-  public:
+public:
     /// \brief Count vertices in a supplied container.
     ///        Method is const, because we don't allow tools to
     ///        modify themselves after initialisation.
