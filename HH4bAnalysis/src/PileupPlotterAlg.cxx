@@ -19,18 +19,18 @@
 
 namespace HH4B
 {
-  PileupPlotterAlg ::
-      PileupPlotterAlg(const std::string &name, ISvcLocator *pSvcLocator)
+  PileupPlotterAlg ::PileupPlotterAlg(const std::string &name,
+                                      ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
   }
 
-  StatusCode PileupPlotterAlg ::
-      initialize()
+  StatusCode PileupPlotterAlg ::initialize()
   {
     ATH_MSG_DEBUG("Initialising " << name());
 
-    ATH_MSG_DEBUG("Attempting to retrieve IVertexCounter \"" << m_vertexCounter.name() << "\"");
+    ATH_MSG_DEBUG("Attempting to retrieve IVertexCounter \""
+                  << m_vertexCounter.name() << "\"");
     ATH_CHECK(m_vertexCounter.retrieve());
 
     if (m_EventInfoKey.empty())
@@ -47,8 +47,10 @@ namespace HH4B
     ATH_CHECK(m_EventInfoKey.initialize());
     ATH_CHECK(m_VerticesKey.initialize());
 
-    ATH_MSG_INFO("Will search \"" << m_EventInfoKey.key() << "\" for event info");
-    ATH_MSG_INFO("Will search \"" << m_VerticesKey.key() << "\" for vertexing info");
+    ATH_MSG_INFO("Will search \"" << m_EventInfoKey.key()
+                                  << "\" for event info");
+    ATH_MSG_INFO("Will search \"" << m_VerticesKey.key()
+                                  << "\" for vertexing info");
 
     ATH_MSG_DEBUG("Booking histograms.");
     ATH_CHECK(bookHistograms());
@@ -56,8 +58,7 @@ namespace HH4B
     return StatusCode::SUCCESS;
   }
 
-  StatusCode PileupPlotterAlg ::
-      execute()
+  StatusCode PileupPlotterAlg ::execute()
   {
     ATH_MSG_DEBUG("Executing " << name());
 
@@ -72,8 +73,7 @@ namespace HH4B
     return StatusCode::SUCCESS;
   }
 
-  StatusCode PileupPlotterAlg ::
-      bookHistograms()
+  StatusCode PileupPlotterAlg ::bookHistograms()
   {
 
     // The "book" method (and "hist") is defined in AthHistogramming.
@@ -81,16 +81,18 @@ namespace HH4B
     // https://acode-browser1.usatlas.bnl.gov
     ATH_CHECK(book(TH1D("NVtx", "Number of Primary Vertices",
                         m_nVtxSpec.nbinsx, m_nVtxSpec.xmin, m_nVtxSpec.xmax)));
-    ATH_CHECK(book(TH1D("AvgMu", "Average number of interactions per bunch crossing",
-                        m_avgMuSpec.nbinsx, m_avgMuSpec.xmin, m_avgMuSpec.xmax)));
-    ATH_CHECK(book(TH1D("ActualMu", "Actual number of interactions per bunch crossing",
-                        m_actualMuSpec.nbinsx, m_actualMuSpec.xmin, m_actualMuSpec.xmax)));
+    ATH_CHECK(
+        book(TH1D("AvgMu", "Average number of interactions per bunch crossing",
+                  m_avgMuSpec.nbinsx, m_avgMuSpec.xmin, m_avgMuSpec.xmax)));
+    ATH_CHECK(book(TH1D(
+        "ActualMu", "Actual number of interactions per bunch crossing",
+        m_actualMuSpec.nbinsx, m_actualMuSpec.xmin, m_actualMuSpec.xmax)));
 
     return StatusCode::SUCCESS;
   }
 
-  StatusCode PileupPlotterAlg ::
-      fillMuHistograms(const xAOD::EventInfo &eventInfo)
+  StatusCode
+  PileupPlotterAlg ::fillMuHistograms(const xAOD::EventInfo &eventInfo)
   {
     ATH_MSG_DEBUG("Filling Mu histograms.");
 
@@ -101,8 +103,8 @@ namespace HH4B
     return StatusCode::SUCCESS;
   }
 
-  StatusCode PileupPlotterAlg ::
-      fillNVtxHistograms(const xAOD::VertexContainer &vertices)
+  StatusCode
+  PileupPlotterAlg ::fillNVtxHistograms(const xAOD::VertexContainer &vertices)
   {
     ATH_MSG_DEBUG("Filling NVtx histograms.");
 

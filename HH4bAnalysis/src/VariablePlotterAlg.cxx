@@ -42,7 +42,8 @@ namespace HH4B
 
     ATH_CHECK(m_Reco4JetsKey.initialize());
 
-    ATH_MSG_INFO("Will search \"" << m_Reco4JetsKey.key() << "\" for jets info");
+    ATH_MSG_INFO("Will search \"" << m_Reco4JetsKey.key()
+                                  << "\" for jets info");
 
     ATH_MSG_DEBUG("Booking histograms.");
     ATH_CHECK(bookHistograms());

@@ -1,7 +1,7 @@
-#include "../tools/NTrkVertexCounter.h"
 #include "../PileupPlotterAlg.h"
-#include "../VariablePlotterAlg.h"
 #include "../VariableDumperAlg.h"
+#include "../VariablePlotterAlg.h"
+#include "../tools/NTrkVertexCounter.h"
 
 using namespace HH4B;
 

@@ -14,14 +14,13 @@
 
 namespace HH4B
 {
-  VariableDumperAlg ::
-      VariableDumperAlg(const std::string &name, ISvcLocator *pSvcLocator)
+  VariableDumperAlg ::VariableDumperAlg(const std::string &name,
+                                        ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
   }
 
-  StatusCode VariableDumperAlg ::
-      initialize()
+  StatusCode VariableDumperAlg ::initialize()
   {
     ATH_MSG_DEBUG("Initialising " << name());
 
@@ -40,20 +39,21 @@ namespace HH4B
     ATH_CHECK(m_EventInfoKey.initialize());
     ATH_CHECK(m_systematicsList.initialize());
 
-    ATH_MSG_INFO("Will search \"" << m_EventInfoKey.key() << "\" for event info");
+    ATH_MSG_INFO("Will search \"" << m_EventInfoKey.key()
+                                  << "\" for event info");
 
     return StatusCode::SUCCESS;
   }
 
-  StatusCode VariableDumperAlg ::
-      execute()
+  StatusCode VariableDumperAlg ::execute()
   {
     ATH_MSG_DEBUG("Executing " << name());
 
     for (const auto &sys : m_systematicsList.systematicsVector())
     {
       std::string sysname;
-      ATH_CHECK(m_systematicsList.service().makeSystematicsName(sysname, "%SYS%", sys));
+      ATH_CHECK(m_systematicsList.service().makeSystematicsName(sysname,
+                                                                "%SYS%", sys));
       // ATH_MSG_INFO("Will apply sysname \"" << sysname << "\" for event");
       SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
       ATH_CHECK(eventInfo.isValid());

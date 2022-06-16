@@ -13,8 +13,8 @@
 #ifndef HH4BANALYSIS_PILEUPPLOTTERALG
 #define HH4BANALYSIS_PILEUPPLOTTERALG
 
-#include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <AsgTools/ToolHandle.h>
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
 #include "xAODEventInfo/EventInfo.h"
 #include "xAODTracking/VertexContainer.h"
@@ -33,16 +33,17 @@ namespace HH4B
   class PileupPlotterAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
-  public:
+public:
     PileupPlotterAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
-    /// \brief Initialisation method, for setting up tools and other persistent configs
+    /// \brief Initialisation method, for setting up tools and other persistent
+    /// configs
     StatusCode initialize() override;
     /// \brief Execute method, for actions to be taken in the event loop
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
-  private:
+private:
     // Call in initialisation to add histograms to the THistSvc
     StatusCode bookHistograms();
 
@@ -55,19 +56,29 @@ namespace HH4B
     StatusCode fillNVtxHistograms(const xAOD::VertexContainer &);
 
     // Member variables for configuration
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{this, "EventInfoKey", "", "EventInfo container for plotting pileup"};
-    SG::ReadHandleKey<xAOD::VertexContainer> m_VerticesKey{this, "VerticesKey", "", "Vertex container used for plotting"};
+    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
+        this, "EventInfoKey", "", "EventInfo container for plotting pileup"};
+    SG::ReadHandleKey<xAOD::VertexContainer> m_VerticesKey{
+        this, "VerticesKey", "", "Vertex container used for plotting"};
 
-    // We use a special templated class to more easily define the properties needed
-    // to define a single histogram.
-    HistSpec1D m_nVtxSpec{this, "NVtxHist", 10, 0., 20., "Histogram: Number of primary vertices"};
+    // We use a special templated class to more easily define the properties
+    // needed to define a single histogram.
+    HistSpec1D m_nVtxSpec{this, "NVtxHist",
+                          10,   0.,
+                          20.,  "Histogram: Number of primary vertices"};
     // Average is over one lumi-block (~5 min)
-    HistSpec1D m_avgMuSpec{this, "AvgMuHist", 10, 0., 200., "Histogram: Average interactions/bunch crossing"};
-    // The estimated value for the exact bunch crossing, taking into account bunch train structure
-    HistSpec1D m_actualMuSpec{this, "ActualMuHist", 10, 0., 200., "Histogram: Actual interactions/bunch crossing"};
+    HistSpec1D m_avgMuSpec{
+        this, "AvgMuHist", 10,
+        0.,   200.,        "Histogram: Average interactions/bunch crossing"};
+    // The estimated value for the exact bunch crossing, taking into account
+    // bunch train structure
+    HistSpec1D m_actualMuSpec{
+        this, "ActualMuHist", 10,
+        0.,   200.,           "Histogram: Actual interactions/bunch crossing"};
 
     /// \brief A tool used to count vertices
-    ToolHandle<HH4B::IVertexCounter> m_vertexCounter{this, "VertexCounter", "", "A tool for counting vertices"};
+    ToolHandle<HH4B::IVertexCounter> m_vertexCounter{
+        this, "VertexCounter", "", "A tool for counting vertices"};
   };
 }
 
