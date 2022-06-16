@@ -30,11 +30,11 @@ namespace HH4B
       return StatusCode::FAILURE;
     }
 
-    m_systematicsList.addHandle(m_electronHandle);
-    m_systematicsList.addHandle(m_photonHandle);
-    m_systematicsList.addHandle(m_muonHandle);
-    m_systematicsList.addHandle(m_jetsmallRHandle);
-    m_systematicsList.addHandle(m_jetlargeRHandle);
+    ATH_CHECK(m_systematicsList.addHandle(m_electronHandle));
+    ATH_CHECK(m_systematicsList.addHandle(m_photonHandle));
+    ATH_CHECK(m_systematicsList.addHandle(m_muonHandle));
+    ATH_CHECK(m_systematicsList.addHandle(m_jetsmallRHandle));
+    ATH_CHECK(m_systematicsList.addHandle(m_jetlargeRHandle));
 
     ATH_CHECK(m_EventInfoKey.initialize());
     ATH_CHECK(m_systematicsList.initialize());

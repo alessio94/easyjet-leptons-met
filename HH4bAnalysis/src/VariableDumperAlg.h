@@ -26,7 +26,7 @@
 namespace HH4B
 {
 
-  /// \brief An algorithm for plotting dilepton masses
+  /// \brief An algorithm for dumping variables
   class VariableDumperAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor

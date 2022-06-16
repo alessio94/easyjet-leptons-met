@@ -9,7 +9,6 @@
 from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-
 from utils.argsHelper import checkArgs
 from utils.containerNameHelper import getContainerName
 from utils.convertOldConfigHelper import convertSequenceAndGetAlgs
@@ -18,12 +17,12 @@ variabledumperlog = Logging.logging.getLogger("VariableDumperConfig")
 
 
 def pileupConfigFiles(dataType):
-    """Return the PRW config files and lumicalc files"""
+    """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
     if dataType == "data":
-        prwfiles = []
-        lumicalcfiles = []
+        prwFiles = []
+        lumicalcFiles = []
     else:
-        lumicalcfiles = [
+        lumicalcFiles = [
             # These need to be updated for release 22 data
             # "GoodRunsLists/data15_13TeV/20170619/PHYS_StandardGRL_All_Good_25ns_276262-284484_OflLumi-13TeV-008.root",
             # "GoodRunsLists/data16_13TeV/20180129/PHYS_StandardGRL_All_Good_25ns_297730-311481_OflLumi-13TeV-009.root",
@@ -31,28 +30,28 @@ def pileupConfigFiles(dataType):
             # "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root",
         ]
         if dataType == "mc":
-            prwfiles = [
+            prwFiles = [
                 # Need to be updated and are job specific?
                 # "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PileupReweighting/share/DSID364xxx/pileup_mc20d_dsid364701_FS.root"
             ]
         else:
             # We don't have a PRW file that works properly for the AFII file
             # so we don't apply it in this case
-            prwfiles = []
-    return prwfiles, lumicalcfiles
+            prwFiles = []
+    return prwFiles, lumicalcFiles
 
 
-# Generate the algorithm to do the histogramming.
+# Generate the algorithm to do the dumping.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def VariableDumperCfg(flags, daodphyslite, outfname):
+def VariableDumperCfg(flags, isDaodPhyslite, outfname):
     dataType = "mc" if flags.Input.isMC else "data"
 
-    reco4JetContainerName = getContainerName("Reco4PFlowJets", daodphyslite)
-    reco10JetContainerName = getContainerName("Reco10PFlowJets", daodphyslite)
-    muonsContainerName = getContainerName("Muons", daodphyslite)
-    electronsContainerName = getContainerName("Electrons", daodphyslite)
-    photonsContainerName = getContainerName("Photons", daodphyslite)
+    reco4JetContainerName = getContainerName("Reco4PFlowJets", isDaodPhyslite)
+    reco10JetContainerName = getContainerName("Reco10PFlowJets", isDaodPhyslite)
+    muonsContainerName = getContainerName("Muons", isDaodPhyslite)
+    electronsContainerName = getContainerName("Electrons", isDaodPhyslite)
+    photonsContainerName = getContainerName("Photons", isDaodPhyslite)
 
     cfg = ComponentAccumulator()
 
@@ -73,15 +72,15 @@ def VariableDumperCfg(flags, daodphyslite, outfname):
     cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
 
     # Include, and then set up the pileup analysis sequence:
-    prwfiles, lumicalcfiles = pileupConfigFiles(dataType)
+    prwFiles, lumicalcFiles = pileupConfigFiles(dataType)
 
     # Create a pile-up analysis sequence
     from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
 
     pileupSequence = makePileupAnalysisSequence(
         dataType,
-        userPileupConfigs=prwfiles,
-        userLumicalcFiles=lumicalcfiles,
+        userPileupConfigs=prwFiles,
+        userLumicalcFiles=lumicalcFiles,
         autoConfig=False,
     )
     pileupSequence.configure(inputName={}, outputName={})
@@ -443,7 +442,7 @@ def main():
         # Add our VariableDumper CA, calling the function defined above.
         cfg.merge(
             VariableDumperCfg(
-                ConfigFlags, daodphyslite=args.daod_physlite, outfname=args.outFile
+                ConfigFlags, isDaodPhyslite=args.daod_physlite, outfname=args.outFile
             )
         )
 
