@@ -24,19 +24,19 @@
   script:
     - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck*/bin/cppcheck --enable=warning,portability --xml-version=2 .
 
-.linting_rules_template: &linting_rules_template
-  rules:
-    - if: $CI_COMMIT_BRANCH != ''
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+# .linting_rules_template: &linting_rules_template
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH != ''
+  #   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 flake8:
   <<: *flake8_check_template
-  <<: *linting_rules_template
+  # <<: *linting_rules_template
 
 black:
   <<: *black_check_template
-  <<: *linting_rules_template
+  # <<: *linting_rules_template
 
 cppcheck:
   <<: *cpp_check_template
-  <<: *linting_rules_template
+  # <<: *linting_rules_template

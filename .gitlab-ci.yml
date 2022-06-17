@@ -6,16 +6,16 @@
 # get an ath analysis image
 image: registry.cern.ch/docker.io/atlas/athanalysis:22.2.73
 
+stages:
+  - linting
+  - build
+  - run
+
 # and source it
 before_script:
   - set +e # exits the pipeline if one of the jobs don't return 0
   - source ~/release_setup.sh
   - if [[ -d build ]]; then source build/**/setup.sh; fi
-
-stages:
-  - linting
-  - build
-  - run
 
 include:
   - ".gitlab/pipelines/.linting-gitlab-ci.yaml"
