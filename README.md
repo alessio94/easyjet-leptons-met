@@ -25,6 +25,31 @@ make
 source */setup.sh
 ```
 
+# Running on files
+
+To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run:
+
+```
+PileupPlotterConfig.py --filesInput data.myinputfile.DAOD_PHYS.pool.root --nTrkMin=2 --evtMax 10
+VariablePlotterConfig.py --filesInput data.myinputfile.DAOD_PHYS.pool.root --evtMax 10
+VariableDumperConfig.py --filesInput data.myinputfile.DAOD_PHYS.pool.root --evtMax 10
+```
+
+Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
+You should find tree new ROOT files, `pileup-hists.root`, `variable-hists.root` and `analysis-variables.root`, respectively.
+
+To process Monte Carlo samples the `--mc` flag is needed:
+
+```
+VariableDumperConfig.py --filesInput mc.myinputfile.pool.root --evtMax 10 --mc
+```
+
+To process DAOD_PHYSLITE the `--daod-physlite` flag is needed:
+
+```
+VariableDumperConfig.py --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10 --mc --daod-physlite
+```
+
 ## AthAnalysis in Docker
 
 If you would rather work on a local computer, numbered `AthAnalysis` releases are available as Docker containers [on dockerhub](https://hub.docker.com/r/atlas/athanalysis/). Naturally, you will have to install [Docker](https://www.docker.com).
@@ -64,6 +89,5 @@ You can use pre-commit hooks, that check if you linted and formatted the files w
 ```
 pip install -r requirements.txt --user
 pre-commit install
+pre-commit run 
 ```
-
-You can test it with `pre-commit run`
