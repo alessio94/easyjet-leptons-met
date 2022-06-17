@@ -5,6 +5,8 @@
 #
 
 # Basic setup
+import sys
+
 from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
@@ -133,9 +135,10 @@ def main():
 
     # Execute the job defined in the ComponentAccumulator.
     # The number of events is specified by `args.evtMax`
-    cfg.run(args.evtMax)
+    return cfg.run(args.evtMax)
 
 
 # Execute the main function if this file was executed as a script
 if __name__ == "__main__":
-    main()
+    code = main()
+    sys.exit(0 if code.isSuccess() else 1)

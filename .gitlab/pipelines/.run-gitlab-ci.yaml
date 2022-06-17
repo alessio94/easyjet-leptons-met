@@ -2,16 +2,16 @@ run_VariableDumper_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - VariableDumperConfig.py --filesInput /cvmfs/atlas-nightlies.cern.ch/repo/data/data-art/ASG/DAOD_PHYS/v1/ttbar.FullSim.DAOD_PHYS.pool.root --threads=1 --evtMax 10 --mc
+    - VariableDumperConfig.py --filesInput /cvmfs/atlas-nightlies.cern.ch/repo/data/data-art/ASG/DAOD_PHYS/v1/ttbar.FullSim.DAOD_PHYS.pool.root --evtMax 10 --mc
 
 run_VariablePlotter_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - VariablePlotterConfig.py --filesInput /cvmfs/atlas-nightlies.cern.ch/repo/data/data-art/ASG/DAOD_PHYS/v1/ttbar.FullSim.DAOD_PHYS.pool.root --threads=1 --evtMax 10 --mc
+    - VariablePlotterConfig.py --filesInput /cvmfs/atlas-nightlies.cern.ch/repo/data/data-art/ASG/DAOD_PHYS/v1/ttbar.FullSim.DAOD_PHYS.pool.root --evtMax 10 --mc
 
 run_PileupPlotterAlg_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - PileupPlotterConfig.py --filesInput /cvmfs/atlas-nightlies.cern.ch/repo/data/data-art/ASG/DAOD_PHYS/v1/ttbar.FullSim.DAOD_PHYS.pool.root --threads=1 --evtMax 10 --mc
+    - PileupPlotterConfig.py --filesInput /cvmfs/atlas-nightlies.cern.ch/repo/data/data-art/ASG/DAOD_PHYS/v1/ttbar.FullSim.DAOD_PHYS.pool.root --evtMax 10 --mc
