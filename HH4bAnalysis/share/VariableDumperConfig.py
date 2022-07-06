@@ -335,7 +335,7 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
         "EventInfo.eventNumber   -> eventNumber",
         # we currently don't have any pileup calib files setup
         # 'EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%',
-        # "EventInfo.mcEventWeight   -> mcEventWeight",
+        "EventInfo.mcEventWeights   -> mcEventWeights",
         "AnalysisElectrons_%SYS%.pt  -> el_%SYS%_pt",
         "AnalysisElectrons_%SYS%.eta -> el_%SYS%_eta",
         "AnalysisElectrons_%SYS%.phi -> el_%SYS%_phi",

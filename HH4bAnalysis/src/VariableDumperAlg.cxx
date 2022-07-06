@@ -54,7 +54,7 @@ namespace HH4B
       std::string sysname;
       ATH_CHECK(m_systematicsList.service().makeSystematicsName(sysname,
                                                                 "%SYS%", sys));
-      // ATH_MSG_INFO("Will apply sysname \"" << sysname << "\" for event");
+      ATH_MSG_INFO("Will apply sysname \"" << sysname << "\" for event");
       SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
       ATH_CHECK(eventInfo.isValid());
 
