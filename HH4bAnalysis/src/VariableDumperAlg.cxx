@@ -16,8 +16,11 @@ namespace HH4B
 {
   VariableDumperAlg ::VariableDumperAlg(const std::string &name,
                                         ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator)
+      : AthHistogramAlgorithm(name, pSvcLocator),
+        m_acc_DFCommonJets_eventClean_LooseBad(
+            "DFCommonJets_eventClean_LooseBad")
   {
+    declareProperty("applyJetCleaning", m_applyJetCleaning);
   }
 
   StatusCode VariableDumperAlg ::initialize()
@@ -57,6 +60,14 @@ namespace HH4B
       ATH_MSG_INFO("Will apply sysname \"" << sysname << "\" for event");
       SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
       ATH_CHECK(eventInfo.isValid());
+      // jet cleaning
+      if (m_applyJetCleaning)
+      {
+        if (!m_acc_DFCommonJets_eventClean_LooseBad(*eventInfo))
+        {
+          return StatusCode::SUCCESS; // go to next event
+        }
+      }
 
       const xAOD::ElectronContainer *electrons(nullptr);
       ATH_CHECK(m_electronHandle.retrieve(electrons, sys));

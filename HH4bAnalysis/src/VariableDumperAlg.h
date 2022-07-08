@@ -12,6 +12,7 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
+#include <AthContainers/AuxElement.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <xAODEgamma/ElectronContainer.h>
@@ -51,6 +52,13 @@ private:
     // Member variables for configuration
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "", "EventInfo container to dump"};
+
+    // for jet cleaning: quality criteria to identify events which are
+    // consistent with noise in the calorimeter or non-collision background
+    // For details last paragraph on page 6:
+    // https://cds.cern.ch/record/2809414/files/ATLAS-COM-CONF-2022-035.pdf
+    bool m_applyJetCleaning;
+    SG::AuxElement::ConstAccessor<char> m_acc_DFCommonJets_eventClean_LooseBad;
 
     CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{
         this, "electrons", "AnalysisElectrons_%SYS%",
