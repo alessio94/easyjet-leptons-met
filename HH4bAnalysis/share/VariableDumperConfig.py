@@ -318,6 +318,7 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
             "VariableDumper",
             EventInfoKey="EventInfo",
             RootStreamName="ANALYSIS",
+            applyJetCleaning=True,
             # BTaggingSelectionTool=bTagSelectionTool,
         )
     )
