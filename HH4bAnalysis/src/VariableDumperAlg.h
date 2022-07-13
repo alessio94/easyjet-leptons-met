@@ -44,9 +44,6 @@ public:
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
-    ToolHandle<IBTaggingSelectionTool> m_btagSelTool{
-        this, "BTaggingSelectionTool", {}, "Tool to select b-jets"};
-
     CP::SysListHandle m_systematicsList{this};
 
     // Member variables for configuration
@@ -72,17 +69,12 @@ private:
         this, "muons", "AnalysisMuons_%SYS%", "the muon collection to run on"};
 
     CP::SysReadHandle<xAOD::JetContainer> m_jetsmallRHandle{
-        this, "jetsmallR", "AnalysisJetsBTAG_%SYS%",
+        this, "jetsmallR", "AnalysisJets_%SYS%",
         "the small-R jet collection to run on"};
 
     CP::SysReadHandle<xAOD::JetContainer> m_jetlargeRHandle{
         this, "jetlargeR", "AnalysisLargeRRecoJets_%SYS%",
         "the large-R jet collection to run on"};
-
-    // output variables for the current event
-    unsigned int m_runNumber = 0;
-    unsigned long long m_eventNumber = 0;
-    float m_mcEventWeight = 0;
   };
 }
 
