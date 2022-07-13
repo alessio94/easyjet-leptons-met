@@ -46,14 +46,14 @@ def pileupConfigFiles(dataType):
 # Generate the algorithm to do the dumping.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def VariableDumperCfg(flags, isDaodPhyslite, outfname):
+def VariableDumperCfg(flags, outfname, is_daod_physlite, btag_wps):
     dataType = "mc" if flags.Input.isMC else "data"
 
-    reco4JetContainerName = getContainerName("Reco4PFlowJets", isDaodPhyslite)
-    reco10JetContainerName = getContainerName("Reco10PFlowJets", isDaodPhyslite)
-    muonsContainerName = getContainerName("Muons", isDaodPhyslite)
-    electronsContainerName = getContainerName("Electrons", isDaodPhyslite)
-    photonsContainerName = getContainerName("Photons", isDaodPhyslite)
+    reco4JetContainerName = getContainerName("Reco4PFlowJets", is_daod_physlite)
+    reco10JetContainerName = getContainerName("Reco10PFlowJets", is_daod_physlite)
+    muonsContainerName = getContainerName("Muons", is_daod_physlite)
+    electronsContainerName = getContainerName("Electrons", is_daod_physlite)
+    photonsContainerName = getContainerName("Photons", is_daod_physlite)
 
     cfg = ComponentAccumulator()
 
@@ -197,23 +197,37 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
 
     from FTagAnalysisAlgorithms.FTagAnalysisSequence import makeFTagAnalysisSequence
 
-    makeFTagAnalysisSequence(
-        jetSequence,
-        dataType,
-        jetCollection=reco4JetContainerName,
-        btagWP="FixedCutBEff_77",
-        btagger="DL1r",  # DL1dv00 not available in makeFTagAnalysisSequence CDI
-        generator="default",  # Pythia8 not available in makeFTagAnalysisSequence CDI
-        postfix="",
-        preselection=None,
-        kinematicSelection=False,
-        noEfficiency=False,
-        legacyRecommendations=True,
-        enableCutflow=False,
-        minPt=20000,
+    bTagCalibFile = (
+        "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
     )
+    for tagger_wp in btag_wps:
+        tagger, btag_wp = tagger_wp.split("_", 1)
+        ftagSeq = makeFTagAnalysisSequence(
+            jetSequence,
+            dataType,
+            jetCollection=reco4JetContainerName,
+            btagWP=btag_wp,
+            btagger=tagger,
+            generator="Pythia8",
+            minPt=20000,
+            postfix="",
+            preselection=None,
+            kinematicSelection=False,
+            noEfficiency=False,
+            legacyRecommendations=False,
+            enableCutflow=False,
+        )
+        # Hack until this is merged:
+        # https://gitlab.cern.ch/atlas/athena/-/merge_requests/54939]
+        for ftagAlg in ftagSeq:
+            if "FTagSelectionAlg" in ftagAlg.getName():
+                ftagAlg.selectionTool.FlvTagCutDefinitionsFileName = bTagCalibFile
+            if "FTagEfficiencyScaleFactorAlg" in ftagAlg.getName():
+                ftagAlg.efficiencyTool.ScaleFactorFileName = bTagCalibFile
+
     jetSequence.configure(
-        inputName=reco4JetContainerName, outputName="AnalysisJetsBTAG_%SYS%"
+        inputName=reco4JetContainerName,
+        outputName="AnalysisJets_%SYS%",
     )
     # print(jetSequence)  # For debugging
     # Convert to new configurables
@@ -221,20 +235,6 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
     cfg.addSequence(jetSequenceCnv)
     for jetAlg in jetAlgsCnv:
         cfg.addEventAlgo(jetAlg, jetSequenceCnv.getName())
-
-    # Define and configure a tool instance
-    # Properties can be set as keyword arguments to the tool constructor
-    # bTagSelectionTool = CompFactory.BTaggingSelectionTool(
-    #     "bTagSelectionTool",
-    #     FlvTagCutDefinitionsFileName=(
-    #         "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
-    #     ),
-    #     TaggerName="DL1dv00",
-    #     OperatingPoint="FixedCutBEff_77",
-    #     JetAuthor=reco4JetContainerName,
-    #     MinPt=20e3,
-    #     MaxEta=2.5,
-    # )
 
     from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
 
@@ -291,7 +291,7 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
             "electrons": "AnalysisElectrons_%SYS%",
             "photons": "AnalysisPhotons_%SYS%",
             "muons": "AnalysisMuons_%SYS%",
-            "jets": "AnalysisJetsBTAG_%SYS%",
+            "jets": "AnalysisJets_%SYS%",
             "fatJets": "AnalysisLargeRRecoJets_%SYS%",
             # 'taus'      : 'AnalysisTauJets_%SYS%'
         },
@@ -299,7 +299,7 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
             "electrons": "AnalysisElectronsOR_%SYS%",
             "photons": "AnalysisPhotonsOR_%SYS%",
             "muons": "AnalysisMuonsOR_%SYS%",
-            "jets": "AnalysisJetsBTAGOR_%SYS%",
+            "jets": "AnalysisJetsOR_%SYS%",
             "fatJets": "AnalysisLargeRRecoJetsOR_%SYS%",
             # 'taus'      : 'AnalysisTauJetsOR_%SYS%'
         },
@@ -319,7 +319,6 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
             EventInfoKey="EventInfo",
             RootStreamName="ANALYSIS",
             applyJetCleaning=True,
-            # BTaggingSelectionTool=bTagSelectionTool,
         )
     )
 
@@ -355,14 +354,14 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
         "AnalysisMuonsOR_%SYS%.eta -> mu_OR_%SYS%_eta",
         "AnalysisMuonsOR_%SYS%.phi -> mu_OR_%SYS%_phi",
         "AnalysisMuonsOR_%SYS%.pt  -> mu_OR_%SYS%_pt",
-        "AnalysisJetsBTAG_%SYS%.m  -> recojet_antikt4_%SYS%_m",
-        "AnalysisJetsBTAG_%SYS%.pt  -> recojet_antikt4_%SYS%_pt",
-        "AnalysisJetsBTAG_%SYS%.eta -> recojet_antikt4_%SYS%_eta",
-        "AnalysisJetsBTAG_%SYS%.phi -> recojet_antikt4_%SYS%_phi",
-        "AnalysisJetsBTAGOR_%SYS%.m  -> recojet_antikt4_OR_%SYS%_m",
-        "AnalysisJetsBTAGOR_%SYS%.pt  -> recojet_antikt4_OR_%SYS%_pt",
-        "AnalysisJetsBTAGOR_%SYS%.eta -> recojet_antikt4_OR_%SYS%_eta",
-        "AnalysisJetsBTAGOR_%SYS%.phi -> recojet_antikt4_OR_%SYS%_phi",
+        "AnalysisJets_%SYS%.m  -> recojet_antikt4_%SYS%_m",
+        "AnalysisJets_%SYS%.pt  -> recojet_antikt4_%SYS%_pt",
+        "AnalysisJets_%SYS%.eta -> recojet_antikt4_%SYS%_eta",
+        "AnalysisJets_%SYS%.phi -> recojet_antikt4_%SYS%_phi",
+        "AnalysisJetsOR_%SYS%.m  -> recojet_antikt4_OR_%SYS%_m",
+        "AnalysisJetsOR_%SYS%.pt  -> recojet_antikt4_OR_%SYS%_pt",
+        "AnalysisJetsOR_%SYS%.eta -> recojet_antikt4_OR_%SYS%_eta",
+        "AnalysisJetsOR_%SYS%.phi -> recojet_antikt4_OR_%SYS%_phi",
         "AnalysisLargeRRecoJets_%SYS%.m  -> recojet_antikt10_%SYS%_m",
         "AnalysisLargeRRecoJets_%SYS%.pt  -> recojet_antikt10_%SYS%_pt",
         "AnalysisLargeRRecoJets_%SYS%.eta -> recojet_antikt10_%SYS%_eta",
@@ -371,6 +370,10 @@ def VariableDumperCfg(flags, isDaodPhyslite, outfname):
         "AnalysisLargeRRecoJetsOR_%SYS%.pt  -> recojet_antikt10_OR_%SYS%_pt",
         "AnalysisLargeRRecoJetsOR_%SYS%.eta -> recojet_antikt10_OR_%SYS%_eta",
         "AnalysisLargeRRecoJetsOR_%SYS%.phi -> recojet_antikt10_OR_%SYS%_phi",
+    ]
+    ntupleMaker.Branches += [
+        f"AnalysisJets_%SYS%.ftag_select_{btag_wp} -> recojet_antikt4_%SYS%_{btag_wp}"
+        for btag_wp in btag_wps
     ]
     cfg.addEventAlgo(ntupleMaker)
 
@@ -414,6 +417,16 @@ def main():
             action="store_true",
             help="Input is DAOD_PHYSLITE",
         )
+        parser.add_argument(
+            "--btag-wps",
+            type=str,
+            nargs="+",
+            default=[
+                "DL1dv00_FixedCutBEff_77",
+                "DL1dv00_FixedCutBEff_85",
+            ],
+            help="btag working points default %(default)s",
+        )
         args = ConfigFlags.fillFromArgs([], parser)
         # Lock the flags so that the configuration of job subcomponents cannot
         # modify them silently/unpredictably.
@@ -445,7 +458,10 @@ def main():
         # Add our VariableDumper CA, calling the function defined above.
         cfg.merge(
             VariableDumperCfg(
-                ConfigFlags, isDaodPhyslite=args.daod_physlite, outfname=args.outFile
+                ConfigFlags,
+                outfname=args.outFile,
+                is_daod_physlite=args.daod_physlite,
+                btag_wps=args.btag_wps,
             )
         )
 
