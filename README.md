@@ -41,13 +41,13 @@ You should find tree new ROOT files, `pileup-hists.root`, `variable-hists.root` 
 To process Monte Carlo samples the `--mc` flag is needed:
 
 ```
-VariableDumperConfig.py --filesInput mc.myinputfile.pool.root --evtMax 10 --mc
+VariableDumperConfig.py --filesInput mc.myinputfile.pool.root --evtMax 10 --mc 
 ```
 
 To process DAOD_PHYSLITE the `--daod-physlite` flag is needed:
 
 ```
-VariableDumperConfig.py --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10 --mc --daod-physlite
+VariableDumperConfig.py --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10 --mc --daod-physlite 
 ```
 
 ## AthAnalysis in Docker

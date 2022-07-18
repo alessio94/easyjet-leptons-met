@@ -18,28 +18,49 @@ from utils.convertOldConfigHelper import convertSequenceAndGetAlgs
 variabledumperlog = Logging.logging.getLogger("VariableDumperConfig")
 
 
-def pileupConfigFiles(dataType):
+def pileupConfigFiles(filename):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
-    if dataType == "data":
-        prwFiles = []
-        lumicalcFiles = []
-    else:
-        lumicalcFiles = [
-            # These need to be updated for release 22 data
-            # "GoodRunsLists/data15_13TeV/20170619/PHYS_StandardGRL_All_Good_25ns_276262-284484_OflLumi-13TeV-008.root",
-            # "GoodRunsLists/data16_13TeV/20180129/PHYS_StandardGRL_All_Good_25ns_297730-311481_OflLumi-13TeV-009.root",
-            # "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.lumicalc.OflLumi-13TeV-010.root",
-            # "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root",
-        ]
-        if dataType == "mc":
-            prwFiles = [
-                # Need to be updated and are job specific?
-                # "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PileupReweighting/share/DSID364xxx/pileup_mc20d_dsid364701_FS.root"
+    filename = filename.split("/")
+    dataset = filename[-2]
+    project, dsid, physics_short, prod_step, dtype, tags = dataset.split(".")
+    if "mc" in project:
+        split_tags = tags.split("_")
+        print(split_tags)
+        # Figure out which MC we are using
+        if "r13167" in split_tags:
+            subcampaign = "mc20a"
+            lumicalcFiles = [
+                "GoodRunsLists/data15_13TeV/20170619/PHYS_StandardGRL_All_Good_25ns_276262-284484_OflLumi-13TeV-008.root",  # noqa
+                "GoodRunsLists/data16_13TeV/20180129/PHYS_StandardGRL_All_Good_25ns_297730-311481_OflLumi-13TeV-009.root",  # noqa
+            ]
+            actual_mu = []
+        elif "r13144" in split_tags:
+            subcampaign = "mc20d"
+            lumicalcFiles = [
+                "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.lumicalc.OflLumi-13TeV-010.root",  # noqa
+            ]
+            actual_mu = [
+                "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root"  # noqa
+            ]
+        elif "r13145" in split_tags:
+            subcampaign = "mc20e"
+            lumicalcFiles = [
+                "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root"  # noqa
+            ]
+            actual_mu = [
+                "GoodRunsLists/data18_13TeV/20190318/physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root"  # noqa
             ]
         else:
-            # We don't have a PRW file that works properly for the AFII file
-            # so we don't apply it in this case
-            prwFiles = []
+            variabledumperlog.error("Cannot determine subcampaign for " + dataset)
+            sys.exit(1)
+
+        prwFiles = [
+            "dev/PileupReweighting/share/DSID{0}xxx/pileup_{1}_dsid{2}_{3}.root".format(  # noqa
+                dsid[:3], subcampaign, dsid, "AFII" if "a" in tags else "FS"
+            )
+        ]
+        prwFiles += actual_mu
+
     return prwFiles, lumicalcFiles
 
 
@@ -74,7 +95,7 @@ def VariableDumperCfg(flags, outfname, is_daod_physlite, btag_wps):
     cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
 
     # Include, and then set up the pileup analysis sequence:
-    prwFiles, lumicalcFiles = pileupConfigFiles(dataType)
+    prwFiles, lumicalcFiles = pileupConfigFiles(*flags.Input.Files)
 
     # Create a pile-up analysis sequence
     from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
@@ -333,8 +354,7 @@ def VariableDumperCfg(flags, outfname, is_daod_physlite, btag_wps):
     ntupleMaker.Branches = [
         "EventInfo.runNumber     -> runNumber",
         "EventInfo.eventNumber   -> eventNumber",
-        # we currently don't have any pileup calib files setup
-        # 'EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%',
+        "EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%",
         "EventInfo.mcEventWeights   -> mcEventWeights",
         "AnalysisElectrons_%SYS%.pt  -> el_%SYS%_pt",
         "AnalysisElectrons_%SYS%.eta -> el_%SYS%_eta",
