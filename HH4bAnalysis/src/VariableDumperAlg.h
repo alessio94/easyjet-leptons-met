@@ -1,4 +1,8 @@
-///////////////////////// -*- C++ -*- /////////////////////////////
+/*
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+*/
+
+///////////////////////////////////////////////////////////////////
 // VariableDumperAlg.h
 //
 // This is an algorithm that will dump variables into a tree.
@@ -23,6 +27,8 @@
 
 #include "FTagAnalysisInterfaces/IBTaggingSelectionTool.h"
 #include <AsgTools/ToolHandle.h>
+
+// Class definition
 
 namespace HH4B
 {
@@ -58,22 +64,23 @@ private:
     SG::AuxElement::ConstAccessor<char> m_acc_DFCommonJets_eventClean_LooseBad;
 
     CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{
-        this, "electrons", "AnalysisElectrons_%SYS%",
+        this, "ElectronsKey", "AnalysisElectrons_%SYS%",
         "the electron collection to run on"};
 
     CP::SysReadHandle<xAOD::PhotonContainer> m_photonHandle{
-        this, "photons", "AnalysisPhotons_%SYS%",
+        this, "PhotosKey", "AnalysisPhotons_%SYS%",
         "the photon collection to run on"};
 
     CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{
-        this, "muons", "AnalysisMuons_%SYS%", "the muon collection to run on"};
+        this, "MuonsKey", "AnalysisMuons_%SYS%",
+        "the muon collection to run on"};
 
     CP::SysReadHandle<xAOD::JetContainer> m_jetsmallRHandle{
-        this, "jetsmallR", "AnalysisJets_%SYS%",
+        this, "SmallJetKey", "AnalysisJets_%SYS%",
         "the small-R jet collection to run on"};
 
     CP::SysReadHandle<xAOD::JetContainer> m_jetlargeRHandle{
-        this, "jetlargeR", "AnalysisLargeRRecoJets_%SYS%",
+        this, "LargeJetKey", "AnalysisLargeJets_%SYS%",
         "the large-R jet collection to run on"};
   };
 }
