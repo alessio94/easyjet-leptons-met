@@ -7,27 +7,23 @@ class SampleTypes(Enum):
     mc20e = "r13145"
 
 
-def pileupConfigFiles(filename):
+def pileupConfigFiles(fileMD):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
-    lumicalc_files = []
-    prw_files = []
-    filename = filename.split("/")
-    dataset = filename[-2]
-    project, dsid, physics_short, prod_step, dtype, tags = dataset.split(".")
-    if "mc" in project:
-        split_tags = tags.split("_")
-        # Figure out which MC we are using
-        if SampleTypes.mc20a.value in split_tags:
-            subcampaign = SampleTypes.mc20a
-        elif SampleTypes.mc20d.value in split_tags:
-            subcampaign = SampleTypes.mc20d
-        elif SampleTypes.mc20e.value in split_tags:
-            subcampaign = SampleTypes.mc20e
-        else:
-            raise LookupError("Cannot determine subcampaign for " + dataset)
+    tags = fileMD.get("AMITag", "")
+    dsid = fileMD.get("mcChannelNumber", 0)
+    split_tags = tags.split("_")
+    # Figure out which MC we are using
+    if SampleTypes.mc20a.value in split_tags:
+        subcampaign = SampleTypes.mc20a
+    elif SampleTypes.mc20d.value in split_tags:
+        subcampaign = SampleTypes.mc20d
+    elif SampleTypes.mc20e.value in split_tags:
+        subcampaign = SampleTypes.mc20e
+    else:
+        raise LookupError(f"Cannot determine subcampaign for DSID {dsid}")
 
-        lumicalc_files = getLumicalcFiles(subcampaign)
-        prw_files = getPrwFiles(dsid, subcampaign, tags)
+    lumicalc_files = getLumicalcFiles(subcampaign)
+    prw_files = getPrwFiles(dsid, subcampaign, tags)
 
     return prw_files, lumicalc_files
 

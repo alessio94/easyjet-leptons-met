@@ -1,5 +1,5 @@
+from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from utils.convertOldConfigHelper import convertSequenceAndGetAlgs
 
 # Include, and then set up the electron analysis sequence:
 from EgammaAnalysisAlgorithms.ElectronAnalysisSequence import (
@@ -7,9 +7,12 @@ from EgammaAnalysisAlgorithms.ElectronAnalysisSequence import (
 )
 
 
-def makeAndAddElectronAnalysisSequence(
-    compAcc, dataType, inputContainerName, outputContainerName
+def ElectronAnalysisSequenceCfg(
+    flags, dataType, inputContainerName, outputContainerName
 ):
+    cfg = ComponentAccumulator()
+
+    # with ConfigurableRun3Behavior(False):
     electronSequence = makeElectronAnalysisSequence(
         dataType,
         workingPoint="LooseLHElectron.NonIso",
@@ -28,12 +31,8 @@ def makeAndAddElectronAnalysisSequence(
         inputName=inputContainerName, outputName=outputContainerName
     )
 
-    # Convert to new configurables
-    electronSequenceCnv, electronAlgsCnv = convertSequenceAndGetAlgs(
-        CompFactory, electronSequence
-    )
-    compAcc.addSequence(electronSequenceCnv)
-    for electronAlg in electronAlgsCnv:
-        compAcc.addEventAlgo(electronAlg, electronSequenceCnv.getName())
+    cfg.addSequence(CompFactory.AthSequencer(electronSequence.getName()))
+    for alg in electronSequence.getGaudiConfig2Components():
+        cfg.addEventAlgo(alg, electronSequence.getName())
 
-    return electronSequenceCnv, electronAlgsCnv
+    return cfg

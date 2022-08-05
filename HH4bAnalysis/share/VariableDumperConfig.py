@@ -8,46 +8,111 @@
 # VariableDumperConfig.py
 # A simple CA file to create a tree of variables
 #
-# Author: Victor Ruelas
 
 import sys
 
 from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from Config.Base import pileupConfigFiles
-from Algs.Event import makeAndAddTriggerAnalysisAlgs, makeAndAddPileupAnalysisSequence
-from Algs.Electrons import makeAndAddElectronAnalysisSequence
-from Algs.Photons import makeAndAddPhotonAnalysisSequence
-from Algs.Muons import makeAndAddMuonAnalysisSequence
-from Algs.Jets import makeAndAddJetAnalysisSequence, makeAndAddFatJetAnalysisSequence
-from Algs.Postprocessing import makeAndAddOverlapAnalysisSequence
-from Algs.Tree import makeAndAddAnalysisTreeAlg
-from utils.argsHelper import checkArgs
-from utils.containerNameHelper import getContainerName
+from AthenaConfiguration.AutoConfigFlags import GetFileMD
+from HH4bAnalysis.Config.Base import pileupConfigFiles
+from HH4bAnalysis.Algs.Event import (
+    TriggerAnalysisAlgsCfg,
+    PileupAnalysisSequenceCfg,
+    EventSelectionAnalysisSequenceCfg,
+)
+from HH4bAnalysis.Algs.Electrons import ElectronAnalysisSequenceCfg
+from HH4bAnalysis.Algs.Photons import PhotonAnalysisSequenceCfg
+from HH4bAnalysis.Algs.Muons import MuonAnalysisSequenceCfg
+from HH4bAnalysis.Algs.Jets import (
+    JetAnalysisSequenceCfg,
+    FatJetAnalysisSequenceCfg,
+    VRJetAnalysisSequenceCfg,
+)
+from HH4bAnalysis.Algs.Postprocessing import OverlapAnalysisSequenceCfg
+from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
+from HH4bAnalysis.utils.containerNameHelper import getContainerName
 
-variabledumperlog = Logging.logging.getLogger("VariableDumperConfig")
+log = Logging.logging.getLogger("VariableDumperConfig")
+
+
+def defineArgs(ConfigFlags):
+    # Generate a parser and add an output file argument, then retrieve the args
+    parser = ConfigFlags.getArgumentParser()
+    parser.add_argument(
+        "--outFile",
+        type=str,
+        default="analysis-variables.root",
+        help="Output file name",
+    )
+    parser.add_argument(
+        "--btag-wps",
+        type=str,
+        nargs="+",
+        default=[
+            "DL1dv00_FixedCutBEff_77",
+            "DL1dv00_FixedCutBEff_85",
+        ],
+        help="Btag working points default %(default)s",
+    )
+    parser.add_argument(
+        "--vr-btag-wps",
+        type=str,
+        nargs="+",
+        default=[
+            "DL1r_FixedCutBEff_77",
+            "DL1r_FixedCutBEff_85",
+        ],
+        help="VR Jets btag working points default %(default)s",
+    )
+    parser.add_argument(
+        "--trigger-list",
+        type=str,
+        default="Run3",
+        help="Trigger list to use, default: %(default)",
+    )
+    return parser
 
 
 # Generate the algorithm to do the dumping.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def VariableDumperCfg(flags, outfname, is_daod_physlite, btag_wps, trigger_chains):
+def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[]):
+    fileMD = GetFileMD(flags.Input.Files[0])
     dataType = "mc" if flags.Input.isMC else "data"
+    is_daod_physlite = fileMD.get("processingTags", []) == ["StreamDAOD_PHYSLITE"]
+    log.info(
+        f"Self-configured: dataType: '{dataType}', is PHYSLITE? {is_daod_physlite}"
+    )
+
+    log.debug(f"Containers available in dataset: {flags.Input.Collections}")
+
+    # TODO: no DL1d branches in PHYSLITE yet
+    if is_daod_physlite:
+        btag_wps = [wp.replace("DL1dv00", "DL1r") for wp in btag_wps]
 
     reco4JetInputContainerName = getContainerName("Reco4PFlowJets", is_daod_physlite)
     reco10JetInputContainerName = getContainerName("Reco10PFlowJets", is_daod_physlite)
+    vrJetInputContainerName = getContainerName("VRJets", is_daod_physlite)
     muonsInputContainerName = getContainerName("Muons", is_daod_physlite)
     electronsInputContainerName = getContainerName("Electrons", is_daod_physlite)
     photonsInputContainerName = getContainerName("Photons", is_daod_physlite)
 
     reco4JetOutputContainerName = f"Analysis{reco4JetInputContainerName}_%SYS%"
-    reco10JetOutputContainerName = f"Analysis{reco10JetInputContainerName}_%SYS%"
     muonsOutputContainerName = f"Analysis{muonsInputContainerName}_%SYS%"
     electronsOutputContainerName = f"Analysis{electronsInputContainerName}_%SYS%"
     photonsOutputContainerName = f"Analysis{photonsInputContainerName}_%SYS%"
+    if reco10JetInputContainerName:
+        reco10JetOutputContainerName = f"Analysis{reco10JetInputContainerName}_%SYS%"
+    else:
+        reco10JetOutputContainerName = ""
+    if vrJetInputContainerName:
+        vrJetOutputContainerName = f"Analysis{vrJetInputContainerName}_%SYS%"
+    else:
+        vrJetOutputContainerName = ""
 
     cfg = ComponentAccumulator()
+    cfg.addSequence(CompFactory.AthSequencer("HH4bSeq"))
 
     # Every CA should include all its dependencies, apart from the global ones
     # included in the main function.
@@ -65,155 +130,223 @@ def VariableDumperCfg(flags, outfname, is_daod_physlite, btag_wps, trigger_chain
     # Create SystematicsSvc explicitly:
     cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
 
-    try:
-        # Include, and then set up the pileup analysis sequence:
-        prwFiles, lumicalcFiles = pileupConfigFiles(*flags.Input.Files)
-    except LookupError as err:
-        variabledumperlog.error(err)
-
+    log.info("Adding trigger analysis algs")
     # Adds variable to EventInfo if trigger passed or not, for example:
-    # EventInfo.HLT_j420 -> 1 # or 0
-    makeAndAddTriggerAnalysisAlgs(cfg, flags, trigger_chains)
+    # EventInfo.[trigger name] -> 1 # or 0
+    if trigger_chains:
+        cfg.merge(TriggerAnalysisAlgsCfg(flags, trigger_chains), "HH4bSeq")
 
-    # Adds variable to EventInfo if for pileup weight, for example:
-    # EventInfo.PileWeight_%SYS$ -> ?
-    makeAndAddPileupAnalysisSequence(
-        cfg,
-        dataType=dataType,
-        prwFiles=prwFiles,
-        lumicalcFiles=lumicalcFiles,
+    log.info("Add DQ Event Filter Alg")
+    # Remove events failing DQ criteria
+    cfg.merge(EventSelectionAnalysisSequenceCfg(flags, dataType), "HH4bSeq")
+
+    doPRW = flags.Input.isMC and not is_daod_physlite
+    if doPRW:
+        try:
+            # Include, and then set up the pileup analysis sequence:
+            prwFiles, lumicalcFiles = pileupConfigFiles(fileMD)
+
+            # Adds variable to EventInfo if for pileup weight, for example:
+            # EventInfo.PileWeight_%SYS$ -> ?
+            cfg.merge(
+                PileupAnalysisSequenceCfg(
+                    flags,
+                    dataType=dataType,
+                    prwFiles=prwFiles,
+                    lumicalcFiles=lumicalcFiles,
+                ),
+                "HH4bSeq",
+            )
+
+        except LookupError as err:
+            log.error(err)
+            doPRW = False
+
+    log.info(f"Do PRW is {doPRW}")
+
+    log.info("Add electron seq")
+    cfg.merge(
+        ElectronAnalysisSequenceCfg(
+            flags,
+            dataType=dataType,
+            inputContainerName=electronsInputContainerName,
+            outputContainerName=electronsOutputContainerName,
+        ),
+        "HH4bSeq",
     )
 
-    makeAndAddElectronAnalysisSequence(
-        cfg,
-        dataType=dataType,
-        inputContainerName=electronsInputContainerName,
-        outputContainerName=electronsOutputContainerName,
+    log.info("Add photon seq")
+    cfg.merge(
+        PhotonAnalysisSequenceCfg(
+            flags,
+            dataType=dataType,
+            inputContainerName=photonsInputContainerName,
+            outputContainerName=photonsOutputContainerName,
+        ),
+        "HH4bSeq",
     )
 
-    makeAndAddPhotonAnalysisSequence(
-        cfg,
-        dataType=dataType,
-        inputContainerName=photonsInputContainerName,
-        outputContainerName=photonsOutputContainerName,
+    log.info("Add muon seq")
+    cfg.merge(
+        MuonAnalysisSequenceCfg(
+            flags,
+            dataType=dataType,
+            inputContainerName=muonsInputContainerName,
+            outputContainerName=muonsOutputContainerName,
+        ),
+        "HH4bSeq",
     )
 
-    makeAndAddMuonAnalysisSequence(
-        cfg,
-        dataType=dataType,
-        inputContainerName=muonsInputContainerName,
-        outputContainerName=muonsOutputContainerName,
+    log.info("Add jet seq")
+    cfg.merge(
+        JetAnalysisSequenceCfg(
+            flags,
+            dataType=dataType,
+            inputContainerName=reco4JetInputContainerName,
+            outputContainerName=reco4JetOutputContainerName,
+            workingPoints=btag_wps,
+            is_daod_physlite=is_daod_physlite,
+        ),
+        "HH4bSeq",
     )
 
-    makeAndAddJetAnalysisSequence(
-        cfg,
-        dataType=dataType,
-        inputContainerName=reco4JetInputContainerName,
-        outputContainerName=reco4JetOutputContainerName,
-        workingPoints=btag_wps,
-    )
-
-    makeAndAddFatJetAnalysisSequence(
-        cfg,
-        dataType=dataType,
-        inputContainerName=reco10JetInputContainerName,
-        outputContainerName=reco10JetOutputContainerName,
-    )
-
-    # Add the custom alg for information not avaiable through CP algs
-    cfg.addEventAlgo(
-        CompFactory.HH4B.VariableDumperAlg(
-            "VariableDumper",
-            EventInfoKey="EventInfo",
-            ElectronsKey=electronsOutputContainerName,
-            PhotosKey=photonsInputContainerName,
-            MuonsKey=muonsInputContainerName,
-            SmallJetKey=reco4JetInputContainerName,
-            LargeJetKey=reco10JetOutputContainerName,
-            RootStreamName="ANALYSIS",
-            applyJetCleaning=True,
+    if is_daod_physlite:
+        log.warning("On PHYSLITE, skip large-R jet sequence for now")
+    else:
+        log.info("Add large-R jet seq")
+        cfg.merge(
+            FatJetAnalysisSequenceCfg(
+                flags,
+                dataType=dataType,
+                inputContainerName=reco10JetInputContainerName,
+                outputContainerName=reco10JetOutputContainerName,
+            ),
+            "HH4bSeq",
         )
-    )
 
-    ###
-    # Beging postprocessing
-    ###
+    if is_daod_physlite:
+        log.warning("On PHYSLITE, skip VR jet sequence for now")
+    else:
+        log.info("Add VR jet seq")
+        cfg.merge(
+            VRJetAnalysisSequenceCfg(
+                flags,
+                dataType=dataType,
+                inputContainerName=vrJetInputContainerName,
+                outputContainerName=vrJetOutputContainerName,
+                workingPoints=vr_btag_wps,
+            ),
+            "HH4bSeq",
+        )
 
-    # Include, and then set up the overlap analysis algorithm sequence:
+    ########################################################################
+    # Begin postprocessing
+    ########################################################################
+
+    log.info("Add Overlap Removal sequence")
     overlapInputNames = {
         "electrons": electronsOutputContainerName,
         "photons": photonsOutputContainerName,
         "muons": muonsOutputContainerName,
         "jets": reco4JetOutputContainerName,
-        "fatJets": reco10JetOutputContainerName,
-        # 'taus'      : 'AnalysisTauJets_%SYS%'
     }
     overlapOutputNames = {
         "electrons": f"{electronsOutputContainerName}_OR",
         "photons": f"{photonsOutputContainerName}_OR",
         "muons": f"{muonsOutputContainerName}_OR",
         "jets": f"{reco4JetOutputContainerName}_OR",
-        "fatJets": f"{reco10JetOutputContainerName}_OR",
-        # 'taus'      : 'AnalysisTauJetsOR_%SYS%'
     }
-    makeAndAddOverlapAnalysisSequence(
-        cfg,
-        dataType=dataType,
-        inputNames=overlapInputNames,
-        outputNames=overlapOutputNames,
+    if not is_daod_physlite:
+        overlapInputNames["fatJets"] = reco10JetOutputContainerName
+        overlapOutputNames["fatJets"] = f"{reco10JetOutputContainerName}_OR"
+
+    cfg.merge(
+        OverlapAnalysisSequenceCfg(
+            flags,
+            dataType=dataType,
+            inputNames=overlapInputNames,
+            outputNames=overlapOutputNames,
+            doFatJets=not is_daod_physlite,
+        ),
+        "HH4bSeq",
     )
 
+    def getFourMomBranches(container, alias, doOR=False):
+        ORstr = "_OR" if doOR else ""
+
+        branches = []
+        vars = ["pt", "eta", "phi"]
+        if "Jets" in container:
+            vars.append("m")
+        for var in vars:
+            branches += [
+                f"{container}{ORstr}.{var}  -> {alias}{ORstr}_%SYS%_{var}",
+            ]
+        return branches
+
+    ########################################################################
     # Create analysis mini-ntuple
+    ########################################################################
+
     analysisTreeBranches = [
         "EventInfo.runNumber     -> runNumber",
         "EventInfo.eventNumber   -> eventNumber",
         "EventInfo.mcEventWeights   -> mcEventWeights",
-        "EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%",
-        f"{electronsOutputContainerName}.pt  -> el_%SYS%_pt",
-        f"{electronsOutputContainerName}.eta -> el_%SYS%_eta",
-        f"{electronsOutputContainerName}.phi -> el_%SYS%_phi",
-        f"{electronsOutputContainerName}_OR.eta -> el_OR_%SYS%_eta",
-        f"{electronsOutputContainerName}_OR.phi -> el_OR_%SYS%_phi",
-        f"{electronsOutputContainerName}_OR.pt  -> el_OR_%SYS%_pt",
-        f"{photonsOutputContainerName}.pt  -> ph_%SYS%_pt",
-        f"{photonsOutputContainerName}.eta -> ph_%SYS%_eta",
-        f"{photonsOutputContainerName}.phi -> ph_%SYS%_phi",
-        f"{photonsOutputContainerName}_OR.eta -> ph_OR_%SYS%_eta",
-        f"{photonsOutputContainerName}_OR.phi -> ph_OR_%SYS%_phi",
-        f"{photonsOutputContainerName}_OR.pt  -> ph_OR_%SYS%_pt",
-        f"{muonsOutputContainerName}.pt  -> mu_%SYS%_pt",
-        f"{muonsOutputContainerName}.eta -> mu_%SYS%_eta",
-        f"{muonsOutputContainerName}.phi -> mu_%SYS%_phi",
-        f"{muonsOutputContainerName}_OR.eta -> mu_OR_%SYS%_eta",
-        f"{muonsOutputContainerName}_OR.phi -> mu_OR_%SYS%_phi",
-        f"{muonsOutputContainerName}_OR.pt  -> mu_OR_%SYS%_pt",
-        f"{reco4JetOutputContainerName}.m  -> recojet_antikt4_%SYS%_m",
-        f"{reco4JetOutputContainerName}.pt  -> recojet_antikt4_%SYS%_pt",
-        f"{reco4JetOutputContainerName}.eta -> recojet_antikt4_%SYS%_eta",
-        f"{reco4JetOutputContainerName}.phi -> recojet_antikt4_%SYS%_phi",
-        f"{reco4JetOutputContainerName}_OR.m  -> recojet_antikt4_OR_%SYS%_m",
-        f"{reco4JetOutputContainerName}_OR.pt  -> recojet_antikt4_OR_%SYS%_pt",
-        f"{reco4JetOutputContainerName}_OR.eta -> recojet_antikt4_OR_%SYS%_eta",
-        f"{reco4JetOutputContainerName}_OR.phi -> recojet_antikt4_OR_%SYS%_phi",
-        f"{reco10JetOutputContainerName}.m  -> recojet_antikt10_%SYS%_m",
-        f"{reco10JetOutputContainerName}.pt  -> recojet_antikt10_%SYS%_pt",
-        f"{reco10JetOutputContainerName}.eta -> recojet_antikt10_%SYS%_eta",
-        f"{reco10JetOutputContainerName}.phi -> recojet_antikt10_%SYS%_phi",
-        f"{reco10JetOutputContainerName}_OR.m  -> recojet_antikt10_OR_%SYS%_m",
-        f"{reco10JetOutputContainerName}_OR.pt  -> recojet_antikt10_OR_%SYS%_pt",
-        f"{reco10JetOutputContainerName}_OR.eta -> recojet_antikt10_OR_%SYS%_eta",
-        f"{reco10JetOutputContainerName}_OR.phi -> recojet_antikt10_OR_%SYS%_phi",
+        "EventInfo.averageInteractionsPerCrossing -> averageInteractionsPerCrossing",
     ]
+
     analysisTreeBranches += [
-        f"EventInfo.trigPassed_{trig_chain} -> trigPassed_{trig_chain}"
+        f"EventInfo.trigPassed_{trig_chain.replace('-','_')} -> trigPassed_{trig_chain.replace('-','_')}"  # noqa
         for trig_chain in trigger_chains
     ]
+
+    if doPRW:
+        analysisTreeBranches += [
+            "EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%",
+        ]
+    else:
+        analysisTreeBranches += [
+            "EventInfo.mcEventWeights -> pileupWeight_NOSYS",
+        ]
+
+    objectpairs = {
+        electronsOutputContainerName: "el",
+        photonsOutputContainerName: "ph",
+        muonsOutputContainerName: "mu",
+        reco4JetOutputContainerName: "recojet_antikt4",
+    }
+    for cont, alias in objectpairs.items():
+        analysisTreeBranches += getFourMomBranches(cont, alias)
+        analysisTreeBranches += getFourMomBranches(cont, alias, doOR=True)
+
+    # B-jet WPs
     analysisTreeBranches += [
         f"{reco4JetOutputContainerName}.ftag_select_{btag_wp}"
         f" -> recojet_antikt4_%SYS%_{btag_wp}"
         for btag_wp in btag_wps
     ]
-    makeAndAddAnalysisTreeAlg(cfg, branches=analysisTreeBranches)
+    analysisTreeBranches += [
+        f"{reco4JetOutputContainerName}_OR.ftag_select_{btag_wp}"
+        f" -> recojet_antikt4_OR_%SYS%_{btag_wp}"
+        for btag_wp in btag_wps
+    ]
+
+    if not is_daod_physlite:
+        analysisTreeBranches += getFourMomBranches(
+            reco10JetOutputContainerName, "recojet_antikt10"
+        )
+        analysisTreeBranches += getFourMomBranches(
+            reco10JetOutputContainerName, "recojet_antikt10", doOR=True
+        )
+        analysisTreeBranches += getFourMomBranches(vrJetOutputContainerName, "vrjet")
+        analysisTreeBranches += [
+            f"{vrJetOutputContainerName}.ftag_select_{btag_wp}"
+            f" -> vrjet_%SYS%_{btag_wp}"
+            for btag_wp in vr_btag_wps
+        ]
+
+    log.info("Add tree seq")
+    cfg.merge(AnalysisTreeAlgCfg(flags, branches=analysisTreeBranches), "HH4bSeq")
 
     return cfg
 
@@ -222,64 +355,31 @@ def VariableDumperCfg(flags, outfname, is_daod_physlite, btag_wps, trigger_chain
 # We define a "main function" that will run a test job if the module
 # is executed rather than imported.
 def main():
+    # Import the job configuration flags, some of which will be autoconfigured.
+    # These are used for steering the job, and include e.g. the input file (list).
+    from AthenaConfiguration.AllConfigFlags import ConfigFlags
+
+    # Get the arguments, defined at the top for easy browsing
+    parser = defineArgs(ConfigFlags)
+    args = ConfigFlags.fillFromArgs([], parser)
+    # Lock the flags so that the configuration of job subcomponents cannot
+    # modify them silently/unpredictably.
+    # Workaround for buggy glob, needed prior
+    # to https://gitlab.cern.ch/atlas/athena/-/merge_requests/55561
+    if ConfigFlags.Input.Files[0] == "_ATHENA_GENERIC_INPUTFILE_NAME_":
+        ConfigFlags.Input.Files = ConfigFlags.Input.Files[1:]
+    log.info(f"Operating on input files {ConfigFlags.Input.Files}")
+    ConfigFlags.lock()
+
+    # Get a ComponentAccumulator setting up the standard components
+    # needed to run an Athena job.
+    from AthenaConfiguration.MainServicesConfig import MainServicesCfg
+
     # Setting temporarily needed for Run 3 code, to generate python
     # Configurable objects for deduplication
     from AthenaCommon.Configurable import ConfigurableRun3Behavior
 
     with ConfigurableRun3Behavior():
-
-        # Import the job configuration flags, some of which will be autoconfigured.
-        # These are used for steering the job, and include e.g. the input file (list).
-        from AthenaConfiguration.AllConfigFlags import ConfigFlags
-
-        # Generate a parser and add an output file argument, then retrieve the args
-        parser = ConfigFlags.getArgumentParser()
-        parser.add_argument(
-            "--outFile",
-            type=str,
-            default="analysis-variables.root",
-            help="Output file name",
-        )
-        parser.add_argument(
-            "--mc",
-            action="store_true",
-            help="Input is Monte Carlo",
-        )
-        parser.add_argument(
-            "--daod-physlite",
-            action="store_true",
-            help="Input is DAOD_PHYSLITE",
-        )
-        parser.add_argument(
-            "--btag-wps",
-            type=str,
-            nargs="+",
-            default=[
-                "DL1dv00_FixedCutBEff_77",
-                "DL1dv00_FixedCutBEff_85",
-            ],
-            help="btag working points default %(default)s",
-        )
-        parser.add_argument(
-            "--trigger-chains",
-            type=str,
-            nargs="+",
-            default=[
-                "HLT_j420",
-                "HLT_j460",
-            ],
-            help="trigger chains default %(default)s",
-        )
-        args = ConfigFlags.fillFromArgs([], parser)
-        # Lock the flags so that the configuration of job subcomponents cannot
-        # modify them silently/unpredictably.
-        ConfigFlags.lock()
-
-        checkArgs(ConfigFlags, args, parser)
-
-        # Get a ComponentAccumulator setting up the standard components
-        # needed to run an Athena job.
-        from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 
         cfg = MainServicesCfg(ConfigFlags)
         # Adjust the loop manager to announce the event number less frequently.
@@ -291,26 +391,25 @@ def main():
         else:
             cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
 
-        # Add the components for reading in POOL files -- this is a specialised
-        # ROOT format storing structured objects like the
-        # ATLAS physics objects (jets etc)
-        from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
+        from HH4bAnalysis.Config.xAODEventSelectorConfig import xAODReadCfg
 
-        cfg.merge(PoolReadCfg(ConfigFlags))
+        cfg.merge(xAODReadCfg(ConfigFlags))
 
         # Add our VariableDumper CA, calling the function defined above.
+        from HH4bAnalysis.Config.TriggerLists import TriggerLists
+
         cfg.merge(
             VariableDumperCfg(
                 ConfigFlags,
                 outfname=args.outFile,
-                is_daod_physlite=args.daod_physlite,
                 btag_wps=args.btag_wps,
-                trigger_chains=args.trigger_chains,
+                vr_btag_wps=args.vr_btag_wps,
+                trigger_chains=TriggerLists[args.trigger_list],
             )
         )
 
         # Print the full job configuration
-        cfg.printConfig()
+        cfg.printConfig(summariseProps=False)
 
     # Execute the job defined in the ComponentAccumulator.
     # The number of events is specified by `args.evtMax`

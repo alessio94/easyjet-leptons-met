@@ -1,21 +1,23 @@
+from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def makeAndAddAnalysisTreeAlg(compAcc, branches):
+def AnalysisTreeAlgCfg(flags, branches):
+    cfg = ComponentAccumulator()
     # Create analysis mini-ntuple
     treeMaker = CompFactory.getComp("CP::TreeMakerAlg")("TreeMaker")
     treeMaker.TreeName = "AnalysisMiniTree"
-    compAcc.addEventAlgo(treeMaker)
+    cfg.addEventAlgo(treeMaker)
 
     # Add branches
     ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMaker")
     ntupleMaker.TreeName = "AnalysisMiniTree"
     ntupleMaker.Branches = branches
-    compAcc.addEventAlgo(ntupleMaker)
+    cfg.addEventAlgo(ntupleMaker)
 
     # Fill tree
     treeFiller = CompFactory.getComp("CP::TreeFillerAlg")("TreeFiller")
     treeFiller.TreeName = "AnalysisMiniTree"
-    compAcc.addEventAlgo(treeFiller)
+    cfg.addEventAlgo(treeFiller)
 
-    return treeMaker, ntupleMaker, treeFiller
+    return cfg
