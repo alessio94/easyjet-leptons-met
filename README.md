@@ -36,16 +36,16 @@ VariableDumperConfig.py --filesInput data.myinputfile.DAOD_PHYS.pool.root --evtM
 Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
 You should find a new ROOT files, `analysis-variables.root`.
 
-To process Monte Carlo samples the `--mc` flag is needed:
+To process Monte Carlo samples the configuration is automatically setup from the sample's metadata:
 
 ```
-VariableDumperConfig.py --filesInput mc.myinputfile.pool.root --evtMax 10 --mc 
+VariableDumperConfig.py --filesInput mc.myinputfile.pool.root --evtMax 10
 ```
 
-To process DAOD_PHYSLITE the `--daod-physlite` flag is needed:
+To process DAOD_PHYSLITE the configuration is automatic as well, the command looks the same:
 
 ```
-VariableDumperConfig.py --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10 --mc --daod-physlite 
+VariableDumperConfig.py --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10 
 ```
 
 ## AthAnalysis in Docker

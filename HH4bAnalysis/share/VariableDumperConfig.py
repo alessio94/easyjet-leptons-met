@@ -136,16 +136,17 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
     if trigger_chains:
         cfg.merge(TriggerAnalysisAlgsCfg(flags, trigger_chains), "HH4bSeq")
 
-    log.info("Add DQ Event Filter Alg")
+    log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
     cfg.merge(EventSelectionAnalysisSequenceCfg(flags, dataType), "HH4bSeq")
 
     doPRW = flags.Input.isMC and not is_daod_physlite
+    log.info(
+        f"Do PRW is {doPRW}. " f"{'Add' if doPRW else 'Skip'} pileup re-weight sequence"
+    )
     if doPRW:
         try:
-            # Include, and then set up the pileup analysis sequence:
             prwFiles, lumicalcFiles = pileupConfigFiles(fileMD)
-
             # Adds variable to EventInfo if for pileup weight, for example:
             # EventInfo.PileWeight_%SYS$ -> ?
             cfg.merge(
@@ -161,8 +162,6 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
         except LookupError as err:
             log.error(err)
             doPRW = False
-
-    log.info(f"Do PRW is {doPRW}")
 
     log.info("Add electron seq")
     cfg.merge(
