@@ -10,7 +10,7 @@ class SampleTypes(Enum):
 def pileupConfigFiles(fileMD):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
     tags = fileMD.get("AMITag", "")
-    dsid = fileMD.get("mcChannelNumber", 0)
+    dsid = fileMD.get("mc_channel_number", 0)
     split_tags = tags.split("_")
     # Figure out which MC we are using
     if SampleTypes.mc20a.value in split_tags:
@@ -51,6 +51,7 @@ def getLumicalcFiles(subcampaign):
 
 def getPrwFiles(dsid, subcampaign, tags):
     actual_mu = []
+    prw_files = []
     if subcampaign == SampleTypes.mc20d:
         actual_mu.append(
             "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root"  # noqa
@@ -60,8 +61,10 @@ def getPrwFiles(dsid, subcampaign, tags):
             "GoodRunsLists/data18_13TeV/20190318/physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root"  # noqa
         )
 
-    prw_files = [
-        f"dev/PileupReweighting/share/DSID{dsid[:3]}xxx/pileup_{subcampaign.name}_dsid{dsid}_{'AFII' if 'a' in tags else 'FS'}.root"  # noqa
-    ]
+    if dsid:
+        dsid_as_str = str(dsid)
+        prw_files.append(
+            f"dev/PileupReweighting/share/DSID{dsid_as_str[:3]}xxx/pileup_{subcampaign.name}_dsid{dsid_as_str}_{'AFII' if 'a' in tags else 'FS'}.root"  # noqa
+        )
 
     return prw_files + actual_mu
