@@ -16,6 +16,7 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
+#include "xAODBTagging/BTaggingUtilities.h"
 #include <AthContainers/AuxElement.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysReadHandle.h>
@@ -24,9 +25,6 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
-
-#include "FTagAnalysisInterfaces/IBTaggingSelectionTool.h"
-#include <AsgTools/ToolHandle.h>
 
 // Class definition
 
@@ -54,14 +52,7 @@ private:
 
     // Member variables for configuration
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-        this, "EventInfoKey", "", "EventInfo container to dump"};
-
-    // for jet cleaning: quality criteria to identify events which are
-    // consistent with noise in the calorimeter or non-collision background
-    // For details last paragraph on page 6:
-    // https://cds.cern.ch/record/2809414/files/ATLAS-COM-CONF-2022-035.pdf
-    bool m_applyJetCleaning;
-    SG::AuxElement::ConstAccessor<char> m_acc_DFCommonJets_eventClean_LooseBad;
+        this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
     CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{
         this, "ElectronsKey", "AnalysisElectrons_%SYS%",
