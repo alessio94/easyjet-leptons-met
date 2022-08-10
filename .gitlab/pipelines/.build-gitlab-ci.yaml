@@ -9,3 +9,4 @@ compile:
   artifacts:
     paths:
       - build
+  needs: []

@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+
+set -Eeu
+
+
+################################################
+# mode-based switches
+################################################
+
+# standard samples
+PHYS_TTBAR=ttbar.410470.PHYS.e6337_s3681_r13167_p5169.pool.root
+declare -A DATAFILES=(
+    [ntuple-fast]=${PHYS_TTBAR}
+    [ntuple]=${PHYS_TTBAR}
+)
+
+declare -A TESTS=(
+    [ntuple-fast]=ntuple-dump-fast
+    [ntuple]=ntuple-dump
+)
+
+ntuple-dump() {
+    VariableDumperConfig.py -o --filesInput $1 --trigger-list "Run2"
+}
+ntuple-dump-fast() {
+    VariableDumperConfig.py -oc --filesInput $1 --trigger-list "Run2"
+}
+
+################################################
+# parse arguments
+################################################
+
+ALL_MODES=${!TESTS[*]}
+
+print-usage() {
+    echo "usage: ${0##*/} [-h] [-d <dir>] (${ALL_MODES[*]// /|})" 1>&2
+}
+
+usage() {
+    print-usage
+    exit 1;
+}
+
+help() {
+    print-usage
+    cat <<EOF
+
+The ${0##*/} utility will download a test DAOD file and run it.
+
+Options:
+ -d <dir>: specify directory to run in
+ -h: print help
+
+If no -d argument is given we'll create one in /tmp and work there.
+
+EOF
+    exit 1
+}
+
+DIRECTORY=""
+DATA_URL=https://gitlab.cern.ch/dguest/hh4b-test-files/-/raw/master/
+
+while getopts ":d:h" o; do
+    case "${o}" in
+        d) DIRECTORY=${OPTARG} ;;
+        h) help ;;
+        *) usage ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if (( $# != 1 )) ; then
+    usage
+fi
+
+MODE=$1
+
+
+############################################
+# Check that all the modes / paths exist
+############################################
+#
+if [[ ! ${DATAFILES[$MODE]+x} ]]; then usage; fi
+DOWNLOAD_PATH=${DATAFILES[$MODE]}
+FILE=${DOWNLOAD_PATH##*/}
+
+if [[ ! ${TESTS[$MODE]+x} ]]; then usage; fi
+RUN=${TESTS[$MODE]}
+
+
+#############################################
+# now start doing stuff
+#############################################
+#
+if [[ -z ${DIRECTORY} ]] ; then
+    DIRECTORY=$(mktemp -d)
+    echo "running in ${DIRECTORY}" >&2
+fi
+
+if [[ ! -d ${DIRECTORY} ]]; then
+    if [[ -e ${DIRECTORY} ]] ; then
+        echo "${DIRECTORY} is not a directory" >&2
+        exit 1
+    fi
+    mkdir ${DIRECTORY}
+fi
+cd $DIRECTORY
+
+# get files
+if [[ ! -f ${FILE} ]] ; then
+    echo "getting file ${FILE}" >&2
+    curl -s ${DATA_URL}/${DOWNLOAD_PATH} > ${FILE}
+fi
+
+# now run the test
+$RUN $FILE
+

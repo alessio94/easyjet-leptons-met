@@ -134,12 +134,13 @@ def VRJetAnalysisSequenceCfg(
             jetCollection=vrJetBTagContaienrName,
             btagWP=btag_wp,
             btagger=tagger,
+            generator="Pythia8",
+            minPt=10e3,
             postfix="",
             preselection=None,
             noEfficiency=False,
             legacyRecommendations=False,
             enableCutflow=False,
-            minPt=10e3,
         )
 
     vrJetSequence.configure(
