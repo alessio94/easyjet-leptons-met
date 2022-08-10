@@ -3,7 +3,12 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 
 
 def OverlapAnalysisSequenceCfg(
-    flags, dataType, inputNames, outputNames, doFatJets=True
+    flags,
+    dataType,
+    inputNames,
+    outputNames,
+    doFatJets=True,
+    doMuons=True,
 ):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.OverlapAnalysisSequence import (
@@ -19,7 +24,7 @@ def OverlapAnalysisSequenceCfg(
         doMuPFJetOR=False,
         doTaus=False,
         doElectrons=True,
-        doMuons=True,
+        doMuons=doMuons,
         doJets=True,
         doPhotons=True,
         doFatJets=doFatJets,

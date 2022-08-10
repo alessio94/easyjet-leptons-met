@@ -16,8 +16,8 @@ atlas_add_library(HH4bAnalysisLib
 
 # Build the Athena component library
 atlas_add_component(HH4bAnalysis
-  src/*.cxx
-  src/tools/*.cxx
+  src/VariableDumperAlg.cxx
+  src/tools/NTrkVertexCounter.cxx
   src/components/*.cxx
   LINK_LIBRARIES
   GaudiKernel
@@ -34,8 +34,16 @@ atlas_add_component(HH4bAnalysis
 )
 
 # Install python modules, joboptions, and share content
-atlas_install_scripts(share/*.*)
-atlas_install_python_modules(python/*/)
+atlas_install_scripts(
+  share/VariableDumperConfig.py
+  share/grid_submit.py
+  share/hh4b-test
+  )
+atlas_install_python_modules(
+  python/Algs
+  python/Config
+  python/utils
+  )
 
 # atlas_install_data( data/* )
 # You can access your data from code using path resolver, e.g.

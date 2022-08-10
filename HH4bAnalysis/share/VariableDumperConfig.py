@@ -10,14 +10,16 @@
 #
 
 import sys
+from pathlib import Path
 
 from AthenaCommon import Logging
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
-from HH4bAnalysis.Config.Base import pileupConfigFiles
+from HH4bAnalysis.Config.Base import pileupConfigFiles, cache_metadata, update_metadata
 from HH4bAnalysis.Algs.Event import (
-    TriggerAnalysisAlgsCfg,
+    GeneratorAnalysisSequenceCfg,
+    TriggerAnalysisSequenceCfg,
     PileupAnalysisSequenceCfg,
     EventSelectionAnalysisSequenceCfg,
 )
@@ -48,7 +50,7 @@ def defineArgs(ConfigFlags):
     parser.add_argument(
         "--btag-wps",
         type=str,
-        nargs="+",
+        nargs="*",
         default=[
             "DL1dv00_FixedCutBEff_77",
             "DL1dv00_FixedCutBEff_85",
@@ -58,10 +60,10 @@ def defineArgs(ConfigFlags):
     parser.add_argument(
         "--vr-btag-wps",
         type=str,
-        nargs="+",
+        nargs="*",
         default=[
-            "DL1r_FixedCutBEff_77",
-            "DL1r_FixedCutBEff_85",
+            # "DL1r_FixedCutBEff_77",
+            # "DL1r_FixedCutBEff_85",
         ],
         help="VR Jets btag working points default %(default)s",
     )
@@ -69,18 +71,79 @@ def defineArgs(ConfigFlags):
         "--trigger-list",
         type=str,
         default="Run3",
-        help="Trigger list to use, default: %(default)",
+        help="Trigger list to use, default: %(default)s",
+    )
+    parser.add_argument(
+        "-c",
+        "--meta-cache",
+        type=Path,
+        default=None,
+        nargs="?",
+        const=Path("metadata.json"),
+        help="use metadata cache file, defaults to %(const)s",
+    )
+    parser.add_argument(
+        "-o",
+        "--loose",
+        action="store_true",
+        help="use loose event cleaning (to get something to pass)",
     )
     return parser
+
+
+def _is_physlite(flags):
+    fileMD = GetFileMD(flags.Input.Files[0])
+    return fileMD.get("processingTags", []) == ["StreamDAOD_PHYSLITE"]
+
+
+def _is_mc_phys(flags):
+    return flags.Input.isMC and not _is_physlite(flags)
+
+
+def _get_container_names(flags):
+    is_daod_physlite = _is_physlite(flags)
+    inputs = dict(
+        reco4Jet=getContainerName("Reco4PFlowJets", is_daod_physlite),
+        reco10Jet=getContainerName("Reco10PFlowJets", is_daod_physlite),
+        vrJet=getContainerName("VRJets", is_daod_physlite),
+        muons=getContainerName("Muons", is_daod_physlite),
+        electrons=getContainerName("Electrons", is_daod_physlite),
+        photons=getContainerName("Photons", is_daod_physlite),
+    )
+    outputs = dict(
+        reco4Jet=f"Analysis{inputs['reco4Jet']}_%SYS%",
+        muons=f"Analysis{inputs['muons']}_%SYS%",
+        electrons=f"Analysis{inputs['electrons']}_%SYS%",
+        photons=f"Analysis{inputs['photons']}_%SYS%",
+    )
+    if inputs["reco10Jet"]:
+        outputs["reco10Jet"] = f"Analysis{inputs['reco10Jet']}_%SYS%"
+    else:
+        outputs["reco10Jet"] = ""
+    if inputs["vrJet"]:
+        outputs["vrJet"] = f"Analysis{inputs['vrJet']}_%SYS%"
+    else:
+        outputs["vrJet"] = ""
+    return {"inputs": inputs, "outputs": outputs}
 
 
 # Generate the algorithm to do the dumping.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[]):
+def AnalysisAlgsCfg(
+    flags,
+    btag_wps,
+    vr_btag_wps,
+    trigger_chains=[],
+    do_muons=True,
+    metadata_cache=None,
+    do_loose=False,
+):
     fileMD = GetFileMD(flags.Input.Files[0])
+    if metadata_cache:
+        update_metadata(metadata_cache)
     dataType = "mc" if flags.Input.isMC else "data"
-    is_daod_physlite = fileMD.get("processingTags", []) == ["StreamDAOD_PHYSLITE"]
+    is_daod_physlite = _is_physlite(flags)
     log.info(
         f"Self-configured: dataType: '{dataType}', is PHYSLITE? {is_daod_physlite}"
     )
@@ -91,56 +154,28 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
     if is_daod_physlite:
         btag_wps = [wp.replace("DL1dv00", "DL1r") for wp in btag_wps]
 
-    reco4JetInputContainerName = getContainerName("Reco4PFlowJets", is_daod_physlite)
-    reco10JetInputContainerName = getContainerName("Reco10PFlowJets", is_daod_physlite)
-    vrJetInputContainerName = getContainerName("VRJets", is_daod_physlite)
-    muonsInputContainerName = getContainerName("Muons", is_daod_physlite)
-    electronsInputContainerName = getContainerName("Electrons", is_daod_physlite)
-    photonsInputContainerName = getContainerName("Photons", is_daod_physlite)
-
-    reco4JetOutputContainerName = f"Analysis{reco4JetInputContainerName}_%SYS%"
-    muonsOutputContainerName = f"Analysis{muonsInputContainerName}_%SYS%"
-    electronsOutputContainerName = f"Analysis{electronsInputContainerName}_%SYS%"
-    photonsOutputContainerName = f"Analysis{photonsInputContainerName}_%SYS%"
-    if reco10JetInputContainerName:
-        reco10JetOutputContainerName = f"Analysis{reco10JetInputContainerName}_%SYS%"
-    else:
-        reco10JetOutputContainerName = ""
-    if vrJetInputContainerName:
-        vrJetOutputContainerName = f"Analysis{vrJetInputContainerName}_%SYS%"
-    else:
-        vrJetOutputContainerName = ""
-
     cfg = ComponentAccumulator()
-    cfg.addSequence(CompFactory.AthSequencer("HH4bSeq"))
 
     # Every CA should include all its dependencies, apart from the global ones
     # included in the main function.
     #
-    # Add an instance of THistSvc, to create the output file and associated stream.
-    # This is needed so that the alg can register its output TTree.
-    # The syntax for the output is:
-    #   Stream name: "ANALYSIS" (default assumed by AthHistogramAlgorithm)
-    #   Output file name: specified by setting "DATAFILE"
-    #   File I/O option: specified by setting "OPT" and passed to the TFile constructor
-    #      "RECREATE" will (over)write the specified file name with a new file
-    cfg.addService(
-        CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
-    )
     # Create SystematicsSvc explicitly:
-    cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
+    systematicsSvc = CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc")
+    cfg.addService(systematicsSvc)
 
     log.info("Adding trigger analysis algs")
-    # Adds variable to EventInfo if trigger passed or not, for example:
-    # EventInfo.[trigger name] -> 1 # or 0
-    if trigger_chains:
-        cfg.merge(TriggerAnalysisAlgsCfg(flags, trigger_chains), "HH4bSeq")
+    # Removes events failing trigger and adds variable to EventInfo
+    # if trigger passed or not, for example:
+    # EventInfo.trigger_name
+    cfg.merge(TriggerAnalysisSequenceCfg(flags, dataType, trigger_chains))
 
     log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
-    cfg.merge(EventSelectionAnalysisSequenceCfg(flags, dataType), "HH4bSeq")
+    cfg.merge(
+        EventSelectionAnalysisSequenceCfg(flags, dataType, grlFiles=[], loose=do_loose)
+    )
 
-    doPRW = flags.Input.isMC and not is_daod_physlite
+    doPRW = _is_mc_phys(flags)
     log.info(
         f"Do PRW is {doPRW}. " f"{'Add' if doPRW else 'Skip'} pileup re-weight sequence"
     )
@@ -148,30 +183,36 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
         try:
             prwFiles, lumicalcFiles = pileupConfigFiles(fileMD)
             # Adds variable to EventInfo if for pileup weight, for example:
-            # EventInfo.PileWeight_%SYS$ -> ?
+            # EventInfo.PileWeight_%SYS$
             cfg.merge(
                 PileupAnalysisSequenceCfg(
                     flags,
                     dataType=dataType,
                     prwFiles=prwFiles,
                     lumicalcFiles=lumicalcFiles,
-                ),
-                "HH4bSeq",
+                )
             )
+
+            log.info("Adding generator analysis sequence")
+            runNumbers = fileMD.get("runNumbers", [])
+            # Adds variable to EventInfo if for generator weight, for example:
+            # EventInfo.generatorWeight_%SYS%
+            cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType, runNumbers[0]))
 
         except LookupError as err:
             log.error(err)
             doPRW = False
+
+    containers = _get_container_names(flags)
 
     log.info("Add electron seq")
     cfg.merge(
         ElectronAnalysisSequenceCfg(
             flags,
             dataType=dataType,
-            inputContainerName=electronsInputContainerName,
-            outputContainerName=electronsOutputContainerName,
-        ),
-        "HH4bSeq",
+            inputContainerName=containers["inputs"]["electrons"],
+            outputContainerName=containers["outputs"]["electrons"],
+        )
     )
 
     log.info("Add photon seq")
@@ -179,34 +220,32 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
         PhotonAnalysisSequenceCfg(
             flags,
             dataType=dataType,
-            inputContainerName=photonsInputContainerName,
-            outputContainerName=photonsOutputContainerName,
-        ),
-        "HH4bSeq",
+            inputContainerName=containers["inputs"]["photons"],
+            outputContainerName=containers["outputs"]["photons"],
+        )
     )
 
-    log.info("Add muon seq")
-    cfg.merge(
-        MuonAnalysisSequenceCfg(
-            flags,
-            dataType=dataType,
-            inputContainerName=muonsInputContainerName,
-            outputContainerName=muonsOutputContainerName,
-        ),
-        "HH4bSeq",
-    )
+    if do_muons:
+        log.info("Add muon seq")
+        cfg.merge(
+            MuonAnalysisSequenceCfg(
+                flags,
+                dataType=dataType,
+                inputContainerName=containers["inputs"]["muons"],
+                outputContainerName=containers["outputs"]["muons"],
+            )
+        )
 
     log.info("Add jet seq")
     cfg.merge(
         JetAnalysisSequenceCfg(
             flags,
             dataType=dataType,
-            inputContainerName=reco4JetInputContainerName,
-            outputContainerName=reco4JetOutputContainerName,
+            inputContainerName=containers["inputs"]["reco4Jet"],
+            outputContainerName=containers["outputs"]["reco4Jet"],
             workingPoints=btag_wps,
             is_daod_physlite=is_daod_physlite,
-        ),
-        "HH4bSeq",
+        )
     )
 
     if is_daod_physlite:
@@ -217,10 +256,9 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
             FatJetAnalysisSequenceCfg(
                 flags,
                 dataType=dataType,
-                inputContainerName=reco10JetInputContainerName,
-                outputContainerName=reco10JetOutputContainerName,
-            ),
-            "HH4bSeq",
+                inputContainerName=containers["inputs"]["reco10Jet"],
+                outputContainerName=containers["outputs"]["reco10Jet"],
+            )
         )
 
     if is_daod_physlite:
@@ -231,11 +269,10 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
             VRJetAnalysisSequenceCfg(
                 flags,
                 dataType=dataType,
-                inputContainerName=vrJetInputContainerName,
-                outputContainerName=vrJetOutputContainerName,
+                inputContainerName=containers["inputs"]["vrJet"],
+                outputContainerName=containers["outputs"]["vrJet"],
                 workingPoints=vr_btag_wps,
-            ),
-            "HH4bSeq",
+            )
         )
 
     ########################################################################
@@ -244,20 +281,17 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
 
     log.info("Add Overlap Removal sequence")
     overlapInputNames = {
-        "electrons": electronsOutputContainerName,
-        "photons": photonsOutputContainerName,
-        "muons": muonsOutputContainerName,
-        "jets": reco4JetOutputContainerName,
+        "electrons": containers["outputs"]["electrons"],
+        "photons": containers["outputs"]["photons"],
+        "jets": containers["outputs"]["reco4Jet"],
     }
-    overlapOutputNames = {
-        "electrons": f"{electronsOutputContainerName}_OR",
-        "photons": f"{photonsOutputContainerName}_OR",
-        "muons": f"{muonsOutputContainerName}_OR",
-        "jets": f"{reco4JetOutputContainerName}_OR",
-    }
+    if do_muons:
+        overlapInputNames["muons"] = containers["outputs"]["muons"]
+
     if not is_daod_physlite:
-        overlapInputNames["fatJets"] = reco10JetOutputContainerName
-        overlapOutputNames["fatJets"] = f"{reco10JetOutputContainerName}_OR"
+        overlapInputNames["fatJets"] = containers["outputs"]["reco10Jet"]
+
+    overlapOutputNames = {k: f"{v}_OR" for k, v in overlapInputNames.items()}
 
     cfg.merge(
         OverlapAnalysisSequenceCfg(
@@ -266,8 +300,43 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
             inputNames=overlapInputNames,
             outputNames=overlapOutputNames,
             doFatJets=not is_daod_physlite,
-        ),
-        "HH4bSeq",
+            doMuons=do_muons,
+        )
+    )
+
+    if metadata_cache:
+        cache_metadata(metadata_cache)
+
+    return cfg
+
+
+def MiniTupleCfg(
+    flags,
+    outfname,
+    trigger_chains,
+    working_points,
+    do_muons=True,
+):
+    cfg = ComponentAccumulator()
+    is_daod_physlite = _is_physlite(flags)
+    doPRW = _is_mc_phys(flags)
+    containers = _get_container_names(flags)["outputs"]
+
+    log.debug(f"Containers requested in dataset: {containers}")
+
+    ########################################################################
+    # Create analysis mini-ntuple
+    ########################################################################
+
+    # Add an instance of THistSvc, to create the output file and associated stream.
+    # This is needed so that the alg can register its output TTree.
+    # The syntax for the output is:
+    #   Stream name: "ANALYSIS" (default assumed by AthHistogramAlgorithm)
+    #   Output file name: specified by setting "DATAFILE"
+    #   File I/O option: specified by setting "OPT" and passed to the TFile constructor
+    #      "RECREATE" will (over)write the specified file name with a new file
+    cfg.addService(
+        CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
     def getFourMomBranches(container, alias, doOR=False):
@@ -283,10 +352,6 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
             ]
         return branches
 
-    ########################################################################
-    # Create analysis mini-ntuple
-    ########################################################################
-
     analysisTreeBranches = [
         "EventInfo.runNumber     -> runNumber",
         "EventInfo.eventNumber   -> eventNumber",
@@ -294,14 +359,18 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
         "EventInfo.averageInteractionsPerCrossing -> averageInteractionsPerCrossing",
     ]
 
-    analysisTreeBranches += [
-        f"EventInfo.trigPassed_{trig_chain.replace('-','_')} -> trigPassed_{trig_chain.replace('-','_')}"  # noqa
-        for trig_chain in trigger_chains
-    ]
+    for trig_chain in trigger_chains:
+        cleaned = trig_chain.replace("-", "_")
+        if "." in trig_chain:
+            continue
+        analysisTreeBranches.append(
+            f"EventInfo.trigPassed_{cleaned} -> trigPassed_{cleaned}"
+        )
 
     if doPRW:
         analysisTreeBranches += [
             "EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%",
+            "EventInfo.generatorWeight_%SYS% -> generatorWeight_%SYS%",
         ]
     else:
         analysisTreeBranches += [
@@ -309,43 +378,44 @@ def VariableDumperCfg(flags, outfname, btag_wps, vr_btag_wps, trigger_chains=[])
         ]
 
     objectpairs = {
-        electronsOutputContainerName: "el",
-        photonsOutputContainerName: "ph",
-        muonsOutputContainerName: "mu",
-        reco4JetOutputContainerName: "recojet_antikt4",
+        containers["electrons"]: "el",
+        containers["photons"]: "ph",
+        containers["reco4Jet"]: "recojet_antikt4",
     }
+    if do_muons:
+        containers["muons"] = "mu"
+
     for cont, alias in objectpairs.items():
         analysisTreeBranches += getFourMomBranches(cont, alias)
         analysisTreeBranches += getFourMomBranches(cont, alias, doOR=True)
 
     # B-jet WPs
     analysisTreeBranches += [
-        f"{reco4JetOutputContainerName}.ftag_select_{btag_wp}"
+        f"{containers['reco4Jet']}.ftag_select_{btag_wp}"
         f" -> recojet_antikt4_%SYS%_{btag_wp}"
-        for btag_wp in btag_wps
+        for btag_wp in working_points["ak4"]
     ]
     analysisTreeBranches += [
-        f"{reco4JetOutputContainerName}_OR.ftag_select_{btag_wp}"
+        f"{containers['reco4Jet']}_OR.ftag_select_{btag_wp}"
         f" -> recojet_antikt4_OR_%SYS%_{btag_wp}"
-        for btag_wp in btag_wps
+        for btag_wp in working_points["ak4"]
     ]
 
     if not is_daod_physlite:
         analysisTreeBranches += getFourMomBranches(
-            reco10JetOutputContainerName, "recojet_antikt10"
+            containers["reco10Jet"], "recojet_antikt10"
         )
         analysisTreeBranches += getFourMomBranches(
-            reco10JetOutputContainerName, "recojet_antikt10", doOR=True
+            containers["reco10Jet"], "recojet_antikt10", doOR=True
         )
-        analysisTreeBranches += getFourMomBranches(vrJetOutputContainerName, "vrjet")
+        analysisTreeBranches += getFourMomBranches(containers["vrJet"], "vrjet")
         analysisTreeBranches += [
-            f"{vrJetOutputContainerName}.ftag_select_{btag_wp}"
-            f" -> vrjet_%SYS%_{btag_wp}"
-            for btag_wp in vr_btag_wps
+            f"{containers['vrJet']}.ftag_select_{btag_wp}" f" -> vrjet_%SYS%_{btag_wp}"
+            for btag_wp in working_points["vr"]
         ]
 
     log.info("Add tree seq")
-    cfg.merge(AnalysisTreeAlgCfg(flags, branches=analysisTreeBranches), "HH4bSeq")
+    cfg.merge(AnalysisTreeAlgCfg(flags, branches=analysisTreeBranches))
 
     return cfg
 
@@ -397,14 +467,31 @@ def main():
         # Add our VariableDumper CA, calling the function defined above.
         from HH4bAnalysis.Config.TriggerLists import TriggerLists
 
+        trigger_chains = TriggerLists[args.trigger_list]
+        do_muons = not args.meta_cache
+
+        cfg.addSequence(CompFactory.AthSequencer("HH4bSeq"), "AthAlgSeq")
         cfg.merge(
-            VariableDumperCfg(
+            AnalysisAlgsCfg(
                 ConfigFlags,
-                outfname=args.outFile,
                 btag_wps=args.btag_wps,
                 vr_btag_wps=args.vr_btag_wps,
-                trigger_chains=TriggerLists[args.trigger_list],
-            )
+                trigger_chains=trigger_chains,
+                metadata_cache=args.meta_cache,
+                do_muons=do_muons,
+                do_loose=args.loose,
+            ),
+            "HH4bSeq",
+        )
+        cfg.merge(
+            MiniTupleCfg(
+                ConfigFlags,
+                outfname=args.outFile,
+                trigger_chains=trigger_chains,
+                working_points={"ak4": args.btag_wps, "vr": args.vr_btag_wps},
+                do_muons=do_muons,
+            ),
+            "HH4bSeq",
         )
 
         # Print the full job configuration

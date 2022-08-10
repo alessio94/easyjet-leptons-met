@@ -1,4 +1,5 @@
 from enum import Enum
+import json
 
 
 class SampleTypes(Enum):
@@ -7,10 +8,39 @@ class SampleTypes(Enum):
     mc20e = "r13145"
 
 
+def cache_metadata(path):
+    from AthenaConfiguration.AutoConfigFlags import _fileMetaData
+
+    all_md = {}
+    for f, m in _fileMetaData.items():
+        all_md[f] = {
+            "metadata": m.metadata,
+            "level": m.metAccessLevel,
+        }
+    with open(path, "w") as cached:
+        json.dump(all_md, cached)
+
+
+def update_metadata(path):
+    from AthenaConfiguration.AutoConfigFlags import _fileMetaData
+
+    if not path.exists():
+        return
+    with open(path) as cached_file:
+        all_cached = json.load(cached_file)
+    for f, m in _fileMetaData.items():
+        cached = all_cached.get(f)
+        if cached:
+            md = _fileMetaData[f]
+            md.metadata.update(cached["metadata"])
+            md.filename = f
+            md.metAccessLevel = cached["level"]
+
+
 def pileupConfigFiles(fileMD):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
-    tags = fileMD.get("AMITag", "")
-    dsid = fileMD.get("mc_channel_number", 0)
+    tags = fileMD["AMITag"]
+    dsid = fileMD["mc_channel_number"]
     split_tags = tags.split("_")
     # Figure out which MC we are using
     if SampleTypes.mc20a.value in split_tags:
