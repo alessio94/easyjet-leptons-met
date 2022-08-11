@@ -63,7 +63,7 @@ def PileupAnalysisSequenceCfg(flags, dataType, prwFiles, lumicalcFiles):
     return cfg
 
 
-def GeneratorAnalysisSequenceCfg(flags, dataType, runNumber):
+def GeneratorAnalysisSequenceCfg(flags, dataType):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.GeneratorAnalysisSequence import (
         makeGeneratorAnalysisSequence,
@@ -71,9 +71,7 @@ def GeneratorAnalysisSequenceCfg(flags, dataType, runNumber):
 
     generatorSequence = makeGeneratorAnalysisSequence(
         dataType,
-        saveCutBookkeepers=True,
-        runNumber=runNumber,
-        cutBookkeepersSystematics=True,
+        runNumber=flags.Input.RunNumber[0],
     )
 
     cfg.addSequence(CompFactory.AthSequencer(generatorSequence.getName()))

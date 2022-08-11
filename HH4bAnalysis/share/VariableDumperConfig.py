@@ -92,8 +92,7 @@ def defineArgs(ConfigFlags):
 
 
 def _is_physlite(flags):
-    fileMD = GetFileMD(flags.Input.Files[0])
-    return fileMD.get("processingTags", []) == ["StreamDAOD_PHYSLITE"]
+    return flags.Input.ProcessingTags == ["StreamDAOD_PHYSLITE"]
 
 
 def _is_mc_phys(flags):
@@ -156,12 +155,8 @@ def AnalysisAlgsCfg(
 
     cfg = ComponentAccumulator()
 
-    # Every CA should include all its dependencies, apart from the global ones
-    # included in the main function.
-    #
     # Create SystematicsSvc explicitly:
-    systematicsSvc = CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc")
-    cfg.addService(systematicsSvc)
+    cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
 
     log.info("Adding trigger analysis algs")
     # Removes events failing trigger and adds variable to EventInfo
@@ -194,10 +189,9 @@ def AnalysisAlgsCfg(
             )
 
             log.info("Adding generator analysis sequence")
-            runNumbers = fileMD.get("runNumbers", [])
             # Adds variable to EventInfo if for generator weight, for example:
             # EventInfo.generatorWeight_%SYS%
-            cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType, runNumbers[0]))
+            cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType))
 
         except LookupError as err:
             log.error(err)
@@ -451,6 +445,17 @@ def main():
     with ConfigurableRun3Behavior():
 
         cfg = MainServicesCfg(ConfigFlags)
+
+        from EventBookkeeperTools.EventBookkeeperToolsConfig import (
+            CutFlowSvcCfg,
+            BookkeeperToolCfg,
+        )
+
+        # Create CutFlowSvc otherwise the default CutFlowSvc that has only
+        # one CutflowBookkeeper object, and can't deal with multiple weights
+        cfg.merge(CutFlowSvcCfg(ConfigFlags))
+        cfg.merge(BookkeeperToolCfg(ConfigFlags))
+
         # Adjust the loop manager to announce the event number less frequently.
         # Makes a big difference if running over many events
         if ConfigFlags.Concurrency.NumThreads > 0:

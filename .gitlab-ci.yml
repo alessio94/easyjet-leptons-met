@@ -9,7 +9,7 @@ image: registry.cern.ch/docker.io/atlas/athanalysis:22.2.85
 stages:
   - linting
   - build
-  # - run
+  - run
 
 # and source it
 before_script:
@@ -20,4 +20,4 @@ before_script:
 include:
   - ".gitlab/pipelines/.linting-gitlab-ci.yaml"
   - ".gitlab/pipelines/.build-gitlab-ci.yaml"
-  # - ".gitlab/pipelines/.run-gitlab-ci.yaml"
+  - ".gitlab/pipelines/.run-gitlab-ci.yaml"
