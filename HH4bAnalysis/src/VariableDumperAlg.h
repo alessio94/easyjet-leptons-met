@@ -59,7 +59,7 @@ private:
         "the electron collection to run on"};
 
     CP::SysReadHandle<xAOD::PhotonContainer> m_photonHandle{
-        this, "PhotosKey", "AnalysisPhotons_%SYS%",
+        this, "PhotonsKey", "AnalysisPhotons_%SYS%",
         "the photon collection to run on"};
 
     CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{
