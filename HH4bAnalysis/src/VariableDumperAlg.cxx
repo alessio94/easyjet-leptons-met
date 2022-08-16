@@ -24,6 +24,8 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Initialising " << name());
 
+    ATH_CHECK(m_EventInfoKey.initialize());
+
     ATH_CHECK(m_systematicsList.addHandle(m_electronHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_photonHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_muonHandle));
@@ -61,28 +63,6 @@ namespace HH4B
       const xAOD::JetContainer *antiKt4RecoJets(nullptr);
       ATH_CHECK(m_jetsmallRHandle.retrieve(antiKt4RecoJets, sys));
       // do something with antiKt4RecoJets
-      for (auto jet : *antiKt4RecoJets)
-      {
-        const xAOD::BTagging *bjet =
-            xAOD::BTaggingUtilities::getBTagging(*jet);
-
-        if (!bjet)
-        {
-          ATH_MSG_WARNING("btagging information not available");
-          continue;
-        }
-
-        double DL1dv00_pb = -1;
-        double DL1dv00_pc = -1;
-        double DL1dv00_pu = -1;
-        bjet->pb("DL1dv00", DL1dv00_pb);
-        bjet->pc("DL1dv00", DL1dv00_pc);
-        bjet->pu("DL1dv00", DL1dv00_pu);
-        ATH_MSG_WARNING("DL1dv00_pb \"" << DL1dv00_pb << "\" for jet");
-        ATH_MSG_WARNING("DL1dv00_pc \"" << DL1dv00_pc << "\" for jet");
-        ATH_MSG_WARNING("DL1dv00_pu \"" << DL1dv00_pu << "\" for jet");
-        jet->auxdecor<double>("DL1dv00_pb") = DL1dv00_pb;
-      }
 
       if (!m_jetlargeRHandle.empty())
       {

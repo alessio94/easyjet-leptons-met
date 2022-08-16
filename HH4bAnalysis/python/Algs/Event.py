@@ -18,11 +18,15 @@ def EventSelectionAnalysisSequenceCfg(flags, dataType, grlFiles=[], loose=False)
             alg.MinTracks = 2
         if "EventFlagSelectorAlg" in alg.getName():
             selectionFlags = ["DFCommonJets_eventClean_LooseBad"]
-            selectionFlags += ["DFCommonJets_isBadBatman"] if not loose else []
+            invertFlags = [False]
+            if not loose:
+                selectionFlags += ["DFCommonJets_isBadBatman"]
+                invertFlags += [True]
             alg.FilterDescription = (
                 f"selecting events passing {', '.join(selectionFlags)}"
             )
             alg.selectionFlags = [f"{flag},as_char" for flag in selectionFlags]
+            alg.invertFlags = invertFlags
 
         cfg.addEventAlgo(alg, eventSelectionSequence.getName())
 
