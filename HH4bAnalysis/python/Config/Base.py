@@ -37,10 +37,10 @@ def update_metadata(path):
             md.metAccessLevel = cached["level"]
 
 
-def pileupConfigFiles(fileMD):
+def pileupConfigFiles(flags):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
-    tags = fileMD["AMITag"]
-    dsid = fileMD["mc_channel_number"]
+    dsid = flags.Input.MCChannelNumber
+    tags = flags.Input.AMITag
     split_tags = tags.split("_")
     # Figure out which MC we are using
     if SampleTypes.mc20a.value in split_tags:

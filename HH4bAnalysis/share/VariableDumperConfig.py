@@ -70,8 +70,11 @@ def defineArgs(ConfigFlags):
     parser.add_argument(
         "--trigger-list",
         type=str,
-        default="Run3",
-        help="Trigger list to use, default: %(default)s",
+        default="Auto",
+        help=(
+            "Trigger list to use, default: %(default)s. "
+            "Will use run number to set trigger list."
+        ),
     )
     parser.add_argument(
         "-c",
@@ -97,6 +100,24 @@ def _is_physlite(flags):
 
 def _is_mc_phys(flags):
     return flags.Input.isMC and not _is_physlite(flags)
+
+
+def _get_trigger_list_from_flags(flags):
+    try:
+        runNumber = flags.Input.RunNumber[0]
+        trigger_list = "Run2" if runNumber < 400000 else "Run3"
+        return trigger_list
+    except Exception:
+        return None
+
+
+def _get_valid_mc21_rtag(tags):
+    is_valid_rtag = False
+    min_mc21_rtag = "r13829"
+    for tag in tags:
+        if "r" in tag:
+            is_valid_rtag = int(tag[1:]) >= int(min_mc21_rtag[1:])
+    return is_valid_rtag, min_mc21_rtag
 
 
 def _get_container_names(flags):
@@ -137,8 +158,10 @@ def AnalysisAlgsCfg(
     do_muons=True,
     metadata_cache=None,
     do_loose=False,
+    do_PRW=False,
+    prw_files=[],
+    lumicalc_files=[],
 ):
-    fileMD = GetFileMD(flags.Input.Files[0])
     if metadata_cache:
         update_metadata(metadata_cache)
     dataType = "mc" if flags.Input.isMC else "data"
@@ -170,32 +193,26 @@ def AnalysisAlgsCfg(
         EventSelectionAnalysisSequenceCfg(flags, dataType, grlFiles=[], loose=do_loose)
     )
 
-    doPRW = _is_mc_phys(flags)
     log.info(
-        f"Do PRW is {doPRW}. " f"{'Add' if doPRW else 'Skip'} pileup re-weight sequence"
+        f"Do PRW is {do_PRW}. "
+        f"{'Add' if do_PRW else 'Skip'} pileup re-weight sequence"
     )
-    if doPRW:
-        try:
-            prwFiles, lumicalcFiles = pileupConfigFiles(fileMD)
-            # Adds variable to EventInfo if for pileup weight, for example:
-            # EventInfo.PileWeight_%SYS$
-            cfg.merge(
-                PileupAnalysisSequenceCfg(
-                    flags,
-                    dataType=dataType,
-                    prwFiles=prwFiles,
-                    lumicalcFiles=lumicalcFiles,
-                )
+    if do_PRW:
+        # Adds variable to EventInfo if for pileup weight, for example:
+        # EventInfo.PileWeight_%SYS$
+        cfg.merge(
+            PileupAnalysisSequenceCfg(
+                flags,
+                dataType=dataType,
+                prwFiles=prw_files,
+                lumicalcFiles=lumicalc_files,
             )
+        )
 
-            log.info("Adding generator analysis sequence")
-            # Adds variable to EventInfo if for generator weight, for example:
-            # EventInfo.generatorWeight_%SYS%
-            cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType))
-
-        except LookupError as err:
-            log.error(err)
-            doPRW = False
+        log.info("Adding generator analysis sequence")
+        # Adds variable to EventInfo if for generator weight, for example:
+        # EventInfo.generatorWeight_%SYS%
+        cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType))
 
     containers = _get_container_names(flags)
 
@@ -310,10 +327,10 @@ def MiniTupleCfg(
     trigger_chains,
     working_points,
     do_muons=True,
+    do_PRW=False,
 ):
     cfg = ComponentAccumulator()
     is_daod_physlite = _is_physlite(flags)
-    doPRW = _is_mc_phys(flags)
     containers = _get_container_names(flags)["outputs"]
 
     log.debug(f"Containers requested in dataset: {containers}")
@@ -361,7 +378,7 @@ def MiniTupleCfg(
             f"EventInfo.trigPassed_{cleaned} -> trigPassed_{cleaned}"
         )
 
-    if doPRW:
+    if do_PRW:
         analysisTreeBranches += [
             "EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%",
             "EventInfo.generatorWeight_%SYS% -> generatorWeight_%SYS%",
@@ -432,6 +449,10 @@ def main():
     if ConfigFlags.Input.Files[0] == "_ATHENA_GENERIC_INPUTFILE_NAME_":
         ConfigFlags.Input.Files = ConfigFlags.Input.Files[1:]
     log.info(f"Operating on input files {ConfigFlags.Input.Files}")
+
+    fileMD = GetFileMD(ConfigFlags.Input.Files[0])
+    ConfigFlags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
+
     ConfigFlags.lock()
 
     # Get a ComponentAccumulator setting up the standard components
@@ -448,13 +469,11 @@ def main():
 
         from EventBookkeeperTools.EventBookkeeperToolsConfig import (
             CutFlowSvcCfg,
-            BookkeeperToolCfg,
         )
 
         # Create CutFlowSvc otherwise the default CutFlowSvc that has only
         # one CutflowBookkeeper object, and can't deal with multiple weights
         cfg.merge(CutFlowSvcCfg(ConfigFlags))
-        cfg.merge(BookkeeperToolCfg(ConfigFlags))
 
         # Adjust the loop manager to announce the event number less frequently.
         # Makes a big difference if running over many events
@@ -472,8 +491,44 @@ def main():
         # Add our VariableDumper CA, calling the function defined above.
         from HH4bAnalysis.Config.TriggerLists import TriggerLists
 
-        trigger_chains = TriggerLists[args.trigger_list]
+        split_tags = ConfigFlags.Input.AMITag.split("_")
+        is_valid_mc21_rtag, min_mc21_rtag = _get_valid_mc21_rtag(split_tags)
+
+        trigger_list = _get_trigger_list_from_flags(ConfigFlags)
+        if not trigger_list:
+            log.warning(
+                "Cannot determine trigger list automatically. Setting to empty list."
+            )
+            trigger_chains = []
+        elif args.trigger_list == "Auto":
+            trigger_chains = TriggerLists[trigger_list]
+            log.info(f"Self-configured trigger list: '{trigger_list}'")
+        elif args.trigger_list != trigger_list:
+            log.error(
+                f"You specified trigger list {args.trigger_list} "
+                f"but dataset needs {trigger_list}"
+            )
+            raise ValueError
+        elif (
+            trigger_list == "Run3" and ConfigFlags.Input.isMC and not is_valid_mc21_rtag
+        ):
+            log.error(
+                "Invalid r-tag for mc21 and Run3 trigger list, "
+                f"r-tag must be >= '{min_mc21_rtag}'"
+            )
+            raise ValueError
+        else:
+            trigger_chains = TriggerLists[args.trigger_list]
+
         do_muons = not args.meta_cache
+
+        do_PRW = _is_mc_phys(ConfigFlags)
+        prw_files, lumicalc_files = [], []
+        try:
+            prw_files, lumicalc_files = pileupConfigFiles(ConfigFlags)
+        except LookupError as err:
+            log.error(err)
+            do_PRW = False
 
         cfg.addSequence(CompFactory.AthSequencer("HH4bSeq"), "AthAlgSeq")
         cfg.merge(
@@ -485,6 +540,9 @@ def main():
                 metadata_cache=args.meta_cache,
                 do_muons=do_muons,
                 do_loose=args.loose,
+                do_PRW=do_PRW,
+                prw_files=prw_files,
+                lumicalc_files=lumicalc_files,
             ),
             "HH4bSeq",
         )
@@ -495,6 +553,7 @@ def main():
                 trigger_chains=trigger_chains,
                 working_points={"ak4": args.btag_wps, "vr": args.vr_btag_wps},
                 do_muons=do_muons,
+                do_PRW=do_PRW,
             ),
             "HH4bSeq",
         )
