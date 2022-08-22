@@ -1,3 +1,6 @@
+from HH4bAnalysis.utils.inputsHelper import is_physlite
+
+
 # custom container names used in this framework
 RECO_4_PFLOW_JETS_KEY = "Reco4PFlowJets"
 RECO_10_PFLOW_JETS_KEY = "Reco10PFlowJets"
@@ -32,6 +35,33 @@ container_map = {
 }
 
 
-def getContainerName(qualitycontainerdesc, daodphyslite=False):
+def _get_container_name(qualitycontainerdesc, daodphyslite=False):
     format_key = "DAOD_PHYSLITE" if daodphyslite else "DAOD_PHYS"
     return container_map[format_key][qualitycontainerdesc]
+
+
+def get_container_names(flags):
+    is_daod_physlite = is_physlite(flags)
+    inputs = dict(
+        reco4Jet=_get_container_name("Reco4PFlowJets", is_daod_physlite),
+        reco10Jet=_get_container_name("Reco10PFlowJets", is_daod_physlite),
+        vrJet=_get_container_name("VRJets", is_daod_physlite),
+        muons=_get_container_name("Muons", is_daod_physlite),
+        electrons=_get_container_name("Electrons", is_daod_physlite),
+        photons=_get_container_name("Photons", is_daod_physlite),
+    )
+    outputs = dict(
+        reco4Jet=f"Analysis{inputs['reco4Jet']}_%SYS%",
+        muons=f"Analysis{inputs['muons']}_%SYS%",
+        electrons=f"Analysis{inputs['electrons']}_%SYS%",
+        photons=f"Analysis{inputs['photons']}_%SYS%",
+    )
+    if inputs["reco10Jet"]:
+        outputs["reco10Jet"] = f"Analysis{inputs['reco10Jet']}_%SYS%"
+    else:
+        outputs["reco10Jet"] = ""
+    if inputs["vrJet"]:
+        outputs["vrJet"] = f"Analysis{inputs['vrJet']}_%SYS%"
+    else:
+        outputs["vrJet"] = ""
+    return {"inputs": inputs, "outputs": outputs}

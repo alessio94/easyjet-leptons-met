@@ -1,6 +1,8 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+from HH4bAnalysis.Config.Base import SampleTypes
+
 
 def EventSelectionAnalysisSequenceCfg(flags, dataType, grlFiles=[], loose=False):
     cfg = ComponentAccumulator()
@@ -60,8 +62,14 @@ def PileupAnalysisSequenceCfg(flags, dataType, prwFiles, lumicalcFiles):
     )
     pileupSequence.configure(inputName={}, outputName={})
 
+    tags = flags.Input.AMITag
     cfg.addSequence(CompFactory.AthSequencer(pileupSequence.getName()))
     for alg in pileupSequence.getGaudiConfig2Components():
+        # Workaround for mc21 courtesy of
+        # https://its.cern.ch/jira/browse/ATLASG-1628?focusedCommentId=4297949&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-4297949
+        if SampleTypes.mc21a.value in tags and "PileupReweightingAlg" in alg.getName():
+            alg.pileupReweightingTool.PeriodAssignments = []
+            alg.pileupReweightingTool.DataScaleFactor = 1
         cfg.addEventAlgo(alg, pileupSequence.getName())
 
     return cfg

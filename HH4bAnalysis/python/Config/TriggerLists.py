@@ -42,4 +42,16 @@ TriggerLists = {
         "HLT_2j45_gsc55_bmv2c1050_split_ht300_L1HT190-J15s5.ETA21",
         "HLT_j420_a10t_lcw_jes_35smcINF_L1J100",
     ],
+    "JetTrigEffStudy": [
+        "HLT_e26_lhtight_ivarloose_L1EM22VHI",
+        "HLT_4j115_pf_ftf_presel4j85_L13J50",
+        "HLT_4j120_L13J50",
+        "HLT_5j70c_pf_ftf_presel5c50_L14J15",
+        "HLT_5j85_pf_ftf_presel5j50_L14J15",
+        "HLT_6j35c_020jvt_pf_ftf_presel6c25_L14J15",
+        "HLT_6j55c_pf_ftf_presel6j40_L14J15",
+        "HLT_6j70_pf_ftf_presel6j40_L14J15",
+        "HLT_7j45_pf_ftf_presel7j30_L14J15",
+        "HLT_10j40_pf_ftf_presel7j30_L14J15",
+    ],
 }
