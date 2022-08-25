@@ -16,7 +16,6 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
-#include "xAODBTagging/BTaggingUtilities.h"
 #include <AthContainers/AuxElement.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysReadHandle.h>
@@ -73,6 +72,10 @@ private:
     CP::SysReadHandle<xAOD::JetContainer> m_jetlargeRHandle{
         this, "LargeJetKey", "AnalysisLargeJets_%SYS%",
         "the large-R jet collection to run on"};
+
+    CP::SysReadHandle<xAOD::JetContainer> m_VRtrackjetHandle{
+        this, "VRtrackjets", "VRTrackJets_%SYS%",
+        "the VR track jet collection to run on"};
   };
 }
 

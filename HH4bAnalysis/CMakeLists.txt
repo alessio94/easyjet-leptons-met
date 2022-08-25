@@ -17,6 +17,8 @@ atlas_add_library(HH4bAnalysisLib
 # Build the Athena component library
 atlas_add_component(HH4bAnalysis
   src/VariableDumperAlg.cxx
+  src/DiHiggsAnalysis.cxx
+  src/DiHiggsAnalysisAlg.cxx
   src/tools/NTrkVertexCounter.cxx
   src/components/*.cxx
   LINK_LIBRARIES
@@ -38,12 +40,12 @@ atlas_install_scripts(
   share/VariableDumperConfig.py
   share/grid_submit.py
   share/hh4b-test
-  )
+)
 atlas_install_python_modules(
   python/Algs
   python/Config
   python/utils
-  )
+)
 
 # atlas_install_data( data/* )
 # You can access your data from code using path resolver, e.g.

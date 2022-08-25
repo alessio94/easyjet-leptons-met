@@ -1,7 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
 from FTagAnalysisAlgorithms.FTagAnalysisSequence import makeFTagAnalysisSequence
+from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
 
 
 def JetAnalysisSequenceCfg(
@@ -30,14 +30,14 @@ def JetAnalysisSequenceCfg(
         "xAODBTaggingEfficiency/13TeV/2022-22-13TeV-MC20-CDI-2022-07-28_v1.root"
     )
     # This is the container name that is available in the CDI aboce
-    jetBTagContaienrName = "AntiKt4EMPFlowJets"
+    jetBTagContainerName = "AntiKt4EMPFlowJets"
 
     for tagger_wp in workingPoints:
         tagger, btag_wp = tagger_wp.split("_", 1)
         makeFTagAnalysisSequence(
             jetSequence,
             dataType,
-            jetCollection=jetBTagContaienrName,
+            jetCollection=jetBTagContainerName,
             btagWP=btag_wp,
             btagger=tagger,
             generator="Pythia8",
@@ -125,19 +125,19 @@ def VRJetAnalysisSequenceCfg(
         "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
     )
     # This is the container name that is available in the CDI aboce
-    vrJetBTagContaienrName = "AntiKtVR30Rmax4Rmin02TrackJets"
+    vrJetBTagContainerName = "AntiKtVR30Rmax4Rmin02TrackJets"
     for tagger_wp in workingPoints:
         tagger, btag_wp = tagger_wp.split("_", 1)
         makeFTagAnalysisSequence(
             vrJetSequence,
             dataType,
-            jetCollection=vrJetBTagContaienrName,
+            jetCollection=vrJetBTagContainerName,
             btagWP=btag_wp,
             btagger=tagger,
-            generator="Pythia8",
             minPt=10e3,
-            postfix="",
+            postfix=btag_wp,
             preselection=None,
+            kinematicSelection=True,
             noEfficiency=False,
             legacyRecommendations=False,
             enableCutflow=False,

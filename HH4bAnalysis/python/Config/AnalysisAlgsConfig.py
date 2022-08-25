@@ -1,24 +1,23 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-
-from HH4bAnalysis.Algs.Event import (
-    GeneratorAnalysisSequenceCfg,
-    TriggerAnalysisSequenceCfg,
-    PileupAnalysisSequenceCfg,
-    EventSelectionAnalysisSequenceCfg,
-)
+from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAlgCfg
 from HH4bAnalysis.Algs.Electrons import ElectronAnalysisSequenceCfg
-from HH4bAnalysis.Algs.Photons import PhotonAnalysisSequenceCfg
-from HH4bAnalysis.Algs.Muons import MuonAnalysisSequenceCfg
+from HH4bAnalysis.Algs.Event import (
+    EventSelectionAnalysisSequenceCfg,
+    GeneratorAnalysisSequenceCfg,
+    PileupAnalysisSequenceCfg,
+    TriggerAnalysisSequenceCfg,
+)
 from HH4bAnalysis.Algs.Jets import (
-    JetAnalysisSequenceCfg,
     FatJetAnalysisSequenceCfg,
+    JetAnalysisSequenceCfg,
     VRJetAnalysisSequenceCfg,
 )
+from HH4bAnalysis.Algs.Muons import MuonAnalysisSequenceCfg
+from HH4bAnalysis.Algs.Photons import PhotonAnalysisSequenceCfg
 from HH4bAnalysis.Algs.Postprocessing import OverlapAnalysisSequenceCfg
-
-from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.Config.Base import cache_metadata, update_metadata
+from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.utils.inputsHelper import is_physlite
 from HH4bAnalysis.utils.logHelper import log
 
@@ -37,6 +36,7 @@ def AnalysisAlgsCfg(
     do_PRW=False,
     prw_files=[],
     lumicalc_files=[],
+    do_dihiggs_analysis=False,
 ):
     if metadata_cache:
         update_metadata(metadata_cache)
@@ -70,8 +70,7 @@ def AnalysisAlgsCfg(
     )
 
     log.info(
-        f"Do PRW is {do_PRW}. "
-        f"{'Add' if do_PRW else 'Skip'} pileup re-weight sequence"
+        f"Do PRW is {do_PRW}. {'Add' if do_PRW else 'Skip'} pileup re-weight sequence"
     )
     if do_PRW:
         # Adds variable to EventInfo if for pileup weight, for example:
@@ -190,6 +189,19 @@ def AnalysisAlgsCfg(
             doMuons=do_muons,
         )
     )
+
+    if do_dihiggs_analysis:
+        cfg.merge(
+            DiHiggsAnalysisAlgCfg(
+                flags,
+                SmallJetKey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
+                LargeJetKey=containers["outputs"]["reco10Jet"].replace(
+                    "%SYS%", "NOSYS"
+                ),
+                btag_wps=btag_wps,
+                vr_btag_wps=vr_btag_wps,
+            )
+        )
 
     if metadata_cache:
         cache_metadata(metadata_cache)

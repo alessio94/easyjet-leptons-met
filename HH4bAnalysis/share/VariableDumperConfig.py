@@ -1,7 +1,7 @@
 #!/bin/env python
 
 #
-# Copyright (C) 2002-2020 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 #
 
 #
@@ -12,11 +12,10 @@
 import sys
 from pathlib import Path
 
-from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
-
-from HH4bAnalysis.Config.Base import pileupConfigFiles, SampleTypes
+from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.Config.AnalysisAlgsConfig import AnalysisAlgsCfg
+from HH4bAnalysis.Config.Base import SampleTypes, pileupConfigFiles
 from HH4bAnalysis.Config.MiniTupleConfig import MiniTupleCfg
 from HH4bAnalysis.utils.inputsHelper import is_physlite
 from HH4bAnalysis.utils.logHelper import log
@@ -36,6 +35,7 @@ def defineArgs(ConfigFlags):
         type=str,
         nargs="*",
         default=[
+            "DL1dv00_FixedCutBEff_70",
             "DL1dv00_FixedCutBEff_77",
             "DL1dv00_FixedCutBEff_85",
         ],
@@ -46,8 +46,8 @@ def defineArgs(ConfigFlags):
         type=str,
         nargs="*",
         default=[
-            # "DL1r_FixedCutBEff_77",
-            # "DL1r_FixedCutBEff_85",
+            "DL1r_FixedCutBEff_77",
+            "DL1r_FixedCutBEff_85",
         ],
         help="VR Jets btag working points default %(default)s",
     )
@@ -75,6 +75,24 @@ def defineArgs(ConfigFlags):
         action="store_true",
         help="use loose event cleaning (to get something to pass)",
     )
+    parser.add_argument(
+        "--do_dihiggs_analysis",
+        action="store_true",
+        help="run DiHiggs anaylysis",
+    )
+    parser.add_argument(
+        "--do_resolved_analysis",
+        action="store_true",
+        default=True,
+        help="activate resolved analysis",
+    )
+    parser.add_argument(
+        "--do_boosted_analysis",
+        action="store_true",
+        default=True,
+        help="activate boosted",
+    )
+
     return parser
 
 
@@ -121,24 +139,23 @@ def main():
 
     fileMD = GetFileMD(ConfigFlags.Input.Files[0])
     ConfigFlags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
+    ConfigFlags.addFlag("do_resolved_analysis", args.do_resolved_analysis)
+    ConfigFlags.addFlag("do_boosted_analysis", args.do_boosted_analysis)
 
     ConfigFlags.lock()
 
     # Get a ComponentAccumulator setting up the standard components
     # needed to run an Athena job.
-    from AthenaConfiguration.MainServicesConfig import MainServicesCfg
-
     # Setting temporarily needed for Run 3 code, to generate python
     # Configurable objects for deduplication
     from AthenaCommon.Configurable import ConfigurableRun3Behavior
+    from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 
     with ConfigurableRun3Behavior():
 
         cfg = MainServicesCfg(ConfigFlags)
 
-        from EventBookkeeperTools.EventBookkeeperToolsConfig import (
-            CutFlowSvcCfg,
-        )
+        from EventBookkeeperTools.EventBookkeeperToolsConfig import CutFlowSvcCfg
 
         # Create CutFlowSvc otherwise the default CutFlowSvc that has only
         # one CutflowBookkeeper object, and can't deal with multiple weights
@@ -212,6 +229,7 @@ def main():
                 do_PRW=do_PRW,
                 prw_files=prw_files,
                 lumicalc_files=lumicalc_files,
+                do_dihiggs_analysis=args.do_dihiggs_analysis,
             ),
             "HH4bSeq",
         )
@@ -223,6 +241,7 @@ def main():
                 working_points={"ak4": args.btag_wps, "vr": args.vr_btag_wps},
                 do_muons=do_muons,
                 do_PRW=do_PRW,
+                do_dihiggs_analysis=args.do_dihiggs_analysis,
             ),
             "HH4bSeq",
         )
