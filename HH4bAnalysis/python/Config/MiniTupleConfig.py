@@ -1,6 +1,5 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-
 from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
 from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.utils.inputsHelper import is_physlite
@@ -102,12 +101,33 @@ def MiniTupleCfg(
         analysisTreeBranches += getFourMomBranches(
             containers["reco10Jet"], "recojet_antikt10"
         )
+        reco10JetVars = [
+            "NTrimSubjets",
+            "TrackSumPt",
+            "Tau1_wta",
+            "Tau2_wta",
+            "Tau3_wta",
+            "ECF1",
+            "ECF2",
+            "ECF3",
+            "Split12",
+            "Split23",
+        ]
+        for var in reco10JetVars:
+            analysisTreeBranches += [
+                f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"
+            ]
+        # one after the other for better readability in the root file
+        for var in reco10JetVars:
+            analysisTreeBranches += [
+                f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"
+            ]
         analysisTreeBranches += getFourMomBranches(
             containers["reco10Jet"], "recojet_antikt10", doOR=True
         )
         analysisTreeBranches += getFourMomBranches(containers["vrJet"], "vrjet")
         analysisTreeBranches += [
-            f"{containers['vrJet']}.ftag_select_{btag_wp}" f" -> vrjet_%SYS%_{btag_wp}"
+            f"{containers['vrJet']}.ftag_select_{btag_wp} -> vrjet_%SYS%_{btag_wp}"
             for btag_wp in working_points["vr"]
         ]
 
