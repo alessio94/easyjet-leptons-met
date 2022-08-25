@@ -30,6 +30,8 @@ namespace HH4B
     ATH_CHECK(m_systematicsList.addHandle(m_photonHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_muonHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_jetsmallRHandle));
+    ATH_CHECK(m_systematicsList.addHandle(m_VRtrackjetHandle));
+    ATH_CHECK(m_EventInfoKey.initialize());
     if (!m_jetlargeRHandle.empty())
     {
       ATH_CHECK(m_systematicsList.addHandle(m_jetlargeRHandle));
@@ -51,25 +53,24 @@ namespace HH4B
                                                                 "%SYS%", sys));
       ATH_MSG_VERBOSE("Will apply sysname \"" << sysname << "\" for event");
 
+      // get the xAOD objects
+      SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
+      ATH_CHECK(eventInfo.isValid());
       const xAOD::ElectronContainer *electrons(nullptr);
       ATH_CHECK(m_electronHandle.retrieve(electrons, sys));
-      // do something with electrons
       const xAOD::PhotonContainer *photons(nullptr);
       ATH_CHECK(m_photonHandle.retrieve(photons, sys));
-      // do something with electrons
       const xAOD::MuonContainer *muons(nullptr);
       ATH_CHECK(m_muonHandle.retrieve(muons, sys));
-      // do something with muons
       const xAOD::JetContainer *antiKt4RecoJets(nullptr);
       ATH_CHECK(m_jetsmallRHandle.retrieve(antiKt4RecoJets, sys));
-      // do something with antiKt4RecoJets
-
+      const xAOD::JetContainer *antiKt10RecoJets(nullptr);
       if (!m_jetlargeRHandle.empty())
       {
-        const xAOD::JetContainer *antiKt10RecoJets(nullptr);
         ATH_CHECK(m_jetlargeRHandle.retrieve(antiKt10RecoJets, sys));
-        // do something with antiKt10RecoJets
       }
+      const xAOD::JetContainer *VRTrackJets(nullptr);
+      ATH_CHECK(m_VRtrackjetHandle.retrieve(VRTrackJets, sys));
     }
 
     return StatusCode::SUCCESS;

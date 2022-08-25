@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAddBranches
 from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
 from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.utils.inputsHelper import is_physlite
@@ -13,6 +14,7 @@ def MiniTupleCfg(
     working_points,
     do_muons=True,
     do_PRW=False,
+    do_dihiggs_analysis=False,
 ):
     cfg = ComponentAccumulator()
     is_daod_physlite = is_physlite(flags)
@@ -130,6 +132,9 @@ def MiniTupleCfg(
             f"{containers['vrJet']}.ftag_select_{btag_wp} -> vrjet_%SYS%_{btag_wp}"
             for btag_wp in working_points["vr"]
         ]
+
+    if do_dihiggs_analysis:
+        analysisTreeBranches += DiHiggsAnalysisAddBranches(flags, working_points)
 
     log.info("Add tree seq")
     cfg.merge(AnalysisTreeAlgCfg(flags, branches=analysisTreeBranches))
