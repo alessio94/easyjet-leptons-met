@@ -112,7 +112,8 @@ def MiniTupleCfg(
         ]
         analysisTreeBranches += getFourMomBranches(containers["vrJet"], "vrjet")
         analysisTreeBranches += [
-            f"{containers['vrJet']}.ftag_select_{btag_wp}" f" -> vrjet_%SYS%_{btag_wp}"  # noqa
+            f"{containers['vrJet']}.ftag_select_{btag_wp}"
+            f" -> vrjet_%SYS%_{btag_wp}"  # noqa
             for btag_wp in working_points["vr"]
         ]
 
@@ -132,7 +133,7 @@ def MiniTupleCfg(
 
     if not is_valid_ptag:
         # Skip the NNjvt variables for old mc20 samples
-        jvt_branches = jvt_branches[:-3]
+        jvt_branches = jvt_branches[:-4]
 
     analysisTreeBranches += [
         f"{containers['reco4Jet']}.{var} -> recojet_antikt4_%SYS%_{var}"
@@ -147,8 +148,12 @@ def MiniTupleCfg(
         _tmp = list(analysisTreeBranches)
         analysisTreeBranches = []
         for b in _tmp:
-            source, output = b.split('->')
-            analysisTreeBranches.append('->'.join([source.replace('_%SYS', ''), output.replace('_%SYS%', '_NOSYS')]))  # noqa
+            source, output = b.split("->")
+            analysisTreeBranches.append(
+                "->".join(
+                    [source.replace("_%SYS", ""), output.replace("_%SYS%", "_NOSYS")]
+                )
+            )  # noqa
 
     if do_dihiggs_analysis:
         analysisTreeBranches += DiHiggsAnalysisAddBranches(flags, working_points)

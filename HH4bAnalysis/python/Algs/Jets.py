@@ -42,7 +42,7 @@ def JetAnalysisSequenceCfg(
             btagger=tagger,
             generator="Pythia8",
             minPt=20000,
-            postfix="",
+            postfix=btag_wp,
             preselection=None,
             kinematicSelection=False,
             noEfficiency=False,
