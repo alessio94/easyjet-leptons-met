@@ -16,10 +16,11 @@ def MiniTupleCfg(
     do_muons=True,
     do_PRW=False,
     do_dihiggs_analysis=False,
+    disable_calib=False,
 ):
     cfg = ComponentAccumulator()
     is_daod_physlite = is_physlite(flags)
-    containers = get_container_names(flags)["outputs"]
+    containers = get_container_names(flags, disable_calib)["outputs"]
 
     log.debug(f"Containers requested in dataset: {containers}")
 
@@ -67,7 +68,7 @@ def MiniTupleCfg(
             f"EventInfo.trigPassed_{cleaned} -> trigPassed_{cleaned}"
         )
 
-    if do_PRW:
+    if do_PRW and not disable_calib:
         analysisTreeBranches += [
             "EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%",
             "EventInfo.generatorWeight_%SYS% -> generatorWeight_%SYS%",
@@ -89,49 +90,29 @@ def MiniTupleCfg(
         analysisTreeBranches += getFourMomBranches(cont, alias)
         analysisTreeBranches += getFourMomBranches(cont, alias, doOR=True)
 
-    # B-jet WPs
-    analysisTreeBranches += [
-        f"{containers['reco4Jet']}.ftag_select_{btag_wp}"
-        f" -> recojet_antikt4_%SYS%_{btag_wp}"
-        for btag_wp in working_points["ak4"]
-    ]
-    analysisTreeBranches += [
-        f"{containers['reco4Jet']}_OR.ftag_select_{btag_wp}"
-        f" -> recojet_antikt4_OR_%SYS%_{btag_wp}"
-        for btag_wp in working_points["ak4"]
-    ]
-
     if not is_daod_physlite:
         analysisTreeBranches += getFourMomBranches(
             containers["reco10Jet"], "recojet_antikt10"
         )
-        reco10JetVars = [
-            "NTrimSubjets",
-            "TrackSumPt",
-            "Tau1_wta",
-            "Tau2_wta",
-            "Tau3_wta",
-            "ECF1",
-            "ECF2",
-            "ECF3",
-            "Split12",
-            "Split23",
-        ]
-        for var in reco10JetVars:
-            analysisTreeBranches += [
-                f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"
-            ]
-        # one after the other for better readability in the root file
-        for var in reco10JetVars:
-            analysisTreeBranches += [
-                f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"
-            ]
         analysisTreeBranches += getFourMomBranches(
             containers["reco10Jet"], "recojet_antikt10", doOR=True
         )
+
+    if not disable_calib:
+        # B-jet WPs
+        analysisTreeBranches += [
+            f"{containers['reco4Jet']}.ftag_select_{btag_wp}"
+            f" -> recojet_antikt4_%SYS%_{btag_wp}"
+            for btag_wp in working_points["ak4"]
+        ]
+        analysisTreeBranches += [
+            f"{containers['reco4Jet']}_OR.ftag_select_{btag_wp}"
+            f" -> recojet_antikt4_OR_%SYS%_{btag_wp}"
+            for btag_wp in working_points["ak4"]
+        ]
         analysisTreeBranches += getFourMomBranches(containers["vrJet"], "vrjet")
         analysisTreeBranches += [
-            f"{containers['vrJet']}.ftag_select_{btag_wp} -> vrjet_%SYS%_{btag_wp}"
+            f"{containers['vrJet']}.ftag_select_{btag_wp}" f" -> vrjet_%SYS%_{btag_wp}"  # noqa
             for btag_wp in working_points["vr"]
         ]
 
@@ -160,6 +141,14 @@ def MiniTupleCfg(
         f"{containers['reco4Jet']}_OR.{var} -> recojet_antikt4_OR_%SYS%_{var}"
         for var in jvt_branches
     ]
+    # No calibration algs -- remove all systematics expressions in the input
+    # and label as NOSYS in output
+    if disable_calib:
+        _tmp = list(analysisTreeBranches)
+        analysisTreeBranches = []
+        for b in _tmp:
+            source, output = b.split('->')
+            analysisTreeBranches.append('->'.join([source.replace('_%SYS', ''), output.replace('_%SYS%', '_NOSYS')]))  # noqa
 
     if do_dihiggs_analysis:
         analysisTreeBranches += DiHiggsAnalysisAddBranches(flags, working_points)
