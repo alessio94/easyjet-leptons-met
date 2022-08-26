@@ -4,6 +4,7 @@ from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAddBranches
 from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
 from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.utils.inputsHelper import is_physlite
+from HH4bAnalysis.utils.inputsHelper import get_valid_ami_tag
 from HH4bAnalysis.utils.logHelper import log
 
 
@@ -53,6 +54,7 @@ def MiniTupleCfg(
     analysisTreeBranches = [
         "EventInfo.runNumber     -> runNumber",
         "EventInfo.eventNumber   -> eventNumber",
+        "EventInfo.lumiBlock   -> lumiBlock",
         "EventInfo.mcEventWeights   -> mcEventWeights",
         "EventInfo.averageInteractionsPerCrossing -> averageInteractionsPerCrossing",
     ]
@@ -132,6 +134,32 @@ def MiniTupleCfg(
             f"{containers['vrJet']}.ftag_select_{btag_wp} -> vrjet_%SYS%_{btag_wp}"
             for btag_wp in working_points["vr"]
         ]
+
+    split_tags = flags.Input.AMITag.split("_")
+    is_valid_ptag = get_valid_ami_tag(split_tags, "p")
+
+    # JVT
+    jvt_branches = [
+        "Jvt",
+        "JvtRpt",
+        "JVFCorr",
+        "jvt_selection",
+        "NNJvt",
+        "NNJvtRpt",
+        "NNJvtPass",
+    ]
+
+    if not is_valid_ptag:
+        # Skip the NNjvt variables for old mc20 samples
+        jvt_branches = jvt_branches[:-3]
+
+    analysisTreeBranches += [
+        f"{containers['reco4Jet']}.{var} -> recojet_antikt4_%SYS%_{var}"
+        for var in jvt_branches
+    ] + [
+        f"{containers['reco4Jet']}_OR.{var} -> recojet_antikt4_OR_%SYS%_{var}"
+        for var in jvt_branches
+    ]
 
     if do_dihiggs_analysis:
         analysisTreeBranches += DiHiggsAnalysisAddBranches(flags, working_points)

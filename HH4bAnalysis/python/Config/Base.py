@@ -20,6 +20,8 @@ class SampleTypes(Enum):
     mc20d = MCSampleYears.r13144.name  # run2, 2017
     mc20e = MCSampleYears.r13145.name  # run2, 2018
     mc21a = MCSampleYears.r13829.name  # run3, 2022
+    # ptag
+    mc20 = "p5057"
 
 
 def cache_metadata(path):
