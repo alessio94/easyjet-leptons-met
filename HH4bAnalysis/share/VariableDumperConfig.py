@@ -54,7 +54,9 @@ def defineArgs(ConfigFlags):
     )
     parser.add_argument(
         "--trigger-list",
-        action="extend", nargs="+", type=str,
+        action="extend",
+        nargs="+",
+        type=str,
         default=[],
         help=(
             "Trigger list to use, default: %(default)s. "
@@ -63,10 +65,12 @@ def defineArgs(ConfigFlags):
     )
     parser.add_argument(
         "--trigger-year",
-        action="extend", nargs="+", type=int,
+        action="extend",
+        nargs="+",
+        type=int,
         default=[],
         help=(
-            "Years used to define the trigger list."
+            "Years used to define the trigger list. "
             "Default empty list will auto-configure from file metadata."
         ),
     )
@@ -105,7 +109,10 @@ def defineArgs(ConfigFlags):
     parser.add_argument(
         "--disable-calib",
         action="store_true",
-        help="disable CP Algs for calibration (can be used for plain PHYSLITE processing)",  # noqa
+        help=(
+            "disable CP Algs for calibration "
+            "(can be used for plain PHYSLITE processing)"
+        ),
     )
     return parser
 
@@ -127,7 +134,9 @@ def main():
     args = ConfigFlags.fillFromArgs([], parser)
 
     # Arg checks
-    assert not (args.disable_calib and not is_physlite(ConfigFlags)), "Disabling calibrations is not safe except on PHYSLITE!"  # noqa
+    assert not (
+        args.disable_calib and not is_physlite(ConfigFlags)
+    ), "Disabling calibrations is not safe except on PHYSLITE!"
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
@@ -195,9 +204,9 @@ def main():
             for trigger_group in trigger_groups:
                 for year in trigger_year_list:
                     trigger_chains |= set(TriggerLists[trigger_group][year])
-        except KeyError as e:
+        except KeyError as err:
             log.error(f"Trigger list for {trigger_group}, {year} not defined.")
-            raise e
+            raise err
 
         trigger_chains = list(trigger_chains)
 
@@ -222,11 +231,12 @@ def main():
 
         do_PRW = _is_mc_phys(ConfigFlags)
         prw_files, lumicalc_files = [], []
-        try:
-            prw_files, lumicalc_files = pileupConfigFiles(ConfigFlags)
-        except LookupError as err:
-            log.error(err)
-            do_PRW = False
+        if do_PRW:
+            try:
+                prw_files, lumicalc_files = pileupConfigFiles(ConfigFlags)
+            except LookupError as err:
+                log.error(err)
+                do_PRW = False
 
         cfg.addSequence(CompFactory.AthSequencer("HH4bSeq"), "AthAlgSeq")
         cfg.merge(
