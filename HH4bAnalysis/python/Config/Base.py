@@ -2,11 +2,24 @@ from enum import Enum
 import json
 
 
+class DataSampleYears(Enum):
+    data16 = (2016,)
+    data18 = (2018,)
+    data22 = (2022,)
+
+
+class MCSampleYears(Enum):
+    r13167 = (2015, 2016)
+    r13144 = (2017,)
+    r13145 = (2018,)
+    r13829 = (2022,)
+
+
 class SampleTypes(Enum):
-    mc20a = "r13167"
-    mc20d = "r13144"
-    mc20e = "r13145"
-    mc21a = "r13829"
+    mc20a = MCSampleYears.r13167.name  # run2, 2015-16
+    mc20d = MCSampleYears.r13144.name  # run2, 2017
+    mc20e = MCSampleYears.r13145.name  # run2, 2018
+    mc21a = MCSampleYears.r13829.name  # run3, 2022
 
 
 def cache_metadata(path):
@@ -42,15 +55,14 @@ def pileupConfigFiles(flags):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
     dsid = flags.Input.MCChannelNumber
     tags = flags.Input.AMITag
-    split_tags = tags.split("_")
     # Figure out which MC we are using
-    if SampleTypes.mc20a.value in split_tags:
+    if SampleTypes.mc20a.value in tags:
         subcampaign = SampleTypes.mc20a
-    elif SampleTypes.mc20d.value in split_tags:
+    elif SampleTypes.mc20d.value in tags:
         subcampaign = SampleTypes.mc20d
-    elif SampleTypes.mc20e.value in split_tags:
+    elif SampleTypes.mc20e.value in tags:
         subcampaign = SampleTypes.mc20e
-    elif SampleTypes.mc21a.value in split_tags:
+    elif SampleTypes.mc21a.value in tags:
         subcampaign = SampleTypes.mc21a
     else:
         raise LookupError(f"Cannot determine subcampaign for DSID {dsid}")
@@ -102,3 +114,22 @@ def getPrwFiles(dsid, subcampaign, tags):
         )
 
     return prw_files + actual_mu.get(subcampaign, [])
+
+
+def getRunYears(flags):
+    years = []
+    if flags.Input.isMC:
+        # use rtag for figuring out year in MC
+        tags = flags.Input.AMITag
+        for mc_campaign in MCSampleYears:
+            if mc_campaign.name in tags:
+                years += mc_campaign.value
+                break
+    else:
+        # Use projet_name for figuring out which year in data
+        project_name = flags.Input.ProjectName
+        for data_campaign in DataSampleYears:
+            if data_campaign.name in project_name:
+                years += data_campaign.value
+                break
+    return years

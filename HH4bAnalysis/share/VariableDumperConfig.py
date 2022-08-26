@@ -12,10 +12,11 @@
 import sys
 from pathlib import Path
 
-from AthenaConfiguration.AutoConfigFlags import GetFileMD
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.AutoConfigFlags import GetFileMD
+
+from HH4bAnalysis.Config.Base import pileupConfigFiles, getRunYears
 from HH4bAnalysis.Config.AnalysisAlgsConfig import AnalysisAlgsCfg
-from HH4bAnalysis.Config.Base import SampleTypes, pileupConfigFiles
 from HH4bAnalysis.Config.MiniTupleConfig import MiniTupleCfg
 from HH4bAnalysis.utils.inputsHelper import is_physlite
 from HH4bAnalysis.utils.logHelper import log
@@ -100,24 +101,6 @@ def _is_mc_phys(flags):
     return flags.Input.isMC and not is_physlite(flags)
 
 
-def _get_trigger_list_from_flags(flags):
-    try:
-        runNumber = flags.Input.RunNumber[0]
-        trigger_list = "Run2" if runNumber < 400000 else "Run3"
-        return trigger_list
-    except Exception:
-        return None
-
-
-def _get_valid_mc21_rtag(tags):
-    is_valid_rtag = False
-    min_mc21_rtag = SampleTypes.mc21a.value
-    for tag in tags:
-        if "r" in tag:
-            is_valid_rtag = int(tag[1:]) >= int(min_mc21_rtag[1:])
-    return is_valid_rtag, min_mc21_rtag
-
-
 # CA modules are intended to be executable, to facilitate easy testing.
 # We define a "main function" that will run a test job if the module
 # is executed rather than imported.
@@ -177,34 +160,51 @@ def main():
         # Add our VariableDumper CA, calling the function defined above.
         from HH4bAnalysis.Config.TriggerLists import TriggerLists
 
-        split_tags = ConfigFlags.Input.AMITag.split("_")
-        is_valid_mc21_rtag, min_mc21_rtag = _get_valid_mc21_rtag(split_tags)
-
-        trigger_list = _get_trigger_list_from_flags(ConfigFlags)
-        if not trigger_list:
-            log.warning(
-                "Cannot determine trigger list automatically. Setting to empty list."
+        trigger_runs = TriggerLists.keys()
+        trigger_chains = []
+        if args.trigger_list == "Auto":
+            run_years = getRunYears(ConfigFlags)
+            log.info(
+                "Self-configured trigger list for years: "
+                f"{', '.join(str(year) for year in run_years) or None}"
             )
-            trigger_chains = []
-        elif args.trigger_list == "Auto":
-            trigger_chains = TriggerLists[trigger_list]
-            log.info(f"Self-configured trigger list: '{trigger_list}'")
-        elif args.trigger_list != trigger_list:
-            log.error(
-                f"You specified trigger list {args.trigger_list} "
-                f"but dataset needs {trigger_list}"
-            )
-            raise ValueError
-        elif (
-            trigger_list == "Run3" and ConfigFlags.Input.isMC and not is_valid_mc21_rtag
-        ):
-            log.error(
-                "Invalid r-tag for mc21 and Run3 trigger list, "
-                f"r-tag must be >= '{min_mc21_rtag}'"
-            )
-            raise ValueError
+            trigger_lists_by_year = {
+                year: list
+                for run in trigger_runs
+                for year, list in TriggerLists[run].items()
+            }
+            trigger_chains = [
+                list for year in run_years for list in trigger_lists_by_year[year]
+            ]
+        elif args.trigger_list in trigger_runs:
+            trigger_list = TriggerLists[args.trigger_list]
+            trigger_chains = [year for years in trigger_list.values() for year in years]
+            # remove duplicates and mantain order
+            trigger_chains = list(dict.fromkeys(trigger_chains))
         else:
-            trigger_chains = TriggerLists[args.trigger_list]
+            error = (
+                f"Invalid trigger list '{args.trigger_list}'. "
+                f"Choose from {', '.join(trigger_runs)}"
+            )
+            log.error(error)
+            raise ValueError(error)
+
+        from HH4bAnalysis.Config.GoodRunsLists import GoodRunsLists
+
+        grl_runs = GoodRunsLists.keys()
+        grl_files = []
+        if not ConfigFlags.Input.isMC:
+            run_years = getRunYears(ConfigFlags)
+            log.info(
+                "Self-configured GRL for years: "
+                f"{', '.join(str(year) for year in run_years) or None}"
+            )
+            grl_lists_by_year = {
+                year: list
+                for run in grl_runs
+                for year, list in GoodRunsLists[run].items()
+            }
+            grl_files = [list for year in run_years for list in grl_lists_by_year[year]]
 
         do_muons = not args.meta_cache
 
@@ -229,6 +229,7 @@ def main():
                 do_PRW=do_PRW,
                 prw_files=prw_files,
                 lumicalc_files=lumicalc_files,
+                grl_files=grl_files,
                 do_dihiggs_analysis=args.do_dihiggs_analysis,
             ),
             "HH4bSeq",
