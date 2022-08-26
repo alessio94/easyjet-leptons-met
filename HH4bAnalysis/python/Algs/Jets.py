@@ -22,7 +22,7 @@ def JetAnalysisSequenceCfg(
         runGhostMuonAssociation=not is_daod_physlite,
         enableCutflow=False,
         enableKinematicHistograms=False,
-        runJvtUpdate=False,
+        runJvtUpdate=True,
         runJvtSelection=True,
     )
 
