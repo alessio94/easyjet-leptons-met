@@ -36,6 +36,7 @@ def AnalysisAlgsCfg(
     do_PRW=False,
     prw_files=[],
     lumicalc_files=[],
+    grl_files=[],
     do_dihiggs_analysis=False,
 ):
     if metadata_cache:
@@ -66,7 +67,9 @@ def AnalysisAlgsCfg(
     log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
     cfg.merge(
-        EventSelectionAnalysisSequenceCfg(flags, dataType, grlFiles=[], loose=do_loose)
+        EventSelectionAnalysisSequenceCfg(
+            flags, dataType, grlFiles=grl_files, loose=do_loose
+        )
     )
 
     log.info(
