@@ -20,10 +20,10 @@ declare -A TESTS=(
 )
 
 ntuple-dump() {
-    VariableDumperConfig.py -o --filesInput $1 --trigger-list "Run2"
+    VariableDumperConfig.py -o --filesInput $1 --trigger-list HH4bResolved HH4bBoosted
 }
 ntuple-dump-fast() {
-    VariableDumperConfig.py -oc --filesInput $1 --trigger-list "Run2"
+    VariableDumperConfig.py -oc --filesInput $1 --trigger-list HH4bResolved HH4bBoosted
 }
 
 ################################################

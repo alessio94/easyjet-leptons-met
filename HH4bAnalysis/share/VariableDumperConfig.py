@@ -54,11 +54,20 @@ def defineArgs(ConfigFlags):
     )
     parser.add_argument(
         "--trigger-list",
-        type=str,
-        default="Auto",
+        action="extend", nargs="+", type=str,
+        default=[],
         help=(
             "Trigger list to use, default: %(default)s. "
             "Will use run number to set trigger list."
+        ),
+    )
+    parser.add_argument(
+        "--trigger-year",
+        action="extend", nargs="+", type=int,
+        default=[],
+        help=(
+            "Years used to define the trigger list."
+            "Default empty list will auto-configure from file metadata."
         ),
     )
     parser.add_argument(
@@ -93,7 +102,11 @@ def defineArgs(ConfigFlags):
         default=True,
         help="activate boosted",
     )
-
+    parser.add_argument(
+        "--disable-calib",
+        action="store_true",
+        help="disable CP Algs for calibration (can be used for plain PHYSLITE processing)",  # noqa
+    )
     return parser
 
 
@@ -112,6 +125,10 @@ def main():
     # Get the arguments, defined at the top for easy browsing
     parser = defineArgs(ConfigFlags)
     args = ConfigFlags.fillFromArgs([], parser)
+
+    # Arg checks
+    assert not (args.disable_calib and not is_physlite(ConfigFlags)), "Disabling calibrations is not safe except on PHYSLITE!"  # noqa
+
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
     # Workaround for buggy glob, needed prior
@@ -160,34 +177,29 @@ def main():
         # Add our VariableDumper CA, calling the function defined above.
         from HH4bAnalysis.Config.TriggerLists import TriggerLists
 
-        trigger_runs = TriggerLists.keys()
-        trigger_chains = []
-        if args.trigger_list == "Auto":
-            run_years = getRunYears(ConfigFlags)
-            log.info(
-                "Self-configured trigger list for years: "
-                f"{', '.join(str(year) for year in run_years) or None}"
-            )
-            trigger_lists_by_year = {
-                year: list
-                for run in trigger_runs
-                for year, list in TriggerLists[run].items()
-            }
-            trigger_chains = [
-                list for year in run_years for list in trigger_lists_by_year[year]
-            ]
-        elif args.trigger_list in trigger_runs:
-            trigger_list = TriggerLists[args.trigger_list]
-            trigger_chains = [year for years in trigger_list.values() for year in years]
-            # remove duplicates and mantain order
-            trigger_chains = list(dict.fromkeys(trigger_chains))
-        else:
-            error = (
-                f"Invalid trigger list '{args.trigger_list}'. "
-                f"Choose from {', '.join(trigger_runs)}"
-            )
-            log.error(error)
-            raise ValueError(error)
+        trigger_year_list = args.trigger_year
+        if not trigger_year_list:
+            trigger_year_list = getRunYears(ConfigFlags)
+        log.info(
+            "Self-configured trigger list for years: "
+            f"{', '.join(str(year) for year in trigger_year_list) or None}"
+        )
+
+        trigger_chains = set()
+        # Empty: set the HH4b analysis triggers
+        trigger_groups = args.trigger_list
+        if not trigger_groups:
+            log.info("No triggers specified, adding HH4b analysis triggers")
+            trigger_groups = ["HH4bResolved", "HH4bBoosted"]
+        try:
+            for trigger_group in trigger_groups:
+                for year in trigger_year_list:
+                    trigger_chains |= set(TriggerLists[trigger_group][year])
+        except KeyError as e:
+            log.error(f"Trigger list for {trigger_group}, {year} not defined.")
+            raise e
+
+        trigger_chains = list(trigger_chains)
 
         from HH4bAnalysis.Config.GoodRunsLists import GoodRunsLists
 
@@ -222,6 +234,7 @@ def main():
                 ConfigFlags,
                 btag_wps=args.btag_wps,
                 vr_btag_wps=args.vr_btag_wps,
+                disable_calib=args.disable_calib,
                 trigger_chains=trigger_chains,
                 metadata_cache=args.meta_cache,
                 do_muons=do_muons,
@@ -243,6 +256,7 @@ def main():
                 do_muons=do_muons,
                 do_PRW=do_PRW,
                 do_dihiggs_analysis=args.do_dihiggs_analysis,
+                disable_calib=args.disable_calib,
             ),
             "HH4bSeq",
         )

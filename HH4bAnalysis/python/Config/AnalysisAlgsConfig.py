@@ -29,6 +29,7 @@ def AnalysisAlgsCfg(
     flags,
     btag_wps,
     vr_btag_wps,
+    disable_calib=False,
     trigger_chains=[],
     do_muons=True,
     metadata_cache=None,
@@ -86,83 +87,100 @@ def AnalysisAlgsCfg(
                 lumicalcFiles=lumicalc_files,
             )
         )
+    containers = get_container_names(flags, disable_calib)
 
-        log.info("Adding generator analysis sequence")
-        # Adds variable to EventInfo if for generator weight, for example:
-        # EventInfo.generatorWeight_%SYS%
-        cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType))
+    if not disable_calib:
 
-    containers = get_container_names(flags)
-
-    log.info("Add electron seq")
-    cfg.merge(
-        ElectronAnalysisSequenceCfg(
-            flags,
-            dataType=dataType,
-            inputContainerName=containers["inputs"]["electrons"],
-            outputContainerName=containers["outputs"]["electrons"],
+        log.info(
+            f"Do PRW is {do_PRW}. "
+            f"{'Add' if do_PRW else 'Skip'} pileup re-weight sequence"
         )
-    )
+        if do_PRW:
+            # Adds variable to EventInfo if for pileup weight, for example:
+            # EventInfo.PileWeight_%SYS$
+            cfg.merge(
+                PileupAnalysisSequenceCfg(
+                    flags,
+                    dataType=dataType,
+                    prwFiles=prw_files,
+                    lumicalcFiles=lumicalc_files,
+                )
+            )
 
-    log.info("Add photon seq")
-    cfg.merge(
-        PhotonAnalysisSequenceCfg(
-            flags,
-            dataType=dataType,
-            inputContainerName=containers["inputs"]["photons"],
-            outputContainerName=containers["outputs"]["photons"],
-        )
-    )
+            log.info("Adding generator analysis sequence")
+            # Adds variable to EventInfo if for generator weight, for example:
+            # EventInfo.generatorWeight_%SYS%
+            cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType))
 
-    if do_muons:
-        log.info("Add muon seq")
+        log.info("Add electron seq")
         cfg.merge(
-            MuonAnalysisSequenceCfg(
+            ElectronAnalysisSequenceCfg(
                 flags,
                 dataType=dataType,
-                inputContainerName=containers["inputs"]["muons"],
-                outputContainerName=containers["outputs"]["muons"],
+                inputContainerName=containers["inputs"]["electrons"],
+                outputContainerName=containers["outputs"]["electrons"],
             )
         )
 
-    log.info("Add jet seq")
-    cfg.merge(
-        JetAnalysisSequenceCfg(
-            flags,
-            dataType=dataType,
-            inputContainerName=containers["inputs"]["reco4Jet"],
-            outputContainerName=containers["outputs"]["reco4Jet"],
-            workingPoints=btag_wps,
-            is_daod_physlite=is_daod_physlite,
-        )
-    )
-
-    if is_daod_physlite:
-        log.warning("On PHYSLITE, skip large-R jet sequence for now")
-    else:
-        log.info("Add large-R jet seq")
+        log.info("Add photon seq")
         cfg.merge(
-            FatJetAnalysisSequenceCfg(
+            PhotonAnalysisSequenceCfg(
                 flags,
                 dataType=dataType,
-                inputContainerName=containers["inputs"]["reco10Jet"],
-                outputContainerName=containers["outputs"]["reco10Jet"],
+                inputContainerName=containers["inputs"]["photons"],
+                outputContainerName=containers["outputs"]["photons"],
             )
         )
 
-    if is_daod_physlite:
-        log.warning("On PHYSLITE, skip VR jet sequence for now")
-    else:
-        log.info("Add VR jet seq")
+        if do_muons:
+            log.info("Add muon seq")
+            cfg.merge(
+                MuonAnalysisSequenceCfg(
+                    flags,
+                    dataType=dataType,
+                    inputContainerName=containers["inputs"]["muons"],
+                    outputContainerName=containers["outputs"]["muons"],
+                )
+            )
+
+        log.info("Add jet seq")
         cfg.merge(
-            VRJetAnalysisSequenceCfg(
+            JetAnalysisSequenceCfg(
                 flags,
                 dataType=dataType,
-                inputContainerName=containers["inputs"]["vrJet"],
-                outputContainerName=containers["outputs"]["vrJet"],
-                workingPoints=vr_btag_wps,
+                inputContainerName=containers["inputs"]["reco4Jet"],
+                outputContainerName=containers["outputs"]["reco4Jet"],
+                workingPoints=btag_wps,
+                is_daod_physlite=is_daod_physlite,
             )
         )
+
+        if is_daod_physlite:
+            log.warning("On PHYSLITE, skip large-R jet sequence for now")
+        else:
+            log.info("Add large-R jet seq")
+            cfg.merge(
+                FatJetAnalysisSequenceCfg(
+                    flags,
+                    dataType=dataType,
+                    inputContainerName=containers["inputs"]["reco10Jet"],
+                    outputContainerName=containers["outputs"]["reco10Jet"],
+                )
+            )
+
+        if is_daod_physlite:
+            log.warning("On PHYSLITE, skip VR jet sequence for now")
+        else:
+            log.info("Add VR jet seq")
+            cfg.merge(
+                VRJetAnalysisSequenceCfg(
+                    flags,
+                    dataType=dataType,
+                    inputContainerName=containers["inputs"]["vrJet"],
+                    outputContainerName=containers["outputs"]["vrJet"],
+                    workingPoints=vr_btag_wps,
+                )
+            )
 
     ########################################################################
     # Begin postprocessing
