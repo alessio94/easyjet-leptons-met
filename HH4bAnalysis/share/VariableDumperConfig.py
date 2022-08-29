@@ -146,8 +146,9 @@ def main():
         ConfigFlags.Input.Files = ConfigFlags.Input.Files[1:]
     log.info(f"Operating on input files {ConfigFlags.Input.Files}")
 
-    fileMD = GetFileMD(ConfigFlags.Input.Files[0])
+    fileMD = GetFileMD(ConfigFlags.Input.Files)
     ConfigFlags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
+    ConfigFlags.addFlag("Input.SimulationFlavour", fileMD.get("SimulationFlavour", ""))
     ConfigFlags.addFlag("do_resolved_analysis", args.do_resolved_analysis)
     ConfigFlags.addFlag("do_boosted_analysis", args.do_boosted_analysis)
 

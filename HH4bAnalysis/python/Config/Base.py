@@ -57,6 +57,7 @@ def pileupConfigFiles(flags):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
     dsid = flags.Input.MCChannelNumber
     tags = flags.Input.AMITag
+    simulation_flavor = flags.Input.SimulationFlavour
     # Figure out which MC we are using
     if SampleTypes.mc20a.value in tags:
         subcampaign = SampleTypes.mc20a
@@ -70,7 +71,7 @@ def pileupConfigFiles(flags):
         raise LookupError(f"Cannot determine subcampaign for DSID {dsid}")
 
     lumicalc_files = getLumicalcFiles(subcampaign)
-    prw_files = getPrwFiles(dsid, subcampaign, tags)
+    prw_files = getPrwFiles(dsid, subcampaign, simulation_flavor)
 
     return prw_files, lumicalc_files
 
@@ -88,14 +89,14 @@ def getLumicalcFiles(subcampaign):
             "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root"  # noqa
         ],
         SampleTypes.mc21a: [
-            "/afs/cern.ch/user/s/schaarsc/public/for_TJ/fakedata_mc21a_MCMuProfile.lumicalc.422633.root"  # noqa
+            "GoodRunsLists/data22_13p6TeV/20220820/ilumicalc_histograms_None_427882-428855_OflLumi-Run3-001.root"  # noqa
         ],
     }
 
     return list.get(subcampaign, [])
 
 
-def getPrwFiles(dsid, subcampaign, tags):
+def getPrwFiles(dsid, subcampaign, simulation_flavor):
     prw_files = []
     actual_mu = {
         SampleTypes.mc20d: [
@@ -104,15 +105,17 @@ def getPrwFiles(dsid, subcampaign, tags):
         SampleTypes.mc20e: [
             "GoodRunsLists/data18_13TeV/20190318/physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root"  # noqa
         ],
-        SampleTypes.mc21a: [
-            "/afs/cern.ch/user/s/schaarsc/public/for_TJ/mc21a.410000.physlite.prw.root"
-        ],
     }
 
-    if dsid and subcampaign != SampleTypes.mc21a:
+    if dsid:
         dsid_as_str = str(dsid)
+        if simulation_flavor in ["", "FullG4", "FullG4_QS", "FullG4_Longlived"]:
+            simulation_type = "FS"
+        else:
+            simulation_type = "AFII"
+
         prw_files.append(
-            f"dev/PileupReweighting/share/DSID{dsid_as_str[:3]}xxx/pileup_{subcampaign.name}_dsid{dsid_as_str}_{'AFII' if 'a' in tags else 'FS'}.root"  # noqa
+            f"dev/PileupReweighting/share/DSID{dsid_as_str[:3]}xxx/pileup_{subcampaign.name}_dsid{dsid_as_str}_{simulation_type}.root"  # noqa
         )
 
     return prw_files + actual_mu.get(subcampaign, [])
