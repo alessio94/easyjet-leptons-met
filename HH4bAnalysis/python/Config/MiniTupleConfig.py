@@ -3,8 +3,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAddBranches
 from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
 from HH4bAnalysis.utils.containerNameHelper import get_container_names
-from HH4bAnalysis.utils.inputsHelper import is_physlite
-from HH4bAnalysis.utils.inputsHelper import get_valid_ami_tag
+from HH4bAnalysis.utils.inputsHelper import get_valid_ami_tag, is_physlite
 from HH4bAnalysis.utils.logHelper import log
 
 
@@ -91,6 +90,28 @@ def MiniTupleCfg(
         analysisTreeBranches += getFourMomBranches(cont, alias, doOR=True)
 
     if not is_daod_physlite:
+        reco10JetVars = [
+            "NTrimSubjets",
+            "TrackSumPt",
+            "Tau1_wta",
+            "Tau2_wta",
+            "Tau3_wta",
+            "ECF1",
+            "ECF2",
+            "ECF3",
+            "Split12",
+            "Split23",
+        ]
+        for var in reco10JetVars:
+            analysisTreeBranches += [
+                f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"
+            ]
+        # one after the other for better readability in the root file
+        for var in reco10JetVars:
+            analysisTreeBranches += [
+                f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"
+            ]
+
         analysisTreeBranches += getFourMomBranches(
             containers["reco10Jet"], "recojet_antikt10"
         )
