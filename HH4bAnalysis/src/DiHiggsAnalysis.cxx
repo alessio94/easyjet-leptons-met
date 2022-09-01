@@ -351,6 +351,7 @@ namespace HH4B
 
       h.m_nGhostAssocVrJets = nGhostAssocVrJets;
       h.m_nBtaggedGhostAssocVrJets = VRTrackjets.size();
+      h.m_fourVector = h.m_largeRJet->jetP4();
 
       // check if we have at least 2 per large R jet and no
       // isRelativeDeltaRToVRJet < 1.0
@@ -373,7 +374,6 @@ namespace HH4B
         h.m_subleadingJet = dynamic_cast<const xAOD::Jet *>(*VRTrackjets[1]);
 
         // calc variables
-        h.m_fourVector = h.m_leadingJet->jetP4() + h.m_subleadingJet->jetP4();
         h.m_dRjets = ROOT::Math::VectorUtil::DeltaR(
             h.m_leadingJet->jetP4(), h.m_subleadingJet->jetP4());
       }
@@ -382,30 +382,25 @@ namespace HH4B
     // write to map
     if (h1.m_doDecorate)
     {
-      m_higgsVarsMap["boosted_h1_m_" + wp] = h1.m_fourVector.M();
       m_higgsVarsMap["boosted_h1_jet1_pt_" + wp] = h1.m_leadingJet->pt();
       m_higgsVarsMap["boosted_h1_jet2_pt_" + wp] = h1.m_subleadingJet->pt();
       m_higgsVarsMap["boosted_h1_dR_jets_" + wp] = h1.m_dRjets;
     }
     if (h2.m_doDecorate)
     {
-      m_higgsVarsMap["boosted_h2_m_" + wp] = h2.m_fourVector.M();
       m_higgsVarsMap["boosted_h2_jet1_pt_" + wp] = h2.m_leadingJet->pt();
       m_higgsVarsMap["boosted_h2_jet2_pt_" + wp] = h2.m_subleadingJet->pt();
       m_higgsVarsMap["boosted_h2_dR_jets_" + wp] = h2.m_dRjets;
     }
-    if (h1.m_doDecorate && h2.m_doDecorate)
-    {
-      m_higgsVarsMap["boosted_hh_m_" + wp] =
-          (h1.m_fourVector + h2.m_fourVector).M();
-    }
 
-    // counting are independent of cuts/doDecorate
     // clang-format off
     m_higgsVarsMap["boosted_h1_nGhostAssocVrJets_" + wp] = h1.m_nGhostAssocVrJets; 
     m_higgsVarsMap["boosted_h1_nBtaggedGhostAssocVrTrackJets_" + wp] = h1.m_nBtaggedGhostAssocVrJets; 
     m_higgsVarsMap["boosted_h2_nGhostAssocVrJets_" + wp] = h2.m_nGhostAssocVrJets; 
     m_higgsVarsMap["boosted_h2_nBtaggedGhostAssocVrTrackJets_" + wp] = h2.m_nBtaggedGhostAssocVrJets;
+    m_higgsVarsMap["boosted_h1_m_" + wp] = h1.m_fourVector.M();
+    m_higgsVarsMap["boosted_h2_m_" + wp] = h2.m_fourVector.M();
+    m_higgsVarsMap["boosted_hh_m_" + wp] = (h1.m_fourVector + h2.m_fourVector).M();
     // clang-format on
 
     return;
