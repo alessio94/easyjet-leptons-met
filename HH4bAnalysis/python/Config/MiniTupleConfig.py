@@ -101,6 +101,10 @@ def MiniTupleCfg(
             "ECF3",
             "Split12",
             "Split23",
+            "JetConstitScaleMomentum_pt",
+            "JetConstitScaleMomentum_eta",
+            "JetConstitScaleMomentum_phi",
+            "JetConstitScaleMomentum_m",
         ]
         for var in reco10JetVars:
             analysisTreeBranches += [
