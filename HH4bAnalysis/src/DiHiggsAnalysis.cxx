@@ -8,9 +8,7 @@
 using namespace asg::msgUserCode;
 
 namespace HH4B
-
 {
-
   std::vector<std::string>
   getHiggsVarsNames(std::vector<std::string> &btag_wps,
                     std::vector<std::string> &vr_btag_wps)
@@ -18,19 +16,36 @@ namespace HH4B
     std::vector<std::string> vars;
     for (std::string wp : btag_wps)
     {
-      vars.push_back("resolved_m_h1_" + wp);
-      vars.push_back("resolved_m_h2_" + wp);
-      vars.push_back("resolved_m_hh_" + wp);
-      vars.push_back("resolved_dR_jets_in_h1_" + wp);
-      vars.push_back("resolved_dR_jets_in_h2_" + wp);
+      vars.push_back("resolved_nCentralJets_" + wp);
+      vars.push_back("resolved_nBtaggedCentralJets_" + wp);
+      vars.push_back("resolved_jet1_pt_" + wp);
+      vars.push_back("resolved_jet2_pt_" + wp);
+      vars.push_back("resolved_jet3_pt_" + wp);
+      vars.push_back("resolved_jet4_pt_" + wp);
+      vars.push_back("resolved_DeltaR12_" + wp);
+      vars.push_back("resolved_DeltaR13_" + wp);
+      vars.push_back("resolved_DeltaR14_" + wp);
+      vars.push_back("resolved_DeltaR23_" + wp);
+      vars.push_back("resolved_DeltaR24_" + wp);
+      vars.push_back("resolved_DeltaR34_" + wp);
+      vars.push_back("resolved_h1_m_" + wp);
+      vars.push_back("resolved_h2_m_" + wp);
+      vars.push_back("resolved_h1_dR_jets_" + wp);
+      vars.push_back("resolved_h2_dR_jets_" + wp);
+      vars.push_back("resolved_hh_m_" + wp);
     }
     for (std::string wp : vr_btag_wps)
     {
-      vars.push_back("boosted_m_h1_" + wp);
-      vars.push_back("boosted_m_h2_" + wp);
-      vars.push_back("boosted_m_hh_" + wp);
-      vars.push_back("boosted_dR_jets_in_h1_" + wp);
-      vars.push_back("boosted_dR_jets_in_h2_" + wp);
+      vars.push_back("boosted_nLargeJets_" + wp);
+      vars.push_back("boosted_h1_m_" + wp);
+      vars.push_back("boosted_h1_jet1_pt_" + wp);
+      vars.push_back("boosted_h1_jet2_pt_" + wp);
+      vars.push_back("boosted_h1_dR_jets_" + wp);
+      vars.push_back("boosted_h2_m_" + wp);
+      vars.push_back("boosted_h2_jet1_pt_" + wp);
+      vars.push_back("boosted_h2_jet2_pt_" + wp);
+      vars.push_back("boosted_h2_dR_jets_" + wp);
+      vars.push_back("boosted_hh_m_" + wp);
       vars.push_back("boosted_h1_nGhostAssocVrJets_" + wp);
       vars.push_back("boosted_h1_nBtaggedGhostAssocVrTrackJets_" + wp);
       vars.push_back("boosted_h2_nGhostAssocVrJets_" + wp);
@@ -53,11 +68,6 @@ namespace HH4B
   DiHiggsAnalysis::makeResolvedAnalysis(const xAOD::JetContainer &smallRjets,
                                         std::string wp)
   {
-    // check if we have at least 4 jets
-    if (smallRjets.size() < 4)
-    {
-      return;
-    }
     // leadding higgs candidate
     HiggsCandidate h1;
     // subleading higgs candidate
@@ -69,9 +79,19 @@ namespace HH4B
     static const SG::AuxElement::ConstAccessor<char> isBtag("ftag_select_" +
                                                             wp);
     // remove non-btagged jets of designated wp
-    // (fancy std::remove_if from boosted analysis only works with vectors)
+    // (fancy std::remove_if from boosted analysis only works with std::vector)
+    bool isCentral;
+    int nCentralJets = 0;
+    int nBtaggedCentralJets = 0;
     for (const xAOD::Jet *jet : smallRjets)
     {
+      // count central jets
+      isCentral = false;
+      if (jet->pt() > 25000. && std::abs(jet->eta()) < 2.5)
+      {
+        nCentralJets += 1;
+        isCentral = true;
+      }
       // the ftag sequence does not tag all of them
       if (!isBtag.isAvailable(*jet))
       {
@@ -82,8 +102,17 @@ namespace HH4B
       if (isBtag(*jet))
       {
         bTaggedJets.push_back(jet);
+        // count btagged central jets
+        if (isCentral)
+        {
+          nBtaggedCentralJets += 1;
+        }
       }
     }
+
+    // write out counts
+    m_higgsVarsMap["resolved_nCentralJets_" + wp] = nCentralJets;
+    m_higgsVarsMap["resolved_nBtaggedCentralJets_" + wp] = nBtaggedCentralJets;
 
     // check if we have at least 4 btagged jets
     if (bTaggedJets.size() < 4)
@@ -171,11 +200,21 @@ namespace HH4B
 
     // write to map
     // clang-format off
-    m_higgsVarsMap["resolved_m_h1_" + wp] = h1.m_fourVector.M();
-    m_higgsVarsMap["resolved_m_h2_" + wp] = h2.m_fourVector.M();
-    m_higgsVarsMap["resolved_m_hh_" + wp] = (h1.m_fourVector + h2.m_fourVector).M(); 
-    m_higgsVarsMap["resolved_dR_jets_in_h1_" + wp] = h1.m_dRjets;
-    m_higgsVarsMap["resolved_dR_jets_in_h2_" + wp] = h2.m_dRjets;
+    m_higgsVarsMap["resolved_jet1_pt_" + wp] = ptSortedBtaggedJets[0]->pt();
+    m_higgsVarsMap["resolved_jet2_pt_" + wp] = ptSortedBtaggedJets[1]->pt();
+    m_higgsVarsMap["resolved_jet3_pt_" + wp] = ptSortedBtaggedJets[2]->pt();
+    m_higgsVarsMap["resolved_jet4_pt_" + wp] = ptSortedBtaggedJets[3]->pt();
+    m_higgsVarsMap["resolved_DeltaR12_" + wp] = dRtoLeadingJet_acc(*ptSortedBtaggedJets[1]);
+    m_higgsVarsMap["resolved_DeltaR13_" + wp] = dRtoLeadingJet_acc(*ptSortedBtaggedJets[2]);
+    m_higgsVarsMap["resolved_DeltaR14_" + wp] = dRtoLeadingJet_acc(*ptSortedBtaggedJets[3]);
+    m_higgsVarsMap["resolved_DeltaR23_" + wp] = ROOT::Math::VectorUtil::DeltaR( ptSortedBtaggedJets[1]->jetP4(), ptSortedBtaggedJets[2]->jetP4());
+    m_higgsVarsMap["resolved_DeltaR24_" + wp] = ROOT::Math::VectorUtil::DeltaR( ptSortedBtaggedJets[1]->jetP4(), ptSortedBtaggedJets[3]->jetP4());
+    m_higgsVarsMap["resolved_DeltaR34_" + wp] = ROOT::Math::VectorUtil::DeltaR( ptSortedBtaggedJets[2]->jetP4(), ptSortedBtaggedJets[3]->jetP4());
+    m_higgsVarsMap["resolved_h1_m_" + wp] = h1.m_fourVector.M();
+    m_higgsVarsMap["resolved_h1_dR_jets_" + wp] = h1.m_dRjets;
+    m_higgsVarsMap["resolved_h2_m_" + wp] = h2.m_fourVector.M();
+    m_higgsVarsMap["resolved_h2_dR_jets_" + wp] = h2.m_dRjets;
+    m_higgsVarsMap["resolved_hh_m_" + wp] = (h1.m_fourVector + h2.m_fourVector).M();
     // clang-format on
     return;
   };
@@ -184,6 +223,17 @@ namespace HH4B
   DiHiggsAnalysis::makeBoostedAnalysis(const xAOD::JetContainer &largeRjets,
                                        std::string wp)
   {
+    // count large jets with some requirements
+    int nLargeJets = 0;
+    for (const xAOD::Jet *jet : largeRjets)
+    {
+      if (jet->pt() > 250000. && std::abs(jet->eta() < 2.0))
+      {
+        nLargeJets += 1;
+      }
+    }
+    m_higgsVarsMap["boosted_nLargeJets_" + wp] = nLargeJets;
+
     // check if we have at least 2 large R jets
     if (largeRjets.size() < 2)
     {
@@ -210,12 +260,12 @@ namespace HH4B
     // don't use "or" here as the || operator is short-circuited in c++, which
     // means in the OR checking case it stops checking conditions once one
     // becomes true
-    if (ptSortedLargeRJets[0]->pt() < 250. || //
-        ptSortedLargeRJets[1]->pt() < 250. || //
-        ptSortedLargeRJets[0]->eta() > 2.0 ||
-        ptSortedLargeRJets[1]->eta() > 2.0
-        // || ptSortedLargeRJets[0]->m() < 50.
-        // || ptSortedLargeRJets[1]->m() < 50.
+    if (ptSortedLargeRJets[0]->pt() < 250000. || //
+        ptSortedLargeRJets[1]->pt() < 250000. || //
+        std::abs(ptSortedLargeRJets[0]->eta()) > 2.0 ||
+        std::abs(ptSortedLargeRJets[1]->eta()) > 2.0
+        // || ptSortedLargeRJets[0]->m() < 50000.
+        // || ptSortedLargeRJets[1]->m() < 50000.
         // || std::abs(ptSortedLargeRJets[0]->eta() -
         //          ptSortedLargeRJets[0]->eta()) > 1.3
     )
@@ -238,7 +288,8 @@ namespace HH4B
     static const SG::AuxElement::ConstAccessor<char> isBtag("ftag_select_" +
                                                             wp);
     // recommended by ftag : Remove the event if any of your signal jets have
-    // relativeDeltaRToVRJet < 1.0.
+    // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.
+    // checks if any of the vr jets overlap
     static const SG::AuxElement::ConstAccessor<float> relativeDeltaRToVRJet(
         "relativeDeltaRToVRJet");
     bool isRelativeDeltaRToVRJet = false;
@@ -267,7 +318,7 @@ namespace HH4B
               (ElementLink<xAOD::IParticleContainer> & VRjet)
               {
                 // count only the ftagged ones
-                if ((*VRjet)->pt() > 10.)
+                if ((*VRjet)->pt() > 10000.)
                 {
                   nGhostAssocVrJets += 1;
                 }
@@ -288,9 +339,7 @@ namespace HH4B
                 {
                   return true;
                 }
-                // recommended by ftag : Remove the event if any of
-                // your signal jets have
-                // relativeDeltaRToVRJet < 1.0.
+                // see accessor definition
                 if (relativeDeltaRToVRJet(**VRjet) < 1.0)
                 {
                   isRelativeDeltaRToVRJet = true;
@@ -333,25 +382,32 @@ namespace HH4B
     // write to map
     if (h1.m_doDecorate)
     {
-      m_higgsVarsMap["boosted_m_h1_" + wp] = h1.m_fourVector.M();
-      m_higgsVarsMap["boosted_dR_jets_in_h1_" + wp] = h1.m_dRjets;
+      m_higgsVarsMap["boosted_h1_m_" + wp] = h1.m_fourVector.M();
+      m_higgsVarsMap["boosted_h1_jet1_pt_" + wp] = h1.m_leadingJet->pt();
+      m_higgsVarsMap["boosted_h1_jet2_pt_" + wp] = h1.m_subleadingJet->pt();
+      m_higgsVarsMap["boosted_h1_dR_jets_" + wp] = h1.m_dRjets;
     }
     if (h2.m_doDecorate)
     {
-      m_higgsVarsMap["boosted_m_h2_" + wp] = h2.m_fourVector.M();
-      m_higgsVarsMap["boosted_dR_jets_in_h2_" + wp] = h2.m_dRjets;
+      m_higgsVarsMap["boosted_h2_m_" + wp] = h2.m_fourVector.M();
+      m_higgsVarsMap["boosted_h2_jet1_pt_" + wp] = h2.m_leadingJet->pt();
+      m_higgsVarsMap["boosted_h2_jet2_pt_" + wp] = h2.m_subleadingJet->pt();
+      m_higgsVarsMap["boosted_h2_dR_jets_" + wp] = h2.m_dRjets;
     }
     if (h1.m_doDecorate && h2.m_doDecorate)
     {
-      m_higgsVarsMap["boosted_m_hh_" + wp] =
+      m_higgsVarsMap["boosted_hh_m_" + wp] =
           (h1.m_fourVector + h2.m_fourVector).M();
     }
+
+    // counting are independent of cuts/doDecorate
     // clang-format off
     m_higgsVarsMap["boosted_h1_nGhostAssocVrJets_" + wp] = h1.m_nGhostAssocVrJets; 
     m_higgsVarsMap["boosted_h1_nBtaggedGhostAssocVrTrackJets_" + wp] = h1.m_nBtaggedGhostAssocVrJets; 
     m_higgsVarsMap["boosted_h2_nGhostAssocVrJets_" + wp] = h2.m_nGhostAssocVrJets; 
     m_higgsVarsMap["boosted_h2_nBtaggedGhostAssocVrTrackJets_" + wp] = h2.m_nBtaggedGhostAssocVrJets;
     // clang-format on
+
     return;
   };
 
