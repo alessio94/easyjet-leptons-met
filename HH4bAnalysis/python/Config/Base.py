@@ -1,5 +1,5 @@
-from enum import Enum
 import json
+from enum import Enum
 
 
 class DataSampleYears(Enum):
@@ -89,7 +89,7 @@ def getLumicalcFiles(subcampaign):
             "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root"  # noqa
         ],
         SampleTypes.mc21a: [
-            "GoodRunsLists/data22_13p6TeV/20220820/ilumicalc_histograms_None_427882-428855_OflLumi-Run3-001.root"  # noqa
+            "GoodRunsLists/data22_13p6TeV/20220902/ilumicalc_histograms_None_427882-430648_OflLumi-Run3-001.root"  # noqa
         ],
     }
 

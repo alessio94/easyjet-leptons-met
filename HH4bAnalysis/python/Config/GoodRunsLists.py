@@ -1,8 +1,8 @@
 GoodRunsLists = {
     "Run3": {
-        # period D-E3, 225.907 pb-1
+        # period D-F2, 3464.27 pb-1
         2022: [
-            "GoodRunsLists/data22_13p6TeV/20220820/data22_13p6TeV.periodDE_DetStatus-v108-pro28_MERGED_PHYS_StandardGRL_All_Good_25ns_ignore__TRIG_HLT_MUO_Upstream_Barrel_problem__TRIG_HLT_MUO_Upstream_Endcap_problem__TRIG_L1_MUB_coverage__TRIG_L1_MUE_misconf_electronics__TRIG_L1_MUB_lost_sync.xml"  # noqa
+            "GoodRunsLists/data22_13p6TeV/20220902/data22_13p6TeV.periodDEF_DetStatus-v108-pro28_MERGED_PHYS_StandardGRL_All_Good_25ns_ignore__TRIG_HLT_MUO_Upstream_Barrel_problem__TRIG_HLT_MUO_Upstream_Endcap_problem__TRIG_L1_MUB_coverage__TRIG_L1_MUE_misconf_electronics__TRIG_L1_MUB_lost_sync.xml"  # noqa
         ]
     },
     "Run2": {
