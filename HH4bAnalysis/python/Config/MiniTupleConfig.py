@@ -38,16 +38,16 @@ def MiniTupleCfg(
         CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
     )
 
-    def getFourMomBranches(container, alias, doOR=False):
+    def getFourMomBranches(container, alias, doOR=False, noSystematics=False):
         ORstr = "_OR" if doOR else ""
-
+        SYSstr = "" if noSystematics else "_%SYS%"
         branches = []
         vars = ["pt", "eta", "phi"]
         if "Jets" in container:
             vars.append("m")
         for var in vars:
             branches += [
-                f"{container}{ORstr}.{var}  -> {alias}{ORstr}_%SYS%_{var}",
+                f"{container}{ORstr}.{var}  -> {alias}{ORstr}{SYSstr}_{var}",
             ]
         return branches
 
@@ -77,6 +77,7 @@ def MiniTupleCfg(
             "EventInfo.mcEventWeights -> pileupWeight_NOSYS",
         ]
 
+    # make dict with analysis container keys and ntuple alias values
     objectpairs = {
         containers["electrons"]: "el",
         containers["photons"]: "ph",
@@ -88,6 +89,30 @@ def MiniTupleCfg(
     for cont, alias in objectpairs.items():
         analysisTreeBranches += getFourMomBranches(cont, alias)
         analysisTreeBranches += getFourMomBranches(cont, alias, doOR=True)
+
+    # truths
+    if flags.Input.isMC:
+        analysisTreeBranches += [
+            (
+                f"{containers['reco4Jet']}.HadronConeExclTruthLabelID ->"
+                " recojet_antikt4_%SYS%_HadronConeExclTruthLabelID"
+            ),
+            (
+                f"{containers['reco4Jet']}_OR.HadronConeExclTruthLabelID ->"
+                " recojet_antikt4_OR_%SYS%_HadronConeExclTruthLabelID"
+            ),
+            (
+                f"{containers['truth4Jet']}.PartonTruthLabelID ->"
+                " truthjet_antikt4_PartonTruthLabelID"
+            ),
+            (
+                f"{containers['truth4Jet']}.HadronConeExclTruthLabelID ->"
+                " truthjet_antikt4_HadronConeExclTruthLabelID"
+            ),
+        ]
+        analysisTreeBranches += getFourMomBranches(
+            containers["truth4Jet"], "truthjet_antikt4", noSystematics=True
+        )
 
     if not is_daod_physlite:
         reco10JetVars = [
@@ -123,6 +148,11 @@ def MiniTupleCfg(
             containers["reco10Jet"], "recojet_antikt10", doOR=True
         )
 
+        if flags.Input.isMC:
+            analysisTreeBranches += getFourMomBranches(
+                containers["truth10Jet"], "truthjet_antikt10", noSystematics=True
+            )
+
     if not disable_calib:
         # B-jet WPs
         analysisTreeBranches += [
@@ -136,6 +166,13 @@ def MiniTupleCfg(
             for btag_wp in working_points["ak4"]
         ]
         analysisTreeBranches += getFourMomBranches(containers["vrJet"], "vrjet")
+        if flags.Input.isMC:
+            analysisTreeBranches += [
+                (
+                    f"{containers['vrJet']}.HadronConeExclTruthLabelID ->"
+                    " vrjet_%SYS%_HadronConeExclTruthLabelID"
+                ),
+            ]
         analysisTreeBranches += [
             f"{containers['vrJet']}.ftag_select_{btag_wp}"
             f" -> vrjet_%SYS%_{btag_wp}"  # noqa

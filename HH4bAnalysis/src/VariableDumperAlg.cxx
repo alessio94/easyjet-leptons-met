@@ -24,14 +24,11 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Initialising " << name());
 
-    ATH_CHECK(m_EventInfoKey.initialize());
-
     ATH_CHECK(m_systematicsList.addHandle(m_electronHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_photonHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_muonHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_jetsmallRHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_VRtrackjetHandle));
-    ATH_CHECK(m_EventInfoKey.initialize());
     if (!m_jetlargeRHandle.empty())
     {
       ATH_CHECK(m_systematicsList.addHandle(m_jetlargeRHandle));
@@ -54,8 +51,6 @@ namespace HH4B
       ATH_MSG_VERBOSE("Will apply sysname \"" << sysname << "\" for event");
 
       // get the xAOD objects
-      SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-      ATH_CHECK(eventInfo.isValid());
       const xAOD::ElectronContainer *electrons(nullptr);
       ATH_CHECK(m_electronHandle.retrieve(electrons, sys));
       const xAOD::PhotonContainer *photons(nullptr);

@@ -1,6 +1,5 @@
 from HH4bAnalysis.utils.inputsHelper import is_physlite
 
-
 # custom container names used in this framework
 RECO_4_PFLOW_JETS_KEY = "Reco4PFlowJets"
 RECO_10_PFLOW_JETS_KEY = "Reco10PFlowJets"
@@ -60,8 +59,13 @@ def get_container_names(flags, nocalib=False):
         electrons=f"Analysis{inputs['electrons']}_%SYS%",
         photons=f"Analysis{inputs['photons']}_%SYS%",
     )
+
+    if flags.Input.isMC:
+        outputs["truth4Jet"] = _get_container_name("Truth4Jets", is_daod_physlite)
     if inputs["reco10Jet"]:
         outputs["reco10Jet"] = f"Analysis{inputs['reco10Jet']}_%SYS%"
+        if flags.Input.isMC:
+            outputs["truth10Jet"] = _get_container_name("Truth10Jets", is_daod_physlite)
     else:
         outputs["reco10Jet"] = ""
     if inputs["vrJet"]:

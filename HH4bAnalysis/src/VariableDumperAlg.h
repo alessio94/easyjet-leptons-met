@@ -50,9 +50,6 @@ private:
     CP::SysListHandle m_systematicsList{this};
 
     // Member variables for configuration
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-        this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
-
     CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{
         this, "ElectronsKey", "AnalysisElectrons_%SYS%",
         "the electron collection to run on"};
