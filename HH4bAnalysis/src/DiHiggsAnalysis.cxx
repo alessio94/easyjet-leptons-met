@@ -283,8 +283,7 @@ namespace HH4B
     static const SG::AuxElement::ConstAccessor<
         std::vector<ElementLink<xAOD::IParticleContainer>>>
         m_acc_VRTrackJets("GhostAntiKtVR30Rmax4Rmin02PV0TrackJets");
-    // accessor for the btagging info on the jet, no static because forwarded
-    // to function
+    // accessor for the btagging info on the jet
     static const SG::AuxElement::ConstAccessor<char> isBtag("ftag_select_" +
                                                             wp);
     // recommended by ftag : Remove the event if any of your signal jets have

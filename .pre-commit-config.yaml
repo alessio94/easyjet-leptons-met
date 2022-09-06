@@ -16,13 +16,13 @@ repos:
   #       #   args: ["-enable=warning,portability", "--xml-version=2"]
 
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 22.8.0
     hooks:
       - id: black
-        args: ["--experimental-string-processing"]
+        args: ["--preview"]
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 5.0.4
     hooks:
       - id: flake8
         args: []
