@@ -58,7 +58,7 @@ EOF
 }
 
 DIRECTORY=""
-DATA_URL=https://gitlab.cern.ch/dguest/hh4b-test-files/-/raw/master/
+DATA_URL=https://gitlab.cern.ch/hub-zn-hep/hh4b-test-files/-/raw/master/
 
 while getopts ":d:h" o; do
     case "${o}" in
