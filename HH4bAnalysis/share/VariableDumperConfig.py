@@ -18,7 +18,7 @@ from AthenaConfiguration.AutoConfigFlags import GetFileMD
 from HH4bAnalysis.Config.Base import pileupConfigFiles, getRunYears
 from HH4bAnalysis.Config.AnalysisAlgsConfig import AnalysisAlgsCfg
 from HH4bAnalysis.Config.MiniTupleConfig import MiniTupleCfg
-from HH4bAnalysis.utils.inputsHelper import is_physlite
+from HH4bAnalysis.utils.inputsHelper import is_physlite, get_dataType
 from HH4bAnalysis.utils.logHelper import log
 
 
@@ -72,6 +72,14 @@ def defineArgs(ConfigFlags):
         help=(
             "Years used to define the trigger list. "
             "Default empty list will auto-configure from file metadata."
+        ),
+    )
+    parser.add_argument(
+        "--disable-trigger-filtering",
+        action="store_true",
+        help=(
+            "Disable trigger filtering (to get all events to pass). "
+            "Has no effect on data."
         ),
     )
     parser.add_argument(
@@ -184,16 +192,25 @@ def main():
 
         cfg.merge(xAODReadCfg(ConfigFlags))
 
+        dataType = get_dataType(ConfigFlags)
+
+        log.info(
+            f"Self-configured: dataType: '{dataType}', "
+            f"is PHYSLITE? {is_physlite(ConfigFlags)}"
+        )
+
+        self_configured_run_years = getRunYears(ConfigFlags, dataType)
+
         # Add our VariableDumper CA, calling the function defined above.
         from HH4bAnalysis.Config.TriggerLists import TriggerLists
 
         trigger_year_list = args.trigger_year
         if not trigger_year_list:
-            trigger_year_list = getRunYears(ConfigFlags)
-        log.info(
-            "Self-configured trigger list for years: "
-            f"{', '.join(str(year) for year in trigger_year_list) or None}"
-        )
+            trigger_year_list = self_configured_run_years
+            log.info(
+                "Self-configured trigger list for years: "
+                f"{', '.join(str(year) for year in trigger_year_list) or None}"
+            )
 
         trigger_chains = set()
         # Empty: set the HH4b analysis triggers
@@ -210,23 +227,29 @@ def main():
             raise err
 
         trigger_chains = list(trigger_chains)
+        if args.disable_trigger_filtering and dataType != "data":
+            log.warning("Disabling trigger filtering, all events will pass!")
+            trigger_chains.insert(0, "L1_RD0_FILLED")
 
         from HH4bAnalysis.Config.GoodRunsLists import GoodRunsLists
 
         grl_runs = GoodRunsLists.keys()
         grl_files = []
-        if not ConfigFlags.Input.isMC:
-            run_years = getRunYears(ConfigFlags)
+        if dataType == "data":
             log.info(
                 "Self-configured GRL for years: "
-                f"{', '.join(str(year) for year in run_years) or None}"
+                f"{', '.join(str(year) for year in self_configured_run_years) or None}"
             )
             grl_lists_by_year = {
                 year: list
                 for run in grl_runs
                 for year, list in GoodRunsLists[run].items()
             }
-            grl_files = [list for year in run_years for list in grl_lists_by_year[year]]
+            grl_files = [
+                list
+                for year in self_configured_run_years
+                for list in grl_lists_by_year[year]
+            ]
 
         do_muons = not args.meta_cache
 
@@ -234,15 +257,18 @@ def main():
         prw_files, lumicalc_files = [], []
         if do_PRW:
             try:
-                prw_files, lumicalc_files = pileupConfigFiles(ConfigFlags)
+                prw_files, lumicalc_files = pileupConfigFiles(ConfigFlags, dataType)
             except LookupError as err:
                 log.error(err)
                 do_PRW = False
+
+        log.info(f"Do PRW is {do_PRW}")
 
         cfg.addSequence(CompFactory.AthSequencer("HH4bSeq"), "AthAlgSeq")
         cfg.merge(
             AnalysisAlgsCfg(
                 ConfigFlags,
+                dataType,
                 btag_wps=args.btag_wps,
                 vr_btag_wps=args.vr_btag_wps,
                 disable_calib=args.disable_calib,

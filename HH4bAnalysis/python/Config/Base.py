@@ -53,11 +53,10 @@ def update_metadata(path):
             md.metAccessLevel = cached["level"]
 
 
-def pileupConfigFiles(flags):
+def pileupConfigFiles(flags, dataType):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
     dsid = flags.Input.MCChannelNumber
     tags = flags.Input.AMITag
-    simulation_flavor = flags.Input.SimulationFlavour
     # Figure out which MC we are using
     if SampleTypes.mc20a.value in tags:
         subcampaign = SampleTypes.mc20a
@@ -71,7 +70,7 @@ def pileupConfigFiles(flags):
         raise LookupError(f"Cannot determine subcampaign for DSID {dsid}")
 
     lumicalc_files = getLumicalcFiles(subcampaign)
-    prw_files = getPrwFiles(dsid, subcampaign, simulation_flavor)
+    prw_files = getPrwFiles(dsid, subcampaign, dataType)
 
     return prw_files, lumicalc_files
 
@@ -96,7 +95,7 @@ def getLumicalcFiles(subcampaign):
     return list.get(subcampaign, [])
 
 
-def getPrwFiles(dsid, subcampaign, simulation_flavor):
+def getPrwFiles(dsid, subcampaign, dataType):
     prw_files = []
     actual_mu = {
         SampleTypes.mc20d: [
@@ -109,7 +108,7 @@ def getPrwFiles(dsid, subcampaign, simulation_flavor):
 
     if dsid:
         dsid_as_str = str(dsid)
-        if simulation_flavor in ["", "FullG4", "FullG4_QS", "FullG4_Longlived"]:
+        if dataType == "mc":
             simulation_type = "FS"
         else:
             simulation_type = "AFII"
@@ -121,9 +120,9 @@ def getPrwFiles(dsid, subcampaign, simulation_flavor):
     return prw_files + actual_mu.get(subcampaign, [])
 
 
-def getRunYears(flags):
+def getRunYears(flags, dataType):
     years = []
-    if flags.Input.isMC:
+    if dataType != "data":
         # use rtag for figuring out year in MC
         tags = flags.Input.AMITag
         for mc_campaign in MCSampleYears:

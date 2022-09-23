@@ -27,6 +27,7 @@ from HH4bAnalysis.utils.logHelper import log
 # so we will need to add a new sequence to the CA
 def AnalysisAlgsCfg(
     flags,
+    dataType,
     btag_wps,
     vr_btag_wps,
     disable_calib=False,
@@ -42,11 +43,8 @@ def AnalysisAlgsCfg(
 ):
     if metadata_cache:
         update_metadata(metadata_cache)
-    dataType = "mc" if flags.Input.isMC else "data"
+
     is_daod_physlite = is_physlite(flags)
-    log.info(
-        f"Self-configured: dataType: '{dataType}', is PHYSLITE? {is_daod_physlite}"
-    )
 
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
 
@@ -73,29 +71,11 @@ def AnalysisAlgsCfg(
         )
     )
 
-    log.info(
-        f"Do PRW is {do_PRW}. {'Add' if do_PRW else 'Skip'} pileup re-weight sequence"
-    )
-    if do_PRW:
-        # Adds variable to EventInfo if for pileup weight, for example:
-        # EventInfo.PileWeight_%SYS$
-        cfg.merge(
-            PileupAnalysisSequenceCfg(
-                flags,
-                dataType=dataType,
-                prwFiles=prw_files,
-                lumicalcFiles=lumicalc_files,
-            )
-        )
     containers = get_container_names(flags, disable_calib)
 
     if not disable_calib:
-
-        log.info(
-            f"Do PRW is {do_PRW}. "
-            f"{'Add' if do_PRW else 'Skip'} pileup re-weight sequence"
-        )
         if do_PRW:
+            log.info("Adding PRW sequence")
             # Adds variable to EventInfo if for pileup weight, for example:
             # EventInfo.PileWeight_%SYS$
             cfg.merge(
@@ -106,13 +86,12 @@ def AnalysisAlgsCfg(
                     lumicalcFiles=lumicalc_files,
                 )
             )
-
             log.info("Adding generator analysis sequence")
             # Adds variable to EventInfo if for generator weight, for example:
             # EventInfo.generatorWeight_%SYS%
             cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType))
 
-        log.info("Add electron seq")
+        log.info("Adding electron seq")
         cfg.merge(
             ElectronAnalysisSequenceCfg(
                 flags,
@@ -122,7 +101,7 @@ def AnalysisAlgsCfg(
             )
         )
 
-        log.info("Add photon seq")
+        log.info("Adding photon seq")
         cfg.merge(
             PhotonAnalysisSequenceCfg(
                 flags,
@@ -133,7 +112,7 @@ def AnalysisAlgsCfg(
         )
 
         if do_muons:
-            log.info("Add muon seq")
+            log.info("Adding muon seq")
             cfg.merge(
                 MuonAnalysisSequenceCfg(
                     flags,
@@ -143,7 +122,7 @@ def AnalysisAlgsCfg(
                 )
             )
 
-        log.info("Add jet seq")
+        log.info("Adding small-R jet seq")
         cfg.merge(
             JetAnalysisSequenceCfg(
                 flags,
@@ -158,7 +137,7 @@ def AnalysisAlgsCfg(
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip large-R jet sequence for now")
         else:
-            log.info("Add large-R jet seq")
+            log.info("Adding large-R jet seq")
             cfg.merge(
                 FatJetAnalysisSequenceCfg(
                     flags,
@@ -171,7 +150,7 @@ def AnalysisAlgsCfg(
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip VR jet sequence for now")
         else:
-            log.info("Add VR jet seq")
+            log.info("Adding VR jet seq")
             cfg.merge(
                 VRJetAnalysisSequenceCfg(
                     flags,
@@ -186,7 +165,7 @@ def AnalysisAlgsCfg(
     # Begin postprocessing
     ########################################################################
 
-    log.info("Add Overlap Removal sequence")
+    log.info("Adding Overlap Removal sequence")
     overlapInputNames = {
         "electrons": containers["outputs"]["electrons"],
         "photons": containers["outputs"]["photons"],
