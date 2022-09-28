@@ -18,6 +18,7 @@ atlas_add_library(HH4bAnalysisLib
 atlas_add_component(HH4bAnalysis
   src/VariableDumperAlg.cxx
   src/DiHiggsAnalysis.cxx
+  src/DiHiggsAnalysisHelpers.cxx
   src/DiHiggsAnalysisAlg.cxx
   src/tools/NTrkVertexCounter.cxx
   src/components/*.cxx

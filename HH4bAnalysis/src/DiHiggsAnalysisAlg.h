@@ -55,6 +55,8 @@ private:
     SG::ReadHandleKey<xAOD::JetContainer> m_LargeJetKey{
         this, "LargeJetKey", "", "the large-R jet collection to run on"};
 
+    // if we have MC
+    bool m_isMC;
     // whether the algorithm should do one of the following analyses
     bool m_doResolvedAnalysis;
     bool m_doBoostedAnalysis;

@@ -1,9 +1,13 @@
 
 #include "DiHiggsAnalysis.h"
 #include "AthenaBaseComps/AthCommonMsg.h"
+#include "DiHiggsAnalysisHelpers.h"
 #include "Math/GenVector/VectorUtil.h"
+#include "xAODTruth/TruthParticleContainer.h"
 #include <AsgMessaging/MessageCheck.h>
 #include <AthContainers/ConstDataVector.h>
+#include <SystematicsHandles/SysReadHandle.h>
+
 // for ANA_MSG_BLAH
 using namespace asg::msgUserCode;
 
@@ -13,43 +17,67 @@ namespace HH4B
   getHiggsVarsNames(std::vector<std::string> &btag_wps,
                     std::vector<std::string> &vr_btag_wps)
   {
+    // clang-format off
+    std::vector<std::string> resolvedVars =
+    {
+      "resolved_nCentralJets_",
+      "resolved_nBtaggedCentralJets_",
+      "resolved_jet1_pt_",
+      "resolved_jet2_pt_",
+      "resolved_jet3_pt_",
+      "resolved_jet4_pt_",
+      "resolved_DeltaR12_",
+      "resolved_DeltaR13_",
+      "resolved_DeltaR14_",
+      "resolved_DeltaR23_",
+      "resolved_DeltaR24_",
+      "resolved_DeltaR34_",
+      "resolved_h1_m_",
+      "resolved_h2_m_",
+      "resolved_h1_dR_jets_",
+      "resolved_h2_dR_jets_",
+      "resolved_hh_m_",
+      "resolved_h1_fromSameInitialParticle_",
+      "resolved_h2_fromSameInitialParticle_",
+      "resolved_h1_dR_leadingJet_closestB_",
+      "resolved_h2_dR_leadingJet_closestB_",
+      "resolved_h1_dR_subleadingJet_closestB_",
+      "resolved_h2_dR_subleadingJet_closestB_",
+    };
+    std::vector<std::string> boostedVars =
+    {
+      "boosted_nLargeJets_",
+      "boosted_h1_m_",
+      "boosted_h1_jet1_pt_",
+      "boosted_h1_jet2_pt_",
+      "boosted_h1_dR_jets_",
+      "boosted_h2_m_",
+      "boosted_h2_jet1_pt_",
+      "boosted_h2_jet2_pt_",
+      "boosted_h2_dR_jets_",
+      "boosted_hh_m_",
+      "boosted_h1_nGhostAssocVrJets_",
+      "boosted_h1_nBtaggedGhostAssocVrTrackJets_",
+      "boosted_h2_nGhostAssocVrJets_",
+      "boosted_h2_nBtaggedGhostAssocVrTrackJets_",
+    }; // clang-format on
+
+    // attach btagging working points to vars
     std::vector<std::string> vars;
-    for (std::string wp : btag_wps)
+
+    for (std::string var : resolvedVars)
     {
-      vars.push_back("resolved_nCentralJets_" + wp);
-      vars.push_back("resolved_nBtaggedCentralJets_" + wp);
-      vars.push_back("resolved_jet1_pt_" + wp);
-      vars.push_back("resolved_jet2_pt_" + wp);
-      vars.push_back("resolved_jet3_pt_" + wp);
-      vars.push_back("resolved_jet4_pt_" + wp);
-      vars.push_back("resolved_DeltaR12_" + wp);
-      vars.push_back("resolved_DeltaR13_" + wp);
-      vars.push_back("resolved_DeltaR14_" + wp);
-      vars.push_back("resolved_DeltaR23_" + wp);
-      vars.push_back("resolved_DeltaR24_" + wp);
-      vars.push_back("resolved_DeltaR34_" + wp);
-      vars.push_back("resolved_h1_m_" + wp);
-      vars.push_back("resolved_h2_m_" + wp);
-      vars.push_back("resolved_h1_dR_jets_" + wp);
-      vars.push_back("resolved_h2_dR_jets_" + wp);
-      vars.push_back("resolved_hh_m_" + wp);
+      for (std::string wp : btag_wps)
+      {
+        vars.push_back(var + wp);
+      }
     }
-    for (std::string wp : vr_btag_wps)
+    for (std::string var : boostedVars)
     {
-      vars.push_back("boosted_nLargeJets_" + wp);
-      vars.push_back("boosted_h1_m_" + wp);
-      vars.push_back("boosted_h1_jet1_pt_" + wp);
-      vars.push_back("boosted_h1_jet2_pt_" + wp);
-      vars.push_back("boosted_h1_dR_jets_" + wp);
-      vars.push_back("boosted_h2_m_" + wp);
-      vars.push_back("boosted_h2_jet1_pt_" + wp);
-      vars.push_back("boosted_h2_jet2_pt_" + wp);
-      vars.push_back("boosted_h2_dR_jets_" + wp);
-      vars.push_back("boosted_hh_m_" + wp);
-      vars.push_back("boosted_h1_nGhostAssocVrJets_" + wp);
-      vars.push_back("boosted_h1_nBtaggedGhostAssocVrTrackJets_" + wp);
-      vars.push_back("boosted_h2_nGhostAssocVrJets_" + wp);
-      vars.push_back("boosted_h2_nBtaggedGhostAssocVrTrackJets_" + wp);
+      for (std::string wp : vr_btag_wps)
+      {
+        vars.push_back(var + wp);
+      }
     }
     return vars;
   }
@@ -66,7 +94,7 @@ namespace HH4B
 
   void
   DiHiggsAnalysis::makeResolvedAnalysis(const xAOD::JetContainer &smallRjets,
-                                        std::string wp)
+                                        std::string wp, bool isMC)
   {
     // leadding higgs candidate
     HiggsCandidate h1;
@@ -78,8 +106,20 @@ namespace HH4B
     // accessor for the btagging info on the jet
     static const SG::AuxElement::ConstAccessor<char> isBtag("ftag_select_" +
                                                             wp);
+    // use some truth info if we have MC
+    ConstDataVector<xAOD::TruthParticleContainer> truthInitialParticles(
+        SG::VIEW_ELEMENTS);
+    static const SG::AuxElement::Decorator<std::vector<float>> dRtoTruthBs_dec(
+        "dRtoTruthBs");
+    std::vector<const xAOD::TruthParticle *> truthBs;
+    if (isMC)
+    {
+      truthBs = getTruthBs();
+    }
+
     // remove non-btagged jets of designated wp
-    // (fancy std::remove_if from boosted analysis only works with std::vector)
+    // (fancy std::remove_if from boosted analysis only works with
+    // std::vector)
     bool isCentral;
     int nCentralJets = 0;
     int nBtaggedCentralJets = 0;
@@ -92,12 +132,29 @@ namespace HH4B
         nCentralJets += 1;
         isCentral = true;
       }
+
+      // get deltaR's to truth b's from initial process
+      if (isMC)
+      {
+        std::vector<float> dRtoTruthBs;
+        for (const xAOD::TruthParticle *tp : truthBs)
+        {
+          // get deltaR to reco jet from each truth b
+          float dR =
+              ROOT::Math::VectorUtil::DeltaR(tp->genvecP4(), jet->jetP4());
+          dRtoTruthBs.push_back(dR);
+        }
+        // decorate jet
+        dRtoTruthBs_dec(*jet) = dRtoTruthBs;
+      }
+
       // the ftag sequence does not tag all of them
       if (!isBtag.isAvailable(*jet))
       {
         ANA_MSG_DEBUG("Skipped non B-tagged jet");
         continue;
       }
+
       // keep only btagged jets with a designated wp
       if (isBtag(*jet))
       {
@@ -108,7 +165,8 @@ namespace HH4B
           nBtaggedCentralJets += 1;
         }
       }
-    }
+
+    } // end of 0.4 jet loop
 
     // write out counts
     m_higgsVarsMap["resolved_nCentralJets_" + wp] = nCentralJets;
@@ -198,6 +256,40 @@ namespace HH4B
     h2.m_dRjets = ROOT::Math::VectorUtil::DeltaR(h2.m_leadingJet->jetP4(),
                                                  h2.m_subleadingJet->jetP4());
 
+    // find here if leading and subleading fit the truths and come from same
+    // higgs
+    if (isMC)
+    {
+      // h1
+      m_higgsVarsMap["resolved_h1_fromSameInitialParticle_" + wp] = 0.;
+      h1.m_leadingJetClosestB = getClosestB(h1.m_leadingJet, truthBs);
+      h1.m_subleadingJetClosestB = getClosestB(h1.m_subleadingJet, truthBs);
+      // check if jets come from same initial particle
+      if (h1.m_leadingJetClosestB.particle->parent()->barcode() ==
+          h1.m_subleadingJetClosestB.particle->parent()->barcode())
+      {
+        m_higgsVarsMap["resolved_h1_fromSameInitialParticle_" + wp] = 1.;
+      }
+      // h2
+      m_higgsVarsMap["resolved_h2_fromSameInitialParticle_" + wp] = 0.;
+      h2.m_leadingJetClosestB = getClosestB(h2.m_leadingJet, truthBs);
+      h2.m_subleadingJetClosestB = getClosestB(h2.m_subleadingJet, truthBs);
+      // check if jets come from same initial particle
+      if (h2.m_leadingJetClosestB.particle->parent()->barcode() ==
+          h2.m_subleadingJetClosestB.particle->parent()->barcode())
+      {
+        m_higgsVarsMap["resolved_h2_fromSameInitialParticle_" + wp] = 1.;
+      }
+
+      // decorate dR's
+      // clang-format off
+      m_higgsVarsMap["resolved_h1_dR_leadingJet_closestB_" + wp] = h1.m_leadingJetClosestB.dR;
+      m_higgsVarsMap["resolved_h2_dR_leadingJet_closestB_" + wp] = h1.m_subleadingJetClosestB.dR;
+      m_higgsVarsMap["resolved_h1_dR_subleadingJet_closestB_" + wp] = h2.m_leadingJetClosestB.dR;
+      m_higgsVarsMap["resolved_h2_dR_subleadingJet_closestB_" + wp] = h2.m_subleadingJetClosestB.dR;
+      // clang-format on
+    }
+
     // write to map
     // clang-format off
     m_higgsVarsMap["resolved_jet1_pt_" + wp] = ptSortedBtaggedJets[0]->pt();
@@ -216,12 +308,13 @@ namespace HH4B
     m_higgsVarsMap["resolved_h2_dR_jets_" + wp] = h2.m_dRjets;
     m_higgsVarsMap["resolved_hh_m_" + wp] = (h1.m_fourVector + h2.m_fourVector).M();
     // clang-format on
+
     return;
   };
 
   void
   DiHiggsAnalysis::makeBoostedAnalysis(const xAOD::JetContainer &largeRjets,
-                                       std::string wp)
+                                       std::string wp, bool isMC)
   {
     // count large jets with some requirements
     int nLargeJets = 0;
@@ -257,9 +350,9 @@ namespace HH4B
 
     // cuts from
     // https://cds.cern.ch/record/2708599/files/ATL-COM-PHYS-2020-083.pdf
-    // don't use "or" here as the || operator is short-circuited in c++, which
-    // means in the OR checking case it stops checking conditions once one
-    // becomes true
+    // don't use "or" here as the || operator is short-circuited in c++,
+    // which means in the OR checking case it stops checking conditions once
+    // one becomes true
     if (ptSortedLargeRJets[0]->pt() < 250000. || //
         ptSortedLargeRJets[1]->pt() < 250000. || //
         std::abs(ptSortedLargeRJets[0]->eta()) > 2.0 ||
