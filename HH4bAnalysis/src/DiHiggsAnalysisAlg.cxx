@@ -6,6 +6,7 @@
 
 #include "DiHiggsAnalysisAlg.h"
 #include "DiHiggsAnalysis.h"
+#include "xAODTruth/TruthParticleContainer.h"
 
 namespace HH4B
 {
@@ -17,6 +18,7 @@ namespace HH4B
     declareProperty("doBoostedAnalysis", m_doBoostedAnalysis);
     declareProperty("btag_wps", m_btag_wps);
     declareProperty("vr_btag_wps", m_vr_btag_wps);
+    declareProperty("isMC", m_isMC);
   }
 
   StatusCode DiHiggsAnalysisAlg ::initialize()
@@ -28,8 +30,8 @@ namespace HH4B
     m_higgsVars = getHiggsVarsNames(m_btag_wps, m_vr_btag_wps);
     for (std::string var : m_higgsVars)
     {
-      SG::AuxElement::Decorator<float> HiggsVars_dec(var);
-      m_diHiggs_decos.emplace(var, HiggsVars_dec);
+      SG::AuxElement::Decorator<float> HiggsVar_dec(var);
+      m_diHiggs_decos.emplace(var, HiggsVar_dec);
     };
 
     ATH_CHECK(m_EventInfoKey.initialize());
@@ -61,14 +63,14 @@ namespace HH4B
     {
       for (std::string wp : m_btag_wps)
       {
-        hh4b_analysis.makeResolvedAnalysis(*antiKt4RecoJets, wp);
+        hh4b_analysis.makeResolvedAnalysis(*antiKt4RecoJets, wp, m_isMC);
       }
     }
     if (m_doBoostedAnalysis)
     {
       for (std::string wp : m_vr_btag_wps)
       {
-        hh4b_analysis.makeBoostedAnalysis(*antiKt10RecoJets, wp);
+        hh4b_analysis.makeBoostedAnalysis(*antiKt10RecoJets, wp, m_isMC);
       }
     }
 
@@ -78,8 +80,8 @@ namespace HH4B
     // loop over decorators
     for (const auto &[var, value] : higgsVarsMap)
     {
-      SG::AuxElement::Decorator<float> HiggsVars_dec = m_diHiggs_decos.at(var);
-      HiggsVars_dec(*eventInfo) = value;
+      SG::AuxElement::Decorator<float> HiggsVar_dec = m_diHiggs_decos.at(var);
+      HiggsVar_dec(*eventInfo) = value;
     };
 
     return StatusCode::SUCCESS;

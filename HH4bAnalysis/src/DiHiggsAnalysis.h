@@ -2,6 +2,8 @@
 #define HH4B_DIHIGGSANALYSIS
 
 #include "xAODJet/JetContainer.h"
+#include "xAODTruth/TruthParticleContainer.h"
+#include <AthContainers/ConstDataVector.h>
 #include <Math/Vector4D.h>
 #include <xAODEventInfo/EventInfo.h>
 
@@ -13,6 +15,11 @@ namespace HH4B
   getHiggsVarsNames(std::vector<std::string> &btag_wps,
                     std::vector<std::string> &vr_btag_wps);
 
+  struct closestB
+  {
+    const xAOD::TruthParticle *particle;
+    float dR;
+  };
   struct HiggsCandidate
   {
     // b-jets for Higgs candidate
@@ -31,19 +38,25 @@ namespace HH4B
     int m_nBtaggedGhostAssocVrJets = -1;
     // don't decorate if requirements are not met
     bool m_doDecorate = true;
+
+    // for truth studies if we have MC
+    closestB m_leadingJetClosestB;
+    closestB m_subleadingJetClosestB;
+
+    bool m_fromSameInitialParticle = false;
   };
 
   class DiHiggsAnalysis
   {
 public:
-    // initialize vars in m_higgsVarsMap
+    // initialize vars m_higgsVarsMap with default values
     void initHiggsVarsMap(std::vector<std::string> &higgsVars);
     // do resolved Analysis
     void makeResolvedAnalysis(const xAOD::JetContainer &smallRjets,
-                              std::string wp);
+                              std::string wp, bool isMC);
     // do boosted Analysis
     void makeBoostedAnalysis(const xAOD::JetContainer &largeRjets,
-                             std::string wp);
+                             std::string wp, bool isMC);
     // returns m_higgsVarsMap for other purposes
     std::unordered_map<std::string, float> getHiggsVarsMap();
     // map holding the final vars (like dict in python)

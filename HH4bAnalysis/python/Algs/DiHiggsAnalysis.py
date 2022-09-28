@@ -1,6 +1,8 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+# from HH4bAnalysis.utils.containerNameHelper import get_container_names
+
 
 def DiHiggsAnalysisAlgCfg(
     flags,
@@ -20,6 +22,7 @@ def DiHiggsAnalysisAlgCfg(
             doBoostedAnalysis=flags.do_boosted_analysis,
             btag_wps=btag_wps,
             vr_btag_wps=vr_btag_wps,
+            isMC=flags.Input.isMC,
         )
     )
 
@@ -27,9 +30,14 @@ def DiHiggsAnalysisAlgCfg(
 
 
 def DiHiggsAnalysisAddBranches(flags, working_points):
-
     analysisTreeBranches = []
 
+    # we will do this once the config is merged in
+    # containers = get_container_names(flags, disable_calib)["outputs"]
+    if flags.Input.isMC:
+        analysisTreeBranches += [
+            "AnalysisAntiKt4EMPFlowJets_%SYS%.dRtoTruthBs -> dRtoTruthBs_%SYS%"
+        ]
     if flags.do_resolved_analysis:
         resolvedVars = [
             "nCentralJets",
@@ -50,11 +58,21 @@ def DiHiggsAnalysisAddBranches(flags, working_points):
             "h2_dR_jets",
             "hh_m",
         ]
-        for btag_wp in working_points["ak4"]:
-            for var in resolvedVars:
-                analysisTreeBranches += [
-                    f"EventInfo.resolved_{var}_{btag_wp}   -> resolved_{btag_wp}_{var}"
-                ]
+    if flags.Input.isMC:
+        resolvedVars += [
+            "h1_fromSameInitialParticle",
+            "h2_fromSameInitialParticle",
+            "h1_dR_leadingJet_closestB",
+            "h2_dR_leadingJet_closestB",
+            "h1_dR_subleadingJet_closestB",
+            "h2_dR_subleadingJet_closestB",
+        ]
+
+    for btag_wp in working_points["ak4"]:
+        for var in resolvedVars:
+            analysisTreeBranches += [
+                f"EventInfo.resolved_{var}_{btag_wp}   -> resolved_{btag_wp}_{var}"
+            ]
 
     if flags.do_boosted_analysis:
         boostedVars = [
