@@ -8,15 +8,46 @@ set -Eeu
 ################################################
 
 # standard samples
-PHYS_TTBAR=ttbar.410470.PHYS.e6337_s3681_r13167_p5169.pool.root
+DATA_2018=data18_13TeV.00362204.physics_Main.DAOD_PHYS_10evts.r13286_p4910_p5057.pool.root
+DATA_2022=data22_13p6TeV.00430648.physics_Main.DAOD_PHYS_10evts.r13928_p5267.pool.root
+PHYS_JETS=mc20_13TeV.364704.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ4WithSW.DAOD_PHYS_10evts.e7142_s3681_r13145_p5057.pool.root
+PHYS_TTBAR_MC20=mc20_13TeV.410471.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e6337_s3681_r13145_p5057.pool.root
+PHYS_SH4B_BOOSTED=mc20_13TeV.801619.Py8EG_A14NNPDF23LO_XHS_X2000_S400_4b.DAOD_PHYS_10evts.e8448_s3681_r13167_p5057.pool.root
+PHYSLITE_SH4B_VERY_BOOSTED=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a899_r13145_p5057.pool.root
+PHYS_TTBAR_MC21=mc21_13p6TeV.601237.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e8453_s3873_r13829_p5278.pool.root
+
 declare -A DATAFILES=(
-    [ntuple-fast]=${PHYS_TTBAR}
-    [ntuple]=${PHYS_TTBAR}
+    [data18-fast]=${DATA_2018}
+    [data18]=${DATA_2018}
+    [data22-fast]=${DATA_2022}
+    [data22]=${DATA_2022}
+    [jets-mc20-fast]=${PHYS_JETS}
+    [jets-mc20]=${PHYS_JETS}
+    [ttbar-mc20-fast]=${PHYS_TTBAR_MC20}
+    [ttbar-mc20]=${PHYS_TTBAR_MC20}
+    [sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED}
+    [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED}
+    [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
+    [ttbar-mc21]=${PHYS_TTBAR_MC21}
+    [physlite-sh4b-very-boosted-mc20-fast]=${PHYSLITE_SH4B_VERY_BOOSTED}
+    [physlite-sh4b-very-boosted-mc20]=${PHYSLITE_SH4B_VERY_BOOSTED}
 )
 
 declare -A TESTS=(
-    [ntuple-fast]=ntuple-dump-fast
-    [ntuple]=ntuple-dump
+    [data18-fast]=ntuple-dump-fast
+    [data18]=ntuple-dump
+    [data22-fast]=ntuple-dump-fast
+    [data22]=ntuple-dump
+    [jets-mc20-fast]=ntuple-dump-fast
+    [jets-mc20]=ntuple-dump
+    [ttbar-mc20-fast]=ntuple-dump-fast
+    [ttbar-mc20]=ntuple-dump
+    [sh4b-boosted-mc20-fast]=ntuple-dump-fast
+    [sh4b-boosted-mc20]=ntuple-dump
+    [ttbar-mc21-fast]=ntuple-dump-fast
+    [ttbar-mc21]=ntuple-dump
+    [physlite-sh4b-very-boosted-mc20-fast]=ntuple-dump-physlite
+    [physlite-sh4b-very-boosted-mc20]=ntuple-dump-physlite
 )
 
 ntuple-dump() {
@@ -24,6 +55,12 @@ ntuple-dump() {
 }
 ntuple-dump-fast() {
     VariableDumperConfig.py -oc --filesInput $1 --trigger-list HH4bResolved HH4bBoosted
+}
+ntuple-dump-physlite() {
+    VariableDumperConfig.py -o --filesInput $1 --trigger-list HH4bResolved HH4bBoosted --disable-calib
+}
+ntuple-dump-physlite-fast() {
+    VariableDumperConfig.py -oc --filesInput $1 --trigger-list HH4bResolved HH4bBoosted --disable-calib
 }
 
 ################################################
