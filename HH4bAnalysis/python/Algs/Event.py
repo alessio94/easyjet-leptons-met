@@ -83,7 +83,9 @@ def GeneratorAnalysisSequenceCfg(flags, dataType):
 
     generatorSequence = makeGeneratorAnalysisSequence(
         dataType,
+        saveCutBookkeepers=True,
         runNumber=flags.Input.RunNumber[0],
+        cutBookkeepersSystematics=True,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(generatorSequence.getName()))
