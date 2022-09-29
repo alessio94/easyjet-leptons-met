@@ -70,7 +70,7 @@ namespace HH4B
     {
       for (std::string wp : m_vr_btag_wps)
       {
-        hh4b_analysis.makeBoostedAnalysis(*antiKt10RecoJets, wp, m_isMC);
+        hh4b_analysis.makeBoostedAnalysis(*antiKt10RecoJets, wp);
       }
     }
 

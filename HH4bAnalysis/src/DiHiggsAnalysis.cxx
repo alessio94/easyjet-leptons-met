@@ -115,6 +115,11 @@ namespace HH4B
     if (isMC)
     {
       truthBs = getTruthBs();
+      // fix for now if there are now b's
+      if (truthBs.size() < 1)
+      {
+        isMC = false;
+      }
     }
 
     // remove non-btagged jets of designated wp
@@ -132,8 +137,9 @@ namespace HH4B
         nCentralJets += 1;
         isCentral = true;
       }
-
       // get deltaR's to truth b's from initial process
+      // set default value
+      dRtoTruthBs_dec(*jet) = std::vector<float>{-1};
       if (isMC)
       {
         std::vector<float> dRtoTruthBs;
@@ -314,7 +320,7 @@ namespace HH4B
 
   void
   DiHiggsAnalysis::makeBoostedAnalysis(const xAOD::JetContainer &largeRjets,
-                                       std::string wp, bool isMC)
+                                       std::string wp)
   {
     // count large jets with some requirements
     int nLargeJets = 0;

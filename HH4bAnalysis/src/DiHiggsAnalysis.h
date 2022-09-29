@@ -56,7 +56,7 @@ public:
                               std::string wp, bool isMC);
     // do boosted Analysis
     void makeBoostedAnalysis(const xAOD::JetContainer &largeRjets,
-                             std::string wp, bool isMC);
+                             std::string wp);
     // returns m_higgsVarsMap for other purposes
     std::unordered_map<std::string, float> getHiggsVarsMap();
     // map holding the final vars (like dict in python)
