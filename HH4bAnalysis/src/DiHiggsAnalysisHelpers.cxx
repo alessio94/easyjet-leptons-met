@@ -9,7 +9,8 @@ namespace HH4B
   {
     SG::ReadHandle<xAOD::TruthParticleContainer> truthBosons(
         "TruthBosonsWithDecayParticles");
-    SG::ReadHandle<xAOD::TruthParticleContainer> truthBSM("TruthBSM");
+    SG::ReadHandle<xAOD::TruthParticleContainer> truthBSM(
+        "TruthBSMWithDecayParticles");
     // collect Higgs and Scalars
     ConstDataVector<xAOD::TruthParticleContainer> truthInitialParticles(
         SG::VIEW_ELEMENTS);
