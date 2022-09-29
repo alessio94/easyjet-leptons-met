@@ -1,12 +1,84 @@
 
-run_VariableDumper_DAOD_PHYS:
+run_VariableDumper_data18_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test ntuple
+    - hh4b-test data18
 
-run_VariableDumper_fast_DAOD_PHYS:
+run_VariableDumper_fast_data18_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test ntuple-fast
+    - hh4b-test data18-fast
+
+run_VariableDumper_data22_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test data22
+
+run_VariableDumper_fast_data22_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test data22-fast
+
+run_VariableDumper_jets-mc20_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test jets-mc20
+
+run_VariableDumper_fast_jets-mc20_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test jets-mc20-fast
+
+run_VariableDumper_ttbar-mc20_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test ttbar-mc20
+
+run_VariableDumper_fast_ttbar-mc20_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test ttbar-mc20-fast
+
+run_VariableDumper_sh4b-boosted-mc20_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test sh4b-boosted-mc20
+
+run_VariableDumper_fast_sh4b-boosted-mc20_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test sh4b-boosted-mc20-fast
+
+run_VariableDumper_ttbar-mc21_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test ttbar-mc21
+
+run_VariableDumper_fast_ttbar-mc21_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test ttbar-mc21-fast
+
+run_VariableDumper_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test physlite-sh4b-very-boosted-mc20
+
+run_VariableDumper_fast_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test physlite-sh4b-very-boosted-mc20-fast

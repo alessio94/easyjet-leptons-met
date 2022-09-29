@@ -90,7 +90,6 @@ def MiniTupleCfg(
         analysisTreeBranches += getFourMomBranches(cont, alias)
         analysisTreeBranches += getFourMomBranches(cont, alias, doOR=True)
 
-    # truths
     if flags.Input.isMC:
         analysisTreeBranches += [
             (
@@ -101,6 +100,13 @@ def MiniTupleCfg(
                 f"{containers['reco4Jet']}_OR.HadronConeExclTruthLabelID ->"
                 " recojet_antikt4_OR_%SYS%_HadronConeExclTruthLabelID"
             ),
+        ]
+
+    if flags.Input.isMC and not is_daod_physlite:
+        analysisTreeBranches += getFourMomBranches(
+            containers["truth4Jet"], "truthjet_antikt4", noSystematics=True
+        )
+        analysisTreeBranches += [
             (
                 f"{containers['truth4Jet']}.PartonTruthLabelID ->"
                 " truthjet_antikt4_PartonTruthLabelID"
@@ -110,9 +116,6 @@ def MiniTupleCfg(
                 " truthjet_antikt4_HadronConeExclTruthLabelID"
             ),
         ]
-        analysisTreeBranches += getFourMomBranches(
-            containers["truth4Jet"], "truthjet_antikt4", noSystematics=True
-        )
 
     if not is_daod_physlite:
         reco10JetVars = [
