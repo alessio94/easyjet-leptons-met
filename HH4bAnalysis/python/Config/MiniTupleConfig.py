@@ -84,7 +84,7 @@ def MiniTupleCfg(
         containers["reco4Jet"]: "recojet_antikt4",
     }
     if do_muons:
-        containers["muons"] = "mu"
+        objectpairs[containers["muons"]] = "mu"
 
     for cont, alias in objectpairs.items():
         analysisTreeBranches += getFourMomBranches(cont, alias)
@@ -102,7 +102,7 @@ def MiniTupleCfg(
             ),
         ]
 
-    if flags.Input.isMC and not is_daod_physlite:
+    if flags.Input.isMC:
         analysisTreeBranches += getFourMomBranches(
             containers["truth4Jet"], "truthjet_antikt4", noSystematics=True
         )

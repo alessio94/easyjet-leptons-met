@@ -43,7 +43,9 @@ def get_container_names(flags, nocalib=False):
     is_daod_physlite = is_physlite(flags)
     inputs = dict(
         reco4Jet=_get_container_name("Reco4PFlowJets", is_daod_physlite),
+        truth4Jet=_get_container_name("Truth4Jets", is_daod_physlite),
         reco10Jet=_get_container_name("Reco10PFlowJets", is_daod_physlite),
+        truth10Jet=_get_container_name("Truth10Jets", is_daod_physlite),
         vrJet=_get_container_name("VRJets", is_daod_physlite),
         muons=_get_container_name("Muons", is_daod_physlite),
         electrons=_get_container_name("Electrons", is_daod_physlite),
@@ -55,21 +57,18 @@ def get_container_names(flags, nocalib=False):
 
     outputs = dict(
         reco4Jet=f"Analysis{inputs['reco4Jet']}_%SYS%",
+        truth4Jet=inputs["truth4Jet"],
+        truth10Jet=inputs["truth10Jet"],
         muons=f"Analysis{inputs['muons']}_%SYS%",
         electrons=f"Analysis{inputs['electrons']}_%SYS%",
         photons=f"Analysis{inputs['photons']}_%SYS%",
     )
 
-    if flags.Input.isMC:
-        outputs["truth4Jet"] = _get_container_name("Truth4Jets", is_daod_physlite)
-    if inputs["reco10Jet"]:
+    if not is_daod_physlite:
         outputs["reco10Jet"] = f"Analysis{inputs['reco10Jet']}_%SYS%"
-        if flags.Input.isMC:
-            outputs["truth10Jet"] = _get_container_name("Truth10Jets", is_daod_physlite)
-    else:
-        outputs["reco10Jet"] = ""
-    if inputs["vrJet"]:
         outputs["vrJet"] = f"Analysis{inputs['vrJet']}_%SYS%"
     else:
+        outputs["reco10Jet"] = ""
         outputs["vrJet"] = ""
+
     return {"inputs": inputs, "outputs": outputs}
