@@ -46,7 +46,7 @@ declare -A TESTS=(
     [sh4b-boosted-mc20]=ntuple-dump
     [ttbar-mc21-fast]=ntuple-dump-fast
     [ttbar-mc21]=ntuple-dump
-    [physlite-sh4b-very-boosted-mc20-fast]=ntuple-dump-physlite
+    [physlite-sh4b-very-boosted-mc20-fast]=ntuple-dump-physlite-fast
     [physlite-sh4b-very-boosted-mc20]=ntuple-dump-physlite
 )
 
