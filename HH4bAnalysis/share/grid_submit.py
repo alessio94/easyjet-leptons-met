@@ -1,8 +1,8 @@
 #!/bin/env python
 
-import os
 import argparse
 import datetime
+import os
 import subprocess
 
 
@@ -10,6 +10,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mc-list", help="Text file containing MC datasets")
     parser.add_argument("--data-list", help="Text file containing data datasets")
+    parser.add_argument(
+        "--runConfig",
+        type=str,
+        required=True,
+        help="file path to the runConfig",
+    )
     parser.add_argument(
         "--campaign",
         default="HH4b.%Y_%m_%d",
@@ -71,6 +77,9 @@ def main():
             "Could not find proxy information."
             + ' Try typing "voms-proxy-init -voms atlas" and try again',
         )
+
+    # copy the runconfig to the submit dir to be available for the exec cmd
+    subprocess.run(["cp", args.runConfig, "config.yaml"])
 
     proc = subprocess.Popen(
         [
@@ -139,12 +148,14 @@ def main():
         raise ValueError("No inputs defined")
 
     for io in io_list:
-        exec_cmd = "VariableDumperConfig.py --filesInput %IN --outFile {0}".format(
-            submit_opts["outputs"].removeprefix("TREE:")
+        exec_cmd = (
+            "VariableDumperConfig.py --filesInput %IN --outFile {0} --runConfig"
+            " config.yaml".format(submit_opts["outputs"].removeprefix("TREE:"))
         )
         if args.mc_list:
-            exec_cmd = "VariableDumperConfig.py --filesInput %IN --outFile {0}".format(
-                submit_opts["outputs"].removeprefix("TREE:")
+            exec_cmd = (
+                "VariableDumperConfig.py --filesInput %IN --outFile {0} --runConfig"
+                " config.yaml".format(submit_opts["outputs"].removeprefix("TREE:"))
             )
         cmd = ["prun", "--inDS", io["inDS"], "--outDS", io["outDS"], "--exec", exec_cmd]
 

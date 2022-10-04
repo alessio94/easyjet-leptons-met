@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAlgCfg
@@ -28,29 +30,19 @@ from HH4bAnalysis.utils.logHelper import log
 def AnalysisAlgsCfg(
     flags,
     dataType,
-    btag_wps,
-    vr_btag_wps,
-    disable_calib=False,
     trigger_chains=[],
     do_muons=True,
-    metadata_cache=None,
-    do_loose=False,
     do_PRW=False,
     prw_files=[],
     lumicalc_files=[],
     grl_files=[],
-    do_dihiggs_analysis=False,
 ):
-    if metadata_cache:
-        update_metadata(metadata_cache)
+    if flags.Analysis.meta_cache:
+        update_metadata(Path("metadata.json"))
 
     is_daod_physlite = is_physlite(flags)
 
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
-
-    # TODO: no DL1d branches in PHYSLITE yet
-    if is_daod_physlite:
-        btag_wps = [wp.replace("DL1dv00", "DL1r") for wp in btag_wps]
 
     cfg = ComponentAccumulator()
 
@@ -67,13 +59,13 @@ def AnalysisAlgsCfg(
     # Remove events failing DQ criteria
     cfg.merge(
         EventSelectionAnalysisSequenceCfg(
-            flags, dataType, grlFiles=grl_files, loose=do_loose
+            flags, dataType, grlFiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
         )
     )
 
-    containers = get_container_names(flags, disable_calib)
+    containers = get_container_names(flags)
 
-    if not disable_calib:
+    if not flags.Analysis.disable_calib:
         if do_PRW:
             log.info("Adding PRW sequence")
             # Adds variable to EventInfo if for pileup weight, for example:
@@ -129,7 +121,6 @@ def AnalysisAlgsCfg(
                 dataType=dataType,
                 inputContainerName=containers["inputs"]["reco4Jet"],
                 outputContainerName=containers["outputs"]["reco4Jet"],
-                workingPoints=btag_wps,
                 is_daod_physlite=is_daod_physlite,
             )
         )
@@ -157,7 +148,6 @@ def AnalysisAlgsCfg(
                     dataType=dataType,
                     inputContainerName=containers["inputs"]["vrJet"],
                     outputContainerName=containers["outputs"]["vrJet"],
-                    workingPoints=vr_btag_wps,
                 )
             )
 
@@ -190,7 +180,7 @@ def AnalysisAlgsCfg(
         )
     )
 
-    if do_dihiggs_analysis:
+    if flags.Analysis.do_dihiggs_analysis and not flags.Analysis.disable_calib:
         cfg.merge(
             DiHiggsAnalysisAlgCfg(
                 flags,
@@ -198,12 +188,10 @@ def AnalysisAlgsCfg(
                 LargeJetKey=containers["outputs"]["reco10Jet"].replace(
                     "%SYS%", "NOSYS"
                 ),
-                btag_wps=btag_wps,
-                vr_btag_wps=vr_btag_wps,
             )
         )
 
-    if metadata_cache:
-        cache_metadata(metadata_cache)
+    if flags.Analysis.meta_cache:
+        cache_metadata(Path("metadata.json"))
 
     return cfg

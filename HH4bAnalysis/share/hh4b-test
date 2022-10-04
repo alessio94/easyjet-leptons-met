@@ -51,16 +51,16 @@ declare -A TESTS=(
 )
 
 ntuple-dump() {
-    VariableDumperConfig.py -o --filesInput $1 --trigger-list HH4bResolved HH4bBoosted
+    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
 }
 ntuple-dump-fast() {
-    VariableDumperConfig.py -oc --filesInput $1 --trigger-list HH4bResolved HH4bBoosted
+    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --meta-cache
 }
 ntuple-dump-physlite() {
-    VariableDumperConfig.py -o --filesInput $1 --trigger-list HH4bResolved HH4bBoosted --disable-calib
+    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --disable-calib 
 }
 ntuple-dump-physlite-fast() {
-    VariableDumperConfig.py -oc --filesInput $1 --trigger-list HH4bResolved HH4bBoosted --disable-calib
+    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --disable-calib --meta-cache
 }
 
 ################################################

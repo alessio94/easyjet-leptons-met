@@ -1,5 +1,9 @@
 import json
+import sys
 from enum import Enum
+
+import yaml
+from HH4bAnalysis.utils.logHelper import log
 
 
 class DataSampleYears(Enum):
@@ -16,10 +20,10 @@ class MCSampleYears(Enum):
 
 
 class SampleTypes(Enum):
-    mc20a = MCSampleYears.r13167.name  # run2, 2015-16
-    mc20d = MCSampleYears.r13144.name  # run2, 2017
-    mc20e = MCSampleYears.r13145.name  # run2, 2018
-    mc21a = MCSampleYears.r13829.name  # run3, 2022
+    mc20a = "r13167"  # run2, 2015-16
+    mc20d = "r13144"  # run2, 2017
+    mc20e = "r13145"  # run2, 2018
+    mc21a = "r13829"  # run3, 2022
     # ptag
     mc20 = "p5057"
 
@@ -137,3 +141,48 @@ def getRunYears(flags, dataType):
                 years += data_campaign.value
                 break
     return years
+
+
+def ConfigFlagsAdder(args, flags):
+    # load user config
+    try:
+        with open(args.runConfig) as file:
+            runConfig = yaml.safe_load(file)
+            log.info("Loaded run config: " + str(args.runConfig))
+    except FileNotFoundError:
+        log.error(
+            "Couldn't load run config: "
+            + str(args.runConfig)
+            + "\n"
+            + "Please give a valid run config file path to  --runConfig"
+        )
+        sys.exit(1)
+
+    # removing standard athena flags from args
+    athFlags = [
+        "debug",
+        "evtMax",
+        "skipEvents",
+        "filesInput",
+        "loglevel",
+        "configOnly",
+        "threads",
+        "nprocs",
+    ]
+
+    # args contain the flags, overwrite runconfig file values with values from flags
+    for key in vars(args):
+        # exclude standard athena flags
+        if key not in athFlags:
+            value = getattr(args, key)
+            # don't overwrite if flags not given (None), not given bools are False
+            if value is not None and value is not False:
+                runConfig[key] = getattr(args, key)
+
+    # add them to ConfigFlags
+    for key, value in runConfig.items():
+        flags.addFlag("Analysis." + key, value)
+        if key != "runConfig":
+            log.info("User configured: " + str(key) + ": " + str(value))
+
+    return flags

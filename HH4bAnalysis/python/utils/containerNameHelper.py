@@ -39,7 +39,7 @@ def _get_container_name(qualitycontainerdesc, daodphyslite=False):
     return container_map[format_key][qualitycontainerdesc]
 
 
-def get_container_names(flags, nocalib=False):
+def get_container_names(flags):
     is_daod_physlite = is_physlite(flags)
     inputs = dict(
         reco4Jet=_get_container_name("Reco4PFlowJets", is_daod_physlite),
@@ -52,7 +52,7 @@ def get_container_names(flags, nocalib=False):
         photons=_get_container_name("Photons", is_daod_physlite),
     )
     # If not running calibration algs in PHYSLITE, we can just skip the outputs
-    if nocalib:
+    if flags.Analysis.disable_calib:
         return {"inputs": inputs, "outputs": inputs}
 
     outputs = dict(

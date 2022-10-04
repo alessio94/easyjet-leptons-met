@@ -9,7 +9,6 @@ def JetAnalysisSequenceCfg(
     dataType,
     inputContainerName,
     outputContainerName,
-    workingPoints,
     is_daod_physlite,
 ):
     cfg = ComponentAccumulator()
@@ -31,6 +30,14 @@ def JetAnalysisSequenceCfg(
     )
     # This is the container name that is available in the CDI aboce
     jetBTagContainerName = "AntiKt4EMPFlowJets"
+
+    # TODO: no DL1d branches in PHYSLITE yet
+    if is_daod_physlite:
+        workingPoints = [
+            wp.replace("DL1dv00", "DL1r") for wp in flags.Analysis.btag_wps
+        ]
+    else:
+        workingPoints = flags.Analysis.btag_wps
 
     for tagger_wp in workingPoints:
         tagger, btag_wp = tagger_wp.split("_", 1)
@@ -95,9 +102,7 @@ def FatJetAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContain
     return cfg
 
 
-def VRJetAnalysisSequenceCfg(
-    flags, dataType, inputContainerName, outputContainerName, workingPoints
-):
+def VRJetAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContainerName):
     cfg = ComponentAccumulator()
 
     def createVRJetSequence():
@@ -126,7 +131,7 @@ def VRJetAnalysisSequenceCfg(
     )
     # This is the container name that is available in the CDI aboce
     vrJetBTagContainerName = "AntiKtVR30Rmax4Rmin02TrackJets"
-    for tagger_wp in workingPoints:
+    for tagger_wp in flags.Analysis.vr_btag_wps:
         tagger, btag_wp = tagger_wp.split("_", 1)
         makeFTagAnalysisSequence(
             vrJetSequence,

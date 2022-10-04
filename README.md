@@ -27,25 +27,25 @@ source */setup.sh
 
 # Running on files
 
-To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run:
+To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig hh4b-analysis/HH4bAnalysis/share/RunConfig.yaml.:
 
 ```
-VariableDumperConfig.py --filesInput data.myinputfile.DAOD_PHYS.pool.root --evtMax 10
+VariableDumperConfig.py --runConfig [path-to-runconfig] --filesInput data.myinputfile.DAOD_PHYS.pool.root --evtMax 10
 ```
-
+>Your build also installs this one into the build area so you can also do --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
 Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
 You should find a new ROOT files, `analysis-variables.root`.
 
 To process Monte Carlo samples the configuration is automatically setup from the sample's metadata:
 
 ```
-VariableDumperConfig.py --filesInput mc.myinputfile.pool.root --evtMax 10
+VariableDumperConfig.py --runConfig [path-to-runconfig] --filesInput mc.myinputfile.pool.root --evtMax 10
 ```
 
 To process DAOD_PHYSLITE the configuration is automatic as well, the command looks the same:
 
 ```
-VariableDumperConfig.py --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10 
+VariableDumperConfig.py --runConfig [path-to-runconfig] --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10 
 ```
 
 ## AthAnalysis in Docker
