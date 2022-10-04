@@ -9,17 +9,13 @@ from HH4bAnalysis.utils.logHelper import log
 
 def MiniTupleCfg(
     flags,
-    outfname,
     trigger_chains,
-    working_points,
     do_muons=True,
     do_PRW=False,
-    do_dihiggs_analysis=False,
-    disable_calib=False,
 ):
     cfg = ComponentAccumulator()
     is_daod_physlite = is_physlite(flags)
-    containers = get_container_names(flags, disable_calib)["outputs"]
+    containers = get_container_names(flags)["outputs"]
 
     log.debug(f"Containers requested in dataset: {containers}")
 
@@ -35,7 +31,9 @@ def MiniTupleCfg(
     #   File I/O option: specified by setting "OPT" and passed to the TFile constructor
     #      "RECREATE" will (over)write the specified file name with a new file
     cfg.addService(
-        CompFactory.THistSvc(Output=[f"ANALYSIS DATAFILE='{outfname}', OPT='RECREATE'"])
+        CompFactory.THistSvc(
+            Output=[f"ANALYSIS DATAFILE='{flags.Analysis.outFile}', OPT='RECREATE'"]
+        )
     )
 
     def getFourMomBranches(container, alias, doOR=False, noSystematics=False):
@@ -67,7 +65,7 @@ def MiniTupleCfg(
             f"EventInfo.trigPassed_{cleaned} -> trigPassed_{cleaned}"
         )
 
-    if do_PRW and not disable_calib:
+    if do_PRW and not flags.Analysis.disable_calib:
         analysisTreeBranches += [
             "EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%",
             "EventInfo.generatorWeight_%SYS% -> generatorWeight_%SYS%",
@@ -151,22 +149,21 @@ def MiniTupleCfg(
             containers["reco10Jet"], "recojet_antikt10", doOR=True
         )
 
+    if not flags.Analysis.disable_calib:
         if flags.Input.isMC:
             analysisTreeBranches += getFourMomBranches(
                 containers["truth10Jet"], "truthjet_antikt10", noSystematics=True
             )
-
-    if not disable_calib:
         # B-jet WPs
         analysisTreeBranches += [
             f"{containers['reco4Jet']}.ftag_select_{btag_wp}"
             f" -> recojet_antikt4_%SYS%_{btag_wp}"
-            for btag_wp in working_points["ak4"]
+            for btag_wp in flags.Analysis.btag_wps
         ]
         analysisTreeBranches += [
             f"{containers['reco4Jet']}_OR.ftag_select_{btag_wp}"
             f" -> recojet_antikt4_OR_%SYS%_{btag_wp}"
-            for btag_wp in working_points["ak4"]
+            for btag_wp in flags.Analysis.btag_wps
         ]
         analysisTreeBranches += getFourMomBranches(containers["vrJet"], "vrjet")
         if flags.Input.isMC:
@@ -177,9 +174,8 @@ def MiniTupleCfg(
                 ),
             ]
         analysisTreeBranches += [
-            f"{containers['vrJet']}.ftag_select_{btag_wp}"
-            f" -> vrjet_%SYS%_{btag_wp}"  # noqa
-            for btag_wp in working_points["vr"]
+            f"{containers['vrJet']}.ftag_select_{btag_wp} -> vrjet_%SYS%_{btag_wp}"
+            for btag_wp in flags.Analysis.vr_btag_wps
         ]
 
     split_tags = flags.Input.AMITag.split("_")
@@ -209,7 +205,7 @@ def MiniTupleCfg(
     ]
     # No calibration algs -- remove all systematics expressions in the input
     # and label as NOSYS in output
-    if disable_calib:
+    if flags.Analysis.disable_calib:
         _tmp = list(analysisTreeBranches)
         analysisTreeBranches = []
         for b in _tmp:
@@ -220,8 +216,8 @@ def MiniTupleCfg(
                 )
             )  # noqa
 
-    if do_dihiggs_analysis:
-        analysisTreeBranches += DiHiggsAnalysisAddBranches(flags, working_points)
+    if flags.Analysis.do_dihiggs_analysis and not flags.Analysis.disable_calib:
+        analysisTreeBranches += DiHiggsAnalysisAddBranches(flags)
 
     log.info("Add tree seq")
     cfg.merge(AnalysisTreeAlgCfg(flags, branches=analysisTreeBranches))

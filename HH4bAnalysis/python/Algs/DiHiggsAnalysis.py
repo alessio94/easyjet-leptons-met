@@ -8,8 +8,6 @@ def DiHiggsAnalysisAlgCfg(
     flags,
     SmallJetKey,
     LargeJetKey,
-    btag_wps,
-    vr_btag_wps,
 ):
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
@@ -18,10 +16,10 @@ def DiHiggsAnalysisAlgCfg(
             EventInfoKey="EventInfo",
             SmallJetKey=SmallJetKey,
             LargeJetKey=LargeJetKey,
-            doResolvedAnalysis=flags.do_resolved_analysis,
-            doBoostedAnalysis=flags.do_boosted_analysis,
-            btag_wps=btag_wps,
-            vr_btag_wps=vr_btag_wps,
+            doResolvedAnalysis=flags.Analysis.do_resolved_analysis,
+            doBoostedAnalysis=flags.Analysis.do_boosted_analysis,
+            btag_wps=flags.Analysis.btag_wps,
+            vr_btag_wps=flags.Analysis.vr_btag_wps,
             isMC=flags.Input.isMC,
         )
     )
@@ -29,7 +27,7 @@ def DiHiggsAnalysisAlgCfg(
     return cfg
 
 
-def DiHiggsAnalysisAddBranches(flags, working_points):
+def DiHiggsAnalysisAddBranches(flags):
     analysisTreeBranches = []
 
     # we will do this once the config is merged in
@@ -38,7 +36,7 @@ def DiHiggsAnalysisAddBranches(flags, working_points):
         analysisTreeBranches += [
             "AnalysisAntiKt4EMPFlowJets_%SYS%.dRtoTruthBs -> dRtoTruthBs_%SYS%"
         ]
-    if flags.do_resolved_analysis:
+    if flags.Analysis.do_resolved_analysis:
         resolvedVars = [
             "nCentralJets",
             "nBtaggedCentralJets",
@@ -68,13 +66,13 @@ def DiHiggsAnalysisAddBranches(flags, working_points):
             "h2_dR_subleadingJet_closestB",
         ]
 
-    for btag_wp in working_points["ak4"]:
+    for btag_wp in flags.Analysis.btag_wps:
         for var in resolvedVars:
             analysisTreeBranches += [
                 f"EventInfo.resolved_{var}_{btag_wp}   -> resolved_{btag_wp}_{var}"
             ]
 
-    if flags.do_boosted_analysis:
+    if flags.Analysis.do_boosted_analysis:
         boostedVars = [
             "nLargeJets",
             "h1_nGhostAssocVrJets",
@@ -91,7 +89,7 @@ def DiHiggsAnalysisAddBranches(flags, working_points):
             "h2_dR_jets",
             "hh_m",
         ]
-        for btag_wp in working_points["vr"]:
+        for btag_wp in flags.Analysis.vr_btag_wps:
             for var in boostedVars:
                 analysisTreeBranches += [
                     f"EventInfo.boosted_{var}_{btag_wp}   -> boosted_{btag_wp}_{var}"
