@@ -64,6 +64,8 @@ def MiniTupleCfg(
         "EventInfo.lumiBlock   -> lumiBlock",
         "EventInfo.mcEventWeights   -> mcEventWeights",
         "EventInfo.averageInteractionsPerCrossing -> averageInteractionsPerCrossing",
+        "EventInfo.actualInteractionsPerCrossing -> actualInteractionsPerCrossing",
+        "EventInfo.mcChannelNumber -> mcChannelNumber",
     ]
 
     for trig_chain in trigger_chains:
@@ -157,6 +159,17 @@ def MiniTupleCfg(
         analysisTreeBranches += getFourMomBranches(
             containers["reco10Jet"], "recojet_antikt10", doOR=True
         )
+        if flags.Input.isMC:
+            analysisTreeBranches += [
+                (
+                    f"{containers['reco10Jet']}.R10TruthLabel_R21Consolidated ->"
+                    " LargeRJetTruthLabel_%SYS%"
+                ),
+                (
+                    f"{containers['reco10Jet']}_OR.R10TruthLabel_R21Consolidated ->"
+                    " LargeRJetTruthLabel_OR_%SYS%"
+                ),
+            ]
 
     if not flags.Analysis.disable_calib:
         if flags.Input.isMC:
