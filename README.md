@@ -25,6 +25,9 @@ make
 source */setup.sh
 ```
 
+*If you are working in a container (described [below](#athanalysis-in-docker)), source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*
+
+
 # Running on files
 
 To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig hh4b-analysis/HH4bAnalysis/share/RunConfig.yaml.:
@@ -78,7 +81,7 @@ asetup --restore
 source */setup.sh
 ```
 
-*If you are working in a container, source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*
+*If you are working in a container, source the `/release_setup.sh` script, instead of the `setupATLAS; asetup --restore` commands.*
 
 ## Running on the grid
 

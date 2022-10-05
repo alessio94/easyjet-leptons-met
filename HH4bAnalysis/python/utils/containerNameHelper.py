@@ -9,6 +9,8 @@ TRUTH_10_JETS_KEY = "Truth10Jets"
 MUONS_KEY = "Muons"
 ELECTRONS_KEY = "Electrons"
 PHOTONS_KEY = "Photons"
+TRUTH_PARTICLE_INFO_KEY = "TruthParticles"
+
 
 container_map = {
     "DAOD_PHYS": {
@@ -20,6 +22,7 @@ container_map = {
         MUONS_KEY: "Muons",
         ELECTRONS_KEY: "Electrons",
         PHOTONS_KEY: "Photons",
+        TRUTH_PARTICLE_INFO_KEY: "TruthBSMWithDecayParticles",
     },
     "DAOD_PHYSLITE": {
         RECO_4_PFLOW_JETS_KEY: "AnalysisJets",
@@ -30,6 +33,7 @@ container_map = {
         MUONS_KEY: "AnalysisMuons",
         ELECTRONS_KEY: "AnalysisElectrons",
         PHOTONS_KEY: "AnalysisPhotons",
+        TRUTH_PARTICLE_INFO_KEY: "TruthBSMWithDecayParticles",
     },
 }
 
@@ -70,5 +74,11 @@ def get_container_names(flags):
     else:
         outputs["reco10Jet"] = ""
         outputs["vrJet"] = ""
+
+    if flags.Input.isMC:
+        inputs["truthParticles"] = _get_container_name(
+            "TruthParticles", is_daod_physlite
+        )
+        outputs["truthParticles"] = "TruthParticles"
 
     return {"inputs": inputs, "outputs": outputs}

@@ -15,6 +15,7 @@ from HH4bAnalysis.Algs.Jets import (
     JetAnalysisSequenceCfg,
     VRJetAnalysisSequenceCfg,
 )
+from HH4bAnalysis.Algs.TruthInformation import TruthParticleInformationAlgCfg
 from HH4bAnalysis.Algs.Muons import MuonAnalysisSequenceCfg
 from HH4bAnalysis.Algs.Photons import PhotonAnalysisSequenceCfg
 from HH4bAnalysis.Algs.Postprocessing import OverlapAnalysisSequenceCfg
@@ -148,6 +149,16 @@ def AnalysisAlgsCfg(
                     dataType=dataType,
                     inputContainerName=containers["inputs"]["vrJet"],
                     outputContainerName=containers["outputs"]["vrJet"],
+                )
+            )
+
+        if dataType != "data":
+            log.info("Adding truth particle info seq")
+            cfg.merge(
+                TruthParticleInformationAlgCfg(
+                    flags,
+                    inputContainerName=containers["inputs"]["truthParticles"],
+                    outputContainerName=containers["outputs"]["truthParticles"],
                 )
             )
 
