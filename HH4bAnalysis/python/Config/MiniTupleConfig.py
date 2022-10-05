@@ -36,17 +36,26 @@ def MiniTupleCfg(
         )
     )
 
-    def getFourMomBranches(container, alias, doOR=False, noSystematics=False):
+    def getFourMomBranches(
+        container, alias, doOR=False, noSystematics=False, doMass=False
+    ):
         ORstr = "_OR" if doOR else ""
         SYSstr = "" if noSystematics else "_%SYS%"
         branches = []
         vars = ["pt", "eta", "phi"]
-        if "Jets" in container:
+        if "Jets" in container or doMass:
             vars.append("m")
         for var in vars:
             branches += [
                 f"{container}{ORstr}.{var}  -> {alias}{ORstr}{SYSstr}_{var}",
             ]
+        return branches
+
+    def getTruthFourMomBranches(container, alias):
+        branches = []
+        vars = ["pt", "eta", "phi", "m"]
+        for var in vars:
+            branches += [f"{container}.{alias}_{var}  ->  {alias}_{var}"]
         return branches
 
     analysisTreeBranches = [
@@ -154,6 +163,17 @@ def MiniTupleCfg(
             analysisTreeBranches += getFourMomBranches(
                 containers["truth10Jet"], "truthjet_antikt10", noSystematics=True
             )
+
+        if flags.Input.isMC:
+            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H")
+            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_S")
+            analysisTreeBranches += getTruthFourMomBranches(
+                "EventInfo", "truth_b_fromH"
+            )
+            analysisTreeBranches += getTruthFourMomBranches(
+                "EventInfo", "truth_b_fromS"
+            )
+
         # B-jet WPs
         analysisTreeBranches += [
             f"{containers['reco4Jet']}.ftag_select_{btag_wp}"

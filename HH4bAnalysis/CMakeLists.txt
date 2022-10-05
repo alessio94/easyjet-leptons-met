@@ -17,6 +17,7 @@ atlas_add_library(HH4bAnalysisLib
 # Build the Athena component library
 atlas_add_component(HH4bAnalysis
   src/VariableDumperAlg.cxx
+  src/TruthParticleInformationAlg.cxx
   src/DiHiggsAnalysis.cxx
   src/DiHiggsAnalysisHelpers.cxx
   src/DiHiggsAnalysisAlg.cxx
