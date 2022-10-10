@@ -1,6 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAddBranches
+from HH4bAnalysis.Algs.Jets import LargeJetGhostVRJetAssociationBranches
 from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
 from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.utils.inputsHelper import get_valid_ami_tag, is_physlite
@@ -152,6 +153,10 @@ def MiniTupleCfg(
             analysisTreeBranches += [
                 f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"
             ]
+
+        analysisTreeBranches += LargeJetGhostVRJetAssociationBranches(
+            flags, containers["reco10Jet"]
+        )
 
         analysisTreeBranches += getFourMomBranches(
             containers["reco10Jet"], "recojet_antikt10"
