@@ -165,3 +165,42 @@ def VRJetAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContaine
         cfg.addEventAlgo(alg, vrJetSequence.getName())
 
     return cfg
+
+
+def LargeJetGhostVRJetAssociationAlgCfg(
+    flags,
+    inputLargeRJetContainerName,
+):
+    cfg = ComponentAccumulator()
+    cfg.addEventAlgo(
+        CompFactory.HH4B.LargeJetGhostVRJetAssociationAlg(
+            "LargeJetGhostVRJetAssociationAlg",
+            LargeJetInKey=inputLargeRJetContainerName,
+            workingPoints=flags.Analysis.vr_btag_wps,
+        )
+    )
+
+    return cfg
+
+
+def LargeJetGhostVRJetAssociationBranches(flags, inputLargeRJetContainerName):
+    analysisTreeBranches = []
+
+    reco10JetGhostAssociatedVRJetsVars = [
+        "goodVRTrackJets",
+        "leadingVRTrackJetsPt",
+        "leadingVRTrackJetsEta",
+        "leadingVRTrackJetsPhi",
+        "leadingVRTrackJetsM",
+    ]
+    for var in reco10JetGhostAssociatedVRJetsVars:
+        analysisTreeBranches += [
+            f"{inputLargeRJetContainerName}.{var} -> recojet_antikt10_%SYS%_{var}"
+        ]
+    analysisTreeBranches += [
+        f"{inputLargeRJetContainerName}.leadingVRTrackJetsBtag_{wp} -> "
+        f"recojet_antikt10_%SYS%_leadingVRTrackJetsBtag_{wp}"
+        for wp in flags.Analysis.vr_btag_wps
+    ]
+
+    return analysisTreeBranches

@@ -14,6 +14,7 @@ from HH4bAnalysis.Algs.Jets import (
     FatJetAnalysisSequenceCfg,
     JetAnalysisSequenceCfg,
     VRJetAnalysisSequenceCfg,
+    LargeJetGhostVRJetAssociationAlgCfg,
 )
 from HH4bAnalysis.Algs.TruthInformation import TruthParticleInformationAlgCfg
 from HH4bAnalysis.Algs.Muons import MuonAnalysisSequenceCfg
@@ -149,6 +150,28 @@ def AnalysisAlgsCfg(
                     dataType=dataType,
                     inputContainerName=containers["inputs"]["vrJet"],
                     outputContainerName=containers["outputs"]["vrJet"],
+                )
+            )
+
+        if is_daod_physlite:
+            log.warning("On PHYSLITE, skip ghost assocciation VR jet sequence for now")
+        else:
+            cfg.merge(
+                LargeJetGhostVRJetAssociationAlgCfg(
+                    flags,
+                    inputLargeRJetContainerName=containers["outputs"][
+                        "reco10Jet"
+                    ].replace("%SYS%", "NOSYS"),
+                )
+            )
+
+        if dataType != "data":
+            log.info("Adding truth particle info seq")
+            cfg.merge(
+                TruthParticleInformationAlgCfg(
+                    flags,
+                    inputContainerName=containers["inputs"]["truthParticles"],
+                    outputContainerName=containers["outputs"]["truthParticles"],
                 )
             )
 
