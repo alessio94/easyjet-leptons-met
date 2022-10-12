@@ -7,11 +7,8 @@
 
 #include <AthenaBaseComps/AthAlgorithm.h>
 
-#include "AthContainers/ConstDataVector.h"
+#include "Math/GenVector/VectorUtil.h" // for computing deltaR
 #include <AthContainers/AuxElement.h>
-#include <limits> // NAN
-#include <xAODCore/ShallowCopy.h>
-#include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 
 // Class definition
@@ -70,6 +67,15 @@ private:
 
     SG::AuxElement::Decorator<std::vector<float>>
         m_leadingVRTrackJetMDecorator{"leadingVRTrackJetsM"};
+
+    SG::AuxElement::Decorator<float> m_leadingVRTrackJetDeltaR12Decorator{
+        "leadingVRTrackJetsDeltaR12"};
+
+    SG::AuxElement::Decorator<float> m_leadingVRTrackJetDeltaR13Decorator{
+        "leadingVRTrackJetsDeltaR13"};
+
+    SG::AuxElement::Decorator<float> m_leadingVRTrackJetDeltaR32Decorator{
+        "leadingVRTrackJetsDeltaR32"};
 
     std::vector<SG::AuxElement::Decorator<std::vector<char>>>
         m_leadingVRTrackJetBtagDecorators;

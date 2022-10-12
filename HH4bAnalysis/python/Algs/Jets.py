@@ -192,6 +192,9 @@ def LargeJetGhostVRJetAssociationBranches(flags, inputLargeRJetContainerName):
         "leadingVRTrackJetsEta",
         "leadingVRTrackJetsPhi",
         "leadingVRTrackJetsM",
+        "leadingVRTrackJetsDeltaR12",
+        "leadingVRTrackJetsDeltaR13",
+        "leadingVRTrackJetsDeltaR32",
     ]
     for var in reco10JetGhostAssociatedVRJetsVars:
         analysisTreeBranches += [
