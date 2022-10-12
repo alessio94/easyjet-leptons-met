@@ -90,6 +90,9 @@ namespace HH4B
       std::vector<float> leadingGAVRJetEta(3, -100);
       std::vector<float> leadingGAVRJetPhi(3, -100);
       std::vector<float> leadingGAVRJetM(3, -1);
+      float deltaR12{-1};
+      float deltaR13{-1};
+      float deltaR32{-1};
       // hold btag decisions
       std::vector<std::vector<char>> btags(m_workingPoints.size(),
                                            std::vector<char>(3, 0));
@@ -99,26 +102,61 @@ namespace HH4B
       {
         try
         {
-          auto vrjet = ilargeRjet_ghostVRjets.at(i);
-          ATH_MSG_VERBOSE("VR jet pt: " << (*vrjet)->pt()
-                                        << ", eta: " << (*vrjet)->eta()
-                                        << ", phi: " << (*vrjet)->phi()
-                                        << ", m: " << (*vrjet)->m());
-          leadingGAVRJetPt.push_back((*vrjet)->pt());
-          leadingGAVRJetEta.push_back((*vrjet)->eta());
-          leadingGAVRJetPhi.push_back((*vrjet)->phi());
-          leadingGAVRJetM.push_back((*vrjet)->m());
+          const xAOD::Jet *leadingVRJet =
+              dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(i));
 
+          // record btagging
           for (size_t i = 0; i < m_workingPoints.size(); i++)
           {
-            char btagged = m_isBtagAccessors[i](**vrjet);
+            char btagged = m_isBtagAccessors[i](*leadingVRJet);
             btags[i].push_back(btagged);
+          }
+
+          // compute and recorddeltaR's
+          ATH_MSG_VERBOSE("VR jet pt: " << leadingVRJet->pt()
+                                        << ", eta: " << leadingVRJet->eta()
+                                        << ", phi: " << leadingVRJet->phi()
+                                        << ", m: " << leadingVRJet->m());
+          leadingGAVRJetPt.push_back(leadingVRJet->pt());
+          leadingGAVRJetEta.push_back(leadingVRJet->eta());
+          leadingGAVRJetPhi.push_back(leadingVRJet->phi());
+          leadingGAVRJetM.push_back(leadingVRJet->m());
+
+          if (ilargeRjet_ghostVRjets.size() > 1 && i == 0)
+          {
+            const xAOD::Jet *secondLeadingVRJet =
+                dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(1));
+
+            deltaR12 = ROOT::Math::VectorUtil::DeltaR(
+                leadingVRJet->jetP4(), secondLeadingVRJet->jetP4());
+            ATH_MSG_VERBOSE("leading VR track jets deltaR12: " << deltaR12);
+          }
+
+          if (ilargeRjet_ghostVRjets.size() > 2 && i == 0)
+          {
+            const xAOD::Jet *thirdLeadingVRJet =
+                dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(2));
+
+            deltaR13 = ROOT::Math::VectorUtil::DeltaR(
+                leadingVRJet->jetP4(), thirdLeadingVRJet->jetP4());
+            ATH_MSG_VERBOSE("leading VR track jets deltaR13: " << deltaR13);
+          }
+
+          if (ilargeRjet_ghostVRjets.size() > 2 && i == 1)
+          {
+            const xAOD::Jet *thirdLeadingVRJet =
+                dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(2));
+
+            deltaR32 = ROOT::Math::VectorUtil::DeltaR(
+                thirdLeadingVRJet->jetP4(), leadingVRJet->jetP4());
+            ATH_MSG_VERBOSE("leading VR track jets deltaR32: " << deltaR32);
           }
         }
         catch (const std::out_of_range &oor)
         {
           // the large R jet has less than 3 ghost associated VR jets,
           // just continue and assign the default values
+          continue;
         }
       }
 
@@ -126,6 +164,9 @@ namespace HH4B
       m_leadingVRTrackJetEtaDecorator(*largejet) = leadingGAVRJetEta;
       m_leadingVRTrackJetPhiDecorator(*largejet) = leadingGAVRJetPhi;
       m_leadingVRTrackJetMDecorator(*largejet) = leadingGAVRJetM;
+      m_leadingVRTrackJetDeltaR12Decorator(*largejet) = deltaR12;
+      m_leadingVRTrackJetDeltaR13Decorator(*largejet) = deltaR13;
+      m_leadingVRTrackJetDeltaR32Decorator(*largejet) = deltaR32;
       for (size_t i = 0; i < m_workingPoints.size(); i++)
       {
         m_leadingVRTrackJetBtagDecorators[i](*largejet) = btags[i];
