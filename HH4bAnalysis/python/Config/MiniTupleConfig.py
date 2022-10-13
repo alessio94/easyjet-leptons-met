@@ -3,8 +3,9 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAddBranches
 from HH4bAnalysis.Algs.Jets import LargeJetGhostVRJetAssociationBranches
 from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
+from HH4bAnalysis.Config.Base import get_valid_ami_tag
 from HH4bAnalysis.utils.containerNameHelper import get_container_names
-from HH4bAnalysis.utils.inputsHelper import get_valid_ami_tag, is_physlite
+from HH4bAnalysis.utils.inputsHelper import is_physlite
 from HH4bAnalysis.utils.logHelper import log
 
 
