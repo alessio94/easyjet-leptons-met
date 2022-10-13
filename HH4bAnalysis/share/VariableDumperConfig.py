@@ -189,7 +189,7 @@ def main():
         prw_files, lumicalc_files = [], []
         if do_PRW:
             try:
-                prw_files, lumicalc_files = pileupConfigFiles(ConfigFlags, dataType)
+                prw_files, lumicalc_files = pileupConfigFiles(ConfigFlags)
             except LookupError as err:
                 log.error(err)
                 do_PRW = False

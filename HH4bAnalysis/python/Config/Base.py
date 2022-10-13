@@ -4,6 +4,7 @@ from enum import Enum
 
 import yaml
 from HH4bAnalysis.utils.logHelper import log
+from HH4bAnalysis.utils.inputsHelper import get_dataType
 
 
 class DataSampleYears(Enum):
@@ -57,10 +58,21 @@ def update_metadata(path):
             md.metAccessLevel = cached["level"]
 
 
-def pileupConfigFiles(flags, dataType):
+def get_valid_ami_tag(tags, check_tag="p", min_valid_tag=SampleTypes.mc20):
+    is_valid_tag = False
+    for tag in tags:
+        if check_tag in tag:
+            is_valid_tag = int(tag[1:]) > int(min_valid_tag.value[1:])
+    return is_valid_tag
+
+
+def pileupConfigFiles(flags):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
+
     dsid = flags.Input.MCChannelNumber
     tags = flags.Input.AMITag
+    dataType = get_dataType(flags, isPRW=True)
+
     # Figure out which MC we are using
     if SampleTypes.mc20a.value in tags:
         subcampaign = SampleTypes.mc20a
