@@ -115,17 +115,16 @@ namespace HH4B
       // Truth information needed only for X, S or H
       if (fabs(ptcl->pdgId() == S_ID) || fabs(ptcl->pdgId() == H_ID))
       {
-        if (ptcl->parent(0)->pdgId() == X_ID)
+        auto parent = ptcl->parent(0);
+        if (parent != nullptr && parent->pdgId() == X_ID)
         {
           if (msgLvl(MSG::VERBOSE))
           {
-            ATH_MSG_VERBOSE("Information about truth X ID: "
-                            << ptcl->parent(0)->pdgId()
-                            << ", status: " << ptcl->parent(0)->status()
-                            << ", pt: " << ptcl->parent(0)->pt()
-                            << ", eta: " << ptcl->parent(0)->eta()
-                            << ", phi: " << ptcl->parent(0)->phi()
-                            << ", m: " << ptcl->parent(0)->m());
+            ATH_MSG_VERBOSE(
+                "Information about truth X ID: "
+                << parent->pdgId() << ", status: " << parent->status()
+                << ", pt: " << parent->pt() << ", eta: " << parent->eta()
+                << ", phi: " << parent->phi() << ", m: " << parent->m());
           }
 
           // Save kinematics of S and H
@@ -161,37 +160,37 @@ namespace HH4B
           }
 
           // Truth information on the b-quarks from S and H for each X
-          int nchild = ptcl->nChildren();
-          for (int ic = 0; ic < nchild; ++ic)
+          int nChildren = ptcl->nChildren();
+          for (int ic = 0; ic < nChildren; ++ic)
           {
-            if (msgLvl(MSG::VERBOSE))
+            auto nchild = ptcl->child(ic);
+            if (nchild != nullptr)
             {
-              ATH_MSG_VERBOSE("Information about b-quarks ID: "
-                              << ptcl->child(ic)->pdgId()
-                              << ", status: " << ptcl->child(ic)->status()
-                              << ", pt: " << ptcl->child(ic)->pt()
-                              << ", eta: " << ptcl->child(ic)->eta()
-                              << ", phi: " << ptcl->child(ic)->phi()
-                              << ", m: " << ptcl->child(ic)->m());
-            }
-            if (ptcl->pdgId() == H_ID)
-            {
+              if (msgLvl(MSG::VERBOSE))
+              {
+                ATH_MSG_VERBOSE("Information about b-quarks ID: "
+                                << ptcl->child(ic)->pdgId()
+                                << ", status: " << ptcl->child(ic)->status()
+                                << ", pt: " << ptcl->child(ic)->pt()
+                                << ", eta: " << ptcl->child(ic)->eta()
+                                << ", phi: " << ptcl->child(ic)->phi()
+                                << ", m: " << ptcl->child(ic)->m());
+              }
+              if (ptcl->pdgId() == H_ID)
+              {
 
-              truth_b_map["truth_b_fromH_pt"].push_back(ptcl->child(ic)->pt());
-              truth_b_map["truth_b_fromH_eta"].push_back(
-                  ptcl->child(ic)->eta());
-              truth_b_map["truth_b_fromH_phi"].push_back(
-                  ptcl->child(ic)->phi());
-              truth_b_map["truth_b_fromH_m"].push_back(ptcl->child(ic)->m());
-            }
-            if (ptcl->pdgId() == S_ID)
-            {
-              truth_b_map["truth_b_fromS_pt"].push_back(ptcl->child(ic)->pt());
-              truth_b_map["truth_b_fromS_eta"].push_back(
-                  ptcl->child(ic)->eta());
-              truth_b_map["truth_b_fromS_phi"].push_back(
-                  ptcl->child(ic)->phi());
-              truth_b_map["truth_b_fromS_m"].push_back(ptcl->child(ic)->m());
+                truth_b_map["truth_b_fromH_pt"].push_back(nchild->pt());
+                truth_b_map["truth_b_fromH_eta"].push_back(nchild->eta());
+                truth_b_map["truth_b_fromH_phi"].push_back(nchild->phi());
+                truth_b_map["truth_b_fromH_m"].push_back(nchild->m());
+              }
+              if (ptcl->pdgId() == S_ID)
+              {
+                truth_b_map["truth_b_fromS_pt"].push_back(nchild->pt());
+                truth_b_map["truth_b_fromS_eta"].push_back(nchild->eta());
+                truth_b_map["truth_b_fromS_phi"].push_back(nchild->phi());
+                truth_b_map["truth_b_fromS_m"].push_back(nchild->m());
+              }
             }
           }
         }

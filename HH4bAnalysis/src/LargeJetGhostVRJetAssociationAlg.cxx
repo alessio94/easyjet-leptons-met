@@ -55,6 +55,7 @@ namespace HH4B
     ATH_MSG_DEBUG("Saving large-R jets as \"" << m_largeJetInKey.key()
                                               << "\".");
 
+    int maxLeadingGAVRjetsSize = 3;
     for (auto *largejet : largeRJets)
     {
       // get ghost associated VR track jets from untrimmed large R jet
@@ -86,77 +87,73 @@ namespace HH4B
                 { return (*left)->pt() > (*right)->pt(); });
 
       // Initialize to some "invalid" values
-      std::vector<float> leadingGAVRJetPt(3, -1);
-      std::vector<float> leadingGAVRJetEta(3, -100);
-      std::vector<float> leadingGAVRJetPhi(3, -100);
-      std::vector<float> leadingGAVRJetM(3, -1);
+      std::vector<float> leadingGAVRJetPt(maxLeadingGAVRjetsSize, -1);
+      std::vector<float> leadingGAVRJetEta(maxLeadingGAVRjetsSize, -100);
+      std::vector<float> leadingGAVRJetPhi(maxLeadingGAVRjetsSize, -100);
+      std::vector<float> leadingGAVRJetM(maxLeadingGAVRjetsSize, -1);
       float deltaR12{-1};
       float deltaR13{-1};
       float deltaR32{-1};
       // hold btag decisions
-      std::vector<std::vector<char>> btags(m_workingPoints.size(),
-                                           std::vector<char>(3, 0));
+      std::vector<std::vector<char>> btags(
+          m_workingPoints.size(),
+          std::vector<char>(maxLeadingGAVRjetsSize, 0));
 
       // loop over the leading VR track jets in the large R jet
-      for (int i = 0; i < 3; i++)
+      int leadingGAVRjetsSize = ilargeRjet_ghostVRjets.size();
+      int minLeadingGAVRjetsSize = leadingGAVRjetsSize > 2
+                                       ? maxLeadingGAVRjetsSize
+                                       : leadingGAVRjetsSize;
+      for (int i = 0; i < minLeadingGAVRjetsSize; i++)
       {
-        try
+        const xAOD::Jet *leadingVRJet =
+            dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(i));
+
+        // record btagging
+        for (size_t i = 0; i < m_workingPoints.size(); i++)
         {
-          const xAOD::Jet *leadingVRJet =
-              dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(i));
-
-          // record btagging
-          for (size_t i = 0; i < m_workingPoints.size(); i++)
-          {
-            char btagged = m_isBtagAccessors[i](*leadingVRJet);
-            btags[i].push_back(btagged);
-          }
-
-          // compute and recorddeltaR's
-          ATH_MSG_VERBOSE("VR jet pt: " << leadingVRJet->pt()
-                                        << ", eta: " << leadingVRJet->eta()
-                                        << ", phi: " << leadingVRJet->phi()
-                                        << ", m: " << leadingVRJet->m());
-          leadingGAVRJetPt.push_back(leadingVRJet->pt());
-          leadingGAVRJetEta.push_back(leadingVRJet->eta());
-          leadingGAVRJetPhi.push_back(leadingVRJet->phi());
-          leadingGAVRJetM.push_back(leadingVRJet->m());
-
-          if (ilargeRjet_ghostVRjets.size() > 1 && i == 0)
-          {
-            const xAOD::Jet *secondLeadingVRJet =
-                dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(1));
-
-            deltaR12 = ROOT::Math::VectorUtil::DeltaR(
-                leadingVRJet->jetP4(), secondLeadingVRJet->jetP4());
-            ATH_MSG_VERBOSE("leading VR track jets deltaR12: " << deltaR12);
-          }
-
-          if (ilargeRjet_ghostVRjets.size() > 2 && i == 0)
-          {
-            const xAOD::Jet *thirdLeadingVRJet =
-                dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(2));
-
-            deltaR13 = ROOT::Math::VectorUtil::DeltaR(
-                leadingVRJet->jetP4(), thirdLeadingVRJet->jetP4());
-            ATH_MSG_VERBOSE("leading VR track jets deltaR13: " << deltaR13);
-          }
-
-          if (ilargeRjet_ghostVRjets.size() > 2 && i == 1)
-          {
-            const xAOD::Jet *thirdLeadingVRJet =
-                dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(2));
-
-            deltaR32 = ROOT::Math::VectorUtil::DeltaR(
-                thirdLeadingVRJet->jetP4(), leadingVRJet->jetP4());
-            ATH_MSG_VERBOSE("leading VR track jets deltaR32: " << deltaR32);
-          }
+          char btagged = m_isBtagAccessors[i](*leadingVRJet);
+          btags[i].push_back(btagged);
         }
-        catch (const std::out_of_range &oor)
+
+        // compute and recorddeltaR's
+        ATH_MSG_VERBOSE("VR jet pt: " << leadingVRJet->pt()
+                                      << ", eta: " << leadingVRJet->eta()
+                                      << ", phi: " << leadingVRJet->phi()
+                                      << ", m: " << leadingVRJet->m());
+        leadingGAVRJetPt.push_back(leadingVRJet->pt());
+        leadingGAVRJetEta.push_back(leadingVRJet->eta());
+        leadingGAVRJetPhi.push_back(leadingVRJet->phi());
+        leadingGAVRJetM.push_back(leadingVRJet->m());
+
+        if (leadingGAVRjetsSize > 1 && i == 0)
         {
-          // the large R jet has less than 3 ghost associated VR jets,
-          // just continue and assign the default values
-          continue;
+          const xAOD::Jet *secondLeadingVRJet =
+              dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(1));
+
+          deltaR12 = ROOT::Math::VectorUtil::DeltaR(
+              leadingVRJet->jetP4(), secondLeadingVRJet->jetP4());
+          ATH_MSG_VERBOSE("leading VR track jets deltaR12: " << deltaR12);
+        }
+
+        if (leadingGAVRjetsSize > 2 && i == 0)
+        {
+          const xAOD::Jet *thirdLeadingVRJet =
+              dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(2));
+
+          deltaR13 = ROOT::Math::VectorUtil::DeltaR(
+              leadingVRJet->jetP4(), thirdLeadingVRJet->jetP4());
+          ATH_MSG_VERBOSE("leading VR track jets deltaR13: " << deltaR13);
+        }
+
+        if (leadingGAVRjetsSize > 2 && i == 1)
+        {
+          const xAOD::Jet *thirdLeadingVRJet =
+              dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(2));
+
+          deltaR32 = ROOT::Math::VectorUtil::DeltaR(thirdLeadingVRJet->jetP4(),
+                                                    leadingVRJet->jetP4());
+          ATH_MSG_VERBOSE("leading VR track jets deltaR32: " << deltaR32);
         }
       }
 
