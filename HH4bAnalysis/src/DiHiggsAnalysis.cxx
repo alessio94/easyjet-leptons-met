@@ -104,12 +104,11 @@ namespace HH4B
     // this is a shallow copy container
     ConstDataVector<xAOD::JetContainer> bTaggedJets(SG::VIEW_ELEMENTS);
     // accessor for the btagging info on the jet
-    static const SG::AuxElement::ConstAccessor<char> isBtag("ftag_select_" +
-                                                            wp);
+    const SG::AuxElement::ConstAccessor<char> isBtag("ftag_select_" + wp);
     // use some truth info if we have MC
     ConstDataVector<xAOD::TruthParticleContainer> truthInitialParticles(
         SG::VIEW_ELEMENTS);
-    static const SG::AuxElement::Decorator<std::vector<float>> dRtoTruthBs_dec(
+    const SG::AuxElement::Decorator<std::vector<float>> dRtoTruthBs_dec(
         "dRtoTruthBs");
     std::vector<const xAOD::TruthParticle *> truthBs;
     if (isMC)
