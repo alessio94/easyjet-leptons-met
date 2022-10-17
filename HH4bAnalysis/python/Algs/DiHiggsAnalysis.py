@@ -36,6 +36,7 @@ def DiHiggsAnalysisAddBranches(flags):
         analysisTreeBranches += [
             "AnalysisAntiKt4EMPFlowJets_%SYS%.dRtoTruthBs -> dRtoTruthBs_%SYS%"
         ]
+
     if flags.Analysis.do_resolved_analysis:
         resolvedVars = [
             "nCentralJets",
@@ -95,4 +96,36 @@ def DiHiggsAnalysisAddBranches(flags):
                     f"EventInfo.boosted_{var}_{btag_wp}   -> boosted_{btag_wp}_{var}"
                 ]
 
+    ### new implementation ####
+    for btag_wp in flags.Analysis.btag_wps:
+        vars = [
+            f"resolvedAnalysisJets_{btag_wp}_pt",
+            f"resolvedAnalysisJets_{btag_wp}_eta",
+            f"resolvedAnalysisJets_{btag_wp}_phi",
+            f"resolvedAnalysisJets_{btag_wp}_m",
+            f"resolvedAnalysisJets_{btag_wp}_isCentral",
+            f"resolvedAnalysisJets_{btag_wp}_n",
+        ]
+        for var in vars:
+            analysisTreeBranches += [f"EventInfo.{var} -> {var}"]
+
     return analysisTreeBranches
+
+
+def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
+    cfg = ComponentAccumulator()
+
+    for btag_wp in flags.Analysis.btag_wps:
+        cfg.addEventAlgo(
+            CompFactory.HH4B.JetSelectorAlg(
+                "JetSelectorAlg_" + btag_wp,
+                containerInKey=SmallJetKey,
+                containerOutKey="resolvedAnalysisJets_" + btag_wp,
+                bTagWP=btag_wp,  # empty string: "" ignores btagging
+                minPt=20_000,
+                maxEta=2.5,
+                howManyToKeep=4,  # -1 means keep all
+                pTsort=True,
+            )
+        )
+    return cfg

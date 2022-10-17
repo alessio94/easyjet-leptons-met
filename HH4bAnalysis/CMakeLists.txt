@@ -20,6 +20,7 @@ atlas_add_component(HH4bAnalysis
   src/TruthParticleInformationAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
   src/DiHiggsAnalysis.cxx
+  src/JetSelectorAlg.cxx
   src/DiHiggsAnalysisHelpers.cxx
   src/DiHiggsAnalysisAlg.cxx
   src/tools/NTrkVertexCounter.cxx

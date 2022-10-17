@@ -2,7 +2,10 @@ from pathlib import Path
 
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAlgCfg
+from HH4bAnalysis.Algs.DiHiggsAnalysis import (
+    DiHiggsAnalysisAlgCfg,
+    DiHiggsAnalysisChainCfg,
+)
 from HH4bAnalysis.Algs.Electrons import ElectronAnalysisSequenceCfg
 from HH4bAnalysis.Algs.Event import (
     EventSelectionAnalysisSequenceCfg,
@@ -13,13 +16,13 @@ from HH4bAnalysis.Algs.Event import (
 from HH4bAnalysis.Algs.Jets import (
     FatJetAnalysisSequenceCfg,
     JetAnalysisSequenceCfg,
-    VRJetAnalysisSequenceCfg,
     LargeJetGhostVRJetAssociationAlgCfg,
+    VRJetAnalysisSequenceCfg,
 )
-from HH4bAnalysis.Algs.TruthInformation import TruthParticleInformationAlgCfg
 from HH4bAnalysis.Algs.Muons import MuonAnalysisSequenceCfg
 from HH4bAnalysis.Algs.Photons import PhotonAnalysisSequenceCfg
 from HH4bAnalysis.Algs.Postprocessing import OverlapAnalysisSequenceCfg
+from HH4bAnalysis.Algs.TruthInformation import TruthParticleInformationAlgCfg
 from HH4bAnalysis.Config.Base import cache_metadata, update_metadata
 from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.utils.inputsHelper import is_physlite
@@ -217,6 +220,15 @@ def AnalysisAlgsCfg(
     if flags.Analysis.do_dihiggs_analysis and not flags.Analysis.disable_calib:
         cfg.merge(
             DiHiggsAnalysisAlgCfg(
+                flags,
+                SmallJetKey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
+                LargeJetKey=containers["outputs"]["reco10Jet"].replace(
+                    "%SYS%", "NOSYS"
+                ),
+            )
+        )
+        cfg.merge(
+            DiHiggsAnalysisChainCfg(
                 flags,
                 SmallJetKey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
                 LargeJetKey=containers["outputs"]["reco10Jet"].replace(
