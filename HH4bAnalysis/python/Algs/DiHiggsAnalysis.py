@@ -105,6 +105,10 @@ def DiHiggsAnalysisAddBranches(flags):
             f"resolvedAnalysisJets_{btag_wp}_m",
             f"resolvedAnalysisJets_{btag_wp}_isCentral",
             f"resolvedAnalysisJets_{btag_wp}_n",
+            f"pairedResolvedAnalysisJets_{btag_wp}_pt",
+            f"pairedResolvedAnalysisJets_{btag_wp}_eta",
+            f"pairedResolvedAnalysisJets_{btag_wp}_phi",
+            f"pairedResolvedAnalysisJets_{btag_wp}_m",
         ]
         for var in vars:
             analysisTreeBranches += [f"EventInfo.{var} -> {var}"]
@@ -126,6 +130,15 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
                 maxEta=2.5,
                 howManyToKeep=4,  # -1 means keep all
                 pTsort=True,
+            )
+        )
+
+        cfg.addEventAlgo(
+            CompFactory.HH4B.JetPairingAlg(
+                "JetPairingAlg_" + btag_wp,
+                containerInKey="resolvedAnalysisJets_" + btag_wp,
+                containerOutKey="pairedResolvedAnalysisJets_" + btag_wp,
+                pairingStrategy="minDeltaR",  # so far only minDeltaR
             )
         )
     return cfg

@@ -236,7 +236,7 @@ namespace HH4B
         dRsortedJets.begin() + 4, // Use begin + N to sort first N
         dRsortedJets.end(), // Iterator marking the end of the range to sort
         [](const xAOD::IParticle *left, const xAOD::IParticle *right)
-        { return dRtoLeadingJet_acc(*left) > dRtoLeadingJet_acc(*right); });
+        { return dRtoLeadingJet_acc(*left) < dRtoLeadingJet_acc(*right); });
 
     // first one is dr to the leading itself, therefore second one
     h1.m_subleadingJet = dRsortedJets[1];
