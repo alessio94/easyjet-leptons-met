@@ -136,11 +136,11 @@ namespace HH4B
     // set defaults
     if (workContainer->size() == 0)
     {
-      jet_pt.push_back(-1);
-      jet_eta.push_back(-1);
-      jet_phi.push_back(-1);
-      jet_m.push_back(-1);
-      jet_isCentral.push_back(-1);
+      jet_pt.push_back(-100);
+      jet_eta.push_back(-100);
+      jet_phi.push_back(-100);
+      jet_m.push_back(-100);
+      jet_isCentral.push_back(-100);
     }
     else
     {

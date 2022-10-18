@@ -63,10 +63,10 @@ namespace HH4B
     std::vector<float> jet_m;
 
     // set defaults
-    jet_pt.push_back(-1);
-    jet_eta.push_back(-1);
-    jet_phi.push_back(-1);
-    jet_m.push_back(-1);
+    jet_pt.push_back(-100);
+    jet_eta.push_back(-100);
+    jet_phi.push_back(-100);
+    jet_m.push_back(-100);
 
     // this assumes that container is pt sorted (use the JetSelectorAlg for
     // this) and checks if we have at least 4 jets otherwise exit this alg

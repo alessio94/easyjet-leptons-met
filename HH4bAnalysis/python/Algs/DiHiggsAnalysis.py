@@ -4,6 +4,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 # from HH4bAnalysis.utils.containerNameHelper import get_container_names
 
 
+# old implementation
 def DiHiggsAnalysisAlgCfg(
     flags,
     SmallJetKey,
@@ -27,7 +28,8 @@ def DiHiggsAnalysisAlgCfg(
     return cfg
 
 
-def DiHiggsAnalysisAddBranches(flags):
+### former implementation
+def DiHiggsAnalysisAddBranchesOld(flags):
     analysisTreeBranches = []
 
     # we will do this once the config is merged in
@@ -96,7 +98,10 @@ def DiHiggsAnalysisAddBranches(flags):
                     f"EventInfo.boosted_{var}_{btag_wp}   -> boosted_{btag_wp}_{var}"
                 ]
 
-    ### new implementation ####
+
+### new implementation ####
+def DiHiggsAnalysisAddBranches(flags):
+    analysisTreeBranches = []
     for btag_wp in flags.Analysis.btag_wps:
         vars = [
             f"resolvedAnalysisJets_{btag_wp}_pt",
@@ -113,32 +118,60 @@ def DiHiggsAnalysisAddBranches(flags):
         for var in vars:
             analysisTreeBranches += [f"EventInfo.{var} -> {var}"]
 
+        resolvedVars = [
+            "DeltaR12",
+            "DeltaR13",
+            "DeltaR14",
+            "DeltaR23",
+            "DeltaR24",
+            "DeltaR34",
+            "h1_m",
+            "h2_m",
+            "hh_m",
+        ]
+        for var in resolvedVars:
+            analysisTreeBranches += [
+                f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
+            ]
+
     return analysisTreeBranches
 
 
 def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
     cfg = ComponentAccumulator()
 
-    for btag_wp in flags.Analysis.btag_wps:
-        cfg.addEventAlgo(
-            CompFactory.HH4B.JetSelectorAlg(
-                "JetSelectorAlg_" + btag_wp,
-                containerInKey=SmallJetKey,
-                containerOutKey="resolvedAnalysisJets_" + btag_wp,
-                bTagWP=btag_wp,  # empty string: "" ignores btagging
-                minPt=20_000,
-                maxEta=2.5,
-                howManyToKeep=4,  # -1 means keep all
-                pTsort=True,
+    if flags.Analysis.do_resolved_dihiggs_analysis:
+        for btag_wp in flags.Analysis.btag_wps:
+            cfg.addEventAlgo(
+                CompFactory.HH4B.JetSelectorAlg(
+                    "JetSelectorAlg_" + btag_wp,
+                    containerInKey=SmallJetKey,
+                    containerOutKey="resolvedAnalysisJets_" + btag_wp,
+                    bTagWP=btag_wp,  # empty string: "" ignores btagging
+                    minPt=20_000,
+                    maxEta=2.5,
+                    howManyToKeep=4,  # -1 means keep all
+                    pTsort=True,
+                )
             )
-        )
 
-        cfg.addEventAlgo(
-            CompFactory.HH4B.JetPairingAlg(
-                "JetPairingAlg_" + btag_wp,
-                containerInKey="resolvedAnalysisJets_" + btag_wp,
-                containerOutKey="pairedResolvedAnalysisJets_" + btag_wp,
-                pairingStrategy="minDeltaR",  # so far only minDeltaR
+            cfg.addEventAlgo(
+                CompFactory.HH4B.JetPairingAlg(
+                    "JetPairingAlg_" + btag_wp,
+                    containerInKey="resolvedAnalysisJets_" + btag_wp,
+                    containerOutKey="pairedResolvedAnalysisJets_" + btag_wp,
+                    pairingStrategy="minDeltaR",  # so far only minDeltaR
+                )
             )
-        )
+
+            cfg.addEventAlgo(
+                CompFactory.HH4B.FinalVarsAlg(
+                    "FinalVarsAlg_" + btag_wp,
+                    containerInKey="pairedResolvedAnalysisJets_" + btag_wp,
+                    bTagWP=btag_wp,
+                    doDiHiggsResolved=True,
+                    doDiHiggsBoosted=False,
+                )
+            )
+
     return cfg
