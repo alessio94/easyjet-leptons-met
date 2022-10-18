@@ -3,9 +3,10 @@
 */
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_JETSELECTORALG
-#define HH4BANALYSIS_JETSELECTORALG
+#ifndef HH4BANALYSIS_JETPAIRINGALG
+#define HH4BANALYSIS_JETPAIRINGRALG
 
+#include "xAODJet/JetContainer.h"
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <xAODEventInfo/EventInfo.h>
@@ -15,11 +16,11 @@ namespace HH4B
 {
 
   /// \brief An algorithm for counting containers
-  class JetSelectorAlg final : public AthHistogramAlgorithm
+  class JetPairingAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
 public:
-    JetSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    JetPairingAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -32,18 +33,14 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<xAOD::JetContainer> m_containerInKey{
+    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerInKey{
         this, "containerInKey", "", "containerName to read"};
     SG::WriteHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerOutKey{
         this, "containerOutKey", "", "containerName to write"};
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
-    std::string m_bTagWP;
-    float m_minPt;
-    float m_maxEta;
-    int m_howManyToKeep;
-    bool m_pTsort;
+    std::string m_pairingStrategy;
     std::unordered_map<std::string,
                        SG::AuxElement::Decorator<std::vector<float>>>
         m_fourVecDecos;

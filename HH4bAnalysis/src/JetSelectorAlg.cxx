@@ -7,7 +7,7 @@
 #include "JetSelectorAlg.h"
 #include "AthContainers/AuxElement.h"
 #include <AthContainers/ConstDataVector.h>
-#include <xAODBase/IParticleContainer.h>
+#include <xAODJet/JetContainer.h>
 
 namespace HH4B
 {
@@ -44,9 +44,9 @@ namespace HH4B
   StatusCode JetSelectorAlg ::execute()
   {
     // container we read in
-    SG::ReadHandle<xAOD::IParticleContainer> container(m_containerInKey);
+    SG::ReadHandle<xAOD::JetContainer> inContainer(m_containerInKey);
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    ATH_CHECK(container.isValid());
+    ATH_CHECK(inContainer.isValid());
     ATH_CHECK(eventInfo.isValid());
 
     // make some accessors and decorators
@@ -58,9 +58,8 @@ namespace HH4B
 
     // fill workContainer with "views" of the inContainer
     // see TJ's tutorial for this
-    auto workContainer =
-        std::make_unique<ConstDataVector<xAOD::IParticleContainer>>(
-            SG::VIEW_ELEMENTS);
+    auto workContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
+        SG::VIEW_ELEMENTS);
 
     // check if a btag wp is given
     bool WPgiven = false;
@@ -68,35 +67,35 @@ namespace HH4B
     {
       WPgiven = true;
     }
-    for (const xAOD::IParticle *ptcl : *container)
+    for (const xAOD::Jet *jet : *inContainer)
     {
       // cuts
-      if (ptcl->pt() < m_minPt && std::abs(ptcl->eta() > m_maxEta))
+      if (jet->pt() < m_minPt && std::abs(jet->eta() > m_maxEta))
       {
         continue;
       }
 
       // decorate if particles are central
-      if (ptcl->pt() > 25000. && std::abs(ptcl->eta()) < 2.5)
+      if (jet->pt() > 25000. && std::abs(jet->eta()) < 2.5)
       {
-        isCentral_dec(*ptcl) = 1;
+        isCentral_dec(*jet) = 1;
       }
       else
       {
-        isCentral_dec(*ptcl) = 0;
+        isCentral_dec(*jet) = 0;
       }
 
       // if no btag wp is given take all
       if (WPgiven)
       {
-        if (isBtag(*ptcl))
+        if (isBtag(*jet))
         {
-          workContainer->push_back(ptcl);
+          workContainer->push_back(jet);
         }
       }
       else
       {
-        workContainer->push_back(ptcl);
+        workContainer->push_back(jet);
       }
     }
 
@@ -128,42 +127,42 @@ namespace HH4B
     }
 
     // decorate eventInfo
-    std::vector<float> ptcl_pt;
-    std::vector<float> ptcl_eta;
-    std::vector<float> ptcl_phi;
-    std::vector<float> ptcl_m;
-    std::vector<float> ptcl_isCentral;
+    std::vector<float> jet_pt;
+    std::vector<float> jet_eta;
+    std::vector<float> jet_phi;
+    std::vector<float> jet_m;
+    std::vector<float> jet_isCentral;
 
     // set defaults
     if (workContainer->size() == 0)
     {
-      ptcl_pt.push_back(-1);
-      ptcl_eta.push_back(-1);
-      ptcl_phi.push_back(-1);
-      ptcl_m.push_back(-1);
-      ptcl_isCentral.push_back(-1);
+      jet_pt.push_back(-1);
+      jet_eta.push_back(-1);
+      jet_phi.push_back(-1);
+      jet_m.push_back(-1);
+      jet_isCentral.push_back(-1);
     }
     else
     {
-      for (const xAOD::IParticle *ptcl : *workContainer)
+      for (const xAOD::Jet *jet : *workContainer)
       {
-        ptcl_pt.push_back(ptcl->pt());
-        ptcl_eta.push_back(ptcl->eta());
-        ptcl_phi.push_back(ptcl->phi());
-        ptcl_m.push_back(ptcl->m());
-        ptcl_isCentral.push_back(float(isCentral_acc(*ptcl)));
+        jet_pt.push_back(jet->pt());
+        jet_eta.push_back(jet->eta());
+        jet_phi.push_back(jet->phi());
+        jet_m.push_back(jet->m());
+        jet_isCentral.push_back(float(isCentral_acc(*jet)));
       }
     }
     // clang-format off
-      m_fourVecDecos.at(m_containerOutKey.key() + "_pt")(*eventInfo) = ptcl_pt;
-      m_fourVecDecos.at(m_containerOutKey.key() + "_eta")(*eventInfo) = ptcl_eta;
-      m_fourVecDecos.at(m_containerOutKey.key() + "_phi")(*eventInfo) = ptcl_phi;
-      m_fourVecDecos.at(m_containerOutKey.key() + "_m")(*eventInfo) = ptcl_m;
-      m_fourVecDecos.at(m_containerOutKey.key() + "_isCentral")(*eventInfo) = ptcl_isCentral;
+      m_fourVecDecos.at(m_containerOutKey.key() + "_pt")(*eventInfo) = jet_pt;
+      m_fourVecDecos.at(m_containerOutKey.key() + "_eta")(*eventInfo) = jet_eta;
+      m_fourVecDecos.at(m_containerOutKey.key() + "_phi")(*eventInfo) = jet_phi;
+      m_fourVecDecos.at(m_containerOutKey.key() + "_m")(*eventInfo) = jet_m;
+      m_fourVecDecos.at(m_containerOutKey.key() + "_isCentral")(*eventInfo) = jet_isCentral;
     // clang-format on
 
     // write to eventstore
-    SG::WriteHandle<ConstDataVector<xAOD::IParticleContainer>> Writer(
+    SG::WriteHandle<ConstDataVector<xAOD::JetContainer>> Writer(
         m_containerOutKey);
     ATH_CHECK(Writer.record(std::move(workContainer)));
 
