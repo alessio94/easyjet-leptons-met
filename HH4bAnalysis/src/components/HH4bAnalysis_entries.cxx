@@ -1,4 +1,5 @@
 #include "../DiHiggsAnalysisAlg.h"
+#include "../FinalVarsAlg.h"
 #include "../JetPairingAlg.h"
 #include "../JetSelectorAlg.h"
 #include "../LargeJetGhostVRJetAssociationAlg.h"
@@ -9,6 +10,7 @@
 using namespace HH4B;
 
 DECLARE_COMPONENT(DiHiggsAnalysisAlg)
+DECLARE_COMPONENT(FinalVarsAlg)
 DECLARE_COMPONENT(JetPairingAlg)
 DECLARE_COMPONENT(JetSelectorAlg)
 DECLARE_COMPONENT(NTrkVertexCounter)

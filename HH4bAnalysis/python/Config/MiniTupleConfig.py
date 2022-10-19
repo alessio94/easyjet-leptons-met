@@ -1,6 +1,9 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisAddBranches
+from HH4bAnalysis.Algs.DiHiggsAnalysis import (
+    DiHiggsAnalysisAddBranches,
+    DiHiggsAnalysisAddBranchesOld,
+)
 from HH4bAnalysis.Algs.Jets import LargeJetGhostVRJetAssociationBranches
 from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
 from HH4bAnalysis.Config.Base import get_valid_ami_tag
@@ -256,6 +259,8 @@ def MiniTupleCfg(
             )  # noqa
 
     if flags.Analysis.do_dihiggs_analysis and not flags.Analysis.disable_calib:
+        analysisTreeBranches += DiHiggsAnalysisAddBranchesOld(flags)
+    if flags.Analysis.do_resolved_dihiggs_analysis and not flags.Analysis.disable_calib:
         analysisTreeBranches += DiHiggsAnalysisAddBranches(flags)
 
     log.info("Add tree seq")
