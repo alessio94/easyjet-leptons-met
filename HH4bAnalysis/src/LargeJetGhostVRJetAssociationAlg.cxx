@@ -91,6 +91,7 @@ namespace HH4B
       std::vector<float> leadingGAVRJetEta(maxLeadingGAVRjetsSize, -100);
       std::vector<float> leadingGAVRJetPhi(maxLeadingGAVRjetsSize, -100);
       std::vector<float> leadingGAVRJetM(maxLeadingGAVRjetsSize, -1);
+
       float deltaR12{-1};
       float deltaR13{-1};
       float deltaR32{-1};
@@ -110,10 +111,10 @@ namespace HH4B
             dynamic_cast<const xAOD::Jet *>(*ilargeRjet_ghostVRjets.at(i));
 
         // record btagging
-        for (size_t i = 0; i < m_workingPoints.size(); i++)
+        for (size_t j = 0; j < m_workingPoints.size(); j++)
         {
-          char btagged = m_isBtagAccessors[i](*leadingVRJet);
-          btags[i].push_back(btagged);
+          char btagged = m_isBtagAccessors[j](*leadingVRJet);
+          btags[j].at(i) = btagged;
         }
 
         // compute and recorddeltaR's
@@ -121,10 +122,10 @@ namespace HH4B
                                       << ", eta: " << leadingVRJet->eta()
                                       << ", phi: " << leadingVRJet->phi()
                                       << ", m: " << leadingVRJet->m());
-        leadingGAVRJetPt.push_back(leadingVRJet->pt());
-        leadingGAVRJetEta.push_back(leadingVRJet->eta());
-        leadingGAVRJetPhi.push_back(leadingVRJet->phi());
-        leadingGAVRJetM.push_back(leadingVRJet->m());
+        leadingGAVRJetPt.at(i) = leadingVRJet->pt();
+        leadingGAVRJetEta.at(i) = leadingVRJet->eta();
+        leadingGAVRJetPhi.at(i) = leadingVRJet->phi();
+        leadingGAVRJetM.at(i) = leadingVRJet->m();
 
         if (leadingGAVRjetsSize > 1 && i == 0)
         {
