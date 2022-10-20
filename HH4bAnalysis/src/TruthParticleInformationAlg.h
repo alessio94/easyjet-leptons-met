@@ -43,9 +43,8 @@ public:
 
 private:
     StatusCode
-    recordTruthParticleInformation(const xAOD::TruthParticleContainer &);
-
-    StatusCode decorateEventInfoWithTruthParticleInfo(const xAOD::EventInfo &);
+    recordTruthParticleInformation(const xAOD::TruthParticleContainer &,
+                                   const xAOD::EventInfo &) const;
 
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
@@ -61,23 +60,29 @@ private:
 
     bool m_isMC;
 
+    std::vector<SG::AuxElement::Decorator<float>> m_selectionTruthHDecorators;
+
+    std::vector<SG::AuxElement::Decorator<float>> m_selectionTruthSDecorators;
+
     std::vector<SG::AuxElement::Decorator<std::vector<float>>>
-        m_selectionTruthBAccessors;
+        m_selectionTruthBFromHDecorators;
 
-    std::vector<SG::AuxElement::Decorator<float>> m_selectionTruthSHAccessors;
+    std::vector<SG::AuxElement::Decorator<std::vector<float>>>
+        m_selectionTruthBFromSDecorators;
 
-    std::unordered_map<std::string, std::vector<float>> truth_b_map = {
-        {"truth_b_fromH_pt", {}},  {"truth_b_fromH_eta", {}},
-        {"truth_b_fromH_phi", {}}, {"truth_b_fromH_m", {}},
-        {"truth_b_fromS_pt", {}},  {"truth_b_fromS_eta", {}},
-        {"truth_b_fromS_phi", {}}, {"truth_b_fromS_m", {}},
-    };
+    std::vector<std::string> m_truthHVars{"truth_H_pt", "truth_H_eta",
+                                          "truth_H_phi", "truth_H_m"};
 
-    std::unordered_map<std::string, float> truth_SH_map = {
-        {"truth_H_pt", -1},  {"truth_H_eta", -1}, {"truth_H_phi", -1},
-        {"truth_H_m", -1},   {"truth_S_pt", -1},  {"truth_S_eta", -1},
-        {"truth_S_phi", -1}, {"truth_S_m", -1},
-    };
+    std::vector<std::string> m_truthSVars{"truth_S_pt", "truth_S_eta",
+                                          "truth_S_phi", "truth_S_m"};
+
+    std::vector<std::string> m_truthBFromHVars{
+        "truth_b_fromH_pt", "truth_b_fromH_eta", "truth_b_fromH_phi",
+        "truth_b_fromH_m"};
+
+    std::vector<std::string> m_truthBFromSVars{
+        "truth_b_fromS_pt", "truth_b_fromS_eta", "truth_b_fromS_phi",
+        "truth_b_fromS_m"};
   };
 }
 
