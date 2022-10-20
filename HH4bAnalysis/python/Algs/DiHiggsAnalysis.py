@@ -102,37 +102,50 @@ def DiHiggsAnalysisAddBranchesOld(flags):
 ### new implementation ####
 def DiHiggsAnalysisAddBranches(flags):
     analysisTreeBranches = []
-    for btag_wp in flags.Analysis.btag_wps:
-        vars = [
-            f"resolvedAnalysisJets_{btag_wp}_pt",
-            f"resolvedAnalysisJets_{btag_wp}_eta",
-            f"resolvedAnalysisJets_{btag_wp}_phi",
-            f"resolvedAnalysisJets_{btag_wp}_m",
-            f"resolvedAnalysisJets_{btag_wp}_isCentral",
-            f"resolvedAnalysisJets_{btag_wp}_n",
-            f"pairedResolvedAnalysisJets_{btag_wp}_pt",
-            f"pairedResolvedAnalysisJets_{btag_wp}_eta",
-            f"pairedResolvedAnalysisJets_{btag_wp}_phi",
-            f"pairedResolvedAnalysisJets_{btag_wp}_m",
-        ]
-        for var in vars:
-            analysisTreeBranches += [f"EventInfo.{var} -> {var}"]
-
-        resolvedVars = [
-            "DeltaR12",
-            "DeltaR13",
-            "DeltaR14",
-            "DeltaR23",
-            "DeltaR24",
-            "DeltaR34",
-            "h1_m",
-            "h2_m",
-            "hh_m",
-        ]
-        for var in resolvedVars:
-            analysisTreeBranches += [
-                f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
+    if (
+        flags.Analysis.do_resolved_dihiggs_analysis
+        or flags.Analysis.do_boosted_dihiggs_analysis
+    ):
+        for btag_wp in flags.Analysis.btag_wps:
+            vars = [
+                f"pairedResolvedAnalysisJets_{btag_wp}_pt",
+                f"pairedResolvedAnalysisJets_{btag_wp}_eta",
+                f"pairedResolvedAnalysisJets_{btag_wp}_phi",
+                f"pairedResolvedAnalysisJets_{btag_wp}_m",
             ]
+            for var in vars:
+                analysisTreeBranches += [f"EventInfo.{var} -> {var}"]
+
+            resolvedVars = [
+                "DeltaR12",
+                "DeltaR13",
+                "DeltaR14",
+                "DeltaR23",
+                "DeltaR24",
+                "DeltaR34",
+                "h1_m",
+                "h2_m",
+                "hh_m",
+            ]
+            boostedVars = [
+                "h1_m",
+                "h1_jet1_pt",
+                "h1_jet2_pt",
+                "h1_dR_jets",
+                "h2_m",
+                "h2_jet1_pt",
+                "h2_jet2_pt",
+                "h2_dR_jets",
+                "hh_m",
+            ]
+            for var in resolvedVars:
+                analysisTreeBranches += [
+                    f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
+                ]
+            for var in boostedVars:
+                analysisTreeBranches += [
+                    f"EventInfo.boosted_{var}_{btag_wp} -> boosted_{btag_wp}_{var}"
+                ]
 
     return analysisTreeBranches
 
@@ -140,21 +153,30 @@ def DiHiggsAnalysisAddBranches(flags):
 def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
     cfg = ComponentAccumulator()
 
+    # this is a resolved dihiggs analysis chain
     if flags.Analysis.do_resolved_dihiggs_analysis:
         for btag_wp in flags.Analysis.btag_wps:
+            # get the 4 leading small R jets
             cfg.addEventAlgo(
                 CompFactory.HH4B.JetSelectorAlg(
-                    "JetSelectorAlg_" + btag_wp,
+                    "SmallJetSelectorAlg_" + btag_wp,
                     containerInKey=SmallJetKey,
                     containerOutKey="resolvedAnalysisJets_" + btag_wp,
                     bTagWP=btag_wp,  # empty string: "" ignores btagging
                     minPt=20_000,
                     maxEta=2.5,
                     howManyToKeep=4,  # -1 means keep all
+                    minimumToHave=4,  # -1 means ignores this
                     pTsort=True,
                 )
             )
 
+            # pair them with some strategy and save them as leading (h1) and
+            # subleading (h2) Higgs candidates in the order:
+            # h1_leading_pt_jet
+            # h1_subleading_pt_jet
+            # h2_leading_pt_jet
+            # h2_subleading_pt_jet
             cfg.addEventAlgo(
                 CompFactory.HH4B.JetPairingAlg(
                     "JetPairingAlg_" + btag_wp,
@@ -164,13 +186,101 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
                 )
             )
 
+            # caluculate final resolved vars
             cfg.addEventAlgo(
                 CompFactory.HH4B.FinalVarsAlg(
                     "FinalVarsAlg_" + btag_wp,
-                    containerInKey="pairedResolvedAnalysisJets_" + btag_wp,
+                    smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_wp,
+                    largeRContainerInKey="",
+                    leadingLargeR_GA_VRJets="",
+                    subLeadingLargeR_GA_VRJets="",
                     bTagWP=btag_wp,
-                    doDiHiggsResolved=True,
+                    doDiHiggsResolved=flags.Analysis.do_resolved_dihiggs_analysis,
                     doDiHiggsBoosted=False,
+                )
+            )
+    # this is the boosted analysis chain
+    if flags.Analysis.do_boosted_dihiggs_analysis:
+        for btag_wp in flags.Analysis.vr_btag_wps:
+            # get the two leading large R's
+            cfg.addEventAlgo(
+                CompFactory.HH4B.JetSelectorAlg(
+                    "LargeJetSelectorAlg_" + btag_wp,
+                    containerInKey=LargeJetKey,
+                    containerOutKey="boostedAnalysisJets_" + btag_wp,
+                    bTagWP="",  # empty string: "" ignores btagging
+                    minPt=250_000,
+                    maxEta=2.0,
+                    howManyToKeep=2,  # -1 means keep all
+                    minimumToHave=2,  # -1 means ignores this
+                    pTsort=True,
+                )
+            )
+            # get the ghost associated VR jets from the leading Large R jet
+            cfg.addEventAlgo(
+                CompFactory.HH4B.GhostAssocVRJetGetterAlg(
+                    "LeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
+                    containerInKey="boostedAnalysisJets_" + btag_wp,
+                    containerOutKey="leadingLargeRVRJets_" + btag_wp,
+                    whichJet=0,
+                )
+            )
+            # make sure we have at least 2 and maximally 3 ghost associated in
+            # the leading large R jet
+            cfg.addEventAlgo(
+                CompFactory.HH4B.JetSelectorAlg(
+                    "LeadingLargeRVRJetSelectorAlg_" + btag_wp,
+                    containerInKey="leadingLargeRVRJets_" + btag_wp,
+                    containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
+                    bTagWP=btag_wp,  # empty string: "" ignores btagging
+                    minPt=10_000,
+                    maxEta=2.5,
+                    howManyToKeep=3,  # -1 means keep all
+                    minimumToHave=2,  # -1 means ignores this
+                    pTsort=True,
+                    removeRelativeDeltaRToVRJet=True,
+                )
+            )
+
+            # get the ghost associated VR jets from the subleading Large R jet
+            cfg.addEventAlgo(
+                CompFactory.HH4B.GhostAssocVRJetGetterAlg(
+                    "SubLeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
+                    containerInKey="boostedAnalysisJets_" + btag_wp,
+                    containerOutKey="SubLeadingLargeRVRJets_" + btag_wp,
+                    whichJet=1,
+                )
+            )
+
+            # make sure we have at least 2 and maximally 3 ghost associated in
+            # the subleading large R jet
+            cfg.addEventAlgo(
+                CompFactory.HH4B.JetSelectorAlg(
+                    "SubLeadingLargeRVRJetSelectorAlg_" + btag_wp,
+                    containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
+                    containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
+                    bTagWP=btag_wp,  # empty string: "" ignores btagging
+                    minPt=10_000,
+                    maxEta=2.5,
+                    howManyToKeep=3,  # -1 means keep all
+                    minimumToHave=2,  # -1 means ignores this
+                    pTsort=True,
+                    removeRelativeDeltaRToVRJet=True,
+                )
+            )
+
+            # calculate final boosted vars
+            cfg.addEventAlgo(
+                CompFactory.HH4B.FinalVarsAlg(
+                    "FinalVarsAlg_" + btag_wp,
+                    smallRContainerInKey="",
+                    largeRContainerInKey="boostedAnalysisJets_" + btag_wp,
+                    leadingLargeR_GA_VRJets="SelectedLeadingLargeRVRJets_" + btag_wp,
+                    subLeadingLargeR_GA_VRJets="SelectedSubLeadingLargeRVRJets_"
+                    + btag_wp,
+                    bTagWP=btag_wp,
+                    doDiHiggsResolved=False,
+                    doDiHiggsBoosted=flags.Analysis.do_boosted_dihiggs_analysis,
                 )
             )
 

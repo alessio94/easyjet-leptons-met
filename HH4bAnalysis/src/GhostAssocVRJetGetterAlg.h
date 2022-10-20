@@ -3,9 +3,10 @@
 */
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_JETSELECTORALG
-#define HH4BANALYSIS_JETSELECTORALG
+#ifndef HH4BANALYSIS_GHOSTASSOCVRJETGETTERALG
+#define HH4BANALYSIS_GHOSTASSOCVRJETGETTERALG
 
+#include "AthContainers/AuxElement.h"
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <xAODEventInfo/EventInfo.h>
@@ -15,11 +16,12 @@ namespace HH4B
 {
 
   /// \brief An algorithm for counting containers
-  class JetSelectorAlg final : public AthHistogramAlgorithm
+  class GhostAssocVRJetGetterAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
 public:
-    JetSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    GhostAssocVRJetGetterAlg(const std::string &name,
+                             ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -39,13 +41,8 @@ private:
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
-    std::string m_bTagWP;
-    float m_minPt;
-    float m_maxEta;
-    int m_minimumToHave;
-    int m_howManyToKeep;
-    bool m_pTsort;
-    bool m_removeRelativeDeltaRToVRJet;
+    // ghost associated VR track jets are only on the untrimmed 1.0 jets
+    unsigned int m_whichJet;
     std::unordered_map<std::string,
                        SG::AuxElement::Decorator<std::vector<float>>>
         m_fourVecDecos;

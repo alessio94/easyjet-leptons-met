@@ -18,8 +18,11 @@ namespace HH4B
     declareProperty("bTagWP", m_bTagWP);
     declareProperty("minPt", m_minPt);
     declareProperty("maxEta", m_maxEta);
+    declareProperty("minimumToHave", m_minimumToHave);
     declareProperty("howManyToKeep", m_howManyToKeep);
     declareProperty("pTsort", m_pTsort);
+    declareProperty("removeRelativeDeltaRToVRJet",
+                    m_removeRelativeDeltaRToVRJet = false);
   }
 
   StatusCode JetSelectorAlg ::initialize()
@@ -30,7 +33,10 @@ namespace HH4B
 
     // make decorators for the four vectors
     std::vector<std::string> vars{
-        "pt", "eta", "phi", "m", "isCentral",
+        "pt",
+        "eta",
+        "phi",
+        "m",
     };
     for (std::string var : vars)
     {
@@ -53,13 +59,17 @@ namespace HH4B
     SG::AuxElement::ConstAccessor<char> isBtag("ftag_select_" + m_bTagWP);
     SG::AuxElement::Decorator<unsigned int> nSelectedParticles_dec(
         m_containerOutKey.key() + "_n");
-    SG::AuxElement::Decorator<char> isCentral_dec("isCentral");
-    SG::AuxElement::Accessor<char> isCentral_acc("isCentral");
 
     // fill workContainer with "views" of the inContainer
     // see TJ's tutorial for this
     auto workContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
         SG::VIEW_ELEMENTS);
+
+    // recommended by ftag : Remove the event if any of your signal jets have
+    // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.
+    // checks if any of the vr jets overlap
+    SG::AuxElement::ConstAccessor<float> relativeDeltaRToVRJet(
+        "relativeDeltaRToVRJet");
 
     // check if a btag wp is given
     bool WPgiven = false;
@@ -67,24 +77,20 @@ namespace HH4B
     {
       WPgiven = true;
     }
+
+    // loop over jets
     for (const xAOD::Jet *jet : *inContainer)
     {
+      // remove jet if VR jets overlap
+      if (m_removeRelativeDeltaRToVRJet && relativeDeltaRToVRJet(*jet) < 1.0)
+      {
+        continue;
+      }
       // cuts
       if (jet->pt() < m_minPt && std::abs(jet->eta() > m_maxEta))
       {
         continue;
       }
-
-      // decorate if particles are central
-      if (jet->pt() > 25000. && std::abs(jet->eta()) < 2.5)
-      {
-        isCentral_dec(*jet) = 1;
-      }
-      else
-      {
-        isCentral_dec(*jet) = 0;
-      }
-
       // if no btag wp is given take all
       if (WPgiven)
       {
@@ -103,7 +109,7 @@ namespace HH4B
     // decorate nr of selected particles to the eventinfo
     nSelectedParticles_dec(*eventInfo) = nParticles;
 
-    // sort and make sure we have at least the amount we want to keep
+    // sort and make sure we have the configured amounts
     if (m_pTsort && nParticles >= m_howManyToKeep)
     {
       // if we give -1, sort the whole container
@@ -121,9 +127,17 @@ namespace HH4B
             return left->pt() > right->pt();
           }); // lambda function here just handy, could also be another
               // function that returns bool
-              // keep only the requested amount
+
+      // keep only the requested amount
       workContainer->erase(workContainer->begin() + m_howManyToKeep,
                            workContainer->end());
+    }
+
+    // if we have less than the requested nr, empty the workcontainer to write
+    // defaults/return empty container
+    if (int(workContainer->size()) < m_minimumToHave)
+    {
+      workContainer->clear();
     }
 
     // decorate eventInfo
@@ -131,7 +145,6 @@ namespace HH4B
     std::vector<float> jet_eta;
     std::vector<float> jet_phi;
     std::vector<float> jet_m;
-    std::vector<float> jet_isCentral;
 
     // set defaults
     if (workContainer->size() == 0)
@@ -140,7 +153,6 @@ namespace HH4B
       jet_eta.push_back(-100);
       jet_phi.push_back(-100);
       jet_m.push_back(-100);
-      jet_isCentral.push_back(-100);
     }
     else
     {
@@ -150,7 +162,6 @@ namespace HH4B
         jet_eta.push_back(jet->eta());
         jet_phi.push_back(jet->phi());
         jet_m.push_back(jet->m());
-        jet_isCentral.push_back(float(isCentral_acc(*jet)));
       }
     }
     // clang-format off
@@ -158,7 +169,6 @@ namespace HH4B
       m_fourVecDecos.at(m_containerOutKey.key() + "_eta")(*eventInfo) = jet_eta;
       m_fourVecDecos.at(m_containerOutKey.key() + "_phi")(*eventInfo) = jet_phi;
       m_fourVecDecos.at(m_containerOutKey.key() + "_m")(*eventInfo) = jet_m;
-      m_fourVecDecos.at(m_containerOutKey.key() + "_isCentral")(*eventInfo) = jet_isCentral;
     // clang-format on
 
     // write to eventstore
