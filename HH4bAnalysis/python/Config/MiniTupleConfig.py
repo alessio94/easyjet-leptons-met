@@ -260,7 +260,11 @@ def MiniTupleCfg(
 
     if flags.Analysis.do_dihiggs_analysis and not flags.Analysis.disable_calib:
         analysisTreeBranches += DiHiggsAnalysisAddBranchesOld(flags)
-    if flags.Analysis.do_resolved_dihiggs_analysis and not flags.Analysis.disable_calib:
+    if (
+        flags.Analysis.do_resolved_dihiggs_analysis
+        or flags.Analysis.do_resolved_dihiggs_analysis
+        and not flags.Analysis.disable_calib
+    ):
         analysisTreeBranches += DiHiggsAnalysisAddBranches(flags)
 
     log.info("Add tree seq")

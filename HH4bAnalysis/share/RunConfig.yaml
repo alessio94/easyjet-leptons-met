@@ -23,7 +23,8 @@ do_dihiggs_analysis: false
 do_resolved_analysis: false
 do_boosted_analysis: false
 # new implementation
-do_resolved_dihiggs_analysis: true
+do_resolved_dihiggs_analysis: false
+do_boosted_dihiggs_analysis: false
 # wether to output a meta data file
 meta_cache: false
 # e.g. for Physlite

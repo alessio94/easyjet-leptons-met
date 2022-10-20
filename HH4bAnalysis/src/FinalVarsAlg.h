@@ -32,8 +32,18 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerInKey{
-        this, "containerInKey", "", "containerName to read"};
+    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
+        m_smallRContainerInKey{this, "smallRContainerInKey", "",
+                               "containerName to read"};
+    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
+        m_largeRContainerInKey{this, "largeRContainerInKey", "",
+                               "containerName to read"};
+    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
+        m_leadingLargeR_GA_VRJets{this, "leadingLargeR_GA_VRJets", "",
+                                  "containerName to read"};
+    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
+        m_subLeadingLargeR_GA_VRJets{this, "subLeadingLargeR_GA_VRJets", "",
+                                     "containerName to read"};
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
