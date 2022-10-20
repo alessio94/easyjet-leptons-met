@@ -86,25 +86,26 @@ namespace HH4B
                 [](ELPC &left, ELPC &right)
                 { return (*left)->pt() > (*right)->pt(); });
 
-      // Initialize to some "invalid" values
-      std::vector<float> leadingGAVRJetPt(maxLeadingGAVRjetsSize, -1);
-      std::vector<float> leadingGAVRJetEta(maxLeadingGAVRjetsSize, -100);
-      std::vector<float> leadingGAVRJetPhi(maxLeadingGAVRjetsSize, -100);
-      std::vector<float> leadingGAVRJetM(maxLeadingGAVRjetsSize, -1);
-
-      float deltaR12{-1};
-      float deltaR13{-1};
-      float deltaR32{-1};
-      // hold btag decisions
-      std::vector<std::vector<char>> btags(
-          m_workingPoints.size(),
-          std::vector<char>(maxLeadingGAVRjetsSize, 0));
-
       // loop over the leading VR track jets in the large R jet
       int leadingGAVRjetsSize = ilargeRjet_ghostVRjets.size();
       int minLeadingGAVRjetsSize = leadingGAVRjetsSize > 2
                                        ? maxLeadingGAVRjetsSize
                                        : leadingGAVRjetsSize;
+
+      // hold btag decisions
+      std::vector<std::vector<char>> btags(
+          m_workingPoints.size(), std::vector<char>(minLeadingGAVRjetsSize));
+
+      // Initialize to some "invalid" values
+      std::vector<float> leadingGAVRJetPt(minLeadingGAVRjetsSize);
+      std::vector<float> leadingGAVRJetEta(minLeadingGAVRjetsSize);
+      std::vector<float> leadingGAVRJetPhi(minLeadingGAVRjetsSize);
+      std::vector<float> leadingGAVRJetM(minLeadingGAVRjetsSize);
+
+      float deltaR12{-1};
+      float deltaR13{-1};
+      float deltaR32{-1};
+
       for (int i = 0; i < minLeadingGAVRjetsSize; i++)
       {
         const xAOD::Jet *leadingVRJet =
@@ -165,9 +166,9 @@ namespace HH4B
       m_leadingVRTrackJetDeltaR12Decorator(*largejet) = deltaR12;
       m_leadingVRTrackJetDeltaR13Decorator(*largejet) = deltaR13;
       m_leadingVRTrackJetDeltaR32Decorator(*largejet) = deltaR32;
-      for (size_t i = 0; i < m_workingPoints.size(); i++)
+      for (size_t j = 0; j < m_workingPoints.size(); j++)
       {
-        m_leadingVRTrackJetBtagDecorators[i](*largejet) = btags[i];
+        m_leadingVRTrackJetBtagDecorators[j](*largejet) = btags[j];
       }
     }
 
