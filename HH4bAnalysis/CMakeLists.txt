@@ -22,7 +22,9 @@ atlas_add_component(HH4bAnalysis
   src/DiHiggsAnalysis.cxx
   src/JetSelectorAlg.cxx
   src/JetPairingAlg.cxx
-  src/FinalVarsAlg.cxx
+  src/FinalVarsResolvedAlg.cxx
+  src/FinalVarsBoostedAlg.cxx
+  src/JetTruthMatcherAlg.cxx
   src/GhostAssocVRJetGetterAlg.cxx
   src/DiHiggsAnalysisHelpers.cxx
   src/DiHiggsAnalysisAlg.cxx

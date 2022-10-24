@@ -228,7 +228,10 @@ def AnalysisAlgsCfg(
             )
         )
 
-    if flags.Analysis.do_resolved_dihiggs_analysis and not flags.Analysis.disable_calib:
+    if (
+        flags.Analysis.do_resolved_dihiggs_analysis
+        or flags.Analysis.do_boosted_dihiggs_analysis
+    ) and not flags.Analysis.disable_calib:
         cfg.merge(
             DiHiggsAnalysisChainCfg(
                 flags,

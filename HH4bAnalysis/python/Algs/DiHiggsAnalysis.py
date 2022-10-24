@@ -102,20 +102,9 @@ def DiHiggsAnalysisAddBranchesOld(flags):
 ### new implementation ####
 def DiHiggsAnalysisAddBranches(flags):
     analysisTreeBranches = []
-    if (
-        flags.Analysis.do_resolved_dihiggs_analysis
-        or flags.Analysis.do_boosted_dihiggs_analysis
-    ):
-        for btag_wp in flags.Analysis.btag_wps:
-            vars = [
-                f"pairedResolvedAnalysisJets_{btag_wp}_pt",
-                f"pairedResolvedAnalysisJets_{btag_wp}_eta",
-                f"pairedResolvedAnalysisJets_{btag_wp}_phi",
-                f"pairedResolvedAnalysisJets_{btag_wp}_m",
-            ]
-            for var in vars:
-                analysisTreeBranches += [f"EventInfo.{var} -> {var}"]
 
+    if flags.Analysis.do_resolved_dihiggs_analysis:
+        for btag_wp in flags.Analysis.btag_wps:
             resolvedVars = [
                 "DeltaR12",
                 "DeltaR13",
@@ -127,6 +116,23 @@ def DiHiggsAnalysisAddBranches(flags):
                 "h2_m",
                 "hh_m",
             ]
+            if flags.Analysis.truth_match_resolved and flags.Input.isMC:
+                resolvedVars += [
+                    "h1_closestTruthBsHaveSameInitialParticle",
+                    "h2_closestTruthBsHaveSameInitialParticle",
+                    "h1_dR_leadingJet_closestTruthB",
+                    "h1_dR_subleadingJet_closestTruthB",
+                    "h2_dR_leadingJet_closestTruthB",
+                    "h2_dR_subleadingJet_closestTruthB",
+                ]
+
+            for var in resolvedVars:
+                analysisTreeBranches += [
+                    f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
+                ]
+
+    if flags.Analysis.do_boosted_dihiggs_analysis:
+        for btag_wp in flags.Analysis.vr_btag_wps:
             boostedVars = [
                 "h1_m",
                 "h1_jet1_pt",
@@ -138,10 +144,6 @@ def DiHiggsAnalysisAddBranches(flags):
                 "h2_dR_jets",
                 "hh_m",
             ]
-            for var in resolvedVars:
-                analysisTreeBranches += [
-                    f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
-                ]
             for var in boostedVars:
                 analysisTreeBranches += [
                     f"EventInfo.boosted_{var}_{btag_wp} -> boosted_{btag_wp}_{var}"
@@ -186,19 +188,25 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
                 )
             )
 
-            # caluculate final resolved vars
+            # calculate final resolved vars
             cfg.addEventAlgo(
-                CompFactory.HH4B.FinalVarsAlg(
-                    "FinalVarsAlg_" + btag_wp,
+                CompFactory.HH4B.FinalVarsResolvedAlg(
+                    "FinalVarsResolvedAlg_" + btag_wp,
                     smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_wp,
-                    largeRContainerInKey="",
-                    leadingLargeR_GA_VRJets="",
-                    subLeadingLargeR_GA_VRJets="",
                     bTagWP=btag_wp,
-                    doDiHiggsResolved=flags.Analysis.do_resolved_dihiggs_analysis,
-                    doDiHiggsBoosted=False,
                 )
             )
+
+            # truth matching the paired jets
+            if flags.Analysis.truth_match_resolved and flags.Input.isMC:
+                cfg.addEventAlgo(
+                    CompFactory.HH4B.JetTruthMatcherAlg(
+                        "JetTruthMatcherAlg_" + btag_wp,
+                        containerInKey="pairedResolvedAnalysisJets_" + btag_wp,
+                        bTagWP=btag_wp,
+                    )
+                )
+
     # this is the boosted analysis chain
     if flags.Analysis.do_boosted_dihiggs_analysis:
         for btag_wp in flags.Analysis.vr_btag_wps:
@@ -271,16 +279,13 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
 
             # calculate final boosted vars
             cfg.addEventAlgo(
-                CompFactory.HH4B.FinalVarsAlg(
-                    "FinalVarsAlg_" + btag_wp,
-                    smallRContainerInKey="",
+                CompFactory.HH4B.FinalVarsBoostedAlg(
+                    "FinalVarsBoostedAlg_" + btag_wp,
                     largeRContainerInKey="boostedAnalysisJets_" + btag_wp,
                     leadingLargeR_GA_VRJets="SelectedLeadingLargeRVRJets_" + btag_wp,
                     subLeadingLargeR_GA_VRJets="SelectedSubLeadingLargeRVRJets_"
                     + btag_wp,
                     bTagWP=btag_wp,
-                    doDiHiggsResolved=False,
-                    doDiHiggsBoosted=flags.Analysis.do_boosted_dihiggs_analysis,
                 )
             )
 

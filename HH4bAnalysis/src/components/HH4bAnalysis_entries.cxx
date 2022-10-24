@@ -1,8 +1,10 @@
 #include "../DiHiggsAnalysisAlg.h"
-#include "../FinalVarsAlg.h"
+#include "../FinalVarsBoostedAlg.h"
+#include "../FinalVarsResolvedAlg.h"
 #include "../GhostAssocVRJetGetterAlg.h"
 #include "../JetPairingAlg.h"
 #include "../JetSelectorAlg.h"
+#include "../JetTruthMatcherAlg.h"
 #include "../LargeJetGhostVRJetAssociationAlg.h"
 #include "../TruthParticleInformationAlg.h"
 #include "../VariableDumperAlg.h"
@@ -10,11 +12,13 @@
 
 using namespace HH4B;
 
+DECLARE_COMPONENT(FinalVarsBoostedAlg)
+DECLARE_COMPONENT(FinalVarsResolvedAlg)
 DECLARE_COMPONENT(DiHiggsAnalysisAlg)
-DECLARE_COMPONENT(FinalVarsAlg)
 DECLARE_COMPONENT(GhostAssocVRJetGetterAlg)
 DECLARE_COMPONENT(JetPairingAlg)
 DECLARE_COMPONENT(JetSelectorAlg)
+DECLARE_COMPONENT(JetTruthMatcherAlg)
 DECLARE_COMPONENT(NTrkVertexCounter)
 DECLARE_COMPONENT(VariableDumperAlg)
 DECLARE_COMPONENT(TruthParticleInformationAlg)

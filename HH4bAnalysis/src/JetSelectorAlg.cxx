@@ -81,17 +81,18 @@ namespace HH4B
     // loop over jets
     for (const xAOD::Jet *jet : *inContainer)
     {
-      // remove jet if VR jets overlap
+      // jump out if VR jets overlap
       if (m_removeRelativeDeltaRToVRJet && relativeDeltaRToVRJet(*jet) < 1.0)
       {
-        continue;
+        workContainer->clear();
+        break;
       }
       // cuts
-      if (jet->pt() < m_minPt && std::abs(jet->eta() > m_maxEta))
+      if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
       {
         continue;
       }
-      // if no btag wp is given take all
+      // select btagging wp
       if (WPgiven)
       {
         if (isBtag(*jet))
@@ -99,14 +100,15 @@ namespace HH4B
           workContainer->push_back(jet);
         }
       }
+      // if no btag wp is given take all
       else
       {
         workContainer->push_back(jet);
       }
     }
 
-    int nParticles = workContainer->size();
     // decorate nr of selected particles to the eventinfo
+    int nParticles = workContainer->size();
     nSelectedParticles_dec(*eventInfo) = nParticles;
 
     // sort and make sure we have the configured amounts
