@@ -172,11 +172,11 @@ def MiniTupleCfg(
             analysisTreeBranches += [
                 (
                     f"{containers['reco10Jet']}.R10TruthLabel_R21Consolidated ->"
-                    " LargeRJetTruthLabel_%SYS%"
+                    " recojet_antikt10_%SYS%_TruthLabel"
                 ),
                 (
                     f"{containers['reco10Jet']}_OR.R10TruthLabel_R21Consolidated ->"
-                    " LargeRJetTruthLabel_OR_%SYS%"
+                    " recojet_antikt10_OR_%SYS%_TruthLabel"
                 ),
             ]
 
