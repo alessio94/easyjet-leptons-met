@@ -141,9 +141,11 @@ namespace HH4B
       {
         auto parent = ptcl->parent(0);
         if (parent == nullptr)
-        {
-          ATH_MSG_ERROR("S or H parent does not exist (nullptr).");
-          return StatusCode::FAILURE;
+        { 
+          ATH_MSG_WARNING("S or H parent does not exist (nullptr). Skipping the event " << eventInfo.eventNumber());
+          continue;
+
+          return StatusCode::SUCCESS;
         }
         if (parent->pdgId() == X_ID)
         {
