@@ -56,6 +56,14 @@ def defineArgs(ConfigFlags):
             "(can be used for plain PHYSLITE processing)"
         ),
     )
+    parser.add_argument(
+        "--allow-no-ptag",
+        action="store_true",
+        help=(
+            "disable ptag detection for CI tests"
+            "(avoids CBK failure on test files)"
+        ),
+    )
     return parser
 
 

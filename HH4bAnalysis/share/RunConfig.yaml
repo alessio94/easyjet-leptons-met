@@ -26,9 +26,12 @@ do_boosted_analysis: false
 do_resolved_dihiggs_analysis: false
 do_boosted_dihiggs_analysis: false
 truth_match_resolved: false
-# wether to output a meta data file
+# whether to output a meta data file
 meta_cache: false
 # e.g. for Physlite
 disable_calib: false
 # Disable trigger filtering (to get all events to pass, has no effect on data.
 disable_trigger_filtering: false
+# Permit to run even if the ptag is not found in the AMI tags
+# Ideally only use this for CI tests, known to be missing
+allow_no_ptag: false
