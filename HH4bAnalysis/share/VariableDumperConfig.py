@@ -120,7 +120,7 @@ def main():
         else:
             cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
 
-        from HH4bAnalysis.Config.xAODEventSelectorConfig import xAODReadCfg
+        from AthenaRootComps.xAODEventSelectorConfig import xAODReadCfg
 
         cfg.merge(xAODReadCfg(ConfigFlags))
 
