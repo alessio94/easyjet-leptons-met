@@ -208,5 +208,8 @@ def LargeJetGhostVRJetAssociationBranches(flags, inputLargeRJetContainerName):
         f"recojet_antikt10_%SYS%_leadingVRTrackJetsBtag_{wp}"
         for wp in flags.Analysis.vr_btag_wps
     ]
+    analysisTreeBranches += [
+        "EventInfo.passRelativeDeltaRToVRJetCut -> passRelativeDeltaRToVRJetCut"
+    ]
 
     return analysisTreeBranches
