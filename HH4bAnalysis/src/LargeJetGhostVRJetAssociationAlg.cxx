@@ -32,6 +32,7 @@ namespace HH4B
     }
 
     ATH_CHECK(m_largeJetInKey.initialize());
+    ATH_CHECK(m_eventInfoKey.initialize());
 
     return StatusCode::SUCCESS;
   }
@@ -40,22 +41,27 @@ namespace HH4B
   {
     ATH_MSG_DEBUG("Executing " << name());
 
-    SG::ReadHandle<JC> largeRJets(m_largeJetInKey);
+    SG::ReadHandle<xAOD::JetContainer> largeRJets(m_largeJetInKey);
     ATH_CHECK(largeRJets.isValid());
+    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_eventInfoKey);
+    ATH_CHECK(eventInfo.isValid());
 
-    ATH_CHECK(recordVRTrackJetGhostAssociation(*largeRJets));
+    ATH_CHECK(recordVRTrackJetGhostAssociation(*largeRJets, *eventInfo));
 
     return StatusCode::SUCCESS;
   }
 
   StatusCode
   LargeJetGhostVRJetAssociationAlg ::recordVRTrackJetGhostAssociation(
-      const JC &largeRJets) const
+      const xAOD::JetContainer &largeRJets,
+      const xAOD::EventInfo &eventInfo) const
   {
     ATH_MSG_DEBUG("Saving large-R jets as \"" << m_largeJetInKey.key()
                                               << "\".");
 
     int maxLeadingGAVRjetsSize = 3;
+    char passRelativeDeltaRToVRJetCut = 1;
+
     for (auto *largejet : largeRJets)
     {
       // get ghost associated VR track jets from untrimmed large R jet
@@ -74,6 +80,20 @@ namespace HH4B
                          std::abs((*vrjet)->eta()) < 2.5);
               }),
           ilargeRjet_ghostVRjets.end());
+
+      bool passesDRcut =
+          std::find_if(ilargeRjet_ghostVRjets.begin(),
+                       ilargeRjet_ghostVRjets.end(),
+                       [&](ELPC &vrjet) {
+                         return relativeDeltaRToVRJet(**vrjet) >= 1.0;
+                       }) != ilargeRjet_ghostVRjets.end();
+
+      if (!passesDRcut)
+      {
+        ATH_MSG_WARNING("VR track jets overlap found, recording to "
+                        "EventInfo.passRelativeDeltaRToVRJetCut");
+        passRelativeDeltaRToVRJetCut = 0;
+      }
 
       ATH_MSG_VERBOSE("Number of VR jets per large R jet: "
                       << ilargeRjet_ghostVRjets.size());
@@ -171,6 +191,9 @@ namespace HH4B
         m_leadingVRTrackJetBtagDecorators[j](*largejet) = btags[j];
       }
     }
+
+    m_passRelativeDeltaRToVRJetCutDecorator(eventInfo) =
+        passRelativeDeltaRToVRJetCut;
 
     return StatusCode::SUCCESS;
   }

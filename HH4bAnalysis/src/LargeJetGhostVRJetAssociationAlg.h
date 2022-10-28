@@ -9,6 +9,7 @@
 
 #include "Math/GenVector/VectorUtil.h" // for computing deltaR
 #include <AthContainers/AuxElement.h>
+#include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 
 // Class definition
@@ -32,26 +33,37 @@ public:
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
 private:
-    using JC = xAOD::JetContainer;
     using ELPC = ElementLink<xAOD::IParticleContainer>;
+    using ELJC = ElementLink<xAOD::JetContainer>;
 
-    StatusCode recordVRTrackJetGhostAssociation(const JC &) const;
+    StatusCode recordVRTrackJetGhostAssociation(const xAOD::JetContainer &,
+                                                const xAOD::EventInfo &) const;
 
-    SG::ReadHandleKey<JC> m_largeJetInKey{
+    SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey{
+        this, "EventInfoKey", "EventInfo",
+        "the eventInfo container to decorate"};
+
+    SG::ReadHandleKey<xAOD::JetContainer> m_largeJetInKey{
         this, "LargeJetInKey", "", "the large-R jet collection to run on"};
 
+    std::vector<std::string> m_workingPoints;
+
     // ghost associated VR track jets are only on the untrimmed 1.0 jets
-    SG::AuxElement::ConstAccessor<ElementLink<JC>> m_largeRUntrimmedAccessor{
-        "Parent"};
+    SG::AuxElement::ConstAccessor<ELJC> m_largeRUntrimmedAccessor{"Parent"};
 
     SG::AuxElement::ConstAccessor<std::vector<ELPC>>
         m_ghostVRTrackJetsAccessor{"GhostAntiKtVR30Rmax4Rmin02PV0TrackJets"};
+
+    std::vector<SG::AuxElement::ConstAccessor<char>> m_isBtagAccessors;
 
     // recommended by ftag : Remove the event if any of your signal jets have
     // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.
     // checks if any of the vr jets overlap
     SG::AuxElement::ConstAccessor<float> relativeDeltaRToVRJet{
         "relativeDeltaRToVRJet"};
+
+    SG::AuxElement::Decorator<float> m_passRelativeDeltaRToVRJetCutDecorator{
+        "passRelativeDeltaRToVRJetCut"};
 
     SG::AuxElement::Decorator<int> m_goodVRTrackJetCountDecorator{
         "goodVRTrackJets"};
@@ -79,12 +91,6 @@ private:
 
     std::vector<SG::AuxElement::Decorator<std::vector<char>>>
         m_leadingVRTrackJetBtagDecorators;
-
-    std::vector<SG::AuxElement::ConstAccessor<char>> m_isBtagAccessors;
-
-    std::vector<std::string> m_workingPoints;
-
-    bool m_isMC;
   };
 }
 
