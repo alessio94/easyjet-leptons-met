@@ -54,15 +54,14 @@ def PileupAnalysisSequenceCfg(flags, dataType, prwFiles, lumicalcFiles):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
 
+    tags = flags.Input.AMITag
     pileupSequence = makePileupAnalysisSequence(
         dataType,
-        userPileupConfigs=prwFiles,
-        userLumicalcFiles=lumicalcFiles,
-        autoConfig=False,
+        files=flags.Input.Files,
+        useDefaultConfig=SampleTypes.mc21a.value in tags
     )
     pileupSequence.configure(inputName={}, outputName={})
 
-    tags = flags.Input.AMITag
     cfg.addSequence(CompFactory.AthSequencer(pileupSequence.getName()))
     for alg in pileupSequence.getGaudiConfig2Components():
         # Workaround for mc21 courtesy of
@@ -81,15 +80,25 @@ def GeneratorAnalysisSequenceCfg(flags, dataType):
         makeGeneratorAnalysisSequence,
     )
 
+    tags = flags.Input.AMITag.split('_')
+    ptag = ''
+    for tag in reversed(tags):
+        if tag.startswith('p'):
+            ptag = tag
+            break
+    if not ptag:
+        print(f"Did not find p-tag in AMI tags: {flags.Input.AMITag}")
+    doCBK = ptag and ptag not in ['p5226', 'p5278', 'p5334']
     generatorSequence = makeGeneratorAnalysisSequence(
         dataType,
-        saveCutBookkeepers=True,
+        saveCutBookkeepers=doCBK,
         runNumber=flags.Input.RunNumber[0],
-        cutBookkeepersSystematics=True,
+        cutBookkeepersSystematics=doCBK,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(generatorSequence.getName()))
     for alg in generatorSequence.getGaudiConfig2Components():
         cfg.addEventAlgo(alg, generatorSequence.getName())
 
+    cfg.printConfig(summariseProps=True)
     return cfg

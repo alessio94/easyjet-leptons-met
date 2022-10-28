@@ -22,6 +22,7 @@ def JetAnalysisSequenceCfg(
         enableCutflow=False,
         enableKinematicHistograms=False,
         runJvtUpdate=True,
+        runNNJvtUpdate=True,
         runJvtSelection=True,
     )
 
@@ -97,6 +98,8 @@ def FatJetAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContain
 
     cfg.addSequence(CompFactory.AthSequencer(largeRrecojetSequence.getName()))
     for alg in largeRrecojetSequence.getGaudiConfig2Components():
+        if 'JetCalibrationAlg' in alg.getName():
+            alg.calibrationTool.IsData = (dataType == 'data')
         cfg.addEventAlgo(alg, largeRrecojetSequence.getName())
 
     return cfg
