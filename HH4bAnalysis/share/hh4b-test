@@ -51,16 +51,16 @@ declare -A TESTS=(
 )
 
 ntuple-dump() {
-    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
+    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --allow-no-ptag
 }
 ntuple-dump-fast() {
-    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --meta-cache
+    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --allow-no-ptag --meta-cache
 }
 ntuple-dump-physlite() {
-    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --disable-calib 
+    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --allow-no-ptag --disable-calib 
 }
 ntuple-dump-physlite-fast() {
-    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --disable-calib --meta-cache
+    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --allow-no-ptag --disable-calib --meta-cache
 }
 
 ################################################

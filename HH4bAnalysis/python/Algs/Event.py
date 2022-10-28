@@ -88,6 +88,8 @@ def GeneratorAnalysisSequenceCfg(flags, dataType):
             break
     if not ptag:
         print(f"Did not find p-tag in AMI tags: {flags.Input.AMITag}")
+        if not flags.Analysis.allow_no_ptag:
+            raise RuntimeError("Could not determine p-tag from file metadata")
     doCBK = ptag and ptag not in ['p5226', 'p5278', 'p5334']
     generatorSequence = makeGeneratorAnalysisSequence(
         dataType,
@@ -100,5 +102,4 @@ def GeneratorAnalysisSequenceCfg(flags, dataType):
     for alg in generatorSequence.getGaudiConfig2Components():
         cfg.addEventAlgo(alg, generatorSequence.getName())
 
-    cfg.printConfig(summariseProps=True)
     return cfg
