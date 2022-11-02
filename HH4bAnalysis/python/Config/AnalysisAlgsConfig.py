@@ -2,10 +2,7 @@ from pathlib import Path
 
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from HH4bAnalysis.Algs.DiHiggsAnalysis import (
-    DiHiggsAnalysisAlgCfg,
-    DiHiggsAnalysisChainCfg,
-)
+from HH4bAnalysis.Algs.DiHiggsAnalysis import DiHiggsAnalysisChainCfg
 from HH4bAnalysis.Algs.Electrons import ElectronAnalysisSequenceCfg
 from HH4bAnalysis.Algs.Event import (
     EventSelectionAnalysisSequenceCfg,
@@ -216,17 +213,6 @@ def AnalysisAlgsCfg(
             doMuons=do_muons,
         )
     )
-
-    if flags.Analysis.do_dihiggs_analysis and not flags.Analysis.disable_calib:
-        cfg.merge(
-            DiHiggsAnalysisAlgCfg(
-                flags,
-                SmallJetKey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
-                LargeJetKey=containers["outputs"]["reco10Jet"].replace(
-                    "%SYS%", "NOSYS"
-                ),
-            )
-        )
 
     if (
         flags.Analysis.do_resolved_dihiggs_analysis

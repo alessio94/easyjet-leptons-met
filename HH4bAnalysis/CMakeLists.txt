@@ -19,15 +19,12 @@ atlas_add_component(HH4bAnalysis
   src/VariableDumperAlg.cxx
   src/TruthParticleInformationAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
-  src/DiHiggsAnalysis.cxx
   src/JetSelectorAlg.cxx
   src/JetPairingAlg.cxx
   src/FinalVarsResolvedAlg.cxx
   src/FinalVarsBoostedAlg.cxx
   src/JetTruthMatcherAlg.cxx
   src/GhostAssocVRJetGetterAlg.cxx
-  src/DiHiggsAnalysisHelpers.cxx
-  src/DiHiggsAnalysisAlg.cxx
   src/tools/NTrkVertexCounter.cxx
   src/components/*.cxx
   LINK_LIBRARIES
