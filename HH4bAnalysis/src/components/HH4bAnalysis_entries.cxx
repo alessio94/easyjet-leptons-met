@@ -1,4 +1,3 @@
-#include "../DiHiggsAnalysisAlg.h"
 #include "../FinalVarsBoostedAlg.h"
 #include "../FinalVarsResolvedAlg.h"
 #include "../GhostAssocVRJetGetterAlg.h"
@@ -14,7 +13,6 @@ using namespace HH4B;
 
 DECLARE_COMPONENT(FinalVarsBoostedAlg)
 DECLARE_COMPONENT(FinalVarsResolvedAlg)
-DECLARE_COMPONENT(DiHiggsAnalysisAlg)
 DECLARE_COMPONENT(GhostAssocVRJetGetterAlg)
 DECLARE_COMPONENT(JetPairingAlg)
 DECLARE_COMPONENT(JetSelectorAlg)

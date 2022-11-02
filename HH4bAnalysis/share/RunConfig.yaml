@@ -18,13 +18,10 @@ trigger_year: Auto
 trigger_list: ["HH4bResolved", "HH4bBoosted"]
 # apply loose jet cleaning only
 loose_jet_cleaning: true
-# which diHiggs analyses to do
-do_dihiggs_analysis: false
-do_resolved_analysis: false
-do_boosted_analysis: false
-# new implementation
+# if you want to run a baseline diHiggs analyses
 do_resolved_dihiggs_analysis: false
 do_boosted_dihiggs_analysis: false
+# if you want to truth match the resolved (is MC protected)
 truth_match_resolved: false
 # whether to output a meta data file
 meta_cache: false
