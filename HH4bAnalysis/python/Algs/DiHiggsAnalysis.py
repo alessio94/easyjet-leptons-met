@@ -19,8 +19,8 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
                     bTagWP=btag_wp,  # empty string: "" ignores btagging
                     minPt=20_000,
                     maxEta=2.5,
-                    howManyToKeep=4,  # -1 means keep all
-                    minimumToHave=4,  # -1 means ignores this
+                    truncateAtAmount=4,  # -1 means keep all
+                    minimumAmount=4,  # -1 means ignores this
                     pTsort=True,
                 )
             )
@@ -71,8 +71,8 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
                     bTagWP="",  # empty string: "" ignores btagging
                     minPt=250_000,
                     maxEta=2.0,
-                    howManyToKeep=2,  # -1 means keep all
-                    minimumToHave=2,  # -1 means ignores this
+                    truncateAtAmount=2,  # -1 means keep all
+                    minimumAmount=2,  # -1 means ignores this
                     pTsort=True,
                 )
             )
@@ -95,8 +95,8 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
                     bTagWP=btag_wp,  # empty string: "" ignores btagging
                     minPt=10_000,
                     maxEta=2.5,
-                    howManyToKeep=3,  # -1 means keep all
-                    minimumToHave=2,  # -1 means ignores this
+                    truncateAtAmount=3,  # -1 means keep all
+                    minimumAmount=2,  # -1 means ignores this
                     pTsort=True,
                     removeRelativeDeltaRToVRJet=True,
                 )
@@ -122,8 +122,8 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
                     bTagWP=btag_wp,  # empty string: "" ignores btagging
                     minPt=10_000,
                     maxEta=2.5,
-                    howManyToKeep=3,  # -1 means keep all
-                    minimumToHave=2,  # -1 means ignores this
+                    truncateAtAmount=3,  # -1 means keep all
+                    minimumAmount=2,  # -1 means ignores this
                     pTsort=True,
                     removeRelativeDeltaRToVRJet=True,
                 )
