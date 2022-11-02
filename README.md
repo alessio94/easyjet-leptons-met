@@ -99,7 +99,7 @@ grid_submit.py -h
 
 ## Development
 
-You can use pre-commit hooks, that check if you linted and formatted the files when you execute `git commit`. It prevents you from pushing something that will fail a pipeline in the CI on gitlab. All you have to do is install pre-commit with pip. The following will do it for you (currently only pre-commits is in the requirements.txt, but let's have it like that as it might grow).
+You can use pre-commit hooks, that check and autoformats some style and formatting hooks in `.pre-commit-config.yaml` when you execute `git commit`. All you have to do is install pre-commit with pip. The following will do it for you.
 
 ```
 pip install -r requirements.txt --user

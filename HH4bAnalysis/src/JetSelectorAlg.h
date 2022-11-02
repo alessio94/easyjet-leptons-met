@@ -42,8 +42,8 @@ private:
     std::string m_bTagWP;
     float m_minPt;
     float m_maxEta;
-    int m_minimumToHave;
-    int m_howManyToKeep;
+    int m_minimumAmount;
+    int m_truncateAtAmount;
     bool m_pTsort;
     bool m_removeRelativeDeltaRToVRJet;
     std::unordered_map<std::string,

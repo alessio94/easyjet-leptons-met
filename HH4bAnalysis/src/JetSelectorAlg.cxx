@@ -18,8 +18,8 @@ namespace HH4B
     declareProperty("bTagWP", m_bTagWP);
     declareProperty("minPt", m_minPt);
     declareProperty("maxEta", m_maxEta);
-    declareProperty("minimumToHave", m_minimumToHave);
-    declareProperty("howManyToKeep", m_howManyToKeep);
+    declareProperty("minimumAmount", m_minimumAmount);
+    declareProperty("truncateAtAmount", m_truncateAtAmount);
     declareProperty("pTsort", m_pTsort);
     declareProperty("removeRelativeDeltaRToVRJet",
                     m_removeRelativeDeltaRToVRJet = false);
@@ -107,22 +107,39 @@ namespace HH4B
       }
     }
 
-    // decorate nr of selected particles to the eventinfo
-    int nParticles = workContainer->size();
-    nSelectedParticles_dec(*eventInfo) = nParticles;
+    int nJets = workContainer->size();
+    // if we have less than the requested nr, empty the workcontainer to write
+    // defaults/return empty container
+    if (nJets < m_minimumAmount)
+    {
+      workContainer->clear();
+      nJets = 0;
+    }
 
-    // sort and make sure we have the configured amounts
-    if (m_pTsort && nParticles >= m_howManyToKeep)
+    // decorate nr of selected particles to the eventinfo
+    nSelectedParticles_dec(*eventInfo) = nJets;
+
+    // sort and truncate
+    int nKeep;
+    if (nJets < m_truncateAtAmount)
+    {
+      nKeep = nJets;
+    }
+    else
+    {
+      nKeep = m_truncateAtAmount;
+    }
+
+    if (m_pTsort)
     {
       // if we give -1, sort the whole container
-      if (m_howManyToKeep == -1)
+      if (m_truncateAtAmount == -1)
       {
-        m_howManyToKeep = nParticles;
+        nKeep = nJets;
       }
       std::partial_sort(
           workContainer->begin(), // Iterator from which to start sorting
-          workContainer->begin() +
-              m_howManyToKeep,  // Use begin + N to sort first N
+          workContainer->begin() + nKeep, // Use begin + N to sort first N
           workContainer->end(), // Iterator marking the end of range to sort
           [](const xAOD::IParticle *left, const xAOD::IParticle *right)
           {
@@ -131,15 +148,8 @@ namespace HH4B
               // function that returns bool
 
       // keep only the requested amount
-      workContainer->erase(workContainer->begin() + m_howManyToKeep,
+      workContainer->erase(workContainer->begin() + nKeep,
                            workContainer->end());
-    }
-
-    // if we have less than the requested nr, empty the workcontainer to write
-    // defaults/return empty container
-    if (int(workContainer->size()) < m_minimumToHave)
-    {
-      workContainer->clear();
     }
 
     // decorate eventInfo
