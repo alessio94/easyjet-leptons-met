@@ -37,13 +37,8 @@ private:
         this, "containerInKey", "", "containerName to read"};
     SG::WriteHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerOutKey{
         this, "containerOutKey", "", "containerName to write"};
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-        this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
     std::string m_pairingStrategy;
-    std::unordered_map<std::string,
-                       SG::AuxElement::Decorator<std::vector<float>>>
-        m_fourVecDecos;
   };
 }
 

@@ -22,22 +22,7 @@ namespace HH4B
   StatusCode JetPairingAlg ::initialize()
   {
     ATH_CHECK(m_containerInKey.initialize());
-    ATH_CHECK(m_EventInfoKey.initialize());
     ATH_CHECK(m_containerOutKey.initialize());
-
-    // make decorators for the four vectors
-    std::vector<std::string> vars{
-        "pt",
-        "eta",
-        "phi",
-        "m",
-    };
-    for (std::string var : vars)
-    {
-      std::string deco_var = m_containerOutKey.key() + "_" + var;
-      SG::AuxElement::Decorator<std::vector<float>> deco(deco_var);
-      m_fourVecDecos.emplace(deco_var, deco);
-    };
 
     return StatusCode::SUCCESS;
   }
@@ -47,26 +32,12 @@ namespace HH4B
     // container we read in
     SG::ReadHandle<ConstDataVector<xAOD::JetContainer>> inContainer(
         m_containerInKey);
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
     ATH_CHECK(inContainer.isValid());
-    ATH_CHECK(eventInfo.isValid());
 
     // fill workContainer with "views" of the inContainer
     // see TJ's tutorial for this
     auto workContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
         inContainer->begin(), inContainer->end(), SG::VIEW_ELEMENTS);
-
-    // decorate eventInfo
-    std::vector<float> jet_pt;
-    std::vector<float> jet_eta;
-    std::vector<float> jet_phi;
-    std::vector<float> jet_m;
-
-    // set defaults
-    jet_pt.push_back(-100);
-    jet_eta.push_back(-100);
-    jet_phi.push_back(-100);
-    jet_m.push_back(-100);
 
     // this assumes that container is pt sorted (use the JetSelectorAlg for
     // this) and checks if we have at least 4 jets otherwise exit this alg
@@ -117,28 +88,7 @@ namespace HH4B
       }
       // keep only the higgs candidate ones to avoid confusion
       workContainer->erase(workContainer->begin() + 4, workContainer->end());
-
-      // decorate
-      jet_pt.clear();
-      jet_eta.clear();
-      jet_phi.clear();
-      jet_m.clear();
-      for (const xAOD::Jet *jet : *workContainer)
-      {
-        jet_pt.push_back(jet->pt());
-        jet_eta.push_back(jet->eta());
-        jet_phi.push_back(jet->phi());
-        jet_m.push_back(jet->m());
-      }
     }
-
-    // clang-format off
-      m_fourVecDecos.at(m_containerOutKey.key() + "_pt")(*eventInfo) = jet_pt;
-      m_fourVecDecos.at(m_containerOutKey.key() + "_eta")(*eventInfo) = jet_eta;
-      m_fourVecDecos.at(m_containerOutKey.key() + "_phi")(*eventInfo) = jet_phi;
-      m_fourVecDecos.at(m_containerOutKey.key() + "_m")(*eventInfo) = jet_m;
-    // clang-format on
-
     // write to EventStore
     SG::WriteHandle<ConstDataVector<xAOD::JetContainer>> Writer(
         m_containerOutKey);
