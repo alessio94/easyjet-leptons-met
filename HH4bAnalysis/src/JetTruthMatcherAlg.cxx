@@ -18,17 +18,29 @@ namespace HH4B
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
     declareProperty("bTagWP", m_bTagWP);
+    declareProperty("regime", m_regime);
+    declareProperty("containerOutKey", m_containerOutKey);
   }
 
   StatusCode JetTruthMatcherAlg ::initialize()
   {
-    ATH_CHECK(m_containerInKey.initialize());
+    if (m_regime == "resolved")
+    {
+      ATH_CHECK(m_smallRContainerInKey.initialize());
+    }
+    else if (m_regime == "boosted")
+    {
+      ATH_CHECK(m_leadingLargeR_GA_VRJets.initialize());
+      ATH_CHECK(m_subLeadingLargeR_GA_VRJets.initialize());
+    }
+
     ATH_CHECK(m_EventInfoKey.initialize());
+    ATH_CHECK(m_containerOutKey.initialize());
 
     // make decorators
     for (std::string var : m_vars)
     {
-      std::string deco_var = var + m_bTagWP;
+      std::string deco_var = m_regime + var + m_bTagWP;
       SG::AuxElement::Decorator<float> deco(deco_var);
       m_decos.emplace(deco_var, deco);
     };
@@ -37,28 +49,61 @@ namespace HH4B
 
   StatusCode JetTruthMatcherAlg ::execute()
   {
-    // container we read in
-    SG::ReadHandle<xAOD::JetContainer> inContainer(m_containerInKey);
+    // this will hold the jets we want to truthmatch
+    ConstDataVector<xAOD::JetContainer> jets(SG::VIEW_ELEMENTS);
+    // get the jets for the analysis regime
+    if (m_regime == "resolved")
+    {
+      SG::ReadHandle<xAOD::JetContainer> pairedJets(m_smallRContainerInKey);
+      ATH_CHECK(pairedJets.isValid());
+      for (const xAOD::Jet *jet : *pairedJets)
+      {
+        jets.push_back(jet);
+      }
+    }
+    else if (m_regime == "boosted")
+    {
+      SG::ReadHandle<xAOD::JetContainer> h1_VRjets(m_leadingLargeR_GA_VRJets);
+      SG::ReadHandle<xAOD::JetContainer> h2_VRjets(
+          m_subLeadingLargeR_GA_VRJets);
+      ATH_CHECK(h1_VRjets.isValid());
+      ATH_CHECK(h2_VRjets.isValid());
+      if ((*h1_VRjets).size() >= 2 && (*h2_VRjets).size() >= 2)
+      {
+        jets.push_back((*h1_VRjets)[0]);
+        jets.push_back((*h1_VRjets)[1]);
+        jets.push_back((*h2_VRjets)[0]);
+        jets.push_back((*h2_VRjets)[1]);
+      }
+    }
+    // some other containers we need
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
     SG::ReadHandle<xAOD::TruthParticleContainer> truthBosons(
         "TruthBosonsWithDecayParticles");
     SG::ReadHandle<xAOD::TruthParticleContainer> truthBSM(
         "TruthBSMWithDecayParticles");
-    ATH_CHECK(inContainer.isValid());
     ATH_CHECK(eventInfo.isValid());
     ATH_CHECK(truthBosons.isValid());
     ATH_CHECK(truthBSM.isValid());
 
-    // set default final final decorations
+    // we want to find the closest truth b's and its deltaR to the jets
+    // this will be used to decorate four vectors with the JetSelectorAlg
+    auto closestTruthBout =
+        std::make_unique<ConstDataVector<xAOD::JetContainer>>(
+            SG::VIEW_ELEMENTS);
+    SG::WriteHandle<ConstDataVector<xAOD::JetContainer>> Writer(
+        m_containerOutKey);
+    // set default decorations
     for (std::string var : m_vars)
     {
-      std::string deco_var = var + m_bTagWP;
+      std::string deco_var = m_regime + var + m_bTagWP;
       m_decos.at(deco_var)(*eventInfo) = -1.;
     };
 
-    // check if we have 4 paired jets
-    if ((*inContainer).size() < 4)
+    // check if we have 4 jets
+    if (jets.size() < 4)
     {
+      ATH_CHECK(Writer.record(std::move(closestTruthBout)));
       return StatusCode::SUCCESS;
     }
 
@@ -102,7 +147,7 @@ namespace HH4B
     // find the closest truth b and its deltaR to the jet
     std::vector<const xAOD::TruthParticle *> closestTruthB;
     std::vector<float> closestTruthBdeltaR;
-    for (const xAOD::Jet *jet : *inContainer)
+    for (const xAOD::Jet *jet : jets)
     {
       // calculate dR to truth B's from initial particles
       std::vector<float> dRtoTruthBs;
@@ -127,28 +172,44 @@ namespace HH4B
     if (closestTruthB[0]->parent()->barcode() ==
         closestTruthB[1]->parent()->barcode())
     {
-      m_decos.at("resolved_h1_closestTruthBsHaveSameInitialParticle_" + m_bTagWP)(*eventInfo) = 1.;
+      m_decos.at(m_regime + "_h1_closestTruthBsHaveSameInitialParticle_" + m_bTagWP)(*eventInfo) = 1.;
     }
     else
     {
-      m_decos.at("resolved_h1_closestTruthBsHaveSameInitialParticle_" + m_bTagWP)(*eventInfo) = 0.;
+      m_decos.at(m_regime + "_h1_closestTruthBsHaveSameInitialParticle_" + m_bTagWP)(*eventInfo) = 0.;
     }
 
     if (closestTruthB[2]->parent()->barcode() ==
         closestTruthB[3]->parent()->barcode())
     {
-      m_decos.at("resolved_h2_closestTruthBsHaveSameInitialParticle_" + m_bTagWP)(*eventInfo) = 1.;
+      m_decos.at(m_regime + "_h2_closestTruthBsHaveSameInitialParticle_" + m_bTagWP)(*eventInfo) = 1.;
     }
     else
     {
-      m_decos.at("resolved_h2_closestTruthBsHaveSameInitialParticle_" + m_bTagWP)(*eventInfo) = 0.;
+      m_decos.at(m_regime + "_h2_closestTruthBsHaveSameInitialParticle_" + m_bTagWP)(*eventInfo) = 0.;
     }
 
-    m_decos.at("resolved_h1_dR_leadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthBdeltaR[0];
-    m_decos.at("resolved_h1_dR_subleadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthBdeltaR[1];
-    m_decos.at("resolved_h2_dR_leadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthBdeltaR[2];
-    m_decos.at("resolved_h2_dR_subleadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthBdeltaR[3];
+    m_decos.at(m_regime + "_h1_dR_leadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthBdeltaR[0];
+    m_decos.at(m_regime + "_h1_dR_subleadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthBdeltaR[1];
+    m_decos.at(m_regime + "_h2_dR_leadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthBdeltaR[2];
+    m_decos.at(m_regime + "_h2_dR_subleadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthBdeltaR[3];
+    m_decos.at(m_regime + "_h1_parentPdgId_leadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthB[0]->parent()->pdgId();
+    m_decos.at(m_regime + "_h1_parentPdgId_subleadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthB[1]->parent()->pdgId();
+    m_decos.at(m_regime + "_h2_parentPdgId_leadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthB[2]->parent()->pdgId();
+    m_decos.at(m_regime + "_h2_parentPdgId_subleadingJet_closestTruthB_" + m_bTagWP)(*eventInfo) = closestTruthB[3]->parent()->pdgId();
     // clang-format on
+
+    // I know this is not so nice, but it does the job:
+    // write matched truths as jets to eventStore to write with
+    // jetSelectorAlg four vector info
+    for (const xAOD::TruthParticle *b : closestTruthB)
+    {
+      const xAOD::IParticle *ptcl = static_cast<const xAOD::IParticle *>(b);
+      const xAOD::Jet *jet = static_cast<const xAOD::Jet *>(ptcl);
+      closestTruthBout->push_back(jet);
+    }
+
+    ATH_CHECK(Writer.record(std::move(closestTruthBout)));
 
     return StatusCode::SUCCESS;
   }

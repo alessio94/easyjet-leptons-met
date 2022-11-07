@@ -53,7 +53,7 @@ TreeBranches += [
 | minPt                       | float  | 20_000                    | minimum pt                                                                                                                                                                     |
 | maxEta                      | float  | 2.0                       | maximum eta                                                                                                                                                                    |
 | minimumAmount               | int    | 4                         | minimum amount of the output jets you require. It can be ignored with `-1`. It will return an empty container if the condition is not fulfilled                                |
-| truncateAtAmount               | int    | 4                         | truncates the nr of jets to the given value. This also optimizes the sorting. It can be ignored with `-1`. It will return an empty container if the condition is not fulfilled |
+| truncateAtAmount            | int    | 4                         | truncates the nr of jets to the given value. This also optimizes the sorting. It can be ignored with `-1`. It will return an empty container if the condition is not fulfilled |
 | pTsort                      | bool   | true                      | Wether to sort the jets by pt                                                                                                                                                  |
 | removeRelativeDeltaRToVRJet | bool   | false   (per default)     | This is to remove VR jets that overlap within a large R jet. If this is the case it will return an empty jet container                                                         |
 
@@ -184,30 +184,38 @@ jtm[containerInKey\nbTagWP]
    end
 JetTruthMatcherAlg --> B[decorate Eventinfo: \nfromSameInitialProcess\ndecorate jet.deltaRClosestTruthB]
 ```
-This does:
+JetTruthMatching configurable for boosted and resolved. What it does:
 - Get all the truth Scalars (pdgId == 35) and Higgs (pdgId == 25) from the containers `TruthBSMWithDecayParticles` and `TruthBosonsWithDecayParticles` 
 - Extract only the first! decay children truth b-quarks from the initial Scalar and Higgs in order to get the actual b's for the 4b final state analysis.
 - Use Higgs candidate jets and calculate delta R per given jet and truth B 
-- Find the closest truth b to each jet
-- check if the closest truth b's to the jets used to reconstruct a Higgs share the same parent
+- Find the closest truth b to each jet 
+- check if the closest truth b's to the jets, that were used to reconstruct a Higgs, share the same parent
+- write the closest truthB's as Jets to the eventStore to write four vectors with the JetSelectorAlg
 
 Writes defaults `-1` if not at least 4 jets are given. The truth matching becomes useful if you apply a delta R criterion on top of the closeness matching.
 
 
-| option         | type   | example                   | meaning                                               |
-| -------------- | ------ | ------------------------- | ----------------------------------------------------- |
-| containerInKey | string | "MyPairedJets"            | xAOD::JetContainer name                               |
-| bTagWP         | string | "DL1dv00_FixedCutBEff_77" | btagging working point (needed for unique decoration) |
+| option                     | type   | example                        | meaning                                                                                                     |
+| -------------------------- | ------ | ------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| regime                     | string | "resolved"                     | accepts "resolved", "boosted", you also only need to give the required container for the regime in question |
+| bTagWP                     | string | "DL1dv00_FixedCutBEff_77"      | btagging working point (needed for unique decoration)                                                       |
+| smallRContainerInKey       | string | "MyPairedJets"                 | xAOD::JetContainer name                                                                                     |
+| leadingLargeR_GA_VRJets    | string | "MyVRJetsFromLeadingLargeR"    | xAOD::JetContainer name, you retrieved these with the `GhostAssocVRJetGetterAlg`                            |
+| subLeadingLargeR_GA_VRJets | string | "MyVRJetsFromSubLeadingLargeR" | xAOD::JetContainer name, you retrieved these with the `GhostAssocVRJetGetterAlg`                            |
+| containerOutKey            | string | "resolvedTruthMatched_out_"    | xAOD::JetContainer name, send this to the JetSelectorAlg to decorate the truth four vectors                 |
+
 
 Decorations per working point in the format `EventInfo.resolved_{variable}_{bTagWP}`:
 
-| variable                     | meaning                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------- |
-| h1_fromSameInitialParticle   | (bool) closest truth b's to the resonctructed h1 jet have the same parent |
-| h2_fromSameInitialParticle   | (bool) closest truth b's to the resonctructed h2 jet have the same parent |
-| h1_dR_leadingJet_closestB    | delta R (leading jet in h1, closest truth b to this jet)                  |
-| h2_dR_leadingJet_closestB    | delta R (leading jet in h2, closest truth b to this jet)                  |
-| h1_dR_subleadingJet_closestB | delta R (subleading jet in h1, closest truth b to this jet)               |
-| h2_dR_subleadingJet_closestB | delta R (subleading jet in h2, closest truth b to this jet)               |
->TODO: add boosted regime, flag for S/H
-
+| variable                                   | meaning                                                                   |
+| ------------------------------------------ | ------------------------------------------------------------------------- |
+| h1_fromSameInitialParticle                 | (bool) closest truth b's to the resonctructed h1 jet have the same parent |
+| h2_fromSameInitialParticle                 | (bool) closest truth b's to the resonctructed h2 jet have the same parent |
+| h1_dR_leadingJet_closestB                  | delta R (leading jet in h1, closest truth b to this jet)                  |
+| h2_dR_leadingJet_closestB                  | delta R (leading jet in h2, closest truth b to this jet)                  |
+| h1_dR_subleadingJet_closestB               | delta R (subleading jet in h1, closest truth b to this jet)               |
+| h2_dR_subleadingJet_closestB               | delta R (subleading jet in h2, closest truth b to this jet)               |
+| h1_parentPdgId_leadingJet_closestTruthB    | parent pdg id of the closest truth b to the leading jet in h1             |
+| h1_parentPdgId_subleadingJet_closestTruthB | parent pdg id of the closest truth b to the subleading jet in h1          |
+| h2_parentPdgId_leadingJet_closestTruthB    | parent pdg id of the closest truth b to the leading jet in h2             |
+| h2_parentPdgId_subleadingJet_closestTruthB | parent pdg id of the closest truth b to the subleading jet in h2          |

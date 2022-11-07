@@ -53,9 +53,24 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
             if flags.Analysis.truth_match_resolved and flags.Input.isMC:
                 cfg.addEventAlgo(
                     CompFactory.HH4B.JetTruthMatcherAlg(
-                        "JetTruthMatcherAlg_" + btag_wp,
-                        containerInKey="pairedResolvedAnalysisJets_" + btag_wp,
+                        "ResolvedJetTruthMatcherAlg_" + btag_wp,
+                        smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_wp,
                         bTagWP=btag_wp,
+                        regime="resolved",
+                        containerOutKey="resolvedTruthMatched_out_" + btag_wp,
+                    )
+                )
+                cfg.addEventAlgo(
+                    CompFactory.HH4B.JetSelectorAlg(
+                        "ResolvedTruthMatchDecoratorAlg_" + btag_wp,
+                        containerInKey="resolvedTruthMatched_out_" + btag_wp,
+                        containerOutKey="resolved_truthMatched_" + btag_wp,
+                        bTagWP="",  # empty string: "" ignores btagging
+                        minPt=0,
+                        maxEta=10,
+                        truncateAtAmount=-1,  # -1 means keep all
+                        minimumAmount=-1,  # -1 means ignores this
+                        pTsort=False,
                     )
                 )
 
@@ -141,6 +156,34 @@ def DiHiggsAnalysisChainCfg(flags, SmallJetKey, LargeJetKey):
                 )
             )
 
+            # truth matching the vr jets
+            if flags.Analysis.truth_match_boosted and flags.Input.isMC:
+                cfg.addEventAlgo(
+                    CompFactory.HH4B.JetTruthMatcherAlg(
+                        "BoostedJetTruthMatcherAlg_" + btag_wp,
+                        leadingLargeR_GA_VRJets="SelectedLeadingLargeRVRJets_"
+                        + btag_wp,
+                        subLeadingLargeR_GA_VRJets="SelectedSubLeadingLargeRVRJets_"
+                        + btag_wp,
+                        bTagWP=btag_wp,
+                        regime="boosted",
+                        containerOutKey="boostedTruthMatched_out_" + btag_wp,
+                    )
+                )
+                cfg.addEventAlgo(
+                    CompFactory.HH4B.JetSelectorAlg(
+                        "BoostedTruthMatchDecoratorAlg_" + btag_wp,
+                        containerInKey="boostedTruthMatched_out_" + btag_wp,
+                        containerOutKey="boosted_truthMatched_" + btag_wp,
+                        bTagWP="",  # empty string: "" ignores btagging
+                        minPt=0,
+                        maxEta=10,
+                        truncateAtAmount=-1,  # -1 means keep all
+                        minimumAmount=-1,  # -1 means ignores this
+                        pTsort=False,
+                    )
+                )
+
     return cfg
 
 
@@ -168,11 +211,21 @@ def DiHiggsAnalysisAddBranches(flags):
                     "h1_dR_subleadingJet_closestTruthB",
                     "h2_dR_leadingJet_closestTruthB",
                     "h2_dR_subleadingJet_closestTruthB",
+                    "h1_parentPdgId_leadingJet_closestTruthB",
+                    "h1_parentPdgId_subleadingJet_closestTruthB",
+                    "h2_parentPdgId_leadingJet_closestTruthB",
+                    "h2_parentPdgId_subleadingJet_closestTruthB",
                 ]
 
             for var in resolvedVars:
                 analysisTreeBranches += [
                     f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
+                ]
+
+            for var in ["pt", "eta", "phi", "m"]:
+                analysisTreeBranches += [
+                    f"EventInfo.resolved_truthMatched_{btag_wp}_{var} ->"
+                    f" resolved_truthMatched_{btag_wp}_{var}"
                 ]
 
     if flags.Analysis.do_boosted_dihiggs_analysis:
@@ -187,10 +240,19 @@ def DiHiggsAnalysisAddBranches(flags):
                 "h2_jet2_pt",
                 "h2_dR_jets",
                 "hh_m",
+                "h1_parentPdgId_leadingJet_closestTruthB",
+                "h1_parentPdgId_subleadingJet_closestTruthB",
+                "h2_parentPdgId_leadingJet_closestTruthB",
+                "h2_parentPdgId_subleadingJet_closestTruthB",
             ]
             for var in boostedVars:
                 analysisTreeBranches += [
                     f"EventInfo.boosted_{var}_{btag_wp} -> boosted_{btag_wp}_{var}"
                 ]
 
+            for var in ["pt", "eta", "phi", "m"]:
+                analysisTreeBranches += [
+                    f"EventInfo.boosted_truthMatched_{btag_wp}_{var} ->"
+                    f" boosted_truthMatched_{btag_wp}_{var}"
+                ]
     return analysisTreeBranches
