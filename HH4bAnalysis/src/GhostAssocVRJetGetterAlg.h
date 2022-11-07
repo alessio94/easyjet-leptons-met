@@ -43,9 +43,6 @@ private:
 
     // ghost associated VR track jets are only on the untrimmed 1.0 jets
     unsigned int m_whichJet;
-    std::unordered_map<std::string,
-                       SG::AuxElement::Decorator<std::vector<float>>>
-        m_fourVecDecos;
   };
 }
 

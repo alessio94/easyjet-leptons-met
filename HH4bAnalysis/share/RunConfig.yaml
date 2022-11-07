@@ -21,8 +21,9 @@ loose_jet_cleaning: true
 # if you want to run a baseline diHiggs analyses
 do_resolved_dihiggs_analysis: false
 do_boosted_dihiggs_analysis: false
-# if you want to truth match the resolved (is MC protected)
+# if you want to truth match (is MC protected)
 truth_match_resolved: false
+truth_match_boosted: false
 # whether to output a meta data file
 meta_cache: false
 # e.g. for Physlite

@@ -6,6 +6,7 @@
 #ifndef HH4BANALYSIS_JETTRUTHMATCHERALG
 #define HH4BANALYSIS_JETTRUTHMATCHERALG
 
+#include "xAODTruth/TruthParticleContainer.h"
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <xAODEventInfo/EventInfo.h>
@@ -31,25 +32,37 @@ public:
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
-
-    SG::ReadHandleKey<xAOD::JetContainer> m_containerInKey{
-        this, "containerInKey", "", "containerName to read"};
+    SG::ReadHandleKey<xAOD::JetContainer> m_smallRContainerInKey{
+        this, "smallRContainerInKey", "", "containerName to read"};
+    SG::ReadHandleKey<xAOD::JetContainer> m_leadingLargeR_GA_VRJets{
+        this, "leadingLargeR_GA_VRJets", "", "containerName to read"};
+    SG::ReadHandleKey<xAOD::JetContainer> m_subLeadingLargeR_GA_VRJets{
+        this, "subLeadingLargeR_GA_VRJets", "", "containerName to read"};
     SG::WriteHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerOutKey{
         this, "containerOutKey", "", "containerName to write"};
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
     std::string m_bTagWP;
-    std::unordered_map<std::string, SG::AuxElement::Decorator<float>> m_decos;
+    std::string m_regime;
 
+    // decorators
+    std::unordered_map<std::string, SG::AuxElement::Decorator<float>> m_decos;
+    std::unordered_map<std::string,
+                       SG::AuxElement::Decorator<std::vector<float>>>
+        m_fourVecDecos;
     // clang-format off
     std::vector<std::string> m_vars{
-      "resolved_h1_closestTruthBsHaveSameInitialParticle_",
-      "resolved_h2_closestTruthBsHaveSameInitialParticle_",
-      "resolved_h1_dR_leadingJet_closestTruthB_",
-      "resolved_h1_dR_subleadingJet_closestTruthB_",
-      "resolved_h2_dR_leadingJet_closestTruthB_",
-      "resolved_h2_dR_subleadingJet_closestTruthB_",
+      "_h1_closestTruthBsHaveSameInitialParticle_",
+      "_h2_closestTruthBsHaveSameInitialParticle_",
+      "_h1_dR_leadingJet_closestTruthB_",
+      "_h1_dR_subleadingJet_closestTruthB_",
+      "_h2_dR_leadingJet_closestTruthB_",
+      "_h2_dR_subleadingJet_closestTruthB_",
+      "_h1_parentPdgId_leadingJet_closestTruthB_",
+      "_h1_parentPdgId_subleadingJet_closestTruthB_",
+      "_h2_parentPdgId_leadingJet_closestTruthB_",
+      "_h2_parentPdgId_subleadingJet_closestTruthB_",
     };
     // clang-format on
   };
