@@ -26,9 +26,17 @@ namespace HH4B
   {
     if (m_regime == "resolved")
     {
+      m_resolved = true;
+    }
+    if (m_regime == "boosted")
+    {
+      m_boosted = true;
+    }
+    if (m_resolved)
+    {
       ATH_CHECK(m_smallRContainerInKey.initialize());
     }
-    else if (m_regime == "boosted")
+    else if (m_boosted)
     {
       ATH_CHECK(m_leadingLargeR_GA_VRJets.initialize());
       ATH_CHECK(m_subLeadingLargeR_GA_VRJets.initialize());
@@ -52,7 +60,7 @@ namespace HH4B
     // this will hold the jets we want to truthmatch
     ConstDataVector<xAOD::JetContainer> jets(SG::VIEW_ELEMENTS);
     // get the jets for the analysis regime
-    if (m_regime == "resolved")
+    if (m_resolved)
     {
       SG::ReadHandle<xAOD::JetContainer> pairedJets(m_smallRContainerInKey);
       ATH_CHECK(pairedJets.isValid());
@@ -61,7 +69,7 @@ namespace HH4B
         jets.push_back(jet);
       }
     }
-    else if (m_regime == "boosted")
+    else if (m_boosted)
     {
       SG::ReadHandle<xAOD::JetContainer> h1_VRjets(m_leadingLargeR_GA_VRJets);
       SG::ReadHandle<xAOD::JetContainer> h2_VRjets(

@@ -45,7 +45,8 @@ private:
 
     std::string m_bTagWP;
     std::string m_regime;
-
+    bool m_resolved = false;
+    bool m_boosted = false;
     // decorators
     std::unordered_map<std::string, SG::AuxElement::Decorator<float>> m_decos;
     std::unordered_map<std::string,
