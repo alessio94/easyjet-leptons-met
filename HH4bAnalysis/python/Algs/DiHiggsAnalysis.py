@@ -216,16 +216,15 @@ def DiHiggsAnalysisAddBranches(flags):
                     "h2_parentPdgId_leadingJet_closestTruthB",
                     "h2_parentPdgId_subleadingJet_closestTruthB",
                 ]
+                for var in ["pt", "eta", "phi", "m"]:
+                    analysisTreeBranches += [
+                        f"EventInfo.resolved_truthMatched_{btag_wp}_{var} ->"
+                        f" resolved_truthMatched_{btag_wp}_{var}"
+                    ]
 
             for var in resolvedVars:
                 analysisTreeBranches += [
                     f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
-                ]
-
-            for var in ["pt", "eta", "phi", "m"]:
-                analysisTreeBranches += [
-                    f"EventInfo.resolved_truthMatched_{btag_wp}_{var} ->"
-                    f" resolved_truthMatched_{btag_wp}_{var}"
                 ]
 
     if flags.Analysis.do_boosted_dihiggs_analysis:
@@ -240,19 +239,29 @@ def DiHiggsAnalysisAddBranches(flags):
                 "h2_jet2_pt",
                 "h2_dR_jets",
                 "hh_m",
-                "h1_parentPdgId_leadingJet_closestTruthB",
-                "h1_parentPdgId_subleadingJet_closestTruthB",
-                "h2_parentPdgId_leadingJet_closestTruthB",
-                "h2_parentPdgId_subleadingJet_closestTruthB",
             ]
+            if flags.Analysis.truth_match_boosted and flags.Input.isMC:
+                boostedVars += [
+                    "h1_closestTruthBsHaveSameInitialParticle",
+                    "h2_closestTruthBsHaveSameInitialParticle",
+                    "h1_dR_leadingJet_closestTruthB",
+                    "h1_dR_subleadingJet_closestTruthB",
+                    "h2_dR_leadingJet_closestTruthB",
+                    "h2_dR_subleadingJet_closestTruthB",
+                    "h1_parentPdgId_leadingJet_closestTruthB",
+                    "h1_parentPdgId_subleadingJet_closestTruthB",
+                    "h2_parentPdgId_leadingJet_closestTruthB",
+                    "h2_parentPdgId_subleadingJet_closestTruthB",
+                ]
+                for var in ["pt", "eta", "phi", "m"]:
+                    analysisTreeBranches += [
+                        f"EventInfo.boosted_truthMatched_{btag_wp}_{var} ->"
+                        f" boosted_truthMatched_{btag_wp}_{var}"
+                    ]
+
             for var in boostedVars:
                 analysisTreeBranches += [
                     f"EventInfo.boosted_{var}_{btag_wp} -> boosted_{btag_wp}_{var}"
                 ]
 
-            for var in ["pt", "eta", "phi", "m"]:
-                analysisTreeBranches += [
-                    f"EventInfo.boosted_truthMatched_{btag_wp}_{var} ->"
-                    f" boosted_truthMatched_{btag_wp}_{var}"
-                ]
     return analysisTreeBranches
