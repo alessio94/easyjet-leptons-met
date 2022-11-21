@@ -10,7 +10,7 @@ def PhotonAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContain
 
     photonSequence = makePhotonAnalysisSequence(
         dataType,
-        workingPoint="Loose.Undefined",
+        workingPoint="Loose.NonIso",
         postfix="loose",
         deepCopyOutput=False,
         shallowViewOutput=True,

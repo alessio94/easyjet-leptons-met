@@ -175,16 +175,6 @@ def AnalysisAlgsCfg(
                 )
             )
 
-        if dataType != "data":
-            log.info("Adding truth particle info seq")
-            cfg.merge(
-                TruthParticleInformationAlgCfg(
-                    flags,
-                    inputContainerName=containers["inputs"]["truthParticles"],
-                    outputContainerName=containers["outputs"]["truthParticles"],
-                )
-            )
-
     ########################################################################
     # Begin postprocessing
     ########################################################################
