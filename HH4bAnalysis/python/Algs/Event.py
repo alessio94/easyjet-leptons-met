@@ -2,6 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 from HH4bAnalysis.Config.Base import SampleTypes
+from HH4bAnalysis.utils.logHelper import log
 
 
 def EventSelectionAnalysisSequenceCfg(flags, dataType, grlFiles=[], loose=False):
@@ -58,7 +59,7 @@ def PileupAnalysisSequenceCfg(flags, dataType, prwFiles, lumicalcFiles):
     pileupSequence = makePileupAnalysisSequence(
         dataType,
         files=flags.Input.Files,
-        useDefaultConfig=SampleTypes.mc21a.value in tags
+        useDefaultConfig=SampleTypes.mc21a.value in tags,
     )
     pileupSequence.configure(inputName={}, outputName={})
 
@@ -80,17 +81,16 @@ def GeneratorAnalysisSequenceCfg(flags, dataType):
         makeGeneratorAnalysisSequence,
     )
 
-    tags = flags.Input.AMITag.split('_')
-    ptag = ''
+    tags = flags.Input.AMITag.split("_")
+    ptag = ""
     for tag in reversed(tags):
-        if tag.startswith('p'):
+        if tag.startswith("p"):
             ptag = tag
             break
     if not ptag:
-        print(f"Did not find p-tag in AMI tags: {flags.Input.AMITag}")
-        if not flags.Analysis.allow_no_ptag:
-            raise RuntimeError("Could not determine p-tag from file metadata")
-    doCBK = ptag and ptag not in ['p5226', 'p5278', 'p5334']
+        log.warning(f"Did not find p-tag in AMI tags: {flags.Input.AMITag}")
+
+    doCBK = ptag not in ["p5226", "p5278", "p5334"]
     generatorSequence = makeGeneratorAnalysisSequence(
         dataType,
         saveCutBookkeepers=doCBK,
