@@ -60,7 +60,7 @@ def defineArgs(ConfigFlags):
         "--allow-no-ptag",
         action="store_true",
         help=(
-            "disable ptag detection for CI tests"
+            "disable ptag detection for CI tests "
             "(avoids CBK failure on test files)"
         ),
     )
@@ -167,9 +167,8 @@ def main():
             raise err
 
         trigger_chains = list(trigger_chains)
-        if ConfigFlags.Analysis.disable_trigger_filtering and dataType != "data":
+        if ConfigFlags.Analysis.disable_trigger_filtering:
             log.warning("Disabling trigger filtering, all events will pass!")
-            trigger_chains.insert(0, "L1_RD0_FILLED")
 
         from HH4bAnalysis.Config.GoodRunsLists import GoodRunsLists
 

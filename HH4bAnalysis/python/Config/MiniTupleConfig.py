@@ -185,13 +185,15 @@ def MiniTupleCfg(
             )
 
         if flags.Input.isMC:
-            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H")
-            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_S")
+            analysisTreeBranches += ["EventInfo.truth_H1_pdgId -> truth_H1_pdgId"]
+            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H1")
             analysisTreeBranches += getTruthFourMomBranches(
-                "EventInfo", "truth_b_fromH"
+                "EventInfo", "truth_b_fromH1"
             )
+            analysisTreeBranches += ["EventInfo.truth_H2_pdgId -> truth_H2_pdgId"]
+            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H2")
             analysisTreeBranches += getTruthFourMomBranches(
-                "EventInfo", "truth_b_fromS"
+                "EventInfo", "truth_b_fromH2"
             )
 
         # B-jet WPs
