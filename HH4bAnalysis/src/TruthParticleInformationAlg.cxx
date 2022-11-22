@@ -8,6 +8,7 @@
 // includes
 //
 #include "TruthParticleInformationAlg.h"
+#include <algorithm>
 
 //
 // method implementations
@@ -16,7 +17,6 @@ namespace HH4B
 {
   static const int H_ID = 25;
   static const int S_ID = 35;
-  static const int X_ID = 36;
 
   TruthParticleInformationAlg ::TruthParticleInformationAlg(
       const std::string &name, ISvcLocator *pSvcLocator)
@@ -36,24 +36,24 @@ namespace HH4B
 
     ATH_CHECK(m_EventInfoKey.initialize());
 
-    for (auto const &truth_H : m_truthHVars)
+    for (auto const &truth_H1 : m_truthH1Vars)
     {
-      m_selectionTruthHDecorators.emplace_back(truth_H);
+      m_selectionTruthH1Decorators.emplace_back(truth_H1);
     }
 
-    for (auto const &truth_S : m_truthSVars)
+    for (auto const &truth_H2 : m_truthH2Vars)
     {
-      m_selectionTruthSDecorators.emplace_back(truth_S);
+      m_selectionTruthH2Decorators.emplace_back(truth_H2);
     }
 
-    for (auto const &truth_b_fromH : m_truthBFromHVars)
+    for (auto const &truth_b_fromH1 : m_truthBFromH1Vars)
     {
-      m_selectionTruthBFromHDecorators.emplace_back(truth_b_fromH);
+      m_selectionTruthBFromH1Decorators.emplace_back(truth_b_fromH1);
     }
 
-    for (auto const &truth_b_fromS : m_truthBFromSVars)
+    for (auto const &truth_b_fromH2 : m_truthBFromH2Vars)
     {
-      m_selectionTruthBFromSDecorators.emplace_back(truth_b_fromS);
+      m_selectionTruthBFromH2Decorators.emplace_back(truth_b_fromH2);
     }
 
     return StatusCode::SUCCESS;
@@ -100,7 +100,34 @@ namespace HH4B
     typedef ConstDataVector<xAOD::TruthParticleContainer> CDV_TruthPart;
 
     // Now we can make another container to hold just the items we care about
-    //
+    CDV_TruthPart hhTruthParticles(truthInformationParticles.begin(),
+                                   truthInformationParticles.end(),
+                                   SG::VIEW_ELEMENTS);
+
+    hhTruthParticles.erase(
+        std::remove_if(hhTruthParticles.begin(), hhTruthParticles.end(),
+                       [](const xAOD::TruthParticle *tp)
+                       {
+                         return (tp->pdgId() != H_ID && tp->pdgId() != S_ID) ||
+                                (tp->nParents() != 1 && tp->nChildren() != 2);
+                       }),
+        hhTruthParticles.end());
+
+    if (hhTruthParticles.size() < 2)
+    {
+      ATH_MSG_WARNING(
+          "Only 1 H truth particle in the event. Skipping the event "
+          << eventInfo.eventNumber());
+      setFilterPassed(false);
+      return StatusCode::SUCCESS;
+    }
+
+    if (hhTruthParticles.size() > 2)
+    {
+      ATH_MSG_WARNING("More than 2 H truth particles in event "
+                      << eventInfo.eventNumber());
+    }
+
     // Here, we need to hand the memory
     // over to the store, so we need to create a new object on the heap.
     // Use std::unique_ptr to avoid memory leaks!
@@ -110,161 +137,96 @@ namespace HH4B
     // manage the corresponding memory). The default is OWN_ELEMENTS.
     auto p_truthparticles = std::make_unique<CDV_TruthPart>(SG::VIEW_ELEMENTS);
 
-    std::map<std::string, std::vector<float>> truth_b_fromH;
-    std::map<std::string, std::vector<float>> truth_b_fromS;
-    std::map<std::string, float> truth_H;
-    std::map<std::string, float> truth_S;
+    std::map<std::string, std::vector<float>> truth_b_fromH1;
+    std::map<std::string, std::vector<float>> truth_b_fromH2;
+    std::map<std::string, float> truth_H1;
+    std::map<std::string, float> truth_H2;
 
-    for (auto *ptcl : truthInformationParticles)
+    auto h1 = hhTruthParticles[0];
+    p_truthparticles->push_back(h1);
+    truth_H1["truth_H1_pt"] = h1->pt();
+    truth_H1["truth_H1_eta"] = h1->eta();
+    truth_H1["truth_H1_phi"] = h1->phi();
+    truth_H1["truth_H1_m"] = h1->m();
+    for (size_t ic = 0; ic < h1->nChildren(); ++ic)
     {
+      auto nchild = h1->child(ic);
+      if (nchild == nullptr)
+      {
+        ATH_MSG_ERROR("children of H1 does not exist (nullptr).");
+        continue;
+      }
       if (msgLvl(MSG::VERBOSE))
       {
-        ATH_MSG_VERBOSE("Information about truth particle ID: "
-                        << ptcl->pdgId() << ", status: " << ptcl->status()
-                        << ", pt: " << ptcl->pt() << ", eta: " << ptcl->eta()
-                        << ", phi: " << ptcl->phi() << ", m: " << ptcl->m());
+        ATH_MSG_VERBOSE("Information about b-quarks coming from H1. ID: "
+                        << nchild->pdgId() << ", status: " << nchild->status()
+                        << ", pt: " << nchild->pt() << ", eta: "
+                        << nchild->eta() << ", phi: " << nchild->phi()
+                        << ", m: " << nchild->m());
       }
+      truth_b_fromH1["truth_b_fromH1_pt"].push_back(nchild->pt());
+      truth_b_fromH1["truth_b_fromH1_eta"].push_back(nchild->eta());
+      truth_b_fromH1["truth_b_fromH1_phi"].push_back(nchild->phi());
+      truth_b_fromH1["truth_b_fromH1_m"].push_back(nchild->m());
+    }
 
-      // Keep only the particles involved in the decay
-      if (ptcl->pdgId() != X_ID && ptcl->pdgId() != S_ID &&
-          ptcl->pdgId() != H_ID)
-        continue;
-
-      // Require that they have exactly 2 children and exactly one parent
-      if (ptcl->nParents() != 1 && ptcl->nChildren() != 2)
-        continue;
-
-      p_truthparticles->push_back(ptcl);
-
-      // Truth information needed only for X, S or H
-      if (ptcl->pdgId() == S_ID || ptcl->pdgId() == H_ID)
+    auto h2 = hhTruthParticles[1];
+    p_truthparticles->push_back(h2);
+    truth_H2["truth_H2_pt"] = h2->pt();
+    truth_H2["truth_H2_eta"] = h2->eta();
+    truth_H2["truth_H2_phi"] = h2->phi();
+    truth_H2["truth_H2_m"] = h2->m();
+    for (size_t ic = 0; ic < h2->nChildren(); ++ic)
+    {
+      auto nchild = h2->child(ic);
+      if (nchild == nullptr)
       {
-        auto parent = ptcl->parent(0);
-        if (parent == nullptr)
-        { 
-          ATH_MSG_WARNING("S or H parent does not exist (nullptr). Skipping the event " << eventInfo.eventNumber());
-          continue;
-
-          return StatusCode::SUCCESS;
-        }
-        if (parent->pdgId() == X_ID)
-        {
-          if (msgLvl(MSG::VERBOSE))
-          {
-            ATH_MSG_VERBOSE(
-                "Information about truth X ID: "
-                << parent->pdgId() << ", status: " << parent->status()
-                << ", pt: " << parent->pt() << ", eta: " << parent->eta()
-                << ", phi: " << parent->phi() << ", m: " << parent->m());
-          }
-
-          // Save kinematics of S and H
-          if (ptcl->pdgId() == S_ID)
-          {
-            if (msgLvl(MSG::VERBOSE))
-            {
-              ATH_MSG_VERBOSE(
-                  "Truth particle about S ID: "
-                  << ptcl->pdgId() << ", status: " << ptcl->status()
-                  << ", pt: " << ptcl->pt() << ", eta: " << ptcl->eta()
-                  << ", phi: " << ptcl->phi() << ", mass: " << ptcl->m());
-            }
-            truth_S["truth_S_pt"] = ptcl->pt();
-            truth_S["truth_S_eta"] = ptcl->eta();
-            truth_S["truth_S_phi"] = ptcl->phi();
-            truth_S["truth_S_m"] = ptcl->m();
-          }
-          if (ptcl->pdgId() == H_ID)
-          {
-            if (msgLvl(MSG::VERBOSE))
-            {
-              ATH_MSG_VERBOSE(
-                  "Truth particle about H ID: "
-                  << ptcl->pdgId() << ", status: " << ptcl->status()
-                  << ", pt: " << ptcl->pt() << ", eta: " << ptcl->eta()
-                  << ", phi: " << ptcl->phi() << ", mass: " << ptcl->m());
-            }
-            truth_H["truth_H_pt"] = ptcl->pt();
-            truth_H["truth_H_eta"] = ptcl->eta();
-            truth_H["truth_H_phi"] = ptcl->phi();
-            truth_H["truth_H_m"] = ptcl->m();
-          }
-
-          // Truth information on the b-quarks from S and H for each X
-          int nChildren = ptcl->nChildren();
-          for (int ic = 0; ic < nChildren; ++ic)
-          {
-            auto nchild = ptcl->child(ic);
-            if (ptcl->pdgId() == H_ID)
-            {
-              if (nchild == nullptr)
-              {
-                ATH_MSG_ERROR("children of H does not exist (nullptr).");
-                return StatusCode::FAILURE;
-              }
-              if (msgLvl(MSG::VERBOSE))
-              {
-                ATH_MSG_VERBOSE(
-                    "Information about b-quarks coming from H,  ID: "
-                    << nchild->pdgId() << ", status: " << nchild->status()
-                    << ", pt: " << nchild->pt() << ", eta: " << nchild->eta()
-                    << ", phi: " << nchild->phi() << ", m: " << nchild->m());
-              }
-              truth_b_fromH["truth_b_fromH_pt"].push_back(nchild->pt());
-              truth_b_fromH["truth_b_fromH_eta"].push_back(nchild->eta());
-              truth_b_fromH["truth_b_fromH_phi"].push_back(nchild->phi());
-              truth_b_fromH["truth_b_fromH_m"].push_back(nchild->m());
-            }
-            if (ptcl->pdgId() == S_ID)
-            {
-              if (nchild == nullptr)
-              {
-                ATH_MSG_ERROR("children of S does not exist (nullptr).");
-                return StatusCode::FAILURE;
-              }
-              if (msgLvl(MSG::VERBOSE))
-              {
-                ATH_MSG_VERBOSE(
-                    "Information about b-quarks coming from S, ID: "
-                    << nchild->pdgId() << ", status: " << nchild->status()
-                    << ", pt: " << nchild->pt() << ", eta: " << nchild->eta()
-                    << ", phi: " << nchild->phi() << ", m: " << nchild->m());
-              }
-              truth_b_fromS["truth_b_fromS_pt"].push_back(nchild->pt());
-              truth_b_fromS["truth_b_fromS_eta"].push_back(nchild->eta());
-              truth_b_fromS["truth_b_fromS_phi"].push_back(nchild->phi());
-              truth_b_fromS["truth_b_fromS_m"].push_back(nchild->m());
-            }
-          }
-        }
+        ATH_MSG_ERROR("children of H2 does not exist (nullptr).");
+        continue;
       }
+      if (msgLvl(MSG::VERBOSE))
+      {
+        ATH_MSG_VERBOSE("Information about b-quarks coming from H2. ID: "
+                        << nchild->pdgId() << ", status: " << nchild->status()
+                        << ", pt: " << nchild->pt() << ", eta: "
+                        << nchild->eta() << ", phi: " << nchild->phi()
+                        << ", m: " << nchild->m());
+      }
+      truth_b_fromH2["truth_b_fromH2_pt"].push_back(nchild->pt());
+      truth_b_fromH2["truth_b_fromH2_eta"].push_back(nchild->eta());
+      truth_b_fromH2["truth_b_fromH2_phi"].push_back(nchild->phi());
+      truth_b_fromH2["truth_b_fromH2_m"].push_back(nchild->m());
     }
 
-    for (size_t i = 0; i < m_truthHVars.size(); i++)
+    // Add decorators
+    m_truth_H1_pdgId(eventInfo) = h1->pdgId();
+    m_truth_H2_pdgId(eventInfo) = h2->pdgId();
+
+    for (size_t i = 0; i < m_truthH1Vars.size(); i++)
     {
-      m_selectionTruthHDecorators[i](eventInfo) = truth_H[m_truthHVars[i]];
+      m_selectionTruthH1Decorators[i](eventInfo) = truth_H1[m_truthH1Vars[i]];
     }
 
-    for (size_t i = 0; i < m_truthSVars.size(); i++)
+    for (size_t i = 0; i < m_truthH2Vars.size(); i++)
     {
-      m_selectionTruthSDecorators[i](eventInfo) = truth_S[m_truthSVars[i]];
+      m_selectionTruthH2Decorators[i](eventInfo) = truth_H2[m_truthH2Vars[i]];
     }
 
-    for (size_t i = 0; i < m_truthBFromHVars.size(); i++)
+    for (size_t i = 0; i < m_truthBFromH1Vars.size(); i++)
     {
-      m_selectionTruthBFromSDecorators[i](eventInfo) =
-          truth_b_fromH[m_truthBFromHVars[i]];
+      m_selectionTruthBFromH2Decorators[i](eventInfo) =
+          truth_b_fromH1[m_truthBFromH1Vars[i]];
     }
 
-    for (size_t i = 0; i < m_truthBFromSVars.size(); i++)
+    for (size_t i = 0; i < m_truthBFromH2Vars.size(); i++)
     {
-      m_selectionTruthBFromHDecorators[i](eventInfo) =
-          truth_b_fromS[m_truthBFromSVars[i]];
+      m_selectionTruthBFromH1Decorators[i](eventInfo) =
+          truth_b_fromH2[m_truthBFromH2Vars[i]];
     }
 
-    SG::WriteHandle<ConstDataVector<xAOD::TruthParticleContainer>>
-        xshParticles(m_truthParticleInfoOutKey);
-    ATH_CHECK(xshParticles.record(std::move(p_truthparticles)));
+    SG::WriteHandle<ConstDataVector<xAOD::TruthParticleContainer>> hhParticles(
+        m_truthParticleInfoOutKey);
+    ATH_CHECK(hhParticles.record(std::move(p_truthparticles)));
 
     return StatusCode::SUCCESS;
   }

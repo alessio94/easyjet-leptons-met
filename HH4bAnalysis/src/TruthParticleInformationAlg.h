@@ -60,29 +60,33 @@ private:
 
     bool m_isMC;
 
-    std::vector<SG::AuxElement::Decorator<float>> m_selectionTruthHDecorators;
+    std::vector<SG::AuxElement::Decorator<float>> m_selectionTruthH1Decorators;
 
-    std::vector<SG::AuxElement::Decorator<float>> m_selectionTruthSDecorators;
-
-    std::vector<SG::AuxElement::Decorator<std::vector<float>>>
-        m_selectionTruthBFromHDecorators;
+    std::vector<SG::AuxElement::Decorator<float>> m_selectionTruthH2Decorators;
 
     std::vector<SG::AuxElement::Decorator<std::vector<float>>>
-        m_selectionTruthBFromSDecorators;
+        m_selectionTruthBFromH1Decorators;
 
-    std::vector<std::string> m_truthHVars{"truth_H_pt", "truth_H_eta",
-                                          "truth_H_phi", "truth_H_m"};
+    std::vector<SG::AuxElement::Decorator<std::vector<float>>>
+        m_selectionTruthBFromH2Decorators;
 
-    std::vector<std::string> m_truthSVars{"truth_S_pt", "truth_S_eta",
-                                          "truth_S_phi", "truth_S_m"};
+    SG::AuxElement::Decorator<int> m_truth_H1_pdgId{"truth_H1_pdgId"};
 
-    std::vector<std::string> m_truthBFromHVars{
-        "truth_b_fromH_pt", "truth_b_fromH_eta", "truth_b_fromH_phi",
-        "truth_b_fromH_m"};
+    SG::AuxElement::Decorator<int> m_truth_H2_pdgId{"truth_H2_pdgId"};
 
-    std::vector<std::string> m_truthBFromSVars{
-        "truth_b_fromS_pt", "truth_b_fromS_eta", "truth_b_fromS_phi",
-        "truth_b_fromS_m"};
+    std::vector<std::string> m_truthH1Vars{"truth_H1_pt", "truth_H1_eta",
+                                           "truth_H1_phi", "truth_H1_m"};
+
+    std::vector<std::string> m_truthH2Vars{"truth_H2_pt", "truth_H2_eta",
+                                           "truth_H2_phi", "truth_H2_m"};
+
+    std::vector<std::string> m_truthBFromH1Vars{
+        "truth_b_fromH1_pt", "truth_b_fromH1_eta", "truth_b_fromH1_phi",
+        "truth_b_fromH1_m"};
+
+    std::vector<std::string> m_truthBFromH2Vars{
+        "truth_b_fromH2_pt", "truth_b_fromH2_eta", "truth_b_fromH2_phi",
+        "truth_b_fromH2_m"};
   };
 }
 

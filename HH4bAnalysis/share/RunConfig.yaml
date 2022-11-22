@@ -33,6 +33,3 @@ meta_cache: false
 disable_calib: false
 # Disable trigger filtering (to get all events to pass, has no effect on data.
 disable_trigger_filtering: false
-# Permit to run even if the ptag is not found in the AMI tags
-# Ideally only use this for CI tests, known to be missing
-allow_no_ptag: false

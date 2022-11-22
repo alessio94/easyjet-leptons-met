@@ -42,7 +42,11 @@ def TriggerAnalysisSequenceCfg(flags, dataType, triggerChains):
         makeTriggerAnalysisSequence,
     )
 
-    triggerSequence = makeTriggerAnalysisSequence(dataType, triggerChains=triggerChains)
+    triggerSequence = makeTriggerAnalysisSequence(
+        dataType,
+        triggerChains=triggerChains,
+        noFilter=flags.Analysis.disable_trigger_filtering,
+    )
 
     cfg.addSequence(CompFactory.AthSequencer(triggerSequence.getName()))
     for alg in triggerSequence.getGaudiConfig2Components():
