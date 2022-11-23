@@ -100,20 +100,25 @@ namespace HH4B
     typedef ConstDataVector<xAOD::TruthParticleContainer> CDV_TruthPart;
 
     // Now we can make another container to hold just the items we care about
-    CDV_TruthPart hhTruthParticles(truthInformationParticles.begin(),
-                                   truthInformationParticles.end(),
-                                   SG::VIEW_ELEMENTS);
+    //
+    // Here, we need to hand the memory
+    // over to the store, so we need to create a new object on the heap.
+    // Use std::unique_ptr to avoid memory leaks!
+    //
+    // Passing SG::VIEW_ELEMENTS to the constructor means that this
+    // container will not own its contents (and therefore need to
+    // manage the corresponding memory). The default is OWN_ELEMENTS.
+    auto hhTruthParticles = std::make_unique<CDV_TruthPart>(SG::VIEW_ELEMENTS);
 
-    hhTruthParticles.erase(
-        std::remove_if(hhTruthParticles.begin(), hhTruthParticles.end(),
-                       [](const xAOD::TruthParticle *tp)
-                       {
-                         return (tp->pdgId() != H_ID && tp->pdgId() != S_ID) ||
-                                (tp->nParents() != 1 && tp->nChildren() != 2);
-                       }),
-        hhTruthParticles.end());
+    for (const xAOD::TruthParticle *tp : truthInformationParticles)
+    {
+      if ((tp->pdgId() == H_ID || tp->pdgId() == S_ID) && tp->nChildren() == 2)
+      {
+        hhTruthParticles->push_back(tp);
+      }
+    }
 
-    if (hhTruthParticles.size() < 2)
+    if (hhTruthParticles->size() < 2)
     {
       ATH_MSG_WARNING(
           "Only 1 H truth particle in the event. Skipping the event "
@@ -122,28 +127,18 @@ namespace HH4B
       return StatusCode::SUCCESS;
     }
 
-    if (hhTruthParticles.size() > 2)
+    if (hhTruthParticles->size() > 2)
     {
       ATH_MSG_WARNING("More than 2 H truth particles in event "
                       << eventInfo.eventNumber());
     }
-
-    // Here, we need to hand the memory
-    // over to the store, so we need to create a new object on the heap.
-    // Use std::unique_ptr to avoid memory leaks!
-    //
-    // Passing SG::VIEW_ELEMENTS to the constructor means that this
-    // container will not own its contents (and therefore need to
-    // manage the corresponding memory). The default is OWN_ELEMENTS.
-    auto p_truthparticles = std::make_unique<CDV_TruthPart>(SG::VIEW_ELEMENTS);
 
     std::map<std::string, std::vector<float>> truth_b_fromH1;
     std::map<std::string, std::vector<float>> truth_b_fromH2;
     std::map<std::string, float> truth_H1;
     std::map<std::string, float> truth_H2;
 
-    auto h1 = hhTruthParticles[0];
-    p_truthparticles->push_back(h1);
+    auto h1 = (*hhTruthParticles.get())[0];
     truth_H1["truth_H1_pt"] = h1->pt();
     truth_H1["truth_H1_eta"] = h1->eta();
     truth_H1["truth_H1_phi"] = h1->phi();
@@ -170,8 +165,7 @@ namespace HH4B
       truth_b_fromH1["truth_b_fromH1_m"].push_back(nchild->m());
     }
 
-    auto h2 = hhTruthParticles[1];
-    p_truthparticles->push_back(h2);
+    auto h2 = (*hhTruthParticles.get())[1];
     truth_H2["truth_H2_pt"] = h2->pt();
     truth_H2["truth_H2_eta"] = h2->eta();
     truth_H2["truth_H2_phi"] = h2->phi();
@@ -224,9 +218,9 @@ namespace HH4B
           truth_b_fromH2[m_truthBFromH2Vars[i]];
     }
 
-    SG::WriteHandle<ConstDataVector<xAOD::TruthParticleContainer>> hhParticles(
+    SG::WriteHandle<ConstDataVector<xAOD::TruthParticleContainer>> writeHandle(
         m_truthParticleInfoOutKey);
-    ATH_CHECK(hhParticles.record(std::move(p_truthparticles)));
+    ATH_CHECK(writeHandle.record(std::move(hhTruthParticles)));
 
     return StatusCode::SUCCESS;
   }
