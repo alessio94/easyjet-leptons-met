@@ -33,7 +33,7 @@ JetSelectorAlg --> B[xAOD::JetContainer\n selection]
 JetSelectorAlg --> C[decorate EventInfo\n n,pt,eta,phi,m]
 ```
 
-This selects Jets and writes them as a ViewContainer to the StoreGate. This algorithms is fast so feel free to even stack it after one another, if you want to construct any funny selection. It also decorates the four vector info to the EventInfo object and the nr of the selection per event. As you can disable all selections it can also be considered a sheer four vector writer of any `xAOD::JetContainer`. So you can add branches to the tree like
+This selects Jets and writes them as a ViewContainer to the StoreGate. This algorithms is fast so feel free to even stack it after one another, if you want to construct any funny selection. It also decorates the four vector info to the EventInfo object and the nr of jets that passed the selection (disregarding `truncateAtAmount` and minimumAmount). As you can disable all selections it can also be considered a sheer four vector writer of any `xAOD::JetContainer`. So you can add branches to the tree like
 ```
 TreeBranches += [
             "EventInfo.MyContainer_pt   ->  MyContainer_pt"
