@@ -108,6 +108,9 @@ namespace HH4B
     }
 
     int nJets = workContainer->size();
+    // decorate nr of selected particles to the eventinfo
+    nSelectedParticles_dec(*eventInfo) = nJets;
+
     // if we have less than the requested nr, empty the workcontainer to write
     // defaults/return empty container
     if (nJets < m_minimumAmount)
@@ -115,9 +118,6 @@ namespace HH4B
       workContainer->clear();
       nJets = 0;
     }
-
-    // decorate nr of selected particles to the eventinfo
-    nSelectedParticles_dec(*eventInfo) = nJets;
 
     // sort and truncate
     int nKeep;
