@@ -60,8 +60,7 @@ def defineArgs(ConfigFlags):
         "--allow-no-ptag",
         action="store_true",
         help=(
-            "disable ptag detection for CI tests "
-            "(avoids CBK failure on test files)"
+            "disable ptag detection for CI tests " "(avoids CBK failure on test files)"
         ),
     )
     return parser
@@ -88,6 +87,10 @@ def main():
     assert not (
         ConfigFlags.Analysis.disable_calib and not is_physlite(ConfigFlags)
     ), "Disabling calibrations is not safe except on PHYSLITE!"
+
+    assert not (
+        ConfigFlags.Analysis.disable_trigger_filtering and not ConfigFlags.Input.isMC
+    ), "Disabling trigger filtering only allowed for MC!"
 
     # Workaround for buggy glob, needed prior
     # to https://gitlab.cern.ch/atlas/athena/-/merge_requests/55561
