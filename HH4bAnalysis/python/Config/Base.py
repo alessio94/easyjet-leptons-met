@@ -136,9 +136,9 @@ def getPrwFiles(dsid, subcampaign, dataType):
     return prw_files + actual_mu.get(subcampaign, [])
 
 
-def getRunYears(flags, dataType):
+def getRunYears(flags):
     years = []
-    if dataType != "data":
+    if flags.Analysis.DataType != "data":
         # use rtag for figuring out year in MC
         tags = flags.Input.AMITag
         for mc_campaign in MCSampleYears:

@@ -21,7 +21,6 @@ def OverlapAnalysisSequenceCfg(
         outputLabel="passesOR",
         linkOverlapObjects=False,
         doEleEleOR=False,
-        doMuPFJetOR=False,
         doTaus=False,
         doElectrons=True,
         doMuons=doMuons,

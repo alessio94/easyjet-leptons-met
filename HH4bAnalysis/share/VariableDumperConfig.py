@@ -102,6 +102,19 @@ def main():
     ConfigFlags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
     ConfigFlags.addFlag("Input.SimulationFlavour", fileMD.get("SimulationFlavour", ""))
 
+    ConfigFlags.addFlag('Analysis.DataType', lambda prevFlags: get_dataType(prevFlags))
+    ConfigFlags.addFlag('Analysis.Years', lambda prevFlags: getRunYears(prevFlags))
+    log.info(
+        f"Configuring to match dataset from {ConfigFlags.Analysis.Years}"
+    )
+    if max(ConfigFlags.Analysis.Years) <= 2018:
+        ConfigFlags.addFlag('Analysis.Run', 2)
+    elif min(ConfigFlags.Analysis.Years) >= 2022:
+        ConfigFlags.addFlag('Analysis.Run', 3)
+    else:
+        raise RuntimeError('Invalid list of years, cannot combine runs')
+    log.info(f'Configured years match Run {ConfigFlags.Analysis.Run}')
+
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
     ConfigFlags.lock()
@@ -135,21 +148,19 @@ def main():
 
         cfg.merge(xAODReadCfg(ConfigFlags))
 
-        dataType = get_dataType(ConfigFlags)
+        dataType = ConfigFlags.Analysis.DataType
 
         log.info(
             f"Self-configured: dataType: '{dataType}', "
             f"is PHYSLITE? {is_physlite(ConfigFlags)}"
         )
 
-        self_configured_run_years = getRunYears(ConfigFlags, dataType)
-
         # Add our VariableDumper CA, calling the function defined above.
         from HH4bAnalysis.Config.TriggerLists import TriggerLists
 
         trigger_year_list = ConfigFlags.Analysis.trigger_year
         if trigger_year_list == "Auto":
-            trigger_year_list = self_configured_run_years
+            trigger_year_list = ConfigFlags.Analysis.Years
             log.info(
                 "Self-configured trigger list for years: "
                 f"{', '.join(str(year) for year in trigger_year_list) or None}"
@@ -180,7 +191,7 @@ def main():
         if dataType == "data":
             log.info(
                 "Self-configured GRL for years: "
-                f"{', '.join(str(year) for year in self_configured_run_years) or None}"
+                f"{', '.join(str(year) for year in ConfigFlags.Analysis.Years) or None}"
             )
             grl_lists_by_year = {
                 year: list
@@ -189,7 +200,7 @@ def main():
             }
             grl_files = [
                 list
-                for year in self_configured_run_years
+                for year in ConfigFlags.Analysis.Years
                 for list in grl_lists_by_year[year]
             ]
 
