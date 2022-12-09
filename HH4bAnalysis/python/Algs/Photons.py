@@ -18,7 +18,7 @@ def PhotonAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContain
         enableCleaning=True,
         cleaningAllowLate=False,
         recomputeIsEM=False,
-        ptSelectionOutput=False,
+        ptSelectionOutput=True,
         enableCutflow=False,
         enableKinematicHistograms=False,
     )

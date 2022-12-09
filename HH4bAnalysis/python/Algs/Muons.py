@@ -12,18 +12,17 @@ def MuonAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContainer
         postfix="loose",
         deepCopyOutput=False,
         shallowViewOutput=True,
-        ptSelectionOutput=False,
+        ptSelectionOutput=True,
         qualitySelectionOutput=True,
         enableCutflow=False,
         enableKinematicHistograms=False,
+        isRun3Geo=(flags.Analysis.Run == 3)
     )
     muonSequence.configure(inputName=inputContainerName, outputName=outputContainerName)
     # print(muonSequence)  # For debugging
 
     cfg.addSequence(CompFactory.AthSequencer(muonSequence.getName()))
     for alg in muonSequence.getGaudiConfig2Components():
-        if "MuonSelectionAlg" in alg.getName():
-            alg.selectionTool.IsRun3Geo = min(flags.Input.RunNumber) > 400000
         cfg.addEventAlgo(alg, muonSequence.getName())
 
     return cfg

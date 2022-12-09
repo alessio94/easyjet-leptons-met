@@ -72,11 +72,9 @@ def MiniTupleCfg(
     ]
 
     for trig_chain in trigger_chains:
-        cleaned = trig_chain.replace("-", "_")
-        if "." in trig_chain:
-            continue
+        trig_formatted = trig_chain.replace("-", "_").replace(".", "p")
         analysisTreeBranches.append(
-            f"EventInfo.trigPassed_{cleaned} -> trigPassed_{cleaned}"
+            f"EventInfo.trigPassed_{trig_formatted} -> trigPassed_{trig_formatted}"
         )
 
     if do_PRW and not flags.Analysis.disable_calib:

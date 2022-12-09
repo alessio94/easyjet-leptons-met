@@ -19,7 +19,7 @@ Now, compile the package
 mkdir build
 cd build
 setupATLAS
-asetup AthAnalysis,22.2.93
+asetup AthAnalysis,22.2.100
 cmake ../hh4b-analysis/
 make
 source */setup.sh
@@ -58,8 +58,8 @@ If you would rather work on a local computer, numbered `AthAnalysis` releases ar
  Preferably, do this in `$WORKDIR`.
 
 ```
-docker pull atlas/athanalysis:22.2.93
-docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:22.2.93
+docker pull atlas/athanalysis:22.2.100
+docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:22.2.100
 ```
 
 This will start up an interactive terminal inside the container, which has read/write access to the following paths:

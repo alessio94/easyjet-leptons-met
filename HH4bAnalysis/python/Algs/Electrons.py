@@ -23,7 +23,7 @@ def ElectronAnalysisSequenceCfg(
         chargeIDSelection=False,
         isolationCorrection=False,
         crackVeto=False,
-        ptSelectionOutput=False,
+        ptSelectionOutput=True,
         enableCutflow=False,
         enableKinematicHistograms=False,
     )
