@@ -8,7 +8,9 @@ from HH4bAnalysis.utils.inputsHelper import get_dataType
 
 
 class DataSampleYears(Enum):
+    data15 = (2015,)
     data16 = (2016,)
+    data17 = (2017,)
     data18 = (2018,)
     data22 = (2022,)
 
