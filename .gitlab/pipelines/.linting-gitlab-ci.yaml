@@ -4,7 +4,10 @@
   before_script:
     - pip install flake8
   script:
-    - flake8 .
+    # Ignore some more annoying flake8 problems:
+    #  E231: missing whitespace after comma, semicolon, colon
+    #  W503: line break before binary operator
+    - flake8 --ignore=E231,W503 .
   needs: []
 
 .black_check_template: &black_check_template
@@ -27,19 +30,12 @@
     - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck*/bin/cppcheck --enable=warning,portability --xml-version=2 .
   needs: []
 
-# .linting_rules_template: &linting_rules_template
-  # rules:
-  #   - if: $CI_COMMIT_BRANCH != ''
-  #   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-
 flake8:
   <<: *flake8_check_template
-  # <<: *linting_rules_template
 
 # black:
 #   <<: *black_check_template
-#   # <<: *linting_rules_template
 
 cppcheck:
   <<: *cpp_check_template
-  # <<: *linting_rules_template
+

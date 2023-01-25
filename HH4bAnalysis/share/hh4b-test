@@ -50,17 +50,30 @@ declare -A TESTS=(
     [physlite-sh4b-very-boosted-mc20]=ntuple-dump-physlite
 )
 
+# some common variables in the tests
+CONFIG=${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
+COMMON=" --allow-no-ptag --runConfig $CONFIG "
+
+# specific tests
 ntuple-dump() {
-    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --allow-no-ptag
+    VariableDumperConfig.py $COMMON --filesInput $1
 }
 ntuple-dump-fast() {
-    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --allow-no-ptag --meta-cache
+    local OPTS="$COMMON --cache-metadata --filesInput $1"
+    local CMD="VariableDumperConfig.py $OPTS"
+    $CMD --config-only True
+    echo "rerunning $CMD to time"
+    $CMD --timeout 30 --write-h5-event
 }
 ntuple-dump-physlite() {
-    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --allow-no-ptag --disable-calib 
+    VariableDumperConfig.py $COMMON --disable-calib --filesInput $1
 }
 ntuple-dump-physlite-fast() {
-    VariableDumperConfig.py --filesInput $1 --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml --allow-no-ptag --disable-calib --meta-cache
+    local OPTS="$COMMON --cache-metadata --filesInput $1 --disable-calib"
+    local CMD="VariableDumperConfig.py $OPTS"
+    $CMD --config-only True
+    echo "rerunning $CMD to time"
+    $CMD --timeout 30
 }
 
 ################################################

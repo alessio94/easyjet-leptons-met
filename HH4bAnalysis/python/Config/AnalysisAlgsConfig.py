@@ -1,4 +1,3 @@
-from pathlib import Path
 
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
@@ -21,7 +20,6 @@ from HH4bAnalysis.Algs.Photons import PhotonAnalysisSequenceCfg
 from HH4bAnalysis.Algs.Postprocessing import OverlapAnalysisSequenceCfg
 from HH4bAnalysis.Algs.ResolvedAnalysis import ResolvedAnalysisCfg
 from HH4bAnalysis.Algs.TruthInformation import TruthParticleInformationAlgCfg
-from HH4bAnalysis.Config.Base import cache_metadata, update_metadata
 from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.utils.inputsHelper import is_physlite
 from HH4bAnalysis.utils.logHelper import log
@@ -40,9 +38,6 @@ def AnalysisAlgsCfg(
     lumicalc_files=[],
     grl_files=[],
 ):
-    if flags.Analysis.meta_cache:
-        update_metadata(Path("metadata.json"))
-
     is_daod_physlite = is_physlite(flags)
 
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
@@ -221,8 +216,5 @@ def AnalysisAlgsCfg(
                 ),
             )
         )
-
-    if flags.Analysis.meta_cache:
-        cache_metadata(Path("metadata.json"))
 
     return cfg
