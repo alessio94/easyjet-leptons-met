@@ -26,6 +26,7 @@ atlas_add_component(HH4bAnalysis
   src/JetTruthMatcherAlg.cxx
   src/GhostAssocVRJetGetterAlg.cxx
   src/tools/NTrkVertexCounter.cxx
+  src/H5FileSvc.cxx
   src/components/*.cxx
   LINK_LIBRARIES
   GaudiKernel

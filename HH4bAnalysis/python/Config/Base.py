@@ -1,6 +1,6 @@
 import json
-import sys
 from enum import Enum
+from argparse import ArgumentTypeError
 
 import yaml
 from HH4bAnalysis.utils.logHelper import log
@@ -41,7 +41,7 @@ def cache_metadata(path):
             "level": m.metAccessLevel,
         }
     with open(path, "w") as cached:
-        json.dump(all_md, cached)
+        json.dump(all_md, cached, indent=2)
 
 
 def update_metadata(path):
@@ -157,41 +157,32 @@ def getRunYears(flags):
     return years
 
 
-def ConfigFlagsAdder(args, flags):
-    # load user config
+def getRunConfig(path):
     try:
-        with open(args.runConfig) as file:
-            runConfig = yaml.safe_load(file)
-            log.info("Loaded run config: " + str(args.runConfig))
-    except FileNotFoundError:
-        log.error(
-            "Couldn't load run config: "
-            + str(args.runConfig)
-            + "\n"
-            + "Please give a valid run config file path to  --runConfig"
-        )
-        sys.exit(1)
+        with open(path) as file:
+            return yaml.safe_load(file)
+    except Exception:
+        raise ArgumentTypeError(f"Couldn't load run config: {path}")
 
-    # removing standard athena flags from args
-    athFlags = [
-        "debug",
-        "evtMax",
-        "skipEvents",
-        "filesInput",
-        "loglevel",
-        "configOnly",
-        "threads",
-        "nprocs",
-    ]
+
+def updateConfigFlags(args, flags, overwrites={}):
+    # load config file
+    runConfig = args.runConfig
 
     # args contain the flags, overwrite runconfig file values with values from flags
     for key in vars(args):
         # exclude standard athena flags
-        if key not in athFlags:
+        if key in overwrites:
+            if overwrites[key] and key not in runConfig:
+                raise ValueError(
+                    f'{key} must be set in the config file')
+            elif key in runConfig and not overwrites[key]:
+                raise ValueError(
+                    f'{key} must not exist in the config file')
+
             value = getattr(args, key)
-            # don't overwrite if flags not given (None), not given bools are False
-            if value is not None and value is not False:
-                runConfig[key] = getattr(args, key)
+            if value is not None:
+                runConfig[key] = value
 
     # add them to ConfigFlags
     for key, value in runConfig.items():

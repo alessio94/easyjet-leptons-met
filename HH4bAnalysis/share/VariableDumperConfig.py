@@ -10,31 +10,63 @@
 #
 
 import sys
+from pathlib import Path
+import time
 
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
 from AthenaConfiguration.ComponentFactory import CompFactory
+
 from HH4bAnalysis.Config.AnalysisAlgsConfig import AnalysisAlgsCfg
-from HH4bAnalysis.Config.Base import ConfigFlagsAdder, getRunYears, pileupConfigFiles
+from HH4bAnalysis.Config.Base import (
+    updateConfigFlags, getRunYears, pileupConfigFiles, getRunConfig
+)
 from HH4bAnalysis.Config.MiniTupleConfig import MiniTupleCfg
+from HH4bAnalysis.Config.H5Config import getH5Cfg
 from HH4bAnalysis.utils.inputsHelper import get_dataType, is_physlite
 from HH4bAnalysis.utils.logHelper import log
+from HH4bAnalysis.Config.Base import cache_metadata, update_metadata
 
 
 def defineArgs(ConfigFlags):
     # Generate a parser and add an output file argument, then retrieve the args
     parser = ConfigFlags.getArgumentParser()
     parser.add_argument(
+        '-c',
         "--runConfig",
-        type=str,
+        type=getRunConfig,
         required=True,
         help="Run config file path",
     )
     parser.add_argument(
+        '-o',
         "--outFile",
         type=str,
         help="Output file name",
     )
     parser.add_argument(
+        '--timeout',
+        type=float,
+        help=(
+            'Maximum runtime (in seconds). Longer processes finish '
+            'with an error.'
+        )
+    )
+
+    # add analysis-specific flags
+    an_opts = parser.add_argument_group(
+        'analysis',
+        'These flags are added to `ConfigFlags.Analysis`.'
+    )
+    # slightly ugly, keep track of the options we can write to here
+    overwrites = {}
+
+    def add_analysis_arg(*pos, overwrite=False, **args):
+        if overwrite and args.get('action') == 'store_true':
+            raise ValueError('bool options must be specified explicitly')
+        argname = an_opts.add_argument(*pos, **args).dest
+        overwrites[argname] = overwrite
+
+    add_analysis_arg(
         "--disable-trigger-filtering",
         action="store_true",
         help=(
@@ -42,13 +74,13 @@ def defineArgs(ConfigFlags):
             "Has no effect on data."
         ),
     )
-    parser.add_argument(
-        "-c",
-        "--meta-cache",
+    add_analysis_arg(
+        "-m",
+        "--cache-metadata",
         action="store_true",
         help="use metadata cache file, defaults to %(const)s",
     )
-    parser.add_argument(
+    add_analysis_arg(
         "--disable-calib",
         action="store_true",
         help=(
@@ -56,14 +88,20 @@ def defineArgs(ConfigFlags):
             "(can be used for plain PHYSLITE processing)"
         ),
     )
-    parser.add_argument(
+    add_analysis_arg(
         "--allow-no-ptag",
         action="store_true",
         help=(
             "disable ptag detection for CI tests " "(avoids CBK failure on test files)"
         ),
     )
-    return parser
+    add_analysis_arg('--write-h5-event', action='store_true')
+
+    oropt = dict(type=bool, metavar='BOOL', overwrite=True)
+    add_analysis_arg('-b','--do-resolved-dihiggs-analysis', **oropt)
+    add_analysis_arg('-r','--do-boosted-dihiggs-analysis', **oropt)
+    add_analysis_arg('--loose-jet-cleaning', **oropt)
+    return parser, overwrites
 
 
 def _is_mc_phys(flags):
@@ -74,14 +112,18 @@ def _is_mc_phys(flags):
 # We define a "main function" that will run a test job if the module
 # is executed rather than imported.
 def main():
+
+    # record the total run time
+    starttime = time.process_time()
+
     # Import the job configuration flags, some of which will be autoconfigured.
     # These are used for steering the job, and include e.g. the input file (list).
     from AthenaConfiguration.AllConfigFlags import ConfigFlags
 
-    parser = defineArgs(ConfigFlags)
+    parser, overwrites = defineArgs(ConfigFlags)
     args = ConfigFlags.fillFromArgs([], parser)
-    # Write user options to ConfigFlags
-    ConfigFlags = ConfigFlagsAdder(args, ConfigFlags)
+    # Write user options to flags.Analysis
+    updateConfigFlags(args, ConfigFlags, overwrites)
 
     # Arg checks
     assert not (
@@ -99,6 +141,8 @@ def main():
     log.info(f"Operating on input files {ConfigFlags.Input.Files}")
 
     fileMD = GetFileMD(ConfigFlags.Input.Files)
+    if ConfigFlags.Analysis.cache_metadata:
+        update_metadata(Path("metadata.json"))
     ConfigFlags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
     ConfigFlags.addFlag("Input.SimulationFlavour", fileMD.get("SimulationFlavour", ""))
 
@@ -118,6 +162,9 @@ def main():
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
     ConfigFlags.lock()
+
+    if ConfigFlags.Analysis.cache_metadata:
+        cache_metadata(Path("metadata.json"))
 
     # Get a ComponentAccumulator setting up the standard components
     # needed to run an Athena job.
@@ -204,7 +251,7 @@ def main():
                 for list in grl_lists_by_year[year]
             ]
 
-        do_muons = not ConfigFlags.Analysis.meta_cache
+        do_muons = not ConfigFlags.Analysis.cache_metadata
 
         do_PRW = _is_mc_phys(ConfigFlags)
         prw_files, lumicalc_files = [], []
@@ -241,12 +288,22 @@ def main():
             "HH4bSeq",
         )
 
+        if ConfigFlags.Analysis.write_h5_event:
+            cfg.merge(getH5Cfg(ConfigFlags))
+
         # Print the full job configuration
         cfg.printConfig(summariseProps=False)
 
     # Execute the job defined in the ComponentAccumulator.
     # The number of events is specified by `args.evtMax`
-    return cfg.run(args.evtMax)
+    return_code = cfg.run(args.evtMax)
+    if args.timeout:
+        duration = time.process_time() - starttime
+        if duration > args.timeout:
+            raise RuntimeError(
+                f'runtime ({duration:.1f}s) '
+                f'exceed timeout ({args.timeout:.0f}s)')
+    return return_code
 
 
 # Execute the main function if this file was executed as a script
