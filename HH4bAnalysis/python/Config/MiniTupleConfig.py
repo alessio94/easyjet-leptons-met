@@ -205,18 +205,6 @@ def MiniTupleCfg(
             f" -> recojet_antikt4_OR_%SYS%_{btag_wp}"
             for btag_wp in flags.Analysis.btag_wps
         ]
-        analysisTreeBranches += getFourMomBranches(containers["vrJet"], "vrjet")
-        if flags.Input.isMC:
-            analysisTreeBranches += [
-                (
-                    f"{containers['vrJet']}.HadronConeExclTruthLabelID ->"
-                    " vrjet_%SYS%_HadronConeExclTruthLabelID"
-                ),
-            ]
-        analysisTreeBranches += [
-            f"{containers['vrJet']}.ftag_select_{btag_wp} -> vrjet_%SYS%_{btag_wp}"
-            for btag_wp in flags.Analysis.vr_btag_wps
-        ]
 
     split_tags = flags.Input.AMITag.split("_")
     is_valid_ptag = get_valid_ami_tag(split_tags, "p")
