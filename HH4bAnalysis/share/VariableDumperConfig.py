@@ -38,12 +38,6 @@ def defineArgs(ConfigFlags):
         help="Run config file path",
     )
     parser.add_argument(
-        '-o',
-        "--outFile",
-        type=str,
-        help="Output file name",
-    )
-    parser.add_argument(
         '--timeout',
         type=float,
         help=(
@@ -66,6 +60,13 @@ def defineArgs(ConfigFlags):
         argname = an_opts.add_argument(*pos, **args).dest
         overwrites[argname] = overwrite
 
+    add_analysis_arg(
+        '-o',
+        "--outFile",
+        default='analysis-variables.root',
+        type=str,
+        help="Output file name",
+    )
     add_analysis_arg(
         "--disable-trigger-filtering",
         action="store_true",
