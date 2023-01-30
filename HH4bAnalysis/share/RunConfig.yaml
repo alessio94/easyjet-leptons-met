@@ -1,5 +1,3 @@
-# file name of the output tree file
-outFile: "analysis-variables.root"
 # btagging working points for small Rjets
 btag_wps:
     - DL1dv00_FixedCutBEff_70
