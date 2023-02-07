@@ -65,7 +65,10 @@ namespace HH4B
         ATH_CHECK(m_jetlargeRHandle.retrieve(antiKt10RecoJets, sys));
       }
       const xAOD::JetContainer *VRTrackJets(nullptr);
-      ATH_CHECK(m_VRtrackjetHandle.retrieve(VRTrackJets, sys));
+      if (!m_VRtrackjetHandle.empty())
+      {
+        ATH_CHECK(m_VRtrackjetHandle.retrieve(VRTrackJets, sys));
+      }
     }
 
     return StatusCode::SUCCESS;
