@@ -21,9 +21,9 @@ def JetAnalysisSequenceCfg(
         runGhostMuonAssociation=not is_daod_physlite,
         enableCutflow=False,
         enableKinematicHistograms=False,
-        runJvtUpdate=True,
-        runNNJvtUpdate=True,
-        runJvtSelection=True,
+        runJvtUpdate=not is_daod_physlite,
+        runNNJvtUpdate=not is_daod_physlite,
+        runJvtSelection=not is_daod_physlite,
     )
 
     bTagCalibFile = (

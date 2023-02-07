@@ -220,7 +220,10 @@ def MiniTupleCfg(
         "NNJvtPass",
     ]
 
-    if not is_valid_ptag:
+    if is_daod_physlite:
+        jvt_branches = ["NNJvtPass"]
+
+    elif not is_valid_ptag:
         # Skip the NNjvt variables for old mc20 samples
         jvt_branches = jvt_branches[:-4]
 
