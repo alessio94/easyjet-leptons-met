@@ -2,8 +2,8 @@
   Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef HH4BANALYSIS_LARGEJETGHOSTVRJETASSOCIATIONALG
-#define HH4BANALYSIS_LARGEJETGHOSTVRJETASSOCIATIONALG
+#ifndef HH4BANALYSIS_LARGEUFOJETGHOSTVRJETASSOCIATIONALG
+#define HH4BANALYSIS_LARGEUFOJETGHOSTVRJETASSOCIATIONALG
 
 #include <AthenaBaseComps/AthAlgorithm.h>
 
@@ -18,11 +18,11 @@ namespace HH4B
 {
 
   /// \brief An algorithm for dumping variables
-  class LargeJetGhostVRJetAssociationAlg final : public AthAlgorithm
+  class LargeUFOJetGhostVRJetAssociationAlg final : public AthAlgorithm
   {
     /// \brief The standard constructor
 public:
-    LargeJetGhostVRJetAssociationAlg(const std::string &name,
+    LargeUFOJetGhostVRJetAssociationAlg(const std::string &name,
                                      ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
@@ -43,8 +43,8 @@ private:
         this, "EventInfoKey", "EventInfo",
         "the eventInfo container to decorate"};
 
-    SG::ReadHandleKey<xAOD::JetContainer> m_largeJetInKey{
-        this, "LargeJetInKey", "", "the large-R jet collection to run on"};
+    SG::ReadHandleKey<xAOD::JetContainer> m_largeUFOJetInKey{
+        this, "LargeUFOJetInKey", "", "the UFOlarge-R jet collection to run on"};
 
     std::vector<std::string> m_workingPoints;
 
@@ -59,12 +59,6 @@ private:
     // recommended by ftag : Remove the event if any of your signal jets have
     // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.
     // checks if any of the vr jets overlap
-    SG::AuxElement::ConstAccessor<float> relativeDeltaRToVRJet{
-        "relativeDeltaRToVRJet"};
-
-    SG::AuxElement::Decorator<float> m_passRelativeDeltaRToVRJetCutDecorator{
-        "passRelativeDeltaRToVRJetCut"};
-
     SG::AuxElement::Decorator<int> m_goodVRTrackJetCountDecorator{
         "goodVRTrackJets"};
 

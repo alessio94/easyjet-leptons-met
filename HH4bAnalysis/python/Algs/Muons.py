@@ -16,7 +16,7 @@ def MuonAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContainer
         qualitySelectionOutput=True,
         enableCutflow=False,
         enableKinematicHistograms=False,
-        isRun3Geo=(flags.Analysis.Run == 3)
+        isRun3Geo=(flags.Analysis.Run == 3),
     )
     muonSequence.configure(inputName=inputContainerName, outputName=outputContainerName)
     # print(muonSequence)  # For debugging

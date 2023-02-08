@@ -50,7 +50,7 @@ def JetAnalysisSequenceCfg(
             btagger=tagger,
             generator="Pythia8",
             minPt=20000,
-            postfix=f'{jetBTagContainerName}_{tagger_wp}',
+            postfix=f"{jetBTagContainerName}_{tagger_wp}",
             preselection=None,
             kinematicSelection=True,
             noEfficiency=False,
@@ -98,13 +98,45 @@ def FatJetAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContain
 
     cfg.addSequence(CompFactory.AthSequencer(largeRrecojetSequence.getName()))
     for alg in largeRrecojetSequence.getGaudiConfig2Components():
-        if 'JetCalibrationAlg' in alg.getName():
-            alg.calibrationTool.IsData = (dataType == 'data')
+        if "JetCalibrationAlg" in alg.getName():
+            alg.calibrationTool.IsData = dataType == "data"
         cfg.addEventAlgo(alg, largeRrecojetSequence.getName())
 
     return cfg
 
 
+# Testing ufo large-R jets!!!!!!
+def FatUFOJetAnalysisSequenceCfg(
+    flags, dataType, inputContainerName, outputContainerName
+):
+    cfg = ComponentAccumulator()
+    # with ConfigurableRun3Behavior(False):
+    largeRUFOrecojetSequence = makeJetAnalysisSequence(
+        dataType,
+        jetCollection=inputContainerName,
+        postfix="largeRUFO",
+        deepCopyOutput=False,
+        shallowViewOutput=True,
+        runGhostMuonAssociation=False,
+        enableCutflow=False,
+        enableKinematicHistograms=False,
+        largeRMass="Comb",
+    )
+
+    largeRUFOrecojetSequence.configure(
+        inputName=inputContainerName, outputName=outputContainerName
+    )
+
+    cfg.addSequence(CompFactory.AthSequencer(largeRUFOrecojetSequence.getName()))
+    for alg in largeRUFOrecojetSequence.getGaudiConfig2Components():
+        if "JetCalibrationAlg" in alg.getName():
+            alg.calibrationTool.IsData = dataType == "data"
+        cfg.addEventAlgo(alg, largeRUFOrecojetSequence.getName())
+
+    return cfg
+
+
+# Ends here!! for ufo jets
 def VRJetAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContainerName):
     cfg = ComponentAccumulator()
 
@@ -210,6 +242,48 @@ def LargeJetGhostVRJetAssociationBranches(flags, inputLargeRJetContainerName):
     ]
     analysisTreeBranches += [
         "EventInfo.passRelativeDeltaRToVRJetCut -> passRelativeDeltaRToVRJetCut"
+    ]
+
+    return analysisTreeBranches
+
+
+def LargeUFOJetGhostVRJetAssociationAlgCfg(
+    flags,
+    inputLargeRUFOJetContainerName,
+):
+    cfg = ComponentAccumulator()
+    cfg.addEventAlgo(
+        CompFactory.HH4B.LargeUFOJetGhostVRJetAssociationAlg(
+            "LargeUFOJetGhostVRJetAssociationAlg",
+            LargeUFOJetInKey=inputLargeRUFOJetContainerName,
+            workingPoints=flags.Analysis.vr_btag_wps,
+        )
+    )
+
+    return cfg
+
+
+def LargeUFOJetGhostVRJetAssociationBranches(flags, inputLargeRUFOJetContainerName):
+    analysisTreeBranches = []
+
+    reco10UFOJetGhostAssociatedVRJetsVars = [
+        "goodVRTrackJets",
+        "leadingVRTrackJetsPt",
+        "leadingVRTrackJetsEta",
+        "leadingVRTrackJetsPhi",
+        "leadingVRTrackJetsM",
+        "leadingVRTrackJetsDeltaR12",
+        "leadingVRTrackJetsDeltaR13",
+        "leadingVRTrackJetsDeltaR32",
+    ]
+    for var in reco10UFOJetGhostAssociatedVRJetsVars:
+        analysisTreeBranches += [
+            f"{inputLargeRUFOJetContainerName}.{var} -> recoUFOjet_antikt10_%SYS%_{var}"
+        ]
+    analysisTreeBranches += [
+        f"{inputLargeRUFOJetContainerName}.leadingVRTrackJetsBtag_{wp} -> "
+        f"recoUFOjet_antikt10_%SYS%_leadingVRTrackJetsBtag_{wp}"
+        for wp in flags.Analysis.vr_btag_wps
     ]
 
     return analysisTreeBranches

@@ -52,14 +52,23 @@ TriggerLists = {
         ],
         2016: [
             "HLT_j420_a10_lcw_L1J100",
+            "HLT_j420_a10r_L1J100",
         ],
         2017: [
             "HLT_j420_a10t_lcw_jes_40smcINF_L1J100",
             "HLT_j390_a10t_lcw_jes_30smcINF_L1J100",  # also 2018
+            "HLT_j460_a10t_lcw_jes_L1J100",
         ],
         2018: [
             "HLT_j420_a10t_lcw_jes_35smcINF_L1J100",
             "HLT_j390_a10t_lcw_jes_30smcINF_L1J100",  # also 2017
+            "HLT_j420_a10t_lcw_jes_35smcINF_L1SC111",  # add. triggers to test
+            "HLT_j460_a10r_L1SC111",
+            "HLT_j460_a10r_L1J100",
+            "HLT_j460_a10_lcw_subjes_L1SC111",
+            "HLT_j460_a10_lcw_subjes_L1J100",
+            "HLT_j460_a10t_lcw_jes_L1SC111",
+            "HLT_j460_a10t_lcw_jes_L1J100",
         ],
         2022: [
             # LCTopo/PFlow without mass cut

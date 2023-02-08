@@ -31,7 +31,9 @@ def main():
     # parser.add_argument("--dest-se", default="DESY-ZN_LOCALGROUPDISK",
     # help="An RSE to duplicate the results to")
     parser.add_argument("--excluded-site", help="Any sites to exclude when running")
-    parser.add_argument("--nGBperJob", default="10", help="How many GB required per job") # noqa
+    parser.add_argument(
+        "--nGBperJob", default="10", help="How many GB required per job"
+    )  # noqa
     # parser.add_argument("--resubmit", action="store_true",
     # help="Run in 'resubmission' mode. This reads in information
     # from an existing task and resubmits the dead tasks.
