@@ -70,9 +70,14 @@ private:
         this, "LargeJetKey", "AnalysisLargeJets_%SYS%",
         "the large-R jet collection to run on"};
 
+    CP::SysReadHandle<xAOD::JetContainer> m_jetUFOlargeRHandle{
+        this, "LargeUFOJetKey", "AnalysisUFOLargeJets_%SYS%",
+        "the UFO large-R jet collection to run on"};
+
     CP::SysReadHandle<xAOD::JetContainer> m_VRtrackjetHandle{
         this, "VRtrackjets", "VRTrackJets_%SYS%",
         "the VR track jet collection to run on"};
+ 
   };
 }
 

@@ -19,6 +19,7 @@ atlas_add_component(HH4bAnalysis
   src/VariableDumperAlg.cxx
   src/TruthParticleInformationAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
+  src/LargeUFOJetGhostVRJetAssociationAlg.cxx
   src/JetSelectorAlg.cxx
   src/JetPairingAlg.cxx
   src/FinalVarsResolvedAlg.cxx
@@ -41,6 +42,9 @@ atlas_add_component(HH4bAnalysis
   FTagAnalysisInterfacesLib
   xAODBTagging
   FourMomUtils
+  CutBookkeeperUtils
+  xAODRootAccess
+  xAODCutFlow
 )
 
 # Install python modules, joboptions, and share content

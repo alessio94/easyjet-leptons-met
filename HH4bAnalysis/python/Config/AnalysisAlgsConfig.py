@@ -11,8 +11,10 @@ from HH4bAnalysis.Algs.Event import (
 )
 from HH4bAnalysis.Algs.Jets import (
     FatJetAnalysisSequenceCfg,
+    FatUFOJetAnalysisSequenceCfg,
     JetAnalysisSequenceCfg,
     LargeJetGhostVRJetAssociationAlgCfg,
+    LargeUFOJetGhostVRJetAssociationAlgCfg,
     VRJetAnalysisSequenceCfg,
 )
 from HH4bAnalysis.Algs.Muons import MuonAnalysisSequenceCfg
@@ -137,6 +139,19 @@ def AnalysisAlgsCfg(
             )
 
         if is_daod_physlite:
+            log.warning("On PHYSLITE, skip  UFO large-R jet sequence for now")
+        else:
+            log.info("Adding UFO large-R jet seq")
+            cfg.merge(
+                FatUFOJetAnalysisSequenceCfg(
+                    flags,
+                    dataType=dataType,
+                    inputContainerName=containers["inputs"]["reco10UFOJet"],
+                    outputContainerName=containers["outputs"]["reco10UFOJet"],
+                )
+            )
+
+        if is_daod_physlite:
             log.warning("On PHYSLITE, skip VR jet sequence for now")
         else:
             log.info("Adding VR jet seq")
@@ -157,6 +172,18 @@ def AnalysisAlgsCfg(
                     flags,
                     inputLargeRJetContainerName=containers["outputs"][
                         "reco10Jet"
+                    ].replace("%SYS%", "NOSYS"),
+                )
+            )
+
+        if is_daod_physlite:
+            log.warning("On PHYSLITE, skip ghost assocciation VR jet sequence for now")
+        else:
+            cfg.merge(
+                LargeUFOJetGhostVRJetAssociationAlgCfg(
+                    flags,
+                    inputLargeRUFOJetContainerName=containers["outputs"][
+                        "reco10UFOJet"
                     ].replace("%SYS%", "NOSYS"),
                 )
             )
@@ -186,6 +213,7 @@ def AnalysisAlgsCfg(
 
     if not is_daod_physlite:
         overlapInputNames["fatJets"] = containers["outputs"]["reco10Jet"]
+        overlapInputNames["fatUFOJets"] = containers["outputs"]["reco10UFOJet"]
 
     overlapOutputNames = {k: f"{v}_OR" for k, v in overlapInputNames.items()}
 

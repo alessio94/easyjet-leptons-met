@@ -1,7 +1,10 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.Algs.BoostedAnalysis import BoostedTreeBranches
-from HH4bAnalysis.Algs.Jets import LargeJetGhostVRJetAssociationBranches
+from HH4bAnalysis.Algs.Jets import (
+    LargeJetGhostVRJetAssociationBranches,
+    LargeUFOJetGhostVRJetAssociationBranches,
+)
 from HH4bAnalysis.Algs.ResolvedAnalysis import ResolvedTreeBranches
 from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
 from HH4bAnalysis.Config.Base import get_valid_ami_tag
@@ -13,6 +16,7 @@ from HH4bAnalysis.utils.logHelper import log
 def MiniTupleCfg(
     flags,
     trigger_chains,
+    doCBK=True,
     do_muons=True,
     do_PRW=False,
 ):
@@ -38,6 +42,7 @@ def MiniTupleCfg(
             Output=[f"ANALYSIS DATAFILE='{flags.Analysis.outFile}', OPT='RECREATE'"]
         )
     )
+    print(CompFactory.CutFlowSvc)
 
     def getFourMomBranches(
         container, alias, doOR=False, noSystematics=False, doMass=False
@@ -143,19 +148,32 @@ def MiniTupleCfg(
             "JetConstitScaleMomentum_eta",
             "JetConstitScaleMomentum_phi",
             "JetConstitScaleMomentum_m",
+            "GhostBHadronsFinalCount",
         ]
         for var in reco10JetVars:
             analysisTreeBranches += [
-                f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"
+                (f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"),
+                # (
+                # f"{containers['reco10UFOJet']}.{var} -> recoUFOjet_antikt10_%SYS%_{var}" # noqa
+                # ),
             ]
         # one after the other for better readability in the root file
         for var in reco10JetVars:
             analysisTreeBranches += [
-                f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"
+                (
+                    f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"  # noqa
+                ),
+                # (
+                # f"{containers['reco10UFOJet']}_OR.{var} -> recoUFOjet_antikt10_OR_%SYS%_{var}" # noqa
+                # ),
             ]
 
         analysisTreeBranches += LargeJetGhostVRJetAssociationBranches(
             flags, containers["reco10Jet"]
+        )
+
+        analysisTreeBranches += LargeUFOJetGhostVRJetAssociationBranches(
+            flags, containers["reco10UFOJet"]
         )
 
         analysisTreeBranches += getFourMomBranches(
@@ -164,6 +182,12 @@ def MiniTupleCfg(
         analysisTreeBranches += getFourMomBranches(
             containers["reco10Jet"], "recojet_antikt10", doOR=True
         )
+        analysisTreeBranches += getFourMomBranches(
+            containers["reco10UFOJet"], "recoUFOjet_antikt10"
+        )
+        # analysisTreeBranches += getFourMomBranches(
+        # containers["reco10UFOJet"], "recoUFOjet_antikt10" , doOR=True,
+        # )
         if flags.Input.isMC:
             analysisTreeBranches += [
                 (
@@ -180,6 +204,9 @@ def MiniTupleCfg(
         if flags.Input.isMC:
             analysisTreeBranches += getFourMomBranches(
                 containers["truth10Jet"], "truthjet_antikt10", noSystematics=True
+            )
+            analysisTreeBranches += getFourMomBranches(
+                containers["truth10UFOJet"], "truthUFOjet_antikt10", noSystematics=True
             )
 
         if flags.Input.isMC:

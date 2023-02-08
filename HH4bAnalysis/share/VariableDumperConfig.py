@@ -147,18 +147,16 @@ def main():
     ConfigFlags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
     ConfigFlags.addFlag("Input.SimulationFlavour", fileMD.get("SimulationFlavour", ""))
 
-    ConfigFlags.addFlag('Analysis.DataType', lambda prevFlags: get_dataType(prevFlags))
-    ConfigFlags.addFlag('Analysis.Years', lambda prevFlags: getRunYears(prevFlags))
-    log.info(
-        f"Configuring to match dataset from {ConfigFlags.Analysis.Years}"
-    )
+    ConfigFlags.addFlag("Analysis.DataType", lambda prevFlags: get_dataType(prevFlags))
+    ConfigFlags.addFlag("Analysis.Years", lambda prevFlags: getRunYears(prevFlags))
+    log.info(f"Configuring to match dataset from {ConfigFlags.Analysis.Years}")
     if max(ConfigFlags.Analysis.Years) <= 2018:
-        ConfigFlags.addFlag('Analysis.Run', 2)
+        ConfigFlags.addFlag("Analysis.Run", 2)
     elif min(ConfigFlags.Analysis.Years) >= 2022:
-        ConfigFlags.addFlag('Analysis.Run', 3)
+        ConfigFlags.addFlag("Analysis.Run", 3)
     else:
-        raise RuntimeError('Invalid list of years, cannot combine runs')
-    log.info(f'Configured years match Run {ConfigFlags.Analysis.Run}')
+        raise RuntimeError("Invalid list of years, cannot combine runs")
+    log.info(f"Configured years match Run {ConfigFlags.Analysis.Run}")
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
@@ -177,12 +175,19 @@ def main():
     with ConfigurableRun3Behavior():
         cfg = MainServicesCfg(ConfigFlags)
 
-        from EventBookkeeperTools.EventBookkeeperToolsConfig import CutFlowSvcCfg
+        from EventBookkeeperTools.EventBookkeeperToolsConfig import (
+            CutFlowSvcCfg,
+            BookkeeperToolCfg,
+        )
 
+        # output_name = "CutBookkeepers"
+        # Needed for filtering, Athena only for now
+        # from EventBookkeeperTools.CutFlowHelpers import CreateCutFlowSvc
         # Create CutFlowSvc otherwise the default CutFlowSvc that has only
         # one CutflowBookkeeper object, and can't deal with multiple weights
         cfg.merge(CutFlowSvcCfg(ConfigFlags))
-
+        cfg.merge(BookkeeperToolCfg(ConfigFlags))
+        # cfg.printConfig(withDetails=True, summariseProps=True)
         # Adjust the loop manager to announce the event number less frequently.
         # Makes a big difference if running over many events
         if ConfigFlags.Concurrency.NumThreads > 0:

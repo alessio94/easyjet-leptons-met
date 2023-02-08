@@ -8,7 +8,7 @@
 // includes
 //
 #include "VariableDumperAlg.h"
-
+#include "xAODRootAccess/TEvent.h"
 //
 // method implementations
 //
@@ -29,9 +29,13 @@ namespace HH4B
     ATH_CHECK(m_systematicsList.addHandle(m_muonHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_jetsmallRHandle));
     ATH_CHECK(m_systematicsList.addHandle(m_VRtrackjetHandle));
-    if (!m_jetlargeRHandle.empty())
+    if (!m_jetlargeRHandle.empty() )
     {
       ATH_CHECK(m_systematicsList.addHandle(m_jetlargeRHandle));
+    }
+    if (!m_jetUFOlargeRHandle.empty() )
+    {
+      ATH_CHECK(m_systematicsList.addHandle(m_jetUFOlargeRHandle));
     }
 
     ATH_CHECK(m_systematicsList.initialize());
@@ -42,7 +46,6 @@ namespace HH4B
   StatusCode VariableDumperAlg ::execute()
   {
     ATH_MSG_DEBUG("Executing " << name());
-
     for (const auto &sys : m_systematicsList.systematicsVector())
     {
       std::string sysname;
@@ -60,9 +63,14 @@ namespace HH4B
       const xAOD::JetContainer *antiKt4RecoJets(nullptr);
       ATH_CHECK(m_jetsmallRHandle.retrieve(antiKt4RecoJets, sys));
       const xAOD::JetContainer *antiKt10RecoJets(nullptr);
-      if (!m_jetlargeRHandle.empty())
+      const xAOD::JetContainer *antiKt10UFORecoJets(nullptr);
+      if (!m_jetlargeRHandle.empty() )
       {
         ATH_CHECK(m_jetlargeRHandle.retrieve(antiKt10RecoJets, sys));
+      }
+      if (!m_jetUFOlargeRHandle.empty() )
+      {
+        ATH_CHECK(m_jetUFOlargeRHandle.retrieve(antiKt10UFORecoJets, sys));
       }
       const xAOD::JetContainer *VRTrackJets(nullptr);
       if (!m_VRtrackjetHandle.empty())
@@ -74,3 +82,4 @@ namespace HH4B
     return StatusCode::SUCCESS;
   }
 }
+
