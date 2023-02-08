@@ -42,9 +42,6 @@ atlas_add_component(HH4bAnalysis
   FTagAnalysisInterfacesLib
   xAODBTagging
   FourMomUtils
-  CutBookkeeperUtils
-  xAODRootAccess
-  xAODCutFlow
 )
 
 # Install python modules, joboptions, and share content

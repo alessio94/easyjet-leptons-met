@@ -8,7 +8,6 @@
 // includes
 //
 #include "VariableDumperAlg.h"
-#include "xAODRootAccess/TEvent.h"
 //
 // method implementations
 //

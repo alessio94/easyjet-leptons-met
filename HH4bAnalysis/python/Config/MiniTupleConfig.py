@@ -152,20 +152,12 @@ def MiniTupleCfg(
         ]
         for var in reco10JetVars:
             analysisTreeBranches += [
-                (f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"),
-                # (
-                # f"{containers['reco10UFOJet']}.{var} -> recoUFOjet_antikt10_%SYS%_{var}" # noqa
-                # ),
+                f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"
             ]
         # one after the other for better readability in the root file
         for var in reco10JetVars:
             analysisTreeBranches += [
-                (
-                    f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"  # noqa
-                ),
-                # (
-                # f"{containers['reco10UFOJet']}_OR.{var} -> recoUFOjet_antikt10_OR_%SYS%_{var}" # noqa
-                # ),
+                f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"  # noqa
             ]
 
         analysisTreeBranches += LargeJetGhostVRJetAssociationBranches(
@@ -185,9 +177,7 @@ def MiniTupleCfg(
         analysisTreeBranches += getFourMomBranches(
             containers["reco10UFOJet"], "recoUFOjet_antikt10"
         )
-        # analysisTreeBranches += getFourMomBranches(
-        # containers["reco10UFOJet"], "recoUFOjet_antikt10" , doOR=True,
-        # )
+
         if flags.Input.isMC:
             analysisTreeBranches += [
                 (

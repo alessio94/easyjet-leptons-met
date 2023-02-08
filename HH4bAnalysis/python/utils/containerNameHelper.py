@@ -79,7 +79,6 @@ def get_container_names(flags):
 
     if not is_daod_physlite:
         outputs["reco10Jet"] = f"Analysis{inputs['reco10Jet']}_%SYS%"
-        # outputs["reco10UFOJet"] = f"{inputs['reco10UFOJet']}_%SYS%"
         outputs["reco10UFOJet"] = f"Analysis{inputs['reco10UFOJet']}_%SYS%"
         outputs["vrJet"] = f"Analysis{inputs['vrJet']}_%SYS%"
     else:

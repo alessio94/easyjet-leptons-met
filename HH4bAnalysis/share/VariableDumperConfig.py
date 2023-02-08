@@ -180,14 +180,11 @@ def main():
             BookkeeperToolCfg,
         )
 
-        # output_name = "CutBookkeepers"
         # Needed for filtering, Athena only for now
-        # from EventBookkeeperTools.CutFlowHelpers import CreateCutFlowSvc
         # Create CutFlowSvc otherwise the default CutFlowSvc that has only
         # one CutflowBookkeeper object, and can't deal with multiple weights
         cfg.merge(CutFlowSvcCfg(ConfigFlags))
         cfg.merge(BookkeeperToolCfg(ConfigFlags))
-        # cfg.printConfig(withDetails=True, summariseProps=True)
         # Adjust the loop manager to announce the event number less frequently.
         # Makes a big difference if running over many events
         if ConfigFlags.Concurrency.NumThreads > 0:
