@@ -68,9 +68,6 @@ private:
     SG::AuxElement::Decorator<int> m_goodVRTrackJetCountDecorator{
         "goodVRTrackJets"};
 
-    SG::AuxElement::ConstAccessor<int> m_HadronConeExclTruthLabelID{
-        "HadronConeExclTruthLabelID"}; //Dec20 2022 added
-
     SG::AuxElement::Decorator<std::vector<float>>
         m_leadingVRTrackJetPtDecorator{"leadingVRTrackJetsPt"};
 

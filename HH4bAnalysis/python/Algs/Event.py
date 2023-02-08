@@ -101,9 +101,9 @@ def GeneratorAnalysisSequenceCfg(flags, dataType):
         runNumber=flags.Input.RunNumber[0],
         cutBookkeepersSystematics=doCBK,
     )
+
     cfg.addSequence(CompFactory.AthSequencer(generatorSequence.getName()))
     for alg in generatorSequence.getGaudiConfig2Components():
-        # help(alg.truthWeightTool)
         cfg.addEventAlgo(alg, generatorSequence.getName())
 
     return cfg
