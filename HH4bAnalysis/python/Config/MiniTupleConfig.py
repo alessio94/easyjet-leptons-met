@@ -157,7 +157,32 @@ def MiniTupleCfg(
         # one after the other for better readability in the root file
         for var in reco10JetVars:
             analysisTreeBranches += [
-                f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"  # noqa
+                (
+                    f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"  # noqa
+                ),
+            ]
+    if not is_daod_physlite:
+        reco10UFOJetVars = [
+            "Tau1_wta",
+            "Tau2_wta",
+            "Tau3_wta",
+            "Tau4_wta",
+            "ECF1",
+            "ECF2",
+            "ECF3",
+            "Split12",
+            "Split23",
+            "JetConstitScaleMomentum_pt",
+            "JetConstitScaleMomentum_eta",
+            "JetConstitScaleMomentum_phi",
+            "JetConstitScaleMomentum_m",
+            "GhostBHadronsFinalCount",
+        ]
+        for v in reco10UFOJetVars:
+            analysisTreeBranches += [
+                (
+                    f"{containers['reco10UFOJet']}.{v} -> recoUFOjet_antikt10_%SYS%_{v}"  # noqa
+                ),
             ]
 
         analysisTreeBranches += LargeJetGhostVRJetAssociationBranches(
@@ -182,13 +207,26 @@ def MiniTupleCfg(
             analysisTreeBranches += [
                 (
                     f"{containers['reco10Jet']}.R10TruthLabel_R21Consolidated ->"
-                    " recojet_antikt10_%SYS%_TruthLabel"
+                    " R10TruthLabel_R21Consolidated_%SYS%"
                 ),
                 (
                     f"{containers['reco10Jet']}_OR.R10TruthLabel_R21Consolidated ->"
-                    " recojet_antikt10_OR_%SYS%_TruthLabel"
+                    " R10TruthLabel_R21Consolidated_OR_%SYS%"
+                ),
+                (
+                    f"{containers['reco10UFOJet']}.R10TruthLabel_R21Precision_2022v1 ->"
+                    " UFO_R10TruthLabel_R21Precision_2022v1_%SYS%"
                 ),
             ]
+            # Just added this ptag check for now. Because older p-tag
+            # derivations do not have these truth label for large-R jet.
+            if "p5511" in flags.Input.AMITag:
+                analysisTreeBranches += [
+                    (
+                        f"{containers['reco10UFOJet']}.R10TruthLabel_R22v1 ->"
+                        " UFO_R10TruthLabel_R22v1_%SYS%"
+                    ),
+                ]
 
     if not flags.Analysis.disable_calib:
         if flags.Input.isMC:

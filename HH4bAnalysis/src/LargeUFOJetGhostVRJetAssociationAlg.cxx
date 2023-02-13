@@ -46,15 +46,14 @@ namespace HH4B
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_eventInfoKey);
     ATH_CHECK(eventInfo.isValid());
 
-    ATH_CHECK(recordVRTrackJetGhostAssociation(*largeRUFOJets, *eventInfo));
+    ATH_CHECK(recordVRTrackJetGhostAssociation(*largeRUFOJets));
 
     return StatusCode::SUCCESS;
   }
 
   StatusCode
   LargeUFOJetGhostVRJetAssociationAlg ::recordVRTrackJetGhostAssociation(
-      const xAOD::JetContainer &largeRUFOJets,
-      const xAOD::EventInfo &eventInfo) const
+      const xAOD::JetContainer &largeRUFOJets) const
   {
     ATH_MSG_DEBUG("Saving large-R UFO jets as \"" << m_largeUFOJetInKey.key()
                                               << "\".");
@@ -107,6 +106,7 @@ namespace HH4B
       std::vector<float> leadingGAVRJetEta(minLeadingGAVRjetsSize);
       std::vector<float> leadingGAVRJetPhi(minLeadingGAVRjetsSize);
       std::vector<float> leadingGAVRJetM(minLeadingGAVRjetsSize);
+      std::vector<int> HadronConeExclTruthLabelID(minLeadingGAVRjetsSize);
 
       float deltaR12{-1};
       float deltaR13{-1};
@@ -133,6 +133,7 @@ namespace HH4B
         leadingGAVRJetEta.at(i) = leadingVRJet->eta();
         leadingGAVRJetPhi.at(i) = leadingVRJet->phi();
         leadingGAVRJetM.at(i) = leadingVRJet->m();
+        HadronConeExclTruthLabelID.at(i) = m_TruthLabelAccessor(*leadingVRJet);
 
         if (leadingGAVRjetsSize > 1 && i == 0)
         {
@@ -172,6 +173,7 @@ namespace HH4B
       m_leadingVRTrackJetDeltaR12Decorator(*largejet) = deltaR12;
       m_leadingVRTrackJetDeltaR13Decorator(*largejet) = deltaR13;
       m_leadingVRTrackJetDeltaR32Decorator(*largejet) = deltaR32;
+      m_HadronConeExclTruthLabelIDDecorator(*largejet) = HadronConeExclTruthLabelID;
       for (size_t j = 0; j < m_workingPoints.size(); j++)
       {
         m_leadingVRTrackJetBtagDecorators[j](*largejet) = btags[j];
