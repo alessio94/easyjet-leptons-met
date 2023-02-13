@@ -243,6 +243,11 @@ def LargeJetGhostVRJetAssociationBranches(flags, inputLargeRJetContainerName):
     analysisTreeBranches += [
         "EventInfo.passRelativeDeltaRToVRJetCut -> passRelativeDeltaRToVRJetCut"
     ]
+    if flags.Input.isMC:
+        analysisTreeBranches += [
+            f"{inputLargeRJetContainerName}.VRTrackJetsTruthLabel -> "
+            f"HadronConeExclTruthLabelID_%SYS%"
+        ]
 
     return analysisTreeBranches
 
@@ -285,5 +290,10 @@ def LargeUFOJetGhostVRJetAssociationBranches(flags, inputLargeRUFOJetContainerNa
         f"recoUFOjet_antikt10_%SYS%_leadingVRTrackJetsBtag_{wp}"
         for wp in flags.Analysis.vr_btag_wps
     ]
+    if flags.Input.isMC:
+        analysisTreeBranches += [
+            f"{inputLargeRUFOJetContainerName}.VRTrackJetsTruthLabel -> "
+            f"UFO_R10_HadronConeExclTruthLabelID_%SYS%"
+        ]
 
     return analysisTreeBranches

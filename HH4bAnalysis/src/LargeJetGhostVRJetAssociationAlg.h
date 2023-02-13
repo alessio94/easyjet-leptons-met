@@ -54,6 +54,9 @@ private:
     SG::AuxElement::ConstAccessor<std::vector<ELPC>>
         m_ghostVRTrackJetsAccessor{"GhostAntiKtVR30Rmax4Rmin02PV0TrackJets"};
 
+    SG::AuxElement::ConstAccessor<int>
+        m_TruthLabelAccessor{"HadronConeExclTruthLabelID"};
+
     std::vector<SG::AuxElement::ConstAccessor<char>> m_isBtagAccessors;
 
     // recommended by ftag : Remove the event if any of your signal jets have
@@ -67,6 +70,9 @@ private:
 
     SG::AuxElement::Decorator<int> m_goodVRTrackJetCountDecorator{
         "goodVRTrackJets"};
+
+    SG::AuxElement::Decorator<std::vector<int>> m_HadronConeExclTruthLabelIDDecorator{
+        "VRTrackJetsTruthLabel"}; 
 
     SG::AuxElement::Decorator<std::vector<float>>
         m_leadingVRTrackJetPtDecorator{"leadingVRTrackJetsPt"};

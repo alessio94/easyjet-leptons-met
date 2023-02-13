@@ -174,11 +174,9 @@ def updateConfigFlags(args, flags, overwrites={}):
         # exclude standard athena flags
         if key in overwrites:
             if overwrites[key] and key not in runConfig:
-                raise ValueError(
-                    f'{key} must be set in the config file')
+                raise ValueError(f"{key} must be set in the config file")
             elif key in runConfig and not overwrites[key]:
-                raise ValueError(
-                    f'{key} must not exist in the config file')
+                raise ValueError(f"{key} must not exist in the config file")
 
             value = getattr(args, key)
             if value is not None:

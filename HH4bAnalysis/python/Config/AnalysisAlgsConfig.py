@@ -1,4 +1,3 @@
-
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.Algs.BoostedAnalysis import BoostedAnalysisCfg
