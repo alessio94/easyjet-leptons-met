@@ -115,12 +115,18 @@ def AnalysisAlgsCfg(
             )
 
         log.info("Adding small-R jet seq")
+        muoncont = containers["outputs"]["muons"]
+        if not do_muons:
+            muoncont = containers["inputs"]["muons"]
         cfg.merge(
             JetAnalysisSequenceCfg(
                 flags,
                 dataType=dataType,
                 inputContainerName=containers["inputs"]["reco4Jet"],
                 outputContainerName=containers["outputs"]["reco4Jet"],
+                # Need muons for b-jet pt correction
+                muonContainerName=muoncont,
+                do_bjet_ptcalib=do_muons,
                 is_daod_physlite=is_daod_physlite,
             )
         )

@@ -223,6 +223,19 @@ def MiniTupleCfg(
             for btag_wp in flags.Analysis.btag_wps
         ]
 
+        if do_muons:
+            # B-jet momentum without correction
+            analysisTreeBranches += [
+                f"{containers['reco4Jet']}.NoBJetCalibMomentum_{var}"
+                f" -> recojet_antikt4_%SYS%_nobjetcalib_{var}"
+                for var in ['pt','eta','phi','m']
+            ]
+            analysisTreeBranches += [
+                f"{containers['reco4Jet']}_OR.NoBJetCalibMomentum_{var}"
+                f" -> recojet_antikt4_OR_%SYS%_nobjetcalib_{var}"
+                for var in ['pt','eta','phi','m']
+            ]
+
     split_tags = flags.Input.AMITag.split("_")
     is_valid_ptag = get_valid_ami_tag(split_tags, "p")
 
