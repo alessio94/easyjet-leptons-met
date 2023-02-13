@@ -26,7 +26,7 @@ container_map = {
         MUONS_KEY: "Muons",
         ELECTRONS_KEY: "Electrons",
         PHOTONS_KEY: "Photons",
-        TRUTH_PARTICLE_INFO_KEY: "TruthBSMWithDecayParticles",
+        TRUTH_PARTICLE_INFO_KEY: "TruthBosonsWithDecayParticles",
     },
     "DAOD_PHYSLITE": {
         RECO_4_PFLOW_JETS_KEY: "AnalysisJets",
@@ -39,7 +39,7 @@ container_map = {
         MUONS_KEY: "AnalysisMuons",
         ELECTRONS_KEY: "AnalysisElectrons",
         PHOTONS_KEY: "AnalysisPhotons",
-        TRUTH_PARTICLE_INFO_KEY: "TruthBSMWithDecayParticles",
+        TRUTH_PARTICLE_INFO_KEY: "TruthBosonsWithDecayParticles",
     },
 }
 

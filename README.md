@@ -10,8 +10,9 @@ First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel fre
 
 ```
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
-git clone ssh://git@gitlab.cern.ch:7999/easyjet/hh4b-analysis.git
+git clone --recursive ssh://git@gitlab.cern.ch:7999/easyjet/hh4b-analysis.git
 ```
+Note the `--recursive` argument, which is needed to get the submodules in the package.
 
 Now, compile the package
 

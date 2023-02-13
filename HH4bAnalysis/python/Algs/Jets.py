@@ -2,6 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from FTagAnalysisAlgorithms.FTagAnalysisSequence import makeFTagAnalysisSequence
 from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
+from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetCalibAnalysisSequence
 
 
 def JetAnalysisSequenceCfg(
@@ -9,7 +10,9 @@ def JetAnalysisSequenceCfg(
     dataType,
     inputContainerName,
     outputContainerName,
+    muonContainerName,
     is_daod_physlite,
+    do_bjet_ptcalib,
 ):
     cfg = ComponentAccumulator()
     jetSequence = makeJetAnalysisSequence(
@@ -56,6 +59,15 @@ def JetAnalysisSequenceCfg(
             noEfficiency=False,
             legacyRecommendations=False,
             enableCutflow=False,
+        )
+
+    if do_bjet_ptcalib:
+        # Pick a reasonable b-tag selection?
+        makeBJetCalibAnalysisSequence(
+            flags,
+            jetSequence,
+            muonName=muonContainerName,
+            btagSelDecor='ftag_select_DL1dv00_FixedCutBEff_77',
         )
 
     jetSequence.configure(
