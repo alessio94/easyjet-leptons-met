@@ -20,7 +20,7 @@ Now, compile the package
 mkdir build
 cd build
 setupATLAS
-asetup AthAnalysis,22.2.100
+asetup AthAnalysis,22.2.108
 cmake ../hh4b-analysis/
 make
 source */setup.sh
@@ -28,6 +28,17 @@ source */setup.sh
 
 *If you are working in a container (described [below](#athanalysis-in-docker)), source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*
 
+
+## Updating
+
+You may occasionally have to resync the submodules after an
+update. You can run
+
+```
+git submodule update --init --recursive
+```
+
+When changing branches with `git checkout` or `git switch`, also be sure to use the `--recurse-submodule` option to keep the submodules current.
 
 # Running on files
 
@@ -49,17 +60,18 @@ VariableDumperConfig.py --runConfig [path-to-runconfig] --filesInput mc.myinputf
 To process DAOD_PHYSLITE the configuration is automatic as well, the command looks the same:
 
 ```
-VariableDumperConfig.py --runConfig [path-to-runconfig] --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10 
+VariableDumperConfig.py --runConfig [path-to-runconfig] --filesInput mc.myinputfile.DAOD_PHYSLITE.pool.root --evtMax 10
 ```
 
 ## AthAnalysis in Docker
 
-If you would rather work on a local computer, numbered `AthAnalysis` releases are available as Docker containers [on dockerhub](https://hub.docker.com/r/atlas/athanalysis/). Naturally, you will have to install [Docker](https://www.docker.com).
+If you would rather work on a local computer, numbered `AthAnalysis` releases are available as Docker containers [in the Athena container registry][registry].
+You will have to install [Docker](https://www.docker.com).
 
- Preferably, do this in `$WORKDIR`.
+Preferably, do this in `$WORKDIR`.
 
 ```
-docker pull atlas/athanalysis:22.2.100
+docker pull gitlab-registry.cern.ch/atlas/athena/athanalysis:22.2.108
 docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:22.2.100
 ```
 
@@ -70,6 +82,8 @@ This will start up an interactive terminal inside the container, which has read/
 The terminal itself begins in an empty directory, `/workdir`. *The `delegated` suffix for these mounted volumes helps optimise the read/write access for better responsiveness.* Within this terminal, you can follow the instructions to source the `/release_setup.sh` script, in place of `setupATLAS; asetup`.
 
 If you encounter any issues, some relevant instructions are available at <https://atlassoftwaredocs.web.cern.ch/athena/dev-setup/>. The `AthAnalysis` containers do not require `cvmfs` access, but you may need to experiment with the command line arguments when launching the container.
+
+[registry]: https://gitlab.cern.ch/atlas/athena/container_registry/8440
 
 ## Restore the setup
 
@@ -105,5 +119,5 @@ You can use pre-commit hooks, that check and autoformats some style and formatti
 ```
 pip install -r requirements.txt --user
 pre-commit install
-pre-commit run 
+pre-commit run
 ```
