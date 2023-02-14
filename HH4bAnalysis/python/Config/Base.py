@@ -181,13 +181,13 @@ def updateConfigFlags(args, flags, overwrites={}):
                     f'{key} must not exist in the config file')
 
             value = getattr(args, key)
-            if value is not None:
+            if value is not None or key not in runConfig:
                 runConfig[key] = value
 
     # add them to ConfigFlags
     for key, value in runConfig.items():
-        flags.addFlag("Analysis." + key, value)
         if key != "runConfig":
             log.info("User configured: " + str(key) + ": " + str(value))
+        flags.addFlag("Analysis." + key, value)
 
     return flags

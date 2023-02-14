@@ -11,16 +11,22 @@ add_compile_options(-Werror)
 # common requirements
 atlas_add_library(H5WriterLib
   src/EventInfoWriter.cxx
+  src/IParticleWriter.cxx
+  src/PrimitiveHelpers.cxx
   LINK_LIBRARIES
   AthenaBaseComps
   xAODEventInfo
+  xAODBase
   HDF5Utils
+  xAODBTagging
   PUBLIC_HEADERS
   H5Writer
   )
 atlas_add_component(H5Writer
   src/H5FileSvc.cxx
   src/EventInfoWriterAlg.cxx
+  src/IParticleWriterAlg.cxx
+  src/AlgHelpers.cxx
   src/components/H5Writer_entries.cxx
   LINK_LIBRARIES
   H5WriterLib

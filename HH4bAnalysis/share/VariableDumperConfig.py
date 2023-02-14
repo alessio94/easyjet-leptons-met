@@ -96,7 +96,12 @@ def defineArgs(ConfigFlags):
             "disable ptag detection for CI tests " "(avoids CBK failure on test files)"
         ),
     )
-    add_analysis_arg('--write-h5-event', action='store_true')
+    add_analysis_arg(
+        '--h5-output',
+        type=Path,
+        default=False,
+        help="save output HDF5 file",
+    )
 
     oropt = dict(type=bool, metavar='BOOL', overwrite=True)
     add_analysis_arg('-b','--do-resolved-dihiggs-analysis', **oropt)
@@ -122,7 +127,7 @@ def main():
     from AthenaConfiguration.AllConfigFlags import ConfigFlags
 
     parser, overwrites = defineArgs(ConfigFlags)
-    args = ConfigFlags.fillFromArgs([], parser)
+    args = ConfigFlags.fillFromArgs(parser=parser)
     # Write user options to flags.Analysis
     updateConfigFlags(args, ConfigFlags, overwrites)
 
@@ -291,8 +296,11 @@ def main():
             "HH4bSeq",
         )
 
-        if ConfigFlags.Analysis.write_h5_event:
-            cfg.merge(getH5Cfg(ConfigFlags))
+        if ConfigFlags.Analysis.h5_output:
+            cfg.merge(
+                getH5Cfg(ConfigFlags),
+                "HH4bSeq",
+            )
 
         # Print the full job configuration
         cfg.printConfig(summariseProps=False)
