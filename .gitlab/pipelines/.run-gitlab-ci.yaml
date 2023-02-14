@@ -1,3 +1,5 @@
+variables:
+  FORCED_LOG_LEVEL: INFO
 
 run_VariableDumper_data18_DAOD_PHYS:
   stage: run

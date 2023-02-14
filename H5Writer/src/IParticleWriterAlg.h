@@ -1,17 +1,17 @@
-#ifndef EVENT_INFO_WRITER_ALG_H
-#define EVENT_INFO_WRITER_ALG_H
+#ifndef IPARTICLE_WRITER_ALG_H
+#define IPARTICLE_WRITER_ALG_H
 
-#include "H5Writer/EventInfoWriter.h"
+#include "H5Writer/IParticleWriter.h"
 #include "src/H5FileSvc.h"
 
 #include "AthenaBaseComps/AthAlgorithm.h"
-#include "xAODEventInfo/EventInfo.h"
+#include "xAODBase/IParticleContainer.h"
 #include "GaudiKernel/ServiceHandle.h"
 
-class EventInfoWriterAlg: public AthAlgorithm
+class IParticleWriterAlg: public AthAlgorithm
 {
 public:
-  EventInfoWriterAlg(const std::string& name, ISvcLocator* loc);
+  IParticleWriterAlg(const std::string& name, ISvcLocator* loc);
 
   virtual StatusCode initialize() override;
   virtual StatusCode execute() override;
@@ -24,15 +24,21 @@ private:
   Gaudi::Property<std::map<std::string, std::string>> m_primToType {
     this, "primitiveToType", {}, "Map from primitive to type"
   };
+  Gaudi::Property<std::map<std::string, std::string>> m_primToAssociation {
+    this, "primitiveToAssociation", {}, "Map from primitive to association"
+  };
   Gaudi::Property<std::string> m_dsName {
     this, "datasetName", "", "Name of output dataset"
   };
-  SG::ReadHandleKey<xAOD::EventInfo> m_infoKey {
-    this, "eventInfo", "EventInfo", "Event info key"};
+  Gaudi::Property<unsigned long long> m_maxSize {
+    this, "maximumSize", 10, "Maximum number of particles to store"
+  };
+  SG::ReadHandleKey<xAOD::IParticleContainer> m_partKey {
+    this, "container", "", "IParticle container key"};
   ServiceHandle<H5FileSvc> m_output_svc {
     this, "output", "", "output file service"};
 
-  std::unique_ptr<EventInfoWriter> m_writer;
+  std::unique_ptr<IParticleWriter> m_writer;
 
 };
 

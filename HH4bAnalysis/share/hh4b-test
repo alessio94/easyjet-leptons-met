@@ -53,7 +53,7 @@ declare -A TESTS=(
 
 # some common variables in the tests
 CONFIG=${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
-COMMON=" --allow-no-ptag --runConfig $CONFIG "
+COMMON=" --allow-no-ptag --runConfig $CONFIG"
 
 # specific tests
 ntuple-dump() {
@@ -64,7 +64,7 @@ ntuple-dump-fast() {
     local CMD="VariableDumperConfig.py $OPTS"
     $CMD --config-only True
     echo "rerunning $CMD to time"
-    $CMD --timeout 30 --write-h5-event
+    $CMD --timeout 30 --h5-output test.h5
 }
 ntuple-dump-physlite() {
     VariableDumperConfig.py $COMMON --disable-calib --filesInput $1
@@ -84,7 +84,7 @@ ntuple-dump-physlite-fast() {
 ALL_MODES=${!TESTS[*]}
 
 print-usage() {
-    echo "usage: ${0##*/} [-h] [-d <dir>] (${ALL_MODES[*]// /|})" 1>&2
+    echo "usage: ${0##*/} [-hv] [-d <dir>] (${ALL_MODES[*]// /|})" 1>&2
 }
 
 usage() {
@@ -100,6 +100,7 @@ The ${0##*/} utility will download a test DAOD file and run it.
 
 Options:
  -d <dir>: specify directory to run in
+ -v: verbose output (INFO level in Athena)
  -h: print help
 
 If no -d argument is given we'll create one in /tmp and work there.
@@ -110,11 +111,13 @@ EOF
 
 DIRECTORY=""
 DATA_URL=https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw/master/
+LOG_LEVEL="WARNING"
 
-while getopts ":d:h" o; do
+while getopts ":d:hv" o; do
     case "${o}" in
         d) DIRECTORY=${OPTARG} ;;
         h) help ;;
+        v) LOG_LEVEL="INFO" ;;
         *) usage ;;
     esac
 done
@@ -126,6 +129,8 @@ fi
 
 MODE=$1
 
+# add common options
+COMMON+=" -l ${FORCED_LOG_LEVEL-${LOG_LEVEL}}"
 
 ############################################
 # Check that all the modes / paths exist
