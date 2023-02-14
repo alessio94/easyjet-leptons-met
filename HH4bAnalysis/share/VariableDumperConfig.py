@@ -174,10 +174,10 @@ def main():
     # needed to run an Athena job.
     # Setting temporarily needed for Run 3 code, to generate python
     # Configurable objects for deduplication
-    from AthenaCommon.Configurable import ConfigurableRun3Behavior
+    from AthenaCommon.Configurable import ConfigurableCABehavior
     from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 
-    with ConfigurableRun3Behavior():
+    with ConfigurableCABehavior():
         cfg = MainServicesCfg(ConfigFlags)
 
         from EventBookkeeperTools.EventBookkeeperToolsConfig import (

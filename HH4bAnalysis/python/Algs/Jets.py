@@ -91,7 +91,7 @@ def JetAnalysisSequenceCfg(
 
 def FatJetAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContainerName):
     cfg = ComponentAccumulator()
-    # with ConfigurableRun3Behavior(False):
+    # with ConfigurableCABehavior(False):
     largeRrecojetSequence = makeJetAnalysisSequence(
         dataType,
         jetCollection=inputContainerName,
@@ -122,7 +122,7 @@ def FatUFOJetAnalysisSequenceCfg(
     flags, dataType, inputContainerName, outputContainerName
 ):
     cfg = ComponentAccumulator()
-    # with ConfigurableRun3Behavior(False):
+    # with ConfigurableCABehavior(False):
     largeRUFOrecojetSequence = makeJetAnalysisSequence(
         dataType,
         jetCollection=inputContainerName,

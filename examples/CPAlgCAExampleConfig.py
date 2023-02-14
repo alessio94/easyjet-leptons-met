@@ -92,9 +92,9 @@ def CPPileupConfig(ConfigFlags, outfname):
 def main():
     # Setting temporarily needed for Run 3 code, to generate python
     # Configurable objects for deduplication
-    from AthenaCommon.Configurable import ConfigurableRun3Behavior
+    from AthenaCommon.Configurable import ConfigurableCABehavior
 
-    with ConfigurableRun3Behavior():
+    with ConfigurableCABehavior():
 
         # Import the job configuration flags, some of which will be autoconfigured.
         # These are used for steering the job, and include e.g. the input file (list).

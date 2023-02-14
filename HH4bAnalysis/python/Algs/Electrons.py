@@ -12,7 +12,7 @@ def ElectronAnalysisSequenceCfg(
 ):
     cfg = ComponentAccumulator()
 
-    # with ConfigurableRun3Behavior(False):
+    # with ConfigurableCABehavior(False):
     electronSequence = makeElectronAnalysisSequence(
         dataType,
         workingPoint="LooseLHElectron.NonIso",

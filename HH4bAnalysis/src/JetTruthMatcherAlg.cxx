@@ -19,7 +19,6 @@ namespace HH4B
   {
     declareProperty("bTagWP", m_bTagWP);
     declareProperty("regime", m_regime);
-    declareProperty("containerOutKey", m_containerOutKey);
   }
 
   StatusCode JetTruthMatcherAlg ::initialize()
