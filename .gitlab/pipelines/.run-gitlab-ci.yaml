@@ -1,23 +1,11 @@
 variables:
   FORCED_LOG_LEVEL: INFO
 
-run_VariableDumper_data18_DAOD_PHYS:
-  stage: run
-  needs: [compile]
-  script:
-    - hh4b-test data18
-
 run_VariableDumper_fast_data18_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
     - hh4b-test data18-fast
-
-run_VariableDumper_data22_DAOD_PHYS:
-  stage: run
-  needs: [compile]
-  script:
-    - hh4b-test data22
 
 run_VariableDumper_fast_data22_DAOD_PHYS:
   stage: run

@@ -69,15 +69,15 @@ namespace HH4B
         m_truthParticleInfoInKey);
     ATH_CHECK(truthInformationParticles.isValid());
 
-    m_isMC = eventInfo->eventType(xAOD::EventInfo::IS_SIMULATION);
-    if (m_isMC)
+    if (eventInfo->eventType(xAOD::EventInfo::IS_SIMULATION))
     {
       ATH_CHECK(recordTruthParticleInformation(*truthInformationParticles,
                                                *eventInfo));
     }
     else
     {
-      ATH_MSG_WARNING("Running on data, not recording truth information!");
+      ATH_MSG_ERROR("Running on data, can't record truth information!");
+      return StatusCode::FAILURE;
     }
 
     return StatusCode::SUCCESS;
@@ -120,17 +120,19 @@ namespace HH4B
 
     if (hhTruthParticles->size() < 2)
     {
-      ATH_MSG_WARNING(
+      ATH_MSG_DEBUG(
           "Only 1 H truth particle in the event. Skipping the event "
           << eventInfo.eventNumber());
-      setFilterPassed(false);
+      if (m_filter) {
+        setFilterPassed(false);
+      }
       return StatusCode::SUCCESS;
     }
 
     if (hhTruthParticles->size() > 2)
     {
-      ATH_MSG_WARNING("More than 2 H truth particles in event "
-                      << eventInfo.eventNumber());
+      ATH_MSG_DEBUG("More than 2 H truth particles in event "
+                    << eventInfo.eventNumber());
     }
 
     std::map<std::string, std::vector<float>> truth_b_fromH1;

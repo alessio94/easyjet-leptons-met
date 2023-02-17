@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+
+"""Check job metadata
+
+This runs some scripts to check that the metadata json output is
+consistent with a consistent unit test.
+"""
+
+from argparse import ArgumentParser
+from json import load
+from sys import stdout, exit
+from tempfile import TemporaryFile
+
+
+def get_args():
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument(
+        'meta_file', nargs='?', default='userJobMetadata.json'
+    )
+    parser.add_argument('-n', '--n-events', default=1, type=int)
+    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('--allow-no-trigger', action='store_true')
+    return parser.parse_args()
+
+
+def run():
+    args = get_args()
+    with open(args.meta_file) as json_file:
+        meta_list = load(json_file)
+    meta_dict = dict(meta_list)
+
+    output = stdout if args.verbose else TemporaryFile('w')
+
+    bad = False
+
+    n_input = meta_dict['n_input']
+    n_events = meta_dict['n_events']
+    n_trigger = meta_dict['n_trigger']
+
+    if n_input < args.n_events:
+        output.write(f'Too few input events: {n_events}\n')
+
+    if args.allow_no_trigger:
+        if n_trigger == 0:
+            output.write(
+                "No events pass trigger :'(, hopefully this is data!\n")
+            return bad
+
+    if n_events < args.n_events:
+        output.write(f'Too few events: {n_events}\n')
+        bad = True
+    else:
+        output.write(f'Found enough events: {n_events}\n')
+
+    return bad
+
+
+if __name__ == '__main__':
+    bad = run()
+    exit(1 if bad else 0)

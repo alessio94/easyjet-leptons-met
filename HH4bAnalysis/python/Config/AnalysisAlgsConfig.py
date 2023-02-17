@@ -25,6 +25,8 @@ from HH4bAnalysis.utils.containerNameHelper import get_container_names
 from HH4bAnalysis.utils.inputsHelper import is_physlite
 from HH4bAnalysis.utils.logHelper import log
 
+from HH4bAnalysis.Config.EventCounterConfig import eventCounterCfg
+
 
 # Generate the algorithm to do the dumping.
 # AthAlgSequence does not respect filter decisions,
@@ -44,6 +46,7 @@ def AnalysisAlgsCfg(
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
 
     cfg = ComponentAccumulator()
+    cfg.merge(eventCounterCfg('n_input'))
 
     # Create SystematicsSvc explicitly:
     cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
@@ -53,6 +56,7 @@ def AnalysisAlgsCfg(
     # if trigger passed or not, for example:
     # EventInfo.trigger_name
     cfg.merge(TriggerAnalysisSequenceCfg(flags, dataType, trigger_chains))
+    cfg.merge(eventCounterCfg('n_trigger'))
 
     log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
@@ -61,6 +65,7 @@ def AnalysisAlgsCfg(
             flags, dataType, grlFiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
         )
     )
+    cfg.merge(eventCounterCfg('n_data_quality'))
 
     containers = get_container_names(flags)
 
@@ -129,6 +134,7 @@ def AnalysisAlgsCfg(
                 is_daod_physlite=is_daod_physlite,
             )
         )
+        cfg.merge(eventCounterCfg('n_small_r'))
 
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip large-R jet sequence for now")
@@ -142,6 +148,7 @@ def AnalysisAlgsCfg(
                     outputContainerName=containers["outputs"]["reco10Jet"],
                 )
             )
+            cfg.merge(eventCounterCfg('n_large_r'))
 
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip  UFO large-R jet sequence for now")
@@ -155,6 +162,7 @@ def AnalysisAlgsCfg(
                     outputContainerName=containers["outputs"]["reco10UFOJet"],
                 )
             )
+            cfg.merge(eventCounterCfg('n_large_r_ufo'))
 
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip VR jet sequence for now")
@@ -168,6 +176,7 @@ def AnalysisAlgsCfg(
                     outputContainerName=containers["outputs"]["vrJet"],
                 )
             )
+            cfg.merge(eventCounterCfg('n_vr'))
 
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip ghost assocciation VR jet sequence for now")
@@ -202,6 +211,7 @@ def AnalysisAlgsCfg(
                     outputContainerName=containers["outputs"]["truthParticles"],
                 )
             )
+            cfg.merge(eventCounterCfg('n_truth_particle'))
 
     ########################################################################
     # Begin postprocessing
@@ -232,6 +242,7 @@ def AnalysisAlgsCfg(
             doMuons=do_muons,
         )
     )
+    cfg.merge(eventCounterCfg('n_overlap'))
 
     if flags.Analysis.do_resolved_dihiggs_analysis and not flags.Analysis.disable_calib:
         cfg.merge(
@@ -240,6 +251,7 @@ def AnalysisAlgsCfg(
                 SmallJetKey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
             )
         )
+        cfg.merge(eventCounterCfg('n_resolved'))
     if flags.Analysis.do_boosted_dihiggs_analysis and not flags.Analysis.disable_calib:
         cfg.merge(
             BoostedAnalysisCfg(
@@ -249,5 +261,6 @@ def AnalysisAlgsCfg(
                 ),
             )
         )
+        cfg.merge(eventCounterCfg('n_merged'))
 
     return cfg

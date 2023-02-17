@@ -39,6 +39,10 @@ private:
     StatusCode recordVRTrackJetGhostAssociation(const xAOD::JetContainer &,
                                                 const xAOD::EventInfo &) const;
 
+    Gaudi::Property<bool> m_isMC {
+      this, "isMC", false, "Is this simulation?"
+    };
+
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey{
         this, "EventInfoKey", "EventInfo",
         "the eventInfo container to decorate"};
@@ -72,7 +76,7 @@ private:
         "goodVRTrackJets"};
 
     SG::AuxElement::Decorator<std::vector<int>> m_HadronConeExclTruthLabelIDDecorator{
-        "VRTrackJetsTruthLabel"}; 
+        "VRTrackJetsTruthLabel"};
 
     SG::AuxElement::Decorator<std::vector<float>>
         m_leadingVRTrackJetPtDecorator{"leadingVRTrackJetsPt"};

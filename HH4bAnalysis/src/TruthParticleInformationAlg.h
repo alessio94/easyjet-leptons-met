@@ -46,6 +46,10 @@ private:
     recordTruthParticleInformation(const xAOD::TruthParticleContainer &,
                                    const xAOD::EventInfo &) const;
 
+    Gaudi::Property<bool> m_filter {
+      this, "filter", false, "Use this as an event filter"
+    };
+
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
@@ -57,8 +61,6 @@ private:
         m_truthParticleInfoOutKey{
             this, "TruthParticleInformationOutKey", "",
             "Truth particle information container to write"};
-
-    bool m_isMC;
 
     std::vector<SG::AuxElement::Decorator<float>> m_selectionTruthH1Decorators;
 

@@ -4,6 +4,8 @@ atlas_subdir(HH4bAnalysis)
 # Find an external package (i.e. ROOT)
 find_package(ROOT COMPONENTS Core Tree Hist REQUIRED)
 
+find_package(nlohmann_json REQUIRED)
+
 # We don't want any warnings in compilation
 # disabling for now until framework is more mature
 # add_compile_options(-Werror)
@@ -17,6 +19,7 @@ atlas_add_library(HH4bAnalysisLib
 # Build the Athena component library
 atlas_add_component(HH4bAnalysis
   src/VariableDumperAlg.cxx
+  src/EventCounterAlg.cxx
   src/TruthParticleInformationAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
   src/LargeUFOJetGhostVRJetAssociationAlg.cxx
@@ -49,6 +52,7 @@ atlas_install_scripts(
   share/VariableDumperConfig.py
   share/grid_submit.py
   share/hh4b-test
+  share/metadata-check
 )
 atlas_install_python_modules(
   python/Algs
