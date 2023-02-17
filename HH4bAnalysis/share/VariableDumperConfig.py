@@ -16,14 +16,23 @@ import time
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+from AthenaCommon.Constants import INFO
+
 from HH4bAnalysis.Config.AnalysisAlgsConfig import AnalysisAlgsCfg
 from HH4bAnalysis.Config.Base import (
     updateConfigFlags, getRunYears, pileupConfigFiles, getRunConfig
 )
 from HH4bAnalysis.Config.MiniTupleConfig import MiniTupleCfg
 from HH4bAnalysis.Config.H5Config import getH5Cfg
+from HH4bAnalysis.Config.EventCounterConfig import (
+    eventCounterCfg,
+    METADATA_FILE
+)
 from HH4bAnalysis.utils.inputsHelper import get_dataType, is_physlite
-from HH4bAnalysis.utils.logHelper import log
+from HH4bAnalysis.utils.logHelper import (
+    log,
+    setRogueLoggers
+)
 from HH4bAnalysis.Config.Base import cache_metadata, update_metadata
 
 
@@ -128,6 +137,8 @@ def main():
 
     parser, overwrites = defineArgs(ConfigFlags)
     args = ConfigFlags.fillFromArgs(parser=parser)
+    log.setLevel(ConfigFlags.Exec.OutputLevel)
+    setRogueLoggers(ConfigFlags.Exec.OutputLevel)
     # Write user options to flags.Analysis
     updateConfigFlags(args, ConfigFlags, overwrites)
 
@@ -135,10 +146,6 @@ def main():
     assert not (
         ConfigFlags.Analysis.disable_calib and not is_physlite(ConfigFlags)
     ), "Disabling calibrations is not safe except on PHYSLITE!"
-
-    assert not (
-        ConfigFlags.Analysis.disable_trigger_filtering and not ConfigFlags.Input.isMC
-    ), "Disabling trigger filtering only allowed for MC!"
 
     # Workaround for buggy glob, needed prior
     # to https://gitlab.cern.ch/atlas/athena/-/merge_requests/55561
@@ -302,12 +309,20 @@ def main():
                 "HH4bSeq",
             )
 
+        cfg.merge(eventCounterCfg('n_events'), 'HH4bSeq')
+
         # Print the full job configuration
-        cfg.printConfig(summariseProps=False)
+        if ConfigFlags.Exec.OutputLevel <= INFO:
+            cfg.printConfig(summariseProps=False)
+
+    # clear the cutflow
+    METADATA_FILE.unlink(missing_ok=True)
 
     # Execute the job defined in the ComponentAccumulator.
     # The number of events is specified by `args.evtMax`
     return_code = cfg.run(args.evtMax)
+
+    # this is for unit tests: if jobs run too long something is wrong
     if args.timeout:
         duration = time.process_time() - starttime
         if duration > args.timeout:

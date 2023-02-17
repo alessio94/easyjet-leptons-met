@@ -35,10 +35,8 @@ declare -A DATAFILES=(
 )
 
 declare -A TESTS=(
-    [data18-fast]=ntuple-dump-fast
-    [data18]=ntuple-dump
-    [data22-fast]=ntuple-dump-fast
-    [data22]=ntuple-dump
+    [data18-fast]=data-ntuple-dump-fast
+    [data22-fast]=data-ntuple-dump-fast
     [jets-mc20-fast]=ntuple-dump-fast
     [jets-mc20]=ntuple-dump
     [ttbar-mc20-fast]=ntuple-dump-fast
@@ -58,6 +56,7 @@ COMMON=" --allow-no-ptag --runConfig $CONFIG"
 # specific tests
 ntuple-dump() {
     VariableDumperConfig.py $COMMON --filesInput $1
+    metadata-check -v
 }
 ntuple-dump-fast() {
     local OPTS="$COMMON --cache-metadata --filesInput $1"
@@ -65,9 +64,20 @@ ntuple-dump-fast() {
     $CMD --config-only True
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5
+    metadata-check -v
+}
+data-ntuple-dump-fast() {
+    local OPTS="$COMMON --cache-metadata --filesInput $1"
+    OPTS+=" --disable-trigger-filtering"
+    local CMD="VariableDumperConfig.py $OPTS"
+    $CMD --config-only True
+    echo "rerunning $CMD to time"
+    $CMD --timeout 30 --h5-output test.h5
+    metadata-check -v
 }
 ntuple-dump-physlite() {
     VariableDumperConfig.py $COMMON --disable-calib --filesInput $1
+    metadata-check -v
 }
 ntuple-dump-physlite-fast() {
     local OPTS="$COMMON --cache-metadata --filesInput $1 --disable-calib"
@@ -75,6 +85,7 @@ ntuple-dump-physlite-fast() {
     $CMD --config-only True
     echo "rerunning $CMD to time"
     $CMD --timeout 30
+    metadata-check -v
 }
 
 ################################################
@@ -169,5 +180,6 @@ if [[ ! -f ${FILE} ]] ; then
 fi
 
 # now run the test
+echo "running ${RUN}"
 $RUN $FILE
 

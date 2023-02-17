@@ -8,6 +8,7 @@
 #include "../LargeUFOJetGhostVRJetAssociationAlg.h"
 #include "../TruthParticleInformationAlg.h"
 #include "../VariableDumperAlg.h"
+#include "../EventCounterAlg.h"
 #include "../tools/NTrkVertexCounter.h"
 
 using namespace HH4B;
@@ -23,3 +24,4 @@ DECLARE_COMPONENT(VariableDumperAlg)
 DECLARE_COMPONENT(TruthParticleInformationAlg)
 DECLARE_COMPONENT(LargeJetGhostVRJetAssociationAlg)
 DECLARE_COMPONENT(LargeUFOJetGhostVRJetAssociationAlg)
+DECLARE_COMPONENT(EventCounterAlg)

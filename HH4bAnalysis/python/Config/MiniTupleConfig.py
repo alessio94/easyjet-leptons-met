@@ -42,7 +42,6 @@ def MiniTupleCfg(
             Output=[f"ANALYSIS DATAFILE='{flags.Analysis.outFile}', OPT='RECREATE'"]
         )
     )
-    print(CompFactory.CutFlowSvc)
 
     def getFourMomBranches(
         container, alias, doOR=False, noSystematics=False, doMass=False
@@ -148,8 +147,10 @@ def MiniTupleCfg(
             "JetConstitScaleMomentum_eta",
             "JetConstitScaleMomentum_phi",
             "JetConstitScaleMomentum_m",
-            "GhostBHadronsFinalCount",
-        ]
+        ] + [
+            "GhostBHadronsFinalCount"
+        ] if flags.Input.isMC else []
+
         for var in reco10JetVars:
             analysisTreeBranches += [
                 f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"
@@ -166,7 +167,6 @@ def MiniTupleCfg(
             "Tau1_wta",
             "Tau2_wta",
             "Tau3_wta",
-            "Tau4_wta",
             "ECF1",
             "ECF2",
             "ECF3",
@@ -177,7 +177,13 @@ def MiniTupleCfg(
             "JetConstitScaleMomentum_phi",
             "JetConstitScaleMomentum_m",
             "GhostBHadronsFinalCount",
-        ]
+        ] + [
+            # TODO: I have no idea what this boi is doing in the
+            # data-only section, but it's not in the data we're
+            # testing for now...
+            "Tau4_wta"
+        ] if flags.Input.isMC else []
+
         for v in reco10UFOJetVars:
             analysisTreeBranches += [
                 (
@@ -235,18 +241,6 @@ def MiniTupleCfg(
             )
             analysisTreeBranches += getFourMomBranches(
                 containers["truth10UFOJet"], "truthUFOjet_antikt10", noSystematics=True
-            )
-
-        if flags.Input.isMC:
-            analysisTreeBranches += ["EventInfo.truth_H1_pdgId -> truth_H1_pdgId"]
-            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H1")
-            analysisTreeBranches += getTruthFourMomBranches(
-                "EventInfo", "truth_b_fromH1"
-            )
-            analysisTreeBranches += ["EventInfo.truth_H2_pdgId -> truth_H2_pdgId"]
-            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H2")
-            analysisTreeBranches += getTruthFourMomBranches(
-                "EventInfo", "truth_b_fromH2"
             )
 
         # B-jet WPs

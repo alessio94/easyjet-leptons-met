@@ -222,6 +222,7 @@ def LargeJetGhostVRJetAssociationAlgCfg(
     cfg.addEventAlgo(
         CompFactory.HH4B.LargeJetGhostVRJetAssociationAlg(
             "LargeJetGhostVRJetAssociationAlg",
+            isMC=flags.Input.isMC,
             LargeJetInKey=inputLargeRJetContainerName,
             workingPoints=flags.Analysis.vr_btag_wps,
         )
@@ -272,6 +273,7 @@ def LargeUFOJetGhostVRJetAssociationAlgCfg(
     cfg.addEventAlgo(
         CompFactory.HH4B.LargeUFOJetGhostVRJetAssociationAlg(
             "LargeUFOJetGhostVRJetAssociationAlg",
+            isMC=flags.Input.isMC,
             LargeUFOJetInKey=inputLargeRUFOJetContainerName,
             workingPoints=flags.Analysis.vr_btag_wps,
         )
