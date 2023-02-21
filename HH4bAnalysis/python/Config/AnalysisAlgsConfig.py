@@ -202,12 +202,13 @@ def AnalysisAlgsCfg(
                 )
             )
 
-        if dataType != "data":
+        if flags.Input.isMC:
             log.info("Adding truth particle info seq")
             cfg.merge(
                 TruthParticleInformationAlgCfg(
                     flags,
-                    inputContainerName=containers["inputs"]["truthParticles"],
+                    inputSMContainerName=containers["inputs"]["truthSMParticles"],
+                    inputBSMContainerName=containers["inputs"]["truthBSMParticles"],
                     outputContainerName=containers["outputs"]["truthParticles"],
                 )
             )

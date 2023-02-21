@@ -4,7 +4,8 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 
 def TruthParticleInformationAlgCfg(
     flags,
-    inputContainerName,
+    inputSMContainerName,
+    inputBSMContainerName,
     outputContainerName,
 ):
     cfg = ComponentAccumulator()
@@ -12,7 +13,8 @@ def TruthParticleInformationAlgCfg(
         CompFactory.HH4B.TruthParticleInformationAlg(
             "TruthParticleInformationAlg",
             EventInfoKey="EventInfo",
-            TruthParticleInformationKey=inputContainerName,
+            TruthParticleSMInKey=inputSMContainerName,
+            TruthParticleBSMInKey=inputBSMContainerName,
             TruthParticleInformationOutKey=outputContainerName,
         )
     )
