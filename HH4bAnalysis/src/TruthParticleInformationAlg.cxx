@@ -15,45 +15,49 @@
 //
 namespace HH4B
 {
-  static const int H_ID = 25;
-  static const int S_ID = 35;
+  constexpr int H_ID = 25;
+  constexpr int S_ID = 35;
+  constexpr int b_ID = 5;
+  constexpr int b_bar_ID = -5;
 
   TruthParticleInformationAlg ::TruthParticleInformationAlg(
       const std::string &name, ISvcLocator *pSvcLocator)
       : AthAlgorithm(name, pSvcLocator)
   {
+    declareProperty("nHiggses", m_nHiggses = 2, "Number of Higgses to record");
   }
 
   StatusCode TruthParticleInformationAlg ::initialize()
   {
     ATH_MSG_DEBUG("Initialising " << name());
 
-    if (!m_truthParticleInfoInKey.empty())
-      ATH_CHECK(m_truthParticleInfoInKey.initialize());
+    if (!m_truthParticleBSMInKey.empty())
+      ATH_CHECK(m_truthParticleBSMInKey.initialize());
+
+    if (!m_truthParticleSMInKey.empty())
+      ATH_CHECK(m_truthParticleSMInKey.initialize());
 
     if (!m_truthParticleInfoOutKey.empty())
       ATH_CHECK(m_truthParticleInfoOutKey.initialize());
 
     ATH_CHECK(m_EventInfoKey.initialize());
 
-    for (auto const &truth_H1 : m_truthH1Vars)
+    for (int h = 0; h < m_nHiggses; h++)
     {
-      m_selectionTruthH1Decorators.emplace_back(truth_H1);
-    }
-
-    for (auto const &truth_H2 : m_truthH2Vars)
-    {
-      m_selectionTruthH2Decorators.emplace_back(truth_H2);
-    }
-
-    for (auto const &truth_b_fromH1 : m_truthBFromH1Vars)
-    {
-      m_selectionTruthBFromH1Decorators.emplace_back(truth_b_fromH1);
-    }
-
-    for (auto const &truth_b_fromH2 : m_truthBFromH2Vars)
-    {
-      m_selectionTruthBFromH2Decorators.emplace_back(truth_b_fromH2);
+      // decorator will show up as "truth_Hx_pdgId", where x is the x higgs
+      m_truthHiggsesPdgIdDecorators.emplace_back(
+          "truth_H" + std::to_string(h + 1) + "_" + "pdgId");
+      m_truthHiggsesKinDecorators.emplace_back(
+          std::vector<SG::AuxElement::Decorator<float>>());
+      m_truthbbKinFromHiggsesDecorators.emplace_back(
+          std::vector<SG::AuxElement::Decorator<std::vector<float>>>());
+      for (const std::string &var : m_kinVars)
+      {
+        m_truthHiggsesKinDecorators[h].emplace_back(
+            "truth_H" + std::to_string(h + 1) + "_" + var);
+        m_truthbbKinFromHiggsesDecorators[h].emplace_back(
+            "truth_bb_fromH" + std::to_string(h + 1) + "_" + var);
+      }
     }
 
     return StatusCode::SUCCESS;
@@ -65,165 +69,170 @@ namespace HH4B
 
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
     ATH_CHECK(eventInfo.isValid());
-    SG::ReadHandle<xAOD::TruthParticleContainer> truthInformationParticles(
-        m_truthParticleInfoInKey);
-    ATH_CHECK(truthInformationParticles.isValid());
+    SG::ReadHandle<xAOD::TruthParticleContainer> truthSMParticles(
+        m_truthParticleSMInKey);
+    ATH_CHECK(truthSMParticles.isValid());
+    SG::ReadHandle<xAOD::TruthParticleContainer> truthBSMParticles(
+        m_truthParticleBSMInKey);
+    ATH_CHECK(truthBSMParticles.isValid());
 
-    if (eventInfo->eventType(xAOD::EventInfo::IS_SIMULATION))
+    bool isMC = eventInfo->eventType(xAOD::EventInfo::IS_SIMULATION);
+    if (!isMC)
     {
-      ATH_CHECK(recordTruthParticleInformation(*truthInformationParticles,
-                                               *eventInfo));
-    }
-    else
-    {
-      ATH_MSG_ERROR("Running on data, can't record truth information!");
+      ATH_MSG_ERROR(
+          "No truth particle information available in data, cannot build "
+          << std::string(m_nHiggses, 'H') << " decay path!");
       return StatusCode::FAILURE;
     }
-
+    ATH_CHECK(recordTruthParticleInformation(*truthBSMParticles,
+                                             *truthSMParticles, *eventInfo));
     return StatusCode::SUCCESS;
   }
 
   StatusCode TruthParticleInformationAlg ::recordTruthParticleInformation(
-      const xAOD::TruthParticleContainer &truthInformationParticles,
+      const xAOD::TruthParticleContainer &truthBSMParticles,
+      const xAOD::TruthParticleContainer &truthSMParticles,
       const xAOD::EventInfo &eventInfo) const
   {
     ATH_MSG_DEBUG("Saving truth particles as \""
                   << m_truthParticleInfoOutKey.key() << "\".");
 
-    // Typedef for readability later
-    // All xAOD::BlahContainers inherit from DataVector, which you
-    // can think of as a vector of pointers that owns the pointers
-    // (and will delete them when it is destructed).
-    // DataVector only receives a non-const object, so we have a
-    // different container type to which we pass const objects,
-    // ConstDataVector (templated to the owning container type).
-    typedef ConstDataVector<xAOD::TruthParticleContainer> CDV_TruthPart;
+    // Check that BSM container is not empty, otherwise use SM container
+    auto truthParticlesContaienr =
+        !truthBSMParticles.empty() ? truthBSMParticles : truthSMParticles;
 
-    // Now we can make another container to hold just the items we care about
-    //
-    // Here, we need to hand the memory
-    // over to the store, so we need to create a new object on the heap.
-    // Use std::unique_ptr to avoid memory leaks!
-    //
-    // Passing SG::VIEW_ELEMENTS to the constructor means that this
-    // container will not own its contents (and therefore need to
-    // manage the corresponding memory). The default is OWN_ELEMENTS.
-    auto hhTruthParticles = std::make_unique<CDV_TruthPart>(SG::VIEW_ELEMENTS);
-
-    for (const xAOD::TruthParticle *tp : truthInformationParticles)
+    /*
+      Find and record truth particle information
+    */
+    std::vector<TruthScalar> higgses =
+        getFinalHiggses(truthParticlesContaienr);
+    /*
+      Decorate truth particle information on EventInfo with defaults if higgses
+      empty
+    */
+    decorateTruthParticleInformation(eventInfo, higgses);
+    /*
+      Write container with truth particles that will be available in other
+      algorithms
+    */
+    auto higgsesTruthParticles =
+        std::make_unique<ConstDataVector<xAOD::TruthParticleContainer>>(
+            SG::VIEW_ELEMENTS);
+    for (TruthScalar h : higgses)
     {
-      if ((tp->pdgId() == H_ID || tp->pdgId() == S_ID) && tp->nChildren() == 2)
-      {
-        hhTruthParticles->push_back(tp);
-      }
+      debugPrintParticleKinematics(h);
+      higgsesTruthParticles->push_back(h);
     }
-
-    if (hhTruthParticles->size() < 2)
-    {
-      ATH_MSG_DEBUG(
-          "Only 1 H truth particle in the event. Skipping the event "
-          << eventInfo.eventNumber());
-      if (m_filter) {
-        setFilterPassed(false);
-      }
-      return StatusCode::SUCCESS;
-    }
-
-    if (hhTruthParticles->size() > 2)
-    {
-      ATH_MSG_DEBUG("More than 2 H truth particles in event "
-                    << eventInfo.eventNumber());
-    }
-
-    std::map<std::string, std::vector<float>> truth_b_fromH1;
-    std::map<std::string, std::vector<float>> truth_b_fromH2;
-    std::map<std::string, float> truth_H1;
-    std::map<std::string, float> truth_H2;
-
-    auto h1 = (*hhTruthParticles.get())[0];
-    truth_H1["truth_H1_pt"] = h1->pt();
-    truth_H1["truth_H1_eta"] = h1->eta();
-    truth_H1["truth_H1_phi"] = h1->phi();
-    truth_H1["truth_H1_m"] = h1->m();
-    for (size_t ic = 0; ic < h1->nChildren(); ++ic)
-    {
-      auto nchild = h1->child(ic);
-      if (nchild == nullptr)
-      {
-        ATH_MSG_ERROR("children of H1 does not exist (nullptr).");
-        continue;
-      }
-      if (msgLvl(MSG::VERBOSE))
-      {
-        ATH_MSG_VERBOSE("Information about b-quarks coming from H1. ID: "
-                        << nchild->pdgId() << ", status: " << nchild->status()
-                        << ", pt: " << nchild->pt() << ", eta: "
-                        << nchild->eta() << ", phi: " << nchild->phi()
-                        << ", m: " << nchild->m());
-      }
-      truth_b_fromH1["truth_b_fromH1_pt"].push_back(nchild->pt());
-      truth_b_fromH1["truth_b_fromH1_eta"].push_back(nchild->eta());
-      truth_b_fromH1["truth_b_fromH1_phi"].push_back(nchild->phi());
-      truth_b_fromH1["truth_b_fromH1_m"].push_back(nchild->m());
-    }
-
-    auto h2 = (*hhTruthParticles.get())[1];
-    truth_H2["truth_H2_pt"] = h2->pt();
-    truth_H2["truth_H2_eta"] = h2->eta();
-    truth_H2["truth_H2_phi"] = h2->phi();
-    truth_H2["truth_H2_m"] = h2->m();
-    for (size_t ic = 0; ic < h2->nChildren(); ++ic)
-    {
-      auto nchild = h2->child(ic);
-      if (nchild == nullptr)
-      {
-        ATH_MSG_ERROR("children of H2 does not exist (nullptr).");
-        continue;
-      }
-      if (msgLvl(MSG::VERBOSE))
-      {
-        ATH_MSG_VERBOSE("Information about b-quarks coming from H2. ID: "
-                        << nchild->pdgId() << ", status: " << nchild->status()
-                        << ", pt: " << nchild->pt() << ", eta: "
-                        << nchild->eta() << ", phi: " << nchild->phi()
-                        << ", m: " << nchild->m());
-      }
-      truth_b_fromH2["truth_b_fromH2_pt"].push_back(nchild->pt());
-      truth_b_fromH2["truth_b_fromH2_eta"].push_back(nchild->eta());
-      truth_b_fromH2["truth_b_fromH2_phi"].push_back(nchild->phi());
-      truth_b_fromH2["truth_b_fromH2_m"].push_back(nchild->m());
-    }
-
-    // Add decorators
-    m_truth_H1_pdgId(eventInfo) = h1->pdgId();
-    m_truth_H2_pdgId(eventInfo) = h2->pdgId();
-
-    for (size_t i = 0; i < m_truthH1Vars.size(); i++)
-    {
-      m_selectionTruthH1Decorators[i](eventInfo) = truth_H1[m_truthH1Vars[i]];
-    }
-
-    for (size_t i = 0; i < m_truthH2Vars.size(); i++)
-    {
-      m_selectionTruthH2Decorators[i](eventInfo) = truth_H2[m_truthH2Vars[i]];
-    }
-
-    for (size_t i = 0; i < m_truthBFromH1Vars.size(); i++)
-    {
-      m_selectionTruthBFromH2Decorators[i](eventInfo) =
-          truth_b_fromH1[m_truthBFromH1Vars[i]];
-    }
-
-    for (size_t i = 0; i < m_truthBFromH2Vars.size(); i++)
-    {
-      m_selectionTruthBFromH1Decorators[i](eventInfo) =
-          truth_b_fromH2[m_truthBFromH2Vars[i]];
-    }
-
     SG::WriteHandle<ConstDataVector<xAOD::TruthParticleContainer>> writeHandle(
         m_truthParticleInfoOutKey);
-    ATH_CHECK(writeHandle.record(std::move(hhTruthParticles)));
+    ATH_CHECK(writeHandle.record(std::move(higgsesTruthParticles)));
 
     return StatusCode::SUCCESS;
+  }
+
+  void TruthParticleInformationAlg ::decorateTruthParticleInformation(
+      const xAOD::EventInfo &eventInfo, std::vector<TruthScalar> higgses) const
+  {
+    if (higgses.size() == 0)
+    {
+      // Default values
+      higgses = std::vector<TruthScalar>(m_nHiggses, TruthScalar());
+    }
+    for (int h = 0; h < m_nHiggses; h++)
+    {
+      m_truthHiggsesPdgIdDecorators[h](eventInfo) = higgses[h].pdgId();
+      for (size_t i = 0; i < m_kinVars.size(); i++)
+      {
+        m_truthHiggsesKinDecorators[h][i](eventInfo) = higgses[h].p4(i);
+        m_truthbbKinFromHiggsesDecorators[h][i](eventInfo) =
+            higgses[h].bb_p4(i);
+      }
+    }
+  }
+
+  void TruthParticleInformationAlg::verbosePrintParticleAndChildren(
+      const xAOD::TruthParticle *p, int counter = 1) const
+  {
+    // Failsafe to prevent infinite recursion if children go indefinitely
+    if (counter == 100)
+      return;
+    ATH_MSG_VERBOSE("Particle " << p->index() << " pdgID " << p->pdgId()
+                                << ", barcode " << p->barcode()
+                                << ", children " << p->nChildren());
+    for (size_t i = 0; i < p->nChildren(); i++)
+    {
+      verbosePrintParticleAndChildren(p->child(i), counter + 1);
+    };
+  }
+
+  void TruthParticleInformationAlg::debugPrintParticleKinematics(
+      const xAOD::TruthParticle *p) const
+  {
+    ATH_MSG_DEBUG("Particle " << p->pdgId() << ", pt " << p->pt() << ", phi "
+                              << p->phi() << ", eta " << p->eta() << ", mass "
+                              << p->m());
+  }
+
+  const xAOD::TruthParticle *
+  TruthParticleInformationAlg ::getFinalParticleOfType(
+      const xAOD::TruthParticle *p, const std::vector<int> ids) const
+  {
+    for (size_t i = 0; i < p->nChildren(); i++)
+    {
+      if (std::find(ids.begin(), ids.end(), p->child(i)->pdgId()) != ids.end())
+      {
+        return getFinalParticleOfType(p->child(i), ids);
+      }
+    }
+    return p;
+  }
+
+  std::vector<const xAOD::TruthParticle *>
+  TruthParticleInformationAlg ::getFinalbb(const xAOD::TruthParticle *h) const
+  {
+    std::vector<const xAOD::TruthParticle *> bb;
+    const xAOD::TruthParticle *tmp(nullptr);
+    for (size_t i = 0; i < h->nChildren(); i++)
+    {
+      if (msgLvl(MSG::VERBOSE))
+      {
+        verbosePrintParticleAndChildren(h->child(i));
+      }
+      const xAOD::TruthParticle *final_b =
+          getFinalParticleOfType(h->child(i), {b_ID, b_bar_ID});
+      if (!tmp || (final_b->barcode() != tmp->barcode()))
+      {
+        tmp = final_b;
+        bb.push_back(final_b);
+      }
+    }
+    return bb;
+  }
+
+  std::vector<TruthScalar> TruthParticleInformationAlg ::getFinalHiggses(
+      const xAOD::TruthParticleContainer &truthParticlesContaienr) const
+  {
+    std::vector<TruthScalar> higgses;
+    const xAOD::TruthParticle *tmp(nullptr);
+    for (const xAOD::TruthParticle *tp : truthParticlesContaienr)
+    {
+      if (msgLvl(MSG::VERBOSE))
+      {
+        verbosePrintParticleAndChildren(tp);
+      }
+      if ((tp->pdgId() == H_ID || tp->pdgId() == S_ID))
+      {
+        const xAOD::TruthParticle *final_h =
+            getFinalParticleOfType(tp, {H_ID, S_ID});
+        if (!tmp || (final_h->barcode() != tmp->barcode()))
+        {
+          TruthScalar h = final_h;
+          h.bb(getFinalbb(final_h));
+          higgses.push_back(h);
+          tmp = final_h;
+        }
+      }
+    }
+    return higgses;
   }
 }

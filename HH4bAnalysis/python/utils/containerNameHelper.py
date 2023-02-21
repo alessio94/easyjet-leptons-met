@@ -11,7 +11,8 @@ TRUTH_10_UFO_JETS_KEY = "Truth10UFOJets"
 MUONS_KEY = "Muons"
 ELECTRONS_KEY = "Electrons"
 PHOTONS_KEY = "Photons"
-TRUTH_PARTICLE_INFO_KEY = "TruthParticles"
+TRUTH_PARTICLE_BSM_INFO_KEY = "TruthBSMParticles"
+TRUTH_PARTICLE_SM_INFO_KEY = "TruthSMParticles"
 
 
 container_map = {
@@ -26,7 +27,8 @@ container_map = {
         MUONS_KEY: "Muons",
         ELECTRONS_KEY: "Electrons",
         PHOTONS_KEY: "Photons",
-        TRUTH_PARTICLE_INFO_KEY: "TruthBosonsWithDecayParticles",
+        TRUTH_PARTICLE_BSM_INFO_KEY: "TruthBSMWithDecayParticles",
+        TRUTH_PARTICLE_SM_INFO_KEY: "TruthBosonsWithDecayParticles",
     },
     "DAOD_PHYSLITE": {
         RECO_4_PFLOW_JETS_KEY: "AnalysisJets",
@@ -39,7 +41,8 @@ container_map = {
         MUONS_KEY: "AnalysisMuons",
         ELECTRONS_KEY: "AnalysisElectrons",
         PHOTONS_KEY: "AnalysisPhotons",
-        TRUTH_PARTICLE_INFO_KEY: "TruthBosonsWithDecayParticles",
+        TRUTH_PARTICLE_BSM_INFO_KEY: "TruthBSMWithDecayParticles",
+        TRUTH_PARTICLE_SM_INFO_KEY: "TruthBosonsWithDecayParticles",
     },
 }
 
@@ -62,6 +65,8 @@ def get_container_names(flags):
         muons=_get_container_name("Muons", is_daod_physlite),
         electrons=_get_container_name("Electrons", is_daod_physlite),
         photons=_get_container_name("Photons", is_daod_physlite),
+        truthSMParticles=_get_container_name("TruthSMParticles", is_daod_physlite),
+        truthBSMParticles=_get_container_name("TruthBSMParticles", is_daod_physlite),
     )
     # If not running calibration algs in PHYSLITE, we can just skip the outputs
     if flags.Analysis.disable_calib:
@@ -75,6 +80,7 @@ def get_container_names(flags):
         muons=f"Analysis{inputs['muons']}_%SYS%",
         electrons=f"Analysis{inputs['electrons']}_%SYS%",
         photons=f"Analysis{inputs['photons']}_%SYS%",
+        truthParticles="TruthParticles",
     )
 
     if not is_daod_physlite:
@@ -85,11 +91,5 @@ def get_container_names(flags):
         outputs["reco10Jet"] = ""
         outputs["reco10UFOJet"] = ""
         outputs["vrJet"] = ""
-
-    if flags.Input.isMC:
-        inputs["truthParticles"] = _get_container_name(
-            "TruthParticles", is_daod_physlite
-        )
-        outputs["truthParticles"] = "TruthParticles"
 
     return {"inputs": inputs, "outputs": outputs}

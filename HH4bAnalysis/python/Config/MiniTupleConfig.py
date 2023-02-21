@@ -132,24 +132,27 @@ def MiniTupleCfg(
         ]
 
     if not is_daod_physlite:
-        reco10JetVars = [
-            "NTrimSubjets",
-            "TrackSumPt",
-            "Tau1_wta",
-            "Tau2_wta",
-            "Tau3_wta",
-            "ECF1",
-            "ECF2",
-            "ECF3",
-            "Split12",
-            "Split23",
-            "JetConstitScaleMomentum_pt",
-            "JetConstitScaleMomentum_eta",
-            "JetConstitScaleMomentum_phi",
-            "JetConstitScaleMomentum_m",
-        ] + [
-            "GhostBHadronsFinalCount"
-        ] if flags.Input.isMC else []
+        reco10JetVars = (
+            [
+                "NTrimSubjets",
+                "TrackSumPt",
+                "Tau1_wta",
+                "Tau2_wta",
+                "Tau3_wta",
+                "ECF1",
+                "ECF2",
+                "ECF3",
+                "Split12",
+                "Split23",
+                "JetConstitScaleMomentum_pt",
+                "JetConstitScaleMomentum_eta",
+                "JetConstitScaleMomentum_phi",
+                "JetConstitScaleMomentum_m",
+            ]
+            + ["GhostBHadronsFinalCount"]
+            if flags.Input.isMC
+            else []
+        )
 
         for var in reco10JetVars:
             analysisTreeBranches += [
@@ -163,26 +166,31 @@ def MiniTupleCfg(
                 ),
             ]
     if not is_daod_physlite:
-        reco10UFOJetVars = [
-            "Tau1_wta",
-            "Tau2_wta",
-            "Tau3_wta",
-            "ECF1",
-            "ECF2",
-            "ECF3",
-            "Split12",
-            "Split23",
-            "JetConstitScaleMomentum_pt",
-            "JetConstitScaleMomentum_eta",
-            "JetConstitScaleMomentum_phi",
-            "JetConstitScaleMomentum_m",
-            "GhostBHadronsFinalCount",
-        ] + [
-            # TODO: I have no idea what this boi is doing in the
-            # data-only section, but it's not in the data we're
-            # testing for now...
-            "Tau4_wta"
-        ] if flags.Input.isMC else []
+        reco10UFOJetVars = (
+            [
+                "Tau1_wta",
+                "Tau2_wta",
+                "Tau3_wta",
+                "ECF1",
+                "ECF2",
+                "ECF3",
+                "Split12",
+                "Split23",
+                "JetConstitScaleMomentum_pt",
+                "JetConstitScaleMomentum_eta",
+                "JetConstitScaleMomentum_phi",
+                "JetConstitScaleMomentum_m",
+                "GhostBHadronsFinalCount",
+            ]
+            + [
+                # TODO: I have no idea what this boi is doing in the
+                # data-only section, but it's not in the data we're
+                # testing for now...
+                "Tau4_wta"
+            ]
+            if flags.Input.isMC
+            else []
+        )
 
         for v in reco10UFOJetVars:
             analysisTreeBranches += [
@@ -243,6 +251,18 @@ def MiniTupleCfg(
                 containers["truth10UFOJet"], "truthUFOjet_antikt10", noSystematics=True
             )
 
+        if flags.Input.isMC:
+            analysisTreeBranches += ["EventInfo.truth_H1_pdgId -> truth_H1_pdgId"]
+            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H1")
+            analysisTreeBranches += getTruthFourMomBranches(
+                "EventInfo", "truth_bb_fromH1"
+            )
+            analysisTreeBranches += ["EventInfo.truth_H2_pdgId -> truth_H2_pdgId"]
+            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H2")
+            analysisTreeBranches += getTruthFourMomBranches(
+                "EventInfo", "truth_bb_fromH2"
+            )
+
         # B-jet WPs
         analysisTreeBranches += [
             f"{containers['reco4Jet']}.ftag_select_{btag_wp}"
@@ -260,12 +280,12 @@ def MiniTupleCfg(
             analysisTreeBranches += [
                 f"{containers['reco4Jet']}.NoBJetCalibMomentum_{var}"
                 f" -> recojet_antikt4_%SYS%_nobjetcalib_{var}"
-                for var in ['pt','eta','phi','m']
+                for var in ["pt", "eta", "phi", "m"]
             ]
             analysisTreeBranches += [
                 f"{containers['reco4Jet']}_OR.NoBJetCalibMomentum_{var}"
                 f" -> recojet_antikt4_OR_%SYS%_nobjetcalib_{var}"
-                for var in ['pt','eta','phi','m']
+                for var in ["pt", "eta", "phi", "m"]
             ]
 
     split_tags = flags.Input.AMITag.split("_")
