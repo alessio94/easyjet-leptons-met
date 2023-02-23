@@ -199,9 +199,13 @@ def MiniTupleCfg(
                 ),
             ]
 
-        analysisTreeBranches += LargeJetGhostVRJetAssociationBranches(
-            flags, containers["reco10Jet"]
-        )
+        analysisTreeBranches += [
+            b.replace('%SYS%','NOSYS') for b in
+            LargeJetGhostVRJetAssociationBranches
+            (
+                flags, containers["reco10Jet"]
+            )
+        ]
 
         analysisTreeBranches += LargeUFOJetGhostVRJetAssociationBranches(
             flags, containers["reco10UFOJet"]
@@ -217,19 +221,23 @@ def MiniTupleCfg(
             containers["reco10UFOJet"], "recoUFOjet_antikt10"
         )
 
+        # Restore SYS when LargeRJet alg supports systematics
         if flags.Input.isMC:
             analysisTreeBranches += [
                 (
-                    f"{containers['reco10Jet']}.R10TruthLabel_R21Consolidated ->"
-                    " R10TruthLabel_R21Consolidated_%SYS%"
+                    f"{containers['reco10Jet'].replace('%SYS%','NOSYS')}"
+                    ".R10TruthLabel_R21Consolidated ->"
+                    " R10TruthLabel_R21Consolidated_NOSYS"
                 ),
                 (
-                    f"{containers['reco10Jet']}_OR.R10TruthLabel_R21Consolidated ->"
-                    " R10TruthLabel_R21Consolidated_OR_%SYS%"
+                    f"{containers['reco10Jet'].replace('%SYS%','NOSYS')}_OR"
+                    ".R10TruthLabel_R21Consolidated ->"
+                    " R10TruthLabel_R21Consolidated_OR_NOSYS"
                 ),
                 (
-                    f"{containers['reco10UFOJet']}.R10TruthLabel_R21Precision_2022v1 ->"
-                    " UFO_R10TruthLabel_R21Precision_2022v1_%SYS%"
+                    f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}"
+                    ".R10TruthLabel_R21Precision_2022v1 ->"
+                    " UFO_R10TruthLabel_R21Precision_2022v1_NOSYS"
                 ),
             ]
             # Just added this ptag check for now. Because older p-tag
@@ -237,8 +245,9 @@ def MiniTupleCfg(
             if "p5511" in flags.Input.AMITag:
                 analysisTreeBranches += [
                     (
-                        f"{containers['reco10UFOJet']}.R10TruthLabel_R22v1 ->"
-                        " UFO_R10TruthLabel_R22v1_%SYS%"
+                        f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}"
+                        ".R10TruthLabel_R22v1 ->"
+                        " UFO_R10TruthLabel_R22v1_NOSYS"
                     ),
                 ]
 

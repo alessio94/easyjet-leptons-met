@@ -98,6 +98,7 @@ def defineArgs(ConfigFlags):
             "(can be used for plain PHYSLITE processing)"
         ),
     )
+
     add_analysis_arg(
         "--allow-no-ptag",
         action="store_true",
@@ -116,6 +117,7 @@ def defineArgs(ConfigFlags):
     add_analysis_arg('-b','--do-resolved-dihiggs-analysis', **oropt)
     add_analysis_arg('-r','--do-boosted-dihiggs-analysis', **oropt)
     add_analysis_arg('--loose-jet-cleaning', **oropt)
+    add_analysis_arg("--do-CP-systematics", **oropt)
     return parser, overwrites
 
 
