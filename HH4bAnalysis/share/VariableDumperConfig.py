@@ -15,7 +15,7 @@ import time
 
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
 from AthenaConfiguration.ComponentFactory import CompFactory
-
+from PerfMonComps.PerfMonCompsConfig import PerfMonMTSvcCfg
 from AthenaCommon.Constants import INFO
 
 from HH4bAnalysis.Config.AnalysisAlgsConfig import AnalysisAlgsCfg
@@ -172,6 +172,8 @@ def main():
         raise RuntimeError("Invalid list of years, cannot combine runs")
     log.info(f"Configured years match Run {ConfigFlags.Analysis.Run}")
 
+    ConfigFlags.PerfMon.doFullMonMT = ConfigFlags.Exec.OutputLevel <= INFO
+
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
     ConfigFlags.lock()
@@ -188,6 +190,9 @@ def main():
 
     with ConfigurableCABehavior():
         cfg = MainServicesCfg(ConfigFlags)
+
+        if ConfigFlags.PerfMon.doFullMonMT:
+            cfg.merge(PerfMonMTSvcCfg(ConfigFlags))
 
         from EventBookkeeperTools.EventBookkeeperToolsConfig import (
             CutFlowSvcCfg,
