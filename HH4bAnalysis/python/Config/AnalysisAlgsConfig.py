@@ -49,7 +49,10 @@ def AnalysisAlgsCfg(
     cfg.merge(eventCounterCfg('n_input'))
 
     # Create SystematicsSvc explicitly:
-    cfg.addService(CompFactory.getComp("CP::SystematicsSvc")("SystematicsSvc"))
+    sysSvc = CompFactory.CP.SystematicsSvc("SystematicsSvc")
+    cfg.addService(sysSvc)
+    if flags.Analysis.do_CP_systematics:
+        sysSvc.sigmaRecommended = 1
 
     log.info("Adding trigger analysis algs")
     # Removes events failing trigger and adds variable to EventInfo

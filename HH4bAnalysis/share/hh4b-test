@@ -30,6 +30,7 @@ declare -A DATAFILES=(
     [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED}
     [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
     [ttbar-mc21]=${PHYS_TTBAR_MC21}
+    [ttbar-mc21-syst]=${PHYS_TTBAR_MC21}
     [physlite-sh4b-very-boosted-mc20-fast]=${PHYSLITE_SH4B_VERY_BOOSTED}
     [physlite-sh4b-very-boosted-mc20]=${PHYSLITE_SH4B_VERY_BOOSTED}
 )
@@ -45,6 +46,7 @@ declare -A TESTS=(
     [sh4b-boosted-mc20]=ntuple-dump
     [ttbar-mc21-fast]=ntuple-dump-fast
     [ttbar-mc21]=ntuple-dump
+    [ttbar-mc21-syst]=ntuple-dump-syst
     [physlite-sh4b-very-boosted-mc20-fast]=ntuple-dump-physlite-fast
     [physlite-sh4b-very-boosted-mc20]=ntuple-dump-physlite
 )
@@ -56,6 +58,10 @@ COMMON=" --allow-no-ptag --runConfig $CONFIG"
 # specific tests
 ntuple-dump() {
     VariableDumperConfig.py $COMMON --filesInput $1
+    metadata-check -v
+}
+ntuple-dump-syst() {
+    VariableDumperConfig.py $COMMON --filesInput $1 --do-CP-systematics True
     metadata-check -v
 }
 ntuple-dump-fast() {
