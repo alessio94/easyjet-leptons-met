@@ -14,6 +14,8 @@ PHYS_JETS=mc20_13TeV.364704.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ4WithSW.DAOD_PHY
 PHYS_TTBAR_MC20=mc20_13TeV.410471.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e6337_s3681_r13145_p5511.pool.root
 PHYS_SH4B_BOOSTED=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5511.pool.root
 PHYSLITE_SH4B_VERY_BOOSTED=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a899_r13145_p5511.pool.root
+PHYS_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5511.pool.root
+PHYSLITE_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5511.pool.root
 PHYS_TTBAR_MC21=mc21_13p6TeV.601237.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e8453_s3873_r13829_p5511.pool.root
 PHYS_JETS_MC21=mc21_13p6TeV.801170.Py8EG_A14NNPDF23LO_jj_JZ5.DAOD_PHYS_10evts.e8453_s3873_r13829_p5511.pool.root
 
@@ -26,6 +28,8 @@ declare -A DATAFILES=(
     [jets-mc20]=${PHYS_JETS}
     [ttbar-mc20-fast]=${PHYS_TTBAR_MC20}
     [ttbar-mc20]=${PHYS_TTBAR_MC20}
+    [hh4b-mc21]=${PHYS_HH4B_MC21}
+    [hh4b-mc21-syst]=${PHYS_HH4B_MC21}
     [sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED}
     [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED}
     [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
@@ -33,6 +37,8 @@ declare -A DATAFILES=(
     [ttbar-mc21-syst]=${PHYS_TTBAR_MC21}
     [physlite-sh4b-very-boosted-mc20-fast]=${PHYSLITE_SH4B_VERY_BOOSTED}
     [physlite-sh4b-very-boosted-mc20]=${PHYSLITE_SH4B_VERY_BOOSTED}
+    [physlite-hh4b-mc21-fast]=${PHYSLITE_HH4B_MC21}
+    [physlite-hh4b-mc21]=${PHYSLITE_HH4B_MC21}
 )
 
 declare -A TESTS=(
@@ -44,11 +50,15 @@ declare -A TESTS=(
     [ttbar-mc20]=ntuple-dump
     [sh4b-boosted-mc20-fast]=ntuple-dump-fast
     [sh4b-boosted-mc20]=ntuple-dump
+    [hh4b-mc21]=ntuple-dump
+    [hh4b-mc21-syst]=ntuple-dump-syst
     [ttbar-mc21-fast]=ntuple-dump-fast
     [ttbar-mc21]=ntuple-dump
     [ttbar-mc21-syst]=ntuple-dump-syst
     [physlite-sh4b-very-boosted-mc20-fast]=ntuple-dump-physlite-fast
     [physlite-sh4b-very-boosted-mc20]=ntuple-dump-physlite
+    [physlite-hh4b-mc21-fast]=ntuple-dump-physlite-fast
+    [physlite-hh4b-mc21]=ntuple-dump-physlite
 )
 
 # some common variables in the tests
