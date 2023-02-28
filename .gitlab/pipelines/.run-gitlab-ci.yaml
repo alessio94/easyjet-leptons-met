@@ -61,6 +61,36 @@ run_VariableDumper_fast_ttbar-mc21_DAOD_PHYS:
   script:
     - hh4b-test ttbar-mc21-fast
 
+run_VariableDumper_syst_ttbar-mc21_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test ttbar-mc21-syst
+
+run_VariableDumper_hh4b-mc21_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test hh4b-mc21
+
+run_VariableDumper_syst_hh4b-mc21_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test hh4b-mc21-syst
+
+run_VariableDumper_hh4b-mc21_DAOD_PHYSLITE:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test physlite-hh4b-mc21
+
+run_VariableDumper_fast_hh4b-mc21_DAOD_PHYSLITE:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test physlite-hh4b-mc21-fast
+
 run_VariableDumper_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
   stage: run
   needs: [compile]
