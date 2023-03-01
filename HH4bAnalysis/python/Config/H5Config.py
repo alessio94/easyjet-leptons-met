@@ -29,14 +29,18 @@ def getH5Cfg(flags):
         )
     )
     jetcol = get_container_names(flags)['outputs']['reco4Jet']
-    types = {'valid':'CUSTOM'}
+    types = {}
+    primitives = []
+    if flags.Analysis.n_h5_jets > 0:
+        types |= {'valid':'CUSTOM'}
+        primitives.append('valid')
     associations = {}
     kinematics = ['ptGeV', 'eta', 'phi', 'massGeV']
     types |= {x: 'CUSTOM' for x in kinematics}
     btagging = [f'DL1dv00_p{x}' for x in 'cub']
     types |= {x: 'HALF' for x in btagging}
     associations = {x:'btaggingLink' for x in btagging}
-    primitives = ['valid'] + kinematics + btagging
+    primitives += kinematics + btagging
     ca.addEventAlgo(
         CompFactory.IParticleWriterAlg(
             'jetwriter',
@@ -44,7 +48,7 @@ def getH5Cfg(flags):
             primitiveToType=types,
             primitiveToAssociation=associations,
             datasetName='jets',
-            maximumSize=6,
+            maximumSize=flags.Analysis.n_h5_jets,
             container=jetcol.replace("_%SYS%", "_NOSYS"),
             output=output
         )
