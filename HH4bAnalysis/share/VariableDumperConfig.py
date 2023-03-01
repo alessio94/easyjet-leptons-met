@@ -112,6 +112,12 @@ def defineArgs(ConfigFlags):
         default=False,
         help="save output HDF5 file",
     )
+    add_analysis_arg(
+        '--n-h5-jets',
+        type=int,
+        default=6,
+        help='number of jets in array, or 0 for awkward array',
+    )
 
     oropt = dict(type=bool, metavar='BOOL', overwrite=True)
     add_analysis_arg('-b','--do-resolved-dihiggs-analysis', **oropt)
@@ -193,6 +199,11 @@ def main():
 
         if ConfigFlags.PerfMon.doFullMonMT:
             cfg.merge(PerfMonMTSvcCfg(ConfigFlags))
+
+        # Avoid stack traces to the exception handler. These traces
+        # aren't very useful since they just point to the handler, not
+        # the original bug.
+        cfg.addService(CompFactory.ExceptionSvc(Catch="NONE"))
 
         from EventBookkeeperTools.EventBookkeeperToolsConfig import (
             CutFlowSvcCfg,

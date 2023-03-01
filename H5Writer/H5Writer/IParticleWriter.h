@@ -15,15 +15,19 @@ namespace xAOD {
 }
 struct IParticleWriterConfig;
 
+namespace details {
+  // implementation depends on type of array we're storing
+  class IParticleWriterBase;
+}
+
 class IParticleWriter {
 public:
-  using Writer_t = H5Utils::Writer<1, const xAOD::IParticle*>;
   IParticleWriter(H5::Group& output_group, const IParticleWriterConfig&);
   ~IParticleWriter();
   void fill(const std::vector<const xAOD::IParticle*>&);
   void flush();
 private:
-  std::unique_ptr<Writer_t> m_writer;
+  std::unique_ptr<details::IParticleWriterBase> m_writer;
 };
 
 #endif

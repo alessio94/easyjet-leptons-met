@@ -30,6 +30,7 @@ declare -A DATAFILES=(
     [ttbar-mc20]=${PHYS_TTBAR_MC20}
     [hh4b-mc21]=${PHYS_HH4B_MC21}
     [hh4b-mc21-syst]=${PHYS_HH4B_MC21}
+    [sh4b-boosted-mc20-fast-awkward]=${PHYS_SH4B_BOOSTED}
     [sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED}
     [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED}
     [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
@@ -48,6 +49,7 @@ declare -A TESTS=(
     [jets-mc20]=ntuple-dump
     [ttbar-mc20-fast]=ntuple-dump-fast
     [ttbar-mc20]=ntuple-dump
+    [sh4b-boosted-mc20-fast-awkward]=ntuple-dump-fast-awkward
     [sh4b-boosted-mc20-fast]=ntuple-dump-fast
     [sh4b-boosted-mc20]=ntuple-dump
     [hh4b-mc21]=ntuple-dump
@@ -79,7 +81,15 @@ ntuple-dump-fast() {
     local CMD="VariableDumperConfig.py $OPTS"
     $CMD --config-only True
     echo "rerunning $CMD to time"
-    $CMD --timeout 30 --h5-output test.h5
+    $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
+    metadata-check -v
+}
+ntuple-dump-fast-awkward() {
+    local OPTS="$COMMON --cache-metadata --filesInput $1"
+    local CMD="VariableDumperConfig.py $OPTS"
+    $CMD --config-only True
+    echo "rerunning $CMD to time"
+    $CMD --timeout 30 --h5-output test-awk.h5 --n-h5-jets 0
     metadata-check -v
 }
 data-ntuple-dump-fast() {
