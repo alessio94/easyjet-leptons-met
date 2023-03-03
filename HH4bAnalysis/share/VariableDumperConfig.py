@@ -155,10 +155,6 @@ def main():
         ConfigFlags.Analysis.disable_calib and not is_physlite(ConfigFlags)
     ), "Disabling calibrations is not safe except on PHYSLITE!"
 
-    # Workaround for buggy glob, needed prior
-    # to https://gitlab.cern.ch/atlas/athena/-/merge_requests/55561
-    if ConfigFlags.Input.Files[0] == "_ATHENA_GENERIC_INPUTFILE_NAME_":
-        ConfigFlags.Input.Files = ConfigFlags.Input.Files[1:]
     log.info(f"Operating on input files {ConfigFlags.Input.Files}")
 
     fileMD = GetFileMD(ConfigFlags.Input.Files)
