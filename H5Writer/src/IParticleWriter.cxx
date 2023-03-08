@@ -30,23 +30,48 @@ namespace {
       H5Utils::Compression::HALF_PRECISION;
 
     const std::string s = p.source;
-    if (s == "pt") {
-      c.add<float>(s, [a](I in) {return a(in)->pt(); }, NAN);
-    } else if (s == "eta") {
-      c.add<float>(s, [a](I in) {return a(in)->eta(); }, NAN, h);
-    } else if (s == "phi") {
-      c.add<float>(s, [a](I in) {return a(in)->phi(); }, NAN, h);
-    } else if (s == "mass") {
-      c.add<float>(s, [a](I in) {return a(in)->m(); }, NAN);
-    } else if (s == "ptGeV") {
-      c.add<float>(s, [a](I in) {return a(in)->pt()*0.001; }, NAN, h);
-    } else if (s == "massGeV") {
-      c.add<float>(s, [a](I in) {return a(in)->m()*0.001; }, NAN, h);
-    } else if (s == "valid") {
+
+    // check for match
+    bool m = false;
+
+    // these do most of the matching work
+    auto match = [&c, s, a, &m, h](const std::string& n, auto func) {
+      if (s == n) {
+        c.add<float>(s, [a, func](I in) { return func(a(in)); }, NAN, h);
+        m = true;
+      }
+    };
+    auto matchGeV = [&c, s, a, &m, h](const std::string& n, auto func) {
+      if (s == n) {
+        if (h == H5Utils::Compression::STANDARD) {
+          throw std::logic_error(
+            "asked for a full precision version of a variable that can"
+            " not be stored at half precision: " + s);
+        }
+        c.add<float>(s, [a, func](I in) {return func(a(in)); }, NAN);
+        m = true;
+      } else if (s == n + "GeV") {
+        c.add(s, [a, func](I in) { return func(a(in))*0.001; }, NAN, h);
+        m = true;
+      }
+    };
+
+    // match cases
+    matchGeV("pt", [](auto in) {return in->pt(); });
+    match("eta", [](auto in) {return in->eta(); });
+    match("phi", [](auto in) {return in->phi(); });
+    matchGeV("px", [](auto in) {return in->p4().Px(); });
+    matchGeV("py", [](auto in) {return in->p4().Py(); });
+    matchGeV("pz", [](auto in) {return in->p4().Pz(); });
+    matchGeV("mass", [](auto in) {return in->m(); });
+
+    if (m) return;
+
+    if (s == "valid") {
       c.add<bool>(s, [](I) {return true; }, false);
-    } else {
-      throw std::logic_error(s + " isn't a known custom primitive");
+      return;
     }
+    throw std::logic_error("unknow known custom primitive: " + s);
   }
 
 

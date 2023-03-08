@@ -94,7 +94,10 @@ def GeneratorAnalysisSequenceCfg(flags, dataType):
     if not ptag:
         log.warning(f"Did not find p-tag in AMI tags: {flags.Input.AMITag}")
 
-    doCBK = ptag not in ["p5226", "p5278", "p5334"]
+    # we have to disable cutbookkeepers if there's no output file, or
+    # if we're looking at one of several broken tags
+    is_bad_tag = ptag in ["p5226", "p5278", "p5334"]
+    doCBK = not is_bad_tag and flags.Analysis.outFile
     generatorSequence = makeGeneratorAnalysisSequence(
         dataType,
         saveCutBookkeepers=doCBK,

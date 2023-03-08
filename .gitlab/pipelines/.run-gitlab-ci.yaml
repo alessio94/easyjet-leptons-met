@@ -73,6 +73,12 @@ run_VariableDumper_hh4b-mc21_DAOD_PHYS:
   script:
     - hh4b-test hh4b-mc21
 
+run_VariableDumper_hh4b-mc21-noroot_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - hh4b-test hh4b-mc21-noroot
+
 run_VariableDumper_syst_hh4b-mc21_DAOD_PHYS:
   stage: run
   needs: [compile]
