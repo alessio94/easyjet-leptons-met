@@ -12,6 +12,7 @@
 import sys
 from pathlib import Path
 import time
+import argparse
 
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
 from AthenaConfiguration.ComponentFactory import CompFactory
@@ -33,21 +34,24 @@ from HH4bAnalysis.utils.logHelper import (
     log,
     setRogueLoggers
 )
+from HH4bAnalysis.utils.argument_parser import add_standard_athena_args
 from HH4bAnalysis.Config.Base import cache_metadata, update_metadata
 
 
 def defineArgs(ConfigFlags):
     # Generate a parser and add an output file argument, then retrieve the args
-    parser = ConfigFlags.getArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         '-c',
         "--runConfig",
+        metavar='CFG',
         type=getRunConfig,
-        required=True,
-        help="Run config file path",
+        default='HH4bAnalysis/RunConfig.yaml',
+        help="Run config file path, default: %(default)s",
     )
+    add_standard_athena_args(parser)
     parser.add_argument(
-        '--timeout',
+        '-t','--timeout',
         type=float,
         help=(
             'Maximum runtime (in seconds). Longer processes finish '
@@ -72,12 +76,13 @@ def defineArgs(ConfigFlags):
     add_analysis_arg(
         '-o',
         "--outFile",
-        default='analysis-variables.root',
-        type=str,
-        help="Output file name",
+        nargs='?',
+        default=False,
+        const='analysis-variables.root',
+        help="Output ROOT file name",
     )
     add_analysis_arg(
-        "--disable-trigger-filtering",
+        '-f', "--disable-trigger-filtering",
         action="store_true",
         help=(
             "Disable trigger filtering (to get all events to pass). "
@@ -88,10 +93,10 @@ def defineArgs(ConfigFlags):
         "-m",
         "--cache-metadata",
         action="store_true",
-        help="use metadata cache file, defaults to %(const)s",
+        help="use metadata cache file",
     )
     add_analysis_arg(
-        "--disable-calib",
+        '-a',"--disable-calib",
         action="store_true",
         help=(
             "disable CP Algs for calibration "
@@ -100,20 +105,14 @@ def defineArgs(ConfigFlags):
     )
 
     add_analysis_arg(
-        "--allow-no-ptag",
-        action="store_true",
-        help=(
-            "disable ptag detection for CI tests " "(avoids CBK failure on test files)"
-        ),
-    )
-    add_analysis_arg(
-        '--h5-output',
+        '-5','--h5-output',
+        metavar='H5OUT',
         type=Path,
         default=False,
         help="save output HDF5 file",
     )
     add_analysis_arg(
-        '--n-h5-jets',
+        '-z','--n-h5-jets',
         type=int,
         default=6,
         help='number of jets in array, or 0 for awkward array',
@@ -122,8 +121,8 @@ def defineArgs(ConfigFlags):
     oropt = dict(type=bool, metavar='BOOL', overwrite=True)
     add_analysis_arg('-b','--do-resolved-dihiggs-analysis', **oropt)
     add_analysis_arg('-r','--do-boosted-dihiggs-analysis', **oropt)
-    add_analysis_arg('--loose-jet-cleaning', **oropt)
-    add_analysis_arg("--do-CP-systematics", **oropt)
+    add_analysis_arg('-j','--loose-jet-cleaning', **oropt)
+    add_analysis_arg('-y',"--do-CP-systematics", **oropt)
     return parser, overwrites
 
 
@@ -307,15 +306,16 @@ def main():
             ),
             "HH4bSeq",
         )
-        cfg.merge(
-            MiniTupleCfg(
-                ConfigFlags,
-                trigger_chains=trigger_chains,
-                do_muons=do_muons,
-                do_PRW=do_PRW,
-            ),
-            "HH4bSeq",
-        )
+        if ConfigFlags.Analysis.outFile:
+            cfg.merge(
+                MiniTupleCfg(
+                    ConfigFlags,
+                    trigger_chains=trigger_chains,
+                    do_muons=do_muons,
+                    do_PRW=do_PRW,
+                ),
+                "HH4bSeq",
+            )
 
         if ConfigFlags.Analysis.h5_output:
             cfg.merge(

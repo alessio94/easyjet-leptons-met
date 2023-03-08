@@ -151,12 +151,12 @@ def main():
 
     for io in io_list:
         exec_cmd = (
-            "VariableDumperConfig.py --filesInput %IN --outFile {0} --runConfig"
+            "VariableDumperConfig.py %IN -l --outFile {0} --runConfig"
             " config.yaml".format(submit_opts["outputs"].removeprefix("TREE:"))
         )
         if args.mc_list:
             exec_cmd = (
-                "VariableDumperConfig.py --filesInput %IN --outFile {0} --runConfig"
+                "VariableDumperConfig.py %IN --outFile {0} --runConfig"
                 " config.yaml".format(submit_opts["outputs"].removeprefix("TREE:"))
             )
         cmd = ["prun", "--inDS", io["inDS"], "--outDS", io["outDS"], "--exec", exec_cmd]

@@ -29,6 +29,7 @@ declare -A DATAFILES=(
     [ttbar-mc20-fast]=${PHYS_TTBAR_MC20}
     [ttbar-mc20]=${PHYS_TTBAR_MC20}
     [hh4b-mc21]=${PHYS_HH4B_MC21}
+    [hh4b-mc21-noroot]=${PHYS_HH4B_MC21}
     [hh4b-mc21-syst]=${PHYS_HH4B_MC21}
     [sh4b-boosted-mc20-fast-awkward]=${PHYS_SH4B_BOOSTED}
     [sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED}
@@ -53,6 +54,7 @@ declare -A TESTS=(
     [sh4b-boosted-mc20-fast]=ntuple-dump-fast
     [sh4b-boosted-mc20]=ntuple-dump
     [hh4b-mc21]=ntuple-dump
+    [hh4b-mc21-noroot]=run-fast
     [hh4b-mc21-syst]=ntuple-dump-syst
     [ttbar-mc21-fast]=ntuple-dump-fast
     [ttbar-mc21]=ntuple-dump
@@ -64,51 +66,58 @@ declare -A TESTS=(
 )
 
 # some common variables in the tests
-CONFIG=${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
-COMMON=" --allow-no-ptag --runConfig $CONFIG"
+COMMON="-o"
 
 # specific tests
 ntuple-dump() {
-    VariableDumperConfig.py $COMMON --filesInput $1
+    VariableDumperConfig.py $COMMON $1
     metadata-check -v
 }
 ntuple-dump-syst() {
-    VariableDumperConfig.py $COMMON --filesInput $1 --do-CP-systematics True
+    VariableDumperConfig.py $COMMON $1 --do-CP-systematics True
     metadata-check -v
 }
 ntuple-dump-fast() {
-    local OPTS="$COMMON --cache-metadata --filesInput $1"
+    local OPTS="$COMMON --cache-metadata $1"
     local CMD="VariableDumperConfig.py $OPTS"
-    $CMD --config-only True
+    $CMD --stop-after-config
+    echo "rerunning $CMD to time"
+    $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
+    metadata-check -v
+}
+run-fast() {
+    local OPTS="--cache-metadata $1"
+    local CMD="VariableDumperConfig.py $OPTS"
+    $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
     metadata-check -v
 }
 ntuple-dump-fast-awkward() {
-    local OPTS="$COMMON --cache-metadata --filesInput $1"
+    local OPTS="$COMMON --cache-metadata $1"
     local CMD="VariableDumperConfig.py $OPTS"
-    $CMD --config-only True
+    $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test-awk.h5 --n-h5-jets 0
     metadata-check -v
 }
 data-ntuple-dump-fast() {
-    local OPTS="$COMMON --cache-metadata --filesInput $1"
+    local OPTS="$COMMON --cache-metadata $1"
     OPTS+=" --disable-trigger-filtering"
     local CMD="VariableDumperConfig.py $OPTS"
-    $CMD --config-only True
+    $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5
     metadata-check -v
 }
 ntuple-dump-physlite() {
-    VariableDumperConfig.py $COMMON --disable-calib --filesInput $1
+    VariableDumperConfig.py $COMMON --disable-calib $1
     metadata-check -v
 }
 ntuple-dump-physlite-fast() {
-    local OPTS="$COMMON --cache-metadata --filesInput $1 --disable-calib"
+    local OPTS="$COMMON --cache-metadata $1 --disable-calib"
     local CMD="VariableDumperConfig.py $OPTS"
-    $CMD --config-only True
+    $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30
     metadata-check -v

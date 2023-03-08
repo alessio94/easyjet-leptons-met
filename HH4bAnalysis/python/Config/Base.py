@@ -1,8 +1,11 @@
 import json
 from enum import Enum
 from argparse import ArgumentTypeError
+import pathlib
+import os
 
 import yaml
+
 from HH4bAnalysis.utils.logHelper import log
 from HH4bAnalysis.utils.inputsHelper import get_dataType
 
@@ -157,12 +160,20 @@ def getRunYears(flags):
     return years
 
 
-def getRunConfig(path):
-    try:
-        with open(path) as file:
-            return yaml.safe_load(file)
-    except Exception:
-        raise ArgumentTypeError(f"Couldn't load run config: {path}")
+def getRunConfig(rawpath):
+    fpath = pathlib.Path(rawpath)
+    for dirpath in [''] + os.environ['DATAPATH'].split(':'):
+        fullpath = dirpath / fpath
+        if fullpath.exists():
+            try:
+                with open(fullpath) as cfgfile:
+                    return yaml.safe_load(cfgfile)
+            except Exception:
+                raise ArgumentTypeError(
+                    f"Couldn't load run config: {fullpath}"
+                )
+
+    raise ArgumentTypeError(f"Couldn't find config: {fpath}")
 
 
 def updateConfigFlags(args, flags, overwrites={}):
@@ -184,8 +195,7 @@ def updateConfigFlags(args, flags, overwrites={}):
 
     # add them to ConfigFlags
     for key, value in runConfig.items():
-        if key != "runConfig":
-            log.info("User configured: " + str(key) + ": " + str(value))
+        log.info("User configured: " + str(key) + ": " + str(value))
         flags.addFlag("Analysis." + key, value)
 
     return flags
