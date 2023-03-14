@@ -26,6 +26,7 @@ from HH4bAnalysis.utils.inputsHelper import is_physlite
 from HH4bAnalysis.utils.logHelper import log
 
 from HH4bAnalysis.Config.EventCounterConfig import eventCounterCfg
+from HH4bAnalysis.Config.JetParentDecoratorConfig import jetParentDecoratorCfg
 
 
 # Generate the algorithm to do the dumping.
@@ -120,6 +121,9 @@ def AnalysisAlgsCfg(
                     outputContainerName=containers["outputs"]["muons"],
                 )
             )
+
+        if flags.Input.isMC:
+            cfg.merge(jetParentDecoratorCfg(flags))
 
         log.info("Adding small-R jet seq")
         muoncont = containers["outputs"]["muons"]
