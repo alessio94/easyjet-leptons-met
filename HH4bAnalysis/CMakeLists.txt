@@ -7,8 +7,7 @@ find_package(ROOT COMPONENTS Core Tree Hist REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 # We don't want any warnings in compilation
-# disabling for now until framework is more mature
-# add_compile_options(-Werror)
+add_compile_options(-Werror)
 
 # Install the interface headers
 atlas_add_library(HH4bAnalysisLib
@@ -31,6 +30,7 @@ atlas_add_component(HH4bAnalysis
   src/GhostAssocVRJetGetterAlg.cxx
   src/tools/NTrkVertexCounter.cxx
   src/H5FileSvc.cxx
+  src/TruthParentDecoratorAlg.cxx
   src/components/*.cxx
   LINK_LIBRARIES
   GaudiKernel
@@ -45,6 +45,7 @@ atlas_add_component(HH4bAnalysis
   FTagAnalysisInterfacesLib
   xAODBTagging
   FourMomUtils
+  TruthUtils
 )
 
 # Install python modules, joboptions, and share content
