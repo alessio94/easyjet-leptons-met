@@ -19,8 +19,7 @@ Now, compile the package
 ```
 mkdir build
 cd build
-setupATLAS
-asetup AthAnalysis,22.2.110
+. hh4b-analysis/setup.sh
 cmake ../hh4b-analysis/
 make
 source */setup.sh
@@ -62,9 +61,13 @@ You will have to install [Docker](https://www.docker.com).
 Preferably, do this in `$WORKDIR`.
 
 ```
-docker pull gitlab-registry.cern.ch/atlas/athena/athanalysis:22.2.108
-docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:22.2.110
+docker pull gitlab-registry.cern.ch/atlas/athena/athanalysis:22.2.XXX
+docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:22.2.XXX
 ```
+
+where you should be careful to change XXX in the lines above to the
+minor release version you'd like to set up. You can find a working
+version in the [`.gitlab-ci.yml`](.gitlab-ci.yml) file.
 
 This will start up an interactive terminal inside the container, which has read/write access to the following paths:
 
