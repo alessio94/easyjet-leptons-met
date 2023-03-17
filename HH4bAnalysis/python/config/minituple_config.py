@@ -1,22 +1,45 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from HH4bAnalysis.Algs.BoostedAnalysis import BoostedTreeBranches
-from HH4bAnalysis.Algs.Jets import (
-    LargeJetGhostVRJetAssociationBranches,
-    LargeUFOJetGhostVRJetAssociationBranches,
+from HH4bAnalysis.config.boosted_config import boosted_branches
+from HH4bAnalysis.cpalgs.jets import (
+    lr_jet_ghost_vr_jet_association_branches,
+    lr_ufo_jet_ghost_vr_jet_association_branches,
 )
-from HH4bAnalysis.Algs.ResolvedAnalysis import ResolvedTreeBranches
-from HH4bAnalysis.Algs.Tree import AnalysisTreeAlgCfg
-from HH4bAnalysis.Config.Base import get_valid_ami_tag
-from HH4bAnalysis.utils.containerNameHelper import get_container_names
-from HH4bAnalysis.utils.inputsHelper import is_physlite
-from HH4bAnalysis.utils.logHelper import log
+from HH4bAnalysis.config.resolved_config import resolved_branches
+from HH4bAnalysis.cpalgs.tree import tree_cfg
+from HH4bAnalysis.config.sample_config import get_valid_ami_tag
+from HH4bAnalysis.config.container_names import get_container_names
+from HH4bAnalysis.utils.inputs_helper import is_physlite
+from HH4bAnalysis.utils.log_helper import log
 
 
-def MiniTupleCfg(
+def _get_four_mom_branches(
+    container, alias, do_or=False, do_systematics=True, do_mass=False
+):
+    or_postfix = "_OR" if do_or else ""
+    sys_postfix = "_%SYS%" if do_systematics else ""
+    branches = []
+    vars = ["pt", "eta", "phi"]
+    if "Jets" in container or do_mass:
+        vars.append("m")
+    for var in vars:
+        branches += [
+            f"{container}{or_postfix}.{var}  -> {alias}{or_postfix}{sys_postfix}_{var}",
+        ]
+    return branches
+
+
+def _get_truth_four_mom_branches(container, alias):
+    branches = []
+    vars = ["pt", "eta", "phi", "m"]
+    for var in vars:
+        branches += [f"{container}.{alias}_{var}  ->  {alias}_{var}"]
+    return branches
+
+
+def minituple_cfg(
     flags,
     trigger_chains,
-    doCBK=True,
     do_muons=True,
     do_PRW=False,
 ):
@@ -43,29 +66,7 @@ def MiniTupleCfg(
         )
     )
 
-    def getFourMomBranches(
-        container, alias, doOR=False, noSystematics=False, doMass=False
-    ):
-        ORstr = "_OR" if doOR else ""
-        SYSstr = "" if noSystematics else "_%SYS%"
-        branches = []
-        vars = ["pt", "eta", "phi"]
-        if "Jets" in container or doMass:
-            vars.append("m")
-        for var in vars:
-            branches += [
-                f"{container}{ORstr}.{var}  -> {alias}{ORstr}{SYSstr}_{var}",
-            ]
-        return branches
-
-    def getTruthFourMomBranches(container, alias):
-        branches = []
-        vars = ["pt", "eta", "phi", "m"]
-        for var in vars:
-            branches += [f"{container}.{alias}_{var}  ->  {alias}_{var}"]
-        return branches
-
-    analysisTreeBranches = [
+    tree_branches = [
         "EventInfo.runNumber     -> runNumber",
         "EventInfo.eventNumber   -> eventNumber",
         "EventInfo.lumiBlock   -> lumiBlock",
@@ -77,17 +78,17 @@ def MiniTupleCfg(
 
     for trig_chain in trigger_chains:
         trig_formatted = trig_chain.replace("-", "_").replace(".", "p")
-        analysisTreeBranches.append(
+        tree_branches.append(
             f"EventInfo.trigPassed_{trig_formatted} -> trigPassed_{trig_formatted}"
         )
 
     if do_PRW and not flags.Analysis.disable_calib:
-        analysisTreeBranches += [
+        tree_branches += [
             "EventInfo.PileupWeight_%SYS% -> pileupWeight_%SYS%",
             "EventInfo.generatorWeight_%SYS% -> generatorWeight_%SYS%",
         ]
     else:
-        analysisTreeBranches += [
+        tree_branches += [
             "EventInfo.mcEventWeights -> pileupWeight_NOSYS",
         ]
 
@@ -101,11 +102,11 @@ def MiniTupleCfg(
         objectpairs[containers["muons"]] = "mu"
 
     for cont, alias in objectpairs.items():
-        analysisTreeBranches += getFourMomBranches(cont, alias)
-        analysisTreeBranches += getFourMomBranches(cont, alias, doOR=True)
+        tree_branches += _get_four_mom_branches(cont, alias)
+        tree_branches += _get_four_mom_branches(cont, alias, do_or=True)
 
     if flags.Input.isMC:
-        analysisTreeBranches += [
+        tree_branches += [
             (
                 f"{containers['reco4Jet']}.HadronConeExclTruthLabelID ->"
                 " recojet_antikt4_%SYS%_HadronConeExclTruthLabelID"
@@ -117,10 +118,10 @@ def MiniTupleCfg(
         ]
 
     if flags.Input.isMC:
-        analysisTreeBranches += getFourMomBranches(
-            containers["truth4Jet"], "truthjet_antikt4", noSystematics=True
+        tree_branches += _get_four_mom_branches(
+            containers["truth4Jet"], "truthjet_antikt4", do_systematics=False
         )
-        analysisTreeBranches += [
+        tree_branches += [
             (
                 f"{containers['truth4Jet']}.PartonTruthLabelID ->"
                 " truthjet_antikt4_PartonTruthLabelID"
@@ -155,12 +156,12 @@ def MiniTupleCfg(
         )
 
         for var in reco10JetVars:
-            analysisTreeBranches += [
+            tree_branches += [
                 f"{containers['reco10Jet']}.{var} -> recojet_antikt10_%SYS%_{var}"
             ]
         # one after the other for better readability in the root file
         for var in reco10JetVars:
-            analysisTreeBranches += [
+            tree_branches += [
                 (
                     f"{containers['reco10Jet']}_OR.{var} -> recojet_antikt10_OR_%SYS%_{var}"  # noqa
                 ),
@@ -193,37 +194,36 @@ def MiniTupleCfg(
         )
 
         for v in reco10UFOJetVars:
-            analysisTreeBranches += [
+            tree_branches += [
                 (
                     f"{containers['reco10UFOJet']}.{v} -> recoUFOjet_antikt10_%SYS%_{v}"  # noqa
                 ),
             ]
 
-        analysisTreeBranches += [
-            b.replace('%SYS%','NOSYS') for b in
-            LargeJetGhostVRJetAssociationBranches
-            (
+        tree_branches += [
+            b.replace("%SYS%", "NOSYS")
+            for b in lr_jet_ghost_vr_jet_association_branches(
                 flags, containers["reco10Jet"]
             )
         ]
 
-        analysisTreeBranches += LargeUFOJetGhostVRJetAssociationBranches(
+        tree_branches += lr_ufo_jet_ghost_vr_jet_association_branches(
             flags, containers["reco10UFOJet"]
         )
 
-        analysisTreeBranches += getFourMomBranches(
+        tree_branches += _get_four_mom_branches(
             containers["reco10Jet"], "recojet_antikt10"
         )
-        analysisTreeBranches += getFourMomBranches(
-            containers["reco10Jet"], "recojet_antikt10", doOR=True
+        tree_branches += _get_four_mom_branches(
+            containers["reco10Jet"], "recojet_antikt10", do_or=True
         )
-        analysisTreeBranches += getFourMomBranches(
+        tree_branches += _get_four_mom_branches(
             containers["reco10UFOJet"], "recoUFOjet_antikt10"
         )
 
         # Restore SYS when LargeRJet alg supports systematics
         if flags.Input.isMC:
-            analysisTreeBranches += [
+            tree_branches += [
                 (
                     f"{containers['reco10Jet'].replace('%SYS%','NOSYS')}"
                     ".R10TruthLabel_R21Consolidated ->"
@@ -243,7 +243,7 @@ def MiniTupleCfg(
             # Just added this ptag check for now. Because older p-tag
             # derivations do not have these truth label for large-R jet.
             if "p5511" in flags.Input.AMITag:
-                analysisTreeBranches += [
+                tree_branches += [
                     (
                         f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}"
                         ".R10TruthLabel_R22v1 ->"
@@ -253,32 +253,34 @@ def MiniTupleCfg(
 
     if not flags.Analysis.disable_calib:
         if flags.Input.isMC:
-            analysisTreeBranches += getFourMomBranches(
-                containers["truth10Jet"], "truthjet_antikt10", noSystematics=True
+            tree_branches += _get_four_mom_branches(
+                containers["truth10Jet"], "truthjet_antikt10", do_systematics=False
             )
-            analysisTreeBranches += getFourMomBranches(
-                containers["truth10UFOJet"], "truthUFOjet_antikt10", noSystematics=True
+            tree_branches += _get_four_mom_branches(
+                containers["truth10UFOJet"],
+                "truthUFOjet_antikt10",
+                do_systematics=False,
             )
 
         if flags.Input.isMC:
-            analysisTreeBranches += ["EventInfo.truth_H1_pdgId -> truth_H1_pdgId"]
-            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H1")
-            analysisTreeBranches += getTruthFourMomBranches(
+            tree_branches += ["EventInfo.truth_H1_pdgId -> truth_H1_pdgId"]
+            tree_branches += _get_truth_four_mom_branches("EventInfo", "truth_H1")
+            tree_branches += _get_truth_four_mom_branches(
                 "EventInfo", "truth_bb_fromH1"
             )
-            analysisTreeBranches += ["EventInfo.truth_H2_pdgId -> truth_H2_pdgId"]
-            analysisTreeBranches += getTruthFourMomBranches("EventInfo", "truth_H2")
-            analysisTreeBranches += getTruthFourMomBranches(
+            tree_branches += ["EventInfo.truth_H2_pdgId -> truth_H2_pdgId"]
+            tree_branches += _get_truth_four_mom_branches("EventInfo", "truth_H2")
+            tree_branches += _get_truth_four_mom_branches(
                 "EventInfo", "truth_bb_fromH2"
             )
 
         # B-jet WPs
-        analysisTreeBranches += [
+        tree_branches += [
             f"{containers['reco4Jet']}.ftag_select_{btag_wp}"
             f" -> recojet_antikt4_%SYS%_{btag_wp}"
             for btag_wp in flags.Analysis.btag_wps
         ]
-        analysisTreeBranches += [
+        tree_branches += [
             f"{containers['reco4Jet']}_OR.ftag_select_{btag_wp}"
             f" -> recojet_antikt4_OR_%SYS%_{btag_wp}"
             for btag_wp in flags.Analysis.btag_wps
@@ -286,12 +288,12 @@ def MiniTupleCfg(
 
         if do_muons:
             # B-jet momentum without correction
-            analysisTreeBranches += [
+            tree_branches += [
                 f"{containers['reco4Jet']}.NoBJetCalibMomentum_{var}"
                 f" -> recojet_antikt4_%SYS%_nobjetcalib_{var}"
                 for var in ["pt", "eta", "phi", "m"]
             ]
-            analysisTreeBranches += [
+            tree_branches += [
                 f"{containers['reco4Jet']}_OR.NoBJetCalibMomentum_{var}"
                 f" -> recojet_antikt4_OR_%SYS%_nobjetcalib_{var}"
                 for var in ["pt", "eta", "phi", "m"]
@@ -318,7 +320,7 @@ def MiniTupleCfg(
         # Skip the NNjvt variables for old mc20 samples
         jvt_branches = jvt_branches[:-4]
 
-    analysisTreeBranches += [
+    tree_branches += [
         f"{containers['reco4Jet']}.{var} -> recojet_antikt4_%SYS%_{var}"
         for var in jvt_branches
     ] + [
@@ -328,23 +330,23 @@ def MiniTupleCfg(
     # No calibration algs -- remove all systematics expressions in the input
     # and label as NOSYS in output
     if flags.Analysis.disable_calib:
-        _tmp = list(analysisTreeBranches)
-        analysisTreeBranches = []
+        _tmp = list(tree_branches)
+        tree_branches = []
         for b in _tmp:
             source, output = b.split("->")
-            analysisTreeBranches.append(
+            tree_branches.append(
                 "->".join(
                     [source.replace("_%SYS", ""), output.replace("_%SYS%", "_NOSYS")]
                 )
             )  # noqa
 
     if flags.Analysis.do_resolved_dihiggs_analysis and not flags.Analysis.disable_calib:
-        analysisTreeBranches += ResolvedTreeBranches(flags)
+        tree_branches += resolved_branches(flags)
 
     if flags.Analysis.do_boosted_dihiggs_analysis and not flags.Analysis.disable_calib:
-        analysisTreeBranches += BoostedTreeBranches(flags)
+        tree_branches += boosted_branches(flags)
 
     log.info("Add tree seq")
-    cfg.merge(AnalysisTreeAlgCfg(flags, branches=analysisTreeBranches))
+    cfg.merge(tree_cfg(flags, branches=tree_branches))
 
     return cfg

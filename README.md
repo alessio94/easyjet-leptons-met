@@ -115,3 +115,15 @@ pip install -r requirements.txt --user
 pre-commit install
 pre-commit run
 ```
+
+### General organization of modules
+
+We would like to organize logic in our codebase according to the following general rules:
+
+- `ComponentAccumulator` code that wraps CP algorithms goes in `cpalgs\`
+
+- HH4b specific `ComponentAccumulator` stuff goes in `config\`
+
+- General non-CA functions go in `utils\`
+
+If you would like to add new logic, we ask that you please adhere to these rules.

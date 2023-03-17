@@ -1,40 +1,40 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from HH4bAnalysis.Algs.BoostedAnalysis import BoostedAnalysisCfg
-from HH4bAnalysis.Algs.Electrons import ElectronAnalysisSequenceCfg
-from HH4bAnalysis.Algs.Event import (
-    EventSelectionAnalysisSequenceCfg,
-    GeneratorAnalysisSequenceCfg,
-    PileupAnalysisSequenceCfg,
-    TriggerAnalysisSequenceCfg,
+from HH4bAnalysis.config.boosted_config import boosted_cfg
+from HH4bAnalysis.cpalgs.electrons import electron_sequence_cfg
+from HH4bAnalysis.cpalgs.event import (
+    event_selection_sequence_cfg,
+    generator_sequence_cfg,
+    pileup_sequence_cfg,
+    trigger_sequence_cfg,
 )
-from HH4bAnalysis.Algs.Jets import (
-    FatJetAnalysisSequenceCfg,
-    FatUFOJetAnalysisSequenceCfg,
-    JetAnalysisSequenceCfg,
-    LargeJetGhostVRJetAssociationAlgCfg,
-    LargeUFOJetGhostVRJetAssociationAlgCfg,
-    VRJetAnalysisSequenceCfg,
+from HH4bAnalysis.cpalgs.jets import (
+    lr_jet_sequence_cfg,
+    lr_ufo_jet_sequence_cfg,
+    jet_sequence_cfg,
+    lr_jet_ghost_vr_jet_association_cfg,
+    lr_ufo_jet_ghost_vr_jet_association_cfg,
+    vr_jet_sequence_cfg,
 )
-from HH4bAnalysis.Algs.Muons import MuonAnalysisSequenceCfg
-from HH4bAnalysis.Algs.Photons import PhotonAnalysisSequenceCfg
-from HH4bAnalysis.Algs.Postprocessing import OverlapAnalysisSequenceCfg
-from HH4bAnalysis.Algs.ResolvedAnalysis import ResolvedAnalysisCfg
-from HH4bAnalysis.Algs.TruthInformation import TruthParticleInformationAlgCfg
-from HH4bAnalysis.utils.containerNameHelper import get_container_names
-from HH4bAnalysis.utils.inputsHelper import is_physlite
-from HH4bAnalysis.utils.logHelper import log
+from HH4bAnalysis.cpalgs.muons import muon_sequence_cfg
+from HH4bAnalysis.cpalgs.photons import photon_sequence_cfg
+from HH4bAnalysis.cpalgs.postprocessing import overlap_sequence_cfg
+from HH4bAnalysis.config.resolved_config import resolved_cfg
+from HH4bAnalysis.config.truth_particle_info_config import truth_particle_info_cfg
+from HH4bAnalysis.config.container_names import get_container_names
+from HH4bAnalysis.utils.inputs_helper import is_physlite
+from HH4bAnalysis.utils.log_helper import log
 
-from HH4bAnalysis.Config.EventCounterConfig import eventCounterCfg
-from HH4bAnalysis.Config.JetParentDecoratorConfig import jetParentDecoratorCfg
+from HH4bAnalysis.config.event_counter_config import event_counter_cfg
+from HH4bAnalysis.config.jet_parent_decorator_config import jet_parent_decorator_cfg
 
 
 # Generate the algorithm to do the dumping.
 # AthAlgSequence does not respect filter decisions,
 # so we will need to add a new sequence to the CA
-def AnalysisAlgsCfg(
+def cpalgs_cfg(
     flags,
-    dataType,
+    datatype,
     trigger_chains=[],
     do_muons=True,
     do_PRW=False,
@@ -47,7 +47,7 @@ def AnalysisAlgsCfg(
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
 
     cfg = ComponentAccumulator()
-    cfg.merge(eventCounterCfg('n_input'))
+    cfg.merge(event_counter_cfg("n_input"))
 
     # Create SystematicsSvc explicitly:
     sysSvc = CompFactory.CP.SystematicsSvc("SystematicsSvc")
@@ -59,17 +59,17 @@ def AnalysisAlgsCfg(
     # Removes events failing trigger and adds variable to EventInfo
     # if trigger passed or not, for example:
     # EventInfo.trigger_name
-    cfg.merge(TriggerAnalysisSequenceCfg(flags, dataType, trigger_chains))
-    cfg.merge(eventCounterCfg('n_trigger'))
+    cfg.merge(trigger_sequence_cfg(flags, datatype, trigger_chains))
+    cfg.merge(event_counter_cfg("n_trigger"))
 
     log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
     cfg.merge(
-        EventSelectionAnalysisSequenceCfg(
-            flags, dataType, grlFiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
+        event_selection_sequence_cfg(
+            flags, datatype, grlfiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
         )
     )
-    cfg.merge(eventCounterCfg('n_data_quality'))
+    cfg.merge(event_counter_cfg("n_data_quality"))
 
     containers = get_container_names(flags)
 
@@ -79,121 +79,121 @@ def AnalysisAlgsCfg(
             # Adds variable to EventInfo if for pileup weight, for example:
             # EventInfo.PileWeight_%SYS$
             cfg.merge(
-                PileupAnalysisSequenceCfg(
+                pileup_sequence_cfg(
                     flags,
-                    dataType=dataType,
-                    prwFiles=prw_files,
-                    lumicalcFiles=lumicalc_files,
+                    datatype=datatype,
+                    prwfiles=prw_files,
+                    lumicalcfiles=lumicalc_files,
                 )
             )
             log.info("Adding generator analysis sequence")
             # Adds variable to EventInfo if for generator weight, for example:
             # EventInfo.generatorWeight_%SYS%
-            cfg.merge(GeneratorAnalysisSequenceCfg(flags, dataType))
+            cfg.merge(generator_sequence_cfg(flags, datatype))
 
         log.info("Adding electron seq")
         cfg.merge(
-            ElectronAnalysisSequenceCfg(
+            electron_sequence_cfg(
                 flags,
-                dataType=dataType,
-                inputContainerName=containers["inputs"]["electrons"],
-                outputContainerName=containers["outputs"]["electrons"],
+                datatype=datatype,
+                incontainername=containers["inputs"]["electrons"],
+                outcontainername=containers["outputs"]["electrons"],
             )
         )
 
         log.info("Adding photon seq")
         cfg.merge(
-            PhotonAnalysisSequenceCfg(
+            photon_sequence_cfg(
                 flags,
-                dataType=dataType,
-                inputContainerName=containers["inputs"]["photons"],
-                outputContainerName=containers["outputs"]["photons"],
+                datatype=datatype,
+                incontainername=containers["inputs"]["photons"],
+                outcontainername=containers["outputs"]["photons"],
             )
         )
 
         if do_muons:
             log.info("Adding muon seq")
             cfg.merge(
-                MuonAnalysisSequenceCfg(
+                muon_sequence_cfg(
                     flags,
-                    dataType=dataType,
-                    inputContainerName=containers["inputs"]["muons"],
-                    outputContainerName=containers["outputs"]["muons"],
+                    datatype=datatype,
+                    incontainername=containers["inputs"]["muons"],
+                    outcontainername=containers["outputs"]["muons"],
                 )
             )
 
         if flags.Input.isMC:
-            cfg.merge(jetParentDecoratorCfg(flags))
+            cfg.merge(jet_parent_decorator_cfg(flags))
 
         log.info("Adding small-R jet seq")
         muoncont = containers["outputs"]["muons"]
         if not do_muons:
             muoncont = containers["inputs"]["muons"]
         cfg.merge(
-            JetAnalysisSequenceCfg(
+            jet_sequence_cfg(
                 flags,
-                dataType=dataType,
-                inputContainerName=containers["inputs"]["reco4Jet"],
-                outputContainerName=containers["outputs"]["reco4Jet"],
+                datatype=datatype,
+                incontainername=containers["inputs"]["reco4Jet"],
+                outcontainername=containers["outputs"]["reco4Jet"],
                 # Need muons for b-jet pt correction
-                muonContainerName=muoncont,
+                muoncontainername=muoncont,
                 do_bjet_ptcalib=do_muons,
                 is_daod_physlite=is_daod_physlite,
             )
         )
-        cfg.merge(eventCounterCfg('n_small_r'))
+        cfg.merge(event_counter_cfg("n_small_r"))
 
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip large-R jet sequence for now")
         else:
             log.info("Adding large-R jet seq")
             cfg.merge(
-                FatJetAnalysisSequenceCfg(
+                lr_jet_sequence_cfg(
                     flags,
-                    dataType=dataType,
-                    inputContainerName=containers["inputs"]["reco10Jet"],
-                    outputContainerName=containers["outputs"]["reco10Jet"],
+                    datatype=datatype,
+                    incontainername=containers["inputs"]["reco10Jet"],
+                    outcontainername=containers["outputs"]["reco10Jet"],
                 )
             )
-            cfg.merge(eventCounterCfg('n_large_r'))
+            cfg.merge(event_counter_cfg("n_large_r"))
 
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip  UFO large-R jet sequence for now")
         else:
             log.info("Adding UFO large-R jet seq")
             cfg.merge(
-                FatUFOJetAnalysisSequenceCfg(
+                lr_ufo_jet_sequence_cfg(
                     flags,
-                    dataType=dataType,
-                    inputContainerName=containers["inputs"]["reco10UFOJet"],
-                    outputContainerName=containers["outputs"]["reco10UFOJet"],
+                    datatype=datatype,
+                    incontainername=containers["inputs"]["reco10UFOJet"],
+                    outcontainername=containers["outputs"]["reco10UFOJet"],
                 )
             )
-            cfg.merge(eventCounterCfg('n_large_r_ufo'))
+            cfg.merge(event_counter_cfg("n_large_r_ufo"))
 
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip VR jet sequence for now")
         else:
             log.info("Adding VR jet seq")
             cfg.merge(
-                VRJetAnalysisSequenceCfg(
+                vr_jet_sequence_cfg(
                     flags,
-                    dataType=dataType,
-                    inputContainerName=containers["inputs"]["vrJet"],
-                    outputContainerName=containers["outputs"]["vrJet"],
+                    datatype=datatype,
+                    incontainername=containers["inputs"]["vrJet"],
+                    outcontainername=containers["outputs"]["vrJet"],
                 )
             )
-            cfg.merge(eventCounterCfg('n_vr'))
+            cfg.merge(event_counter_cfg("n_vr"))
 
         if is_daod_physlite:
             log.warning("On PHYSLITE, skip ghost assocciation VR jet sequence for now")
         else:
             cfg.merge(
-                LargeJetGhostVRJetAssociationAlgCfg(
+                lr_jet_ghost_vr_jet_association_cfg(
                     flags,
-                    inputLargeRJetContainerName=containers["outputs"][
-                        "reco10Jet"
-                    ].replace("%SYS%", "NOSYS"),
+                    inlrjet_containername=containers["outputs"]["reco10Jet"].replace(
+                        "%SYS%", "NOSYS"
+                    ),
                 )
             )
 
@@ -201,9 +201,9 @@ def AnalysisAlgsCfg(
             log.warning("On PHYSLITE, skip ghost assocciation VR jet sequence for now")
         else:
             cfg.merge(
-                LargeUFOJetGhostVRJetAssociationAlgCfg(
+                lr_ufo_jet_ghost_vr_jet_association_cfg(
                     flags,
-                    inputLargeRUFOJetContainerName=containers["outputs"][
+                    inlrufojet_containername=containers["outputs"][
                         "reco10UFOJet"
                     ].replace("%SYS%", "NOSYS"),
                 )
@@ -212,14 +212,14 @@ def AnalysisAlgsCfg(
         if flags.Input.isMC:
             log.info("Adding truth particle info seq")
             cfg.merge(
-                TruthParticleInformationAlgCfg(
+                truth_particle_info_cfg(
                     flags,
-                    inputSMContainerName=containers["inputs"]["truthSMParticles"],
-                    inputBSMContainerName=containers["inputs"]["truthBSMParticles"],
-                    outputContainerName=containers["outputs"]["truthParticles"],
+                    sm_containerinkey=containers["inputs"]["truthSMParticles"],
+                    bsm_containerinkey=containers["inputs"]["truthBSMParticles"],
+                    containeroutkey=containers["outputs"]["truthParticles"],
                 )
             )
-            cfg.merge(eventCounterCfg('n_truth_particle'))
+            cfg.merge(event_counter_cfg("n_truth_particle"))
 
     ########################################################################
     # Begin postprocessing
@@ -241,34 +241,34 @@ def AnalysisAlgsCfg(
     overlapOutputNames = {k: f"{v}_OR" for k, v in overlapInputNames.items()}
 
     cfg.merge(
-        OverlapAnalysisSequenceCfg(
+        overlap_sequence_cfg(
             flags,
-            dataType=dataType,
-            inputNames=overlapInputNames,
-            outputNames=overlapOutputNames,
+            datatype=datatype,
+            inputnames=overlapInputNames,
+            outputnames=overlapOutputNames,
             doFatJets=not is_daod_physlite,
             doMuons=do_muons,
         )
     )
-    cfg.merge(eventCounterCfg('n_overlap'))
+    cfg.merge(event_counter_cfg("n_overlap"))
 
     if flags.Analysis.do_resolved_dihiggs_analysis and not flags.Analysis.disable_calib:
         cfg.merge(
-            ResolvedAnalysisCfg(
+            resolved_cfg(
                 flags,
-                SmallJetKey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
+                smalljetkey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
             )
         )
-        cfg.merge(eventCounterCfg('n_resolved'))
+        cfg.merge(event_counter_cfg("n_resolved"))
     if flags.Analysis.do_boosted_dihiggs_analysis and not flags.Analysis.disable_calib:
         cfg.merge(
-            BoostedAnalysisCfg(
+            boosted_cfg(
                 flags,
-                LargeJetKey=containers["outputs"]["reco10Jet"].replace(
+                largejetkey=containers["outputs"]["reco10Jet"].replace(
                     "%SYS%", "NOSYS"
                 ),
             )
         )
-        cfg.merge(eventCounterCfg('n_merged'))
+        cfg.merge(event_counter_cfg("n_merged"))
 
     return cfg

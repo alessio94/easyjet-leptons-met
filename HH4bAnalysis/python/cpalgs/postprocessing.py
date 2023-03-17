@@ -2,11 +2,11 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def OverlapAnalysisSequenceCfg(
+def overlap_sequence_cfg(
     flags,
-    dataType,
-    inputNames,
-    outputNames,
+    datatype,
+    inputnames,
+    outputnames,
     doFatJets=True,
     doMuons=True,
 ):
@@ -16,7 +16,7 @@ def OverlapAnalysisSequenceCfg(
     )
 
     overlapSequence = makeOverlapAnalysisSequence(
-        dataType,
+        datatype,
         inputLabel="",
         outputLabel="passesOR",
         linkOverlapObjects=False,
@@ -35,8 +35,8 @@ def OverlapAnalysisSequenceCfg(
         enableCutflow=False,
     )
     overlapSequence.configure(
-        inputName=inputNames,
-        outputName=outputNames,
+        inputName=inputnames,
+        outputName=outputnames,
     )
     # print(overlapSequence)  # For debugging
 

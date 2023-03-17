@@ -56,8 +56,8 @@ atlas_install_scripts(
   share/metadata-check
 )
 atlas_install_python_modules(
-  python/Algs
-  python/Config
+  python/cpalgs
+  python/config
   python/utils
 )
 atlas_install_data(
