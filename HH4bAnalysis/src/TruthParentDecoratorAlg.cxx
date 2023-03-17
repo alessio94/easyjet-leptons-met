@@ -156,7 +156,7 @@ namespace {
 
 
   // these functions are for dealing with specific vertices
-  bool isHF(const xAOD::TruthParticle* p) {
+  bool isHeavyFlavor(const xAOD::TruthParticle* p) {
     return p->hasCharm() || p->hasBottom();
   }
   const xAOD::TruthParticle* getParent(const xAOD::TruthParticle* p) {
@@ -168,7 +168,7 @@ namespace {
   }
   bool isSoftLepton(const xAOD::TruthParticle* p) {
     const xAOD::TruthParticle* parent = getParent(p);
-    return isHF(parent) && p->isChLepton();
+    return isHeavyFlavor(parent) && p->isChLepton();
   }
   bool isSoftCharm(const xAOD::TruthParticle* p) {
     const xAOD::TruthParticle* parent = getParent(p);

@@ -1,22 +1,22 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-from HH4bAnalysis.Config.Base import SampleTypes
-from HH4bAnalysis.utils.logHelper import log
+from HH4bAnalysis.config.sample_config import SampleTypes
+from HH4bAnalysis.utils.log_helper import log
 
 
-def EventSelectionAnalysisSequenceCfg(flags, dataType, grlFiles=[], loose=False):
+def event_selection_sequence_cfg(flags, datatype, grlfiles=[], loose=False):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.EventSelectionAnalysisSequence import (
         makeEventSelectionAnalysisSequence,
     )
 
-    eventSelectionSequence = makeEventSelectionAnalysisSequence(
-        dataType, userGRLFiles=grlFiles, runEventCleaning=True
+    event_selection_sequence = makeEventSelectionAnalysisSequence(
+        datatype, userGRLFiles=grlfiles, runEventCleaning=True
     )
 
-    cfg.addSequence(CompFactory.AthSequencer(eventSelectionSequence.getName()))
-    for alg in eventSelectionSequence.getGaudiConfig2Components():
+    cfg.addSequence(CompFactory.AthSequencer(event_selection_sequence.getName()))
+    for alg in event_selection_sequence.getGaudiConfig2Components():
         if "PrimaryVertexSelectorAlg" in alg.getName():
             alg.MinTracks = 2
         if "EventFlagSelectorAlg" in alg.getName():
@@ -31,55 +31,55 @@ def EventSelectionAnalysisSequenceCfg(flags, dataType, grlFiles=[], loose=False)
             alg.selectionFlags = [f"{flag},as_char" for flag in selectionFlags]
             alg.invertFlags = invertFlags
 
-        cfg.addEventAlgo(alg, eventSelectionSequence.getName())
+        cfg.addEventAlgo(alg, event_selection_sequence.getName())
 
     return cfg
 
 
-def TriggerAnalysisSequenceCfg(flags, dataType, triggerChains):
+def trigger_sequence_cfg(flags, datatype, triggerchains):
     cfg = ComponentAccumulator()
     from TriggerAnalysisAlgorithms.TriggerAnalysisSequence import (
         makeTriggerAnalysisSequence,
     )
 
-    triggerSequence = makeTriggerAnalysisSequence(
-        dataType,
-        triggerChains=triggerChains,
+    trigger_sequence = makeTriggerAnalysisSequence(
+        datatype,
+        triggerChains=triggerchains,
         noFilter=flags.Analysis.disable_trigger_filtering,
     )
 
-    cfg.addSequence(CompFactory.AthSequencer(triggerSequence.getName()))
-    for alg in triggerSequence.getGaudiConfig2Components():
-        cfg.addEventAlgo(alg, triggerSequence.getName())
+    cfg.addSequence(CompFactory.AthSequencer(trigger_sequence.getName()))
+    for alg in trigger_sequence.getGaudiConfig2Components():
+        cfg.addEventAlgo(alg, trigger_sequence.getName())
 
     return cfg
 
 
-def PileupAnalysisSequenceCfg(flags, dataType, prwFiles, lumicalcFiles):
+def pileup_sequence_cfg(flags, datatype, prwfiles, lumicalcfiles):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
 
     tags = flags.Input.AMITag
-    pileupSequence = makePileupAnalysisSequence(
-        dataType,
+    pileup_sequence = makePileupAnalysisSequence(
+        datatype,
         files=flags.Input.Files,
         useDefaultConfig=SampleTypes.mc21a.value in tags,
     )
-    pileupSequence.configure(inputName={}, outputName={})
+    pileup_sequence.configure(inputName={}, outputName={})
 
-    cfg.addSequence(CompFactory.AthSequencer(pileupSequence.getName()))
-    for alg in pileupSequence.getGaudiConfig2Components():
+    cfg.addSequence(CompFactory.AthSequencer(pileup_sequence.getName()))
+    for alg in pileup_sequence.getGaudiConfig2Components():
         # Workaround for mc21 courtesy of
         # https://its.cern.ch/jira/browse/ATLASG-1628?focusedCommentId=4297949&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-4297949
         if SampleTypes.mc21a.value in tags and "PileupReweightingAlg" in alg.getName():
             alg.pileupReweightingTool.PeriodAssignments = []
             alg.pileupReweightingTool.DataScaleFactor = 1
-        cfg.addEventAlgo(alg, pileupSequence.getName())
+        cfg.addEventAlgo(alg, pileup_sequence.getName())
 
     return cfg
 
 
-def GeneratorAnalysisSequenceCfg(flags, dataType):
+def generator_sequence_cfg(flags, datatype):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.GeneratorAnalysisSequence import (
         makeGeneratorAnalysisSequence,
@@ -98,15 +98,15 @@ def GeneratorAnalysisSequenceCfg(flags, dataType):
     # if we're looking at one of several broken tags
     is_bad_tag = ptag in ["p5226", "p5278", "p5334"]
     doCBK = not is_bad_tag and flags.Analysis.outFile
-    generatorSequence = makeGeneratorAnalysisSequence(
-        dataType,
+    generator_sequence = makeGeneratorAnalysisSequence(
+        datatype,
         saveCutBookkeepers=doCBK,
         runNumber=flags.Input.RunNumber[0],
         cutBookkeepersSystematics=doCBK,
     )
 
-    cfg.addSequence(CompFactory.AthSequencer(generatorSequence.getName()))
-    for alg in generatorSequence.getGaudiConfig2Components():
-        cfg.addEventAlgo(alg, generatorSequence.getName())
+    cfg.addSequence(CompFactory.AthSequencer(generator_sequence.getName()))
+    for alg in generator_sequence.getGaudiConfig2Components():
+        cfg.addEventAlgo(alg, generator_sequence.getName())
 
     return cfg

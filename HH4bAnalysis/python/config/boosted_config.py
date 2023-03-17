@@ -4,7 +4,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 # this is a boosted analysis chain
 
 
-def BoostedAnalysisCfg(flags, LargeJetKey):
+def boosted_cfg(flags, largejetkey):
     cfg = ComponentAccumulator()
 
     for btag_wp in flags.Analysis.vr_btag_wps:
@@ -12,7 +12,7 @@ def BoostedAnalysisCfg(flags, LargeJetKey):
         cfg.addEventAlgo(
             CompFactory.HH4B.JetSelectorAlg(
                 "LargeJetSelectorAlg_" + btag_wp,
-                containerInKey=LargeJetKey,
+                containerInKey=largejetkey,
                 containerOutKey="boostedAnalysisJets_" + btag_wp,
                 bTagWP="",  # empty string: "" ignores btagging
                 minPt=250_000,
@@ -116,11 +116,11 @@ def BoostedAnalysisCfg(flags, LargeJetKey):
     return cfg
 
 
-def BoostedTreeBranches(flags):
-    analysisTreeBranches = []
+def boosted_branches(flags):
+    branches = []
 
     for btag_wp in flags.Analysis.vr_btag_wps:
-        boostedVars = [
+        boosted_vars = [
             "h1_m",
             "h1_jet1_pt",
             "h1_jet2_pt",
@@ -132,7 +132,7 @@ def BoostedTreeBranches(flags):
             "hh_m",
         ]
         if flags.Analysis.truth_match_boosted and flags.Input.isMC:
-            boostedVars += [
+            boosted_vars += [
                 "h1_closestTruthBsHaveSameInitialParticle",
                 "h2_closestTruthBsHaveSameInitialParticle",
                 "h1_dR_leadingJet_closestTruthB",
@@ -145,14 +145,14 @@ def BoostedTreeBranches(flags):
                 "h2_parentPdgId_subleadingJet_closestTruthB",
             ]
             for var in ["pt", "eta", "phi", "m"]:
-                analysisTreeBranches += [
+                branches += [
                     f"EventInfo.boosted_truthMatched_{btag_wp}_{var} ->"
                     f" boosted_truthMatched_{btag_wp}_{var}"
                 ]
 
-        for var in boostedVars:
-            analysisTreeBranches += [
+        for var in boosted_vars:
+            branches += [
                 f"EventInfo.boosted_{var}_{btag_wp} -> boosted_{btag_wp}_{var}"
             ]
 
-    return analysisTreeBranches
+    return branches

@@ -1,13 +1,5 @@
 import json
 from enum import Enum
-from argparse import ArgumentTypeError
-import pathlib
-import os
-
-import yaml
-
-from HH4bAnalysis.utils.logHelper import log
-from HH4bAnalysis.utils.inputsHelper import get_dataType
 
 
 class DataSampleYears(Enum):
@@ -71,12 +63,12 @@ def get_valid_ami_tag(tags, check_tag="p", min_valid_tag=SampleTypes.mc20):
     return is_valid_tag
 
 
-def pileupConfigFiles(flags):
+def get_pileup_config_files(flags):
     """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
 
     dsid = flags.Input.MCChannelNumber
     tags = flags.Input.AMITag
-    dataType = get_dataType(flags, isPRW=True)
+    data_type = get_data_type(flags, is_prw=True)
 
     # Figure out which MC we are using
     if SampleTypes.mc20a.value in tags:
@@ -90,13 +82,13 @@ def pileupConfigFiles(flags):
     else:
         raise LookupError(f"Cannot determine subcampaign for DSID {dsid}")
 
-    lumicalc_files = getLumicalcFiles(subcampaign)
-    prw_files = getPrwFiles(dsid, subcampaign, dataType)
+    lumicalc_files = _get_lumicalc_files(subcampaign)
+    prw_files = _get_prw_files(dsid, subcampaign, data_type)
 
     return prw_files, lumicalc_files
 
 
-def getLumicalcFiles(subcampaign):
+def _get_lumicalc_files(subcampaign):
     list = {
         SampleTypes.mc20a: [
             "GoodRunsLists/data15_13TeV/20170619/PHYS_StandardGRL_All_Good_25ns_276262-284484_OflLumi-13TeV-008.root",  # noqa
@@ -116,7 +108,7 @@ def getLumicalcFiles(subcampaign):
     return list.get(subcampaign, [])
 
 
-def getPrwFiles(dsid, subcampaign, dataType):
+def _get_prw_files(dsid, subcampaign, data_type):
     prw_files = []
     actual_mu = {
         SampleTypes.mc20d: [
@@ -129,7 +121,7 @@ def getPrwFiles(dsid, subcampaign, dataType):
 
     if dsid:
         dsid_as_str = str(dsid)
-        if dataType == "mc":
+        if data_type == "mc":
             simulation_type = "FS"
         else:
             simulation_type = "AFII"
@@ -141,7 +133,7 @@ def getPrwFiles(dsid, subcampaign, dataType):
     return prw_files + actual_mu.get(subcampaign, [])
 
 
-def getRunYears(flags):
+def get_run_years(flags):
     years = []
     if flags.Analysis.DataType != "data":
         # use rtag for figuring out year in MC
@@ -160,42 +152,28 @@ def getRunYears(flags):
     return years
 
 
-def getRunConfig(rawpath):
-    fpath = pathlib.Path(rawpath)
-    for dirpath in [''] + os.environ['DATAPATH'].split(':'):
-        fullpath = dirpath / fpath
-        if fullpath.exists():
-            try:
-                with open(fullpath) as cfgfile:
-                    return yaml.safe_load(cfgfile)
-            except Exception:
-                raise ArgumentTypeError(
-                    f"Couldn't load run config: {fullpath}"
-                )
+def get_data_type(flags, is_prw=False):
+    data_type = ""
+    if flags.Input.SimulationFlavour in [
+        "",
+        "FullG4",
+        "FullG4_QS",
+        "FullG4_Longlived",
+    ]:
+        data_type = "mc"
+    if flags.Input.SimulationFlavour in ["ATLFAST3_QS"] and not is_prw:
+        # in R22 there are no calibrations for af3 yet,
+        # using FullSim calibrations for now
+        data_type = "mc"
+    if flags.Input.SimulationFlavour in ["ATLFAST3_QS"] and is_prw:
+        # there are no PRW files for af3 yet, except for the SH samples.
+        # however, they are hard-coded in the dev group as AFII.root,
+        # so for now setting af3 to afii to get correct PRW files from dev
+        data_type = "afii"
+    if not flags.Input.isMC:
+        data_type = "data"
 
-    raise ArgumentTypeError(f"Couldn't find config: {fpath}")
+    if not data_type:
+        raise AssertionError("Data type cannot be determined from inputs!")
 
-
-def updateConfigFlags(args, flags, overwrites={}):
-    # load config file
-    runConfig = args.runConfig
-
-    # args contain the flags, overwrite runconfig file values with values from flags
-    for key in vars(args):
-        # exclude standard athena flags
-        if key in overwrites:
-            if overwrites[key] and key not in runConfig:
-                raise ValueError(f"{key} must be set in the config file")
-            elif key in runConfig and not overwrites[key]:
-                raise ValueError(f"{key} must not exist in the config file")
-
-            value = getattr(args, key)
-            if value is not None or key not in runConfig:
-                runConfig[key] = value
-
-    # add them to ConfigFlags
-    for key, value in runConfig.items():
-        log.info("User configured: " + str(key) + ": " + str(value))
-        flags.addFlag("Analysis." + key, value)
-
-    return flags
+    return data_type

@@ -4,7 +4,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 # this is a resolved dihiggs analysis chain
 
 
-def ResolvedAnalysisCfg(flags, SmallJetKey):
+def resolved_cfg(flags, smalljetkey):
     cfg = ComponentAccumulator()
 
     # this is a resolved dihiggs analysis chain
@@ -13,7 +13,7 @@ def ResolvedAnalysisCfg(flags, SmallJetKey):
         cfg.addEventAlgo(
             CompFactory.HH4B.JetSelectorAlg(
                 "SmallJetSelectorAlg_" + btag_wp,
-                containerInKey=SmallJetKey,
+                containerInKey=smalljetkey,
                 containerOutKey="resolvedAnalysisJets_" + btag_wp,
                 bTagWP=btag_wp,  # empty string: "" ignores btagging
                 minPt=20_000,
@@ -76,11 +76,11 @@ def ResolvedAnalysisCfg(flags, SmallJetKey):
     return cfg
 
 
-def ResolvedTreeBranches(flags):
-    analysisTreeBranches = []
+def resolved_branches(flags):
+    branches = []
 
     for btag_wp in flags.Analysis.btag_wps:
-        resolvedVars = [
+        resolved_vars = [
             "DeltaR12",
             "DeltaR13",
             "DeltaR14",
@@ -92,7 +92,7 @@ def ResolvedTreeBranches(flags):
             "hh_m",
         ]
         if flags.Analysis.truth_match_resolved and flags.Input.isMC:
-            resolvedVars += [
+            resolved_vars += [
                 "h1_closestTruthBsHaveSameInitialParticle",
                 "h2_closestTruthBsHaveSameInitialParticle",
                 "h1_dR_leadingJet_closestTruthB",
@@ -105,14 +105,14 @@ def ResolvedTreeBranches(flags):
                 "h2_parentPdgId_subleadingJet_closestTruthB",
             ]
             for var in ["pt", "eta", "phi", "m"]:
-                analysisTreeBranches += [
+                branches += [
                     f"EventInfo.resolved_truthMatched_{btag_wp}_{var} ->"
                     f" resolved_truthMatched_{btag_wp}_{var}"
                 ]
 
-        for var in resolvedVars:
-            analysisTreeBranches += [
+        for var in resolved_vars:
+            branches += [
                 f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
             ]
 
-    return analysisTreeBranches
+    return branches

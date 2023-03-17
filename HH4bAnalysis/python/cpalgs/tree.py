@@ -2,7 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def AnalysisTreeAlgCfg(flags, branches, treename="AnalysisMiniTree"):
+def tree_cfg(flags, branches, treename="AnalysisMiniTree"):
     cfg = ComponentAccumulator()
     # Create analysis mini-ntuple
     treeMaker = CompFactory.getComp("CP::TreeMakerAlg")("TreeMaker")
@@ -13,7 +13,7 @@ def AnalysisTreeAlgCfg(flags, branches, treename="AnalysisMiniTree"):
     ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMaker")
     ntupleMaker.TreeName = treename
     ntupleMaker.Branches = branches
-    ntupleMaker.systematicsService = 'SystematicsSvc'
+    ntupleMaker.systematicsService = "SystematicsSvc"
     cfg.addEventAlgo(ntupleMaker)
 
     # Fill tree

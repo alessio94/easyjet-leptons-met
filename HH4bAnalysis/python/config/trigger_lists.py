@@ -1,4 +1,4 @@
-TriggerLists = {
+TRIGGER_LISTS = {
     "HH4bResolved": {
         2015: [
             # 2015 (not used in the resolved analysis):

@@ -1,4 +1,4 @@
-from HH4bAnalysis.utils.inputsHelper import is_physlite
+from HH4bAnalysis.utils.inputs_helper import is_physlite
 
 # custom container names used in this framework
 RECO_4_PFLOW_JETS_KEY = "Reco4PFlowJets"
@@ -15,7 +15,7 @@ TRUTH_PARTICLE_BSM_INFO_KEY = "TruthBSMParticles"
 TRUTH_PARTICLE_SM_INFO_KEY = "TruthSMParticles"
 
 
-container_map = {
+CONTAINER_MAP = {
     "DAOD_PHYS": {
         RECO_4_PFLOW_JETS_KEY: "AntiKt4EMPFlowJets",
         RECO_10_PFLOW_JETS_KEY: "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets",
@@ -49,7 +49,7 @@ container_map = {
 
 def _get_container_name(qualitycontainerdesc, daodphyslite=False):
     format_key = "DAOD_PHYSLITE" if daodphyslite else "DAOD_PHYS"
-    return container_map[format_key][qualitycontainerdesc]
+    return CONTAINER_MAP[format_key][qualitycontainerdesc]
 
 
 def get_container_names(flags):

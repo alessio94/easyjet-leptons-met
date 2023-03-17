@@ -2,12 +2,12 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def MuonAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContainerName):
+def muon_sequence_cfg(flags, datatype, incontainername, outcontainername):
     cfg = ComponentAccumulator()
     from MuonAnalysisAlgorithms.MuonAnalysisSequence import makeMuonAnalysisSequence
 
-    muonSequence = makeMuonAnalysisSequence(
-        dataType,
+    muon_sequence = makeMuonAnalysisSequence(
+        datatype,
         workingPoint="Loose.NonIso",
         postfix="loose",
         deepCopyOutput=False,
@@ -18,11 +18,11 @@ def MuonAnalysisSequenceCfg(flags, dataType, inputContainerName, outputContainer
         enableKinematicHistograms=False,
         isRun3Geo=(flags.Analysis.Run == 3),
     )
-    muonSequence.configure(inputName=inputContainerName, outputName=outputContainerName)
-    # print(muonSequence)  # For debugging
+    muon_sequence.configure(inputName=incontainername, outputName=outcontainername)
+    # print(muon_sequence)  # For debugging
 
-    cfg.addSequence(CompFactory.AthSequencer(muonSequence.getName()))
-    for alg in muonSequence.getGaudiConfig2Components():
-        cfg.addEventAlgo(alg, muonSequence.getName())
+    cfg.addSequence(CompFactory.AthSequencer(muon_sequence.getName()))
+    for alg in muon_sequence.getGaudiConfig2Components():
+        cfg.addEventAlgo(alg, muon_sequence.getName())
 
     return cfg

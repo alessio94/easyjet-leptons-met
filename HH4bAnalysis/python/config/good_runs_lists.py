@@ -1,4 +1,4 @@
-GoodRunsLists = {
+GOOD_RUNS_LISTS = {
     "Run3": {
         # period D-F2, 3464.27 pb-1
         2022: [

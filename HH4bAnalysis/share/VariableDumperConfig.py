@@ -19,70 +19,72 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from PerfMonComps.PerfMonCompsConfig import PerfMonMTSvcCfg
 from AthenaCommon.Constants import INFO
 
-from HH4bAnalysis.Config.AnalysisAlgsConfig import AnalysisAlgsCfg
-from HH4bAnalysis.Config.Base import (
-    updateConfigFlags, getRunYears, pileupConfigFiles, getRunConfig
+from HH4bAnalysis.config.cpalgs_config import cpalgs_cfg
+from HH4bAnalysis.config.sample_config import (
+    get_run_years,
+    get_pileup_config_files,
+    get_data_type,
+    cache_metadata,
+    update_metadata,
 )
-from HH4bAnalysis.Config.MiniTupleConfig import MiniTupleCfg
-from HH4bAnalysis.Config.H5Config import getH5Cfg
-from HH4bAnalysis.Config.EventCounterConfig import (
-    eventCounterCfg,
-    METADATA_FILE
+from HH4bAnalysis.config.minituple_config import minituple_cfg
+from HH4bAnalysis.config.h5_config import get_h5_cfg
+from HH4bAnalysis.config.event_counter_config import event_counter_cfg, METADATA_FILE
+from HH4bAnalysis.utils.inputs_helper import is_physlite, is_mc_phys
+from HH4bAnalysis.utils.log_helper import log, setRogueLoggers
+from HH4bAnalysis.utils.argument_parser import (
+    add_standard_athena_args,
+    run_config_arg,
+    validate_args,
+    fill_config_flags_from_args,
 )
-from HH4bAnalysis.utils.inputsHelper import get_dataType, is_physlite
-from HH4bAnalysis.utils.logHelper import (
-    log,
-    setRogueLoggers
-)
-from HH4bAnalysis.utils.argument_parser import add_standard_athena_args
-from HH4bAnalysis.Config.Base import cache_metadata, update_metadata
 
 
 def defineArgs(ConfigFlags):
     # Generate a parser and add an output file argument, then retrieve the args
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-c',
+        "-c",
         "--runConfig",
-        metavar='CFG',
-        type=getRunConfig,
-        default='HH4bAnalysis/RunConfig.yaml',
+        metavar="CFG",
+        type=run_config_arg,
+        default="HH4bAnalysis/RunConfig.yaml",
         help="Run config file path, default: %(default)s",
     )
-    add_standard_athena_args(parser)
     parser.add_argument(
-        '-t','--timeout',
+        "-t",
+        "--timeout",
         type=float,
         help=(
-            'Maximum runtime (in seconds). Longer processes finish '
-            'with an error.'
-        )
+            "Maximum runtime (in seconds). Longer processes finish " "with an error."
+        ),
     )
+    add_standard_athena_args(parser)
 
     # add analysis-specific flags
     an_opts = parser.add_argument_group(
-        'analysis',
-        'These flags are added to `ConfigFlags.Analysis`.'
+        "analysis", "These flags are added to `ConfigFlags.Analysis`."
     )
     # slightly ugly, keep track of the options we can write to here
     overwrites = {}
 
     def add_analysis_arg(*pos, overwrite=False, **args):
-        if overwrite and args.get('action') == 'store_true':
-            raise ValueError('bool options must be specified explicitly')
+        if overwrite and args.get("action") == "store_true":
+            raise ValueError("bool options must be specified explicitly")
         argname = an_opts.add_argument(*pos, **args).dest
         overwrites[argname] = overwrite
 
     add_analysis_arg(
-        '-o',
+        "-o",
         "--outFile",
-        nargs='?',
+        nargs="?",
         default=False,
-        const='analysis-variables.root',
+        const="analysis-variables.root",
         help="Output ROOT file name",
     )
     add_analysis_arg(
-        '-f', "--disable-trigger-filtering",
+        "-f",
+        "--disable-trigger-filtering",
         action="store_true",
         help=(
             "Disable trigger filtering (to get all events to pass). "
@@ -96,38 +98,38 @@ def defineArgs(ConfigFlags):
         help="use metadata cache file",
     )
     add_analysis_arg(
-        '-a',"--disable-calib",
+        "-a",
+        "--disable-calib",
         action="store_true",
         help=(
             "disable CP Algs for calibration "
             "(can be used for plain PHYSLITE processing)"
         ),
     )
-
     add_analysis_arg(
-        '-5','--h5-output',
-        metavar='H5OUT',
+        "-5",
+        "--h5-output",
+        metavar="H5OUT",
         type=Path,
         default=False,
         help="save output HDF5 file",
     )
     add_analysis_arg(
-        '-z','--n-h5-jets',
+        "-z",
+        "--n-h5-jets",
         type=int,
         default=6,
-        help='number of jets in array, or 0 for awkward array',
+        help="number of jets in array, or 0 for awkward array",
     )
 
-    oropt = dict(type=bool, metavar='BOOL', overwrite=True)
-    add_analysis_arg('-b','--do-resolved-dihiggs-analysis', **oropt)
-    add_analysis_arg('-r','--do-boosted-dihiggs-analysis', **oropt)
-    add_analysis_arg('-j','--loose-jet-cleaning', **oropt)
-    add_analysis_arg('-y',"--do-CP-systematics", **oropt)
+    oropt = dict(type=bool, metavar="BOOL", overwrite=True)
+    add_analysis_arg("-b", "--do-resolved-dihiggs-analysis", **oropt)
+    add_analysis_arg("-r", "--do-boosted-dihiggs-analysis", **oropt)
+    add_analysis_arg("-j", "--loose-jet-cleaning", **oropt)
+    add_analysis_arg("-y", "--do-CP-systematics", **oropt)
+    validate_args(parser, overwrites)
+
     return parser, overwrites
-
-
-def _is_mc_phys(flags):
-    return flags.Input.isMC and not is_physlite(flags)
 
 
 # CA modules are intended to be executable, to facilitate easy testing.
@@ -147,7 +149,7 @@ def main():
     log.setLevel(ConfigFlags.Exec.OutputLevel)
     setRogueLoggers(ConfigFlags.Exec.OutputLevel)
     # Write user options to flags.Analysis
-    updateConfigFlags(args, ConfigFlags, overwrites)
+    fill_config_flags_from_args(args, ConfigFlags, overwrites)
 
     # Arg checks
     assert not (
@@ -161,9 +163,8 @@ def main():
         update_metadata(Path("metadata.json"))
     ConfigFlags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
     ConfigFlags.addFlag("Input.SimulationFlavour", fileMD.get("SimulationFlavour", ""))
-
-    ConfigFlags.addFlag("Analysis.DataType", lambda prevFlags: get_dataType(prevFlags))
-    ConfigFlags.addFlag("Analysis.Years", lambda prevFlags: getRunYears(prevFlags))
+    ConfigFlags.addFlag("Analysis.DataType", lambda prevFlags: get_data_type(prevFlags))
+    ConfigFlags.addFlag("Analysis.Years", lambda prevFlags: get_run_years(prevFlags))
     log.info(f"Configuring to match dataset from {ConfigFlags.Analysis.Years}")
     if max(ConfigFlags.Analysis.Years) <= 2018:
         ConfigFlags.addFlag("Analysis.Run", 2)
@@ -223,15 +224,15 @@ def main():
 
         cfg.merge(xAODReadCfg(ConfigFlags))
 
-        dataType = ConfigFlags.Analysis.DataType
+        datatype = ConfigFlags.Analysis.DataType
 
         log.info(
-            f"Self-configured: dataType: '{dataType}', "
+            f"Self-configured: datatype: '{datatype}', "
             f"is PHYSLITE? {is_physlite(ConfigFlags)}"
         )
 
         # Add our VariableDumper CA, calling the function defined above.
-        from HH4bAnalysis.Config.TriggerLists import TriggerLists
+        from HH4bAnalysis.config.trigger_lists import TRIGGER_LISTS
 
         trigger_year_list = ConfigFlags.Analysis.trigger_year
         if trigger_year_list == "Auto":
@@ -250,7 +251,7 @@ def main():
         try:
             for trigger_group in trigger_groups:
                 for year in trigger_year_list:
-                    trigger_chains |= set(TriggerLists[trigger_group][year])
+                    trigger_chains |= set(TRIGGER_LISTS[trigger_group][year])
         except KeyError as err:
             log.error(f"Trigger list for {trigger_group}, {year} not defined.")
             raise err
@@ -259,11 +260,11 @@ def main():
         if ConfigFlags.Analysis.disable_trigger_filtering:
             log.warning("Disabling trigger filtering, all events will pass!")
 
-        from HH4bAnalysis.Config.GoodRunsLists import GoodRunsLists
+        from HH4bAnalysis.config.good_runs_lists import GOOD_RUNS_LISTS
 
-        grl_runs = GoodRunsLists.keys()
+        grl_runs = GOOD_RUNS_LISTS.keys()
         grl_files = []
-        if dataType == "data":
+        if datatype == "data":
             log.info(
                 "Self-configured GRL for years: "
                 f"{', '.join(str(year) for year in ConfigFlags.Analysis.Years) or None}"
@@ -271,7 +272,7 @@ def main():
             grl_lists_by_year = {
                 year: list
                 for run in grl_runs
-                for year, list in GoodRunsLists[run].items()
+                for year, list in GOOD_RUNS_LISTS[run].items()
             }
             grl_files = [
                 list
@@ -281,11 +282,11 @@ def main():
 
         do_muons = not ConfigFlags.Analysis.cache_metadata
 
-        do_PRW = _is_mc_phys(ConfigFlags)
+        do_PRW = is_mc_phys(ConfigFlags)
         prw_files, lumicalc_files = [], []
         if do_PRW:
             try:
-                prw_files, lumicalc_files = pileupConfigFiles(ConfigFlags)
+                prw_files, lumicalc_files = get_pileup_config_files(ConfigFlags)
             except LookupError as err:
                 log.error(err)
                 do_PRW = False
@@ -294,9 +295,9 @@ def main():
 
         cfg.addSequence(CompFactory.AthSequencer("HH4bSeq"), "AthAlgSeq")
         cfg.merge(
-            AnalysisAlgsCfg(
+            cpalgs_cfg(
                 ConfigFlags,
-                dataType,
+                datatype,
                 trigger_chains=trigger_chains,
                 do_muons=do_muons,
                 do_PRW=do_PRW,
@@ -308,7 +309,7 @@ def main():
         )
         if ConfigFlags.Analysis.outFile:
             cfg.merge(
-                MiniTupleCfg(
+                minituple_cfg(
                     ConfigFlags,
                     trigger_chains=trigger_chains,
                     do_muons=do_muons,
@@ -319,11 +320,11 @@ def main():
 
         if ConfigFlags.Analysis.h5_output:
             cfg.merge(
-                getH5Cfg(ConfigFlags),
+                get_h5_cfg(ConfigFlags),
                 "HH4bSeq",
             )
 
-        cfg.merge(eventCounterCfg('n_events'), 'HH4bSeq')
+        cfg.merge(event_counter_cfg("n_events"), "HH4bSeq")
 
         # Print the full job configuration
         if ConfigFlags.Exec.OutputLevel <= INFO:
@@ -341,8 +342,8 @@ def main():
         duration = time.process_time() - starttime
         if duration > args.timeout:
             raise RuntimeError(
-                f'runtime ({duration:.1f}s) '
-                f'exceed timeout ({args.timeout:.0f}s)')
+                f"runtime ({duration:.1f}s) " f"exceed timeout ({args.timeout:.0f}s)"
+            )
     return return_code
 
 
