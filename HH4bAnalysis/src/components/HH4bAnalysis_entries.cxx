@@ -5,7 +5,6 @@
 #include "../JetSelectorAlg.h"
 #include "../JetTruthMatcherAlg.h"
 #include "../LargeJetGhostVRJetAssociationAlg.h"
-#include "../LargeUFOJetGhostVRJetAssociationAlg.h"
 #include "../TruthParticleInformationAlg.h"
 #include "../TruthParentDecoratorAlg.h"
 #include "../VariableDumperAlg.h"
@@ -25,5 +24,4 @@ DECLARE_COMPONENT(VariableDumperAlg)
 DECLARE_COMPONENT(TruthParticleInformationAlg)
 DECLARE_COMPONENT(TruthParentDecoratorAlg)
 DECLARE_COMPONENT(LargeJetGhostVRJetAssociationAlg)
-DECLARE_COMPONENT(LargeUFOJetGhostVRJetAssociationAlg)
 DECLARE_COMPONENT(EventCounterAlg)

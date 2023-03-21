@@ -267,10 +267,10 @@ def lr_ufo_jet_ghost_vr_jet_association_cfg(
 ):
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
-        CompFactory.HH4B.LargeUFOJetGhostVRJetAssociationAlg(
+        CompFactory.HH4B.LargeJetGhostVRJetAssociationAlg(
             "LargeUFOJetGhostVRJetAssociationAlg",
             isMC=flags.Input.isMC,
-            LargeUFOJetInKey=inlrufojet_containername,
+            LargeJetInKey=inlrufojet_containername,
             workingPoints=flags.Analysis.vr_btag_wps,
         )
     )
