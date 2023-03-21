@@ -10,7 +10,6 @@
 #include "../TruthParentDecoratorAlg.h"
 #include "../VariableDumperAlg.h"
 #include "../EventCounterAlg.h"
-#include "../tools/NTrkVertexCounter.h"
 
 using namespace HH4B;
 
@@ -20,7 +19,6 @@ DECLARE_COMPONENT(GhostAssocVRJetGetterAlg)
 DECLARE_COMPONENT(JetPairingAlg)
 DECLARE_COMPONENT(JetSelectorAlg)
 DECLARE_COMPONENT(JetTruthMatcherAlg)
-DECLARE_COMPONENT(NTrkVertexCounter)
 DECLARE_COMPONENT(VariableDumperAlg)
 DECLARE_COMPONENT(TruthParticleInformationAlg)
 DECLARE_COMPONENT(TruthParentDecoratorAlg)
