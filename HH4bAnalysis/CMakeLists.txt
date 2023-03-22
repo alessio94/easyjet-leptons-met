@@ -21,7 +21,6 @@ atlas_add_component(HH4bAnalysis
   src/EventCounterAlg.cxx
   src/TruthParticleInformationAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
-  src/LargeUFOJetGhostVRJetAssociationAlg.cxx
   src/JetSelectorAlg.cxx
   src/JetPairingAlg.cxx
   src/FinalVarsResolvedAlg.cxx
