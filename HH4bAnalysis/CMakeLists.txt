@@ -9,12 +9,6 @@ find_package(nlohmann_json REQUIRED)
 # We don't want any warnings in compilation
 add_compile_options(-Werror)
 
-# Install the interface headers
-atlas_add_library(HH4bAnalysisLib
-  INTERFACE
-  PUBLIC_HEADERS HH4bAnalysis
-)
-
 # Build the Athena component library
 atlas_add_component(HH4bAnalysis
   src/VariableDumperAlg.cxx
@@ -27,7 +21,6 @@ atlas_add_component(HH4bAnalysis
   src/FinalVarsBoostedAlg.cxx
   src/JetTruthMatcherAlg.cxx
   src/GhostAssocVRJetGetterAlg.cxx
-  src/tools/NTrkVertexCounter.cxx
   src/H5FileSvc.cxx
   src/TruthParentDecoratorAlg.cxx
   src/components/*.cxx
