@@ -19,7 +19,7 @@ Now, compile the package
 ```
 mkdir build
 cd build
-. hh4b-analysis/setup.sh
+source ./../hh4b-analysis/setup.sh
 cmake ../hh4b-analysis/
 make
 source */setup.sh
