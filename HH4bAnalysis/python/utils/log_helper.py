@@ -1,13 +1,13 @@
 from AthenaCommon import Logging
 
-log = Logging.logging.getLogger("VariableDumperConfig")
+log = Logging.logging.getLogger("easyjet-ntupler")
 
 _rogue_loggers = [
-    'Athena',
-    'AutoConfigFlags',
-    'MetaReader',
-    'makePileupAnalysisSequence',
-    'ConfigurableDb',
+    "Athena",
+    "AutoConfigFlags",
+    "MetaReader",
+    "makePileupAnalysisSequence",
+    "ConfigurableDb",
 ]
 
 

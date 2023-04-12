@@ -77,7 +77,7 @@ def boosted_cfg(flags, largejetkey):
 
         # calculate final boosted vars
         cfg.addEventAlgo(
-            CompFactory.HH4B.FinalVarsBoostedAlg(
+            CompFactory.HH4B.BaselineVarsBoostedAlg(
                 "FinalVarsBoostedAlg_" + btag_wp,
                 largeRContainerInKey="boostedAnalysisJets_" + btag_wp,
                 leadingLargeR_GA_VRJets="SelectedLeadingLargeRVRJets_" + btag_wp,

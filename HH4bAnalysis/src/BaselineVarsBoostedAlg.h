@@ -3,8 +3,8 @@
 */
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_FINALVARSRESOLVEDALG
-#define HH4BANALYSIS_FINALVARSRESOLVEDALG
+#ifndef HH4BANALYSIS_FINALVARSBOOSTEDALG
+#define HH4BANALYSIS_FINALVARSBOOSTEDALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
@@ -15,11 +15,11 @@ namespace HH4B
 {
 
   /// \brief An algorithm for counting containers
-  class FinalVarsResolvedAlg final : public AthHistogramAlgorithm
+  class BaselineVarsBoostedAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
 public:
-    FinalVarsResolvedAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    BaselineVarsBoostedAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -33,8 +33,14 @@ private:
     // "someInfo"};
 
     SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
-        m_smallRContainerInKey{this, "smallRContainerInKey", "",
+        m_largeRContainerInKey{this, "largeRContainerInKey", "",
                                "containerName to read"};
+    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
+        m_leadingLargeR_GA_VRJets{this, "leadingLargeR_GA_VRJets", "",
+                                  "containerName to read"};
+    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
+        m_subLeadingLargeR_GA_VRJets{this, "subLeadingLargeR_GA_VRJets", "",
+                                     "containerName to read"};
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
@@ -42,15 +48,15 @@ private:
     std::unordered_map<std::string, SG::AuxElement::Decorator<float>> m_decos;
     // clang-format off
     std::vector<std::string> m_vars{
-      "resolved_DeltaR12_",
-      "resolved_DeltaR13_",
-      "resolved_DeltaR14_",
-      "resolved_DeltaR23_",
-      "resolved_DeltaR24_",
-      "resolved_DeltaR34_",
-      "resolved_h1_m_",
-      "resolved_h2_m_",
-      "resolved_hh_m_",
+      "boosted_h1_m_",
+      "boosted_h1_jet1_pt_",
+      "boosted_h1_jet2_pt_",
+      "boosted_h1_dR_jets_",
+      "boosted_h2_m_",
+      "boosted_h2_jet1_pt_",
+      "boosted_h2_jet2_pt_",
+      "boosted_h2_dR_jets_",
+      "boosted_hh_m_",
     };
     // clang-format on
   };

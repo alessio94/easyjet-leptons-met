@@ -150,13 +150,12 @@ def main():
         raise ValueError("No inputs defined")
 
     for io in io_list:
-        exec_cmd = (
-            "VariableDumperConfig.py %IN -l --outFile {0} --runConfig"
-            " config.yaml".format(submit_opts["outputs"].removeprefix("TREE:"))
+        exec_cmd = "easyjet-ntupler %IN -l --outFile {0} --runConfig" " config.yaml".format(
+            submit_opts["outputs"].removeprefix("TREE:")
         )
         if args.mc_list:
             exec_cmd = (
-                "VariableDumperConfig.py %IN --outFile {0} --runConfig"
+                "easyjet-ntupler %IN --outFile {0} --runConfig"
                 " config.yaml".format(submit_opts["outputs"].removeprefix("TREE:"))
             )
         cmd = ["prun", "--inDS", io["inDS"], "--outDS", io["outDS"], "--exec", exec_cmd]

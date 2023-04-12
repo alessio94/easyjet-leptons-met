@@ -1,110 +1,110 @@
 variables:
   FORCED_LOG_LEVEL: INFO
 
-run_VariableDumper_fast_data18_DAOD_PHYS:
+run_easyjet-ntupler_fast_data18_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test data18-fast
+    - easyjet-test data18-fast
 
-run_VariableDumper_fast_data22_DAOD_PHYS:
+run_easyjet-ntupler_fast_data22_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test data22-fast
+    - easyjet-test data22-fast
 
-run_VariableDumper_jets-mc20_DAOD_PHYS:
+run_easyjet-ntupler_jets-mc20_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test jets-mc20
+    - easyjet-test jets-mc20
 
-run_VariableDumper_fast_jets-mc20_DAOD_PHYS:
+run_easyjet-ntupler_fast_jets-mc20_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test jets-mc20-fast
+    - easyjet-test jets-mc20-fast
 
-run_VariableDumper_ttbar-mc20_DAOD_PHYS:
+run_easyjet-ntupler_ttbar-mc20_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test ttbar-mc20
+    - easyjet-test ttbar-mc20
 
-run_VariableDumper_fast_ttbar-mc20_DAOD_PHYS:
+run_easyjet-ntupler_fast_ttbar-mc20_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test ttbar-mc20-fast
+    - easyjet-test ttbar-mc20-fast
 
-run_VariableDumper_sh4b-boosted-mc20_DAOD_PHYS:
+run_easyjet-ntupler_sh4b-boosted-mc20_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test sh4b-boosted-mc20
+    - easyjet-test sh4b-boosted-mc20
 
-run_VariableDumper_fast_sh4b-boosted-mc20_DAOD_PHYS:
+run_easyjet-ntupler_fast_sh4b-boosted-mc20_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test sh4b-boosted-mc20-fast
+    - easyjet-test sh4b-boosted-mc20-fast
 
-run_VariableDumper_ttbar-mc21_DAOD_PHYS:
+run_easyjet-ntupler_ttbar-mc21_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test ttbar-mc21
+    - easyjet-test ttbar-mc21
 
-run_VariableDumper_fast_ttbar-mc21_DAOD_PHYS:
+run_easyjet-ntupler_fast_ttbar-mc21_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test ttbar-mc21-fast
+    - easyjet-test ttbar-mc21-fast
 
-run_VariableDumper_syst_ttbar-mc21_DAOD_PHYS:
+run_easyjet-ntupler_syst_ttbar-mc21_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test ttbar-mc21-syst
+    - easyjet-test ttbar-mc21-syst
 
-run_VariableDumper_hh4b-mc21_DAOD_PHYS:
+run_easyjet-ntupler_hh4b-mc21_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test hh4b-mc21
+    - easyjet-test hh4b-mc21
 
-run_VariableDumper_hh4b-mc21-noroot_DAOD_PHYS:
+run_easyjet-ntupler_hh4b-mc21-noroot_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test hh4b-mc21-noroot
+    - easyjet-test hh4b-mc21-noroot
 
-run_VariableDumper_syst_hh4b-mc21_DAOD_PHYS:
+run_easyjet-ntupler_syst_hh4b-mc21_DAOD_PHYS:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test hh4b-mc21-syst
+    - easyjet-test hh4b-mc21-syst
 
-run_VariableDumper_hh4b-mc21_DAOD_PHYSLITE:
+run_easyjet-ntupler_hh4b-mc21_DAOD_PHYSLITE:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test physlite-hh4b-mc21
+    - easyjet-test physlite-hh4b-mc21
 
-run_VariableDumper_fast_hh4b-mc21_DAOD_PHYSLITE:
+run_easyjet-ntupler_fast_hh4b-mc21_DAOD_PHYSLITE:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test physlite-hh4b-mc21-fast
+    - easyjet-test physlite-hh4b-mc21-fast
 
-run_VariableDumper_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
+run_easyjet-ntupler_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test physlite-sh4b-very-boosted-mc20
+    - easyjet-test physlite-sh4b-very-boosted-mc20
 
-run_VariableDumper_fast_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
+run_easyjet-ntupler_fast_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
   stage: run
   needs: [compile]
   script:
-    - hh4b-test physlite-sh4b-very-boosted-mc20-fast
+    - easyjet-test physlite-sh4b-very-boosted-mc20-fast

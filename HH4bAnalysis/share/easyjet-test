@@ -70,16 +70,16 @@ COMMON="-o"
 
 # specific tests
 ntuple-dump() {
-    VariableDumperConfig.py $COMMON $1
+    easyjet-ntupler $COMMON $1
     metadata-check -v
 }
 ntuple-dump-syst() {
-    VariableDumperConfig.py $COMMON $1 --do-CP-systematics True
+    easyjet-ntupler $COMMON $1 --do-CP-systematics True
     metadata-check -v
 }
 ntuple-dump-fast() {
     local OPTS="$COMMON --cache-metadata $1"
-    local CMD="VariableDumperConfig.py $OPTS"
+    local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
@@ -87,7 +87,7 @@ ntuple-dump-fast() {
 }
 run-fast() {
     local OPTS="--cache-metadata $1"
-    local CMD="VariableDumperConfig.py $OPTS"
+    local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
@@ -95,7 +95,7 @@ run-fast() {
 }
 ntuple-dump-fast-awkward() {
     local OPTS="$COMMON --cache-metadata $1"
-    local CMD="VariableDumperConfig.py $OPTS"
+    local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test-awk.h5 --n-h5-jets 0
@@ -104,19 +104,19 @@ ntuple-dump-fast-awkward() {
 data-ntuple-dump-fast() {
     local OPTS="$COMMON --cache-metadata $1"
     OPTS+=" --disable-trigger-filtering"
-    local CMD="VariableDumperConfig.py $OPTS"
+    local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5
     metadata-check -v
 }
 ntuple-dump-physlite() {
-    VariableDumperConfig.py $COMMON --disable-calib $1
+    easyjet-ntupler $COMMON --disable-calib $1
     metadata-check -v
 }
 ntuple-dump-physlite-fast() {
     local OPTS="$COMMON --cache-metadata $1 --disable-calib"
-    local CMD="VariableDumperConfig.py $OPTS"
+    local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30
