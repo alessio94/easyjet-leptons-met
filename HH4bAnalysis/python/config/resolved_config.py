@@ -41,7 +41,7 @@ def resolved_cfg(flags, smalljetkey):
 
         # calculate final resolved vars
         cfg.addEventAlgo(
-            CompFactory.HH4B.FinalVarsResolvedAlg(
+            CompFactory.HH4B.BaselineVarsResolvedAlg(
                 "FinalVarsResolvedAlg_" + btag_wp,
                 smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_wp,
                 bTagWP=btag_wp,

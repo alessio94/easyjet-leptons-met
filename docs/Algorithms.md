@@ -1,5 +1,5 @@
 
-# Algorithms configurable from `VariableDumperConfig.py`
+# Algorithms configurable from `easyjet-ntupler`
 
 All the algorithms described here can be configured from python with the `ComponentAccumulator`  and are intended to have an interface to JetContainers from python:
 
@@ -106,15 +106,15 @@ Variable radius (VR) jets are written onto the parent (untrimmed) large R jets a
 
 &nbsp;
 &nbsp;
-#### FinalVarsResolvedAlg
+#### BaselineVarsResolvedAlg
 
 ```mermaid
 flowchart LR
-A[xAOD::JetContainer] --> FinalVarsResolvedAlg
-subgraph FinalVarsResolvedAlg
+A[xAOD::JetContainer] --> BaselineVarsResolvedAlg
+subgraph BaselineVarsResolvedAlg
 smallRContainerInKey\nbTagWP
 end
-FinalVarsResolvedAlg --> B[decorate Eventinfo: \n resolved_btagWP_DeltaR12\nresolved_btagWP_DeltaR13\nresolved_btagWP_DeltaR14\nresolved_btagWP_DeltaR23\nresolved_btagWP_DeltaR24\nresolved_btagWP_DeltaR34\nresolved_btagWP_h1_m\nresolved_btagWP_h2_m\nresolved_btagWP_hh_m]
+BaselineVarsResolvedAlg --> B[decorate Eventinfo: \n resolved_btagWP_DeltaR12\nresolved_btagWP_DeltaR13\nresolved_btagWP_DeltaR14\nresolved_btagWP_DeltaR23\nresolved_btagWP_DeltaR24\nresolved_btagWP_DeltaR34\nresolved_btagWP_h1_m\nresolved_btagWP_h2_m\nresolved_btagWP_hh_m]
 ```
 
 Calculate variables for the paired small R jets for a given btagging working point and decorates them to the EventInfo. Note that it Assumes the order from the JetPairingAlg. If the algorithm does not get a jetContainer with at least 4 jets it decorates all variables with default values of `-1`.
@@ -139,14 +139,14 @@ Decorations per working point in the format `EventInfo.resolved_{variable}_{bTag
 
 &nbsp;
 &nbsp;
-#### FinalVarsBoostedAlg
+#### BaselineVarsBoostedAlg
 ```mermaid
 flowchart LR
-A[xAOD::JetContainer] --> FinalVarsBoostedAlg
-subgraph FinalVarsBoostedAlg
+A[xAOD::JetContainer] --> BaselineVarsBoostedAlg
+subgraph BaselineVarsBoostedAlg
 largeRContainerInKey\nleadingLargeR_GA_VRJets\nsubLeadingLargeR_GA_VRJets\nbTagWP
 end
-FinalVarsBoostedAlg --> B[decorate Eventinfo: \nboosted_btagWP_h1_m\nboosted_btagWP_h1_jet1_pt\nboosted_btagWP_h1_jet2_pt\nboosted_btagWP_h1_dR_jets\nboosted_btagWP_h2_m\nboosted_btagWP_h2_jet1_pt\nboosted_btagWP_h2_jet2_pt\nboosted_btagWP_h2_dR_jets\nboosted_btagWP_hh_m]
+BaselineVarsBoostedAlg --> B[decorate Eventinfo: \nboosted_btagWP_h1_m\nboosted_btagWP_h1_jet1_pt\nboosted_btagWP_h1_jet2_pt\nboosted_btagWP_h1_dR_jets\nboosted_btagWP_h2_m\nboosted_btagWP_h2_jet1_pt\nboosted_btagWP_h2_jet2_pt\nboosted_btagWP_h2_dR_jets\nboosted_btagWP_hh_m]
 ```
 Calculate variables for the boosted regime and decorate eventInfo per btagging working point. Assumes to get a pt sorted Large R container. The btagging will be select with the `JetSelectorAlg` that you handed the VR Jets you got from `GhostAssocVRJetGetterAlg`. The algorithm decorates defaults `-1` if none of the handed jetContainers contain >=2 jets.
 

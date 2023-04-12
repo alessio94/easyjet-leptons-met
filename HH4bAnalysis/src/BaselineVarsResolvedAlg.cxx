@@ -4,22 +4,22 @@
 
 /// @author Frederic Renner
 
-#include "FinalVarsResolvedAlg.h"
 #include "AthContainers/AuxElement.h"
+#include "BaselineVarsResolvedAlg.h"
 #include "FourMomUtils/xAODP4Helpers.h"
 #include <AthContainers/ConstDataVector.h>
 #include <xAODJet/JetContainer.h>
 
 namespace HH4B
 {
-  FinalVarsResolvedAlg ::FinalVarsResolvedAlg(const std::string &name,
-                                              ISvcLocator *pSvcLocator)
+  BaselineVarsResolvedAlg ::BaselineVarsResolvedAlg(const std::string &name,
+                                                    ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
     declareProperty("bTagWP", m_bTagWP);
   }
 
-  StatusCode FinalVarsResolvedAlg ::initialize()
+  StatusCode BaselineVarsResolvedAlg ::initialize()
   {
     ATH_CHECK(m_smallRContainerInKey.initialize());
     ATH_CHECK(m_EventInfoKey.initialize());
@@ -34,7 +34,7 @@ namespace HH4B
     return StatusCode::SUCCESS;
   }
 
-  StatusCode FinalVarsResolvedAlg ::execute()
+  StatusCode BaselineVarsResolvedAlg ::execute()
   {
     // container we read in
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);

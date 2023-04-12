@@ -11,14 +11,13 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(HH4bAnalysis
-  src/VariableDumperAlg.cxx
   src/EventCounterAlg.cxx
   src/TruthParticleInformationAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
   src/JetSelectorAlg.cxx
   src/JetPairingAlg.cxx
-  src/FinalVarsResolvedAlg.cxx
-  src/FinalVarsBoostedAlg.cxx
+  src/BaselineVarsResolvedAlg.cxx
+  src/BaselineVarsBoostedAlg.cxx
   src/JetTruthMatcherAlg.cxx
   src/GhostAssocVRJetGetterAlg.cxx
   src/H5FileSvc.cxx
@@ -42,9 +41,9 @@ atlas_add_component(HH4bAnalysis
 
 # Install python modules, joboptions, and share content
 atlas_install_scripts(
-  share/VariableDumperConfig.py
-  share/grid_submit.py
-  share/hh4b-test
+  share/easyjet-ntupler
+  share/easyjet-gridsubmit
+  share/easyjet-test
   share/metadata-check
 )
 atlas_install_python_modules(

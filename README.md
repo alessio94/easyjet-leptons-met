@@ -44,7 +44,7 @@ When changing branches with `git checkout` or `git switch`, also be sure to use 
 To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig hh4b-analysis/HH4bAnalysis/share/RunConfig.yaml.:
 
 ```
-VariableDumperConfig.py data.myinputfile.DAOD_PHYS.pool.root --runConfig [path-to-runconfig] --evtMax 10 --outFile analysis-variables.root
+easyjet-ntupler data.myinputfile.DAOD_PHYS.pool.root --runConfig [path-to-runconfig] --evtMax 10 --outFile analysis-variables.root
 ```
 >Your build also installs this one into the build area so you can also do --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
 Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
@@ -97,13 +97,13 @@ source */setup.sh
 To run on the grid there is a script available and is used as follows:
 
 ```
-grid_submit.py --data-list myDataList.txt
+easyjet-gridsubmit --data-list myDataList.txt
 ```
 
 For more options you can do:
 
 ```
-grid_submit.py -h
+easyjet-gridsubmit -h
 ```
 
 ## Development

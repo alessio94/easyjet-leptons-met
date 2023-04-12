@@ -1,4 +1,4 @@
-# Baseline HH analysis in the `VariableDumperConfig.py`
+# Baseline HH analysis in the `easyjet-ntupler`
 
 The resolved and boosted analyses can be turned on/off from the [HH4bAnalysis/share/RunConfig.yaml](https://gitlab.cern.ch/easyjet/hh4b-analysis/-/tree/master/HH4bAnalysis/share/RunConfig.yaml). The Configuration and the stacking of the algorithms can be found in [HH4bAnalysis/python/Algs/DiHiggsAnalysis.py](https://gitlab.cern.ch/easyjet/hh4b-analysis/-/tree/master/HH4bAnalysis/python/Algs/DiHiggsAnalysis.py). The flow diagrams depict what is happening:
 
@@ -17,8 +17,8 @@ subgraph JetPairingAlg
 pairingStrategy=minDeltaR
 end
 JetPairingAlg --> C[xAOD::JetContainer]
-C[xAOD::JetContainer] --> FinalVarsResolvedAlg
-subgraph FinalVarsResolvedAlg
+C[xAOD::JetContainer] --> BaselineVarsResolvedAlg
+subgraph BaselineVarsResolvedAlg
 smallRContainerInKey\nbTagWP
    end
  
@@ -46,7 +46,7 @@ C1 --> JetSelectorAlg1
 bTagWP=btag_wp\nminPt=10000\nmaxEta=2.5\ntruncateAtAmount=3\nminimumAmount=2\npTsort=True\nremoveRelativeDeltaRToVRJet=True 
 end
 JetSelectorAlg1 --> D1[xAOD::JetContainer]
-D1-->FinalVarsBoostedAlg
+D1-->BaselineVarsBoostedAlg
 
 B[xAOD::JetContainer]-->GhostAssocVRJetGetterAlg2
 subgraph GhostAssocVRJetGetterAlg2
@@ -58,9 +58,9 @@ C2 --> JetSelectorAlg2
 BTagWP=btag_wp\nminPt=10000\nmaxEta=2.5\ntruncateAtAmount=3\nminimumAmount=2\npTsort=True\nremoveRelativeDeltaRToVRJet=True 
 end
 JetSelectorAlg2 --> D2[xAOD::JetContainer]
-D2-->FinalVarsBoostedAlg
- B-->FinalVarsBoostedAlg
-subgraph FinalVarsBoostedAlg
+D2-->BaselineVarsBoostedAlg
+ B-->BaselineVarsBoostedAlg
+subgraph BaselineVarsBoostedAlg
 largeRContainerInKey\nleadingLargeR_GA_VRJets\nsubLeadingLargeR_GA_VRJets\nbTagWP
 end
 ```
