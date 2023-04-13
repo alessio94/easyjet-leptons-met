@@ -1,4 +1,3 @@
-import argparse
 from argparse import ArgumentTypeError
 import pathlib
 import yaml
@@ -13,8 +12,8 @@ def add_standard_athena_args(parser):
 
     https://gitlab.cern.ch/atlas/athena/-/blob/release/22.2.110/Control/AthenaConfiguration/python/AthConfigFlags.py#L434
 
-    Do not change any of the names in the output namespace object.
-    They are parsed by an Athena function later!
+    Since this was introduced we also stole the parser function that
+    fills the configuration flags from the arguments, see below.
 
     """
     parser.add_argument(
@@ -70,10 +69,49 @@ def add_standard_athena_args(parser):
         help="Stop after configuration phase",
     )
 
-    # these are not used in our framework but the config flag filler
-    # wants them
-    parser.add_argument("--threads", type=int, default=0, help=argparse.SUPPRESS)
-    parser.add_argument("--nprocs", type=int, default=0, help=argparse.SUPPRESS)
+
+def fill_from_args(flags, parser=None):
+    """
+    Copied (and simplified) from athena's over-featured version
+    """
+
+    args = parser.parse_args()
+
+    if args.debug is not None:
+        from AthenaCommon.Debugging import DbgStage
+        if args.debug not in DbgStage.allowed_values:
+            raise ValueError("Unknown debug stage, allowed values {}".format(
+                DbgStage.allowed_values))
+        flags.Exec.DebugStage = args.debug
+
+    if args.evtMax is not None:
+        flags.Exec.MaxEvents = args.evtMax
+
+    if args.skipEvents is not None:
+        flags.Exec.SkipEvents = args.skipEvents
+
+    flags.Input.Files = []  # remove generic
+    for ffile in args.filesInput.split(","):
+        if '*' in ffile:  # handle wildcard
+            import glob
+            flags.Input.Files += glob.glob(ffile)
+        else:
+            flags.Input.Files += [ffile]
+
+    if args.loglevel is not None:
+        from AthenaCommon import Constants
+        if hasattr(Constants,args.loglevel):
+            flags.Exec.OutputLevel = getattr(Constants,args.loglevel)
+        else:
+            raise ValueError(
+                "Unknown log-level, allowed values are"
+                " ALL, VERBOSE, DEBUG,INFO, WARNING, ERROR, FATAL")
+
+    if args.config_only is not None:
+        from os import environ
+        environ["PICKLECAFILE"] = args.config_only
+
+    return args
 
 
 def run_config_arg(rawpath):

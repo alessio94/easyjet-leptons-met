@@ -37,6 +37,7 @@ from HH4bAnalysis.utils.argument_parser import (
     run_config_arg,
     validate_args,
     fill_config_flags_from_args,
+    fill_from_args
 )
 
 
@@ -145,7 +146,7 @@ def main():
     from AthenaConfiguration.AllConfigFlags import ConfigFlags
 
     parser, overwrites = defineArgs(ConfigFlags)
-    args = ConfigFlags.fillFromArgs(parser=parser)
+    args = fill_from_args(ConfigFlags, parser=parser)
     log.setLevel(ConfigFlags.Exec.OutputLevel)
     setRogueLoggers(ConfigFlags.Exec.OutputLevel)
     # Write user options to flags.Analysis

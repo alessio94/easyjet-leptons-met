@@ -75,11 +75,11 @@ def _get_truth_types():
 
     types = {}
     types |= {f"HadronConeExclTruthLabel{x}": "FLOAT" for x in ffloats}
-    types |= {f"HadronConeExclTruthLabel{x}": "INT" for x in fints}
+    types |= {f"HadronConeExclTruthLabel{x}": "INT2CHAR" for x in fints}
     boson_label = []
     for boson in "Higgs", "Scalar", "Top":
         boson_label += [f"parent{boson}{x}" for x in bhalves + bints]
         types |= {f"parent{boson}{x}": "HALF" for x in bhalves}
-        types |= {f"parent{boson}{x}": "INT" for x in bints}
+        types |= {f"parent{boson}{x}": "INT2SHORT" for x in bints}
 
     return ftag_label + boson_label, types
