@@ -9,12 +9,18 @@ struct Primitive {
     CUSTOM,
     UCHAR,
     CHAR,
+    USHORT,
+    SHORT,
     UINT,
     INT,
     ULL,
     HALF,
     FLOAT,
-    DOUBLE
+    DOUBLE,
+    UINT2UCHAR,
+    INT2CHAR,
+    UINT2USHORT,
+    INT2SHORT
   };
   Type type;
   std::string source;
