@@ -51,7 +51,6 @@ def jet_parent_decorator_cfg(flags, name_prefix=""):
                 "TruthElectrons",
                 "TruthForwardProtons",
                 "TruthHFWithDecayParticles",
-                "TruthPileupParticles",
                 "TruthTaus",
             ],
             targetContainer=jet_collection,
