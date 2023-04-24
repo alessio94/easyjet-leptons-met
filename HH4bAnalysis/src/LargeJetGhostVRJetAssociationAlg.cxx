@@ -60,7 +60,7 @@ namespace HH4B
                                               << "\".");
 
     int maxLeadingGAVRjetsSize = 3;
-    char passRelativeDeltaRToVRJetCut = 0;
+    char passRelativeDeltaRToVRJetCut = 1;
 
     for (auto *largejet : largeRJets)
     {
@@ -87,15 +87,12 @@ namespace HH4B
                        [&](ELPC &vrjet) {
                          return relativeDeltaRToVRJet(**vrjet) < 1.0;
                        }) != ilargeRjet_ghostVRjets.end();
-      if (!failsDRcut)
+      if (failsDRcut)
       {
-        passRelativeDeltaRToVRJetCut = 1;
-      } else
-      {
-        ATH_MSG_VERBOSE("VR track jets overlap found, recording to "
-                        "EventInfo.passRelativeDeltaRToVRJetCut");
         passRelativeDeltaRToVRJetCut = 0;
-      }
+        ATH_MSG_WARNING("VR track jets overlap found, recording to "
+                        "EventInfo.passRelativeDeltaRToVRJetCut");
+      }else{}
 
       ATH_MSG_VERBOSE("Number of VR jets per large R jet: "
                       << ilargeRjet_ghostVRjets.size());
