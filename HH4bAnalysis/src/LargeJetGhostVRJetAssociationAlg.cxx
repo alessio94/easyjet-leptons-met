@@ -60,7 +60,7 @@ namespace HH4B
                                               << "\".");
 
     int maxLeadingGAVRjetsSize = 3;
-    char passRelativeDeltaRToVRJetCut = 1;
+    char passRelativeDeltaRToVRJetCut = 0;
 
     for (auto *largejet : largeRJets)
     {
@@ -81,14 +81,16 @@ namespace HH4B
               }),
           ilargeRjet_ghostVRjets.end());
 
-      bool passesDRcut =
+      bool failsDRcut =
           std::find_if(ilargeRjet_ghostVRjets.begin(),
                        ilargeRjet_ghostVRjets.end(),
                        [&](ELPC &vrjet) {
-                         return relativeDeltaRToVRJet(**vrjet) >= 1.0;
+                         return relativeDeltaRToVRJet(**vrjet) < 1.0;
                        }) != ilargeRjet_ghostVRjets.end();
-
-      if (!passesDRcut)
+      if (!failsDRcut)
+      {
+        passRelativeDeltaRToVRJetCut = 1;
+      } else
       {
         ATH_MSG_VERBOSE("VR track jets overlap found, recording to "
                         "EventInfo.passRelativeDeltaRToVRJetCut");
