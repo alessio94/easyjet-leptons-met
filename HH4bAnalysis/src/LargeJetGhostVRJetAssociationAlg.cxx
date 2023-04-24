@@ -90,7 +90,7 @@ namespace HH4B
 
       if (!passesDRcut)
       {
-        ATH_MSG_WARNING("VR track jets overlap found, recording to "
+        ATH_MSG_VERBOSE("VR track jets overlap found, recording to "
                         "EventInfo.passRelativeDeltaRToVRJetCut");
         passRelativeDeltaRToVRJetCut = 0;
       }
