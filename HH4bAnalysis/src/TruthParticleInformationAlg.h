@@ -102,7 +102,7 @@ private:
 
     void
     decorateTruthParticleInformation(const xAOD::EventInfo &eventInfo,
-                                     std::vector<TruthScalar> higgses) const;
+                                     std::vector<TruthScalar>& higgses) const;
 
     const xAOD::TruthParticle *
     getFinalParticleOfType(const xAOD::TruthParticle *p,
@@ -135,7 +135,7 @@ private:
             this, "TruthParticleInformationOutKey", "",
             "Truth particle information container to write"};
 
-    int m_nHiggses;
+    unsigned int m_nHiggses;
 
     std::vector<SG::AuxElement::Decorator<int>> m_truthHiggsesPdgIdDecorators;
 
