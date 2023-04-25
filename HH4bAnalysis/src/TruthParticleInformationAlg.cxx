@@ -42,7 +42,7 @@ namespace HH4B
 
     ATH_CHECK(m_EventInfoKey.initialize());
 
-    for (int h = 0; h < m_nHiggses; h++)
+    for (unsigned int h = 0; h < m_nHiggses; h++)
     {
       // decorator will show up as "truth_Hx_pdgId", where x is the x higgs
       m_truthHiggsesPdgIdDecorators.emplace_back(
@@ -131,14 +131,14 @@ namespace HH4B
   }
 
   void TruthParticleInformationAlg ::decorateTruthParticleInformation(
-      const xAOD::EventInfo &eventInfo, std::vector<TruthScalar> higgses) const
+      const xAOD::EventInfo &eventInfo, std::vector<TruthScalar>& higgses) const
   {
-    if (higgses.size() == 0)
+    if (higgses.size() < m_nHiggses)
     {
       // Default values
-      higgses = std::vector<TruthScalar>(m_nHiggses, TruthScalar());
+      higgses.resize(m_nHiggses, TruthScalar());
     }
-    for (int h = 0; h < m_nHiggses; h++)
+    for (unsigned int h = 0; h < m_nHiggses; h++)
     {
       m_truthHiggsesPdgIdDecorators[h](eventInfo) = higgses[h].pdgId();
       for (size_t i = 0; i < m_kinVars.size(); i++)
