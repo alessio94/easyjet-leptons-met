@@ -81,13 +81,19 @@ namespace HH4B
               }),
           ilargeRjet_ghostVRjets.end());
 
-      bool failsDRcut =
-          std::find_if(ilargeRjet_ghostVRjets.begin(),
-                       ilargeRjet_ghostVRjets.end(),
-                       [&](ELPC &vrjet) {
-                         return relativeDeltaRToVRJet(**vrjet) < 1.0;
-                       }) != ilargeRjet_ghostVRjets.end();
-      if (failsDRcut)
+      // find min relativeDeltaRToVRJet per jet
+      // if any VR-trk jet fails the condition, 
+      // passRelativeDeltaRToVRJetCut (per event) fails
+      std::vector<float> list_relativeDeltaRToVRJet;
+      for (ELPC &vrjet : ilargeRjet_ghostVRjets)
+      {
+        list_relativeDeltaRToVRJet.push_back(relativeDeltaRToVRJet(**vrjet));
+      }
+      float min_relativeDeltaRToVRJet = !list_relativeDeltaRToVRJet.empty()
+                                        ? *std::min_element(list_relativeDeltaRToVRJet.begin(),
+                                                            list_relativeDeltaRToVRJet.end())
+                                       : NAN;
+      if (min_relativeDeltaRToVRJet < 1.0) 
       {
         passRelativeDeltaRToVRJetCut = 0;
         ATH_MSG_VERBOSE("VR track jets overlap found, recording to "
@@ -99,6 +105,9 @@ namespace HH4B
 
       m_goodVRTrackJetCountDecorator(*largejet) =
           ilargeRjet_ghostVRjets.size();
+      
+      m_minRelativeDeltaRToVRJetDecorator(*largejet) =
+          min_relativeDeltaRToVRJet;
 
       // Sort VR track jets by leading pT
       std::sort(ilargeRjet_ghostVRjets.begin(), ilargeRjet_ghostVRjets.end(),

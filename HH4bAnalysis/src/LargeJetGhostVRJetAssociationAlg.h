@@ -75,6 +75,9 @@ private:
     SG::AuxElement::Decorator<int> m_goodVRTrackJetCountDecorator{
         "goodVRTrackJets"};
 
+    SG::AuxElement::Decorator<float> m_minRelativeDeltaRToVRJetDecorator{
+        "minRelativeDeltaRToVRJet"};
+
     SG::AuxElement::Decorator<std::vector<int>> m_HadronConeExclTruthLabelIDDecorator{
         "VRTrackJetsTruthLabel"};
 

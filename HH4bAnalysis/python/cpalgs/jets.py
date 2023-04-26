@@ -234,6 +234,7 @@ def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername):
 
     vr_vars = [
         "goodVRTrackJets",
+        "minRelativeDeltaRToVRJet",
         "leadingVRTrackJetsPt",
         "leadingVRTrackJetsEta",
         "leadingVRTrackJetsPhi",
@@ -283,6 +284,7 @@ def lr_ufo_jet_ghost_vr_jet_association_branches(flags, inlrufojet_containername
 
     ufo_vars = [
         "goodVRTrackJets",
+        "minRelativeDeltaRToVRJet",
         "leadingVRTrackJetsPt",
         "leadingVRTrackJetsEta",
         "leadingVRTrackJetsPhi",
