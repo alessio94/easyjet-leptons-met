@@ -97,14 +97,14 @@ run_easyjet-ntupler_fast_hh4b-mc21_DAOD_PHYSLITE:
   script:
     - easyjet-test physlite-hh4b-mc21-fast
 
-run_easyjet-ntupler_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
+run_easyjet-ntupler_sh4b-boosted-mc20_DAOD_PHYSLITE:
   stage: run
   needs: [compile]
   script:
-    - easyjet-test physlite-sh4b-very-boosted-mc20
+    - easyjet-test physlite-sh4b-boosted-mc20
 
-run_easyjet-ntupler_fast_sh4b-very-boosted-mc20_DAOD_PHYSLITE:
+run_easyjet-ntupler_fast_sh4b-boosted-mc20_DAOD_PHYSLITE:
   stage: run
   needs: [compile]
   script:
-    - easyjet-test physlite-sh4b-very-boosted-mc20-fast
+    - easyjet-test physlite-sh4b-boosted-mc20-fast
