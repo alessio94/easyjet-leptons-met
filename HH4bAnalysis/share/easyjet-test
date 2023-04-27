@@ -7,6 +7,9 @@ set -Eeu
 # mode-based switches
 ################################################
 
+#tag from easyjet/hh4b-test-files
+PTAG=p5631
+
 # standard samples
 DATA_2018=data18_13TeV.00362204.physics_Main.DAOD_PHYS_10evts.r13286_p5631.pool.root
 DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14190_p5632.pool.root
@@ -156,7 +159,7 @@ EOF
 }
 
 DIRECTORY=""
-DATA_URL=https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw/master/
+DATA_URL=https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw
 LOG_LEVEL="WARNING"
 
 while getopts ":d:hv" o; do
@@ -211,7 +214,7 @@ cd $DIRECTORY
 # get files
 if [[ ! -f ${FILE} ]] ; then
     echo "getting file ${FILE}" >&2
-    curl -s ${DATA_URL}/${DOWNLOAD_PATH} > ${FILE}
+    curl -s ${DATA_URL}/${PTAG}/${DOWNLOAD_PATH} > ${FILE}
 fi
 
 # now run the test
