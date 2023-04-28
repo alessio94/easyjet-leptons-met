@@ -25,33 +25,54 @@ namespace {
     if (!detail::isCustom(p)) {
       throw std::logic_error("called addCustomType on non-custom type");
     }
-    const auto h = (p.type == Primitive::Type::PRECISION_CUSTOM) ?
+    bool force_precision = p.type == Primitive::Type::PRECISION_CUSTOM;
+    const H5Utils::Compression half = force_precision ?
       H5Utils::Compression::STANDARD :
       H5Utils::Compression::HALF_PRECISION;
 
     const std::string s = p.source;
+    const std::string t = p.target;
 
     // check for match
     bool m = false;
 
+    auto add = [&c, a, t](auto f, auto compression, float mult = 1.0) {
+      c.add<float>(
+        t,
+        [a, f, mult](I in) -> float {
+          const auto* associated = a(in);
+          if (!associated) return NAN;
+          return f(associated)*mult;
+        },
+        NAN, compression);
+    };
+
     // these do most of the matching work
-    auto match = [&c, s, a, &m, h](const std::string& n, auto func) {
+    auto match = [&add, s, &m, half](const std::string& n, auto func) {
       if (s == n) {
-        c.add<float>(s, [a, func](I in) { return func(a(in)); }, NAN, h);
+        add(func, half);
         m = true;
       }
     };
-    auto matchGeV = [&c, s, a, &m, h](const std::string& n, auto func) {
+    // This matches two possible strings: the original string and one
+    // with a "GeV" suffix. The purpose of the suffixed version is to
+    // allow us to store things at half precision (since most things
+    // stored in MeV would overflow half precision floats).
+    auto matchGeV = [&add, s, &m, half](const std::string& n, auto func) {
       if (s == n) {
-        if (h == H5Utils::Compression::STANDARD) {
+        // Sort of convoluted logic here: if we force higher precision
+        // we set "half" to be full precision. But if someone asks for
+        // full precision in a variable that must be stored that way
+        // anyway, we throw an exception.
+        if (half == H5Utils::Compression::STANDARD) {
           throw std::logic_error(
             "asked for a full precision version of a variable that can"
             " not be stored at half precision: " + s);
         }
-        c.add<float>(s, [a, func](I in) {return func(a(in)); }, NAN);
+        add(func, H5Utils::Compression::STANDARD);
         m = true;
       } else if (s == n + "GeV") {
-        c.add(s, [a, func](I in) { return func(a(in))*0.001; }, NAN, h);
+        add(func, half, 0.001);
         m = true;
       }
     };
@@ -95,6 +116,18 @@ namespace {
   template <typename T, typename R>
   const R* LinkGetter<T,R>::operator()(In_t in) const {
     auto elink = m_accessor(*in);
+    // isDefault should generally indicate that the element link has
+    // been created but not set to point to any specific place. This
+    // is distinct from being created and pointing to a particle that
+    // has been thinned or slimmed away. So it's safe to use as a "not
+    // set" code.
+    if (elink.isDefault()) {
+      return nullptr;
+    }
+    // If the link is _not_ default, but is also invalid, then we're
+    // trying to access something that has been removed. We treat this
+    // as an error, because the behavior becomes dependent on the
+    // format.
     if (!elink.isValid()) {
       throw std::runtime_error("invalid link " + m_linkName);
     }

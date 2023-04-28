@@ -203,15 +203,19 @@ StatusCode TruthParentDecoratorAlg::initialize() {
   m_target_pdgid_key = pfx + "PdgId";
   m_target_barcode_key = pfx + "Barcode";
   m_target_dr_truth_key = pfx + "DRTruthParticle";
+  m_target_link_key = pfx + "Link";
   m_match_pdgid_key = pfx + "MatchingParticlePdgId";
   m_match_children_key = pfx + "MatchingParticleNChildren";
   m_match_barcode_key = pfx + "MatchingParticleBarcode";
+  m_match_link_key = pfx + "MatchingParticleLink";
   ATH_CHECK(m_target_pdgid_key.initialize());
   ATH_CHECK(m_target_barcode_key.initialize());
   ATH_CHECK(m_target_dr_truth_key.initialize());
+  ATH_CHECK(m_target_link_key.initialize());
   ATH_CHECK(m_match_pdgid_key.initialize());
   ATH_CHECK(m_match_children_key.initialize());
   ATH_CHECK(m_match_barcode_key.initialize());
+  ATH_CHECK(m_match_link_key.initialize());
   return StatusCode::SUCCESS;
 }
 
@@ -248,9 +252,11 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   SG::WriteDecorHandle<JC,int> pdgid(m_target_pdgid_key, cxt);
   SG::WriteDecorHandle<JC,int> barcode(m_target_barcode_key, cxt);
   SG::WriteDecorHandle<JC,float> deltaR(m_target_dr_truth_key, cxt);
+  SG::WriteDecorHandle<JC,JL> link(m_target_link_key, cxt);
   SG::WriteDecorHandle<JC,int> matchPdgId(m_match_pdgid_key, cxt);
   SG::WriteDecorHandle<JC,int> matchChildCount(m_match_children_key, cxt);
   SG::WriteDecorHandle<JC,int> matchBarcode(m_match_barcode_key, cxt);
+  SG::WriteDecorHandle<JC,JL> matchLink(m_match_link_key, cxt);
 
   std::set<int> parentids(m_parent_pdgids.begin(), m_parent_pdgids.end());
 
@@ -276,9 +282,13 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
         pdgid(*target) = p->pdgId();
         barcode(*target) = p->barcode();
         deltaR(*target) = dr;
+        auto* container = static_cast<const TPC*>(p->container());
+        link(*target) = JL(*container, p->index());
         matchPdgId(*target) = child->pdgId();
         matchChildCount(*target) = child->nChildren();
         matchBarcode(*target) = child_barcode;
+        auto* matchedContainer = static_cast<const TPC*>(child->container());
+        matchLink(*target) = JL(*matchedContainer, child->index());
       }
     }
   }
@@ -288,9 +298,11 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
       pdgid(*j) = 0;
       barcode(*j) = 0;
       deltaR(*j) = NAN;
+      link(*j) = JL();
       matchPdgId(*j) = 0;
       matchChildCount(*j) = 0;
       matchBarcode(*j) = 0;
+      matchLink(*j) = JL();
     }
   }
   return StatusCode::SUCCESS;
@@ -338,6 +350,7 @@ void TruthParentDecoratorAlg::addTruthContainer(
       auto& child_set = insert(p);
       for (unsigned int child_n = 0; child_n < p->nChildren(); child_n++) {
         const xAOD::TruthParticle* c = p->child(child_n);
+        if (!c) throw std::runtime_error("null child in truth record");
         if (cascadeWants(c)) {
           insert(c);
           child_set.insert(c->barcode());

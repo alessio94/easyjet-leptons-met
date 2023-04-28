@@ -39,12 +39,13 @@ def get_h5_cfg(flags):
     types |= {x: "CUSTOM" for x in kinematics}
     btagging = [f"DL1dv00_p{x}" for x in "cub"]
     types |= {x: "HALF" for x in btagging}
-    associations = {x: "btaggingLink" for x in btagging}
+    associations = {x: f"btaggingLink/{x}" for x in btagging}
     primitives += kinematics + btagging
     if flags.Input.isMC:
-        mc_primatives, mc_types = _get_truth_types()
+        mc_primatives, mc_types, mc_assoc = _get_truth_types()
         primitives += mc_primatives
         types |= mc_types
+        associations |= mc_assoc
     ca.addEventAlgo(
         CompFactory.IParticleWriterAlg(
             "jetwriter",
@@ -64,7 +65,9 @@ def _get_truth_types():
     ffloats = []
     fints = ["ID"]
     ftag_label = [f"HadronConeExclTruthLabel{x}" for x in ffloats + fints]
-    bhalves = ["DRTruthParticle"]
+    bhalves = [
+        "DRTruthParticle",
+    ]
     bints = [
         "PdgId",
         "Barcode",
@@ -77,9 +80,14 @@ def _get_truth_types():
     types |= {f"HadronConeExclTruthLabel{x}": "FLOAT" for x in ffloats}
     types |= {f"HadronConeExclTruthLabel{x}": "INT2CHAR" for x in fints}
     boson_label = []
+    associations = {}
     for boson in "Higgs", "Scalar", "Top":
         boson_label += [f"parent{boson}{x}" for x in bhalves + bints]
         types |= {f"parent{boson}{x}": "HALF" for x in bhalves}
         types |= {f"parent{boson}{x}": "INT2SHORT" for x in bints}
+        matchpt = f"parent{boson}MatchingParticlePtGeV"
+        boson_label += [matchpt]
+        associations[matchpt] = f"parent{boson}MatchingParticleLink/ptGeV"
+        types[matchpt] = 'CUSTOM'
 
-    return ftag_label + boson_label, types
+    return ftag_label + boson_label, types, associations

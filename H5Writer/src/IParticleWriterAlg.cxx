@@ -29,12 +29,29 @@ StatusCode IParticleWriterAlg::initialize() {
       return StatusCode::FAILURE;
     }
     auto type = getPrimitiveType(m_primToType.value().at(prim));
-    Primitive newprim{type, prim, prim};
-    std::string link_name = "";
     if (m_primToAssociation.value().count(prim)) {
-      link_name = m_primToAssociation.value().at(prim);
+      std::string path = m_primToAssociation.value().at(prim);
+      size_t pos = path.find('/');
+      if (pos == std::string::npos) {
+        ATH_MSG_ERROR("no '/' in " << path);
+        return StatusCode::FAILURE;
+      }
+      std::string link_name = path.substr(0, pos);
+      std::string source_name = path.substr(pos+1);
+      Primitive newprim {
+        type,
+        source_name,
+        prim
+      };
+      cfg.inputs.push_back(AssociatedPrimitive{link_name, newprim});
+    } else {
+      Primitive newprim {
+        type,
+        prim,
+        prim
+      };
+      cfg.inputs.push_back(AssociatedPrimitive{"",newprim});
     }
-    cfg.inputs.push_back(AssociatedPrimitive{link_name,newprim});
   }
   m_writer.reset(new IParticleWriter(*m_output_svc->file(), cfg));
 

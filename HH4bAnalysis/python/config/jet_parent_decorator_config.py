@@ -9,9 +9,17 @@ def jet_parent_decorator_cfg(flags, name_prefix=""):
     jet_collection = containers["inputs"]["reco4Jet"]
     sm_particles = containers["inputs"]["truthSMParticles"]
     bsm_particles = containers["inputs"]["truthBSMParticles"]
-    common = dict(
+    b_hadron_common = dict(
+        addBsToCascade=True,
+        addCsToCascade=True,
+        vetoSoftLeptonCascade=True,
+        vetoSoftCharmCascade=True,
+    )
+    scalar_boson_common = dict(
         targetContainer=jet_collection,
         cascades=["TruthBottom", "TruthCharm", "TruthHFWithDecayParticles"],
+        cascadePdgIds=[-5, 5],
+        **b_hadron_common,
     )
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
@@ -20,7 +28,7 @@ def jet_parent_decorator_cfg(flags, name_prefix=""):
             parents=sm_particles,
             decoratorPrefix="parentHiggs",
             parentPdgIds=[25],
-            **common,
+            **scalar_boson_common,
         )
     )
     cfg.addEventAlgo(
@@ -29,7 +37,7 @@ def jet_parent_decorator_cfg(flags, name_prefix=""):
             parents=bsm_particles,
             decoratorPrefix="parentScalar",
             parentPdgIds=[35],
-            **common,
+            **scalar_boson_common,
         )
     )
     # we want to label any jet coming via a W to a quark, tau, or
@@ -54,6 +62,7 @@ def jet_parent_decorator_cfg(flags, name_prefix=""):
                 "TruthTaus",
             ],
             targetContainer=jet_collection,
+            **b_hadron_common
         )
     )
     return cfg

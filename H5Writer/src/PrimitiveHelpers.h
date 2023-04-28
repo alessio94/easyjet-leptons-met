@@ -16,13 +16,17 @@ namespace detail {
 
   // build accessor
   template <typename T, typename I, typename A, typename S=T>
-  std::function<T(I)> get(std::string source, A ass) {
+  std::function<T(I)> get(std::string source, A ass, T def) {
     SG::AuxElement::ConstAccessor<S> acc(source);
     using rettype = decltype(ass(std::declval<I>()));
     if constexpr (std::is_pointer<rettype>::value) {
-      return [acc, ass](I in) { return acc(*ass(in)); };
+      return [acc, ass, def](I in) -> T {
+        const auto* associated = ass(in);
+        if (!associated) return def;
+        return acc(*associated);
+      };
     } else {
-      return [acc, ass](I in) { return acc(ass(in)); };
+      return [acc, ass](I in) -> T { return acc(ass(in)); };
     }
   }
 
@@ -44,23 +48,25 @@ namespace detail {
     std::string t = input.target.empty() ? input.source : input.target;
     const auto h = H5Utils::Compression::HALF_PRECISION;
     const char cz = char(0);
+    const char cm = char(-1);
+    const char sm = short(-1);
     switch (input.type) {
     case Tp::PRECISION_CUSTOM: // intentional fall-through
     case Tp::CUSTOM: throw std::logic_error("custom type unsupported");
-    case Tp::UCHAR: c.add(t, get<uchar,I,A>(s,a), cz); return;
-    case Tp::CHAR: c.add(t, get<char,I,A>(s,a), char(-1)); return;
-    case Tp::USHORT: c.add(t, get<ushort,I,A>(s,a), cz); return;
-    case Tp::SHORT: c.add(t, get<short,I,A>(s,a), short(-1)); return;
-    case Tp::UINT: c.add(t, get<uint,I,A>(s,a), 0); return;
-    case Tp::INT: c.add(t, get<int,I,A>(s,a), -1); return;
-    case Tp::ULL: c.add(t, get<ull,I,A>(s,a),0); return;
-    case Tp::HALF: c.add(t, get<float,I,A>(s,a), NAN, h); return;
-    case Tp::FLOAT: c.add(t, get<float,I,A>(s,a), NAN); return;
-    case Tp::DOUBLE: c.add(t, get<double,I,A>(s,a), NAN); return;
-    case Tp::UINT2UCHAR: c.add(t, get<uchar,I,A,uint>(s,a), 0); return;
-    case Tp::INT2CHAR: c.add(t, get<char,I,A,int>(s,a), char(-1)); return;
-    case Tp::UINT2USHORT: c.add(t, get<ushort,I,A,uint>(s,a), 0); return;
-    case Tp::INT2SHORT: c.add(t, get<short,I,A,int>(s,a), short(-1)); return;
+    case Tp::UCHAR: c.add(t, get<uchar,I,A>(s,a,cz), cz); return;
+    case Tp::CHAR: c.add(t, get<char,I,A>(s,a,cm), cm); return;
+    case Tp::USHORT: c.add(t, get<ushort,I,A>(s,a,cz), cz); return;
+    case Tp::SHORT: c.add(t, get<short,I,A>(s,a,sm), sm); return;
+    case Tp::UINT: c.add(t, get<uint,I,A>(s,a,0), 0); return;
+    case Tp::INT: c.add(t, get<int,I,A>(s,a,-1), -1); return;
+    case Tp::ULL: c.add(t, get<ull,I,A>(s,a,0),0); return;
+    case Tp::HALF: c.add(t, get<float,I,A>(s,a,NAN), NAN, h); return;
+    case Tp::FLOAT: c.add(t, get<float,I,A>(s,a,NAN), NAN); return;
+    case Tp::DOUBLE: c.add(t, get<double,I,A>(s,a,NAN), NAN); return;
+    case Tp::UINT2UCHAR: c.add(t, get<uchar,I,A,uint>(s,a,0), 0); return;
+    case Tp::INT2CHAR: c.add(t, get<char,I,A,int>(s,a,cm), cm); return;
+    case Tp::UINT2USHORT: c.add(t, get<ushort,I,A,uint>(s,a,0), 0); return;
+    case Tp::INT2SHORT: c.add(t, get<short,I,A,int>(s,a,sm), sm); return;
     }
   }
 

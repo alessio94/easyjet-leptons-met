@@ -73,6 +73,10 @@ def cpalgs_cfg(
 
     containers = get_container_names(flags)
 
+    # truth record seems to be broken in physlite
+    if flags.Input.isMC and not is_physlite(flags):
+        cfg.merge(jet_parent_decorator_cfg(flags))
+
     if not flags.Analysis.disable_calib:
         if do_PRW:
             log.info("Adding PRW sequence")
@@ -121,9 +125,6 @@ def cpalgs_cfg(
                     outcontainername=containers["outputs"]["muons"],
                 )
             )
-
-        if flags.Input.isMC:
-            cfg.merge(jet_parent_decorator_cfg(flags))
 
         log.info("Adding small-R jet seq")
         muoncont = containers["outputs"]["muons"]
