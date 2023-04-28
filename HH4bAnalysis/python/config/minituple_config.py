@@ -106,18 +106,31 @@ def minituple_cfg(
         tree_branches += _get_four_mom_branches(cont, alias, do_or=True)
 
     if flags.Input.isMC:
-        tree_branches += [
-            (
-                f"{containers['reco4Jet']}.HadronConeExclTruthLabelID ->"
-                " recojet_antikt4_%SYS%_HadronConeExclTruthLabelID"
-            ),
-            (
-                f"{containers['reco4Jet']}_OR.HadronConeExclTruthLabelID ->"
-                " recojet_antikt4_OR_%SYS%_HadronConeExclTruthLabelID"
-            ),
+        parent_bosons = ["Higgs", "Scalar", "Top"]
+        parent_labels = [
+            "DRTruthParticle",
+            "PdgId",
+            "Barcode",
+            "MatchingParticlePdgId"
         ]
-
-    if flags.Input.isMC:
+        truth_labels = [
+            "HadronConeExclTruthLabelID",
+        ]
+        if not is_physlite(flags):
+            truth_labels += [
+                f"parent{b}{l}" for l in parent_labels for b in parent_bosons
+            ]
+        for label in truth_labels:
+            tree_branches += [
+                (
+                    f"{containers['reco4Jet']}.{label} ->"
+                    f" recojet_antikt4_%SYS%_{label}"
+                ),
+                (
+                    f"{containers['reco4Jet']}_OR.{label} ->"
+                    f" recojet_antikt4_OR_%SYS%_{label}"
+                ),
+            ]
         tree_branches += _get_four_mom_branches(
             containers["truth4Jet"], "truthjet_antikt4", do_systematics=False
         )
