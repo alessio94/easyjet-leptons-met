@@ -62,7 +62,7 @@ def minituple_cfg(
     #      "RECREATE" will (over)write the specified file name with a new file
     cfg.addService(
         CompFactory.THistSvc(
-            Output=[f"ANALYSIS DATAFILE='{flags.Analysis.outFile}', OPT='RECREATE'"]
+            Output=[f"ANALYSIS DATAFILE='{flags.Analysis.out_file}', OPT='RECREATE'"]
         )
     )
 

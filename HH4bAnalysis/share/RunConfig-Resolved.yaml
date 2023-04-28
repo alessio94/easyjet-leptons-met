@@ -3,9 +3,13 @@ btag_wps:
     - DL1dv00_FixedCutBEff_70
     - DL1dv00_FixedCutBEff_77
     - DL1dv00_FixedCutBEff_85
+    - DL1dv01_FixedCutBEff_70
+    - DL1dv01_FixedCutBEff_77
+    - DL1dv01_FixedCutBEff_85
     - GN120220509_FixedCutBEff_70
     - GN120220509_FixedCutBEff_77
     - GN120220509_FixedCutBEff_85
+
 # btagging working points for Variable Radius Track jets
 vr_btag_wps:
     - DL1r_FixedCutBEff_77
@@ -18,16 +22,18 @@ trigger_year: Auto
 # We can also be explicit here I think
 trigger_list: ["HH4bResolved", "HH4bBoosted"]
 # apply trigger lists to filter events
-do_trigger_filtering: true
+do_trigger_filtering: false
 # disable CP Algs for calibration
 disable_calib: false
 # apply loose jet cleaning only
 loose_jet_cleaning: true
+do_CP_systematics: false
 # if you want to run a baseline diHiggs analyses
-do_resolved_dihiggs_analysis: false
+do_resolved_dihiggs_analysis: true
 do_boosted_dihiggs_analysis: false
 # if you want to truth match (is MC protected)
 truth_match_resolved: false
 truth_match_boosted: false
-# Whether to activate CP alg systematic variations
-do_CP_systematics: false
+# whether to output a meta data file
+meta_cache: false
+

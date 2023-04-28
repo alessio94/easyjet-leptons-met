@@ -19,11 +19,14 @@ Now, compile the package
 ```
 mkdir build
 cd build
-source ./../hh4b-analysis/setup.sh
-cmake ../hh4b-analysis/
+source ../hh4b-analysis/setup.sh
+# Usage of this flag is only temporary. See below for more details
+cmake -DATLAS_USE_CUSTOM_CPACK_INSTALL_SCRIPT=TRUE ../hh4b-analysis/
 make
 source */setup.sh
 ```
+
+**NOTE: The flag `-DATLAS_USE_CUSTOM_CPACK_INSTALL_SCRIPT=TRUE` is a temporary fix and should be removed once this [change](https://gitlab.cern.ch/atlas/atlasexternals/-/merge_requests/1012) is propagated into the next release.**
 
 *If you are working in a container (described [below](#athanalysis-in-docker)), source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*
 
@@ -44,9 +47,9 @@ When changing branches with `git checkout` or `git switch`, also be sure to use 
 To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig hh4b-analysis/HH4bAnalysis/share/RunConfig.yaml.:
 
 ```
-easyjet-ntupler data.myinputfile.DAOD_PHYS.pool.root --runConfig [path-to-runconfig] --evtMax 10 --outFile analysis-variables.root
+easyjet-ntupler data.myinputfile.DAOD_PHYS.pool.root --run-config [path-to-runconfig] --evtMax 10 --out-file analysis-variables.root
 ```
->Your build also installs this one into the build area so you can also do --runConfig ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
+>Your build also installs this one into the build area so you can also do --run-config ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
 Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
 You should find a new ROOT files, `analysis-variables.root`.
 
@@ -61,8 +64,8 @@ You will have to install [Docker](https://www.docker.com).
 Preferably, do this in `$WORKDIR`.
 
 ```
-docker pull gitlab-registry.cern.ch/atlas/athena/athanalysis:22.2.XXX
-docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:22.2.XXX
+docker pull gitlab-registry.cern.ch/atlas/athena/athanalysis:24.2.XXX
+docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:24.2.XXX
 ```
 
 where you should be careful to change XXX in the lines above to the

@@ -36,16 +36,18 @@ from HH4bAnalysis.utils.argument_parser import (
     run_config_arg,
     validate_args,
     fill_config_flags_from_args,
-    fill_from_args
+    fill_from_args,
 )
 
 
 def defineArgs(ConfigFlags):
     # Generate a parser and add an output file argument, then retrieve the args
     parser = argparse.ArgumentParser()
+    add_standard_athena_args(parser)
+
     parser.add_argument(
         "-c",
-        "--runConfig",
+        "--run-config",
         metavar="CFG",
         type=run_config_arg,
         default="HH4bAnalysis/RunConfig.yaml",
@@ -59,7 +61,11 @@ def defineArgs(ConfigFlags):
             "Maximum runtime (in seconds). Longer processes finish " "with an error."
         ),
     )
-    add_standard_athena_args(parser)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the configuration and exit.",
+    )
 
     # add analysis-specific flags
     an_opts = parser.add_argument_group(
@@ -68,6 +74,8 @@ def defineArgs(ConfigFlags):
     # slightly ugly, keep track of the options we can write to here
     overwrites = {}
 
+    # overwrite means that the option should be set to the value of the flag,
+    # overwriting the value in the config file
     def add_analysis_arg(*pos, overwrite=False, **args):
         if overwrite and args.get("action") == "store_true":
             raise ValueError("bool options must be specified explicitly")
@@ -76,35 +84,17 @@ def defineArgs(ConfigFlags):
 
     add_analysis_arg(
         "-o",
-        "--outFile",
+        "--out-file",
         nargs="?",
         default=False,
         const="analysis-variables.root",
         help="Output ROOT file name",
     )
     add_analysis_arg(
-        "-f",
-        "--disable-trigger-filtering",
-        action="store_true",
-        help=(
-            "Disable trigger filtering (to get all events to pass). "
-            "Has no effect on data."
-        ),
-    )
-    add_analysis_arg(
         "-m",
         "--cache-metadata",
         action="store_true",
         help="use metadata cache file",
-    )
-    add_analysis_arg(
-        "-a",
-        "--disable-calib",
-        action="store_true",
-        help=(
-            "disable CP Algs for calibration "
-            "(can be used for plain PHYSLITE processing)"
-        ),
     )
     add_analysis_arg(
         "-5",
@@ -122,7 +112,35 @@ def defineArgs(ConfigFlags):
         help="number of jets in array, or 0 for awkward array",
     )
 
-    oropt = dict(type=bool, metavar="BOOL", overwrite=True)
+    # type=bool is not recommended because it sets non-empty strings to True,
+    # but we want to allow the user to set the flag to "False" to disable
+    _bool_opt = (
+        lambda opt: opt.lower() == "true" if opt.lower() in ("true", "false") else opt
+    )
+    oropt = dict(
+        type=_bool_opt,
+        choices=[True, False],
+        metavar="BOOL",
+        overwrite=True,
+    )
+    add_analysis_arg(
+        "-a",
+        "--disable-calib",
+        help=(
+            "disable CP Algs for calibration "
+            "(can be set to True for plain PHYSLITE processing)"
+        ),
+        **oropt,
+    )
+    add_analysis_arg(
+        "-f",
+        "--do-trigger-filtering",
+        help=(
+            "enable trigger filtering (set flag to False to get all events to pass). "
+            "Has no effect on data."
+        ),
+        **oropt,
+    )
     add_analysis_arg("-b", "--do-resolved-dihiggs-analysis", **oropt)
     add_analysis_arg("-r", "--do-boosted-dihiggs-analysis", **oropt)
     add_analysis_arg("-j", "--loose-jet-cleaning", **oropt)
@@ -150,6 +168,10 @@ def main():
     setRogueLoggers(ConfigFlags.Exec.OutputLevel)
     # Write user options to flags.Analysis
     fill_config_flags_from_args(args, ConfigFlags, overwrites)
+    # If we're just printing the configuration, do that and exit before
+    # configuring the job and checking the input files.
+    if args.dry_run:
+        return 1
 
     # Arg checks
     assert not (
@@ -256,7 +278,7 @@ def main():
             raise err
 
         trigger_chains = list(trigger_chains)
-        if ConfigFlags.Analysis.disable_trigger_filtering:
+        if not ConfigFlags.Analysis.do_trigger_filtering:
             log.warning("Disabling trigger filtering, all events will pass!")
 
         from HH4bAnalysis.config.good_runs_lists import GOOD_RUNS_LISTS
@@ -306,7 +328,7 @@ def main():
             ),
             "HH4bSeq",
         )
-        if ConfigFlags.Analysis.outFile:
+        if ConfigFlags.Analysis.out_file:
             cfg.merge(
                 minituple_cfg(
                     ConfigFlags,
@@ -343,10 +365,10 @@ def main():
             raise RuntimeError(
                 f"runtime ({duration:.1f}s) " f"exceed timeout ({args.timeout:.0f}s)"
             )
-    return return_code
+    return return_code.isSuccess()
 
 
 # Execute the main function if this file was executed as a script
 if __name__ == "__main__":
-    code = main()
-    sys.exit(0 if code.isSuccess() else 1)
+    is_successful = main()
+    sys.exit(0 if is_successful else 1)
