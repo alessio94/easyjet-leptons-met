@@ -4,6 +4,7 @@ import argparse
 import datetime
 import os
 import subprocess
+from shutil import which
 
 
 def main():
@@ -11,7 +12,7 @@ def main():
     parser.add_argument("--mc-list", help="Text file containing MC datasets")
     parser.add_argument("--data-list", help="Text file containing data datasets")
     parser.add_argument(
-        "--runConfig",
+        "--run-config",
         type=str,
         required=True,
         help="file path to the runConfig",
@@ -34,6 +35,11 @@ def main():
     parser.add_argument(
         "--nGBperJob", default="10", help="How many GB required per job"
     )  # noqa
+    parser.add_argument(
+        "--noSubmit",
+        action="store_true",
+        help="Don't submit the jobs, just create the tarball",
+    )
     # parser.add_argument("--resubmit", action="store_true",
     # help="Run in 'resubmission' mode. This reads in information
     # from an existing task and resubmits the dead tasks.
@@ -41,14 +47,20 @@ def main():
 
     args = parser.parse_args()
 
+    # check easyjet-ntupler is available before submitting
+    if which("easyjet-ntupler") is None:
+        raise ValueError("Failed to find easyjet-ntupler. Check that it is installed")
+
     # Prepare some of the prun options here
     submit_opts = {
         "mergeOutput": True,
         "outputs": "TREE:output-hh4b.root",
         "writeInputToTxt": "IN:in.txt",
         "useAthenaPackages": True,
-        # "noSubmit": True,  # only creates tarball but doesn't submit
     }
+
+    if args.noSubmit:
+        submit_opts["noSubmit"] = True
 
     # if args.dest-se is not None:
     # submit_opts["destSE"] = args.dest-se
@@ -81,7 +93,10 @@ def main():
         )
 
     # copy the runconfig to the submit dir to be available for the exec cmd
-    subprocess.run(["cp", args.runConfig, "config.yaml"])
+    try:
+        subprocess.run(["cp", args.run_config, "config.yaml"], check=True)
+    except subprocess.CalledProcessError as e:
+        raise OSError(e.returncode, "Failed to copy run config files.")
 
     proc = subprocess.Popen(
         [
@@ -150,14 +165,10 @@ def main():
         raise ValueError("No inputs defined")
 
     for io in io_list:
-        exec_cmd = "easyjet-ntupler %IN -l --outFile {0} --runConfig" " config.yaml".format(
-            submit_opts["outputs"].removeprefix("TREE:")
+        exec_cmd = "easyjet-ntupler %IN -l --run-config {0} --out-file {1}".format(
+            "config.yaml", submit_opts["outputs"].removeprefix("TREE:")
         )
-        if args.mc_list:
-            exec_cmd = (
-                "easyjet-ntupler %IN --outFile {0} --runConfig"
-                " config.yaml".format(submit_opts["outputs"].removeprefix("TREE:"))
-            )
+
         cmd = ["prun", "--inDS", io["inDS"], "--outDS", io["outDS"], "--exec", exec_cmd]
 
         for k, v in submit_opts.items():

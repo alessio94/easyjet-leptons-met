@@ -79,9 +79,11 @@ def fill_from_args(flags, parser=None):
 
     if args.debug is not None:
         from AthenaCommon.Debugging import DbgStage
+
         if args.debug not in DbgStage.allowed_values:
-            raise ValueError("Unknown debug stage, allowed values {}".format(
-                DbgStage.allowed_values))
+            raise ValueError(
+                "Unknown debug stage, allowed values {}".format(DbgStage.allowed_values)
+            )
         flags.Exec.DebugStage = args.debug
 
     if args.evtMax is not None:
@@ -92,23 +94,27 @@ def fill_from_args(flags, parser=None):
 
     flags.Input.Files = []  # remove generic
     for ffile in args.filesInput.split(","):
-        if '*' in ffile:  # handle wildcard
+        if "*" in ffile:  # handle wildcard
             import glob
+
             flags.Input.Files += glob.glob(ffile)
         else:
             flags.Input.Files += [ffile]
 
     if args.loglevel is not None:
         from AthenaCommon import Constants
-        if hasattr(Constants,args.loglevel):
-            flags.Exec.OutputLevel = getattr(Constants,args.loglevel)
+
+        if hasattr(Constants, args.loglevel):
+            flags.Exec.OutputLevel = getattr(Constants, args.loglevel)
         else:
             raise ValueError(
                 "Unknown log-level, allowed values are"
-                " ALL, VERBOSE, DEBUG,INFO, WARNING, ERROR, FATAL")
+                " ALL, VERBOSE, DEBUG,INFO, WARNING, ERROR, FATAL"
+            )
 
     if args.config_only is not None:
         from os import environ
+
         environ["PICKLECAFILE"] = args.config_only
 
     return args
@@ -130,7 +136,7 @@ def run_config_arg(rawpath):
 
 def validate_args(parser, overwrites={}):
     args, _ = parser.parse_known_args()
-    runconfig = args.runConfig
+    runconfig = args.run_config
     # check that values belonging in runcofig exist, and vice-versa
     for key, value in overwrites.items():
         if value and key not in runconfig:
@@ -140,19 +146,20 @@ def validate_args(parser, overwrites={}):
 
 
 def fill_config_flags_from_args(args, flags, overwrites={}):
-    # load config file
-    runConfig = args.runConfig
+    # Collect all the run config values from config file and flags
+    run_config_all = args.run_config
 
-    # args contain the flags, overwrite runconfig file values with values from flags
+    # args contain the flags, overwrite run_config file values with values from flags
+    # and add flags that are not in run_config file
     for key in vars(args):
         # exclude standard athena flags
         if key in overwrites:
             value = getattr(args, key)
-            if value is not None or key not in runConfig:
-                runConfig[key] = value
+            if value is not None or key not in run_config_all:
+                run_config_all[key] = value
 
-    # add them to ConfigFlags
-    for key, value in runConfig.items():
+    # add them to athena's ConfigFlags
+    for key, value in run_config_all.items():
         log.info("User configured: " + str(key) + ": " + str(value))
         flags.addFlag("Analysis." + key, value)
 

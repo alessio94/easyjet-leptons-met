@@ -45,7 +45,7 @@ def trigger_sequence_cfg(flags, datatype, triggerchains):
     trigger_sequence = makeTriggerAnalysisSequence(
         datatype,
         triggerChains=triggerchains,
-        noFilter=flags.Analysis.disable_trigger_filtering,
+        noFilter=False if flags.Analysis.do_trigger_filtering else True,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(trigger_sequence.getName()))
@@ -97,7 +97,7 @@ def generator_sequence_cfg(flags, datatype):
     # we have to disable cutbookkeepers if there's no output file, or
     # if we're looking at one of several broken tags
     is_bad_tag = ptag in ["p5226", "p5278", "p5334"]
-    doCBK = not is_bad_tag and flags.Analysis.outFile
+    doCBK = not is_bad_tag and flags.Analysis.out_file
     generator_sequence = makeGeneratorAnalysisSequence(
         datatype,
         saveCutBookkeepers=doCBK,
