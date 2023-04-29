@@ -20,13 +20,12 @@ Now, compile the package
 mkdir build
 cd build
 source ../hh4b-analysis/setup.sh
-# Usage of this flag is only temporary. See below for more details
-cmake -DATLAS_USE_CUSTOM_CPACK_INSTALL_SCRIPT=TRUE ../hh4b-analysis/
+cmake ../hh4b-analysis/
 make
 source */setup.sh
 ```
 
-**NOTE: The flag `-DATLAS_USE_CUSTOM_CPACK_INSTALL_SCRIPT=TRUE` is a temporary fix and should be removed once this [change](https://gitlab.cern.ch/atlas/atlasexternals/-/merge_requests/1012) is propagated into the next release.**
+**NOTE: If you are using release 24.2.2 and want to submit grid jobs, you need to run `cmake` with the flag `-DATLAS_USE_CUSTOM_CPACK_INSTALL_SCRIPT=TRUE`. More details [change](https://gitlab.cern.ch/atlas/atlasexternals/-/merge_requests/1012).**
 
 *If you are working in a container (described [below](#athanalysis-in-docker)), source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*
 
