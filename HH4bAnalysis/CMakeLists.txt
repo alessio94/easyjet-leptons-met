@@ -41,10 +41,10 @@ atlas_add_component(HH4bAnalysis
 
 # Install python modules, joboptions, and share content
 atlas_install_scripts(
-  share/easyjet-ntupler
-  share/easyjet-gridsubmit
-  share/easyjet-test
-  share/metadata-check
+  bin/easyjet-ntupler
+  bin/easyjet-gridsubmit
+  bin/easyjet-test
+  bin/metadata-check
 )
 atlas_install_python_modules(
   python/cpalgs
@@ -52,7 +52,7 @@ atlas_install_python_modules(
   python/utils
 )
 atlas_install_data(
-  share/RunConfig.yaml
+  share/*.yaml
 )
 
 # atlas_install_data( data/* )
