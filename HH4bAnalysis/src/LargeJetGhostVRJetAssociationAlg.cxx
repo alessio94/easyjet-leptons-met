@@ -3,7 +3,9 @@
 */
 
 #include "LargeJetGhostVRJetAssociationAlg.h"
+//Athena includes
 
+//#include "PathResolver/PathResolver.h"
 namespace HH4B
 {
   LargeJetGhostVRJetAssociationAlg ::LargeJetGhostVRJetAssociationAlg(
@@ -17,6 +19,11 @@ namespace HH4B
   StatusCode LargeJetGhostVRJetAssociationAlg ::initialize()
   {
     ATH_MSG_DEBUG("Initialising " << name());
+
+    FlavorTagDiscriminants::HbbTagConfig hbbConfig_Xbb2020v3;
+    hbbConfig_Xbb2020v3.input_file_path = "BTagging/2020v3/Xbb/GhostVR30Rmax4Rmin02TrackJet_BTagging201903/network.json";
+    hbbConfig_Xbb2020v3.subjet_link_name = "GhostAntiKtVR30Rmax4Rmin02PV0TrackJets";
+    m_hbbTagXbb2020v3 = std::make_unique<FlavorTagDiscriminants::HbbTag>(hbbConfig_Xbb2020v3);
 
     if (m_workingPoints.empty())
     {
@@ -64,6 +71,8 @@ namespace HH4B
 
     for (auto *largejet : largeRJets)
     {
+      m_hbbTagXbb2020v3->decorate(*largejet);
+
       // get ghost associated VR track jets from untrimmed large R jet
       const xAOD::Jet *untrimmedLargeRJet =
           *m_largeRUntrimmedAccessor(*largejet);
@@ -130,7 +139,7 @@ namespace HH4B
       std::vector<float> leadingGAVRJetPhi(minLeadingGAVRjetsSize);
       std::vector<float> leadingGAVRJetM(minLeadingGAVRjetsSize);
       std::vector<int> HadronConeExclTruthLabelID(minLeadingGAVRjetsSize);
-
+      
       float deltaR12{-1};
       float deltaR13{-1};
       float deltaR32{-1};
@@ -146,7 +155,7 @@ namespace HH4B
           char btagged = m_isBtagAccessors[j](*leadingVRJet);
           btags[j].at(i) = btagged;
         }
-
+        
         // compute and recorddeltaR's
         ATH_MSG_VERBOSE("VR jet pt: " << leadingVRJet->pt()
                                       << ", eta: " << leadingVRJet->eta()
@@ -198,6 +207,7 @@ namespace HH4B
       m_leadingVRTrackJetDeltaR12Decorator(*largejet) = deltaR12;
       m_leadingVRTrackJetDeltaR13Decorator(*largejet) = deltaR13;
       m_leadingVRTrackJetDeltaR32Decorator(*largejet) = deltaR32;
+
       if (m_isMC) {
         m_HadronConeExclTruthLabelIDDecorator(*largejet) = HadronConeExclTruthLabelID;
       }

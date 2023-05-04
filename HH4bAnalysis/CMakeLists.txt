@@ -37,6 +37,7 @@ atlas_add_component(HH4bAnalysis
   xAODBTagging
   FourMomUtils
   TruthUtils
+  FlavorTagDiscriminants
 )
 
 # Install python modules, joboptions, and share content
