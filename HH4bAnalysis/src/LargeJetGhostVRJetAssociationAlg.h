@@ -12,7 +12,16 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 
+// Hbb tag
+#include "FlavorTagDiscriminants/HbbTagConfig.h"
+#include "FlavorTagDiscriminants/HbbTag.h"
+
 // Class definition
+
+// Forward declare the Xbb tagger 
+namespace FlavorTagDiscriminants {
+  class HbbTag;
+}
 
 namespace HH4B
 {
@@ -29,6 +38,7 @@ public:
     /// configs
     StatusCode initialize() override;
     /// \brief Execute method, for actions to be taken in the event loop
+
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
@@ -38,6 +48,9 @@ private:
 
     StatusCode recordVRTrackJetGhostAssociation(const xAOD::JetContainer &,
                                                 const xAOD::EventInfo &) const;
+
+    // Xbb tagger 
+    std::unique_ptr<FlavorTagDiscriminants::HbbTag> m_hbbTagXbb2020v3;
 
     Gaudi::Property<bool> m_isMC {
       this, "isMC", false, "Is this simulation?"
@@ -104,6 +117,7 @@ private:
 
     std::vector<SG::AuxElement::Decorator<std::vector<char>>>
         m_leadingVRTrackJetBtagDecorators;
+    
   };
 }
 

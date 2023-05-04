@@ -242,6 +242,9 @@ def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername):
         "leadingVRTrackJetsDeltaR12",
         "leadingVRTrackJetsDeltaR13",
         "leadingVRTrackJetsDeltaR32",
+        "Xbb2020v3_Higgs",
+        "Xbb2020v3_Top",
+        "Xbb2020v3_QCD",
     ]
     for var in vr_vars:
         branches += [f"{inlrjet_containername}.{var} -> recojet_antikt10_%SYS%_{var}"]
@@ -292,6 +295,9 @@ def lr_ufo_jet_ghost_vr_jet_association_branches(flags, inlrufojet_containername
         "leadingVRTrackJetsDeltaR12",
         "leadingVRTrackJetsDeltaR13",
         "leadingVRTrackJetsDeltaR32",
+        "Xbb2020v3_Higgs",
+        "Xbb2020v3_Top",
+        "Xbb2020v3_QCD",
     ]
     for var in ufo_vars:
         branches += [
