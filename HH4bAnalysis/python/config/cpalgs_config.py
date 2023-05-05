@@ -36,7 +36,6 @@ def cpalgs_cfg(
     flags,
     datatype,
     trigger_chains=[],
-    do_muons=True,
     do_PRW=False,
     prw_files=[],
     lumicalc_files=[],
@@ -115,7 +114,7 @@ def cpalgs_cfg(
             )
         )
 
-        if do_muons:
+        if flags.Analysis.do_muons:
             log.info("Adding muon seq")
             cfg.merge(
                 muon_sequence_cfg(
@@ -128,8 +127,9 @@ def cpalgs_cfg(
 
         log.info("Adding small-R jet seq")
         muoncont = containers["outputs"]["muons"]
-        if not do_muons:
+        if not flags.Analysis.do_muons:
             muoncont = containers["inputs"]["muons"]
+
         cfg.merge(
             jet_sequence_cfg(
                 flags,
@@ -138,7 +138,7 @@ def cpalgs_cfg(
                 outcontainername=containers["outputs"]["reco4Jet"],
                 # Need muons for b-jet pt correction
                 muoncontainername=muoncont,
-                do_bjet_ptcalib=do_muons,
+                do_bjet_ptcalib=flags.Analysis.do_muons,
                 is_daod_physlite=is_daod_physlite,
             )
         )
@@ -226,32 +226,39 @@ def cpalgs_cfg(
     # Begin postprocessing
     ########################################################################
 
-    log.info("Adding Overlap Removal sequence")
-    overlapInputNames = {
-        "electrons": containers["outputs"]["electrons"],
-        "photons": containers["outputs"]["photons"],
-        "jets": containers["outputs"]["reco4Jet"],
-    }
-    if do_muons:
-        overlapInputNames["muons"] = containers["outputs"]["muons"]
+    if flags.Analysis.do_overlap_removal:
+        log.info("Adding Overlap Removal sequence")
+        if (
+            flags.Analysis.write_large_R_Topo_jets
+            and flags.Analysis.write_large_R_UFO_jets
+        ):
+            raise ValueError("Overlap removal only works with one Large R collection")
+        overlapInputNames = {
+            "electrons": containers["outputs"]["electrons"],
+            "photons": containers["outputs"]["photons"],
+            "jets": containers["outputs"]["reco4Jet"],
+            "muons": containers["outputs"]["muons"],
+        }
 
-    if not is_daod_physlite:
-        overlapInputNames["fatJets"] = containers["outputs"]["reco10Jet"]
-        overlapInputNames["fatUFOJets"] = containers["outputs"]["reco10UFOJet"]
+        if not is_daod_physlite:
+            if flags.Analysis.write_large_R_Topo_jets:
+                overlapInputNames["fatJets"] = containers["outputs"]["reco10Jet"]
+            if flags.Analysis.write_large_R_UFO_jets:
+                overlapInputNames["fatJets"] = containers["outputs"]["reco10UFOJet"]
 
-    overlapOutputNames = {k: f"{v}_OR" for k, v in overlapInputNames.items()}
+        overlapOutputNames = {k: f"{v}_OR" for k, v in overlapInputNames.items()}
 
-    cfg.merge(
-        overlap_sequence_cfg(
-            flags,
-            datatype=datatype,
-            inputnames=overlapInputNames,
-            outputnames=overlapOutputNames,
-            doFatJets=not is_daod_physlite,
-            doMuons=do_muons,
+        cfg.merge(
+            overlap_sequence_cfg(
+                flags,
+                datatype=datatype,
+                inputnames=overlapInputNames,
+                outputnames=overlapOutputNames,
+                doFatJets=not is_daod_physlite,
+                doMuons=flags.Analysis.do_muons,
+            )
         )
-    )
-    cfg.merge(event_counter_cfg("n_overlap"))
+        cfg.merge(event_counter_cfg("n_overlap"))
 
     if flags.Analysis.do_resolved_dihiggs_analysis and not flags.Analysis.disable_calib:
         cfg.merge(

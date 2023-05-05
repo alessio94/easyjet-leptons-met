@@ -30,20 +30,20 @@ do_boosted_dihiggs_analysis: false
 truth_match_resolved: false
 truth_match_boosted: false
 # Whether to activate CP alg systematic variations
-do_CP_systematics: false
+do_CP_systematics: true
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
-do_overlap_removal: true
-# which objects to write
+do_overlap_removal: false
+# which objets to write
 write_small_R_jets: true
 write_large_R_Topo_jets: true
-write_large_R_UFO_jets: False
-write_electrons: true
-write_photons: true
-write_muons: true
+write_large_R_UFO_jets: false
+write_electrons: false
+write_photons: false
+write_muons: false
 # turned off automatically if MC
-write_truth_small_R_jets: true
-write_truth_large_R_jets: true
-write_truth_higgs: true
+write_truth_small_R_jets: false
+write_truth_large_R_jets: false
+write_truth_higgs: false
 # whether to output a meta data file
 meta_cache: false
