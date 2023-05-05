@@ -57,9 +57,7 @@ def defineArgs(ConfigFlags):
         "-t",
         "--timeout",
         type=float,
-        help=(
-            "Maximum runtime (in seconds). Longer processes finish " "with an error."
-        ),
+        help="Maximum runtime (in seconds). Longer processes finish with an error.",
     )
     parser.add_argument(
         "--dry-run",
@@ -97,6 +95,11 @@ def defineArgs(ConfigFlags):
         help="use metadata cache file",
     )
     add_analysis_arg(
+        "--fast-test",
+        action="store_true",
+        help="disables certain sequences to speed up testing",
+    )
+    add_analysis_arg(
         "-5",
         "--h5-output",
         metavar="H5OUT",
@@ -114,9 +117,9 @@ def defineArgs(ConfigFlags):
 
     # type=bool is not recommended because it sets non-empty strings to True,
     # but we want to allow the user to set the flag to "False" to disable
-    _bool_opt = (
-        lambda opt: opt.lower() == "true" if opt.lower() in ("true", "false") else opt
-    )
+    def _bool_opt(opt):
+        return opt.lower() == "true" if opt.lower() in ("true", "false") else opt
+
     oropt = dict(
         type=_bool_opt,
         choices=[True, False],
@@ -141,8 +144,8 @@ def defineArgs(ConfigFlags):
         ),
         **oropt,
     )
-    add_analysis_arg("-b", "--do-resolved-dihiggs-analysis", **oropt)
-    add_analysis_arg("-r", "--do-boosted-dihiggs-analysis", **oropt)
+    add_analysis_arg("-r", "--do-resolved-dihiggs-analysis", **oropt)
+    add_analysis_arg("-b", "--do-boosted-dihiggs-analysis", **oropt)
     add_analysis_arg("-j", "--loose-jet-cleaning", **oropt)
     add_analysis_arg("-y", "--do-CP-systematics", **oropt)
     validate_args(parser, overwrites)
@@ -154,7 +157,6 @@ def defineArgs(ConfigFlags):
 # We define a "main function" that will run a test job if the module
 # is executed rather than imported.
 def main():
-
     # record the total run time
     starttime = time.process_time()
 
@@ -172,6 +174,16 @@ def main():
     # configuring the job and checking the input files.
     if args.dry_run:
         return 1
+
+    ConfigFlags.addFlag("Analysis.do_muons", True)
+
+    # disable some sequences for fast-run
+    if ConfigFlags.Analysis.fast_test:
+        ConfigFlags.Analysis.do_overlap_removal = False
+        ConfigFlags.Analysis.do_muons = False
+
+    if is_physlite(ConfigFlags):
+        ConfigFlags.Analysis.do_overlap_removal = False
 
     # Arg checks
     assert not (
@@ -301,8 +313,6 @@ def main():
                 for list in grl_lists_by_year[year]
             ]
 
-        do_muons = not ConfigFlags.Analysis.cache_metadata
-
         do_PRW = is_mc_phys(ConfigFlags)
         prw_files, lumicalc_files = [], []
         if do_PRW:
@@ -320,7 +330,6 @@ def main():
                 ConfigFlags,
                 datatype,
                 trigger_chains=trigger_chains,
-                do_muons=do_muons,
                 do_PRW=do_PRW,
                 prw_files=prw_files,
                 lumicalc_files=lumicalc_files,
@@ -333,8 +342,8 @@ def main():
                 minituple_cfg(
                     ConfigFlags,
                     trigger_chains=trigger_chains,
-                    do_muons=do_muons,
                     do_PRW=do_PRW,
+                    do_OR=ConfigFlags.Analysis.do_overlap_removal,
                 ),
                 "HH4bSeq",
             )
@@ -363,7 +372,7 @@ def main():
         duration = time.process_time() - starttime
         if duration > args.timeout:
             raise RuntimeError(
-                f"runtime ({duration:.1f}s) " f"exceed timeout ({args.timeout:.0f}s)"
+                f"runtime ({duration:.1f}s) exceed timeout ({args.timeout:.0f}s)"
             )
     return return_code.isSuccess()
 

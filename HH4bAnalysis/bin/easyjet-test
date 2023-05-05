@@ -81,7 +81,7 @@ ntuple-dump-syst() {
     metadata-check -v
 }
 ntuple-dump-fast() {
-    local OPTS="$COMMON --cache-metadata $1"
+    local OPTS="$COMMON --fast-test --cache-metadata $1"
     OPTS+=" --do-trigger-filtering True"
     local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
@@ -90,7 +90,7 @@ ntuple-dump-fast() {
     metadata-check -v
 }
 run-fast() {
-    local OPTS="--cache-metadata $1"
+    local OPTS="--fast-test --cache-metadata $1"
     OPTS+=" --do-trigger-filtering True"
     local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
@@ -99,7 +99,7 @@ run-fast() {
     metadata-check -v
 }
 ntuple-dump-fast-awkward() {
-    local OPTS="$COMMON --cache-metadata $1"
+    local OPTS="$COMMON --fast-test --cache-metadata $1"
     OPTS+=" --do-trigger-filtering True"
     local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
@@ -108,7 +108,7 @@ ntuple-dump-fast-awkward() {
     metadata-check -v
 }
 data-ntuple-dump-fast() {
-    local OPTS="$COMMON --cache-metadata $1"
+    local OPTS="$COMMON --fast-test --cache-metadata $1"
     OPTS+=" --do-trigger-filtering False"
     local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config
@@ -121,7 +121,7 @@ ntuple-dump-physlite() {
     metadata-check -v
 }
 ntuple-dump-physlite-fast() {
-    local OPTS="$COMMON --cache-metadata $1 --disable-calib True"
+    local OPTS="$COMMON --fast-test --cache-metadata $1 --disable-calib True"
     OPTS+=" --do-trigger-filtering True"
     local CMD="easyjet-ntupler $OPTS"
     $CMD --stop-after-config

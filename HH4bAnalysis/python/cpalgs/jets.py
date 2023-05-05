@@ -229,7 +229,7 @@ def lr_jet_ghost_vr_jet_association_cfg(
     return cfg
 
 
-def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername):
+def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername, do_OR):
     branches = []
 
     vr_vars = [
@@ -246,11 +246,14 @@ def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername):
         "Xbb2020v3_Top",
         "Xbb2020v3_QCD",
     ]
+    or_str = "OR_" if do_OR else ""
     for var in vr_vars:
-        branches += [f"{inlrjet_containername}.{var} -> recojet_antikt10_%SYS%_{var}"]
+        branches += [
+            f"{inlrjet_containername}.{var} -> recojet_antikt10_{or_str}%SYS%_{var}"
+        ]
     branches += [
         f"{inlrjet_containername}.leadingVRTrackJetsBtag_{wp} -> "
-        f"recojet_antikt10_%SYS%_leadingVRTrackJetsBtag_{wp}"
+        f"recojet_antikt10_{or_str}%SYS%_leadingVRTrackJetsBtag_{wp}"
         for wp in flags.Analysis.vr_btag_wps
     ]
     branches += [
@@ -259,7 +262,8 @@ def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername):
     if flags.Input.isMC:
         branches += [
             f"{inlrjet_containername}.VRTrackJetsTruthLabel -> "
-            f"HadronConeExclTruthLabelID_%SYS%"
+            f"recojet_antikt10_{or_str}"
+            "%SYS%_leadingVRTrackJets_HadronConeExclTruthLabelID"
         ]
 
     return branches
@@ -282,7 +286,9 @@ def lr_ufo_jet_ghost_vr_jet_association_cfg(
     return cfg
 
 
-def lr_ufo_jet_ghost_vr_jet_association_branches(flags, inlrufojet_containername):
+def lr_ufo_jet_ghost_vr_jet_association_branches(
+    flags, inlrufojet_containername, do_OR
+):
     branches = []
 
     ufo_vars = [
@@ -299,19 +305,22 @@ def lr_ufo_jet_ghost_vr_jet_association_branches(flags, inlrufojet_containername
         "Xbb2020v3_Top",
         "Xbb2020v3_QCD",
     ]
+    or_str = "OR_" if do_OR else ""
     for var in ufo_vars:
         branches += [
-            f"{inlrufojet_containername}.{var} -> recoUFOjet_antikt10_%SYS%_{var}"
+            f"{inlrufojet_containername}.{var} ->"
+            f" recoUFOjet_antikt10_{or_str}%SYS%_{var}"
         ]
     branches += [
         f"{inlrufojet_containername}.leadingVRTrackJetsBtag_{wp} -> "
-        f"recoUFOjet_antikt10_%SYS%_leadingVRTrackJetsBtag_{wp}"
+        f"recoUFOjet_antikt10_{or_str}%SYS%_leadingVRTrackJetsBtag_{wp}"
         for wp in flags.Analysis.vr_btag_wps
     ]
     if flags.Input.isMC:
         branches += [
-            f"{inlrufojet_containername}.VRTrackJetsTruthLabel -> "
-            f"UFO_R10_HadronConeExclTruthLabelID_%SYS%"
+            f"{inlrufojet_containername}.VRTrackJetsTruthLabel ->"
+            f" recoUFOjet_antikt10_{or_str}"
+            "%SYS%_leadingVRTrackJets_HadronConeExclTruthLabelID"
         ]
 
     return branches
