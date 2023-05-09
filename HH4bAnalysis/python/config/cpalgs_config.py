@@ -24,6 +24,7 @@ from HH4bAnalysis.config.truth_particle_info_config import truth_particle_info_c
 from HH4bAnalysis.config.container_names import get_container_names
 from HH4bAnalysis.utils.inputs_helper import is_physlite
 from HH4bAnalysis.utils.log_helper import log
+from HH4bAnalysis.utils.systematics_helper import consolidate_systematics_regex
 
 from HH4bAnalysis.config.event_counter_config import event_counter_cfg
 from HH4bAnalysis.config.jet_parent_decorator_config import jet_parent_decorator_cfg
@@ -53,6 +54,18 @@ def cpalgs_cfg(
     cfg.addService(sysSvc)
     if flags.Analysis.do_CP_systematics:
         sysSvc.sigmaRecommended = 1
+        systs = consolidate_systematics_regex(flags.Analysis.systematics_regex)
+
+        log.info("Systematics regex:")
+        log.info(systs)
+        sysSvc.systematicsRegex = systs
+
+        syslistalg = CompFactory.CP.SysListDumperAlg(
+            "SysList",
+            histogramName="systematics",
+            systematicsService=sysSvc,
+        )
+        cfg.addEventAlgo(syslistalg)
 
     log.info("Adding trigger analysis algs")
     # Removes events failing trigger and adds variable to EventInfo

@@ -35,6 +35,7 @@ truth_match_resolved: false
 truth_match_boosted: false
 # Whether to activate CP alg systematic variations
 do_CP_systematics: false
+systematics_regex: [".*"]
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
