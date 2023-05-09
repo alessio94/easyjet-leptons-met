@@ -24,6 +24,8 @@ class SampleTypes(Enum):
     mc21a = "r13829"  # run3, 2022
     # ptag
     mc20 = "p5057"
+    # ptag for Xbb tagger
+    mc20x = "p5657"
 
 
 def cache_metadata(path):
