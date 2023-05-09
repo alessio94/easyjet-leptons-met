@@ -87,7 +87,18 @@ def cpalgs_cfg(
 
     # truth record seems to be broken in physlite
     if flags.Input.isMC and not is_physlite(flags):
-        cfg.merge(jet_parent_decorator_cfg(flags))
+        cfg.merge(jet_parent_decorator_cfg(
+            flags,
+            jet_collection=containers["inputs"]["reco4Jet"],
+            name_prefix="smallR",
+            match_dr=0.3
+        ))
+        cfg.merge(jet_parent_decorator_cfg(
+            flags,
+            jet_collection=containers["inputs"]["reco10UFOJet"],
+            name_prefix="largeR",
+            match_dr=0.9,
+        ))
 
     if not flags.Analysis.disable_calib:
         if do_PRW:

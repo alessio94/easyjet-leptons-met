@@ -48,6 +48,10 @@ private:
     this, "vetoSoftCharmCascade", false,
     "veto soft charm decays from cascade"
   };
+  Gaudi::Property<float> m_match_delta_r{
+    this, "matchDeltaR", -1,
+    "width of delta R cone for matching (zero or less -> infinite)"
+  };
   SG::ReadHandleKey<TPC> m_parents_key{
     this, "parents", "", "truth parent container"
   };
@@ -55,12 +59,13 @@ private:
     this, "cascades", {}, "truth hadron container"
   };
   SG::WriteDecorHandleKey<JC> m_target_pdgid_key;
-  SG::WriteDecorHandleKey<JC> m_target_barcode_key;
   SG::WriteDecorHandleKey<JC> m_target_dr_truth_key;
   SG::WriteDecorHandleKey<JC> m_target_link_key;
+  SG::WriteDecorHandleKey<JC> m_target_index_key;
+  SG::WriteDecorHandleKey<JC> m_target_n_matched_key;
+  SG::WriteDecorHandleKey<JC> m_target_match_mask_key;
   SG::WriteDecorHandleKey<JC> m_match_pdgid_key;
   SG::WriteDecorHandleKey<JC> m_match_children_key;
-  SG::WriteDecorHandleKey<JC> m_match_barcode_key;
   SG::WriteDecorHandleKey<JC> m_match_link_key;
 };
 

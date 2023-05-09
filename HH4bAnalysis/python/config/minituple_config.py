@@ -114,20 +114,10 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False, do_OR=False):
             flags, is_daod_physlite, containers, tree_branches, do_or=do_OR
         )
 
-    if flags.Analysis.write_truth_small_R_jets and flags.Input.isMC:
+    if flags.Input.isMC and flags.Analysis.write_truth_small_R_jets:
         tree_branches += _get_four_mom_branches(
             containers["truth4Jet"], "truthjet_antikt4", do_systematics=False
         )
-        tree_branches += [
-            (
-                f"{containers['truth4Jet']}.PartonTruthLabelID ->"
-                " truthjet_antikt4_PartonTruthLabelID"
-            ),
-            (
-                f"{containers['truth4Jet']}.HadronConeExclTruthLabelID ->"
-                " truthjet_antikt4_HadronConeExclTruthLabelID"
-            ),
-        ]
 
     if not flags.Analysis.disable_calib and flags.Input.isMC:
         if flags.Analysis.write_truth_large_R_jets:
@@ -204,6 +194,61 @@ def get_jvt_branches(flags, is_daod_physlite):
     return jvt_branches
 
 
+def get_jet_truth_labels(flags):
+    # first part is adding the truth matching to parent particles
+    parent_bosons = ["Higgs", "Scalar", "Top"]
+    parent_labels = [
+        "DRTruthParticle",
+        "PdgId",
+        "MatchingParticlePdgId"
+    ]
+    small_r_labels = [
+        "HadronConeExclTruthLabelID",
+    ]
+
+    if is_physlite(flags):
+        truth_labels = []
+    else:
+        truth_labels = [
+            f"parent{b}{l}" for l in parent_labels for b in parent_bosons
+        ]
+
+    truths = []
+    if flags.Analysis.write_small_R_jets:
+        truths.append((4, '', small_r_labels))
+    if flags.Analysis.write_large_R_UFO_jets:
+        truths.append((10, 'UFO',[]))
+
+    containers = get_container_names(flags)["outputs"]
+
+    tree_branches = []
+    for width, constit, additional in truths:
+        for label in truth_labels + additional:
+            jet_container = containers[f'reco{width}{constit}Jet']
+            tree_branches.append(
+                f"{jet_container}.{label} ->"
+                f" reco{constit}jet_antikt{width}_%SYS%_{label}"
+            )
+            if flags.Analysis.do_overlap_removal:
+                tree_branches.append(
+                    f"{jet_container}_OR.{label} ->"
+                    f" reco{constit}jet_antikt{width}_OR_%SYS%_{label}"
+                )
+
+    # Also add the standard b-tagging truth labels
+    tree_branches += [
+        (
+            f"{containers['truth4Jet']}.PartonTruthLabelID ->"
+            " truthjet_antikt4_PartonTruthLabelID"
+        ),
+        (
+            f"{containers['truth4Jet']}.HadronConeExclTruthLabelID ->"
+            " truthjet_antikt4_HadronConeExclTruthLabelID"
+        ),
+    ]
+    return tree_branches
+
+
 def get_small_R_gn2_branches():
     # GN2 scores (not included in CDI)
     small_R_gn2_branches = [
@@ -219,26 +264,7 @@ def add_small_R_branches(flags, is_daod_physlite, containers, tree_branches, do_
         container=containers["reco4Jet"], alias="recojet_antikt4", do_or=do_or
     )
     if flags.Input.isMC:
-        parent_bosons = ["Higgs", "Scalar", "Top"]
-        parent_labels = ["DRTruthParticle", "PdgId", "Barcode", "MatchingParticlePdgId"]
-
-        truth_labels = [
-            "HadronConeExclTruthLabelID",
-        ]
-        if not is_physlite(flags):
-            truth_labels += [
-                f"parent{b}{l}" for l in parent_labels for b in parent_bosons
-            ]
-        for label in truth_labels:
-            if do_or:
-                tree_branches += [
-                    f"{containers['reco4Jet']}_OR.{label} ->"
-                    f" recojet_antikt4_OR_%SYS%_{label}"
-                ]
-            else:
-                tree_branches += [
-                    f"{containers['reco4Jet']}.{label} -> recojet_antikt4_%SYS%_{label}"
-                ]
+        tree_branches += get_jet_truth_labels(flags)
 
     jvt_branches = get_jvt_branches(flags, is_daod_physlite)
 

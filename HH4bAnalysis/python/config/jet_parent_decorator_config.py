@@ -4,9 +4,13 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.config.container_names import get_container_names
 
 
-def jet_parent_decorator_cfg(flags, name_prefix=""):
+def jet_parent_decorator_cfg(
+        flags,
+        jet_collection,
+        name_prefix="",
+        match_dr=0.3,
+):
     containers = get_container_names(flags)
-    jet_collection = containers["inputs"]["reco4Jet"]
     sm_particles = containers["inputs"]["truthSMParticles"]
     bsm_particles = containers["inputs"]["truthBSMParticles"]
     b_hadron_common = dict(
@@ -14,6 +18,7 @@ def jet_parent_decorator_cfg(flags, name_prefix=""):
         addCsToCascade=True,
         vetoSoftLeptonCascade=True,
         vetoSoftCharmCascade=True,
+        matchDeltaR=match_dr,
     )
     scalar_boson_common = dict(
         targetContainer=jet_collection,

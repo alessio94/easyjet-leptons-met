@@ -70,10 +70,15 @@ def _get_truth_types():
     ]
     bints = [
         "PdgId",
-        "Barcode",
         "MatchingParticlePdgId",
         "MatchingParticleNChildren",
-        "MatchingParticleBarcode",
+    ]
+    bchar = [
+        "Index",
+        "NMatchedChildren",
+    ]
+    bull = [
+        "ParentsMask",
     ]
 
     types = {}
@@ -81,13 +86,22 @@ def _get_truth_types():
     types |= {f"HadronConeExclTruthLabel{x}": "INT2CHAR" for x in fints}
     boson_label = []
     associations = {}
-    for boson in "Higgs", "Scalar", "Top":
-        boson_label += [f"parent{boson}{x}" for x in bhalves + bints]
+    all_boson_suffix = bhalves + bints + bchar + bull
+    for boson in ["Higgs", "Scalar", "Top"]:
+        boson_label += [f"parent{boson}{x}" for x in all_boson_suffix]
         types |= {f"parent{boson}{x}": "HALF" for x in bhalves}
         types |= {f"parent{boson}{x}": "INT2SHORT" for x in bints}
+        types |= {f"parent{boson}{x}": "CHAR" for x in bchar}
+        types |= {f"parent{boson}{x}": "ULL" for x in bull}
+
         matchpt = f"parent{boson}MatchingParticlePtGeV"
         boson_label += [matchpt]
         associations[matchpt] = f"parent{boson}MatchingParticleLink/ptGeV"
         types[matchpt] = 'CUSTOM'
+
+        matchbar = f"parent{boson}Barcode"
+        boson_label += [matchbar]
+        associations[matchbar] = f"parent{boson}Link/barcode"
+        types[matchbar] = 'INT'
 
     return ftag_label + boson_label, types, associations
