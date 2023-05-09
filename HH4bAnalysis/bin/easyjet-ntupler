@@ -114,6 +114,14 @@ def defineArgs(ConfigFlags):
         default=6,
         help="number of jets in array, or 0 for awkward array",
     )
+    add_analysis_arg(
+        "-x",
+        "--systematics-regex",
+        type=str,
+        nargs='+',
+        help="List of regexes for matching systematic variations, each value autocompleted to (^[value].*)",
+        overwrite=True,
+    )
 
     # type=bool is not recommended because it sets non-empty strings to True,
     # but we want to allow the user to set the flag to "False" to disable
