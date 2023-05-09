@@ -7,7 +7,10 @@ from HH4bAnalysis.cpalgs.jets import (
 )
 from HH4bAnalysis.config.resolved_config import resolved_branches
 from HH4bAnalysis.cpalgs.tree import tree_cfg
-from HH4bAnalysis.config.sample_config import get_valid_ami_tag
+from HH4bAnalysis.config.sample_config import (
+    get_valid_ami_tag,
+    SampleTypes,
+)
 from HH4bAnalysis.config.container_names import get_container_names
 from HH4bAnalysis.utils.inputs_helper import is_physlite
 from HH4bAnalysis.utils.log_helper import log
@@ -201,6 +204,16 @@ def get_jvt_branches(flags, is_daod_physlite):
     return jvt_branches
 
 
+def get_small_R_gn2_branches():
+    # GN2 scores (not included in CDI)
+    small_R_gn2_branches = [
+        "GN2v00_pc",
+        "GN2v00_pu",
+        "GN2v00_pb",
+    ]
+    return small_R_gn2_branches
+
+
 def add_small_R_branches(flags, is_daod_physlite, containers, tree_branches, do_or):
     tree_branches += _get_four_mom_branches(
         container=containers["reco4Jet"], alias="recojet_antikt4", do_or=do_or
@@ -264,6 +277,17 @@ def add_small_R_branches(flags, is_daod_physlite, containers, tree_branches, do_
                 f"{containers['reco4Jet']}.{var} -> recojet_antikt4_%SYS%_{var}"
                 for var in jvt_branches
             ]
+
+    # GN2 scores
+    # not available in PHYSLITE... yet
+    # NB these are read from BTagging collection
+    # so cannot be compared to thinned list of jets!
+    if not is_daod_physlite:
+        small_R_gn2_branches = get_small_R_gn2_branches()
+        tree_branches += [
+            f"BTagging_AntiKt4EMPFlow.{var} -> recojet_antikt4_NOSYS_{var}"
+            for var in small_R_gn2_branches
+        ]
 
     return tree_branches
 
@@ -346,6 +370,21 @@ def add_large_R_Topo_branches(
     return tree_branches
 
 
+def get_ufo_large_R_gn2_branches():
+    # GN2 scores (not included in CDI)
+    ufo_large_R_gn2_branches = [
+        "GN2Xv00_phbb",
+        "GN2Xv00_phcc",
+        "GN2Xv00_ptop",
+        "GN2Xv00_pqcd",
+        "GN2XWithMassv00_phbb",
+        "GN2XWithMassv00_phcc",
+        "GN2XWithMassv00_ptop",
+        "GN2XWithMassv00_pqcd",
+    ]
+    return ufo_large_R_gn2_branches
+
+
 def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches, do_or):
     if not is_daod_physlite:
         reco10UFOJetVars = (
@@ -374,6 +413,11 @@ def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches,
             else []
         )
 
+        # GN2, save scores
+        # only available after p5658, and not in PHYSLITE
+        ufo_large_R_gn2_branches = get_ufo_large_R_gn2_branches()
+        split_tags = flags.Input.AMITag.split("_")
+        is_valid_ptag = get_valid_ami_tag(split_tags, "p", SampleTypes.mc20x)
         if do_or:
             for v in reco10UFOJetVars:
                 tree_branches += [
@@ -393,23 +437,23 @@ def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches,
                     (
                         f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}_OR"
                         ".R10TruthLabel_R21Precision_2022v1 ->"
-                        " UFO_R10TruthLabel_R21Precision_2022v1_OR_NOSYS"
+                        " recoUFOjet_antikt10_OR_NOSYS_R10TruthLabel_R21Precision_2022v1" # noqa
+                    ),
+                    (
+                        f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}_OR"
+                        ".R10TruthLabel_R22v1 ->"
+                        " recoUFOjet_antikt10_OR_NOSYS_R10TruthLabel_R22v1"
                     ),
                 ]
-                # Just added this ptag check for now. Because older p-tag
-                # derivations do not have these truth label for large-R jet.
-                if "p5511" in flags.Input.AMITag:
-                    tree_branches += [
-                        (
-                            f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}_OR"
-                            ".R10TruthLabel_R22v1 ->"
-                            " UFO_R10TruthLabel_R22v1_OR_NOSYS"
-                        ),
-                    ]
 
             tree_branches += lr_ufo_jet_ghost_vr_jet_association_branches(
                 flags, f"{containers['reco10UFOJet']}_OR", do_OR=True
             )
+            if is_valid_ptag:
+                tree_branches += [
+                    f"{containers['reco10UFOJet']}.{var} -> recoUFOjet_antikt10_OR_%SYS%_{var}"  # noqa 
+                    for var in ufo_large_R_gn2_branches
+                ]
         else:
             for v in reco10UFOJetVars:
                 tree_branches += [
@@ -429,21 +473,21 @@ def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches,
                     (
                         f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}"
                         ".R10TruthLabel_R21Precision_2022v1 ->"
-                        " UFO_R10TruthLabel_R21Precision_2022v1_NOSYS"
+                        " recoUFOjet_antikt10_NOSYS_R10TruthLabel_R21Precision_2022v1"
+                    ),
+                    (
+                        f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}"
+                        ".R10TruthLabel_R22v1 ->"
+                        " recoUFOjet_antikt10_NOSYS_R10TruthLabel_R22v1"
                     ),
                 ]
-                # Just added this ptag check for now. Because older p-tag
-                # derivations do not have these truth label for large-R jet.
-                if "p5511" in flags.Input.AMITag:
-                    tree_branches += [
-                        (
-                            f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}"
-                            ".R10TruthLabel_R22v1 ->"
-                            " UFO_R10TruthLabel_R22v1_NOSYS"
-                        ),
-                    ]
             tree_branches += lr_ufo_jet_ghost_vr_jet_association_branches(
                 flags, containers["reco10UFOJet"], do_OR=False
             )
+            if is_valid_ptag:
+                tree_branches += [
+                    f"{containers['reco10UFOJet']}.{var} -> recoUFOjet_antikt10_%SYS%_{var}"  # noqa 
+                    for var in ufo_large_R_gn2_branches
+                ]
 
     return tree_branches
