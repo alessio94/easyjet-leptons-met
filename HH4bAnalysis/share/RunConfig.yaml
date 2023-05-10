@@ -37,11 +37,21 @@ systematics_regex: [".*"]
 do_overlap_removal: true
 # which objects to write
 write_small_R_jets: true
+# additional small R info 
+write_small_R_higgs_parent_info: true
+write_small_R_btag: true
+write_small_R_JVT_details: true
+write_small_R_no_bjet_calib: true
+write_small_R_gn2_branches: true
 write_large_R_Topo_jets: true
 write_large_R_UFO_jets: False
+
+# additional Large R info
+write_large_R_substructure: true
 write_electrons: true
 write_photons: true
 write_muons: true
+
 # turned off automatically if MC
 write_truth_small_R_jets: true
 write_truth_large_R_jets: true
