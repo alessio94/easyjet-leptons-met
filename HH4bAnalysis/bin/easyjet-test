@@ -8,7 +8,7 @@ set -Eeu
 ################################################
 
 #tag from easyjet/hh4b-test-files
-PTAG=p5631
+TAG=p5631p5658
 
 # standard samples
 DATA_2018=data18_13TeV.00362204.physics_Main.DAOD_PHYS_10evts.r13286_p5631.pool.root
@@ -16,6 +16,7 @@ DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14190_p5632.poo
 PHYS_JETS_MC20=mc20_13TeV.364704.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ4WithSW.DAOD_PHYS_10evts.e7142_s3681_r13145_p5631.pool.root
 PHYS_TTBAR_MC20=mc20_13TeV.410471.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e6337_s3681_r13145_p5631.pool.root
 PHYS_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5631.pool.root
+PHYS_SH4B_BOOSTED_MC20_p5658=mc20_13TeV.801637.Py8EG_A14NNPDF23LO_XHS_X3000_S100_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5658.pool.root
 PHYSLITE_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a899_r13145_p5631.pool.root
 PHYS_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5631.pool.root
 PHYSLITE_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5631.pool.root
@@ -37,6 +38,7 @@ declare -A DATAFILES=(
     [sh4b-boosted-mc20-fast-awkward]=${PHYS_SH4B_BOOSTED_MC20}
     [sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED_MC20}
     [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED_MC20}
+    [sh4b-boosted-mc20-p5658]=${PHYS_SH4B_BOOSTED_MC20_p5658}
     [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
     [ttbar-mc21]=${PHYS_TTBAR_MC21}
     [ttbar-mc21-syst]=${PHYS_TTBAR_MC21}
@@ -55,7 +57,8 @@ declare -A TESTS=(
     [ttbar-mc20]=ntuple-dump
     [sh4b-boosted-mc20-fast-awkward]=ntuple-dump-fast-awkward
     [sh4b-boosted-mc20-fast]=ntuple-dump-fast
-    [sh4b-boosted-mc20]=ntuple-dump
+    [sh4b-boosted-mc20]=ntuple-dump-boosted
+    [sh4b-boosted-mc20-p5658]=ntuple-dump-boosted
     [hh4b-mc21]=ntuple-dump
     [hh4b-mc21-noroot]=run-fast
     [hh4b-mc21-syst]=ntuple-dump-syst
@@ -74,6 +77,10 @@ COMMON="-o"
 # specific tests
 ntuple-dump() {
     easyjet-ntupler $COMMON $1 --do-trigger-filtering True
+    metadata-check -v
+}
+ntuple-dump-boosted() {
+    easyjet-ntupler $COMMON $1 --do-trigger-filtering True --run-config HH4bAnalysis/RunConfig-SH4b.yaml
     metadata-check -v
 }
 ntuple-dump-syst() {
@@ -218,7 +225,7 @@ cd $DIRECTORY
 # get files
 if [[ ! -f ${FILE} ]] ; then
     echo "getting file ${FILE}" >&2
-    curl -s ${DATA_URL}/${PTAG}/${DOWNLOAD_PATH} > ${FILE}
+    curl -s ${DATA_URL}/${TAG}/${DOWNLOAD_PATH} > ${FILE}
 fi
 
 # now run the test
