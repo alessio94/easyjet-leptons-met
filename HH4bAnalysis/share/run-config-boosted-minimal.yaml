@@ -50,10 +50,18 @@ systematics_regex: [
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
-# which objets to write
+# which objects to write
 write_small_R_jets: true
+# additional small R info 
+write_small_R_higgs_parent_info: false
+write_small_R_btag: false
+write_small_R_JVT_details: false
+write_small_R_no_bjet_calib: false
+write_small_R_gn2_branches: false
 write_large_R_Topo_jets: true
 write_large_R_UFO_jets: false
+# additional Large R info
+write_large_R_substructure: false
 write_electrons: false
 write_photons: false
 write_muons: false
