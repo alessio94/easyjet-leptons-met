@@ -14,6 +14,7 @@ import time
 import argparse
 
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
+from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.ComponentFactory import CompFactory
 from PerfMonComps.PerfMonCompsConfig import PerfMonMTSvcCfg
 from AthenaCommon.Constants import INFO
@@ -168,61 +169,61 @@ def main():
     # record the total run time
     starttime = time.process_time()
 
-    # Import the job configuration flags, some of which will be autoconfigured.
+    # Initialise the job configuration flags, some of which will be autoconfigured.
     # These are used for steering the job, and include e.g. the input file (list).
-    from AthenaConfiguration.AllConfigFlags import ConfigFlags
+    flags = initConfigFlags()
 
-    parser, overwrites = defineArgs(ConfigFlags)
-    args = fill_from_args(ConfigFlags, parser=parser)
-    log.setLevel(ConfigFlags.Exec.OutputLevel)
-    setRogueLoggers(ConfigFlags.Exec.OutputLevel)
+    parser, overwrites = defineArgs(flags)
+    args = fill_from_args(flags, parser=parser)
+    log.setLevel(flags.Exec.OutputLevel)
+    setRogueLoggers(flags.Exec.OutputLevel)
     # Write user options to flags.Analysis
-    fill_config_flags_from_args(args, ConfigFlags, overwrites)
+    fill_config_flags_from_args(args, flags, overwrites)
     # If we're just printing the configuration, do that and exit before
     # configuring the job and checking the input files.
     if args.dry_run:
         return 1
 
-    ConfigFlags.addFlag("Analysis.do_muons", True)
+    flags.addFlag("Analysis.do_muons", True)
 
     # disable some sequences for fast-run
-    if ConfigFlags.Analysis.fast_test:
-        ConfigFlags.Analysis.do_overlap_removal = False
-        ConfigFlags.Analysis.do_muons = False
+    if flags.Analysis.fast_test:
+        flags.Analysis.do_overlap_removal = False
+        flags.Analysis.do_muons = False
 
-    if is_physlite(ConfigFlags):
-        ConfigFlags.Analysis.do_overlap_removal = False
+    if is_physlite(flags):
+        flags.Analysis.do_overlap_removal = False
 
     # Arg checks
     assert not (
-        ConfigFlags.Analysis.disable_calib and not is_physlite(ConfigFlags)
+        flags.Analysis.disable_calib and not is_physlite(flags)
     ), "Disabling calibrations is not safe except on PHYSLITE!"
 
-    log.info(f"Operating on input files {ConfigFlags.Input.Files}")
+    log.info(f"Operating on input files {flags.Input.Files}")
 
-    fileMD = GetFileMD(ConfigFlags.Input.Files)
-    if ConfigFlags.Analysis.cache_metadata:
+    fileMD = GetFileMD(flags.Input.Files)
+    if flags.Analysis.cache_metadata:
         update_metadata(Path("metadata.json"))
-    ConfigFlags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
-    ConfigFlags.addFlag("Input.SimulationFlavour", fileMD.get("SimulationFlavour", ""))
-    ConfigFlags.addFlag("Analysis.DataType", lambda prevFlags: get_data_type(prevFlags))
-    ConfigFlags.addFlag("Analysis.Years", lambda prevFlags: get_run_years(prevFlags))
-    log.info(f"Configuring to match dataset from {ConfigFlags.Analysis.Years}")
-    if max(ConfigFlags.Analysis.Years) <= 2018:
-        ConfigFlags.addFlag("Analysis.Run", 2)
-    elif min(ConfigFlags.Analysis.Years) >= 2022:
-        ConfigFlags.addFlag("Analysis.Run", 3)
+    flags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
+    flags.addFlag("Input.SimulationFlavour", fileMD.get("SimulationFlavour", ""))
+    flags.addFlag("Analysis.DataType", lambda prevFlags: get_data_type(prevFlags))
+    flags.addFlag("Analysis.Years", lambda prevFlags: get_run_years(prevFlags))
+    log.info(f"Configuring to match dataset from {flags.Analysis.Years}")
+    if max(flags.Analysis.Years) <= 2018:
+        flags.addFlag("Analysis.Run", 2)
+    elif min(flags.Analysis.Years) >= 2022:
+        flags.addFlag("Analysis.Run", 3)
     else:
         raise RuntimeError("Invalid list of years, cannot combine runs")
-    log.info(f"Configured years match Run {ConfigFlags.Analysis.Run}")
+    log.info(f"Configured years match Run {flags.Analysis.Run}")
 
-    ConfigFlags.PerfMon.doFullMonMT = ConfigFlags.Exec.OutputLevel <= INFO
+    flags.PerfMon.doFullMonMT = flags.Exec.OutputLevel <= INFO
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
-    ConfigFlags.lock()
+    flags.lock()
 
-    if ConfigFlags.Analysis.cache_metadata:
+    if flags.Analysis.cache_metadata:
         cache_metadata(Path("metadata.json"))
 
     # Get a ComponentAccumulator setting up the standard components
@@ -233,10 +234,10 @@ def main():
     from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 
     with ConfigurableCABehavior():
-        cfg = MainServicesCfg(ConfigFlags)
+        cfg = MainServicesCfg(flags)
 
-        if ConfigFlags.PerfMon.doFullMonMT:
-            cfg.merge(PerfMonMTSvcCfg(ConfigFlags))
+        if flags.PerfMon.doFullMonMT:
+            cfg.merge(PerfMonMTSvcCfg(flags))
 
         # Avoid stack traces to the exception handler. These traces
         # aren't very useful since they just point to the handler, not
@@ -251,11 +252,11 @@ def main():
         # Needed for filtering, Athena only for now
         # Create CutFlowSvc otherwise the default CutFlowSvc that has only
         # one CutflowBookkeeper object, and can't deal with multiple weights
-        cfg.merge(CutFlowSvcCfg(ConfigFlags))
-        cfg.merge(BookkeeperToolCfg(ConfigFlags))
+        cfg.merge(CutFlowSvcCfg(flags))
+        cfg.merge(BookkeeperToolCfg(flags))
         # Adjust the loop manager to announce the event number less frequently.
         # Makes a big difference if running over many events
-        if ConfigFlags.Concurrency.NumThreads > 0:
+        if flags.Concurrency.NumThreads > 0:
             cfg.addService(
                 CompFactory.AthenaHiveEventLoopMgr(EventPrintoutInterval=500)
             )
@@ -264,20 +265,20 @@ def main():
 
         from AthenaRootComps.xAODEventSelectorConfig import xAODReadCfg
 
-        cfg.merge(xAODReadCfg(ConfigFlags))
+        cfg.merge(xAODReadCfg(flags))
 
-        datatype = ConfigFlags.Analysis.DataType
+        datatype = flags.Analysis.DataType
 
         log.info(
             f"Self-configured: datatype: '{datatype}', "
-            f"is PHYSLITE? {is_physlite(ConfigFlags)}"
+            f"is PHYSLITE? {is_physlite(flags)}"
         )
 
         from HH4bAnalysis.config.trigger_lists import TRIGGER_LISTS
 
-        trigger_year_list = ConfigFlags.Analysis.trigger_year
+        trigger_year_list = flags.Analysis.trigger_year
         if trigger_year_list == "Auto":
-            trigger_year_list = ConfigFlags.Analysis.Years
+            trigger_year_list = flags.Analysis.Years
             log.info(
                 "Self-configured trigger list for years: "
                 f"{', '.join(str(year) for year in trigger_year_list) or None}"
@@ -285,7 +286,7 @@ def main():
 
         trigger_chains = set()
         # Empty: set the HH4b analysis triggers
-        trigger_groups = ConfigFlags.Analysis.trigger_list
+        trigger_groups = flags.Analysis.trigger_list
         if trigger_groups == "Auto":
             log.info("No triggers specified, adding HH4b analysis triggers")
             trigger_groups = ["HH4bResolved", "HH4bBoosted"]
@@ -298,7 +299,7 @@ def main():
             raise err
 
         trigger_chains = list(trigger_chains)
-        if not ConfigFlags.Analysis.do_trigger_filtering:
+        if not flags.Analysis.do_trigger_filtering:
             log.warning("Disabling trigger filtering, all events will pass!")
 
         from HH4bAnalysis.config.good_runs_lists import GOOD_RUNS_LISTS
@@ -308,7 +309,7 @@ def main():
         if datatype == "data":
             log.info(
                 "Self-configured GRL for years: "
-                f"{', '.join(str(year) for year in ConfigFlags.Analysis.Years) or None}"
+                f"{', '.join(str(year) for year in flags.Analysis.Years) or None}"
             )
             grl_lists_by_year = {
                 year: list
@@ -317,15 +318,15 @@ def main():
             }
             grl_files = [
                 list
-                for year in ConfigFlags.Analysis.Years
+                for year in flags.Analysis.Years
                 for list in grl_lists_by_year[year]
             ]
 
-        do_PRW = is_mc_phys(ConfigFlags)
+        do_PRW = is_mc_phys(flags)
         prw_files, lumicalc_files = [], []
         if do_PRW:
             try:
-                prw_files, lumicalc_files = get_pileup_config_files(ConfigFlags)
+                prw_files, lumicalc_files = get_pileup_config_files(flags)
             except LookupError as err:
                 log.error(err)
                 do_PRW = False
@@ -335,7 +336,7 @@ def main():
         cfg.addSequence(CompFactory.AthSequencer("HH4bSeq"), "AthAlgSeq")
         cfg.merge(
             cpalgs_cfg(
-                ConfigFlags,
+                flags,
                 datatype,
                 trigger_chains=trigger_chains,
                 do_PRW=do_PRW,
@@ -345,27 +346,27 @@ def main():
             ),
             "HH4bSeq",
         )
-        if ConfigFlags.Analysis.out_file:
+        if flags.Analysis.out_file:
             cfg.merge(
                 minituple_cfg(
-                    ConfigFlags,
+                    flags,
                     trigger_chains=trigger_chains,
                     do_PRW=do_PRW,
-                    do_OR=ConfigFlags.Analysis.do_overlap_removal,
+                    do_OR=flags.Analysis.do_overlap_removal,
                 ),
                 "HH4bSeq",
             )
 
-        if ConfigFlags.Analysis.h5_output:
+        if flags.Analysis.h5_output:
             cfg.merge(
-                get_h5_cfg(ConfigFlags),
+                get_h5_cfg(flags),
                 "HH4bSeq",
             )
 
         cfg.merge(event_counter_cfg("n_events"), "HH4bSeq")
 
         # Print the full job configuration
-        if ConfigFlags.Exec.OutputLevel <= INFO:
+        if flags.Exec.OutputLevel <= INFO:
             cfg.printConfig(summariseProps=False)
 
     # clear the cutflow
