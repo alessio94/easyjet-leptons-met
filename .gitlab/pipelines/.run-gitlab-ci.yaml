@@ -43,6 +43,12 @@ run_easyjet-ntupler_sh4b-boosted-mc20_DAOD_PHYS:
   script:
     - easyjet-test sh4b-boosted-mc20
 
+run_easyjet-ntupler_sh4b-boosted-mc20-p5658_DAOD_PHYS:
+  stage: run
+  needs: [compile]
+  script:
+    - easyjet-test sh4b-boosted-mc20-p5658
+
 run_easyjet-ntupler_fast_sh4b-boosted-mc20_DAOD_PHYS:
   stage: run
   needs: [compile]
