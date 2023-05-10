@@ -8,16 +8,16 @@ from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetCalibAnalysisSequ
 def jet_sequence_cfg(
     flags,
     datatype,
-    incontainername,
-    outcontainername,
-    muoncontainername,
+    inname,
+    outname,
+    muonname,
     is_daod_physlite,
     do_bjet_ptcalib,
 ):
     cfg = ComponentAccumulator()
     jet_sequence = makeJetAnalysisSequence(
         datatype,
-        jetCollection=incontainername,
+        jetCollection=inname,
         postfix="smallR",
         deepCopyOutput=False,
         shallowViewOutput=True,
@@ -33,7 +33,7 @@ def jet_sequence_cfg(
         "xAODBTaggingEfficiency/13TeV/2022-22-13TeV-MC20-CDI-2022-07-28_v1.root"
     )
     # This is the container name that is available in the CDI aboce
-    jet_btag_containername = "AntiKt4EMPFlowJets"
+    jet_btag_name = "AntiKt4EMPFlowJets"
 
     # TODO: no DL1d branches in PHYSLITE yet
     if is_daod_physlite:
@@ -48,12 +48,12 @@ def jet_sequence_cfg(
         makeFTagAnalysisSequence(
             jet_sequence,
             datatype,
-            jetCollection=jet_btag_containername,
+            jetCollection=jet_btag_name,
             btagWP=btag_wp,
             btagger=tagger,
             generator="Pythia8",
             minPt=20000,
-            postfix=f"{jet_btag_containername}_{tagger_wp}",
+            postfix=f"{jet_btag_name}_{tagger_wp}",
             preselection=None,
             kinematicSelection=True,
             noEfficiency=False,
@@ -66,13 +66,13 @@ def jet_sequence_cfg(
         makeBJetCalibAnalysisSequence(
             flags,
             jet_sequence,
-            muonName=muoncontainername,
+            muonName=muonname,
             btagSelDecor="ftag_select_DL1dv00_FixedCutBEff_77",
         )
 
     jet_sequence.configure(
-        inputName=incontainername,
-        outputName=outcontainername,
+        inputName=inname,
+        outputName=outname,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(jet_sequence.getName()))
@@ -90,12 +90,12 @@ def jet_sequence_cfg(
 
 
 # lr = large-R
-def lr_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
+def lr_jet_sequence_cfg(flags, datatype, inname, outname):
     cfg = ComponentAccumulator()
     # with ConfigurableCABehavior(False):
     lr_recojet_sequence = makeJetAnalysisSequence(
         datatype,
-        jetCollection=incontainername,
+        jetCollection=inname,
         postfix="largeR",
         deepCopyOutput=False,
         shallowViewOutput=True,
@@ -106,7 +106,7 @@ def lr_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
     )
 
     lr_recojet_sequence.configure(
-        inputName=incontainername, outputName=outcontainername
+        inputName=inname, outputName=outname
     )
 
     cfg.addSequence(CompFactory.AthSequencer(lr_recojet_sequence.getName()))
@@ -118,12 +118,12 @@ def lr_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
     return cfg
 
 
-def lr_ufo_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
+def lr_ufo_jet_sequence_cfg(flags, datatype, inname, outname):
     cfg = ComponentAccumulator()
     # with ConfigurableCABehavior(False):
     lr_ufo_recojet_sequence = makeJetAnalysisSequence(
         datatype,
-        jetCollection=incontainername,
+        jetCollection=inname,
         postfix="largeRUFO",
         deepCopyOutput=False,
         shallowViewOutput=True,
@@ -134,7 +134,7 @@ def lr_ufo_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
     )
 
     lr_ufo_recojet_sequence.configure(
-        inputName=incontainername, outputName=outcontainername
+        inputName=inname, outputName=outname
     )
 
     cfg.addSequence(CompFactory.AthSequencer(lr_ufo_recojet_sequence.getName()))
@@ -147,7 +147,7 @@ def lr_ufo_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
 
 
 # vr = variable R
-def vr_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
+def vr_jet_sequence_cfg(flags, datatype, inname, outname):
     cfg = ComponentAccumulator()
 
     def create_vr_jet_sequence():
@@ -175,13 +175,13 @@ def vr_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
         "xAODBTaggingEfficiency/13TeV/2021-22-13TeV-MC16-CDI-2021-12-02_v2.root"
     )
     # This is the container name that is available in the CDI aboce
-    vr_jet_btag_containername = "AntiKtVR30Rmax4Rmin02TrackJets"
+    vr_jet_btag_name = "AntiKtVR30Rmax4Rmin02TrackJets"
     for tagger_wp in flags.Analysis.vr_btag_wps:
         tagger, btag_wp = tagger_wp.split("_", 1)
         makeFTagAnalysisSequence(
             vr_jet_sequence,
             datatype,
-            jetCollection=vr_jet_btag_containername,
+            jetCollection=vr_jet_btag_name,
             btagWP=btag_wp,
             btagger=tagger,
             minPt=10e3,
@@ -194,8 +194,8 @@ def vr_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
         )
 
     vr_jet_sequence.configure(
-        inputName=incontainername,
-        outputName=outcontainername,
+        inputName=inname,
+        outputName=outname,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(vr_jet_sequence.getName()))
@@ -214,14 +214,14 @@ def vr_jet_sequence_cfg(flags, datatype, incontainername, outcontainername):
 
 def lr_jet_ghost_vr_jet_association_cfg(
     flags,
-    inlrjet_containername,
+    inlrjet_name,
 ):
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
         CompFactory.HH4B.LargeJetGhostVRJetAssociationAlg(
             "LargeJetGhostVRJetAssociationAlg",
             isMC=flags.Input.isMC,
-            LargeJetInKey=inlrjet_containername,
+            LargeJetInKey=inlrjet_name,
             workingPoints=flags.Analysis.vr_btag_wps,
         )
     )
@@ -229,7 +229,7 @@ def lr_jet_ghost_vr_jet_association_cfg(
     return cfg
 
 
-def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername, do_OR):
+def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_name, do_OR):
     branches = []
 
     vr_vars = [
@@ -249,10 +249,10 @@ def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername, do_OR
     or_str = "OR_" if do_OR else ""
     for var in vr_vars:
         branches += [
-            f"{inlrjet_containername}.{var} -> recojet_antikt10_{or_str}%SYS%_{var}"
+            f"{inlrjet_name}.{var} -> recojet_antikt10_{or_str}%SYS%_{var}"
         ]
     branches += [
-        f"{inlrjet_containername}.leadingVRTrackJetsBtag_{wp} -> "
+        f"{inlrjet_name}.leadingVRTrackJetsBtag_{wp} -> "
         f"recojet_antikt10_{or_str}%SYS%_leadingVRTrackJetsBtag_{wp}"
         for wp in flags.Analysis.vr_btag_wps
     ]
@@ -261,7 +261,7 @@ def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername, do_OR
     ]
     if flags.Input.isMC:
         branches += [
-            f"{inlrjet_containername}.VRTrackJetsTruthLabel -> "
+            f"{inlrjet_name}.VRTrackJetsTruthLabel -> "
             f"recojet_antikt10_{or_str}"
             "%SYS%_leadingVRTrackJets_HadronConeExclTruthLabelID"
         ]
@@ -271,14 +271,14 @@ def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_containername, do_OR
 
 def lr_ufo_jet_ghost_vr_jet_association_cfg(
     flags,
-    inlrufojet_containername,
+    inlrufojet_name,
 ):
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
         CompFactory.HH4B.LargeJetGhostVRJetAssociationAlg(
             "LargeUFOJetGhostVRJetAssociationAlg",
             isMC=flags.Input.isMC,
-            LargeJetInKey=inlrufojet_containername,
+            LargeJetInKey=inlrufojet_name,
             workingPoints=flags.Analysis.vr_btag_wps,
         )
     )
@@ -287,7 +287,7 @@ def lr_ufo_jet_ghost_vr_jet_association_cfg(
 
 
 def lr_ufo_jet_ghost_vr_jet_association_branches(
-    flags, inlrufojet_containername, do_OR
+    flags, inlrufojet_name, do_OR
 ):
     branches = []
 
@@ -308,17 +308,17 @@ def lr_ufo_jet_ghost_vr_jet_association_branches(
     or_str = "OR_" if do_OR else ""
     for var in ufo_vars:
         branches += [
-            f"{inlrufojet_containername}.{var} ->"
+            f"{inlrufojet_name}.{var} ->"
             f" recoUFOjet_antikt10_{or_str}%SYS%_{var}"
         ]
     branches += [
-        f"{inlrufojet_containername}.leadingVRTrackJetsBtag_{wp} -> "
+        f"{inlrufojet_name}.leadingVRTrackJetsBtag_{wp} -> "
         f"recoUFOjet_antikt10_{or_str}%SYS%_leadingVRTrackJetsBtag_{wp}"
         for wp in flags.Analysis.vr_btag_wps
     ]
     if flags.Input.isMC:
         branches += [
-            f"{inlrufojet_containername}.VRTrackJetsTruthLabel ->"
+            f"{inlrufojet_name}.VRTrackJetsTruthLabel ->"
             f" recoUFOjet_antikt10_{or_str}"
             "%SYS%_leadingVRTrackJets_HadronConeExclTruthLabelID"
         ]

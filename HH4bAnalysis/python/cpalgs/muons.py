@@ -2,7 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def muon_sequence_cfg(flags, datatype, incontainername, outcontainername):
+def muon_sequence_cfg(flags, datatype, inname, outname):
     cfg = ComponentAccumulator()
     from MuonAnalysisAlgorithms.MuonAnalysisSequence import makeMuonAnalysisSequence
 
@@ -18,7 +18,7 @@ def muon_sequence_cfg(flags, datatype, incontainername, outcontainername):
         enableKinematicHistograms=False,
         isRun3Geo=(flags.Analysis.Run == 3),
     )
-    muon_sequence.configure(inputName=incontainername, outputName=outcontainername)
+    muon_sequence.configure(inputName=inname, outputName=outname)
     # print(muon_sequence)  # For debugging
 
     cfg.addSequence(CompFactory.AthSequencer(muon_sequence.getName()))

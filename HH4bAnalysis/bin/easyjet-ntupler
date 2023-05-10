@@ -39,9 +39,10 @@ from HH4bAnalysis.utils.argument_parser import (
     fill_config_flags_from_args,
     fill_from_args,
 )
+from HH4bAnalysis.utils.option_validation import validate_flags
 
 
-def defineArgs(ConfigFlags):
+def defineArgs(flags):
     # Generate a parser and add an output file argument, then retrieve the args
     parser = argparse.ArgumentParser()
     add_standard_athena_args(parser)
@@ -179,25 +180,21 @@ def main():
     setRogueLoggers(flags.Exec.OutputLevel)
     # Write user options to flags.Analysis
     fill_config_flags_from_args(args, flags, overwrites)
-    # If we're just printing the configuration, do that and exit before
-    # configuring the job and checking the input files.
-    if args.dry_run:
-        return 1
-
-    flags.addFlag("Analysis.do_muons", True)
 
     # disable some sequences for fast-run
     if flags.Analysis.fast_test:
         flags.Analysis.do_overlap_removal = False
         flags.Analysis.do_muons = False
+        flags.Analysis.write_muons = False
 
     if is_physlite(flags):
         flags.Analysis.do_overlap_removal = False
-
-    # Arg checks
-    assert not (
-        flags.Analysis.disable_calib and not is_physlite(flags)
-    ), "Disabling calibrations is not safe except on PHYSLITE!"
+        # Some collections are not supported:
+        flags.Analysis.do_large_R_Topo_jets = False
+        flags.Analysis.write_large_R_Topo_jets = False
+        flags.Analysis.do_VR_jets = False
+        flags.Analysis.write_VR_jets = False
+        log.warning('Operating on PHYSLITE, disabling large-R and VR collections')
 
     log.info(f"Operating on input files {flags.Input.Files}")
 
@@ -219,9 +216,14 @@ def main():
 
     flags.PerfMon.doFullMonMT = flags.Exec.OutputLevel <= INFO
 
+    validate_flags(flags)
+
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
     flags.lock()
+
+    if args.dry_run:
+        return 1
 
     if flags.Analysis.cache_metadata:
         cache_metadata(Path("metadata.json"))
