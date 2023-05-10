@@ -256,7 +256,11 @@ def add_small_R_branches(flags, is_daod_physlite, containers, tree_branches, do_
 
     jvt_branches = get_jvt_detailed_branches(flags, is_daod_physlite)
 
-    if not flags.Analysis.disable_calib:
+    if (
+        flags.Analysis.do_small_R_jets
+        and flags.Analysis.do_muons
+        and not flags.Analysis.disable_calib
+    ):
         if do_or:
             # B-jet WPs
             if flags.Analysis.write_small_R_btag:

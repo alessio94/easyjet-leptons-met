@@ -7,8 +7,7 @@ def overlap_sequence_cfg(
     datatype,
     inputnames,
     outputnames,
-    doFatJets=True,
-    doMuons=True,
+    **kwargs
 ):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.OverlapAnalysisSequence import (
@@ -22,17 +21,13 @@ def overlap_sequence_cfg(
         linkOverlapObjects=False,
         doEleEleOR=False,
         doTaus=False,
-        doElectrons=True,
-        doMuons=doMuons,
-        doJets=True,
-        doPhotons=True,
-        doFatJets=doFatJets,
         enableUserPriority=False,
         bJetLabel="",
         boostedLeptons=False,
         postfix="",
         shallowViewOutput=True,
         enableCutflow=False,
+        **kwargs
     )
     overlapSequence.configure(
         inputName=inputnames,

@@ -1,3 +1,11 @@
+# Toggles for object types
+do_small_R_jets: true
+do_large_R_Topo_jets: true
+do_large_R_UFO_jets: false
+do_VR_jets: true
+do_muons: true
+do_electrons: false
+do_photons: false
 # btagging working points for small Rjets
 btag_wps:
     - DL1dv00_FixedCutBEff_70
@@ -41,19 +49,19 @@ systematics_regex: [".*"]
 do_overlap_removal: false
 # which objects to write
 write_small_R_jets: true
+write_large_R_Topo_jets: true
+write_large_R_UFO_jets: true
+write_muons: false
+write_electrons: false
+write_photons: false
 # additional small R info 
 write_small_R_higgs_parent_info: true
 write_small_R_btag: true
 write_small_R_JVT_details: true
 write_small_R_no_bjet_calib: true
 write_small_R_gn2_branches: true
-write_large_R_Topo_jets: true
-write_large_R_UFO_jets: true
 # additional Large R info
 write_large_R_substructure: false
-write_electrons: false
-write_photons: false
-write_muons: false
 # turned off automatically if MC
 write_truth_small_R_jets: true
 write_truth_large_R_jets: true

@@ -2,7 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def photon_sequence_cfg(flags, datatype, incontainername, outcontainername):
+def photon_sequence_cfg(flags, datatype, inname, outname):
     cfg = ComponentAccumulator()
     from EgammaAnalysisAlgorithms.PhotonAnalysisSequence import (
         makePhotonAnalysisSequence,
@@ -22,7 +22,7 @@ def photon_sequence_cfg(flags, datatype, incontainername, outcontainername):
         enableCutflow=False,
         enableKinematicHistograms=False,
     )
-    photon_sequence.configure(inputName=incontainername, outputName=outcontainername)
+    photon_sequence.configure(inputName=inname, outputName=outname)
 
     cfg.addSequence(CompFactory.AthSequencer(photon_sequence.getName()))
     for alg in photon_sequence.getGaudiConfig2Components():
