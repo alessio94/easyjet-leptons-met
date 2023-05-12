@@ -29,9 +29,11 @@ def validate_do_write_obj_flags(flags):
 def validate_analysis_prerequisites(flags):
     if flags.Analysis.do_resolved_dihiggs_analysis:
         assert flags.Analysis.do_small_R_jets
+        assert not flags.Analysis.disable_calib
 
     if flags.Analysis.do_boosted_dihiggs_analysis:
         assert flags.Analysis.do_large_R_Topo_jets
+        assert not flags.Analysis.disable_calib
 
 
 def validate_file_format(flags):

@@ -20,6 +20,8 @@ from PerfMonComps.PerfMonCompsConfig import PerfMonMTSvcCfg
 from AthenaCommon.Constants import INFO
 
 from HH4bAnalysis.config.cpalgs_config import cpalgs_cfg
+from HH4bAnalysis.config.truth_config import truth_info_cfg
+from HH4bAnalysis.config.dihiggs_analysis_config import dihiggs_analysis_cfg
 from HH4bAnalysis.config.sample_config import (
     get_run_years,
     get_pileup_config_files,
@@ -340,6 +342,26 @@ def main():
             ),
             "HH4bSeq",
         )
+
+        if flags.Input.isMC:
+            cfg.merge(
+                truth_info_cfg(
+                    flags,
+                ),
+                "HH4bSeq",
+            )
+
+        if (
+            flags.Analysis.do_resolved_dihiggs_analysis
+            or flags.Analysis.do_boosted_dihiggs_analysis
+        ):
+            cfg.merge(
+                dihiggs_analysis_cfg(
+                    flags,
+                ),
+                "HH4bSeq",
+            )
+
         if flags.Analysis.out_file:
             cfg.merge(
                 minituple_cfg(

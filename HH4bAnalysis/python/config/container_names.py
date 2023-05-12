@@ -60,20 +60,21 @@ def get_container_names(flags):
 
     # If not running calibration algs in PHYSLITE, we can just skip the outputs
     if flags.Analysis.disable_calib:
-        return {"inputs": inputs, "outputs": inputs}
+        outputs = inputs
+    else:
+        outputs = dict(
+            reco4Jet=f"Analysis{inputs['reco4Jet']}_%SYS%",
+            reco10UFOJet=f"Analysis{inputs['reco10UFOJet']}_%SYS%",
+            muons=f"Analysis{inputs['muons']}_%SYS%",
+            electrons=f"Analysis{inputs['electrons']}_%SYS%",
+            photons=f"Analysis{inputs['photons']}_%SYS%",
+            #
+            truth4Jet=inputs["truth4Jet"],
+            truth10TrimmedJet=inputs["truth10TrimmedJet"],
+            truth10SoftDropJet=inputs["truth10SoftDropJet"],
+        )
 
-    outputs = dict(
-        reco4Jet=f"Analysis{inputs['reco4Jet']}_%SYS%",
-        reco10UFOJet=f"Analysis{inputs['reco10UFOJet']}_%SYS%",
-        muons=f"Analysis{inputs['muons']}_%SYS%",
-        electrons=f"Analysis{inputs['electrons']}_%SYS%",
-        photons=f"Analysis{inputs['photons']}_%SYS%",
-        #
-        truth4Jet=inputs["truth4Jet"],
-        truth10TrimmedJet=inputs["truth10TrimmedJet"],
-        truth10SoftDropJet=inputs["truth10SoftDropJet"],
-        truthHHParticles="TruthDiHiggsParticles",
-    )
+    outputs["truthHHParticles"] = "TruthDiHiggsParticles"
 
     if flags.Input.isPHYSLITE:
         outputs["reco10TopoJet"] = ""

@@ -1,7 +1,5 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from HH4bAnalysis.config.boosted_config import boosted_cfg
-from HH4bAnalysis.cpalgs.electrons import electron_sequence_cfg
 from HH4bAnalysis.cpalgs.event import (
     event_selection_sequence_cfg,
     generator_sequence_cfg,
@@ -9,22 +7,29 @@ from HH4bAnalysis.cpalgs.event import (
     trigger_sequence_cfg,
 )
 from HH4bAnalysis.cpalgs.jets import (
-    lr_jet_sequence_cfg,
     jet_sequence_cfg,
-    lr_jet_ghost_vr_jet_association_cfg,
     vr_jet_sequence_cfg,
+    lr_jet_sequence_cfg,
+    lr_jet_ghost_vr_jet_association_cfg,
 )
 from HH4bAnalysis.cpalgs.muons import muon_sequence_cfg
+from HH4bAnalysis.cpalgs.electrons import electron_sequence_cfg
 from HH4bAnalysis.cpalgs.photons import photon_sequence_cfg
 from HH4bAnalysis.cpalgs.overlap_removal import overlap_sequence_cfg
-from HH4bAnalysis.config.resolved_config import resolved_cfg
-from HH4bAnalysis.config.truth_particle_info_config import truth_particle_info_cfg
 from HH4bAnalysis.config.container_names import get_container_names
 from HH4bAnalysis.utils.log_helper import log
 from HH4bAnalysis.utils.systematics_helper import consolidate_systematics_regex
 
 from HH4bAnalysis.config.event_counter_config import event_counter_cfg
-from HH4bAnalysis.config.jet_parent_decorator_config import jet_parent_decorator_cfg
+
+# Map object types to sequence configurators
+analysis_seqs = {
+    "muons":        muon_sequence_cfg,
+    "electrons":    electron_sequence_cfg,
+    "photons":      photon_sequence_cfg,
+    "small_R_jets": jet_sequence_cfg,
+    "VR_jets":      vr_jet_sequence_cfg,
+}
 
 
 # Generate the algorithm to do the dumping.
@@ -80,21 +85,6 @@ def cpalgs_cfg(
 
     containers = get_container_names(flags)
 
-    # truth record seems to be broken in physlite
-    if flags.Input.isMC and not flags.Input.isPHYSLITE:
-        cfg.merge(jet_parent_decorator_cfg(
-            flags,
-            jet_collection=containers["inputs"]["reco4Jet"],
-            name_prefix="smallR",
-            match_dr=0.3
-        ))
-        cfg.merge(jet_parent_decorator_cfg(
-            flags,
-            jet_collection=containers["inputs"]["reco10UFOJet"],
-            name_prefix="largeR",
-            match_dr=0.9,
-        ))
-
     if not flags.Analysis.disable_calib:
         if do_PRW:
             log.info("Adding PRW sequence")
@@ -112,42 +102,25 @@ def cpalgs_cfg(
             # EventInfo.generatorWeight_%SYS%
             cfg.merge(generator_sequence_cfg(flags))
 
-        if flags.Analysis.do_electrons:
-            log.info("Adding electron seq")
-            cfg.merge(
-                electron_sequence_cfg(
-                    flags,
-                    containers,
+        for objtype in [
+            "electrons",
+            "photons",
+            "muons",
+            "small_R_jets",
+            "VR_jets"
+        ]:
+            if flags(f"Analysis.do_{objtype}"):
+                log.info(f"Adding {objtype} seq")
+                cfg.merge(
+                    analysis_seqs[objtype](
+                        flags,
+                        containers,
+                    )
                 )
-            )
-
-        if flags.Analysis.do_photons:
-            log.info("Adding photon seq")
-            cfg.merge(
-                photon_sequence_cfg(
-                    flags,
-                    containers,
-                )
-            )
-
-        if flags.Analysis.do_muons:
-            log.info("Adding muon seq")
-            cfg.merge(
-                muon_sequence_cfg(
-                    flags,
-                    containers,
-                )
-            )
-
-        if flags.Analysis.do_small_R_jets:
-            log.info("Adding small-R jet seq")
-            cfg.merge(
-                jet_sequence_cfg(
-                    flags,
-                    containers,
-                )
-            )
-            cfg.merge(event_counter_cfg("n_small_r"))
+                if objtype == "small_R_jets":
+                    cfg.merge(event_counter_cfg("n_small_r"))
+                if objtype == "VR_jets":
+                    cfg.merge(event_counter_cfg("n_vr"))
 
         if flags.Analysis.do_large_R_Topo_jets:
             log.info("Adding large-R jet seq")
@@ -158,7 +131,16 @@ def cpalgs_cfg(
                     lr_jet_type="Topo",
                 )
             )
-            cfg.merge(event_counter_cfg("n_large_r"))
+            cfg.merge(event_counter_cfg("n_large_r_topo"))
+
+            if flags.Analysis.do_VR_jets:
+                cfg.merge(
+                    lr_jet_ghost_vr_jet_association_cfg(
+                        flags,
+                        containers,
+                        lr_jet_type="Topo",
+                    )
+                )
 
         if flags.Analysis.do_large_R_UFO_jets:
             log.info("Adding UFO large-R jet seq")
@@ -171,26 +153,7 @@ def cpalgs_cfg(
             )
             cfg.merge(event_counter_cfg("n_large_r_ufo"))
 
-        if flags.Analysis.do_VR_jets:
-            log.info("Adding VR jet seq")
-            cfg.merge(
-                vr_jet_sequence_cfg(
-                    flags,
-                    containers,
-                )
-            )
-            cfg.merge(event_counter_cfg("n_vr"))
-
-            if flags.Analysis.do_large_R_Topo_jets:
-                cfg.merge(
-                    lr_jet_ghost_vr_jet_association_cfg(
-                        flags,
-                        containers,
-                        lr_jet_type="Topo",
-                    )
-                )
-
-            if flags.Analysis.do_large_R_UFO_jets:
+            if flags.Analysis.do_VR_jets:
                 cfg.merge(
                     lr_jet_ghost_vr_jet_association_cfg(
                         flags,
@@ -198,16 +161,6 @@ def cpalgs_cfg(
                         lr_jet_type="UFO",
                     )
                 )
-
-        if flags.Input.isMC:
-            log.info("Adding truth particle info seq")
-            cfg.merge(
-                truth_particle_info_cfg(
-                    flags,
-                    containers,
-                )
-            )
-            cfg.merge(event_counter_cfg("n_truth_particle"))
 
     ########################################################################
     # Begin postprocessing
@@ -223,24 +176,5 @@ def cpalgs_cfg(
             )
         )
         cfg.merge(event_counter_cfg("n_overlap"))
-
-    if flags.Analysis.do_resolved_dihiggs_analysis and not flags.Analysis.disable_calib:
-        cfg.merge(
-            resolved_cfg(
-                flags,
-                smalljetkey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
-            )
-        )
-        cfg.merge(event_counter_cfg("n_resolved"))
-    if flags.Analysis.do_boosted_dihiggs_analysis and not flags.Analysis.disable_calib:
-        cfg.merge(
-            boosted_cfg(
-                flags,
-                largejetkey=containers["outputs"]["reco10TopoJet"].replace(
-                    "%SYS%", "NOSYS"
-                ),
-            )
-        )
-        cfg.merge(event_counter_cfg("n_merged"))
 
     return cfg
