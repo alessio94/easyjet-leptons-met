@@ -181,20 +181,14 @@ def main():
     # Write user options to flags.Analysis
     fill_config_flags_from_args(args, flags, overwrites)
 
+    # Determined from input file without explicitly reading metadata
+    flags.addFlag("Input.isPHYSLITE", lambda prevFlags: is_physlite(prevFlags))
+
     # disable some sequences for fast-run
     if flags.Analysis.fast_test:
         flags.Analysis.do_overlap_removal = False
         flags.Analysis.do_muons = False
         flags.Analysis.write_muons = False
-
-    if is_physlite(flags):
-        flags.Analysis.do_overlap_removal = False
-        # Some collections are not supported:
-        flags.Analysis.do_large_R_Topo_jets = False
-        flags.Analysis.write_large_R_Topo_jets = False
-        flags.Analysis.do_VR_jets = False
-        flags.Analysis.write_VR_jets = False
-        log.warning('Operating on PHYSLITE, disabling large-R and VR collections')
 
     log.info(f"Operating on input files {flags.Input.Files}")
 
@@ -270,10 +264,9 @@ def main():
         cfg.merge(xAODReadCfg(flags))
 
         datatype = flags.Analysis.DataType
-
         log.info(
-            f"Self-configured: datatype: '{datatype}', "
-            f"is PHYSLITE? {is_physlite(flags)}"
+            f"Self-configured: datatype: '{flags.Analysis.DataType}', "
+            f"is PHYSLITE? {flags.Input.isPHYSLITE}"
         )
 
         from HH4bAnalysis.config.trigger_lists import TRIGGER_LISTS
@@ -308,7 +301,7 @@ def main():
 
         grl_runs = GOOD_RUNS_LISTS.keys()
         grl_files = []
-        if datatype == "data":
+        if flags.Analysis.DataType == "data":
             log.info(
                 "Self-configured GRL for years: "
                 f"{', '.join(str(year) for year in flags.Analysis.Years) or None}"
@@ -339,7 +332,6 @@ def main():
         cfg.merge(
             cpalgs_cfg(
                 flags,
-                datatype,
                 trigger_chains=trigger_chains,
                 do_PRW=do_PRW,
                 prw_files=prw_files,

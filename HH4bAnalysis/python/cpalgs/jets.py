@@ -7,26 +7,22 @@ from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetCalibAnalysisSequ
 
 def jet_sequence_cfg(
     flags,
-    datatype,
-    inname,
-    outname,
-    muonname,
-    is_daod_physlite,
-    do_bjet_ptcalib,
+    containers,
 ):
+
     cfg = ComponentAccumulator()
     jet_sequence = makeJetAnalysisSequence(
-        datatype,
-        jetCollection=inname,
+        flags.Analysis.DataType,
+        jetCollection=containers["inputs"]["reco4Jet"],
         postfix="smallR",
         deepCopyOutput=False,
         shallowViewOutput=True,
-        runGhostMuonAssociation=not is_daod_physlite,
+        runGhostMuonAssociation=not flags.Input.isPHYSLITE,
         enableCutflow=False,
         enableKinematicHistograms=False,
-        runJvtUpdate=not is_daod_physlite,
-        runNNJvtUpdate=not is_daod_physlite,
-        runJvtSelection=not is_daod_physlite,
+        runJvtUpdate=not flags.Input.isPHYSLITE,
+        runNNJvtUpdate=not flags.Input.isPHYSLITE,
+        runJvtSelection=not flags.Input.isPHYSLITE,
     )
 
     btag_calib_file = (
@@ -35,19 +31,11 @@ def jet_sequence_cfg(
     # This is the container name that is available in the CDI aboce
     jet_btag_name = "AntiKt4EMPFlowJets"
 
-    # TODO: no DL1d branches in PHYSLITE yet
-    if is_daod_physlite:
-        working_points = [
-            wp.replace("DL1dv00", "DL1r") for wp in flags.Analysis.btag_wps
-        ]
-    else:
-        working_points = flags.Analysis.btag_wps
-
-    for tagger_wp in working_points:
+    for tagger_wp in flags.Analysis.btag_wps:
         tagger, btag_wp = tagger_wp.split("_", 1)
         makeFTagAnalysisSequence(
             jet_sequence,
-            datatype,
+            flags.Analysis.DataType,
             jetCollection=jet_btag_name,
             btagWP=btag_wp,
             btagger=tagger,
@@ -61,18 +49,20 @@ def jet_sequence_cfg(
             enableCutflow=False,
         )
 
-    if do_bjet_ptcalib:
+    # Run this by default, but will fail if muon calib sequence not run
+    # TODO: Add a toggle?
+    if flags.Analysis.do_muons:
         # Pick a reasonable b-tag selection?
         makeBJetCalibAnalysisSequence(
             flags,
             jet_sequence,
-            muonName=muonname,
+            muonName=containers["outputs"]["muons"],
             btagSelDecor="ftag_select_DL1dv00_FixedCutBEff_77",
         )
 
     jet_sequence.configure(
-        inputName=inname,
-        outputName=outname,
+        inputName=containers["inputs"]["reco4Jet"],
+        outputName=containers["outputs"]["reco4Jet"],
     )
 
     cfg.addSequence(CompFactory.AthSequencer(jet_sequence.getName()))
@@ -90,64 +80,35 @@ def jet_sequence_cfg(
 
 
 # lr = large-R
-def lr_jet_sequence_cfg(flags, datatype, inname, outname):
+def lr_jet_sequence_cfg(flags, containers, lr_jet_type):
     cfg = ComponentAccumulator()
-    # with ConfigurableCABehavior(False):
     lr_recojet_sequence = makeJetAnalysisSequence(
-        datatype,
-        jetCollection=inname,
-        postfix="largeR",
+        flags.Analysis.DataType,
+        jetCollection=containers["inputs"][f"reco10{lr_jet_type}Jet"],
+        postfix="largeR" + lr_jet_type,
         deepCopyOutput=False,
         shallowViewOutput=True,
         runGhostMuonAssociation=False,
         enableCutflow=False,
         enableKinematicHistograms=False,
-        largeRMass="Comb",
     )
 
     lr_recojet_sequence.configure(
-        inputName=inname, outputName=outname
+        inputName=containers["inputs"][f"reco10{lr_jet_type}Jet"],
+        outputName=containers["outputs"][f"reco10{lr_jet_type}Jet"]
     )
 
     cfg.addSequence(CompFactory.AthSequencer(lr_recojet_sequence.getName()))
     for alg in lr_recojet_sequence.getGaudiConfig2Components():
         if "JetCalibrationAlg" in alg.getName():
-            alg.calibrationTool.IsData = datatype == "data"
+            alg.calibrationTool.IsData = flags.Analysis.DataType == "data"
         cfg.addEventAlgo(alg, lr_recojet_sequence.getName())
 
     return cfg
 
 
-def lr_ufo_jet_sequence_cfg(flags, datatype, inname, outname):
-    cfg = ComponentAccumulator()
-    # with ConfigurableCABehavior(False):
-    lr_ufo_recojet_sequence = makeJetAnalysisSequence(
-        datatype,
-        jetCollection=inname,
-        postfix="largeRUFO",
-        deepCopyOutput=False,
-        shallowViewOutput=True,
-        runGhostMuonAssociation=False,
-        enableCutflow=False,
-        enableKinematicHistograms=False,
-        largeRMass="Comb",
-    )
-
-    lr_ufo_recojet_sequence.configure(
-        inputName=inname, outputName=outname
-    )
-
-    cfg.addSequence(CompFactory.AthSequencer(lr_ufo_recojet_sequence.getName()))
-    for alg in lr_ufo_recojet_sequence.getGaudiConfig2Components():
-        if "JetCalibrationAlg" in alg.getName():
-            alg.calibrationTool.IsData = datatype == "data"
-        cfg.addEventAlgo(alg, lr_ufo_recojet_sequence.getName())
-
-    return cfg
-
-
 # vr = variable R
-def vr_jet_sequence_cfg(flags, datatype, inname, outname):
+def vr_jet_sequence_cfg(flags, containers):
     cfg = ComponentAccumulator()
 
     def create_vr_jet_sequence():
@@ -180,7 +141,7 @@ def vr_jet_sequence_cfg(flags, datatype, inname, outname):
         tagger, btag_wp = tagger_wp.split("_", 1)
         makeFTagAnalysisSequence(
             vr_jet_sequence,
-            datatype,
+            flags.Analysis.DataType,
             jetCollection=vr_jet_btag_name,
             btagWP=btag_wp,
             btagger=tagger,
@@ -194,8 +155,8 @@ def vr_jet_sequence_cfg(flags, datatype, inname, outname):
         )
 
     vr_jet_sequence.configure(
-        inputName=inname,
-        outputName=outname,
+        inputName=containers["inputs"]["vrJet"],
+        outputName=containers["outputs"]["vrJet"],
     )
 
     cfg.addSequence(CompFactory.AthSequencer(vr_jet_sequence.getName()))
@@ -214,113 +175,20 @@ def vr_jet_sequence_cfg(flags, datatype, inname, outname):
 
 def lr_jet_ghost_vr_jet_association_cfg(
     flags,
-    inlrjet_name,
+    containers,
+    lr_jet_type,
 ):
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
         CompFactory.HH4B.LargeJetGhostVRJetAssociationAlg(
-            "LargeJetGhostVRJetAssociationAlg",
+            f"Large{lr_jet_type}JetGhostVRJetAssociationAlg",
             isMC=flags.Input.isMC,
-            LargeJetInKey=inlrjet_name,
+            LargeJetInKey=containers["outputs"][f"reco10{lr_jet_type}Jet"].replace(
+                "%SYS%", "NOSYS"
+            ),
             workingPoints=flags.Analysis.vr_btag_wps,
+            EventInfoDecorSuffix=lr_jet_type,
         )
     )
 
     return cfg
-
-
-def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_name, do_OR):
-    branches = []
-
-    vr_vars = [
-        "goodVRTrackJets",
-        "minRelativeDeltaRToVRJet",
-        "leadingVRTrackJetsPt",
-        "leadingVRTrackJetsEta",
-        "leadingVRTrackJetsPhi",
-        "leadingVRTrackJetsM",
-        "leadingVRTrackJetsDeltaR12",
-        "leadingVRTrackJetsDeltaR13",
-        "leadingVRTrackJetsDeltaR32",
-        "Xbb2020v3_Higgs",
-        "Xbb2020v3_Top",
-        "Xbb2020v3_QCD",
-    ]
-    or_str = "OR_" if do_OR else ""
-    for var in vr_vars:
-        branches += [
-            f"{inlrjet_name}.{var} -> recojet_antikt10_{or_str}%SYS%_{var}"
-        ]
-    branches += [
-        f"{inlrjet_name}.leadingVRTrackJetsBtag_{wp} -> "
-        f"recojet_antikt10_{or_str}%SYS%_leadingVRTrackJetsBtag_{wp}"
-        for wp in flags.Analysis.vr_btag_wps
-    ]
-    branches += [
-        "EventInfo.passRelativeDeltaRToVRJetCut -> passRelativeDeltaRToVRJetCut"
-    ]
-    if flags.Input.isMC:
-        branches += [
-            f"{inlrjet_name}.VRTrackJetsTruthLabel -> "
-            f"recojet_antikt10_{or_str}"
-            "%SYS%_leadingVRTrackJets_HadronConeExclTruthLabelID"
-        ]
-
-    return branches
-
-
-def lr_ufo_jet_ghost_vr_jet_association_cfg(
-    flags,
-    inlrufojet_name,
-):
-    cfg = ComponentAccumulator()
-    cfg.addEventAlgo(
-        CompFactory.HH4B.LargeJetGhostVRJetAssociationAlg(
-            "LargeUFOJetGhostVRJetAssociationAlg",
-            isMC=flags.Input.isMC,
-            LargeJetInKey=inlrufojet_name,
-            workingPoints=flags.Analysis.vr_btag_wps,
-        )
-    )
-
-    return cfg
-
-
-def lr_ufo_jet_ghost_vr_jet_association_branches(
-    flags, inlrufojet_name, do_OR
-):
-    branches = []
-
-    ufo_vars = [
-        "goodVRTrackJets",
-        "minRelativeDeltaRToVRJet",
-        "leadingVRTrackJetsPt",
-        "leadingVRTrackJetsEta",
-        "leadingVRTrackJetsPhi",
-        "leadingVRTrackJetsM",
-        "leadingVRTrackJetsDeltaR12",
-        "leadingVRTrackJetsDeltaR13",
-        "leadingVRTrackJetsDeltaR32",
-        "Xbb2020v3_Higgs",
-        "Xbb2020v3_Top",
-        "Xbb2020v3_QCD",
-    ]
-    or_str = "OR_" if do_OR else ""
-    for var in ufo_vars:
-        branches += [
-            f"{inlrufojet_name}.{var} ->"
-            f" recoUFOjet_antikt10_{or_str}%SYS%_{var}"
-        ]
-    branches += [
-        f"{inlrufojet_name}.leadingVRTrackJetsBtag_{wp} -> "
-        f"recoUFOjet_antikt10_{or_str}%SYS%_leadingVRTrackJetsBtag_{wp}"
-        for wp in flags.Analysis.vr_btag_wps
-    ]
-    if flags.Input.isMC:
-        branches += [
-            f"{inlrufojet_name}.VRTrackJetsTruthLabel ->"
-            f" recoUFOjet_antikt10_{or_str}"
-            "%SYS%_leadingVRTrackJets_HadronConeExclTruthLabelID"
-        ]
-
-    return branches

@@ -47,7 +47,7 @@ do_overlap_removal: true
 write_small_R_jets: true
 write_large_R_Topo_jets: true
 write_large_R_UFO_jets: false
-write_VR_jets: false
+write_VR_jets: true
 write_muons: true
 write_electrons: false
 write_photons: false

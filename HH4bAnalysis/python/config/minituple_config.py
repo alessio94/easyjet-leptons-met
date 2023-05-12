@@ -1,10 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.config.boosted_config import boosted_branches
-from HH4bAnalysis.cpalgs.jets import (
-    lr_jet_ghost_vr_jet_association_branches,
-    lr_ufo_jet_ghost_vr_jet_association_branches,
-)
 from HH4bAnalysis.config.resolved_config import resolved_branches
 from HH4bAnalysis.cpalgs.tree import tree_cfg
 from HH4bAnalysis.config.sample_config import (
@@ -12,7 +8,6 @@ from HH4bAnalysis.config.sample_config import (
     SampleTypes,
 )
 from HH4bAnalysis.config.container_names import get_container_names
-from HH4bAnalysis.utils.inputs_helper import is_physlite
 from HH4bAnalysis.utils.log_helper import log
 
 
@@ -42,7 +37,6 @@ def _get_truth_four_mom_branches(container, alias):
 
 def minituple_cfg(flags, trigger_chains, do_PRW=False, do_OR=False):
     cfg = ComponentAccumulator()
-    is_daod_physlite = is_physlite(flags)
 
     containers = get_container_names(flags)["outputs"]
     log.debug(f"Containers requested in dataset: {containers}")
@@ -101,17 +95,17 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False, do_OR=False):
 
     if flags.Analysis.write_small_R_jets:
         tree_branches = add_small_R_branches(
-            flags, is_daod_physlite, containers, tree_branches, do_or=do_OR
+            flags, containers, tree_branches, do_or=do_OR
         )
 
     if flags.Analysis.write_large_R_Topo_jets:
         tree_branches = add_large_R_Topo_branches(
-            flags, is_daod_physlite, containers, tree_branches, do_or=do_OR
+            flags, containers, tree_branches, do_or=do_OR
         )
 
     if flags.Analysis.write_large_R_UFO_jets:
         tree_branches = add_large_R_UFO_branches(
-            flags, is_daod_physlite, containers, tree_branches, do_or=do_OR
+            flags, containers, tree_branches, do_or=do_OR
         )
 
     if flags.Input.isMC and flags.Analysis.write_truth_small_R_jets:
@@ -123,13 +117,13 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False, do_OR=False):
         if flags.Analysis.write_truth_large_R_jets:
             if flags.Analysis.write_large_R_Topo_jets:
                 tree_branches += _get_four_mom_branches(
-                    containers["truth10Jet"],
+                    containers["truth10TrimmedJet"],
                     "truthjet_antikt10",
                     do_systematics=False,
                 )
             if flags.Analysis.write_large_R_UFO_jets:
                 tree_branches += _get_four_mom_branches(
-                    containers["truth10UFOJet"],
+                    containers["truth10SoftDropJet"],
                     "truthUFOjet_antikt10",
                     do_systematics=False,
                 )
@@ -170,7 +164,7 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False, do_OR=False):
     return cfg
 
 
-def get_jvt_detailed_branches(flags, is_daod_physlite):
+def get_jvt_detailed_branches(flags):
     # JVT
     jvt_branches = [
         "Jvt",
@@ -196,7 +190,7 @@ def get_jet_truth_labels(flags):
         "HadronConeExclTruthLabelID",
     ]
 
-    if is_physlite(flags):
+    if flags.Input.isPHYSLITE:
         truth_labels = []
     else:
         truth_labels = [f"parent{b}{l}" for l in parent_labels for b in parent_bosons]
@@ -247,14 +241,14 @@ def get_small_R_gn2_branches():
     return small_R_gn2_branches
 
 
-def add_small_R_branches(flags, is_daod_physlite, containers, tree_branches, do_or):
+def add_small_R_branches(flags, containers, tree_branches, do_or):
     tree_branches += _get_four_mom_branches(
         container=containers["reco4Jet"], alias="recojet_antikt4", do_or=do_or
     )
     if flags.Input.isMC and flags.Analysis.write_small_R_higgs_parent_info:
         tree_branches += get_jet_truth_labels(flags)
 
-    jvt_branches = get_jvt_detailed_branches(flags, is_daod_physlite)
+    jvt_branches = get_jvt_detailed_branches(flags)
 
     if (
         flags.Analysis.do_small_R_jets
@@ -319,7 +313,7 @@ def add_small_R_branches(flags, is_daod_physlite, containers, tree_branches, do_
     # not available in PHYSLITE... yet
     # NB these are read from BTagging collection
     # so cannot be compared to thinned list of jets!
-    if flags.Analysis.write_small_R_gn2_branches and not is_daod_physlite:
+    if flags.Analysis.write_small_R_gn2_branches and not flags.Input.isPHYSLITE:
         small_R_gn2_branches = get_small_R_gn2_branches()
         tree_branches += [
             f"BTagging_AntiKt4EMPFlow.{var} -> recojet_antikt4_NOSYS_{var}"
@@ -329,11 +323,52 @@ def add_small_R_branches(flags, is_daod_physlite, containers, tree_branches, do_
     return tree_branches
 
 
+def lr_jet_ghost_vr_jet_association_branches(flags, inlrjet_name, lr_jet_type, do_OR):
+    branches = []
+
+    vr_vars = [
+        "goodVRTrackJets",
+        "minRelativeDeltaRToVRJet",
+        "leadingVRTrackJetsPt",
+        "leadingVRTrackJetsEta",
+        "leadingVRTrackJetsPhi",
+        "leadingVRTrackJetsM",
+        "leadingVRTrackJetsDeltaR12",
+        "leadingVRTrackJetsDeltaR13",
+        "leadingVRTrackJetsDeltaR32",
+        "Xbb2020v3_Higgs",
+        "Xbb2020v3_Top",
+        "Xbb2020v3_QCD",
+    ]
+    or_str = "OR_" if do_OR else ""
+    for var in vr_vars:
+        branches += [
+            f"{inlrjet_name}.{var} -> recojet_antikt10{lr_jet_type}_{or_str}%SYS%_{var}"
+        ]
+    branches += [
+        f"{inlrjet_name}.leadingVRTrackJetsBtag_{wp} -> "
+        f"recojet_antikt10{lr_jet_type}_{or_str}%SYS%_leadingVRTrackJetsBtag_{wp}"
+        for wp in flags.Analysis.vr_btag_wps
+    ]
+    branches += [
+        f"EventInfo.passRelativeDeltaRToVRJetCut{lr_jet_type}"
+        f" -> passRelativeDeltaRToVRJetCut{lr_jet_type}"
+    ]
+    if flags.Input.isMC:
+        branches += [
+            f"{inlrjet_name}.VRTrackJetsTruthLabel -> "
+            f"recojet_antikt10{lr_jet_type}_{or_str}"
+            "%SYS%_leadingVRTrackJets_HadronConeExclTruthLabelID"
+        ]
+
+    return branches
+
+
 def add_large_R_Topo_branches(
-    flags, is_daod_physlite, containers, tree_branches, do_or
+    flags, containers, tree_branches, do_or
 ):
-    if not is_daod_physlite:
-        reco10JetVars = (
+    if not flags.Input.isPHYSLITE:
+        reco10TopoJetVars = (
             [
                 "NTrimSubjets",
                 "TrackSumPt",
@@ -357,55 +392,57 @@ def add_large_R_Topo_branches(
 
         if do_or:
             if flags.Analysis.write_large_R_substructure:
-                for var in reco10JetVars:
+                for var in reco10TopoJetVars:
                     # one after the other for better readability in the root file
                     tree_branches += [
-                        f"{containers['reco10Jet']}_OR.{var} ->"
-                        f" recojet_antikt10_OR_%SYS%_{var}"
+                        f"{containers['reco10TopoJet']}_OR.{var} ->"
+                        f" recojet_antikt10Topo_OR_%SYS%_{var}"
                     ]
             tree_branches += _get_four_mom_branches(
-                containers["reco10Jet"], "recojet_antikt10", do_or=True
+                containers["reco10TopoJet"], "recojet_antikt10Topo", do_or=True
             )
             # Restore SYS when LargeRJet alg supports systematics
             if flags.Input.isMC:
                 tree_branches += [
                     (
-                        f"{containers['reco10Jet'].replace('%SYS%','NOSYS')}_OR"
+                        f"{containers['reco10TopoJet'].replace('%SYS%','NOSYS')}_OR"
                         ".R10TruthLabel_R21Consolidated ->"
-                        " recojet_antikt10_OR_NOSYS_R10TruthLabel_R21Consolidated"
+                        " recojet_antikt10Topo_OR_NOSYS_R10TruthLabel_R21Consolidated"
                     ),
                 ]
             tree_branches += [
                 b.replace("%SYS%", "NOSYS")
                 for b in lr_jet_ghost_vr_jet_association_branches(
-                    flags, f"{containers['reco10Jet']}_OR", do_OR=True
+                    flags, f"{containers['reco10TopoJet']}_OR", "Topo", do_OR=True
                 )
             ]
         else:
             if flags.Analysis.write_large_R_substructure:
-                for var in reco10JetVars:
+                for var in reco10TopoJetVars:
                     tree_branches += [
-                        f"{containers['reco10Jet']}.{var} ->"
-                        f" recojet_antikt10_%SYS%_{var}"
+                        f"{containers['reco10TopoJet']}.{var} ->"
+                        f" recojet_antikt10Topo_%SYS%_{var}"
                     ]
+
             tree_branches += _get_four_mom_branches(
-                containers["reco10Jet"], "recojet_antikt10", do_or=False
+                containers["reco10TopoJet"], "recojet_antikt10Topo", do_or=False
             )
             if flags.Input.isMC:
                 tree_branches += [
                     (
-                        f"{containers['reco10Jet'].replace('%SYS%','NOSYS')}"
+                        f"{containers['reco10TopoJet'].replace('%SYS%','NOSYS')}"
                         ".R10TruthLabel_R21Consolidated ->"
-                        " recojet_antikt10_NOSYS_R10TruthLabel_R21Consolidated"
+                        " recojet_antikt10Topo_NOSYS_R10TruthLabel_R21Consolidated"
                     ),
                 ]
 
-            tree_branches += [
-                b.replace("%SYS%", "NOSYS")
-                for b in lr_jet_ghost_vr_jet_association_branches(
-                    flags, containers["reco10Jet"], do_OR=False
-                )
-            ]
+            if flags.Analysis.write_VR_jets:
+                tree_branches += [
+                    b.replace("%SYS%", "NOSYS")
+                    for b in lr_jet_ghost_vr_jet_association_branches(
+                        flags, containers["reco10TopoJet"], "Topo", do_OR=False
+                    )
+                ]
 
     return tree_branches
 
@@ -425,8 +462,8 @@ def get_ufo_large_R_gn2_branches():
     return ufo_large_R_gn2_branches
 
 
-def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches, do_or):
-    if not is_daod_physlite:
+def add_large_R_UFO_branches(flags, containers, tree_branches, do_or):
+    if not flags.Input.isPHYSLITE:
         reco10UFOJetVars = (
             [
                 "Tau1_wta",
@@ -441,14 +478,8 @@ def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches,
                 "JetConstitScaleMomentum_eta",
                 "JetConstitScaleMomentum_phi",
                 "JetConstitScaleMomentum_m",
-                "GhostBHadronsFinalCount",
             ]
-            + [
-                # TODO: I have no idea what this boi is doing in the
-                # data-only section, but it's not in the data we're
-                # testing for now...
-                "Tau4_wta"
-            ]
+            + ["GhostBHadronsFinalCount"]
             if flags.Input.isMC
             else []
         )
@@ -464,12 +495,12 @@ def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches,
                     tree_branches += [
                         (
                             f"{containers['reco10UFOJet']}_OR.{v} ->"
-                            f" recoUFOjet_antikt10_OR_%SYS%_{v}"
+                            f" recojet_antikt10UFO_OR_%SYS%_{v}"
                         ),
                     ]
             tree_branches += _get_four_mom_branches(
                 containers["reco10UFOJet"],
-                "recoUFOjet_antikt10",
+                "recojet_antikt10UFO",
                 do_or=True,
             )
             # Restore SYS when LargeRJet alg supports systematics
@@ -478,21 +509,22 @@ def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches,
                     (
                         f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}_OR"
                         ".R10TruthLabel_R21Precision_2022v1 ->"
-                        " recoUFOjet_antikt10_OR_NOSYS_R10TruthLabel_R21Precision_2022v1"  # noqa
+                        " recojet_antikt10UFO_OR_NOSYS_R10TruthLabel_R21Precision_2022v1"  # noqa
                     ),
                     (
                         f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}_OR"
                         ".R10TruthLabel_R22v1 ->"
-                        " recoUFOjet_antikt10_OR_NOSYS_R10TruthLabel_R22v1"
+                        " recojet_antikt10UFO_OR_NOSYS_R10TruthLabel_R22v1"
                     ),
                 ]
 
-            tree_branches += lr_ufo_jet_ghost_vr_jet_association_branches(
-                flags, f"{containers['reco10UFOJet']}_OR", do_OR=True
-            )
+            if flags.Analysis.write_VR_jets:
+                tree_branches += lr_jet_ghost_vr_jet_association_branches(
+                    flags, f"{containers['reco10UFOJet']}_OR", "UFO", do_OR=True
+                )
             if is_valid_ptag:
                 tree_branches += [
-                    f"{containers['reco10UFOJet']}.{var} -> recoUFOjet_antikt10_OR_%SYS%_{var}"  # noqa
+                    f"{containers['reco10UFOJet']}.{var} -> recojet_antikt10UFO_OR_%SYS%_{var}"  # noqa
                     for var in ufo_large_R_gn2_branches
                 ]
         else:
@@ -501,12 +533,12 @@ def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches,
                     tree_branches += [
                         (
                             f"{containers['reco10UFOJet']}.{v} ->"
-                            f" recoUFOjet_antikt10_%SYS%_{v}"
+                            f" recojet_antikt10UFO_%SYS%_{v}"
                         ),
                     ]
             tree_branches += _get_four_mom_branches(
                 containers["reco10UFOJet"],
-                "recoUFOjet_antikt10",
+                "recojet_antikt10UFO",
                 do_or=False,
             )
             # Restore SYS when LargeRJet alg supports systematics
@@ -515,20 +547,20 @@ def add_large_R_UFO_branches(flags, is_daod_physlite, containers, tree_branches,
                     (
                         f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}"
                         ".R10TruthLabel_R21Precision_2022v1 ->"
-                        " recoUFOjet_antikt10_NOSYS_R10TruthLabel_R21Precision_2022v1"
+                        " recojet_antikt10UFO_NOSYS_R10TruthLabel_R21Precision_2022v1"
                     ),
                     (
                         f"{containers['reco10UFOJet'].replace('%SYS%','NOSYS')}"
                         ".R10TruthLabel_R22v1 ->"
-                        " recoUFOjet_antikt10_NOSYS_R10TruthLabel_R22v1"
+                        " recojet_antikt10UFO_NOSYS_R10TruthLabel_R22v1"
                     ),
                 ]
-            tree_branches += lr_ufo_jet_ghost_vr_jet_association_branches(
-                flags, containers["reco10UFOJet"], do_OR=False
+            tree_branches += lr_jet_ghost_vr_jet_association_branches(
+                flags, containers["reco10UFOJet"], "UFO", do_OR=False
             )
             if is_valid_ptag:
                 tree_branches += [
-                    f"{containers['reco10UFOJet']}.{var} -> recoUFOjet_antikt10_%SYS%_{var}"  # noqa
+                    f"{containers['reco10UFOJet']}.{var} -> recojet_antikt10UFO_%SYS%_{var}"  # noqa
                     for var in ufo_large_R_gn2_branches
                 ]
 
