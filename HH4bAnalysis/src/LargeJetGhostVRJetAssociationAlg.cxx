@@ -12,8 +12,6 @@ namespace HH4B
       const std::string &name, ISvcLocator *pSvcLocator)
       : AthAlgorithm(name, pSvcLocator)
   {
-    declareProperty("workingPoints", m_workingPoints,
-                    "the working points to select VR track jets with");
   }
 
   StatusCode LargeJetGhostVRJetAssociationAlg ::initialize()
@@ -40,6 +38,10 @@ namespace HH4B
 
     ATH_CHECK(m_largeJetInKey.initialize());
     ATH_CHECK(m_eventInfoKey.initialize());
+
+    m_passRelativeDeltaRToVRJetCutDecorator = SG::AuxElement::Decorator<char>(
+      "passRelativeDeltaRToVRJetCut" + m_eventInfoDecorSuffix
+    );
 
     return StatusCode::SUCCESS;
   }

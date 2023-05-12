@@ -5,14 +5,14 @@ from HH4bAnalysis.config.sample_config import SampleTypes
 from HH4bAnalysis.utils.log_helper import log
 
 
-def event_selection_sequence_cfg(flags, datatype, grlfiles=[], loose=False):
+def event_selection_sequence_cfg(flags, grlfiles=[], loose=False):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.EventSelectionAnalysisSequence import (
         makeEventSelectionAnalysisSequence,
     )
 
     event_selection_sequence = makeEventSelectionAnalysisSequence(
-        datatype, userGRLFiles=grlfiles, runEventCleaning=True
+        flags.Analysis.DataType, userGRLFiles=grlfiles, runEventCleaning=True
     )
 
     cfg.addSequence(CompFactory.AthSequencer(event_selection_sequence.getName()))
@@ -36,14 +36,14 @@ def event_selection_sequence_cfg(flags, datatype, grlfiles=[], loose=False):
     return cfg
 
 
-def trigger_sequence_cfg(flags, datatype, triggerchains):
+def trigger_sequence_cfg(flags, triggerchains):
     cfg = ComponentAccumulator()
     from TriggerAnalysisAlgorithms.TriggerAnalysisSequence import (
         makeTriggerAnalysisSequence,
     )
 
     trigger_sequence = makeTriggerAnalysisSequence(
-        datatype,
+        flags.Analysis.DataType,
         triggerChains=triggerchains,
         noFilter=False if flags.Analysis.do_trigger_filtering else True,
     )
@@ -55,13 +55,13 @@ def trigger_sequence_cfg(flags, datatype, triggerchains):
     return cfg
 
 
-def pileup_sequence_cfg(flags, datatype, prwfiles, lumicalcfiles):
+def pileup_sequence_cfg(flags, prwfiles, lumicalcfiles):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
 
     tags = flags.Input.AMITag
     pileup_sequence = makePileupAnalysisSequence(
-        datatype,
+        flags.Analysis.DataType,
         files=flags.Input.Files,
         useDefaultConfig=SampleTypes.mc21a.value in tags,
     )
@@ -79,7 +79,7 @@ def pileup_sequence_cfg(flags, datatype, prwfiles, lumicalcfiles):
     return cfg
 
 
-def generator_sequence_cfg(flags, datatype):
+def generator_sequence_cfg(flags):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.GeneratorAnalysisSequence import (
         makeGeneratorAnalysisSequence,
@@ -99,7 +99,7 @@ def generator_sequence_cfg(flags, datatype):
     is_bad_tag = ptag in ["p5226", "p5278", "p5334"]
     doCBK = not is_bad_tag and flags.Analysis.out_file
     generator_sequence = makeGeneratorAnalysisSequence(
-        datatype,
+        flags.Analysis.DataType,
         saveCutBookkeepers=doCBK,
         runNumber=flags.Input.RunNumber[0],
         cutBookkeepersSystematics=doCBK,

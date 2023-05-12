@@ -63,8 +63,13 @@ private:
     SG::ReadHandleKey<xAOD::JetContainer> m_largeJetInKey{
         this, "LargeJetInKey", "", "the large-R jet collection to run on"};
 
-    std::vector<std::string> m_workingPoints;
+    Gaudi::Property<std::string> m_eventInfoDecorSuffix{
+        this, "EventInfoDecorSuffix", "",
+        "suffix indicating the type of jet used for EventInfo decorations"};
 
+    Gaudi::Property<std::vector<std::string> > m_workingPoints {
+        this, "workingPoints", {}, "the working points to select VR track jets with"};
+    
     // ghost associated VR track jets are only on the untrimmed 1.0 jets
     SG::AuxElement::ConstAccessor<ELJC> m_largeRUntrimmedAccessor{"Parent"};
 
@@ -82,7 +87,9 @@ private:
     SG::AuxElement::ConstAccessor<float> relativeDeltaRToVRJet{
         "relativeDeltaRToVRJet"};
 
-    SG::AuxElement::Decorator<float> m_passRelativeDeltaRToVRJetCutDecorator{
+    // Name will be updated with suffix in initialise
+    // Retained here for reference
+    SG::AuxElement::Decorator<char> m_passRelativeDeltaRToVRJetCutDecorator{
         "passRelativeDeltaRToVRJetCut"};
 
     SG::AuxElement::Decorator<int> m_goodVRTrackJetCountDecorator{

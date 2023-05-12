@@ -1,95 +1,85 @@
-from HH4bAnalysis.utils.inputs_helper import is_physlite
+# A bit repetitive but avoids extracting the list
+# from a specific file format
+objtypes = [
+    "reco4Jet",
+    "reco10TopoJet",
+    "reco10UFOJet",
+    "vrJet",
+    "truth4Jet",
+    "truth10TrimmedJet",
+    "truth10SoftDropJet",
+    "muons",
+    "electrons",
+    "photons",
+    "truthBSMParticles",
+    "truthSMParticles",
+]
 
-# custom container names used in this framework
-RECO_4_PFLOW_JETS_KEY = "Reco4PFlowJets"
-RECO_10_PFLOW_JETS_KEY = "Reco10PFlowJets"
-RECO_10_UFO_JETS_KEY = "Reco10UFOJets"
-VR_JETS_KEY = "VRJets"
-TRUTH_4_JETS_KEY = "Truth4Jets"
-TRUTH_10_JETS_KEY = "Truth10Jets"
-TRUTH_10_UFO_JETS_KEY = "Truth10UFOJets"
-MUONS_KEY = "Muons"
-ELECTRONS_KEY = "Electrons"
-PHOTONS_KEY = "Photons"
-TRUTH_PARTICLE_BSM_INFO_KEY = "TruthBSMParticles"
-TRUTH_PARTICLE_SM_INFO_KEY = "TruthSMParticles"
-
-
-CONTAINER_MAP = {
+container_map = {
     "DAOD_PHYS": {
-        RECO_4_PFLOW_JETS_KEY: "AntiKt4EMPFlowJets",
-        RECO_10_PFLOW_JETS_KEY: "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets",
-        RECO_10_UFO_JETS_KEY: "AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets",
-        VR_JETS_KEY: "AntiKtVR30Rmax4Rmin02PV0TrackJets",
-        TRUTH_4_JETS_KEY: "AntiKt4TruthDressedWZJets",
-        TRUTH_10_JETS_KEY: "AntiKt10TruthTrimmedPtFrac5SmallR20Jets",
-        TRUTH_10_UFO_JETS_KEY: "AntiKt10TruthSoftDropBeta100Zcut10Jets",
-        MUONS_KEY: "Muons",
-        ELECTRONS_KEY: "Electrons",
-        PHOTONS_KEY: "Photons",
-        TRUTH_PARTICLE_BSM_INFO_KEY: "TruthBSMWithDecayParticles",
-        TRUTH_PARTICLE_SM_INFO_KEY: "TruthBosonsWithDecayParticles",
+        "reco4Jet":           "AntiKt4EMPFlowJets",
+        "reco10TopoJet":      "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets",
+        "reco10UFOJet":       "AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets",
+        "vrJet":              "AntiKtVR30Rmax4Rmin02PV0TrackJets",
+        "truth4Jet":          "AntiKt4TruthDressedWZJets",
+        "truth10TrimmedJet":  "AntiKt10TruthTrimmedPtFrac5SmallR20Jets",
+        "truth10SoftDropJet": "AntiKt10TruthSoftDropBeta100Zcut10Jets",
+        "muons":              "Muons",
+        "electrons":          "Electrons",
+        "photons":            "Photons",
+        "truthBSMParticles":  "TruthBSMWithDecayParticles",
+        "truthSMParticles":   "TruthBosonsWithDecayParticles",
     },
     "DAOD_PHYSLITE": {
-        RECO_4_PFLOW_JETS_KEY: "AnalysisJets",
-        RECO_10_PFLOW_JETS_KEY: "",
-        RECO_10_UFO_JETS_KEY: "",
-        VR_JETS_KEY: "",
-        TRUTH_4_JETS_KEY: "AntiKt4TruthDressedWZJets",
-        TRUTH_10_JETS_KEY: "",
-        TRUTH_10_UFO_JETS_KEY: "",
-        MUONS_KEY: "AnalysisMuons",
-        ELECTRONS_KEY: "AnalysisElectrons",
-        PHOTONS_KEY: "AnalysisPhotons",
-        TRUTH_PARTICLE_BSM_INFO_KEY: "TruthBSMWithDecayParticles",
-        TRUTH_PARTICLE_SM_INFO_KEY: "TruthBosonsWithDecayParticles",
+        "reco4Jet":           "AnalysisJets",
+        "reco10TopoJet":      "",
+        "reco10UFOJet":       "AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets",
+        "vrJet":              "",
+        "truth4Jet":          "AntiKt4TruthDressedWZJets",
+        "truth10TrimmedJet":  "AntiKt10TruthTrimmedPtFrac5SmallR20Jets",
+        "truth10SoftDropJet": "AntiKt10TruthSoftDropBeta100Zcut10Jets",
+        "muons":              "AnalysisMuons",
+        "electrons":          "AnalysisElectrons",
+        "photons":            "AnalysisPhotons",
+        "truthBSMParticles":  "TruthBSMWithDecayParticles",
+        "truthSMParticles":   "TruthBosonsWithDecayParticles",
     },
 }
 
 
-def _get_container_name(qualitycontainerdesc, daodphyslite=False):
-    format_key = "DAOD_PHYSLITE" if daodphyslite else "DAOD_PHYS"
-    return CONTAINER_MAP[format_key][qualitycontainerdesc]
+def _get_container_name(objtype, daodphyslite=False):
+    daod_format = "DAOD_PHYSLITE" if daodphyslite else "DAOD_PHYS"
+    return container_map[daod_format][objtype]
 
 
 def get_container_names(flags):
-    is_daod_physlite = is_physlite(flags)
-    inputs = dict(
-        reco4Jet=_get_container_name("Reco4PFlowJets", is_daod_physlite),
-        truth4Jet=_get_container_name("Truth4Jets", is_daod_physlite),
-        reco10Jet=_get_container_name("Reco10PFlowJets", is_daod_physlite),
-        reco10UFOJet=_get_container_name("Reco10UFOJets", is_daod_physlite),
-        truth10Jet=_get_container_name("Truth10Jets", is_daod_physlite),
-        truth10UFOJet=_get_container_name("Truth10UFOJets", is_daod_physlite),
-        vrJet=_get_container_name("VRJets", is_daod_physlite),
-        muons=_get_container_name("Muons", is_daod_physlite),
-        electrons=_get_container_name("Electrons", is_daod_physlite),
-        photons=_get_container_name("Photons", is_daod_physlite),
-        truthSMParticles=_get_container_name("TruthSMParticles", is_daod_physlite),
-        truthBSMParticles=_get_container_name("TruthBSMParticles", is_daod_physlite),
-    )
+    inputs = {
+        objtype: _get_container_name(objtype, flags.Input.isPHYSLITE)
+        for objtype in objtypes
+    }
+
     # If not running calibration algs in PHYSLITE, we can just skip the outputs
     if flags.Analysis.disable_calib:
         return {"inputs": inputs, "outputs": inputs}
 
     outputs = dict(
         reco4Jet=f"Analysis{inputs['reco4Jet']}_%SYS%",
-        truth4Jet=inputs["truth4Jet"],
-        truth10Jet=inputs["truth10Jet"],
-        truth10UFOJet=inputs["truth10UFOJet"],
+        reco10UFOJet=f"Analysis{inputs['reco10UFOJet']}_%SYS%",
         muons=f"Analysis{inputs['muons']}_%SYS%",
         electrons=f"Analysis{inputs['electrons']}_%SYS%",
         photons=f"Analysis{inputs['photons']}_%SYS%",
-        truthParticles="TruthParticles",
+        #
+        truth4Jet=inputs["truth4Jet"],
+        truth10TrimmedJet=inputs["truth10TrimmedJet"],
+        truth10SoftDropJet=inputs["truth10SoftDropJet"],
+        truthHHParticles="TruthDiHiggsParticles",
     )
 
-    if not is_daod_physlite:
-        outputs["reco10Jet"] = f"Analysis{inputs['reco10Jet']}_%SYS%"
-        outputs["reco10UFOJet"] = f"Analysis{inputs['reco10UFOJet']}_%SYS%"
-        outputs["vrJet"] = f"Analysis{inputs['vrJet']}_%SYS%"
-    else:
-        outputs["reco10Jet"] = ""
-        outputs["reco10UFOJet"] = ""
+    if flags.Input.isPHYSLITE:
+        outputs["reco10TopoJet"] = ""
         outputs["vrJet"] = ""
+    else:
+        outputs["reco10TopoJet"] = f"Analysis{inputs['reco10TopoJet']}_%SYS%"
+        outputs["vrJet"] = f"Analysis{inputs['vrJet']}_%SYS%"
 
     return {"inputs": inputs, "outputs": outputs}

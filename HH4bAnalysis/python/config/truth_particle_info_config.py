@@ -4,18 +4,16 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 
 def truth_particle_info_cfg(
     flags,
-    sm_containerinkey,
-    bsm_containerinkey,
-    containeroutkey,
+    containers,
 ):
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
         CompFactory.HH4B.TruthParticleInformationAlg(
             "TruthParticleInformationAlg",
             EventInfoKey="EventInfo",
-            TruthParticleSMInKey=sm_containerinkey,
-            TruthParticleBSMInKey=bsm_containerinkey,
-            TruthParticleInformationOutKey=containeroutkey,
+            TruthParticleSMInKey=containers["inputs"]["truthSMParticles"],
+            TruthParticleBSMInKey=containers["inputs"]["truthBSMParticles"],
+            TruthParticleInformationOutKey=containers["outputs"]["truthHHParticles"],
         )
     )
 

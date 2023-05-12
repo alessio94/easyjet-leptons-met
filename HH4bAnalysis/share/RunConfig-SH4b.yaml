@@ -1,7 +1,7 @@
 # Toggles for object types
 do_small_R_jets: true
-do_large_R_Topo_jets: true
-do_large_R_UFO_jets: false
+do_large_R_Topo_jets: false
+do_large_R_UFO_jets: true
 do_VR_jets: true
 do_muons: true
 do_electrons: false
@@ -49,8 +49,9 @@ systematics_regex: [".*"]
 do_overlap_removal: false
 # which objects to write
 write_small_R_jets: true
-write_large_R_Topo_jets: true
+write_large_R_Topo_jets: false
 write_large_R_UFO_jets: true
+write_VR_jets: true
 write_muons: false
 write_electrons: false
 write_photons: false

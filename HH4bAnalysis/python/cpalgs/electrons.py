@@ -7,12 +7,12 @@ from EgammaAnalysisAlgorithms.ElectronAnalysisSequence import (
 )
 
 
-def electron_sequence_cfg(flags, datatype, inname, outname):
+def electron_sequence_cfg(flags, containers):
     cfg = ComponentAccumulator()
 
     # with ConfigurableCABehavior(False):
     electronSequence = makeElectronAnalysisSequence(
-        datatype,
+        flags.Analysis.DataType,
         workingPoint="LooseLHElectron.NonIso",
         postfix="loose",
         deepCopyOutput=False,
@@ -25,7 +25,10 @@ def electron_sequence_cfg(flags, datatype, inname, outname):
         enableCutflow=False,
         enableKinematicHistograms=False,
     )
-    electronSequence.configure(inputName=inname, outputName=outname)
+    electronSequence.configure(
+        inputName=containers["inputs"]["electrons"],
+        outputName=containers["outputs"]["electrons"],
+    )
 
     cfg.addSequence(CompFactory.AthSequencer(electronSequence.getName()))
     for alg in electronSequence.getGaudiConfig2Components():

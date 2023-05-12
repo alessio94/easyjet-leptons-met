@@ -1,8 +1,8 @@
 # Toggles for object types
 do_small_R_jets: true
-do_large_R_Topo_jets: true
-do_large_R_UFO_jets: false
-do_VR_jets: true
+do_large_R_Topo_jets: false
+do_large_R_UFO_jets: true
+do_VR_jets: false
 do_muons: true
 do_electrons: false
 do_photons: false
@@ -38,45 +38,30 @@ do_boosted_dihiggs_analysis: false
 truth_match_resolved: false
 truth_match_boosted: false
 # Whether to activate CP alg systematic variations
-do_CP_systematics: true
-systematics_regex: [
-        "JET_JER",
-        "JET_JMR",
-        "JET_JD2R",
-        "JET_Comb_Modelling",
-        "JET_Comb_Baseline",
-        "JET_Comb_Tracking",
-        "JET_Comb_TotalStat",
-        "JET_MassRes_Hbb",
-        "JET_MassRes_Top",
-        "JET_MassRes_WZ",
-        "JET_Rtrk_Modelling",
-        "JET_Rtrk_Baseline",
-        "JET_Rtrk_Tracking",
-        "JET_Rtrk_TotalStat",
-]
+do_CP_systematics: false
+systematics_regex: [".*"]
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
 # which objects to write
 write_small_R_jets: true
-write_large_R_Topo_jets: true
-write_large_R_UFO_jets: false
-write_VR_jets: true
-write_muons: false
+write_large_R_Topo_jets: false
+write_large_R_UFO_jets: true
+write_VR_jets: false
+write_muons: true
 write_electrons: false
 write_photons: false
 # additional small R info 
-write_small_R_higgs_parent_info: false
-write_small_R_btag: false
-write_small_R_JVT_details: false
-write_small_R_no_bjet_calib: false
-write_small_R_gn2_branches: false
+write_small_R_higgs_parent_info: true
+write_small_R_btag: true
+write_small_R_JVT_details: true
+write_small_R_no_bjet_calib: true
+write_small_R_gn2_branches: true
 # additional Large R info
-write_large_R_substructure: false
+write_large_R_substructure: true
 # turned off automatically if MC
-write_truth_small_R_jets: false
-write_truth_large_R_jets: false
-write_truth_higgs: false
+write_truth_small_R_jets: true
+write_truth_large_R_jets: true
+write_truth_higgs: true
 # whether to output a meta data file
 meta_cache: false

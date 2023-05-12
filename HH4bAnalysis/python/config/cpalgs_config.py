@@ -10,19 +10,16 @@ from HH4bAnalysis.cpalgs.event import (
 )
 from HH4bAnalysis.cpalgs.jets import (
     lr_jet_sequence_cfg,
-    lr_ufo_jet_sequence_cfg,
     jet_sequence_cfg,
     lr_jet_ghost_vr_jet_association_cfg,
-    lr_ufo_jet_ghost_vr_jet_association_cfg,
     vr_jet_sequence_cfg,
 )
 from HH4bAnalysis.cpalgs.muons import muon_sequence_cfg
 from HH4bAnalysis.cpalgs.photons import photon_sequence_cfg
-from HH4bAnalysis.cpalgs.postprocessing import overlap_sequence_cfg
+from HH4bAnalysis.cpalgs.overlap_removal import overlap_sequence_cfg
 from HH4bAnalysis.config.resolved_config import resolved_cfg
 from HH4bAnalysis.config.truth_particle_info_config import truth_particle_info_cfg
 from HH4bAnalysis.config.container_names import get_container_names
-from HH4bAnalysis.utils.inputs_helper import is_physlite
 from HH4bAnalysis.utils.log_helper import log
 from HH4bAnalysis.utils.systematics_helper import consolidate_systematics_regex
 
@@ -35,14 +32,12 @@ from HH4bAnalysis.config.jet_parent_decorator_config import jet_parent_decorator
 # so we will need to add a new sequence to the CA
 def cpalgs_cfg(
     flags,
-    datatype,
     trigger_chains=[],
     do_PRW=False,
     prw_files=[],
     lumicalc_files=[],
     grl_files=[],
 ):
-    is_daod_physlite = is_physlite(flags)
 
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
 
@@ -71,14 +66,14 @@ def cpalgs_cfg(
     # Removes events failing trigger and adds variable to EventInfo
     # if trigger passed or not, for example:
     # EventInfo.trigger_name
-    cfg.merge(trigger_sequence_cfg(flags, datatype, trigger_chains))
+    cfg.merge(trigger_sequence_cfg(flags, trigger_chains))
     cfg.merge(event_counter_cfg("n_trigger"))
 
     log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
     cfg.merge(
         event_selection_sequence_cfg(
-            flags, datatype, grlfiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
+            flags, grlfiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
         )
     )
     cfg.merge(event_counter_cfg("n_data_quality"))
@@ -86,7 +81,7 @@ def cpalgs_cfg(
     containers = get_container_names(flags)
 
     # truth record seems to be broken in physlite
-    if flags.Input.isMC and not is_physlite(flags):
+    if flags.Input.isMC and not flags.Input.isPHYSLITE:
         cfg.merge(jet_parent_decorator_cfg(
             flags,
             jet_collection=containers["inputs"]["reco4Jet"],
@@ -108,7 +103,6 @@ def cpalgs_cfg(
             cfg.merge(
                 pileup_sequence_cfg(
                     flags,
-                    datatype=datatype,
                     prwfiles=prw_files,
                     lumicalcfiles=lumicalc_files,
                 )
@@ -116,16 +110,14 @@ def cpalgs_cfg(
             log.info("Adding generator analysis sequence")
             # Adds variable to EventInfo if for generator weight, for example:
             # EventInfo.generatorWeight_%SYS%
-            cfg.merge(generator_sequence_cfg(flags, datatype))
+            cfg.merge(generator_sequence_cfg(flags))
 
         if flags.Analysis.do_electrons:
             log.info("Adding electron seq")
             cfg.merge(
                 electron_sequence_cfg(
                     flags,
-                    datatype=datatype,
-                    inname=containers["inputs"]["electrons"],
-                    outname=containers["outputs"]["electrons"],
+                    containers,
                 )
             )
 
@@ -134,9 +126,7 @@ def cpalgs_cfg(
             cfg.merge(
                 photon_sequence_cfg(
                     flags,
-                    datatype=datatype,
-                    inname=containers["inputs"]["photons"],
-                    outname=containers["outputs"]["photons"],
+                    containers,
                 )
             )
 
@@ -145,28 +135,16 @@ def cpalgs_cfg(
             cfg.merge(
                 muon_sequence_cfg(
                     flags,
-                    datatype=datatype,
-                    inname=containers["inputs"]["muons"],
-                    outname=containers["outputs"]["muons"],
+                    containers,
                 )
             )
-
-        muoncont = containers["outputs"]["muons"]
-        if not flags.Analysis.do_muons:
-            muoncont = containers["inputs"]["muons"]
 
         if flags.Analysis.do_small_R_jets:
             log.info("Adding small-R jet seq")
             cfg.merge(
                 jet_sequence_cfg(
                     flags,
-                    datatype=datatype,
-                    inname=containers["inputs"]["reco4Jet"],
-                    outname=containers["outputs"]["reco4Jet"],
-                    # Need muons for b-jet pt correction
-                    muonname=muoncont,
-                    do_bjet_ptcalib=flags.Analysis.do_muons,
-                    is_daod_physlite=is_daod_physlite,
+                    containers,
                 )
             )
             cfg.merge(event_counter_cfg("n_small_r"))
@@ -176,9 +154,8 @@ def cpalgs_cfg(
             cfg.merge(
                 lr_jet_sequence_cfg(
                     flags,
-                    datatype=datatype,
-                    inname=containers["inputs"]["reco10Jet"],
-                    outname=containers["outputs"]["reco10Jet"],
+                    containers,
+                    lr_jet_type="Topo",
                 )
             )
             cfg.merge(event_counter_cfg("n_large_r"))
@@ -186,11 +163,10 @@ def cpalgs_cfg(
         if flags.Analysis.do_large_R_UFO_jets:
             log.info("Adding UFO large-R jet seq")
             cfg.merge(
-                lr_ufo_jet_sequence_cfg(
+                lr_jet_sequence_cfg(
                     flags,
-                    datatype=datatype,
-                    inname=containers["inputs"]["reco10UFOJet"],
-                    outname=containers["outputs"]["reco10UFOJet"],
+                    containers,
+                    lr_jet_type="UFO"
                 )
             )
             cfg.merge(event_counter_cfg("n_large_r_ufo"))
@@ -200,9 +176,7 @@ def cpalgs_cfg(
             cfg.merge(
                 vr_jet_sequence_cfg(
                     flags,
-                    datatype=datatype,
-                    inname=containers["inputs"]["vrJet"],
-                    outname=containers["outputs"]["vrJet"],
+                    containers,
                 )
             )
             cfg.merge(event_counter_cfg("n_vr"))
@@ -211,19 +185,17 @@ def cpalgs_cfg(
                 cfg.merge(
                     lr_jet_ghost_vr_jet_association_cfg(
                         flags,
-                        inlrjet_name=containers["outputs"]["reco10Jet"].replace(
-                            "%SYS%", "NOSYS"
-                        ),
+                        containers,
+                        lr_jet_type="Topo",
                     )
                 )
 
             if flags.Analysis.do_large_R_UFO_jets:
                 cfg.merge(
-                    lr_ufo_jet_ghost_vr_jet_association_cfg(
+                    lr_jet_ghost_vr_jet_association_cfg(
                         flags,
-                        inlrufojet_name=containers["outputs"][
-                            "reco10UFOJet"
-                        ].replace("%SYS%", "NOSYS"),
+                        containers,
+                        lr_jet_type="UFO",
                     )
                 )
 
@@ -232,9 +204,7 @@ def cpalgs_cfg(
             cfg.merge(
                 truth_particle_info_cfg(
                     flags,
-                    sm_containerinkey=containers["inputs"]["truthSMParticles"],
-                    bsm_containerinkey=containers["inputs"]["truthBSMParticles"],
-                    containeroutkey=containers["outputs"]["truthParticles"],
+                    containers,
                 )
             )
             cfg.merge(event_counter_cfg("n_truth_particle"))
@@ -245,40 +215,11 @@ def cpalgs_cfg(
 
     if flags.Analysis.do_overlap_removal:
         log.info("Adding Overlap Removal sequence")
-        if (
-            flags.Analysis.write_large_R_Topo_jets
-            and flags.Analysis.write_large_R_UFO_jets
-        ):
-            raise ValueError("Overlap removal only works with one Large R collection")
-        overlapInputNames = {}
-        for objtype in ["muons", "electrons", "photons"]:
-            if flags(f"Analysis.do_{objtype}"):
-                overlapInputNames[objtype] = containers["outputs"][objtype]
-
-        if flags.Analysis.do_small_R_jets:
-            overlapInputNames["jets"] = containers["outputs"]["reco4Jet"]
-
-        do_fatJet_OR = False
-        if flags.Analysis.write_large_R_Topo_jets:
-            overlapInputNames["fatJets"] = containers["outputs"]["reco10Jet"]
-            do_fatJet_OR = True
-        if flags.Analysis.write_large_R_UFO_jets:
-            overlapInputNames["fatJets"] = containers["outputs"]["reco10UFOJet"]
-            do_fatJet_OR = True
-
-        overlapOutputNames = {k: f"{v}_OR" for k, v in overlapInputNames.items()}
 
         cfg.merge(
             overlap_sequence_cfg(
                 flags,
-                datatype=datatype,
-                inputnames=overlapInputNames,
-                outputnames=overlapOutputNames,
-                doJets=flags.Analysis.do_small_R_jets,
-                doFatJets=do_fatJet_OR,
-                doMuons=flags.Analysis.do_muons,
-                doElectrons=flags.Analysis.do_electrons,
-                doPhotons=flags.Analysis.do_photons,
+                containers,
             )
         )
         cfg.merge(event_counter_cfg("n_overlap"))
@@ -295,7 +236,7 @@ def cpalgs_cfg(
         cfg.merge(
             boosted_cfg(
                 flags,
-                largejetkey=containers["outputs"]["reco10Jet"].replace(
+                largejetkey=containers["outputs"]["reco10TopoJet"].replace(
                     "%SYS%", "NOSYS"
                 ),
             )
