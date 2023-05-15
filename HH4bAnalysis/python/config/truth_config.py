@@ -27,7 +27,7 @@ def truth_info_cfg(
             flags,
             jet_collection=containers["inputs"]["reco10UFOJet"],
             name_prefix="largeR",
-            match_dr=0.9,
+            match_dr=1.0,
         ))
 
     log.info("Adding truth particle info seq")

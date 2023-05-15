@@ -66,6 +66,10 @@ def jet_parent_decorator_cfg(
                 "TruthHFWithDecayParticles",
                 "TruthTaus",
             ],
+            countChildrenInCascadeWithPdgIds={
+                "nTopToWChildren": [-24, 24],
+                "nTopToBChildren": [-5, 5]
+            },
             targetContainer=jet_collection,
             **b_hadron_common
         )

@@ -6,6 +6,22 @@
 // no need for forward declaration here, no one reads this header
 #include "xAODBase/IParticleContainer.h"
 #include "xAODTruth/TruthParticleContainer.h"
+#include "StoreGate/WriteDecorHandleKeyArray.h"
+
+struct MatchedParent;
+
+class CascadeCountDecorator
+{
+public:
+  CascadeCountDecorator(const std::string& name,
+                        const std::vector<int>& pids);
+  void decorate(const SG::AuxElement& target,
+                const std::vector<MatchedParent>& parents) const;
+  void decorateDefault(const SG::AuxElement& target) const;
+private:
+  std::vector<int> m_pids;
+  SG::AuxElement::Decorator<unsigned char> m_dec;
+};
 
 class TruthParentDecoratorAlg: public AthReentrantAlgorithm
 {
@@ -21,6 +37,7 @@ public:
   virtual StatusCode execute (const EventContext&) const override;
   virtual StatusCode finalize () override;
 private:
+  using cascade_counter_property_t = std::map<std::string,std::vector<int>>;
   void addTruthContainer(Barcodex&, IPMap&, const TPC&) const;
   SG::ReadHandleKey<JC> m_target_container_key{
     this, "targetContainer", "", "target container to decorate"
@@ -67,6 +84,14 @@ private:
   SG::WriteDecorHandleKey<JC> m_match_pdgid_key;
   SG::WriteDecorHandleKey<JC> m_match_children_key;
   SG::WriteDecorHandleKey<JC> m_match_link_key;
+
+  Gaudi::Property<cascade_counter_property_t> m_counts_matching_cascade {
+    this, "countChildrenInCascadeWithPdgIds", {},
+    "Create one counter for each entry, named by key. Counts children "
+    "with at least one overlapping value in the cascade."
+  };
+  SG::WriteDecorHandleKeyArray<JC> m_cascade_count_writer_keys;
+  std::vector<CascadeCountDecorator> m_cascade_count_decorators;
 };
 
 #endif

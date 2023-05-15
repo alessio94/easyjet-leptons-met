@@ -182,24 +182,29 @@ def get_jet_truth_labels(flags):
     # first part is adding the truth matching to parent particles
     parent_bosons = ["Higgs", "Scalar", "Top"]
     parent_labels = [
-        "DRTruthParticle",
-        "PdgId",
-        "MatchingParticlePdgId",
     ]
     small_r_labels = [
-        "HadronConeExclTruthLabelID",
+        "HadronConeExclTruthLabelID"
     ]
+    large_r_labels = [
+    ]
+    truth_labels = []
 
-    if flags.Input.isPHYSLITE:
-        truth_labels = []
-    else:
-        truth_labels = [f"parent{b}{l}" for l in parent_labels for b in parent_bosons]
+    if not flags.Input.isPHYSLITE:
+        truth_labels = [
+            *[f"parent{b}{l}" for l in parent_labels for b in parent_bosons],
+            *[f"nTopTo{p}Children" for p in "BW"],
+            *[f"parent{p}ParentsMask" for p in ["Higgs", "Top"]],
+        ]
+        large_r_labels += [
+            f"parent{p}NMatchedChildren" for p in parent_bosons
+        ]
 
     truths = []
     if flags.Analysis.write_small_R_jets:
         truths.append((4, "", small_r_labels))
     if flags.Analysis.write_large_R_UFO_jets:
-        truths.append((10, "UFO", []))
+        truths.append((10, "UFO", large_r_labels))
 
     containers = get_container_names(flags)["outputs"]
 

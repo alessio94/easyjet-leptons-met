@@ -75,6 +75,8 @@ def _get_truth_types():
     ]
     bchar = [
         "Index",
+    ]
+    buchar = [
         "NMatchedChildren",
     ]
     bull = [
@@ -92,6 +94,7 @@ def _get_truth_types():
         types |= {f"parent{boson}{x}": "HALF" for x in bhalves}
         types |= {f"parent{boson}{x}": "INT2SHORT" for x in bints}
         types |= {f"parent{boson}{x}": "CHAR" for x in bchar}
+        types |= {f"parent{boson}{x}": "UCHAR" for x in buchar}
         types |= {f"parent{boson}{x}": "ULL" for x in bull}
 
         matchpt = f"parent{boson}MatchingParticlePtGeV"
@@ -103,5 +106,10 @@ def _get_truth_types():
         boson_label += [matchbar]
         associations[matchbar] = f"parent{boson}Link/barcode"
         types[matchbar] = 'INT'
+
+    for cascade_type in ["B","W"]:
+        key = f"nTopTo{cascade_type}Children"
+        types[key] = "UCHAR"
+        boson_label.append(key)
 
     return ftag_label + boson_label, types, associations

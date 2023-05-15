@@ -2,24 +2,26 @@
 
 #include "StoreGate/WriteDecorHandle.h"
 
+// structure to hold info on a matched parent particle
+struct MatchedParent
+{
+  const xAOD::TruthParticle* parent;
+  const xAOD::TruthParticle* child;
+  float deltaR;
+  unsigned int parent_index;
+  std::set<int> cascade_pids;
+};
+
 namespace {
 
   using Barcodex = TruthParentDecoratorAlg::Barcodex;
   using IPMap = TruthParentDecoratorAlg::IPMap;
   using JC = TruthParentDecoratorAlg::JC;
   using TPC = TruthParentDecoratorAlg::TPC;
+  using parent_mask_t = unsigned long long;
 
-  // structure to hold info on a matched parent particle
-  struct MatchedParent
-  {
-    const xAOD::TruthParticle* parent;
-    const xAOD::TruthParticle* child;
-    float deltaR;
-    unsigned int parent_index;
-  };
-
-  unsigned long long matchMask(const std::vector<MatchedParent>& matches) {
-    unsigned long long mask = 0x0;
+  parent_mask_t matchMask(const std::vector<MatchedParent>& matches) {
+    parent_mask_t mask = 0x0;
     for (const auto& match: matches) {
       constexpr size_t max_idx = std::numeric_limits<decltype(mask)>::digits;
       if (match.parent_index > max_idx) {
@@ -51,6 +53,8 @@ namespace {
     for (const auto& v: container) out.push_back(std::to_string(v));
     return out;
   }
+  // debugging function, not used now
+  [[maybe_unused]]
   std::string listAllChildren(const xAOD::TruthParticle* p) {
     std::vector<std::string> output;
     for (unsigned int child_n = 0; child_n < p->nChildren(); child_n++) {
@@ -97,10 +101,11 @@ namespace {
 
   // functions to traverse barcodex and disambiguate the selected
   // child
-  std::set<int> findAllChildren(
+  std::map<int, std::set<int>> findAllDescendants(
     int parent, const Barcodex& barcodex,
     std::set<int> history = {})
   {
+    using return_t = std::map<int,std::set<int>>;
     auto itr = barcodex.find(parent);
     if (itr == barcodex.end()) {
       auto hist = stringify(history);
@@ -109,25 +114,28 @@ namespace {
         " {" + join(hist) + "}");
     }
     const std::set<int>& children = itr->second;
-    if (children.empty()) return std::set<int>{parent};
-    std::set<int> all_children;
+    if (children.empty()) return return_t{{parent, history}};
     if (!history.insert(parent).second) {
       auto hist = stringify(history);
       throw std::runtime_error(
         "found cycle, tried to add " + std::to_string(parent) + " to "
         "{" + join(hist) + "}");
     }
+    return_t all_children;
     for (int child: children) {
-      all_children.merge(findAllChildren(child, barcodex, history));
+      // We don't just merge the children here in case there are
+      // multiple histories that lead to the same discendent. Instead
+      // we merge the histories of all descendents.
+      for (auto [dec, dh]: findAllDescendants(child, barcodex, history)) {
+        all_children[dec].merge(dh);
+      }
     }
     return all_children;
   }
 
 
   const xAOD::TruthParticle* selectChild(
-    MsgStream& msg,
-    const IPMap::mapped_type& barkids,
-    MSG::Level level = MSG::DEBUG)
+    const IPMap::mapped_type& barkids)
   {
     const xAOD::TruthParticle* child = *barkids.begin();
     if (barkids.size() > 1) {
@@ -151,18 +159,6 @@ namespace {
           "pdgid: " + std::to_string(child->pdgId()) + "}"
           );
       }
-    }
-    if (msg.level() <= level) {
-      std::vector<std::string> child_info {
-        "child_pdgid: " + std::to_string(child->pdgId()),
-        "child_n_dups: " + std::to_string(barkids.size()),
-      };
-      std::vector<std::string> dup_info;
-      for (const xAOD::TruthParticle* dupkid: barkids) {
-        dup_info.push_back(listAllChildren(dupkid));
-      }
-      child_info.push_back("children: " + join(dup_info));
-      msg << level << "Found child: {" + join(child_info) + "}" << endmsg;
     }
     return child;
   }
@@ -198,9 +194,37 @@ namespace {
     return parent->hasBottom() && p->hasCharm();
   }
 
-
 }
 
+
+// cascade count decorator
+CascadeCountDecorator::CascadeCountDecorator(
+  const std::string& name,
+  const std::vector<int>& pids):
+  m_pids(pids.begin(), pids.end()),
+  m_dec(name)
+{
+}
+void CascadeCountDecorator::decorate(
+  const SG::AuxElement& target,
+  const std::vector<MatchedParent>& parents) const
+{
+  unsigned char n_match = 0;
+  for (const auto& parent: parents) {
+    for (const auto& pid: m_pids) {
+      if (parent.cascade_pids.count(pid)) n_match++;
+    }
+  }
+  m_dec(target) = n_match;
+}
+void CascadeCountDecorator::decorateDefault(
+  const SG::AuxElement& target) const
+{
+  m_dec(target) = 0;
+}
+
+
+// main algorithm
 TruthParentDecoratorAlg::TruthParentDecoratorAlg(
   const std::string& name,
   ISvcLocator* loc):
@@ -246,6 +270,14 @@ StatusCode TruthParentDecoratorAlg::initialize() {
   ATH_CHECK(m_match_pdgid_key.initialize());
   ATH_CHECK(m_match_children_key.initialize());
   ATH_CHECK(m_match_link_key.initialize());
+
+  for (auto [key, pids]: m_counts_matching_cascade) {
+    m_cascade_count_writer_keys.emplace_back(key);
+    m_cascade_count_decorators.emplace_back(key, pids);
+  }
+  for (auto& key: m_cascade_count_writer_keys) declare(key);
+  ATH_CHECK(m_cascade_count_writer_keys.initialize());
+
   return StatusCode::SUCCESS;
 }
 
@@ -259,14 +291,30 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   SG::ReadHandle<JC> targets(m_target_container_key, cxt);
   if (targets->empty()) return StatusCode::SUCCESS;
 
-  // for lack of a better idea, store truth parents sorted by mass
+  // read in and sort the parent collection
   SG::ReadHandle<TPC> phandle(m_parents_key, cxt);
-  std::vector<const xAOD::TruthParticle*> psort(
-    phandle->begin(), phandle->end());
+  std::set<int> parentids(m_parent_pdgids.begin(), m_parent_pdgids.end());
+  std::vector<const xAOD::TruthParticle*> psort;
+  for (const xAOD::TruthParticle* p: *phandle) {
+    if (!parentids.count(p->pdgId())) continue;
+    if (!isOriginal(p)) continue;
+    psort.push_back(p);
+  }
+  // for lack of a better idea, store truth parents sorted by mass
   std::sort(
     psort.begin(), psort.end(),
     [](const auto* p1, const auto* p2) {return p1->m() > p2->m();}
     );
+  // check to make sure we don't overflow the match mask
+  constexpr size_t max_idx = std::numeric_limits<parent_mask_t>::digits;
+  if (psort.size() > max_idx) {
+    ATH_MSG_WARNING(
+      "Found too many parent particles to store in parent match mask "
+      "truncating the parent collection [max: " << max_idx << ", "
+      "n: " << psort.size() << "]");
+    psort.resize(max_idx);
+  }
+
 
   std::vector<SG::ReadHandle<TPC>> cascades_raw;
   for (const auto& key: m_cascades_key) {
@@ -291,16 +339,13 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   // Part 3: build map from targets to parents
   /////////////////////////////////////////////
   std::unordered_map<const J*, std::vector<MatchedParent>> labeled_targets;
-  std::set<int> parentids(m_parent_pdgids.begin(), m_parent_pdgids.end());
   unsigned int n_parents = 0;
   for (const auto* p: psort) {
-    if (!parentids.count(p->pdgId())) continue;
-    if (!isOriginal(p)) continue;
     unsigned int parent_index = n_parents++;
     ATH_MSG_VERBOSE("pdgid: " << p->pdgId() << ", barcode: " << p->barcode());
-    for (int child_barcode: findAllChildren(p->barcode(), barcodex)) {
-      IPMap::mapped_type& barkids = ipmap.at(child_barcode);
-      const xAOD::TruthParticle* child = selectChild(msg(), barkids);
+    for (auto [cbar, histbars]: findAllDescendants(p->barcode(), barcodex)) {
+      IPMap::mapped_type& barkids = ipmap.at(cbar);
+      const xAOD::TruthParticle* child = selectChild(barkids);
       std::vector<std::pair<float, const J*>> drs;
       for (const auto* j: *targets) {
         drs.emplace_back(j->p4().DeltaR(child->p4()), j);
@@ -311,6 +356,10 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
       match.child = child;
       match.deltaR = nearest->first;
       match.parent_index = parent_index;
+      match.cascade_pids.insert(child->pdgId());
+      for (auto& histbar: histbars) {
+        match.cascade_pids.insert(selectChild(ipmap.at(histbar))->pdgId());
+      }
       if (match.deltaR < m_match_delta_r) {
         labeled_targets[nearest->second].push_back(match);
       }
@@ -320,16 +369,20 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   ///////////////////////
   // Part 4: decorate!
   ///////////////////////
-  using ull_t = unsigned long long;
+  using uc_t = unsigned char;
   SG::WriteDecorHandle<JC,int> pdgid(m_target_pdgid_key, cxt);
   SG::WriteDecorHandle<JC,float> deltaR(m_target_dr_truth_key, cxt);
   SG::WriteDecorHandle<JC,JL> link(m_target_link_key, cxt);
   SG::WriteDecorHandle<JC,char> index(m_target_index_key, cxt);
-  SG::WriteDecorHandle<JC,char> nMatched(m_target_n_matched_key, cxt);
-  SG::WriteDecorHandle<JC,ull_t> mask(m_target_match_mask_key, cxt);
+  SG::WriteDecorHandle<JC,uc_t> nMatched(m_target_n_matched_key, cxt);
+  SG::WriteDecorHandle<JC,parent_mask_t> mask(m_target_match_mask_key, cxt);
   SG::WriteDecorHandle<JC,int> matchPdgId(m_match_pdgid_key, cxt);
   SG::WriteDecorHandle<JC,int> matchChildCount(m_match_children_key, cxt);
   SG::WriteDecorHandle<JC,JL> matchLink(m_match_link_key, cxt);
+  std::vector<SG::WriteDecorHandle<JC, char>> cascadeCounts;
+  for (const auto& key: m_cascade_count_writer_keys) {
+    cascadeCounts.emplace_back(key, cxt);
+  }
 
   for (const J* j: *targets) {
     if (labeled_targets.count(j)) {
@@ -352,6 +405,9 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
       matchChildCount(*j) = child->nChildren();
       auto* matchedContainer = static_cast<const TPC*>(child->container());
       matchLink(*j) = JL(*matchedContainer, child->index());
+      for (const auto& cascadeCount: m_cascade_count_decorators) {
+        cascadeCount.decorate(*j, matches);
+      }
     } else {
       pdgid(*j) = 0;
       deltaR(*j) = NAN;
@@ -362,6 +418,9 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
       matchPdgId(*j) = 0;
       matchChildCount(*j) = 0;
       matchLink(*j) = JL();
+      for (const auto& cascadeCount: m_cascade_count_decorators) {
+        cascadeCount.decorateDefault(*j);
+      }
     }
   }
   return StatusCode::SUCCESS;
