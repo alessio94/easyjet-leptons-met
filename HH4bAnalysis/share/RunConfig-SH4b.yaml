@@ -64,5 +64,3 @@ write_large_R_substructure: false
 write_truth_small_R_jets: true
 write_truth_large_R_jets: true
 write_truth_higgs: true
-# whether to output a meta data file
-meta_cache: false
