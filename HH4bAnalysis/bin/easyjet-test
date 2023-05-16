@@ -72,7 +72,7 @@ declare -A TESTS=(
 )
 
 # some common variables in the tests
-COMMON="-o"
+COMMON="-o -O"
 
 # specific tests
 ntuple-dump() {

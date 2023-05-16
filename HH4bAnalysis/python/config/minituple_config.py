@@ -161,6 +161,18 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False, do_OR=False):
     log.info("Add tree seq")
     cfg.merge(tree_cfg(flags, branches=tree_branches))
 
+    if flags.Analysis.dump_output_branchlist:
+        outf_sub = flags.Analysis.out_file.replace('root','txt')
+        if '/' in outf_sub:
+            outf_dir, outf_sub = outf_sub.rsplit('/',1)
+            branches_fname = f"{outf_dir}/output-branches-{outf_sub}"
+        else:
+            branches_fname = f"output-branches-{outf_sub}"
+
+        with open(branches_fname,'w') as branches_f:
+            for b in tree_branches:
+                branches_f.write(f"{b}\n")
+
     return cfg
 
 

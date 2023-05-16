@@ -93,6 +93,15 @@ def defineArgs(flags):
         help="Output ROOT file name",
     )
     add_analysis_arg(
+        "-O",
+        "--dump-output-branchlist",
+        action="store_true",
+        help=(
+            "enable output branch list dump."
+            "Will be written to output-branches-[out-file].txt"
+        )
+    )
+    add_analysis_arg(
         "-m",
         "--cache-metadata",
         action="store_true",
