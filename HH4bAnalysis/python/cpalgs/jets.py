@@ -57,7 +57,7 @@ def jet_sequence_cfg(
             flags,
             jet_sequence,
             muonName=containers["outputs"]["muons"],
-            btagSelDecor="ftag_select_DL1dv00_FixedCutBEff_77",
+            btagSelDecor="ftag_select_DL1dv01_FixedCutBEff_77",
         )
 
     jet_sequence.configure(
