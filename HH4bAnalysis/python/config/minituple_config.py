@@ -390,7 +390,7 @@ def add_large_R_Topo_branches(
                 "JetConstitScaleMomentum_phi",
                 "JetConstitScaleMomentum_m",
             ]
-            + ["GhostBHadronsFinalCount"]
+            + ["GhostBHadronsFinalCount", "GhostCHadronsFinalCount"]
             if flags.Input.isMC
             else []
         )
@@ -484,7 +484,7 @@ def add_large_R_UFO_branches(flags, containers, tree_branches, do_or):
                 "JetConstitScaleMomentum_phi",
                 "JetConstitScaleMomentum_m",
             ]
-            + ["GhostBHadronsFinalCount"]
+            + ["GhostBHadronsFinalCount", "GhostCHadronsFinalCount"]
             if flags.Input.isMC
             else []
         )
