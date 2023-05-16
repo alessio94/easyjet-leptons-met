@@ -57,7 +57,7 @@ namespace HH4B
           m_acc_VRTrackJets(*untrimmedLargeR);
       // I know this seems stupid, but we need it in the xAOD::JetContainer
       // format
-      for (ElementLink<xAOD::IParticleContainer> vrJet : VRTrackjets)
+      for (const ElementLink<xAOD::IParticleContainer>& vrJet : VRTrackjets)
       {
         const xAOD::Jet *jet = static_cast<const xAOD::Jet *>(*vrJet.cptr());
         workContainer->push_back(jet);

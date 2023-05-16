@@ -27,7 +27,7 @@ namespace HH4B
     ATH_CHECK(m_EventInfoKey.initialize());
 
     // make decorators
-    for (std::string var : m_vars)
+    for (const std::string& var : m_vars)
     {
       std::string deco_var = var + m_bTagWP;
       SG::AuxElement::Decorator<float> deco(deco_var);
@@ -52,7 +52,7 @@ namespace HH4B
     ATH_CHECK(subleadingVRjets.isValid());
 
     // set defaults
-    for (std::string var : m_vars)
+    for (const std::string& var : m_vars)
     {
       std::string deco_var = var + m_bTagWP;
       m_decos.at(deco_var)(*eventInfo) = -1.;

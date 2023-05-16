@@ -45,7 +45,7 @@ namespace HH4B
     ATH_CHECK(m_containerOutKey.initialize());
 
     // make decorators
-    for (std::string var : m_vars)
+    for (const std::string& var : m_vars)
     {
       std::string deco_var = m_regime + var + m_bTagWP;
       SG::AuxElement::Decorator<float> deco(deco_var);

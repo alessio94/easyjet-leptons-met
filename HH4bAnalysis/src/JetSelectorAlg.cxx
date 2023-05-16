@@ -38,7 +38,7 @@ namespace HH4B
         "phi",
         "m",
     };
-    for (std::string var : vars)
+    for (const std::string& var : vars)
     {
       std::string deco_var = m_containerOutKey.key() + "_" + var;
       SG::AuxElement::Decorator<std::vector<float>> deco(deco_var);

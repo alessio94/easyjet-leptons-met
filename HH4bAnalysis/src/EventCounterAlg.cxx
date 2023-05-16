@@ -38,7 +38,7 @@ StatusCode EventCounterAlg::finalize() {
     metadata = list_t();
   }
   std::string key = m_countName.value();
-  for (auto [oldkey, count]: metadata.get<list_t>()) {
+  for (auto& [oldkey, count]: metadata.get<list_t>()) {
     if (oldkey == key) {
       ATH_MSG_ERROR(
         "metadata key " << key << " already exists in " << output_file);

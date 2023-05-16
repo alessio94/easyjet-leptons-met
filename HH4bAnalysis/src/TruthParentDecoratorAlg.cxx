@@ -126,7 +126,7 @@ namespace {
       // We don't just merge the children here in case there are
       // multiple histories that lead to the same discendent. Instead
       // we merge the histories of all descendents.
-      for (auto [dec, dh]: findAllDescendants(child, barcodex, history)) {
+      for (auto& [dec, dh]: findAllDescendants(child, barcodex, history)) {
         all_children[dec].merge(dh);
       }
     }
@@ -271,7 +271,7 @@ StatusCode TruthParentDecoratorAlg::initialize() {
   ATH_CHECK(m_match_children_key.initialize());
   ATH_CHECK(m_match_link_key.initialize());
 
-  for (auto [key, pids]: m_counts_matching_cascade) {
+  for (auto& [key, pids]: m_counts_matching_cascade) {
     m_cascade_count_writer_keys.emplace_back(key);
     m_cascade_count_decorators.emplace_back(key, pids);
   }
@@ -343,7 +343,7 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   for (const auto* p: psort) {
     unsigned int parent_index = n_parents++;
     ATH_MSG_VERBOSE("pdgid: " << p->pdgId() << ", barcode: " << p->barcode());
-    for (auto [cbar, histbars]: findAllDescendants(p->barcode(), barcodex)) {
+    for (auto& [cbar, histbars]: findAllDescendants(p->barcode(), barcodex)) {
       IPMap::mapped_type& barkids = ipmap.at(cbar);
       const xAOD::TruthParticle* child = selectChild(barkids);
       std::vector<std::pair<float, const J*>> drs;
