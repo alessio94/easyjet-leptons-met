@@ -25,6 +25,32 @@ def validate_do_write_obj_flags(flags):
         if write_obj and not do_obj:
             raise RuntimeError(f'write_{objtype}=True when do_{objtype}=False')
 
+        try:
+            if any([
+                flags.Analysis.write_small_R_btag,
+                flags.Analysis.write_small_R_higgs_parent_info,
+                flags.Analysis.write_small_R_JVT_details,
+                flags.Analysis.write_small_R_no_bjet_calib,
+                flags.Analysis.write_small_R_gn2_branches,
+            ]):
+                assert flags.Analysis.write_small_R_jets
+            if any([
+                flags.Analysis.write_large_R_substructure,
+            ]):
+                assert any([
+                    flags.Analysis.write_large_R_Topo_jets,
+                    flags.Analysis.write_large_R_UFO_jets
+                ])
+        except AssertionError:
+            raise RuntimeError(
+                "Detailed branches requested when base container not written"
+            )
+
+        if flags.Analysis.write_small_R_no_bjet_calib:
+            assert not flags.Analysis.disable_calib, (
+                "B-jet momentum correction requires muon and b-jet CP algs"
+            )
+
 
 def validate_analysis_prerequisites(flags):
     if flags.Analysis.do_resolved_dihiggs_analysis:
@@ -38,11 +64,14 @@ def validate_analysis_prerequisites(flags):
 
 def validate_file_format(flags):
     if flags.Input.isPHYSLITE:
-        try:
-            assert not flags.Analysis.do_VR_jets
-            assert not flags.Analysis.do_large_R_Topo_jets
-        except AssertionError:
-            raise RuntimeError("Collections requested are incompatible with PHYSLITE")
+
+        assert not any([
+            flags.Analysis.do_VR_jets,
+            flags.Analysis.do_large_R_Topo_jets,
+            flags.Analysis.write_small_R_JVT_details,
+            flags.Analysis.write_large_R_truth_labels
+        ]), "Collections/variables requested are incompatible with PHYSLITE"
+
         assert not flags.Analysis.do_overlap_removal, "OR not needed on PHYSLITE"
     else:
         assert not flags.Analysis.disable_calib, (

@@ -1,0 +1,127 @@
+from HH4bAnalysis.output_branches.branch_manager import BranchManager, SystOption
+from HH4bAnalysis.output_branches.truth_jets import get_large_R_jet_truth_labels
+from HH4bAnalysis.config.sample_config import (
+    get_valid_ami_tag,
+    SampleTypes,
+)
+
+
+def get_large_R_jet_branches(flags, input_container, output_prefix, lr_jet_type):
+    _syst_option = SystOption.ALL_SYST
+    if flags.Analysis.disable_calib:
+        _syst_option = SystOption.NONE
+
+    large_R_jet_branches = BranchManager(
+        input_container,
+        output_prefix,
+        do_overlap_removal=flags.Analysis.do_overlap_removal,
+        systematics_option=_syst_option,
+    )
+
+    # The LargeJetGhostVRJetAssociationAlg does not support systematics
+    # Implement systematics handles, then remove this extra BM
+    large_R_jet_NOSYS_branches = BranchManager(
+        input_container,
+        output_prefix,
+        do_overlap_removal=flags.Analysis.do_overlap_removal,
+        systematics_option=SystOption.NO_SYST,
+    )
+
+    if lr_jet_type == "Topo":
+        large_R_jet_branches.required_flags.append(flags.Analysis.do_large_R_Topo_jets)
+    if lr_jet_type == "UFO":
+        large_R_jet_branches.required_flags.append(flags.Analysis.do_large_R_UFO_jets)
+
+    large_R_jet_branches.add_four_mom_branches(do_mass=True)
+
+    if flags.Input.isMC and flags.Analysis.write_large_R_truth_labels:
+        large_R_jet_branches.variables += [
+            "GhostBHadronsFinalCount",
+            "GhostCHadronsFinalCount",
+        ] + get_large_R_jet_truth_labels(flags)
+
+        if lr_jet_type == "Topo":
+            large_R_jet_NOSYS_branches.variables += [
+                "R10TruthLabel_R21Consolidated",
+            ]
+        if lr_jet_type == "UFO":
+            large_R_jet_NOSYS_branches.variables += [
+                "R10TruthLabel_R21Precision_2022v1",
+                "R10TruthLabel_R22v1",
+            ]
+
+    if flags.Analysis.write_VR_jets:
+        large_R_jet_branches.variables += get_ghost_vr_branches(flags)
+
+    if flags.Analysis.write_large_R_substructure:
+        large_R_jet_branches.variables += get_substructure_branches(lr_jet_type)
+
+    split_tags = flags.Input.AMITag.split("_")
+    is_valid_ptag = get_valid_ami_tag(split_tags, "p", SampleTypes.mc20x)
+    if lr_jet_type == "UFO" and is_valid_ptag:
+        large_R_jet_branches.variables += get_large_R_gn2_branches()
+
+    return (
+        large_R_jet_branches.get_output_list()
+        + large_R_jet_NOSYS_branches.get_output_list()
+    )
+
+
+def get_ghost_vr_branches(flags):
+    vr_vars = [
+        "goodVRTrackJets",
+        "minRelativeDeltaRToVRJet",
+        "leadingVRTrackJetsPt",
+        "leadingVRTrackJetsEta",
+        "leadingVRTrackJetsPhi",
+        "leadingVRTrackJetsM",
+        "leadingVRTrackJetsDeltaR12",
+        "leadingVRTrackJetsDeltaR13",
+        "leadingVRTrackJetsDeltaR32",
+        "Xbb2020v3_Higgs",
+        "Xbb2020v3_Top",
+        "Xbb2020v3_QCD",
+    ] + [
+        f"leadingVRTrackJetsBtag_{wp}"
+        for wp in flags.Analysis.vr_btag_wps
+    ]
+    if flags.Input.isMC:
+        vr_vars += [
+            "VRTrackJetsTruthLabel"
+            # previously leadingVRTrackJets_HadronConeExclTruthLabelID
+        ]
+    return vr_vars
+
+
+def get_substructure_branches(lr_jet_type):
+    substructure_vars = [
+        "Tau1_wta",
+        "Tau2_wta",
+        "Tau3_wta",
+        "ECF1",
+        "ECF2",
+        "ECF3",
+        "Split12",
+        "Split23",
+    ]
+    # Trimmed jet vars
+    if lr_jet_type == "Topo":
+        substructure_vars += [
+            "NTrimSubjets",
+            "TrackSumPt",
+        ]
+    return substructure_vars
+
+
+def get_large_R_gn2_branches():
+    gn2_branches = [
+        "GN2Xv00_phbb",
+        "GN2Xv00_phcc",
+        "GN2Xv00_ptop",
+        "GN2Xv00_pqcd",
+        "GN2XWithMassv00_phbb",
+        "GN2XWithMassv00_phcc",
+        "GN2XWithMassv00_ptop",
+        "GN2XWithMassv00_pqcd",
+    ]
+    return gn2_branches

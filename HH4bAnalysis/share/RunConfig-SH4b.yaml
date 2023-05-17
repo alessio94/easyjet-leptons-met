@@ -58,6 +58,7 @@ write_small_R_no_bjet_calib: true
 write_small_R_gn2_branches: true
 # additional Large R info
 write_large_R_substructure: false
+write_large_R_truth_labels: true
 # turned off automatically if MC
 write_truth_small_R_jets: true
 write_truth_large_R_jets: true

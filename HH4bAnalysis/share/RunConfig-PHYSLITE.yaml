@@ -51,12 +51,13 @@ write_electrons: false
 write_photons: false
 # additional small R info 
 write_small_R_higgs_parent_info: true
-write_small_R_btag: true
-write_small_R_JVT_details: true
-write_small_R_no_bjet_calib: true
+write_small_R_btag: false
+write_small_R_JVT_details: false
+write_small_R_no_bjet_calib: false
 write_small_R_gn2_branches: true
 # additional Large R info
 write_large_R_substructure: true
+write_large_R_truth_labels: false
 # turned off automatically if MC
 write_truth_small_R_jets: true
 write_truth_large_R_jets: true

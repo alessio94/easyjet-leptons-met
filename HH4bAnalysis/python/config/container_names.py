@@ -33,7 +33,7 @@ container_map = {
     "DAOD_PHYSLITE": {
         "reco4Jet":           "AnalysisJets",
         "reco10TopoJet":      "",
-        "reco10UFOJet":       "AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets",
+        "reco10UFOJet":       "AnalysisLargeRJets",
         "vrJet":              "",
         "truth4Jet":          "AntiKt4TruthDressedWZJets",
         "truth10TrimmedJet":  "AntiKt10TruthTrimmedPtFrac5SmallR20Jets",

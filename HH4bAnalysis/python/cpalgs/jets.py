@@ -49,7 +49,7 @@ def jet_sequence_cfg(
             enableCutflow=False,
         )
 
-    # Run this by default, but will fail if muon calib sequence not run
+    # Run this by default, but will fail if muon and btag calib sequences not run
     # TODO: Add a toggle?
     if flags.Analysis.do_muons:
         # Pick a reasonable b-tag selection?

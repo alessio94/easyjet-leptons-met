@@ -377,7 +377,6 @@ def main():
                     flags,
                     trigger_chains=trigger_chains,
                     do_PRW=do_PRW,
-                    do_OR=flags.Analysis.do_overlap_removal,
                 ),
                 "HH4bSeq",
             )

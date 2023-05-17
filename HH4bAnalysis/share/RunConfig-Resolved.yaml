@@ -1,8 +1,8 @@
 # Toggles for object types
 do_small_R_jets: true
-do_large_R_Topo_jets: true
+do_large_R_Topo_jets: false
 do_large_R_UFO_jets: false
-do_VR_jets: true
+do_VR_jets: false
 do_muons: true
 do_electrons: false
 do_photons: false
@@ -58,7 +58,8 @@ write_small_R_no_bjet_calib: true
 write_small_R_gn2_branches: true
 # additional Large R info
 write_large_R_substructure: false
+write_large_R_truth_labels: false
 # turned off automatically if MC
 write_truth_small_R_jets: true
-write_truth_large_R_jets: true
+write_truth_large_R_jets: false
 write_truth_higgs: true

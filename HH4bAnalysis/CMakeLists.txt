@@ -49,6 +49,7 @@ atlas_install_scripts(
 atlas_install_python_modules(
   python/cpalgs
   python/config
+  python/output_branches
   python/utils
 )
 atlas_install_data(
