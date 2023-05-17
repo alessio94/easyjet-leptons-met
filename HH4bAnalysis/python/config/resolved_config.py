@@ -48,31 +48,6 @@ def resolved_cfg(flags, smalljetkey):
             )
         )
 
-        # truth matching the paired jets
-        if flags.Analysis.truth_match_resolved and flags.Input.isMC:
-            cfg.addEventAlgo(
-                CompFactory.HH4B.JetTruthMatcherAlg(
-                    "ResolvedJetTruthMatcherAlg_" + btag_wp,
-                    smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_wp,
-                    bTagWP=btag_wp,
-                    regime="resolved",
-                    containerOutKey="resolvedTruthMatched_out_" + btag_wp,
-                )
-            )
-            cfg.addEventAlgo(
-                CompFactory.HH4B.JetSelectorAlg(
-                    "ResolvedTruthMatchDecoratorAlg_" + btag_wp,
-                    containerInKey="resolvedTruthMatched_out_" + btag_wp,
-                    containerOutKey="resolved_truthMatched_" + btag_wp,
-                    bTagWP="",  # empty string: "" ignores btagging
-                    minPt=0,
-                    maxEta=10,
-                    truncateAtAmount=-1,  # -1 means keep all
-                    minimumAmount=-1,  # -1 means ignores this
-                    pTsort=False,
-                )
-            )
-
     return cfg
 
 
@@ -91,24 +66,6 @@ def resolved_branches(flags):
             "h2_m",
             "hh_m",
         ]
-        if flags.Analysis.truth_match_resolved and flags.Input.isMC:
-            resolved_vars += [
-                "h1_closestTruthBsHaveSameInitialParticle",
-                "h2_closestTruthBsHaveSameInitialParticle",
-                "h1_dR_leadingJet_closestTruthB",
-                "h1_dR_subleadingJet_closestTruthB",
-                "h2_dR_leadingJet_closestTruthB",
-                "h2_dR_subleadingJet_closestTruthB",
-                "h1_parentPdgId_leadingJet_closestTruthB",
-                "h1_parentPdgId_subleadingJet_closestTruthB",
-                "h2_parentPdgId_leadingJet_closestTruthB",
-                "h2_parentPdgId_subleadingJet_closestTruthB",
-            ]
-            for var in ["pt", "eta", "phi", "m"]:
-                branches += [
-                    f"EventInfo.resolved_truthMatched_{btag_wp}_{var} ->"
-                    f" resolved_truthMatched_{btag_wp}_{var}"
-                ]
 
         for var in resolved_vars:
             branches += [

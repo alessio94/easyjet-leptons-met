@@ -18,7 +18,6 @@ atlas_add_component(HH4bAnalysis
   src/JetPairingAlg.cxx
   src/BaselineVarsResolvedAlg.cxx
   src/BaselineVarsBoostedAlg.cxx
-  src/JetTruthMatcherAlg.cxx
   src/GhostAssocVRJetGetterAlg.cxx
   src/H5FileSvc.cxx
   src/TruthParentDecoratorAlg.cxx

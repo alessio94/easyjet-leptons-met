@@ -35,8 +35,6 @@ loose_jet_cleaning: true
 do_resolved_dihiggs_analysis: false
 do_boosted_dihiggs_analysis: false
 # if you want to truth match (is MC protected)
-truth_match_resolved: false
-truth_match_boosted: false
 # Whether to activate CP alg systematic variations
 do_CP_systematics: false
 systematics_regex: [".*"]
