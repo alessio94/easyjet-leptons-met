@@ -1,116 +1,106 @@
 variables:
   FORCED_LOG_LEVEL: INFO
+  TESTDIR: ci_testdir
+
+.run_easyjet-ntupler:
+  stage: run
+  needs: [compile]
+  artifacts:
+    paths:
+      - $TESTDIR/output-branches-analysis-variables.txt
+      - $TESTDIR/userJobMetadata.json
 
 run_easyjet-ntupler_fast_data18_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test data18-fast
+    - easyjet-test -d $TESTDIR data18-fast
 
 run_easyjet-ntupler_fast_data22_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test data22-fast
+    - easyjet-test -d $TESTDIR data22-fast
 
 run_easyjet-ntupler_jets-mc20_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test jets-mc20
+    - easyjet-test -d $TESTDIR jets-mc20
 
 run_easyjet-ntupler_fast_jets-mc20_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test jets-mc20-fast
+    - easyjet-test -d $TESTDIR jets-mc20-fast
 
 run_easyjet-ntupler_ttbar-mc20_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test ttbar-mc20
+    - easyjet-test -d $TESTDIR ttbar-mc20
 
 run_easyjet-ntupler_fast_ttbar-mc20_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test ttbar-mc20-fast
+    - easyjet-test -d $TESTDIR ttbar-mc20-fast
 
 run_easyjet-ntupler_sh4b-boosted-mc20_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test sh4b-boosted-mc20
+    - easyjet-test -d $TESTDIR sh4b-boosted-mc20
 
 run_easyjet-ntupler_sh4b-boosted-mc20-p5658_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test sh4b-boosted-mc20-p5658
+    - easyjet-test -d $TESTDIR sh4b-boosted-mc20-p5658
 
 run_easyjet-ntupler_fast_sh4b-boosted-mc20_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test sh4b-boosted-mc20-fast
+    - easyjet-test -d $TESTDIR sh4b-boosted-mc20-fast
 
 run_easyjet-ntupler_ttbar-mc21_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test ttbar-mc21
+    - easyjet-test -d $TESTDIR ttbar-mc21
 
 run_easyjet-ntupler_fast_ttbar-mc21_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test ttbar-mc21-fast
+    - easyjet-test -d $TESTDIR ttbar-mc21-fast
 
 run_easyjet-ntupler_syst_ttbar-mc21_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test ttbar-mc21-syst
+    - easyjet-test -d $TESTDIR ttbar-mc21-syst
 
 run_easyjet-ntupler_hh4b-mc21_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test hh4b-mc21
+    - easyjet-test -d $TESTDIR hh4b-mc21
 
 run_easyjet-ntupler_hh4b-mc21-noroot_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test hh4b-mc21-noroot
+    - easyjet-test -d $TESTDIR hh4b-mc21-noroot
 
 run_easyjet-ntupler_syst_hh4b-mc21_DAOD_PHYS:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test hh4b-mc21-syst
+    - easyjet-test -d $TESTDIR hh4b-mc21-syst
 
 run_easyjet-ntupler_hh4b-mc21_DAOD_PHYSLITE:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test physlite-hh4b-mc21
+    - easyjet-test -d $TESTDIR physlite-hh4b-mc21
 
 run_easyjet-ntupler_fast_hh4b-mc21_DAOD_PHYSLITE:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test physlite-hh4b-mc21-fast
+    - easyjet-test -d $TESTDIR physlite-hh4b-mc21-fast
 
 run_easyjet-ntupler_sh4b-boosted-mc20_DAOD_PHYSLITE:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test physlite-sh4b-boosted-mc20
+    - easyjet-test -d $TESTDIR physlite-sh4b-boosted-mc20
 
 run_easyjet-ntupler_fast_sh4b-boosted-mc20_DAOD_PHYSLITE:
-  stage: run
-  needs: [compile]
+  extends: .run_easyjet-ntupler
   script:
-    - easyjet-test physlite-sh4b-boosted-mc20-fast
+    - easyjet-test -d $TESTDIR physlite-sh4b-boosted-mc20-fast
