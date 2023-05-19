@@ -1,5 +1,6 @@
 import json
 from enum import Enum
+from pathlib import Path
 
 
 class DataSampleYears(Enum):
@@ -55,6 +56,17 @@ def update_metadata(path):
             md.metadata.update(cached["metadata"])
             md.filename = f
             md.metAccessLevel = cached["level"]
+
+
+def has_metadata(flags,path=Path('metadata.json')):
+    if not path.is_file():
+        return False
+    with open(path) as meta:
+        metadict = json.load(meta)
+        for infile in flags.Input.Files:
+            if infile not in metadict:
+                return False
+        return True
 
 
 def get_valid_ami_tag(tags, check_tag="p", min_valid_tag=SampleTypes.mc20):

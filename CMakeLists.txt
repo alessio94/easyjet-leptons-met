@@ -19,6 +19,14 @@ atlas_project( HH4bAnalysis 1.0.0
 
 # Set up the runtime environment setup script(s):
 lcg_generate_env( SH_FILE ${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh )
+message(STATUS "Appending EasyJet tab complete to setup")
+file(CREATE_LINK
+  ${CMAKE_SOURCE_DIR}/tab-complete.bash
+  ${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/tab-complete.bash
+  SYMBOLIC)
+file(APPEND ${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh.in
+  "# custom EasyJet scripts:\n"
+  ". \${HH4bAnalysis_DIR}/tab-complete.bash")
 install( FILES ${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh
    DESTINATION . )
 

@@ -42,10 +42,10 @@ declare -A DATAFILES=(
     [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
     [ttbar-mc21]=${PHYS_TTBAR_MC21}
     [ttbar-mc21-syst]=${PHYS_TTBAR_MC21}
-    [physlite-sh4b-boosted-mc20-fast]=${PHYSLITE_SH4B_BOOSTED_MC20}
-    [physlite-sh4b-boosted-mc20]=${PHYSLITE_SH4B_BOOSTED_MC20}
-    [physlite-hh4b-mc21-fast]=${PHYSLITE_HH4B_MC21}
-    [physlite-hh4b-mc21]=${PHYSLITE_HH4B_MC21}
+    [lite-sh4b-boosted-mc20-fast]=${PHYSLITE_SH4B_BOOSTED_MC20}
+    [lite-sh4b-boosted-mc20]=${PHYSLITE_SH4B_BOOSTED_MC20}
+    [lite-hh4b-mc21-fast]=${PHYSLITE_HH4B_MC21}
+    [lite-hh4b-mc21]=${PHYSLITE_HH4B_MC21}
 )
 
 declare -A TESTS=(
@@ -57,83 +57,73 @@ declare -A TESTS=(
     [ttbar-mc20]=ntuple-dump
     [sh4b-boosted-mc20-fast-awkward]=ntuple-dump-fast-awkward
     [sh4b-boosted-mc20-fast]=ntuple-dump-fast
-    [sh4b-boosted-mc20]=ntuple-dump-boosted
-    [sh4b-boosted-mc20-p5658]=ntuple-dump-boosted
+    [sh4b-boosted-mc20]=ntuple-dump
+    [sh4b-boosted-mc20-p5658]=ntuple-dump
     [hh4b-mc21]=ntuple-dump
     [hh4b-mc21-noroot]=run-fast
     [hh4b-mc21-syst]=ntuple-dump-syst
     [ttbar-mc21-fast]=ntuple-dump-fast
     [ttbar-mc21]=ntuple-dump
     [ttbar-mc21-syst]=ntuple-dump-syst
-    [physlite-sh4b-boosted-mc20-fast]=ntuple-dump-physlite-fast
-    [physlite-sh4b-boosted-mc20]=ntuple-dump-physlite
-    [physlite-hh4b-mc21-fast]=ntuple-dump-physlite-fast
-    [physlite-hh4b-mc21]=ntuple-dump-physlite
+    [lite-sh4b-boosted-mc20-fast]=ntuple-dump-fast
+    [lite-sh4b-boosted-mc20]=ntuple-dump
+    [lite-hh4b-mc21-fast]=ntuple-dump-fast
+    [lite-hh4b-mc21]=ntuple-dump
+)
+
+DEFAULT_CONFIG=HH4bAnalysis/RunConfig.yaml
+declare -A CONFIGS=(
+    [sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [sh4b-boosted-mc20-p5658]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [lite-sh4b-boosted-mc20-fast]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
+    [lite-sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
+    [lite-hh4b-mc21-fast]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
+    [lite-hh4b-mc21]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
 )
 
 # some common variables in the tests
-COMMON="-o -O"
+COMMON="-O"
 
 # specific tests
 ntuple-dump() {
-    easyjet-ntupler $COMMON $1 --do-trigger-filtering True
-    metadata-check -v
-}
-ntuple-dump-boosted() {
-    easyjet-ntupler $COMMON $1 --do-trigger-filtering True --run-config HH4bAnalysis/RunConfig-SH4b.yaml
+    easyjet-ntupler $1 -c $2 -o $COMMON
     metadata-check -v
 }
 ntuple-dump-syst() {
-    easyjet-ntupler $COMMON $1 --do-CP-systematics True --do-trigger-filtering True
+    easyjet-ntupler $1 -c $2 -o $COMMON --do-CP-systematics True
     metadata-check -v
 }
 ntuple-dump-fast() {
-    local OPTS="$COMMON --fast-test --cache-metadata $1"
-    OPTS+=" --do-trigger-filtering True"
-    local CMD="easyjet-ntupler $OPTS"
+    local OPTS="-o $COMMON --fast-test --cache-metadata"
+    local CMD="easyjet-ntupler $1 -c $2 $OPTS"
+    $CMD --stop-after-config
+    echo "rerunning $CMD to time"
+    $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
+    metadata-check -v
+}
+data-ntuple-dump-fast() {
+    local OPTS="-o $COMMON --fast-test --cache-metadata"
+    OPTS+=" --do-trigger-filtering False"
+    local CMD="easyjet-ntupler $1 -c $2 $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
     metadata-check -v
 }
 run-fast() {
-    local OPTS="--fast-test --cache-metadata $1"
-    OPTS+=" --do-trigger-filtering True"
-    local CMD="easyjet-ntupler $OPTS"
+    local OPTS="$COMMON --fast-test --cache-metadata"
+    local CMD="easyjet-ntupler $1 -c $2 $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
     metadata-check -v
 }
 ntuple-dump-fast-awkward() {
-    local OPTS="$COMMON --fast-test --cache-metadata $1"
-    OPTS+=" --do-trigger-filtering True"
-    local CMD="easyjet-ntupler $OPTS"
+    local OPTS="$COMMON --fast-test --cache-metadata"
+    local CMD="easyjet-ntupler $1 -c $2 $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test-awk.h5 --n-h5-jets 0
-    metadata-check -v
-}
-data-ntuple-dump-fast() {
-    local OPTS="$COMMON --fast-test --cache-metadata $1"
-    OPTS+=" --do-trigger-filtering False"
-    local CMD="easyjet-ntupler $OPTS"
-    $CMD --stop-after-config
-    echo "rerunning $CMD to time"
-    $CMD --timeout 30 --h5-output test.h5
-    metadata-check -v
-}
-ntuple-dump-physlite() {
-    easyjet-ntupler $COMMON --disable-calib True $1 --do-trigger-filtering True -c HH4bAnalysis/RunConfig-PHYSLITE.yaml
-    metadata-check -v
-}
-ntuple-dump-physlite-fast() {
-    local OPTS="$COMMON --fast-test --cache-metadata $1 --disable-calib True"
-    OPTS+=" --do-trigger-filtering True -c HH4bAnalysis/RunConfig-PHYSLITE.yaml"
-    local CMD="easyjet-ntupler $OPTS"
-    $CMD --stop-after-config
-    echo "rerunning $CMD to time"
-    $CMD --timeout 30
     metadata-check -v
 }
 
@@ -142,9 +132,12 @@ ntuple-dump-physlite-fast() {
 ################################################
 
 ALL_MODES=${!TESTS[*]}
+DIRECTORY=${EASYJET_TESTDIR-""}
+DATA_URL=https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw
+LOG_LEVEL=${EASYJET_LOG_LEVEL-"WARNING"}
 
 print-usage() {
-    echo "usage: ${0##*/} [-hv] [-d <dir>] (${ALL_MODES[*]// /|})" 1>&2
+    echo "usage: ${0##*/} [-h] [-l <level>] [-d <dir>] <mode>" 1>&2
 }
 
 usage() {
@@ -160,24 +153,47 @@ The ${0##*/} utility will download a test DAOD file and run it.
 
 Options:
  -d <dir>: specify directory to run in
- -v: verbose output (INFO level in Athena)
+ -l <level>: set log level
  -h: print help
 
-If no -d argument is given we'll create one in /tmp and work there.
+Run modes:
+$(dump-modes)
+
+Notes on environment variables:
+ - EASYJET_LOG_LEVEL: default for -l, currently ${LOG_LEVEL}
+ - EASYJET_TESTDIR: default for -d, currently ${DIRECTORY:-/tmp/<random>}
 
 EOF
     exit 1
 }
 
-DIRECTORY=""
-DATA_URL=https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw
-LOG_LEVEL="WARNING"
+dump-modes() {
+    local mode
+    for mode in ${ALL_MODES[*]}
+    do
+        printf "  %s --> %s\n" $mode ${CONFIGS[$mode]-$DEFAULT_CONFIG}
+    done
+}
 
-while getopts ":d:hv" o; do
+OPT_KEYS=":d:hl:"
+dump-complete() {
+    printf "%s " ${ALL_MODES[*]}
+    local char
+    echo -n ${OPT_KEYS//:} | while read -n 1 char
+    do
+        printf -- "-%s " $char
+    done
+}
+
+# the c option is "hidden", we just use it to pass options to tab
+# complete
+while getopts ${OPT_KEYS}c o; do
     case "${o}" in
         d) DIRECTORY=${OPTARG} ;;
         h) help ;;
-        v) LOG_LEVEL="INFO" ;;
+        l) LOG_LEVEL=${OPTARG} ;;
+        # this is just here for tab complete
+        c) dump-complete; exit 0 ;;
         *) usage ;;
     esac
 done
@@ -190,7 +206,7 @@ fi
 MODE=$1
 
 # add common options
-COMMON+=" -l ${FORCED_LOG_LEVEL-${LOG_LEVEL}}"
+COMMON+=" -l ${LOG_LEVEL}"
 
 ############################################
 # Check that all the modes / paths exist
@@ -203,6 +219,7 @@ FILE=${DOWNLOAD_PATH##*/}
 if [[ ! ${TESTS[$MODE]+x} ]]; then usage; fi
 RUN=${TESTS[$MODE]}
 
+CONFIG=${CONFIGS[$MODE]-$DEFAULT_CONFIG}
 
 #############################################
 # now start doing stuff
@@ -230,5 +247,5 @@ fi
 
 # now run the test
 echo "running ${RUN}"
-$RUN $FILE
+$RUN $FILE $CONFIG
 

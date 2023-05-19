@@ -28,7 +28,7 @@ trigger_list: ["HH4bResolved", "HH4bBoosted"]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 # disable CP Algs for calibration
-disable_calib: false
+disable_calib: true
 # apply loose jet cleaning only
 loose_jet_cleaning: true
 # if you want to run a baseline diHiggs analyses

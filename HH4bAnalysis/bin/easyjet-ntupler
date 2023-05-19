@@ -28,6 +28,7 @@ from HH4bAnalysis.config.sample_config import (
     get_data_type,
     cache_metadata,
     update_metadata,
+    has_metadata
 )
 from HH4bAnalysis.config.minituple_config import minituple_cfg
 from HH4bAnalysis.config.h5_config import get_h5_cfg
@@ -188,6 +189,9 @@ def main():
     parser, overwrites = defineArgs(flags)
     args = fill_from_args(flags, parser=parser)
     log.setLevel(flags.Exec.OutputLevel)
+    if args.config_only and has_metadata(flags):
+        log.info("found metadata for input files, skipping config run")
+        return 1
     setRogueLoggers(flags.Exec.OutputLevel)
     # Write user options to flags.Analysis
     fill_config_flags_from_args(args, flags, overwrites)
@@ -207,9 +211,10 @@ def main():
     if flags.Analysis.cache_metadata:
         update_metadata(Path("metadata.json"))
     flags.addFlag("Input.AMITag", fileMD.get("AMITag", ""))
-    flags.addFlag("Input.SimulationFlavour", fileMD.get("SimulationFlavour", ""))
-    flags.addFlag("Analysis.DataType", lambda prevFlags: get_data_type(prevFlags))
-    flags.addFlag("Analysis.Years", lambda prevFlags: get_run_years(prevFlags))
+    flags.addFlag("Input.SimulationFlavour",
+                  fileMD.get("SimulationFlavour", ""))
+    flags.addFlag("Analysis.DataType", get_data_type)
+    flags.addFlag("Analysis.Years", get_run_years)
     log.info(f"Configuring to match dataset from {flags.Analysis.Years}")
     if max(flags.Analysis.Years) <= 2018:
         flags.addFlag("Analysis.Run", 2)

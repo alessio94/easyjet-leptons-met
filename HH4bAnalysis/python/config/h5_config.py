@@ -42,7 +42,7 @@ def get_h5_cfg(flags):
     associations = {x: f"btaggingLink/{x}" for x in btagging}
     primitives += kinematics + btagging
     if flags.Input.isMC:
-        mc_primatives, mc_types, mc_assoc = _get_truth_types()
+        mc_primatives, mc_types, mc_assoc = _get_truth_types(flags)
         primitives += mc_primatives
         types |= mc_types
         associations |= mc_assoc
@@ -61,7 +61,7 @@ def get_h5_cfg(flags):
     return ca
 
 
-def _get_truth_types():
+def _get_truth_types(flags):
     ffloats = []
     fints = ["ID"]
     ftag_label = [f"HadronConeExclTruthLabel{x}" for x in ffloats + fints]
@@ -89,25 +89,28 @@ def _get_truth_types():
     boson_label = []
     associations = {}
     all_boson_suffix = bhalves + bints + bchar + bull
-    for boson in ["Higgs", "Scalar", "Top"]:
-        boson_label += [f"parent{boson}{x}" for x in all_boson_suffix]
-        types |= {f"parent{boson}{x}": "HALF" for x in bhalves}
-        types |= {f"parent{boson}{x}": "INT2SHORT" for x in bints}
-        types |= {f"parent{boson}{x}": "CHAR" for x in bchar}
-        types |= {f"parent{boson}{x}": "UCHAR" for x in buchar}
-        types |= {f"parent{boson}{x}": "ULL" for x in bull}
+    physlite = flags.Input.isPHYSLITE
+    all_parents = [] if physlite else ["Higgs", "Scalar", "Top"]
+    for parent in all_parents:
+        boson_label += [f"parent{parent}{x}" for x in all_boson_suffix]
+        types |= {f"parent{parent}{x}": "HALF" for x in bhalves}
+        types |= {f"parent{parent}{x}": "INT2SHORT" for x in bints}
+        types |= {f"parent{parent}{x}": "CHAR" for x in bchar}
+        types |= {f"parent{parent}{x}": "UCHAR" for x in buchar}
+        types |= {f"parent{parent}{x}": "ULL" for x in bull}
 
-        matchpt = f"parent{boson}MatchingParticlePtGeV"
+        matchpt = f"parent{parent}MatchingParticlePtGeV"
         boson_label += [matchpt]
-        associations[matchpt] = f"parent{boson}MatchingParticleLink/ptGeV"
+        associations[matchpt] = f"parent{parent}MatchingParticleLink/ptGeV"
         types[matchpt] = 'CUSTOM'
 
-        matchbar = f"parent{boson}Barcode"
+        matchbar = f"parent{parent}Barcode"
         boson_label += [matchbar]
-        associations[matchbar] = f"parent{boson}Link/barcode"
+        associations[matchbar] = f"parent{parent}Link/barcode"
         types[matchbar] = 'INT'
 
-    for cascade_type in ["B","W"]:
+    cascade_types = [] if physlite else ["B","W"]
+    for cascade_type in cascade_types:
         key = f"nTopTo{cascade_type}Children"
         types[key] = "UCHAR"
         boson_label.append(key)
