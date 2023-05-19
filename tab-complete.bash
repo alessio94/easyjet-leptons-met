@@ -5,7 +5,7 @@
 
 # Check if we are in BASH, if not get out of here
 if [ "x${BASH_SOURCE[0]}" = "x" ]; then
-    exit 0
+    return
 fi
 
 # add a function to help with the tests
