@@ -19,7 +19,7 @@ def main():
     )
     parser.add_argument(
         "--campaign",
-        default="HH4b.%Y_%m_%d",
+        default="EJ_%Y_%m_%d",
         help=(
             "The name of the campaign. Will be prepended to the output dataset"
             " name. Can include datetime.strftime replacement fields"
