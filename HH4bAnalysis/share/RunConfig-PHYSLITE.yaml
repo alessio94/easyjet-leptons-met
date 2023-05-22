@@ -62,3 +62,5 @@ write_large_R_truth_labels: false
 write_truth_small_R_jets: true
 write_truth_large_R_jets: true
 write_truth_higgs: true
+# custom extra output branches
+extra_output_branches: []

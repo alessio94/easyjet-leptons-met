@@ -124,6 +124,12 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False):
     if flags.Analysis.do_boosted_dihiggs_analysis and not flags.Analysis.disable_calib:
         tree_branches += boosted_branches(flags)
 
+    if flags.Analysis.extra_output_branches:
+        log.info(
+            f"Appending {len(flags.Analysis.extra_output_branches)} extra branches"
+        )
+        tree_branches += flags.Analysis.extra_output_branches
+
     log.info("Add tree seq")
     cfg.merge(tree_cfg(flags, branches=tree_branches))
 
