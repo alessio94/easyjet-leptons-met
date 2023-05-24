@@ -55,6 +55,10 @@ atlas_install_python_modules(
 atlas_install_data(
   share/*.yaml
 )
+atlas_install_generic(
+  tab-complete.bash
+  DESTINATION .
+)
 
 # atlas_install_data( data/* )
 # You can access your data from code using path resolver, e.g.

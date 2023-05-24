@@ -3,13 +3,13 @@
 # set the environment variable TABTEST to dump output to that file,
 # and read with `tail -f`
 
-# Check if we are in BASH, if not get out of here
-if [ "x${BASH_SOURCE[0]}" = "x" ]; then
+# Check if we are in BASH, or not interactive, get out of here
+if [ "x${BASH_SOURCE[0]}" = "x" ] || ! [[ $- == *i* ]]; then
     return
 fi
 
 # add a function to help with the tests
-function _easyjet-test() {
+function _easyjet_test() {
     local current=${COMP_WORDS[COMP_CWORD]}
     local previous=${COMP_WORDS[COMP_CWORD-1]}
     local log=${TABTEST-/dev/null}
@@ -31,4 +31,4 @@ function _easyjet-test() {
     COMPREPLY=($(compgen -W "${opts}" -- ${current}))
     echo " all options" >> ${log}
 }
-complete -F _easyjet-test easyjet-test
+complete -F _easyjet_test easyjet-test
