@@ -58,7 +58,7 @@ def update_metadata(path):
             md.metAccessLevel = cached["level"]
 
 
-def has_metadata(flags,path=Path('metadata.json')):
+def has_metadata(flags, path=Path('metadata.json')):
     if not path.is_file():
         return False
     with open(path) as meta:

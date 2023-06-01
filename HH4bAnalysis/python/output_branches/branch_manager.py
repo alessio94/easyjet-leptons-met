@@ -43,18 +43,18 @@ class BranchManager(object):
             "%SYS%" in _input_container
             and self.systematics_option == SystOption.NO_SYST
         ):
-            _input_container = _input_container.replace("_%SYS%",self.syst_str())
+            _input_container = _input_container.replace("_%SYS%", self.syst_str())
         return _input_container
 
-    def output_string(self,var):
+    def output_string(self, var):
         # Handle case where output prefix is ''
         return (
             f"{self.full_input_container()}.{var} -> "
             f"{self.full_output_prefix()}{var}"
         )
 
-    def add_four_mom_branches(self,do_mass):
-        self.variables += ["pt","eta","phi"]
+    def add_four_mom_branches(self, do_mass):
+        self.variables += ["pt", "eta", "phi"]
         if do_mass:
             self.variables += ["m"]
 

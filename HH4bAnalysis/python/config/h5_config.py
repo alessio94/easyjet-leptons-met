@@ -28,7 +28,7 @@ def get_h5_cfg(flags):
             output=output,
         )
     )
-    jetcol = get_container_names(flags)["outputs"]["reco4Jet"]
+    jetcol = get_container_names(flags)["outputs"]["reco4PFlowJet"]
     types = {}
     primitives = []
     if flags.Analysis.n_h5_jets > 0:
@@ -109,7 +109,7 @@ def _get_truth_types(flags):
         associations[matchbar] = f"parent{parent}Link/barcode"
         types[matchbar] = 'INT'
 
-    cascade_types = [] if physlite else ["B","W"]
+    cascade_types = [] if physlite else ["B", "W"]
     for cascade_type in cascade_types:
         key = f"nTopTo{cascade_type}Children"
         types[key] = "UCHAR"

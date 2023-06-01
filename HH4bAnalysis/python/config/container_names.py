@@ -1,7 +1,7 @@
 # A bit repetitive but avoids extracting the list
 # from a specific file format
 objtypes = [
-    "reco4Jet",
+    "reco4PFlowJet",
     "reco10TopoJet",
     "reco10UFOJet",
     "vrJet",
@@ -17,7 +17,7 @@ objtypes = [
 
 container_map = {
     "DAOD_PHYS": {
-        "reco4Jet":           "AntiKt4EMPFlowJets",
+        "reco4PFlowJet":      "AntiKt4EMPFlowJets",
         "reco10TopoJet":      "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets",
         "reco10UFOJet":       "AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets",
         "vrJet":              "AntiKtVR30Rmax4Rmin02PV0TrackJets",
@@ -31,7 +31,7 @@ container_map = {
         "truthSMParticles":   "TruthBosonsWithDecayParticles",
     },
     "DAOD_PHYSLITE": {
-        "reco4Jet":           "AnalysisJets",
+        "reco4PFlowJet":      "AnalysisJets",
         "reco10TopoJet":      "",
         "reco10UFOJet":       "AnalysisLargeRJets",
         "vrJet":              "",
@@ -63,7 +63,7 @@ def get_container_names(flags):
         outputs = inputs
     else:
         outputs = dict(
-            reco4Jet=f"Analysis{inputs['reco4Jet']}_%SYS%",
+            reco4PFlowJet=f"Analysis{inputs['reco4PFlowJet']}_%SYS%",
             reco10UFOJet=f"Analysis{inputs['reco10UFOJet']}_%SYS%",
             muons=f"Analysis{inputs['muons']}_%SYS%",
             electrons=f"Analysis{inputs['electrons']}_%SYS%",

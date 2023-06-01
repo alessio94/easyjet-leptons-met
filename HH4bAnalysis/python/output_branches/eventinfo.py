@@ -35,7 +35,7 @@ def get_event_info_branches(flags, do_PRW, trigger_chains):
         ]:
             eventinfo_branches.variables += [
                 f"{truthpart}_{var}"
-                for var in ["pt","eta","phi","m"]
+                for var in ["pt", "eta", "phi", "m"]
             ]
 
     if flags.Analysis.write_large_R_Topo_jets and flags.Analysis.write_VR_jets:

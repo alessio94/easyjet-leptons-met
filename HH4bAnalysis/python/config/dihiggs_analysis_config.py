@@ -16,7 +16,9 @@ def dihiggs_analysis_cfg(
         cfg.merge(
             resolved_cfg(
                 flags,
-                smalljetkey=containers["outputs"]["reco4Jet"].replace("%SYS%", "NOSYS"),
+                smalljetkey=containers["outputs"]["reco4PFlowJet"].replace(
+                    "%SYS%", "NOSYS"
+                ),
             )
         )
         cfg.merge(event_counter_cfg("n_resolved"))

@@ -13,7 +13,7 @@ def jet_sequence_cfg(
     cfg = ComponentAccumulator()
     jet_sequence = makeJetAnalysisSequence(
         flags.Analysis.DataType,
-        jetCollection=containers["inputs"]["reco4Jet"],
+        jetCollection=containers["inputs"]["reco4PFlowJet"],
         postfix="smallR",
         deepCopyOutput=False,
         shallowViewOutput=True,
@@ -61,8 +61,8 @@ def jet_sequence_cfg(
         )
 
     jet_sequence.configure(
-        inputName=containers["inputs"]["reco4Jet"],
-        outputName=containers["outputs"]["reco4Jet"],
+        inputName=containers["inputs"]["reco4PFlowJet"],
+        outputName=containers["outputs"]["reco4PFlowJet"],
     )
 
     cfg.addSequence(CompFactory.AthSequencer(jet_sequence.getName()))

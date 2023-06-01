@@ -8,8 +8,8 @@ def muon_sequence_cfg(flags, containers):
 
     muon_sequence = makeMuonAnalysisSequence(
         flags.Analysis.DataType,
-        workingPoint="Medium.NonIso",
-        postfix="medium",
+        workingPoint="Loose.NonIso",
+        postfix="loose",
         deepCopyOutput=False,
         shallowViewOutput=True,
         ptSelectionOutput=True,

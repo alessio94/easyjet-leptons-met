@@ -47,17 +47,14 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False):
 
     tree_branches = []
 
-    tree_branches += get_event_info_branches(
-        flags, do_PRW, trigger_chains
-    )
+    tree_branches += get_event_info_branches(flags, do_PRW, trigger_chains)
 
     objects_out = {
-        "electrons":    ("el", get_electron_branches),
-        "photons":      ("ph", get_photon_branches),
-        "muons":        ("mu", get_muon_branches),
+        "electrons": ("el", get_electron_branches),
+        "photons": ("ph", get_photon_branches),
+        "muons": ("mu", get_muon_branches),
     }
     for objtype, (prefix, branch_getter) in objects_out.items():
-
         if flags(f"Analysis.write_{objtype}"):
             tree_branches += branch_getter(
                 flags,
@@ -68,8 +65,8 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False):
     if flags.Analysis.write_small_R_jets:
         tree_branches += get_small_R_jet_branches(
             flags,
-            input_container=containers["reco4Jet"],
-            output_prefix="recojet_antikt4"
+            input_container=containers["reco4PFlowJet"],
+            output_prefix="recojet_antikt4PFlow",
         )
         # Use this to directly read b-tagging information
         # Note that the indices can get out of sync with
@@ -78,7 +75,7 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False):
         tree_branches += get_small_R_bjet_branches(
             flags,
             input_container="BTagging_AntiKt4EMPFlow",
-            output_prefix="recojet_antikt4"
+            output_prefix="recojet_antikt4PFlow",
         )
 
     if flags.Analysis.write_large_R_Topo_jets:
@@ -101,7 +98,7 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False):
         tree_branches += get_small_R_truthjet_branches(
             flags,
             input_container=containers["truth4Jet"],
-            output_prefix="truthjet_antikt4",
+            output_prefix="truthjet_antikt4PFlow",
         )
 
     if flags.Input.isMC and flags.Analysis.write_truth_large_R_jets:
@@ -134,14 +131,14 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False):
     cfg.merge(tree_cfg(flags, branches=tree_branches))
 
     if flags.Analysis.dump_output_branchlist:
-        outf_sub = flags.Analysis.out_file.replace('root','txt')
-        if '/' in outf_sub:
-            outf_dir, outf_sub = outf_sub.rsplit('/',1)
+        outf_sub = flags.Analysis.out_file.replace("root", "txt")
+        if "/" in outf_sub:
+            outf_dir, outf_sub = outf_sub.rsplit("/", 1)
             branches_fname = f"{outf_dir}/output-branches-{outf_sub}"
         else:
             branches_fname = f"output-branches-{outf_sub}"
 
-        with open(branches_fname,'w') as branches_f:
+        with open(branches_fname, "w") as branches_f:
             for b in tree_branches:
                 branches_f.write(f"{b}\n")
 

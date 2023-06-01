@@ -6,7 +6,7 @@ def consolidate_systematics_regex(regex_list):
         syst_regex = '.*'
     else:
         for r in regex_list:
-            invalid = ['','.*','NOSYS','^$']
+            invalid = ['', '.*', 'NOSYS', '^$']
             if r in invalid:
                 raise ValueError(f"'{r}' in systematics regex is invalid")
         # Start with match for empty string i.e. NOSYS

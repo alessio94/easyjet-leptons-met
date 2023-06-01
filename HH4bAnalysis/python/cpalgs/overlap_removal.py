@@ -22,7 +22,7 @@ def overlap_sequence_cfg(
             overlapInputNames[objtype] = containers["outputs"][objtype]
 
     if flags.Analysis.do_small_R_jets:
-        overlapInputNames["jets"] = containers["outputs"]["reco4Jet"]
+        overlapInputNames["jets"] = containers["outputs"]["reco4PFlowJet"]
 
     do_fatJet_OR = False
     if flags.Analysis.write_large_R_Topo_jets:
