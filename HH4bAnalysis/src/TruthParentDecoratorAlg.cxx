@@ -272,7 +272,7 @@ StatusCode TruthParentDecoratorAlg::initialize() {
   ATH_CHECK(m_match_link_key.initialize());
 
   for (auto& [key, pids]: m_counts_matching_cascade) {
-    m_cascade_count_writer_keys.emplace_back(key);
+    m_cascade_count_writer_keys.emplace_back(jc + "." + key);
     m_cascade_count_decorators.emplace_back(key, pids);
   }
   for (auto& key: m_cascade_count_writer_keys) declare(key);
@@ -379,8 +379,11 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   SG::WriteDecorHandle<JC,int> matchPdgId(m_match_pdgid_key, cxt);
   SG::WriteDecorHandle<JC,int> matchChildCount(m_match_children_key, cxt);
   SG::WriteDecorHandle<JC,JL> matchLink(m_match_link_key, cxt);
-  std::vector<SG::WriteDecorHandle<JC, char>> cascadeCounts;
+  std::vector<SG::WriteDecorHandle<JC, unsigned char>> cascadeCounts;
   for (const auto& key: m_cascade_count_writer_keys) {
+    // note that this doesn't currently work, see this jira ticket:
+    //
+    // https://its.cern.ch/jira/browse/ATEAM-909
     cascadeCounts.emplace_back(key, cxt);
   }
 
