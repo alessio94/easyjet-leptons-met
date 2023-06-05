@@ -37,7 +37,6 @@ def get_large_R_jet_branches(flags, input_container, output_prefix, lr_jet_type)
     if flags.Input.isMC and flags.Analysis.write_large_R_truth_labels:
         large_R_jet_branches.variables += [
             "GhostBHadronsFinalCount",
-            "GhostCHadronsFinalCount",
         ] + get_large_R_jet_truth_labels(flags)
 
         if lr_jet_type == "Topo":
@@ -46,6 +45,7 @@ def get_large_R_jet_branches(flags, input_container, output_prefix, lr_jet_type)
             ]
         if lr_jet_type == "UFO":
             large_R_jet_NOSYS_branches.variables += [
+                "GhostCHadronsFinalCount",
                 "R10TruthLabel_R21Precision_2022v1",
                 "R10TruthLabel_R22v1",
             ]

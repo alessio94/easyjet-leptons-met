@@ -30,6 +30,14 @@ def truth_info_cfg(
             match_dr=1.0,
         ))
 
+    if flags.Analysis.do_large_R_Topo_jets and not flags.Input.isPHYSLITE:
+        cfg.merge(jet_parent_decorator_cfg(
+            flags,
+            jet_collection=containers["inputs"]["reco10TopoJet"],
+            name_prefix="largeRTopo",
+            match_dr=1.0,
+        ))
+
     log.info("Adding truth particle info seq")
     cfg.merge(
         truth_particle_info_cfg(
