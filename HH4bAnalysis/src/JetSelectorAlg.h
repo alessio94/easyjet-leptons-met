@@ -46,9 +46,6 @@ private:
     int m_truncateAtAmount;
     bool m_pTsort;
     bool m_removeRelativeDeltaRToVRJet;
-    std::unordered_map<std::string,
-                       SG::AuxElement::Decorator<std::vector<float>>>
-        m_fourVecDecos;
   };
 }
 
