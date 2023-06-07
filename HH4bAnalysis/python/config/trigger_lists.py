@@ -1,4 +1,22 @@
 TRIGGER_LISTS = {
+    "HHyybb": {
+        2015: [
+            "HLT_g35_loose_g25_loose",
+            "HLT_g120_loose",
+        ],
+        2016: [
+            "HLT_g35_loose_g25_loose",
+            "HLT_g140_loose",
+        ],
+        2017: [
+            "HLT_g35_medium_g25_medium_L12EM20VH",
+            "HLT_g140_loose",
+        ],
+        2018: [
+            "HLT_g35_medium_g25_medium_L12EM20VH",
+            "HLT_g140_loose",
+        ],
+    },
     "HH4bResolved": {
         2015: [
             # 2015 (not used in the resolved analysis):

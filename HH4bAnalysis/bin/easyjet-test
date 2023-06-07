@@ -15,6 +15,8 @@ DATA_2018=data18_13TeV.00362204.physics_Main.DAOD_PHYS_10evts.r13286_p5631.pool.
 DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14190_p5632.pool.root
 PHYS_JETS_MC20=mc20_13TeV.364704.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ4WithSW.DAOD_PHYS_10evts.e7142_s3681_r13145_p5631.pool.root
 PHYS_TTBAR_MC20=mc20_13TeV.410471.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e6337_s3681_r13145_p5631.pool.root
+PHYSLITE_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13144_p5631.pool.root
+PHYS_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13144_p5631.pool.root
 PHYS_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5631.pool.root
 PHYS_SH4B_BOOSTED_MC20_p5658=mc20_13TeV.801637.Py8EG_A14NNPDF23LO_XHS_X3000_S100_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5658.pool.root
 PHYSLITE_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a899_r13145_p5631.pool.root
@@ -33,6 +35,7 @@ declare -A DATAFILES=(
     [jets-mc20]=${PHYS_JETS_MC20}
     [ttbar-mc20-fast]=${PHYS_TTBAR_MC20}
     [ttbar-mc20]=${PHYS_TTBAR_MC20}
+    [yybb-mc20]=${PHYS_YYBB_MC20}
     [hh4b-mc21]=${PHYS_HH4B_MC21}
     [hh4b-mc21-noroot]=${PHYS_HH4B_MC21}
     [hh4b-mc21-syst]=${PHYS_HH4B_MC21}
@@ -49,6 +52,7 @@ declare -A DATAFILES=(
     [lite-sh4b-boosted-mc20]=${PHYSLITE_SH4B_BOOSTED_MC20}
     [lite-hh4b-mc21-fast]=${PHYSLITE_HH4B_MC21}
     [lite-hh4b-mc21]=${PHYSLITE_HH4B_MC21}
+    [lite-yybb-mc20]=${PHYSLITE_YYBB_MC20}
 )
 
 declare -A TESTS=(
@@ -58,6 +62,7 @@ declare -A TESTS=(
     [jets-mc20]=ntuple-dump
     [ttbar-mc20-fast]=ntuple-dump-fast
     [ttbar-mc20]=ntuple-dump
+    [yybb-mc20]=ntuple-dump
     [sh4b-boosted-mc20-fast-awkward]=ntuple-dump-fast-awkward
     [sh4b-boosted-mc20-fast]=ntuple-dump-fast
     [sh4b-boosted-mc20]=ntuple-dump
@@ -74,15 +79,18 @@ declare -A TESTS=(
     [lite-sh4b-boosted-mc20]=ntuple-dump
     [lite-hh4b-mc21-fast]=ntuple-dump-fast
     [lite-hh4b-mc21]=ntuple-dump
+    [lite-yybb-mc20]=ntuple-dump
 )
 
 DEFAULT_CONFIG=HH4bAnalysis/RunConfig.yaml
 declare -A CONFIGS=(
     [sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-SH4b.yaml
     [sh4b-boosted-mc20-p5658]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [yybb-mc20]=HH4bAnalysis/RunConfig-PHYS-yybb.yaml
     [jets-mc23]=HH4bAnalysis/RunConfig-SH4b.yaml
     [lite-sh4b-boosted-mc20-fast]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
     [lite-sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
+    [lite-yybb-mc20]=HH4bAnalysis/RunConfig-PHYSLITE-yybb.yaml
     [lite-hh4b-mc21-fast]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
     [lite-hh4b-mc21]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
 )

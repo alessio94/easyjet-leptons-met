@@ -368,6 +368,7 @@ def main():
         if (
             flags.Analysis.do_resolved_dihiggs_analysis
             or flags.Analysis.do_boosted_dihiggs_analysis
+            or flags.Analysis.do_yybb_analysis
         ):
             cfg.merge(
                 dihiggs_analysis_cfg(

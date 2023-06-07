@@ -1,25 +1,24 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from HH4bAnalysis.config.boosted_config import boosted_branches
-from HH4bAnalysis.config.resolved_config import resolved_branches
-from HH4bAnalysis.cpalgs.tree import tree_cfg
 from HH4bAnalysis.config.container_names import get_container_names
-from HH4bAnalysis.utils.log_helper import log
-from HH4bAnalysis.output_branches.eventinfo import get_event_info_branches
+from HH4bAnalysis.config.resolved_config import resolved_branches
+from HH4bAnalysis.config.yybb_config import yybb_branches
+from HH4bAnalysis.cpalgs.tree import tree_cfg
 from HH4bAnalysis.output_branches.electrons import get_electron_branches
-from HH4bAnalysis.output_branches.photons import get_photon_branches
+from HH4bAnalysis.output_branches.eventinfo import get_event_info_branches
+from HH4bAnalysis.output_branches.large_R_jets import get_large_R_jet_branches
 from HH4bAnalysis.output_branches.muons import get_muon_branches
+from HH4bAnalysis.output_branches.photons import get_photon_branches
 from HH4bAnalysis.output_branches.small_R_jets import (
-    get_small_R_jet_branches,
     get_small_R_bjet_branches,
-)
-from HH4bAnalysis.output_branches.large_R_jets import (
-    get_large_R_jet_branches,
+    get_small_R_jet_branches,
 )
 from HH4bAnalysis.output_branches.truth_jets import (
-    get_small_R_truthjet_branches,
     get_large_R_truthjet_branches,
+    get_small_R_truthjet_branches,
 )
+from HH4bAnalysis.utils.log_helper import log
 
 
 def minituple_cfg(flags, trigger_chains, do_PRW=False):
@@ -120,6 +119,9 @@ def minituple_cfg(flags, trigger_chains, do_PRW=False):
 
     if flags.Analysis.do_boosted_dihiggs_analysis and not flags.Analysis.disable_calib:
         tree_branches += boosted_branches(flags)
+
+    if flags.Analysis.do_yybb_analysis:
+        tree_branches += yybb_branches(flags)
 
     if flags.Analysis.extra_output_branches:
         log.info(

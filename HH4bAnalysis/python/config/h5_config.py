@@ -1,6 +1,5 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-
 from HH4bAnalysis.config.container_names import get_container_names
 
 
@@ -89,6 +88,7 @@ def _get_truth_types(flags):
     boson_label = []
     associations = {}
     all_boson_suffix = bhalves + bints + bchar + bull
+
     physlite = flags.Input.isPHYSLITE
     all_parents = [] if physlite else ["Higgs", "Scalar", "Top"]
     for parent in all_parents:
@@ -102,12 +102,12 @@ def _get_truth_types(flags):
         matchpt = f"parent{parent}MatchingParticlePtGeV"
         boson_label += [matchpt]
         associations[matchpt] = f"parent{parent}MatchingParticleLink/ptGeV"
-        types[matchpt] = 'CUSTOM'
+        types[matchpt] = "CUSTOM"
 
         matchbar = f"parent{parent}Barcode"
         boson_label += [matchbar]
         associations[matchbar] = f"parent{parent}Link/barcode"
-        types[matchbar] = 'INT'
+        types[matchbar] = "INT"
 
     cascade_types = [] if physlite else ["B", "W"]
     for cascade_type in cascade_types:

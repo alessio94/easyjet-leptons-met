@@ -61,6 +61,9 @@ def validate_analysis_prerequisites(flags):
         assert flags.Analysis.do_large_R_Topo_jets
         assert not flags.Analysis.disable_calib
 
+    if flags.Analysis.do_yybb_analysis:
+        assert flags.Analysis.do_small_R_jets
+
 
 def validate_file_format(flags):
     if flags.Input.isPHYSLITE:

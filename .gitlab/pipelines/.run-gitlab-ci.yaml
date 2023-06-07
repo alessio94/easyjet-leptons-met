@@ -62,6 +62,11 @@ ntupler_sh4b_boosted_mc20_fast:
   script:
     - easyjet-test sh4b-boosted-mc20-fast
 
+ntupler_yybb_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test yybb-mc20
+
 ntupler_ttbar-mc21:
   extends: .ntupler
   script:
@@ -111,3 +116,8 @@ ntupler_lite_sh4b_boosted_mc20_fast:
   extends: .ntupler
   script:
     - easyjet-test lite-sh4b-boosted-mc20-fast
+
+ntupler_lite_yybb_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test lite-yybb-mc20

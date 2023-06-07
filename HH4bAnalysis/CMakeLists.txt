@@ -15,9 +15,11 @@ atlas_add_component(HH4bAnalysis
   src/TruthParticleInformationAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
   src/JetSelectorAlg.cxx
+  src/PhotonSelectorAlg.cxx
   src/JetPairingAlg.cxx
   src/BaselineVarsResolvedAlg.cxx
   src/BaselineVarsBoostedAlg.cxx
+  src/BaselineVarsyybbAlg.cxx
   src/GhostAssocVRJetGetterAlg.cxx
   src/H5FileSvc.cxx
   src/TruthParentDecoratorAlg.cxx

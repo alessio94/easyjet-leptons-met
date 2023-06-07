@@ -16,7 +16,7 @@ class MCSampleYears(Enum):
     r13144 = (2017,)
     r13145 = (2018,)
     r13829 = (2022,)
-    r14622 = (2022,2023)
+    r14622 = (2022, 2023)
 
 
 class SampleTypes(Enum):
@@ -60,7 +60,7 @@ def update_metadata(path):
             md.metAccessLevel = cached["level"]
 
 
-def has_metadata(flags, path=Path('metadata.json')):
+def has_metadata(flags, path=Path("metadata.json")):
     if not path.is_file():
         return False
     with open(path) as meta:

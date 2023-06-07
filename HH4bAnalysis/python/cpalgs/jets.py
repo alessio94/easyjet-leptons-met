@@ -1,15 +1,14 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetCalibAnalysisSequence
 from FTagAnalysisAlgorithms.FTagAnalysisSequence import makeFTagAnalysisSequence
 from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
-from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetCalibAnalysisSequence
 
 
 def jet_sequence_cfg(
     flags,
     containers,
 ):
-
     cfg = ComponentAccumulator()
     jet_sequence = makeJetAnalysisSequence(
         flags.Analysis.DataType,
@@ -28,7 +27,7 @@ def jet_sequence_cfg(
     btag_calib_file = (
         "xAODBTaggingEfficiency/13TeV/2022-22-13TeV-MC20-CDI-2022-07-28_v1.root"
     )
-    # This is the container name that is available in the CDI aboce
+    # This is the container name that is available in the CDI above
     jet_btag_name = "AntiKt4EMPFlowJets"
 
     for tagger_wp in flags.Analysis.btag_wps:
@@ -95,7 +94,7 @@ def lr_jet_sequence_cfg(flags, containers, lr_jet_type):
 
     lr_recojet_sequence.configure(
         inputName=containers["inputs"][f"reco10{lr_jet_type}Jet"],
-        outputName=containers["outputs"][f"reco10{lr_jet_type}Jet"]
+        outputName=containers["outputs"][f"reco10{lr_jet_type}Jet"],
     )
 
     cfg.addSequence(CompFactory.AthSequencer(lr_recojet_sequence.getName()))

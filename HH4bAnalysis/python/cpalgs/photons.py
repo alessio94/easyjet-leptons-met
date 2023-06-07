@@ -10,7 +10,7 @@ def photon_sequence_cfg(flags, containers):
 
     photon_sequence = makePhotonAnalysisSequence(
         flags.Analysis.DataType,
-        workingPoint="Loose.NonIso",
+        workingPoint=flags.Analysis.PhotonWP,
         postfix="loose",
         deepCopyOutput=False,
         shallowViewOutput=True,
