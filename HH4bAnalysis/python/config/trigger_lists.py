@@ -45,6 +45,7 @@ TRIGGER_LISTS = {
             "HLT_j150_2j55_0eta290_020jvt_bdl1d70_pf_ftf_preselj80XX2j45b90_L1J85_3J30",  # noqa
             "HLT_j150_2j55_0eta290_020jvt_bdl1r70_pf_ftf_preselj80XX2j45b90_L1J85_3J30",  # noqa
         ],
+        2023: [],
     },
     "HH4bBoosted": {
         2015: [
@@ -82,6 +83,7 @@ TRIGGER_LISTS = {
             "HLT_j420_35smcINF_a10t_lcw_jes_L1J100",
             "HLT_j420_35smcINF_a10t_lcw_jes_L1SC111-CJ15",
         ],
+        2023: [],
     },
     "JetTrigEffStudy": {
         2015: [
@@ -124,5 +126,6 @@ TRIGGER_LISTS = {
             "HLT_7j45_pf_ftf_presel7j30_L14J15",
             "HLT_10j40_pf_ftf_presel7j30_L14J15",
         ],
+        2023: [],
     },
 }

@@ -60,10 +60,11 @@ def pileup_sequence_cfg(flags, prwfiles, lumicalcfiles):
     from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
 
     tags = flags.Input.AMITag
+    mc21mc23 = (SampleTypes.mc21a.value in tags) or (SampleTypes.mc23a.value in tags)
     pileup_sequence = makePileupAnalysisSequence(
         flags.Analysis.DataType,
         files=flags.Input.Files,
-        useDefaultConfig=SampleTypes.mc21a.value in tags,
+        useDefaultConfig=mc21mc23,
     )
     pileup_sequence.configure(inputName={}, outputName={})
 
@@ -71,7 +72,7 @@ def pileup_sequence_cfg(flags, prwfiles, lumicalcfiles):
     for alg in pileup_sequence.getGaudiConfig2Components():
         # Workaround for mc21 courtesy of
         # https://its.cern.ch/jira/browse/ATLASG-1628?focusedCommentId=4297949&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-4297949
-        if SampleTypes.mc21a.value in tags and "PileupReweightingAlg" in alg.getName():
+        if mc21mc23 and "PileupReweightingAlg" in alg.getName():
             alg.pileupReweightingTool.PeriodAssignments = []
             alg.pileupReweightingTool.DataScaleFactor = 1
         cfg.addEventAlgo(alg, pileup_sequence.getName())

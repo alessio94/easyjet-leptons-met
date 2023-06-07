@@ -8,7 +8,7 @@ set -Eeu
 ################################################
 
 #tag from easyjet/hh4b-test-files
-TAG=p5631p5658
+TAG=mc23PHYS
 
 # standard samples
 DATA_2018=data18_13TeV.00362204.physics_Main.DAOD_PHYS_10evts.r13286_p5631.pool.root
@@ -22,6 +22,7 @@ PHYS_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYS_10evts.e8472_
 PHYSLITE_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5631.pool.root
 PHYS_TTBAR_MC21=mc21_13p6TeV.601237.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e8453_s3873_r13829_p5631.pool.root
 PHYS_JETS_MC21=mc21_13p6TeV.801170.Py8EG_A14NNPDF23LO_jj_JZ5.DAOD_PHYS_10evts.e8453_s3873_r13829_p5631.pool.root
+PHYS_JETS_MC23=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_s4111_r14622_p5706.pool.root
 
 declare -A DATAFILES=(
     [data18-fast]=${DATA_2018}
@@ -42,6 +43,8 @@ declare -A DATAFILES=(
     [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
     [ttbar-mc21]=${PHYS_TTBAR_MC21}
     [ttbar-mc21-syst]=${PHYS_TTBAR_MC21}
+    [jets-mc21]=${PHYS_JETS_MC21}
+    [jets-mc23]=${PHYS_JETS_MC23}
     [lite-sh4b-boosted-mc20-fast]=${PHYSLITE_SH4B_BOOSTED_MC20}
     [lite-sh4b-boosted-mc20]=${PHYSLITE_SH4B_BOOSTED_MC20}
     [lite-hh4b-mc21-fast]=${PHYSLITE_HH4B_MC21}
@@ -65,6 +68,8 @@ declare -A TESTS=(
     [ttbar-mc21-fast]=ntuple-dump-fast
     [ttbar-mc21]=ntuple-dump
     [ttbar-mc21-syst]=ntuple-dump-syst
+    [jets-mc21]=ntuple-dump
+    [jets-mc23]=ntuple-dump
     [lite-sh4b-boosted-mc20-fast]=ntuple-dump-fast
     [lite-sh4b-boosted-mc20]=ntuple-dump
     [lite-hh4b-mc21-fast]=ntuple-dump-fast
@@ -75,6 +80,7 @@ DEFAULT_CONFIG=HH4bAnalysis/RunConfig.yaml
 declare -A CONFIGS=(
     [sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-SH4b.yaml
     [sh4b-boosted-mc20-p5658]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [jets-mc23]=HH4bAnalysis/RunConfig-SH4b.yaml
     [lite-sh4b-boosted-mc20-fast]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
     [lite-sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-PHYSLITE.yaml
     [lite-hh4b-mc21-fast]=HH4bAnalysis/RunConfig-PHYSLITE.yaml

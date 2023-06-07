@@ -16,6 +16,7 @@ class MCSampleYears(Enum):
     r13144 = (2017,)
     r13145 = (2018,)
     r13829 = (2022,)
+    r14622 = (2022,2023)
 
 
 class SampleTypes(Enum):
@@ -23,6 +24,7 @@ class SampleTypes(Enum):
     mc20d = "r13144"  # run2, 2017
     mc20e = "r13145"  # run2, 2018
     mc21a = "r13829"  # run3, 2022
+    mc23a = "r14622"  # run3, 2022
     # ptag
     mc20 = "p5057"
     # ptag for Xbb tagger
@@ -93,6 +95,8 @@ def get_pileup_config_files(flags):
         subcampaign = SampleTypes.mc20e
     elif SampleTypes.mc21a.value in tags:
         subcampaign = SampleTypes.mc21a
+    elif SampleTypes.mc23a.value in tags:
+        subcampaign = SampleTypes.mc23a
     else:
         raise LookupError(f"Cannot determine subcampaign for DSID {dsid}")
 
@@ -115,6 +119,9 @@ def _get_lumicalc_files(subcampaign):
             "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root"  # noqa
         ],
         SampleTypes.mc21a: [
+            "GoodRunsLists/data22_13p6TeV/20220902/ilumicalc_histograms_None_427882-430648_OflLumi-Run3-001.root"  # noqa
+        ],
+        SampleTypes.mc23a: [
             "GoodRunsLists/data22_13p6TeV/20220902/ilumicalc_histograms_None_427882-430648_OflLumi-Run3-001.root"  # noqa
         ],
     }

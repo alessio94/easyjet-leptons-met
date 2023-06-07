@@ -32,6 +32,11 @@ ntupler_jets_mc20_fast:
   script:
     - easyjet-test jets-mc20-fast
 
+ntupler_jets_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test jets-mc23
+
 ntupler_ttbar_mc20:
   extends: .ntupler
   script:
