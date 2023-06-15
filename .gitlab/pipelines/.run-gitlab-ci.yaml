@@ -47,16 +47,6 @@ ntupler_ttbar_mc20_fast:
   script:
     - easyjet-test ttbar-mc20-fast
 
-ntupler_sh4b_boosted_mc20:
-  extends: .ntupler
-  script:
-    - easyjet-test sh4b-boosted-mc20
-
-ntupler_sh4b_boosted_mc20_p5658:
-  extends: .ntupler
-  script:
-    - easyjet-test sh4b-boosted-mc20-p5658
-
 ntupler_sh4b_boosted_mc20_fast:
   extends: .ntupler
   script:
@@ -65,7 +55,7 @@ ntupler_sh4b_boosted_mc20_fast:
 ntupler_yybb_mc20:
   extends: .ntupler
   script:
-    - easyjet-test yybb-mc20
+    - hh4b-test yybb-mc20
 
 ntupler_ttbar-mc21:
   extends: .ntupler
@@ -120,4 +110,14 @@ ntupler_lite_sh4b_boosted_mc20_fast:
 ntupler_lite_yybb_mc20:
   extends: .ntupler
   script:
-    - easyjet-test lite-yybb-mc20
+    - hh4b-test lite-yybb-mc20
+
+ntupler_sh4b_boosted_mc20:
+  extends: .ntupler
+  script:
+    - hh4b-test sh4b-boosted-mc20
+
+ntupler_sh4b_boosted_mc20_p5658:
+  extends: .ntupler
+  script:
+    - hh4b-test sh4b-boosted-mc20-p5658

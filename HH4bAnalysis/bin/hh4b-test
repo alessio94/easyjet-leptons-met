@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+
+set -Eeu
+
+
+################################################
+# mode-based switches
+################################################
+
+#tag from easyjet/hh4b-test-files
+TAG=mc23PHYS
+
+# test samples
+PHYS_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5631.pool.root
+PHYS_SH4B_BOOSTED_MC20_p5658=mc20_13TeV.801637.Py8EG_A14NNPDF23LO_XHS_X3000_S100_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5658.pool.root
+PHYS_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13144_p5631.pool.root
+PHYSLITE_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13144_p5631.pool.root
+
+declare -A DATAFILES=(
+    [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED_MC20}
+    [sh4b-boosted-mc20-p5658]=${PHYS_SH4B_BOOSTED_MC20_p5658}
+    [yybb-mc20]=${PHYS_YYBB_MC20}
+    [lite-yybb-mc20]=${PHYSLITE_YYBB_MC20}
+)
+
+declare -A TESTS=(
+    [sh4b-boosted-mc20]=hh4b-dump
+    [sh4b-boosted-mc20-p5658]=hh4b-dump
+    [yybb-mc20]=hh4b-dump
+    [lite-yybb-mc20]=hh4b-dump
+)
+
+DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
+declare -A CONFIGS=(
+    [sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [sh4b-boosted-mc20-p5658]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [yybb-mc20]=HH4bAnalysis/RunConfig-PHYS-yybb.yaml
+    [lite-yybb-mc20]=HH4bAnalysis/RunConfig-PHYSLITE-yybb.yaml
+)
+
+# some common variables in the tests
+COMMON="-O"
+
+# specific tests
+hh4b-dump() {
+    hh4b-ntupler $1 -c $2 -o $COMMON
+    metadata-check -v
+}
+
+################################################
+# parse arguments
+################################################
+
+ALL_MODES=${!TESTS[*]}
+DIRECTORY=${EASYJET_TESTDIR-""}
+DATA_URL=https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw
+LOG_LEVEL=${EASYJET_LOG_LEVEL-"WARNING"}
+
+print-usage() {
+    echo "usage: ${0##*/} [-h] [-l <level>] [-d <dir>] <mode>" 1>&2
+}
+
+usage() {
+    print-usage
+    exit 1;
+}
+
+help() {
+    print-usage
+    cat <<EOF
+
+The ${0##*/} utility will download a test DAOD file and run it.
+
+Options:
+ -d <dir>: specify directory to run in
+ -l <level>: set log level
+ -h: print help
+
+Run modes:
+$(dump-modes)
+
+Notes on environment variables:
+ - EASYJET_LOG_LEVEL: default for -l, currently ${LOG_LEVEL}
+ - EASYJET_TESTDIR: default for -d, currently ${DIRECTORY:-/tmp/<random>}
+
+EOF
+    exit 1
+}
+
+dump-modes() {
+    local mode
+    for mode in ${ALL_MODES[*]}
+    do
+        printf "  %s --> %s\n" $mode ${CONFIGS[$mode]-$DEFAULT_CONFIG}
+    done
+}
+
+OPT_KEYS=":d:hl:"
+dump-complete() {
+    printf "%s " ${ALL_MODES[*]}
+    local char
+    echo -n ${OPT_KEYS//:} | while read -n 1 char
+    do
+        printf -- "-%s " $char
+    done
+}
+
+# the c option is "hidden", we just use it to pass options to tab
+# complete
+while getopts ${OPT_KEYS}c o; do
+    case "${o}" in
+        d) DIRECTORY=${OPTARG} ;;
+        h) help ;;
+        l) LOG_LEVEL=${OPTARG} ;;
+        # this is just here for tab complete
+        c) dump-complete; exit 0 ;;
+        *) usage ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if (( $# != 1 )) ; then
+    usage
+fi
+
+MODE=$1
+
+# add common options
+COMMON+=" -l ${LOG_LEVEL}"
+
+############################################
+# Check that all the modes / paths exist
+############################################
+#
+if [[ ! ${DATAFILES[$MODE]+x} ]]; then usage; fi
+DOWNLOAD_PATH=${DATAFILES[$MODE]}
+FILE=${DOWNLOAD_PATH##*/}
+
+if [[ ! ${TESTS[$MODE]+x} ]]; then usage; fi
+RUN=${TESTS[$MODE]}
+
+CONFIG=${CONFIGS[$MODE]-$DEFAULT_CONFIG}
+
+#############################################
+# now start doing stuff
+#############################################
+#
+if [[ -z ${DIRECTORY} ]] ; then
+    DIRECTORY=$(mktemp -d)
+    echo "running in ${DIRECTORY}" >&2
+fi
+
+if [[ ! -d ${DIRECTORY} ]]; then
+    if [[ -e ${DIRECTORY} ]] ; then
+        echo "${DIRECTORY} is not a directory" >&2
+        exit 1
+    fi
+    mkdir ${DIRECTORY}
+fi
+cd $DIRECTORY
+
+# get files
+if [[ ! -f ${FILE} ]] ; then
+    echo "getting file ${FILE}" >&2
+    curl -s ${DATA_URL}/${TAG}/${DOWNLOAD_PATH} > ${FILE}
+fi
+
+# now run the test
+echo "running ${RUN}"
+$RUN $FILE $CONFIG
+

@@ -43,17 +43,20 @@ When changing branches with `git checkout` or `git switch`, also be sure to use 
 
 # Running on files
 
-To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig hh4b-analysis/HH4bAnalysis/share/RunConfig.yaml.:
+To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig `hh4b-analysis/EasyjetHub/share/RunConfig.yaml`.:
 
 ```
 easyjet-ntupler data.myinputfile.DAOD_PHYS.pool.root --run-config [path-to-runconfig] --evtMax 10 --out-file analysis-variables.root
 ```
->Your build also installs this one into the build area so you can also do --run-config ${HH4bAnalysis_DIR}/data/HH4bAnalysis/RunConfig.yaml
+>Your build also installs this one into the build area so you can also do --run-config ${EasyjetHub_DIR}/data/EasyjetHub/RunConfig.yaml
 Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
 You should find a new ROOT files, `analysis-variables.root`.
 
 To process Monte Carlo or PHYSLITE samples the command is exactly the same: configuration is automatically setup from the sample's metadata.
 
+## Extending the ntupler with analysis-specific algorithms
+
+We expose functions for generating the sequences used in `easyjet-ntupler` via the `hub.py` module, such that a custom executable can be defined that extends the basic job with analysis-specific operations. An annotated example for this can be found in [`HH4bAnalysis/bin/hh4b-ntupler`](./HH4bAnalysis/bin/hh4b-ntupler). See [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md) and [`EasyjetHub/python/hub.py`](./EasyjetHub/python/hub.py) directly for guidance.
 
 ## AthAnalysis in Docker
 
@@ -108,7 +111,32 @@ For more options you can do:
 easyjet-gridsubmit -h
 ```
 
-## Development
+# Development
+
+Contributions to this code are welcome in the form of merge requests. The fast-forward merge policy is used, such that the git history is always linear, and most importantly ensures that the continuous integration of the master branch cannot be broken due to two independent MRs that interact without their own CI breaking. Merge requests require successful pipelines and an approval by one of the project developers.
+
+Limited code formatting rules are enforced via `cppcheck` and `flake8`. We aim to follow `PEP8` python style conventions, except certain cases where it is more natural to follow ATLAS-like camel-case variable names.
+
+### Package structure
+
+The following `CMake` packages are defined in this repository:
+- `EasyjetHub`: Core framework code providing analysis-independent algorithms and job steering
+- `HH4bAnalysis`: Analysis-specific code for HH->4b information
+  - E.g. preselections, jet pairing algorithms and decay path tracing specific to the 4b decay mode are implemented here
+  - For historical reasons, `yybb` code is also currently included in this package, but will be separated into its own package at a later date
+- `BJetCalibrationTool` (submodule): Tool and algs for applying b-jet four-momentum correction
+- `H5Writer`: Tool and algs for writing HDF5 output
+
+### General organization of python modules
+
+Please follow the existing module organisation as laid out in [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md).
+In case of ambiguity we are happy to discuss where additional modules or folders can be inserted.
+
+*Note: To distinguish modules defined in `easyjet` from those in in `atlas/athena`, modules producing `ComponentAccumulator` configurations are named in snake case and end in `config.py` e.g. `EasyjetHub.steering.main_sequence_config.py`, rather than in camel case e.g. `AthenaConfiguration.MainSequencesConfig.py`.*
+
+### Pre-commit hooks
+
+*Currently not entirely functional*
 
 You can use pre-commit hooks, that check and autoformats some style and formatting hooks in `.pre-commit-config.yaml` when you execute `git commit`. All you have to do is install pre-commit with pip. The following will do it for you.
 
@@ -117,15 +145,3 @@ pip install -r requirements.txt --user
 pre-commit install
 pre-commit run
 ```
-
-### General organization of modules
-
-We would like to organize logic in our codebase according to the following general rules:
-
-- `ComponentAccumulator` code that wraps CP algorithms goes in `cpalgs\`
-
-- HH4b specific `ComponentAccumulator` stuff goes in `config\`
-
-- General non-CA functions go in `utils\`
-
-If you would like to add new logic, we ask that you please adhere to these rules.

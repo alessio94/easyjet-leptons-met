@@ -9,7 +9,7 @@ def yybb_cfg(flags, smalljetkey, photonkey):
 
     # Take leading two photons - independent of btag working point
     cfg.addEventAlgo(
-        CompFactory.HH4B.PhotonSelectorAlg(
+        CompFactory.Easyjet.PhotonSelectorAlg(
             "PhotonSelectorAlg",
             containerInKey=photonkey,
             containerOutKey="yybbAnalysisPhotons",
@@ -29,7 +29,7 @@ def yybb_cfg(flags, smalljetkey, photonkey):
     for btag_wp in flags.Analysis.btag_wps:
         # get the 2 leading small R jets
         cfg.addEventAlgo(
-            CompFactory.HH4B.JetSelectorAlg(
+            CompFactory.Easyjet.JetSelectorAlg(
                 "SmallJetSelectorAlg_" + btag_wp,
                 containerInKey=smalljetkey,
                 containerOutKey="yybbAnalysisJets_" + btag_wp,

@@ -1,7 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
+from EasyjetHub.steering.container_names import get_container_names
+from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from HH4bAnalysis.config.boosted_config import boosted_cfg
-from HH4bAnalysis.config.container_names import get_container_names
-from HH4bAnalysis.config.event_counter_config import event_counter_cfg
 from HH4bAnalysis.config.resolved_config import resolved_cfg
 from HH4bAnalysis.config.yybb_config import yybb_cfg
 
