@@ -89,13 +89,13 @@ def minituple_cfg(flags):
             input_container=containers["reco4PFlowJet"],
             output_prefix="recojet_antikt4PFlow",
         )
+
         # Use this to directly read b-tagging information
-        # Note that the indices can get out of sync with
-        # the small-R jet container if jet thinning is
-        # done -- see issue #67
+        # Needs to be decorated onto the jet container
+        # to handle jet selection (thinning)
         tree_branches += get_small_R_bjet_branches(
             flags,
-            input_container="BTagging_AntiKt4EMPFlow",
+            input_container=containers["reco4PFlowJet"],
             output_prefix="recojet_antikt4PFlow",
         )
 

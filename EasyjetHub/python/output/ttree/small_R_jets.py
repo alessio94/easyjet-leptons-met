@@ -53,11 +53,15 @@ def get_small_R_jet_branches(flags, input_container, output_prefix):
 
 
 def get_small_R_bjet_branches(flags, input_container, output_prefix):
+    _syst_option = SystOption.ALL_SYST
+    if flags.Analysis.disable_calib:
+        _syst_option = SystOption.NONE
+
     small_R_bjet_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=False,
-        systematics_option=SystOption.NONE,
+        do_overlap_removal=flags.Analysis.do_overlap_removal,
+        systematics_option=_syst_option,
         required_flags=[
             flags.Analysis.do_small_R_jets
         ]
@@ -65,8 +69,6 @@ def get_small_R_bjet_branches(flags, input_container, output_prefix):
 
     # GN2 scores
     # not available in PHYSLITE... yet
-    # NB these are read from BTagging collection
-    # so cannot be compared to thinned list of jets!
     # TODO: Handle this properly (drop PHYSLITE check when ptag updated)
     if (
         flags.Analysis.write_small_R_gn2_branches

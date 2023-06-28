@@ -11,6 +11,7 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(EasyjetHub
+  src/BTaggingDecoratorAlg.cxx
   src/EventCounterAlg.cxx
   src/GhostAssocVRJetGetterAlg.cxx
   src/JetSelectorAlg.cxx
@@ -23,8 +24,10 @@ atlas_add_component(EasyjetHub
   #GaudiKernel
   AthenaBaseComps
   AthContainers
+  AthLinks
   AsgTools
   xAODBase
+  xAODBTagging
   xAODEventInfo
   xAODJet
   xAODTruth

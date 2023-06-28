@@ -3,6 +3,9 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetCalibAnalysisSequence
 from FTagAnalysisAlgorithms.FTagAnalysisSequence import makeFTagAnalysisSequence
 from JetAnalysisAlgorithms.JetAnalysisSequence import makeJetAnalysisSequence
+from EasyjetHub.output.ttree.btag_decor_config import (
+    btag_decor_cfg
+)
 
 
 def jet_sequence_cfg(
@@ -10,6 +13,18 @@ def jet_sequence_cfg(
     containers,
 ):
     cfg = ComponentAccumulator()
+
+    # Schedule the alg to decorate these onto jets
+    # rather than accessing from xAOD::BTagging
+    # We perform the decoration on the uncalibrated jets
+    # so as to avoid any systematics-dependence or filtering
+    if (
+        flags.Analysis.write_small_R_gn2_branches
+        and not flags.Input.isPHYSLITE
+        # TODO: Handle this properly (drop PHYSLITE check when ptag updated)
+    ):
+        cfg.merge(btag_decor_cfg(flags))
+
     jet_sequence = makeJetAnalysisSequence(
         flags.Analysis.DataType,
         jetCollection=containers["inputs"]["reco4PFlowJet"],
