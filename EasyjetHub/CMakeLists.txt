@@ -16,6 +16,8 @@ atlas_add_component(EasyjetHub
   src/GhostAssocVRJetGetterAlg.cxx
   src/JetSelectorAlg.cxx
   src/PhotonSelectorAlg.cxx
+  src/MuonSelectorAlg.cxx
+  src/ElectronSelectorAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
   src/TruthParentDecoratorAlg.cxx
   src/H5FileSvc.cxx
