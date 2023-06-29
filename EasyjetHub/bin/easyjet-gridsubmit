@@ -20,7 +20,7 @@ def main():
     parser.add_argument(
         "--exec",
         type=str,
-        default="easyjet-ntupler"
+        default="easyjet-ntupler",
         help="The name of the executable",
     )
     parser.add_argument(
@@ -173,7 +173,7 @@ def main():
         exec_cmd = "{0} %IN -l --run-config {1} --out-file {2}".format(
             args.exec,
             "config.yaml",
-            submit_opts["outputs"].removeprefix("TREE:")
+            submit_opts["outputs"].removeprefix("TREE:"),
         )
 
         cmd = ["prun", "--inDS", io["inDS"], "--outDS", io["outDS"], "--exec", exec_cmd]
