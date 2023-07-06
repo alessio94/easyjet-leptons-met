@@ -16,12 +16,17 @@ DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14190_p5632.poo
 PHYS_JETS_MC20=mc20_13TeV.364704.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ4WithSW.DAOD_PHYS_10evts.e7142_s3681_r13145_p5631.pool.root
 PHYS_TTBAR_MC20=mc20_13TeV.410471.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e6337_s3681_r13145_p5631.pool.root
 PHYS_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5631.pool.root
+PHYS_SH4B_BOOSTED_MC20_p5658=mc20_13TeV.801637.Py8EG_A14NNPDF23LO_XHS_X3000_S100_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5658.pool.root
 PHYSLITE_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a899_r13145_p5631.pool.root
 PHYS_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5631.pool.root
 PHYSLITE_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5631.pool.root
 PHYS_TTBAR_MC21=mc21_13p6TeV.601237.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e8453_s3873_r13829_p5631.pool.root
 PHYS_JETS_MC21=mc21_13p6TeV.801170.Py8EG_A14NNPDF23LO_jj_JZ5.DAOD_PHYS_10evts.e8453_s3873_r13829_p5631.pool.root
 PHYS_JETS_MC23=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_s4111_r14622_p5706.pool.root
+
+PHYS_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13144_p5631.pool.root
+PHYSLITE_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13144_p5631.pool.root
+
 
 declare -A DATAFILES=(
     [data18-fast]=${DATA_2018}
@@ -46,6 +51,10 @@ declare -A DATAFILES=(
     [lite-sh4b-boosted-mc20]=${PHYSLITE_SH4B_BOOSTED_MC20}
     [lite-hh4b-mc21-fast]=${PHYSLITE_HH4B_MC21}
     [lite-hh4b-mc21]=${PHYSLITE_HH4B_MC21}
+    [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED_MC20}
+    [sh4b-boosted-mc20-p5658]=${PHYS_SH4B_BOOSTED_MC20_p5658}
+    [yybb-mc20]=${PHYS_YYBB_MC20}
+    [lite-yybb-mc20]=${PHYSLITE_YYBB_MC20}
 )
 
 declare -A TESTS=(
@@ -69,6 +78,10 @@ declare -A TESTS=(
     [lite-sh4b-boosted-mc20]=ntuple-dump
     [lite-hh4b-mc21-fast]=ntuple-dump-fast
     [lite-hh4b-mc21]=ntuple-dump
+    [sh4b-boosted-mc20]=hh4b-dump
+    [sh4b-boosted-mc20-p5658]=hh4b-dump
+    [yybb-mc20]=hh4b-dump
+    [lite-yybb-mc20]=hh4b-dump
 )
 
 DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
@@ -77,6 +90,10 @@ declare -A CONFIGS=(
     [lite-sh4b-boosted-mc20]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [lite-hh4b-mc21-fast]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [lite-hh4b-mc21]=EasyjetHub/RunConfig-PHYSLITE.yaml
+    [sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [sh4b-boosted-mc20-p5658]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [yybb-mc20]=HH4bAnalysis/RunConfig-PHYS-yybb.yaml
+    [lite-yybb-mc20]=HH4bAnalysis/RunConfig-PHYSLITE-yybb.yaml
 )
 
 # some common variables in the tests
@@ -122,6 +139,10 @@ ntuple-dump-fast-awkward() {
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test-awk.h5 --n-h5-jets 0
+    metadata-check -v
+}
+hh4b-dump() {
+    hh4b-ntupler $1 -c $2 -o $COMMON
     metadata-check -v
 }
 

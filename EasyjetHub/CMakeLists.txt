@@ -44,8 +44,6 @@ atlas_add_component(EasyjetHub
 atlas_install_scripts(
   bin/easyjet-ntupler
   bin/easyjet-gridsubmit
-  bin/easyjet-test
-  bin/metadata-check
 )
 atlas_install_python_modules(
   python/*.py
@@ -56,10 +54,6 @@ atlas_install_python_modules(
 )
 atlas_install_data(
   share/*.yaml
-)
-atlas_install_generic(
-  tab-complete.bash
-  DESTINATION .
 )
 
 # atlas_install_data( data/* )

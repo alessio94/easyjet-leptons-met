@@ -32,7 +32,6 @@ atlas_add_component(HH4bAnalysis
 # Install python modules, joboptions, and share content
 atlas_install_scripts(
   bin/hh4b-ntupler
-  bin/hh4b-test
 )
 
 atlas_install_python_modules(
