@@ -21,6 +21,7 @@ Primitive::Type getPrimitiveType(const std::string& name) {
   CHECK_TYPE(name, INT2CHAR);
   CHECK_TYPE(name, UINT2USHORT);
   CHECK_TYPE(name, INT2SHORT);
+  CHECK_TYPE(name, UL2ULL);
   throw std::domain_error("unknown type " + name);
 }
 #undef CHECK_TYPE

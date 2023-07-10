@@ -18,7 +18,7 @@ def get_h5_cfg(flags):
                 "actualInteractionsPerCrossing",
             ],
             primitiveToType={
-                "eventNumber": "ULL",
+                "eventNumber": "UL2ULL",
                 "mcEventNumber": "ULL",
                 "lumiBlock": "UINT",
                 "averageInteractionsPerCrossing": "HALF",

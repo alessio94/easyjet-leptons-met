@@ -1,4 +1,5 @@
 import json
+import pickle
 from enum import Enum
 from pathlib import Path
 
@@ -40,17 +41,34 @@ def cache_metadata(path):
             "metadata": m.metadata,
             "level": m.metAccessLevel,
         }
-    with open(path, "w") as cached:
-        json.dump(all_md, cached, indent=2)
+    try:
+        with open(path, "w") as cached:
+            json.dump(all_md, cached, indent=2)
+    except TypeError:
+        # if json fails, try pickle
+        path.unlink(missing_ok=True)
+        with open(path.with_suffix(".pkl"), "wb") as cached:
+            pickle.dump(all_md, cached)
+
+
+def _load_metadata(path):
+    pkl_path = path.with_suffix('.pkl')
+    if not path.exists() and pkl_path.exists():
+        path = pkl_path
+    elif not path.exists():
+        return None
+    with open(path, "rb") as cached_file:
+        if path.suffix == '.pkl':
+            return pickle.load(cached_file)
+        else:
+            return json.load(cached_file)
 
 
 def update_metadata(path):
     from AthenaConfiguration.AutoConfigFlags import _fileMetaData
-
-    if not path.exists():
+    all_cached = _load_metadata(path)
+    if all_cached is None:
         return
-    with open(path) as cached_file:
-        all_cached = json.load(cached_file)
     for f, m in _fileMetaData.items():
         cached = all_cached.get(f)
         if cached:
@@ -61,14 +79,13 @@ def update_metadata(path):
 
 
 def has_metadata(flags, path=Path("metadata.json")):
-    if not path.is_file():
+    metadict = _load_metadata(path)
+    if metadict is None:
         return False
-    with open(path) as meta:
-        metadict = json.load(meta)
-        for infile in flags.Input.Files:
-            if infile not in metadict:
-                return False
-        return True
+    for infile in flags.Input.Files:
+        if infile not in metadict:
+            return False
+    return True
 
 
 def get_valid_ami_tag(tags, check_tag="p", min_valid_tag=SampleTypes.mc20):

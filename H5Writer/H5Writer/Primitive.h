@@ -20,7 +20,8 @@ struct Primitive {
     UINT2UCHAR,
     INT2CHAR,
     UINT2USHORT,
-    INT2SHORT
+    INT2SHORT,
+    UL2ULL  //sort of a hack until we support ul in h5
   };
   Type type;
   std::string source;

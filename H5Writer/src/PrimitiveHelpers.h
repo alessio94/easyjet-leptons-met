@@ -39,6 +39,7 @@ namespace detail {
   using uint = unsigned int;
   using ushort = unsigned short;
   using ull = unsigned long long;
+  using ul = unsigned long;
 
   template <typename T, typename A=defaultAccessor_t<T>>
   void addInput(T& c, const Primitive& input, A a=defaultAccessor<T>) {
@@ -67,9 +68,9 @@ namespace detail {
     case Tp::INT2CHAR: c.add(t, get<char,I,A,int>(s,a,cm), cm); return;
     case Tp::UINT2USHORT: c.add(t, get<ushort,I,A,uint>(s,a,0), 0); return;
     case Tp::INT2SHORT: c.add(t, get<short,I,A,int>(s,a,sm), sm); return;
+    case Tp::UL2ULL: c.add(t, get<ull,I,A,ul>(s,a,0),0); return;
     }
   }
-
 }
 
 #endif

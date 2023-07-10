@@ -22,6 +22,11 @@ ntupler_data22_fast:
   script:
     - easyjet-test data22-fast
 
+ntupler_sh4b_data22:
+  extends: .ntupler
+  script:
+    - easyjet-test sh4b-data22
+
 ntupler_jets_mc20:
   extends: .ntupler
   script:

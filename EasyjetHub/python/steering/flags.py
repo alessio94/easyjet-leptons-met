@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
@@ -34,7 +35,7 @@ def analysis_configuration(parser=None):
     log.setLevel(flags.Exec.OutputLevel)
     if args.config_only and has_metadata(flags):
         log.info("found metadata for input files, skipping config run")
-        return 1
+        sys.exit(0)
     setRogueLoggers(flags.Exec.OutputLevel)
     # Write user options to flags.Analysis
     fill_flags_from_runconfig(args, flags, parser.overwrites)
