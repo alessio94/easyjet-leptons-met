@@ -1,6 +1,8 @@
-# HH4bAnalysis
+# Easyjet framework
 
-HH to 4b Analysis Framework initiated by Humboldt-Universität zu Berlin ERC Project.
+An AthAnalysis framework, focusing on physics analysis combining runs 2 and 3.
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for instructions on modifying this code.
 
 # Installation
 
@@ -24,8 +26,6 @@ cmake ../hh4b-analysis/
 make
 source */setup.sh
 ```
-
-**NOTE: If you are using release 24.2.2 and want to submit grid jobs, you need to run `cmake` with the flag `-DATLAS_USE_CUSTOM_CPACK_INSTALL_SCRIPT=TRUE`. More details [change](https://gitlab.cern.ch/atlas/atlasexternals/-/merge_requests/1012).**
 
 *If you are working in a container (described [below](#athanalysis-in-docker)), source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*
 
@@ -53,10 +53,6 @@ Feel free to increase the number of events, though beware of how many events may
 You should find a new ROOT files, `analysis-variables.root`.
 
 To process Monte Carlo or PHYSLITE samples the command is exactly the same: configuration is automatically setup from the sample's metadata.
-
-## Extending the ntupler with analysis-specific algorithms
-
-We expose functions for generating the sequences used in `easyjet-ntupler` via the `hub.py` module, such that a custom executable can be defined that extends the basic job with analysis-specific operations. An annotated example for this can be found in [`HH4bAnalysis/bin/hh4b-ntupler`](./HH4bAnalysis/bin/hh4b-ntupler). See [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md) and [`EasyjetHub/python/hub.py`](./EasyjetHub/python/hub.py) directly for guidance.
 
 ## AthAnalysis in Docker
 
@@ -111,30 +107,7 @@ For more options you can do:
 easyjet-gridsubmit -h
 ```
 
-# Development
-
-Contributions to this code are welcome in the form of merge requests. The fast-forward merge policy is used, such that the git history is always linear, and most importantly ensures that the continuous integration of the master branch cannot be broken due to two independent MRs that interact without their own CI breaking. Merge requests require successful pipelines and an approval by one of the project developers.
-
-Limited code formatting rules are enforced via `cppcheck` and `flake8`. We aim to follow `PEP8` python style conventions, except certain cases where it is more natural to follow ATLAS-like camel-case variable names.
-
-### Package structure
-
-The following `CMake` packages are defined in this repository:
-- `EasyjetHub`: Core framework code providing analysis-independent algorithms and job steering
-- `HH4bAnalysis`: Analysis-specific code for HH->4b information
-  - E.g. preselections, jet pairing algorithms and decay path tracing specific to the 4b decay mode are implemented here
-  - For historical reasons, `yybb` code is also currently included in this package, but will be separated into its own package at a later date
-- `BJetCalibrationTool` (submodule): Tool and algs for applying b-jet four-momentum correction
-- `H5Writer`: Tool and algs for writing HDF5 output
-
-### General organization of python modules
-
-Please follow the existing module organisation as laid out in [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md).
-In case of ambiguity we are happy to discuss where additional modules or folders can be inserted.
-
-*Note: To distinguish modules defined in `easyjet` from those in in `atlas/athena`, modules producing `ComponentAccumulator` configurations are named in snake case and end in `config.py` e.g. `EasyjetHub.steering.main_sequence_config.py`, rather than in camel case e.g. `AthenaConfiguration.MainSequencesConfig.py`.*
-
-### Pre-commit hooks
+## Pre-commit hooks
 
 *Currently not entirely functional*
 
