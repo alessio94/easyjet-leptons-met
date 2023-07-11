@@ -11,7 +11,7 @@ def resolved_cfg(flags, smalljetkey):
     for btag_wp in flags.Analysis.btag_wps:
         # get the 4 leading small R jets
         cfg.addEventAlgo(
-            CompFactory.HH4B.JetSelectorAlg(
+            CompFactory.Easyjet.JetSelectorAlg(
                 "SmallJetSelectorAlg_" + btag_wp,
                 containerInKey=smalljetkey,
                 containerOutKey="resolvedAnalysisJets_" + btag_wp,

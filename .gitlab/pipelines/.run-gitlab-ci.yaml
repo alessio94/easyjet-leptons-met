@@ -92,6 +92,11 @@ ntupler_hh4b_mc21_syst:
   script:
     - easyjet-test hh4b-mc21-syst
 
+ntupler_hh4b_resolved_mc21:
+  extends: .ntupler
+  script:
+    - easyjet-test hh4b-resolved-mc21
+
 ntupler_lite_hh4b_mc21:
   extends: .ntupler
   script:

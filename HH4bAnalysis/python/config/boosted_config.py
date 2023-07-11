@@ -10,7 +10,7 @@ def boosted_cfg(flags, largejetkey):
     for btag_wp in flags.Analysis.vr_btag_wps:
         # get the two leading large R's
         cfg.addEventAlgo(
-            CompFactory.HH4B.JetSelectorAlg(
+            CompFactory.Easyjet.JetSelectorAlg(
                 "LargeJetSelectorAlg_" + btag_wp,
                 containerInKey=largejetkey,
                 containerOutKey="boostedAnalysisJets_" + btag_wp,
@@ -24,7 +24,7 @@ def boosted_cfg(flags, largejetkey):
         )
         # get the ghost associated VR jets from the leading Large R jet
         cfg.addEventAlgo(
-            CompFactory.HH4B.GhostAssocVRJetGetterAlg(
+            CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
                 "LeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
                 containerInKey="boostedAnalysisJets_" + btag_wp,
                 containerOutKey="leadingLargeRVRJets_" + btag_wp,
@@ -34,7 +34,7 @@ def boosted_cfg(flags, largejetkey):
         # make sure we have at least 2 and maximally 3 ghost associated in
         # the leading large R jet
         cfg.addEventAlgo(
-            CompFactory.HH4B.JetSelectorAlg(
+            CompFactory.Easyjet.JetSelectorAlg(
                 "LeadingLargeRVRJetSelectorAlg_" + btag_wp,
                 containerInKey="leadingLargeRVRJets_" + btag_wp,
                 containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
@@ -50,7 +50,7 @@ def boosted_cfg(flags, largejetkey):
 
         # get the ghost associated VR jets from the subleading Large R jet
         cfg.addEventAlgo(
-            CompFactory.HH4B.GhostAssocVRJetGetterAlg(
+            CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
                 "SubLeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
                 containerInKey="boostedAnalysisJets_" + btag_wp,
                 containerOutKey="SubLeadingLargeRVRJets_" + btag_wp,
@@ -61,7 +61,7 @@ def boosted_cfg(flags, largejetkey):
         # make sure we have at least 2 and maximally 3 ghost associated in
         # the subleading large R jet
         cfg.addEventAlgo(
-            CompFactory.HH4B.JetSelectorAlg(
+            CompFactory.Easyjet.JetSelectorAlg(
                 "SubLeadingLargeRVRJetSelectorAlg_" + btag_wp,
                 containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
                 containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
