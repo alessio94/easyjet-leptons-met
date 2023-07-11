@@ -14,6 +14,7 @@ atlas_add_component(HH4bAnalysis
   src/BaselineVarsResolvedAlg.cxx
   src/BaselineVarsBoostedAlg.cxx
   src/BaselineVarsyybbAlg.cxx
+  src/BaselineVarsbbttAlg.cxx
   src/components/*.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -21,6 +22,7 @@ atlas_add_component(HH4bAnalysis
   AthContainers
   xAODEventInfo
   xAODEgamma
+  xAODMuon
   xAODJet
   xAODTracking
   xAODTruth

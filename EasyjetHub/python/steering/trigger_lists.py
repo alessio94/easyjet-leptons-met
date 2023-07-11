@@ -1,4 +1,47 @@
 TRIGGER_LISTS = {
+    "HHbbtt": {
+        2015: [
+            # Reference single electron trigger
+            "HLT_e26_lhtight_nod0_ivarloose",
+            # Reference single muon trigger
+            "HLT_mu26_ivarmedium",
+        ],
+        2016: [
+            # Reference single electron trigger
+            "HLT_e26_lhtight_nod0_ivarloose",
+            # Reference single muon trigger
+            "HLT_mu26_ivarmedium",
+        ],
+        2017: [
+            # Reference single electron trigger
+            "HLT_e26_lhtight_nod0_ivarloose",
+            # Reference single muon trigger
+            "HLT_mu26_ivarmedium",
+        ],
+        2018: [
+            # Reference single electron trigger
+            "HLT_e26_lhtight_nod0_ivarloose",
+            # Reference single muon trigger
+            "HLT_mu26_ivarmedium",
+        ],
+        2022: [
+            # Reference single electron trigger
+            "HLT_e26_lhtight_ivarloose_L1EM22VHI",
+            # Reference single muon trigger
+            "HLT_mu24_ivarmedium_L1MU14FCH",
+            # Various multijet triggers
+            "HLT_4j120_L13J50",
+            "HLT_4j115_pf_ftf_presel4j85_L13J50",
+            "HLT_5j70c_pf_ftf_presel5c50_L14J15",
+            "HLT_5j85_pf_ftf_presel5j50_L14J15",
+            "HLT_6j35c_020jvt_pf_ftf_presel6c25_L14J15",
+            "HLT_6j55c_pf_ftf_presel6j40_L14J15",
+            "HLT_6j70_pf_ftf_presel6j40_L14J15",
+            "HLT_7j45_pf_ftf_presel7j30_L14J15",
+            "HLT_10j40_pf_ftf_presel7j30_L14J15",
+        ],
+        2023: [],
+    },
     "HHyybb": {
         2015: [
             "HLT_g35_loose_g25_loose",

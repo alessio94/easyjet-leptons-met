@@ -4,6 +4,7 @@ from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from HH4bAnalysis.config.boosted_config import boosted_cfg
 from HH4bAnalysis.config.resolved_config import resolved_cfg
 from HH4bAnalysis.config.yybb_config import yybb_cfg
+from HH4bAnalysis.config.bbtt_config import bbtt_cfg
 
 
 def dihiggs_analysis_cfg(
@@ -46,5 +47,20 @@ def dihiggs_analysis_cfg(
             )
         )
         cfg.merge(event_counter_cfg("n_yybb"))
+
+    if flags.Analysis.do_bbtt_analysis:
+        cfg.merge(
+            bbtt_cfg(
+                flags,
+                smalljetkey=containers["outputs"]["reco4PFlowJet"].replace(
+                    "%SYS%", "NOSYS"
+                ),
+                muonkey=containers["outputs"]["muons"].replace("%SYS%", "NOSYS"),
+                electronkey=containers["outputs"]["electrons"].replace(
+                    "%SYS%", "NOSYS"
+                ),
+            )
+        )
+        cfg.merge(event_counter_cfg("n_bbtt"))
 
     return cfg

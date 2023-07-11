@@ -24,6 +24,7 @@ from HH4bAnalysis.config.dihiggs_analysis_config import dihiggs_analysis_cfg
 from HH4bAnalysis.config.boosted_config import boosted_branches
 from HH4bAnalysis.config.resolved_config import resolved_branches
 from HH4bAnalysis.config.yybb_config import yybb_branches
+from HH4bAnalysis.config.bbtt_config import bbtt_branches
 
 
 def hh4b_parser():
@@ -55,6 +56,8 @@ def hh4b_job_cfg():
         flags.Analysis.extra_output_branches += resolved_branches(flags)
     if flags.Analysis.do_yybb_analysis:
         flags.Analysis.extra_output_branches += yybb_branches(flags)
+    if flags.Analysis.do_bbtt_analysis:
+        flags.Analysis.extra_output_branches += bbtt_branches(flags)
 
 
     # Lock the flags so that the configuration of job subcomponents cannot
@@ -74,6 +77,7 @@ def hh4b_job_cfg():
         flags.Analysis.do_resolved_dihiggs_analysis
         or flags.Analysis.do_boosted_dihiggs_analysis
         or flags.Analysis.do_yybb_analysis
+        or flags.Analysis.do_bbtt_analysis
     ):
         cfg.merge(
             dihiggs_analysis_cfg(flags),
