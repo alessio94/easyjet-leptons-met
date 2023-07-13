@@ -44,6 +44,7 @@ atlas_add_component(EasyjetHub
 atlas_install_scripts(
   bin/easyjet-ntupler
   bin/easyjet-gridsubmit
+  bin/easyjet-merge-configs
 )
 atlas_install_python_modules(
   python/*.py
@@ -53,7 +54,9 @@ atlas_install_python_modules(
   python/utils
 )
 atlas_install_data(
-  share/*.yaml
+  share/RunConfig-PHYSLITE.yaml
+  share/RunConfig.yaml
+  share/base-config.yaml
 )
 
 # atlas_install_data( data/* )

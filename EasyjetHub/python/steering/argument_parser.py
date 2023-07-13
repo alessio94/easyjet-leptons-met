@@ -1,9 +1,8 @@
-from argparse import ArgumentParser, ArgumentTypeError
+from argparse import ArgumentParser
 import pathlib
-import yaml
-import os
 
 from EasyjetHub.steering.utils.log_helper import log
+from .config_files import run_config_arg
 
 
 def add_standard_athena_args(parser):
@@ -119,20 +118,6 @@ def fill_from_args(flags, parser=None):
         environ["PICKLECAFILE"] = args.config_only
 
     return args
-
-
-def run_config_arg(rawpath):
-    fpath = pathlib.Path(rawpath)
-    for dirpath in [""] + os.environ["DATAPATH"].split(":"):
-        fullpath = dirpath / fpath
-        if fullpath.exists():
-            try:
-                with open(fullpath) as cfgfile:
-                    return yaml.safe_load(cfgfile)
-            except Exception:
-                raise ArgumentTypeError(f"Couldn't load run config: {fullpath}")
-
-    raise ArgumentTypeError(f"Couldn't find config: {fpath}")
 
 
 def validate_args(parser, overwrites={}):

@@ -41,7 +41,11 @@ atlas_install_python_modules(
   python/utils
 )
 atlas_install_data(
-  share/*.yaml
+  share/RunConfig-PHYS-yybb.yaml
+  share/RunConfig-PHYSLITE-yybb.yaml
+  share/RunConfig-Resolved.yaml
+  share/RunConfig-SH4b.yaml
+  share/run-config-boosted-minimal.yaml
 )
 
 # atlas_install_data( data/* )
