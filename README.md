@@ -4,6 +4,10 @@ An AthAnalysis framework, focusing on physics analysis combining runs 2 and 3.
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for instructions on modifying this code.
 
+For questions, join the SH4b analysis MM team [here](https://mattermost.web.cern.ch/signup_user_complete/?id=pra49cyqh3du9fymb7btog8exy&md=link&sbr=su).
+- FW and NTUP users: [easyjet FW](https://mattermost.web.cern.ch/sh4b/channels/easyjet-fw).
+- FW developers and notifications: [easyjet dev](https://mattermost.web.cern.ch/sh4b/channels/easyjet-dev).
+
 # Installation
 
 *The instructions below with `setupATLAS` and `asetup` assume you are working on a CERN CentOS terminal, e.g. lxplus or a Singularity container on an institute cluster. Alternative instructions for using Docker images are given below.*
