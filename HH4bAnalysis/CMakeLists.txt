@@ -23,6 +23,7 @@ atlas_add_component(HH4bAnalysis
   xAODEventInfo
   xAODEgamma
   xAODMuon
+  xAODTau
   xAODJet
   xAODTracking
   xAODTruth

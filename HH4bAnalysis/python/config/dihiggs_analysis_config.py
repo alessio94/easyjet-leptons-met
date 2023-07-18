@@ -59,6 +59,7 @@ def dihiggs_analysis_cfg(
                 electronkey=containers["outputs"]["electrons"].replace(
                     "%SYS%", "NOSYS"
                 ),
+                taukey=containers["outputs"]["taus"].replace("%SYS%", "NOSYS"),
             )
         )
         cfg.merge(event_counter_cfg("n_bbtt"))

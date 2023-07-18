@@ -13,6 +13,7 @@ from EasyjetHub.algs.calibration.jets import (
 from EasyjetHub.algs.calibration.muons import muon_sequence_cfg
 from EasyjetHub.algs.calibration.electrons import electron_sequence_cfg
 from EasyjetHub.algs.calibration.photons import photon_sequence_cfg
+from EasyjetHub.algs.calibration.taus import tau_sequence_cfg
 from EasyjetHub.algs.postprocessing.overlap_removal import overlap_sequence_cfg
 from EasyjetHub.steering.container_names import get_container_names
 from EasyjetHub.steering.utils.log_helper import log
@@ -25,6 +26,7 @@ analysis_seqs = {
     "muons":        muon_sequence_cfg,
     "electrons":    electron_sequence_cfg,
     "photons":      photon_sequence_cfg,
+    "taus":         tau_sequence_cfg,
     "small_R_jets": jet_sequence_cfg,
     "VR_jets":      vr_jet_sequence_cfg,
 }
@@ -85,6 +87,7 @@ def cpalgs_cfg(
             "electrons",
             "photons",
             "muons",
+            "taus",
             "small_R_jets",
             "VR_jets"
         ]:

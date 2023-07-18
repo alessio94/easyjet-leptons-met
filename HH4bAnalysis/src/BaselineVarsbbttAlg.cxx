@@ -10,6 +10,7 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
+#include <xAODTau/TauJetContainer.h>
 
 namespace HH4B
 {
@@ -25,6 +26,7 @@ namespace HH4B
     ATH_CHECK(m_smallRContainerInKey.initialize());
     ATH_CHECK(m_muonContainerInKey.initialize());
     ATH_CHECK(m_electronContainerInKey.initialize());
+    ATH_CHECK(m_tauContainerInKey.initialize());
     ATH_CHECK(m_EventInfoKey.initialize());
 
     // make decorators
@@ -57,14 +59,18 @@ namespace HH4B
         m_muonContainerInKey);
     SG::ReadHandle<ConstDataVector<xAOD::ElectronContainer> > electrons_(
         m_electronContainerInKey);
+    SG::ReadHandle<ConstDataVector<xAOD::TauJetContainer> > taus_(
+            m_tauContainerInKey);
 
     ATH_CHECK(smallRjets.isValid());
     ATH_CHECK(muons_.isValid());
     ATH_CHECK(electrons_.isValid());
+    ATH_CHECK(taus_.isValid());
 
     ConstDataVector<xAOD::JetContainer> jets = *smallRjets;
     ConstDataVector<xAOD::MuonContainer> muons = *muons_;
     ConstDataVector<xAOD::ElectronContainer> electrons = *electrons_;
+    ConstDataVector<xAOD::TauJetContainer> taus = *taus_;
 
     if (muons.size() >= 1)
     {
@@ -78,10 +84,16 @@ namespace HH4B
     if (electrons.size() >= 1)
     {
       // Leading muon
-      m_decos.at("Leading_Muon_pt_" + m_bTagWP)(*eventInfo) =
+      m_decos.at("Leading_Electron_pt_" + m_bTagWP)(*eventInfo) =
           electrons[0]->pt();
-      m_decos.at("Leading_Muon_eta_" + m_bTagWP)(*eventInfo) =
+      m_decos.at("Leading_Electron_eta_" + m_bTagWP)(*eventInfo) =
           electrons[0]->eta();
+    }
+    if (taus.size() >= 1 ){
+	    m_decos.at("Leading_Tau_pt_" + m_bTagWP)(*eventInfo) =
+		    taus[0]->pt();
+	    m_decos.at("Leading_Tau_eta_" + m_bTagWP)(*eventInfo) =
+		    taus[0]->eta();
     }
 
     return StatusCode::SUCCESS;

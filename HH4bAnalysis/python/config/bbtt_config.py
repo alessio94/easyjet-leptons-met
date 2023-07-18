@@ -4,7 +4,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 # bbtt analysis chain
 
 
-def bbtt_cfg(flags, smalljetkey, muonkey, electronkey):
+def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg = ComponentAccumulator()
 
     cfg.addEventAlgo(
@@ -12,8 +12,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey):
             "MuonSelectorAlg",
             containerInKey=muonkey,
             containerOutKey="bbttAnalysisMuons",
-            minPt=21_000,
-            maxEta=2.5,
+            minPt=7_000,
+            maxEta=2.7,
             pTsort=True,
         )
     )
@@ -23,14 +23,31 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey):
             "ElectronSelectorAlg",
             containerInKey=electronkey,
             containerOutKey="bbttAnalysisElectrons",
-            minPt=25_000,
+            minPt=7_000,
+            minEtaVeto=1.37,
+            maxEtaVeto=1.52,
+            maxEta=2.47,
+            pTsort=True,
+        )
+    )
+
+    # add Tau
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.TauSelectorAlg(
+            "TauSelectorAlg",
+            containerInKey=taukey,
+            containerOutKey="bbttAnalysisTaus",
+            minPt=20_000,
+            minEtaVeto=1.37,
+            maxEtaVeto=1.52,
             maxEta=2.5,
+            truncateAtAmount=-1,  # -1 means keep all
+            minimumAmount=-1,     # -1 means ignores this
             pTsort=True,
         )
     )
 
     for btag_wp in flags.Analysis.btag_wps:
-        # get the 2 leading small R jets
         cfg.addEventAlgo(
             CompFactory.Easyjet.JetSelectorAlg(
                 "SmallJetSelectorAlg_" + btag_wp,
@@ -52,6 +69,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey):
                 smallRContainerInKey="bbttAnalysisJets_" + btag_wp,
                 muonContainerInKey="bbttAnalysisMuons",
                 electronContainerInKey="bbttAnalysisElectrons",
+                tauContainerInKey="bbttAnalysisTaus",
                 bTagWP=btag_wp,
             )
         )
@@ -70,6 +88,9 @@ def bbtt_branches(flags):
             # Leading electron
             "Leading_Electron_pt",
             "Leading_Electron_eta",
+            # Leading tau
+            "Leading_Tau_pt",
+            "Leading_Tau_eta",
         ]
 
         for var in bbtt_vars:

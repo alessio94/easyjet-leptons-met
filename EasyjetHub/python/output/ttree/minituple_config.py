@@ -6,6 +6,7 @@ from EasyjetHub.output.ttree.eventinfo import get_event_info_branches
 from EasyjetHub.output.ttree.electrons import get_electron_branches
 from EasyjetHub.output.ttree.photons import get_photon_branches
 from EasyjetHub.output.ttree.muons import get_muon_branches
+from EasyjetHub.output.ttree.taus import get_tau_branches
 from EasyjetHub.output.ttree.small_R_jets import (
     get_small_R_jet_branches,
     get_small_R_bjet_branches,
@@ -74,6 +75,7 @@ def minituple_cfg(flags):
         "electrons": ("el", get_electron_branches),
         "photons": ("ph", get_photon_branches),
         "muons": ("mu", get_muon_branches),
+        "taus": ("tau", get_tau_branches),
     }
     for objtype, (prefix, branch_getter) in objects_out.items():
         if flags(f"Analysis.write_{objtype}"):

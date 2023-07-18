@@ -1,18 +1,17 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
-/// @author Minori Fujimoto
 
-#include "ElectronSelectorAlg.h"
+#include "TauSelectorAlg.h"
 #include "AthContainers/AuxElement.h"
 #include <AthContainers/ConstDataVector.h>
-#include <xAODEgamma/ElectronContainer.h>
+#include <xAODTau/TauJetContainer.h>
 #include "FourMomUtils/xAODP4Helpers.h"
 
 namespace Easyjet
 {
-  ElectronSelectorAlg::ElectronSelectorAlg(const std::string &name,
+  TauSelectorAlg::TauSelectorAlg(const std::string &name,
                                        ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
@@ -25,7 +24,7 @@ namespace Easyjet
     declareProperty("pTsort", m_pTsort);
   }
 
-  StatusCode ElectronSelectorAlg::initialize()
+  StatusCode TauSelectorAlg::initialize()
   {
     ATH_CHECK(m_containerInKey.initialize());
     ATH_CHECK(m_EventInfoKey.initialize());
@@ -34,10 +33,10 @@ namespace Easyjet
     return StatusCode::SUCCESS;
   }
 
-  StatusCode ElectronSelectorAlg::execute()
+  StatusCode TauSelectorAlg::execute()
   {
     // container we read in
-    SG::ReadHandle<xAOD::ElectronContainer> inContainer(m_containerInKey);
+    SG::ReadHandle<xAOD::TauJetContainer> inContainer(m_containerInKey);
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
     ATH_CHECK(inContainer.isValid());
     ATH_CHECK(eventInfo.isValid());
@@ -51,58 +50,48 @@ namespace Easyjet
     // see TJ's tutorial for this
 
     auto workContainer =
-        std::make_unique<ConstDataVector<xAOD::ElectronContainer> >(
+        std::make_unique<ConstDataVector<xAOD::TauJetContainer> >(
             SG::VIEW_ELEMENTS);
     
-     
-    // loop over electrons 
-    for (const xAOD::Electron *electron : *inContainer)
+    // loop over taus 
+    for (const xAOD::TauJet *tau : *inContainer)
     {
-      float this_electron_eta_abs;
+    float this_tau_eta_abs;
       // cuts
-      if (electron->pt() < m_minPt)
+      if (tau->pt() < m_minPt)
       continue;
 
-      this_electron_eta_abs = std::abs(electron->eta());
-      if ((this_electron_eta_abs > m_minEtaVeto &&
-           this_electron_eta_abs < m_maxEtaVeto) ||
-          (this_electron_eta_abs > m_maxEta ))
+      this_tau_eta_abs = std::abs(tau->eta());
+      if ((this_tau_eta_abs > m_minEtaVeto &&
+           this_tau_eta_abs < m_maxEtaVeto) ||
+          (this_tau_eta_abs > m_maxEta))
         continue;
 
       // If cuts are passed, save the object
-      workContainer->push_back(electron);
+      workContainer->push_back(tau);
     }
-
-    int nElectrons = workContainer->size();
+    int nTaus = workContainer->size();
 
     // decorate nr of selected particles to the eventinfo
-    nSelectedParticles_dec(*eventInfo) = nElectrons;
+    nSelectedParticles_dec(*eventInfo) = nTaus;
 
     // if we have less than the requested nr, empty the workcontainer to write
     // defaults/return empty container
-    if (nElectrons < m_minimumAmount)
+    if (nTaus < m_minimumAmount)
     {
       workContainer->clear();
-      nElectrons = 0;
+      nTaus = 0;
     }
 
     // sort and truncate
-    int nKeep;
-    if (nElectrons < m_truncateAtAmount)
-    {
-      nKeep = nElectrons;
-    }
-    else
-    {
-      nKeep = m_truncateAtAmount;
-    }
+    int nKeep = std::min(nTaus, m_truncateAtAmount);
 
     if (m_pTsort)
     {
       // if we give -1, sort the whole container
       if (m_truncateAtAmount == -1)
       {
-        nKeep = nElectrons;
+        nKeep = nTaus;
       }
       std::partial_sort(
           workContainer->begin(), // Iterator from which to start sorting
@@ -119,7 +108,7 @@ namespace Easyjet
     }
     
     // write to eventstore
-    SG::WriteHandle<ConstDataVector<xAOD::ElectronContainer> > Writer(
+    SG::WriteHandle<ConstDataVector<xAOD::TauJetContainer> > Writer(
         m_containerOutKey);
     ATH_CHECK(Writer.record(std::move(workContainer)));
 

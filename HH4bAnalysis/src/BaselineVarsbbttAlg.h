@@ -13,6 +13,7 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
+#include <xAODTau/TauJetContainer.h>
 
 namespace HH4B
 {
@@ -46,6 +47,9 @@ private:
     SG::ReadHandleKey<ConstDataVector<xAOD::ElectronContainer> >
     m_electronContainerInKey{ this, "electronContainerInKey",
                             "",   "containerName to read" };
+    SG::ReadHandleKey<ConstDataVector<xAOD::TauJetContainer> >
+        m_tauContainerInKey{ this, "tauContainerInKey",
+	                            "",   "containerName to read" };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
       this, "EventInfoKey", "EventInfo", "EventInfo container to dump"
@@ -56,6 +60,7 @@ private:
     std::vector<std::string> m_vars{
       "Leading_Muon_pt_",     "Leading_Muon_eta_",    
       "Leading_Electron_pt_", "Leading_Electron_eta_",    
+      "Leading_Tau_pt_", "Leading_Tau_eta_",    
     };
   };
 }

@@ -1,3 +1,5 @@
+include: EasyjetHub/base-config.yaml
+
 # Toggles for object types
 do_small_R_jets: true
 do_large_R_Topo_jets: false

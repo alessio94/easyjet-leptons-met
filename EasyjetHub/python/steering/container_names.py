@@ -11,6 +11,7 @@ objtypes = [
     "muons",
     "electrons",
     "photons",
+    "taus",
     "truthBSMParticles",
     "truthSMParticles",
 ]
@@ -27,6 +28,7 @@ container_map = {
         "muons":              "Muons",
         "electrons":          "Electrons",
         "photons":            "Photons",
+        "taus":               "TauJets",
         "truthBSMParticles":  "TruthBSMWithDecayParticles",
         "truthSMParticles":   "TruthBosonsWithDecayParticles",
     },
@@ -41,6 +43,7 @@ container_map = {
         "muons":              "AnalysisMuons",
         "electrons":          "AnalysisElectrons",
         "photons":            "AnalysisPhotons",
+        "taus":               "AnalysisTauJets",
         "truthBSMParticles":  "TruthBSMWithDecayParticles",
         "truthSMParticles":   "TruthBosonsWithDecayParticles",
     },
@@ -68,6 +71,7 @@ def get_container_names(flags):
             muons=f"Analysis{inputs['muons']}_%SYS%",
             electrons=f"Analysis{inputs['electrons']}_%SYS%",
             photons=f"Analysis{inputs['photons']}_%SYS%",
+            taus=f"Analysis{inputs['taus']}_%SYS%",
             #
             truth4Jet=inputs["truth4Jet"],
             truth10TrimmedJet=inputs["truth10TrimmedJet"],

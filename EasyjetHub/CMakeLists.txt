@@ -18,6 +18,7 @@ atlas_add_component(EasyjetHub
   src/PhotonSelectorAlg.cxx
   src/MuonSelectorAlg.cxx
   src/ElectronSelectorAlg.cxx
+  src/TauSelectorAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
   src/TruthParentDecoratorAlg.cxx
   src/H5FileSvc.cxx
@@ -32,6 +33,7 @@ atlas_add_component(EasyjetHub
   xAODBTagging
   xAODEventInfo
   xAODJet
+  xAODTau
   xAODTruth
   StoreGateLib
   SystematicsHandlesLib

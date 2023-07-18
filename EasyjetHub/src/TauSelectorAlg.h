@@ -1,24 +1,24 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef HH4BANALYSIS_ELECTRONSELECTORALG
-#define HH4BANALYSIS_ELECTRONSELECTORALG
+#ifndef HH4BANALYSIS_TAUSELECTORALG
+#define HH4BANALYSIS_TAUSELECTORALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <xAODEventInfo/EventInfo.h>
-#include <xAODEgamma/ElectronContainer.h>
+#include <xAODTau/TauJetContainer.h>
 
 namespace Easyjet
 {
 
   /// \brief An algorithm for counting containers
-  class ElectronSelectorAlg final : public AthHistogramAlgorithm
+  class TauSelectorAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
 public:
-    ElectronSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    TauSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -31,10 +31,10 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<xAOD::ElectronContainer> m_containerInKey{
+    SG::ReadHandleKey<xAOD::TauJetContainer> m_containerInKey{
       this, "containerInKey", "", "containerName to read"
     };
-    SG::WriteHandleKey<ConstDataVector<xAOD::ElectronContainer> >
+    SG::WriteHandleKey<ConstDataVector<xAOD::TauJetContainer> >
     m_containerOutKey{ this, "containerOutKey", "", "containerName to write" };
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
       this, "EventInfoKey", "EventInfo", "EventInfo container to dump"

@@ -6,6 +6,7 @@ do_VR_jets: false
 do_muons: true
 do_electrons: false
 do_photons: false
+do_taus: false
 
 # btagging working points for small Rjets
 btag_wps:
@@ -54,6 +55,7 @@ write_VR_jets: false
 write_muons: true
 write_electrons: false
 write_photons: false
+write_taus: false
 
 # additional small R info
 write_small_R_higgs_parent_info: true

@@ -17,6 +17,7 @@ def validate_do_write_obj_flags(flags):
         'muons',
         'electrons',
         'photons',
+        'taus',
     ]:
         do_obj = flags(f'Analysis.do_{objtype}')
         write_obj = flags(f'Analysis.write_{objtype}')
