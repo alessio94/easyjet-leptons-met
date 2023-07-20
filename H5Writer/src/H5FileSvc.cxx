@@ -26,7 +26,7 @@ H5::H5File* H5FileSvc::file() {
 // weird magic, sort of copied from
 // Control/AthenaBaseComps/src/AthCnvSvc.cxx
 // There's a better example under PerfMonComps
-// https://gitlab.cern.ch/atlas/athena/-/tree/master/Control/PerformanceMonitoring/PerfMonComps
+// https://gitlab.cern.ch/atlas/athena/-/tree/main/Control/PerformanceMonitoring/PerfMonComps
 //
 StatusCode H5FileSvc::queryInterface(const InterfaceID& riid,
                                      void** ppvInterface)

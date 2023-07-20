@@ -12,7 +12,7 @@ If more fine-grained scheduling is required, the algorithm configuration modules
 
 ### CP algorithm configuration
 
-CP algorithm configurations are defined with wrappers for the basic schedulers defined in the packages in [`athena/PhysicsAnalysis/Algorithms`](https://gitlab.cern.ch/atlas/athena/-/tree/master/PhysicsAnalysis/Algorithms).
+CP algorithm configurations are defined with wrappers for the basic schedulers defined in the packages in [`athena/PhysicsAnalysis/Algorithms`](https://gitlab.cern.ch/atlas/athena/-/tree/main/PhysicsAnalysis/Algorithms).
 
 Selected modifications of the calibration configurations can be made by defining configuration flags, which can then be set in the run configuration YAML files. In the longer term, the full configurations may be placed in the YAML to permit greater flexibility and the possibility to define multiple presets.
 

@@ -16,5 +16,5 @@ unset CI
 if [[ ! $DOCKER_ANALYSIS_BASE_VERSION =~ [0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "couldn't parse CI file for base image, setting up latest"
 fi
-asetup AthAnalysis,${DOCKER_ANALYSIS_BASE_VERSION-"master,latest"}
+asetup AthAnalysis,${DOCKER_ANALYSIS_BASE_VERSION-"main,latest"}
 unset DOCKER_ANALYSIS_BASE_VERSION

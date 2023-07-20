@@ -1,6 +1,6 @@
 # TTree output configuration
 
-All output writing is done via the TTree algorithms provided in [`PhysicsAnalysis/AsgAnalysisAlgorithms`](https://gitlab.cern.ch/atlas/athena/blob/master/PhysicsAnalysis/Algorithms/AsgAnalysisAlgorithms/):
+All output writing is done via the TTree algorithms provided in [`PhysicsAnalysis/AsgAnalysisAlgorithms`](https://gitlab.cern.ch/atlas/athena/blob/main/PhysicsAnalysis/Algorithms/AsgAnalysisAlgorithms/):
 - `TreeMakerAlg` creates the TTree
 - `AsgxAODNTupleMakerAlg` is the main algorithm that defines a translation of `xAOD` variables to output branches
 - `TreeFillerAlg` handles the actual operation of reading `xAOD` data and filling the `TTree` branches
