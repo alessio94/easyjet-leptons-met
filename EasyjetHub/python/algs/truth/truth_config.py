@@ -3,7 +3,7 @@ from EasyjetHub.steering.container_names import get_container_names
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from EasyjetHub.algs.truth.jet_parent_decorator_config import jet_parent_decorator_cfg
-from HH4bAnalysis.config.truth_particle_info_config import truth_particle_info_cfg
+from bbbbAnalysis.config.truth_particle_info_config import truth_particle_info_cfg
 
 
 def truth_info_cfg(

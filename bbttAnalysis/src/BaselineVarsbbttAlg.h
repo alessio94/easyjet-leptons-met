@@ -6,6 +6,7 @@
 #ifndef HH4BANALYSIS_FINALVARSBBTTALG
 #define HH4BANALYSIS_FINALVARSBBTTALG
 
+#include <AthContainers/ConstDataVector.h>
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <FourMomUtils/xAODP4Helpers.h>
 #include <SystematicsHandles/SysReadHandle.h>

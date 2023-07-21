@@ -57,12 +57,13 @@ declare -A DATAFILES=(
     [sh4b-boosted-mc20-p5658]=${PHYS_SH4B_BOOSTED_MC20_p5658}
     [yybb-mc20]=${PHYS_YYBB_MC20}
     [lite-yybb-mc20]=${PHYSLITE_YYBB_MC20}
+    [lite-bbtt-mc20]=${PHYS_TTBAR_MC20}
 )
 
 declare -A TESTS=(
     [data18-fast]=data-ntuple-dump-fast
     [data22-fast]=data-ntuple-dump-fast
-    [sh4b-data22]=hh4b-dump
+    [sh4b-data22]=bbbb-dump
     [jets-mc20-fast]=ntuple-dump-fast
     [jets-mc20]=ntuple-dump
     [ttbar-mc20-fast]=ntuple-dump-fast
@@ -73,7 +74,7 @@ declare -A TESTS=(
     [hh4b-mc21]=ntuple-dump
     [hh4b-mc21-noroot]=run-fast
     [hh4b-mc21-syst]=ntuple-dump-syst
-    [hh4b-resolved-mc21]=hh4b-dump
+    [hh4b-resolved-mc21]=bbbb-dump
     [ttbar-mc21-fast]=ntuple-dump-fast
     [ttbar-mc21]=ntuple-dump
     [ttbar-mc21-syst]=ntuple-dump-syst
@@ -83,25 +84,27 @@ declare -A TESTS=(
     [lite-sh4b-boosted-mc20]=ntuple-dump
     [lite-hh4b-mc21-fast]=ntuple-dump-fast
     [lite-hh4b-mc21]=ntuple-dump
-    [sh4b-boosted-mc20]=hh4b-dump
-    [sh4b-boosted-mc20-p5658]=hh4b-dump
-    [yybb-mc20]=hh4b-dump
-    [lite-yybb-mc20]=hh4b-dump
+    [sh4b-boosted-mc20]=bbbb-dump
+    [sh4b-boosted-mc20-p5658]=bbbb-dump
+    [yybb-mc20]=bbyy-dump
+    [lite-yybb-mc20]=bbyy-dump
+    [lite-bbtt-mc20]=bbtt-dump
 )
 
 DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
 declare -A CONFIGS=(
-    [sh4b-data22]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [sh4b-data22]=bbbbAnalysis/RunConfig-SH4b.yaml
     [lite-sh4b-boosted-mc20-fast]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [lite-sh4b-boosted-mc20]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [lite-hh4b-mc21-fast]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [lite-hh4b-mc21]=EasyjetHub/RunConfig-PHYSLITE.yaml
-    [sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-SH4b.yaml
-    [sh4b-boosted-mc20-p5658]=HH4bAnalysis/RunConfig-SH4b.yaml
-    [ttbar-mc20-fast-aod]=HH4bAnalysis/RunConfig-Resolved.yaml
-    [hh4b-resolved-mc21]=HH4bAnalysis/RunConfig-Resolved.yaml
-    [yybb-mc20]=HH4bAnalysis/RunConfig-PHYS-yybb.yaml
-    [lite-yybb-mc20]=HH4bAnalysis/RunConfig-PHYSLITE-yybb.yaml
+    [sh4b-boosted-mc20]=bbbbAnalysis/RunConfig-SH4b.yaml
+    [sh4b-boosted-mc20-p5658]=bbbbAnalysis/RunConfig-SH4b.yaml
+    [ttbar-mc20-fast-aod]=bbbbAnalysis/RunConfig-Resolved.yaml
+    [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
+    [yybb-mc20]=bbyyAnalysis/RunConfig-PHYS-yybb.yaml
+    [lite-yybb-mc20]=bbyyAnalysis/RunConfig-PHYSLITE-yybb.yaml
+    [lite-bbtt-mc20]=bbttAnalysis/RunConfig-PHYSLITE-bbtt.yaml
 )
 
 # some common variables in the tests
@@ -157,8 +160,16 @@ ntuple-dump-fast-awkward() {
     $CMD --timeout 30 --h5-output test-awk.h5 --n-h5-jets 0
     metadata-check -v
 }
-hh4b-dump() {
-    hh4b-ntupler $1 -c $2 -o $COMMON
+bbbb-dump() {
+    bbbb-ntupler $1 -c $2 -o $COMMON
+    metadata-check -v
+}
+bbyy-dump() {
+    bbyy-ntupler $1 -c $2 -o $COMMON
+    metadata-check -v
+}
+bbtt-dump() {
+    bbtt-ntupler $1 -c $2 -o $COMMON
     metadata-check -v
 }
 

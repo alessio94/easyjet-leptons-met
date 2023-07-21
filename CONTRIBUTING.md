@@ -24,13 +24,13 @@ Merge requests require successful pipelines and an approval by one of the projec
 
 ## Extending the ntupler with analysis-specific algorithms
 
-We expose functions for generating the sequences used in `easyjet-ntupler` via the `hub.py` module, such that a custom executable can be defined that extends the basic job with analysis-specific operations. An annotated example for this can be found in [`HH4bAnalysis/bin/hh4b-ntupler`](./HH4bAnalysis/bin/hh4b-ntupler). See [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md) and [`EasyjetHub/python/hub.py`](./EasyjetHub/python/hub.py) directly for guidance.
+We expose functions for generating the sequences used in `easyjet-ntupler` via the `hub.py` module, such that a custom executable can be defined that extends the basic job with analysis-specific operations. An annotated example for this can be found in [`bbbbAnalysis/bin/bbbb-ntupler`](./bbbbAnalysis/bin/bbbb-ntupler). See [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md) and [`EasyjetHub/python/hub.py`](./EasyjetHub/python/hub.py) directly for guidance.
 
 ## Package structure
 
 The following `CMake` packages are defined in this repository:
 - `EasyjetHub`: Core framework code providing analysis-independent algorithms and job steering
-- `HH4bAnalysis`: Analysis-specific code for HH->4b information
+- `bbbbAnalysis`: Analysis-specific code for HH->4b information
   - E.g. preselections, jet pairing algorithms and decay path tracing specific to the 4b decay mode are implemented here
   - For historical reasons, `yybb` code is also currently included in this package, but will be separated into its own package at a later date
 - `BJetCalibrationTool` (submodule): Tool and algs for applying b-jet four-momentum correction

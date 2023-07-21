@@ -60,7 +60,7 @@ TRIGGER_LISTS = {
             "HLT_g140_loose",
         ],
     },
-    "HH4bResolved": {
+    "bbbbResolved": {
         2015: [
             # 2015 (not used in the resolved analysis):
             "HLT_2j35_btight_2j35_L13J25.0ETA23",
@@ -108,7 +108,7 @@ TRIGGER_LISTS = {
         ],
         2023: [],
     },
-    "HH4bBoosted": {
+    "bbbbBoosted": {
         2015: [
             "HLT_j360_a10_lcw_sub_L1J100",
         ],

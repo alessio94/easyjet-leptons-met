@@ -118,11 +118,11 @@ def get_trigger_chains(flags):
         )
 
     trigger_chains = set()
-    # Empty: set the HH4b analysis triggers
+    # Empty: set the bbbb analysis triggers
     trigger_groups = flags.Analysis.trigger_list
     if trigger_groups == "Auto":
-        log.info("No triggers specified, adding HH4b analysis triggers")
-        trigger_groups = ["HH4bResolved", "HH4bBoosted"]
+        log.info("No triggers specified, adding bbbb analysis triggers")
+        trigger_groups = ["bbbbResolved", "bbbbBoosted"]
     try:
         for trigger_group in trigger_groups:
             for year in trigger_year_list:

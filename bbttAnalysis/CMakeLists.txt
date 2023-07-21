@@ -1,5 +1,5 @@
 # Declare the package
-atlas_subdir(HH4bAnalysis)
+atlas_subdir(bbttAnalysis)
 
 # Find an external package (i.e. ROOT)
 find_package(ROOT COMPONENTS Core Tree Hist REQUIRED)
@@ -8,14 +8,9 @@ find_package(ROOT COMPONENTS Core Tree Hist REQUIRED)
 add_compile_options(-Werror)
 
 # Build the Athena component library
-atlas_add_component(HH4bAnalysis
-  src/TruthParticleInformationAlg.cxx
-  src/JetPairingAlg.cxx
-  src/BaselineVarsResolvedAlg.cxx
-  src/BaselineVarsBoostedAlg.cxx
-  src/BaselineVarsyybbAlg.cxx
+atlas_add_component(bbttAnalysis
   src/BaselineVarsbbttAlg.cxx
-  src/components/*.cxx
+  src/components/bbttAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
   AsgTools
@@ -34,19 +29,14 @@ atlas_add_component(HH4bAnalysis
 
 # Install python modules, joboptions, and share content
 atlas_install_scripts(
-  bin/hh4b-ntupler
+  bin/bbtt-ntupler
 )
 
 atlas_install_python_modules(
-  python/config
-  python/utils
+  python/bbtt_config.py
 )
 atlas_install_data(
-  share/RunConfig-PHYS-yybb.yaml
-  share/RunConfig-PHYSLITE-yybb.yaml
-  share/RunConfig-Resolved.yaml
-  share/RunConfig-SH4b.yaml
-  share/run-config-boosted-minimal.yaml
+  share/RunConfig-PHYSLITE-bbtt.yaml
 )
 
 # atlas_install_data( data/* )

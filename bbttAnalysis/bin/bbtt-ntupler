@@ -19,29 +19,14 @@ from EasyjetHub.hub import (
     output_cfg,
 )
 
-from HH4bAnalysis.utils.option_validation import validate_hh4b_analysis_prerequisites
-from HH4bAnalysis.config.dihiggs_analysis_config import dihiggs_analysis_cfg
-from HH4bAnalysis.config.boosted_config import boosted_branches
-from HH4bAnalysis.config.resolved_config import resolved_branches
-from HH4bAnalysis.config.yybb_config import yybb_branches
-from HH4bAnalysis.config.bbtt_config import bbtt_branches
-
-
-def hh4b_parser():
-    # Get and customise the parser
-    parser = AnalysisArgumentParser()
-    parser.add_analysis_arg(
-        "-r", "--do-resolved-dihiggs-analysis",
-        **AnalysisArgumentParser.oropt
-    )
-    parser.add_analysis_arg(
-        "-b", "--do-boosted-dihiggs-analysis",
-        **AnalysisArgumentParser.oropt
-    )
+from bbttAnalysis.bbtt_config import bbtt_branches
+from bbttAnalysis.bbtt_config import bbtt_cfg
+from EasyjetHub.steering.container_names import get_container_names
+from EasyjetHub.algs.event_counter_config import event_counter_cfg
 
 
 def hh4b_job_cfg():
-    parser = hh4b_parser()
+    parser = AnalysisArgumentParser()
 
     # Fill the configuration flags from the
     # parsed arguments
@@ -50,39 +35,37 @@ def hh4b_job_cfg():
     # Extend the list of output branches via flags
     # For more sophistication this could be done using
     # custom BranchManagers
-    if flags.Analysis.do_boosted_dihiggs_analysis:
-        flags.Analysis.extra_output_branches += boosted_branches(flags)
-    if flags.Analysis.do_resolved_dihiggs_analysis:
-        flags.Analysis.extra_output_branches += resolved_branches(flags)
-    if flags.Analysis.do_yybb_analysis:
-        flags.Analysis.extra_output_branches += yybb_branches(flags)
     if flags.Analysis.do_bbtt_analysis:
         flags.Analysis.extra_output_branches += bbtt_branches(flags)
-
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
     flags.lock()
 
-    validate_hh4b_analysis_prerequisites(flags)
-
     # Get a standard ComponentAccumulator with the following infrastructure:
     # - basic services for event loop, messaging etc
     # - apply preselection on triggers and data quality
     # - build event info with calibrations etc
-    seqname = "HH4bSeq"
+    seqname = "bbttSeq"
     cfg = default_sequence_cfg(flags, seqname)
 
-    if (
-        flags.Analysis.do_resolved_dihiggs_analysis
-        or flags.Analysis.do_boosted_dihiggs_analysis
-        or flags.Analysis.do_yybb_analysis
-        or flags.Analysis.do_bbtt_analysis
-    ):
+    if flags.Analysis.do_bbtt_analysis:
+        containers = get_container_names(flags)
         cfg.merge(
-            dihiggs_analysis_cfg(flags),
-            seqname,
+            bbtt_cfg(
+                flags,
+                smalljetkey=containers["outputs"]["reco4PFlowJet"].replace(
+                    "%SYS%", "NOSYS"
+                ),
+                muonkey=containers["outputs"]["muons"].replace("%SYS%", "NOSYS"),
+                electronkey=containers["outputs"]["electrons"].replace(
+                    "%SYS%", "NOSYS"
+                ),
+                taukey=containers["outputs"]["taus"].replace("%SYS%", "NOSYS"),
+            ),
+            seqname
         )
+        cfg.merge(event_counter_cfg("n_bbtt"), seqname)
 
     cfg.merge(output_cfg(flags, seqname))
 

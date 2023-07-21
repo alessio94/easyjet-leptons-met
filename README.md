@@ -16,7 +16,7 @@ First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel fre
 
 ```
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
-git clone --recursive ssh://git@gitlab.cern.ch:7999/easyjet/hh4b-analysis.git
+git clone --recursive ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 ```
 Note the `--recursive` argument, which is needed to get the submodules in the package.
 
@@ -25,8 +25,8 @@ Now, compile the package
 ```
 mkdir build
 cd build
-source ../hh4b-analysis/setup.sh
-cmake ../hh4b-analysis/
+source ../easyjet/setup.sh
+cmake ../easyjet/
 make
 source */setup.sh
 ```
@@ -47,7 +47,7 @@ When changing branches with `git checkout` or `git switch`, also be sure to use 
 
 # Running on files
 
-To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig `hh4b-analysis/EasyjetHub/share/RunConfig.yaml`.:
+To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig `easyjet/EasyjetHub/share/RunConfig.yaml`.:
 
 ```
 easyjet-ntupler data.myinputfile.DAOD_PHYS.pool.root --run-config [path-to-runconfig] --evtMax 10 --out-file analysis-variables.root

@@ -30,7 +30,7 @@ PhotonWP: "Loose.NonIso"  # possibly make a list to try multiple photon WPs
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto
 
-# "Auto" configures triggers for "HH4bResolved", "HH4bBoosted"
+# "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
 # We can also be explicit here I think
 trigger_list: ["HHyybb"]
 

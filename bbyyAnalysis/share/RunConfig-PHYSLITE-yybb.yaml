@@ -32,7 +32,7 @@ PhotonWP: "Loose.NonIso"
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto
 
-# "Auto" configures triggers for "HH4bResolved", "HH4bBoosted"
+# "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
 trigger_list: ["HHyybb"]
 
 # apply trigger lists to filter events

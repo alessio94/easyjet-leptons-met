@@ -1,0 +1,95 @@
+#!/bin/env python
+
+#
+# Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+#
+
+#
+# Extends easyjet-ntupler with dihiggs-specific algorithms
+#
+
+import sys
+import time
+
+from EasyjetHub.hub import (
+    AnalysisArgumentParser,
+    analysis_configuration,
+    run_job,
+    default_sequence_cfg,
+    output_cfg,
+)
+
+from bbyyAnalysis.yybb_config import yybb_branches
+from bbyyAnalysis.yybb_config import yybb_cfg
+from EasyjetHub.steering.container_names import get_container_names
+from EasyjetHub.algs.event_counter_config import event_counter_cfg
+
+
+def hh4b_job_cfg():
+    parser = AnalysisArgumentParser()
+
+    # Fill the configuration flags from the
+    # parsed arguments
+    flags, args = analysis_configuration(parser)
+
+    # Extend the list of output branches via flags
+    # For more sophistication this could be done using
+    # custom BranchManagers
+    if flags.Analysis.do_yybb_analysis:
+        flags.Analysis.extra_output_branches += yybb_branches(flags)
+
+    # Lock the flags so that the configuration of job subcomponents cannot
+    # modify them silently/unpredictably.
+    flags.lock()
+
+    # Get a standard ComponentAccumulator with the following infrastructure:
+    # - basic services for event loop, messaging etc
+    # - apply preselection on triggers and data quality
+    # - build event info with calibrations etc
+    seqname = "bbyySeq"
+    cfg = default_sequence_cfg(flags, seqname)
+
+    if flags.Analysis.do_yybb_analysis:
+        containers = get_container_names(flags)
+        cfg.merge(
+            yybb_cfg(
+                flags,
+                smalljetkey=containers["outputs"]["reco4PFlowJet"].replace(
+                    "%SYS%", "NOSYS"
+                ),
+                photonkey=containers["outputs"]["photons"].replace("%SYS%", "NOSYS"),
+            ),
+            seqname
+        )
+        cfg.merge(event_counter_cfg("n_yybb"), seqname)
+
+    cfg.merge(output_cfg(flags, seqname))
+
+    return cfg, flags, args
+
+
+def main():
+    # record the total run time
+    starttime = time.process_time()
+
+    cfg, flags, args = hh4b_job_cfg()
+
+    if args.dry_run:
+        return_code = 1
+    else:
+        return_code = run_job(flags, args, cfg)
+
+    # this is for unit tests: if jobs run too long something is wrong
+    if args.timeout:
+        duration = time.process_time() - starttime
+        if duration > args.timeout:
+            raise RuntimeError(
+                f"runtime ({duration:.1f}s) exceed timeout ({args.timeout:.0f}s)"
+            )
+    return return_code.isSuccess()
+
+
+# Execute the main function if this file was executed as a script
+if __name__ == "__main__":
+    is_successful = main()
+    sys.exit(0 if is_successful else 1)

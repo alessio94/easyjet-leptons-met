@@ -19,9 +19,9 @@ vr_btag_wps:
     - DL1r_FixedCutBEff_77
     - DL1r_FixedCutBEff_85
 
-# "Auto" configures triggers for "HH4bResolved", "HH4bBoosted"
+# "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
 # We can also be explicit here I think
-trigger_list: ["HH4bResolved", "HH4bBoosted"]
+trigger_list: ["bbbbResolved", "bbbbBoosted"]
 # apply loose jet cleaning only
 loose_jet_cleaning: true
 # which objects to write
