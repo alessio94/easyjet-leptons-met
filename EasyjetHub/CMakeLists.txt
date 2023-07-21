@@ -22,6 +22,7 @@ atlas_add_component(EasyjetHub
   src/LargeJetGhostVRJetAssociationAlg.cxx
   src/TruthParentDecoratorAlg.cxx
   src/H5FileSvc.cxx
+  src/JetDeepCopyAlg.cxx
   src/components/*.cxx
   LINK_LIBRARIES
   #GaudiKernel

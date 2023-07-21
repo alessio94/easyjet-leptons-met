@@ -89,6 +89,8 @@ def fill_from_args(flags, parser=None):
     if args.evtMax is not None:
         flags.Exec.MaxEvents = args.evtMax
 
+    flags.Output.AODFileName = args.output_xaod
+
     if args.skipEvents is not None:
         flags.Exec.SkipEvents = args.skipEvents
 
@@ -191,6 +193,14 @@ class AnalysisArgumentParser(ArgumentParser):
             action="store_true",
             help="Print the configuration and exit.",
         )
+        self.add_argument(
+            "-p",
+            "--output-xaod",
+            nargs='?',
+            help="name for output xAOD file",
+            default="",
+            const="output.pool.root",
+        )
 
         # add analysis-specific flags
         self.an_opts = self.add_argument_group(
@@ -284,6 +294,7 @@ class AnalysisArgumentParser(ArgumentParser):
             "-y", "--do-CP-systematics",
             **AnalysisArgumentParser.oropt
         )
+        validate_args(self, self.overwrites)
 
     # overwrite means that the option should be set to the value of the flag,
     # overwriting the value in the config file
@@ -292,4 +303,3 @@ class AnalysisArgumentParser(ArgumentParser):
             raise ValueError("bool options must be specified explicitly")
         argname = self.an_opts.add_argument(*pos, **args).dest
         self.overwrites[argname] = overwrite
-        validate_args(self, self.overwrites)

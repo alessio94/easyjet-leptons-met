@@ -37,6 +37,7 @@ declare -A DATAFILES=(
     [jets-mc20]=${PHYS_JETS_MC20}
     [ttbar-mc20-fast]=${PHYS_TTBAR_MC20}
     [ttbar-mc20]=${PHYS_TTBAR_MC20}
+    [ttbar-mc20-fast-aod]=${PHYS_TTBAR_MC20}
     [hh4b-mc21]=${PHYS_HH4B_MC21}
     [hh4b-mc21-noroot]=${PHYS_HH4B_MC21}
     [hh4b-mc21-syst]=${PHYS_HH4B_MC21}
@@ -66,6 +67,7 @@ declare -A TESTS=(
     [jets-mc20]=ntuple-dump
     [ttbar-mc20-fast]=ntuple-dump-fast
     [ttbar-mc20]=ntuple-dump
+    [ttbar-mc20-fast-aod]=run-aod-fast
     [sh4b-boosted-mc20-fast-awkward]=ntuple-dump-fast-awkward
     [sh4b-boosted-mc20-fast]=ntuple-dump-fast
     [hh4b-mc21]=ntuple-dump
@@ -96,6 +98,7 @@ declare -A CONFIGS=(
     [lite-hh4b-mc21]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [sh4b-boosted-mc20]=HH4bAnalysis/RunConfig-SH4b.yaml
     [sh4b-boosted-mc20-p5658]=HH4bAnalysis/RunConfig-SH4b.yaml
+    [ttbar-mc20-fast-aod]=HH4bAnalysis/RunConfig-Resolved.yaml
     [hh4b-resolved-mc21]=HH4bAnalysis/RunConfig-Resolved.yaml
     [yybb-mc20]=HH4bAnalysis/RunConfig-PHYS-yybb.yaml
     [lite-yybb-mc20]=HH4bAnalysis/RunConfig-PHYSLITE-yybb.yaml
@@ -136,6 +139,14 @@ run-fast() {
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
+    metadata-check -v
+}
+run-aod-fast() {
+    local OPTS="$COMMON --fast-test --cache-metadata"
+    local CMD="hh4b-ntupler $1 -c $2 $OPTS"
+    $CMD --stop-after-config
+    echo "rerunning $CMD to time"
+    $CMD --timeout 30 --output-xaod test.pool.root
     metadata-check -v
 }
 ntuple-dump-fast-awkward() {

@@ -6,6 +6,7 @@ from EventBookkeeperTools.EventBookkeeperToolsConfig import (
     CutFlowSvcCfg,
     BookkeeperToolCfg,
 )
+from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
 
 from EasyjetHub.algs.cpalgs_config import cpalgs_cfg
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
@@ -16,6 +17,7 @@ from EasyjetHub.algs.preselection.preselection_config import (
 from EasyjetHub.algs.truth.truth_config import truth_info_cfg
 from EasyjetHub.output.ttree.minituple_config import minituple_cfg
 from EasyjetHub.output.h5.h5_config import get_h5_cfg
+from EasyjetHub.output.xaod import get_xaod_cfg
 from EasyjetHub.steering.utils.log_helper import log
 
 
@@ -60,7 +62,11 @@ def core_services_cfg(flags):
 
     from AthenaRootComps.xAODEventSelectorConfig import xAODReadCfg
 
-    cfg.merge(xAODReadCfg(flags))
+    # We need to use a pool file reader if we write out an xAOD
+    if flags.Output.AODFileName:
+        cfg.merge(PoolReadCfg(flags))
+    else:
+        cfg.merge(xAODReadCfg(flags))
 
     return cfg
 
@@ -157,6 +163,12 @@ def output_cfg(flags, seqname):
         cfg.merge(
             get_h5_cfg(flags),
             seqname,
+        )
+
+    if flags.Output.AODFileName:
+        cfg.merge(
+            get_xaod_cfg(flags),
+            seqname
         )
 
     cfg.merge(event_counter_cfg("n_events"), seqname)
