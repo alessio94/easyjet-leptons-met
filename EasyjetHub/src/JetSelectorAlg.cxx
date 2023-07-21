@@ -19,6 +19,7 @@ namespace Easyjet
     declareProperty("minPt", m_minPt);
     declareProperty("maxEta", m_maxEta);
     declareProperty("minimumAmount", m_minimumAmount);
+    declareProperty("maximumAmount", m_maximumAmount=-1);
     declareProperty("truncateAtAmount", m_truncateAtAmount);
     declareProperty("pTsort", m_pTsort);
     declareProperty("removeRelativeDeltaRToVRJet",
@@ -98,9 +99,10 @@ namespace Easyjet
     // decorate nr of selected particles to the eventinfo
     nSelectedParticles_dec(*eventInfo) = nJets;
 
-    // if we have less than the requested nr, empty the workcontainer to write
+    // if we have more or less than the requested numbers, empty the workcontainer to write
     // defaults/return empty container
-    if (nJets < m_minimumAmount)
+    bool over_maximum = m_maximumAmount > 0 && nJets > m_maximumAmount;
+    if ( nJets < m_minimumAmount || over_maximum)
     {
       workContainer->clear();
       nJets = 0;

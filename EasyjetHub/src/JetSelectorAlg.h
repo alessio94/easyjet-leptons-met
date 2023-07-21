@@ -43,6 +43,7 @@ private:
     float m_minPt;
     float m_maxEta;
     int m_minimumAmount;
+    int m_maximumAmount;
     int m_truncateAtAmount;
     bool m_pTsort;
     bool m_removeRelativeDeltaRToVRJet;

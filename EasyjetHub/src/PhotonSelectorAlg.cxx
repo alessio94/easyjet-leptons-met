@@ -42,71 +42,72 @@ namespace Easyjet
     ATH_CHECK(inContainer.isValid());
     ATH_CHECK(eventInfo.isValid());
 
-    // make some accessors and decorators
+    static const SG::AuxElement::Accessor<char>  DFCommonPhotonsIsEMLoose ("DFCommonPhotonsIsEMLoose");
 
+    // make some accessors and decorators
     SG::AuxElement::Decorator<unsigned int> nSelectedParticles_dec(
         m_containerOutKey.key() + "_n");
-
-    // fill workContainer with "views" of the inContainer
-    // see TJ's tutorial for this
 
     auto workContainer =
         std::make_unique<ConstDataVector<xAOD::PhotonContainer> >(
             SG::VIEW_ELEMENTS);
 
-    float this_photon_eta_abs;
-    // loop over photons - must have at least 2 for diphoton object
+    // Cut flow
+    int passOQ = -1; 
+    int passPtCut = -1;
+    int passEtaCut = -1;
+    int passCleaning = -1;
+    float pt_cut = 25000;
+    int passPID = -1;
     for (const xAOD::Photon *photon : *inContainer)
     {
-      this_photon_eta_abs = std::abs(photon->eta());
-      // cuts
-      if ((this_photon_eta_abs > m_etaBounds[0] &&
-           this_photon_eta_abs < m_etaBounds[1]) ||
-          (this_photon_eta_abs > m_etaBounds[2]))
-        continue;
+      passPtCut = 0;
+      passEtaCut = 0;
+      passOQ = photon->isGoodOQ(xAOD::EgammaParameters::BADCLUSPHOTON); // From DF
+      passCleaning = 0;
+      passPID = 0;
+      passPID = DFCommonPhotonsIsEMLoose(*photon); // From DF
 
-      // If cuts are passed, save the object
-      workContainer->push_back(photon);
+      if (!((photon->OQ() & 1073741824) != 0 ||
+            (
+              (photon->OQ() & 134217728) != 0 &&
+              (photon->showerShapeValue(xAOD::EgammaParameters::Reta) > 0.98
+              || photon->showerShapeValue(xAOD::EgammaParameters::f1) > 0.4
+              || (photon->OQ() & 67108864) != 0
+              )
+            )
+          )) {
+        passCleaning = 1;
+      } else {
+        passCleaning = 0;
+      }
+
+      if(photon->pt() > pt_cut) passPtCut = 1;
+
+      if(m_etaBounds[0] == -1 && m_etaBounds[1] == -1 && m_etaBounds[2] == -1){
+        passEtaCut = 1;
+      }
+      else{
+        if((abs(photon->eta()) <= m_etaBounds[0] || abs(photon->eta()) >= m_etaBounds[1]) && abs(photon->eta()) <= m_etaBounds[2]) passEtaCut = 1;
+      }
+
+      if(   passOQ
+         && passCleaning
+         && passPtCut
+         && passEtaCut
+         && passPID
+         ){
+       workContainer->push_back(photon);
+      }
+
     }
 
     int nPhotons = workContainer->size();
 
-    float LeadPho_ptOverMyy = -99;
-    float SubleadPho_ptOverMyy = -99;
-    float diphoton_mass = -99;
-
-    // Add lead/subleading photon requirements
-
-    if (nPhotons >= 2)
-    {
-
-      const xAOD::Photon *Leading_Photon = *inContainer->begin();
-      auto secondPhotonIterator = std::next(inContainer->begin(), 1);
-      const xAOD::Photon *Subleading_Photon = *secondPhotonIterator;
-
-      // Create TLorentzVector objects from the photon four-momenta
-      TLorentzVector leadingPhotonP4 = Leading_Photon->p4();
-      TLorentzVector subleadingPhotonP4 = Subleading_Photon->p4();
-
-      // Calculate the invariant mass
-      diphoton_mass = (leadingPhotonP4 + subleadingPhotonP4).M();
-
-      LeadPho_ptOverMyy = Leading_Photon->pt() / diphoton_mass;
-      SubleadPho_ptOverMyy = Subleading_Photon->pt() / diphoton_mass;
-
-      if ((LeadPho_ptOverMyy < m_LeadPho_ptOverMyy_min) ||
-          (SubleadPho_ptOverMyy < m_SubleadPho_ptOverMyy_min))
-      {
-        workContainer->clear();
-        nPhotons = 0; // event failed, artifically set this with nPhotons = 0.
-                      // may want to revisit.
-      }
-    }
-
     // decorate nr of selected particles to the eventinfo
     nSelectedParticles_dec(*eventInfo) = nPhotons;
 
-    // if we have less than the requested nr, empty the workcontainer to write
+    // if we have less than the requested number, empty the workcontainer to write
     // defaults/return empty container
     if (nPhotons < m_minimumAmount)
     {

@@ -49,11 +49,25 @@ private:
     std::string m_bTagWP;
     std::unordered_map<std::string, SG::AuxElement::Decorator<float> > m_decos;
     std::vector<std::string> m_vars{
-      "DeltaR12_",              "Leading_Photon_pt_",
-      "Leading_Photon_eta_",    "Leading_Photon_phi_",
-      "Leading_Photon_E_",      "Subleading_Photon_pt_",
-      "Subleading_Photon_eta_", "Subleading_Photon_phi_",
-      "Subleading_Photon_E_",   "myy_",
+      // Cut flow
+      "TWO_LOOSE_PHOTONS",
+      "N_LOOSE_PHOTONS",
+      "TWO_TIGHTID_PHOTONS",
+      "TWO_ISO_PHOTONS",
+      "PASS_RELPT_CUT",
+      "MASSCUT",
+      "myy",
+      //Jets cut
+      "LESS_THAN_SIX_CENTRAL_JETS_CUT",
+      "isPassed",
+
+      // Leading/Subleading photon kinematics
+      "Leading_Photon_pt", "Leading_Photon_eta", "Leading_Photon_phi", "Leading_Photon_E",
+      "Subleading_Photon_pt", "Subleading_Photon_eta", "Subleading_Photon_phi", "Subleading_Photon_E",
+
+      // Leading/Subleading jet kinematics
+      "Leading_Jet_pt", "Leading_Jet_eta", "Leading_Jet_phi", "Leading_Jet_E",     
+      "Subleading_Jet_pt", "Subleading_Jet_eta", "Subleading_Jet_phi", "Subleading_Jet_E",
     };
   };
 }

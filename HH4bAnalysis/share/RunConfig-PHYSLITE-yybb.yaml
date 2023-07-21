@@ -11,8 +11,10 @@ do_photons: true
 
 # btagging working points for small Rjets
 btag_wps:
-    #- DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_77
+
+    #- DL1dv01_FixedCutBEff_70
+    #- DL1dv01_FixedCutBEff_77
     #- DL1dv01_FixedCutBEff_85
     #- GN120220509_FixedCutBEff_70
     #- GN120220509_FixedCutBEff_77
@@ -23,18 +25,18 @@ btag_wps:
     #- DL1r_FixedCutBEff_77
     #- DL1r_FixedCutBEff_85
 
-PhotonWP: "Tight.FixedCutLoose" # possibly make a list to try multiple photon WPs
+PhotonWP: "Loose.NonIso" 
+#PhotonWP: "Tight.FixedCutLoose" # possibly make a list to try multiple photon WPs
 
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto
 
 # "Auto" configures triggers for "HH4bResolved", "HH4bBoosted"
-# We can also be explicit here I think
 trigger_list: ["HHyybb"]
 
 # apply trigger lists to filter events
-do_trigger_filtering: true
+do_trigger_filtering: false
 
 # disable CP Algs for calibration
 disable_calib: false
@@ -67,20 +69,20 @@ write_electrons: false
 write_photons: true
 
 # additional small R info
-write_small_R_higgs_parent_info: true
+write_small_R_higgs_parent_info: false
 write_small_R_btag: false
 write_small_R_JVT_details: false
 write_small_R_no_bjet_calib: false
-write_small_R_gn2_branches: true
+write_small_R_gn2_branches: false
 
 # additional Large R info
 write_large_R_substructure: false
 write_large_R_truth_labels: false
 
 # turned off automatically if MC
-write_truth_small_R_jets: true
+write_truth_small_R_jets: false
 write_truth_large_R_jets: false
-write_truth_higgs: true
+write_truth_higgs: false
 
 # custom extra output branches
 extra_output_branches: []

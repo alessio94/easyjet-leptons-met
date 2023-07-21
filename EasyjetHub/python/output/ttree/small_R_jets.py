@@ -75,8 +75,14 @@ def get_small_R_bjet_branches(flags, input_container, output_prefix):
         and not flags.Input.isPHYSLITE
     ):
         small_R_bjet_branches.variables += [
+            "GN2v00_pb",
             "GN2v00_pc",
             "GN2v00_pu",
-            "GN2v00_pb",
+            "DL1dv01_pb",
+            "DL1dv01_pc",
+            "DL1dv01_pu",
+            "DL1r_pb",
+            "DL1r_pc",
+            "DL1r_pu",
         ]
     return small_R_bjet_branches.get_output_list()
