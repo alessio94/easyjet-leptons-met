@@ -1,3 +1,5 @@
+# WARNING: this isn't really supported, don't rely on the formatting
+# provided here to get merge requests into an acceptable state.
 repos:
   - repo: https://github.com/pocc/pre-commit-hooks
     rev: v1.3.5

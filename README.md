@@ -90,8 +90,7 @@ If you come back to this in a new shell session, you can recover the setup with:
 
 ```
 cd $WORKDIR/build
-setupATLAS
-asetup --restore
+source ../hh4b-analysis/setup.sh
 source */setup.sh
 ```
 
@@ -111,14 +110,3 @@ For more options you can do:
 easyjet-gridsubmit -h
 ```
 
-## Pre-commit hooks
-
-*Currently not entirely functional*
-
-You can use pre-commit hooks, that check and autoformats some style and formatting hooks in `.pre-commit-config.yaml` when you execute `git commit`. All you have to do is install pre-commit with pip. The following will do it for you.
-
-```
-pip install -r requirements.txt --user
-pre-commit install
-pre-commit run
-```
