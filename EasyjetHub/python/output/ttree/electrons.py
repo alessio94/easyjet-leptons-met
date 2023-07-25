@@ -14,5 +14,6 @@ def get_electron_branches(flags, input_container, output_prefix):
     )
 
     electron_branches.add_four_mom_branches(do_mass=False)
+    electron_branches.variables += ["charge"]
 
     return electron_branches.get_output_list()

@@ -9,6 +9,7 @@
 #include "../LargeJetGhostVRJetAssociationAlg.h"
 #include "../TruthParentDecoratorAlg.h"
 #include "../JetDeepCopyAlg.h"
+#include "../TauDecoratorAlg.h"
 
 using namespace Easyjet;
 
@@ -23,3 +24,4 @@ DECLARE_COMPONENT(TauSelectorAlg)
 DECLARE_COMPONENT(LargeJetGhostVRJetAssociationAlg)
 DECLARE_COMPONENT(TruthParentDecoratorAlg)
 DECLARE_COMPONENT(JetDeepCopyAlg)
+DECLARE_COMPONENT(TauDecoratorAlg)

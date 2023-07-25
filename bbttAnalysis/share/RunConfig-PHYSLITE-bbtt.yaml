@@ -6,6 +6,7 @@ do_large_R_UFO_jets: false
 do_muons: true
 do_electrons: true
 do_taus: true
+do_met : true
 
 # btagging working points for small Rjets
 btag_wps:
@@ -27,8 +28,11 @@ do_overlap_removal: false
 
 # which objects to write
 write_small_R_jets: true
+write_small_R_btag: true
 write_large_R_UFO_jets: false
 write_muons: true
 write_electrons: true
 write_taus: true
-
+write_truth_higgs: true
+write_truth_small_R_jets: true
+write_met : true

@@ -1,10 +1,13 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from EasyjetHub.output.ttree.tau_decor_config import tau_decor_cfg
 
 
 def tau_sequence_cfg(flags, containers):
     cfg = ComponentAccumulator()
     from TauAnalysisAlgorithms.TauAnalysisSequence import makeTauAnalysisSequence
+
+    cfg.merge(tau_decor_cfg(flags))
 
     tau_sequence = makeTauAnalysisSequence(
         flags.Analysis.DataType,

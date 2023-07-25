@@ -8,7 +8,7 @@ set -Eeu
 ################################################
 
 #tag from easyjet/hh4b-test-files
-TAG=mc23PHYS
+TAG=mc21bbtautau
 
 # standard samples
 DATA_2018=data18_13TeV.00362204.physics_Main.DAOD_PHYS_10evts.r13286_p5631.pool.root
@@ -27,6 +27,8 @@ PHYS_JETS_MC23=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8
 PHYS_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13144_p5631.pool.root
 PHYSLITE_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13144_p5631.pool.root
 
+PHYS_BBTT_MC21=mc21_13p6TeV.601477.PhPy8EG_HHbbttHadHad_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5737.pool.root
+PHYSLITE_BBTT_MC21=mc21_13p6TeV.601477.PhPy8EG_HHbbttHadHad_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5737.pool.root
 
 declare -A DATAFILES=(
     [data18-fast]=${DATA_2018}
@@ -57,7 +59,8 @@ declare -A DATAFILES=(
     [sh4b-boosted-mc20-p5658]=${PHYS_SH4B_BOOSTED_MC20_p5658}
     [yybb-mc20]=${PHYS_YYBB_MC20}
     [lite-yybb-mc20]=${PHYSLITE_YYBB_MC20}
-    [lite-bbtt-mc20]=${PHYS_TTBAR_MC20}
+    [lite-bbtt-mc21]=${PHYSLITE_BBTT_MC21}
+    [bbtt-mc21]=${PHYS_BBTT_MC21}
 )
 
 declare -A TESTS=(
@@ -88,7 +91,8 @@ declare -A TESTS=(
     [sh4b-boosted-mc20-p5658]=bbbb-dump
     [yybb-mc20]=bbyy-dump
     [lite-yybb-mc20]=bbyy-dump
-    [lite-bbtt-mc20]=bbtt-dump
+    [lite-bbtt-mc21]=bbtt-dump
+    [bbtt-mc21]=bbtt-dump
 )
 
 DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
@@ -104,7 +108,8 @@ declare -A CONFIGS=(
     [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
     [yybb-mc20]=bbyyAnalysis/RunConfig-PHYS-yybb.yaml
     [lite-yybb-mc20]=bbyyAnalysis/RunConfig-PHYSLITE-yybb.yaml
-    [lite-bbtt-mc20]=bbttAnalysis/RunConfig-PHYSLITE-bbtt.yaml
+    [lite-bbtt-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt.yaml
+    [bbtt-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt.yaml
 )
 
 # some common variables in the tests

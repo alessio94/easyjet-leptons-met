@@ -14,5 +14,6 @@ def get_tau_branches(flags, input_container, output_prefix):
     )
 
     tau_branches.add_four_mom_branches(do_mass=False)
+    tau_branches.variables += ["charge", "nProng"]
 
     return tau_branches.get_output_list()

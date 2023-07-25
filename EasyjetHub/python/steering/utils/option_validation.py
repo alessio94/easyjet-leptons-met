@@ -18,6 +18,7 @@ def validate_do_write_obj_flags(flags):
         'electrons',
         'photons',
         'taus',
+        'met'
     ]:
         do_obj = flags(f'Analysis.do_{objtype}')
         write_obj = flags(f'Analysis.write_{objtype}')
@@ -48,6 +49,11 @@ def validate_do_write_obj_flags(flags):
         if flags.Analysis.write_small_R_no_bjet_calib:
             assert not flags.Analysis.disable_calib, (
                 "B-jet momentum correction requires muon and b-jet CP algs"
+            )
+
+        if flags.Analysis.do_met:
+            assert flags.Analysis.do_small_R_jets, (
+                "MET requires small R jets to be run"
             )
 
 

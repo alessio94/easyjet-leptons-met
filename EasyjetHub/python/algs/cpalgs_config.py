@@ -14,6 +14,7 @@ from EasyjetHub.algs.calibration.muons import muon_sequence_cfg
 from EasyjetHub.algs.calibration.electrons import electron_sequence_cfg
 from EasyjetHub.algs.calibration.photons import photon_sequence_cfg
 from EasyjetHub.algs.calibration.taus import tau_sequence_cfg
+from EasyjetHub.algs.calibration.met import met_sequence_cfg
 from EasyjetHub.algs.postprocessing.overlap_removal import overlap_sequence_cfg
 from EasyjetHub.steering.container_names import get_container_names
 from EasyjetHub.steering.utils.log_helper import log
@@ -143,6 +144,14 @@ def cpalgs_cfg(
                         lr_jet_type="UFO",
                     )
                 )
+
+        if flags.Analysis.do_met:
+            log.info("Adding MET seq")
+            cfg.merge(
+                met_sequence_cfg(
+                    flags,
+                    containers)
+            )
 
     ########################################################################
     # Begin postprocessing

@@ -14,6 +14,7 @@ objtypes = [
     "taus",
     "truthBSMParticles",
     "truthSMParticles",
+    "met"
 ]
 
 container_map = {
@@ -31,6 +32,7 @@ container_map = {
         "taus":               "TauJets",
         "truthBSMParticles":  "TruthBSMWithDecayParticles",
         "truthSMParticles":   "TruthBosonsWithDecayParticles",
+        "met":                "AntiKt4EMPFlow",
     },
     "DAOD_PHYSLITE": {
         "reco4PFlowJet":      "AnalysisJets",
@@ -46,6 +48,7 @@ container_map = {
         "taus":               "AnalysisTauJets",
         "truthBSMParticles":  "TruthBSMWithDecayParticles",
         "truthSMParticles":   "TruthBosonsWithDecayParticles",
+        "met":                "AnalysisMET"
     },
 }
 
@@ -72,6 +75,8 @@ def get_container_names(flags):
             electrons=f"Analysis{inputs['electrons']}_%SYS%",
             photons=f"Analysis{inputs['photons']}_%SYS%",
             taus=f"Analysis{inputs['taus']}_%SYS%",
+            #
+            met="AnalysisMET_%SYS%",
             #
             truth4Jet=inputs["truth4Jet"],
             truth10TrimmedJet=inputs["truth10TrimmedJet"],

@@ -18,6 +18,7 @@ from EasyjetHub.output.ttree.truth_jets import (
     get_large_R_truthjet_branches,
     get_small_R_truthjet_branches,
 )
+from EasyjetHub.output.ttree.met import get_met_branches
 
 
 def tree_cfg(flags, branches, treename="AnalysisMiniTree"):
@@ -115,6 +116,13 @@ def minituple_cfg(flags):
             input_container=containers["reco10UFOJet"],
             output_prefix="recojet_antikt10UFO",
             lr_jet_type="UFO",
+        )
+
+    if flags.Analysis.write_met:
+        tree_branches += get_met_branches(
+            flags,
+            input_container=containers["met"],
+            output_prefix="met"
         )
 
     if flags.Input.isMC and flags.Analysis.write_truth_small_R_jets:
