@@ -29,16 +29,13 @@ TRIGGER_LISTS = {
             "HLT_e26_lhtight_ivarloose_L1EM22VHI",
             # Reference single muon trigger
             "HLT_mu24_ivarmedium_L1MU14FCH",
-            # Various multijet triggers
-            "HLT_4j120_L13J50",
-            "HLT_4j115_pf_ftf_presel4j85_L13J50",
-            "HLT_5j70c_pf_ftf_presel5c50_L14J15",
-            "HLT_5j85_pf_ftf_presel5j50_L14J15",
-            "HLT_6j35c_020jvt_pf_ftf_presel6c25_L14J15",
-            "HLT_6j55c_pf_ftf_presel6j40_L14J15",
-            "HLT_6j70_pf_ftf_presel6j40_L14J15",
-            "HLT_7j45_pf_ftf_presel7j30_L14J15",
-            "HLT_10j40_pf_ftf_presel7j30_L14J15",
+            # single tau trigger
+            "HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100",
+            # bbtt trigger
+            "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25",  # noqa: E501
+            "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR-TAU20ITAU12I-J25",  # noqa: E501
+            # jet+b-jet trigger
+            "HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25",  # noqa: E501
         ],
         2023: [],
     },
