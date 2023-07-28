@@ -10,6 +10,7 @@ add_compile_options(-Werror)
 # Build the Athena component library
 atlas_add_component(bbttAnalysis
   src/BaselineVarsbbttAlg.cxx
+  src/MMCDecoratorAlg.cxx
   src/components/bbttAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -25,6 +26,7 @@ atlas_add_component(bbttAnalysis
   SystematicsHandlesLib
   FourMomUtils
   TruthUtils
+  DiTauMassToolsLib
 )
 
 # Install python modules, joboptions, and share content

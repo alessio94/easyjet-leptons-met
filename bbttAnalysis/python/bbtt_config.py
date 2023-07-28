@@ -62,6 +62,18 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             )
         )
 
+        # TODO: Output currently only works for 1 b-tagging WP
+        cfg.addEventAlgo(
+            CompFactory.HH4B.MMCDecoratorAlg(
+                "MMCDecoratorAlg_" + btag_wp,
+                jets="bbttAnalysisJets_" + btag_wp,
+                muons="bbttAnalysisMuons",
+                electrons="bbttAnalysisElectrons",
+                taus="bbttAnalysisTaus",
+                met="AnalysisMET_%SYS%",
+            )
+        )
+
         # calculate final bbtt vars
         cfg.addEventAlgo(
             CompFactory.HH4B.BaselineVarsbbttAlg(
@@ -96,5 +108,8 @@ def bbtt_branches(flags):
         for var in bbtt_vars:
             branch_name = f"EventInfo.{var}_{btag_wp} -> {btag_wp}_{var}"
             branches += [branch_name]
+
+    for var in ["status", "pt", "eta", "phi", "m"]:
+        branches += [f"EventInfo.mmc_{var}_%SYS% -> mmc_%SYS%_{var}"]
 
     return branches
