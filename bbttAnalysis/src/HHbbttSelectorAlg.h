@@ -3,20 +3,18 @@
 */
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_FINALVARSBBTTALG
-#define HH4BANALYSIS_FINALVARSBBTTALG
+#ifndef HH4BANALYSIS_HHBBTTSELECTORALG
+#define HH4BANALYSIS_HHBBTTSELECTORALG
 
-#include <SystematicsHandles/SysReadHandle.h>
-#include <SystematicsHandles/SysListHandle.h>
-#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <memory>
 
-#include <AthContainers/ConstDataVector.h>
-
-#include <AthenaBaseComps/AthHistogramAlgorithm.h>
+#include "AnaAlgorithm/AnaAlgorithm.h"
 #include <FourMomUtils/xAODP4Helpers.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/ISysHandleBase.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
@@ -25,26 +23,27 @@
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+#include <EventBookkeeperTools/FilterReporterParams.h>
+
 namespace HH4B
 {
 
   /// \brief An algorithm for counting containers
-  class BaselineVarsbbttAlg final : public AthHistogramAlgorithm
+  class HHbbttSelectorAlg final : public EL::AnaAlgorithm
   {
     /// \brief The standard constructor
 public:
-    BaselineVarsbbttAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    HHbbttSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
     StatusCode initialize() override;
     /// \brief Execute method, for actions to be taken in the event loop
     StatusCode execute() override;
-    /// We use default finalize() -- this is for cleanup, and we don't do any
+    /// \brief Finalisation method, for cleanup, final print out etc
+    StatusCode finalize() override;
 
 private:
-    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-    // "someInfo"};
 
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
@@ -67,17 +66,17 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-    std::string m_bTagWP;
-
     /// \brief Setup sys-aware output decorations
-    CP::SysWriteDecorHandle<bool> m_leading_muon_pt {"Leading_Muon_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_leading_muon_eta {"Leading_Muon_eta_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_pass_sr {"pass_bbtt_sr_%SYS%", this};
 
-    CP::SysWriteDecorHandle<bool> m_leading_elec_pt {"Leading_Electron_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_leading_elec_eta {"Leading_Electron_eta_%SYS%", this};
+    /// \brief Setup overall filter decision that passes event if it passes the 
+    /// selection for any systematic
+    FilterReporterParams m_filterParams {this, "HHbbtt", "HHbbtautau selection"};
 
-    CP::SysWriteDecorHandle<bool> m_leading_tau_pt {"Leading_Tau_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_leading_tau_eta {"Leading_Tau_eta_%SYS%", this};
+    /// \brief Steerable properties
+    Gaudi::Property<std::string> m_channel { this, "Channel", "lephad", 
+					       "Which channel is run"};
+    /// \brief Internal variables
 
   };
 }

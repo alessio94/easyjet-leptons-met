@@ -36,3 +36,6 @@ write_taus: true
 write_truth_higgs: true
 write_truth_small_R_jets: true
 write_met : true
+
+do_CP_systematics: false
+systematics_regex: [".*"]

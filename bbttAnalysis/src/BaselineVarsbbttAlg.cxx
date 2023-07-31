@@ -19,81 +19,91 @@ namespace HH4B
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
     declareProperty("bTagWP", m_bTagWP);
+    if (!m_bTagWP.empty()) m_bTagWP = "_" + m_bTagWP;
   }
 
   StatusCode BaselineVarsbbttAlg::initialize()
   {
-    ATH_CHECK(m_smallRContainerInKey.initialize());
-    ATH_CHECK(m_muonContainerInKey.initialize());
-    ATH_CHECK(m_electronContainerInKey.initialize());
-    ATH_CHECK(m_tauContainerInKey.initialize());
-    ATH_CHECK(m_EventInfoKey.initialize());
 
-    // make decorators
-    for (const std::string &var : m_vars)
-    {
-      std::string deco_var = var + m_bTagWP;
-      SG::AuxElement::Decorator<float> deco(deco_var);
-      m_decos.emplace(deco_var, deco);
-    };
+    // Read syst-aware input handles
+    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+
+    // Intialise syst-aware output decorators
+    ATH_CHECK(m_leading_muon_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_leading_muon_eta.initialize(m_systematicsList, m_eventHandle));
+
+    ATH_CHECK(m_leading_elec_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_leading_elec_eta.initialize(m_systematicsList, m_eventHandle));
+
+    ATH_CHECK(m_leading_tau_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_leading_tau_eta.initialize(m_systematicsList, m_eventHandle));
+
+    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize());    
+
     return StatusCode::SUCCESS;
   }
 
   StatusCode BaselineVarsbbttAlg::execute()
   {
-    // container we read in
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    ATH_CHECK(eventInfo.isValid());
 
-    // set defaults
-
-    for (const std::string &var : m_vars)
+    // Loop over all systs
+    for (const auto& sys : m_systematicsList.systematicsVector())
     {
-      std::string deco_var = var + m_bTagWP;
-      m_decos.at(deco_var)(*eventInfo) = -99.;
-    };
 
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRjets(
-        m_smallRContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::MuonContainer> > muons_(
-        m_muonContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::ElectronContainer> > electrons_(
-        m_electronContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::TauJetContainer> > taus_(
-            m_tauContainerInKey);
+      // Retrive inputs
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-    ATH_CHECK(smallRjets.isValid());
-    ATH_CHECK(muons_.isValid());
-    ATH_CHECK(electrons_.isValid());
-    ATH_CHECK(taus_.isValid());
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-    ConstDataVector<xAOD::JetContainer> jets = *smallRjets;
-    ConstDataVector<xAOD::MuonContainer> muons = *muons_;
-    ConstDataVector<xAOD::ElectronContainer> electrons = *electrons_;
-    ConstDataVector<xAOD::TauJetContainer> taus = *taus_;
+      const xAOD::MuonContainer *muons = nullptr;
+      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
 
-    if (muons.size() >= 1)
-    {
-      // Leading muon
-      m_decos.at("Leading_Muon_pt_" + m_bTagWP)(*eventInfo) =
-          muons[0]->pt();
-      m_decos.at("Leading_Muon_eta_" + m_bTagWP)(*eventInfo) =
-          muons[0]->eta();
-    }
+      const xAOD::ElectronContainer *electrons = nullptr;
+      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
-    if (electrons.size() >= 1)
-    {
-      // Leading muon
-      m_decos.at("Leading_Electron_pt_" + m_bTagWP)(*eventInfo) =
-          electrons[0]->pt();
-      m_decos.at("Leading_Electron_eta_" + m_bTagWP)(*eventInfo) =
-          electrons[0]->eta();
-    }
-    if (taus.size() >= 1 ){
-	    m_decos.at("Leading_Tau_pt_" + m_bTagWP)(*eventInfo) =
-		    taus[0]->pt();
-	    m_decos.at("Leading_Tau_eta_" + m_bTagWP)(*eventInfo) =
-		    taus[0]->eta();
+      const xAOD::TauJetContainer *taus = nullptr;
+      ANA_CHECK (m_tauHandle.retrieve (taus, sys));
+
+      const xAOD::MissingETContainer *metCont = nullptr;
+      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
+      const xAOD::MissingET* met = (*metCont)["Final"];
+      if (!met) {
+	ATH_MSG_ERROR("Could not retrieve MET");
+	return StatusCode::FAILURE;	
+      }
+
+      if (muons->size() > 0) {
+	m_leading_muon_pt.set(*event, muons->at(0)->pt(), sys);
+	m_leading_muon_eta.set(*event, muons->at(0)->eta(), sys);
+      } else {
+	m_leading_muon_pt.set(*event, -99, sys);
+	m_leading_muon_eta.set(*event, -99, sys);
+      }
+
+      if (electrons->size() > 0) {
+	m_leading_elec_pt.set(*event, electrons->at(0)->pt(), sys);
+	m_leading_elec_eta.set(*event, electrons->at(0)->eta(), sys);
+      } else {
+	m_leading_elec_pt.set(*event, -99, sys);
+	m_leading_elec_eta.set(*event, -99, sys);
+      }
+
+
+      if (muons->size() > 0) {
+	m_leading_tau_pt.set(*event, taus->at(0)->pt(), sys);
+	m_leading_tau_eta.set(*event, taus->at(0)->eta(), sys);
+      } else {
+ 	m_leading_tau_pt.set(*event, -99, sys);
+	m_leading_tau_eta.set(*event, -99, sys);
+      }
     }
 
     return StatusCode::SUCCESS;
