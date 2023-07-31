@@ -60,6 +60,10 @@ AntiKt4EMPFlowJets.NNJvt -> pf_jets_JET__JES__1up_NNJvt
 # etc ...
 ```
 
+Systmeatics can be switched only only for certain variables using the `systs_only_for` attribute of the `BranchManager`. 
+Conversely, systematics can we switched off for certain variables using the `syst_not_for` attribute.   The former takes 
+precedence.  Setting the `write_object_systs_only_for_pt` flag only stores systematic variations for pt/Et-related branches.
+
 Setting the `do_overlap_removal` flag inserts `OR` into the output prefix, and uses the overlap-removed container:
 ```python
 AntiKt4EMPFlowJets_OR.pt -> pf_jets_OR_NOSYS_pt

@@ -8,6 +8,7 @@ do_electrons: false
 do_photons: false
 do_taus: false
 do_met: false
+do_mmc: false
 # btagging working points for small Rjets
 btag_wps: []
 # btagging working points for Variable Radius Track jets
@@ -32,6 +33,8 @@ do_bbtt_analysis: false
 # Whether to activate CP alg systematic variations
 do_CP_systematics: false
 systematics_regex: []
+# Do we apply object systs only for pt/et
+write_object_systs_only_for_pt: false
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false

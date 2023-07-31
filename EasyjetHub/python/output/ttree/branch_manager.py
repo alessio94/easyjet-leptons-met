@@ -17,6 +17,9 @@ class BranchManager(object):
     systematics_option: SystOption = SystOption.NONE
     required_flags:     list = field(default_factory=list)
     variables:          list = field(default_factory=list)
+    # Apply systs only for given vars (takes priority) or not for some vars
+    syst_only_for:      list = field(default_factory=list)
+    syst_not_for:       list = field(default_factory=list)
 
     def or_str(self):
         if self.do_overlap_removal:
@@ -31,27 +34,43 @@ class BranchManager(object):
             SystOption.ALL_SYST: "_%SYS%",
         }[self.systematics_option]
 
-    def full_output_prefix(self):
+    def apply_syst_for_var(self, var):
+        """
+        Check if we are applying systematics for a given variable.
+        If syst_only_for is set, apply only for those vars, else
+        if syst_not_for is set, don't apply for those.
+        """
+        return ((self.syst_only_for and var not in self.syst_only_for)
+                or (not self.syst_only_for and var in self.syst_not_for))
+
+    def full_output_prefix(self, var):
         _output_prefix = f"{self.output_prefix}{self.or_str()}{self.syst_str()}"
+
+        if self.apply_syst_for_var(var):
+            _output_prefix = _output_prefix.replace("_%SYS%", "")
+
         if _output_prefix:
             _output_prefix += '_'
         return _output_prefix
 
-    def full_input_container(self):
+    def full_input_container(self, var):
         _input_container = f"{self.input_container}{self.or_str()}"
         if (
             "%SYS%" in _input_container
             and self.systematics_option == SystOption.NO_SYST
         ):
             _input_container = _input_container.replace("_%SYS%", self.syst_str())
+
+        if self.apply_syst_for_var(var):
+            _input_container = _input_container.replace("_%SYS%", "_NOSYS")
+
         return _input_container
 
     def output_string(self, var):
-        # Handle case where output prefix is ''
-        return (
-            f"{self.full_input_container()}.{var} -> "
-            f"{self.full_output_prefix()}{var}"
-        )
+        incont = self.full_input_container(var)
+        outpref = self.full_output_prefix(var)
+        outstr = f"{incont}.{var} -> {outpref}{var}"
+        return outstr
 
     def add_four_mom_branches(self, do_mass):
         self.variables += ["pt", "eta", "phi"]

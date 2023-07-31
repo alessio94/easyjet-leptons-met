@@ -18,6 +18,9 @@ def get_large_R_jet_branches(flags, input_container, output_prefix, lr_jet_type)
         systematics_option=_syst_option,
     )
 
+    if flags.Analysis.write_object_systs_only_for_pt:
+        large_R_jet_branches.syst_only_for = ["pt"]
+
     # The LargeJetGhostVRJetAssociationAlg does not support systematics
     # Implement systematics handles, then remove this extra BM
     large_R_jet_NOSYS_branches = BranchManager(

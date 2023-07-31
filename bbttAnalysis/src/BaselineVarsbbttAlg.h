@@ -67,17 +67,20 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    /// \brief Setup sys-aware output decorations
+    CP::SysWriteDecorHandle<float> m_leading_muon_pt {"Leading_Muon_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_leading_muon_eta {"Leading_Muon_eta_%SYS%", this};
+
+    CP::SysWriteDecorHandle<float> m_leading_elec_pt {"Leading_Electron_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_leading_elec_eta {"Leading_Electron_eta_%SYS%", this};
+
+    CP::SysWriteDecorHandle<float> m_leading_tau_pt {"Leading_Tau_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_leading_tau_eta {"Leading_Tau_eta_%SYS%", this};
+
+    // Steerbale vars
     std::string m_bTagWP;
 
-    /// \brief Setup sys-aware output decorations
-    CP::SysWriteDecorHandle<bool> m_leading_muon_pt {"Leading_Muon_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_leading_muon_eta {"Leading_Muon_eta_%SYS%", this};
-
-    CP::SysWriteDecorHandle<bool> m_leading_elec_pt {"Leading_Electron_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_leading_elec_eta {"Leading_Electron_eta_%SYS%", this};
-
-    CP::SysWriteDecorHandle<bool> m_leading_tau_pt {"Leading_Tau_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_leading_tau_eta {"Leading_Tau_eta_%SYS%", this};
+    // Local variables and functions
 
   };
 }

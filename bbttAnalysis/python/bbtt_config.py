@@ -77,16 +77,17 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     )
 
     # MMC decoration
-    cfg.addEventAlgo(
-        CompFactory.HH4B.MMCDecoratorAlg(
-            "MMCDecoratorAlg",
-            jets="bbttAnalysisJets",
-            muons="bbttAnalysisMuons",
-            electrons="bbttAnalysisElectrons",
-            taus="bbttAnalysisTaus",
-            met="AnalysisMET_%SYS%",
+    if flags.Analysis.do_mmc:
+        cfg.addEventAlgo(
+            CompFactory.HH4B.MMCDecoratorAlg(
+                "MMCDecoratorAlg",
+                jets="bbttAnalysisJets",
+                muons="bbttAnalysisMuons",
+                electrons="bbttAnalysisElectrons",
+                taus="bbttAnalysisTaus",
+                met="AnalysisMET_%SYS%",
+            )
         )
-    )
 
     # calculate final bbtt vars
     cfg.addEventAlgo(
@@ -120,10 +121,16 @@ def bbtt_branches(flags):
     ]
 
     for var in bbtt_vars:
-        branch_name = f"EventInfo.{var}_%SYS% -> bbtt_%SYS%_{var}"
-        branches += [branch_name]
+        if flags.Analysis.write_object_systs_only_for_pt and "pt" not in var:
+            branches += [f"EventInfo.{var}_NOSYS -> bbtt_{var}"]
+        else:
+            branches += [f"EventInfo.{var}_%SYS% -> bbtt_%SYS%_{var}"]
 
-    for var in ["status", "pt", "eta", "phi", "m"]:
-        branches += [f"EventInfo.mmc_{var}_%SYS% -> mmc_%SYS%_{var}"]
+    if flags.Analysis.do_mmc:
+        for var in ["status", "pt", "eta", "phi", "m"]:
+            if flags.Analysis.write_object_systs_only_for_pt and var != "pt":
+                branches += [f"EventInfo.mmc_{var}_NOSYS -> mmc_{var}"]
+            else:
+                branches += [f"EventInfo.mmc_{var}_%SYS% -> mmc_%SYS%_{var}"]
 
     return branches

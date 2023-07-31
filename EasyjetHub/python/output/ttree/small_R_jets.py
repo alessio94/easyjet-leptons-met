@@ -17,6 +17,9 @@ def get_small_R_jet_branches(flags, input_container, output_prefix):
         ]
     )
 
+    if flags.Analysis.write_object_systs_only_for_pt:
+        small_R_jet_branches.syst_only_for = ["pt"]
+
     small_R_jet_branches.add_four_mom_branches(do_mass=True)
 
     small_R_jet_branches.variables += ["NNJvtPass"]

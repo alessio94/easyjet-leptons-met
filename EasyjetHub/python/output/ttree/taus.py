@@ -13,6 +13,9 @@ def get_tau_branches(flags, input_container, output_prefix):
         systematics_option=_syst_option,
     )
 
+    if flags.Analysis.write_object_systs_only_for_pt:
+        tau_branches.syst_only_for = ["pt"]
+
     tau_branches.add_four_mom_branches(do_mass=False)
     tau_branches.variables += ["charge", "nProng"]
 

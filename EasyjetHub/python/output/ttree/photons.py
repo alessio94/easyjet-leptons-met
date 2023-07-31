@@ -13,6 +13,9 @@ def get_photon_branches(flags, input_container, output_prefix):
         systematics_option=_syst_option,
     )
 
+    if flags.Analysis.write_object_systs_only_for_pt:
+        photon_branches.syst_only_for = ["pt"]
+
     photon_branches.add_four_mom_branches(do_mass=False)
 
     return photon_branches.get_output_list()

@@ -80,6 +80,8 @@ namespace HH4B
 	return StatusCode::FAILURE;	
       }
 
+      // Calculate vars
+
       if (muons->size() > 0) {
 	m_leading_muon_pt.set(*event, muons->at(0)->pt(), sys);
 	m_leading_muon_eta.set(*event, muons->at(0)->eta(), sys);
@@ -96,8 +98,7 @@ namespace HH4B
 	m_leading_elec_eta.set(*event, -99, sys);
       }
 
-
-      if (muons->size() > 0) {
+      if (taus->size() > 0) {
 	m_leading_tau_pt.set(*event, taus->at(0)->pt(), sys);
 	m_leading_tau_eta.set(*event, taus->at(0)->eta(), sys);
       } else {

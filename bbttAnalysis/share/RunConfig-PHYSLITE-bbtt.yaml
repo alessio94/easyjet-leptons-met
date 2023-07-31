@@ -7,6 +7,7 @@ do_muons: true
 do_electrons: true
 do_taus: true
 do_met : true
+do_mmc : true
 
 # btagging working points for small Rjets
 btag_wps:
@@ -39,3 +40,5 @@ write_met : true
 
 do_CP_systematics: false
 systematics_regex: [".*"]
+# Do we apply object systs only for pt/et
+write_object_systs_only_for_pt: true
