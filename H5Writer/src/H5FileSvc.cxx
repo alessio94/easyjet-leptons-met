@@ -19,7 +19,7 @@ StatusCode H5FileSvc::finalize() {
   return StatusCode::SUCCESS;
 }
 
-H5::H5File* H5FileSvc::file() {
+H5::Group* H5FileSvc::group() {
   return m_file.get();
 }
 
@@ -31,12 +31,12 @@ H5::H5File* H5FileSvc::file() {
 StatusCode H5FileSvc::queryInterface(const InterfaceID& riid,
                                      void** ppvInterface)
 {
-  if ( interfaceID().versionMatch(riid) )  {
+  if ( IH5GroupSvc::interfaceID().versionMatch(riid) )  {
     // This thing seems to get called when we run the code.
     //
     // For now the dynamic cast won't do anything, but if we ever make
-    // a base class for H5FileSvc this cast should go to IH5FileSvc.
-    *ppvInterface = dynamic_cast<H5FileSvc*>(this);
+    // a base class for H5FileSvc this cast should go to IH5GroupSvc.
+    *ppvInterface = dynamic_cast<IH5GroupSvc*>(this);
   } else {
     // And this thing gets called when the code is being compiled
     return AthService::queryInterface(riid, ppvInterface);

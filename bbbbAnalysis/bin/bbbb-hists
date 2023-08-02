@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+
+from AthenaConfiguration.MainServicesConfig import MainServicesCfg
+from AthenaConfiguration.AllConfigFlags import initConfigFlags
+from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
+from AthenaConfiguration.ComponentFactory import CompFactory
+
+# main service config misses anything to read files, so you need to
+# import both
+from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
+
+# we're still debugging
+from AthenaCommon.Constants import DEBUG
+
+from argparse import ArgumentParser
+import sys
+
+def parse_args():
+    parser = ArgumentParser()
+    parser.add_argument('input_files', nargs='+')
+    parser.add_argument('-d','--debug', action='store_true')
+    return parser.parse_args()
+
+
+def core_services_cfg(flags):
+    # Get a ComponentAccumulator setting up the standard components
+    # needed to run an Athena job.
+    cfg = MainServicesCfg(flags)
+
+    # Avoid stack traces to the exception handler. These traces
+    # aren't very useful since they just point to the handler, not
+    # the original bug.
+    cfg.addService(CompFactory.ExceptionSvc(Catch="NONE"))
+
+    cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
+    cfg.merge(PoolReadCfg(flags))
+
+    return cfg
+
+
+def histogram_cfg(flags):
+    cfg = ComponentAccumulator()
+    output = CompFactory.H5FileSvc(path="hists.h5")
+    cfg.addService(output)
+    cfg.addEventAlgo(
+        CompFactory.HH4B.JetBoostHistogramsAlg(
+            name="JetBoostHistogramsAlg",
+            jetsIn="EasyJets",
+            # OutputLevel=DEBUG,
+            output=output,
+        )
+    )
+    return cfg
+
+def run():
+    args = parse_args()
+    flags = initConfigFlags()
+    flags.Input.Files = args.input_files
+    if args.debug:
+        flags.Exec.DebugStage = 'exec'
+
+
+    cfg = core_services_cfg(flags)
+    cfg.merge(histogram_cfg(flags))
+
+    ret = cfg.run()
+    sys.exit(0 if ret.isSuccess() else 1)
+
+if __name__ == '__main__':
+    run()

@@ -10,6 +10,7 @@
 
 import sys
 import time
+import pathlib
 
 from EasyjetHub.hub import (
     AnalysisArgumentParser,
@@ -29,13 +30,13 @@ def hh4b_parser():
     # Get and customise the parser
     parser = AnalysisArgumentParser()
     parser.add_analysis_arg(
-        "-r", "--do-resolved-dihiggs-analysis",
-        **AnalysisArgumentParser.oropt
+        "--output-hists",
+        metavar="HISTS",
+        type=pathlib.Path,
+        default=False,
+        help="save histograms"
     )
-    parser.add_analysis_arg(
-        "-b", "--do-boosted-dihiggs-analysis",
-        **AnalysisArgumentParser.oropt
-    )
+    return parser
 
 
 def hh4b_job_cfg():
@@ -66,16 +67,10 @@ def hh4b_job_cfg():
     seqname = "HH4bSeq"
     cfg = default_sequence_cfg(flags, seqname)
 
-    if (
-        flags.Analysis.do_resolved_dihiggs_analysis
-        or flags.Analysis.do_boosted_dihiggs_analysis
-        or flags.Analysis.do_yybb_analysis
-        or flags.Analysis.do_bbtt_analysis
-    ):
-        cfg.merge(
-            dihiggs_analysis_cfg(flags),
-            seqname,
-        )
+    cfg.merge(
+        dihiggs_analysis_cfg(flags),
+        seqname,
+    )
 
     cfg.merge(output_cfg(flags, seqname))
 

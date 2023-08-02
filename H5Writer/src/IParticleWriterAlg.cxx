@@ -53,7 +53,7 @@ StatusCode IParticleWriterAlg::initialize() {
       cfg.inputs.push_back(AssociatedPrimitive{"",newprim});
     }
   }
-  m_writer.reset(new IParticleWriter(*m_output_svc->file(), cfg));
+  m_writer.reset(new IParticleWriter(*m_output_svc->group(), cfg));
 
   return StatusCode::SUCCESS;
 }

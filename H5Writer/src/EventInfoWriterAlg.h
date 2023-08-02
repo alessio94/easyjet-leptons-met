@@ -2,7 +2,7 @@
 #define EVENT_INFO_WRITER_ALG_H
 
 #include "H5Writer/EventInfoWriter.h"
-#include "src/H5FileSvc.h"
+#include "H5Writer/IH5GroupSvc.h"
 
 #include "AthenaBaseComps/AthAlgorithm.h"
 #include "xAODEventInfo/EventInfo.h"
@@ -29,7 +29,7 @@ private:
   };
   SG::ReadHandleKey<xAOD::EventInfo> m_infoKey {
     this, "eventInfo", "EventInfo", "Event info key"};
-  ServiceHandle<H5FileSvc> m_output_svc {
+  ServiceHandle<IH5GroupSvc> m_output_svc {
     this, "output", "", "output file service"};
 
   std::unique_ptr<EventInfoWriter> m_writer;

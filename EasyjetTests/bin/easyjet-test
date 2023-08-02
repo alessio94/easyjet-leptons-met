@@ -43,6 +43,7 @@ declare -A DATAFILES=(
     [hh4b-mc21]=${PHYS_HH4B_MC21}
     [hh4b-mc21-noroot]=${PHYS_HH4B_MC21}
     [hh4b-mc21-syst]=${PHYS_HH4B_MC21}
+    [hh4b-mc21-syst-hist]=${PHYS_HH4B_MC21}
     [hh4b-resolved-mc21]=${PHYS_HH4B_MC21}
     [sh4b-boosted-mc20-fast-awkward]=${PHYS_SH4B_BOOSTED_MC20}
     [sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED_MC20}
@@ -77,6 +78,7 @@ declare -A TESTS=(
     [hh4b-mc21]=ntuple-dump
     [hh4b-mc21-noroot]=run-fast
     [hh4b-mc21-syst]=ntuple-dump-syst
+    [hh4b-mc21-syst-hist]=hist-dump-syst
     [hh4b-resolved-mc21]=bbbb-dump
     [ttbar-mc21-fast]=ntuple-dump-fast
     [ttbar-mc21]=ntuple-dump
@@ -104,6 +106,7 @@ declare -A CONFIGS=(
     [lite-hh4b-mc21]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [sh4b-boosted-mc20]=bbbbAnalysis/RunConfig-SH4b.yaml
     [sh4b-boosted-mc20-p5658]=bbbbAnalysis/RunConfig-SH4b.yaml
+    [hh4b-mc21-syst-hist]=bbbbAnalysis/histonly-config.yaml
     [ttbar-mc20-fast-aod]=bbbbAnalysis/RunConfig-Resolved.yaml
     [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
     [yybb-mc20]=bbyyAnalysis/RunConfig-PHYS-yybb.yaml
@@ -151,10 +154,18 @@ run-fast() {
 }
 run-aod-fast() {
     local OPTS="$COMMON --fast-test --cache-metadata"
-    local CMD="hh4b-ntupler $1 -c $2 $OPTS"
+    local CMD="bbbb-ntupler $1 -c $2 $OPTS"
     $CMD --stop-after-config
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --output-xaod test.pool.root
+    metadata-check -v
+}
+hist-dump-syst() {
+    local OPTS="$COMMON --fast-test --cache-metadata"
+    local CMD="bbbb-ntupler $1 -c $2 $OPTS"
+    $CMD --stop-after-config
+    echo "rerunning $CMD to time"
+    $CMD --timeout 30 --output-hists hists.h5
     metadata-check -v
 }
 ntuple-dump-fast-awkward() {
@@ -218,11 +229,32 @@ EOF
     exit 1
 }
 
+# Terminal magic: if stdout is set to go to a terminal we'll add
+# colors to the help output below. Otherwise we strip this stuff
+# out. Note that you have to check the interactivity here: within the
+# function the output stream is never seen as going to the terminal.
+if [[ -t 1 ]]; then
+    INTERACTIVE=yes
+else
+    INTERACTIVE=""
+fi
 dump-modes() {
+    if [[ ${INTERACTIVE} ]]; then
+        local RB=$(tput setaf 1)$(tput bold)
+        local NO=$(tput sgr0)
+        local Y=$(tput setaf 3)
+        local G=$(tput setaf 2)
+        local FMT="  %s ${Y}-> ${RB}%s${NO} ${G}%s${NO} %s\n"
+    else
+        local FMT="  %s -> %s %s %s\n"
+    fi
     local mode
     for mode in ${ALL_MODES[*]}
     do
-        printf "  %s --> %s\n" $mode ${CONFIGS[$mode]-$DEFAULT_CONFIG}
+        local func=${TESTS[$mode]}
+        local config=${CONFIGS[$mode]-$DEFAULT_CONFIG}
+        local data=${DATAFILES[$mode]}
+        printf "${FMT}" $mode $func $config $data
     done
 }
 

@@ -4,21 +4,22 @@
 #include "AthenaBaseComps/AthService.h"
 #include "Gaudi/Property.h"
 
+#include "H5Writer/IH5GroupSvc.h"
+
 #include <memory>
 
 namespace H5 {
   class H5File;
 }
 
-class H5FileSvc : public AthService
+class H5FileSvc : public IH5GroupSvc, public AthService
 {
 public:
-  DeclareInterfaceID( H5FileSvc, 1, 0 );
   H5FileSvc(const std::string& name, ISvcLocator* pSvcLocator);
   ~H5FileSvc();
   StatusCode initialize() override;
   StatusCode finalize() override;
-  H5::H5File* file();
+  H5::Group* group() override;
 private:
   StatusCode queryInterface(const InterfaceID& riid,
                             void** ppvInterface) override;

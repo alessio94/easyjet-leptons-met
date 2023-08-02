@@ -52,6 +52,11 @@ ntupler_ttbar_mc20_fast:
   script:
     - easyjet-test ttbar-mc20-fast
 
+miniaod_ttbar_mc20_fast:
+  extends: .ntupler
+  script:
+    - easyjet-test ttbar-mc20-fast-aod
+
 ntupler_sh4b_boosted_mc20_fast:
   extends: .ntupler
   script:

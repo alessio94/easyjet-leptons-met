@@ -22,9 +22,9 @@ from EasyjetHub.steering.utils.option_validation import validate_flags
 from EasyjetHub.steering.utils.log_helper import log, setRogueLoggers
 
 
-def analysis_configuration(parser=None):
+def analysis_configuration(parser="default"):
 
-    if not parser:
+    if parser == "default":
         parser = AnalysisArgumentParser()
 
     # Initialise the job configuration flags, some of which will be autoconfigured.

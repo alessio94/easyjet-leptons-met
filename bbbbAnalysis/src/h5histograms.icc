@@ -1,0 +1,216 @@
+#include "H5Cpp.h"
+#include "hdf5_hl.h"
+
+#include <vector>
+#include <cassert>
+#include <array>
+#include <numeric>
+
+#include <boost/histogram.hpp>
+
+namespace h5h {
+// Kind of janky way to tell if the histogram has a variance field
+//
+// Hopefully this gets better with C++20 concepts
+//
+  template <typename T>
+  using variance_t = decltype(
+    std::declval<typename T::const_iterator>()->variance());
+
+  template <typename T, typename = void>
+  constexpr bool has_variance = false;
+
+  template <typename T>
+  constexpr bool has_variance<T,std::void_t<variance_t<T>>> = true;
+
+// figure out the output array type
+  template <typename T, typename = void>
+  struct array_type
+  {
+    using type = typename T::value_type;
+  };
+  template <typename T>
+  struct array_type<T, std::void_t<variance_t<T>>>
+  {
+    using type = std::remove_cv_t<std::remove_reference_t<variance_t<T>>>;
+  };
+  template <typename T>
+  using array_t = typename array_type<T>::type;
+
+// typing magic
+  template <typename T>
+  const H5::DataType hdf5_t;
+  template<>
+  const H5::DataType hdf5_t<double> = H5::PredType::NATIVE_DOUBLE;
+  template<>
+  const H5::DataType hdf5_t<float> = H5::PredType::NATIVE_FLOAT;
+  template<>
+  const H5::DataType hdf5_t<int> = H5::PredType::NATIVE_INT;
+  template<>
+  const H5::DataType hdf5_t<unsigned long> = H5::PredType::NATIVE_ULONG;
+  template<>
+  const H5::DataType hdf5_t<unsigned long long> = H5::PredType::NATIVE_ULLONG;
+
+  template <typename T, bool variance=false>
+  std::vector<array_t<T>> get_flat_hist_array(const T& hist) {
+    using out_t = std::vector<array_t<T>>;
+    namespace bh = boost::histogram;
+    std::vector<int> hist_dims(hist.rank());
+    for (size_t dim = 0; dim < hist.rank(); dim++) {
+      hist_dims.at(dim) = hist.axis(dim).size();
+    }
+    auto global_index = [&dims=hist_dims, &hist](const auto& hist_idx) -> size_t {
+      std::vector<size_t> offset_index;
+      for (size_t ax_n = 0; ax_n < hist.rank(); ax_n++) {
+        bool underflow = (
+          hist.axis(ax_n).options() & bh::axis::option::underflow);
+        // ugly check to decide if we have to add underflow offset
+        int offset_signed = hist_idx.index(ax_n) + (underflow ? 1 : 0);
+        if (offset_signed < 0) throw std::logic_error("neg signed index");
+        size_t offset = static_cast<size_t>(offset_signed);
+        offset_index.push_back(offset);
+      }
+      size_t global = 0;
+      size_t stride = 1;
+      for (size_t dim_p1 = dims.size(); dim_p1 != 0; dim_p1--) {
+        size_t dim = dim_p1 - 1;
+        size_t idx = offset_index.at(dim);
+        global += idx * stride;
+        stride *= dims.at(dim);
+      }
+      return global;
+    };
+    out_t out(hist.size());
+    for (const auto& x : bh::indexed(hist, bh::coverage::all)) {
+      size_t global = global_index(x);
+      static_assert(!variance || has_variance<T>);
+      if constexpr (variance) {
+        out.at(global) = x->variance();
+      } else if constexpr (has_variance<T>) {
+        out.at(global) = x->value();
+      } else {
+        out.at(global) = *x;
+      }
+    }
+    return out;
+  }
+
+  struct Axis
+  {
+    std::vector<float> edges;
+    std::string name;
+    int extra_bins_in_hist;
+  };
+
+  template <typename T>
+  std::vector<Axis> get_axes(const T& hist) {
+    using out_t = std::vector<Axis>;
+    namespace opts = boost::histogram::axis::option;
+    out_t edges;
+    for (size_t ax_n = 0; ax_n < hist.rank(); ax_n++) {
+      const auto& axis = hist.axis(ax_n);
+      out_t::value_type ax;
+      bool underflow = (axis.options() & opts::underflow);
+      bool overflow = (axis.options() & opts::underflow);
+      // there are n normal bins + 1 edges, so we start with one less
+      // bin in the histogram then in the edges. Then we add under /
+      // overflow.
+      ax.extra_bins_in_hist = -1 + (underflow ? 1 : 0) + (overflow ? 1: 0);
+      for (const auto& bin: axis) {
+        ax.edges.push_back(bin.lower());
+      }
+      // add the upper edge too
+      if (axis.size() > 0) {
+        const auto& last = *axis.rbegin();
+        // for integer binning, which has the same upper and lower bin
+        // value, we have one more bonus bin in the hist and don't save
+        // all the edges
+        if (last.upper() == last.lower()) {
+          ax.extra_bins_in_hist += 1;
+        } else {
+          ax.edges.push_back(last.upper());
+        }
+      }
+      ax.name = axis.metadata();
+      edges.push_back(ax);
+    }
+    return edges;
+  }
+
+  void chkerr(herr_t code, const std::string& error) {
+    if (code < 0) throw std::runtime_error("error setting " + error);
+  }
+
+  template <typename T>
+  auto product(const std::vector<T>& v) {
+    return std::accumulate(
+      v.begin(), v.end(), T(1), std::multiplies<hsize_t>{});
+  }
+
+  template <typename T>
+  void write_hist_to_group(
+    H5::Group& parent_group,
+    const T& hist,
+    const std::string& name)
+  {
+    // build the data space
+    auto axes = get_axes(hist);
+    std::vector<hsize_t> ds_dims;
+    for (const auto& axis: axes) {
+      int total_size = axis.edges.size() + axis.extra_bins_in_hist;
+      if (total_size < 0) throw std::logic_error("negative bin count");
+      ds_dims.push_back(static_cast<hsize_t>(total_size));
+    }
+    H5::DataSpace space(ds_dims.size(), ds_dims.data());
+
+    // now read in the data and write to a dataset
+    auto data = get_flat_hist_array(hist);
+    assert(product(ds_dims) == data.size());
+    H5::Group group = parent_group.createGroup(name);
+    H5::DSetCreatPropList props;
+    props.setChunk(ds_dims.size(), ds_dims.data());
+    props.setDeflate(7);
+    chkerr(
+      H5Pset_dset_no_attrs_hint(props.getId(), true),
+      "no attribute hint");
+    H5::DataType type = hdf5_t<typename decltype(data)::value_type>;
+    H5::DataSet dataset = group.createDataSet(
+      "histogram",
+      type,
+      space,
+      props);
+    dataset.write(data.data(), type);
+
+    // add the variance
+    if constexpr (has_variance<T>) {
+      auto variance = get_flat_hist_array<T,true>(hist);
+      H5::DataSet var_dataset = group.createDataSet(
+        "variance",
+        type,
+        space,
+        props);
+      var_dataset.write(variance.data(), type);
+    }
+
+    // add the edge datasets
+    H5::Group axgroup = group.createGroup("axes");
+    size_t axnum = 0;
+    for (const auto& axis: axes) {
+      std::array<hsize_t,1> axdims{axis.edges.size()};
+      H5::DataSpace ax_space(axdims.size(), axdims.data());
+      H5::DSetCreatPropList ax_props(props);
+      ax_props.setChunk(axdims.size(), axdims.data());
+      auto ax_type = hdf5_t<float>;
+      auto ax_ds = axgroup.createDataSet(
+        axis.name,
+        ax_type,
+        ax_space,
+        ax_props);
+      ax_ds.write(axis.edges.data(), ax_type);
+      chkerr(
+        H5DSattach_scale(
+          dataset.getId(), ax_ds.getId(), axnum++),
+        "dimenstion scale");
+    }
+  }
+}

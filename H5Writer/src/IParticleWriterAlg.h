@@ -2,7 +2,7 @@
 #define IPARTICLE_WRITER_ALG_H
 
 #include "H5Writer/IParticleWriter.h"
-#include "src/H5FileSvc.h"
+#include "H5Writer/IH5GroupSvc.h"
 
 #include "AthenaBaseComps/AthAlgorithm.h"
 #include "xAODBase/IParticleContainer.h"
@@ -35,7 +35,7 @@ private:
   };
   SG::ReadHandleKey<xAOD::IParticleContainer> m_partKey {
     this, "container", "", "IParticle container key"};
-  ServiceHandle<H5FileSvc> m_output_svc {
+  ServiceHandle<IH5GroupSvc> m_output_svc {
     this, "output", "", "output file service"};
 
   std::unique_ptr<IParticleWriter> m_writer;

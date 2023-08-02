@@ -30,7 +30,7 @@ StatusCode EventInfoWriterAlg::initialize() {
     std::string type = m_primToType.value().at(prim);
     cfg.inputs.push_back(Primitive{getPrimitiveType(type), prim, prim});
   }
-  m_writer.reset(new EventInfoWriter(*m_output_svc->file(), cfg));
+  m_writer.reset(new EventInfoWriter(*m_output_svc->group(), cfg));
 
   return StatusCode::SUCCESS;
 }

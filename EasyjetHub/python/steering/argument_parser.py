@@ -70,7 +70,7 @@ def add_standard_athena_args(parser):
     )
 
 
-def fill_from_args(flags, parser=None):
+def fill_from_args(flags, parser):
     """
     Copied (and simplified) from athena's over-featured version
     """
@@ -122,9 +122,7 @@ def fill_from_args(flags, parser=None):
     return args
 
 
-def validate_args(parser, overwrites={}):
-    args, _ = parser.parse_known_args()
-    runconfig = args.run_config
+def validate_args(runconfig, overwrites):
     # check that values belonging in runcofig exist, and vice-versa
     for key, value in overwrites.items():
         if value and key not in runconfig:
@@ -133,9 +131,10 @@ def validate_args(parser, overwrites={}):
             raise ValueError(f"{key} must not exist in the config file")
 
 
-def fill_flags_from_runconfig(args, flags, overwrites={}):
+def fill_flags_from_runconfig(args, flags, overwrites):
     # Collect all the run config values from config file and flags
-    run_config_all = args.run_config
+    run_config_all = run_config_arg(args.run_config)
+    validate_args(run_config_all, overwrites)
 
     # args contain the flags, overwrite run_config file values with values from flags
     # and add flags that are not in run_config file
@@ -178,8 +177,8 @@ class AnalysisArgumentParser(ArgumentParser):
             "-c",
             "--run-config",
             metavar="CFG",
-            type=run_config_arg,
-            default="EasyjetHub/RunConfig.yaml",
+            type=pathlib.Path,
+            default=pathlib.Path("EasyjetHub/RunConfig.yaml"),
             help="Run config file path, default: %(default)s",
         )
         self.add_argument(
@@ -294,7 +293,6 @@ class AnalysisArgumentParser(ArgumentParser):
             "-y", "--do-CP-systematics",
             **AnalysisArgumentParser.oropt
         )
-        validate_args(self, self.overwrites)
 
     # overwrite means that the option should be set to the value of the flag,
     # overwriting the value in the config file

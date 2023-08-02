@@ -1,14 +1,9 @@
-include: EasyjetHub/base-config.yaml
+include: base-config.yaml
 
 # Toggles for object types
 do_small_R_jets: true
-do_large_R_Topo_jets: false
 do_large_R_UFO_jets: true
-do_VR_jets: false
 do_muons: true
-do_electrons: false
-do_photons: false
-do_taus: false
 
 # btagging working points for small Rjets
 btag_wps:
@@ -24,10 +19,6 @@ vr_btag_wps:
     - DL1r_FixedCutBEff_77
     - DL1r_FixedCutBEff_85
 
-# list of triggers to apply
-# "Auto" configures mc from the r-tag, data from year, e.g. data22
-trigger_year: Auto
-
 # "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
 # We can also be explicit here I think
 trigger_list: ["bbbbResolved", "bbbbBoosted"]
@@ -40,35 +31,18 @@ disable_calib: true
 
 # apply loose jet cleaning only
 loose_jet_cleaning: true
-# if you want to truth match (is MC protected)
-# Whether to activate CP alg systematic variations
-do_CP_systematics: false
-systematics_regex: [".*"]
-
-# write objects with overlap removal applied
-# turning this on you have to decide on one large R jet collection
-do_overlap_removal: false
 
 # which objects to write
 write_small_R_jets: true
-write_large_R_Topo_jets: false
 write_large_R_UFO_jets: true
-write_VR_jets: false
 write_muons: true
-write_electrons: false
-write_photons: false
-write_taus: false
 
 # additional small R info
 write_small_R_higgs_parent_info: true
-write_small_R_btag: false
-write_small_R_JVT_details: false
-write_small_R_no_bjet_calib: false
 write_small_R_gn2_branches: true
 
 # additional Large R info
 write_large_R_substructure: true
-write_large_R_truth_labels: false
 
 # turned off automatically if MC
 write_truth_small_R_jets: true
