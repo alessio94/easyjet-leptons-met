@@ -9,7 +9,7 @@
     #  E241: multiple spaces after comma (and at least colon)
     #  W503: line break before binary operator
     #  E741: ambiguous variable name
-    - flake8 --ignore=E231,E241,W503,E741 . --per-file-ignores="hub.py:F401"
+    - flake8 --ignore=E231,E241,W503,E741 . --per-file-ignores="hub.py:F401 trigger_lists.py:E501"
   needs: []
 
 .black_check_template: &black_check_template

@@ -25,10 +25,20 @@ TRIGGER_LISTS = {
             "HLT_mu26_ivarmedium",
         ],
         2022: [
-            # Reference single electron trigger
+            # single electron trigger
             "HLT_e26_lhtight_ivarloose_L1EM22VHI",
-            # Reference single muon trigger
+            "HLT_e60_lhmedium_L1EM22VHI",
+            "HLT_e140_lhloose_L1EM22VHI",
+            # electron + tau trigger
+            "HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1EM22VHI",
+            "HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1EM15VHI_2TAU12IM_4J12",
+            # single muon trigger
             "HLT_mu24_ivarmedium_L1MU14FCH",
+            "HLT_mu50_L1MU14FCH",
+            # muon + tau trigger
+            "HLT_mu20_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1MU14FCH",
+            "HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU20IM",
+            "HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU12IM_3J12",
             # single tau trigger
             "HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100",
             # bbtt trigger
@@ -37,7 +47,21 @@ TRIGGER_LISTS = {
             # jet+b-jet trigger
             "HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25",  # noqa: E501
         ],
-        2023: [],
+        2023: [
+            # Reference single electron trigger
+            "HLT_e26_lhtight_ivarloose_L1eEM26M",
+            "HLT_e60_lhmedium_L1eEM26M",
+            "HLT_e140_lhloose_L1eEM26M",
+            # Reference single muon trigger
+            "HLT_mu24_ivarmedium_L1MU14FCH",
+            # single tau trigger
+            "HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100",
+            # bbtt trigger
+            "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25",  # noqa: E501
+            "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR-TAU20ITAU12I-J25",  # noqa: E501
+            "HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR-TAU20ITAU12I-J25",  # noqa: E501
+            "HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25",  # noqa: E501
+        ],
     },
     "HHyybb": {
         2015: [
