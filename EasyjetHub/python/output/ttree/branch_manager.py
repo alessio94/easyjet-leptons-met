@@ -17,6 +17,7 @@ class BranchManager(object):
     systematics_option: SystOption = SystOption.NONE
     required_flags:     list = field(default_factory=list)
     variables:          list = field(default_factory=list)
+
     # Apply systs only for given vars (takes priority) or not for some vars
     syst_only_for:      list = field(default_factory=list)
     syst_not_for:       list = field(default_factory=list)

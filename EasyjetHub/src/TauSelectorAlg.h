@@ -7,6 +7,11 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysWriteHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+
+#include <AthContainers/ConstDataVector.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODTau/TauJetContainer.h>
 
@@ -31,14 +36,22 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<xAOD::TauJetContainer> m_containerInKey{
-      this, "containerInKey", "", "containerName to read"
-    };
-    SG::WriteHandleKey<ConstDataVector<xAOD::TauJetContainer> >
-    m_containerOutKey{ this, "containerOutKey", "", "containerName to write" };
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-      this, "EventInfoKey", "EventInfo", "EventInfo container to dump"
-    };
+    /// \brief Setup syst-aware input container handles
+    CP::SysListHandle m_systematicsList {this};
+
+    CP::SysReadHandle<xAOD::EventInfo>
+    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+
+    CP::SysReadHandle<xAOD::TauJetContainer>
+    m_inHandle{ this, "containerInKey", "",   "Tau container to read" };
+
+    /// \brief Setup syst-aware output container handles
+    CP::SysWriteHandle<ConstDataVector<xAOD::TauJetContainer>>
+    m_outHandle{ this, "containerOutKey", "",   "Tau container to write" };
+
+    /// \brief Setup sys-aware output decorations
+    CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nTaus_%SYS%", 
+        "Name out output decorator for number of selected taus"};
 
     float m_minPt;
     float m_minEtaVeto;

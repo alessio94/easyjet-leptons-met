@@ -8,6 +8,12 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysWriteHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+
+#include <AthContainers/ConstDataVector.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 
@@ -32,14 +38,27 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<xAOD::JetContainer> m_containerInKey{
-        this, "containerInKey", "", "containerName to read"};
-    SG::WriteHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerOutKey{
-        this, "containerOutKey", "", "containerName to write"};
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-        this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
+    /// \brief Setup syst-aware input container handles
+    CP::SysListHandle m_systematicsList {this};
 
-    std::string m_bTagWP;
+    CP::SysReadHandle<xAOD::EventInfo>
+    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_inHandle{ this, "containerInKey", "",   "Jet container to read" };
+
+    // \brief Setup syst-aware input decorations
+    CP::SysReadDecorHandle<char> m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+    CP::SysReadDecorHandle<float> m_relativeDeltaRToVRJet {"relativeDeltaRToVRJet", this};
+
+    /// \brief Setup syst-aware output container handles
+    CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
+    m_outHandle{ this, "containerOutKey", "",   "Jet container to write" };
+
+    /// \brief Setup sys-aware output decorations
+    CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nJets_%SYS%", 
+        "Name of output decorator for number of selected jets"};
+
     float m_minPt;
     float m_maxEta;
     int m_minimumAmount;

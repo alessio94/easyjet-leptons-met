@@ -7,6 +7,11 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysWriteHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+
+#include <AthContainers/ConstDataVector.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODEgamma/ElectronContainer.h>
 
@@ -31,14 +36,22 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<xAOD::ElectronContainer> m_containerInKey{
-      this, "containerInKey", "", "containerName to read"
-    };
-    SG::WriteHandleKey<ConstDataVector<xAOD::ElectronContainer> >
-    m_containerOutKey{ this, "containerOutKey", "", "containerName to write" };
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-      this, "EventInfoKey", "EventInfo", "EventInfo container to dump"
-    };
+    /// \brief Setup syst-aware input container handles
+    CP::SysListHandle m_systematicsList {this};
+
+    CP::SysReadHandle<xAOD::EventInfo>
+    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+
+    CP::SysReadHandle<xAOD::ElectronContainer>
+    m_inHandle{ this, "containerInKey", "",   "Electron container to read" };
+
+    /// \brief Setup syst-aware output container handles
+    CP::SysWriteHandle<ConstDataVector<xAOD::ElectronContainer>>
+    m_outHandle{ this, "containerOutKey", "",   "Electron container to write" };
+
+    /// \brief Setup sys-aware output decorations
+    CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nElecrons_%SYS%", 
+        "Name out output decorator for number of selected electrons"};
 
     float m_minPt;
     float m_minEtaVeto;

@@ -6,10 +6,8 @@
 
 #include "MuonSelectorAlg.h"
 #include "AthContainers/AuxElement.h"
-#include <AthContainers/ConstDataVector.h>
 #include <xAODMuon/MuonContainer.h>
 #include "FourMomUtils/xAODP4Helpers.h"
-#include <xAODMuon/Muon.h>
 
 namespace Easyjet
 {
@@ -26,94 +24,94 @@ namespace Easyjet
 
   StatusCode MuonSelectorAlg::initialize()
   {
-    ATH_CHECK(m_containerInKey.initialize());
-    ATH_CHECK(m_EventInfoKey.initialize());
-    ATH_CHECK(m_containerOutKey.initialize());
 
+    // Read syst-aware input/output handles
+    ATH_CHECK (m_inHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_outHandle.initialize(m_systematicsList));
+
+    // Intialise syst-aware input/output decorators    
+    ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
+
+    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize());    
     return StatusCode::SUCCESS;
   }
 
   StatusCode MuonSelectorAlg::execute()
   {
-    // container we read in
-    SG::ReadHandle<xAOD::MuonContainer> inContainer(m_containerInKey);
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    ATH_CHECK(inContainer.isValid());
-    ATH_CHECK(eventInfo.isValid());
+    // Loop over all systs
+    for (const auto& sys : m_systematicsList.systematicsVector()) {
 
-    // make some accessors and decorators
+      // Retrive inputs
+      const xAOD::MuonContainer *inContainer = nullptr;
+      ANA_CHECK (m_inHandle.retrieve (inContainer, sys));      
 
-    SG::AuxElement::Decorator<unsigned int> nSelectedParticles_dec(
-        m_containerOutKey.key() + "_n");
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-    // fill workContainer with "views" of the inContainer
-    // see TJ's tutorial for this
-
-    auto workContainer =
+      // Setup output 
+      auto workContainer =
         std::make_unique<ConstDataVector<xAOD::MuonContainer> >(
             SG::VIEW_ELEMENTS);
-    
      
-    // loop over muons 
-    for (const xAOD::Muon *muon : *inContainer)
-    {
-      // cuts
-      if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
-      continue;
+      // loop over muons 
+      for (const xAOD::Muon *muon : *inContainer)
+	{
+	  // cuts
+	  if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
+	    continue;
+	  
+	  // If cuts are passed, save the object
+	  workContainer->push_back(muon);
+	}
+      
+      int nMuons = workContainer->size();      
+      m_nSelPart.set(*event, nMuons, sys);
 
-      // If cuts are passed, save the object
-      workContainer->push_back(muon);
-    }
-
-    int nMuons = workContainer->size();
-
-    // decorate nr of selected particles to the eventinfo
-    nSelectedParticles_dec(*eventInfo) = nMuons;
-
-    // if we have less than the requested nr, empty the workcontainer to write
-    // defaults/return empty container
-    if (nMuons < m_minimumAmount)
-    {
-      workContainer->clear();
-      nMuons = 0;
-    }
-
-    // sort and truncate
-    int nKeep;
-    if (nMuons < m_truncateAtAmount)
-    {
-      nKeep = nMuons;
-    }
-    else
-    {
-      nKeep = m_truncateAtAmount;
-    }
-
-    if (m_pTsort)
-    {
-      // if we give -1, sort the whole container
-      if (m_truncateAtAmount == -1)
-      {
-        nKeep = nMuons;
-      }
-      std::partial_sort(
-          workContainer->begin(), // Iterator from which to start sorting
-          workContainer->begin() + nKeep, // Use begin + N to sort first N
-          workContainer->end(), // Iterator marking the end of range to sort
-          [](const xAOD::IParticle *left, const xAOD::IParticle *right)
-      { return left->pt() > right->pt(); }); // lambda function here just
-                                             // handy, could also be another
-                                             // function that returns bool
+      // if we have less than the requested nr, empty the workcontainer to write
+      // defaults/return empty container
+      if (nMuons < m_minimumAmount)
+	{
+	  workContainer->clear();
+	  nMuons = 0;
+	}
+      
+      // sort and truncate
+      int nKeep;
+      if (nMuons < m_truncateAtAmount)
+	{
+	  nKeep = nMuons;
+	}
+      else
+	{
+	  nKeep = m_truncateAtAmount;
+	}
+      
+      if (m_pTsort)
+	{
+	  // if we give -1, sort the whole container
+	  if (m_truncateAtAmount == -1)
+	    {
+	      nKeep = nMuons;
+	    }
+	  std::partial_sort(
+             workContainer->begin(), // Iterator from which to start sorting
+             workContainer->begin() + nKeep, // Use begin + N to sort first N
+             workContainer->end(), // Iterator marking the end of range to sort
+             [](const xAOD::IParticle *left, const xAOD::IParticle *right)
+	     { return left->pt() > right->pt(); }); // lambda function here just
+                                                    // handy, could also be another
+                                                    // function that returns bool
 
       // keep only the requested amount
       workContainer->erase(workContainer->begin() + nKeep,
                            workContainer->end());
     }
     
-    // write to eventstore
-    SG::WriteHandle<ConstDataVector<xAOD::MuonContainer> > Writer(
-        m_containerOutKey);
-    ATH_CHECK(Writer.record(std::move(workContainer)));
+      // Write to eventstore
+      ATH_CHECK(m_outHandle.record(std::move(workContainer), sys));   
+    }
 
     return StatusCode::SUCCESS;
   }

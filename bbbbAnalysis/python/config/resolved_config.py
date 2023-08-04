@@ -15,7 +15,7 @@ def resolved_cfg(flags, smalljetkey):
                 "SmallJetSelectorAlg_" + btag_wp,
                 containerInKey=smalljetkey,
                 containerOutKey="resolvedAnalysisJets_" + btag_wp,
-                bTagWP=btag_wp,  # empty string: "" ignores btagging
+                bTagWPDecorName="ftag_select_" + btag_wp,
                 minPt=20_000,
                 maxEta=2.5,
                 truncateAtAmount=4,  # -1 means keep all

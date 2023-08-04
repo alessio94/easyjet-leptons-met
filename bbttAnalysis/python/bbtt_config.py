@@ -1,7 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-from EasyjetHub.steering.container_names import get_container_names
+# from EasyjetHub.steering.container_names import get_container_names
 
 # bbtt analysis chain
 
@@ -13,7 +13,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
             containerInKey=muonkey,
-            containerOutKey="bbttAnalysisMuons",
+            containerOutKey="bbttAnalysisMuons_%SYS%",
             minPt=7_000,
             maxEta=2.7,
             pTsort=True,
@@ -24,7 +24,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
             containerInKey=electronkey,
-            containerOutKey="bbttAnalysisElectrons",
+            containerOutKey="bbttAnalysisElectrons_%SYS%",
             minPt=7_000,
             minEtaVeto=1.37,
             maxEtaVeto=1.52,
@@ -38,7 +38,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
         CompFactory.Easyjet.TauSelectorAlg(
             "TauSelectorAlg",
             containerInKey=taukey,
-            containerOutKey="bbttAnalysisTaus",
+            containerOutKey="bbttAnalysisTaus_%SYS%",
             minPt=20_000,
             minEtaVeto=1.37,
             maxEtaVeto=1.52,
@@ -51,10 +51,10 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
 
     cfg.addEventAlgo(
         CompFactory.Easyjet.JetSelectorAlg(
-            "SmallJetSelectorAlg_",
+            "SmallJetSelectorAlg",
             containerInKey=smalljetkey,
-            containerOutKey="bbttAnalysisJets",
-            bTagWP="",  # empty string: "" ignores btagging
+            containerOutKey="bbttAnalysisJets_%SYS%",
+            bTagWPDecorName="",  # empty string: "" ignores btagging
             minPt=25_000,
             maxEta=2.5,
             truncateAtAmount=2,  # -1 means keep all
@@ -67,11 +67,11 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg.addEventAlgo(
         CompFactory.HH4B.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
-            jets="bbttAnalysisJets",
-            muons="bbttAnalysisMuons",
-            electrons="bbttAnalysisElectrons",
-            #                taus="bbttAnalysisTaus",
-            taus=get_container_names(flags)["outputs"]["taus"],
+            jets="bbttAnalysisJets_%SYS%",
+            muons="bbttAnalysisMuons_%SYS%",
+            electrons="bbttAnalysisElectrons_%SYS%",
+            taus="bbttAnalysisTaus_%SYS%",
+            # taus=get_container_names(flags)["outputs"]["taus"],
             met="AnalysisMET_%SYS%",
         )
     )
@@ -81,10 +81,10 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
         cfg.addEventAlgo(
             CompFactory.HH4B.MMCDecoratorAlg(
                 "MMCDecoratorAlg",
-                jets="bbttAnalysisJets",
-                muons="bbttAnalysisMuons",
-                electrons="bbttAnalysisElectrons",
-                taus="bbttAnalysisTaus",
+                jets="bbttAnalysisJets_%SYS%",
+                muons="bbttAnalysisMuons_%SYS%",
+                electrons="bbttAnalysisElectrons_%SYS%",
+                taus="bbttAnalysisTaus_%SYS%",
                 met="AnalysisMET_%SYS%",
             )
         )
@@ -93,10 +93,10 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg.addEventAlgo(
         CompFactory.HH4B.BaselineVarsbbttAlg(
             "FinalVarsbbttAlg",
-            jets="bbttAnalysisJets",
-            muons="bbttAnalysisMuons",
-            electrons="bbttAnalysisElectrons",
-            taus="bbttAnalysisTaus",
+            jets="bbttAnalysisJets_%SYS%",
+            muons="bbttAnalysisMuons_%SYS%",
+            electrons="bbttAnalysisElectrons_%SYS%",
+            taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
             bTagWP="",
         )
@@ -132,5 +132,7 @@ def bbtt_branches(flags):
                 branches += [f"EventInfo.mmc_{var}_NOSYS -> mmc_{var}"]
             else:
                 branches += [f"EventInfo.mmc_{var}_%SYS% -> mmc_%SYS%_{var}"]
+
+    branches += ["EventInfo.pass_bbtt_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
 
     return branches

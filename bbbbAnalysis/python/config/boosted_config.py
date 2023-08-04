@@ -14,7 +14,7 @@ def boosted_cfg(flags, largejetkey):
                 "LargeJetSelectorAlg_" + btag_wp,
                 containerInKey=largejetkey,
                 containerOutKey="boostedAnalysisJets_" + btag_wp,
-                bTagWP="",  # empty string: "" ignores btagging
+                bTagWPDecorName="ftag_select_" + btag_wp,
                 minPt=250_000,
                 maxEta=2.0,
                 truncateAtAmount=2,  # -1 means keep all
