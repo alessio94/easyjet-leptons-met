@@ -54,14 +54,10 @@ def hh4b_job_cfg():
         cfg.merge(
             bbtt_cfg(
                 flags,
-                smalljetkey=containers["outputs"]["reco4PFlowJet"].replace(
-                    "%SYS%", "NOSYS"
-                ),
-                muonkey=containers["outputs"]["muons"].replace("%SYS%", "NOSYS"),
-                electronkey=containers["outputs"]["electrons"].replace(
-                    "%SYS%", "NOSYS"
-                ),
-                taukey=containers["outputs"]["taus"].replace("%SYS%", "NOSYS"),
+                smalljetkey=containers["outputs"]["reco4PFlowJet"], 
+                muonkey=containers["outputs"]["muons"],
+                electronkey=containers["outputs"]["electrons"],
+                taukey=containers["outputs"]["taus"],
             ),
             seqname
         )
