@@ -6,9 +6,15 @@ All output writing is done via the TTree algorithms provided in [`PhysicsAnalysi
 - `TreeFillerAlg` handles the actual operation of reading `xAOD` data and filling the `TTree` branches
 Further details are in the [atlassoftwaredocs AnalysisSWTutorial](https://atlassoftwaredocs.web.cern.ch/AnalysisSWTutorial/basic_trees/).
 
+In the basic job run by `easyjet-ntupler`, the full TTree creation is handled by the `minituple_cfg()` function in [`minituple_config.py`](./minituple_config.py).
+
 There are two routes to adding branches into the output file:
-- A structured set of branches is defined in [`minituple_config.py`](./minituple_config.py), and is steerable via configuration flags. The detailed branch lists and configuration logic are defined in modules in this directory, corresponding to each of the object containers.
+- A structured set of branches is defined when calling `minituple_cfg)()`, and is steerable via configuration flags. The detailed branch lists and configuration logic are defined in modules in this directory, corresponding to each of the object containers.
 - Arbitrary additions can be made by setting the `Analysis.extra_output_branches` flag, which is a list of output branch expressions following the syntax below.
+
+For more complex analysis logic, especially cases where different TTrees need to be written with their own specific event selection and content, the underlying `tree_cfg()` function can be called directly.
+This function permits direct configuration of the tree name, target ROOT file and the directory to which the tree is written.
+The full list of branches is input directly.
 
 ### Output syntax
 

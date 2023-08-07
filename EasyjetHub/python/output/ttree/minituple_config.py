@@ -1,3 +1,4 @@
+from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.steering.container_names import get_container_names
@@ -21,29 +22,81 @@ from EasyjetHub.output.ttree.truth_jets import (
 from EasyjetHub.output.ttree.met import get_met_branches
 
 
-def tree_cfg(flags, branches, treename="AnalysisMiniTree"):
+def tree_cfg(
+    flags: AthConfigFlags,
+    branches: list[str],
+    treename: str = "AnalysisMiniTree",
+    outfile:  str = "output.root",
+    stream:   str = "ANALYSIS",
+    treedir:  str = ""
+) -> ComponentAccumulator:
+    """
+    Configures output of a single TTree
+    Different calls can output different trees and/or root files
+    The 'stream' provides a mapping to the output file
+    One stream can only route to one root file, but can write
+    multiple trees (and histograms etc)
+    """
+
     cfg = ComponentAccumulator()
+
+    # Add an instance of THistSvc, to create the output file and associated stream.
+    # This is needed so that the alg can register its output TTree.
+    # The syntax for the output is:
+    #   Stream name: (default is "ANALYSIS" assumed by AthHistogramAlgorithm)
+    #   Output file name: specified by setting "DATAFILE"
+    #   File I/O option: specified by setting "OPT" and passed to the TFile constructor
+    #      "RECREATE" will (over)write the specified file name with a new file
+    cfg.addService(
+        CompFactory.THistSvc(
+            Output=[f"{stream} DATAFILE='{outfile}', OPT='RECREATE'"]
+        )
+    )
+
+    log.info(
+        f"Writing tree '{treedir}/{treename}'"
+        f" to '{outfile}' via stream '{stream}'"
+    )
+
     # Create analysis mini-ntuple
-    treeMaker = CompFactory.getComp("CP::TreeMakerAlg")("TreeMaker")
+    treeMaker = CompFactory.CP.TreeMakerAlg(
+        f"TreeMaker_{treename}",
+        RootStreamName=f"/{stream}",
+        RootDirName=treedir,
+    )
     treeMaker.TreeName = treename
     cfg.addEventAlgo(treeMaker)
 
     # Add branches
-    ntupleMaker = CompFactory.getComp("CP::AsgxAODNTupleMakerAlg")("NTupleMaker")
-    ntupleMaker.TreeName = treename
-    ntupleMaker.Branches = branches
-    ntupleMaker.systematicsService = "SystematicsSvc"
+    ntupleMaker = CompFactory.CP.AsgxAODNTupleMakerAlg(
+        f"NTupleMaker_{treename}",
+        TreeName=treename,
+        Branches=branches,
+        systematicsService="SystematicsSvc",
+        RootStreamName=f"/{stream}",
+        RootDirName=treedir,
+    )
     cfg.addEventAlgo(ntupleMaker)
 
     # Fill tree
-    treeFiller = CompFactory.getComp("CP::TreeFillerAlg")("TreeFiller")
-    treeFiller.TreeName = treename
+    treeFiller = CompFactory.CP.TreeFillerAlg(
+        f"TreeFiller_{treename}",
+        TreeName=treename,
+        RootStreamName=f"/{stream}",
+        RootDirName=treedir,
+    )
     cfg.addEventAlgo(treeFiller)
 
     return cfg
 
 
-def minituple_cfg(flags):
+def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
+    """
+    This is the template output TTree configuration, steered via yaml config.
+    It uses the branch managers to configure writing out the standard object
+    collections, producing /AnalysisMiniTree in the output ROOT file set
+    in the RunConfig.
+    """
     cfg = ComponentAccumulator()
 
     containers = get_container_names(flags)["outputs"]
@@ -52,19 +105,6 @@ def minituple_cfg(flags):
     ########################################################################
     # Create analysis mini-ntuple
     ########################################################################
-
-    # Add an instance of THistSvc, to create the output file and associated stream.
-    # This is needed so that the alg can register its output TTree.
-    # The syntax for the output is:
-    #   Stream name: "ANALYSIS" (default assumed by AthHistogramAlgorithm)
-    #   Output file name: specified by setting "DATAFILE"
-    #   File I/O option: specified by setting "OPT" and passed to the TFile constructor
-    #      "RECREATE" will (over)write the specified file name with a new file
-    cfg.addService(
-        CompFactory.THistSvc(
-            Output=[f"ANALYSIS DATAFILE='{flags.Analysis.out_file}', OPT='RECREATE'"]
-        )
-    )
 
     tree_branches = []
 
@@ -153,7 +193,7 @@ def minituple_cfg(flags):
         tree_branches += flags.Analysis.extra_output_branches
 
     log.info("Add tree seq")
-    cfg.merge(tree_cfg(flags, branches=tree_branches))
+    cfg.merge(tree_cfg(flags, branches=tree_branches, outfile=flags.Analysis.out_file))
 
     if flags.Analysis.dump_output_branchlist:
         outf_sub = flags.Analysis.out_file.replace("root", "txt")
