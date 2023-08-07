@@ -8,6 +8,8 @@ For questions, join the SH4b analysis MM team [here](https://mattermost.web.cern
 - FW and NTUP users: [easyjet FW](https://mattermost.web.cern.ch/sh4b/channels/easyjet-fw).
 - FW developers and notifications: [easyjet dev](https://mattermost.web.cern.ch/sh4b/channels/easyjet-dev).
 
+Meetings will be held on demand, generally 1 pm Friday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/).
+
 # Installation
 
 *The instructions below with `setupATLAS` and `asetup` assume you are working on a CERN CentOS terminal, e.g. lxplus or a Singularity container on an institute cluster. Alternative instructions for using Docker images are given below.*
