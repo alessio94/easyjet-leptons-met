@@ -1,6 +1,6 @@
 .flake8_check_template: &flake8_check_template
   stage: linting
-  image: python:3.8-slim
+  image: registry.cern.ch/docker.io/library/python:3.9-slim
   before_script:
     - pip install flake8
   script:
@@ -14,7 +14,7 @@
 
 .black_check_template: &black_check_template
   stage: linting
-  image: python:3.8-slim
+  image: registry.cern.ch/docker.io/library/python:3.9-slim
   before_script:
     - pip install black==22.3.0
   script:
@@ -23,13 +23,23 @@
 
 .cppcheck: &cpp_check_template
   stage: linting
-  image: atlas/athanalysis:22.2.55
+  image: gitlab-registry.cern.ch/atlas/athena/athanalysis:24.2.2
   tags:
     - cvmfs
   before_script:
     - source /release_setup.sh
   script:
     - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck*/bin/cppcheck --enable=warning,portability --xml-version=2 .
+  needs: []
+
+.mypy_check_template: &mypy_check_template
+  stage: linting
+  image: registry.cern.ch/docker.io/library/python:3.9-slim
+  before_script:
+    - pip install mypy --quiet
+    - pip install types-PyYAML
+  script:
+    - mypy .
   needs: []
 
 flake8:
@@ -41,3 +51,5 @@ flake8:
 cppcheck:
   <<: *cpp_check_template
 
+mypy:
+  <<: *mypy_check_template
