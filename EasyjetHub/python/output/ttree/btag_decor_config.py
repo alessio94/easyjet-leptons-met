@@ -1,11 +1,10 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from EasyjetHub.steering.container_names import get_container_names
 
 
 def btag_decor_cfg(flags):
     # Could make this configurable
-    jetcoll = get_container_names(flags)["inputs"]["reco4PFlowJet"]
+    jetcoll = flags.Analysis.container_names.input.reco4PFlowJet
     if flags.Analysis.write_small_R_gn2_branches:
         cfg = ComponentAccumulator()
         cfg.addEventAlgo(

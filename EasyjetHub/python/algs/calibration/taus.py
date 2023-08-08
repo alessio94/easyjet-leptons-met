@@ -3,7 +3,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.output.ttree.tau_decor_config import tau_decor_cfg
 
 
-def tau_sequence_cfg(flags, containers):
+def tau_sequence_cfg(flags):
     cfg = ComponentAccumulator()
     from TauAnalysisAlgorithms.TauAnalysisSequence import makeTauAnalysisSequence
 
@@ -20,8 +20,8 @@ def tau_sequence_cfg(flags, containers):
         # isRun3Geo=(flags.Analysis.Run == 3),
     )
     tau_sequence.configure(
-        inputName=containers["inputs"]["taus"],
-        outputName=containers["outputs"]["taus"],
+        inputName=flags.Analysis.container_names.input.taus,
+        outputName=flags.Analysis.container_names.output.taus,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(tau_sequence.getName()))

@@ -1,11 +1,10 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from EasyjetHub.steering.container_names import get_container_names
 
 
 def tau_decor_cfg(flags):
     # Could make this configurable
-    taucoll = get_container_names(flags)["inputs"]["taus"]
+    taucoll = flags.Analysis.container_names.input.taus
 
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(

@@ -2,7 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def muon_sequence_cfg(flags, containers):
+def muon_sequence_cfg(flags):
     cfg = ComponentAccumulator()
     from MuonAnalysisAlgorithms.MuonAnalysisSequence import makeMuonAnalysisSequence
 
@@ -19,8 +19,8 @@ def muon_sequence_cfg(flags, containers):
         isRun3Geo=(flags.Analysis.Run == 3),
     )
     muon_sequence.configure(
-        inputName=containers["inputs"]["muons"],
-        outputName=containers["outputs"]["muons"],
+        inputName=flags.Analysis.container_names.input.muons,
+        outputName=flags.Analysis.container_names.output.muons,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(muon_sequence.getName()))

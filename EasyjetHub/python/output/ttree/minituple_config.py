@@ -1,7 +1,6 @@
 from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from EasyjetHub.steering.container_names import get_container_names
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.output.ttree.eventinfo import get_event_info_branches
 from EasyjetHub.output.ttree.electrons import get_electron_branches
@@ -99,9 +98,6 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
     """
     cfg = ComponentAccumulator()
 
-    containers = get_container_names(flags)["outputs"]
-    log.debug(f"Containers requested in dataset: {containers}")
-
     ########################################################################
     # Create analysis mini-ntuple
     ########################################################################
@@ -122,14 +118,14 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
         if flags(f"Analysis.write_{objtype}"):
             tree_branches += branch_getter(
                 flags,
-                input_container=containers[objtype],
+                input_container=getattr(flags.Analysis.container_names.output,objtype),
                 output_prefix=prefix,
             )
 
     if flags.Analysis.write_small_R_jets:
         tree_branches += get_small_R_jet_branches(
             flags,
-            input_container=containers["reco4PFlowJet"],
+            input_container=flags.Analysis.container_names.output.reco4PFlowJet,
             output_prefix="recojet_antikt4PFlow",
         )
 
@@ -138,14 +134,14 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
         # to handle jet selection (thinning)
         tree_branches += get_small_R_bjet_branches(
             flags,
-            input_container=containers["reco4PFlowJet"],
+            input_container=flags.Analysis.container_names.output.reco4PFlowJet,
             output_prefix="recojet_antikt4PFlow",
         )
 
     if flags.Analysis.write_large_R_Topo_jets:
         tree_branches += get_large_R_jet_branches(
             flags,
-            input_container=containers["reco10TopoJet"],
+            input_container=flags.Analysis.container_names.output.reco10TopoJet,
             output_prefix="recojet_antikt10Topo",
             lr_jet_type="Topo",
         )
@@ -153,7 +149,7 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
     if flags.Analysis.write_large_R_UFO_jets:
         tree_branches += get_large_R_jet_branches(
             flags,
-            input_container=containers["reco10UFOJet"],
+            input_container=flags.Analysis.container_names.output.reco10UFOJet,
             output_prefix="recojet_antikt10UFO",
             lr_jet_type="UFO",
         )
@@ -161,14 +157,14 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
     if flags.Analysis.write_met:
         tree_branches += get_met_branches(
             flags,
-            input_container=containers["met"],
+            input_container=flags.Analysis.container_names.output.met,
             output_prefix="met"
         )
 
     if flags.Input.isMC and flags.Analysis.write_truth_small_R_jets:
         tree_branches += get_small_R_truthjet_branches(
             flags,
-            input_container=containers["truth4Jet"],
+            input_container=flags.Analysis.container_names.input.truth4Jet,
             output_prefix="truthjet_antikt4PFlow",
         )
 
@@ -176,13 +172,13 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
         if flags.Analysis.write_large_R_Topo_jets:
             tree_branches += get_large_R_truthjet_branches(
                 flags,
-                input_container=containers["truth10TrimmedJet"],
+                input_container=flags.Analysis.container_names.input.truth10TrimmedJet,
                 output_prefix="truthjet_antikt10Trimmed",
             )
         if flags.Analysis.write_large_R_UFO_jets:
             tree_branches += get_large_R_truthjet_branches(
                 flags,
-                input_container=containers["truth10SoftDropJet"],
+                input_container=flags.Analysis.container_names.input.truth10SoftDropJet,
                 output_prefix="truthjet_antikt10SoftDrop",
             )
 

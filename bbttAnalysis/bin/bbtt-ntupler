@@ -21,11 +21,10 @@ from EasyjetHub.hub import (
 
 from bbttAnalysis.bbtt_config import bbtt_branches
 from bbttAnalysis.bbtt_config import bbtt_cfg
-from EasyjetHub.steering.container_names import get_container_names
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 
 
-def hh4b_job_cfg():
+def bbtt_job_cfg():
     parser = AnalysisArgumentParser()
 
     # Fill the configuration flags from the
@@ -50,14 +49,13 @@ def hh4b_job_cfg():
     cfg = default_sequence_cfg(flags, seqname)
 
     if flags.Analysis.do_bbtt_analysis:
-        containers = get_container_names(flags)
         cfg.merge(
             bbtt_cfg(
                 flags,
-                smalljetkey=containers["outputs"]["reco4PFlowJet"], 
-                muonkey=containers["outputs"]["muons"],
-                electronkey=containers["outputs"]["electrons"],
-                taukey=containers["outputs"]["taus"],
+                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet, 
+                muonkey=flags.Analysis.container_names.output.muons,
+                electronkey=flags.Analysis.container_names.output.electrons,
+                taukey=flags.Analysis.container_names.output.taus,
             ),
             seqname
         )
@@ -72,7 +70,7 @@ def main():
     # record the total run time
     starttime = time.process_time()
 
-    cfg, flags, args = hh4b_job_cfg()
+    cfg, flags, args = bbtt_job_cfg()
 
     if args.dry_run:
         return_code = 1

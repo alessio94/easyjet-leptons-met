@@ -1,8 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-# from EasyjetHub.steering.container_names import get_container_names
-
 # bbtt analysis chain
 
 
@@ -71,7 +69,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             muons="bbttAnalysisMuons_%SYS%",
             electrons="bbttAnalysisElectrons_%SYS%",
             taus="bbttAnalysisTaus_%SYS%",
-            # taus=get_container_names(flags)["outputs"]["taus"],
             met="AnalysisMET_%SYS%",
         )
     )

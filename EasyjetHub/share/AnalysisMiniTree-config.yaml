@@ -1,0 +1,29 @@
+# Name the TTree
+tree_name: AnalysisMiniTree
+# Do we apply object systs only for pt/et
+write_object_systs_only_for_pt: false
+# which objects to write
+write_small_R_jets: false
+write_large_R_Topo_jets: false
+write_large_R_UFO_jets: false
+write_VR_jets: false
+write_muons: false
+write_electrons: false
+write_photons: false
+write_taus: false
+write_met: false
+# additional small R info
+write_small_R_higgs_parent_info: false
+write_small_R_btag: false
+write_small_R_JVT_details: false
+write_small_R_no_bjet_calib: false
+write_small_R_gn2_branches: false
+# additional Large R info
+write_large_R_substructure: false
+write_large_R_truth_labels: false
+# turned off automatically if MC
+write_truth_small_R_jets: false
+write_truth_large_R_jets: false
+write_truth_higgs: false
+# custom extra output branches
+extra_output_branches: []

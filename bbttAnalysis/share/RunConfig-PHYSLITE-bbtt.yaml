@@ -1,44 +1,4 @@
-include: EasyjetHub/base-config.yaml
-
-# Toggles for object types
-do_small_R_jets: true
-do_large_R_UFO_jets: false
-do_muons: true
-do_electrons: true
-do_taus: true
-do_met : true
-do_mmc : true
-
-# btagging working points for small Rjets
-btag_wps:
-    - DL1dv01_FixedCutBEff_77
-
-# btagging working points for Variable Radius Track jets
-#vr_btag_wps:
-    #- DL1r_FixedCutBEff_77
-    #- DL1r_FixedCutBEff_85
-
-# "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
-trigger_list: ["HHbbtt"]
-
-do_bbtt_analysis: true
-
-# write objects with overlap removal applied
-# turning this on you have to decide on one large R jet collection
-do_overlap_removal: false
-
-# which objects to write
-write_small_R_jets: true
-write_small_R_btag: true
-write_large_R_UFO_jets: false
-write_muons: true
-write_electrons: true
-write_taus: true
-write_truth_higgs: true
-write_truth_small_R_jets: true
-write_met : true
-
-do_CP_systematics: false
-systematics_regex: [".*"]
-# Do we apply object systs only for pt/et
-write_object_systs_only_for_pt: true
+include: bbtt-base-config.yaml
+# Replace container names with PHYSLITE ones
+container_names:
+    include: EasyjetHub/container-names-DAOD_PHYSLITE.yaml

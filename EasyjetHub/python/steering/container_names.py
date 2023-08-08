@@ -1,95 +1,49 @@
-# A bit repetitive but avoids extracting the list
-# from a specific file format
-objtypes = [
-    "reco4PFlowJet",
-    "reco10TopoJet",
-    "reco10UFOJet",
-    "vrJet",
-    "truth4Jet",
-    "truth10TrimmedJet",
-    "truth10SoftDropJet",
-    "muons",
-    "electrons",
-    "photons",
-    "taus",
-    "truthBSMParticles",
-    "truthSMParticles",
-    "met"
-]
-
-container_map = {
-    "DAOD_PHYS": {
-        "reco4PFlowJet":      "AntiKt4EMPFlowJets",
-        "reco10TopoJet":      "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets",
-        "reco10UFOJet":       "AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets",
-        "vrJet":              "AntiKtVR30Rmax4Rmin02PV0TrackJets",
-        "truth4Jet":          "AntiKt4TruthDressedWZJets",
-        "truth10TrimmedJet":  "AntiKt10TruthTrimmedPtFrac5SmallR20Jets",
-        "truth10SoftDropJet": "AntiKt10TruthSoftDropBeta100Zcut10Jets",
-        "muons":              "Muons",
-        "electrons":          "Electrons",
-        "photons":            "Photons",
-        "taus":               "TauJets",
-        "truthBSMParticles":  "TruthBSMWithDecayParticles",
-        "truthSMParticles":   "TruthBosonsWithDecayParticles",
-        "met":                "AntiKt4EMPFlow",
-    },
-    "DAOD_PHYSLITE": {
-        "reco4PFlowJet":      "AnalysisJets",
-        "reco10TopoJet":      "",
-        "reco10UFOJet":       "AnalysisLargeRJets",
-        "vrJet":              "",
-        "truth4Jet":          "AntiKt4TruthDressedWZJets",
-        "truth10TrimmedJet":  "AntiKt10TruthTrimmedPtFrac5SmallR20Jets",
-        "truth10SoftDropJet": "AntiKt10TruthSoftDropBeta100Zcut10Jets",
-        "muons":              "AnalysisMuons",
-        "electrons":          "AnalysisElectrons",
-        "photons":            "AnalysisPhotons",
-        "taus":               "AnalysisTauJets",
-        "truthBSMParticles":  "TruthBSMWithDecayParticles",
-        "truthSMParticles":   "TruthBosonsWithDecayParticles",
-        "met":                "AnalysisMET"
-    },
-}
+from EasyjetHub.steering.argument_parser import dict_to_flags
+from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 
 
-def _get_container_name(objtype, daodphyslite=False):
-    daod_format = "DAOD_PHYSLITE" if daodphyslite else "DAOD_PHYS"
-    return container_map[daod_format][objtype]
+def define_output_container_name_flags(flags: AthConfigFlags) -> AthConfigFlags:
+    """
+    Retrieve the input container names for calibration from
+    the yaml configuration. Different yaml configs can be
+    provided to support different data formats.
+    The input containers are then mapped to output names
+    corresponding to the post-calibration containers.
+    """
+    inputs = flags.Analysis.container_names.input
 
-
-def get_container_names(flags):
-    inputs = {
-        objtype: _get_container_name(objtype, flags.Input.isPHYSLITE)
-        for objtype in objtypes
-    }
-
-    # If not running calibration algs in PHYSLITE, we can just skip the outputs
     if flags.Analysis.disable_calib:
-        outputs = inputs
+        # If not running calibration algs in PHYSLITE, we can just
+        # clone the inputs to the outputs
+        # Re-convert to make a copy
+        # Truth is not calibrated, so skip
+        outputs = dict_to_flags(
+            {k:getattr(inputs,k) for k in inputs.dict_keys if 'truth' not in k}
+        )
     else:
-        outputs = dict(
-            reco4PFlowJet=f"Analysis{inputs['reco4PFlowJet']}_%SYS%",
-            reco10UFOJet=f"Analysis{inputs['reco10UFOJet']}_%SYS%",
-            muons=f"Analysis{inputs['muons']}_%SYS%",
-            electrons=f"Analysis{inputs['electrons']}_%SYS%",
-            photons=f"Analysis{inputs['photons']}_%SYS%",
-            taus=f"Analysis{inputs['taus']}_%SYS%",
+        # Convert the input to output containers as defined in the
+        # CP alg sequences
+        output_dict = dict(
+            reco4PFlowJet=f"Analysis{inputs.reco4PFlowJet}_%SYS%",
+            reco10UFOJet=f"Analysis{inputs.reco10UFOJet}_%SYS%",
+            reco10TopoJet=f"Analysis{inputs.reco10TopoJet}_%SYS%",
+            vrJet=f"Analysis{inputs.vrJet}_%SYS%",
+            muons=f"Analysis{inputs.muons}_%SYS%",
+            electrons=f"Analysis{inputs.electrons}_%SYS%",
+            photons=f"Analysis{inputs.photons}_%SYS%",
+            taus=f"Analysis{inputs.taus}_%SYS%",
             #
             met="AnalysisMET_%SYS%",
-            #
-            truth4Jet=inputs["truth4Jet"],
-            truth10TrimmedJet=inputs["truth10TrimmedJet"],
-            truth10SoftDropJet=inputs["truth10SoftDropJet"],
         )
+        # Disable collections unavailable in PHYSLITE
+        if flags.Input.isPHYSLITE:
+            output_dict.update(dict(
+                reco10TopoJet='',
+                vrJet='',
+            ))
+        outputs = dict_to_flags(output_dict)
 
-    outputs["truthHHParticles"] = "TruthDiHiggsParticles"
+    # This is a truth collection created by easyjets
+    outputs.addFlag("truthHHParticles", "TruthDiHiggsParticles")
 
-    if flags.Input.isPHYSLITE:
-        outputs["reco10TopoJet"] = ""
-        outputs["vrJet"] = ""
-    else:
-        outputs["reco10TopoJet"] = f"Analysis{inputs['reco10TopoJet']}_%SYS%"
-        outputs["vrJet"] = f"Analysis{inputs['vrJet']}_%SYS%"
-
-    return {"inputs": inputs, "outputs": outputs}
+    return outputs

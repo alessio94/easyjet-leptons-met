@@ -1,4 +1,7 @@
 include: base-config.yaml
+# Replace container names with PHYSLITE ones
+container_names:
+    include: container-names-DAOD_PHYSLITE.yaml
 
 # Toggles for object types
 do_small_R_jets: true

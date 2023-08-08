@@ -1,8 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-from EasyjetHub.steering.container_names import get_container_names
-
 
 def get_h5_cfg(flags):
     ca = ComponentAccumulator()
@@ -28,7 +26,7 @@ def get_h5_cfg(flags):
             output=output,
         )
     )
-    jetcol = get_container_names(flags)["outputs"]["reco4PFlowJet"]
+    jetcol = flags.Analysis.container_names.input.reco4PFlowJet
     types = {}
     primitives = []
     if flags.Analysis.n_h5_jets > 0:

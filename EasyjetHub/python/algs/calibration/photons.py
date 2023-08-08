@@ -2,7 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def photon_sequence_cfg(flags, containers):
+def photon_sequence_cfg(flags):
     cfg = ComponentAccumulator()
     from EgammaAnalysisAlgorithms.PhotonAnalysisSequence import (
         makePhotonAnalysisSequence,
@@ -23,8 +23,8 @@ def photon_sequence_cfg(flags, containers):
         enableKinematicHistograms=False,
     )
     photon_sequence.configure(
-        inputName=containers["inputs"]["photons"],
-        outputName=containers["outputs"]["photons"],
+        inputName=flags.Analysis.container_names.input.photons,
+        outputName=flags.Analysis.container_names.output.photons,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(photon_sequence.getName()))

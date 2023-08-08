@@ -20,6 +20,7 @@ from EasyjetHub.steering.argument_parser import (
 )
 from EasyjetHub.steering.utils.option_validation import validate_flags
 from EasyjetHub.steering.utils.log_helper import log, setRogueLoggers
+from EasyjetHub.steering.container_names import define_output_container_name_flags
 
 
 def analysis_configuration(parser="default"):
@@ -91,6 +92,12 @@ def analysis_configuration(parser="default"):
     flags.addFlag("Analysis.doPRW", do_PRW)
     flags.addFlag("Analysis.PRWFiles", prw_files)
     flags.addFlag("Analysis.LumiCalcFiles", lumicalc_files)
+
+    flags.addFlagsCategory(
+        "Analysis.container_names.output",
+        lambda flags=flags: define_output_container_name_flags(flags),
+        prefix=True,
+    )
 
     validate_flags(flags)
 

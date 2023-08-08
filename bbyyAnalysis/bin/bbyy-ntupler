@@ -21,11 +21,10 @@ from EasyjetHub.hub import (
 
 from bbyyAnalysis.yybb_config import yybb_branches
 from bbyyAnalysis.yybb_config import yybb_cfg
-from EasyjetHub.steering.container_names import get_container_names
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 
 
-def hh4b_job_cfg():
+def yybb_job_cfg():
     parser = AnalysisArgumentParser()
 
     # Fill the configuration flags from the
@@ -50,14 +49,13 @@ def hh4b_job_cfg():
     cfg = default_sequence_cfg(flags, seqname)
 
     if flags.Analysis.do_yybb_analysis:
-        containers = get_container_names(flags)
         cfg.merge(
             yybb_cfg(
                 flags,
-                smalljetkey=containers["outputs"]["reco4PFlowJet"].replace(
+                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet.replace(
                     "%SYS%", "NOSYS"
                 ),
-                photonkey=containers["outputs"]["photons"].replace("%SYS%", "NOSYS"),
+                photonkey=flags.Analysis.container_names.output.photons.replace("%SYS%", "NOSYS"),
             ),
             seqname
         )
@@ -72,7 +70,7 @@ def main():
     # record the total run time
     starttime = time.process_time()
 
-    cfg, flags, args = hh4b_job_cfg()
+    cfg, flags, args = yybb_job_cfg()
 
     if args.dry_run:
         return_code = 1

@@ -10,7 +10,6 @@ from EasyjetHub.output.ttree.btag_decor_config import (
 
 def jet_sequence_cfg(
     flags,
-    containers,
 ):
     cfg = ComponentAccumulator()
 
@@ -27,7 +26,7 @@ def jet_sequence_cfg(
 
     jet_sequence = makeJetAnalysisSequence(
         flags.Analysis.DataType,
-        jetCollection=containers["inputs"]["reco4PFlowJet"],
+        jetCollection=flags.Analysis.container_names.input.reco4PFlowJet,
         postfix="smallR",
         deepCopyOutput=False,
         shallowViewOutput=True,
@@ -70,13 +69,13 @@ def jet_sequence_cfg(
         makeBJetCalibAnalysisSequence(
             flags,
             jet_sequence,
-            muonName=containers["outputs"]["muons"],
+            muonName=flags.Analysis.container_names.output.muons,
             btagSelDecor="ftag_select_DL1dv01_FixedCutBEff_77",
         )
 
     jet_sequence.configure(
-        inputName=containers["inputs"]["reco4PFlowJet"],
-        outputName=containers["outputs"]["reco4PFlowJet"],
+        inputName=flags.Analysis.container_names.input.reco4PFlowJet,
+        outputName=flags.Analysis.container_names.output.reco4PFlowJet,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(jet_sequence.getName()))
@@ -94,11 +93,14 @@ def jet_sequence_cfg(
 
 
 # lr = large-R
-def lr_jet_sequence_cfg(flags, containers, lr_jet_type):
+def lr_jet_sequence_cfg(flags, lr_jet_type):
     cfg = ComponentAccumulator()
     lr_recojet_sequence = makeJetAnalysisSequence(
         flags.Analysis.DataType,
-        jetCollection=containers["inputs"][f"reco10{lr_jet_type}Jet"],
+        jetCollection=getattr(
+            flags.Analysis.container_names.input,
+            f"reco10{lr_jet_type}Jet",
+        ),
         postfix="largeR" + lr_jet_type,
         deepCopyOutput=False,
         shallowViewOutput=True,
@@ -108,8 +110,14 @@ def lr_jet_sequence_cfg(flags, containers, lr_jet_type):
     )
 
     lr_recojet_sequence.configure(
-        inputName=containers["inputs"][f"reco10{lr_jet_type}Jet"],
-        outputName=containers["outputs"][f"reco10{lr_jet_type}Jet"],
+        inputName=getattr(
+            flags.Analysis.container_names.input,
+            f"reco10{lr_jet_type}Jet",
+        ),
+        outputName=getattr(
+            flags.Analysis.container_names.output,
+            f"reco10{lr_jet_type}Jet",
+        ),
     )
 
     cfg.addSequence(CompFactory.AthSequencer(lr_recojet_sequence.getName()))
@@ -122,7 +130,7 @@ def lr_jet_sequence_cfg(flags, containers, lr_jet_type):
 
 
 # vr = variable R
-def vr_jet_sequence_cfg(flags, containers):
+def vr_jet_sequence_cfg(flags):
     cfg = ComponentAccumulator()
 
     def create_vr_jet_sequence():
@@ -169,8 +177,8 @@ def vr_jet_sequence_cfg(flags, containers):
         )
 
     vr_jet_sequence.configure(
-        inputName=containers["inputs"]["vrJet"],
-        outputName=containers["outputs"]["vrJet"],
+        inputName=flags.Analysis.container_names.input.vrJet,
+        outputName=flags.Analysis.container_names.output.vrJet,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(vr_jet_sequence.getName()))
@@ -189,7 +197,6 @@ def vr_jet_sequence_cfg(flags, containers):
 
 def lr_jet_ghost_vr_jet_association_cfg(
     flags,
-    containers,
     lr_jet_type,
 ):
     cfg = ComponentAccumulator()
@@ -197,9 +204,10 @@ def lr_jet_ghost_vr_jet_association_cfg(
         CompFactory.Easyjet.LargeJetGhostVRJetAssociationAlg(
             f"Large{lr_jet_type}JetGhostVRJetAssociationAlg",
             isMC=flags.Input.isMC,
-            LargeJetInKey=containers["outputs"][f"reco10{lr_jet_type}Jet"].replace(
-                "%SYS%", "NOSYS"
-            ),
+            LargeJetInKey=getattr(
+                flags.Analysis.container_names.input,
+                f"reco10{lr_jet_type}Jet"
+            ).replace("%SYS%", "NOSYS"),
             workingPoints=flags.Analysis.vr_btag_wps,
             EventInfoDecorSuffix=lr_jet_type,
         )

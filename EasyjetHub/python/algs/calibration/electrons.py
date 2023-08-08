@@ -7,7 +7,7 @@ from EgammaAnalysisAlgorithms.ElectronAnalysisSequence import (
 )
 
 
-def electron_sequence_cfg(flags, containers):
+def electron_sequence_cfg(flags):
     cfg = ComponentAccumulator()
 
     # with ConfigurableCABehavior(False):
@@ -26,8 +26,8 @@ def electron_sequence_cfg(flags, containers):
         enableKinematicHistograms=False,
     )
     electronSequence.configure(
-        inputName=containers["inputs"]["electrons"],
-        outputName=containers["outputs"]["electrons"],
+        inputName=flags.Analysis.container_names.input.electrons,
+        outputName=flags.Analysis.container_names.output.electrons,
     )
 
     cfg.addSequence(CompFactory.AthSequencer(electronSequence.getName()))

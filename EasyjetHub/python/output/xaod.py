@@ -1,7 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from OutputStreamAthenaPool.OutputStreamConfig import OutputStreamCfg
-from EasyjetHub.steering.container_names import get_container_names
 
 
 def container(typename, key, items=[]):
@@ -16,7 +15,7 @@ def container(typename, key, items=[]):
 def get_xaod_cfg(flags):
     ca = ComponentAccumulator()
     # first we make copies of the jet collection, because reasons
-    jetcol = get_container_names(flags)["inputs"]["reco4PFlowJet"]
+    jetcol = flags.Analysis.container_names.input.reco4PFlowJet
     ca.addEventAlgo(CompFactory.Easyjet.JetDeepCopyAlg(
         name="jetdeepcopy",
         jetsIn=jetcol.replace("%SYS%","NOSYS"),

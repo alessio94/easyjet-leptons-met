@@ -1,11 +1,12 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import pathlib
 
+from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 from EasyjetHub.steering.utils.log_helper import log
 from .config_files import run_config_arg
 
 
-def add_standard_athena_args(parser):
+def add_standard_athena_args(parser: ArgumentParser) -> None:
     """Custom version of the arguments flags
 
     The names of the arguments are stolen from Athena, see here:
@@ -70,7 +71,7 @@ def add_standard_athena_args(parser):
     )
 
 
-def fill_from_args(flags, parser):
+def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
     """
     Copied (and simplified) from athena's over-featured version
     """
@@ -122,7 +123,7 @@ def fill_from_args(flags, parser):
     return args
 
 
-def validate_args(runconfig, overwrites):
+def validate_args(runconfig: dict, overwrites: dict) -> None:
     # check that values belonging in runcofig exist, and vice-versa
     for key, value in overwrites.items():
         if value and key not in runconfig:
@@ -131,7 +132,28 @@ def validate_args(runconfig, overwrites):
             raise ValueError(f"{key} must not exist in the config file")
 
 
-def fill_flags_from_runconfig(args, flags, overwrites):
+def dict_to_flags(d: dict) -> AthConfigFlags:
+    _flags = AthConfigFlags()
+    for k,v in d.items():
+        if isinstance(v,dict):
+            _flags.addFlagsCategory(
+                k,
+                lambda v=v: dict_to_flags(v),
+                prefix=True,
+            )
+        else:
+            _flags.addFlag(k,v)
+    # Save the list of keys for easier iteration as
+    # regenerating the dict from the flag is difficult
+    _flags.addFlag('dict_keys',list(d.keys()))
+    return _flags
+
+
+def fill_flags_from_runconfig(
+    args: Namespace,
+    flags: AthConfigFlags,
+    overwrites: dict,
+) -> AthConfigFlags:
     # Collect all the run config values from config file and flags
     run_config_all = run_config_arg(args.run_config)
     validate_args(run_config_all, overwrites)
@@ -148,15 +170,23 @@ def fill_flags_from_runconfig(args, flags, overwrites):
     # add them to athena's ConfigFlags
     for key, value in run_config_all.items():
         log.info("User configured: " + str(key) + ": " + str(value))
-        flags.addFlag("Analysis." + key, value)
+        # if we find a dict, make a flag category
+        if isinstance(value,dict):
+            flags.addFlagsCategory(
+                f"Analysis.{key}",
+                lambda value=value: dict_to_flags(value),
+                prefix=True,
+            )
+        else:
+            flags.addFlag(f"Analysis.{key}", value)
 
     return flags
 
 
 # type=bool is not recommended because it sets non-empty strings to True,
 # but we want to allow the user to set the flag to "False" to disable
-def _bool_opt(opt):
-    return opt.lower() == "true" if opt.lower() in ("true", "false") else opt
+def _bool_opt(opt: str) -> bool:
+    return opt.lower() == "true" if opt.lower() in ("true", "false") else bool(opt)
 
 
 class AnalysisArgumentParser(ArgumentParser):

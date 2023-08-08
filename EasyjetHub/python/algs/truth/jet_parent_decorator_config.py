@@ -1,8 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-from EasyjetHub.steering.container_names import get_container_names
-
 
 def jet_parent_decorator_cfg(
         flags,
@@ -10,9 +8,8 @@ def jet_parent_decorator_cfg(
         name_prefix="",
         match_dr=0.3,
 ):
-    containers = get_container_names(flags)
-    sm_particles = containers["inputs"]["truthSMParticles"]
-    bsm_particles = containers["inputs"]["truthBSMParticles"]
+    sm_particles = flags.Analysis.container_names.input.truthSMParticles
+    bsm_particles = flags.Analysis.container_names.input.truthBSMParticles
     b_hadron_common = dict(
         addBsToCascade=True,
         addCsToCascade=True,

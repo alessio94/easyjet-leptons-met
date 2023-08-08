@@ -16,7 +16,6 @@ from EasyjetHub.algs.calibration.photons import photon_sequence_cfg
 from EasyjetHub.algs.calibration.taus import tau_sequence_cfg
 from EasyjetHub.algs.calibration.met import met_sequence_cfg
 from EasyjetHub.algs.postprocessing.overlap_removal import overlap_sequence_cfg
-from EasyjetHub.steering.container_names import get_container_names
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.steering.utils.systematics_helper import consolidate_systematics_regex
 
@@ -65,8 +64,6 @@ def cpalgs_cfg(
         )
         cfg.addEventAlgo(syslistalg)
 
-    containers = get_container_names(flags)
-
     if not flags.Analysis.disable_calib:
         if flags.Analysis.doPRW:
             log.info("Adding PRW sequence")
@@ -95,10 +92,7 @@ def cpalgs_cfg(
             if flags(f"Analysis.do_{objtype}"):
                 log.info(f"Adding {objtype} seq")
                 cfg.merge(
-                    analysis_seqs[objtype](
-                        flags,
-                        containers,
-                    )
+                    analysis_seqs[objtype](flags)
                 )
                 if objtype == "small_R_jets":
                     cfg.merge(event_counter_cfg("n_small_r"))
@@ -110,7 +104,6 @@ def cpalgs_cfg(
             cfg.merge(
                 lr_jet_sequence_cfg(
                     flags,
-                    containers,
                     lr_jet_type="Topo",
                 )
             )
@@ -120,7 +113,6 @@ def cpalgs_cfg(
                 cfg.merge(
                     lr_jet_ghost_vr_jet_association_cfg(
                         flags,
-                        containers,
                         lr_jet_type="Topo",
                     )
                 )
@@ -130,7 +122,6 @@ def cpalgs_cfg(
             cfg.merge(
                 lr_jet_sequence_cfg(
                     flags,
-                    containers,
                     lr_jet_type="UFO"
                 )
             )
@@ -140,7 +131,6 @@ def cpalgs_cfg(
                 cfg.merge(
                     lr_jet_ghost_vr_jet_association_cfg(
                         flags,
-                        containers,
                         lr_jet_type="UFO",
                     )
                 )
@@ -148,9 +138,7 @@ def cpalgs_cfg(
         if flags.Analysis.do_met:
             log.info("Adding MET seq")
             cfg.merge(
-                met_sequence_cfg(
-                    flags,
-                    containers)
+                met_sequence_cfg(flags)
             )
 
     ########################################################################
@@ -161,10 +149,7 @@ def cpalgs_cfg(
         log.info("Adding Overlap Removal sequence")
 
         cfg.merge(
-            overlap_sequence_cfg(
-                flags,
-                containers,
-            )
+            overlap_sequence_cfg(flags)
         )
         cfg.merge(event_counter_cfg("n_overlap"))
 

@@ -2,10 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def overlap_sequence_cfg(
-    flags,
-    containers,
-):
+def overlap_sequence_cfg(flags):
     cfg = ComponentAccumulator()
     from AsgAnalysisAlgorithms.OverlapAnalysisSequence import (
         makeOverlapAnalysisSequence,
@@ -19,17 +16,24 @@ def overlap_sequence_cfg(
     overlapInputNames = {}
     for objtype in ["muons", "electrons", "photons", "taus"]:
         if flags(f"Analysis.do_{objtype}"):
-            overlapInputNames[objtype] = containers["outputs"][objtype]
+            overlapInputNames[objtype] = getattr(
+                flags.Analysis.container_names.output,
+                objtype,
+            )
 
     if flags.Analysis.do_small_R_jets:
-        overlapInputNames["jets"] = containers["outputs"]["reco4PFlowJet"]
+        overlapInputNames["jets"] = flags.Analysis.container_names.output.reco4PFlowJet
 
     do_fatJet_OR = False
     if flags.Analysis.write_large_R_Topo_jets:
-        overlapInputNames["fatJets"] = containers["outputs"]["reco10TopoJet"]
+        overlapInputNames["fatJets"] = (
+            flags.Analysis.container_names.output.reco10TopoJet
+        )
         do_fatJet_OR = True
     if flags.Analysis.write_large_R_UFO_jets:
-        overlapInputNames["fatJets"] = containers["outputs"]["reco10UFOJet"]
+        overlapInputNames["fatJets"] = (
+            flags.Analysis.container_names.output.reco10UFOJet
+        )
         do_fatJet_OR = True
 
     overlapOutputNames = {k: f"{v}_OR" for k, v in overlapInputNames.items()}

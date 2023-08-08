@@ -36,6 +36,7 @@ atlas_install_python_modules(
   python/yybb_config.py
 )
 atlas_install_data(
+  share/yybb-base-config.yaml
   share/RunConfig-PHYS-yybb.yaml
   share/RunConfig-PHYSLITE-yybb.yaml
 )

@@ -61,6 +61,9 @@ atlas_install_data(
   share/RunConfig-PHYSLITE.yaml
   share/RunConfig.yaml
   share/base-config.yaml
+  share/AnalysisMiniTree-config.yaml
+  share/container-names-DAOD_PHYS.yaml
+  share/container-names-DAOD_PHYSLITE.yaml
 )
 
 # atlas_install_data( data/* )

@@ -1,0 +1,15 @@
+input:
+  reco4PFlowJet:       AnalysisJets
+  reco10TopoJet:       ''
+  reco10UFOJet:        AnalysisLargeRJets
+  vrJet:               ''
+  truth4Jet:           AntiKt4TruthDressedWZJets
+  truth10TrimmedJet:   AntiKt10TruthTrimmedPtFrac5SmallR20Jets
+  truth10SoftDropJet:  AntiKt10TruthSoftDropBeta100Zcut10Jets
+  muons:               AnalysisMuons
+  electrons:           AnalysisElectrons
+  photons:             AnalysisPhotons
+  taus:                AnalysisTauJets
+  truthBSMParticles:   TruthBSMWithDecayParticles
+  truthSMParticles:    TruthBosonsWithDecayParticles
+  met:                 AnalysisMET
