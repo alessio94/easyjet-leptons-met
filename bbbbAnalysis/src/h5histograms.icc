@@ -137,7 +137,7 @@ namespace h5h {
     return edges;
   }
 
-  void chkerr(herr_t code, const std::string& error) {
+  inline void chkerr(herr_t code, const std::string& error) {
     if (code < 0) throw std::runtime_error("error setting " + error);
   }
 

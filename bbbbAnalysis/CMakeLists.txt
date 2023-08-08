@@ -19,6 +19,8 @@ atlas_add_component(bbbbAnalysis
   src/BaselineVarsBoostedAlg.cxx
   src/JetBoostHistograms.cxx
   src/JetBoostHistogramsAlg.cxx
+  src/MassPlaneBoostHistograms.cxx
+  src/MassPlaneBoostHistogramsAlg.cxx
   src/components/HH4bAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps

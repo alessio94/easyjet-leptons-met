@@ -4,9 +4,9 @@ An AthAnalysis framework, focusing on physics analysis combining runs 2 and 3.
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for instructions on modifying this code.
 
-For questions, join the SH4b analysis MM team [here](https://mattermost.web.cern.ch/signup_user_complete/?id=pra49cyqh3du9fymb7btog8exy&md=link&sbr=su).
-- FW and NTUP users: [easyjet FW](https://mattermost.web.cern.ch/sh4b/channels/easyjet-fw).
-- FW developers and notifications: [easyjet dev](https://mattermost.web.cern.ch/sh4b/channels/easyjet-dev).
+For questions, join the EasyJet MM team [here](https://mattermost.web.cern.ch/signup_user_complete/?id=zqgsdao6sffjum15jm11y65gkh&md=link&sbr=su).
+- FW and NTUP users: [easyjet FW](https://mattermost.web.cern.ch/easyjet/channels/easyjet-fw).
+- FW developers and notifications: [easyjet dev](https://mattermost.web.cern.ch/easyjet/channels/easyjet-dev).
 
 Meetings will be held on demand, generally 1 pm Friday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/).
 

@@ -159,6 +159,12 @@ run-aod-fast() {
     echo "rerunning $CMD to time"
     $CMD --timeout 30 --output-xaod test.pool.root
     metadata-check -v
+    local HISTS=aod-hists.h5
+    CMD="bbbb-hists test.pool.root -o $HISTS"
+    echo "running $CMD"
+    $CMD
+    echo "made hists:"
+    h5ls ${HISTS}/nominal
 }
 hist-dump-syst() {
     local OPTS="$COMMON --fast-test --cache-metadata"

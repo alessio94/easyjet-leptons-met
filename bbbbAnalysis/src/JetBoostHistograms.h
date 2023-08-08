@@ -6,16 +6,21 @@
 namespace H5 {
   class Group;
 }
-class IJetHist;
 
-class JetBoostHistograms {
-public:
-  JetBoostHistograms();
-  ~JetBoostHistograms();
-  void fill(const xAOD::Jet& jet, float weight);
-  void write(H5::Group& output_group);
-private:
-  std::vector<std::unique_ptr<IJetHist>> m_hists;
-};
+namespace bhist {
+
+  class IJetHist;
+
+  class JetHists {
+  public:
+    JetHists();
+    ~JetHists();
+    void fill(const xAOD::Jet& jet, float weight);
+    void write(H5::Group& output_group) const;
+  private:
+    std::vector<std::unique_ptr<IJetHist>> m_hists;
+  };
+
+}
 
 #endif

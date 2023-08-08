@@ -1,8 +1,8 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
-from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from bbbbAnalysis.config.boosted_config import boosted_cfg
 from bbbbAnalysis.config.resolved_config import resolved_cfg
+from bbbbAnalysis.config.boost_histograms import histograms_cfg
 
 
 def dihiggs_analysis_cfg(
@@ -30,15 +30,6 @@ def dihiggs_analysis_cfg(
         )
         cfg.merge(event_counter_cfg("n_merged"))
 
-    if out_path := flags.Analysis.output_hists:
-        output = CompFactory.H5FileSvc(path=str(out_path))
-        cfg.addService(output)
-        cfg.addEventAlgo(
-            CompFactory.HH4B.JetBoostHistogramsAlg(
-                name="JetBoostHistogramsAlg",
-                jetsIn=smalljetkey,
-                output=output,
-            )
-        )
+    cfg.merge(histograms_cfg(flags))
 
     return cfg

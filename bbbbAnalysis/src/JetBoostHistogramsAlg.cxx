@@ -31,7 +31,8 @@ namespace HH4B
 
     for (const auto& sys: m_systematicsList.systematicsVector()) {
       ATH_MSG_DEBUG("booking " << sys.name());
-      m_jet_histograms.emplace_back(sys,std::make_unique<JetBoostHistograms>());
+      m_jet_histograms.emplace_back(
+        sys,std::make_unique<bhist::JetHists>());
     }
 
     return StatusCode::SUCCESS;
@@ -62,8 +63,13 @@ namespace HH4B
     for (const auto& [sys, hists]: m_jet_histograms) {
       std::string name = sys.name().empty() ? "nominal" : sys.name();
       ATH_MSG_DEBUG("saving " << name);
-      H5::Group sysgroup = m_output_svc->group()->createGroup(name);
-      hists->write(sysgroup);
+      H5::Group* parent = m_output_svc->group();
+      if (!H5Lexists(parent->getLocId(), name.c_str(), H5P_DEFAULT)) {
+        parent->createGroup(name);
+      }
+      H5::Group sysgroup = parent->openGroup(name);
+      H5::Group jetgroup = sysgroup.createGroup("jet");
+      hists->write(jetgroup);
     }
     return StatusCode::SUCCESS;
   }

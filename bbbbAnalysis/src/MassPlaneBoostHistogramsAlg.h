@@ -8,8 +8,10 @@
 
 
 // Always protect against multiple includes!
-#ifndef BBBB_JETBOOSTHISTOGRAMALG_H
-#define BBBB_JETBOOSTHISTOGRAMALG_H
+#ifndef BBBB_MASSBOOSTHISTOGRAMALG_H
+#define BBBB_MASSBOOSTHISTOGRAMALG_H
+
+#include "MassPlaneBoostHistograms.h"
 
 #include "H5Writer/IH5GroupSvc.h"
 
@@ -20,20 +22,17 @@
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 
-namespace bhist {
-  class JetHists;
-}
 
 namespace HH4B
 {
 
   /// \brief An algorithm for counting containers
-  class JetBoostHistogramsAlg final : public AthReentrantAlgorithm
+  class MassPlaneBoostHistogramsAlg final : public AthReentrantAlgorithm
   {
     /// \brief The standard constructor
 public:
-    JetBoostHistogramsAlg(const std::string &name, ISvcLocator *pSvcLocator);
-    ~JetBoostHistogramsAlg();
+    MassPlaneBoostHistogramsAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    ~MassPlaneBoostHistogramsAlg();
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -61,7 +60,15 @@ private:
       this, "output", "", "output file service"
     };
 
-    using JHist = std::pair<CP::SystematicSet,std::unique_ptr<bhist::JetHists>>;
+    // properties declared later, I'm not sure how to do this properly
+    // in the header
+    bhist::MassPlaneHistsConfig m_config;
+    // hack because gaudi doesn't support std::set<std::string>, fill
+    // this thing and then put it in config above.
+    std::vector<std::string> m_mmv;
+
+    using HP = std::unique_ptr<bhist::MassPlaneHists>;
+    using JHist = std::pair<CP::SystematicSet,HP>;
     std::vector<JHist> m_jet_histograms;
 
   };

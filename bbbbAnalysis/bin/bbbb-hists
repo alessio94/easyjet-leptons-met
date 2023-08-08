@@ -5,19 +5,29 @@ from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+# this should do all the important things for this script
+from bbbbAnalysis.config.boost_histograms import histograms_cfg
+
 # main service config misses anything to read files, so you need to
 # import both
 from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
-
-# we're still debugging
-from AthenaCommon.Constants import DEBUG
+# set a lower logging level
+from AthenaCommon import Constants
 
 from argparse import ArgumentParser
 import sys
+from pathlib import Path
+
 
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument('input_files', nargs='+')
+    parser.add_argument(
+        '-o',
+        '--output-hists',
+        type=Path,
+        default=Path('hists.h5'),
+    )
     parser.add_argument('-d','--debug', action='store_true')
     return parser.parse_args()
 
@@ -35,22 +45,11 @@ def core_services_cfg(flags):
     cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
     cfg.merge(PoolReadCfg(flags))
 
+    # we need this thing for sys-aware algorithms to work
+    cfg.addService(CompFactory.CP.SystematicsSvc("SystematicsSvc"))
+
     return cfg
 
-
-def histogram_cfg(flags):
-    cfg = ComponentAccumulator()
-    output = CompFactory.H5FileSvc(path="hists.h5")
-    cfg.addService(output)
-    cfg.addEventAlgo(
-        CompFactory.HH4B.JetBoostHistogramsAlg(
-            name="JetBoostHistogramsAlg",
-            jetsIn="EasyJets",
-            # OutputLevel=DEBUG,
-            output=output,
-        )
-    )
-    return cfg
 
 def run():
     args = parse_args()
@@ -58,10 +57,13 @@ def run():
     flags.Input.Files = args.input_files
     if args.debug:
         flags.Exec.DebugStage = 'exec'
-
-
+    flags.Exec.OutputLevel = Constants.WARNING
     cfg = core_services_cfg(flags)
-    cfg.merge(histogram_cfg(flags))
+    cfg.merge(histograms_cfg(
+        flags,
+        jets="EasyJets",
+        out_path=args.output_hists
+    ))
 
     ret = cfg.run()
     sys.exit(0 if ret.isSuccess() else 1)
