@@ -205,7 +205,7 @@ DATA_URL=https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw
 LOG_LEVEL=${EASYJET_LOG_LEVEL-"WARNING"}
 
 print-usage() {
-    echo "usage: ${0##*/} [-h] [-l <level>] [-d <dir>] <mode>" 1>&2
+    echo "usage: ${0##*/} [-h] [-l <level>] [-L <log-file>] [-d <dir>] <mode>" 1>&2
 }
 
 usage() {
@@ -222,10 +222,13 @@ The ${0##*/} utility will download a test DAOD file and run it.
 Options:
  -d <dir>: specify directory to run in
  -l <level>: set log level
+ -L <log-file>: specify log file into which to direct output
  -h: print help
 
 Run modes:
 $(dump-modes)
+  all -> run all of the above (for local testing)
+  all-exit-early -> all, but exit immediately if any test fails
 
 Notes on environment variables:
  - EASYJET_LOG_LEVEL: default for -l, currently ${LOG_LEVEL}
@@ -264,9 +267,9 @@ dump-modes() {
     done
 }
 
-OPT_KEYS=":d:hl:"
+OPT_KEYS=":d:hl:L:"
 dump-complete() {
-    printf "%s " ${ALL_MODES[*]}
+    printf "%s " ${ALL_MODES[*]} all all-exit-early
     local char
     echo -n ${OPT_KEYS//:} | while read -n 1 char
     do
@@ -281,6 +284,7 @@ while getopts ${OPT_KEYS}c o; do
         d) DIRECTORY=${OPTARG} ;;
         h) help ;;
         l) LOG_LEVEL=${OPTARG} ;;
+        L) LOG_FILE=${OPTARG} ;;
         # this is just here for tab complete
         c) dump-complete; exit 0 ;;
         *) usage ;;
@@ -293,6 +297,10 @@ if (( $# != 1 )) ; then
 fi
 
 MODE=$1
+if [[ $MODE == "all-exit-early" ]]; then
+    MODE="all"
+    EXIT_EARLY=1
+fi
 
 # add common options
 COMMON+=" -l ${LOG_LEVEL}"
@@ -301,14 +309,20 @@ COMMON+=" -l ${LOG_LEVEL}"
 # Check that all the modes / paths exist
 ############################################
 #
-if [[ ! ${DATAFILES[$MODE]+x} ]]; then usage; fi
-DOWNLOAD_PATH=${DATAFILES[$MODE]}
-FILE=${DOWNLOAD_PATH##*/}
 
-if [[ ! ${TESTS[$MODE]+x} ]]; then usage; fi
-RUN=${TESTS[$MODE]}
+verify-test() {
+    if [[ ! ${DATAFILES[$1]}+x ]]; then usage; fi
+    if [[ ! ${TESTS[$1]}+x ]]; then usage; fi
+}
 
-CONFIG=${CONFIGS[$MODE]-$DEFAULT_CONFIG}
+if [[ ${MODE} == "all" ]]; then
+    for mode in $ALL_MODES
+    do
+        verify-test $mode
+    done
+else
+    verify-test $MODE
+fi
 
 #############################################
 # now start doing stuff
@@ -328,13 +342,59 @@ if [[ ! -d ${DIRECTORY} ]]; then
 fi
 cd $DIRECTORY
 
-# get files
-if [[ ! -f ${FILE} ]] ; then
-    echo "getting file ${FILE}" >&2
-    curl -s ${DATA_URL}/${TAG}/${DOWNLOAD_PATH} > ${FILE}
-fi
+error-handler() {
+    echo "$1 failed with exit code $?" >> test_results.log
+}
+
+run-test() {
+    local mode=$1
+    local download_path=${DATAFILES[$mode]}
+    local file=${download_path##*/}
+    local config=${CONFIGS[$mode]-$DEFAULT_CONFIG}
+
+    # get files
+    if [[ ! -f ${file} ]] ; then
+        echo "getting file ${file} from ${DATA_URL}"
+        curl -s ${DATA_URL}/${TAG}/${download_path} > ${file}
+    fi
+
+    local testcmd="${TESTS[$mode]} $file $config"
+    trap "error-handler $mode" ERR
+    if [[ ! -z ${LOG_FILE+x} ]]; then
+        $testcmd > $LOG_FILE 2>&1
+    else
+        $testcmd
+    fi
+    echo "$mode succeeded" >> test_results.log
+}
+
+# Variables
+NPROCS=6
+
+test-summary() {
+    echo "Waiting 10s to collect test results from other incomplete jobs"
+    sleep 10
+    printf "\nAvailable test results:\n\n"
+    for result in */test_results.log; do
+        cat $result >> test_results.log
+    done
+    cat test_results.log
+}
 
 # now run the test
-echo "running ${RUN}"
-$RUN $FILE $CONFIG
+if [[ ${MODE} == "all" ]] ; then
+    # Run in parallel -- each job is in a separate shell
+    testcmd="${0} -d {} -L test.log {} 2>&1"
+    if [[ ! -z ${EXIT_EARLY+x} ]] ; then
+        testcmd+=" || exit 255"
+    fi
+    trap "echo failed tests detected; test-summary" ERR
+    printf "%s\n" $ALL_MODES | xargs -P $NPROCS -I {} bash -c "${testcmd}" &> /dev/null
 
+    printf "\nAll tests completed successfully"
+else
+    echo "running ${MODE}"
+    trap "echo test failed with exit code \$?" ERR
+    run-test $MODE
+    echo "${MODE} completed successfully"
+fi
