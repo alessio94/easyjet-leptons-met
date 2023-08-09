@@ -21,6 +21,7 @@ atlas_add_component(EasyjetHub
   src/TauSelectorAlg.cxx
   src/LargeJetGhostVRJetAssociationAlg.cxx
   src/TruthParentDecoratorAlg.cxx
+  src/TruthParticleInformationAlg.cxx
   src/H5FileSvc.cxx
   src/JetDeepCopyAlg.cxx
   src/TauDecoratorAlg.cxx

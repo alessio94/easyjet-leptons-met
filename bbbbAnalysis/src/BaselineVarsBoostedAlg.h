@@ -11,6 +11,9 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 
+// not sure we ever _need_ to use this below, but we use it below
+#include "AthContainers/ConstDataVector.h"
+
 namespace HH4B
 {
 

@@ -1,9 +1,9 @@
 Contributing Guidelines
 =======================
 
-Anyone is welcome to contribute to this code. In fact, we make no promise to provide a comprehensive ATLAS analysis framework: if you are working in a final state that isn't currently covered by easyjet some contributions are expected.
+Anyone is welcome to contribute to this code. If you are working in a final state that isn't currently covered by easyjet some contributions are expected.
 
-For simple additions there is no need to ask for permission or contact the maintainers before making a merge request. The basic procedure is:
+There is no need to ask for permission or contact the maintainers before making a merge request. The basic procedure is:
 
 - Fork the repository on gitlab
 - Clone the code locally and make any changes you need on an
@@ -16,7 +16,7 @@ For larger changes or general questions about the code, please open an issue on 
 
 Limited code formatting rules are enforced via `cppcheck` and `flake8`. We aim to follow `PEP8` python style conventions, except certain cases where it is more natural to follow ATLAS-like camel-case variable names.
 
-If in doubt, try to follow the style of the surrounding code.
+If in doubt, follow the style of the surrounding code.
 
 ## Merge request guidelines
 
@@ -29,16 +29,26 @@ We expose functions for generating the sequences used in `easyjet-ntupler` via t
 ## Package structure
 
 The following `CMake` packages are defined in this repository:
-- `EasyjetHub`: Core framework code providing analysis-independent algorithms and job steering
-- `bbbbAnalysis`: Analysis-specific code for HH->4b information
-  - E.g. preselections, jet pairing algorithms and decay path tracing specific to the 4b decay mode are implemented here
-  - For historical reasons, `yybb` code is also currently included in this package, but will be separated into its own package at a later date
-- `BJetCalibrationTool` (submodule): Tool and algs for applying b-jet four-momentum correction
-- `H5Writer`: Tool and algs for writing HDF5 output
+- `EasyjetHub`: Core framework code providing analysis-independent algorithms and job steering.
+- `EasyjetTests`: CI testing code.
+- `*Analysis`: Analysis-specific code. These packages should not depend on each other.
+
+Other packages are utilities used by the above ones.
+Most of them are generic enough that they should (eventually) be migrated to the main Athena repository.
+
+All packages should have a `README.md` file of their own.
 
 ## General organization of python modules
 
 Please follow the existing module organisation as laid out in [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md).
 In case of ambiguity we are happy to discuss where additional modules or folders can be inserted.
 
-*Note: To distinguish modules defined in `easyjet` from those in in `atlas/athena`, modules producing `ComponentAccumulator` configurations are named in snake case and end in `config.py` e.g. `EasyjetHub.steering.main_sequence_config.py`, rather than in camel case e.g. `AthenaConfiguration.MainSequencesConfig.py`.*
+To distinguish modules defined in `easyjet` from those in in `atlas/athena`, modules producing `ComponentAccumulator` configurations are named in snake case, e.g.
+```
+EasyjetHub.steering.main_sequence_config.py
+```
+rather than in camel case e.g.
+```
+AthenaConfiguration.MainSequencesConfig.py`
+```
+They either end in `config.py` or are located in a directory named `config`.

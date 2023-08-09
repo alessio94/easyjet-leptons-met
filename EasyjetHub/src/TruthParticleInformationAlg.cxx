@@ -13,7 +13,7 @@
 //
 // method implementations
 //
-namespace HH4B
+namespace Easyjet
 {
   constexpr int H_ID = 25;
   constexpr int S_ID = 35;

@@ -22,7 +22,7 @@ trigger_list: ["bbbbResolved", "bbbbBoosted"]
 # apply loose jet cleaning only
 loose_jet_cleaning: true
 
-do_resolved_dihiggs_analysis: true
+do_resolved_dihiggs: true
 
 # write
 write_small_R_jets: true

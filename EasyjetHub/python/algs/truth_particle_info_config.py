@@ -8,7 +8,7 @@ def truth_particle_info_cfg(
 
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
-        CompFactory.HH4B.TruthParticleInformationAlg(
+        CompFactory.Easyjet.TruthParticleInformationAlg(
             "TruthParticleInformationAlg",
             EventInfoKey="EventInfo",
             TruthParticleSMInKey=(

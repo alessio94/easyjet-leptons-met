@@ -20,7 +20,7 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODTruth/TruthParticleContainer.h>
 
-namespace HH4B
+namespace Easyjet
 {
   class TruthScalar
   {

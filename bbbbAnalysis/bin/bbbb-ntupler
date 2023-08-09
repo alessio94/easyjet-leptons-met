@@ -21,9 +21,9 @@ from EasyjetHub.hub import (
 )
 
 from bbbbAnalysis.utils.option_validation import validate_hh4b_analysis_prerequisites
-from bbbbAnalysis.config.dihiggs_analysis_config import dihiggs_analysis_cfg
-from bbbbAnalysis.config.boosted_config import boosted_branches
-from bbbbAnalysis.config.resolved_config import resolved_branches
+from bbbbAnalysis.config.dihiggs import dihiggs_cfg
+from bbbbAnalysis.config.boosted import boosted_branches
+from bbbbAnalysis.config.resolved import resolved_branches
 
 
 def hh4b_parser():
@@ -49,9 +49,9 @@ def hh4b_job_cfg():
     # Extend the list of output branches via flags
     # For more sophistication this could be done using
     # custom BranchManagers
-    if flags.Analysis.do_boosted_dihiggs_analysis:
+    if flags.Analysis.do_boosted_dihiggs:
         flags.Analysis.extra_output_branches += boosted_branches(flags)
-    if flags.Analysis.do_resolved_dihiggs_analysis:
+    if flags.Analysis.do_resolved_dihiggs:
         flags.Analysis.extra_output_branches += resolved_branches(flags)
 
     # Lock the flags so that the configuration of job subcomponents cannot
@@ -68,7 +68,7 @@ def hh4b_job_cfg():
     cfg = default_sequence_cfg(flags, seqname)
 
     cfg.merge(
-        dihiggs_analysis_cfg(flags),
+        dihiggs_cfg(flags),
         seqname,
     )
 

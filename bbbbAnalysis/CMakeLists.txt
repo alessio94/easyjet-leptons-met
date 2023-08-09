@@ -13,7 +13,6 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(bbbbAnalysis
-  src/TruthParticleInformationAlg.cxx
   src/JetPairingAlg.cxx
   src/BaselineVarsResolvedAlg.cxx
   src/BaselineVarsBoostedAlg.cxx
