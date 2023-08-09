@@ -65,36 +65,36 @@ declare -A DATAFILES=(
 )
 
 declare -A TESTS=(
-    [data18-fast]=data-ntuple-dump-fast
-    [data22-fast]=data-ntuple-dump-fast
-    [sh4b-data22]=bbbb-dump
-    [jets-mc20-fast]=ntuple-dump-fast
-    [jets-mc20]=ntuple-dump
-    [ttbar-mc20-fast]=ntuple-dump-fast
-    [ttbar-mc20]=ntuple-dump
-    [ttbar-mc20-fast-aod]=run-aod-fast
-    [sh4b-boosted-mc20-fast-awkward]=ntuple-dump-fast-awkward
-    [sh4b-boosted-mc20-fast]=ntuple-dump-fast
-    [hh4b-mc21]=ntuple-dump
-    [hh4b-mc21-noroot]=run-fast
-    [hh4b-mc21-syst]=ntuple-dump-syst
+    [data18-fast]="data-fast easyjet-ntupler"
+    [data22-fast]="data-fast easyjet-ntupler"
+    [sh4b-data22]="simple bbbb-ntupler"
+    [jets-mc20-fast]="fast easyjet-ntupler"
+    [jets-mc20]="simple easyjet-ntupler"
+    [ttbar-mc20-fast]="fast easyjet-ntupler"
+    [ttbar-mc20]="simple easyjet-ntupler"
+    [ttbar-mc20-fast-aod]="aod-fast bbbb-ntupler"
+    [sh4b-boosted-mc20-fast-awkward]="fast easyjet-ntupler"
+    [sh4b-boosted-mc20-fast]="fast easyjet-ntupler"
+    [hh4b-mc21]="simple easyjet-ntupler"
+    [hh4b-mc21-noroot]="h5-fast easyjet-ntupler"
+    [hh4b-mc21-syst]="systematics easyjet-ntupler"
     [hh4b-mc21-syst-hist]=hist-dump-syst
-    [hh4b-resolved-mc21]=bbbb-dump
-    [ttbar-mc21-fast]=ntuple-dump-fast
-    [ttbar-mc21]=ntuple-dump
-    [ttbar-mc21-syst]=ntuple-dump-syst
-    [jets-mc21]=ntuple-dump
-    [jets-mc23]=ntuple-dump
-    [lite-sh4b-boosted-mc20-fast]=ntuple-dump-fast
-    [lite-sh4b-boosted-mc20]=ntuple-dump
-    [lite-hh4b-mc21-fast]=ntuple-dump-fast
-    [lite-hh4b-mc21]=ntuple-dump
-    [sh4b-boosted-mc20]=bbbb-dump
-    [sh4b-boosted-mc20-p5658]=bbbb-dump
-    [yybb-mc20]=bbyy-dump
-    [lite-yybb-mc20]=bbyy-dump
-    [lite-bbtt-mc21]=bbtt-dump
-    [bbtt-mc21]=bbtt-dump
+    [hh4b-resolved-mc21]="simple bbbb-ntupler"
+    [ttbar-mc21-fast]="fast easyjet-ntupler"
+    [ttbar-mc21]="simple easyjet-ntupler"
+    [ttbar-mc21-syst]="systematics easyjet-ntupler"
+    [jets-mc21]="simple easyjet-ntupler"
+    [jets-mc23]="simple easyjet-ntupler"
+    [lite-sh4b-boosted-mc20-fast]="fast easyjet-ntupler"
+    [lite-sh4b-boosted-mc20]="simple easyjet-ntupler"
+    [lite-hh4b-mc21-fast]="fast easyjet-ntupler"
+    [lite-hh4b-mc21]="simple easyjet-ntupler"
+    [sh4b-boosted-mc20]="simple bbbb-ntupler"
+    [sh4b-boosted-mc20-p5658]="simple bbbb-ntupler"
+    [yybb-mc20]="simple bbyy-ntupler"
+    [lite-yybb-mc20]="simple bbyy-ntupler"
+    [lite-bbtt-mc21]="simple bbtt-ntupler"
+    [bbtt-mc21]="simple bbtt-ntupler"
 )
 
 DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
@@ -106,6 +106,7 @@ declare -A CONFIGS=(
     [lite-hh4b-mc21]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [sh4b-boosted-mc20]=bbbbAnalysis/RunConfig-SH4b.yaml
     [sh4b-boosted-mc20-p5658]=bbbbAnalysis/RunConfig-SH4b.yaml
+    [sh4b-boosted-mc20-fast-awkward]=EasyjetHub/awkward-config.yaml
     [hh4b-mc21-syst-hist]=bbbbAnalysis/histonly-config.yaml
     [ttbar-mc20-fast-aod]=bbbbAnalysis/RunConfig-Resolved.yaml
     [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
@@ -119,48 +120,57 @@ declare -A CONFIGS=(
 COMMON="-O"
 
 # specific tests
-ntuple-dump() {
-    easyjet-ntupler $1 -c $2 -o $COMMON
+simple() {
+    $1 $2 -c $3 $COMMON -o analysis.root
     metadata-check -v
 }
-ntuple-dump-syst() {
-    easyjet-ntupler $1 -c $2 -o $COMMON --do-CP-systematics True
+systematics() {
+    $1 $2 -c $3 -o $COMMON --do-CP-systematics True
     metadata-check -v
 }
-ntuple-dump-fast() {
-    local OPTS="-o $COMMON --fast-test --cache-metadata"
-    local CMD="easyjet-ntupler $1 -c $2 $OPTS"
+fast() {
+    local OPTS="$COMMON --fast-test --cache-metadata"
+    OPTS+=" -o analysis.root --h5-output test.h5"
+    local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    echo "rerunning $CMD to time"
-    $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
+    CMD+=" --timeout 30 "
+    echo "running $CMD"
+    $CMD
     metadata-check -v
 }
-data-ntuple-dump-fast() {
-    local OPTS="-o $COMMON --fast-test --cache-metadata"
+data-fast() {
+    local OPTS="$COMMON --fast-test --cache-metadata"
+    OPTS+=" -o analysis.root --h5-output test.h5"
     OPTS+=" --do-trigger-filtering False"
-    local CMD="easyjet-ntupler $1 -c $2 $OPTS"
+    local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    echo "rerunning $CMD to time"
-    $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
+    CMD+=" --timeout 30 "
+    echo "running $CMD"
+    $CMD
     metadata-check -v
 }
-run-fast() {
+h5-fast() {
     local OPTS="$COMMON --fast-test --cache-metadata"
-    local CMD="easyjet-ntupler $1 -c $2 $OPTS"
+    OPTS+=" --h5-output test.h5"
+    local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    echo "rerunning $CMD to time"
-    $CMD --timeout 30 --h5-output test.h5 --n-h5-jets 20
+    CMD+=" --timeout 30 "
+    echo "running $CMD"
+    $CMD
     metadata-check -v
 }
-run-aod-fast() {
+aod-fast() {
+    local AOD=test.pool.root
     local OPTS="$COMMON --fast-test --cache-metadata"
-    local CMD="bbbb-ntupler $1 -c $2 $OPTS"
+    OPTS+=" --output-xaod ${AOD}"
+    local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    echo "rerunning $CMD to time"
-    $CMD --timeout 30 --output-xaod test.pool.root
+    CMD+=" --timeout 30 "
+    echo "running $CMD"
+    $CMD
     metadata-check -v
     local HISTS=aod-hists.h5
-    CMD="bbbb-hists test.pool.root -o $HISTS"
+    CMD="bbbb-hists ${AOD} -o $HISTS"
     echo "running $CMD"
     $CMD
     echo "made hists:"
@@ -168,30 +178,12 @@ run-aod-fast() {
 }
 hist-dump-syst() {
     local OPTS="$COMMON --fast-test --cache-metadata"
+    OPTS+=" --output-hists hists.h5"
     local CMD="bbbb-ntupler $1 -c $2 $OPTS"
     $CMD --stop-after-config
-    echo "rerunning $CMD to time"
-    $CMD --timeout 30 --output-hists hists.h5
-    metadata-check -v
-}
-ntuple-dump-fast-awkward() {
-    local OPTS="$COMMON --fast-test --cache-metadata"
-    local CMD="easyjet-ntupler $1 -c $2 $OPTS"
-    $CMD --stop-after-config
-    echo "rerunning $CMD to time"
-    $CMD --timeout 30 --h5-output test-awk.h5 --n-h5-jets 0
-    metadata-check -v
-}
-bbbb-dump() {
-    bbbb-ntupler $1 -c $2 -o $COMMON
-    metadata-check -v
-}
-bbyy-dump() {
-    bbyy-ntupler $1 -c $2 -o $COMMON
-    metadata-check -v
-}
-bbtt-dump() {
-    bbtt-ntupler $1 -c $2 -o $COMMON
+    CMD+="  --timeout 30"
+    echo "running $CMD"
+    $CMD
     metadata-check -v
 }
 
@@ -263,7 +255,7 @@ dump-modes() {
         local func=${TESTS[$mode]}
         local config=${CONFIGS[$mode]-$DEFAULT_CONFIG}
         local data=${DATAFILES[$mode]}
-        printf "${FMT}" $mode $func $config $data
+        printf "${FMT}" $mode "$func" $config $data
     done
 }
 

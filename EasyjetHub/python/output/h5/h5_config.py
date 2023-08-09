@@ -29,7 +29,7 @@ def get_h5_cfg(flags):
     jetcol = flags.Analysis.container_names.input.reco4PFlowJet
     types = {}
     primitives = []
-    if flags.Analysis.n_h5_jets > 0:
+    if flags.Analysis.h5.n_jets > 0:
         types |= {"valid": "CUSTOM"}
         primitives.append("valid")
     associations = {}
@@ -51,7 +51,7 @@ def get_h5_cfg(flags):
             primitiveToType=types,
             primitiveToAssociation=associations,
             datasetName="jets",
-            maximumSize=flags.Analysis.n_h5_jets,
+            maximumSize=flags.Analysis.h5.n_jets,
             container=jetcol.replace("_%SYS%", "_NOSYS"),
             output=output,
         )

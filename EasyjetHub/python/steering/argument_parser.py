@@ -276,13 +276,6 @@ class AnalysisArgumentParser(ArgumentParser):
             help="save output HDF5 file",
         )
         self.add_analysis_arg(
-            "-z",
-            "--n-h5-jets",
-            type=int,
-            default=6,
-            help="number of jets in array, or 0 for awkward array",
-        )
-        self.add_analysis_arg(
             "-x",
             "--systematics-regex",
             type=str,

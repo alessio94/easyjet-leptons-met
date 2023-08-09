@@ -42,3 +42,5 @@ container_names:
   include: container-names-DAOD_PHYS.yaml
 
 histograms: false
+h5:
+  n_jets: 10
