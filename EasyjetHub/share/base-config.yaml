@@ -24,9 +24,6 @@ do_trigger_filtering: false
 disable_calib: false
 # apply loose jet cleaning only
 loose_jet_cleaning: false
-# if you want to run a baseline diHiggs analyses
-do_resolved_dihiggs: false
-do_boosted_dihiggs: false
 # Whether to activate CP alg systematic variations
 do_CP_systematics: false
 systematics_regex: []
@@ -35,7 +32,11 @@ systematics_regex: []
 do_overlap_removal: false
 
 # Include the TTree configuration
-include: AnalysisMiniTree-config.yaml
+ttree_output:
+  ttree_names:
+    - AnalysisMiniTree
+  AnalysisMiniTree:
+    include: AnalysisMiniTree-config.yaml
 
 # Definition of container names
 container_names:

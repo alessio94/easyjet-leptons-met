@@ -49,10 +49,11 @@ def hh4b_job_cfg():
     # Extend the list of output branches via flags
     # For more sophistication this could be done using
     # custom BranchManagers
+    tree_flags = flags.Analysis.ttree_output.AnalysisMiniTree
     if flags.Analysis.do_boosted_dihiggs:
-        flags.Analysis.extra_output_branches += boosted_branches(flags)
+        tree_flags.extra_output_branches += boosted_branches(flags)
     if flags.Analysis.do_resolved_dihiggs:
-        flags.Analysis.extra_output_branches += resolved_branches(flags)
+        tree_flags.extra_output_branches += resolved_branches(flags)
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.

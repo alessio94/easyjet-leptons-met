@@ -2,7 +2,7 @@ from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from EasyjetHub.output.ttree.truth_jets import get_small_R_jet_truth_labels
 
 
-def get_small_R_jet_branches(flags, input_container, output_prefix):
+def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
     _syst_option = SystOption.ALL_SYST
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
@@ -17,21 +17,21 @@ def get_small_R_jet_branches(flags, input_container, output_prefix):
         ]
     )
 
-    if flags.Analysis.write_object_systs_only_for_pt:
+    if tree_flags.write_object_systs_only_for_pt:
         small_R_jet_branches.syst_only_for = ["pt"]
 
     small_R_jet_branches.add_four_mom_branches(do_mass=True)
 
     small_R_jet_branches.variables += ["NNJvtPass"]
 
-    if flags.Analysis.write_small_R_btag:
+    if tree_flags.collection_options.small_R_jets.btag_info:
         small_R_jet_branches.variables += [
             f"ftag_select_{btag_wp}"
             for btag_wp in flags.Analysis.btag_wps
         ]
 
     if (
-        flags.Analysis.write_small_R_no_bjet_calib
+        tree_flags.collection_options.small_R_jets.no_bjet_calib_p4
         and flags.Analysis.do_muons
     ):
         small_R_jet_branches.variables += [
@@ -39,7 +39,7 @@ def get_small_R_jet_branches(flags, input_container, output_prefix):
             for var in ["pt", "eta", "phi", "m"]
         ]
 
-    if flags.Analysis.write_small_R_JVT_details:
+    if tree_flags.collection_options.small_R_jets.JVT_details:
         small_R_jet_branches.variables += [
             "Jvt",
             "JvtRpt",
@@ -49,13 +49,16 @@ def get_small_R_jet_branches(flags, input_container, output_prefix):
             "NNJvtRpt",
         ]
 
-    if flags.Input.isMC and flags.Analysis.write_small_R_higgs_parent_info:
+    if (
+        flags.Input.isMC
+        and tree_flags.collection_options.small_R_jets.higgs_parent_info
+    ):
         small_R_jet_branches.variables += get_small_R_jet_truth_labels(flags)
 
     return small_R_jet_branches.get_output_list()
 
 
-def get_small_R_bjet_branches(flags, input_container, output_prefix):
+def get_small_R_bjet_branches(flags, tree_flags, input_container, output_prefix):
     _syst_option = SystOption.ALL_SYST
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
@@ -74,7 +77,7 @@ def get_small_R_bjet_branches(flags, input_container, output_prefix):
     # not available in PHYSLITE... yet
     # TODO: Handle this properly (drop PHYSLITE check when ptag updated)
     if (
-        flags.Analysis.write_small_R_gn2_branches
+        tree_flags.collection_options.small_R_jets.gn2_branches
         and not flags.Input.isPHYSLITE
     ):
         small_R_bjet_branches.variables += [

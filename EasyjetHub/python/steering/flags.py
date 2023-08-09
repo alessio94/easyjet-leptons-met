@@ -51,7 +51,9 @@ def analysis_configuration(parser="default"):
     if flags.Analysis.fast_test:
         flags.Analysis.do_overlap_removal = False
         flags.Analysis.do_muons = False
-        flags.Analysis.write_muons = False
+        for tree_name in flags.Analysis.ttree_output.ttree_names:
+            tree_flags = getattr(flags.Analysis.ttree_output,tree_name)
+            tree_flags.reco_outputs.muons = False
 
     log.info(f"Operating on input files {flags.Input.Files}")
 

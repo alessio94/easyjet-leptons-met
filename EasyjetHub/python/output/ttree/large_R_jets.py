@@ -6,7 +6,12 @@ from EasyjetHub.steering.sample_metadata import (
 )
 
 
-def get_large_R_jet_branches(flags, input_container, output_prefix, lr_jet_type):
+def get_large_R_jet_branches(
+    flags, tree_flags,
+    input_container,
+    output_prefix,
+    lr_jet_type
+):
     _syst_option = SystOption.ALL_SYST
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
@@ -18,7 +23,7 @@ def get_large_R_jet_branches(flags, input_container, output_prefix, lr_jet_type)
         systematics_option=_syst_option,
     )
 
-    if flags.Analysis.write_object_systs_only_for_pt:
+    if tree_flags.write_object_systs_only_for_pt:
         large_R_jet_branches.syst_only_for = ["pt"]
 
     # The LargeJetGhostVRJetAssociationAlg does not support systematics
@@ -37,7 +42,7 @@ def get_large_R_jet_branches(flags, input_container, output_prefix, lr_jet_type)
 
     large_R_jet_branches.add_four_mom_branches(do_mass=True)
 
-    if flags.Input.isMC and flags.Analysis.write_large_R_truth_labels:
+    if flags.Input.isMC and tree_flags.collection_options.large_R_jets.truth_labels:
         large_R_jet_branches.variables += [
             "GhostBHadronsFinalCount",
         ] + get_large_R_jet_truth_labels(flags)
@@ -53,10 +58,10 @@ def get_large_R_jet_branches(flags, input_container, output_prefix, lr_jet_type)
                 "R10TruthLabel_R22v1",
             ]
 
-    if flags.Analysis.write_VR_jets:
+    if tree_flags.reco_outputs.VR_jets:
         large_R_jet_branches.variables += get_ghost_vr_branches(flags)
 
-    if flags.Analysis.write_large_R_substructure:
+    if tree_flags.collection_options.large_R_jets.substructure_info:
         large_R_jet_branches.variables += get_substructure_branches(lr_jet_type)
 
     split_tags = flags.Input.AMITag.split("_")

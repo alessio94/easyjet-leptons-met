@@ -153,11 +153,19 @@ def output_cfg(flags, seqname):
 
     cfg = ComponentAccumulator()
     cfg.addSequence(CompFactory.AthSequencer(seqname), "AthAlgSeq")
+    # Configure however many TTree outputs are configured.
+    # This config only handles one output file, as it comes from the
+    # command line arguments. In principle we could set up multiple
+    # output files, but that needs more custom config hooks
     if flags.Analysis.out_file:
-        cfg.merge(
-            minituple_cfg(flags),
-            seqname,
-        )
+        for tree_name in flags.Analysis.ttree_output.ttree_names:
+            cfg.merge(
+                minituple_cfg(
+                    flags,tree_name,
+                    flags.Analysis.out_file,
+                ),
+                seqname,
+            )
 
     if flags.Analysis.h5_output:
         cfg.merge(

@@ -26,18 +26,23 @@ do_bbtt_analysis: true
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
 
-# which objects to write
-write_small_R_jets: true
-write_small_R_btag: true
-write_large_R_UFO_jets: false
-write_muons: true
-write_electrons: true
-write_taus: true
-write_truth_higgs: true
-write_truth_small_R_jets: true
-write_met : true
+# configure TTree output contents
+ttree_output:
+  AnalysisMiniTree:
+    write_object_systs_only_for_pt: true
+    reco_outputs:
+      small_R_jets: true
+      muons: true
+      electrons: true
+      taus: true
+      met : true
+    collection_options:
+      small_R_jets:
+        btag_info: true
+    truth_outputs:
+      small_R_jets: true
+      higgs_particle: true
 
 do_CP_systematics: false
 systematics_regex: [".*"]
-# Do we apply object systs only for pt/et
-write_object_systs_only_for_pt: true
+

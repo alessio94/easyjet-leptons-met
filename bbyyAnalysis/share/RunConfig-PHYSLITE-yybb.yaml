@@ -2,16 +2,3 @@
 include: yybb-base-config.yaml
 container_names:
     include: EasyjetHub/container-names-DAOD_PHYSLITE.yaml
-
-# Disable some options that are incompatible with PHYSLITE
-
-# additional small R info
-write_small_R_higgs_parent_info: false
-write_small_R_btag: false
-write_small_R_JVT_details: false
-write_small_R_no_bjet_calib: false
-write_small_R_gn2_branches: false
-
-# turned off automatically if MC
-write_truth_small_R_jets: false
-write_truth_higgs: false

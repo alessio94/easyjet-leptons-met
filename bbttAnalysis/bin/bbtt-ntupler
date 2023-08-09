@@ -35,7 +35,8 @@ def bbtt_job_cfg():
     # For more sophistication this could be done using
     # custom BranchManagers
     if flags.Analysis.do_bbtt_analysis:
-        flags.Analysis.extra_output_branches += bbtt_branches(flags)
+        flags.Analysis.ttree_output.AnalysisMiniTree.extra_output_branches \
+            += bbtt_branches(flags)
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.

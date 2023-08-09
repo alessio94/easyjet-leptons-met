@@ -17,12 +17,7 @@ def jet_sequence_cfg(
     # rather than accessing from xAOD::BTagging
     # We perform the decoration on the uncalibrated jets
     # so as to avoid any systematics-dependence or filtering
-    if (
-        flags.Analysis.write_small_R_gn2_branches
-        and not flags.Input.isPHYSLITE
-        # TODO: Handle this properly (drop PHYSLITE check when ptag updated)
-    ):
-        cfg.merge(btag_decor_cfg(flags))
+    cfg.merge(btag_decor_cfg(flags))
 
     jet_sequence = makeJetAnalysisSequence(
         flags.Analysis.DataType,

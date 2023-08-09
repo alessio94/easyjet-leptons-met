@@ -27,7 +27,7 @@ def tree_cfg(
     treename: str = "AnalysisMiniTree",
     outfile:  str = "output.root",
     stream:   str = "ANALYSIS",
-    treedir:  str = ""
+    treedir:  str = "",
 ) -> ComponentAccumulator:
     """
     Configures output of a single TTree
@@ -89,7 +89,11 @@ def tree_cfg(
     return cfg
 
 
-def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
+def minituple_cfg(
+    flags: AthConfigFlags,
+    tree_name: str,
+    outfile_name: str,
+) -> ComponentAccumulator:
     """
     This is the template output TTree configuration, steered via yaml config.
     It uses the branch managers to configure writing out the standard object
@@ -102,10 +106,13 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
     # Create analysis mini-ntuple
     ########################################################################
 
+    # Extract the set of flags pertaining to this tree
+    tree_flags = getattr(flags.Analysis.ttree_output,tree_name)
+
     tree_branches = []
 
     tree_branches += get_event_info_branches(
-        flags, flags.Analysis.doPRW, flags.Analysis.TriggerChains
+        flags, tree_flags, flags.Analysis.doPRW, flags.Analysis.TriggerChains
     )
 
     objects_out = {
@@ -115,16 +122,17 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
         "taus": ("tau", get_tau_branches),
     }
     for objtype, (prefix, branch_getter) in objects_out.items():
-        if flags(f"Analysis.write_{objtype}"):
+        if getattr(tree_flags.reco_outputs,f'{objtype}'):
             tree_branches += branch_getter(
                 flags,
+                tree_flags,
                 input_container=getattr(flags.Analysis.container_names.output,objtype),
                 output_prefix=prefix,
             )
 
-    if flags.Analysis.write_small_R_jets:
+    if tree_flags.reco_outputs.small_R_jets:
         tree_branches += get_small_R_jet_branches(
-            flags,
+            flags, tree_flags,
             input_container=flags.Analysis.container_names.output.reco4PFlowJet,
             output_prefix="recojet_antikt4PFlow",
         )
@@ -133,63 +141,69 @@ def minituple_cfg(flags: AthConfigFlags) -> ComponentAccumulator:
         # Needs to be decorated onto the jet container
         # to handle jet selection (thinning)
         tree_branches += get_small_R_bjet_branches(
-            flags,
+            flags, tree_flags,
             input_container=flags.Analysis.container_names.output.reco4PFlowJet,
             output_prefix="recojet_antikt4PFlow",
         )
 
-    if flags.Analysis.write_large_R_Topo_jets:
+    if tree_flags.reco_outputs.large_R_Topo_jets:
         tree_branches += get_large_R_jet_branches(
-            flags,
+            flags, tree_flags,
             input_container=flags.Analysis.container_names.output.reco10TopoJet,
             output_prefix="recojet_antikt10Topo",
             lr_jet_type="Topo",
         )
 
-    if flags.Analysis.write_large_R_UFO_jets:
+    if tree_flags.reco_outputs.large_R_UFO_jets:
         tree_branches += get_large_R_jet_branches(
-            flags,
+            flags, tree_flags,
             input_container=flags.Analysis.container_names.output.reco10UFOJet,
             output_prefix="recojet_antikt10UFO",
             lr_jet_type="UFO",
         )
 
-    if flags.Analysis.write_met:
+    if tree_flags.reco_outputs.met:
         tree_branches += get_met_branches(
             flags,
             input_container=flags.Analysis.container_names.output.met,
             output_prefix="met"
         )
 
-    if flags.Input.isMC and flags.Analysis.write_truth_small_R_jets:
+    if flags.Input.isMC and tree_flags.truth_outputs.small_R_jets:
         tree_branches += get_small_R_truthjet_branches(
             flags,
             input_container=flags.Analysis.container_names.input.truth4Jet,
             output_prefix="truthjet_antikt4PFlow",
         )
 
-    if flags.Input.isMC and flags.Analysis.write_truth_large_R_jets:
-        if flags.Analysis.write_large_R_Topo_jets:
+    if flags.Input.isMC and tree_flags.truth_outputs.large_R_jets:
+        if tree_flags.reco_outputs.large_R_Topo_jets:
             tree_branches += get_large_R_truthjet_branches(
                 flags,
                 input_container=flags.Analysis.container_names.input.truth10TrimmedJet,
                 output_prefix="truthjet_antikt10Trimmed",
             )
-        if flags.Analysis.write_large_R_UFO_jets:
+        if tree_flags.reco_outputs.large_R_UFO_jets:
             tree_branches += get_large_R_truthjet_branches(
                 flags,
                 input_container=flags.Analysis.container_names.input.truth10SoftDropJet,
                 output_prefix="truthjet_antikt10SoftDrop",
             )
 
-    if flags.Analysis.extra_output_branches:
+    if tree_flags.extra_output_branches:
         log.info(
-            f"Appending {len(flags.Analysis.extra_output_branches)} extra branches"
+            f"Appending {len(tree_flags.extra_output_branches)} extra branches"
         )
-        tree_branches += flags.Analysis.extra_output_branches
+        tree_branches += tree_flags.extra_output_branches
 
     log.info("Add tree seq")
-    cfg.merge(tree_cfg(flags, branches=tree_branches, outfile=flags.Analysis.out_file))
+    cfg.merge(tree_cfg(
+        flags,
+        branches=tree_branches,
+        outfile=outfile_name,
+        stream=tree_flags.stream_name,
+        treedir=tree_flags.directory_name,
+    ))
 
     if flags.Analysis.dump_output_branchlist:
         outf_sub = flags.Analysis.out_file.replace("root", "txt")

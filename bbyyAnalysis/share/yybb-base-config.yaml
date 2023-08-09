@@ -55,24 +55,12 @@ systematics_regex: [".*"]
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
 
-# which objects to write
-write_small_R_jets: true
-write_large_R_Topo_jets: false
-write_large_R_UFO_jets: false
-write_VR_jets: false
-write_muons: false
-write_electrons: false
-write_photons: true
-
-# additional Large R info
-write_large_R_substructure: false
-write_large_R_truth_labels: false
-
-# turned off automatically if MC
-write_truth_small_R_jets: true
-write_truth_large_R_jets: false
-write_truth_higgs: true
-
-# custom extra output branches
-extra_output_branches: []
-
+# configure TTree output contents
+ttree_output:
+  AnalysisMiniTree:
+    reco_outputs:
+      small_R_jets: true
+      photons: true
+    truth_outputs:
+      small_R_jets: true
+      higgs_particle: true

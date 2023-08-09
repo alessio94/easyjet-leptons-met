@@ -9,8 +9,8 @@ def overlap_sequence_cfg(flags):
     )
 
     if (
-        flags.Analysis.write_large_R_Topo_jets
-        and flags.Analysis.write_large_R_UFO_jets
+        flags.Analysis.do_large_R_Topo_jets
+        and flags.Analysis.do_large_R_UFO_jets
     ):
         raise ValueError("Overlap removal only works with one Large R collection")
     overlapInputNames = {}
@@ -25,12 +25,12 @@ def overlap_sequence_cfg(flags):
         overlapInputNames["jets"] = flags.Analysis.container_names.output.reco4PFlowJet
 
     do_fatJet_OR = False
-    if flags.Analysis.write_large_R_Topo_jets:
+    if flags.Analysis.do_large_R_Topo_jets:
         overlapInputNames["fatJets"] = (
             flags.Analysis.container_names.output.reco10TopoJet
         )
         do_fatJet_OR = True
-    if flags.Analysis.write_large_R_UFO_jets:
+    if flags.Analysis.do_large_R_UFO_jets:
         overlapInputNames["fatJets"] = (
             flags.Analysis.container_names.output.reco10UFOJet
         )

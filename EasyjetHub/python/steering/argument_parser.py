@@ -142,6 +142,7 @@ def dict_to_flags(d: dict) -> AthConfigFlags:
                 prefix=True,
             )
         else:
+            assert v is not None, f"Flag value {k} not assigned"
             _flags.addFlag(k,v)
     # Save the list of keys for easier iteration as
     # regenerating the dict from the flag is difficult
@@ -178,6 +179,7 @@ def fill_flags_from_runconfig(
                 prefix=True,
             )
         else:
+            assert value is not None, f"Flag value {key} not assigned"
             flags.addFlag(f"Analysis.{key}", value)
 
     return flags

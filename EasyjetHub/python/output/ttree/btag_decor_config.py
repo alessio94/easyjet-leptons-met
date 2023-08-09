@@ -5,24 +5,27 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 def btag_decor_cfg(flags):
     # Could make this configurable
     jetcoll = flags.Analysis.container_names.input.reco4PFlowJet
-    if flags.Analysis.write_small_R_gn2_branches:
-        cfg = ComponentAccumulator()
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.BTaggingDecoratorAlg(
-                f"BTagDecor_{jetcoll}",
-                jetsIn=jetcoll,
-                floatVars=[
-                    "GN2v00_pb",
-                    "GN2v00_pc",
-                    "GN2v00_pu",
-                    "DL1dv01_pb",
-                    "DL1dv01_pc",
-                    "DL1dv01_pu",
-                    "DL1r_pb",
-                    "DL1r_pc",
-                    "DL1r_pu",
-                ],
-            )
+    cfg = ComponentAccumulator()
+    btag_vars = [
+        "DL1dv01_pb",
+        "DL1dv01_pc",
+        "DL1dv01_pu",
+    ]
+    if not flags.Input.isPHYSLITE:
+        btag_vars += [
+            "DL1r_pb",
+            "DL1r_pc",
+            "DL1r_pu",
+            "GN2v00_pb",
+            "GN2v00_pc",
+            "GN2v00_pu",
+        ]
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.BTaggingDecoratorAlg(
+            f"BTagDecor_{jetcoll}",
+            jetsIn=jetcoll,
+            floatVars=btag_vars,
         )
+    )
 
     return cfg

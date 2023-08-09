@@ -1,7 +1,7 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager
 
 
-def get_event_info_branches(flags, do_PRW, trigger_chains):
+def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
     eventinfo_branches = BranchManager(
         input_container="EventInfo",
         output_prefix="",
@@ -27,7 +27,7 @@ def get_event_info_branches(flags, do_PRW, trigger_chains):
     ]
     eventinfo_branches.variables += trigger_branches
 
-    if flags.Analysis.write_truth_higgs and flags.Input.isMC:
+    if tree_flags.truth_outputs.higgs_particle and flags.Input.isMC:
         eventinfo_branches.variables += ["truth_H1_pdgId", "truth_H2_pdgId"]
         for truthpart in [
             "truth_H1", "truth_H2",
@@ -38,7 +38,7 @@ def get_event_info_branches(flags, do_PRW, trigger_chains):
                 for var in ["pt", "eta", "phi", "m"]
             ]
 
-    if flags.Analysis.write_large_R_Topo_jets and flags.Analysis.write_VR_jets:
+    if tree_flags.reco_outputs.large_R_Topo_jets and tree_flags.reco_outputs.VR_jets:
         eventinfo_branches.required_flags.append(
             flags.Analysis.do_large_R_Topo_jets
         )
@@ -46,7 +46,7 @@ def get_event_info_branches(flags, do_PRW, trigger_chains):
             "passRelativeDeltaRToVRJetCutTopo"
         ]
 
-    if flags.Analysis.write_large_R_UFO_jets and flags.Analysis.write_VR_jets:
+    if tree_flags.reco_outputs.large_R_UFO_jets and tree_flags.reco_outputs.VR_jets:
         eventinfo_branches.required_flags.append(
             flags.Analysis.do_large_R_UFO_jets
         )

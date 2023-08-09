@@ -35,22 +35,20 @@ disable_calib: true
 # apply loose jet cleaning only
 loose_jet_cleaning: true
 
-# which objects to write
-write_small_R_jets: true
-write_large_R_UFO_jets: true
-write_muons: true
-
-# additional small R info
-write_small_R_higgs_parent_info: true
-write_small_R_gn2_branches: true
-
-# additional Large R info
-write_large_R_substructure: true
-
-# turned off automatically if MC
-write_truth_small_R_jets: true
-write_truth_large_R_jets: true
-write_truth_higgs: true
-
-# custom extra output branches
-extra_output_branches: []
+# configure TTree output contents
+ttree_output:
+  AnalysisMiniTree:
+    reco_outputs:
+      small_R_jets: true
+      large_R_UFO_jets: true
+      muons: true
+    collection_options:
+      small_R_jets:
+        higgs_parent_info: true
+        gn2_branches: true
+      large_R_jets:
+        substructure_info: true
+    truth_outputs:
+      small_R_jets: true
+      large_R_jets: true
+      higgs_particle: true

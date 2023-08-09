@@ -1,7 +1,7 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 
 
-def get_muon_branches(flags, input_container, output_prefix):
+def get_muon_branches(flags, tree_flags, input_container, output_prefix):
     _syst_option = SystOption.ALL_SYST
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
@@ -13,7 +13,7 @@ def get_muon_branches(flags, input_container, output_prefix):
         systematics_option=_syst_option,
     )
 
-    if flags.Analysis.write_object_systs_only_for_pt:
+    if tree_flags.write_object_systs_only_for_pt:
         muon_branches.syst_only_for = ["pt"]
 
     muon_branches.add_four_mom_branches(do_mass=False)
