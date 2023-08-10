@@ -204,7 +204,10 @@ namespace bhist {
       ] (const Pairs& pairs) -> bool
     {
       for (const auto& pair: pairs) {
-        if (idx(*pair.j1) != idx(*pair.j2)) return false;
+        char idx1 = idx(*pair.j1);
+        char idx2 = idx(*pair.j2);
+        if (idx1 < 0 || idx2 < 0) return false;
+        if (idx1 != idx2) return false;
       }
       return true;
     };

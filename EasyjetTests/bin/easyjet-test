@@ -39,17 +39,11 @@ declare -A DATAFILES=(
     [jets-mc20]=${PHYS_JETS_MC20}
     [ttbar-mc20-fast]=${PHYS_TTBAR_MC20}
     [ttbar-mc20]=${PHYS_TTBAR_MC20}
-    [ttbar-mc20-fast-aod]=${PHYS_TTBAR_MC20}
     [hh4b-mc21]=${PHYS_HH4B_MC21}
-    [hh4b-mc21-noroot]=${PHYS_HH4B_MC21}
-    [hh4b-mc21-syst]=${PHYS_HH4B_MC21}
-    [hh4b-mc21-syst-hist]=${PHYS_HH4B_MC21}
     [hh4b-resolved-mc21]=${PHYS_HH4B_MC21}
-    [sh4b-boosted-mc20-fast-awkward]=${PHYS_SH4B_BOOSTED_MC20}
     [sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED_MC20}
     [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
     [ttbar-mc21]=${PHYS_TTBAR_MC21}
-    [ttbar-mc21-syst]=${PHYS_TTBAR_MC21}
     [jets-mc21]=${PHYS_JETS_MC21}
     [jets-mc23]=${PHYS_JETS_MC23}
     [lite-sh4b-boosted-mc20-fast]=${PHYSLITE_SH4B_BOOSTED_MC20}
@@ -62,6 +56,16 @@ declare -A DATAFILES=(
     [lite-yybb-mc20]=${PHYSLITE_YYBB_MC20}
     [lite-bbtt-mc21]=${PHYSLITE_BBTT_MC21}
     [bbtt-mc21]=${PHYS_BBTT_MC21}
+    # systematics enabled
+    [syst-ttbar-mc21]=${PHYS_TTBAR_MC21}
+    [syst-hh4b-mc21]=${PHYS_HH4B_MC21}
+    # non-ntupler workflows
+    [aod-hh4b-mc21-fast]=${PHYS_HH4B_MC21}
+    [h5-hh4b-mc21]=${PHYS_HH4B_MC21}
+    [hist-syst-hh4b-mc21]=${PHYS_HH4B_MC21}
+    [awkward-sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED_MC20}
+    # test mode
+    [fail]=${PHYS_HH4B_MC21}
 )
 
 declare -A TESTS=(
@@ -72,17 +76,11 @@ declare -A TESTS=(
     [jets-mc20]="simple easyjet-ntupler"
     [ttbar-mc20-fast]="fast easyjet-ntupler"
     [ttbar-mc20]="simple easyjet-ntupler"
-    [ttbar-mc20-fast-aod]="aod-fast bbbb-ntupler"
-    [sh4b-boosted-mc20-fast-awkward]="fast easyjet-ntupler"
     [sh4b-boosted-mc20-fast]="fast easyjet-ntupler"
     [hh4b-mc21]="simple easyjet-ntupler"
-    [hh4b-mc21-noroot]="h5-fast easyjet-ntupler"
-    [hh4b-mc21-syst]="systematics easyjet-ntupler"
-    [hh4b-mc21-syst-hist]=hist-dump-syst
     [hh4b-resolved-mc21]="simple bbbb-ntupler"
     [ttbar-mc21-fast]="fast easyjet-ntupler"
     [ttbar-mc21]="simple easyjet-ntupler"
-    [ttbar-mc21-syst]="systematics easyjet-ntupler"
     [jets-mc21]="simple easyjet-ntupler"
     [jets-mc23]="simple easyjet-ntupler"
     [lite-sh4b-boosted-mc20-fast]="fast easyjet-ntupler"
@@ -95,6 +93,16 @@ declare -A TESTS=(
     [lite-yybb-mc20]="simple bbyy-ntupler"
     [lite-bbtt-mc21]="simple bbtt-ntupler"
     [bbtt-mc21]="simple bbtt-ntupler"
+    # systamatics
+    [syst-ttbar-mc21]="systematics easyjet-ntupler"
+    [syst-hh4b-mc21]="systematics easyjet-ntupler"
+    # non-ntupler
+    [aod-hh4b-mc21-fast]="aod-fast bbbb-ntupler"
+    [h5-hh4b-mc21]="h5-fast easyjet-ntupler"
+    [hist-syst-hh4b-mc21]="hist-syst bbbb-ntupler"
+    [awkward-sh4b-boosted-mc20-fast]="fast easyjet-ntupler"
+    # test mode
+    [fail]=false
 )
 
 DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
@@ -106,14 +114,15 @@ declare -A CONFIGS=(
     [lite-hh4b-mc21]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [sh4b-boosted-mc20]=bbbbAnalysis/RunConfig-SH4b.yaml
     [sh4b-boosted-mc20-p5658]=bbbbAnalysis/RunConfig-SH4b.yaml
-    [sh4b-boosted-mc20-fast-awkward]=EasyjetHub/awkward-config.yaml
-    [hh4b-mc21-syst-hist]=bbbbAnalysis/histonly-config.yaml
-    [ttbar-mc20-fast-aod]=bbbbAnalysis/RunConfig-Resolved.yaml
     [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
     [yybb-mc20]=bbyyAnalysis/RunConfig-PHYS-yybb.yaml
     [lite-yybb-mc20]=bbyyAnalysis/RunConfig-PHYSLITE-yybb.yaml
     [lite-bbtt-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt.yaml
     [bbtt-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt.yaml
+    # non-ntupler
+    [aod-hh4b-mc21-fast]=bbbbAnalysis/RunConfig-Resolved.yaml
+    [hist-syst-hh4b-mc21]=bbbbAnalysis/histonly-config.yaml
+    [awkward-sh4b-boosted-mc20-fast]=EasyjetHub/awkward-config.yaml
 )
 
 # some common variables in the tests
@@ -176,10 +185,10 @@ aod-fast() {
     echo "made hists:"
     h5ls ${HISTS}/nominal
 }
-hist-dump-syst() {
+hist-syst() {
     local OPTS="$COMMON --fast-test --cache-metadata"
     OPTS+=" --output-hists hists.h5"
-    local CMD="bbbb-ntupler $1 -c $2 $OPTS"
+    local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
     CMD+="  --timeout 30"
     echo "running $CMD"
@@ -195,6 +204,15 @@ ALL_MODES=${!TESTS[*]}
 DIRECTORY=${EASYJET_TESTDIR-""}
 DATA_URL=https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw
 LOG_LEVEL=${EASYJET_LOG_LEVEL-"WARNING"}
+NPROCS=${EASYJET_NPROCS-$(nproc)}
+# metatest means we stuff in an echo prefix to commands
+if [[ ${EASYJET_METATEST+x} ]]; then
+    METASTATUS=set
+    PFX=echo
+else
+    METASTATUS=unset
+    PFX=""
+fi
 
 print-usage() {
     echo "usage: ${0##*/} [-h] [-l <level>] [-L <log-file>] [-d <dir>] <mode>" 1>&2
@@ -225,6 +243,8 @@ $(dump-modes)
 Notes on environment variables:
  - EASYJET_LOG_LEVEL: default for -l, currently ${LOG_LEVEL}
  - EASYJET_TESTDIR: default for -d, currently ${DIRECTORY:-/tmp/<random>}
+ - EASYJET_NPROCS: number of processes with "all", currently ${NPROCS}
+ - EASYJET_METATEST: set to run a test test, currently ${METASTATUS}
 
 EOF
     exit 1
@@ -250,7 +270,7 @@ dump-modes() {
         local FMT="  %s -> %s %s %s\n"
     fi
     local mode
-    for mode in ${ALL_MODES[*]}
+    for mode in ${ALL_MODES[*]/fail}
     do
         local func=${TESTS[$mode]}
         local config=${CONFIGS[$mode]-$DEFAULT_CONFIG}
@@ -347,10 +367,10 @@ run-test() {
     # get files
     if [[ ! -f ${file} ]] ; then
         echo "getting file ${file} from ${DATA_URL}"
-        curl -s ${DATA_URL}/${TAG}/${download_path} > ${file}
+        ${PFX} curl -s ${DATA_URL}/${TAG}/${download_path} > ${file}
     fi
 
-    local testcmd="${TESTS[$mode]} $file $config"
+    local testcmd="${PFX} ${TESTS[$mode]} $file $config"
     trap "error-handler $mode" ERR
     if [[ ! -z ${LOG_FILE+x} ]]; then
         $testcmd > $LOG_FILE 2>&1
@@ -360,12 +380,11 @@ run-test() {
     echo "$mode succeeded" >> test_results.log
 }
 
-# Variables
-NPROCS=6
-
 test-summary() {
-    echo "Waiting 10s to collect test results from other incomplete jobs"
-    sleep 10
+    if [[ ! -z ${EXIT_EARLY+x} ]] ; then
+        echo "Waiting 10s to collect test results from other incomplete jobs"
+        sleep 10
+    fi
     printf "\nAvailable test results:\n\n"
     for result in */test_results.log; do
         cat $result >> test_results.log
@@ -376,14 +395,15 @@ test-summary() {
 # now run the test
 if [[ ${MODE} == "all" ]] ; then
     # Run in parallel -- each job is in a separate shell
-    testcmd="${0} -d {} -L test.log {} 2>&1"
+    testcmd="${0} -d {} -L test.log {}"
     if [[ ! -z ${EXIT_EARLY+x} ]] ; then
         testcmd+=" || exit 255"
     fi
+    PMODES=${ALL_MODES[*]/fail}
     trap "echo failed tests detected; test-summary" ERR
-    printf "%s\n" $ALL_MODES | xargs -P $NPROCS -I {} bash -c "${testcmd}" &> /dev/null
+    printf "%s\n" $PMODES | xargs -P $NPROCS -I {} bash -c "${testcmd}" &> /dev/null
 
-    printf "\nAll tests completed successfully"
+    printf "\nAll tests completed successfully\n"
 else
     echo "running ${MODE}"
     trap "echo test failed with exit code \$?" ERR

@@ -52,20 +52,10 @@ ntupler_ttbar_mc20_fast:
   script:
     - easyjet-test ttbar-mc20-fast
 
-miniaod_ttbar_mc20_fast:
-  extends: .ntupler
-  script:
-    - easyjet-test ttbar-mc20-fast-aod
-
 ntupler_sh4b_boosted_mc20_fast:
   extends: .ntupler
   script:
     - easyjet-test sh4b-boosted-mc20-fast
-
-ntupler_sh4b_boosted_mc20_fast_awkward:
-  extends: .ntupler
-  script:
-    - easyjet-test sh4b-boosted-mc20-fast-awkward
 
 ntupler_yybb_mc20:
   extends: .ntupler
@@ -82,25 +72,10 @@ ntupler_ttbar_mc21_fast:
   script:
     - easyjet-test ttbar-mc21-fast
 
-ntupler_ttbar_mc21_syst:
-  extends: .ntupler
-  script:
-    - easyjet-test ttbar-mc21-syst
-
 ntupler_hh4b-mc21:
   extends: .ntupler
   script:
     - easyjet-test hh4b-mc21
-
-ntupler_hh4b_mc21_noroot:
-  extends: .ntupler
-  script:
-    - easyjet-test hh4b-mc21-noroot
-
-ntupler_hh4b_mc21_syst:
-  extends: .ntupler
-  script:
-    - easyjet-test hh4b-mc21-syst
 
 ntupler_hh4b_resolved_mc21:
   extends: .ntupler
@@ -146,3 +121,55 @@ ntupler_sh4b_boosted_mc20_p5658:
   extends: .ntupler
   script:
     - easyjet-test sh4b-boosted-mc20-p5658
+
+# systematics enabled
+
+syst_ttbar_mc21_syst:
+  extends: .ntupler
+  script:
+    - easyjet-test syst-ttbar-mc21
+
+syst_hh4b_mc21_syst:
+  extends: .ntupler
+  script:
+    - easyjet-test syst-hh4b-mc21
+
+# non-ntupler workflows
+
+aod_hh4b_mc21_fast:
+  stage: run
+  needs: [compile]
+  script:
+    - easyjet-test aod-hh4b-mc21-fast
+
+h5_hh4b_mc21_fast:
+  stage: run
+  needs: [compile]
+  script:
+    - easyjet-test h5-hh4b-mc21
+
+hist_syst_hh4b_mc21:
+  stage: run
+  needs: [compile]
+  script:
+    - easyjet-test hist-syst-hh4b-mc21
+
+awkward_sh4b_boosted_mc20_fast:
+  stage: run
+  needs: [compile]
+  script:
+    - easyjet-test awkward-sh4b-boosted-mc20-fast
+
+# metatests
+
+test_fail:
+  stage: run
+  needs: [compile]
+  script:
+    - (! easyjet-test fail)
+
+test_all:
+  stage: run
+  needs: [compile]
+  script:
+    - EASYJET_METATEST=true easyjet-test all
