@@ -35,9 +35,13 @@ disable_calib: true
 # apply loose jet cleaning only
 loose_jet_cleaning: true
 
-# configure TTree output contents
+# Include the TTree configuration and update details
 ttree_output:
+  ttree_names:
+    - AnalysisMiniTree
   AnalysisMiniTree:
+    include: AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
     reco_outputs:
       small_R_jets: true
       large_R_UFO_jets: true

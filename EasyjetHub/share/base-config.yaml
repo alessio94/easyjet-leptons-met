@@ -31,13 +31,6 @@ systematics_regex: []
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
 
-# Include the TTree configuration
-ttree_output:
-  ttree_names:
-    - AnalysisMiniTree
-  AnalysisMiniTree:
-    include: AnalysisMiniTree-config.yaml
-
 # Definition of container names
 container_names:
   include: container-names-DAOD_PHYS.yaml
@@ -45,3 +38,6 @@ container_names:
 histograms: false
 h5:
   n_jets: 10
+
+ttree_output:
+  ttree_names: []

@@ -35,8 +35,9 @@ def yybb_job_cfg():
     # For more sophistication this could be done using
     # custom BranchManagers
     if flags.Analysis.do_yybb_analysis:
-        flags.Analysis.ttree_output.AnalysisMiniTree.extra_output_branches \
-            += yybb_branches(flags)
+        for tree_name in flags.Analysis.ttree_output.ttree_names:
+            tree_flags = getattr(flags.Analysis.ttree_output,tree_name)
+            tree_flags.extra_output_branches += yybb_branches(flags)
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.

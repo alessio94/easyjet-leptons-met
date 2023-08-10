@@ -26,9 +26,13 @@ loose_jet_cleaning: true
 do_resolved_dihiggs: true
 do_boosted_dihiggs: false
 
-# configure TTree output contents
+# Include the TTree configuration and update details
 ttree_output:
+  ttree_names:
+    - AnalysisMiniTree
   AnalysisMiniTree:
+    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
     reco_outputs:
       small_R_jets: true
     collection_options:

@@ -61,9 +61,13 @@ systematics_regex: [
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
 
-# configure TTree output contents
+# Include the TTree configuration and update details
 ttree_output:
+  ttree_names:
+    - AnalysisMiniTree
   AnalysisMiniTree:
+    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
     reco_outputs:
       small_R_jets: true
       large_R_Topo_jets: true
