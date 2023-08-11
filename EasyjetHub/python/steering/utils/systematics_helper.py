@@ -2,7 +2,7 @@
 # into a single regex for the SystematicsSvc
 def consolidate_systematics_regex(regex_list):
     # Default to a single match-all
-    if regex_list == ['.*']:
+    if set(regex_list) == {'.*'}:
         syst_regex = '.*'
     else:
         for r in regex_list:

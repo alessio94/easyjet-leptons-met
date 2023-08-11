@@ -15,7 +15,7 @@ def overlap_sequence_cfg(flags):
         raise ValueError("Overlap removal only works with one Large R collection")
     overlapInputNames = {}
     for objtype in ["muons", "electrons", "photons", "taus"]:
-        if flags(f"Analysis.do_{objtype}"):
+        if flags.Analysis[f"do_{objtype}"]:
             overlapInputNames[objtype] = getattr(
                 flags.Analysis.container_names.output,
                 objtype,

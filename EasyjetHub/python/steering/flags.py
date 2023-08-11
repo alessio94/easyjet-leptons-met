@@ -1,5 +1,6 @@
 from pathlib import Path
 import sys
+from collections import namedtuple
 
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
@@ -23,6 +24,126 @@ from EasyjetHub.steering.utils.log_helper import log, setRogueLoggers
 from EasyjetHub.steering.container_names import define_output_container_name_flags
 
 
+#####################################################################
+# flag converters, makes everything into a not AthConfigFlags object
+#####################################################################
+#
+# There's some really nasty private data access in here, but that's
+# what it takes to get out of a nasty place.
+
+
+def dictify(subflag):
+    """make some set of flags into a dictionary
+
+    This function aims to encapsulate all the nasty stuff that we have
+    to do with config flags
+
+    """
+    subflag._flags.loadAllDynamicFlags()
+    outdict = {}
+    for key, item in _subflag_itr(subflag):
+        x = outdict
+        subkeys = key.split('.')
+        for subkey in subkeys[:-1]:
+            x = x.setdefault(subkey,{})
+        x[subkeys[-1]] = item
+    return outdict
+
+
+def _subflag_itr(subflag):
+    address = subflag._name
+    for key in subflag._flags._flagdict.keys():
+        if key.startswith(address):
+            ntrim = len(address) + 1
+            remaining = key[ntrim:]
+            yield key, getattr(subflag, remaining)
+
+
+def _purge_flags(flags, name):
+    """another nasty function that messes with AthConfigFlags"""
+    for key in list(flags._flagdict):
+        if key.startswith(name):
+            del flags._flagdict[key]
+
+
+##########################################################
+# Convert everything back to standard python stuff
+##########################################################
+#
+# Everything in here should be better behaved
+# than AthConfigFlags
+
+
+# convenience accessors: make this behave more like a dict
+def _tup_items(self):
+    for key in self._fields:
+        yield key, getattr(self, key)
+
+
+def _tup_keys(self):
+    for key in self._fields:
+        yield key
+
+
+def _tup_values(self):
+    for key in self._fields:
+        yield getattr(self, key)
+
+
+def _tup_getitem(self, key):
+    if not isinstance(key, str):
+        raise TypeError("index must be a string")
+    # replace the attribute error with an index error (like a dict would)
+    try:
+        return getattr(self, key)
+    except AttributeError as err:
+        raise IndexError(err)
+
+
+def tuplicate(keydict, name='base'):
+    """Convert a dictionary / list struct to namedtuple / tuple
+
+    The resulting data structure is immutable and behaves sort of like
+    AthConfigFlags, only better.
+
+    """
+    if isinstance(keydict, dict):
+        # Avoid clobbering these keys if they exist. For now just
+        # throw an exception.
+        for k in ['items', 'keys', 'values']:
+            if k in keydict:
+                raise ValueError(
+                    f"field '{k}' isn't allowed in configuration files")
+        subtuples = {k: tuplicate(v, k) for k, v in keydict.items()}
+        tupclass = namedtuple(name, subtuples.keys())
+        # monkey patch for custom keyed indexing, numbered indexing
+        # isn't really meaningful for these data structures.
+        tupclass.__getitem__ = _tup_getitem
+        # patch in custom dict-like functions
+        tupclass.items = _tup_items
+        tupclass.keys = _tup_keys
+        tupclass.values = _tup_values
+        return tupclass(**subtuples)
+    if isinstance(keydict, list):
+        return tuple(tuplicate(x, 'listitem') for x in keydict)
+    return keydict
+
+
+def lock_merged_config_flags(flags, subflag='Analysis'):
+    """Main function to lock configuration flags
+
+    This should be the only thing that users need to call.
+    """
+    flag_dict = dictify(getattr(flags, subflag))
+    tup_flags = tuplicate(flag_dict)
+    _purge_flags(flags, subflag)
+    flags.addFlag(subflag, tup_flags.Analysis)
+    flags.lock()
+
+
+###########################################
+# other, less awesome functions
+###########################################
 def analysis_configuration(parser="default"):
 
     if parser == "default":

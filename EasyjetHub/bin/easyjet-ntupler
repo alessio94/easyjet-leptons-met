@@ -22,7 +22,7 @@ def minimal_job_cfg():
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
-    flags.lock()
+    hub.lock_merged_config_flags(flags)
 
     # Get a standard ComponentAccumulator with the following infrastructure:
     # - basic services for event loop, messaging etc

@@ -89,7 +89,7 @@ def cpalgs_cfg(
             "small_R_jets",
             "VR_jets"
         ]:
-            if flags(f"Analysis.do_{objtype}"):
+            if flags.Analysis[f"do_{objtype}"]:
                 log.info(f"Adding {objtype} seq")
                 cfg.merge(
                     analysis_seqs[objtype](flags)

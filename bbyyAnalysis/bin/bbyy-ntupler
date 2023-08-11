@@ -17,6 +17,7 @@ from EasyjetHub.hub import (
     run_job,
     default_sequence_cfg,
     output_cfg,
+    lock_merged_config_flags,
 )
 
 from bbyyAnalysis.yybb_config import yybb_branches
@@ -41,7 +42,7 @@ def yybb_job_cfg():
 
     # Lock the flags so that the configuration of job subcomponents cannot
     # modify them silently/unpredictably.
-    flags.lock()
+    lock_merged_config_flags(flags)
 
     # Get a standard ComponentAccumulator with the following infrastructure:
     # - basic services for event loop, messaging etc
