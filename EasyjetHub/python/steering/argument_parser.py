@@ -177,6 +177,20 @@ class AnalysisArgumentParser(ArgumentParser):
             default="",
             const="output.pool.root",
         )
+        self.add_argument(
+            "--dump-analysis-config-flags",
+            nargs='?',
+            default="",
+            help="Dump flags.Analysis to a yaml file.",
+            const="config-flags.Analysis.yaml",
+        )
+        self.add_argument(
+            "--dump-full-config-flags",
+            nargs='?',
+            default="",
+            help="Dump entire flags container to a yaml file.",
+            const="config-flags.full.yaml",
+        )
 
         # add analysis-specific flags
         self.an_opts = self.add_argument_group(

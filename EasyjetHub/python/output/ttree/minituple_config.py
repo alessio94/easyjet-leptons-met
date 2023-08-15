@@ -236,7 +236,7 @@ def minituple_cfg(
         log.info(
             f"Appending {len(tree_flags.extra_output_branches)} branches from yaml"
         )
-        tree_branches += extra_output_branches
+        tree_branches += list(extra_output_branches)
 
     log.info("Add tree seq")
     cfg.merge(tree_cfg(

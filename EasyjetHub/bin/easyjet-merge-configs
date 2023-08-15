@@ -4,7 +4,7 @@
 Merge some config files as a test
 """
 
-from EasyjetHub.steering.config_files import run_config_arg
+from EasyjetHub.steering.utils.config_files import run_config_arg
 from argparse import ArgumentParser
 import yaml
 

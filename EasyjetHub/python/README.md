@@ -9,12 +9,11 @@ To get a job running in the fewest possible lines of code, an executable could b
 from EasyjetHub import hub
 # Fill the configuration flags from the
 # parsed arguments
-flags, args = hub.analysis_configuration()
-# Lock the flags so that the configuration of job subcomponents cannot
-# modify them silently/unpredictably.
+# The flags are locked so that the configuration of job subcomponents
+# cannot modify them silently/unpredictably.
 # This step additionally makes a type substitution of the category
 # `flags.Analysis`, making iteration over the analysis flags easier.
-hub.lock_merged_config_flags(flags)
+flags, args = hub.analysis_configuration()
 # Get a standard ComponentAccumulator with the following infrastructure:
 # - basic services for event loop, messaging etc
 # - apply preselection on triggers and data quality

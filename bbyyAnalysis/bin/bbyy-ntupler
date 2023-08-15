@@ -16,9 +16,8 @@ from EasyjetHub.hub import (
     analysis_configuration,
     run_job,
     default_sequence_cfg,
-    output_cfg,
-    lock_merged_config_flags,
 )
+from EasyjetHub.output.ttree.minituple_config import minituple_cfg
 
 from bbyyAnalysis.yybb_config import yybb_branches
 from bbyyAnalysis.yybb_config import yybb_cfg
@@ -30,18 +29,8 @@ def yybb_job_cfg():
 
     # Fill the configuration flags from the
     # parsed arguments
+    # Returned flags are locked
     flags, args = analysis_configuration(parser)
-
-    # Extend the list of output branches via flags
-    # For more sophistication this could be done using
-    # custom BranchManagers
-    if flags.Analysis.do_yybb_analysis:
-        for tree_flags in flags.Analysis.ttree_output:
-            tree_flags['extra_output_branches'] += yybb_branches(flags)
-
-    # Lock the flags so that the configuration of job subcomponents cannot
-    # modify them silently/unpredictably.
-    lock_merged_config_flags(flags)
 
     # Get a standard ComponentAccumulator with the following infrastructure:
     # - basic services for event loop, messaging etc
@@ -50,6 +39,10 @@ def yybb_job_cfg():
     seqname = "bbyySeq"
     cfg = default_sequence_cfg(flags, seqname)
 
+    # Extend the list of output branches via flags
+    # For more sophistication this could be done using
+    # custom BranchManagers
+    extra_yybb_branches = []
     if flags.Analysis.do_yybb_analysis:
         cfg.merge(
             yybb_cfg(
@@ -63,7 +56,24 @@ def yybb_job_cfg():
         )
         cfg.merge(event_counter_cfg("n_yybb"), seqname)
 
-    cfg.merge(output_cfg(flags, seqname))
+        extra_yybb_branches = yybb_branches(flags)
+
+    # Explicitly call the minituple config because we want to provide
+    # additional branches, the list of which is generated dynamically
+    # rather than statically in the yaml
+    if flags.Analysis.out_file:
+        for tree_flags in flags.Analysis.ttree_output:
+            cfg.merge(
+                minituple_cfg(
+                    flags,tree_flags,
+                    flags.Analysis.out_file,
+                    extra_output_branches = extra_yybb_branches
+                ),
+                seqname,
+            )
+
+    # Record the number of events for logging and tests
+    cfg.merge(event_counter_cfg("n_events"), seqname)
 
     return cfg, flags, args
 

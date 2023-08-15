@@ -4,10 +4,9 @@ An `easyjet` job is steered primarily by configuration written in `yaml`, with s
 
 Within the python configuration code, the top-level configuration is passed around to configuration functions using the Athena [`AthConfigFlags`](https://gitlab.cern.ch/atlas/athena/-/blob/main/Control/AthenaConfiguration/python/AthConfigFlags.py) construct (assigned to the variable `flags`), allowing these functions awareness of job-wide settings/context. For input/output file configuration, some flags are added to `flags.Input/Output`, while settings governing the event loop are propagated to `flags.Exec`. Otherwise, all configuration specific to `easyjet` is held in the `flags.Analysis` category.
 
-There are three phases to the configuration:
-1. Flags are fully defined by parsing yaml and command line arguments.
-2. Flags are locked to prevent further manipulation.
-3. Flags are passed to configuration functions to generate the analysis algorithm sequence.
+There are two phases to the configuration:
+1. Flags are fully defined by parsing yaml and command line arguments. They are immediately locked so no further manipulation is possible.
+2. Flags are passed to configuration functions to generate the analysis algorithm sequence.
 
 
 ## Configuration in yaml
@@ -105,13 +104,10 @@ parser.add_analysis_argument(
 
 # Fill the configuration flags from the
 # parsed arguments
+# Returned flags are locked.
 flags, args = analysis_configuration(parser)
 
 print(args.greeting)
-
-# Lock the flags so that the configuration of job subcomponents cannot
-# modify them silently/unpredictably.
-lock_merged_config_flags(flags)
 
 if flags.Analysis.extra_verbose_output:
     print('Hope you have enough space for this log file!')
@@ -134,7 +130,7 @@ self.add_analysis_arg(
 
 ## The `ConfigItem` class
 
-During the locking step, the `flags.Analysis` category is transformed from `AthConfigFlags` into a custom class, `ConfigItem`. This is primarily a technical detail that most users need not pay much attention to. The differences between a `ConfigItem` instance and a locked `AthConfigFlags` instance are mainly that:
+During the flag creation, the `flags.Analysis` category is transformed from `AthConfigFlags` into a custom class, `ConfigItem`. This is primarily a technical detail that most users need not pay much attention to. The differences between a `ConfigItem` instance and a locked `AthConfigFlags` instance are mainly that:
 - It is easier to iterate over `ConfigItem`, as this class provides a python `dict`-like interface including `keys()`, `values()` and `items()` functions.
 - `ConfigItem` supports lists of `ConfigItem`, whereas `AthConfigFlags` is entirely associative. Practically speaking, a list of `yaml` objects is only accessible as a `list[dict]` in `AthConfigFlags`, which terminates the object-like (`flags.a.b`) access as soon as a list appears.
 - Where a subcategory of `AthConfigFlags` e.g. `flags.Input` returns a `FlagAddress` with access to the entire hierarchy, no backwards access is possible in `ConfigItem` -- `flags.Analysis.container_names.input` cannot be used to access `flags.Analysis.container_names.output`.

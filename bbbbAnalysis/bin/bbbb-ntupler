@@ -17,7 +17,6 @@ from EasyjetHub.hub import (
     analysis_configuration,     # lives in flags
     run_job,                    # lives in run
     default_sequence_cfg,       # lives in main_sequence_config
-    lock_merged_config_flags,   # lives in flags
 )
 from EasyjetHub.output.ttree.minituple_config import minituple_cfg
 from EasyjetHub.output.h5.h5_config import get_h5_cfg
@@ -47,12 +46,9 @@ def hh4b_job_cfg():
     parser = hh4b_parser()
 
     # Fill the configuration flags from the
-    # parsed arguments
+    # parsed arguments.
+    # Returned flags are locked
     flags, args = analysis_configuration(parser)
-
-    # Lock the flags so that the configuration of job subcomponents cannot
-    # modify them silently/unpredictably.
-    lock_merged_config_flags(flags)
 
     validate_hh4b_analysis_prerequisites(flags)
 
@@ -104,6 +100,7 @@ def hh4b_job_cfg():
             seqname
         )
 
+    # Record the number of events for logging and tests
     cfg.merge(event_counter_cfg("n_events"), seqname)
 
     return cfg, flags, args

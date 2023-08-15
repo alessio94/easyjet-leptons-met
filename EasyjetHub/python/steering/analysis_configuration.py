@@ -1,4 +1,6 @@
 from pathlib import Path
+import yaml
+import copy
 import sys
 
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
@@ -20,6 +22,8 @@ from EasyjetHub.steering.argument_parser import (
 from EasyjetHub.steering.utils.log_helper import log, setRogueLoggers
 from EasyjetHub.steering.utils.config_flags import (
     fill_flags_from_runconfig,
+    lock_merged_config_flags,
+    dictify,
 )
 
 
@@ -107,6 +111,23 @@ def analysis_configuration(parser="default"):
 
     if flags.Analysis.cache_metadata:
         cache_metadata(Path("metadata.json"))
+
+    # Flags need to be locked to be used.
+    # All values should be specified via the argument parser
+    # or in the yaml config.
+    # Getting the yaml configuration to mesh with the flags requires a
+    # bit more postprocessing so you can't use flags.lock().
+    lock_merged_config_flags(flags)
+
+    if args.dump_analysis_config_flags:
+        yaml.dump(flags.Analysis,open(args.dump_analysis_config_flags,'w'))
+
+    if args.dump_full_config_flags:
+        # Copy to avoid messing up the original flags
+        # then convert to dictionary and dump
+        flags_copy = copy.deepcopy(flags)
+        flags_as_dict = dictify(flags_copy)
+        yaml.dump(flags_as_dict,open(args.dump_full_config_flags,'w'))
 
     return flags, args
 

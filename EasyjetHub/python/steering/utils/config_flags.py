@@ -5,7 +5,7 @@ from .option_validation import validate_flags
 from ..argument_parser import validate_args
 from argparse import Namespace
 
-from AthenaConfiguration.AthConfigFlags import AthConfigFlags
+from AthenaConfiguration.AthConfigFlags import AthConfigFlags, FlagAddress
 
 #####################################################################
 # flag converters, makes everything into a not AthConfigFlags object
@@ -15,16 +15,19 @@ from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 # what it takes to get out of a nasty place.
 
 
-def dictify(subflag):
+def dictify(flags):
     """make some set of flags into a dictionary
 
     This function aims to encapsulate all the nasty stuff that we have
     to do with config flags
 
     """
-    subflag._flags.loadAllDynamicFlags()
+    if isinstance(flags,FlagAddress):
+        flags._flags.loadAllDynamicFlags()
+    elif isinstance(flags,AthConfigFlags):
+        flags.loadAllDynamicFlags()
     outdict = {}
-    for key, item in _subflag_itr(subflag):
+    for key, item in _subflag_itr(flags):
         x = outdict
         subkeys = key.split('.')
         for subkey in subkeys[:-1]:
@@ -33,13 +36,29 @@ def dictify(subflag):
     return outdict
 
 
-def _subflag_itr(subflag):
-    address = subflag._name
-    for key in subflag._flags._flagdict.keys():
-        if key.startswith(address):
+def _subflag_itr(flags):
+    if isinstance(flags,FlagAddress):
+        # subflag
+        keys = flags._flags._flagdict.keys()
+        address = flags._name
+    elif isinstance(flags,AthConfigFlags):
+        # top-level flags
+        keys = flags._flagdict.keys()
+        address = ''
+    else:
+        raise TypeError(f'Cannot iterate on {type(flags)}')
+    for key in keys:
+        if not address:
+            try:
+                val = getattr(flags, key)
+            except ModuleNotFoundError:
+                # Handle Athena packages that are not in AthAnalysis
+                val = 'undef'
+            yield key, val
+        elif key.startswith(address):
             ntrim = len(address) + 1
             remaining = key[ntrim:]
-            yield key, getattr(subflag, remaining)
+            yield key, getattr(flags, remaining)
 
 
 def _purge_flags(flags, name):
