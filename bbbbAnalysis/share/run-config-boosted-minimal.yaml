@@ -63,15 +63,13 @@ do_overlap_removal: false
 
 # Include the TTree configuration and update details
 ttree_output:
-  ttree_names:
-    - AnalysisMiniTree
-  AnalysisMiniTree:
+  - AnalysisMiniTree:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
     reco_outputs:
-      small_R_jets: true
-      large_R_Topo_jets: true
-      VR_jets: true
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      large_R_Topo_jets: 'container_names.output.reco10TopoJet'
+      VR_jets: 'container_names.output.vrJet'
     collection_options:
       large_R_jets:
         truth_labels: true

@@ -6,15 +6,50 @@ All output writing is done via the TTree algorithms provided in [`PhysicsAnalysi
 - `TreeFillerAlg` handles the actual operation of reading `xAOD` data and filling the `TTree` branches
 Further details are in the [atlassoftwaredocs AnalysisSWTutorial](https://atlassoftwaredocs.web.cern.ch/AnalysisSWTutorial/basic_trees/).
 
-In the basic job run by `easyjet-ntupler`, the full TTree creation is handled by the `minituple_cfg()` function in [`minituple_config.py`](./minituple_config.py).
+In the basic job run by `easyjet-ntupler`, the full TTree creation is handled by the `minituple_cfg()` function in [`minituple_config.py`](./minituple_config.py). For convenience, the function [`EasyjetHub.steering.main_sequence_config.output_cfg`](../../steering/main_sequence_config.py), accessible also as `EasyjetHub.hub.output_cfg`, will call `minituple_cfg()` if any TTree output file is specified (via `-O` or `--out-file`), while also setting up support for `h5` and `xAOD` output formats.
 
-There are two routes to adding branches into the output file:
-- A structured set of branches is defined when calling `minituple_cfg)()`, and is steerable via configuration flags. The detailed branch lists and configuration logic are defined in modules in this directory, corresponding to each of the object containers.
-- Arbitrary additions can be made by setting the `Analysis.extra_output_branches` flag, which is a list of output branch expressions following the syntax below.
+There are two routes to adding branches into the output file using`minituple_cfg()`. Each job is permitted to define a list of TTree configurations, which populate the `flags.Analysis.ttree_configs` list. For each of these configurations:
+- A structured set of branches is defined when calling `minituple_cfg()`, passing in the current TTree configuration. The detailed branch lists and configuration logic are defined in modules in this directory, corresponding to each of the object containers. The template TTree configuration is defined in [`EasyjetHub/share/AnalysisMiniTree-config.yaml`](../../../share/AnalysisMiniTree-config.yaml), including the tree name and the lists of containers and details to write. The template has all flags defaulted to off, so all desired content should be explicitly switched on (see e.g. [`EasyjetHub/share/RunConfig.yaml`](../../../share/RunConfig.yaml)).
+- Arbitrary additions can be made in two ways:
+  1. A fixed set of branches can be added setting the `extra_output_branches` flag under the TTree config in the yaml.
+  2. Mainly for cases where the branch list needs to be generated dynamically with python code, `minituple_cfg()` also takes an `extra_output_branches` argument, which is combined with any list set in yaml.
+The syntax for `extra_output_branches` is specified below.
 
-For more complex analysis logic, especially cases where different TTrees need to be written with their own specific event selection and content, the underlying `tree_cfg()` function can be called directly.
-This function permits direct configuration of the tree name, target ROOT file and the directory to which the tree is written.
-The full list of branches is input directly.
+Other arguments to `minituple_cfg()` permit direct configuration of the tree name, target ROOT file and the directory to which the tree is written. [^1]
+
+[^1]: Note that if `minituple_cfg()` is called via [`EasyjetHub.steering.main_sequence_config.output_cfg`](../../steering/main_sequence_config.py), all TTree configs will be read and written to the same output file, with identical selection.
+
+For even more control over the branch content, the `tree_cfg()` function that is called within `minituple_cfg()` can be used directly. This permits the full list of branches to be specified freely.
+
+
+### Tree configuration in yaml
+
+A single TTree configuration object contains these flags, among others:
+- `tree_name`, `directory_name`, `stream_name`: specification to `THistSvc` how to place the TTree in the output file
+- `reco_outputs`, `truth_outputs`: mappings, specifying the set of containers in StoreGate to be written out. Each can either be specified explicitly, or with reference to a flag under `flags.Analysis`. The flags will be searched first. E.g. consider the following fragment:
+```yaml
+reco_outputs:
+  small_R_jets: container_names.output.reco4PFlowJet
+  electrons: AnalysisElectrons
+```
+  - The job will try to write the jet container stored as `flags.Analysis.container_names.output.reco4PFlowJet`[^1] -- and will break if the flag is not defined.
+  - The job will try to write the electron container `AnalysisElectrons` (unless there exists a flag called `flags.Analysis.AnalysisElectrons`, in which case the value of this flag would be used -- this should be avoided, as potentially misleading).
+- `container_options`: flags specifying details to be added for specific containers, e.g.
+```yaml
+collection_options:
+  small_R_jets:
+    btag_info: True
+  large_R_jets:
+    substructure_info: True
+```
+- `write_object_systs_only_for_pt`: Forwarded to all `BranchManager` objects steering the configuration of this TTree.
+
+For the full set of flags, see [`EasyjetHub/share/AnalysisMiniTree-config.yaml`](../../../share/AnalysisMiniTree-config.yaml).
+
+[^1]: For convenience and to maintain flexibility, the python configuration operates on input/output containers specified by alias according to the input format in `EasyjetHub/share/container-names-DAOD_PHYS(LITE).yaml`.[^2] The `container_names.input/output` flags should always be specified, but additional `container_names` subflags could be used for analysis-specific customisation.
+
+[^2]: When operating on `DAOD_PHYSLITE`, calibrations can be turned off, in which case the `output` containers are not produced.
+
 
 ### Output syntax
 
@@ -32,6 +67,7 @@ Electrons.px -> electrons_px
 # The code cannot call Electrons[i].px()
 ```
 For writing arbitrary variables, it is necessary to add a decoration to some `xAOD` object that holds the relevant information. Typically, one would decorate the the object container with information pertaining to the full container. Information defined once per event can instead be decorated on `EventInfo`.
+
 
 ## BranchManager helper class
 
@@ -66,7 +102,7 @@ AntiKt4EMPFlowJets.NNJvt -> pf_jets_JET__JES__1up_NNJvt
 # etc ...
 ```
 
-Systmeatics can be switched only only for certain variables using the `systs_only_for` attribute of the `BranchManager`. 
+Systematics can be switched only only for certain variables using the `systs_only_for` attribute of the `BranchManager`. 
 Conversely, systematics can we switched off for certain variables using the `syst_not_for` attribute.   The former takes 
 precedence.  Setting the `write_object_systs_only_for_pt` flag only stores systematic variations for pt/Et-related branches.
 

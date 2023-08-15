@@ -57,14 +57,12 @@ do_overlap_removal: false
 
 # Include the TTree configuration and update details
 ttree_output:
-  ttree_names:
-    - AnalysisMiniTree
-  AnalysisMiniTree:
+  - AnalysisMiniTree:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
     reco_outputs:
-      small_R_jets: true
-      photons: true
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      photons: 'container_names.output.photons'
     truth_outputs:
-      small_R_jets: true
-      higgs_particle: true
+      small_R_jets: 'container_names.input.truth4Jet'
+      higgs_particle: 'container_names.output.truthHHParticles'

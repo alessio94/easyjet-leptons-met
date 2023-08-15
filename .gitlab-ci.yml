@@ -9,6 +9,7 @@ image: gitlab-registry.cern.ch/atlas/athena/athanalysis:24.2.13
 stages:
   - linting
   - build
+  - unittest
   - run
 
 # and source it
@@ -20,4 +21,5 @@ before_script:
 include:
   - ".gitlab/pipelines/.linting-gitlab-ci.yaml"
   - ".gitlab/pipelines/.build-gitlab-ci.yaml"
+  - ".gitlab/pipelines/.unittest-gitlab-ci.yaml"
   - ".gitlab/pipelines/.run-gitlab-ci.yaml"

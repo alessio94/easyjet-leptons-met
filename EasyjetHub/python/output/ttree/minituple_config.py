@@ -1,3 +1,4 @@
+from operator import attrgetter
 from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
@@ -19,6 +20,21 @@ from EasyjetHub.output.ttree.truth_jets import (
     get_small_R_truthjet_branches,
 )
 from EasyjetHub.output.ttree.met import get_met_branches
+from EasyjetHub.steering.utils.config_flags import ConfigItem
+
+
+# Permit aliasing of the container names
+# The full path under Analysis is substituted if possible
+def substitute_container_name(flags:AthConfigFlags, name:str) -> str:
+    _name = name
+    analysis_flags = flags.Analysis
+    try:
+        # With attrgetter we can retrieve a name containing '.'
+        # which works for names a few levels deeper in the flags
+        _name = attrgetter(name)(analysis_flags)
+    except AttributeError:
+        pass
+    return _name
 
 
 def tree_cfg(
@@ -91,8 +107,9 @@ def tree_cfg(
 
 def minituple_cfg(
     flags: AthConfigFlags,
-    tree_name: str,
+    tree_flags: ConfigItem,
     outfile_name: str,
+    extra_output_branches: list[str] = [],
 ) -> ComponentAccumulator:
     """
     This is the template output TTree configuration, steered via yaml config.
@@ -105,9 +122,6 @@ def minituple_cfg(
     ########################################################################
     # Create analysis mini-ntuple
     ########################################################################
-
-    # Extract the set of flags pertaining to this tree
-    tree_flags = getattr(flags.Analysis.ttree_output,tree_name)
 
     tree_branches = []
 
@@ -122,18 +136,24 @@ def minituple_cfg(
         "taus": ("tau", get_tau_branches),
     }
     for objtype, (prefix, branch_getter) in objects_out.items():
-        if getattr(tree_flags.reco_outputs,f'{objtype}'):
+        write_container_flag = getattr(tree_flags.reco_outputs, objtype)
+        if write_container_flag:
+            write_container = substitute_container_name(flags, write_container_flag)
             tree_branches += branch_getter(
                 flags,
                 tree_flags,
-                input_container=getattr(flags.Analysis.container_names.output,objtype),
+                input_container=write_container,
                 output_prefix=prefix,
             )
 
     if tree_flags.reco_outputs.small_R_jets:
+        small_R_name = substitute_container_name(
+            flags,
+            tree_flags.reco_outputs.small_R_jets
+        )
         tree_branches += get_small_R_jet_branches(
             flags, tree_flags,
-            input_container=flags.Analysis.container_names.output.reco4PFlowJet,
+            input_container=small_R_name,
             output_prefix="recojet_antikt4PFlow",
         )
 
@@ -142,14 +162,17 @@ def minituple_cfg(
         # to handle jet selection (thinning)
         tree_branches += get_small_R_bjet_branches(
             flags, tree_flags,
-            input_container=flags.Analysis.container_names.output.reco4PFlowJet,
+            input_container=small_R_name,
             output_prefix="recojet_antikt4PFlow",
         )
 
     if tree_flags.reco_outputs.large_R_Topo_jets:
         tree_branches += get_large_R_jet_branches(
             flags, tree_flags,
-            input_container=flags.Analysis.container_names.output.reco10TopoJet,
+            input_container=substitute_container_name(
+                flags,
+                tree_flags.reco_outputs.large_R_Topo_jets
+            ),
             output_prefix="recojet_antikt10Topo",
             lr_jet_type="Topo",
         )
@@ -157,7 +180,10 @@ def minituple_cfg(
     if tree_flags.reco_outputs.large_R_UFO_jets:
         tree_branches += get_large_R_jet_branches(
             flags, tree_flags,
-            input_container=flags.Analysis.container_names.output.reco10UFOJet,
+            input_container=substitute_container_name(
+                flags,
+                tree_flags.reco_outputs.large_R_UFO_jets
+            ),
             output_prefix="recojet_antikt10UFO",
             lr_jet_type="UFO",
         )
@@ -165,36 +191,52 @@ def minituple_cfg(
     if tree_flags.reco_outputs.met:
         tree_branches += get_met_branches(
             flags,
-            input_container=flags.Analysis.container_names.output.met,
+            input_container=substitute_container_name(
+                flags, tree_flags.reco_outputs.met
+            ),
             output_prefix="met"
         )
 
     if flags.Input.isMC and tree_flags.truth_outputs.small_R_jets:
         tree_branches += get_small_R_truthjet_branches(
             flags,
-            input_container=flags.Analysis.container_names.input.truth4Jet,
+            input_container=substitute_container_name(
+                flags, tree_flags.truth_outputs.small_R_jets
+            ),
             output_prefix="truthjet_antikt4PFlow",
         )
 
-    if flags.Input.isMC and tree_flags.truth_outputs.large_R_jets:
-        if tree_flags.reco_outputs.large_R_Topo_jets:
-            tree_branches += get_large_R_truthjet_branches(
+    large_R_truth_flags = tree_flags.truth_outputs.large_R_jets
+    if flags.Input.isMC and large_R_truth_flags:
+        def add_large_R_truth(flags, large_R_name):
+            large_R_name = substitute_container_name(flags, large_R_name)
+            large_R_type = ''
+            if 'Trimmed' in large_R_name:
+                large_R_type = 'Trimmed'
+            if 'SoftDrop' in large_R_name:
+                large_R_type = 'SoftDrop'
+            return get_large_R_truthjet_branches(
                 flags,
-                input_container=flags.Analysis.container_names.input.truth10TrimmedJet,
-                output_prefix="truthjet_antikt10Trimmed",
+                input_container=large_R_name,
+                output_prefix="truthjet_antikt10" + large_R_type,
             )
-        if tree_flags.reco_outputs.large_R_UFO_jets:
-            tree_branches += get_large_R_truthjet_branches(
-                flags,
-                input_container=flags.Analysis.container_names.input.truth10SoftDropJet,
-                output_prefix="truthjet_antikt10SoftDrop",
-            )
+        if isinstance(large_R_truth_flags,tuple):
+            for coll in large_R_truth_flags:
+                tree_branches += add_large_R_truth(flags, coll)
+        else:
+            tree_branches += add_large_R_truth(flags, large_R_truth_flags)
+
+    if extra_output_branches:
+        log.info(
+            f"Appending {len(extra_output_branches)} branches from args"
+        )
+        tree_branches += extra_output_branches
 
     if tree_flags.extra_output_branches:
         log.info(
-            f"Appending {len(tree_flags.extra_output_branches)} extra branches"
+            f"Appending {len(tree_flags.extra_output_branches)} branches from yaml"
         )
-        tree_branches += tree_flags.extra_output_branches
+        tree_branches += extra_output_branches
 
     log.info("Add tree seq")
     cfg.merge(tree_cfg(

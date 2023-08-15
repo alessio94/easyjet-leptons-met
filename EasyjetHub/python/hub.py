@@ -5,15 +5,16 @@
 # Arguments are converted into AthConfigFlags
 from EasyjetHub.steering.argument_parser import AnalysisArgumentParser
 
-from EasyjetHub.steering.flags import (
-    # Initialisation of standard AthConfigFlags
-    # File metadata is used for limited autoconfiguration
+# Initialisation of standard AthConfigFlags
+# File metadata is used for limited autoconfiguration
+from EasyjetHub.steering.analysis_configuration import (
     analysis_configuration,
-    # Flags need to be locked to be used.
-    # Getting the yaml configuration to mesh with the flags requires a
-    # bit more postprocessing so you can't use flags.lock().
-    lock_merged_config_flags,
 )
+
+# Flags need to be locked to be used.
+# Getting the yaml configuration to mesh with the flags requires a
+# bit more postprocessing so you can't use flags.lock().
+from EasyjetHub.steering.utils.config_flags import lock_merged_config_flags
 
 # Standard sequences needed to run an easyjet job on DAOD input
 from EasyjetHub.steering.main_sequence_config import (

@@ -323,8 +323,8 @@ COMMON+=" -l ${LOG_LEVEL}"
 #
 
 verify-test() {
-    if [[ ! ${DATAFILES[$1]}+x ]]; then usage; fi
-    if [[ ! ${TESTS[$1]}+x ]]; then usage; fi
+    if [[ ! ${DATAFILES[$1]+x} ]]; then usage; fi
+    if [[ ! ${TESTS[$1]+x} ]]; then usage; fi
 }
 
 if [[ ${MODE} == "all" ]]; then

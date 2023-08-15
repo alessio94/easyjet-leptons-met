@@ -157,11 +157,13 @@ def output_cfg(flags, seqname):
     # This config only handles one output file, as it comes from the
     # command line arguments. In principle we could set up multiple
     # output files, but that needs more custom config hooks
+    # If additional branches need to be configured dynamically,
+    # i.e. via python, then minituple_cfg should be called explicitly
     if flags.Analysis.out_file:
-        for tree_name in flags.Analysis.ttree_output.ttree_names:
+        for tree_flags in flags.Analysis.ttree_output:
             cfg.merge(
                 minituple_cfg(
-                    flags,tree_name,
+                    flags,tree_flags,
                     flags.Analysis.out_file,
                 ),
                 seqname,

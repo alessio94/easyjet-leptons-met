@@ -12,7 +12,9 @@ from EasyjetHub import hub
 flags, args = hub.analysis_configuration()
 # Lock the flags so that the configuration of job subcomponents cannot
 # modify them silently/unpredictably.
-flags.lock()
+# This step additionally makes a type substitution of the category
+# `flags.Analysis`, making iteration over the analysis flags easier.
+hub.lock_merged_config_flags(flags)
 # Get a standard ComponentAccumulator with the following infrastructure:
 # - basic services for event loop, messaging etc
 # - apply preselection on triggers and data quality
@@ -27,10 +29,6 @@ hub.run_job(flags, args, cfg).isSuccess()
 
 ### Directories
 - `algs/`: Modules configuring algorithms that run in the event loop
-  - `cpalgs_config.py`
-    - Configuration of the full suite of CP algs
-  - `event_counter_config.py`
-    - Simple event counter algorithm, can be inserted after any selection
   - `calibration/`
     - CP alg configuration modules for four-vector and scale factor calibrations
     - See `/algs/calibration/README.md` for an overview of custom operation
@@ -46,6 +44,7 @@ hub.run_job(flags, args, cfg).isSuccess()
   - `ttree/`
     - ROOT TTree output
     - See [`output/ttree/README.md`](./output/ttree/README.md) for documentation on defining branch lists for a container
+  - `xaod.py` provides basic support for writing an `xAOD` output file
 - `steering/`: Modules configuring the global job state, providing features such as:
   - Argument parsing
   - Standard configuration flags

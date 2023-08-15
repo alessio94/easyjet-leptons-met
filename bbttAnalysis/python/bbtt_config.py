@@ -118,17 +118,16 @@ def bbtt_branches(flags):
         "Leading_Tau_eta",
     ]
 
-    for tree_name in flags.Analysis.ttree_output.ttree_names:
-        tree_flags = getattr(flags.Analysis.ttree_output, tree_name)
+    for tree_flags in flags.Analysis.ttree_output:
         for var in bbtt_vars:
-            if tree_flags.write_object_systs_only_for_pt and "pt" not in var:
+            if tree_flags['write_object_systs_only_for_pt'] and "pt" not in var:
                 branches += [f"EventInfo.{var}_NOSYS -> bbtt_{var}"]
             else:
                 branches += [f"EventInfo.{var}_%SYS% -> bbtt_%SYS%_{var}"]
 
     if flags.Analysis.do_mmc:
         for var in ["status", "pt", "eta", "phi", "m"]:
-            if tree_flags.write_object_systs_only_for_pt and var != "pt":
+            if tree_flags['write_object_systs_only_for_pt'] and var != "pt":
                 branches += [f"EventInfo.mmc_{var}_NOSYS -> mmc_{var}"]
             else:
                 branches += [f"EventInfo.mmc_{var}_%SYS% -> mmc_%SYS%_{var}"]

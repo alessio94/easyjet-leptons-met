@@ -5,8 +5,7 @@ def validate_flags(flags):
 
     validate_do_obj_flags(flags)
 
-    for tree_name in flags.Analysis.ttree_output.ttree_names:
-        tree_flags = getattr(flags.Analysis.ttree_output,tree_name)
+    for tree_flags in flags.Analysis.ttree_output:
         validate_do_write_obj_flags(flags, tree_flags)
 
     validate_file_format(flags)
@@ -35,14 +34,14 @@ def validate_do_write_obj_flags(flags, tree_flags):
         'met'
     ]:
         try:
-            do_obj = getattr(flags.Analysis,f'do_{objtype}')
-            write_obj = getattr(tree_flags.reco_outputs,f'{objtype}')
+            do_obj = flags.Analysis[f'do_{objtype}']
+            write_obj = tree_flags.reco_outputs[objtype]
         except Exception as e:
             log.error(f'Failed to retrieve do/write {objtype} flags')
             raise e
         if write_obj and not do_obj:
             raise RuntimeError(
-                f'{tree_flags.tree_name}.reco_outputs.{objtype}=True'
+                f'{tree_flags.tree_name}.reco_outputs.{objtype} defined'
                 f' when do_{objtype}=False'
             )
 

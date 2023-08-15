@@ -13,3 +13,15 @@ input:
   truthBSMParticles:   TruthBSMWithDecayParticles
   truthSMParticles:    TruthBosonsWithDecayParticles
   met:                 AnalysisMET
+
+output:
+  reco4PFlowJet:       AnalysisAntiKt4EMPFlowJets_%SYS%
+  reco10TopoJet:       ''
+  reco10UFOJet:        AnalysisAntiKt10UFOCSSKSoftDropBeta100Zcut10Jets_%SYS%
+  vrJet:               ''
+  muons:               AnalysisMuons_%SYS%
+  electrons:           AnalysisElectrons_%SYS%
+  photons:             AnalysisPhotons_%SYS%
+  taus:                AnalysisTauJets_%SYS%
+  met:                 AnalysisMET_%SYS%
+  truthHHParticles:    TruthDiHiggsParticles

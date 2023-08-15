@@ -6,15 +6,15 @@ stream_name: ANALYSIS
 write_object_systs_only_for_pt: false
 # which objects to write
 reco_outputs:
-  small_R_jets: false
-  large_R_Topo_jets: false
-  large_R_UFO_jets: false
-  VR_jets: false
-  muons: false
-  electrons: false
-  photons: false
-  taus: false
-  met: false
+  small_R_jets: ''
+  large_R_Topo_jets: ''
+  large_R_UFO_jets: ''
+  VR_jets: ''
+  muons: ''
+  electrons: ''
+  photons: ''
+  taus: ''
+  met: ''
 
 collection_options:
 
@@ -31,8 +31,8 @@ collection_options:
 
 # turned off automatically if MC
 truth_outputs:
-  small_R_jets: false
-  large_R_jets: false
-  higgs_particle: false
+  small_R_jets: ''
+  large_R_jets: ''
+  higgs_particle: ''
 # custom extra output branches
 extra_output_branches: []

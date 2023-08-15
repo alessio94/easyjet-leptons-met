@@ -37,15 +37,15 @@ loose_jet_cleaning: true
 
 # Include the TTree configuration and update details
 ttree_output:
-  ttree_names:
-    - AnalysisMiniTree
-  AnalysisMiniTree:
+  -
     include: AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
+    # Read from input containers, as the CP calibration
+    # is disabled
     reco_outputs:
-      small_R_jets: true
-      large_R_UFO_jets: true
-      muons: true
+      small_R_jets: 'container_names.input.reco4PFlowJet'
+      large_R_UFO_jets: 'container_names.input.reco10UFOJet'
+      muons: 'container_names.input.muons'
     collection_options:
       small_R_jets:
         higgs_parent_info: true
@@ -53,6 +53,6 @@ ttree_output:
       large_R_jets:
         substructure_info: true
     truth_outputs:
-      small_R_jets: true
-      large_R_jets: true
-      higgs_particle: true
+      small_R_jets: 'container_names.input.truth4Jet'
+      large_R_jets: 'container_names.input.truth10SoftDropJet'
+      higgs_particle: 'container_names.output.truthHHParticles'

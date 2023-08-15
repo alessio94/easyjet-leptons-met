@@ -3,9 +3,6 @@ input:
   reco10TopoJet:       AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets
   reco10UFOJet:        AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets
   vrJet:               AntiKtVR30Rmax4Rmin02PV0TrackJets
-  truth4Jet:           AntiKt4TruthDressedWZJets
-  truth10TrimmedJet:   AntiKt10TruthTrimmedPtFrac5SmallR20Jets
-  truth10SoftDropJet:  AntiKt10TruthSoftDropBeta100Zcut10Jets
   muons:               Muons
   electrons:           Electrons
   photons:             Photons
@@ -13,3 +10,18 @@ input:
   truthBSMParticles:   TruthBSMWithDecayParticles
   truthSMParticles:    TruthBosonsWithDecayParticles
   met:                 AntiKt4EMPFlow
+  truth4Jet:           AntiKt4TruthDressedWZJets
+  truth10TrimmedJet:   AntiKt10TruthTrimmedPtFrac5SmallR20Jets
+  truth10SoftDropJet:  AntiKt10TruthSoftDropBeta100Zcut10Jets
+
+output:
+  reco4PFlowJet:       AnalysisAntiKt4EMPFlowJets_%SYS%
+  reco10TopoJet:       AnalysisAntiKt10LCTopoTrimmedPtFrac5SmallR20Jets_%SYS%
+  reco10UFOJet:        AnalysisAntiKt10UFOCSSKSoftDropBeta100Zcut10Jets_%SYS%
+  vrJet:               AnalysisAntiKtVR30Rmax4Rmin02PV0TrackJets_%SYS%
+  muons:               AnalysisMuons_%SYS%
+  electrons:           AnalysisElectrons_%SYS%
+  photons:             AnalysisPhotons_%SYS%
+  taus:                AnalysisTauJets_%SYS%
+  met:                 AnalysisMET_%SYS%
+  truthHHParticles:    TruthDiHiggsParticles

@@ -28,24 +28,22 @@ do_overlap_removal: false
 
 # Include the TTree configuration and update details
 ttree_output:
-  ttree_names:
-    - AnalysisMiniTree
-  AnalysisMiniTree:
+  - AnalysisMiniTree:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
     write_object_systs_only_for_pt: true
     reco_outputs:
-      small_R_jets: true
-      muons: true
-      electrons: true
-      taus: true
-      met : true
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
+      taus: 'container_names.output.taus'
+      met : 'container_names.output.met'
     collection_options:
       small_R_jets:
         btag_info: true
     truth_outputs:
-      small_R_jets: true
-      higgs_particle: true
+      small_R_jets: 'container_names.input.truth4Jet'
+      higgs_particle: 'container_names.output.truthHHParticles'
 
 do_CP_systematics: false
 systematics_regex: [".*"]

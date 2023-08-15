@@ -6,12 +6,16 @@ from argparse import ArgumentTypeError
 
 def combine_config_files(local, config_path, fragment_key="include"):
 
-    # if this isn't a dict there's nothing to combine
-    if not isinstance(local, dict):
+    # if this isn't an iterable there's nothing to combine
+    if isinstance(local, dict):
+        to_combine = local.values()
+    elif isinstance(local, list):
+        to_combine = local
+    else:
         return
 
     # otherwise descend into all the entries here
-    for sub in local.values():
+    for sub in to_combine:
         combine_config_files(sub, config_path)
 
     # if there are no fragments to include we're done

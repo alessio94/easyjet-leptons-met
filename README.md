@@ -60,6 +60,14 @@ You should find a new ROOT files, `analysis-variables.root`.
 
 To process Monte Carlo or PHYSLITE samples the command is exactly the same: configuration is automatically setup from the sample's metadata.
 
+### Getting oriented with the configuration
+
+For an overview of the core package structure and basic instructions for building an analysis custom executable, see [EasyjetHub/README.md](./EasyjetHub/README.md)
+
+For an overview of the configuration syntax and how to extend this, see [EasyjetHub/steering/README.md](./EasyjetHub/steering/README.md).
+
+For an explanation of the TTree output configuration, see [EasyjetHub/output/ttree/README.md](./EasyjetHub/output/ttree/README.md).
+
 ## AthAnalysis in Docker
 
 If you would rather work on a local computer, numbered `AthAnalysis` releases are available as Docker containers [in the Athena container registry][registry].
