@@ -23,7 +23,7 @@
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
-#include <EventBookkeeperTools/FilterReporterParams.h>
+#include <SystematicsHandles/SysFilterReporterParams.h>
 
 namespace HH4B
 {
@@ -69,9 +69,7 @@ private:
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<bool> m_pass_sr {"pass_bbtt_sr_%SYS%", this};
 
-    /// \brief Setup overall filter decision that passes event if it passes the 
-    /// selection for any systematic
-    FilterReporterParams m_filterParams {this, "HHbbtt", "HHbbtautau selection"};
+    CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
 
     /// \brief Steerable properties
     Gaudi::Property<std::string> m_channel { this, "Channel", "lephad", 

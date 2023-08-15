@@ -6,7 +6,10 @@
 
 #include "HHbbttSelectorAlg.h"
 
-#include <EventBookkeeperTools/FilterReporter.h>
+//#include <EventBookkeeperTools/FilterReporter.h>
+
+#include <SystematicsHandles/SysFilterReporter.h>
+#include <SystematicsHandles/SysFilterReporterCombiner.h>
 
 namespace HH4B
 {
@@ -19,6 +22,9 @@ namespace HH4B
 
   StatusCode HHbbttSelectorAlg ::initialize()
   {
+
+    // Initialise global event filter
+    ATH_CHECK (m_filterParams.initialize(m_systematicsList));
 
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
@@ -34,9 +40,6 @@ namespace HH4B
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
 
-    // Initialise global event filter
-    ATH_CHECK (m_filterParams.initialize());
-
     return StatusCode::SUCCESS;
   }
 
@@ -44,11 +47,12 @@ namespace HH4B
   {
 
     // Global filter originally false
-    FilterReporter filter(m_filterParams, false);
+    CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
+      CP::SysFilterReporter filter (filterCombiner, sys);
 
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
@@ -76,15 +80,9 @@ namespace HH4B
 
       // Apply selection
 
-      // Sys-aware decorator originally false per syst
-      m_pass_sr.set(*event, false, sys);
-
       // Cuts - just to test for now
       //if (taus->size() != 2) continue;
       //if (! (taus->at(0)->pt() > 60000)) continue;
-
-      // Sys-aware decorator true per syst if cuts passed
-      m_pass_sr.set(*event, true, sys);
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
@@ -95,7 +93,8 @@ namespace HH4B
   }
 
   StatusCode HHbbttSelectorAlg::finalize() {
-    ATH_MSG_INFO(m_filterParams.summary());
+    ANA_CHECK (m_filterParams.finalize ());
+    //ATH_MSG_INFO(m_filterParams.summary());
     return StatusCode::SUCCESS;
   }
 

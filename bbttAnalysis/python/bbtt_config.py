@@ -1,8 +1,8 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-# bbtt analysis chain
 
+# bbtt analysis chain
 
 def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg = ComponentAccumulator()
@@ -70,6 +70,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             electrons="bbttAnalysisElectrons_%SYS%",
             taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
+            eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
         )
     )
 
@@ -118,7 +119,7 @@ def bbtt_branches(flags):
     ]
 
     for tree_name in flags.Analysis.ttree_output.ttree_names:
-        tree_flags = getattr(flags.Analysis.ttree_output,tree_name)
+        tree_flags = getattr(flags.Analysis.ttree_output, tree_name)
         for var in bbtt_vars:
             if tree_flags.write_object_systs_only_for_pt and "pt" not in var:
                 branches += [f"EventInfo.{var}_NOSYS -> bbtt_{var}"]
@@ -132,6 +133,6 @@ def bbtt_branches(flags):
             else:
                 branches += [f"EventInfo.mmc_{var}_%SYS% -> mmc_%SYS%_{var}"]
 
-    branches += ["EventInfo.pass_bbtt_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
+    branches += ["EventInfo.bbtt_pass_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
 
     return branches
