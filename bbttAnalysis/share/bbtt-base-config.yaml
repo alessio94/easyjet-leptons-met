@@ -8,14 +8,12 @@ do_taus: true
 do_met : true
 do_mmc : true
 
+# Decay mode considered for truth decoration
+truthDecayModes: ["bbtt"]
+
 # btagging working points for small Rjets
 btag_wps:
     - DL1dv01_FixedCutBEff_77
-
-# btagging working points for Variable Radius Track jets
-#vr_btag_wps:
-    #- DL1r_FixedCutBEff_77
-    #- DL1r_FixedCutBEff_85
 
 # "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
 trigger_list: ["HHbbtt"]

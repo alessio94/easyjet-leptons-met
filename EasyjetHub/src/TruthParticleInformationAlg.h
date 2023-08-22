@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 ///////////////////////////////////////////////////////////////////
@@ -11,14 +11,19 @@
 ///////////////////////////////////////////////////////////////////
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_TRUTHPARTICLEINFORMATIONALG
-#define HH4BANALYSIS_TRUTHPARTICLEINFORMATIONALG
+#ifndef HHANALYSIS_TRUTHPARTICLEINFORMATIONALG
+#define HHANALYSIS_TRUTHPARTICLEINFORMATIONALG
 
 #include "AthContainers/ConstDataVector.h"
 #include <AthContainers/AuxElement.h>
 #include <AthenaBaseComps/AthAlgorithm.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODTruth/TruthParticleContainer.h>
+
+namespace MC
+{
+  static const int SBOSONBSM = 35;
+}
 
 namespace Easyjet
 {
@@ -29,9 +34,9 @@ private:
     int m_pdgId;
     P4 m_p4;
     const xAOD::TruthParticle *m_source = nullptr;
-    // final bb children
-    std::vector<P4> m_bb_p4;
-    std::vector<const xAOD::TruthParticle *> m_bb;
+    // final children
+    std::vector<P4> m_children_p4;
+    std::vector<const xAOD::TruthParticle *> m_children;
 
 public:
     TruthScalar() { m_pdgId = 0; };
@@ -54,23 +59,32 @@ public:
       return coords[coordIdx];
     }
 
-    void bb(std::vector<const xAOD::TruthParticle *> bb)
+    void children(std::vector<const xAOD::TruthParticle *> children)
     {
-      for (const xAOD::TruthParticle *b : bb)
+      for (const xAOD::TruthParticle *child : children)
       {
-        P4 b_p4{b->pt(), b->eta(), b->phi(), b->m()};
-        m_bb_p4.push_back(b_p4);
+        P4 child_p4{child->pt(), child->eta(), child->phi(), child->m()};
+        m_children_p4.push_back(child_p4);
       }
-      m_bb = std::move(bb);
+      m_children = std::move(children);
     }
 
-    std::vector<float> bb_p4(int coordIdx)
+    std::vector<int> children_pdgId(){
+      std::vector<int> pdgId_pair;
+      for (const xAOD::TruthParticle *child : m_children)
+      {
+	pdgId_pair.push_back(child->pdgId());
+      }
+      return pdgId_pair;
+    }
+
+    std::vector<float> children_p4(int coordIdx)
     {
       std::vector<float> coords_pair;
-      for (P4 b_p4 : m_bb_p4)
+      for (P4 child_p4 : m_children_p4)
       {
         std::array<float, 4> coords;
-        b_p4.GetCoordinates(coords.begin());
+        child_p4.GetCoordinates(coords.begin());
         coords_pair.push_back(coords[coordIdx]);
       }
       return coords_pair;
@@ -106,10 +120,10 @@ private:
 
     const xAOD::TruthParticle *
     getFinalParticleOfType(const xAOD::TruthParticle *p,
-                           const std::vector<int> pdgIds) const;
+                           const std::unordered_set<int> pdgIds) const;
 
     std::vector<const xAOD::TruthParticle *>
-    getFinalbb(const xAOD::TruthParticle *p) const;
+    getFinalChildren(const xAOD::TruthParticle *p) const;
 
     std::vector<TruthScalar>
     getFinalHiggses(const xAOD::TruthParticleContainer &container) const;
@@ -136,14 +150,18 @@ private:
             "Truth particle information container to write"};
 
     unsigned int m_nHiggses;
+    std::vector<std::string> m_decayModes;
 
     std::vector<SG::AuxElement::Decorator<int>> m_truthHiggsesPdgIdDecorators;
 
     std::vector<std::vector<SG::AuxElement::Decorator<float>>>
         m_truthHiggsesKinDecorators;
 
+    std::vector<SG::AuxElement::Decorator<std::vector<int>>>
+        m_truthChildrenPdgIdFromHiggsesDecorators;
+
     std::vector<std::vector<SG::AuxElement::Decorator<std::vector<float>>>>
-        m_truthbbKinFromHiggsesDecorators;
+        m_truthChildrenKinFromHiggsesDecorators;
 
     std::array<std::string, 4> m_kinVars{"pt", "eta", "phi", "m"};
   };

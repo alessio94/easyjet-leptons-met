@@ -8,6 +8,10 @@ do_VR_jets: true
 do_muons: true
 do_electrons: false
 do_photons: false
+
+# Decay mode considered for truth decoration
+truthDecayModes: ["bbbb"]
+
 # btagging working points for small Rjets
 btag_wps:
     - DL1dv01_FixedCutBEff_70

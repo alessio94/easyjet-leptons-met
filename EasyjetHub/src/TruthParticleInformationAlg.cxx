@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Victor Ruelas
@@ -10,21 +10,25 @@
 #include "TruthParticleInformationAlg.h"
 #include <algorithm>
 
+#include "TruthUtils/HepMCHelpers.h"
+
 //
 // method implementations
 //
 namespace Easyjet
 {
-  constexpr int H_ID = 25;
-  constexpr int S_ID = 35;
-  constexpr int b_ID = 5;
-  constexpr int b_bar_ID = -5;
+  const std::unordered_map<std::string, std::vector<int>> decayProducts_IDs{
+    {"bbbb", {MC::BQUARK, -MC::BQUARK}},
+    {"bbtt", {MC::BQUARK, -MC::BQUARK, MC::TAU, -MC::TAU}},
+    {"bbyy", {MC::BQUARK, -MC::BQUARK, MC::PHOTON}}
+  };
 
   TruthParticleInformationAlg ::TruthParticleInformationAlg(
       const std::string &name, ISvcLocator *pSvcLocator)
       : AthAlgorithm(name, pSvcLocator)
   {
     declareProperty("nHiggses", m_nHiggses = 2, "Number of Higgses to record");
+    declareProperty("decayModes", m_decayModes, "HH decay modes to consider");
   }
 
   StatusCode TruthParticleInformationAlg ::initialize()
@@ -47,17 +51,26 @@ namespace Easyjet
       // decorator will show up as "truth_Hx_pdgId", where x is the x higgs
       m_truthHiggsesPdgIdDecorators.emplace_back(
           "truth_H" + std::to_string(h + 1) + "_" + "pdgId");
+      m_truthChildrenPdgIdFromHiggsesDecorators.emplace_back(
+          "truth_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
+
       m_truthHiggsesKinDecorators.emplace_back(
           std::vector<SG::AuxElement::Decorator<float>>());
-      m_truthbbKinFromHiggsesDecorators.emplace_back(
+      m_truthChildrenKinFromHiggsesDecorators.emplace_back(
           std::vector<SG::AuxElement::Decorator<std::vector<float>>>());
       for (const std::string &var : m_kinVars)
       {
         m_truthHiggsesKinDecorators[h].emplace_back(
             "truth_H" + std::to_string(h + 1) + "_" + var);
-        m_truthbbKinFromHiggsesDecorators[h].emplace_back(
-            "truth_bb_fromH" + std::to_string(h + 1) + "_" + var);
+        m_truthChildrenKinFromHiggsesDecorators[h].emplace_back(
+            "truth_children_fromH" + std::to_string(h + 1) + "_" + var);
       }
+    }
+
+    for (const auto& decayMode : m_decayModes)
+    {
+      if(decayProducts_IDs.find(decayMode)==decayProducts_IDs.end())
+	ATH_MSG_ERROR("Decay mode "<<decayMode<<" is not supported");
     }
 
     return StatusCode::SUCCESS;
@@ -98,14 +111,14 @@ namespace Easyjet
                   << m_truthParticleInfoOutKey.key() << "\".");
 
     // Check that BSM container is not empty, otherwise use SM container
-    auto truthParticlesContaienr =
+    auto truthParticlesContainer =
         !truthBSMParticles.empty() ? truthBSMParticles : truthSMParticles;
 
     /*
       Find and record truth particle information
     */
     std::vector<TruthScalar> higgses =
-        getFinalHiggses(truthParticlesContaienr);
+        getFinalHiggses(truthParticlesContainer);
     /*
       Decorate truth particle information on EventInfo with defaults if higgses
       empty
@@ -141,11 +154,13 @@ namespace Easyjet
     for (unsigned int h = 0; h < m_nHiggses; h++)
     {
       m_truthHiggsesPdgIdDecorators[h](eventInfo) = higgses[h].pdgId();
+      m_truthChildrenPdgIdFromHiggsesDecorators[h](eventInfo) = higgses[h].children_pdgId();
+
       for (size_t i = 0; i < m_kinVars.size(); i++)
       {
         m_truthHiggsesKinDecorators[h][i](eventInfo) = higgses[h].p4(i);
-        m_truthbbKinFromHiggsesDecorators[h][i](eventInfo) =
-            higgses[h].bb_p4(i);
+        m_truthChildrenKinFromHiggsesDecorators[h][i](eventInfo) =
+            higgses[h].children_p4(i);
       }
     }
   }
@@ -175,7 +190,7 @@ namespace Easyjet
 
   const xAOD::TruthParticle *
   TruthParticleInformationAlg ::getFinalParticleOfType(
-      const xAOD::TruthParticle *p, const std::vector<int> ids) const
+      const xAOD::TruthParticle *p, const std::unordered_set<int> ids) const
   {
     for (size_t i = 0; i < p->nChildren(); i++)
     {
@@ -188,9 +203,9 @@ namespace Easyjet
   }
 
   std::vector<const xAOD::TruthParticle *>
-  TruthParticleInformationAlg ::getFinalbb(const xAOD::TruthParticle *h) const
+  TruthParticleInformationAlg ::getFinalChildren(const xAOD::TruthParticle *h) const
   {
-    std::vector<const xAOD::TruthParticle *> bb;
+    std::vector<const xAOD::TruthParticle *> children;
     const xAOD::TruthParticle *tmp(nullptr);
     for (size_t i = 0; i < h->nChildren(); i++)
     {
@@ -198,36 +213,46 @@ namespace Easyjet
       {
         verbosePrintParticleAndChildren(h->child(i));
       }
-      const xAOD::TruthParticle *final_b =
-          getFinalParticleOfType(h->child(i), {b_ID, b_bar_ID});
-      if (!tmp || (final_b->barcode() != tmp->barcode()))
+
+      std::unordered_set<int> childrenPdgIds;
+      for (const auto& decayMode : m_decayModes)
       {
-        tmp = final_b;
-        bb.push_back(final_b);
+	for (const auto id : decayProducts_IDs.at(decayMode))
+	{
+	  childrenPdgIds.emplace(id);
+	}
+      }
+
+      const xAOD::TruthParticle *final_child =
+          getFinalParticleOfType(h->child(i), childrenPdgIds);
+      if (!tmp || (final_child->barcode() != tmp->barcode()))
+      {
+        tmp = final_child;
+        children.push_back(final_child);
       }
     }
-    return bb;
+    return children;
   }
 
   std::vector<TruthScalar> TruthParticleInformationAlg ::getFinalHiggses(
-      const xAOD::TruthParticleContainer &truthParticlesContaienr) const
+      const xAOD::TruthParticleContainer &truthParticlesContainer) const
   {
     std::vector<TruthScalar> higgses;
     const xAOD::TruthParticle *tmp(nullptr);
-    for (const xAOD::TruthParticle *tp : truthParticlesContaienr)
+    for (const xAOD::TruthParticle *tp : truthParticlesContainer)
     {
       if (msgLvl(MSG::VERBOSE))
       {
         verbosePrintParticleAndChildren(tp);
       }
-      if ((tp->pdgId() == H_ID || tp->pdgId() == S_ID))
+      if ((tp->pdgId() == MC::HIGGSBOSON || tp->pdgId() == MC::SBOSONBSM))
       {
         const xAOD::TruthParticle *final_h =
-            getFinalParticleOfType(tp, {H_ID, S_ID});
+	  getFinalParticleOfType(tp, {MC::HIGGSBOSON, MC::SBOSONBSM});
         if (!tmp || (final_h->barcode() != tmp->barcode()))
         {
           TruthScalar h = final_h;
-          h.bb(getFinalbb(final_h));
+          h.children(getFinalChildren(final_h));
           higgses.push_back(h);
           tmp = final_h;
         }

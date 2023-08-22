@@ -5,6 +5,10 @@ do_large_R_Topo_jets: true
 do_large_R_UFO_jets: true
 do_VR_jets: true
 do_muons: true
+
+# Decay mode considered for truth decoration
+truthDecayModes: ["bbbb"]
+
 # btagging working points for small Rjets
 btag_wps:
     - DL1dv01_FixedCutBEff_70

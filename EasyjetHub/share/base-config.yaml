@@ -9,6 +9,8 @@ do_photons: false
 do_taus: false
 do_met: false
 do_mmc: false
+# Decay mode considered for truth decoration
+truthDecayModes: []
 # btagging working points for small Rjets
 btag_wps: []
 # btagging working points for Variable Radius Track jets

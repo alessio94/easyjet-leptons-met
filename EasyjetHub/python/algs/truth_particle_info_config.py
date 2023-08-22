@@ -20,6 +20,7 @@ def truth_particle_info_cfg(
             TruthParticleInformationOutKey=(
                 flags.Analysis.container_names.output.truthHHParticles
             ),
+            decayModes=flags.Analysis.truthDecayModes,
         )
     )
 
