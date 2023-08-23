@@ -76,6 +76,8 @@ def cpalgs_cfg(
                     lumicalcfiles=lumicalc_files,
                 )
             )
+
+        if flags.Analysis.DataType != "data":
             log.info("Adding generator analysis sequence")
             # Adds variable to EventInfo if for generator weight, for example:
             # EventInfo.generatorWeight_%SYS%

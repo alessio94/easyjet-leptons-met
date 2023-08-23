@@ -25,7 +25,7 @@ from EasyjetHub.steering.utils.config_flags import ConfigItem
 
 # Permit aliasing of the container names
 # The full path under Analysis is substituted if possible
-def substitute_container_name(flags:AthConfigFlags, name:str) -> str:
+def substitute_container_name(flags: AthConfigFlags, name: str) -> str:
     _name = name
     analysis_flags = flags.Analysis
     try:
@@ -40,6 +40,7 @@ def substitute_container_name(flags:AthConfigFlags, name:str) -> str:
 def tree_cfg(
     flags: AthConfigFlags,
     branches: list[str],
+    met_branches: list[str],
     treename: str = "AnalysisMiniTree",
     outfile:  str = "output.root",
     stream:   str = "ANALYSIS",
@@ -92,6 +93,18 @@ def tree_cfg(
         RootDirName=treedir,
     )
     cfg.addEventAlgo(ntupleMaker)
+
+    if met_branches:
+        metNtupleMaker = CompFactory.CP.AsgxAODMetNTupleMakerAlg(
+            f"METNTupleMaker_{treename}",
+            TreeName=treename,
+            Branches=met_branches,
+            systematicsSvc="SystematicsSvc",
+            RootStreamName=f"/{stream}",
+            RootDirName=treedir,
+            termName="Final"
+        )
+        cfg.addEventAlgo(metNtupleMaker)
 
     # Fill tree
     treeFiller = CompFactory.CP.TreeFillerAlg(
@@ -188,8 +201,9 @@ def minituple_cfg(
             lr_jet_type="UFO",
         )
 
+    met_branches = []
     if tree_flags.reco_outputs.met:
-        tree_branches += get_met_branches(
+        met_branches += get_met_branches(
             flags,
             input_container=substitute_container_name(
                 flags, tree_flags.reco_outputs.met
@@ -220,7 +234,7 @@ def minituple_cfg(
                 input_container=large_R_name,
                 output_prefix="truthjet_antikt10" + large_R_type,
             )
-        if isinstance(large_R_truth_flags,tuple):
+        if isinstance(large_R_truth_flags, tuple):
             for coll in large_R_truth_flags:
                 tree_branches += add_large_R_truth(flags, coll)
         else:
@@ -242,6 +256,7 @@ def minituple_cfg(
     cfg.merge(tree_cfg(
         flags,
         branches=tree_branches,
+        met_branches=met_branches,
         outfile=outfile_name,
         stream=tree_flags.stream_name,
         treedir=tree_flags.directory_name,
