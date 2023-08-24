@@ -9,7 +9,7 @@ def get_met_branches(flags, input_container, output_prefix):
     met_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=flags.Analysis.do_overlap_removal,
+        do_overlap_removal=False,
         systematics_option=_syst_option,
     )
 
