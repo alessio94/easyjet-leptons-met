@@ -1,3 +1,8 @@
+# In general we should not need custom Pileup Reweighting
+# Switch on iff necessary
+do_custom_PRW: false
+# We may need special LumiCalc files depending on triggers
+do_custom_lumicalc: false
 # Toggles for object types
 do_small_R_jets: false
 do_large_R_Topo_jets: false
@@ -25,7 +30,8 @@ do_trigger_filtering: false
 # disable CP Algs for calibration
 disable_calib: false
 # apply loose jet cleaning only
-loose_jet_cleaning: false
+# TODO: Switch back to false with 24.2.20
+loose_jet_cleaning: true
 # Whether to activate CP alg systematic variations
 do_CP_systematics: false
 systematics_regex: []

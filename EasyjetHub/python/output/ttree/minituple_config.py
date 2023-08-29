@@ -37,6 +37,17 @@ def substitute_container_name(flags: AthConfigFlags, name: str) -> str:
     return _name
 
 
+def add_passes_OR_branch(input_container: str, output_prefix: str) -> str:
+    # Awkward handling for Overlap Removal with ConfigBlocks.
+    # We can't yet filter the OR'ed objects with the view
+    # creator alg, so instead we attach the selection
+    # decoration, which has a double systematic suffix
+    return (
+        f'{input_container}.passesOR_%SYS%'
+        f' -> {output_prefix}_%SYS%_passesOR'
+    )
+
+
 def tree_cfg(
     flags: AthConfigFlags,
     branches: list[str],
@@ -158,6 +169,8 @@ def minituple_cfg(
                 input_container=write_container,
                 output_prefix=prefix,
             )
+            if flags.Analysis.do_overlap_removal:
+                tree_branches.append(add_passes_OR_branch(write_container,prefix))
 
     if tree_flags.reco_outputs.small_R_jets:
         small_R_name = substitute_container_name(
@@ -169,6 +182,10 @@ def minituple_cfg(
             input_container=small_R_name,
             output_prefix="recojet_antikt4PFlow",
         )
+        if flags.Analysis.do_overlap_removal:
+            tree_branches.append(
+                add_passes_OR_branch(small_R_name,"recojet_antikt4PFlow")
+            )
 
         # Use this to directly read b-tagging information
         # Needs to be decorated onto the jet container
@@ -180,26 +197,36 @@ def minituple_cfg(
         )
 
     if tree_flags.reco_outputs.large_R_Topo_jets:
+        large_R_jet_name = substitute_container_name(
+            flags,
+            tree_flags.reco_outputs.large_R_Topo_jets
+        )
         tree_branches += get_large_R_jet_branches(
             flags, tree_flags,
-            input_container=substitute_container_name(
-                flags,
-                tree_flags.reco_outputs.large_R_Topo_jets
-            ),
+            input_container=large_R_jet_name,
             output_prefix="recojet_antikt10Topo",
             lr_jet_type="Topo",
         )
+        if flags.Analysis.do_overlap_removal:
+            tree_branches.append(
+                add_passes_OR_branch(large_R_jet_name,"recojet_antikt10Topo")
+            )
 
     if tree_flags.reco_outputs.large_R_UFO_jets:
+        large_R_jet_name = substitute_container_name(
+            flags,
+            tree_flags.reco_outputs.large_R_UFO_jets
+        )
         tree_branches += get_large_R_jet_branches(
             flags, tree_flags,
-            input_container=substitute_container_name(
-                flags,
-                tree_flags.reco_outputs.large_R_UFO_jets
-            ),
+            input_container=large_R_jet_name,
             output_prefix="recojet_antikt10UFO",
             lr_jet_type="UFO",
         )
+        if flags.Analysis.do_overlap_removal:
+            tree_branches.append(
+                add_passes_OR_branch(large_R_jet_name,"recojet_antikt10UFO")
+            )
 
     met_branches = []
     if tree_flags.reco_outputs.met:

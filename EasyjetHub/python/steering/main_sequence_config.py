@@ -7,12 +7,19 @@ from EventBookkeeperTools.EventBookkeeperToolsConfig import (
     BookkeeperToolCfg,
 )
 from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
+from AthenaConfiguration.Enums import LHCPeriod
+
+from AnalysisAlgorithmsConfig.ConfigAccumulator import ConfigAccumulator
+from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 
 from EasyjetHub.algs.cpalgs_config import cpalgs_cfg
-from EasyjetHub.algs.event_counter_config import event_counter_cfg
+from EasyjetHub.algs.event_counter_config import (
+    event_counter_cfg,
+    makeEventCounterConfig,
+)
 from EasyjetHub.algs.preselection.preselection_config import (
-    event_selection_sequence_cfg,
-    trigger_sequence_cfg,
+    event_selection_sequence,
+    trigger_sequence,
 )
 from EasyjetHub.algs.truth.truth_config import truth_info_cfg
 from EasyjetHub.output.ttree.minituple_config import minituple_cfg
@@ -23,7 +30,7 @@ from EasyjetHub.steering.utils.log_helper import log
 
 def default_sequence_cfg(flags, seqname):
     cfg = core_services_cfg(flags)
-    cfg.merge(preselection_cfg(flags,seqname))
+    cfg.merge(preselection_cfg(flags, seqname))
     cfg.merge(event_building_cfg(flags, seqname))
 
     return cfg
@@ -73,6 +80,9 @@ def core_services_cfg(flags):
 
 # Select events early with trigger and data quality requirements
 def preselection_cfg(flags, seqname):
+    # Aggregate the configured CP algs in one ConfigSequence,
+    # which will handle the container names, copying etc
+    configSeq = ConfigSequence()
 
     if not flags.Analysis.do_trigger_filtering:
         log.warning("Disabling trigger filtering, all events will pass!")
@@ -97,26 +107,37 @@ def preselection_cfg(flags, seqname):
             for list in grl_lists_by_year[year]
         ]
 
-    cfg = ComponentAccumulator()
-    cfg.addSequence(CompFactory.AthSequencer(seqname), "AthAlgSeq")
-
     log.info("Adding trigger analysis algs")
     # Removes events failing trigger and adds variable to EventInfo
     # if trigger passed or not, for example:
     # EventInfo.trigger_name
-    cfg.merge(trigger_sequence_cfg(flags), seqname)
-    cfg.merge(event_counter_cfg("n_trigger"), seqname)
+    configSeq += trigger_sequence(flags)
+    makeEventCounterConfig(configSeq, "n_trigger")
 
     log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
-    cfg.merge(
-        event_selection_sequence_cfg(
-            flags, grlfiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
-        ),
-        seqname
+    configSeq += event_selection_sequence(
+        flags, grlfiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
     )
-    cfg.merge(event_counter_cfg("n_data_quality"), seqname)
+    makeEventCounterConfig(configSeq, "n_data_quality")
 
+    # Create the output CA to set the sequence correctly
+    cfg = ComponentAccumulator()
+    cfg.addSequence(CompFactory.AthSequencer(seqname))
+    # Define the sequence holding all the calibration
+    preselSeq = CompFactory.AthSequencer('PreselectionSequence')
+
+    # Activate the full configuration, which stitches together
+    # the ConfigBlocks with interstitial container names etc
+    configAccumulator = ConfigAccumulator(
+        flags.Analysis.DataType,
+        preselSeq,
+        isPhyslite=flags.Input.isPHYSLITE,
+        geometry=getattr(LHCPeriod,f'Run{flags.Analysis.Run}'),
+    )
+    configSeq.fullConfigure(configAccumulator)
+
+    cfg.merge(configAccumulator.CA, seqname)
     return cfg
 
 
@@ -126,24 +147,21 @@ def event_building_cfg(flags, seqname):
 
     log.info(f"Do PRW is {flags.Analysis.doPRW}")
 
+    # Create the output CA to set the sequence correctly
     cfg = ComponentAccumulator()
-    cfg.addSequence(CompFactory.AthSequencer(seqname), "AthAlgSeq")
+    cfg.addSequence(CompFactory.AthSequencer(seqname))
+
     cfg.merge(
         cpalgs_cfg(
             flags,
             prw_files=flags.Analysis.PRWFiles,
             lumicalc_files=flags.Analysis.LumiCalcFiles,
         ),
-        seqname,
+        seqname
     )
 
     if flags.Input.isMC:
-        cfg.merge(
-            truth_info_cfg(
-                flags,
-            ),
-            seqname,
-        )
+        cfg.merge(truth_info_cfg(flags), seqname)
 
     return cfg
 

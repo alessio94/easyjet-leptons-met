@@ -1,34 +1,33 @@
-from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
-from AthenaConfiguration.ComponentFactory import CompFactory
+from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
+from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
+
+from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
-def met_sequence_cfg(flags):
-    cfg = ComponentAccumulator()
-    from MetAnalysisAlgorithms.MetAnalysisSequence import makeMetAnalysisSequence
+def met_sequence(flags, configAcc):
 
-    met_sequence = makeMetAnalysisSequence(
-        flags.Analysis.DataType,
-        metSuffix=flags.Analysis.container_names.input.met
+    assert flags.Analysis.do_small_R_jets, (
+        "Small-R jets are strictly necessary for MET"
     )
 
-    # Small-R jets are mandatory for MET
-    inputs = {"jets": flags.Analysis.container_names.output.reco4PFlowJet}
-    if flags.Analysis.do_muons:
-        inputs["muons"] = flags.Analysis.container_names.output.muons
-    if flags.Analysis.do_electrons:
-        inputs["electrons"] = flags.Analysis.container_names.output.electrons
-    if flags.Analysis.do_photons:
-        inputs["photons"] = flags.Analysis.container_names.output.photons
-    if flags.Analysis.do_taus:
-        inputs["taus"] = flags.Analysis.container_names.output.taus
+    configSeq = ConfigSequence()
 
-    met_sequence.configure(
-        inputName=inputs,
-        outputName=flags.Analysis.container_names.output.met
+    # Suggested for bbtt
+    # TODO: Make selections configurable
+    container_names = flags.Analysis.container_names
+    met_selections = dict(
+        electrons=f'{drop_sys(container_names.output.electrons)}.loose',
+        photons=f'{drop_sys(container_names.output.photons)}.tight',
+        muons=f'{drop_sys(container_names.output.muons)}.medium',
+        taus=f'{drop_sys(container_names.output.taus)}.loose',
     )
 
-    cfg.addSequence(CompFactory.AthSequencer(met_sequence.getName()))
-    for alg in met_sequence.getGaudiConfig2Components():
-        cfg.addEventAlgo(alg, met_sequence.getName())
+    configSeq += makeConfig('MissingET', drop_sys(container_names.output.met))
+    # Pass all the calibrated jets
+    configSeq.setOptionValue('.jets', drop_sys(container_names.allcalib.reco4PFlowJet))
+    # Add whatever collections are active in the job
+    for objtype, selection in met_selections.items():
+        if flags.Analysis[f"do_{objtype}"]:
+            configSeq.setOptionValue(f'.{objtype}', selection)
 
-    return cfg
+    return configSeq

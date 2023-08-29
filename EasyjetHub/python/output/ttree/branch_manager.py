@@ -22,11 +22,15 @@ class BranchManager(object):
     syst_only_for:      list = field(default_factory=list)
     syst_not_for:       list = field(default_factory=list)
 
+    # In the ConfigBlock OR setup, we cannot actually make OR-ed
+    # view containers for output without some more work.
+    # So instead we have to add a 'passesOR_%SYS% branch
     def or_str(self):
-        if self.do_overlap_removal:
-            return "_OR"
-        else:
-            return ""
+        return ""
+        # if self.do_overlap_removal:
+        #     return "_OR"
+        # else:
+        #     return ""
 
     def syst_str(self):
         return {

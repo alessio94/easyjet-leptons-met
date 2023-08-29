@@ -1,34 +1,57 @@
-from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
-from AthenaConfiguration.ComponentFactory import CompFactory
+from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
+from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
+
+from EasyjetHub.algs.calibration.view_select import makeViewSelectionConfig
+from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
-def photon_sequence_cfg(flags):
-    cfg = ComponentAccumulator()
-    from EgammaAnalysisAlgorithms.PhotonAnalysisSequence import (
-        makePhotonAnalysisSequence,
+def photon_sequence(flags, configAcc):
+
+    # Previous configuration, to be reproduced
+    #     flags.Analysis.DataType,
+    #     workingPoint=flags.Analysis.PhotonWP,
+    #     postfix="loose",
+    #     deepCopyOutput=False,
+    #     shallowViewOutput=True,
+    #     crackVeto=False,
+    #     enableCleaning=True,
+    #     cleaningAllowLate=False,
+    #     recomputeIsEM=False,
+    #     ptSelectionOutput=True,
+    #     enableCutflow=False,
+    #     enableKinematicHistograms=False,
+
+    configSeq = ConfigSequence()
+
+    # Temporary hack, we should do this in a more systematic way
+    # The config sequence will deal with the systematics suffix
+    output_name = drop_sys(flags.Analysis.container_names.output.photons)
+    configSeq += makeConfig('Photons', output_name)
+
+    # PID configuration
+    configSeq.setOptionValue('.recomputeIsEM', False)
+    configSeq += makeConfig('Photons.Selection', output_name + '.tight')
+    configSeq.setOptionValue('.qualityWP', 'Tight')
+    configSeq.setOptionValue('.isolationWP', 'FixedCutTight')
+
+    # Kinematic selection
+    configSeq += makeConfig('Selection.PtEta', output_name)
+    configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
+    configSeq.setOptionValue('.minPt', 10e3)
+    configSeq.setOptionValue('.maxEta', 2.37)
+
+    # Add systematic object links
+    configSeq += makeConfig('SystObjectLink', f'SystObjectLink.{output_name}')
+
+    # Apply selection as view container
+    makeViewSelectionConfig(configSeq, output_name)
+    # Add working point selection
+    makeViewSelectionConfig(
+        configSeq,
+        'tight' + output_name,
+        input=output_name,
+        original=flags.Analysis.container_names.input.photons,
+        selection='tight'
     )
 
-    photon_sequence = makePhotonAnalysisSequence(
-        flags.Analysis.DataType,
-        workingPoint=flags.Analysis.PhotonWP,
-        postfix="loose",
-        deepCopyOutput=False,
-        shallowViewOutput=True,
-        crackVeto=False,
-        enableCleaning=True,
-        cleaningAllowLate=False,
-        recomputeIsEM=False,
-        ptSelectionOutput=True,
-        enableCutflow=False,
-        enableKinematicHistograms=False,
-    )
-    photon_sequence.configure(
-        inputName=flags.Analysis.container_names.input.photons,
-        outputName=flags.Analysis.container_names.output.photons,
-    )
-
-    cfg.addSequence(CompFactory.AthSequencer(photon_sequence.getName()))
-    for alg in photon_sequence.getGaudiConfig2Components():
-        cfg.addEventAlgo(alg, photon_sequence.getName())
-
-    return cfg
+    return configSeq

@@ -6,7 +6,7 @@ def run_job(flags,args,cfg):
 
     # Print the full job configuration
     if flags.Exec.OutputLevel <= INFO:
-        cfg.printConfig(summariseProps=False)
+        cfg.printConfig(summariseProps=True)
 
     # clear the cutflow
     METADATA_FILE.unlink(missing_ok=True)

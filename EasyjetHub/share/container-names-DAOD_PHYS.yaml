@@ -1,3 +1,4 @@
+# Collections read from file
 input:
   reco4PFlowJet:       AntiKt4EMPFlowJets
   reco10TopoJet:       AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets
@@ -14,6 +15,9 @@ input:
   truth10TrimmedJet:   AntiKt10TruthTrimmedPtFrac5SmallR20Jets
   truth10SoftDropJet:  AntiKt10TruthSoftDropBeta100Zcut10Jets
 
+# Collections produced by the framework
+# Calibrated reco collections with PID and kinematic selection
+# Or special truth collections
 output:
   reco4PFlowJet:       AnalysisAntiKt4EMPFlowJets_%SYS%
   reco10TopoJet:       AnalysisAntiKt10LCTopoTrimmedPtFrac5SmallR20Jets_%SYS%
@@ -25,3 +29,7 @@ output:
   taus:                AnalysisTauJets_%SYS%
   met:                 AnalysisMET_%SYS%
   truthHHParticles:    TruthDiHiggsParticles
+
+# For MET we want all calibrated jets with no filter selection
+allcalib:
+  reco4PFlowJet:       CalibAntiKt4EMPFlowJets_%SYS%

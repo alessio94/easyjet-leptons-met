@@ -10,7 +10,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
-            containerInKey=muonkey,
+            containerInKey='medium' + muonkey,
             containerOutKey="bbttAnalysisMuons_%SYS%",
             minPt=7_000,
             maxEta=2.7,
@@ -21,7 +21,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg.addEventAlgo(
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
-            containerInKey=electronkey,
+            containerInKey='loose' + electronkey,
             containerOutKey="bbttAnalysisElectrons_%SYS%",
             minPt=7_000,
             minEtaVeto=1.37,
@@ -35,7 +35,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg.addEventAlgo(
         CompFactory.Easyjet.TauSelectorAlg(
             "TauSelectorAlg",
-            containerInKey=taukey,
+            containerInKey='loose' + taukey,
             containerOutKey="bbttAnalysisTaus_%SYS%",
             minPt=20_000,
             minEtaVeto=1.37,

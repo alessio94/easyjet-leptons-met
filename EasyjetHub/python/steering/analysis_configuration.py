@@ -96,7 +96,11 @@ def analysis_configuration(parser="default"):
     prw_files, lumicalc_files = [], []
     if do_PRW:
         try:
-            prw_files, lumicalc_files = get_pileup_config_files(flags)
+            _prw_files, _lumicalc_files = get_pileup_config_files(flags)
+            if flags.Analysis.do_custom_PRW:
+                prw_files = _prw_files
+            if flags.Analysis.do_custom_lumicalc:
+                lumicalc_files = _lumicalc_files
         except LookupError as err:
             log.error(err)
             do_PRW = False

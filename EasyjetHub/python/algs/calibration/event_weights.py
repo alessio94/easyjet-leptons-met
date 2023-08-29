@@ -1,40 +1,38 @@
-from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
-from AthenaConfiguration.ComponentFactory import CompFactory
+from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
+from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
 
-from EasyjetHub.steering.sample_metadata import SampleTypes
 from EasyjetHub.steering.utils.log_helper import log
 
 
-def pileup_sequence_cfg(flags, prwfiles, lumicalcfiles):
-    cfg = ComponentAccumulator()
-    from AsgAnalysisAlgorithms.PileupAnalysisSequence import makePileupAnalysisSequence
+def pileup_sequence(flags, prwfiles, lumicalcfiles):
+    configSeq = ConfigSequence()
 
+    # Workaround for mc21 courtesy of
+    # https://its.cern.ch/jira/browse/ATLASG-1628?focusedCommentId=4297949&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-4297949
+    """
+    Check if we still need this. Not so trivial to hack in ConfigBlock
     tags = flags.Input.AMITag
-    mc21mc23 = (SampleTypes.mc21a.value in tags) or (SampleTypes.mc23a.value in tags)
-    pileup_sequence = makePileupAnalysisSequence(
-        flags.Analysis.DataType,
-        files=flags.Input.Files,
-        useDefaultConfig=mc21mc23,
-    )
-    pileup_sequence.configure(inputName={}, outputName={})
-
-    cfg.addSequence(CompFactory.AthSequencer(pileup_sequence.getName()))
+    mc21mc23 = (SampleTypes.mc21a.value in tags) or(SampleTypes.mc23a.value in tags)
     for alg in pileup_sequence.getGaudiConfig2Components():
-        # Workaround for mc21 courtesy of
-        # https://its.cern.ch/jira/browse/ATLASG-1628?focusedCommentId=4297949&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-4297949
         if mc21mc23 and "PileupReweightingAlg" in alg.getName():
             alg.pileupReweightingTool.PeriodAssignments = []
             alg.pileupReweightingTool.DataScaleFactor = 1
         cfg.addEventAlgo(alg, pileup_sequence.getName())
+    """
+    configSeq += makeConfig('Event.PileupReweighting', None)
+    configSeq.setOptionValue('.campaign', flags.Input.MCCampaign, noneAction='ignore')
+    configSeq.setOptionValue('.files', flags.Input.Files, noneAction='ignore')
+    configSeq.setOptionValue('.useDefaultConfig', True)
+    if prwfiles:
+        configSeq.setOptionValue('.userPileupConfigs', prwfiles)
+    if lumicalcfiles:
+        configSeq.setOptionValue('.userLumicalcFiles', lumicalcfiles)
 
-    return cfg
+    return configSeq
 
 
-def generator_sequence_cfg(flags):
-    cfg = ComponentAccumulator()
-    from AsgAnalysisAlgorithms.GeneratorAnalysisSequence import (
-        makeGeneratorAnalysisSequence,
-    )
+def generator_sequence(flags):
+    configSeq = ConfigSequence()
 
     tags = flags.Input.AMITag.split("_")
     ptag = ""
@@ -49,15 +47,10 @@ def generator_sequence_cfg(flags):
     # if we're looking at one of several broken tags
     is_bad_tag = ptag in ["p5226", "p5278", "p5334"]
     doCBK = not is_bad_tag and flags.Analysis.out_file
-    generator_sequence = makeGeneratorAnalysisSequence(
-        flags.Analysis.DataType,
-        saveCutBookkeepers=doCBK,
-        runNumber=flags.Input.RunNumber[0],
-        cutBookkeepersSystematics=doCBK,
-    )
+    # Include, and then set up the generator analysis sequence:
+    configSeq += makeConfig('Event.Generator', None)
+    configSeq.setOptionValue('.saveCutBookkeepers', doCBK)
+    configSeq.setOptionValue('.runNumber', flags.Input.RunNumber[0])
+    configSeq.setOptionValue('.cutBookkeepersSystematics', doCBK)
 
-    cfg.addSequence(CompFactory.AthSequencer(generator_sequence.getName()))
-    for alg in generator_sequence.getGaudiConfig2Components():
-        cfg.addEventAlgo(alg, generator_sequence.getName())
-
-    return cfg
+    return configSeq
