@@ -13,7 +13,7 @@
 
 #include "MassPlaneBoostHistograms.h"
 
-#include "H5Writer/IH5GroupSvc.h"
+#include "HDF5Utils/IH5GroupSvc.h"
 
 #include <AthenaBaseComps/AthReentrantAlgorithm.h>
 #include <xAODJet/JetContainer.h>

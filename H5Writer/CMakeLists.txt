@@ -8,14 +8,6 @@ atlas_subdir( H5Writer )
 # We don't want any warnings in compilation
 add_compile_options(-Werror)
 
-# interface library
-atlas_add_library(IH5GroupSvc
-  PUBLIC_HEADERS
-  H5Writer
-  LINK_LIBRARIES
-  GaudiKernel
-  )
-
 # common requirements
 atlas_add_library(H5WriterLib
   src/EventInfoWriter.cxx
@@ -31,7 +23,6 @@ atlas_add_library(H5WriterLib
   H5Writer
   )
 atlas_add_component(H5Writer
-  src/H5FileSvc.cxx
   src/EventInfoWriterAlg.cxx
   src/IParticleWriterAlg.cxx
   src/AlgHelpers.cxx

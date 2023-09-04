@@ -2,7 +2,7 @@
 #define EVENT_INFO_WRITER_ALG_H
 
 #include "H5Writer/EventInfoWriter.h"
-#include "H5Writer/IH5GroupSvc.h"
+#include "HDF5Utils/IH5GroupSvc.h"
 
 #include "AthenaBaseComps/AthAlgorithm.h"
 #include "xAODEventInfo/EventInfo.h"

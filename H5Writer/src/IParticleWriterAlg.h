@@ -2,7 +2,7 @@
 #define IPARTICLE_WRITER_ALG_H
 
 #include "H5Writer/IParticleWriter.h"
-#include "H5Writer/IH5GroupSvc.h"
+#include "HDF5Utils/IH5GroupSvc.h"
 
 #include "AthenaBaseComps/AthAlgorithm.h"
 #include "xAODBase/IParticleContainer.h"
