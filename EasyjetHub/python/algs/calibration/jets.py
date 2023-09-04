@@ -112,9 +112,7 @@ def jet_sequence(
         drop_sys(output_name),
         input=drop_sys(allcalib_name),
         original=input_name,
-        selection='selectPtEta'
-        # TODO: Restore JVT when we have 24.2.20
-        # selection='selectPtEta&&jvt'
+        selection='selectPtEta&&jvt',
     )
 
     return configSeq
