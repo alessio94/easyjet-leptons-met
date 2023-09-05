@@ -45,6 +45,7 @@ private:
       this, "tausIn", "", "containerName to read"
     };
 
+    std::string m_tauIDWP;
     // Internal members
 
   };

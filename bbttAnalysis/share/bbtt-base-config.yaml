@@ -22,7 +22,7 @@ do_bbtt_analysis: true
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
-do_overlap_removal: false
+do_overlap_removal: true
 
 # Include the TTree configuration and update details
 ttree_output:

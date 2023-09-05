@@ -16,6 +16,8 @@ def tau_sequence(flags, configAcc):
     # PID configuration
     configSeq += makeConfig('TauJets', output_name)
     configSeq.setOptionValue('.rerunTruthMatching', False)
+    configSeq += makeConfig('TauJets.Selection', output_name + '.baseline')
+    configSeq.setOptionValue('.quality', 'Baseline')
     configSeq += makeConfig('TauJets.Selection', output_name + '.loose')
     configSeq.setOptionValue('.quality', 'Loose')
     configSeq += makeConfig('TauJets.Selection', output_name + '.tight')
@@ -33,7 +35,7 @@ def tau_sequence(flags, configAcc):
     # Apply selection as view container
     makeViewSelectionConfig(configSeq, output_name)
     # Add working point selection
-    for wp in ['loose','tight']:
+    for wp in ['baseline','loose','tight']:
         makeViewSelectionConfig(
             configSeq,
             wp + output_name,

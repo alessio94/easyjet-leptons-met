@@ -61,8 +61,11 @@ namespace Easyjet
       // loop over taus 
       for (const xAOD::TauJet *tau : *inContainer) {
      	float this_tau_eta_abs;
-	
-     	// cuts
+
+	bool isTauID = tau->auxdecor<char>("isIDTau");
+	bool isAntiTau = tau->auxdecor<char>("isAntiTau");
+	if ( !isAntiTau && !isTauID ) continue;
+
      	if (tau->pt() < m_minPt)
      	  continue;
 	

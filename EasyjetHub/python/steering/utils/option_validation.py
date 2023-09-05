@@ -87,7 +87,6 @@ def validate_file_format(flags):
             flags.Analysis.do_large_R_Topo_jets,
         ]), "Collections requested are incompatible with PHYSLITE"
 
-        assert not flags.Analysis.do_overlap_removal, "OR not needed on PHYSLITE"
     else:
         assert not flags.Analysis.disable_calib, (
             "Disabling calibrations is not safe except on PHYSLITE!"

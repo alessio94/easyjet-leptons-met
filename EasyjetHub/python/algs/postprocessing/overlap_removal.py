@@ -26,7 +26,7 @@ def overlap_sequence(flags):
         electrons='loose',
         photons='tight',
         muons='medium',
-        taus='loose',
+        taus='baseline',
     )
     # Construct the names of the view containers with working point selection
     # We need to use the '.' style so that the algs operate on the full
@@ -67,6 +67,12 @@ def overlap_sequence(flags):
     for objtype, coll in preOR_collections.items():
         configSeq.setOptionValue(f'.{objtype}', coll)
 
+    # config for TauAntiTauOR
+    # configSeq.setOptionValue('.antiTauIDTauLabel', 'isIDTau')
+    configSeq.setOptionValue('.antiTauBJetLabel', 'ftag_select_DL1dv01_FixedCutBEff_77')
+    configSeq.setOptionValue('.antiTauLabel', 'isAntiTau')
+    configSeq.setOptionValue('.doTauAntiTauJetOR', True)
+
     # Define output view containers after OR
     # Need to loop again because of the ConfigSequence convention
     # that you add and configure blocks one by one
@@ -93,9 +99,11 @@ def overlap_sequence(flags):
         outputLabel='passesOR',
         linkOverlapObjects=False,
         doEleEleOR=False,
-        doTaus=False,
+        doTaus=flags.Analysis.do_taus,
         enableUserPriority=False,
-        bJetLabel='',
+        antiTauBJetLabel="ftag_select_DL1dv01_FixedCutBEff_77",
+        antiTauLabel="isAntiTau",
+        doTauAntiTauJetOR=True,
         boostedLeptons=False,
         postfix='',
         shallowViewOutput=True,

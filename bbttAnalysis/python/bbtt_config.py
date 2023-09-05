@@ -2,8 +2,6 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-# bbtt analysis chain
-
 def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg = ComponentAccumulator()
 
@@ -31,11 +29,10 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
         )
     )
 
-    # add Tau
     cfg.addEventAlgo(
         CompFactory.Easyjet.TauSelectorAlg(
             "TauSelectorAlg",
-            containerInKey='loose' + taukey,
+            containerInKey='baseline' + taukey,
             containerOutKey="bbttAnalysisTaus_%SYS%",
             minPt=20_000,
             minEtaVeto=1.37,
