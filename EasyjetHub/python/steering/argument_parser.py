@@ -74,49 +74,83 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
     Copied (and simplified) from athena's over-featured version
     """
 
-    args = parser.parse_args()
+    args, leftover = parser.parse_known_args()
 
-    if args.debug is not None:
+    # Track the flags handled by custom CLI arguments
+    # so we can check for unintentional overrides by
+    # explicit flag settings
+    flags_from_args = dict(
+        debug='Exec.DebugStage',
+        evtMax='Exec.MaxEvents',
+        output_xaod='Output.AODFileName',
+        skipEvents='Exec.SkipEvents',
+        filesInput='Input.Files',
+        loglevel='Exec.OutputLevel',
+    )
+
+    # Custom flag setters
+    def set_debug(flags, name, value):
         from AthenaCommon.Debugging import DbgStage
-
-        if args.debug not in DbgStage.allowed_values:
+        if value not in DbgStage.allowed_values:
             raise ValueError(
                 "Unknown debug stage, allowed values {}".format(DbgStage.allowed_values)
             )
-        flags.Exec.DebugStage = args.debug
+        setattr(flags, name, value)
 
-    if args.evtMax is not None:
-        flags.Exec.MaxEvents = args.evtMax
+    def set_input_files(flags, name, value):
+        input_file_list = []
+        for ffile in value.split(","):
+            if "*" in ffile:  # handle wildcard
+                import glob
+                input_file_list += glob.glob(ffile)
+            else:
+                input_file_list += [ffile]
+        setattr(flags, name, input_file_list)
 
-    flags.Output.AODFileName = args.output_xaod
-
-    if args.skipEvents is not None:
-        flags.Exec.SkipEvents = args.skipEvents
-
-    flags.Input.Files = []  # remove generic
-    for ffile in args.filesInput.split(","):
-        if "*" in ffile:  # handle wildcard
-            import glob
-
-            flags.Input.Files += glob.glob(ffile)
-        else:
-            flags.Input.Files += [ffile]
-
-    if args.loglevel is not None:
+    def set_log_level(flags, name, value):
         from AthenaCommon import Constants
 
-        if hasattr(Constants, args.loglevel):
-            flags.Exec.OutputLevel = getattr(Constants, args.loglevel)
+        if hasattr(Constants, value):
+            setattr(flags, name, getattr(Constants, value))
         else:
             raise ValueError(
                 "Unknown log-level, allowed values are"
                 " ALL, VERBOSE, DEBUG,INFO, WARNING, ERROR, FATAL"
             )
 
+    flag_setters = dict(
+        debug=set_debug,
+        filesInput=set_input_files,
+        loglevel=set_log_level,
+    )
+
+    # Set flags with dedicated CLI arguments
+    for arg_name, flag_name in flags_from_args.items():
+        arg_val = getattr(args,arg_name)
+        if arg_val is not None:
+            if arg_name in flag_setters:
+                flag_setters[arg_name](flags, flag_name, arg_val)
+            else:
+                setattr(flags, flag_name, arg_val)
+
     if args.config_only is not None:
         from os import environ
 
         environ["PICKLECAFILE"] = args.config_only
+
+    # Interpret any leftover arguments as ConfigFlags settings
+    for flag_arg in leftover:
+        # Check that these are not set by custom arguments, as
+        # this could lead to inconsistencies
+        for k,f in flags_from_args.items():
+            if flag_arg.startswith(f):
+                raise RuntimeError(
+                    f"Flag '{f}' should be set with '{k}', do not override directly."
+                )
+        try:
+            flags.fillFromString(flag_arg)
+        except Exception as e:
+            raise RuntimeError(f'Failed to parse argument {flag_arg}') from e
 
     return args
 
