@@ -12,12 +12,6 @@ There is no need to ask for permission or contact the maintainers before making 
 
 For larger changes or general questions about the code, please open an issue on gitlab.
 
-## Coding style
-
-Limited code formatting rules are enforced via `cppcheck` and `flake8`. We aim to follow `PEP8` python style conventions, except certain cases where it is more natural to follow ATLAS-like camel-case variable names.
-
-If in doubt, follow the style of the surrounding code.
-
 ## Merge request guidelines
 
 Merge requests require successful pipelines and an approval by one of the project developers. If you are adding a new top-level script we encourage you to add a regression test in `EasyjetTests`. See the README in that package for more details.
@@ -52,3 +46,43 @@ rather than in camel case e.g.
 AthenaConfiguration.MainSequencesConfig.py`
 ```
 They either end in `config.py` or are located in a directory named `config`.
+
+## Coding style
+
+Limited code formatting rules are enforced via `cppcheck` and `flake8`. We aim to follow `PEP8` python style conventions, except certain cases where it is more natural to follow ATLAS-like camel-case variable names.
+
+If in doubt, follow the style of the surrounding code.
+
+### Athena-specific guidelines
+
+There are some features in C++ and Athena that should be avoided in some areas.
+
+#### Accessors in xAODs
+
+Athena (specifically xAODs) provide a few ways to access auxiliary data (or "decorations"). When algorithms need to account for systematic variations [systematic handles][sh] are the only option. In other cases xAODs give a few options, which are listed in descending order of preference below:
+
+1. [Read][rh] and [write][wh] handles
+2. `SG::AuxElement::ConstAccessor<T>` and `SG::AuxElement::Decorator<T>`
+3. `object->auxdata<T>` and `object->auxdecor<T>`
+
+Read and write handles are preferred as they integrate well with multithreaded code and thus keep consistency with Atlas production code.
+When required `ConstAccessor`s and `Decorator`s should be declared as early as possible: either as class member variables or as global `static const` in the source file.
+The last option, `auxdata`/`auxdecor`, should never be used without a very good reason[^1].
+
+You should take care to avoid `Decorator` to access data, e.g.
+```c++
+SG::AuxElement::Decorator<float> dec("something");
+float something = dec(object);
+```
+this will return an undefined value if `something` does not exist! Instead you should use `ConstAccessor`.
+
+#### Strings in `execute(...)`
+
+We discourage any string access within the `execute` method. Not only is it slow, it also pushes configuration errors which should be caught in initialization back to the execution loop.
+Instead you should parse the in initialization and use `enum` or other primitive types within the `execute`.
+
+[sh]: https://atlassoftwaredocs.web.cern.ch/AnalysisTools/ana_alg_sys_handle/
+[rh]: https://gitlab.cern.ch/atlas/athena/-/blob/main/Control/StoreGate/StoreGate/ReadDecorHandle.h
+[wh]: https://gitlab.cern.ch/atlas/athena/-/blob/main/Control/StoreGate/StoreGate/WriteDecorHandle.h
+
+[^1]: At the time of writing we can't think of a good reason to use the `object->auxdata<T>` syntax anywhere.
