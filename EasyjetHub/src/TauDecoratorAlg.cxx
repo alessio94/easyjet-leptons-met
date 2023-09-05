@@ -6,6 +6,7 @@
 
 
 #include "TauDecoratorAlg.h"
+#include <AsgDataHandles/WriteDecorHandle.h>
 
 namespace Easyjet
 {
@@ -20,6 +21,14 @@ namespace Easyjet
   {
     ATH_CHECK (m_tausInKey.initialize());
 
+    m_nProngDecorKey = m_tausInKey.key() + "." + m_nProngDecorName;
+    m_IDTauDecorKey = m_tausInKey.key() + "." + m_IDTauDecorName;
+    m_antiTauDecorKey = m_tausInKey.key() + "." + m_antiTauDecorName;
+
+    ATH_CHECK (m_nProngDecorKey.initialize());
+    ATH_CHECK (m_IDTauDecorKey.initialize());
+    ATH_CHECK (m_antiTauDecorKey.initialize());
+
     return StatusCode::SUCCESS;
   }
 
@@ -28,13 +37,14 @@ namespace Easyjet
 
     SG::ReadHandle<xAOD::TauJetContainer> tausIn(m_tausInKey,ctx);
     ATH_CHECK (tausIn.isValid());
-    SG::AuxElement::Decorator<float> dec("nProng");
-    SG::AuxElement::Decorator<char> Taudec("isIDTau");
-    SG::AuxElement::Decorator<char> antiTaudec("isAntiTau");
+
+    SG::WriteDecorHandle<xAOD::TauJetContainer, int> nProngDecorHandle(m_nProngDecorKey);
+    SG::WriteDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
+    SG::WriteDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
 
     for(const xAOD::TauJet* tau : *tausIn) {
 
-      dec(*tau) = tau->nTracks();
+      nProngDecorHandle(*tau) = tau->nTracks();
 
       auto tauIDWP= xAOD::TauJetParameters::JetRNNSigLoose;
       if (m_tauIDWP == "Medium") tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
@@ -45,11 +55,11 @@ namespace Easyjet
       }
       
       bool isTauID = tau->isTau(tauIDWP);
-      Taudec(*tau) = isTauID;
+      idTauDecorHandle(*tau) = isTauID;
 
       float RNNScore = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
       bool isAntiTau = !isTauID && RNNScore>0.01;
-      antiTaudec(*tau) = isAntiTau;
+      antiTauDecorHandle(*tau) = isAntiTau;
 
     }
 

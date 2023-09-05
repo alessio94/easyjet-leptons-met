@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 
   TauDecoratorAlg:
   An alg that copies tau information to aux decorations so can be
@@ -15,6 +15,7 @@
 #include <vector>
 #include <utility>
 
+#include <AsgDataHandles/WriteDecorHandleKey.h>
 #include <AthenaBaseComps/AthReentrantAlgorithm.h>
 #include <AthContainers/AuxElement.h>
 #include <AthLinks/ElementLink.h>
@@ -44,6 +45,21 @@ private:
     SG::ReadHandleKey<xAOD::TauJetContainer> m_tausInKey{
       this, "tausIn", "", "containerName to read"
     };
+
+    Gaudi::Property<std::string> m_nProngDecorName{
+      this, "nProngDecorKey", "nProng", "Decoration for nProng"
+    };
+    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_nProngDecorKey;
+
+    Gaudi::Property<std::string> m_IDTauDecorName{
+      this, "idTauDecorKey", "isIDTau", "Decoration for ID taus"
+    };
+    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
+
+    Gaudi::Property<std::string> m_antiTauDecorName{
+      this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus"
+    };
+    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
 
     std::string m_tauIDWP;
     // Internal members

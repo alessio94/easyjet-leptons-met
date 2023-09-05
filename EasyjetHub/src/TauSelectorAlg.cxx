@@ -1,10 +1,11 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 
 #include "TauSelectorAlg.h"
 #include "AthContainers/AuxElement.h"
+#include <AsgDataHandles/ReadDecorHandle.h>
 #include <xAODTau/TauJetContainer.h>
 #include "FourMomUtils/xAODP4Helpers.h"
 
@@ -31,10 +32,16 @@ namespace Easyjet
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
 
-    // Intialise syst-aware input/output decorators    
+    m_IDTauDecorKey = m_inHandle.getNamePattern() + "." + m_IDTauDecorName;
+    m_antiTauDecorKey = m_inHandle.getNamePattern() + "." + m_antiTauDecorName;
+
+    ATH_CHECK (m_IDTauDecorKey.initialize());
+    ATH_CHECK (m_antiTauDecorKey.initialize());
+
+    // Initialise syst-aware input/output decorators 
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
 
     return StatusCode::SUCCESS;
@@ -42,6 +49,9 @@ namespace Easyjet
 
   StatusCode TauSelectorAlg::execute()
   {
+
+    SG::ReadDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
+    SG::ReadDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
@@ -60,16 +70,14 @@ namespace Easyjet
     
       // loop over taus 
       for (const xAOD::TauJet *tau : *inContainer) {
-     	float this_tau_eta_abs;
-
-	bool isTauID = tau->auxdecor<char>("isIDTau");
-	bool isAntiTau = tau->auxdecor<char>("isAntiTau");
+	bool isTauID = idTauDecorHandle(*tau);
+	bool isAntiTau = antiTauDecorHandle(*tau);
 	if ( !isAntiTau && !isTauID ) continue;
 
      	if (tau->pt() < m_minPt)
      	  continue;
 	
-     	this_tau_eta_abs = std::abs(tau->eta());
+     	float this_tau_eta_abs = std::abs(tau->eta());
      	if ((this_tau_eta_abs > m_minEtaVeto &&
      	     this_tau_eta_abs < m_maxEtaVeto) ||
      	    (this_tau_eta_abs > m_maxEta))

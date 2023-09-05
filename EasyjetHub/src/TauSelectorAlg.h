@@ -1,11 +1,12 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef HH4BANALYSIS_TAUSELECTORALG
-#define HH4BANALYSIS_TAUSELECTORALG
+#ifndef EASYJET_TAUSELECTORALG
+#define EASYJET_TAUSELECTORALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
+#include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysWriteHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
@@ -45,13 +46,23 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_inHandle{ this, "containerInKey", "",   "Tau container to read" };
 
+    Gaudi::Property<std::string> m_IDTauDecorName
+      { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
+
+
+    Gaudi::Property<std::string> m_antiTauDecorName
+      { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
+
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::TauJetContainer>>
     m_outHandle{ this, "containerOutKey", "",   "Tau container to write" };
 
     /// \brief Setup sys-aware output decorations
-    CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nTaus_%SYS%", 
-        "Name out output decorator for number of selected taus"};
+    CP::SysWriteDecorHandle<int>
+      m_nSelPart{ this, "decorOutName", "nTaus_%SYS%",
+	  "Name out output decorator for number of selected taus" };
 
     float m_minPt;
     float m_minEtaVeto;
