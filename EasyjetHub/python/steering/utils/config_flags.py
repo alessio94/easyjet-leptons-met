@@ -5,7 +5,7 @@ from .option_validation import validate_flags
 from ..argument_parser import validate_args
 from argparse import Namespace
 
-from AthenaConfiguration.AthConfigFlags import AthConfigFlags, FlagAddress
+from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 
 #####################################################################
 # flag converters, makes everything into a not AthConfigFlags object
@@ -16,16 +16,12 @@ from AthenaConfiguration.AthConfigFlags import AthConfigFlags, FlagAddress
 
 
 def dictify(flags):
-    """make some set of flags into a dictionary
+    """Convert AthConfigFlags flags into a dictionary
 
     This function aims to encapsulate all the nasty stuff that we have
     to do with config flags
-
     """
-    if isinstance(flags,FlagAddress):
-        flags._flags.loadAllDynamicFlags()
-    elif isinstance(flags,AthConfigFlags):
-        flags.loadAllDynamicFlags()
+    flags.loadAllDynamicFlags()
     outdict = {}
     for key, item in _subflag_itr(flags):
         x = outdict
@@ -37,16 +33,8 @@ def dictify(flags):
 
 
 def _subflag_itr(flags):
-    if isinstance(flags,FlagAddress):
-        # subflag
-        keys = flags._flags._flagdict.keys()
-        address = flags._name
-    elif isinstance(flags,AthConfigFlags):
-        # top-level flags
-        keys = flags._flagdict.keys()
-        address = ''
-    else:
-        raise TypeError(f'Cannot iterate on {type(flags)}')
+    keys = flags._flagdict.keys()
+    address = ''
     for key in keys:
         if not address:
             try:
@@ -59,13 +47,6 @@ def _subflag_itr(flags):
             ntrim = len(address) + 1
             remaining = key[ntrim:]
             yield key, getattr(flags, remaining)
-
-
-def _purge_flags(flags, name):
-    """another nasty function that messes with AthConfigFlags"""
-    for key in list(flags._flagdict):
-        if key.startswith(name):
-            del flags._flagdict[key]
 
 
 ##########################################################
@@ -253,15 +234,15 @@ def fill_flags_from_runconfig(
     return flags
 
 
-def lock_merged_config_flags(flags, subflag='Analysis'):
+def lock_merged_config_flags(flags, subflag_name='Analysis'):
     """Main function to lock configuration flags
 
     This should be the only thing that users need to call.
     """
-    flag_dict = dictify(getattr(flags, subflag))
+    flag_dict = flags[subflag_name].asdict()
     tup_flags = to_immutable(flag_dict)
-    _purge_flags(flags, subflag)
-    flags.addFlag(subflag, tup_flags.Analysis)
+    del flags[subflag_name]
+    flags.addFlag(subflag_name, tup_flags)
     flags.lock()
 
     validate_flags(flags)

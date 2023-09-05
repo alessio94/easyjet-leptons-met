@@ -27,6 +27,9 @@ from EasyjetHub.steering.utils.config_flags import (
 )
 
 
+###########################################
+# other, less awesome functions
+###########################################
 def analysis_configuration(parser="default"):
 
     if parser == "default":
