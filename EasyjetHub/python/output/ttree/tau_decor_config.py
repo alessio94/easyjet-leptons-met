@@ -7,6 +7,7 @@ def tau_decor_cfg(flags, **kwargs):
     taucoll = flags.Analysis.container_names.input.taus
 
     kwargs.setdefault("tauIDWP", "Loose")
+    kwargs.setdefault("channel", flags.Analysis.channel)
 
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(

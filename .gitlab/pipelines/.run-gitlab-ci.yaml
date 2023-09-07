@@ -107,10 +107,15 @@ ntupler_lite_yybb_mc20:
   script:
     - easyjet-test lite-yybb-mc20
 
-ntupler_lite_bbtt_mc21:
+ntupler_lite_bbtt_hadhad_mc21:
   extends: .ntupler
   script:
-    - easyjet-test lite-bbtt-mc21
+    - easyjet-test lite-bbtt-hadhad-mc21
+
+ntupler_lite_bbtt_lephad_mc21:
+  extends: .ntupler
+  script:
+    - easyjet-test lite-bbtt-lephad-mc21
 
 ntupler_sh4b_boosted_mc20:
   extends: .ntupler

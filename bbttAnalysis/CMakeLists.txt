@@ -41,8 +41,10 @@ atlas_install_python_modules(
 )
 atlas_install_data(
   share/bbtt-base-config.yaml
-  share/RunConfig-PHYS-bbtt.yaml
-  share/RunConfig-PHYSLITE-bbtt.yaml
+  share/RunConfig-PHYS-bbtt-hadhad.yaml
+  share/RunConfig-PHYSLITE-bbtt-hadhad.yaml
+  share/RunConfig-PHYS-bbtt-lephad.yaml
+  share/RunConfig-PHYSLITE-bbtt-lephad.yaml
 )
 
 # atlas_install_data( data/* )

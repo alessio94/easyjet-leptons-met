@@ -1,1 +1,3 @@
 include: bbtt-base-config.yaml
+
+channel: "lephad"
