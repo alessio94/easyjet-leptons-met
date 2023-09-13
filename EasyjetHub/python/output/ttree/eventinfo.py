@@ -15,6 +15,8 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "mcChannelNumber",
         ]
     )
+    if flags.Input.isMC and not flags.Input.isPHYSLITE:
+        eventinfo_branches.variables += ["generatorWeight_%SYS%"]
 
     if do_PRW and not flags.Analysis.disable_calib:
         eventinfo_branches.variables += ["PileupWeight_%SYS%"]
