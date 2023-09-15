@@ -128,7 +128,7 @@ namespace HH4B
 	
 	status = m_mmcTool->GetFitStatus(method);	
 	if (status == 1) {
-	  res = m_mmcTool->GetResonanceVec(method);	
+	  res = m_mmcTool->GetResonanceVec(method)*1e3;	
 	}
       }
 
@@ -138,6 +138,7 @@ namespace HH4B
       m_mmc_eta.set(*event, res.Eta(), sys);
       m_mmc_phi.set(*event, res.Phi(), sys);
       m_mmc_m.set(*event, res.M(), sys);            
+
     }
 
     return StatusCode::SUCCESS;

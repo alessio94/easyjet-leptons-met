@@ -9,14 +9,12 @@
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
 
 #include <AthContainers/ConstDataVector.h>
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <FourMomUtils/xAODP4Helpers.h>
-
-#include <SystematicsHandles/SysReadHandle.h>
-#include <SystematicsHandles/SysListHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
@@ -67,6 +65,15 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    CP::SysReadDecorHandle<float> 
+    m_mmc_pt { this, "mmc_pt", "mmc_pt_%SYS%", "MMC pt key"};
+    CP::SysReadDecorHandle<float> 
+    m_mmc_eta { this, "mmc_eta", "mmc_eta_%SYS%", "MMC eta key"};
+    CP::SysReadDecorHandle<float> 
+    m_mmc_phi { this, "mmc_phi", "mmc_phi_%SYS%", "MMC phi key"};
+    CP::SysReadDecorHandle<float> 
+    m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
+
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<float> m_leading_muon_pt {"Leading_Muon_pt_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_leading_muon_eta {"Leading_Muon_eta_%SYS%", this};
@@ -76,6 +83,15 @@ private:
 
     CP::SysWriteDecorHandle<float> m_leading_tau_pt {"Leading_Tau_pt_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_leading_tau_eta {"Leading_Tau_eta_%SYS%", this};
+
+    CP::SysWriteDecorHandle<float> m_HH_pt {"HH_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_HH_eta {"HH_eta_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_HH_phi {"HH_phi_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_HH_m {"HH_m_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_HH_vis_pt {"HH_vis_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_HH_vis_eta {"HH_vis_eta_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_HH_vis_phi {"HH_vis_phi_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_HH_vis_m {"HH_vis_m_%SYS%", this};
 
     // Steerbale vars
     std::string m_bTagWP;

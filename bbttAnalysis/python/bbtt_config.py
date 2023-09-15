@@ -129,6 +129,13 @@ def bbtt_branches(flags):
             else:
                 branches += [f"EventInfo.mmc_{var}_%SYS% -> mmc_%SYS%_{var}"]
 
+        for hh in ["HH", "HH_vis"]:
+            for var in ["pt", "eta", "phi", "m"]:
+                if tree_flags['write_object_systs_only_for_pt'] and "pt" not in var:
+                    branches += [f"EventInfo.{hh}_{var}_NOSYS -> {hh}_{var}"]
+                else:
+                    branches += [f"EventInfo.{hh}_{var}_%SYS% -> {hh}_%SYS%_{var}"]
+
     branches += ["EventInfo.bbtt_pass_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
 
     return branches

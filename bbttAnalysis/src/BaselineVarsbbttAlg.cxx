@@ -12,6 +12,8 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODTau/TauJetContainer.h>
 
+#include "TLorentzVector.h"
+
 namespace HH4B
 {
   BaselineVarsbbttAlg::BaselineVarsbbttAlg(const std::string &name,
@@ -33,6 +35,11 @@ namespace HH4B
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    ATH_CHECK (m_mmc_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_mmc_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
+
     // Intialise syst-aware output decorators
     ATH_CHECK(m_leading_muon_pt.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_leading_muon_eta.initialize(m_systematicsList, m_eventHandle));
@@ -42,6 +49,16 @@ namespace HH4B
 
     ATH_CHECK(m_leading_tau_pt.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_leading_tau_eta.initialize(m_systematicsList, m_eventHandle));
+
+    ATH_CHECK(m_HH_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_HH_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_HH_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_HH_m.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_HH_vis_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_HH_vis_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_HH_vis_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_HH_vis_m.initialize(m_systematicsList, m_eventHandle));
+
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -105,6 +122,33 @@ namespace HH4B
  	m_leading_tau_pt.set(*event, -99, sys);
 	m_leading_tau_eta.set(*event, -99, sys);
       }
+
+      // DiHiggs mass 
+      TLorentzVector bb(0,0,0,0);
+      TLorentzVector tautau(0,0,0,0);
+      TLorentzVector HH(0,0,0,0);
+      TLorentzVector HH_vis(0,0,0,0);
+      TLorentzVector mmc_vec(0,0,0,0);
+      if (jets->size() > 1 && taus->size() > 1) {
+        bb=jets->at(0)->p4()+jets->at(1)->p4();
+        tautau=taus->at(0)->p4()+taus->at(1)->p4();
+        HH_vis=bb+tautau;
+
+        mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
+	                     m_mmc_eta.get(*event, sys),
+	                     m_mmc_phi.get(*event, sys),
+	                     m_mmc_m.get(*event, sys));
+        HH=bb+mmc_vec;
+      }
+
+      m_HH_pt.set(*event, HH.Pt(), sys);
+      m_HH_eta.set(*event, HH.Eta(), sys);
+      m_HH_phi.set(*event, HH.Phi(), sys);
+      m_HH_m.set(*event, HH.M(), sys);
+      m_HH_vis_pt.set(*event, HH_vis.Pt(), sys);
+      m_HH_vis_eta.set(*event, HH_vis.Eta(), sys);
+      m_HH_vis_phi.set(*event, HH_vis.Phi(), sys);
+      m_HH_vis_m.set(*event, HH_vis.M(), sys);
     }
 
     return StatusCode::SUCCESS;
