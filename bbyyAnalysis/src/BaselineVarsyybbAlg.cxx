@@ -10,6 +10,8 @@
 #include <AthContainers/ConstDataVector.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
+#include <xAODMuon/MuonContainer.h>
 
 namespace HH4B
 {
@@ -17,22 +19,25 @@ namespace HH4B
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
-    declareProperty("bTagWP", m_bTagWP);
+
   }
 
   StatusCode BaselineVarsyybbAlg::initialize()
   {
     ATH_CHECK(m_smallRContainerInKey.initialize());
+    ATH_CHECK(m_smallRContainerInKey_No_WP.initialize());
     ATH_CHECK(m_photonContainerInKey.initialize());
+    ATH_CHECK(m_muonContainerInKey.initialize());
+    ATH_CHECK(m_electronContainerInKey.initialize());
     ATH_CHECK(m_EventInfoKey.initialize());
 
-    // make decorators
     for (const std::string &var : m_vars)
     {
-      std::string deco_var = var + m_bTagWP;
+      std::string deco_var = var; 
       SG::AuxElement::Decorator<float> deco(deco_var);
       m_decos.emplace(deco_var, deco);
     };
+
     return StatusCode::SUCCESS;
   }
 
@@ -44,24 +49,33 @@ namespace HH4B
 
     for (const std::string &var : m_vars)
     {
-      std::string deco_var = var;
+      std::string deco_var = var; 
       m_decos.at(deco_var)(*eventInfo) = -99.; 
     };
 
     SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRjets(
        m_smallRContainerInKey);
+    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRjets_No_WP(
+       m_smallRContainerInKey_No_WP);
     SG::ReadHandle<ConstDataVector<xAOD::PhotonContainer> > photons_(
         m_photonContainerInKey);
+    SG::ReadHandle<ConstDataVector<xAOD::MuonContainer> > muons_(
+        m_muonContainerInKey);
+    SG::ReadHandle<ConstDataVector<xAOD::ElectronContainer> > electrons_(
+        m_electronContainerInKey);
 
-    //static const SG::AuxElement::Accessor<char>  DFCommonPhotonsIsEMLoose ("DFCommonPhotonsIsEMLoose");
     static const SG::AuxElement::Accessor<char>  DFCommonPhotonsIsEMTight ("DFCommonPhotonsIsEMTight");
     static const SG::AuxElement::Accessor<char>  DFCommonPhotonsCleaning ("DFCommonPhotonsCleaning");
-
-    //AsgPhotonIsEMSelector PID("AsgPhotonIsEMSelector");
+    static const SG::AuxElement::Accessor<char>  DFCommonElectronsLHMedium ("DFCommonElectronsLHMedium");
+    static const SG::AuxElement::Accessor<char>  DFCommonElectronsDNNMedium ("DFCommonElectronsDNNMedium");
+    static const SG::AuxElement::Accessor<char>  DFCommonMuonPassIDCuts ("DFCommonMuonPassIDCuts");
+    static const SG::AuxElement::Accessor<char>  DFCommonMuonPassPreselection ("DFCommonMuonPassPreselection");
 
     ATH_CHECK(smallRjets.isValid());
+    ATH_CHECK(smallRjets_No_WP.isValid());
     ATH_CHECK(photons_.isValid());
-
+    ATH_CHECK(muons_.isValid());
+    ATH_CHECK(electrons_.isValid());
     ConstDataVector<xAOD::JetContainer> jets = *smallRjets;
     ConstDataVector<xAOD::PhotonContainer> photons = *photons_;
 
@@ -70,13 +84,15 @@ namespace HH4B
     int PASS_RELPT_CUT = 0;
     int MASSCUT = 0;
     int isPassed = 0;
-    //Adding cut : < 6 central jets with pt<25GeV
-    int LESS_THAN_SIX_CENTRAL_JETS_CUT=0;
+    int N_LEPTONS_CUT=0;
+    int LESS_THAN_SIX_CENTRAL_JETS=0;
+    int EXACTLY_TWO_B_JETS = 0;
     std::vector<float> PassTightIDs;
     std::vector<float> PassIsos;
     std::vector<float> ptOverMasses;
     std::vector<float> CentralJetsEta;
-
+    int n_leptons=0;
+    int n_bjets=0;
 
 
     bool PassIso = 0;
@@ -89,7 +105,7 @@ namespace HH4B
 
       for (const xAOD::Photon *photon : *photons_)
       {
-        PassIso = (bool)( (photon->isolation(xAOD::Iso::topoetcone20)/photon->pt()) < 0.065 &&  (photon->isolation(xAOD::Iso::ptcone20)/photon->pt()) < 0.05 );
+        PassIso = (photon->isolation(xAOD::Iso::topoetcone20)/photon->pt()) < 0.065 &&  (photon->isolation(xAOD::Iso::ptcone20)/photon->pt()) < 0.05 ;
         PassTightIDs.push_back(DFCommonPhotonsIsEMTight(*photon));
         PassIsos.push_back(PassIso);
         ptOverMasses.push_back(photon->pt()/myy);
@@ -102,24 +118,57 @@ namespace HH4B
 
     }
 
+      for (const xAOD::Electron *electron : *electrons_)
+      {
+        bool PassElectronIso = 0;
+        bool PassElectronMedium = 0;
+        // or ptcone20_Nonprompt_All_MaxWeightTTVALooseCone_pt1000
+         PassElectronIso = (electron->isolation(xAOD::Iso::topoetcone20)/electron->pt()) < 0.20 &&  (electron->isolation(xAOD::Iso::ptcone20_Nonprompt_All_MaxWeightTTVALooseCone_pt500)/electron->pt()) < 0.15 ;
+         PassElectronMedium = DFCommonElectronsLHMedium(*electron) || DFCommonElectronsDNNMedium(*electron);
+        if (PassElectronIso && PassElectronMedium)
+            n_leptons+=1;
+      }
 
-    //Applying central jets cut. 
+      for (const xAOD::Muon *muon : *muons_)
+      {
+        bool PassMuonIso = 0;
+        bool PassMuonMedium = 0;
+        PassMuonIso = (muon->isolation(xAOD::Iso::topoetcone20)/muon->pt()) < 0.30 &&  (muon->isolation(xAOD::Iso::ptcone20)/muon->pt()) < 0.15 ;
+         PassMuonMedium = DFCommonMuonPassIDCuts(*muon) && DFCommonMuonPassPreselection(*muon);
+        if (PassMuonIso && PassMuonMedium)
+            n_leptons+=1;
+      }
 
-    for (const xAOD::Jet *jet : *smallRjets)
+      // No medium+isolated electrons and muons.
+      if (n_leptons==0)
+      {
+        N_LEPTONS_CUT =1;
+      }
+
+    //Applying jet cuts. 
+    for (const xAOD::Jet *jet : *smallRjets) // All jets contained here are b-jets
     {
-        if(std::abs(jet->eta())<2.5)
+        if (jet->pt()>25000. && std::abs(jet->eta())<2.5) // then check if it has pt>25GeV and if it's central.
+            n_bjets+=1;
+    }
+
+    if (n_bjets==2)
+    {
+      EXACTLY_TWO_B_JETS=1;
+    }
+
+    //Applying jet cuts. 
+    for (const xAOD::Jet *jet : *smallRjets_No_WP) // Jets here can be every type of jet (No Working point selected)
+    {
+        if(std::abs(jet->eta())<2.5) // check if jet is central
         {
           CentralJetsEta.push_back(jet->eta());
         }
-
-        // else
-        //    std::cout << "Jet eta : " << jet->eta() << std::endl;
-
     }
 
     if (CentralJetsEta.size()<6)
     {
-      LESS_THAN_SIX_CENTRAL_JETS_CUT=1;
+      LESS_THAN_SIX_CENTRAL_JETS=1;
     }
 
     if((photons.size() >= 2)
@@ -127,11 +176,10 @@ namespace HH4B
        && TWO_ISO_PHOTONS==1
        && PASS_RELPT_CUT==1
        && MASSCUT==1
-       && LESS_THAN_SIX_CENTRAL_JETS_CUT==1
+       && N_LEPTONS_CUT==1
+       && LESS_THAN_SIX_CENTRAL_JETS==1
+       && EXACTLY_TWO_B_JETS==1
     ) isPassed = 1;
-
-
-
 
 
     // Save cutflow booleans
@@ -142,9 +190,10 @@ namespace HH4B
     m_decos.at("TWO_ISO_PHOTONS")(*eventInfo) = TWO_ISO_PHOTONS;
     m_decos.at("PASS_RELPT_CUT")(*eventInfo) = PASS_RELPT_CUT;
     m_decos.at("MASSCUT")(*eventInfo) = MASSCUT;
-    m_decos.at("LESS_THAN_SIX_CENTRAL_JETS_CUT")(*eventInfo) = LESS_THAN_SIX_CENTRAL_JETS_CUT;
+    m_decos.at("N_LEPTONS_CUT")(*eventInfo) = N_LEPTONS_CUT;
+    m_decos.at("LESS_THAN_SIX_CENTRAL_JETS")(*eventInfo) = LESS_THAN_SIX_CENTRAL_JETS;
+    m_decos.at("EXACTLY_TWO_B_JETS")(*eventInfo) = EXACTLY_TWO_B_JETS;
     m_decos.at("isPassed")(*eventInfo) = isPassed;
-
 
     if(photons.size() == 1){
       // Leading photon
@@ -193,6 +242,7 @@ namespace HH4B
       m_decos.at("Subleading_Jet_E")(*eventInfo) = jets[1]->e();
 
     }
+
 
     return StatusCode::SUCCESS;
   }

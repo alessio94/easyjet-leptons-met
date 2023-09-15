@@ -4,7 +4,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 # yybb analysis chain
 
 
-def yybb_cfg(flags, smalljetkey, photonkey):
+def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
 
     # photons
@@ -26,25 +26,72 @@ def yybb_cfg(flags, smalljetkey, photonkey):
         )
     )
 
-    # jets
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.MuonSelectorAlg(
+            "MuonSelectorAlg",
+            containerInKey=muonkey,
+            containerOutKey="yybbAnalysisMuons",
+            minPt=7_000,
+            maxEta=2.7,
+            truncateAtAmount=-1,  # -1 means keep all
+            minimumAmount=-1,  # -1 means ignores this
+            pTsort=True,
+        )
+    )
+
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.ElectronSelectorAlg(
+            "ElectronSelectorAlg",
+            containerInKey=electronkey,
+            containerOutKey="yybbAnalysisElectrons",
+            minPt=7_000,
+            minEtaVeto=1.37,
+            maxEtaVeto=1.52,
+            maxEta=2.47,
+            truncateAtAmount=-1,  # -1 means keep all
+            minimumAmount=-1,  # -1 means ignores this
+            pTsort=True,
+        )
+    )
+
     cfg.addEventAlgo(
         CompFactory.Easyjet.JetSelectorAlg(
             "SmallJetSelectorAlg",
             containerInKey=smalljetkey,
             containerOutKey="yybbAnalysisJets",
+            bTagWPDecorName="ftag_select_DL1dv01_FixedCutBEff_77",
             minPt=-1,
             maxEta=6,
             truncateAtAmount=-1,  # -1 means keep all
             minimumAmount=-1,  # -1 means ignores this
+            maximumAmount=99,
+            pTsort=True,
         )
     )
 
-    # calculate final yybb vars
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.JetSelectorAlg(
+            "SmallJetSelectorAlg_No_WP",
+            containerInKey=smalljetkey,
+            containerOutKey="yybbAnalysisJets_No_WP",
+            bTagWPDecorName="",
+            minPt=-1,
+            maxEta=6,
+            truncateAtAmount=-1,  # -1 means keep all
+            minimumAmount=-1,  # -1 means ignores this
+            maximumAmount=99,
+            pTsort=True,
+        )
+    )
+
     cfg.addEventAlgo(
         CompFactory.HH4B.BaselineVarsyybbAlg(
             "FinalVarsyybbAlg",
-            smallRContainerInKey="yybbAnalysisJets",
             photonContainerInKey="yybbAnalysisPhotons",
+            smallRContainerInKey="yybbAnalysisJets",
+            smallRContainerInKey_No_WP="yybbAnalysisJets_No_WP",
+            muonContainerInKey="yybbAnalysisMuons",
+            electronContainerInKey="yybbAnalysisElectrons",
         )
     )
 
@@ -53,22 +100,27 @@ def yybb_cfg(flags, smalljetkey, photonkey):
 
 def yybb_branches(flags):
     branches = []
+
     variables = [
         "N_LOOSE_PHOTONS", "TWO_TIGHTID_PHOTONS", "TWO_ISO_PHOTONS",
-        "PASS_RELPT_CUT", "MASSCUT", "myy", "isPassed",
-        "LESS_THAN_SIX_CENTRAL_JETS_CUT"
+        "PASS_RELPT_CUT", "MASSCUT", "myy", "isPassed","N_LEPTONS_CUT",
+        "LESS_THAN_SIX_CENTRAL_JETS","EXACTLY_TWO_B_JETS"
     ]
-    for var in variables:
-        var_str = "EventInfo.%s -> %s" % (var, var)
-        branches.append(var_str)
+
+    if (flags.Analysis.do_yybb_cutflow):
+        for var in variables:
+            var_str = "EventInfo.%s -> %s" % (var, var)
+            branches.append(var_str)
 
     kinematics = ["pt", "eta", "phi", "E"]
     pt_ords = ["Leading", "Subleading"]
-    for kin in kinematics:
-        for pt_ord in pt_ords:
-            v = "EventInfo.%s_Photon_%s -> %s_Photon_%s" % (pt_ord, kin, pt_ord, kin)
-            j = "EventInfo.%s_Jet_%s -> %s_Jet_%s" % (pt_ord, kin, pt_ord, kin)
-            branches += [v]
-            branches += [j]
+    particles = ["Photon", "Jet"]
+
+    for pt_ord in pt_ords:
+        for p in particles:
+            for kin in kinematics:
+                v = "EventInfo.%s_%s_%s -> %s_%s_%s" % \
+                    (pt_ord, p, kin, pt_ord, p, kin)
+                branches += [v]
 
     return branches

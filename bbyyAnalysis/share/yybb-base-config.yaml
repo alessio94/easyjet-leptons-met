@@ -5,8 +5,8 @@ do_small_R_jets: true
 do_large_R_Topo_jets: false
 do_large_R_UFO_jets: false
 do_VR_jets: false
-do_muons: false
-do_electrons: false
+do_muons: true
+do_electrons: true
 do_photons: true
 
 # Decay mode considered for truth decoration
@@ -52,6 +52,9 @@ systematics_regex: [".*"]
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
+
+#Enable cutflow 
+do_yybb_cutflow: true
 
 # Include the TTree configuration and update details
 ttree_output:

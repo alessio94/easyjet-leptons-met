@@ -10,9 +10,12 @@
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <FourMomUtils/xAODP4Helpers.h>
 #include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
+#include <xAODMuon/MuonContainer.h>
 
 namespace HH4B
 {
@@ -35,19 +38,33 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
+    CP::SysListHandle m_systematicsList {this};
+
     SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer> >
     m_smallRContainerInKey{ this, "smallRContainerInKey",
                             "",   "containerName to read" };
 
+
+    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer> >
+    m_smallRContainerInKey_No_WP{ this, "smallRContainerInKey_No_WP",
+                            "",   "Jet container without WP to read" };
+
     SG::ReadHandleKey<ConstDataVector<xAOD::PhotonContainer> >
     m_photonContainerInKey{ this, "photonContainerInKey",
+                            "",   "containerName to read" };
+
+    SG::ReadHandleKey<ConstDataVector<xAOD::MuonContainer> >
+    m_muonContainerInKey{ this, "muonContainerInKey",
+                            "",   "containerName to read" };
+
+    SG::ReadHandleKey<ConstDataVector<xAOD::ElectronContainer> >
+    m_electronContainerInKey{ this, "electronContainerInKey",
                             "",   "containerName to read" };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
       this, "EventInfoKey", "EventInfo", "EventInfo container to dump"
     };
 
-    std::string m_bTagWP;
     std::unordered_map<std::string, SG::AuxElement::Decorator<float> > m_decos;
     std::vector<std::string> m_vars{
       // Cut flow
@@ -58,8 +75,12 @@ private:
       "PASS_RELPT_CUT",
       "MASSCUT",
       "myy",
+      //Nlep=0 cut
+      "N_LEPTONS_CUT",
       //Jets cut
-      "LESS_THAN_SIX_CENTRAL_JETS_CUT",
+      "LESS_THAN_SIX_CENTRAL_JETS",
+      "EXACTLY_TWO_B_JETS",
+      //Passed event through all cuts.
       "isPassed",
 
       // Leading/Subleading photon kinematics
@@ -69,7 +90,9 @@ private:
       // Leading/Subleading jet kinematics
       "Leading_Jet_pt", "Leading_Jet_eta", "Leading_Jet_phi", "Leading_Jet_E",     
       "Subleading_Jet_pt", "Subleading_Jet_eta", "Subleading_Jet_phi", "Subleading_Jet_E",
+
     };
+
   };
 }
 
