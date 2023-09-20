@@ -7,47 +7,6 @@ from argparse import Namespace
 
 from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 
-#####################################################################
-# flag converters, makes everything into a not AthConfigFlags object
-#####################################################################
-#
-# There's some really nasty private data access in here, but that's
-# what it takes to get out of a nasty place.
-
-
-def dictify(flags):
-    """Convert AthConfigFlags flags into a dictionary
-
-    This function aims to encapsulate all the nasty stuff that we have
-    to do with config flags
-    """
-    flags.loadAllDynamicFlags()
-    outdict = {}
-    for key, item in _subflag_itr(flags):
-        x = outdict
-        subkeys = key.split('.')
-        for subkey in subkeys[:-1]:
-            x = x.setdefault(subkey,{})
-        x[subkeys[-1]] = item
-    return outdict
-
-
-def _subflag_itr(flags):
-    keys = flags._flagdict.keys()
-    address = ''
-    for key in keys:
-        if not address:
-            try:
-                val = getattr(flags, key)
-            except ModuleNotFoundError:
-                # Handle Athena packages that are not in AthAnalysis
-                val = 'undef'
-            yield key, val
-        elif key.startswith(address):
-            ntrim = len(address) + 1
-            remaining = key[ntrim:]
-            yield key, getattr(flags, remaining)
-
 
 ##########################################################
 # Convert everything back to standard python stuff

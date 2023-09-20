@@ -1,6 +1,5 @@
 from pathlib import Path
 import yaml
-import copy
 import sys
 
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
@@ -23,7 +22,6 @@ from EasyjetHub.steering.utils.log_helper import log, setRogueLoggers
 from EasyjetHub.steering.utils.config_flags import (
     fill_flags_from_runconfig,
     lock_merged_config_flags,
-    dictify,
 )
 
 
@@ -127,13 +125,15 @@ def analysis_configuration(parser="default"):
     lock_merged_config_flags(flags)
 
     if args.dump_analysis_config_flags:
-        yaml.dump(flags.Analysis,open(args.dump_analysis_config_flags,'w'))
+        yaml.dump(
+            flags.Analysis.as_mutable(),
+            open(args.dump_analysis_config_flags,'w')
+        )
 
     if args.dump_full_config_flags:
-        # Copy to avoid messing up the original flags
-        # then convert to dictionary and dump
-        flags_copy = copy.deepcopy(flags)
-        flags_as_dict = dictify(flags_copy)
+        flags_as_dict = flags.asdict()
+        # convert the analysis flags back to a dict too
+        flags_as_dict['Analysis'] = flags.Analysis.as_mutable()
         yaml.dump(flags_as_dict,open(args.dump_full_config_flags,'w'))
 
     return flags, args
