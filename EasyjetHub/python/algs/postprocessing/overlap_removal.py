@@ -68,7 +68,7 @@ def overlap_sequence(flags):
         configSeq.setOptionValue(f'.{objtype}', coll)
 
     # config for TauAntiTauOR
-    # configSeq.setOptionValue('.antiTauIDTauLabel', 'isIDTau')
+    configSeq.setOptionValue('.antiTauIDTauLabel', 'isIDTau')
     configSeq.setOptionValue('.antiTauBJetLabel', 'ftag_select_DL1dv01_FixedCutBEff_77')
     configSeq.setOptionValue('.antiTauLabel', 'isAntiTau')
     configSeq.setOptionValue('.doTauAntiTauJetOR', True)

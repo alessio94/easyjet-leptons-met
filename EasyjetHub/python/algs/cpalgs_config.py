@@ -67,6 +67,10 @@ def cpalgs_cfg(
         )
         cfg.addEventAlgo(syslistalg)
 
+    # Create SelectionNameSvc explicitly
+    selectionSvc = CompFactory.CP.SelectionNameSvc("SelectionNameSvc")
+    cfg.addService(selectionSvc)
+
     # Aggregate the configured CP algs in one ConfigSequence,
     # which will handle the container names, copying etc
     configSeq = ConfigSequence()
