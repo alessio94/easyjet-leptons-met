@@ -27,7 +27,7 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
     if tree_flags.collection_options.small_R_jets.btag_info:
         small_R_jet_branches.variables += [
             f"ftag_select_{btag_wp}"
-            for btag_wp in flags.Analysis.btag_wps
+            for btag_wp in flags.Analysis.small_R.btag_wps
         ]
 
     if (

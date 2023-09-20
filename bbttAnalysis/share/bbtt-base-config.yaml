@@ -11,9 +11,12 @@ do_mmc : true
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbtt"]
 
-# btagging working points for small Rjets
-btag_wps:
+# small R config
+small_R:
+  # btagging working points 
+  btag_wps: 
     - DL1dv01_FixedCutBEff_77
+
 
 # "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
 trigger_list: ["HHbbtt"]

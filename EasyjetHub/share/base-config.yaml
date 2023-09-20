@@ -16,10 +16,18 @@ do_met: false
 do_mmc: false
 # Decay mode considered for truth decoration
 truthDecayModes: []
-# btagging working points for small Rjets
-btag_wps: []
-# btagging working points for Variable Radius Track jets
-vr_btag_wps: []
+
+# small R config
+small_R:
+  max_eta: 100
+  # btagging working points for small R jets
+  btag_wps: []
+
+# large R config
+large_R:
+  # btagging working points for Variable Radius Track jets
+  vr_btag_wps: []
+
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto

@@ -7,17 +7,24 @@ do_muons: true
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]
 
-# working points
-btag_wps:
+# small R config
+small_R:
+  # btagging working points
+  btag_wps: 
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_77
     - DL1dv01_FixedCutBEff_85
     - GN120220509_FixedCutBEff_70
     - GN120220509_FixedCutBEff_77
     - GN120220509_FixedCutBEff_85
-vr_btag_wps:
+
+# large R config
+large_R:
+  # btagging working points for Variable Radius Track jets
+  vr_btag_wps:
     - DL1r_FixedCutBEff_77
     - DL1r_FixedCutBEff_85
+
 
 # "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
 trigger_list: ["bbbbResolved", "bbbbBoosted"]

@@ -91,7 +91,7 @@ def get_ghost_vr_branches(flags):
         "Xbb2020v3_QCD",
     ] + [
         f"leadingVRTrackJetsBtag_{wp}"
-        for wp in flags.Analysis.vr_btag_wps
+        for wp in flags.Analysis.large_R.vr_btag_wps
     ]
     if flags.Input.isMC:
         vr_vars += [

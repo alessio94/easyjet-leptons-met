@@ -7,7 +7,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 def boosted_cfg(flags, largejetkey):
     cfg = ComponentAccumulator()
 
-    for btag_wp in flags.Analysis.vr_btag_wps:
+    for btag_wp in flags.Analysis.large_R.vr_btag_wps:
         # get the two leading large R's
         cfg.addEventAlgo(
             CompFactory.Easyjet.JetSelectorAlg(
@@ -92,7 +92,7 @@ def boosted_cfg(flags, largejetkey):
 def boosted_branches(flags):
     branches = []
 
-    for btag_wp in flags.Analysis.vr_btag_wps:
+    for btag_wp in flags.Analysis.large_R.vr_btag_wps:
         boosted_vars = [
             "h1_m",
             "h1_jet1_pt",

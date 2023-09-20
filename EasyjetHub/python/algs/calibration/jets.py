@@ -44,7 +44,7 @@ def jet_sequence(
     #     runJvtSelection=not flags.Input.isPHYSLITE,
     # )
 
-    for tagger_wp in flags.Analysis.btag_wps:
+    for tagger_wp in flags.Analysis.small_R.btag_wps:
         tagger, btag_wp = tagger_wp.split("_", 1)
         configSeq += makeConfig(
             'FlavourTagging',
@@ -100,7 +100,7 @@ def jet_sequence(
     )
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
-    configSeq.setOptionValue('.maxEta', 2.5)
+    configSeq.setOptionValue('.maxEta', flags.Analysis.small_R.max_eta)
 
     # Apply selection as view container
 
@@ -148,7 +148,7 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 def vr_jet_sequence(flags, configAcc):
 
     # Previous configuration, to be reproduced
-    # for tagger_wp in flags.Analysis.vr_btag_wps:
+    # for tagger_wp in flags.Analysis.large_R.vr_btag_wps:
     #     tagger, btag_wp = tagger_wp.split("_", 1)
     #     makeFTagAnalysisSequence(
     #         vr_jet_sequence,
@@ -178,7 +178,7 @@ def vr_jet_sequence(flags, configAcc):
 
     # There is no output container, we just operate on the input one
     input_name = flags.Analysis.container_names.input.vrJet
-    for tagger_wp in flags.Analysis.vr_btag_wps:
+    for tagger_wp in flags.Analysis.large_R.vr_btag_wps:
         tagger, btag_wp = tagger_wp.split("_", 1)
         # Default CDI in FTag config which is:
         #   "xAODBTaggingEfficiency/13TeV/2022-22-13TeV-MC20-CDI-2022-07-28_v1.root"
@@ -218,7 +218,7 @@ def lr_jet_ghost_vr_jet_association_cfg(
                 flags.Analysis.container_names.input,
                 f"reco10{lr_jet_type}Jet"
             ).replace("%SYS%", "NOSYS"),
-            workingPoints=flags.Analysis.vr_btag_wps,
+            workingPoints=flags.Analysis.large_R.vr_btag_wps,
             EventInfoDecorSuffix=lr_jet_type,
         )
     )
