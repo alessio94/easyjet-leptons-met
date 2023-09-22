@@ -87,26 +87,6 @@ def preselection_cfg(flags, seqname):
     if not flags.Analysis.do_trigger_filtering:
         log.warning("Disabling trigger filtering, all events will pass!")
 
-    from EasyjetHub.steering.good_runs_lists import GOOD_RUNS_LISTS
-
-    grl_runs = GOOD_RUNS_LISTS.keys()
-    grl_files = []
-    if flags.Analysis.DataType == "data":
-        log.info(
-            "Self-configured GRL for years: "
-            f"{', '.join(str(year) for year in flags.Analysis.Years) or None}"
-        )
-        grl_lists_by_year = {
-            year: list
-            for run in grl_runs
-            for year, list in GOOD_RUNS_LISTS[run].items()
-        }
-        grl_files = [
-            list
-            for year in flags.Analysis.Years
-            for list in grl_lists_by_year[year]
-        ]
-
     log.info("Adding trigger analysis algs")
     # Removes events failing trigger and adds variable to EventInfo
     # if trigger passed or not, for example:
@@ -116,9 +96,7 @@ def preselection_cfg(flags, seqname):
 
     log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
-    configSeq += event_selection_sequence(
-        flags, grlfiles=grl_files, loose=flags.Analysis.loose_jet_cleaning
-    )
+    configSeq += event_selection_sequence(flags)
     makeEventCounterConfig(configSeq, "n_data_quality")
 
     # Create the output CA to set the sequence correctly
@@ -151,14 +129,7 @@ def event_building_cfg(flags, seqname):
     cfg = ComponentAccumulator()
     cfg.addSequence(CompFactory.AthSequencer(seqname))
 
-    cfg.merge(
-        cpalgs_cfg(
-            flags,
-            prw_files=flags.Analysis.PRWFiles,
-            lumicalc_files=flags.Analysis.LumiCalcFiles,
-        ),
-        seqname
-    )
+    cfg.merge(cpalgs_cfg(flags), seqname)
 
     if flags.Input.isMC:
         cfg.merge(truth_info_cfg(flags), seqname)

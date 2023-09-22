@@ -1,16 +1,17 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
+from EasyjetHub.steering.sample_metadata import get_grl_files
 
 
-def event_selection_sequence(flags, grlfiles=[], loose=False):
+def event_selection_sequence(flags):
     configSeq = ConfigSequence()
 
     configSeq += makeConfig('Event.Cleaning', None)
     configSeq.setOptionValue('.runPrimaryVertexSelection', True)
     configSeq.setOptionValue('.runEventCleaning', True)
-    configSeq.setOptionValue('.userGRLFiles', grlfiles)
+    configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
 
-    if not loose:
+    if not flags.Analysis.loose_jet_cleaning:
         configSeq.setOptionValue(
             '.selectionFlags',
             [

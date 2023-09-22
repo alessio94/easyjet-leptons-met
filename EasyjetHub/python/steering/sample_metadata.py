@@ -2,6 +2,7 @@ import json
 import pickle
 from enum import Enum
 from pathlib import Path
+from PathResolver import PathResolver
 
 
 class DataSampleYears(Enum):
@@ -10,6 +11,7 @@ class DataSampleYears(Enum):
     data17 = (2017,)
     data18 = (2018,)
     data22 = (2022,)
+    data23 = (2023,)
 
 
 class MCSampleYears(Enum):
@@ -18,6 +20,7 @@ class MCSampleYears(Enum):
     r13145 = (2018,)
     r13829 = (2022,)
     r14622 = (2022, 2023)
+    r14799 = (2023,)
 
 
 class SampleTypes(Enum):
@@ -26,6 +29,7 @@ class SampleTypes(Enum):
     mc20e = "r13145"  # run2, 2018
     mc21a = "r13829"  # run3, 2022
     mc23a = "r14622"  # run3, 2022
+    mc23c = "r14799"  # run3, 2023
     # ptag
     mc20 = "p5057"
     # ptag for Xbb tagger
@@ -96,79 +100,79 @@ def get_valid_ami_tag(tags, check_tag="p", min_valid_tag=SampleTypes.mc20):
     return is_valid_tag
 
 
-def get_pileup_config_files(flags):
-    """Return the PRW (Pileup ReWeighting) config files and lumicalc files"""
+def get_lumicalc_files(flags):
+    """Return the lumicalc files"""
 
-    dsid = flags.Input.MCChannelNumber
-    tags = flags.Input.AMITag
-    data_type = get_data_type(flags, is_prw=True)
-
-    # Figure out which MC we are using
-    if SampleTypes.mc20a.value in tags:
-        subcampaign = SampleTypes.mc20a
-    elif SampleTypes.mc20d.value in tags:
-        subcampaign = SampleTypes.mc20d
-    elif SampleTypes.mc20e.value in tags:
-        subcampaign = SampleTypes.mc20e
-    elif SampleTypes.mc21a.value in tags:
-        subcampaign = SampleTypes.mc21a
-    elif SampleTypes.mc23a.value in tags:
-        subcampaign = SampleTypes.mc23a
-    else:
-        raise LookupError(f"Cannot determine subcampaign for DSID {dsid}")
-
-    lumicalc_files = _get_lumicalc_files(subcampaign)
-    prw_files = _get_prw_files(dsid, subcampaign, data_type)
-
-    return prw_files, lumicalc_files
-
-
-def _get_lumicalc_files(subcampaign):
-    list = {
-        SampleTypes.mc20a: [
-            "GoodRunsLists/data15_13TeV/20170619/PHYS_StandardGRL_All_Good_25ns_276262-284484_OflLumi-13TeV-008.root",  # noqa
-            "GoodRunsLists/data16_13TeV/20180129/PHYS_StandardGRL_All_Good_25ns_297730-311481_OflLumi-13TeV-009.root",  # noqa
-        ],
-        SampleTypes.mc20d: [
-            "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.lumicalc.OflLumi-13TeV-010.root",  # noqa
-        ],
-        SampleTypes.mc20e: [
-            "GoodRunsLists/data18_13TeV/20190318/ilumicalc_histograms_None_348885-364292_OflLumi-13TeV-010.root"  # noqa
-        ],
-        SampleTypes.mc21a: [
-            "GoodRunsLists/data22_13p6TeV/20220902/ilumicalc_histograms_None_427882-430648_OflLumi-Run3-001.root"  # noqa
-        ],
-        SampleTypes.mc23a: [
-            "GoodRunsLists/data22_13p6TeV/20220902/ilumicalc_histograms_None_427882-430648_OflLumi-Run3-001.root"  # noqa
-        ],
-    }
-
-    return list.get(subcampaign, [])
-
-
-def _get_prw_files(dsid, subcampaign, data_type):
-    prw_files = []
-    actual_mu = {
-        SampleTypes.mc20d: [
-            "GoodRunsLists/data17_13TeV/20180619/physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root"  # noqa
-        ],
-        SampleTypes.mc20e: [
-            "GoodRunsLists/data18_13TeV/20190318/physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root"  # noqa
-        ],
-    }
-
-    if dsid:
-        dsid_as_str = str(dsid)
-        if data_type == "mc":
-            simulation_type = "FS"
+    lumicalc_files = set()
+    for year in flags.Analysis.Years:
+        year = str(year)
+        lumicalc_dir = flags.Analysis.grl_years[year]
+        lumicalc_file = flags.Analysis.lumicalc_files[year]
+        if lumicalc_dir and lumicalc_file:
+            lumicalc_files.add(str(Path(lumicalc_dir) / lumicalc_file))
         else:
-            simulation_type = "AFII"
+            raise RuntimeError(
+                f"Could not find Lumicalc for year {year}. "
+                "Specify Lumicalc files in the config file."
+            )
+    return list(lumicalc_files)
 
-        prw_files.append(
-            f"dev/PileupReweighting/share/DSID{dsid_as_str[:3]}xxx/pileup_{subcampaign.name}_dsid{dsid_as_str}_{simulation_type}.root"  # noqa
+
+def get_campaign(flags):
+    """Return campaign based on AMI tags"""
+
+    tags = flags.Input.AMITag
+    dsid = flags.Input.MCChannelNumber
+
+    if SampleTypes.mc20a.value in tags:
+        campaign = SampleTypes.mc20a
+    elif SampleTypes.mc20d.value in tags:
+        campaign = SampleTypes.mc20d
+    elif SampleTypes.mc20e.value in tags:
+        campaign = SampleTypes.mc20e
+    elif SampleTypes.mc21a.value in tags:
+        campaign = SampleTypes.mc21a
+    elif SampleTypes.mc23a.value in tags:
+        campaign = SampleTypes.mc23a
+    elif SampleTypes.mc23c.value in tags:
+        campaign = SampleTypes.mc23c
+    else:
+        raise LookupError(
+            "Cannot determine campaign "
+            f"for AMI tags {tags} and DSID {dsid}."
         )
 
-    return prw_files + actual_mu.get(subcampaign, [])
+    return campaign.name
+
+
+def get_prw_files(flags):
+    """Return the PRW (Pileup ReWeighting) config files."""
+    campaign = get_campaign(flags)
+
+    prw_files = set()
+    for year in flags.Analysis.Years:
+        year = str(year)
+        prw_dir = flags.Analysis.grl_years[year]
+        # because we don't get PRW from GRL folders from all years
+        try:
+            prw_file = flags.Analysis.prw_files[year]
+            prw_files.add(str(Path(prw_dir) / prw_file))
+        except AttributeError:
+            prw_file = flags.Analysis.prw_files[campaign]
+            prw_files.add(prw_file)
+
+    if flags.Input.MCChannelNumber:
+        dsid = str(flags.Input.MCChannelNumber)
+        data_type = get_data_type(flags, is_prw=True)
+        if data_type == "afii":
+            simulation_type = "AFII"
+        else:
+            simulation_type = "FS"
+        config = f"dev/PileupReweighting/share/DSID{dsid[:3]}xxx/pileup_{campaign}_dsid{dsid}_{simulation_type}.root"  # noqa
+        if PathResolver.FindCalibFile(config):
+            prw_files.add(config)
+
+    return list(prw_files)
 
 
 def get_run_years(flags):
@@ -215,3 +219,20 @@ def get_data_type(flags, is_prw=False):
         raise AssertionError("Data type cannot be determined from inputs!")
 
     return data_type
+
+
+def get_grl_files(flags):
+    grl_files = set()
+    if not flags.Input.isMC:
+        for year in flags.Analysis.Years:
+            year = str(year)
+            grl_dir = flags.Analysis.grl_years[year]
+            grl_file = flags.Analysis.grl_files[year]
+            if grl_dir and grl_file:
+                grl_files.add(str(Path(grl_dir) / grl_file))
+            else:
+                raise RuntimeError(
+                    f"Could not find GRL for year {year}. "
+                    "Specify GRL files in the config file."
+                )
+    return list(grl_files)

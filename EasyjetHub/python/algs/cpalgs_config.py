@@ -38,11 +38,7 @@ analysis_seqs = {
 }
 
 
-def cpalgs_cfg(
-    flags,
-    prw_files=[],
-    lumicalc_files=[],
-):
+def cpalgs_cfg(flags):
 
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
 
@@ -91,11 +87,7 @@ def cpalgs_cfg(
             log.info("Adding PRW sequence")
             # Adds variable to EventInfo if for pileup weight, for example:
             # EventInfo.PileWeight_%SYS$
-            configSeq += pileup_sequence(
-                flags,
-                prwfiles=prw_files,
-                lumicalcfiles=lumicalc_files,
-            )
+            configSeq += pileup_sequence(flags)
 
         if flags.Analysis.DataType != "data":
             log.info("Adding generator analysis sequence")

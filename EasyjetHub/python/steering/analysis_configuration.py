@@ -9,7 +9,6 @@ from AthenaCommon.Constants import INFO
 from EasyjetHub.steering.sample_metadata import (
     get_data_type,
     get_run_years,
-    get_pileup_config_files,
     update_metadata,
     has_metadata,
     cache_metadata,
@@ -91,23 +90,8 @@ def analysis_configuration(parser="default"):
         lambda prevFlags: get_trigger_chains(prevFlags)
     )
 
-    def is_mc_phys(flags):
-        return flags.Input.isMC and not flags.Input.isPHYSLITE
-    do_PRW = is_mc_phys(flags)
-    prw_files, lumicalc_files = [], []
-    if do_PRW:
-        try:
-            _prw_files, _lumicalc_files = get_pileup_config_files(flags)
-            if flags.Analysis.do_custom_PRW:
-                prw_files = _prw_files
-            if flags.Analysis.do_custom_lumicalc:
-                lumicalc_files = _lumicalc_files
-        except LookupError as err:
-            log.error(err)
-            do_PRW = False
+    do_PRW = flags.Input.isMC and not flags.Input.isPHYSLITE
     flags.addFlag("Analysis.doPRW", do_PRW)
-    flags.addFlag("Analysis.PRWFiles", prw_files)
-    flags.addFlag("Analysis.LumiCalcFiles", lumicalc_files)
 
     log.info(
         f"Self-configured: datatype: '{flags.Analysis.DataType}', "
@@ -140,7 +124,6 @@ def analysis_configuration(parser="default"):
 
 
 def get_trigger_chains(flags):
-
     from EasyjetHub.steering.trigger_lists import TRIGGER_LISTS
 
     trigger_year_list = flags.Analysis.trigger_year

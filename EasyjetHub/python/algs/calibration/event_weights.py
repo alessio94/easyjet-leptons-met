@@ -1,10 +1,10 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
-
+from EasyjetHub.steering.sample_metadata import get_prw_files, get_lumicalc_files
 from EasyjetHub.steering.utils.log_helper import log
 
 
-def pileup_sequence(flags, prwfiles, lumicalcfiles):
+def pileup_sequence(flags):
     configSeq = ConfigSequence()
 
     # Workaround for mc21 courtesy of
@@ -22,11 +22,13 @@ def pileup_sequence(flags, prwfiles, lumicalcfiles):
     configSeq += makeConfig('Event.PileupReweighting', None)
     configSeq.setOptionValue('.campaign', flags.Input.MCCampaign, noneAction='ignore')
     configSeq.setOptionValue('.files', flags.Input.Files, noneAction='ignore')
-    configSeq.setOptionValue('.useDefaultConfig', True)
-    if prwfiles:
-        configSeq.setOptionValue('.userPileupConfigs', prwfiles)
-    if lumicalcfiles:
-        configSeq.setOptionValue('.userLumicalcFiles', lumicalcfiles)
+    if flags.Analysis.do_custom_PRW:
+        configSeq.setOptionValue('.userPileupConfigs', get_prw_files(flags))
+    else:
+        # only use default config if we're not using custom PRW
+        configSeq.setOptionValue('.useDefaultConfig', True)
+    if flags.Analysis.do_custom_lumicalc:
+        configSeq.setOptionValue('.userLumicalcFiles', get_lumicalc_files(flags))
 
     return configSeq
 

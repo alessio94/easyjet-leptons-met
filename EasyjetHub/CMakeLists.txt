@@ -67,6 +67,11 @@ atlas_install_data(
   share/AnalysisMiniTree-config.yaml
   share/container-names-DAOD_PHYS.yaml
   share/container-names-DAOD_PHYSLITE.yaml
+  share/grl_years.yaml
+  share/general_grl.yaml
+  share/bjet_grl.yaml
+  share/prw.yaml
+  share/lumicalc.yaml
 )
 
 # atlas_install_data( data/* )

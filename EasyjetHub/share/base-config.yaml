@@ -1,8 +1,3 @@
-# In general we should not need custom Pileup Reweighting
-# Switch on iff necessary
-do_custom_PRW: false
-# We may need special LumiCalc files depending on triggers
-do_custom_lumicalc: false
 # Toggles for object types
 do_small_R_jets: false
 do_large_R_Topo_jets: false
@@ -35,10 +30,27 @@ trigger_year: Auto
 trigger_list: []
 # apply trigger lists to filter events
 do_trigger_filtering: false
-# disable CP Algs for calibration
-disable_calib: false
+# list of directories to search for files
+grl_years:
+  include: grl_years.yaml
+# good runs lists to filter events
+grl_files:
+  include: general_grl.yaml
+# In general we should not need custom Pileup Reweighting
+# Switch on iff necessary
+do_custom_PRW: false
+# prw files to reweight events. Uses grl_years to find files. Not used if do_custom_PRW is false
+prw_files:
+  include: prw.yaml
+# We may need special LumiCalc files depending on triggers
+do_custom_lumicalc: false
+# lumi calc files to calculate luminosity. Uses grl_years to find files. Not used if do_custom_lumicalc is false
+lumicalc_files:
+  include: lumicalc.yaml
 # apply loose jet cleaning only
 loose_jet_cleaning: false
+# disable CP Algs for calibration
+disable_calib: false
 # Whether to activate CP alg systematic variations
 do_CP_systematics: false
 systematics_regex: [".*"]
