@@ -13,7 +13,7 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
 
-namespace HH4B
+namespace HHBBYY
 {
   BaselineVarsyybbAlg::BaselineVarsyybbAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)
@@ -67,7 +67,6 @@ namespace HH4B
     static const SG::AuxElement::Accessor<char>  DFCommonPhotonsIsEMTight ("DFCommonPhotonsIsEMTight");
     static const SG::AuxElement::Accessor<char>  DFCommonPhotonsCleaning ("DFCommonPhotonsCleaning");
     static const SG::AuxElement::Accessor<char>  DFCommonElectronsLHMedium ("DFCommonElectronsLHMedium");
-    static const SG::AuxElement::Accessor<char>  DFCommonElectronsDNNMedium ("DFCommonElectronsDNNMedium");
     static const SG::AuxElement::Accessor<char>  DFCommonMuonPassIDCuts ("DFCommonMuonPassIDCuts");
     static const SG::AuxElement::Accessor<char>  DFCommonMuonPassPreselection ("DFCommonMuonPassPreselection");
 
@@ -124,7 +123,7 @@ namespace HH4B
         bool PassElectronMedium = 0;
         // or ptcone20_Nonprompt_All_MaxWeightTTVALooseCone_pt1000
          PassElectronIso = (electron->isolation(xAOD::Iso::topoetcone20)/electron->pt()) < 0.20 &&  (electron->isolation(xAOD::Iso::ptcone20_Nonprompt_All_MaxWeightTTVALooseCone_pt500)/electron->pt()) < 0.15 ;
-         PassElectronMedium = DFCommonElectronsLHMedium(*electron) || DFCommonElectronsDNNMedium(*electron);
+         PassElectronMedium = DFCommonElectronsLHMedium(*electron);
         if (PassElectronIso && PassElectronMedium)
             n_leptons+=1;
       }

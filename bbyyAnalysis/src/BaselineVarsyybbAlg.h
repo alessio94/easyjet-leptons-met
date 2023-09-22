@@ -3,8 +3,8 @@
 */
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_FINALVARSYYBBALG
-#define HH4BANALYSIS_FINALVARSYYBBALG
+#ifndef HHBBYYANALYSIS_FINALVARSYYBBALG
+#define HHBBYYANALYSIS_FINALVARSYYBBALG
 
 #include <AthContainers/ConstDataVector.h>
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
@@ -17,7 +17,7 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
 
-namespace HH4B
+namespace HHBBYY
 {
 
   /// \brief An algorithm for counting containers

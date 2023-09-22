@@ -1,5 +1,5 @@
 #include "../BaselineVarsyybbAlg.h"
 
-using namespace HH4B;
+using namespace HHBBYY;
 
 DECLARE_COMPONENT(BaselineVarsyybbAlg)

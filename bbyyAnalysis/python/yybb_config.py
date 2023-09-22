@@ -85,7 +85,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     )
 
     cfg.addEventAlgo(
-        CompFactory.HH4B.BaselineVarsyybbAlg(
+        CompFactory.HHBBYY.BaselineVarsyybbAlg(
             "FinalVarsyybbAlg",
             photonContainerInKey="yybbAnalysisPhotons",
             smallRContainerInKey="yybbAnalysisJets",
