@@ -95,7 +95,7 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
             raise ValueError(
                 "Unknown debug stage, allowed values {}".format(DbgStage.allowed_values)
             )
-        setattr(flags, name, value)
+        flags[name] = value
 
     def set_input_files(flags, name, value):
         input_file_list = []
@@ -105,13 +105,13 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
                 input_file_list += glob.glob(ffile)
             else:
                 input_file_list += [ffile]
-        setattr(flags, name, input_file_list)
+        flags[name] = input_file_list
 
     def set_log_level(flags, name, value):
         from AthenaCommon import Constants
 
         if hasattr(Constants, value):
-            setattr(flags, name, getattr(Constants, value))
+            flags[name] = getattr(Constants, value)
         else:
             raise ValueError(
                 "Unknown log-level, allowed values are"
@@ -131,7 +131,7 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
             if arg_name in flag_setters:
                 flag_setters[arg_name](flags, flag_name, arg_val)
             else:
-                setattr(flags, flag_name, arg_val)
+                flags[flag_name] = arg_val
 
     if args.config_only is not None:
         from os import environ

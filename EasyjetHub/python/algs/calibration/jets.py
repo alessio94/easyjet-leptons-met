@@ -124,14 +124,10 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
-    input_name = getattr(
-        flags.Analysis.container_names.input,
-        f"reco10{lr_jet_type}Jet",
-    )
-    output_name = getattr(
-        flags.Analysis.container_names.output,
-        f"reco10{lr_jet_type}Jet",
-    ).replace('_%SYS%','')
+    input_name = flags.Analysis.container_names.input[
+        f"reco10{lr_jet_type}Jet"]
+    output_name = flags.Analysis.container_names.output[
+        f"reco10{lr_jet_type}Jet"].replace('_%SYS%','')
     configSeq += makeConfig('Jets', output_name, jetCollection=input_name)
     configSeq.setOptionValue('.postfix', f'largeR_{lr_jet_type}jets')
 
@@ -214,10 +210,8 @@ def lr_jet_ghost_vr_jet_association_cfg(
         CompFactory.Easyjet.LargeJetGhostVRJetAssociationAlg(
             f"Large{lr_jet_type}JetGhostVRJetAssociationAlg",
             isMC=flags.Input.isMC,
-            LargeJetInKey=getattr(
-                flags.Analysis.container_names.input,
-                f"reco10{lr_jet_type}Jet"
-            ).replace("%SYS%", "NOSYS"),
+            LargeJetInKey=flags.Analysis.container_names.input[
+                f"reco10{lr_jet_type}Jet"].replace("%SYS%", "NOSYS"),
             workingPoints=flags.Analysis.large_R.vr_btag_wps,
             EventInfoDecorSuffix=lr_jet_type,
         )

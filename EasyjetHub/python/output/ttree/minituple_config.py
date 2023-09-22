@@ -160,7 +160,7 @@ def minituple_cfg(
         "taus": ("tau", get_tau_branches),
     }
     for objtype, (prefix, branch_getter) in objects_out.items():
-        write_container_flag = getattr(tree_flags.reco_outputs, objtype)
+        write_container_flag = tree_flags.reco_outputs[objtype]
         if write_container_flag:
             write_container = substitute_container_name(flags, write_container_flag)
             tree_branches += branch_getter(

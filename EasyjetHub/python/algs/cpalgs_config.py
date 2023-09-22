@@ -79,7 +79,7 @@ def cpalgs_cfg(flags):
         flags.Analysis.DataType,
         calibSeq,
         isPhyslite=flags.Input.isPHYSLITE,
-        geometry=getattr(LHCPeriod,f'Run{flags.Analysis.Run}'),
+        geometry=LHCPeriod[f'Run{flags.Analysis.Run}'],
     )
 
     if not flags.Analysis.disable_calib:
