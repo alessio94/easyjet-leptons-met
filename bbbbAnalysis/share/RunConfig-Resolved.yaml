@@ -26,8 +26,9 @@ large_R:
     - DL1r_FixedCutBEff_85
 
 
-# "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
-trigger_list: ["bbbbResolved", "bbbbBoosted"]
+# list of triggers per year to consider
+trigger_chains:
+  include: EasyjetHub/trigger.yaml
 
 # apply loose jet cleaning only
 loose_jet_cleaning: true

@@ -72,6 +72,7 @@ atlas_install_data(
   share/bjet_grl.yaml
   share/prw.yaml
   share/lumicalc.yaml
+  share/trigger.yaml
 )
 
 # atlas_install_data( data/* )

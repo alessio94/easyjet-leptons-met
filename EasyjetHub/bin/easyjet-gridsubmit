@@ -61,7 +61,7 @@ def main():
     # Prepare some of the prun options here
     submit_opts = {
         "mergeOutput": True,
-        "outputs": "TREE:output-hh4b.root",
+        "outputs": "TREE:output-tree.root",
         "writeInputToTxt": "IN:in.txt",
         "useAthenaPackages": True,
     }
@@ -160,8 +160,8 @@ def main():
             io_list.append(
                 {
                     "inDS": ds_name,
-                    "outDS": "user.{0}.{1}.{2}.{3}".format(
-                        nickname, campaign, split[0], split[1]
+                    "outDS": "user.{0}.{1}.{2}.{3}.{4}".format(
+                        nickname, campaign, split[0], split[1], split[-1]
                     ),
                 }
             )

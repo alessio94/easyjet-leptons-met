@@ -29,9 +29,9 @@ PhotonWP: "Loose.NonIso"  # possibly make a list to try multiple photon WPs
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto
 
-# "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
-# We can also be explicit here I think
-trigger_list: ["HHyybb"]
+# list of triggers per year to consider
+trigger_chains:
+  include: bbyyAnalysis/trigger.yaml
 
 # apply trigger lists to filter events
 do_trigger_filtering: false

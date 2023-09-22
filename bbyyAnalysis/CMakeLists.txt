@@ -39,6 +39,7 @@ atlas_install_data(
   share/yybb-base-config.yaml
   share/RunConfig-PHYS-yybb.yaml
   share/RunConfig-PHYSLITE-yybb.yaml
+  share/trigger.yaml
 )
 
 # atlas_install_data( data/* )

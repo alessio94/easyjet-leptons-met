@@ -29,9 +29,9 @@ large_R:
     - DL1r_FixedCutBEff_77
     - DL1r_FixedCutBEff_85
 
-# "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
-# We can also be explicit here I think
-trigger_list: ["bbbbResolved", "bbbbBoosted"]
+# list of triggers per year to consider
+trigger_chains:
+  include: trigger.yaml
 
 # apply trigger lists to filter events
 do_trigger_filtering: true

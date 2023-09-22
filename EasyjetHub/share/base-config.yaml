@@ -26,8 +26,16 @@ large_R:
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto
-# "Auto" configures triggers for "bbbbResolved", "bbbbBoosted"
-trigger_list: []
+# list of triggers per year to consider
+trigger_chains:
+  "2015": []
+  "2016": []
+  "2017": []
+  "2018": []
+  "2022": []
+  "2023": []
+
+
 # apply trigger lists to filter events
 do_trigger_filtering: false
 # list of directories to search for files

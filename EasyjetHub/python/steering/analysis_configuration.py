@@ -124,7 +124,6 @@ def analysis_configuration(parser="default"):
 
 
 def get_trigger_chains(flags):
-    from EasyjetHub.steering.trigger_lists import TRIGGER_LISTS
 
     trigger_year_list = flags.Analysis.trigger_year
     if trigger_year_list == "Auto":
@@ -135,17 +134,12 @@ def get_trigger_chains(flags):
         )
 
     trigger_chains = set()
-    # Empty: set the bbbb analysis triggers
-    trigger_groups = flags.Analysis.trigger_list
-    if trigger_groups == "Auto":
-        log.info("No triggers specified, adding bbbb analysis triggers")
-        trigger_groups = ["bbbbResolved", "bbbbBoosted"]
-    try:
-        for trigger_group in trigger_groups:
+    if flags.hasCategory("Analysis.trigger_chains"):
+        try:
             for year in trigger_year_list:
-                trigger_chains |= set(TRIGGER_LISTS[trigger_group][year])
-    except KeyError as err:
-        log.error(f"Trigger list for {trigger_group}, {year} not defined.")
-        raise err
+                trigger_chains |= set(flags.Analysis.trigger_chains[str(year)])
+        except KeyError as err:
+            log.error(f"Trigger chains for {year} not defined.")
+            raise err
 
     return list(trigger_chains)

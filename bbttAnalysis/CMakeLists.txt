@@ -45,6 +45,7 @@ atlas_install_data(
   share/RunConfig-PHYSLITE-bbtt-hadhad.yaml
   share/RunConfig-PHYS-bbtt-lephad.yaml
   share/RunConfig-PHYSLITE-bbtt-lephad.yaml
+  share/trigger.yaml
 )
 
 # atlas_install_data( data/* )
