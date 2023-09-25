@@ -21,15 +21,9 @@
 #include <AthLinks/ElementLink.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODTau/TauJetContainer.h>
+#include <xAODMuon/MuonContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
 
-namespace bbtautau 
-{
-  enum Channel
-  {
-    LepHad = 0,
-    HadHad = 1,
-  };
-}
 
 namespace Easyjet
 {
@@ -52,6 +46,33 @@ public:
 private:
 
     // Members for configurable properties
+
+    // Muons
+    SG::ReadHandleKey<xAOD::MuonContainer> m_muonsInKey{
+      this, "muonsIn", "", "containerName to read"
+    };
+
+    Gaudi::Property<std::string> m_muonIdDecorName
+      { this, "muonIdDecorKey", "DFCommonMuonPassIDCuts",
+	  "Decoration for muon ID cuts" };
+    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonIdDecorKey;
+
+    Gaudi::Property<std::string> m_muonPreselDecorName
+      { this, "muonPreselDecorKey", "DFCommonMuonPassPreselection",
+	  "Decoration for muon preselection" };
+    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
+
+    // Electrons
+    SG::ReadHandleKey<xAOD::ElectronContainer> m_elesInKey{
+      this, "elesIn", "", "containerName to read"
+    };
+
+    Gaudi::Property<std::string> m_eleIdDecorName
+      { this, "eleIdDecorKey", "DFCommonElectronsLHTight",
+	  "Decoration for electron ID working point" };
+    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleIdDecorKey;
+
+    // Taus
     SG::ReadHandleKey<xAOD::TauJetContainer> m_tausInKey{
       this, "tausIn", "", "containerName to read"
     };
@@ -74,10 +95,6 @@ private:
 
     std::string m_tauIDWP_name;
     xAOD::TauJetParameters::IsTauFlag m_tauIDWP;
-    std::string m_channel_name;
-    bbtautau::Channel m_channel;
-
-    // Internal members
 
   };
 }

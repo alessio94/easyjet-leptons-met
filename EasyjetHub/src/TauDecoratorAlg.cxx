@@ -6,6 +6,7 @@
 
 
 #include "TauDecoratorAlg.h"
+#include <AsgDataHandles/ReadDecorHandle.h>
 #include <AsgDataHandles/WriteDecorHandle.h>
 
 namespace Easyjet
@@ -15,13 +16,21 @@ namespace Easyjet
       : AthReentrantAlgorithm(name, pSvcLocator)
   {
     declareProperty("tauIDWP", m_tauIDWP_name);
-    declareProperty("channel", m_channel_name);
-
   }
 
   StatusCode TauDecoratorAlg ::initialize()
   {
+    ATH_CHECK (m_muonsInKey.initialize());
+    ATH_CHECK (m_elesInKey.initialize());
     ATH_CHECK (m_tausInKey.initialize());
+
+    m_muonIdDecorKey = m_muonsInKey.key() + "." + m_muonIdDecorName;
+    m_muonPreselDecorKey = m_muonsInKey.key() + "." + m_muonPreselDecorName;
+    m_eleIdDecorKey = m_elesInKey.key() + "." + m_eleIdDecorName;
+
+    ATH_CHECK (m_muonIdDecorKey.initialize());
+    ATH_CHECK (m_muonPreselDecorKey.initialize());
+    ATH_CHECK (m_eleIdDecorKey.initialize());
 
     m_nProngDecorKey = m_tausInKey.key() + "." + m_nProngDecorName;
     m_IDTauDecorKey = m_tausInKey.key() + "." + m_IDTauDecorName;
@@ -39,13 +48,6 @@ namespace Easyjet
       return StatusCode::FAILURE;
     }
 
-    if(m_channel_name == "lephad") m_channel = bbtautau::LepHad;
-    else if(m_channel_name == "hadhad") m_channel = bbtautau::HadHad;
-    else{
-      ATH_MSG_ERROR("Unknown channel");
-      return StatusCode::FAILURE;
-    }
-
     return StatusCode::SUCCESS;
   }
 
@@ -54,6 +56,15 @@ namespace Easyjet
 
     SG::ReadHandle<xAOD::TauJetContainer> tausIn(m_tausInKey,ctx);
     ATH_CHECK (tausIn.isValid());
+
+    SG::ReadHandle<xAOD::MuonContainer> muonsIn(m_muonsInKey,ctx);
+    SG::ReadHandle<xAOD::ElectronContainer> elesIn(m_elesInKey,ctx);
+    ATH_CHECK (muonsIn.isValid());
+    ATH_CHECK (elesIn.isValid());
+
+    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonIdDecorHandle(m_muonIdDecorKey);
+    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonPreselDecorHandle(m_muonPreselDecorKey);
+    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleIdDecorHandle(m_eleIdDecorKey);
 
     SG::WriteDecorHandle<xAOD::TauJetContainer, int> nProngDecorHandle(m_nProngDecorKey);
     SG::WriteDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
@@ -70,10 +81,18 @@ namespace Easyjet
 
     }
 
+    int nlepton = 0;
+    for(const xAOD::Muon* muon : *muonsIn) {
+      if(muonIdDecorHandle(*muon) && muonPreselDecorHandle(*muon)) nlepton++;
+    }
+    for(const xAOD::Electron* ele : *elesIn) {
+      if(eleIdDecorHandle(*ele)) nlepton++;
+    }
+
     int nantitau = 0;
     int nantitau_max = -1;
-    if(m_channel==bbtautau::LepHad) nantitau_max = 1 - nidtau;
-    else if(m_channel==bbtautau::HadHad) nantitau_max = 2 - nidtau;
+    if(nlepton>0) nantitau_max = 1 - nidtau;
+    else nantitau_max = 2 - nidtau;
 
     for(const xAOD::TauJet* tau : *tausIn) {
       bool isAntiTau = false;
