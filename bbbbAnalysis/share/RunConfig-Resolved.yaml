@@ -25,6 +25,8 @@ large_R:
     - DL1r_FixedCutBEff_77
     - DL1r_FixedCutBEff_85
 
+grl_files:
+  include: EasyjetHub/bjet_grl.yaml
 
 # list of triggers per year to consider
 trigger_chains:

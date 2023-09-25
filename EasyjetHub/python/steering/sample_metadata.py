@@ -154,12 +154,17 @@ def get_prw_files(flags):
         year = str(year)
         prw_dir = flags.Analysis.grl_years[year]
         # because we don't get PRW from GRL folders from all years
-        try:
+        if year in flags.Analysis.prw_files:
             prw_file = flags.Analysis.prw_files[year]
             prw_files.add(str(Path(prw_dir) / prw_file))
-        except AttributeError:
+        elif campaign in flags.Analysis.prw_files:
             prw_file = flags.Analysis.prw_files[campaign]
             prw_files.add(prw_file)
+        else:
+            raise RuntimeError(
+                f"Could not find PRW for year {year} or campaign {campaign}. "
+                "Specify PRW files in the config file."
+            )
 
     if flags.Input.MCChannelNumber:
         dsid = str(flags.Input.MCChannelNumber)

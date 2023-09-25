@@ -53,10 +53,71 @@ ttree_output:
       large_R_UFO_jets: 'container_names.input.reco10TopoJet'
 ```
 
+In general one should not need custom pileup reweighting, as they are set automatically upstream by the CP tools. However, if necessary, the `prw_files` flag can be used to specify a custom PRW file, and the `lumicalc_files` flag can be used to specify a custom luminosity calculation file. These flags are dictionaries of year or MC campaign, and can be defined in the analysis configuration as:
+
+```yaml
+prw_files:
+  include: prw.yaml
+lumicalc_files:
+  include: lumicalc.yaml
+```
+
+To ensure that GRL, PRW and luminosity calculation files are consistent, the `prw_files` and `lumicalc_files` should only specify the file name, and the directory they are contained should be set in the `grl_years`, for example:
+
+```yaml
+grl_years:
+  include: grl_years.yaml
+prw_files:
+  include: prw.yaml
+lumicalc_files:
+  include: lumicalc.yaml
+```
+
+where `grl_years.yaml` contains:
+
+```yaml
+'2022': 'GoodRunsLists/data22_13p6TeV/20230207/'
+'2023': 'GoodRunsLists/data23_13p6TeV/20230828/'
+```
+and `lumicalc_files.yaml` contains:
+
+```yaml
+'2022': 'ilumicalc_histograms_None_431810-440613_OflLumi-Run3-003.root'
+'2023': 'ilumicalc_histograms_None_451587-456749_OflLumi-Run3-003.root'
+```
+
+and `prw.yaml` could contain files by year or by MC campaign if using common PRW files like:
+
+```yaml
+'2018': 'physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root'
+'mc20a': 'PileupReweighting/mc20_common/mc20a.284500.physlite.prw.v1.root'
+```
+
+Additionally, GRL files can be specified in the analysis config like:
+
+```yaml
+grl_files:
+  include: general_grl.yaml
+```
+
+where `general_grl.yaml` contains only the file names by year:
+
+```yaml
+'2022': 'data22_13p6TeV.periodAllYear_DetStatus-v109-pro28-04_MERGED_PHYS_StandardGRL_All_Good_25ns.xml'
+'2023': 'data23_13p6TeV.periodAllYear_DetStatus-v110-pro31-06_MERGED_PHYS_StandardGRL_All_Good_25ns.xml'
+```
+
+or for analysis relying on b-jet triggers,
+
+```yaml
+grl_files:
+  include: bjet_grl.yaml
+```
+
 ### Illegal yaml values
 
 Some potential pitfalls in writing the `yaml` are as follows:
-- `None` is an invalid value for `AthConfigFlags` and will be rejected. For default 'inactive' behaviour, it is recommended to set `[]` or `''` as appropriate, indicating the type of the flag.
+- `None` is an invalid value for `AthConfigFlags` and will be rejected. For default 'inactive' behaviour, it is recommended to set `[]`, `{}` or `''` as appropriate, indicating the type of the flag.
 - `None` can also appear if defining two keys in succeeding lines without assigning a value to the first
 ```yaml
 key1:
@@ -72,11 +133,11 @@ ttree_output:
     tree_name: 'PFlowJetTree'
     ...
 # Produces:
-# { 'ttree_output: [
+# { 'ttree_output: [{
 #   'PFlowJetTree': None,
 #   'tree_name': 'PFlowJetTree',
 #   ...
-# ] }
+# }] }
 ```
 
 ## Command line arguments

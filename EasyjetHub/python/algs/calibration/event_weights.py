@@ -22,12 +22,12 @@ def pileup_sequence(flags):
     configSeq += makeConfig('Event.PileupReweighting', None)
     configSeq.setOptionValue('.campaign', flags.Input.MCCampaign, noneAction='ignore')
     configSeq.setOptionValue('.files', flags.Input.Files, noneAction='ignore')
-    if flags.Analysis.do_custom_PRW:
+    if 'prw_files' in flags.Analysis:
         configSeq.setOptionValue('.userPileupConfigs', get_prw_files(flags))
     else:
         # only use default config if we're not using custom PRW
         configSeq.setOptionValue('.useDefaultConfig', True)
-    if flags.Analysis.do_custom_lumicalc:
+    if 'lumicalc_files' in flags.Analysis:
         configSeq.setOptionValue('.userLumicalcFiles', get_lumicalc_files(flags))
 
     return configSeq
