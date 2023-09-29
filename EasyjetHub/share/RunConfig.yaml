@@ -1,10 +1,12 @@
 include: base-config.yaml
 
 # Toggles for object types
+do_muons: true
+do_electrons: true
 do_small_R_jets: true
 do_large_R_UFO_jets: true
-do_VR_jets: true
-do_muons: true
+# No b-tagging recommendation available for VR jets in p5855 samples
+do_VR_jets: false
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]
@@ -46,10 +48,11 @@ ttree_output:
     include: AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
     reco_outputs:
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
       small_R_jets: 'container_names.output.reco4PFlowJet'
       large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-      VR_jets: 'container_names.output.vrJets'
-      muons: 'container_names.output.muons'
+      #VR_jets: 'container_names.output.vrJets'
     collection_options:
       small_R_jets:
         higgs_parent_info: true

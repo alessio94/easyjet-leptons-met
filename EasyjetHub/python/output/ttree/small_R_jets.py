@@ -87,8 +87,5 @@ def get_small_R_bjet_branches(flags, tree_flags, input_container, output_prefix)
             "DL1dv01_pb",
             "DL1dv01_pc",
             "DL1dv01_pu",
-            "DL1r_pb",
-            "DL1r_pc",
-            "DL1r_pu",
         ]
     return small_R_bjet_branches.get_output_list()

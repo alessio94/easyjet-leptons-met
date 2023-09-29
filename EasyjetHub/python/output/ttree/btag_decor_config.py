@@ -13,9 +13,6 @@ def btag_decor_cfg(flags):
     ]
     if not flags.Input.isPHYSLITE:
         btag_vars += [
-            "DL1r_pb",
-            "DL1r_pc",
-            "DL1r_pu",
             "GN2v00_pb",
             "GN2v00_pc",
             "GN2v00_pu",

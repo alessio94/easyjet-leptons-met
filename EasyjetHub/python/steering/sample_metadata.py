@@ -14,13 +14,15 @@ class DataSampleYears(Enum):
     data23 = (2023,)
 
 
-class MCSampleYears(Enum):
-    r13167 = (2015, 2016)
-    r13144 = (2017,)
-    r13145 = (2018,)
-    r13829 = (2022,)
-    r14622 = (2022, 2023)
-    r14799 = (2023,)
+MCSampleYears = {
+    'r13167': (2015, 2016),
+    'r13144': (2017,),
+    'r13145': (2018,),
+    'r13829': (2022,),
+    'r14622': (2022, 2023),
+    'r14799': (2023,),
+    'r14908': (2023,),
+}
 
 
 class SampleTypes(Enum):
@@ -30,6 +32,7 @@ class SampleTypes(Enum):
     mc21a = "r13829"  # run3, 2022
     mc23a = "r14622"  # run3, 2022
     mc23c = "r14799"  # run3, 2023
+    mc23c_af3 = "r14908"  # run3, 2023, fastsim
     # ptag
     mc20 = "p5057"
     # ptag for Xbb tagger
@@ -136,6 +139,8 @@ def get_campaign(flags):
         campaign = SampleTypes.mc23a
     elif SampleTypes.mc23c.value in tags:
         campaign = SampleTypes.mc23c
+    elif SampleTypes.mc23c_af3.value in tags:
+        campaign = SampleTypes.mc23c_af3
     else:
         raise LookupError(
             "Cannot determine campaign "
@@ -186,8 +191,8 @@ def get_run_years(flags):
         # use rtag for figuring out year in MC
         tags = flags.Input.AMITag
         for mc_campaign in MCSampleYears:
-            if mc_campaign.name in tags:
-                years += mc_campaign.value
+            if mc_campaign in tags:
+                years += MCSampleYears[mc_campaign]
                 break
     else:
         # Use projet_name for figuring out which year in data

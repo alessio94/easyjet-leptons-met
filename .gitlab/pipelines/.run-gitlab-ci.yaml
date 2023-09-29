@@ -22,11 +22,6 @@ ntupler_data22_fast:
   script:
     - easyjet-test data22-fast
 
-ntupler_sh4b_data22:
-  extends: .ntupler
-  script:
-    - easyjet-test sh4b-data22
-
 ntupler_jets_mc20:
   extends: .ntupler
   script:
@@ -41,6 +36,11 @@ ntupler_jets_mc23:
   extends: .ntupler
   script:
     - easyjet-test jets-mc23
+
+ntupler_jets_mc23_af3:
+  extends: .ntupler
+  script:
+    - easyjet-test jets-mc23-af3
 
 ntupler_ttbar_mc20:
   extends: .ntupler
@@ -102,10 +102,11 @@ ntupler_lite_sh4b_boosted_mc20_fast:
   script:
     - easyjet-test lite-sh4b-boosted-mc20-fast
 
-ntupler_lite_yybb_mc20:
-  extends: .ntupler
-  script:
-    - easyjet-test lite-yybb-mc20
+# Disabled until p5855 PHYSLITE input available
+#ntupler_lite_yybb_mc20:
+#  extends: .ntupler
+#  script:
+#    - easyjet-test lite-yybb-mc20
 
 ntupler_lite_bbtt_hadhad_mc21:
   extends: .ntupler

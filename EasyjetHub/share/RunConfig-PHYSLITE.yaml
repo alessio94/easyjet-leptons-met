@@ -7,6 +7,7 @@ container_names:
 do_small_R_jets: true
 do_large_R_UFO_jets: true
 do_muons: true
+do_electrons: true
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]
@@ -53,6 +54,7 @@ ttree_output:
       small_R_jets: 'container_names.input.reco4PFlowJet'
       large_R_UFO_jets: 'container_names.input.reco10UFOJet'
       muons: 'container_names.input.muons'
+      electrons: 'container_names.input.electrons'
     collection_options:
       small_R_jets:
         higgs_parent_info: true
