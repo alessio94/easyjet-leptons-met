@@ -36,6 +36,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             truncateAtAmount=-1,  # -1 means keep all
             minimumAmount=-1,  # -1 means ignores this
             pTsort=True,
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
@@ -51,6 +52,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             truncateAtAmount=-1,  # -1 means keep all
             minimumAmount=-1,  # -1 means ignores this
             pTsort=True,
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
@@ -66,6 +68,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             minimumAmount=-1,  # -1 means ignores this
             maximumAmount=99,
             pTsort=True,
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
@@ -81,6 +84,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             minimumAmount=-1,  # -1 means ignores this
             maximumAmount=99,
             pTsort=True,
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 

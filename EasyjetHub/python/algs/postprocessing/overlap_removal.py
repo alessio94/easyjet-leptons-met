@@ -25,7 +25,7 @@ def overlap_sequence(flags):
     ORselections = dict(
         electrons='loose',
         photons='tight',
-        muons='medium',
+        muons='loose',
         taus='baseline',
     )
     # Construct the names of the view containers with working point selection

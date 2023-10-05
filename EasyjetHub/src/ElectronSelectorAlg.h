@@ -45,6 +45,10 @@ private:
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_inHandle{ this, "containerInKey", "",   "Electron container to read" };
 
+    Gaudi::Property<std::string> m_ORElDecorName
+      { this, "ORDecorKey", "passesOR", "Decoration for electrons OR" };
+    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_ORElDecorKey;
+
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::ElectronContainer>>
     m_outHandle{ this, "containerOutKey", "",   "Electron container to write" };
@@ -60,6 +64,7 @@ private:
     int m_minimumAmount;
     int m_truncateAtAmount;
     bool m_pTsort;
+    bool m_checkOR;
   };
 }
 

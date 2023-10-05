@@ -8,6 +8,7 @@
 #include "AthContainers/AuxElement.h"
 #include <xAODMuon/MuonContainer.h>
 #include "FourMomUtils/xAODP4Helpers.h"
+#include <AsgDataHandles/ReadDecorHandle.h>
 
 namespace Easyjet
 {
@@ -20,6 +21,7 @@ namespace Easyjet
     declareProperty("minimumAmount", m_minimumAmount);
     declareProperty("truncateAtAmount", m_truncateAtAmount);
     declareProperty("pTsort", m_pTsort);
+    declareProperty("checkOR", m_checkOR);
   }
 
   StatusCode MuonSelectorAlg::initialize()
@@ -33,6 +35,9 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
+    m_ORMuDecorKey = m_inHandle.getNamePattern() + "." + m_ORMuDecorName;
+    ATH_CHECK (m_ORMuDecorKey.initialize());
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
     return StatusCode::SUCCESS;
@@ -40,6 +45,8 @@ namespace Easyjet
 
   StatusCode MuonSelectorAlg::execute()
   {
+    SG::ReadDecorHandle<xAOD::MuonContainer, char> ORDecorHandle(m_ORMuDecorKey);
+
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
 
@@ -58,6 +65,12 @@ namespace Easyjet
       // loop over muons 
       for (const xAOD::Muon *muon : *inContainer)
 	{
+          // skip OR muons
+	  if ( m_checkOR ){
+	    bool ispassORMu = ORDecorHandle(*muon);
+	    if ( !ispassORMu ) continue;
+	  }
+
 	  // cuts
 	  if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
 	    continue;

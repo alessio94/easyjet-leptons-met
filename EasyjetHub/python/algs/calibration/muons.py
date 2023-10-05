@@ -27,6 +27,9 @@ def muon_sequence(flags, configAcc):
     configSeq += makeConfig('Muons', output_name)
 
     # PID configuration
+    configSeq += makeConfig('Muons.Selection', output_name + '.loose')
+    configSeq.setOptionValue('.quality', 'Loose')
+    configSeq.setOptionValue('.isolation', 'Loose_VarRad')
     configSeq += makeConfig('Muons.Selection', output_name + '.medium')
     configSeq.setOptionValue('.quality', 'Medium')
     configSeq.setOptionValue('.isolation', 'Loose_VarRad')
@@ -47,13 +50,15 @@ def muon_sequence(flags, configAcc):
 
     # Apply kinematic selection as view container
     makeViewSelectionConfig(configSeq, output_name)
+
     # Add working point selection
-    makeViewSelectionConfig(
-        configSeq,
-        'medium' + output_name,
-        input=output_name,
-        original=flags.Analysis.container_names.input.muons,
-        selection='medium'
-    )
+    for wp in ['loose','medium']:
+        makeViewSelectionConfig(
+            configSeq,
+            wp + output_name,
+            input=output_name,
+            original=flags.Analysis.container_names.input.muons,
+            selection=wp
+        )
 
     return configSeq

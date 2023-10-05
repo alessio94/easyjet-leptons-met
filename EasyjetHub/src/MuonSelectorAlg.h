@@ -45,6 +45,10 @@ private:
     CP::SysReadHandle<xAOD::MuonContainer>
     m_inHandle{ this, "containerInKey", "",   "Muon container to read" };
 
+    Gaudi::Property<std::string> m_ORMuDecorName
+      { this, "ORDecorKey", "passesOR", "Decoration for muons OR" };
+    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_ORMuDecorKey;
+
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::MuonContainer>>
     m_outHandle{ this, "containerOutKey", "",   "Muon container to write" };
@@ -59,6 +63,7 @@ private:
     int m_minimumAmount;
     int m_truncateAtAmount;
     bool m_pTsort;
+    bool m_checkOR;
   };
 }
 

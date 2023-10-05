@@ -10,11 +10,14 @@
 
 #include "AnaAlgorithm/AnaAlgorithm.h"
 #include <FourMomUtils/xAODP4Helpers.h>
+#include <AsgDataHandles/ReadDecorHandleKey.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/ISysHandleBase.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
+#include <AsgDataHandles/WriteDecorHandleKey.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
@@ -24,6 +27,15 @@
 #include <xAODMissingET/MissingETContainer.h>
 
 #include <SystematicsHandles/SysFilterReporterParams.h>
+
+namespace bbtautau 
+{
+  enum Channel
+  {
+    LepHad = 0,
+    HadHad = 1,
+  };
+}
 
 namespace HH4B
 {
@@ -66,15 +78,62 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    CP::SysReadDecorHandle<float> 
+    m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
+
+    Gaudi::Property<std::string> m_IDTauDecorName
+      { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
+
+    CP::SysReadDecorHandle<char> 
+    m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+
+    Gaudi::Property<std::string> m_eleIdDecorName
+      { this, "eleIdDecorKey", "DFCommonElectronsLHTight","Decoration for electron ID working point" };
+    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleIdDecorKey;
+		      
+    Gaudi::Property<std::string> m_muonIdDecorName
+      { this, "muonIdDecorKey", "DFCommonMuonPassIDCuts","Decoration for muon ID cuts" };
+    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonIdDecorKey;
+
+    Gaudi::Property<std::string> m_muonPreselDecorName
+      { this, "muonPreselDecorKey", "DFCommonMuonPassPreselection","Decoration for muon preselection" };
+    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
+
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<bool> m_pass_sr {"pass_bbtt_sr_%SYS%", this};
 
     CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
 
     /// \brief Steerable properties
-    Gaudi::Property<std::string> m_channel { this, "Channel", "lephad", 
-					       "Which channel is run"};
+    Gaudi::Property<std::vector<std::string>> m_channel_names
+          { this, "channel", {}, "Which channel to run" };
+    
+    std::vector<bbtautau::Channel> m_channels;
+   
+    CP::SysWriteDecorHandle<bool> m_pass_SLT {"pass_SLT_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_pass_LTT {"pass_LTT_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_pass_STT {"pass_STT_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_pass_DTT {"pass_DTT_%SYS%", this};
+
+    CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
+    
     /// \brief Internal variables
+
+    bool N_LEPTONS_CUT;
+    bool ONE_TAU;
+    bool TWO_JETS;
+    bool TWO_BJETS;
+    bool LEADJET_PT;
+    bool MMC_MASS;
+    bool MBB_MASS;
+    bool OS_CHARGE;
+    bool pass_SLT;
+    bool pass_LTT;
+    bool pass_STT;
+    bool pass_DTT;
 
   };
 }

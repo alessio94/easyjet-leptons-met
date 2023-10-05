@@ -8,6 +8,7 @@
 #include "AthContainers/AuxElement.h"
 #include <xAODEgamma/ElectronContainer.h>
 #include "FourMomUtils/xAODP4Helpers.h"
+#include <AsgDataHandles/ReadDecorHandle.h>
 
 namespace Easyjet
 {
@@ -22,6 +23,7 @@ namespace Easyjet
     declareProperty("minimumAmount", m_minimumAmount);
     declareProperty("truncateAtAmount", m_truncateAtAmount);
     declareProperty("pTsort", m_pTsort);
+    declareProperty("checkOR", m_checkOR);
   }
 
   StatusCode ElectronSelectorAlg::initialize()
@@ -34,6 +36,9 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
+    m_ORElDecorKey = m_inHandle.getNamePattern() + "." + m_ORElDecorName;
+    ATH_CHECK (m_ORElDecorKey.initialize());
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
 
@@ -42,6 +47,7 @@ namespace Easyjet
 
   StatusCode ElectronSelectorAlg::execute()
   {
+    SG::ReadDecorHandle<xAOD::ElectronContainer, char> ORDecorHandle(m_ORElDecorKey);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
@@ -61,6 +67,12 @@ namespace Easyjet
       // loop over electrons 
       for (const xAOD::Electron *electron : *inContainer)
 	{
+          // skip OR electrons
+	  if ( m_checkOR ){
+	    bool ispassOREl = ORDecorHandle(*electron);
+	    if ( !ispassOREl ) continue;
+	  }
+
 	  float this_electron_eta_abs;
 	  // cuts
 	  if (electron->pt() < m_minPt)

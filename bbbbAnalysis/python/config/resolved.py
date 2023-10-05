@@ -21,6 +21,7 @@ def resolved_cfg(flags, smalljetkey):
                 truncateAtAmount=4,  # -1 means keep all
                 minimumAmount=4,  # -1 means ignores this
                 pTsort=True,
+                checkOR=flags.Analysis.do_overlap_removal,
             )
         )
 

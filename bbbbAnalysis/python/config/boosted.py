@@ -20,6 +20,7 @@ def boosted_cfg(flags, largejetkey):
                 truncateAtAmount=2,  # -1 means keep all
                 minimumAmount=2,  # -1 means ignores this
                 pTsort=True,
+                checkOR=flags.Analysis.do_overlap_removal,
             )
         )
         # get the ghost associated VR jets from the leading Large R jet
@@ -45,6 +46,7 @@ def boosted_cfg(flags, largejetkey):
                 minimumAmount=2,  # -1 means ignores this
                 pTsort=True,
                 removeRelativeDeltaRToVRJet=True,
+                checkOR=flags.Analysis.do_overlap_removal,
             )
         )
 

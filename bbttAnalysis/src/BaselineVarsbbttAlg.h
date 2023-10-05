@@ -74,16 +74,14 @@ private:
     CP::SysReadDecorHandle<float> 
     m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
 
+    CP::SysReadDecorHandle<bool> 
+    m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input dectorator for selected el"};
+    CP::SysReadDecorHandle<bool> 
+    m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input dectorator for selected mu"};
+    CP::SysReadDecorHandle<bool> 
+    m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input dectorator for selected tau"};
+
     /// \brief Setup sys-aware output decorations
-    CP::SysWriteDecorHandle<float> m_leading_muon_pt {"Leading_Muon_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_leading_muon_eta {"Leading_Muon_eta_%SYS%", this};
-
-    CP::SysWriteDecorHandle<float> m_leading_elec_pt {"Leading_Electron_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_leading_elec_eta {"Leading_Electron_eta_%SYS%", this};
-
-    CP::SysWriteDecorHandle<float> m_leading_tau_pt {"Leading_Tau_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_leading_tau_eta {"Leading_Tau_eta_%SYS%", this};
-
     CP::SysWriteDecorHandle<float> m_HH_pt {"HH_pt_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_HH_eta {"HH_eta_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_HH_phi {"HH_phi_%SYS%", this};
@@ -93,8 +91,15 @@ private:
     CP::SysWriteDecorHandle<float> m_HH_vis_phi {"HH_vis_phi_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_HH_vis_m {"HH_vis_m_%SYS%", this};
 
-    // Steerbale vars
-    std::string m_bTagWP;
+    CP::SysWriteDecorHandle<float> m_selected_lepton_pt {"Selected_Lepton_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_eta {"Selected_Lepton_eta_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_phi {"Selected_Lepton_phi_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_charge {"Selected_Lepton_charge_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_pdgid {"Selected_Lepton_pdgid_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_tau_pt {"Selected_Tau_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_tau_eta {"Selected_Tau_eta_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_tau_phi {"Selected_Tau_phi_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_tau_charge {"Selected_Tau_charge_%SYS%", this};
 
     // Local variables and functions
 

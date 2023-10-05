@@ -50,10 +50,13 @@ private:
       { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
 
-
     Gaudi::Property<std::string> m_antiTauDecorName
       { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
+
+    Gaudi::Property<std::string> m_ORTauDecorName
+      { this, "ORDecorKey", "passesOR", "Decoration for ID taus" };
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_ORTauDecorKey;
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::TauJetContainer>>
@@ -71,6 +74,7 @@ private:
     int m_minimumAmount;
     int m_truncateAtAmount;
     bool m_pTsort;
+    bool m_checkOR;
   };
 }
 

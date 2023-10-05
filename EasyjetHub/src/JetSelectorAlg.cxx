@@ -7,6 +7,7 @@
 #include "JetSelectorAlg.h"
 #include "AthContainers/AuxElement.h"
 #include <xAODJet/JetContainer.h>
+#include <AsgDataHandles/ReadDecorHandle.h>
 
 namespace Easyjet
 {
@@ -22,6 +23,7 @@ namespace Easyjet
     declareProperty("pTsort", m_pTsort);
     declareProperty("removeRelativeDeltaRToVRJet",
                     m_removeRelativeDeltaRToVRJet = false);
+    declareProperty("checkOR", m_checkOR);
   }
 
   StatusCode JetSelectorAlg ::initialize()
@@ -36,6 +38,9 @@ namespace Easyjet
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_inHandle));
     }
+    m_ORJetDecorKey = m_inHandle.getNamePattern() + "." + m_ORJetDecorName;
+    ATH_CHECK (m_ORJetDecorKey.initialize());
+
     ATH_CHECK (m_relativeDeltaRToVRJet.initialize(m_systematicsList, m_inHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
@@ -46,6 +51,8 @@ namespace Easyjet
 
   StatusCode JetSelectorAlg ::execute()
   {
+    SG::ReadDecorHandle<xAOD::JetContainer, char> ORDecorHandle(m_ORJetDecorKey);
+
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
 
@@ -67,6 +74,12 @@ namespace Easyjet
       // loop over jets
       for (const xAOD::Jet *jet : *inContainer)
 	{
+          // skip OR jets
+	  if( m_checkOR ){
+	    bool ispassORJet = ORDecorHandle(*jet);
+	    if ( !ispassORJet ) continue;
+	  }
+
 	  // jump out if VR jets overlap
 	  // recommended by ftag : Remove the event if any of your signal jets have
 	  // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.

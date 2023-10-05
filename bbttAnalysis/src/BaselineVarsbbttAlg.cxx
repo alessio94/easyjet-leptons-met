@@ -11,6 +11,7 @@
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODTau/TauJetContainer.h>
+#include <AthContainers/ConstDataVector.h>
 
 #include "TLorentzVector.h"
 
@@ -20,8 +21,7 @@ namespace HH4B
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
-    declareProperty("bTagWP", m_bTagWP);
-    if (!m_bTagWP.empty()) m_bTagWP = "_" + m_bTagWP;
+
   }
 
   StatusCode BaselineVarsbbttAlg::initialize()
@@ -40,16 +40,11 @@ namespace HH4B
     ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
+
     // Intialise syst-aware output decorators
-    ATH_CHECK(m_leading_muon_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_leading_muon_eta.initialize(m_systematicsList, m_eventHandle));
-
-    ATH_CHECK(m_leading_elec_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_leading_elec_eta.initialize(m_systematicsList, m_eventHandle));
-
-    ATH_CHECK(m_leading_tau_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_leading_tau_eta.initialize(m_systematicsList, m_eventHandle));
-
     ATH_CHECK(m_HH_pt.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_HH_eta.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_HH_phi.initialize(m_systematicsList, m_eventHandle));
@@ -59,6 +54,15 @@ namespace HH4B
     ATH_CHECK(m_HH_vis_phi.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_HH_vis_m.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK(m_selected_lepton_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_lepton_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_lepton_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_lepton_charge.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_lepton_pdgid.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_tau_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_tau_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_tau_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_tau_charge.initialize(m_systematicsList, m_eventHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -99,29 +103,58 @@ namespace HH4B
 
       // Calculate vars
 
-      if (muons->size() > 0) {
-	m_leading_muon_pt.set(*event, muons->at(0)->pt(), sys);
-	m_leading_muon_eta.set(*event, muons->at(0)->eta(), sys);
-      } else {
-	m_leading_muon_pt.set(*event, -99, sys);
-	m_leading_muon_eta.set(*event, -99, sys);
-      }
+      // selected leptons ; 
+      float lepton_pt = -99;
+      float lepton_eta = -99;
+      float lepton_phi = -99;
+      int lepton_charge = -99;
+      int lepton_pdgid = -99;
 
-      if (electrons->size() > 0) {
-	m_leading_elec_pt.set(*event, electrons->at(0)->pt(), sys);
-	m_leading_elec_eta.set(*event, electrons->at(0)->eta(), sys);
-      } else {
-	m_leading_elec_pt.set(*event, -99, sys);
-	m_leading_elec_eta.set(*event, -99, sys);
+      for(const xAOD::Electron* electron : *electrons) {
+        if (m_selected_el.get(*electron, sys)){
+          lepton_pt = electron->pt();
+          lepton_eta = electron->eta();
+          lepton_phi = electron->phi();
+          lepton_charge = electron->charge();
+	  lepton_pdgid = electron->charge() > 0 ? -11 : 11;
+          break; // At most one lepton selected
+	}
       }
+      for(const xAOD::Muon* muon : *muons) {
+        if (m_selected_mu.get(*muon, sys)){
+          lepton_pt = muon->pt();
+          lepton_eta = muon->eta();
+          lepton_phi = muon->phi();
+          lepton_charge = muon->charge();
+	  lepton_pdgid = muon->charge() > 0 ? -13 : 13;
+          break; 
+	}
+      }
+      m_selected_lepton_pt.set(*event, lepton_pt, sys);
+      m_selected_lepton_eta.set(*event, lepton_eta, sys);
+      m_selected_lepton_phi.set(*event, lepton_phi, sys);
+      m_selected_lepton_charge.set(*event, lepton_charge, sys);
+      m_selected_lepton_pdgid.set(*event, lepton_pdgid, sys);
 
-      if (taus->size() > 0) {
-	m_leading_tau_pt.set(*event, taus->at(0)->pt(), sys);
-	m_leading_tau_eta.set(*event, taus->at(0)->eta(), sys);
-      } else {
- 	m_leading_tau_pt.set(*event, -99, sys);
-	m_leading_tau_eta.set(*event, -99, sys);
+      //selected tau
+      float tau_pt = -99;
+      float tau_eta = -99;
+      float tau_phi = -99;
+      int tau_charge = -99;
+
+      for(const xAOD::TauJet* tau : *taus) {
+        if (m_selected_tau.get(*tau, sys)){
+          tau_pt = tau->pt();
+          tau_eta = tau->eta();
+          tau_phi = tau->phi();
+          tau_charge = tau->charge();
+          break; 
+	}
       }
+      m_selected_tau_pt.set(*event, tau_pt, sys);
+      m_selected_tau_eta.set(*event, tau_eta, sys);
+      m_selected_tau_phi.set(*event, tau_phi, sys);
+      m_selected_tau_charge.set(*event, tau_charge, sys);
 
       // DiHiggs mass 
       TLorentzVector bb(0,0,0,0);
@@ -129,17 +162,17 @@ namespace HH4B
       TLorentzVector HH(0,0,0,0);
       TLorentzVector HH_vis(0,0,0,0);
       TLorentzVector mmc_vec(0,0,0,0);
-      if (jets->size() > 1 && taus->size() > 1) {
-        bb=jets->at(0)->p4()+jets->at(1)->p4();
-        tautau=taus->at(0)->p4()+taus->at(1)->p4();
-        HH_vis=bb+tautau;
 
-        mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
-	                     m_mmc_eta.get(*event, sys),
-	                     m_mmc_phi.get(*event, sys),
-	                     m_mmc_m.get(*event, sys));
-        HH=bb+mmc_vec;
-      }
+      if (jets->size() > 1) bb = jets->at(0)->p4() + jets->at(1)->p4();
+      if (taus->size() > 1) tautau = taus->at(0)->p4() + taus->at(1)->p4();
+
+      HH_vis=bb+tautau;
+
+      mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
+                           m_mmc_eta.get(*event, sys),
+                           m_mmc_phi.get(*event, sys),
+                           m_mmc_m.get(*event, sys));
+      HH=bb+mmc_vec;
 
       m_HH_pt.set(*event, HH.Pt(), sys);
       m_HH_eta.set(*event, HH.Eta(), sys);

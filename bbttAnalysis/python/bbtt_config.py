@@ -8,11 +8,14 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
-            containerInKey='medium' + muonkey,
+            containerInKey='loose' + muonkey,
             containerOutKey="bbttAnalysisMuons_%SYS%",
             minPt=7_000,
             maxEta=2.7,
+            truncateAtAmount=-1,  # -1 means keep all
+            minimumAmount=-1,     # -1 means ignores this
             pTsort=True,
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
@@ -25,7 +28,10 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             minEtaVeto=1.37,
             maxEtaVeto=1.52,
             maxEta=2.47,
+            truncateAtAmount=-1,  # -1 means keep all
+            minimumAmount=-1,     # -1 means ignores this
             pTsort=True,
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
@@ -41,6 +47,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             truncateAtAmount=-1,  # -1 means keep all
             minimumAmount=-1,     # -1 means ignores this
             pTsort=True,
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
@@ -55,19 +62,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             truncateAtAmount=2,  # -1 means keep all
             minimumAmount=2,  # -1 means ignores this
             pTsort=True,
-        )
-    )
-
-    # Selection
-    cfg.addEventAlgo(
-        CompFactory.HH4B.HHbbttSelectorAlg(
-            "HHbbttSelectorAlg",
-            jets="bbttAnalysisJets_%SYS%",
-            muons="bbttAnalysisMuons_%SYS%",
-            electrons="bbttAnalysisElectrons_%SYS%",
-            taus="bbttAnalysisTaus_%SYS%",
-            met="AnalysisMET_%SYS%",
-            eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
@@ -84,6 +79,21 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             )
         )
 
+    # Selection
+    cfg.addEventAlgo(
+        CompFactory.HH4B.HHbbttSelectorAlg(
+            "HHbbttSelectorAlg",
+            jets="bbttAnalysisJets_%SYS%",
+            muons="bbttAnalysisMuons_%SYS%",
+            electrons="bbttAnalysisElectrons_%SYS%",
+            taus="bbttAnalysisTaus_%SYS%",
+            met="AnalysisMET_%SYS%",
+            eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
+            bTagWPDecorName="ftag_select_DL1dv01_FixedCutBEff_77",
+            channel=flags.Analysis.channel,
+        )
+    )
+
     # calculate final bbtt vars
     cfg.addEventAlgo(
         CompFactory.HH4B.BaselineVarsbbttAlg(
@@ -93,7 +103,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             electrons="bbttAnalysisElectrons_%SYS%",
             taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
-            bTagWP="",
         )
     )
 
@@ -104,15 +113,13 @@ def bbtt_branches(flags):
     branches = []
 
     bbtt_vars = [
-        # Leading muon
-        "Leading_Muon_pt",
-        "Leading_Muon_eta",
-        # Leading electron
-        "Leading_Electron_pt",
-        "Leading_Electron_eta",
-        # Leading tau
-        "Leading_Tau_pt",
-        "Leading_Tau_eta",
+        "Selected_Lepton_pt",
+        "Selected_Lepton_eta",
+        "Selected_Lepton_charge",
+        "Selected_Lepton_pdgid",
+        "Selected_Tau_pt",
+        "Selected_Tau_eta",
+        "Selected_Tau_charge",
     ]
 
     for tree_flags in flags.Analysis.ttree_output:
@@ -137,5 +144,8 @@ def bbtt_branches(flags):
                     branches += [f"EventInfo.{hh}_{var}_%SYS% -> {hh}_%SYS%_{var}"]
 
     branches += ["EventInfo.bbtt_pass_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
+
+    branches += ["EventInfo.pass_SLT_%SYS% -> bbtt_pass_SLT_%SYS%"]
+    branches += ["EventInfo.pass_LTT_%SYS% -> bbtt_pass_LTT_%SYS%"]
 
     return branches

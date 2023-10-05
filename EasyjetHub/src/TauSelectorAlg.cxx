@@ -22,6 +22,7 @@ namespace Easyjet
     declareProperty("minimumAmount", m_minimumAmount);
     declareProperty("truncateAtAmount", m_truncateAtAmount);
     declareProperty("pTsort", m_pTsort);
+    declareProperty("checkOR", m_checkOR);
   }
 
   StatusCode TauSelectorAlg::initialize()
@@ -34,9 +35,11 @@ namespace Easyjet
 
     m_IDTauDecorKey = m_inHandle.getNamePattern() + "." + m_IDTauDecorName;
     m_antiTauDecorKey = m_inHandle.getNamePattern() + "." + m_antiTauDecorName;
+    m_ORTauDecorKey = m_inHandle.getNamePattern() + "." + m_ORTauDecorName;
 
     ATH_CHECK (m_IDTauDecorKey.initialize());
     ATH_CHECK (m_antiTauDecorKey.initialize());
+    ATH_CHECK (m_ORTauDecorKey.initialize());
 
     // Initialise syst-aware input/output decorators 
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
@@ -52,6 +55,7 @@ namespace Easyjet
 
     SG::ReadDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
     SG::ReadDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
+    SG::ReadDecorHandle<xAOD::TauJetContainer, char> ORDecorHandle(m_ORTauDecorKey);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
@@ -70,10 +74,18 @@ namespace Easyjet
     
       // loop over taus 
       for (const xAOD::TauJet *tau : *inContainer) {
+
+        // If not not ID tau nor anti tau, skip
 	bool isTauID = idTauDecorHandle(*tau);
 	bool isAntiTau = antiTauDecorHandle(*tau);
 	if ( !isAntiTau && !isTauID ) continue;
 
+        // If not passing OR, skip
+	if( m_checkOR ){
+	 bool ispassORTau = ORDecorHandle(*tau);
+	 if ( !ispassORTau ) continue;
+	}
+	
      	if (tau->pt() < m_minPt)
      	  continue;
 	

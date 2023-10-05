@@ -49,6 +49,10 @@ private:
 
     // \brief Setup syst-aware input decorations
     CP::SysReadDecorHandle<char> m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+    Gaudi::Property<std::string> m_ORJetDecorName
+      { this, "ORDecorKey", "passesOR", "Decoration for jets OR" };
+    SG::ReadDecorHandleKey<xAOD::JetContainer> m_ORJetDecorKey;
+
     CP::SysReadDecorHandle<float> m_relativeDeltaRToVRJet {"relativeDeltaRToVRJet", this};
 
     /// \brief Setup syst-aware output container handles
@@ -66,6 +70,7 @@ private:
     int m_truncateAtAmount;
     bool m_pTsort;
     bool m_removeRelativeDeltaRToVRJet;
+    bool m_checkOR;
   };
 }
 

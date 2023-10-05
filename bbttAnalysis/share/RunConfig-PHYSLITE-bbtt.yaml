@@ -3,4 +3,4 @@ include: bbtt-base-config.yaml
 container_names:
     include: EasyjetHub/container-names-DAOD_PHYSLITE.yaml
 
-channel: "lephad"
+channel: ["hadhad","lephad"]
