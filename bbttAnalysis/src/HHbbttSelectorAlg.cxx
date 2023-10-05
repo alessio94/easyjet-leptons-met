@@ -61,12 +61,6 @@ namespace HH4B
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
-    m_IDTauDecorKey = m_tauHandle.getNamePattern() + "." + m_IDTauDecorName;
-
-    ATH_CHECK (m_IDTauDecorKey.initialize());
-    ATH_CHECK (m_eleIdDecorKey.initialize());
-    ATH_CHECK (m_muonIdDecorKey.initialize());
-    ATH_CHECK (m_muonPreselDecorKey.initialize());
 
     // Intialise syst-aware output decorators
     ATH_CHECK(m_pass_sr.initialize(m_systematicsList, m_eventHandle));

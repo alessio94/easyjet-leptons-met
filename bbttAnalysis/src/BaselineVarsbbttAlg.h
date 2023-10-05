@@ -80,6 +80,9 @@ private:
     m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input dectorator for selected mu"};
     CP::SysReadDecorHandle<bool> 
     m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input dectorator for selected tau"};
+    
+    CP::SysReadDecorHandle<char> 
+    m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<float> m_HH_pt {"HH_pt_%SYS%", this};

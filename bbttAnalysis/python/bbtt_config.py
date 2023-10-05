@@ -103,6 +103,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             electrons="bbttAnalysisElectrons_%SYS%",
             taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
+            bTagWPDecorName="ftag_select_DL1dv01_FixedCutBEff_77",
         )
     )
 

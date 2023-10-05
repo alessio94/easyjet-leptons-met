@@ -64,6 +64,10 @@ namespace HH4B
     ATH_CHECK(m_selected_tau_phi.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_selected_tau_charge.initialize(m_systematicsList, m_eventHandle));
 
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+    }
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
 
@@ -162,8 +166,16 @@ namespace HH4B
       TLorentzVector HH(0,0,0,0);
       TLorentzVector HH_vis(0,0,0,0);
       TLorentzVector mmc_vec(0,0,0,0);
-
-      if (jets->size() > 1) bb = jets->at(0)->p4() + jets->at(1)->p4();
+ 
+      bool WPgiven = !m_isBtag.empty();
+      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      for(const xAOD::Jet* jet : *jets) {
+        if (WPgiven) {
+          if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+        }
+      }
+     
+      if (bjets->size() > 1) bb = bjets->at(0)->p4() + bjets->at(1)->p4();
       if (taus->size() > 1) tautau = taus->at(0)->p4() + taus->at(1)->p4();
 
       HH_vis=bb+tautau;
