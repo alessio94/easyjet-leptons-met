@@ -9,7 +9,7 @@ variables:
   needs: [compile]
   artifacts:
     paths:
-      - $EASYJET_TESTDIR/output-branches-analysis-variables.txt
+      - $EASYJET_TESTDIR/output-branches-analysis.txt
       - $EASYJET_TESTDIR/userJobMetadata.json
 
 ntupler_data18_fast:
