@@ -8,6 +8,7 @@ from EventBookkeeperTools.EventBookkeeperToolsConfig import (
 )
 from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
 from AthenaConfiguration.Enums import LHCPeriod
+from AthenaCommon.Constants import INFO
 
 from AnalysisAlgorithmsConfig.ConfigAccumulator import ConfigAccumulator
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
@@ -44,6 +45,12 @@ def core_services_cfg(flags):
     # Get a ComponentAccumulator setting up the standard components
     # needed to run an Athena job.
     cfg = MainServicesCfg(flags)
+    # turn down the output level if the log level is set tighter than info
+    if flags.Exec.OutputLevel > INFO:
+        cfg.setAppProperty('AppName', '')
+    # Gaudi is weird and expects the app properties to be strings:
+    # cast to a string so that it can cast it back.
+    cfg.setAppProperty('OutputLevel', str(flags.Exec.OutputLevel))
 
     if flags.PerfMon.doFullMonMT:
         cfg.merge(PerfMonMTSvcCfg(flags))
