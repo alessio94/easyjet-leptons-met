@@ -24,8 +24,8 @@ namespace HHBBYY
 
   StatusCode BaselineVarsyybbAlg::initialize()
   {
-    ATH_CHECK(m_smallRContainerInKey.initialize());
-    ATH_CHECK(m_smallRContainerInKey_No_WP.initialize());
+    ATH_CHECK(m_smallRJets_BTag_ContainerInKey.initialize());
+    ATH_CHECK(m_smallRJets_ContainerInKey.initialize());
     ATH_CHECK(m_photonContainerInKey.initialize());
     ATH_CHECK(m_muonContainerInKey.initialize());
     ATH_CHECK(m_electronContainerInKey.initialize());
@@ -53,10 +53,10 @@ namespace HHBBYY
       m_decos.at(deco_var)(*eventInfo) = -99.; 
     };
 
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRjets(
-       m_smallRContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRjets_No_WP(
-       m_smallRContainerInKey_No_WP);
+    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRJets_BTag(
+       m_smallRJets_BTag_ContainerInKey);
+    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRJets(
+       m_smallRJets_ContainerInKey);
     SG::ReadHandle<ConstDataVector<xAOD::PhotonContainer> > photons_(
         m_photonContainerInKey);
     SG::ReadHandle<ConstDataVector<xAOD::MuonContainer> > muons_(
@@ -70,12 +70,12 @@ namespace HHBBYY
     static const SG::AuxElement::Accessor<char>  DFCommonMuonPassIDCuts ("DFCommonMuonPassIDCuts");
     static const SG::AuxElement::Accessor<char>  DFCommonMuonPassPreselection ("DFCommonMuonPassPreselection");
 
-    ATH_CHECK(smallRjets.isValid());
-    ATH_CHECK(smallRjets_No_WP.isValid());
+    ATH_CHECK(smallRJets_BTag.isValid());
+    ATH_CHECK(smallRJets.isValid());
     ATH_CHECK(photons_.isValid());
     ATH_CHECK(muons_.isValid());
     ATH_CHECK(electrons_.isValid());
-    ConstDataVector<xAOD::JetContainer> jets = *smallRjets;
+    ConstDataVector<xAOD::JetContainer> btag_jets = *smallRJets_BTag;
     ConstDataVector<xAOD::PhotonContainer> photons = *photons_;
 
     int TWO_TIGHTID_PHOTONS = 0;
@@ -83,25 +83,51 @@ namespace HHBBYY
     int PASS_RELPT_CUT = 0;
     int MASSCUT = 0;
     int isPassed = 0;
-    int N_LEPTONS_CUT=0;
-    int LESS_THAN_SIX_CENTRAL_JETS=0;
+    int N_LEPTONS_CUT = 0;
+    int LESS_THAN_SIX_CENTRAL_JETS = 0;
     int EXACTLY_TWO_B_JETS = 0;
     std::vector<float> PassTightIDs;
     std::vector<float> PassIsos;
     std::vector<float> ptOverMasses;
     std::vector<float> CentralJetsEta;
     int n_leptons=0;
-    int n_bjets=0;
-
 
     bool PassIso = 0;
     double myy = -99;
 
-    if(photons.size() >= 2){
-      //auto h2 = (photons[0]->p4() + photons[1]->p4());
-      myy = (photons[0]->p4() + photons[1]->p4()).M();
-      //myy = h2.M();
+    TLorentzVector H_BB;
+    TLorentzVector H_yy;
+    TLorentzVector H_HH;
+    
+    double Ht = 0; // scalar sum of jet pT
 
+    // Photon sector
+    if (photons.size() >= 1)
+    {
+      // Leading photon
+      m_decos.at("Leading_Photon_pt")(*eventInfo) = photons[0]->pt();
+      m_decos.at("Leading_Photon_eta")(*eventInfo) = photons[0]->eta();
+      m_decos.at("Leading_Photon_phi")(*eventInfo) = photons[0]->phi();
+      m_decos.at("Leading_Photon_E")(*eventInfo) = photons[0]->e();
+    }
+    if (photons.size() >= 2)
+    {
+      // Subleading photon
+      m_decos.at("Subleading_Photon_pt")(*eventInfo) = photons[1]->pt();
+      m_decos.at("Subleading_Photon_eta")(*eventInfo) = photons[1]->eta();
+      m_decos.at("Subleading_Photon_phi")(*eventInfo) = photons[1]->phi();
+      m_decos.at("Subleading_Photon_E")(*eventInfo) = photons[1]->e(); 
+      
+      // build the H(yy) candidate
+      H_yy = photons[0]->p4() + photons[1]->p4();
+      myy = H_yy.M();
+      m_decos.at("myy")(*eventInfo) = myy;
+      m_decos.at("pTyy")(*eventInfo) = H_yy.Pt();
+      m_decos.at("Etayy")(*eventInfo) = H_yy.Eta();
+      m_decos.at("Phiyy")(*eventInfo) = H_yy.Phi();
+      m_decos.at("dRyy")(*eventInfo) = (photons[0]->p4()).DeltaR(photons[1]->p4());
+
+      // photon isolation and selection pT/myy
       for (const xAOD::Photon *photon : *photons_)
       {
         PassIso = (photon->isolation(xAOD::Iso::topoetcone20)/photon->pt()) < 0.065 &&  (photon->isolation(xAOD::Iso::ptcone20)/photon->pt()) < 0.05 ;
@@ -113,62 +139,98 @@ namespace HHBBYY
       if(PassTightIDs[0] == 1 && PassTightIDs[1] == 1) TWO_TIGHTID_PHOTONS = 1;
       if(PassIsos[0] == 1 && PassIsos[1] == 1) TWO_ISO_PHOTONS = 1;
       if(ptOverMasses[0] > 0.35 && ptOverMasses[1] > 0.25) PASS_RELPT_CUT = 1;
-      if(myy >= 105000. && myy < 160000.) MASSCUT = 1;
+      if(myy >= 105e3 && myy < 160e3) MASSCUT = 1;
 
-    }
+    } // end photon
 
-      for (const xAOD::Electron *electron : *electrons_)
-      {
-        bool PassElectronIso = 0;
-        bool PassElectronMedium = 0;
-        // or ptcone20_Nonprompt_All_MaxWeightTTVALooseCone_pt1000
-         PassElectronIso = (electron->isolation(xAOD::Iso::topoetcone20)/electron->pt()) < 0.20 &&  (electron->isolation(xAOD::Iso::ptcone20_Nonprompt_All_MaxWeightTTVALooseCone_pt500)/electron->pt()) < 0.15 ;
-         PassElectronMedium = DFCommonElectronsLHMedium(*electron);
-        if (PassElectronIso && PassElectronMedium)
-            n_leptons+=1;
-      }
-
-      for (const xAOD::Muon *muon : *muons_)
-      {
-        bool PassMuonIso = 0;
-        bool PassMuonMedium = 0;
-        PassMuonIso = (muon->isolation(xAOD::Iso::topoetcone20)/muon->pt()) < 0.30 &&  (muon->isolation(xAOD::Iso::ptcone20)/muon->pt()) < 0.15 ;
-         PassMuonMedium = DFCommonMuonPassIDCuts(*muon) && DFCommonMuonPassPreselection(*muon);
-        if (PassMuonIso && PassMuonMedium)
-            n_leptons+=1;
-      }
-
-      // No medium+isolated electrons and muons.
-      if (n_leptons==0)
-      {
-        N_LEPTONS_CUT =1;
-      }
-
-    //Applying jet cuts. 
-    for (const xAOD::Jet *jet : *smallRjets) // All jets contained here are b-jets
+    // b-jet sector
+    if (btag_jets.size()>=1)
     {
-        if (jet->pt()>25000. && std::abs(jet->eta())<2.5) // then check if it has pt>25GeV and if it's central.
-            n_bjets+=1;
+      m_decos.at("Jet_pt_B1")(*eventInfo) = btag_jets[0]->pt();
+      m_decos.at("Jet_eta_B1")(*eventInfo) = btag_jets[0]->eta();
+      m_decos.at("Jet_phi_B1")(*eventInfo) = btag_jets[0]->phi();
+      m_decos.at("Jet_E_B1")(*eventInfo) = btag_jets[0]->e();
+    }
+    if (btag_jets.size()>=2)
+    {
+      m_decos.at("Jet_pt_B2")(*eventInfo) = btag_jets[1]->pt();
+      m_decos.at("Jet_eta_B2")(*eventInfo) = btag_jets[1]->eta();
+      m_decos.at("Jet_phi_B2")(*eventInfo) = btag_jets[1]->phi();
+      m_decos.at("Jet_E_B2")(*eventInfo) = btag_jets[1]->e();
+
+      // build the H(BB) candidate
+      H_BB = btag_jets[0]->p4()+btag_jets[1]->p4();
+      m_decos.at("mBB")(*eventInfo) = H_BB.M();
+      m_decos.at("pTBB")(*eventInfo) = H_BB.Pt();
+      m_decos.at("EtaBB")(*eventInfo) = H_BB.Eta();
+      m_decos.at("PhiBB")(*eventInfo) = H_BB.Phi();
+      m_decos.at("dRBB")(*eventInfo) = (btag_jets[0]->p4()).DeltaR(btag_jets[1]->p4());
     }
 
-    if (n_bjets==2)
+    // build the HH candidate
+    if (photons.size() >= 2 && btag_jets.size()>=2)
+    {
+      H_HH = H_yy + H_BB;
+      m_decos.at("mBByy")(*eventInfo) = H_HH.M();
+      m_decos.at("pTBByy")(*eventInfo) = H_HH.Pt();
+      m_decos.at("EtaBByy")(*eventInfo) = H_HH.Eta();
+      m_decos.at("PhiBByy")(*eventInfo) = H_HH.Phi();
+      m_decos.at("dRBByy")(*eventInfo) = H_yy.DeltaR(H_BB);
+      m_decos.at("mBByy_star")(*eventInfo) = H_HH.M() - (H_BB.M()-125e3) - (H_yy.M()-125e3);
+    }
+
+    // electron isolation
+    for (const xAOD::Electron *electron : *electrons_)
+    {
+      bool PassElectronIso = 0;
+      bool PassElectronMedium = 0;
+      // or ptcone20_Nonprompt_All_MaxWeightTTVALooseCone_pt1000
+      PassElectronIso = (electron->isolation(xAOD::Iso::topoetcone20)/electron->pt()) < 0.20 &&  (electron->isolation(xAOD::Iso::ptcone20_Nonprompt_All_MaxWeightTTVALooseCone_pt500)/electron->pt()) < 0.15 ;
+      PassElectronMedium = DFCommonElectronsLHMedium(*electron);
+      if (PassElectronIso && PassElectronMedium)
+        n_leptons+=1;
+    }
+
+    // muon isolation
+    for (const xAOD::Muon *muon : *muons_)
+    {
+      bool PassMuonIso = 0;
+      bool PassMuonMedium = 0;
+      PassMuonIso = (muon->isolation(xAOD::Iso::topoetcone20)/muon->pt()) < 0.30 &&  (muon->isolation(xAOD::Iso::ptcone20)/muon->pt()) < 0.15 ;
+      PassMuonMedium = DFCommonMuonPassIDCuts(*muon) && DFCommonMuonPassPreselection(*muon);
+      if (PassMuonIso && PassMuonMedium)
+        n_leptons+=1;
+    }
+
+    // No medium+isolated electrons and muons.
+    if (n_leptons==0)
+    {
+      N_LEPTONS_CUT = 1;
+    }
+
+    // exactly 2 b-jets
+    if (smallRJets_BTag->size()==2)
     {
       EXACTLY_TWO_B_JETS=1;
     }
 
-    //Applying jet cuts. 
-    for (const xAOD::Jet *jet : *smallRjets_No_WP) // Jets here can be every type of jet (No Working point selected)
+
+    // Applying central jet cuts.
+    for (const xAOD::Jet *jet : *smallRJets) // Jets here can be every type of jet (No Working point selected)
     {
-        if(std::abs(jet->eta())<2.5) // check if jet is central
-        {
-          CentralJetsEta.push_back(jet->eta());
-        }
+      if(std::abs(jet->eta())<2.5) // check if jet is central 
+      {
+        CentralJetsEta.push_back(jet->eta()); // saving only eta
+      }
+      Ht += jet->pt();
     }
+    m_decos.at("Ht")(*eventInfo) = Ht;
 
     if (CentralJetsEta.size()<6)
     {
       LESS_THAN_SIX_CENTRAL_JETS=1;
     }
+
 
     if((photons.size() >= 2)
        && TWO_TIGHTID_PHOTONS==1
@@ -193,55 +255,6 @@ namespace HHBBYY
     m_decos.at("LESS_THAN_SIX_CENTRAL_JETS")(*eventInfo) = LESS_THAN_SIX_CENTRAL_JETS;
     m_decos.at("EXACTLY_TWO_B_JETS")(*eventInfo) = EXACTLY_TWO_B_JETS;
     m_decos.at("isPassed")(*eventInfo) = isPassed;
-
-    if(photons.size() == 1){
-      // Leading photon
-      m_decos.at("Leading_Photon_pt")(*eventInfo) = photons[0]->pt();
-      m_decos.at("Leading_Photon_eta")(*eventInfo) = photons[0]->eta();
-      m_decos.at("Leading_Photon_phi")(*eventInfo) = photons[0]->phi();
-      m_decos.at("Leading_Photon_E")(*eventInfo) = photons[0]->e();
-
-    }
-
-    if(photons.size() >= 2){
-      // // Leading photon
-      m_decos.at("Leading_Photon_pt")(*eventInfo) = photons[0]->pt();
-      m_decos.at("Leading_Photon_eta")(*eventInfo) = photons[0]->eta();
-      m_decos.at("Leading_Photon_phi")(*eventInfo) = photons[0]->phi();
-      m_decos.at("Leading_Photon_E")(*eventInfo) = photons[0]->e();
-
-      // Subleading photon
-      m_decos.at("Subleading_Photon_pt")(*eventInfo) = photons[1]->pt();
-      m_decos.at("Subleading_Photon_eta")(*eventInfo) = photons[1]->eta();
-      m_decos.at("Subleading_Photon_phi")(*eventInfo) = photons[1]->phi();
-      m_decos.at("Subleading_Photon_E")(*eventInfo) = photons[1]->e(); 
-      m_decos.at("myy")(*eventInfo) = myy;
-    }
-
-    if (jets.size()==1)
-    {
-      m_decos.at("Leading_Jet_pt")(*eventInfo) = jets[0]->pt();
-      m_decos.at("Leading_Jet_eta")(*eventInfo) = jets[0]->eta();
-      m_decos.at("Leading_Jet_phi")(*eventInfo) = jets[0]->phi();
-      m_decos.at("Leading_Jet_E")(*eventInfo) = jets[0]->e();
-
-    }
-
-    if (jets.size()>=2)
-    {
-      m_decos.at("Leading_Jet_pt")(*eventInfo) = jets[0]->pt();
-      m_decos.at("Leading_Jet_eta")(*eventInfo) = jets[0]->eta();
-      m_decos.at("Leading_Jet_phi")(*eventInfo) = jets[0]->phi();
-      m_decos.at("Leading_Jet_E")(*eventInfo) = jets[0]->e();
-
-
-      m_decos.at("Subleading_Jet_pt")(*eventInfo) = jets[1]->pt();
-      m_decos.at("Subleading_Jet_eta")(*eventInfo) = jets[1]->eta();
-      m_decos.at("Subleading_Jet_phi")(*eventInfo) = jets[1]->phi();
-      m_decos.at("Subleading_Jet_E")(*eventInfo) = jets[1]->e();
-
-    }
-
 
     return StatusCode::SUCCESS;
   }

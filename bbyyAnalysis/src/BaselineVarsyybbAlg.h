@@ -33,7 +33,7 @@ public:
     /// \brief Execute method, for actions to be taken in the event loop
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
-
+    
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
@@ -41,12 +41,12 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer> >
-    m_smallRContainerInKey{ this, "smallRContainerInKey",
+    m_smallRJets_BTag_ContainerInKey{ this, "smallRJets_BTag_ContainerInKey",
                             "",   "containerName to read" };
 
 
     SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer> >
-    m_smallRContainerInKey_No_WP{ this, "smallRContainerInKey_No_WP",
+    m_smallRJets_ContainerInKey{ this, "smallRJets_ContainerInKey",
                             "",   "Jet container without WP to read" };
 
     SG::ReadHandleKey<ConstDataVector<xAOD::PhotonContainer> >
@@ -74,7 +74,6 @@ private:
       "TWO_ISO_PHOTONS",
       "PASS_RELPT_CUT",
       "MASSCUT",
-      "myy",
       //Nlep=0 cut
       "N_LEPTONS_CUT",
       //Jets cut
@@ -87,10 +86,18 @@ private:
       "Leading_Photon_pt", "Leading_Photon_eta", "Leading_Photon_phi", "Leading_Photon_E",
       "Subleading_Photon_pt", "Subleading_Photon_eta", "Subleading_Photon_phi", "Subleading_Photon_E",
 
-      // Leading/Subleading jet kinematics
-      "Leading_Jet_pt", "Leading_Jet_eta", "Leading_Jet_phi", "Leading_Jet_E",     
-      "Subleading_Jet_pt", "Subleading_Jet_eta", "Subleading_Jet_phi", "Subleading_Jet_E",
+      "myy", "pTyy", "dRyy", "Etayy", "Phiyy",
 
+      // Leading/Subleading jet kinematics
+      "Jet_pt_B1", "Jet_eta_B1", "Jet_phi_B1", "Jet_E_B1",
+      "Jet_pt_B2", "Jet_eta_B2", "Jet_phi_B2", "Jet_E_B2", 
+      "mBB", "pTBB", "dRBB", "EtaBB", "PhiBB",
+
+      // di-higgs variables
+      "mBByy", "pTBByy", "dRBByy", "EtaBByy", "PhiBByy", "mBByy_star",
+
+      // mva variables
+      "Ht"
     };
 
   };
