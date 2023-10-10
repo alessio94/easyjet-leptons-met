@@ -84,7 +84,7 @@ def jet_sequence(
         )
         configSeq.setOptionValue(
             '.btagSelDecor',
-            "ftag_select_DL1dv01_FixedCutBEff_77",
+            "ftag_select_" + flags.Analysis.small_R.btag_wps[0],
         )
 
     # Add systematic object links

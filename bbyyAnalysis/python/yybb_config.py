@@ -61,7 +61,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             "SmallRJet_BTag_SelectorAlg",
             containerInKey=smalljetkey,
             containerOutKey="yybbAnalysisJets_BTag",
-            bTagWPDecorName="ftag_select_DL1dv01_FixedCutBEff_77",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wps[0],
             minPt=25e3,
             maxEta=2.5,
             truncateAtAmount=-1,  # -1 means keep all
