@@ -14,15 +14,45 @@ Meetings will be held on demand, generally 1 pm Friday, Central European Time, s
 
 *The instructions below with `setupATLAS` and `asetup` assume you are working on a CERN CentOS terminal, e.g. lxplus or a Singularity container on an institute cluster. Alternative instructions for using Docker images are given below.*
 
-First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel free to make an alias with `export WORKDIR=.`) clone the repository (you are also welcome to fork a copy in case you might want to develop on top and contribute to improving it!):
-
+First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel free to make an alias with `export WORKDIR=.`) clone the repository :
 ```
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
 git clone --recursive ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 ```
 Note the `--recursive` argument, which is needed to get the submodules in the package.
 
-Now, compile the package
+### Installation as developper
+
+In case you want to make some developments to the sofwtare itself, we recomand you to:
+1. Fork the branch using [this link](https://gitlab.cern.ch/easyjet/easyjet/-/forks/new). Please remember to put your username in the Project URL.
+2. Clone the repository and set it as upstream: ``` git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git ```
+3. Go to the directory and set your forked branch as origin and fetch it:
+``` 
+cd easyjet
+git remote add origin ssh://git@gitlab.cern.ch:7999/$(git config user.name)/easyjet.git
+git fetch origin
+```
+
+For each development do:
+4. Update the master (if you haven't done it since a while):
+```
+git checkout master
+git pull --rebase upstream/master
+```
+5. Now you can create a new branch:``` git checkout -b YourNewFavoriteBranch ```
+    - Alternatively you can checkout an existing branch on your fork by doing ``` git checkout YourExisitingBranch ``` (don't use origin/YourExisitingBranch).
+6. Once your changes are done you can create a Merge Request (make sure you merge onto the upstream master)
+7. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
+```
+git pull --rebase upstream/master
+# Fix potential conflicts
+git push -f origin YourNewFavoriteBranch
+```
+Please favour `rebase` over `merge` as it can badly affect the commit history. By default `git pull`, will use merge, unless you provide the explicit `--rebase` option.
+
+And repeat 4 - 7 as many times as necessary up until the analyis is published.
+
+### How to compile
 
 ```
 mkdir build
