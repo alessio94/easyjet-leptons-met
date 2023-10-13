@@ -15,8 +15,10 @@ truthDecayModes: []
 # small R config
 small_R:
   max_eta: 100
-  # btagging working points for small R jets
-  btag_wps: []
+  # nominal btagging working point, used for b-jet pT calibration in particular
+  btag_wp: ""
+  # additional btagging working points, available for selections and per-jet SFs
+  btag_extra_wps: []
 
 # large R config
 large_R:

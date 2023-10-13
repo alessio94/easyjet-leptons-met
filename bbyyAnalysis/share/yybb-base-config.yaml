@@ -14,13 +14,8 @@ truthDecayModes: ["bbyy"]
 
 # small R config
 small_R:
-  btag_wps:
-    #- DL1dv01_FixedCutBEff_70
-    - DL1dv01_FixedCutBEff_77
-    #- DL1dv01_FixedCutBEff_85
-    #- GN120220509_FixedCutBEff_70
-    #- GN120220509_FixedCutBEff_77
-    #- GN120220509_FixedCutBEff_85
+  btag_wp: "DL1dv01_FixedCutBEff_77"
+  #btag_wp: "GN120220509_FixedCutBEff_77"
 
 PhotonWP: "Loose.NonIso"  # possibly make a list to try multiple photon WPs
 

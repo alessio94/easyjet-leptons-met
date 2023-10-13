@@ -89,7 +89,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
             eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
-            bTagWPDecorName="ftag_select_DL1dv01_FixedCutBEff_77",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
             channel=flags.Analysis.channel,
         )
     )
@@ -103,7 +103,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             electrons="bbttAnalysisElectrons_%SYS%",
             taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
-            bTagWPDecorName="ftag_select_DL1dv01_FixedCutBEff_77",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
         )
     )
 

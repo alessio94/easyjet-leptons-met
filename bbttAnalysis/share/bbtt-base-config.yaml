@@ -13,9 +13,8 @@ truthDecayModes: ["bbtt"]
 
 # small R config
 small_R:
-  # btagging working points 
-  btag_wps: 
-    - DL1dv01_FixedCutBEff_77
+  # btagging nominal working point
+  btag_wp: "DL1dv01_FixedCutBEff_77"
 
 # list of triggers per year to consider
 trigger_chains:

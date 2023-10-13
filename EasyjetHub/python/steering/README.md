@@ -37,8 +37,8 @@ container_names:
 In addition to the associative definitions above, where all values are accessed by keys (parsed initially to a python `dict`), sequential definitions (parsed initially to a python `list`) are also permitted. Both simple and complex lists are possible:
 ```yaml
 truthDecayModes: ["bbbb"]
-btag_wps:
-    - GN120220509_FixedCutBEff_70
+btag_wp: "GN120220509_FixedCutBEff_70"
+btag_extra_wps:
     - GN120220509_FixedCutBEff_77
 ttree_output:
   - # List item 1

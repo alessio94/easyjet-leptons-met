@@ -44,7 +44,11 @@ def jet_sequence(
     #     runJvtSelection=not flags.Input.isPHYSLITE,
     # )
 
-    for tagger_wp in flags.Analysis.small_R.btag_wps:
+    btag_wps = [flags.Analysis.small_R.btag_wp]
+    if hasattr(flags.Analysis.small_R, 'btag_extra_wps'):
+        btag_wps += flags.Analysis.small_R.btag_extra_wps
+
+    for tagger_wp in btag_wps:
         tagger, btag_wp = tagger_wp.split("_", 1)
         configSeq += makeConfig(
             'FlavourTagging',
@@ -84,7 +88,7 @@ def jet_sequence(
         )
         configSeq.setOptionValue(
             '.btagSelDecor',
-            "ftag_select_" + flags.Analysis.small_R.btag_wps[0],
+            "ftag_select_" + flags.Analysis.small_R.btag_wp,
         )
 
     # Add systematic object links

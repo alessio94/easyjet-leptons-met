@@ -9,10 +9,11 @@ truthDecayModes: ["bbbb"]
 
 # small R config
 small_R:
-  # btagging working points
-  btag_wps: 
+  # nominal btagging working point, used for b-jet pT calibration in particular
+  btag_wp: "DL1dv01_FixedCutBEff_77"
+  # additional btagging working points, available for selections and per-jet SFs
+  btag_extra_wps:
     - DL1dv01_FixedCutBEff_70
-    - DL1dv01_FixedCutBEff_77
     - DL1dv01_FixedCutBEff_85
     - GN120220509_FixedCutBEff_70
     - GN120220509_FixedCutBEff_77

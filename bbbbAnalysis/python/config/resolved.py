@@ -8,7 +8,9 @@ def resolved_cfg(flags, smalljetkey):
     cfg = ComponentAccumulator()
 
     # this is a resolved dihiggs analysis chain
-    for btag_wp in flags.Analysis.small_R.btag_wps:
+    btag_wps = [flags.Analysis.small_R.btag_wp]
+    btag_wps += flags.Analysis.small_R.btag_extra_wps
+    for btag_wp in btag_wps:
         # get the 4 leading small R jets
         cfg.addEventAlgo(
             CompFactory.Easyjet.JetSelectorAlg(
@@ -55,7 +57,9 @@ def resolved_cfg(flags, smalljetkey):
 def resolved_branches(flags):
     branches = []
 
-    for btag_wp in flags.Analysis.small_R.btag_wps:
+    btag_wps = [flags.Analysis.small_R.btag_wp]
+    btag_wps += flags.Analysis.small_R.btag_extra_wps
+    for btag_wp in btag_wps:
         resolved_vars = [
             "DeltaR12",
             "DeltaR13",

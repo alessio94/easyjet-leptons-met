@@ -70,7 +70,7 @@ def overlap_sequence(flags):
     # config for TauAntiTauOR
     configSeq.setOptionValue('.antiTauIDTauLabel', 'isIDTau')
     configSeq.setOptionValue('.antiTauBJetLabel',
-                             "ftag_select_" + flags.Analysis.small_R.btag_wps[0])
+                             "ftag_select_" + flags.Analysis.small_R.btag_wp)
     configSeq.setOptionValue('.antiTauLabel', 'isAntiTau')
     configSeq.setOptionValue('.doTauAntiTauJetOR', True)
 
@@ -102,7 +102,7 @@ def overlap_sequence(flags):
         doEleEleOR=False,
         doTaus=flags.Analysis.do_taus,
         enableUserPriority=False,
-        antiTauBJetLabel="ftag_select_" + flags.Analysis.small_R.btag_wps[0],
+        antiTauBJetLabel="ftag_select_" + flags.Analysis.small_R.btag_wp,
         antiTauLabel="isAntiTau",
         doTauAntiTauJetOR=True,
         boostedLeptons=False,
