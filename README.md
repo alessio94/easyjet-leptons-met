@@ -25,7 +25,8 @@ Note the `--recursive` argument, which is needed to get the submodules in the pa
 
 In case you want to make some developments to the sofwtare itself, we recomand you to:
 1. Fork the branch using [this link](https://gitlab.cern.ch/easyjet/easyjet/-/forks/new). Please remember to put your username in the Project URL.
-2. Clone the repository and set it as upstream: ``` git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git ```
+2. Clone the repository and set it as upstream:
+``` git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git ```
 3. Go to the directory and set your forked branch as origin and fetch it:
 ``` 
 cd easyjet
@@ -39,8 +40,11 @@ For each development do:
 git checkout master
 git pull --rebase upstream/master
 ```
-5. Now you can create a new branch:``` git checkout -b YourNewFavoriteBranch ```
-    - Alternatively you can checkout an existing branch on your fork by doing ``` git checkout YourExisitingBranch ``` (don't use origin/YourExisitingBranch).
+5. Now you can create a new branch:
+``` git checkout -b YourNewFavoriteBranch ```
+    - Alternatively you can checkout an existing branch on your fork by doing
+    ``` git checkout YourExisitingBranch ```
+    (don't use origin/YourExisitingBranch).
 6. Once your changes are done you can create a Merge Request (make sure you merge onto the upstream master)
 7. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
 ```
