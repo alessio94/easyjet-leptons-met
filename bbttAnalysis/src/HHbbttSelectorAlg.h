@@ -1,10 +1,10 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_HHBBTTSELECTORALG
-#define HH4BANALYSIS_HHBBTTSELECTORALG
+#ifndef BBTTANALYSIS_HHBBTTSELECTORALG
+#define BBTTANALYSIS_HHBBTTSELECTORALG
 
 #include <memory>
 
@@ -28,17 +28,15 @@
 
 #include <SystematicsHandles/SysFilterReporterParams.h>
 
-namespace bbtautau 
+
+namespace HHBBTT
 {
+
   enum Channel
   {
     LepHad = 0,
     HadHad = 1,
   };
-}
-
-namespace HH4B
-{
 
   /// \brief An algorithm for counting containers
   class HHbbttSelectorAlg final : public EL::AnaAlgorithm
@@ -109,7 +107,7 @@ private:
     Gaudi::Property<std::vector<std::string>> m_channel_names
           { this, "channel", {}, "Which channel to run" };
     
-    std::vector<bbtautau::Channel> m_channels;
+    std::vector<HHBBTT::Channel> m_channels;
    
     CP::SysWriteDecorHandle<bool> m_pass_SLT {"pass_SLT_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_pass_LTT {"pass_LTT_%SYS%", this};

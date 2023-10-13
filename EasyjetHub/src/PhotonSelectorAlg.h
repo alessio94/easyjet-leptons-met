@@ -1,9 +1,9 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef HH4BANALYSIS_PHOTONSELECTORALG
-#define HH4BANALYSIS_PHOTONSELECTORALG
+#ifndef EASYJET_PHOTONSELECTORALG
+#define EASYJET_PHOTONSELECTORALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>

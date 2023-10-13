@@ -8,7 +8,7 @@
 
 #include "TLorentzVector.h"
 
-namespace HH4B
+namespace HHBBTT
 {
   MMCDecoratorAlg ::MMCDecoratorAlg(const std::string &name,
                                   ISvcLocator *pSvcLocator)

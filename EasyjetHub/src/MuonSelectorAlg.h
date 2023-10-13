@@ -2,8 +2,8 @@
   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef HH4BANALYSIS_MUONSELECTORALG
-#define HH4BANALYSIS_MUONSELECTORALG
+#ifndef EASYJET_MUONSELECTORALG
+#define EASYJET_MUONSELECTORALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>

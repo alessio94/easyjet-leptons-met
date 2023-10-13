@@ -2,7 +2,7 @@
 #include "../MMCDecoratorAlg.h"
 #include "../HHbbttSelectorAlg.h"
 
-using namespace HH4B;
+using namespace HHBBTT;
 
 DECLARE_COMPONENT(BaselineVarsbbttAlg)
 DECLARE_COMPONENT(MMCDecoratorAlg)

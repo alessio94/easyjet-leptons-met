@@ -1,10 +1,10 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_FINALVARSBBTTALG
-#define HH4BANALYSIS_FINALVARSBBTTALG
+#ifndef BBTTANALYSIS_FINALVARSBBTTALG
+#define BBTTANALYSIS_FINALVARSBBTTALG
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
@@ -23,7 +23,7 @@
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
-namespace HH4B
+namespace HHBBTT
 {
 
   /// \brief An algorithm for counting containers

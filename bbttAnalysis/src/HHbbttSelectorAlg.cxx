@@ -14,7 +14,7 @@
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
 #include <AthContainers/ConstDataVector.h>
 
-namespace HH4B
+namespace HHBBTT
 {
   HHbbttSelectorAlg ::HHbbttSelectorAlg(const std::string &name,
                                   ISvcLocator *pSvcLocator)
@@ -69,8 +69,8 @@ namespace HH4B
     ATH_CHECK (m_systematicsList.initialize());    
 
     for ( auto name : m_channel_names){
-      if( name == "lephad") m_channels.push_back(bbtautau::LepHad);
-      else if ( name == "hadhad") m_channels.push_back(bbtautau::HadHad);
+      if( name == "lephad") m_channels.push_back(HHBBTT::LepHad);
+      else if ( name == "hadhad") m_channels.push_back(HHBBTT::HadHad);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -259,8 +259,8 @@ namespace HH4B
 
       bool pass = false;
       for(const auto& channel : m_channels){
-	      if(channel == bbtautau::LepHad) pass |= (pass_SLT || pass_LTT);
-	      else if(channel == bbtautau::HadHad) pass |= (pass_STT || pass_DTT);
+	if(channel == HHBBTT::LepHad) pass |= (pass_SLT || pass_LTT);
+	else if(channel == HHBBTT::HadHad) pass |= (pass_STT || pass_DTT);
       }
       if (!pass) continue;
 

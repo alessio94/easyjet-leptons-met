@@ -1,10 +1,10 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
-#ifndef HH4BANALYSIS_MMCDECORATORALG
-#define HH4BANALYSIS_MMCDECORATORALG
+#ifndef BBTTANALYSIS_MMCDECORATORALG
+#define BBTTANALYSIS_MMCDECORATORALG
 
 #include <memory>
 
@@ -25,7 +25,7 @@
 
 #include <DiTauMassTools/MissingMassToolV2.h>
 
-namespace HH4B
+namespace HHBBTT
 {
 
   /// \brief An algorithm for counting containers

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -15,7 +15,7 @@
 
 #include "TLorentzVector.h"
 
-namespace HH4B
+namespace HHBBTT
 {
   BaselineVarsbbttAlg::BaselineVarsbbttAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)

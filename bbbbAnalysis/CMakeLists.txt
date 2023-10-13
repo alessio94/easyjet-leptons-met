@@ -20,7 +20,7 @@ atlas_add_component(bbbbAnalysis
   src/JetBoostHistogramsAlg.cxx
   src/MassPlaneBoostHistograms.cxx
   src/MassPlaneBoostHistogramsAlg.cxx
-  src/components/HH4bAnalysis_entries.cxx
+  src/components/bbbbAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
   AsgTools

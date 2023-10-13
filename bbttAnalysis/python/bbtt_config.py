@@ -69,7 +69,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     # MMC decoration
     if flags.Analysis.do_mmc:
         cfg.addEventAlgo(
-            CompFactory.HH4B.MMCDecoratorAlg(
+            CompFactory.HHBBTT.MMCDecoratorAlg(
                 "MMCDecoratorAlg",
                 jets="bbttAnalysisJets_%SYS%",
                 muons="bbttAnalysisMuons_%SYS%",
@@ -81,7 +81,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
 
     # Selection
     cfg.addEventAlgo(
-        CompFactory.HH4B.HHbbttSelectorAlg(
+        CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
             jets="bbttAnalysisJets_%SYS%",
             muons="bbttAnalysisMuons_%SYS%",
@@ -96,7 +96,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
 
     # calculate final bbtt vars
     cfg.addEventAlgo(
-        CompFactory.HH4B.BaselineVarsbbttAlg(
+        CompFactory.HHBBTT.BaselineVarsbbttAlg(
             "FinalVarsbbttAlg",
             jets="bbttAnalysisJets_%SYS%",
             muons="bbttAnalysisMuons_%SYS%",
