@@ -5,6 +5,8 @@ import datetime
 import os
 import subprocess
 from shutil import which
+import yaml
+from EasyjetHub.steering.utils.config_files import run_config_arg
 
 
 def main():
@@ -100,7 +102,8 @@ def main():
 
     # copy the runconfig to the submit dir to be available for the exec cmd
     try:
-        subprocess.run(["cp", args.run_config, "config.yaml"], check=True)
+        with open('config.yaml','w') as cfg:
+            cfg.write(yaml.dump(run_config_arg(args.run_config)))
     except subprocess.CalledProcessError as e:
         raise OSError(e.returncode, "Failed to copy run config files.")
 

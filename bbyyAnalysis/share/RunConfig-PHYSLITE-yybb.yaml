@@ -1,4 +1,4 @@
 # Replace container names with PHYSLITE ones
-include: yybb-base-config.yaml
+include: bbyyAnalysis/yybb-base-config.yaml
 container_names:
     include: EasyjetHub/container-names-DAOD_PHYSLITE.yaml
