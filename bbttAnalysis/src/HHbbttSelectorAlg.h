@@ -123,16 +123,19 @@ private:
     
     /// \brief Internal variables
 
-    bool N_LEPTONS_CUT;
-    bool ONE_TAU;
     bool TWO_JETS;
     bool TWO_BJETS;
     bool LEADJET_PT;
     bool MMC_MASS;
     bool MBB_MASS;
-    bool OS_CHARGE;
+    bool N_LEPTONS_CUT_LEPHAD;
+    bool ONE_TAU;
+    bool OS_CHARGE_LEPHAD;
     bool pass_SLT;
     bool pass_LTT;
+    bool N_LEPTONS_CUT_HADHAD;
+    bool TWO_TAU;
+    bool OS_CHARGE_HADHAD;
     bool pass_STT;
     bool pass_DTT;
 
