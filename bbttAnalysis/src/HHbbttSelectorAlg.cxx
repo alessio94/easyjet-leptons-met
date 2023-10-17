@@ -262,7 +262,7 @@ namespace HHBBTT
 	if(channel == HHBBTT::LepHad) pass |= (pass_SLT || pass_LTT);
 	else if(channel == HHBBTT::HadHad) pass |= (pass_STT || pass_DTT);
       }
-      if (!pass) continue;
+      if (!m_bypass && !pass) continue;
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not

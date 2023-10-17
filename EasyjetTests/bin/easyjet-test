@@ -132,10 +132,10 @@ declare -A CONFIGS=(
     [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
     [yybb-mc20]=bbyyAnalysis/RunConfig-PHYS-yybb.yaml
     [lite-yybb-mc20]=bbyyAnalysis/RunConfig-PHYSLITE-yybb.yaml
-    [lite-bbtt-hadhad-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt.yaml
-    [bbtt-hadhad-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt.yaml
-    [lite-bbtt-lephad-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt.yaml
-    [bbtt-lephad-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt.yaml
+    [lite-bbtt-hadhad-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt-bypass.yaml
+    [bbtt-hadhad-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt-bypass.yaml
+    [lite-bbtt-lephad-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt-bypass.yaml
+    [bbtt-lephad-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt-bypass.yaml
     # non-ntupler
     [aod-hh4b-mc21-fast]=bbbbAnalysis/RunConfig-Resolved.yaml
     [hist-syst-hh4b-mc21]=bbbbAnalysis/histonly-config.yaml

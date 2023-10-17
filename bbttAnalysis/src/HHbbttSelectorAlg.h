@@ -55,6 +55,15 @@ public:
 
 private:
 
+    /// \brief Steerable properties
+    Gaudi::Property<std::vector<std::string>> m_channel_names
+      { this, "channel", {}, "Which channel to run" };
+
+    std::vector<HHBBTT::Channel> m_channels;
+
+    Gaudi::Property<bool> m_bypass
+      { this, "bypass", false, "Run selector algorithm in pass-through mode" };
+
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
@@ -102,12 +111,6 @@ private:
     CP::SysWriteDecorHandle<bool> m_pass_sr {"pass_bbtt_sr_%SYS%", this};
 
     CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
-
-    /// \brief Steerable properties
-    Gaudi::Property<std::vector<std::string>> m_channel_names
-          { this, "channel", {}, "Which channel to run" };
-    
-    std::vector<HHBBTT::Channel> m_channels;
    
     CP::SysWriteDecorHandle<bool> m_pass_SLT {"pass_SLT_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_pass_LTT {"pass_LTT_%SYS%", this};

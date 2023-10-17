@@ -21,6 +21,7 @@ trigger_chains:
   include: bbttAnalysis/trigger.yaml
 
 do_bbtt_analysis: true
+channel: ["hadhad","lephad"]
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection

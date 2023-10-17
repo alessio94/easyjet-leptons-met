@@ -91,6 +91,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
             channel=flags.Analysis.channel,
+            bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
+                    else False),
         )
     )
 
