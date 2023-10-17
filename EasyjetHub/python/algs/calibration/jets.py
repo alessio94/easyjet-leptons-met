@@ -45,7 +45,7 @@ def jet_sequence(
     # )
 
     btag_wps = [flags.Analysis.small_R.btag_wp]
-    if hasattr(flags.Analysis.small_R, 'btag_extra_wps'):
+    if 'btag_extra_wps' in flags.Analysis.small_R:
         btag_wps += flags.Analysis.small_R.btag_extra_wps
 
     for tagger_wp in btag_wps:
@@ -57,6 +57,12 @@ def jet_sequence(
         configSeq.setOptionValue('.btagger', tagger)
         configSeq.setOptionValue('.btagWP', btag_wp)
         configSeq.setOptionValue('.kinematicSelection', True)
+        if 'btagCDI' in flags.Analysis.small_R:
+            configSeq.setOptionValue('.bTagCalibFile', flags.Analysis.small_R.btagCDI)
+        # if GN2 in tagger name overwrite the CDI
+        if "GN2" in tagger:
+            configSeq.setOptionValue('.bTagCalibFile',
+                'xAODBTaggingEfficiency/13p6TeV/2023-22-13p6TeV-MC21-CDI_Test_2023-08-1_v1.root') # noqa
 
         # makeFTagAnalysisSequence(
         #     jet_sequence,
