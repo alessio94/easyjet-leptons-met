@@ -1,6 +1,7 @@
 # Collections read from file
 input:
   reco4PFlowJet:       AntiKt4EMPFlowJets
+  reco4EMTopoJet:      AntiKt4EMTopoJets
   reco10TopoJet:       AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets
   reco10UFOJet:        AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets
   vrJet:               AntiKtVR30Rmax4Rmin02PV0TrackJets
@@ -20,6 +21,7 @@ input:
 # Or special truth collections
 output:
   reco4PFlowJet:       AnalysisAntiKt4EMPFlowJets_%SYS%
+  reco4EMTopoJet:      AnalysisAntiKt4EMTopoJets_%SYS%
   reco10TopoJet:       AnalysisAntiKt10LCTopoTrimmedPtFrac5SmallR20Jets_%SYS%
   reco10UFOJet:        AnalysisAntiKt10UFOCSSKSoftDropBeta100Zcut10Jets_%SYS%
   vrJet:               AnalysisAntiKtVR30Rmax4Rmin02PV0TrackJets_%SYS%
@@ -33,3 +35,4 @@ output:
 # For MET we want all calibrated jets with no filter selection
 allcalib:
   reco4PFlowJet:       CalibAntiKt4EMPFlowJets_%SYS%
+  reco4EMTopoJet:      CalibAntiKt4EMTopoJets_%SYS%

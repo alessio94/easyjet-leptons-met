@@ -2,7 +2,9 @@ from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from EasyjetHub.output.ttree.truth_jets import get_small_R_jet_truth_labels
 
 
-def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
+def get_small_R_jet_branches(
+    flags, tree_flags, input_container, output_prefix
+):
     _syst_option = SystOption.ALL_SYST
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
@@ -14,7 +16,7 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
         systematics_option=_syst_option,
         required_flags=[
             flags.Analysis.do_small_R_jets
-        ]
+        ],
     )
 
     if tree_flags.write_object_systs_only_for_pt:
@@ -22,35 +24,36 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
 
     small_R_jet_branches.add_four_mom_branches(do_mass=True)
 
-    small_R_jet_branches.variables += ["NNJvtPass"]
+    if flags.Analysis.small_R.jet_type != "reco4EMTopoJet":
+        small_R_jet_branches.variables += ["NNJvtPass"]
 
-    if tree_flags.collection_options.small_R_jets.btag_info:
-        btag_wps = [flags.Analysis.small_R.btag_wp]
-        if 'btag_extra_wps' in flags.Analysis.small_R:
-            btag_wps += flags.Analysis.small_R.btag_extra_wps
-        small_R_jet_branches.variables += [
-            f"ftag_select_{btag_wp}"
-            for btag_wp in btag_wps
-        ]
+        if tree_flags.collection_options.small_R_jets.btag_info:
+            btag_wps = [flags.Analysis.small_R.btag_wp]
+            if 'btag_extra_wps' in flags.Analysis.small_R:
+                btag_wps += flags.Analysis.small_R.btag_extra_wps
+            small_R_jet_branches.variables += [
+                f"ftag_select_{btag_wp}"
+                for btag_wp in btag_wps
+            ]
 
-    if (
-        tree_flags.collection_options.small_R_jets.no_bjet_calib_p4
-        and flags.Analysis.do_muons
-    ):
-        small_R_jet_branches.variables += [
-            f"NoBJetCalibMomentum_{var}"
-            for var in ["pt", "eta", "phi", "m"]
-        ]
+        if (
+            tree_flags.collection_options.small_R_jets.no_bjet_calib_p4
+            and flags.Analysis.do_muons
+        ):
+            small_R_jet_branches.variables += [
+                f"NoBJetCalibMomentum_{var}"
+                for var in ["pt", "eta", "phi", "m"]
+            ]
 
-    if tree_flags.collection_options.small_R_jets.JVT_details:
-        small_R_jet_branches.variables += [
-            "Jvt",
-            "JvtRpt",
-            "JVFCorr",
-            "jvt_selection",
-            "NNJvt",
-            "NNJvtRpt",
-        ]
+        if tree_flags.collection_options.small_R_jets.JVT_details:
+            small_R_jet_branches.variables += [
+                "Jvt",
+                "JvtRpt",
+                "JVFCorr",
+                "jvt_selection",
+                "NNJvt",
+                "NNJvtRpt",
+            ]
 
     if (
         flags.Input.isMC
@@ -61,7 +64,9 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
     return small_R_jet_branches.get_output_list()
 
 
-def get_small_R_bjet_branches(flags, tree_flags, input_container, output_prefix):
+def get_small_R_bjet_branches(
+    flags, tree_flags, input_container, output_prefix
+):
     _syst_option = SystOption.ALL_SYST
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
@@ -73,7 +78,7 @@ def get_small_R_bjet_branches(flags, tree_flags, input_container, output_prefix)
         systematics_option=_syst_option,
         required_flags=[
             flags.Analysis.do_small_R_jets
-        ]
+        ],
     )
 
     # GN2 scores

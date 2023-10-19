@@ -19,6 +19,9 @@ small_R:
   btag_wp: ""
   # additional btagging working points, available for selections and per-jet SFs
   btag_extra_wps: []
+  # select jet type
+  jet_type: 'reco4PFlowJet'
+
 
 # large R config
 large_R:

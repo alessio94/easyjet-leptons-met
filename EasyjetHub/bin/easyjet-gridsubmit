@@ -49,6 +49,9 @@ def main():
         "--nGBperJob", default=None, help="How many GB required per job"
     )
     parser.add_argument(
+        "--nFiles", default=None, help="How many files to run on"
+    )
+    parser.add_argument(
         "--noSubmit",
         action="store_true",
         help="Don't submit the jobs, just create the tarball",
@@ -76,6 +79,8 @@ def main():
         submit_opts["excludedSite"] = args.excluded_site
     if args.nGBperJob is not None:
         submit_opts["nGBPerJob"] = args.nGBperJob
+    if args.nFiles is not None:
+        submit_opts["nFiles"] = args.nFiles
 
     if args.asetup is None:
         atlas_project = os.environ["AtlasProject"]

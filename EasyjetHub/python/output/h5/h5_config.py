@@ -26,7 +26,7 @@ def get_h5_cfg(flags):
             output=output,
         )
     )
-    jetcol = flags.Analysis.container_names.input.reco4PFlowJet
+    jetcol = flags.Analysis.container_names.input[flags.Analysis.small_R.jet_type]
     types = {}
     primitives = []
     if flags.Analysis.h5.n_jets > 0:

@@ -24,7 +24,10 @@ def met_sequence(flags, configAcc):
 
     configSeq += makeConfig('MissingET', drop_sys(container_names.output.met))
     # Pass all the calibrated jets
-    configSeq.setOptionValue('.jets', drop_sys(container_names.allcalib.reco4PFlowJet))
+    configSeq.setOptionValue(
+        '.jets',
+        drop_sys(container_names.allcalib[flags.Analysis.small_R.jet_type])
+    )
     # Add whatever collections are active in the job
     for objtype, selection in met_selections.items():
         if flags.Analysis[f"do_{objtype}"]:

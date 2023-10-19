@@ -177,14 +177,18 @@ def minituple_cfg(
             flags,
             tree_flags.reco_outputs.small_R_jets
         )
+        small_R_prefix = (
+            "recojet_antikt4"
+            + flags.Analysis.small_R.jet_type.replace("reco4","").replace("Jet","")
+        )
         tree_branches += get_small_R_jet_branches(
             flags, tree_flags,
             input_container=small_R_name,
-            output_prefix="recojet_antikt4PFlow",
+            output_prefix=small_R_prefix,
         )
         if flags.Analysis.do_overlap_removal:
             tree_branches.append(
-                add_passes_OR_branch(small_R_name,"recojet_antikt4PFlow")
+                add_passes_OR_branch(small_R_name,small_R_prefix)
             )
 
         # Use this to directly read b-tagging information
@@ -193,7 +197,7 @@ def minituple_cfg(
         tree_branches += get_small_R_bjet_branches(
             flags, tree_flags,
             input_container=small_R_name,
-            output_prefix="recojet_antikt4PFlow",
+            output_prefix=small_R_prefix,
         )
 
     if tree_flags.reco_outputs.large_R_Topo_jets:
@@ -244,7 +248,7 @@ def minituple_cfg(
             input_container=substitute_container_name(
                 flags, tree_flags.truth_outputs.small_R_jets
             ),
-            output_prefix="truthjet_antikt4PFlow",
+            output_prefix="truthjet_antikt4",
         )
 
     large_R_truth_flags = tree_flags.truth_outputs.large_R_jets

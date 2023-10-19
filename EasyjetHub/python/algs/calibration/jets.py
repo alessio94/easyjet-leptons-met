@@ -20,15 +20,21 @@ def jet_sequence(
     # Filtering on kinematics and JVT is done later
     # We need to make the filtered jet container explicitly different
     # because for MET we need the unfiltered container
-    allcalib_name = flags.Analysis.container_names.allcalib.reco4PFlowJet
 
-    configSeq += makeConfig(
-        'Jets',
-        drop_sys(allcalib_name),
-        jetCollection='AntiKt4EMPFlowJets'
+    jet_type = flags.Analysis.small_R.jet_type
+    allcalib_name = flags.Analysis.container_names.allcalib[jet_type]
+    # Need to keep DAOD_PHYS collection name regardless of input
+    # due to CP algs configs in Athena
+    jetColl = (
+        "AntiKt4EMPFlowJets"
+        if jet_type == "reco4PFlowJet"
+        else "AntiKt4EMTopoJets"
     )
-    configSeq.setOptionValue('.runNNJvtUpdate', True)
-    configSeq.setOptionValue('.runJvtSelection', True)
+
+    configSeq += makeConfig("Jets", drop_sys(allcalib_name), jetCollection=jetColl)
+    # don't run JVT only for EMTopo jets
+    configSeq.setOptionValue(".runNNJvtUpdate", jet_type != "reco4EMTopoJet")
+    configSeq.setOptionValue(".runJvtSelection", jet_type != "reco4EMTopoJet")
 
     # jet_sequence = makeJetAnalysisSequence(
     #     flags.Analysis.DataType,
@@ -44,58 +50,49 @@ def jet_sequence(
     #     runJvtSelection=not flags.Input.isPHYSLITE,
     # )
 
-    btag_wps = [flags.Analysis.small_R.btag_wp]
-    if 'btag_extra_wps' in flags.Analysis.small_R:
-        btag_wps += flags.Analysis.small_R.btag_extra_wps
+    if jet_type != "reco4EMTopoJet":
+        btag_wps = [flags.Analysis.small_R.btag_wp]
+        if 'btag_extra_wps' in flags.Analysis.small_R:
+            btag_wps += flags.Analysis.small_R.btag_extra_wps
 
-    for tagger_wp in btag_wps:
-        tagger, btag_wp = tagger_wp.split("_", 1)
-        configSeq += makeConfig(
-            'FlavourTagging',
-            f'{drop_sys(allcalib_name)}.{tagger_wp}'
-        )
-        configSeq.setOptionValue('.btagger', tagger)
-        configSeq.setOptionValue('.btagWP', btag_wp)
-        configSeq.setOptionValue('.kinematicSelection', True)
-        if 'btagCDI' in flags.Analysis.small_R:
-            configSeq.setOptionValue('.bTagCalibFile', flags.Analysis.small_R.btagCDI)
-        # if GN2 in tagger name overwrite the CDI
-        if "GN2" in tagger:
-            configSeq.setOptionValue('.bTagCalibFile',
-                'xAODBTaggingEfficiency/13p6TeV/2023-22-13p6TeV-MC21-CDI_Test_2023-08-1_v1.root') # noqa
+        for tagger_wp in btag_wps:
+            tagger, btag_wp = tagger_wp.split("_", 1)
+            configSeq += makeConfig(
+                'FlavourTagging',
+                f'{drop_sys(allcalib_name)}.{tagger_wp}'
+            )
+            configSeq.setOptionValue('.btagger', tagger)
+            configSeq.setOptionValue('.btagWP', btag_wp)
+            configSeq.setOptionValue('.kinematicSelection', True)
+            if 'btagCDI' in flags.Analysis.small_R:
+                configSeq.setOptionValue(
+                    '.bTagCalibFile',
+                    flags.Analysis.small_R.btagCDI
+                )
+            # if GN2 in tagger name overwrite the CDI
+            if "GN2" in tagger:
+                configSeq.setOptionValue(
+                    '.bTagCalibFile',
+                    'xAODBTaggingEfficiency/13p6TeV/'
+                    '2023-22-13p6TeV-MC21-CDI_Test_2023-08-1_v1.root'
+                ) # noqa
 
-        # makeFTagAnalysisSequence(
-        #     jet_sequence,
-        #     flags.Analysis.DataType,
-        #     jetCollection=jet_btag_name,
-        #     btagWP=btag_wp,
-        #     btagger=tagger,
-        #     generator="Pythia8",
-        #     minPt=20000,
-        #     postfix=f"{jet_btag_name}_{tagger_wp}",
-        #     preselection=None,
-        #     kinematicSelection=True,
-        #     noEfficiency=False,
-        #     legacyRecommendations=False,
-        #     enableCutflow=False,
-        # )
-
-    # Run this by default, but will fail if muon and btag calib sequences not run
-    # TODO: Add a toggle?
-    if flags.Analysis.do_muons:
-        # Pick a reasonable b-tag selection?
-        makeBJetPtCalibrationConfig(
-            configSeq,
-            drop_sys(flags.Analysis.container_names.allcalib.reco4PFlowJet),
-        )
-        configSeq.setOptionValue(
-            '.muonName',
-            drop_sys(flags.Analysis.container_names.output.muons),
-        )
-        configSeq.setOptionValue(
-            '.btagSelDecor',
-            "ftag_select_" + flags.Analysis.small_R.btag_wp,
-        )
+        # Run this by default, but will fail if muon and btag calib sequences not run
+        # TODO: Add a toggle?
+        if flags.Analysis.do_muons:
+            # Pick a reasonable b-tag selection?
+            makeBJetPtCalibrationConfig(
+                configSeq,
+                drop_sys(allcalib_name),
+            )
+            configSeq.setOptionValue(
+                '.muonName',
+                drop_sys(flags.Analysis.container_names.output.muons),
+            )
+            configSeq.setOptionValue(
+                '.btagSelDecor',
+                "ftag_select_" + flags.Analysis.small_R.btag_wp,
+            )
 
     # Add systematic object links
     configSeq += makeConfig(
@@ -115,8 +112,9 @@ def jet_sequence(
     # Apply selection as view container
 
     # Declare the connections between the allcalib and output containers
-    output_name = flags.Analysis.container_names.output.reco4PFlowJet
-    input_name = flags.Analysis.container_names.input.reco4PFlowJet
+    output_name = flags.Analysis.container_names.output[jet_type]
+    input_name = flags.Analysis.container_names.input[jet_type]
+
     makeViewSelectionConfig(
         configSeq,
         drop_sys(output_name),

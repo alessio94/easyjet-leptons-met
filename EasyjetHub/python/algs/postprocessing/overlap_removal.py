@@ -13,6 +13,12 @@ def overlap_sequence(flags):
     ):
         raise ValueError('Overlap removal only works with one Large R collection')
 
+    if flags.Analysis.do_small_R_jets:
+        if flags.Analysis.small_R.jet_type not in {'reco4PFlowJet','reco4EMTopoJet'}:
+            raise ValueError(
+                "Specified small-R jet type is invalid"
+            )
+
     # TODO: May want to make these configurable
     container_names = flags.Analysis.container_names
 
@@ -37,16 +43,20 @@ def overlap_sequence(flags):
             selection = ORselections[objtype]
             preOR_collections[objtype] = f'{collname}.{selection}'
 
-    # Jets have different flag naming conventions
-    if flags.Analysis.do_small_R_jets:
-        preOR_collections['jets'] = drop_sys(container_names.output.reco4PFlowJet)
-
     # For the benefit of the view container creation
     original_names = {
         objtype:flags.Analysis.container_names.input[objtype]
         for objtype in ['electrons','photons','muons','taus']
     }
-    original_names['jets'] = flags.Analysis.container_names.input.reco4PFlowJet
+
+    # Jets have different flag naming conventions
+    if flags.Analysis.do_small_R_jets:
+        preOR_collections['jets'] = drop_sys(
+            container_names.output[flags.Analysis.small_R.jet_type]
+        )
+        original_names['jets'] = flags.Analysis.container_names.input[
+            flags.Analysis.small_R.jet_type
+        ]
 
     # Large-R jets need more special handling
     if flags.Analysis.do_large_R_Topo_jets:
@@ -58,7 +68,7 @@ def overlap_sequence(flags):
         preOR_collections['fatJets'] = (
             drop_sys(flags.Analysis.container_names.output.reco10UFOJet)
         )
-        original_names['fatJets'] = flags.Analysis.container_names.input.reco10TopoJet
+        original_names['fatJets'] = flags.Analysis.container_names.input.reco10UFOJet
 
     # Include, and then set up the overlap analysis algorithm config:
     configSeq += makeConfig('OverlapRemoval', None)

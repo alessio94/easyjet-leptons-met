@@ -4,7 +4,7 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 
 def btag_decor_cfg(flags):
     # Could make this configurable
-    jetcoll = flags.Analysis.container_names.input.reco4PFlowJet
+    jetcoll = flags.Analysis.container_names.input[flags.Analysis.small_R.jet_type]
     cfg = ComponentAccumulator()
     btag_vars = [
         "DL1dv01_pb",
