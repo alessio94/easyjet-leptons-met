@@ -16,6 +16,13 @@ def validate_do_obj_flags(flags):
         assert flags.Analysis.do_small_R_jets, (
             "MET requires small R jets to be run"
         )
+    if flags.Analysis.do_photons:
+        assert flags.Analysis.PhotonID, (
+            "Photons require ID working point e.g. PhotonID: 'Tight'"
+        )
+        assert flags.Analysis.PhotonIso, (
+            "Photons require isolation working point e.g. PhotonIso: 'FixedCutLoose'"
+        )
 
 
 def validate_do_write_obj_flags(flags, tree_flags):

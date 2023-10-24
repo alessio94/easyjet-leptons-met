@@ -21,6 +21,8 @@ def photon_sequence(flags, configAcc):
     #     enableCutflow=False,
     #     enableKinematicHistograms=False,
 
+    PhotonWPLabel = "%s_%s" % (flags.Analysis.PhotonID, flags.Analysis.PhotonIso)
+
     configSeq = ConfigSequence()
 
     # Temporary hack, we should do this in a more systematic way
@@ -30,9 +32,11 @@ def photon_sequence(flags, configAcc):
 
     # PID configuration
     configSeq.setOptionValue('.recomputeIsEM', False)
-    configSeq += makeConfig('Photons.Selection', output_name + '.tight')
-    configSeq.setOptionValue('.qualityWP', 'Tight')
-    configSeq.setOptionValue('.isolationWP', 'FixedCutTight')
+    configSeq += makeConfig('Photons.Selection', output_name + '.' + PhotonWPLabel)
+    configSeq.setOptionValue('.qualityWP', flags.Analysis.PhotonID)
+    configSeq.setOptionValue('.isolationWP', flags.Analysis.PhotonIso)
+    if (flags.Analysis.PhotonIso == "NonIso"):
+        configSeq.setOptionValue('.noEffSF', True)
 
     # Kinematic selection
     configSeq += makeConfig('Selection.PtEta', output_name)
@@ -48,10 +52,10 @@ def photon_sequence(flags, configAcc):
     # Add working point selection
     makeViewSelectionConfig(
         configSeq,
-        'tight' + output_name,
+        PhotonWPLabel + output_name,
         input=output_name,
         original=flags.Analysis.container_names.input.photons,
-        selection='tight'
+        selection=PhotonWPLabel
     )
 
     return configSeq
