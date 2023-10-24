@@ -21,9 +21,9 @@ git clone --recursive ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 ```
 Note the `--recursive` argument, which is needed to get the submodules in the package.
 
-### Installation as developper
+### Installation as developer
 
-In case you want to make some developments to the sofwtare itself, we recomand you to:
+In case you want to make some developments to the software itself, we recommend you to:
 1. Fork the branch using [this link](https://gitlab.cern.ch/easyjet/easyjet/-/forks/new). Please remember to put your username in the Project URL.
 2. Clone the repository and set it as upstream:
 ``` git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git ```
@@ -35,6 +35,7 @@ git fetch origin
 ```
 
 For each development do:
+
 4. Update the master (if you haven't done it since a while):
 ```
 git checkout master
@@ -54,7 +55,7 @@ git push -f origin YourNewFavoriteBranch
 ```
 Please favour `rebase` over `merge` as it can badly affect the commit history. By default `git pull`, will use merge, unless you provide the explicit `--rebase` option.
 
-And repeat 4 - 7 as many times as necessary up until the analyis is published.
+And repeat 4 - 7 as many times as necessary up until the analysis is published.
 
 ### How to compile
 
@@ -83,7 +84,7 @@ When changing branches with `git checkout` or `git switch`, also be sure to use 
 
 # Running on files
 
-To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example runconfig `easyjet/EasyjetHub/share/RunConfig.yaml`.:
+To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example run config `easyjet/EasyjetHub/share/RunConfig.yaml`.:
 
 ```
 easyjet-ntupler data.myinputfile.DAOD_PHYS.pool.root --run-config [path-to-runconfig] --evtMax 10 --out-file analysis-variables.root
