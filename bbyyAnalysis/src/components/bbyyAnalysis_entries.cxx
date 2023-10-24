@@ -1,5 +1,5 @@
 #include "../BaselineVarsyybbAlg.h"
+#include "../SelectionFlagsyybbAlg.h"
 
-using namespace HHBBYY;
-
-DECLARE_COMPONENT(BaselineVarsyybbAlg)
+DECLARE_COMPONENT(HHBBYY::BaselineVarsyybbAlg)
+DECLARE_COMPONENT(HHBBYY::SelectionFlagsyybbAlg)

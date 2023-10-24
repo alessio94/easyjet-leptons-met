@@ -10,7 +10,9 @@ add_compile_options(-Werror)
 # Build the Athena component library
 atlas_add_component(bbyyAnalysis
   src/BaselineVarsyybbAlg.cxx
+  src/SelectionFlagsyybbAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
+  src/CutManager.cxx
   LINK_LIBRARIES
   AthenaBaseComps
   AsgTools

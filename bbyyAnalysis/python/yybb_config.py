@@ -94,8 +94,21 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             photonContainerInKey="yybbAnalysisPhotons",
             smallRJets_BTag_ContainerInKey="yybbAnalysisJets_BTag",
             smallRJets_ContainerInKey="yybbAnalysisJets",
+            isMC=flags.Input.isMC
+        )
+    )
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBYY.SelectionFlagsyybbAlg(
+            "SelectionFlagsyybbAlg",
+            photonContainerInKey="yybbAnalysisPhotons",
+            smallRJets_BTag_ContainerInKey="yybbAnalysisJets_BTag",
+            smallRJets_ContainerInKey="yybbAnalysisJets",
             muonContainerInKey="yybbAnalysisMuons",
             electronContainerInKey="yybbAnalysisElectrons",
+            cutList=flags.Analysis.CutList,
+            saveCutFlow=flags.Analysis.save_yybb_cutflow,
+            photonTriggers=flags.Analysis.TriggerChains
         )
     )
 
@@ -104,17 +117,6 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
 
 def yybb_branches(flags):
     branches = []
-
-    variables = [
-        "N_LOOSE_PHOTONS", "TWO_TIGHTID_PHOTONS", "TWO_ISO_PHOTONS",
-        "PASS_RELPT_CUT", "MASSCUT", "isPassed","N_LEPTONS_CUT",
-        "LESS_THAN_SIX_CENTRAL_JETS","EXACTLY_TWO_B_JETS"
-    ]
-
-    if (flags.Analysis.do_yybb_cutflow):
-        for var in variables:
-            var_str = "EventInfo.%s -> %s" % (var, var)
-            branches.append(var_str)
 
     # Photons
     photon_kinematics = ["pt", "eta", "phi", "E"]
@@ -131,7 +133,7 @@ def yybb_branches(flags):
         branches.append(var_str)
 
     # BJets
-    btag_variables = ["pt", "eta", "phi", "E"]
+    btag_variables = ["pt", "eta", "phi", "E", "HadronConeExclTruthLabelID"]
     btag_pt_ords = ["B1", "B2"]
     for pt_ord in btag_pt_ords:
         for kin in btag_variables:
@@ -157,5 +159,15 @@ def yybb_branches(flags):
     for var in mva_variables:
         var_str = "EventInfo.%s -> %s" % (var, var)
         branches.append(var_str)
+
+    branches.append("EventInfo.PassAllCuts -> PassAllCuts")
+
+    if (flags.Analysis.save_yybb_cutflow):
+
+        cutList = flags.Analysis.CutList
+
+        for cut in cutList:
+            cut_str = "EventInfo.%s -> %s" % (cut, cut)
+            branches.append(cut_str)
 
     return branches

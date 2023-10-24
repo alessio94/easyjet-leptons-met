@@ -14,8 +14,6 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
-#include <xAODEgamma/ElectronContainer.h>
-#include <xAODMuon/MuonContainer.h>
 
 namespace HHBBYY
 {
@@ -38,8 +36,6 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    CP::SysListHandle m_systematicsList {this};
-
     SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer> >
     m_smallRJets_BTag_ContainerInKey{ this, "smallRJets_BTag_ContainerInKey",
                             "",   "containerName to read" };
@@ -53,34 +49,13 @@ private:
     m_photonContainerInKey{ this, "photonContainerInKey",
                             "",   "containerName to read" };
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::MuonContainer> >
-    m_muonContainerInKey{ this, "muonContainerInKey",
-                            "",   "containerName to read" };
-
-    SG::ReadHandleKey<ConstDataVector<xAOD::ElectronContainer> >
-    m_electronContainerInKey{ this, "electronContainerInKey",
-                            "",   "containerName to read" };
-
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
       this, "EventInfoKey", "EventInfo", "EventInfo container to dump"
     };
 
+    bool m_isMC;
     std::unordered_map<std::string, SG::AuxElement::Decorator<float> > m_decos;
     std::vector<std::string> m_vars{
-      // Cut flow
-      "TWO_LOOSE_PHOTONS",
-      "N_LOOSE_PHOTONS",
-      "TWO_TIGHTID_PHOTONS",
-      "TWO_ISO_PHOTONS",
-      "PASS_RELPT_CUT",
-      "MASSCUT",
-      //Nlep=0 cut
-      "N_LEPTONS_CUT",
-      //Jets cut
-      "LESS_THAN_SIX_CENTRAL_JETS",
-      "EXACTLY_TWO_B_JETS",
-      //Passed event through all cuts.
-      "isPassed",
 
       // Leading/Subleading photon kinematics
       "Leading_Photon_pt", "Leading_Photon_eta", "Leading_Photon_phi", "Leading_Photon_E",
@@ -88,7 +63,7 @@ private:
 
       "myy", "pTyy", "dRyy", "Etayy", "Phiyy",
 
-      // Leading/Subleading jet kinematics
+      // Leading/Subleading b-tagged jet kinematics
       "Jet_pt_B1", "Jet_eta_B1", "Jet_phi_B1", "Jet_E_B1",
       "Jet_pt_B2", "Jet_eta_B2", "Jet_phi_B2", "Jet_E_B2", 
       "mBB", "pTBB", "dRBB", "EtaBB", "PhiBB",
@@ -97,7 +72,11 @@ private:
       "mBByy", "pTBByy", "dRBByy", "EtaBByy", "PhiBByy", "mBByy_star",
 
       // mva variables
-      "Ht"
+      "Ht",
+
+      // Flavour of Truth B-tagged Leading/Subleading jets.   
+      "Jet_HadronConeExclTruthLabelID_B1","Jet_HadronConeExclTruthLabelID_B2"
+
     };
 
   };
