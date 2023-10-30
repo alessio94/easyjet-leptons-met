@@ -1,0 +1,4 @@
+include: bbVVAnalysis/bbVV-base-config.yaml
+# Replace container names with PHYSLITE ones
+container_names:
+    include: EasyjetHub/container-names-DAOD_PHYSLITE.yaml
