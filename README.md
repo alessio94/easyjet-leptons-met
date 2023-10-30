@@ -4,11 +4,12 @@ An AthAnalysis framework, focusing on physics analysis combining runs 2 and 3.
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for instructions on modifying this code.
 
-For questions, join the EasyJet MM team [here](https://mattermost.web.cern.ch/signup_user_complete/?id=zqgsdao6sffjum15jm11y65gkh&md=link&sbr=su).
+For questions, [join the EasyJet MM team](https://mattermost.web.cern.ch/signup_user_complete/?id=zqgsdao6sffjum15jm11y65gkh&md=link&sbr=su).
 - FW and NTUP users: [easyjet FW](https://mattermost.web.cern.ch/easyjet/channels/easyjet-fw).
 - FW developers and notifications: [easyjet dev](https://mattermost.web.cern.ch/easyjet/channels/easyjet-dev).
+- Major HH decay channels have a corresponding mattermost channel, e.g. bbbb, bbtautau, etc.
 
-Meetings will be held on demand, generally 1 pm Friday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/).
+Meetings will be biweekly at 5 pm on Tuesday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/) or [the dihiggs subgroup indico](https://indico.cern.ch/category/10816/), and announced on the e-group [atlas-phys-hdbs-dihiggs-hhframework@cern.ch](https://e-groups.cern.ch/e-groups/Egroup.do?egroupName=atlas-phys-hdbs-dihiggs-hhframework)
 
 # Installation
 
