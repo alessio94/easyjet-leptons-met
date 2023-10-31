@@ -40,7 +40,7 @@ For each development do:
 4. Update the master (if you haven't done it since a while):
 ```
 git checkout master
-git pull --rebase upstream/master
+git pull --rebase upstream master
 ```
 5. Now you can create a new branch:
 ``` git checkout -b YourNewFavoriteBranch ```
@@ -50,7 +50,7 @@ git pull --rebase upstream/master
 6. Once your changes are done you can create a Merge Request (make sure you merge onto the upstream master)
 7. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
 ```
-git pull --rebase upstream/master
+git pull --rebase upstream master
 # Fix potential conflicts
 git push -f origin YourNewFavoriteBranch
 ```
