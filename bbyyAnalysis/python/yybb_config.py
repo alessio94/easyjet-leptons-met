@@ -6,13 +6,11 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 
 def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
-
-    # photons
     cfg.addEventAlgo(
         CompFactory.Easyjet.PhotonSelectorAlg(
             "PhotonSelectorAlg",
             containerInKey=photonkey,
-            containerOutKey="yybbAnalysisPhotons",
+            containerOutKey="yybbAnalysisPhotons_%SYS%",
             LeadPho_ptOverMyy_min=-1,  # pT/myy
             SubleadPho_ptOverMyy_min=-1,  # pT/myy
             etaBounds=[
@@ -30,7 +28,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
             containerInKey=muonkey,
-            containerOutKey="yybbAnalysisMuons",
+            containerOutKey="yybbAnalysisMuons_%SYS%",
             minPt=10e3,
             maxEta=2.7,
             truncateAtAmount=-1,  # -1 means keep all
@@ -44,7 +42,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
             containerInKey=electronkey,
-            containerOutKey="yybbAnalysisElectrons",
+            containerOutKey="yybbAnalysisElectrons_%SYS%",
             minPt=10e3,
             minEtaVeto=1.37,
             maxEtaVeto=1.52,
@@ -58,9 +56,9 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
 
     cfg.addEventAlgo(
         CompFactory.Easyjet.JetSelectorAlg(
-            "SmallRJet_BTag_SelectorAlg",
+            "JetBTag_SelectorAlg",
             containerInKey=smalljetkey,
-            containerOutKey="yybbAnalysisJets_BTag",
+            containerOutKey="yybbAnalysisJets_BTag_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
             minPt=25e3,
             maxEta=2.5,
@@ -74,9 +72,9 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
 
     cfg.addEventAlgo(
         CompFactory.Easyjet.JetSelectorAlg(
-            "SmallRJet_SelectorAlg",
+            "JetSelectorAlg",
             containerInKey=smalljetkey,
-            containerOutKey="yybbAnalysisJets",
+            containerOutKey="yybbAnalysisJets_%SYS%",
             bTagWPDecorName="",
             minPt=25e3,
             maxEta=4.4,
@@ -90,10 +88,10 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
 
     cfg.addEventAlgo(
         CompFactory.HHBBYY.BaselineVarsyybbAlg(
-            "FinalVarsyybbAlg",
-            photonContainerInKey="yybbAnalysisPhotons",
-            smallRJets_BTag_ContainerInKey="yybbAnalysisJets_BTag",
-            smallRJets_ContainerInKey="yybbAnalysisJets",
+            "BaselineVarsyybbAlg",
+            photons="yybbAnalysisPhotons_%SYS%",
+            bjets="yybbAnalysisJets_BTag_%SYS%",
+            jets="yybbAnalysisJets_%SYS%",
             isMC=flags.Input.isMC
         )
     )
@@ -101,11 +99,11 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     cfg.addEventAlgo(
         CompFactory.HHBBYY.SelectionFlagsyybbAlg(
             "SelectionFlagsyybbAlg",
-            photonContainerInKey="yybbAnalysisPhotons",
-            smallRJets_BTag_ContainerInKey="yybbAnalysisJets_BTag",
-            smallRJets_ContainerInKey="yybbAnalysisJets",
-            muonContainerInKey="yybbAnalysisMuons",
-            electronContainerInKey="yybbAnalysisElectrons",
+            photons="yybbAnalysisPhotons_%SYS%",
+            bjets="yybbAnalysisJets_BTag_%SYS%",
+            jets="yybbAnalysisJets_%SYS%",
+            muons="yybbAnalysisMuons_%SYS%",
+            electrons="yybbAnalysisElectrons_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_yybb_cutflow,
             photonTriggers=flags.Analysis.TriggerChains
@@ -123,51 +121,45 @@ def yybb_branches(flags):
     pt_ords = ["Leading", "Subleading"]
     for pt_ord in pt_ords:
         for kin in photon_kinematics:
-            v = "EventInfo.%s_Photon_%s -> %s_Photon_%s" % \
-                (pt_ord,  kin, pt_ord,  kin)
-            branches += [v]
+            branches += [f"EventInfo.{pt_ord}_Photon_{kin}_%SYS% -> %SYS%_{pt_ord}_Photon_{kin}"]  # noqa
+
+    branches += ["EventInfo.nPhotons_%SYS% -> %SYS%_nPhotons"]
 
     diphoton_variables = ["myy", "pTyy", "dRyy", "Etayy", "Phiyy"]
     for var in diphoton_variables:
-        var_str = "EventInfo.%s -> %s" % (var, var)
-        branches.append(var_str)
+        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
     # BJets
-    btag_variables = ["pt", "eta", "phi", "E", "HadronConeExclTruthLabelID"]
-    btag_pt_ords = ["B1", "B2"]
+    btag_variables = ["pt", "eta", "phi", "E", "truthLabel"]
+    btag_pt_ords = ["b1", "b2"]
     for pt_ord in btag_pt_ords:
         for kin in btag_variables:
-            v = "EventInfo.Jet_%s_%s -> Jet_%s_%s" % \
-                (kin, pt_ord, kin, pt_ord)
-            branches += [v]
+            branches += [f"EventInfo.Jet_{kin}_{pt_ord}_%SYS% -> %SYS%_Jet_{kin}_{pt_ord}"]  # noqa
 
-    dibjet_variables = ["mBB", "pTBB", "dRBB", "EtaBB", "PhiBB"]
+    branches += ["EventInfo.nJets_%SYS% -> %SYS%_nJets"]
+    branches += ["EventInfo.nBJets_%SYS% -> %SYS%_nBJets"]
+
+    dibjet_variables = ["mbb", "pTbb", "dRbb", "Etabb", "Phibb"]
     for var in dibjet_variables:
-        var_str = "EventInfo.%s -> %s" % (var, var)
-        branches.append(var_str)
+        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
     # di-higgs variables
     dihiggs_variables = [
-        "mBByy", "pTBByy", "EtaBByy", "PhiBByy", "dRBByy", "mBByy_star"
+        "mbbyy", "pTbbyy", "Etabbyy", "Phibbyy", "dRbbyy", "mbbyy_star"
     ]
     for var in dihiggs_variables:
-        var_str = "EventInfo.%s -> %s" % (var, var)
-        branches.append(var_str)
+        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
     # mva variables
-    mva_variables = ["Ht"]
+    mva_variables = ["HT"]
     for var in mva_variables:
-        var_str = "EventInfo.%s -> %s" % (var, var)
-        branches.append(var_str)
+        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
-    branches.append("EventInfo.PassAllCuts -> PassAllCuts")
+    branches += ["EventInfo.PassAllCuts_%SYS% -> %SYS%_PassAllCuts"]
 
     if (flags.Analysis.save_yybb_cutflow):
-
         cutList = flags.Analysis.CutList
-
         for cut in cutList:
-            cut_str = "EventInfo.%s -> %s" % (cut, cut)
-            branches.append(cut_str)
+            branches += [f"EventInfo.{cut}_%SYS% -> %SYS%_{cut}"]
 
     return branches

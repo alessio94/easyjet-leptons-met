@@ -17,131 +17,161 @@ namespace HHBBYY
 
   StatusCode BaselineVarsyybbAlg::initialize()
   {
-    ATH_CHECK(m_smallRJets_BTag_ContainerInKey.initialize());
-    ATH_CHECK(m_smallRJets_ContainerInKey.initialize());
-    ATH_CHECK(m_photonContainerInKey.initialize());
-    ATH_CHECK(m_EventInfoKey.initialize());
+    ATH_MSG_INFO("*********************************\n");
+    ATH_MSG_INFO("       BaselineVarsyybbAlg       \n");
+    ATH_MSG_INFO("*********************************\n");
 
-    for (const std::string &var : m_vars)
-    {
-      std::string deco_var = var; 
-      SG::AuxElement::Decorator<float> deco(deco_var);
-      m_decos.emplace(deco_var, deco);
-    };
+    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+
+    for (const std::string &string_var: m_Fvarnames) {
+      CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
+      m_Fbranches.emplace(string_var, var);
+      ATH_CHECK (m_Fbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
+    }
+
+    for (const std::string &string_var: m_Ivarnames) {
+      CP::SysWriteDecorHandle<int> var {string_var+"_%SYS%", this};
+      m_Ibranches.emplace(string_var, var);
+      ATH_CHECK (m_Ibranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
+    }
+
+    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
   }
 
   StatusCode BaselineVarsyybbAlg::execute()
   {
-    // container we read in
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    ATH_CHECK(eventInfo.isValid());
-
-    static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
-
-    for (const std::string &var : m_vars)
+    // Loop over all systs
+    for (const auto& sys : m_systematicsList.systematicsVector())
     {
-      std::string deco_var = var; 
-      m_decos.at(deco_var)(*eventInfo) = -99.; 
-    };
+      // container we read in
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-    double Ht = 0; // scalar sum of jet pT
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRJets_BTag(
-       m_smallRJets_BTag_ContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRJets(
-       m_smallRJets_ContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::PhotonContainer> > photons_(
-        m_photonContainerInKey);
+      const xAOD::JetContainer *bjets = nullptr;
+      ANA_CHECK (m_bjetHandle.retrieve (bjets, sys));
 
-    ConstDataVector<xAOD::JetContainer> btag_jets = *smallRJets_BTag;
-    ConstDataVector<xAOD::PhotonContainer> photons = *photons_;
+      const xAOD::PhotonContainer *photons = nullptr;
+      ANA_CHECK (m_photonHandle.retrieve (photons, sys));
 
-    ATH_CHECK(smallRJets_BTag.isValid());
-    ATH_CHECK(smallRJets.isValid());
-    ATH_CHECK(photons_.isValid());
+      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
-    TLorentzVector H_BB;
-    TLorentzVector H_yy;
-    TLorentzVector H_HH;
+      // initialize
+      TLorentzVector H_bb(0.,0.,0.,0.);
+      TLorentzVector H_yy(0.,0.,0.,0.);
+      TLorentzVector HH(0.,0.,0.,0.);
+      TLorentzVector y1(0.,0.,0.,0.);
+      TLorentzVector y2(0.,0.,0.,0.);
+      TLorentzVector b1(0.,0.,0.,0.);
+      TLorentzVector b2(0.,0.,0.,0.);
 
-    // Photon sector
-    if (photons.size() >= 1)
-    {
-      // Leading photon
-      m_decos.at("Leading_Photon_pt")(*eventInfo) = photons[0]->pt();
-      m_decos.at("Leading_Photon_eta")(*eventInfo) = photons[0]->eta();
-      m_decos.at("Leading_Photon_phi")(*eventInfo) = photons[0]->phi();
-      m_decos.at("Leading_Photon_E")(*eventInfo) = photons[0]->e();
-    }
-    if (photons.size() >= 2)
-    {
-      // Subleading photon
-      m_decos.at("Subleading_Photon_pt")(*eventInfo) = photons[1]->pt();
-      m_decos.at("Subleading_Photon_eta")(*eventInfo) = photons[1]->eta();
-      m_decos.at("Subleading_Photon_phi")(*eventInfo) = photons[1]->phi();
-      m_decos.at("Subleading_Photon_E")(*eventInfo) = photons[1]->e(); 
+      int truthLabel_b1 = -99, truthLabel_b2 = -99;
+      double dRHH = -99., dRyy = -99., dRbb = -99.;
+
+      for (const std::string &string_var: m_Fvarnames) {
+        m_Fbranches.at(string_var).set(*event, -99., sys);
+      }
       
-      // build the H(yy) candidate
-      H_yy = photons[0]->p4() + photons[1]->p4();
-      m_decos.at("myy")(*eventInfo) = H_yy.M();
-      m_decos.at("pTyy")(*eventInfo) = H_yy.Pt();
-      m_decos.at("Etayy")(*eventInfo) = H_yy.Eta();
-      m_decos.at("Phiyy")(*eventInfo) = H_yy.Phi();
-      m_decos.at("dRyy")(*eventInfo) = (photons[0]->p4()).DeltaR(photons[1]->p4());
-    } // end photon
+      for (const std::string &string_var: m_Ivarnames) {
+        m_Ibranches.at(string_var).set(*event, -99, sys);
+      }
 
-    // b-jet sector
-    if (btag_jets.size()>=1)
-    {
-      m_decos.at("Jet_pt_B1")(*eventInfo) = btag_jets[0]->pt();
-      m_decos.at("Jet_eta_B1")(*eventInfo) = btag_jets[0]->eta();
-      m_decos.at("Jet_phi_B1")(*eventInfo) = btag_jets[0]->phi();
-      m_decos.at("Jet_E_B1")(*eventInfo) = btag_jets[0]->e();
+      double HT = 0.; // scalar sum of jet pT
 
-      //Get Leading B-Tagged Jet's Flavor
-      if(m_isMC)
-        m_decos.at("Jet_HadronConeExclTruthLabelID_B1")(*eventInfo) = HadronConeExclTruthLabelID(*btag_jets[0]);
+      // photon sector
+      if (photons->size() >= 1) {
+        y1 = photons->at(0)->p4();
+
+        m_Fbranches.at("Leading_Photon_pt").set(*event, y1.Pt(), sys);
+        m_Fbranches.at("Leading_Photon_eta").set(*event, y1.Eta(), sys);
+        m_Fbranches.at("Leading_Photon_phi").set(*event, y1.Phi(), sys);
+        m_Fbranches.at("Leading_Photon_E").set(*event, y1.E(), sys);
+      }
+      if (photons->size() >= 2) {
+        y2 = photons->at(1)->p4();
+
+        // Build the H(yy) candidate
+        H_yy = y1 + y2;
+        dRyy = (y1).DeltaR(y2);
+
+        m_Fbranches.at("Subleading_Photon_pt").set(*event, y2.Pt(), sys);
+        m_Fbranches.at("Subleading_Photon_eta").set(*event, y2.Eta(), sys);
+        m_Fbranches.at("Subleading_Photon_phi").set(*event, y2.Phi(), sys);
+        m_Fbranches.at("Subleading_Photon_E").set(*event, y2.E(), sys);
+
+        m_Fbranches.at("myy").set(*event, H_yy.M(), sys);
+        m_Fbranches.at("pTyy").set(*event, H_yy.Pt(), sys);
+        m_Fbranches.at("Etayy").set(*event, H_yy.Eta(), sys);
+        m_Fbranches.at("Phiyy").set(*event, H_yy.Phi(), sys);
+        m_Fbranches.at("dRyy").set(*event, dRyy, sys);
+      }
+
+      // b-jet sector
+      if (bjets->size() >= 1) {
+        b1 = bjets->at(0)->p4();
+        if (m_isMC) truthLabel_b1 = HadronConeExclTruthLabelID(*bjets->at(0));
+
+        m_Fbranches.at("Jet_pt_b1").set(*event, b1.Pt(), sys);
+        m_Fbranches.at("Jet_eta_b1").set(*event, b1.Eta(), sys);
+        m_Fbranches.at("Jet_phi_b1").set(*event, b1.Phi(), sys);
+        m_Fbranches.at("Jet_E_b1").set(*event, b1.E(), sys);
+        if (m_isMC) m_Ibranches.at("Jet_truthLabel_b1").set(*event, truthLabel_b1, sys);
+      }
+      if (bjets->size() >= 2) {
+        b2 = bjets->at(1)->p4();
+        if (m_isMC) truthLabel_b2 = HadronConeExclTruthLabelID(*bjets->at(1));
+
+        // Build the H(bb) candidate
+        H_bb = b1 + b2;
+        dRbb = (b1).DeltaR(b2);
+
+        m_Fbranches.at("Jet_pt_b2").set(*event, b2.Pt(), sys);
+        m_Fbranches.at("Jet_eta_b2").set(*event, b2.Eta(), sys);
+        m_Fbranches.at("Jet_phi_b2").set(*event, b2.Phi(), sys);
+        m_Fbranches.at("Jet_E_b2").set(*event, b2.E(), sys);
+        if (m_isMC) m_Ibranches.at("Jet_truthLabel_b2").set(*event, truthLabel_b2, sys);
+
+        m_Fbranches.at("mbb").set(*event, H_bb.M(), sys);
+        m_Fbranches.at("pTbb").set(*event, H_bb.Pt(), sys);
+        m_Fbranches.at("Etabb").set(*event, H_bb.Eta(), sys);
+        m_Fbranches.at("Phibb").set(*event, H_bb.Phi(), sys);
+        m_Fbranches.at("dRbb").set(*event, dRbb, sys);
+      }
+
+      // Build the HH candidate
+      if (photons->size() >= 2 && bjets->size() >= 2) {
+        HH = H_yy + H_bb;
+        dRHH = H_yy.DeltaR(H_bb);
+
+        m_Fbranches.at("pTbbyy").set(*event, HH.Pt(), sys);
+        m_Fbranches.at("Etabbyy").set(*event, HH.Eta(), sys);
+        m_Fbranches.at("Phibbyy").set(*event, HH.Phi(), sys);
+        m_Fbranches.at("dRbbyy").set(*event, dRHH, sys);
+
+        m_Fbranches.at("mbbyy").set(*event, HH.M(), sys);
+        m_Fbranches.at("mbbyy_star").set(*event, HH.M()-(H_bb.M()-125e3)-(H_yy.M()-125e3), sys);
+      }
+
+      // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.4
+      for (const xAOD::Jet *jet : *jets)
+      {
+        HT += jet->pt();
+      }
+      m_Fbranches.at("HT").set(*event, HT, sys);
+
+      m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
+      m_Ibranches.at("nJets").set(*event, jets->size(), sys);
+      m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
+
     }
-    if (btag_jets.size()>=2)
-    {
-      m_decos.at("Jet_pt_B2")(*eventInfo) = btag_jets[1]->pt();
-      m_decos.at("Jet_eta_B2")(*eventInfo) = btag_jets[1]->eta();
-      m_decos.at("Jet_phi_B2")(*eventInfo) = btag_jets[1]->phi();
-      m_decos.at("Jet_E_B2")(*eventInfo) = btag_jets[1]->e();
-
-      // build the H(BB) candidate
-      H_BB = btag_jets[0]->p4()+btag_jets[1]->p4();
-      m_decos.at("mBB")(*eventInfo) = H_BB.M();
-      m_decos.at("pTBB")(*eventInfo) = H_BB.Pt();
-      m_decos.at("EtaBB")(*eventInfo) = H_BB.Eta();
-      m_decos.at("PhiBB")(*eventInfo) = H_BB.Phi();
-      m_decos.at("dRBB")(*eventInfo) = (btag_jets[0]->p4()).DeltaR(btag_jets[1]->p4());
-
-      //Get Subleading B-Tagged Jet's Flavor
-      if(m_isMC)
-        m_decos.at("Jet_HadronConeExclTruthLabelID_B2")(*eventInfo) = HadronConeExclTruthLabelID(*btag_jets[1]);
-    }
-
-    // build the HH candidate
-    if (photons.size() >= 2 && btag_jets.size()>=2)
-    {
-      H_HH = H_yy + H_BB;
-      m_decos.at("mBByy")(*eventInfo) = H_HH.M();
-      m_decos.at("pTBByy")(*eventInfo) = H_HH.Pt();
-      m_decos.at("EtaBByy")(*eventInfo) = H_HH.Eta();
-      m_decos.at("PhiBByy")(*eventInfo) = H_HH.Phi();
-      m_decos.at("dRBByy")(*eventInfo) = H_yy.DeltaR(H_BB);
-      m_decos.at("mBByy_star")(*eventInfo) = H_HH.M() - (H_BB.M()-125e3) - (H_yy.M()-125e3);
-    }
-
-    // Applying central jet cuts.
-    for (const xAOD::Jet *jet : *smallRJets) // Jets here can be every type of jet (No Working point selected)
-    {
-      Ht += jet->pt();
-    }
-    m_decos.at("Ht")(*eventInfo) = Ht;
 
     return StatusCode::SUCCESS;
   }

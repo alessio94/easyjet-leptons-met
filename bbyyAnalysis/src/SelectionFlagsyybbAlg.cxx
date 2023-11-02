@@ -19,35 +19,37 @@ namespace HHBBYY
 
   StatusCode SelectionFlagsyybbAlg::initialize()
   {
-    ATH_CHECK(m_smallRJets_BTag_ContainerInKey.initialize());
-    ATH_CHECK(m_smallRJets_ContainerInKey.initialize());
-    ATH_CHECK(m_photonContainerInKey.initialize());
-    ATH_CHECK(m_muonContainerInKey.initialize());
-    ATH_CHECK(m_electronContainerInKey.initialize());
-    ATH_CHECK(m_EventInfoKey.initialize());
-
     ATH_MSG_INFO("*********************************\n");
-    ATH_MSG_INFO("Your selected list of cuts :\n");
-    for (const std::string &cut : m_inputCutList) {
-      std::string deco_cut = cut; 
-      SG::AuxElement::Decorator<float> deco(deco_cut);
-      m_decos.emplace(deco_cut, deco);
-      ATH_MSG_INFO(cut);
-    };
+    ATH_MSG_INFO("      SelectionFlagsyybbAlg      \n");
     ATH_MSG_INFO("*********************************\n");
+    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    SG::AuxElement::Decorator<float> decoPassAll("PassAllCuts");
-    m_decos.emplace("PassAllCuts", decoPassAll);
+    for (const std::string &string_var: m_inputCutList) {
+      CP::SysWriteDecorHandle<bool> var {string_var+"_%SYS%", this};
+      m_Bbranches.emplace(string_var, var);
+      ATH_CHECK (m_Bbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
+    }
+  
+    // special flag for all cuts
+    ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
 
-    yybbCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
+    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize()); 
+
+    m_yybbCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
 
     for (const std::string &cut : m_inputCutList)  { 
       // Initialize a vector of CutEntry structs based on the input Cut List
-      yybbCuts.add(cut);
+      m_yybbCuts.add(cut);
     }
 
     //After filling the CutManager, book your histograms.
-    const unsigned int nbins = yybbCuts.size() + 1; //  need an extra bin for the total num of events.
+    const unsigned int nbins = m_yybbCuts.size() + 1; //  need an extra bin for the total num of events.
     ANA_CHECK (book (TH1F ("AbsoluteEfficiency", "Absolute Efficiency of HH->yybb cuts", nbins, 0.5, nbins + 0.5))); 
     ANA_CHECK (book (TH1F ("RelativeEfficiency", "Relative Efficiency of HH->yybb cuts", nbins, 0.5, nbins + 0.5))); 
     ANA_CHECK (book (TH1F ("StandardCutFlow",       "Standard Cutflow of HH->yybb cuts", nbins, 0.5, nbins + 0.5))); 
@@ -58,94 +60,95 @@ namespace HHBBYY
 
   StatusCode SelectionFlagsyybbAlg::execute()
   {
-    //Containers that we read in
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRJets_btag(
-        m_smallRJets_BTag_ContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRJets(
-        m_smallRJets_ContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::PhotonContainer> > photons(
-        m_photonContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::MuonContainer> > muons(
-        m_muonContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::ElectronContainer> > electrons(
-        m_electronContainerInKey);
 
-    ATH_CHECK(eventInfo.isValid());
-    ATH_CHECK(smallRJets_btag.isValid());
-    ATH_CHECK(smallRJets.isValid());
-    ATH_CHECK(photons.isValid());
-    ATH_CHECK(muons.isValid());
-    ATH_CHECK(electrons.isValid());
+    // Loop over all systs
+    for (const auto& sys : m_systematicsList.systematicsVector())
+    {
+      // Retrive inputs
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-    m_total_events+=1; //Calculate total_events.
-    // Refresh CutEntry objects concerning the "passed or not" information per event.
-    for (CutEntry& cut : yybbCuts) cut.passed = false;
+      const xAOD::PhotonContainer *photons = nullptr;
+      ANA_CHECK (m_photonHandle.retrieve (photons, sys));
 
-    for (const std::string &cut : m_inputCutList) {
-      std::string deco_cut = cut; 
-      m_decos.at(deco_cut)(*eventInfo) = -99.; 
-    };
-    m_decos.at("PassAllCuts")(*eventInfo) = -99.; 
-  
-    if (!m_photonTriggers.empty()) {
-      evaluateTriggerCuts(*eventInfo,m_photonTriggers,yybbCuts);
-    }
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-    evaluatePhotonCuts(*photons, yybbCuts);
-    evaluateLeptonCuts(*electrons, *muons, yybbCuts);
-    evaluateJetCuts(*smallRJets_btag, *smallRJets, yybbCuts);
+      const xAOD::JetContainer *bjets = nullptr;
+      ANA_CHECK (m_bjetHandle.retrieve (bjets, sys));
 
-    //Assign values only to decorated cuts (cuts of input cutlist) but they should also
-    //exist in the CutManager. For instance, a trigger cut could be erased from CutManager
-    //because the specific input ntuple doesn't include the requested trigger.
-    for (const auto &cut : m_inputCutList) {
-      if(yybbCuts.exists(cut)) {
-        m_decos.at(cut)(*eventInfo) = yybbCuts(cut).passed;
-        if (yybbCuts(cut).passed)
-          yybbCuts(cut).counter+=1;
+      const xAOD::MuonContainer *muons = nullptr;
+      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+
+      const xAOD::ElectronContainer *electrons = nullptr;
+      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+      
+      // reset all cut flags to default=false
+      for (CutEntry& cut : m_yybbCuts) {
+        cut.passed = false;
+        m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
-    }
 
-    // Check how many consecutive cuts are passed by the event.
-    unsigned int consecutive_cuts = 0;
-    for (size_t i = 0; i < yybbCuts.size(); ++i) {
-      if (yybbCuts[i].passed)
-        consecutive_cuts++;
-      else
-        break;
-    }
+      if (!m_photonTriggers.empty()) {
+        evaluateTriggerCuts(*event, m_photonTriggers, m_yybbCuts);
+      }
 
-    // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
-    // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
-    for (unsigned int i=0; i<consecutive_cuts; i++) {
-      yybbCuts[i].relativeCounter+=1;
-    }
+      evaluatePhotonCuts(*photons, m_yybbCuts);
+      evaluateLeptonCuts(*electrons, *muons, m_yybbCuts);
+      evaluateJetCuts(*bjets, *jets, m_yybbCuts);
 
-    if (consecutive_cuts==yybbCuts.size()) {
-      m_decos.at("PassAllCuts")(*eventInfo) = 1;
-      yybbCuts.PassAllCuts +=1;
-    }
-    else{
-      m_decos.at("PassAllCuts")(*eventInfo) = 0;
-    }
+      bool passedall = true;
+      for (CutEntry& cut : m_yybbCuts) {
+        passedall = passedall && cut.passed;
+        m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
+      }
+      m_passallcuts.set(*event, passedall, sys);
 
+      // do the CUTFLOW only with sys="" -> NOSYS
+      if (sys.name()!="") continue;
+
+      // Compute total_events
+      m_total_events+=1; 
+
+      // Count how many cuts the event passed and increase the relative counter
+      for (const auto &cut : m_inputCutList) {
+        if(m_yybbCuts.exists(cut)) {
+          if (m_yybbCuts(cut).passed)
+            m_yybbCuts(cut).counter+=1;
+        }
+      }
+
+      // Check how many consecutive cuts are passed by the event.
+      unsigned int consecutive_cuts = 0;
+      for (size_t i = 0; i < m_yybbCuts.size(); ++i) {
+        if (m_yybbCuts[i].passed)
+          consecutive_cuts++;
+        else
+          break;
+      }
+
+      // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
+      // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
+      for (unsigned int i=0; i<consecutive_cuts; i++) {
+        m_yybbCuts[i].relativeCounter+=1;
+      }
+
+    }
 
     return StatusCode::SUCCESS;
-
   }
-
 
   StatusCode SelectionFlagsyybbAlg::finalize()
   {
 
+    //adapt the following for each syst TODO
     ATH_MSG_INFO("Total events = " << m_total_events <<std::endl);
-    yybbCuts.CheckCutResults(); // Print CheckCutResults
+    m_yybbCuts.CheckCutResults(); // Print CheckCutResults
 
     if(m_saveCutFlow) {
-      yybbCuts.DoAbsoluteEfficiency(m_total_events, hist("AbsoluteEfficiency"));
-      yybbCuts.DoRelativeEfficiency(m_total_events, hist("RelativeEfficiency"));
-      yybbCuts.DoStandardCutFlow(m_total_events, hist("StandardCutFlow"));
+      m_yybbCuts.DoAbsoluteEfficiency(m_total_events, hist("AbsoluteEfficiency"));
+      m_yybbCuts.DoRelativeEfficiency(m_total_events, hist("RelativeEfficiency"));
+      m_yybbCuts.DoStandardCutFlow(m_total_events, hist("StandardCutFlow"));
     }
     else {
       delete hist("AbsoluteEfficiency");
@@ -158,7 +161,7 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsyybbAlg::evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, const std::vector<std::string> &photonTriggers, 
+  void SelectionFlagsyybbAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &photonTriggers, 
                                                   CutManager& yybbCuts) {
 
     if (!yybbCuts.exists("PASS_TRIGGER"))
@@ -169,7 +172,7 @@ namespace HHBBYY
       std::string trigAccessorName = "trigPassed_"+trigger;
       const SG::AuxElement::ConstAccessor<bool> TriggerAccessor(trigAccessorName);
       //If the event passes any of the available (single or di-) photon triggers, set the overall trigger cut to true.
-      if (TriggerAccessor(eventInfo)) {
+      if (TriggerAccessor(event)) {
         yybbCuts("PASS_TRIGGER").passed = true;
         break;
       }
@@ -177,7 +180,7 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsyybbAlg::evaluatePhotonCuts(const ConstDataVector<xAOD::PhotonContainer>& photons, CutManager& yybbCuts)
+  void SelectionFlagsyybbAlg::evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& yybbCuts)
   {
 
     static const SG::AuxElement::ConstAccessor<char>  DFCommonPhotonsIsEMTight ("DFCommonPhotonsIsEMTight");
@@ -194,9 +197,9 @@ namespace HHBBYY
     // photon isolation and selection pT/myy
     if (photons.size() >= 2)
     {
-      myy = (photons[0]->p4() + photons[1]->p4()).M();
+      myy = (photons.at(0)->p4() + photons.at(1)->p4()).M();
 
-      for (const xAOD::Photon* photon : {photons[0], photons[1]})
+      for (const xAOD::Photon* photon : {photons.at(0), photons.at(1)})
       {
         PassIso = (photon->isolation(xAOD::Iso::topoetcone20) / photon->pt()) < 0.065 &&
                 (photon->isolation(xAOD::Iso::ptcone20) / photon->pt()) < 0.05;
@@ -217,8 +220,8 @@ namespace HHBBYY
   }
 
 
-  void SelectionFlagsyybbAlg::evaluateLeptonCuts(const ConstDataVector<xAOD::ElectronContainer>& electrons,
-                                const ConstDataVector<xAOD::MuonContainer>& muons, CutManager& yybbCuts)
+  void SelectionFlagsyybbAlg::evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
+                                const xAOD::MuonContainer& muons, CutManager& yybbCuts)
   {
 
     if (!yybbCuts.exists("EXACTLY_ZERO_LEPTONS"))
@@ -264,13 +267,13 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsyybbAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& smallRJets_btag,
-                            const ConstDataVector<xAOD::JetContainer>& smallRJets, CutManager& yybbCuts)
+  void SelectionFlagsyybbAlg::evaluateJetCuts(const xAOD::JetContainer& bjets,
+                            const xAOD::JetContainer& jets, CutManager& yybbCuts)
   {
     int CentralJets=0;
 
     ///All jets in the containers should have pT>25GeV. Check minPt of your JetSelectorAlg in the yybb_config file.
-    for (const xAOD::Jet *jet : smallRJets)
+    for (const xAOD::Jet *jet : jets)
     {// Jets here can be every type of jet (No Working point selected)
       // check if jet is central
       if(std::abs(jet->eta())<2.5)
@@ -281,16 +284,16 @@ namespace HHBBYY
       yybbCuts("LESS_THAN_SIX_CENTRAL_JETS").passed = true;
 
     // If Forward Jets + Central jets >=2 --> The event passes.
-    if (smallRJets.size() >= 2 && yybbCuts.exists("AT_LEAST_TWO_JETS"))
+    if (jets.size() >= 2 && yybbCuts.exists("AT_LEAST_TWO_JETS"))
       yybbCuts("AT_LEAST_TWO_JETS").passed = true;
 
-    if (smallRJets_btag.size()>=1 && yybbCuts.exists("AT_LEAST_ONE_B_JET"))
+    if (bjets.size()>=1 && yybbCuts.exists("AT_LEAST_ONE_B_JET"))
       yybbCuts("AT_LEAST_ONE_B_JET").passed = true;
-    if (smallRJets_btag.size()==1 && yybbCuts.exists("EXACTLY_ONE_B_JET"))
+    if (bjets.size()==1 && yybbCuts.exists("EXACTLY_ONE_B_JET"))
       yybbCuts("EXACTLY_ONE_B_JET").passed = true;
-    if (smallRJets_btag.size()>=2 && yybbCuts.exists("AT_LEAST_TWO_B_JETS"))
+    if (bjets.size()>=2 && yybbCuts.exists("AT_LEAST_TWO_B_JETS"))
       yybbCuts("AT_LEAST_TWO_B_JETS").passed = true;
-    if (smallRJets_btag.size()==2 && yybbCuts.exists("EXACTLY_TWO_B_JETS")) 
+    if (bjets.size()==2 && yybbCuts.exists("EXACTLY_TWO_B_JETS")) 
       yybbCuts("EXACTLY_TWO_B_JETS").passed = true;
 
   }
