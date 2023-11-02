@@ -1,0 +1,4 @@
+# Replace container names with PHYSLITE ones
+include: ttHH-base-config.yaml
+container_names:
+    include: EasyjetHub/container-names-DAOD_PHYSLITE.yaml
