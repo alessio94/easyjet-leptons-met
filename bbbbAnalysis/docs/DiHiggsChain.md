@@ -1,6 +1,6 @@
 # Baseline HH analysis in the `easyjet-ntupler`
 
-The resolved and boosted analyses can be turned on/off from the [bbbbAnalysis/share/RunConfig.yaml](https://gitlab.cern.ch/easyjet/easyjet/-/tree/master/bbbbAnalysis/share/RunConfig.yaml). The Configuration and the stacking of the algorithms can be found in [bbbbAnalysis/python/Algs/DiHiggsAnalysis.py](https://gitlab.cern.ch/easyjet/easyjet/-/tree/master/bbbbAnalysis/python/Algs/DiHiggsAnalysis.py). The flow diagrams depict what is happening:
+The resolved and boosted analyses can be turned on/off from the [bbbbAnalysis/share/RunConfig.yaml](https://gitlab.cern.ch/easyjet/easyjet/-/tree/min/bbbbAnalysis/share/RunConfig.yaml). The Configuration and the stacking of the algorithms can be found in [bbbbAnalysis/python/Algs/DiHiggsAnalysis.py](https://gitlab.cern.ch/easyjet/easyjet/-/tree/main/bbbbAnalysis/python/Algs/DiHiggsAnalysis.py). The flow diagrams depict what is happening:
 
 ### resolved
 

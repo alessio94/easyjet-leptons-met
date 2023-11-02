@@ -100,6 +100,6 @@ If you would like to update the `yybb` analysis package, start from [yybb dev](h
 
 ## Package structure
 
-The main file which defines the `yybb` part of the easyjet sequence is `easyjet/bbyyAnalysis/python/yybb_config.py`. It is here that the [`PhotonSelectorAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/master/EasyjetHub/src/PhotonSelectorAlg.cxx) and [`JetSelectorAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/master/EasyjetHub/src/JetSelectorAlg.cxx) are called from `EasyjetHub` (because they are not `yybb` specific packages). These are run with `yybb` parameters and the output collections are saved.
+The main file which defines the `yybb` part of the easyjet sequence is `easyjet/bbyyAnalysis/python/yybb_config.py`. It is here that the [`PhotonSelectorAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/main/EasyjetHub/src/PhotonSelectorAlg.cxx) and [`JetSelectorAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/main/EasyjetHub/src/JetSelectorAlg.cxx) are called from `EasyjetHub` (because they are not `yybb` specific packages). These are run with `yybb` parameters and the output collections are saved.
 
-These are then input to [`BaselineVarsyybbAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/master/bbyyAnalysis/src/BaselineVarsyybbAlg.cxx), where these input collections are used to compute final variables saved in the TTree.
+These are then input to [`BaselineVarsyybbAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/main/bbyyAnalysis/src/BaselineVarsyybbAlg.cxx), where these input collections are used to compute final variables saved in the TTree.

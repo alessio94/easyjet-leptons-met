@@ -16,7 +16,7 @@ cfg = ComponentAccumulator()
     )
 ```
 
-The first entry needs to be unique, so athena knows which algorithm to run. Algorithms described with a `containerInKey` option, take a `xAOD::JetContainer`, do some operations with these jets and write another `xAOD::JetContainer` object holding the jets of interest to the StoreGate (the interface to load/write xAOD objects) with the name `containerOutKey`. The output container is written in `VIEW_ELEMENTS` mode, meaning that that the jets of interest are pointers to the jets from the input container, so that existing info is referenced and not duplicated in memory. All implementations can be found in [bbbbAnalysis/src/](https://gitlab.cern.ch/easyjet/easyjet/-/tree/master/bbbbAnalysis/src). Examples of these algorithms in place can be found in [docs/DiHiggsChain.md](https://gitlab.cern.ch/easyjet/easyjet/-/tree/master/docs/DiHiggsChain.md).
+The first entry needs to be unique, so athena knows which algorithm to run. Algorithms described with a `containerInKey` option, take a `xAOD::JetContainer`, do some operations with these jets and write another `xAOD::JetContainer` object holding the jets of interest to the StoreGate (the interface to load/write xAOD objects) with the name `containerOutKey`. The output container is written in `VIEW_ELEMENTS` mode, meaning that that the jets of interest are pointers to the jets from the input container, so that existing info is referenced and not duplicated in memory. All implementations can be found in [bbbbAnalysis/src/](https://gitlab.cern.ch/easyjet/easyjet/-/tree/main/bbbbAnalysis/src). Examples of these algorithms in place can be found in [docs/DiHiggsChain.md](https://gitlab.cern.ch/easyjet/easyjet/-/tree/main/docs/DiHiggsChain.md).
 &nbsp;
 &nbsp;
 

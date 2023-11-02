@@ -37,20 +37,20 @@ git fetch origin
 
 For each development do:
 
-4. Update the master (if you haven't done it since a while):
+4. Update the main branch (if you haven't done it since a while):
 ```
-git checkout master
-git pull --rebase upstream master
+git checkout main
+git pull --rebase upstream main
 ```
 5. Now you can create a new branch:
 ``` git checkout -b YourNewFavoriteBranch ```
     - Alternatively you can checkout an existing branch on your fork by doing
     ``` git checkout YourExisitingBranch ```
     (don't use origin/YourExisitingBranch).
-6. Once your changes are done you can create a Merge Request (make sure you merge onto the upstream master)
+6. Once your changes are done you can create a Merge Request (make sure you merge onto the upstream main)
 7. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
 ```
-git pull --rebase upstream master
+git pull --rebase upstream main
 ```
 Then fix the potential conflicts and push to the current branch:
 ```
