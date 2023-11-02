@@ -252,10 +252,10 @@ namespace HHBBYY
     {
       bool PassMuonIso = 0;
       bool PassMuonMedium = 0;
-      /*Loose_VarRad WP based on
+      /*PflowLoose_VarRad WP based on
       https://twiki.cern.ch/twiki/bin/view/AtlasProtected/RecommendedIsolationWPsRel22#Muon_isolation_working_points*/
-      PassMuonIso = muon->isolation(xAOD::Iso::topoetcone20)/muon->pt() < 0.30 &&  
-                      muon->isolation(xAOD::Iso::ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt1000)/muon->pt() < 0.15 ;
+      PassMuonIso = 	( muon->isolation(xAOD::Iso::ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt500) 
+                      + 0.4*muon->isolation(xAOD::Iso::neflowisol20) ) / muon->pt() < 0.16;
       PassMuonMedium = DFCommonMuonPassIDCuts(*muon) && DFCommonMuonPassPreselection(*muon);
       if (PassMuonIso && PassMuonMedium)
         n_leptons+=1;
