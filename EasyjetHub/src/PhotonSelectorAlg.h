@@ -49,6 +49,9 @@ private:
     // \brief Setup syst-aware input decorations
     CP::SysReadDecorHandle<char> m_isLoose {"DFCommonPhotonsIsEMLoose", this};
 
+    // Photin cleaning
+    CP::SysReadDecorHandle<char> m_isClean {"DFCommonPhotonsCleaning", this};
+
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::PhotonContainer>>
     m_outHandle{ this, "containerOutKey", "",   "Photon container to write" };
