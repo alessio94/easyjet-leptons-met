@@ -22,7 +22,10 @@ namespace HHBBYY
     ATH_MSG_INFO("*********************************\n");
 
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+    }
+
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
@@ -56,9 +59,6 @@ namespace HHBBYY
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-      const xAOD::JetContainer *bjets = nullptr;
-      ANA_CHECK (m_bjetHandle.retrieve (bjets, sys));
-
       const xAOD::PhotonContainer *photons = nullptr;
       ANA_CHECK (m_photonHandle.retrieve (photons, sys));
 
@@ -84,7 +84,26 @@ namespace HHBBYY
         m_Ibranches.at(string_var).set(*event, -99, sys);
       }
 
+      int nCentralJets = 0;
       double HT = 0.; // scalar sum of jet pT
+
+      bool WPgiven = !m_isBtag.empty();
+      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      for(const xAOD::Jet* jet : *jets) {
+        // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.4
+        HT += jet->pt();
+
+        // count central jets
+        if (std::abs(jet->eta())<2.5) {
+          nCentralJets++;
+        }
+
+        // check if jet is btagged
+        if (WPgiven) {
+          if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+        }
+      }
+
 
       // photon sector
       if (photons->size() >= 1) {
@@ -160,15 +179,11 @@ namespace HHBBYY
         m_Fbranches.at("mbbyy_star").set(*event, HH.M()-(H_bb.M()-125e3)-(H_yy.M()-125e3), sys);
       }
 
-      // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.4
-      for (const xAOD::Jet *jet : *jets)
-      {
-        HT += jet->pt();
-      }
       m_Fbranches.at("HT").set(*event, HT, sys);
 
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
+      m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
 
     }

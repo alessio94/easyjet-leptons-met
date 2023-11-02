@@ -64,7 +64,7 @@ namespace HHBBYY
       static void evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& yybbCuts);
       static void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& yybbCuts);
-      static void evaluateJetCuts(const xAOD::JetContainer& bjets,
+      static void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                           const xAOD::JetContainer& jets, CutManager& yybbCuts);
 
     private :
@@ -76,10 +76,10 @@ namespace HHBBYY
       CP::SysListHandle m_systematicsList {this};
 
       CP::SysReadHandle<xAOD::JetContainer>
-      m_bjetHandle{ this, "bjets", "",   "BJet container to read" };
-
-      CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "",   "Jet container to read" };
+
+      CP::SysReadDecorHandle<char> 
+      m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
       CP::SysReadHandle<xAOD::PhotonContainer>
       m_photonHandle{ this, "photons", "",   "Photons container to read" };

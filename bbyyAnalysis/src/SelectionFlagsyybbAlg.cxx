@@ -22,8 +22,12 @@ namespace HHBBYY
     ATH_MSG_INFO("*********************************\n");
     ATH_MSG_INFO("      SelectionFlagsyybbAlg      \n");
     ATH_MSG_INFO("*********************************\n");
+
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+    }
+
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
@@ -74,8 +78,13 @@ namespace HHBBYY
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-      const xAOD::JetContainer *bjets = nullptr;
-      ANA_CHECK (m_bjetHandle.retrieve (bjets, sys));
+      bool WPgiven = !m_isBtag.empty();
+      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      for(const xAOD::Jet* jet : *jets) {
+        if (WPgiven) {
+          if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+        }
+      }
 
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
@@ -267,7 +276,7 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsyybbAlg::evaluateJetCuts(const xAOD::JetContainer& bjets,
+  void SelectionFlagsyybbAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                             const xAOD::JetContainer& jets, CutManager& yybbCuts)
   {
     int CentralJets=0;

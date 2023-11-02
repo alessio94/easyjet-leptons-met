@@ -56,22 +56,6 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
 
     cfg.addEventAlgo(
         CompFactory.Easyjet.JetSelectorAlg(
-            "JetBTag_SelectorAlg",
-            containerInKey=smalljetkey,
-            containerOutKey="yybbAnalysisJets_BTag_%SYS%",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
-            minPt=25e3,
-            maxEta=2.5,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
-            maximumAmount=99,
-            pTsort=True,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
-
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.JetSelectorAlg(
             "JetSelectorAlg",
             containerInKey=smalljetkey,
             containerOutKey="yybbAnalysisJets_%SYS%",
@@ -90,8 +74,8 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.HHBBYY.BaselineVarsyybbAlg(
             "BaselineVarsyybbAlg",
             photons="yybbAnalysisPhotons_%SYS%",
-            bjets="yybbAnalysisJets_BTag_%SYS%",
             jets="yybbAnalysisJets_%SYS%",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
             isMC=flags.Input.isMC
         )
     )
@@ -100,8 +84,8 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.HHBBYY.SelectionFlagsyybbAlg(
             "SelectionFlagsyybbAlg",
             photons="yybbAnalysisPhotons_%SYS%",
-            bjets="yybbAnalysisJets_BTag_%SYS%",
             jets="yybbAnalysisJets_%SYS%",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
             muons="yybbAnalysisMuons_%SYS%",
             electrons="yybbAnalysisElectrons_%SYS%",
             cutList=flags.Analysis.CutList,
@@ -123,8 +107,6 @@ def yybb_branches(flags):
         for kin in photon_kinematics:
             branches += [f"EventInfo.{pt_ord}_Photon_{kin}_%SYS% -> %SYS%_{pt_ord}_Photon_{kin}"]  # noqa
 
-    branches += ["EventInfo.nPhotons_%SYS% -> %SYS%_nPhotons"]
-
     diphoton_variables = ["myy", "pTyy", "dRyy", "Etayy", "Phiyy"]
     for var in diphoton_variables:
         branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
@@ -136,9 +118,6 @@ def yybb_branches(flags):
         for kin in btag_variables:
             branches += [f"EventInfo.Jet_{kin}_{pt_ord}_%SYS% -> %SYS%_Jet_{kin}_{pt_ord}"]  # noqa
 
-    branches += ["EventInfo.nJets_%SYS% -> %SYS%_nJets"]
-    branches += ["EventInfo.nBJets_%SYS% -> %SYS%_nBJets"]
-
     dibjet_variables = ["mbb", "pTbb", "dRbb", "Etabb", "Phibb"]
     for var in dibjet_variables:
         branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
@@ -148,6 +127,10 @@ def yybb_branches(flags):
         "mbbyy", "pTbbyy", "Etabbyy", "Phibbyy", "dRbbyy", "mbbyy_star"
     ]
     for var in dihiggs_variables:
+        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
+
+    n_object = ["nPhotons", "nJets", "nCentralJets", "nBJets"]
+    for var in n_object:
         branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
     # mva variables

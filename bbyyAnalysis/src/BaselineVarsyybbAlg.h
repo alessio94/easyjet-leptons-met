@@ -45,10 +45,10 @@ namespace HHBBYY
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_bjetHandle{ this, "bjets", "",   "BJet container to read" };
-
-    CP::SysReadHandle<xAOD::JetContainer>
     m_jetHandle{ this, "jets", "",   "Jet container to read" };
+
+    CP::SysReadDecorHandle<char> 
+    m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_photonHandle{ this, "photons", "",   "Photons container to read" };
@@ -81,7 +81,7 @@ namespace HHBBYY
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
     std::vector<std::string> m_Ivarnames{
-      "nPhotons", "nBJets", "nJets",
+      "nPhotons", "nBJets", "nJets", "nCentralJets",
       "Jet_truthLabel_b1", "Jet_truthLabel_b2",
     };
 
