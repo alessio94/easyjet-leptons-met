@@ -116,13 +116,16 @@ def bbtt_branches(flags):
     branches = []
 
     bbtt_vars = [
-        "Selected_Lepton_pt",
-        "Selected_Lepton_eta",
-        "Selected_Lepton_charge",
-        "Selected_Lepton_pdgid",
-        "Selected_Tau_pt",
-        "Selected_Tau_eta",
-        "Selected_Tau_charge",
+        "Lepton_pt",
+        "Lepton_eta",
+        "Lepton_charge",
+        "Lepton_pdgid",
+        "Leading_Tau_pt",
+        "Leading_Tau_eta",
+        "Leading_Tau_charge",
+        "Sublead_Tau_pt",
+        "Sublead_Tau_eta",
+        "Sublead_Tau_charge",
     ]
 
     for tree_flags in flags.Analysis.ttree_output:

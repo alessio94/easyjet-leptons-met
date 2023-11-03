@@ -85,26 +85,20 @@ private:
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     /// \brief Setup sys-aware output decorations
-    CP::SysWriteDecorHandle<float> m_HH_pt {"HH_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_HH_eta {"HH_eta_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_HH_phi {"HH_phi_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_HH_m {"HH_m_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_HH_vis_pt {"HH_vis_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_HH_vis_eta {"HH_vis_eta_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_HH_vis_phi {"HH_vis_phi_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_HH_vis_m {"HH_vis_m_%SYS%", this};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
+    std::vector<std::string> m_Fvarnames{      
+      "Lepton_pt", "Lepton_eta", "Lepton_phi",
+      "Leading_Tau_pt", "Leading_Tau_eta", "Leading_Tau_phi",
+      "Sublead_Tau_pt", "Sublead_Tau_eta", "Sublead_Tau_phi",
+      "HH_pt", "HH_eta", "HH_phi", "HH_m",
+      "HH_vis_pt", "HH_vis_eta", "HH_vis_phi", "HH_vis_m",
+    };
 
-    CP::SysWriteDecorHandle<float> m_selected_lepton_pt {"Selected_Lepton_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_eta {"Selected_Lepton_eta_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_phi {"Selected_Lepton_phi_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_charge {"Selected_Lepton_charge_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_pdgid {"Selected_Lepton_pdgid_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_tau_pt {"Selected_Tau_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_tau_eta {"Selected_Tau_eta_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_tau_phi {"Selected_Tau_phi_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_tau_charge {"Selected_Tau_charge_%SYS%", this};
-
-    // Local variables and functions
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
+    std::vector<std::string> m_Ivarnames{      
+      "Lepton_charge", "Lepton_pdgid",
+      "Leading_Tau_charge", "Sublead_Tau_charge"
+    };
 
   };
 }

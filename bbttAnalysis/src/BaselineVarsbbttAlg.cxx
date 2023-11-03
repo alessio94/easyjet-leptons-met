@@ -44,32 +44,25 @@ namespace HHBBTT
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
 
-    // Intialise syst-aware output decorators
-    ATH_CHECK(m_HH_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_HH_eta.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_HH_phi.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_HH_m.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_HH_vis_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_HH_vis_eta.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_HH_vis_phi.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_HH_vis_m.initialize(m_systematicsList, m_eventHandle));
-
-    ATH_CHECK(m_selected_lepton_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_eta.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_phi.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_charge.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_pdgid.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_tau_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_tau_eta.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_tau_phi.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_tau_charge.initialize(m_systematicsList, m_eventHandle));
-
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
 
+    // Intialise syst-aware output decorators
+    for (const std::string &var : m_Fvarnames){
+      CP::SysWriteDecorHandle<float> whandle{var+"_%SYS%", this};
+      m_Fbranches.emplace(var, whandle);
+      ATH_CHECK(m_Fbranches.at(var).initialize(m_systematicsList, m_eventHandle));
+    };
+
+    for (const std::string &var : m_Ivarnames){
+      CP::SysWriteDecorHandle<int> whandle{var+"_%SYS%", this};
+      m_Ibranches.emplace(var, whandle);
+      ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
+    };
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
-    ATH_CHECK (m_systematicsList.initialize());    
+    ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
   }
@@ -106,67 +99,89 @@ namespace HHBBTT
       }
 
       // Calculate vars
+      for (const auto& var: m_Fvarnames) {
+        m_Fbranches.at(var).set(*event, -99., sys);
+      }
+      for (const auto& var: m_Ivarnames) {
+        m_Ibranches.at(var).set(*event, -99, sys);
+      }
 
       // selected leptons ; 
-      float lepton_pt = -99;
-      float lepton_eta = -99;
-      float lepton_phi = -99;
+      TLorentzVector lepton(0,0,0,0);
       int lepton_charge = -99;
       int lepton_pdgid = -99;
+      bool found_lepton = false;
 
       for(const xAOD::Electron* electron : *electrons) {
         if (m_selected_el.get(*electron, sys)){
-          lepton_pt = electron->pt();
-          lepton_eta = electron->eta();
-          lepton_phi = electron->phi();
+          lepton = electron->p4();
           lepton_charge = electron->charge();
-	  lepton_pdgid = electron->charge() > 0 ? -11 : 11;
+          lepton_pdgid = electron->charge() > 0 ? -11 : 11;
+	  found_lepton = true;
           break; // At most one lepton selected
 	}
       }
       for(const xAOD::Muon* muon : *muons) {
+        if(found_lepton) break;
         if (m_selected_mu.get(*muon, sys)){
-          lepton_pt = muon->pt();
-          lepton_eta = muon->eta();
-          lepton_phi = muon->phi();
+          lepton = muon->p4();
           lepton_charge = muon->charge();
-	  lepton_pdgid = muon->charge() > 0 ? -13 : 13;
+          lepton_pdgid = muon->charge() > 0 ? -13 : 13;
+          found_lepton = true;
           break; 
 	}
       }
-      m_selected_lepton_pt.set(*event, lepton_pt, sys);
-      m_selected_lepton_eta.set(*event, lepton_eta, sys);
-      m_selected_lepton_phi.set(*event, lepton_phi, sys);
-      m_selected_lepton_charge.set(*event, lepton_charge, sys);
-      m_selected_lepton_pdgid.set(*event, lepton_pdgid, sys);
+
+      if(found_lepton){
+        m_Fbranches.at("Lepton_pt").set(*event, lepton.Pt(), sys);
+        m_Fbranches.at("Lepton_eta").set(*event, lepton.Eta(), sys);
+        m_Fbranches.at("Lepton_phi").set(*event, lepton.Phi(), sys);
+        m_Ibranches.at("Lepton_charge").set(*event, lepton_charge, sys);
+        m_Ibranches.at("Lepton_pdgid").set(*event, lepton_pdgid, sys);
+      }
 
       //selected tau
-      float tau_pt = -99;
-      float tau_eta = -99;
-      float tau_phi = -99;
-      int tau_charge = -99;
+      TLorentzVector lead_tau(0,0,0,0);
+      TLorentzVector sublead_tau(0,0,0,0);
+      int lead_tau_charge = -99;
+      int sublead_tau_charge = -99;
+      bool found_lead_tau = false;
+      bool found_sublead_tau = false;
 
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
-          tau_pt = tau->pt();
-          tau_eta = tau->eta();
-          tau_phi = tau->phi();
-          tau_charge = tau->charge();
+          if(!found_lead_tau){
+            lead_tau = tau->p4();
+            lead_tau_charge = tau->charge();
+            found_lead_tau = true;
+            continue;
+          }
+
+          sublead_tau = tau->p4();
+          sublead_tau_charge = tau->charge();
+          found_sublead_tau = true;
           break; 
-	}
+        }
       }
-      m_selected_tau_pt.set(*event, tau_pt, sys);
-      m_selected_tau_eta.set(*event, tau_eta, sys);
-      m_selected_tau_phi.set(*event, tau_phi, sys);
-      m_selected_tau_charge.set(*event, tau_charge, sys);
+
+      if(found_lead_tau){
+        m_Fbranches.at("Leading_Tau_pt").set(*event, lead_tau.Pt(), sys);
+        m_Fbranches.at("Leading_Tau_eta").set(*event, lead_tau.Eta(), sys);
+        m_Fbranches.at("Leading_Tau_phi").set(*event, lead_tau.Phi(), sys);
+        m_Ibranches.at("Leading_Tau_charge").set(*event, lead_tau_charge, sys);
+      }
+
+      if(found_sublead_tau){
+        m_Fbranches.at("Sublead_Tau_pt").set(*event, sublead_tau.Pt(), sys);
+        m_Fbranches.at("Sublead_Tau_eta").set(*event, sublead_tau.Eta(), sys);
+        m_Fbranches.at("Sublead_Tau_phi").set(*event, sublead_tau.Phi(), sys);
+        m_Ibranches.at("Sublead_Tau_charge").set(*event, sublead_tau_charge, sys);
+      }
 
       // DiHiggs mass 
       TLorentzVector bb(0,0,0,0);
-      TLorentzVector tautau(0,0,0,0);
-      TLorentzVector HH(0,0,0,0);
-      TLorentzVector HH_vis(0,0,0,0);
-      TLorentzVector mmc_vec(0,0,0,0);
- 
+      bool found_bb = false;
+
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       for(const xAOD::Jet* jet : *jets) {
@@ -175,25 +190,45 @@ namespace HHBBTT
         }
       }
      
-      if (bjets->size() > 1) bb = bjets->at(0)->p4() + bjets->at(1)->p4();
-      if (taus->size() > 1) tautau = taus->at(0)->p4() + taus->at(1)->p4();
+      if (bjets->size() > 1){
+        bb = bjets->at(0)->p4() + bjets->at(1)->p4();
+        found_bb = true;
+      }
 
-      HH_vis=bb+tautau;
+      TLorentzVector tautau_vis(0,0,0,0);
+      bool found_tautau_vis = false;
+      if(found_lead_tau){
+        if(found_lepton){
+          tautau_vis = lead_tau + lepton;
+          found_tautau_vis = true;
+        }else if(found_sublead_tau){
+          tautau_vis = lead_tau + sublead_tau;
+          found_tautau_vis = true;
+        }
+      }
 
-      mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
-                           m_mmc_eta.get(*event, sys),
-                           m_mmc_phi.get(*event, sys),
-                           m_mmc_m.get(*event, sys));
-      HH=bb+mmc_vec;
+      if(found_bb && found_tautau_vis){
 
-      m_HH_pt.set(*event, HH.Pt(), sys);
-      m_HH_eta.set(*event, HH.Eta(), sys);
-      m_HH_phi.set(*event, HH.Phi(), sys);
-      m_HH_m.set(*event, HH.M(), sys);
-      m_HH_vis_pt.set(*event, HH_vis.Pt(), sys);
-      m_HH_vis_eta.set(*event, HH_vis.Eta(), sys);
-      m_HH_vis_phi.set(*event, HH_vis.Phi(), sys);
-      m_HH_vis_m.set(*event, HH_vis.M(), sys);
+        TLorentzVector HH_vis = bb+tautau_vis;
+
+        m_Fbranches.at("HH_vis_pt").set(*event, HH_vis.Pt(), sys);
+        m_Fbranches.at("HH_vis_eta").set(*event, HH_vis.Eta(), sys);
+        m_Fbranches.at("HH_vis_phi").set(*event, HH_vis.Phi(), sys);
+        m_Fbranches.at("HH_vis_m").set(*event, HH_vis.M(), sys);
+
+        TLorentzVector mmc_vec(0,0,0,0);
+        mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
+			     m_mmc_eta.get(*event, sys),
+			     m_mmc_phi.get(*event, sys),
+			     m_mmc_m.get(*event, sys));
+        TLorentzVector HH = bb+mmc_vec;
+
+        m_Fbranches.at("HH_pt").set(*event, HH.Pt(), sys);
+        m_Fbranches.at("HH_eta").set(*event, HH.Eta(), sys);
+        m_Fbranches.at("HH_phi").set(*event, HH.Phi(), sys);
+        m_Fbranches.at("HH_m").set(*event, HH.M(), sys);
+      }
+
     }
 
     return StatusCode::SUCCESS;
