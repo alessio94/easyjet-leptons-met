@@ -58,8 +58,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             containerOutKey="bbttAnalysisJets_%SYS%",
             bTagWPDecorName="",  # empty string: "" ignores btagging
             minPt=25_000,
-            maxEta=2.5,
-            truncateAtAmount=2,  # -1 means keep all
+            maxEta=4.4,
+            truncateAtAmount=-1,  # -1 means keep all
             minimumAmount=2,  # -1 means ignores this
             pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
