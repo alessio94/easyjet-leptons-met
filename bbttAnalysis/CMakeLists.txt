@@ -11,6 +11,7 @@ add_compile_options(-Werror)
 atlas_add_component(bbttAnalysis
   src/BaselineVarsbbttAlg.cxx
   src/MMCDecoratorAlg.cxx
+  src/MMCSelectorAlg.cxx
   src/HHbbttSelectorAlg.cxx
   src/components/bbttAnalysis_entries.cxx
   LINK_LIBRARIES

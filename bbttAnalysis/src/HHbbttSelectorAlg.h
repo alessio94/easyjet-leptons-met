@@ -28,15 +28,10 @@
 
 #include <SystematicsHandles/SysFilterReporterParams.h>
 
+#include "HHbbttChannels.h"
 
 namespace HHBBTT
 {
-
-  enum Channel
-  {
-    LepHad = 0,
-    HadHad = 1,
-  };
 
   /// \brief An algorithm for counting containers
   class HHbbttSelectorAlg final : public EL::AnaAlgorithm
@@ -85,9 +80,6 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-    CP::SysReadDecorHandle<float> 
-    m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
-
     Gaudi::Property<std::string> m_IDTauDecorName
       { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
@@ -106,11 +98,6 @@ private:
     Gaudi::Property<std::string> m_muonPreselDecorName
       { this, "muonPreselDecorKey", "DFCommonMuonPassPreselection","Decoration for muon preselection" };
     SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
-
-    /// \brief Setup sys-aware output decorations
-    CP::SysWriteDecorHandle<bool> m_pass_sr {"pass_bbtt_sr_%SYS%", this};
-
-    CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
    
     CP::SysWriteDecorHandle<bool> m_pass_SLT {"pass_SLT_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_pass_LTT {"pass_LTT_%SYS%", this};
@@ -120,13 +107,15 @@ private:
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
+
+    /// \brief Setup sys-aware output decorations
+    CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
     
     /// \brief Internal variables
 
     bool TWO_JETS;
     bool TWO_BJETS;
     bool LEADJET_PT;
-    bool MMC_MASS;
     bool MBB_MASS;
     bool N_LEPTONS_CUT_LEPHAD;
     bool ONE_TAU;

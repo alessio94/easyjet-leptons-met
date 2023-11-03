@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+import AthenaCommon.SystemOfUnits as Units
 
 
 def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
@@ -43,6 +44,22 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
         )
     )
 
+    # Selection
+    cfg.addEventAlgo(
+        CompFactory.HHBBTT.HHbbttSelectorAlg(
+            "HHbbttSelectorAlg",
+            jets="bbttAnalysisJets_%SYS%",
+            muons="bbttAnalysisMuons_%SYS%",
+            electrons="bbttAnalysisElectrons_%SYS%",
+            taus="bbttAnalysisTaus_%SYS%",
+            met="AnalysisMET_%SYS%",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
+            eventDecisionOutputDecoration="bbtt_pass_sr_noMMC_%SYS%",
+            channel=flags.Analysis.channel,
+            bypass=flags.Analysis.bypass,
+        )
+    )
+
     # MMC decoration
     if flags.Analysis.do_mmc:
         cfg.addEventAlgo(
@@ -53,25 +70,18 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
                 electrons="bbttAnalysisElectrons_%SYS%",
                 taus="bbttAnalysisTaus_%SYS%",
                 met="AnalysisMET_%SYS%",
+                channel=flags.Analysis.channel,
             )
         )
 
-    # Selection
-    cfg.addEventAlgo(
-        CompFactory.HHBBTT.HHbbttSelectorAlg(
-            "HHbbttSelectorAlg",
-            jets="bbttAnalysisJets_%SYS%",
-            muons="bbttAnalysisMuons_%SYS%",
-            electrons="bbttAnalysisElectrons_%SYS%",
-            taus="bbttAnalysisTaus_%SYS%",
-            met="AnalysisMET_%SYS%",
-            eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
-            channel=flags.Analysis.channel,
-            bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
-                    else False),
+        cfg.addEventAlgo(
+            CompFactory.HHBBTT.MMCSelectorAlg(
+                "MMCSelectorAlg",
+                MMC_min=60 * Units.GeV,
+                eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
+                bypass=flags.Analysis.bypass,
+            )
         )
-    )
 
     # calculate final bbtt vars
     cfg.addEventAlgo(
@@ -130,5 +140,7 @@ def bbtt_branches(flags):
 
     branches += ["EventInfo.pass_SLT_%SYS% -> bbtt_pass_SLT_%SYS%"]
     branches += ["EventInfo.pass_LTT_%SYS% -> bbtt_pass_LTT_%SYS%"]
+    branches += ["EventInfo.pass_STT_%SYS% -> bbtt_pass_STT_%SYS%"]
+    branches += ["EventInfo.pass_DTT_%SYS% -> bbtt_pass_DTT_%SYS%"]
 
     return branches

@@ -28,6 +28,15 @@ namespace HHBBTT
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    ATH_CHECK (m_pass_SLT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_LTT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_STT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_DTT.initialize(m_systematicsList, m_eventHandle));
+
+    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
+
     // Intialise syst-aware output decorators
     ATH_CHECK(m_mmc_status.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_mmc_pt.initialize(m_systematicsList, m_eventHandle));
@@ -37,6 +46,15 @@ namespace HHBBTT
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ANA_CHECK (m_systematicsList.initialize());    
+
+    for ( auto name : m_channel_names){
+      if( name == "lephad") m_channels.push_back(HHBBTT::LepHad);
+      else if ( name == "hadhad") m_channels.push_back(HHBBTT::HadHad);
+      else{
+        ATH_MSG_ERROR("Unknown channel");
+        return StatusCode::FAILURE;
+      }
+    }
 
     // Initialise MMC tool
     m_mmcTool.reset(new DiTauMassTools::MissingMassToolV2("MissingMassToolV2"));
@@ -97,23 +115,42 @@ namespace HHBBTT
       int status = 0;      
       TLorentzVector res(0,0,0,0);
       const auto method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
-     
-      if (taus->size() > 0)
-      {
-	part1 = taus->at(0);
+
+      bool is_lephad = false;
+      bool is_hadhad = false;
+
+      for(const auto& channel : m_channels){
+        if(channel == HHBBTT::LepHad){
+          is_lephad =
+            m_pass_SLT.get(*event, sys) || m_pass_LTT.get(*event, sys);
+        }
+        else if(channel == HHBBTT::HadHad){
+          is_hadhad =
+            m_pass_STT.get(*event, sys) || m_pass_DTT.get(*event, sys);
+        }
       }
 
-      if (electrons->size() == 1 && muons->size() == 0 && taus->size() == 1) 
-      {
-	part2 = electrons->at(0);
-      } 
-      else if (electrons->size() == 0 && muons->size() == 1 && taus->size() == 1) 
-      {
-	part2 = muons->at(0);	
-      }  
-      else if (electrons->size() == 0 && muons->size() == 0 && taus->size() == 2) 
-      {
-	part2 = taus->at(1);	
+      for(const xAOD::TauJet* tau : *taus) {
+        if (m_selected_tau.get(*tau, sys)){
+          if(!part1) part1 = tau;
+          if(!is_hadhad) break;
+          else continue;
+
+          part2 = tau;
+          break;
+        }
+      }
+
+      if(is_lephad){
+        for(const xAOD::Electron* electron : *electrons) {
+          if (part2) break;
+          if (m_selected_el.get(*electron, sys)) part2 = electron;
+        }
+
+        for(const xAOD::Muon* muon : *muons) {
+          if(part2) break;
+          if (m_selected_mu.get(*muon, sys)) part2 = muon;
+        }
       }
 
       // Run MMC if find eligible particle content

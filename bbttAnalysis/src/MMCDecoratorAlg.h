@@ -14,6 +14,7 @@
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/ISysHandleBase.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>
@@ -24,6 +25,8 @@
 #include <xAODMissingET/MissingETContainer.h>
 
 #include <DiTauMassTools/MissingMassToolV2.h>
+
+#include "HHbbttChannels.h"
 
 namespace HHBBTT
 {
@@ -65,6 +68,15 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    CP::SysReadDecorHandle<bool> m_pass_SLT {"pass_SLT_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_pass_LTT {"pass_LTT_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_pass_STT {"pass_STT_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_pass_DTT {"pass_DTT_%SYS%", this};
+
+    CP::SysReadDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
+
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int> m_mmc_status {"mmc_status_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_mmc_pt {"mmc_pt_%SYS%", this};
@@ -82,6 +94,11 @@ private:
 
     Gaudi::Property<int> m_verbose { this, "UseVerbose", 0, 
 					"Activate MMC verbose output"};
+
+    Gaudi::Property<std::vector<std::string>> m_channel_names
+      { this, "channel", {}, "Which channel to run" };
+
+    std::vector<HHBBTT::Channel> m_channels;
 
     /// \brief Internal variables
     std::unique_ptr<DiTauMassTools::MissingMassToolV2> m_mmcTool;

@@ -8,8 +8,6 @@
 #include <AsgDataHandles/ReadDecorHandle.h>
 #include <AsgDataHandles/WriteDecorHandle.h>
 
-//#include <EventBookkeeperTools/FilterReporter.h>
-
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
 #include <AthContainers/ConstDataVector.h>
@@ -37,8 +35,11 @@ namespace HHBBTT
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+    }
 
+    // Intialise syst-aware output decorators
     ATH_CHECK(m_pass_SLT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_pass_LTT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_pass_STT.initialize(m_systematicsList, m_eventHandle));
@@ -57,13 +58,6 @@ namespace HHBBTT
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK(m_selected_tau.initialize(m_systematicsList, m_tauHandle));
-
-    if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
-    }
-
-    // Intialise syst-aware output decorators
-    ATH_CHECK(m_pass_sr.initialize(m_systematicsList, m_eventHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -130,7 +124,6 @@ namespace HHBBTT
       TWO_JETS = false;
       TWO_BJETS = false;
       LEADJET_PT = false;
-      MMC_MASS = false;
       MBB_MASS = false;
       // flags for lephad
       N_LEPTONS_CUT_LEPHAD = false;
@@ -290,8 +283,6 @@ namespace HHBBTT
       //****************
       // event level info
       //****************
-      if (m_mmc_m.get(*event, sys) > 60000)
-        MMC_MASS = true;
       if (mbb < 150000)
         MBB_MASS = true;
       if (charge_tau0 != charge_lepton)
@@ -301,24 +292,24 @@ namespace HHBBTT
 
       // SLT
       if (N_LEPTONS_CUT_LEPHAD && lep_ptcut_SLT && ONE_TAU && tau_ptcut_SLT &&
-          TWO_JETS && TWO_BJETS && LEADJET_PT && MMC_MASS && MBB_MASS &&
+          TWO_JETS && TWO_BJETS && LEADJET_PT && MBB_MASS &&
           OS_CHARGE_LEPHAD)
         pass_SLT = true;
 
       // LTT
       if (N_LEPTONS_CUT_LEPHAD && lep_ptcut_LTT && ONE_TAU && tau_ptcut_LTT &&
-          TWO_JETS && TWO_BJETS && LEADJET_PT && MMC_MASS && MBB_MASS &&
+          TWO_JETS && TWO_BJETS && LEADJET_PT && MBB_MASS &&
           OS_CHARGE_LEPHAD)
         pass_LTT = true;
 
       // STT
       if (N_LEPTONS_CUT_HADHAD && TWO_TAU && tau_ptcut_STT &&
-          TWO_JETS && TWO_BJETS && LEADJET_PT && MMC_MASS &&
+          TWO_JETS && TWO_BJETS && LEADJET_PT &&
           OS_CHARGE_HADHAD)
         pass_STT = true;
       // DTT
       if (N_LEPTONS_CUT_HADHAD && TWO_TAU && tau_ptcut_DTT &&
-          TWO_JETS && TWO_BJETS && LEADJET_PT && MMC_MASS &&
+          TWO_JETS && TWO_BJETS && LEADJET_PT &&
           OS_CHARGE_HADHAD)
         pass_DTT = true;
 
@@ -344,7 +335,6 @@ namespace HHBBTT
 
   StatusCode HHbbttSelectorAlg::finalize() {
     ANA_CHECK (m_filterParams.finalize ());
-    //ATH_MSG_INFO(m_filterParams.summary());
     return StatusCode::SUCCESS;
   }
 
