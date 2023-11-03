@@ -63,14 +63,16 @@ private:
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nJets_%SYS%", 
         "Name of output decorator for number of selected jets"};
 
-    float m_minPt;
-    float m_maxEta;
-    int m_minimumAmount;
-    int m_maximumAmount;
-    int m_truncateAtAmount;
-    bool m_pTsort;
-    bool m_removeRelativeDeltaRToVRJet;
-    bool m_checkOR;
+
+    Gaudi::Property<float> m_minPt            {this, "minPt", 25e3, "Minimum pT of jets"};
+    Gaudi::Property<float> m_maxEta           {this, "maxEta", 4.4, "Maximum eta of jets"}; // default is central jets
+    Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of jets to consider"}; // -1 means ignores this
+    Gaudi::Property<int>   m_maximumAmount    {this, "maximumAmount", -1, "Maximum number of jets to consider"};
+    Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort jets by pT"};
+    Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra jets after pT sorting"}; // -1 means keep them all
+    Gaudi::Property<bool>  m_removeRelativeDeltaRToVRJet {this, "removeRelativeDeltaRToVRJet", false, "Remove events in which VR jets overlaps"};
+    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
+
   };
 }
 

@@ -11,15 +11,6 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             "PhotonSelectorAlg",
             containerInKey=photonkey,
             containerOutKey="yybbAnalysisPhotons_%SYS%",
-            LeadPho_ptOverMyy_min=-1,  # pT/myy
-            SubleadPho_ptOverMyy_min=-1,  # pT/myy
-            etaBounds=[
-                1.37,
-                1.52,
-                2.37
-            ],  # photon eta must be: < 1.37, or between 1.52 and 2.37
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
             pTsort=True,
         )
     )
@@ -30,10 +21,6 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             containerInKey=muonkey,
             containerOutKey="yybbAnalysisMuons_%SYS%",
             minPt=10e3,
-            maxEta=2.7,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -44,12 +31,6 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             containerInKey=electronkey,
             containerOutKey="yybbAnalysisElectrons_%SYS%",
             minPt=10e3,
-            minEtaVeto=1.37,
-            maxEtaVeto=1.52,
-            maxEta=2.47,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -60,12 +41,6 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             containerInKey=smalljetkey,
             containerOutKey="yybbAnalysisJets_%SYS%",
             bTagWPDecorName="",
-            minPt=25e3,
-            maxEta=4.4,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
-            maximumAmount=99,
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )

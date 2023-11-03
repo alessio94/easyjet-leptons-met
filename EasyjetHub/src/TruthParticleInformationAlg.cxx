@@ -27,11 +27,7 @@ namespace Easyjet
 
   TruthParticleInformationAlg ::TruthParticleInformationAlg(
       const std::string &name, ISvcLocator *pSvcLocator)
-      : AthAlgorithm(name, pSvcLocator)
-  {
-    declareProperty("nHiggses", m_nHiggses = 2, "Number of Higgses to record");
-    declareProperty("decayModes", m_decayModes, "HH decay modes to consider");
-  }
+      : AthAlgorithm(name, pSvcLocator) { }
 
   StatusCode TruthParticleInformationAlg ::initialize()
   {
@@ -72,7 +68,7 @@ namespace Easyjet
     for (const auto& decayMode : m_decayModes)
     {
       if(decayProducts_IDs.find(decayMode)==decayProducts_IDs.end())
-	ATH_MSG_ERROR("Decay mode "<<decayMode<<" is not supported");
+        ATH_MSG_ERROR("Decay mode "<<decayMode<<" is not supported");
     }
 
     return StatusCode::SUCCESS;

@@ -10,11 +10,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             "MuonSelectorAlg",
             containerInKey='loose' + muonkey,
             containerOutKey="bbttAnalysisMuons_%SYS%",
-            minPt=7_000,
-            maxEta=2.7,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,     # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -24,13 +19,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             "ElectronSelectorAlg",
             containerInKey='loose' + electronkey,
             containerOutKey="bbttAnalysisElectrons_%SYS%",
-            minPt=7_000,
-            minEtaVeto=1.37,
-            maxEtaVeto=1.52,
-            maxEta=2.47,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,     # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -40,13 +28,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             "TauSelectorAlg",
             containerInKey='baseline' + taukey,
             containerOutKey="bbttAnalysisTaus_%SYS%",
-            minPt=20_000,
-            minEtaVeto=1.37,
-            maxEtaVeto=1.52,
-            maxEta=2.5,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,     # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -57,11 +38,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             containerInKey=smalljetkey,
             containerOutKey="bbttAnalysisJets_%SYS%",
             bTagWPDecorName="",  # empty string: "" ignores btagging
-            minPt=25_000,
-            maxEta=4.4,
-            truncateAtAmount=-1,  # -1 means keep all
             minimumAmount=2,  # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )

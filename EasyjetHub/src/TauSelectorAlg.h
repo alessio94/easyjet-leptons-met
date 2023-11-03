@@ -67,14 +67,14 @@ private:
       m_nSelPart{ this, "decorOutName", "nTaus_%SYS%",
 	  "Name out output decorator for number of selected taus" };
 
-    float m_minPt;
-    float m_minEtaVeto;
-    float m_maxEtaVeto;
-    float m_maxEta;
-    int m_minimumAmount;
-    int m_truncateAtAmount;
-    bool m_pTsort;
-    bool m_checkOR;
+    Gaudi::Property<float> m_minPt            {this, "minPt", 20e3, "Minimum pT of taus"};
+    Gaudi::Property<float> m_minEtaVeto       {this, "minEtaVeto", 1.37, "Minimum eta veto of EMCal"};
+    Gaudi::Property<float> m_maxEtaVeto       {this, "maxEtaVeto", 1.52, "Maximum eta veto of EMCal"};
+    Gaudi::Property<float> m_maxEta           {this, "maxEta", 2.5, "Maximum eta of taus"};
+    Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of taus to consider"}; // -1 means ignores this
+    Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort taus by pT"};
+    Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra taus after pT sorting"}; // -1 means keep them all
+    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
   };
 }
 

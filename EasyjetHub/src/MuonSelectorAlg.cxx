@@ -14,15 +14,7 @@ namespace Easyjet
 {
   MuonSelectorAlg::MuonSelectorAlg(const std::string &name,
                                        ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator)
-  {
-    declareProperty("minPt", m_minPt);
-    declareProperty("maxEta", m_maxEta);
-    declareProperty("minimumAmount", m_minimumAmount);
-    declareProperty("truncateAtAmount", m_truncateAtAmount);
-    declareProperty("pTsort", m_pTsort);
-    declareProperty("checkOR", m_checkOR);
-  }
+      : AthHistogramAlgorithm(name, pSvcLocator) { }
 
   StatusCode MuonSelectorAlg::initialize()
   {
@@ -64,63 +56,53 @@ namespace Easyjet
      
       // loop over muons 
       for (const xAOD::Muon *muon : *inContainer)
-	{
-          // skip OR muons
-	  if ( m_checkOR ){
-	    bool ispassORMu = ORDecorHandle(*muon);
-	    if ( !ispassORMu ) continue;
-	  }
+      {
+        // skip OR muons
+        if ( m_checkOR ){
+          bool ispassORMu = ORDecorHandle(*muon);
+          if ( !ispassORMu ) continue;
+        }
 
-	  // cuts
-	  if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
-	    continue;
-	  
-	  // If cuts are passed, save the object
-	  workContainer->push_back(muon);
-	}
+        // pT and eta cuts
+        if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
+          continue;
+        
+        // If cuts are passed, save the object
+        workContainer->push_back(muon);
+      }
       
       int nMuons = workContainer->size();      
       m_nSelPart.set(*event, nMuons, sys);
 
       // if we have less than the requested nr, empty the workcontainer to write
       // defaults/return empty container
-      if (nMuons < m_minimumAmount)
-	{
-	  workContainer->clear();
-	  nMuons = 0;
-	}
+      if (nMuons < m_minimumAmount) {
+        workContainer->clear();
+        nMuons = 0;
+      }
       
       // sort and truncate
       int nKeep;
-      if (nMuons < m_truncateAtAmount)
-	{
-	  nKeep = nMuons;
-	}
-      else
-	{
-	  nKeep = m_truncateAtAmount;
-	}
+      if (nMuons < m_truncateAtAmount) nKeep = nMuons;
+      else nKeep = m_truncateAtAmount;
       
-      if (m_pTsort)
-	{
-	  // if we give -1, sort the whole container
-	  if (m_truncateAtAmount == -1)
-	    {
-	      nKeep = nMuons;
-	    }
-	  std::partial_sort(
-             workContainer->begin(), // Iterator from which to start sorting
-             workContainer->begin() + nKeep, // Use begin + N to sort first N
-             workContainer->end(), // Iterator marking the end of range to sort
-             [](const xAOD::IParticle *left, const xAOD::IParticle *right)
-	     { return left->pt() > right->pt(); }); // lambda function here just
-                                                    // handy, could also be another
-                                                    // function that returns bool
+      if (m_pTsort) {
+        // if we give -1, sort the whole container
+        if (m_truncateAtAmount == -1) nKeep = nMuons;
+        
+        std::partial_sort(
+                workContainer->begin(), // Iterator from which to start sorting
+                workContainer->begin() + nKeep, // Use begin + N to sort first N
+                workContainer->end(), // Iterator marking the end of range to sort
+                [](const xAOD::IParticle *left, const xAOD::IParticle *right)
+          { return left->pt() > right->pt(); }); // lambda function here just
+                                                        // handy, could also be another
+                                                        // function that returns bool
 
-      // keep only the requested amount
-      workContainer->erase(workContainer->begin() + nKeep,
-                           workContainer->end());
-    }
+          // keep only the requested amount
+          workContainer->erase(workContainer->begin() + nKeep,
+                              workContainer->end());
+      }
     
       // Write to eventstore
       ATH_CHECK(m_outHandle.record(std::move(workContainer), sys));   

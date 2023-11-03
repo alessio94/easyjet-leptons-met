@@ -43,7 +43,7 @@ private:
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
     // ghost associated VR track jets are only on the untrimmed 1.0 jets
-    unsigned int m_whichJet;
+    Gaudi::Property<unsigned int> m_whichJet {this, "whichJet", -1, "Index of jets to be trimmed"};
   };
 }
 

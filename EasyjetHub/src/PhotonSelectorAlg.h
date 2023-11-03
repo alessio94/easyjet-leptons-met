@@ -60,12 +60,13 @@ private:
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "Photons_%SYS%", 
         "Name out output decorator for number of selected photons"};
 
-    float m_LeadPho_ptOverMyy_min;
-    float m_SubleadPho_ptOverMyy_min;
-    std::vector<float> m_etaBounds;
-    int m_minimumAmount;
-    int m_truncateAtAmount;
-    bool m_pTsort;
+    Gaudi::Property<float> m_minPt            {this, "minPt", 25e3, "Minimum pT of photons"};
+    Gaudi::Property<float> m_minEtaVeto       {this, "minEtaVeto", 1.37, "Minimum eta veto of EMCal"};
+    Gaudi::Property<float> m_maxEtaVeto       {this, "maxEtaVeto", 1.52, "Maximum eta veto of EMCal"};
+    Gaudi::Property<float> m_maxEta           {this, "maxEta", 2.37, "Maximum eta of photons"};
+    Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of photons to consider"}; // -1 means ignores this
+    Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort photons by pT"};
+    Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra photons after pT sorting"}; // -1 means keep them all
   };
 }
 

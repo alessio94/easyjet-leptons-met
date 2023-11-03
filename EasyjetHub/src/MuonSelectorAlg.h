@@ -58,12 +58,12 @@ private:
         "Name out output decorator for number of selected muons"};
 
 
-    float m_minPt;
-    float m_maxEta;
-    int m_minimumAmount;
-    int m_truncateAtAmount;
-    bool m_pTsort;
-    bool m_checkOR;
+    Gaudi::Property<float> m_minPt            {this, "minPt", 7e3, "Minimum pT of muons"};
+    Gaudi::Property<float> m_maxEta           {this, "maxEta", 2.7, "Maximum eta of muons"};
+    Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of muons to consider"}; // -1 means ignores this
+    Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort muons by pT"};
+    Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra muons after pT sorting"}; // -1 means keep them all
+    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
   };
 }
 

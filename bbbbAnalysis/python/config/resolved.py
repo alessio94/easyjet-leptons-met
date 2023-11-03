@@ -18,11 +18,10 @@ def resolved_cfg(flags, smalljetkey):
                 containerInKey=smalljetkey,
                 containerOutKey="resolvedAnalysisJets_" + btag_wp,
                 bTagWPDecorName="ftag_select_" + btag_wp,
-                minPt=20_000,
+                minPt=20e3,
                 maxEta=2.5,
                 truncateAtAmount=4,  # -1 means keep all
                 minimumAmount=4,  # -1 means ignores this
-                pTsort=True,
                 checkOR=flags.Analysis.do_overlap_removal,
             )
         )

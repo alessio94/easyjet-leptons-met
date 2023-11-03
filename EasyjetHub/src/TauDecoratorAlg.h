@@ -92,8 +92,7 @@ private:
     };
     SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
 
-
-    std::string m_tauIDWP_name;
+    Gaudi::Property<std::string> m_tauIDWP_name {this, "tauIDWP", "", "Name of the Tau ID WP"};
     xAOD::TauJetParameters::IsTauFlag m_tauIDWP;
 
   };

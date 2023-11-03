@@ -15,11 +15,10 @@ def boosted_cfg(flags, largejetkey):
                 containerInKey=largejetkey,
                 containerOutKey="boostedAnalysisJets_" + btag_wp,
                 bTagWPDecorName="ftag_select_" + btag_wp,
-                minPt=250_000,
+                minPt=250e3,
                 maxEta=2.0,
                 truncateAtAmount=2,  # -1 means keep all
                 minimumAmount=2,  # -1 means ignores this
-                pTsort=True,
                 checkOR=flags.Analysis.do_overlap_removal,
             )
         )
@@ -40,11 +39,10 @@ def boosted_cfg(flags, largejetkey):
                 containerInKey="leadingLargeRVRJets_" + btag_wp,
                 containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
                 bTagWP=btag_wp,  # empty string: "" ignores btagging
-                minPt=10_000,
+                minPt=10e3,
                 maxEta=2.5,
                 truncateAtAmount=3,  # -1 means keep all
                 minimumAmount=2,  # -1 means ignores this
-                pTsort=True,
                 removeRelativeDeltaRToVRJet=True,
                 checkOR=flags.Analysis.do_overlap_removal,
             )
@@ -68,11 +66,10 @@ def boosted_cfg(flags, largejetkey):
                 containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
                 containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
                 bTagWP=btag_wp,  # empty string: "" ignores btagging
-                minPt=10_000,
+                minPt=10e3,
                 maxEta=2.5,
                 truncateAtAmount=3,  # -1 means keep all
                 minimumAmount=2,  # -1 means ignores this
-                pTsort=True,
                 removeRelativeDeltaRToVRJet=True,
             )
         )

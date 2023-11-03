@@ -13,10 +13,7 @@ namespace Easyjet
 {
   GhostAssocVRJetGetterAlg ::GhostAssocVRJetGetterAlg(const std::string &name,
                                                       ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator)
-  {
-    declareProperty("whichJet", m_whichJet);
-  }
+      : AthHistogramAlgorithm(name, pSvcLocator) { }
 
   StatusCode GhostAssocVRJetGetterAlg ::initialize()
   {

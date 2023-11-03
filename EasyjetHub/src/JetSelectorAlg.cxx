@@ -13,18 +13,7 @@ namespace Easyjet
 {
   JetSelectorAlg ::JetSelectorAlg(const std::string &name,
                                   ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator)
-  {
-    declareProperty("minPt", m_minPt);
-    declareProperty("maxEta", m_maxEta);
-    declareProperty("minimumAmount", m_minimumAmount);
-    declareProperty("maximumAmount", m_maximumAmount=-1);
-    declareProperty("truncateAtAmount", m_truncateAtAmount);
-    declareProperty("pTsort", m_pTsort);
-    declareProperty("removeRelativeDeltaRToVRJet",
-                    m_removeRelativeDeltaRToVRJet = false);
-    declareProperty("checkOR", m_checkOR);
-  }
+      : AthHistogramAlgorithm(name, pSvcLocator) { }
 
   StatusCode JetSelectorAlg ::initialize()
   {
@@ -73,41 +62,33 @@ namespace Easyjet
       
       // loop over jets
       for (const xAOD::Jet *jet : *inContainer)
-	{
-          // skip OR jets
-	  if( m_checkOR ){
-	    bool ispassORJet = ORDecorHandle(*jet);
-	    if ( !ispassORJet ) continue;
-	  }
+      {
+        // skip OR jets
+        if( m_checkOR ){
+          bool ispassORJet = ORDecorHandle(*jet);
+          if ( !ispassORJet ) continue;
+        }
 
-	  // jump out if VR jets overlap
-	  // recommended by ftag : Remove the event if any of your signal jets have
-	  // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.
-	  // checks if any of the vr jets overlap	  
-	  if (m_removeRelativeDeltaRToVRJet && m_relativeDeltaRToVRJet.get(*jet, sys) < 1.0)
-	    {
-	      workContainer->clear();
-	      break;
-	    }
-	  // cuts
-	  if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
-	    {
-	      continue;
-	    }
-	  // select btagging wp
-	  if (WPgiven)
-	    {
-	      if (m_isBtag.get(*jet, sys))
-		{
-		  workContainer->push_back(jet);
-		}
-	    }
-	  // if no btag wp is given take all
-	  else
-	    {
-	      workContainer->push_back(jet);
-	    }
-	}
+        // jump out if VR jets overlap
+        // recommended by ftag : Remove the event if any of your signal jets have
+        // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.
+        // checks if any of the vr jets overlap	  
+        if (m_removeRelativeDeltaRToVRJet && m_relativeDeltaRToVRJet.get(*jet, sys) < 1.0)
+        {
+          workContainer->clear();
+          break;
+        }
+        // cuts
+        if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
+          continue;
+
+        // select btagging wp
+        if (WPgiven && m_isBtag.get(*jet, sys))
+          workContainer->push_back(jet);
+        // if no btag wp is given take all
+        else
+          workContainer->push_back(jet);
+      }
       
       int nJets = workContainer->size();
       m_nSelPart.set(*event, nJets, sys);
@@ -116,43 +97,35 @@ namespace Easyjet
       // defaults/return empty container
       bool over_maximum = m_maximumAmount > 0 && nJets > m_maximumAmount;
       if ( nJets < m_minimumAmount || over_maximum)
-	{
-	  workContainer->clear();
-	  nJets = 0;
-	}
+      {
+        workContainer->clear();
+        nJets = 0;
+      }
       
       // sort and truncate
       int nKeep;
-      if (nJets < m_truncateAtAmount)
-	{
-	  nKeep = nJets;
-	}
-      else
-	{
-	  nKeep = m_truncateAtAmount;
-	}
+      if (nJets < m_truncateAtAmount) nKeep = nJets;
+      else nKeep = m_truncateAtAmount;
       
       if (m_pTsort)
-	{
-	  // if we give -1, sort the whole container
-	  if (m_truncateAtAmount == -1)
-	    {
-	      nKeep = nJets;
-	    }
-	  std::partial_sort(
-             workContainer->begin(), // Iterator from which to start sorting
-	     workContainer->begin() + nKeep, // Use begin + N to sort first N
-	     workContainer->end(), // Iterator marking the end of range to sort
-	     [](const xAOD::IParticle *left, const xAOD::IParticle *right)
-	     {
-	       return left->pt() > right->pt();
-	     }); // lambda function here just handy, could also be another
-                 // function that returns bool
+      {
+        // if we give -1, sort the whole container
+        if (m_truncateAtAmount == -1) nKeep = nJets;
+        
+        std::partial_sort(
+                workContainer->begin(), // Iterator from which to start sorting
+          workContainer->begin() + nKeep, // Use begin + N to sort first N
+          workContainer->end(), // Iterator marking the end of range to sort
+          [](const xAOD::IParticle *left, const xAOD::IParticle *right)
+          {
+            return left->pt() > right->pt();
+          }); // lambda function here just handy, could also be another
+                    // function that returns bool
 
-	  // keep only the requested amount
-	  workContainer->erase(workContainer->begin() + nKeep,
-			       workContainer->end());
-	}
+        // keep only the requested amount
+        workContainer->erase(workContainer->begin() + nKeep,
+                workContainer->end());
+      }
    
       // Write to eventstore
       ATH_CHECK(m_outHandle.record(std::move(workContainer), sys));   

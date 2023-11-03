@@ -149,8 +149,8 @@ private:
             this, "TruthParticleInformationOutKey", "",
             "Truth particle information container to write"};
 
-    unsigned int m_nHiggses;
-    std::vector<std::string> m_decayModes;
+    Gaudi::Property<unsigned int> m_nHiggses                {this, "nHiggses", 2, "Number of Higgses to record"};
+    Gaudi::Property<std::vector<std::string>> m_decayModes  {this, "decayModes", {""}, "HH decay modes to consider"};
 
     std::vector<SG::AuxElement::Decorator<int>> m_truthHiggsesPdgIdDecorators;
 

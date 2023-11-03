@@ -13,15 +13,7 @@ namespace Easyjet
 {
   PhotonSelectorAlg::PhotonSelectorAlg(const std::string &name,
                                        ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator)
-  {
-    declareProperty("LeadPho_ptOverMyy_min", m_LeadPho_ptOverMyy_min);
-    declareProperty("SubleadPho_ptOverMyy_min", m_SubleadPho_ptOverMyy_min);
-    declareProperty("etaBounds", m_etaBounds);
-    declareProperty("minimumAmount", m_minimumAmount);
-    declareProperty("truncateAtAmount", m_truncateAtAmount);
-    declareProperty("pTsort", m_pTsort);
-  }
+      : AthHistogramAlgorithm(name, pSvcLocator) { }
 
   StatusCode PhotonSelectorAlg::initialize()
   {
@@ -60,33 +52,29 @@ namespace Easyjet
         std::make_unique<ConstDataVector<xAOD::PhotonContainer> >(
             SG::VIEW_ELEMENTS);
 
-      float pt_cut = 25000;
-
       for (const xAOD::Photon *photon : *inContainer)
       {
-        bool passPtCut = false;
-        bool passEtaCut = false;
-
-        // From DF
-        bool passOQ = photon->isGoodOQ(xAOD::EgammaParameters::BADCLUSPHOTON); 
-        bool passCleaning = m_isClean.get(*photon, sys);
-        bool passPID = m_isLoose.get(*photon, sys);
-
-        if(photon->pt() > pt_cut) passPtCut = true;
+        // From DF, Quality
+        if(!photon->isGoodOQ(xAOD::EgammaParameters::BADCLUSPHOTON))
+          continue ; 
+        // From DF, Identification
+        if(!m_isLoose.get(*photon, sys))
+          continue ;
         
-        if(m_etaBounds[0] == -1 && m_etaBounds[1] == -1 && m_etaBounds[2] == -1){
-          passEtaCut = true;
-        }
-        else{
-          if((abs(photon->eta()) <= m_etaBounds[0] || abs(photon->eta()) >= m_etaBounds[1])
-             && abs(photon->eta()) <= m_etaBounds[2]) passEtaCut = true;
-        }
-
-        if(passOQ
-        && passCleaning
-        && passPtCut
-        && passEtaCut
-        && passPID) workContainer->push_back(photon);
+        // E-gamma cleaning
+        if(!m_isClean.get(*photon, sys))
+          continue ;
+        
+        if (photon->pt() < m_minPt)
+          continue;
+        
+        float this_photon_eta_abs = std::abs(photon->eta());
+        if((this_photon_eta_abs > m_minEtaVeto &&
+            this_photon_eta_abs < m_maxEtaVeto) ||
+            (this_photon_eta_abs > m_maxEta ))
+          continue ;
+        
+        workContainer->push_back(photon);  
       }
 
       int nPhotons = workContainer->size();
@@ -105,25 +93,22 @@ namespace Easyjet
       if (nPhotons < m_truncateAtAmount) nKeep = nPhotons;
       else nKeep = m_truncateAtAmount;
 
-      if (m_pTsort)
-      {
+      if (m_pTsort){
         // if we give -1, sort the whole container
-        if (m_truncateAtAmount == -1)
-        {
-          nKeep = nPhotons;
-        }
-
-        // lambda function here just handy, could also be another function that returns bool
-        std::partial_sort(
+        if (m_truncateAtAmount == -1) nKeep = nPhotons;
+        
+        std::partial_sort( 
           workContainer->begin(), // Iterator from which to start sorting
           workContainer->begin() + nKeep, // Use begin + N to sort first N
           workContainer->end(), // Iterator marking the end of range to sort
           [](const xAOD::IParticle *left, const xAOD::IParticle *right)
-          { return left->pt() > right->pt(); });
+          { return left->pt() > right->pt(); }); // lambda function here just
+                                                 // handy, could also be another
+                                                 // function that returns bool
 
         // keep only the requested amount
         workContainer->erase(workContainer->begin() + nKeep,
-                            workContainer->end());
+                             workContainer->end());
       }
 
       // Write to eventstore

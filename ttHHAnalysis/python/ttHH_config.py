@@ -13,10 +13,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey=muonkey,
             containerOutKey="ttHHAnalysisMuons",
             minPt=10e3,
-            maxEta=2.7,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -27,12 +23,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey=electronkey,
             containerOutKey="ttHHAnalysisElectrons",
             minPt=10e3,
-            minEtaVeto=1.37,
-            maxEtaVeto=1.52,
-            maxEta=2.47,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -43,12 +33,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey=smalljetkey,
             containerOutKey="ttHHAnalysisJets_BTag",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
-            minPt=25e3,
             maxEta=2.5,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
-            maximumAmount=99,
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -59,12 +44,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey=smalljetkey,
             containerOutKey="ttHHAnalysisJets",
             bTagWPDecorName="",
-            minPt=25e3,
-            maxEta=4.4,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,  # -1 means ignores this
-            maximumAmount=99,
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )

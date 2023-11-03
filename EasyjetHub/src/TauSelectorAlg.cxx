@@ -13,17 +13,7 @@ namespace Easyjet
 {
   TauSelectorAlg::TauSelectorAlg(const std::string &name,
                                        ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator)
-  {
-    declareProperty("minPt", m_minPt);
-    declareProperty("minEtaVeto", m_minEtaVeto);
-    declareProperty("maxEtaVeto", m_maxEtaVeto);
-    declareProperty("maxEta", m_maxEta);
-    declareProperty("minimumAmount", m_minimumAmount);
-    declareProperty("truncateAtAmount", m_truncateAtAmount);
-    declareProperty("pTsort", m_pTsort);
-    declareProperty("checkOR", m_checkOR);
-  }
+      : AthHistogramAlgorithm(name, pSvcLocator) { }
 
   StatusCode TauSelectorAlg::initialize()
   {
@@ -76,27 +66,28 @@ namespace Easyjet
       for (const xAOD::TauJet *tau : *inContainer) {
 
         // If not not ID tau nor anti tau, skip
-	bool isTauID = idTauDecorHandle(*tau);
-	bool isAntiTau = antiTauDecorHandle(*tau);
-	if ( !isAntiTau && !isTauID ) continue;
+        bool isTauID = idTauDecorHandle(*tau);
+        bool isAntiTau = antiTauDecorHandle(*tau);
+        if ( !isAntiTau && !isTauID ) 
+          continue;
 
         // If not passing OR, skip
-	if( m_checkOR ){
-	 bool ispassORTau = ORDecorHandle(*tau);
-	 if ( !ispassORTau ) continue;
-	}
+        if( m_checkOR ){
+          bool ispassORTau = ORDecorHandle(*tau);
+          if ( !ispassORTau ) continue;
+        }
 	
-     	if (tau->pt() < m_minPt)
-     	  continue;
-	
-     	float this_tau_eta_abs = std::abs(tau->eta());
-     	if ((this_tau_eta_abs > m_minEtaVeto &&
-     	     this_tau_eta_abs < m_maxEtaVeto) ||
-     	    (this_tau_eta_abs > m_maxEta))
-     	  continue;
-	
-     	// If cuts are passed, save the object
-     	workContainer->push_back(tau);
+        if (tau->pt() < m_minPt)
+          continue;
+    
+        float this_tau_eta_abs = std::abs(tau->eta());
+        if ((this_tau_eta_abs > m_minEtaVeto &&
+            this_tau_eta_abs < m_maxEtaVeto) ||
+            (this_tau_eta_abs > m_maxEta))
+          continue;
+    
+        // If cuts are passed, save the object
+        workContainer->push_back(tau);
        }
 
       int nTaus = workContainer->size();      
@@ -105,34 +96,33 @@ namespace Easyjet
       // if we have less than the requested nr, empty the workcontainer to write
       // defaults/return empty container
       if (nTaus < m_minimumAmount) {
-     	workContainer->clear();
-     	nTaus = 0;
+        workContainer->clear();
+        nTaus = 0;
       }
       
       // sort and truncate
-      int nKeep = std::min(nTaus, m_truncateAtAmount);
+      int nKeep;
+      if (nTaus < m_truncateAtAmount) nKeep = nTaus;
+      else nKeep = m_truncateAtAmount;
       
       if (m_pTsort) {
-     	// if we give -1, sort the whole container
-     	if (m_truncateAtAmount == -1) {
-     	  nKeep = nTaus;
-     	}
-	
-     	std::partial_sort(
-           workContainer->begin(), // Iterator from which to start sorting
-           workContainer->begin() + nKeep, // Use begin + N to sort first N
-           workContainer->end(), // Iterator marking the end of range to sort
-           [](const xAOD::IParticle *left, const xAOD::IParticle *right)
-     	  { return left->pt() > right->pt(); }); // lambda function here just
-                                                  // handy, could also be another
-                                                  // function that returns bool
+        // if we give -1, sort the whole container
+        if (m_truncateAtAmount == -1)  nKeep = nTaus;
+    
+        std::partial_sort(
+            workContainer->begin(), // Iterator from which to start sorting
+            workContainer->begin() + nKeep, // Use begin + N to sort first N
+            workContainer->end(), // Iterator marking the end of range to sort
+            [](const xAOD::IParticle *left, const xAOD::IParticle *right)
+          { return left->pt() > right->pt(); }); // lambda function here just
+                                                    // handy, could also be another
+                                                    // function that returns bool
 
-     	// keep only the requested amount
-     	workContainer->erase(workContainer->begin() + nKeep,
-     			     workContainer->end());
+        // keep only the requested amount
+        workContainer->erase(workContainer->begin() + nKeep,
+     			                   workContainer->end());
       }
     
-
       // Write to eventstore
       ATH_CHECK(m_outHandle.record(std::move(workContainer), sys));   
     }

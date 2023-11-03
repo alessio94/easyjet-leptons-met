@@ -13,10 +13,7 @@ namespace Easyjet
 {
   TauDecoratorAlg ::TauDecoratorAlg(const std::string &name,
                                   ISvcLocator *pSvcLocator)
-      : AthReentrantAlgorithm(name, pSvcLocator)
-  {
-    declareProperty("tauIDWP", m_tauIDWP_name);
-  }
+      : AthReentrantAlgorithm(name, pSvcLocator) { }
 
   StatusCode TauDecoratorAlg ::initialize()
   {

@@ -10,11 +10,6 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             "MuonSelectorAlg",
             containerInKey='loose' + muonkey,
             containerOutKey="bbVVAnalysisMuons_%SYS%",
-            minPt=7_000,
-            maxEta=2.7,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,     # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -24,13 +19,6 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             "ElectronSelectorAlg",
             containerInKey='loose' + electronkey,
             containerOutKey="bbVVAnalysisElectrons_%SYS%",
-            minPt=7_000,
-            minEtaVeto=1.37,
-            maxEtaVeto=1.52,
-            maxEta=2.47,
-            truncateAtAmount=-1,  # -1 means keep all
-            minimumAmount=-1,     # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -41,11 +29,9 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             containerInKey=smalljetkey,
             containerOutKey="bbVVAnalysisJets_%SYS%",
             bTagWPDecorName="",  # empty string: "" ignores btagging
-            minPt=25_000,
             maxEta=2.5,
             truncateAtAmount=2,  # -1 means keep all
             minimumAmount=2,  # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -56,11 +42,10 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             containerInKey=largejetkey,
             containerOutKey="bbVVAnalysisLRJets_%SYS%",
             bTagWPDecorName="",  # empty string: "" ignores btagging
-            minPt=200_000,
-            maxEta=2.,
+            minPt=200e3,
+            maxEta=2.0,
             truncateAtAmount=3,  # -1 means keep all
             minimumAmount=2,  # -1 means ignores this
-            pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -73,11 +58,10 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 containerInKey=largejetkey,
                 containerOutKey="boostedAnalysisJets_" + btag_wp,
                 bTagWPDecorName="ftag_select_" + btag_wp,
-                minPt=250_000,
+                minPt=250e3,
                 maxEta=2.0,
                 truncateAtAmount=2,  # -1 means keep all
                 minimumAmount=2,  # -1 means ignores this
-                pTsort=True,
                 checkOR=flags.Analysis.do_overlap_removal,
             )
         )
@@ -98,11 +82,10 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 containerInKey="leadingLargeRVRJets_" + btag_wp,
                 containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
                 bTagWP=btag_wp,  # empty string: "" ignores btagging
-                minPt=10_000,
+                minPt=10e3,
                 maxEta=2.5,
                 truncateAtAmount=3,  # -1 means keep all
                 minimumAmount=2,  # -1 means ignores this
-                pTsort=True,
                 removeRelativeDeltaRToVRJet=True,
                 checkOR=flags.Analysis.do_overlap_removal,
             )
@@ -126,11 +109,10 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
                 containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
                 bTagWP=btag_wp,  # empty string: "" ignores btagging
-                minPt=10_000,
+                minPt=10e3,
                 maxEta=2.5,
                 truncateAtAmount=3,  # -1 means keep all
                 minimumAmount=2,  # -1 means ignores this
-                pTsort=True,
                 removeRelativeDeltaRToVRJet=True,
             )
         )
