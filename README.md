@@ -51,8 +51,10 @@ git pull --rebase upstream master
 7. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
 ```
 git pull --rebase upstream master
-# Fix potential conflicts
-git push -f origin YourNewFavoriteBranch
+```
+Then fix the potential conflicts and push to the current branch:
+```
+git push -f origin $(git symbolic-ref --short HEAD)
 ```
 Please favour `rebase` over `merge` as it can badly affect the commit history. By default `git pull`, will use merge, unless you provide the explicit `--rebase` option.
 
