@@ -62,6 +62,9 @@ def jet_sequence(
                 f'{drop_sys(allcalib_name)}.{tagger_wp}'
             )
             configSeq.setOptionValue('.btagger', tagger)
+            # set the MC/MC SF to default for now, this was broken by
+            # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
+            configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
             configSeq.setOptionValue('.kinematicSelection', True)
             if 'btagCDI' in flags.Analysis.small_R:

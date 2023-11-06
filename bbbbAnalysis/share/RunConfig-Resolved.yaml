@@ -2,7 +2,7 @@ include: EasyjetHub/base-config.yaml
 
 # Toggles for object types
 do_small_R_jets: true
-do_muons: true
+do_muons: false
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]
@@ -15,9 +15,6 @@ small_R:
   btag_extra_wps:
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
-    - GN120220509_FixedCutBEff_70
-    - GN120220509_FixedCutBEff_77
-    - GN120220509_FixedCutBEff_85
 
 grl_files:
   include: EasyjetHub/bjet_grl.yaml

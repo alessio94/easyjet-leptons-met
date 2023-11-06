@@ -1,7 +1,7 @@
 include: base-config.yaml
 
 # Toggles for object types
-do_muons: true
+do_muons: false
 do_electrons: true
 do_small_R_jets: true
 do_large_R_UFO_jets: true
@@ -19,9 +19,6 @@ small_R:
   btag_extra_wps:
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
-    - GN120220509_FixedCutBEff_70
-    - GN120220509_FixedCutBEff_77
-    - GN120220509_FixedCutBEff_85
 
 # list of triggers per year to consider
 trigger_chains:
@@ -42,7 +39,6 @@ ttree_output:
     include: AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
     reco_outputs:
-      muons: 'container_names.output.muons'
       electrons: 'container_names.output.electrons'
       small_R_jets: 'container_names.output.reco4PFlowJet'
       large_R_UFO_jets: 'container_names.output.reco10UFOJet'

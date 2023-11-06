@@ -1,6 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from OutputStreamAthenaPool.OutputStreamConfig import OutputStreamCfg
+from xAODMetaDataCnv.InfileMetaDataConfig import SetupMetaDataForStreamCfg
 
 
 def container(typename, key, items=[]):
@@ -25,5 +26,10 @@ def get_xaod_cfg(flags):
         "xAOD::EventInfo#EventInfo",
         "xAOD::AuxInfoBase#EventInfoAux."
     ] + container("Jet", "EasyJets")
-    ca.merge(OutputStreamCfg(flags, "AOD", ItemList=item_list))
+    ca.merge(OutputStreamCfg(
+        flags,
+        "AOD",
+        ItemList=item_list,
+    ))
+    ca.merge(SetupMetaDataForStreamCfg(flags, streamName="AOD"))
     return ca

@@ -1,7 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AnalysisAlgorithmsConfig.ConfigAccumulator import ConfigAccumulator
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
-from AthenaConfiguration.Enums import LHCPeriod
 
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.calibration.event_weights import (
@@ -76,10 +75,8 @@ def cpalgs_cfg(flags):
     # the ConfigBlocks with interstitial container names etc
     calibSeq = CompFactory.AthSequencer('CPAlgSequence')
     configAccumulator = ConfigAccumulator(
-        flags.Analysis.DataType,
         calibSeq,
-        isPhyslite=flags.Input.isPHYSLITE,
-        geometry=LHCPeriod[f'Run{flags.Analysis.Run}'],
+        autoconfigFromFlags=flags,
     )
 
     if not flags.Analysis.disable_calib:

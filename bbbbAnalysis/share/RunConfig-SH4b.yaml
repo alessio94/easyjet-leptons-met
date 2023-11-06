@@ -1,10 +1,10 @@
 include: EasyjetHub/base-config.yaml
 # Toggles for object types
 do_small_R_jets: true
-do_large_R_Topo_jets: true
+do_large_R_Topo_jets: false
 do_large_R_UFO_jets: true
 do_VR_jets: true
-do_muons: true
+do_muons: false
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]
@@ -17,9 +17,6 @@ small_R:
   btag_extra_wps:
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
-    - GN120220509_FixedCutBEff_70
-    - GN120220509_FixedCutBEff_77
-    - GN120220509_FixedCutBEff_85
 
 # list of triggers per year to consider
 trigger_chains:
@@ -39,7 +36,6 @@ ttree_output:
     # Our overrides. All defaults are off
     reco_outputs:
       small_R_jets: 'container_names.output.reco4PFlowJet'
-      large_R_Topo_jets: 'container_names.output.reco10TopoJet'
       large_R_UFO_jets: 'container_names.output.reco10UFOJet'
       VR_jets: 'container_names.output.vrJet'
     collection_options:
