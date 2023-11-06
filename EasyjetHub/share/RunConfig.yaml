@@ -1,7 +1,7 @@
 include: base-config.yaml
 
 # Toggles for object types
-do_muons: false
+do_muons: true
 do_electrons: true
 do_small_R_jets: true
 do_large_R_UFO_jets: true
@@ -39,6 +39,7 @@ ttree_output:
     include: AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
     reco_outputs:
+      muons: 'container_names.output.muons'
       electrons: 'container_names.output.electrons'
       small_R_jets: 'container_names.output.reco4PFlowJet'
       large_R_UFO_jets: 'container_names.output.reco10UFOJet'

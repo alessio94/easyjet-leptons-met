@@ -4,7 +4,7 @@ do_small_R_jets: true
 do_large_R_Topo_jets: false
 do_large_R_UFO_jets: true
 do_VR_jets: true
-do_muons: false
+do_muons: true
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]
