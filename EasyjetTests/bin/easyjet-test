@@ -8,7 +8,7 @@ set -Eeu
 ################################################
 
 #tag from easyjet/hh4b-test-files
-TAG=p5855HHbbyy
+TAG=p5855bbbb
 
 # standard samples
 PHYS_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYS_10evts.r13286_p5855.pool.root
@@ -17,15 +17,14 @@ PHYS_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14190_p585
 PHYSLITE_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYSLITE_10evts.r14190_p5858.pool.root
 PHYS_JETS_MC20=mc20_13TeV.364704.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ4WithSW.DAOD_PHYS_10evts.e7142_s3681_r13145_p5855.pool.root
 PHYS_TTBAR_MC20=mc20_13TeV.410471.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e6337_s3681_r13145_p5855.pool.root
-PHYS_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5631.pool.root
-PHYS_SH4B_BOOSTED_MC20_p5658=mc20_13TeV.801637.Py8EG_A14NNPDF23LO_XHS_X3000_S100_4b.DAOD_PHYS_10evts.e8448_a899_r13145_p5658.pool.root
-PHYSLITE_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a899_r13145_p5631.pool.root
-PHYS_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5631.pool.root
-PHYSLITE_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5631.pool.root
+PHYS_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a907_r14860_p5855.pool.root
+PHYSLITE_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a907_r14860_p5855.pool.root
+PHYS_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5855.pool.root
+PHYSLITE_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5855.pool.root
 PHYS_TTBAR_MC21=mc21_13p6TeV.601237.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e8453_s3873_r13829_p5855.pool.root
 PHYS_JETS_MC21=mc21_13p6TeV.801170.Py8EG_A14NNPDF23LO_jj_JZ5.DAOD_PHYS_10evts.e8453_s3873_r13829_p5855.pool.root
-PHYS_JETS_MC23=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_s4111_r14622_p5706.pool.root
-PHYS_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_s4114_r14908_p5855.pool.root
+PHYS_JETS_MC23=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_s4111_r14622_p5855.pool.root
+PHYS_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_a911_s4114_r14908_p5855.pool.root
 
 PHYS_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13144_p5855.pool.root
 PHYSLITE_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13144_p5855.pool.root
@@ -59,7 +58,6 @@ declare -A DATAFILES=(
     [lite-hh4b-mc21-fast]=${PHYSLITE_HH4B_MC21}
     [lite-hh4b-mc21]=${PHYSLITE_HH4B_MC21}
     [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED_MC20}
-    [sh4b-boosted-mc20-p5658]=${PHYS_SH4B_BOOSTED_MC20_p5658}
     [yybb-mc20]=${PHYS_YYBB_MC20}
     [lite-yybb-mc20]=${PHYSLITE_YYBB_MC20}
     [lite-bbtt-hadhad-mc21]=${PHYSLITE_BBTT_HH_MC21}
@@ -100,7 +98,6 @@ declare -A TESTS=(
     [lite-hh4b-mc21-fast]="fast easyjet-ntupler"
     [lite-hh4b-mc21]="simple easyjet-ntupler"
     [sh4b-boosted-mc20]="simple bbbb-ntupler"
-    [sh4b-boosted-mc20-p5658]="simple bbbb-ntupler"
     [yybb-mc20]="simple bbyy-ntupler"
     [lite-yybb-mc20]="simple bbyy-ntupler"
     [lite-bbtt-hadhad-mc21]="simple bbtt-ntupler"
@@ -128,7 +125,6 @@ declare -A CONFIGS=(
     [lite-hh4b-mc21-fast]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [lite-hh4b-mc21]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [sh4b-boosted-mc20]=bbbbAnalysis/RunConfig-SH4b.yaml
-    [sh4b-boosted-mc20-p5658]=bbbbAnalysis/RunConfig-SH4b.yaml
     [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
     [yybb-mc20]=bbyyAnalysis/RunConfig-PHYS-yybb.yaml
     [lite-yybb-mc20]=bbyyAnalysis/RunConfig-PHYSLITE-yybb.yaml

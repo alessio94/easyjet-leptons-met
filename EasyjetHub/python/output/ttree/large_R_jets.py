@@ -86,9 +86,6 @@ def get_ghost_vr_branches(flags):
         "leadingVRTrackJetsDeltaR12",
         "leadingVRTrackJetsDeltaR13",
         "leadingVRTrackJetsDeltaR32",
-        "Xbb2020v3_Higgs",
-        "Xbb2020v3_Top",
-        "Xbb2020v3_QCD",
     ] + [
         f"leadingVRTrackJetsBtag_{wp}"
         for wp in flags.Analysis.large_R.vr_btag_wps
@@ -123,13 +120,9 @@ def get_substructure_branches(lr_jet_type):
 
 def get_large_R_gn2_branches():
     gn2_branches = [
-        "GN2Xv00_phbb",
-        "GN2Xv00_phcc",
-        "GN2Xv00_ptop",
-        "GN2Xv00_pqcd",
-        "GN2XWithMassv00_phbb",
-        "GN2XWithMassv00_phcc",
-        "GN2XWithMassv00_ptop",
-        "GN2XWithMassv00_pqcd",
+        "GN2Xv01_phbb",
+        "GN2Xv01_phcc",
+        "GN2Xv01_ptop",
+        "GN2Xv01_pqcd",
     ]
     return gn2_branches

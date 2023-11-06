@@ -123,11 +123,6 @@ ntupler_sh4b_boosted_mc20:
   script:
     - easyjet-test sh4b-boosted-mc20
 
-ntupler_sh4b_boosted_mc20_p5658:
-  extends: .ntupler
-  script:
-    - easyjet-test sh4b-boosted-mc20-p5658
-
 # systematics enabled
 
 syst_ttbar_mc21_syst:

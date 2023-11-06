@@ -16,8 +16,11 @@ class DataSampleYears(Enum):
 
 MCSampleYears = {
     'r13167': (2015, 2016),
+    'r14859': (2015, 2016),
     'r13144': (2017,),
+    'r14860': (2017,),
     'r13145': (2018,),
+    'r14861': (2018,),
     'r13829': (2022,),
     'r14622': (2022, 2023),
     'r14799': (2023,),
@@ -27,8 +30,11 @@ MCSampleYears = {
 
 class SampleTypes(Enum):
     mc20a = "r13167"  # run2, 2015-16
+    mc20a_af3 = "r14859"  # run2, 2015-16, fastsim
     mc20d = "r13144"  # run2, 2017
+    mc20d_af3 = "r14860"  # run2, 2017, fastsim
     mc20e = "r13145"  # run2, 2018
+    mc20e_af3 = "r14861"  # run2, 2018, fastsim
     mc21a = "r13829"  # run3, 2022
     mc23a = "r14622"  # run3, 2022
     mc23c = "r14799"  # run3, 2023

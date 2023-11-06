@@ -1,11 +1,9 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "LargeJetGhostVRJetAssociationAlg.h"
-//Athena includes
 
-//#include "PathResolver/PathResolver.h"
 namespace Easyjet
 {
   LargeJetGhostVRJetAssociationAlg ::LargeJetGhostVRJetAssociationAlg(
@@ -17,17 +15,6 @@ namespace Easyjet
   StatusCode LargeJetGhostVRJetAssociationAlg ::initialize()
   {
     ATH_MSG_DEBUG("Initialising " << name());
-
-    FlavorTagDiscriminants::HbbTagConfig hbbConfig_Xbb2020v3;
-    hbbConfig_Xbb2020v3.input_file_path = "BTagging/2020v3/Xbb/GhostVR30Rmax4Rmin02TrackJet_BTagging201903/network.json";
-    hbbConfig_Xbb2020v3.subjet_link_name = "GhostAntiKtVR30Rmax4Rmin02PV0TrackJets";
-    m_hbbTagXbb2020v3 = std::make_unique<FlavorTagDiscriminants::HbbTag>(hbbConfig_Xbb2020v3);
-
-    if (m_workingPoints.empty())
-    {
-      ATH_MSG_ERROR("A list of working points needs to be provided");
-      return StatusCode::FAILURE;
-    }
 
     for (auto &workingpoint : m_workingPoints)
     {
@@ -73,8 +60,6 @@ namespace Easyjet
 
     for (auto *largejet : largeRJets)
     {
-      m_hbbTagXbb2020v3->decorate(*largejet);
-
       // get ghost associated VR track jets from untrimmed large R jet
       const xAOD::Jet *untrimmedLargeRJet =
           *m_largeRUntrimmedAccessor(*largejet);
