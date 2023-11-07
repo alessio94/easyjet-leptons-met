@@ -1,0 +1,48 @@
+include: EasyjetHub/base-config.yaml
+# Toggles for object types
+do_small_R_jets: true
+do_large_R_UFO_jets: false
+do_muons: true
+do_electrons: true
+do_met : true
+do_mmc : true
+
+# Decay mode considered for truth decoration
+truthDecayModes: ["bbtt", "bbWW", "bbZZ"]
+
+# small R config
+small_R:
+  # btagging working points 
+  btag_wp: "DL1dv01_FixedCutBEff_77"
+
+# list of triggers per year to consider
+trigger_chains:
+  include: bbllAnalysis/trigger.yaml
+
+do_bbll_analysis: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+
+# Include the TTree configuration and update details
+ttree_output:
+  - AnalysisMiniTree:
+    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
+    write_object_systs_only_for_pt: true
+    reco_outputs:
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
+      met : 'container_names.output.met'
+    collection_options:
+      small_R_jets:
+        btag_info: true
+    truth_outputs:
+      small_R_jets: 'container_names.input.truth4Jet'
+      higgs_particle: 'container_names.output.truthHHParticles'
+
+do_CP_systematics: false
+systematics_regex: [".*"]
+
