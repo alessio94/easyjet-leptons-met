@@ -1,4 +1,8 @@
 include: EasyjetHub/base-config.yaml
+
+# Toggles to bypass event selection
+bypass: false
+
 # Toggles for object types
 do_small_R_jets: true
 do_large_R_UFO_jets: false
