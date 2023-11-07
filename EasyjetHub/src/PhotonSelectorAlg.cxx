@@ -8,6 +8,9 @@
 #include "AthContainers/AuxElement.h"
 #include <xAODEgamma/PhotonContainer.h>
 #include "FourMomUtils/xAODP4Helpers.h"
+#include <xAODTracking/VertexContainer.h>
+#include <AsgDataHandles/ReadHandle.h>
+#include "egammaUtils/egPhotonWrtPoint.h"
 
 namespace Easyjet
 {
@@ -28,14 +31,30 @@ namespace Easyjet
     ATH_CHECK (m_isLoose.initialize(m_systematicsList, m_inHandle));
     ATH_CHECK (m_isClean.initialize(m_systematicsList, m_inHandle));
 
-    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
+
+    // Initialise vertex container for photon pointing
+    ATH_CHECK (m_vertexContainerInKey.initialize());
 
     return StatusCode::SUCCESS;
   }
 
   StatusCode PhotonSelectorAlg::execute()
   {
+
+    // vertex related objects and variables
+    SG::ReadHandle<xAOD::VertexContainer> vertices_(m_vertexContainerInKey);
+    const xAOD::Vertex* primary = nullptr;
+    for (const xAOD::Vertex* vtx : *vertices_) {
+      if (vtx->vertexType() == xAOD::VxType::PriVtx) {
+        primary = vtx;
+        break;
+      }
+    }
+    if (!primary) {
+      ATH_MSG_WARNING("Could not find a Primary vertex");
+    }
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
@@ -54,27 +73,35 @@ namespace Easyjet
 
       for (const xAOD::Photon *photon : *inContainer)
       {
+        // Recompute photon pt and eta with respect to the hardest vertex z position
+        xAOD::Photon *thisPhoton = new xAOD::Photon(*photon);
+
+        if(m_recomputePhotons){
+          photonWrtPoint::correctForZ(*thisPhoton, primary->z());
+        };
+
         // From DF, Quality
-        if(!photon->isGoodOQ(xAOD::EgammaParameters::BADCLUSPHOTON))
+        if(!thisPhoton->isGoodOQ(xAOD::EgammaParameters::BADCLUSPHOTON))
           continue ; 
         // From DF, Identification
-        if(!m_isLoose.get(*photon, sys))
+        if(!m_isLoose.get(*thisPhoton, sys))
           continue ;
         
         // E-gamma cleaning
-        if(!m_isClean.get(*photon, sys))
+        if(!m_isClean.get(*thisPhoton, sys))
           continue ;
         
-        if (photon->pt() < m_minPt)
+        if (thisPhoton->pt() < m_minPt)
           continue;
         
-        float this_photon_eta_abs = std::abs(photon->eta());
+        float this_photon_eta_abs = std::abs(thisPhoton->eta());
         if((this_photon_eta_abs > m_minEtaVeto &&
             this_photon_eta_abs < m_maxEtaVeto) ||
             (this_photon_eta_abs > m_maxEta ))
           continue ;
-        
-        workContainer->push_back(photon);  
+
+        const xAOD::Photon *outPhoton = thisPhoton;
+        workContainer->push_back(outPhoton);
       }
 
       int nPhotons = workContainer->size();

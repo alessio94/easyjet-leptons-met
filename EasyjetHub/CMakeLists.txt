@@ -38,6 +38,7 @@ atlas_add_component(EasyjetHub
   xAODJet
   xAODTau
   xAODTruth
+  egammaUtils
   StoreGateLib
   SystematicsHandlesLib
   FourMomUtils
