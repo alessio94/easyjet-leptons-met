@@ -56,6 +56,12 @@ private:
 
     std::vector<HHBBTT::Channel> m_channels;
 
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
+    Gaudi::Property<std::vector<int>> m_years
+      { this, "Years", false, "which years are running" };
+    
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
@@ -87,6 +93,11 @@ private:
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
+    CP::SysReadDecorHandle<unsigned int>
+    m_runNumber {this, "runNumber", "runNumber", "Runnumber"};
+
+    std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
+
     Gaudi::Property<std::string> m_eleIdDecorName
       { this, "eleIdDecorKey", "DFCommonElectronsLHTight","Decoration for electron ID working point" };
     SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleIdDecorKey;
@@ -98,11 +109,16 @@ private:
     Gaudi::Property<std::string> m_muonPreselDecorName
       { this, "muonPreselDecorKey", "DFCommonMuonPassPreselection","Decoration for muon preselection" };
     SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
-   
-    CP::SysWriteDecorHandle<bool> m_pass_SLT {"pass_SLT_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_pass_LTT {"pass_LTT_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_pass_STT {"pass_STT_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_pass_DTT {"pass_DTT_%SYS%", this};
+
+    Gaudi::Property<std::vector<std::string>> m_triggers 
+          {this, "triggerlists", {}, "Name list of trigger"};
+
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+    std::vector<std::string> m_Bvarnames{      
+      "pass_trigger_SLT", "pass_trigger_LTT", "pass_trigger_STT", "pass_trigger_DTT",
+      "pass_baseline_SLT", "pass_baseline_LTT", "pass_baseline_STT", "pass_baseline_DTT",
+      "pass_SLT", "pass_LTT", "pass_STT", "pass_DTT",
+    };
 
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
@@ -113,20 +129,32 @@ private:
     
     /// \brief Internal variables
 
+    bool trigPassed_SLT;
+    bool trigPassed_LTT;
+    bool trigPassed_STT;
+    bool trigPassed_DTT;
     bool TWO_JETS;
     bool TWO_BJETS;
-    bool LEADJET_PT;
     bool MBB_MASS;
     bool N_LEPTONS_CUT_LEPHAD;
     bool ONE_TAU;
     bool OS_CHARGE_LEPHAD;
+    bool pass_baseline_SLT;
+    bool pass_baseline_LTT;
     bool pass_SLT;
     bool pass_LTT;
     bool N_LEPTONS_CUT_HADHAD;
     bool TWO_TAU;
     bool OS_CHARGE_HADHAD;
+    bool pass_baseline_STT;
+    bool pass_baseline_DTT;
     bool pass_STT;
     bool pass_DTT;
+    std::unordered_map<std::string, std::unordered_map<std::string, float>> m_pt_threshold;
+    bool DTT_DeltaR_cut;
+    
+
+    void applyTriggerSelection(const xAOD::TauJetContainer* taus, const xAOD::EventInfo* event, const CP::SystematicSet& sys);
 
   };
 }

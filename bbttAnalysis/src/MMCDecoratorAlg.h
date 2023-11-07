@@ -68,10 +68,10 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-    CP::SysReadDecorHandle<bool> m_pass_SLT {"pass_SLT_%SYS%", this};
-    CP::SysReadDecorHandle<bool> m_pass_LTT {"pass_LTT_%SYS%", this};
-    CP::SysReadDecorHandle<bool> m_pass_STT {"pass_STT_%SYS%", this};
-    CP::SysReadDecorHandle<bool> m_pass_DTT {"pass_DTT_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_pass_SLT {this, "passSLT", "", "events pass (baseline) SLT"};
+    CP::SysReadDecorHandle<bool> m_pass_LTT {this, "passLTT", "", "events pass (baseline) LTT"};
+    CP::SysReadDecorHandle<bool> m_pass_STT {this, "passSTT", "", "events pass (baseline) STT"};
+    CP::SysReadDecorHandle<bool> m_pass_DTT {this, "passDTT", "", "events pass (baseline) DTT"};
 
     CP::SysReadDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};

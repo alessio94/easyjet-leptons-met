@@ -133,11 +133,13 @@ namespace HHBBTT
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
           if(!part1) part1 = tau;
-          if(!is_hadhad) break;
-          else continue;
-
-          part2 = tau;
-          break;
+          else{
+            if(!is_hadhad) break;
+            else{
+              part2 = tau;
+              break;
+            }
+          }
         }
       }
 

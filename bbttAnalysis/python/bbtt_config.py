@@ -45,6 +45,11 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     )
 
     # Selection
+    trigger_branches = [
+        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
+        for c in flags.Analysis.TriggerChains
+    ]
+
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
@@ -55,12 +60,19 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
             eventDecisionOutputDecoration="bbtt_pass_sr_noMMC_%SYS%",
+            triggerlists=trigger_branches,
             channel=flags.Analysis.channel,
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years,
             bypass=flags.Analysis.bypass,
         )
     )
 
     # MMC decoration
+    if flags.Analysis.do_baseline:
+        baseline = "_baseline_"
+    else:
+        baseline = "_"
     if flags.Analysis.do_mmc:
         cfg.addEventAlgo(
             CompFactory.HHBBTT.MMCDecoratorAlg(
@@ -70,6 +82,10 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
                 electrons="bbttAnalysisElectrons_%SYS%",
                 taus="bbttAnalysisTaus_%SYS%",
                 met="AnalysisMET_%SYS%",
+                passSLT="pass" + baseline + "SLT_%SYS%",
+                passLTT="pass" + baseline + "LTT_%SYS%",
+                passSTT="pass" + baseline + "STT_%SYS%",
+                passDTT="pass" + baseline + "DTT_%SYS%",
                 channel=flags.Analysis.channel,
             )
         )
@@ -138,9 +154,8 @@ def bbtt_branches(flags):
 
     branches += ["EventInfo.bbtt_pass_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
 
-    branches += ["EventInfo.pass_SLT_%SYS% -> bbtt_pass_SLT_%SYS%"]
-    branches += ["EventInfo.pass_LTT_%SYS% -> bbtt_pass_LTT_%SYS%"]
-    branches += ["EventInfo.pass_STT_%SYS% -> bbtt_pass_STT_%SYS%"]
-    branches += ["EventInfo.pass_DTT_%SYS% -> bbtt_pass_DTT_%SYS%"]
+    for var in ["_trigger_", "_baseline_", "_"]:
+        for cat in ["SLT", "LTT", "STT", "DTT"]:
+            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> bbtt_pass{var}{cat}_%SYS%"]
 
     return branches
