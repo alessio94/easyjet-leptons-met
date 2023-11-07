@@ -38,6 +38,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             "SmallJetSelectorAlg",
             containerInKey=smalljetkey,
             containerOutKey="bbttAnalysisJets_%SYS%",
+            minPt=20 * Units.GeV,
             bTagWPDecorName="",  # empty string: "" ignores btagging
             minimumAmount=2,  # -1 means ignores this
             checkOR=flags.Analysis.do_overlap_removal,
