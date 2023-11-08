@@ -25,18 +25,11 @@ PHYS_TTBAR_MC21=mc21_13p6TeV.601237.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PH
 PHYS_JETS_MC21=mc21_13p6TeV.801170.Py8EG_A14NNPDF23LO_jj_JZ5.DAOD_PHYS_10evts.e8453_s3873_r13829_p5855.pool.root
 PHYS_JETS_MC23=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_s4111_r14622_p5855.pool.root
 PHYS_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_a911_s4114_r14908_p5855.pool.root
-
 PHYS_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13144_p5855.pool.root
 PHYSLITE_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13144_p5855.pool.root
-
 PHYS_BBTT_HH_MC21=mc21_13p6TeV.601477.PhPy8EG_HHbbttHadHad_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5855.pool.root
 PHYSLITE_BBTT_HH_MC21=mc21_13p6TeV.601477.PhPy8EG_HHbbttHadHad_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5855.pool.root
-# bbtt: using hadhad mc21 samples for the lephad test as we don't have the lephad mc21 samples yet
-PHYS_BBTT_LH_MC21=${PHYS_BBTT_HH_MC21}
-PHYSLITE_BBTT_LH_MC21=${PHYSLITE_BBTT_HH_MC21}
-#bbll: using ttbar samples and data18 samples as a substitute as the bbll samples aren't available yet
-PHYS_BBLL_MC20=${PHYS_TTBAR_MC20}
-PHYSLITE_BBLL_MC20=${PHYSLITE_DATA_2018}
+
 
 declare -A DATAFILES=(
     [data18-fast]=${PHYS_DATA_2018}
@@ -63,12 +56,10 @@ declare -A DATAFILES=(
     [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED_MC20}
     [yybb-mc20]=${PHYS_YYBB_MC20}
     [lite-yybb-mc20]=${PHYSLITE_YYBB_MC20}
-    [lite-bbtt-hadhad-mc21]=${PHYSLITE_BBTT_HH_MC21}
-    [bbtt-hadhad-mc21]=${PHYS_BBTT_HH_MC21}
-    [lite-bbtt-lephad-mc21]=${PHYSLITE_BBTT_LH_MC21}
-    [bbtt-lephad-mc21]=${PHYS_BBTT_LH_MC21}
-    [lite-bbll-mc20]=${PHYSLITE_BBLL_MC20}
-    [bbll-mc20]=${PHYS_BBLL_MC20}
+    [lite-bbll-data18]=${PHYSLITE_DATA_2018}
+    [bbll-mc20]=${PHYS_TTBAR_MC20}
+    [lite-bbtt-mc21]=${PHYSLITE_BBTT_HH_MC21}
+    [bbtt-mc21]=${PHYS_BBTT_HH_MC21}
     # systematics enabled
     [syst-ttbar-mc21]=${PHYS_TTBAR_MC21}
     [syst-hh4b-mc21]=${PHYS_HH4B_MC21}
@@ -105,12 +96,10 @@ declare -A TESTS=(
     [sh4b-boosted-mc20]="simple bbbb-ntupler"
     [yybb-mc20]="simple bbyy-ntupler"
     [lite-yybb-mc20]="simple bbyy-ntupler"
-    [lite-bbtt-hadhad-mc21]="simple bbtt-ntupler"
-    [bbtt-hadhad-mc21]="simple bbtt-ntupler"
-    [lite-bbtt-lephad-mc21]="simple bbtt-ntupler"
-    [bbtt-lephad-mc21]="simple bbtt-ntupler"
     [bbll-mc20]="simple bbll-ntupler"
-    [lite-bbll-mc20]="simple bbll-ntupler"
+    [lite-bbll-data18]="simple bbll-ntupler"
+    [bbtt-mc21]="simple bbtt-ntupler"
+    [lite-bbtt-mc21]="simple bbtt-ntupler"
     # systamatics
     [syst-ttbar-mc21]="systematics easyjet-ntupler"
     [syst-hh4b-mc21]="systematics easyjet-ntupler"
@@ -135,12 +124,10 @@ declare -A CONFIGS=(
     [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
     [yybb-mc20]=bbyyAnalysis/RunConfig-PHYS-yybb.yaml
     [lite-yybb-mc20]=bbyyAnalysis/RunConfig-PHYSLITE-yybb.yaml
-    [lite-bbtt-hadhad-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt-bypass.yaml
-    [bbtt-hadhad-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt-bypass.yaml
-    [lite-bbtt-lephad-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt-bypass.yaml
-    [bbtt-lephad-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt-bypass.yaml
-    [lite-bbll-mc20]=bbllAnalysis/RunConfig-PHYSLITE-bbll.yaml
+    [lite-bbll-data18]=bbllAnalysis/RunConfig-PHYSLITE-bbll.yaml
     [bbll-mc20]=bbllAnalysis/RunConfig-PHYS-bbll.yaml
+    [lite-bbtt-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt-bypass.yaml
+    [bbtt-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt-bypass.yaml
     # non-ntupler
     [aod-hh4b-mc21-fast]=bbbbAnalysis/RunConfig-Resolved.yaml
     [hist-syst-hh4b-mc21]=bbbbAnalysis/histonly-config.yaml
