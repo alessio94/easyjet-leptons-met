@@ -68,13 +68,12 @@ namespace Easyjet
 
       // Setup output 
       auto workContainer =
-        std::make_unique<ConstDataVector<xAOD::PhotonContainer> >(
-            SG::VIEW_ELEMENTS);
+        std::make_unique<ConstDataVector<xAOD::PhotonContainer> >();
 
       for (const xAOD::Photon *photon : *inContainer)
       {
         // Recompute photon pt and eta with respect to the hardest vertex z position
-        xAOD::Photon *thisPhoton = new xAOD::Photon(*photon);
+        auto thisPhoton = std::make_unique<xAOD::Photon>(*photon);
 
         if(m_recomputePhotons){
           photonWrtPoint::correctForZ(*thisPhoton, primary->z());
@@ -100,8 +99,7 @@ namespace Easyjet
             (this_photon_eta_abs > m_maxEta ))
           continue ;
 
-        const xAOD::Photon *outPhoton = thisPhoton;
-        workContainer->push_back(outPhoton);
+        workContainer->push_back(thisPhoton.release());
       }
 
       int nPhotons = workContainer->size();
