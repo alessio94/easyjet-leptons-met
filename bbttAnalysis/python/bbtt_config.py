@@ -61,7 +61,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
             eventDecisionOutputDecoration="bbtt_pass_sr_noMMC_%SYS%",
-            triggerlists=trigger_branches,
+            triggerLists=trigger_branches,
             channel=flags.Analysis.channel,
             isMC=flags.Input.isMC,
             Years=flags.Analysis.Years,

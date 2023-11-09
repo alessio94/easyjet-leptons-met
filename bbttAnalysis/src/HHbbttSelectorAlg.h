@@ -111,7 +111,7 @@ private:
     SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
 
     Gaudi::Property<std::vector<std::string>> m_triggers 
-          {this, "triggerlists", {}, "Name list of trigger"};
+          {this, "triggerLists", {}, "Name list of trigger"};
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
     std::vector<std::string> m_Bvarnames{      

@@ -71,7 +71,7 @@ make
 source */setup.sh
 ```
 
-*If you are working in a container (described [below](#athanalysis-in-docker)), source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*
+*If you are working in a container (described [below](#athanalysis-in-docker)), source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*. The setup.sh will provide the current working AthAnalysis version
 
 
 ## Updating
@@ -96,15 +96,17 @@ easyjet-ntupler data.myinputfile.DAOD_PHYS.pool.root --run-config [path-to-runco
 Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
 You should find a new ROOT files, `analysis-variables.root`.
 
+*To run analysis specific code run the executable of the analysis you want to run. For example to run the bbtautau analysis run `bbtt-ntupler <file> ...`. For more information on each individual analyis read the README in the analysis subfolder. 
+
 To process Monte Carlo or PHYSLITE samples the command is exactly the same: configuration is automatically setup from the sample's metadata.
 
 ### Getting oriented with the configuration
 
 For an overview of the core package structure and basic instructions for building an analysis custom executable, see [EasyjetHub/README.md](./EasyjetHub/README.md)
 
-For an overview of the configuration syntax and how to extend this, see [EasyjetHub/steering/README.md](./EasyjetHub/steering/README.md).
+For an overview of the configuration syntax and how to extend this, see [EasyjetHub/python/steering/README.md](./EasyjetHub/python/steering/README.md).
 
-For an explanation of the TTree output configuration, see [EasyjetHub/output/ttree/README.md](./EasyjetHub/output/ttree/README.md).
+For an explanation of the TTree output configuration, see [EasyjetHub/python/output/ttree/README.md](./EasyjetHub/python/output/ttree/README.md).
 
 ## AthAnalysis in Docker
 
@@ -138,7 +140,7 @@ If you come back to this in a new shell session, you can recover the setup with:
 
 ```
 cd $WORKDIR/build
-source ../hh4b-analysis/setup.sh
+source ../easyjet/setup.sh
 source */setup.sh
 ```
 
