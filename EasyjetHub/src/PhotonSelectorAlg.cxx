@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Abraham Tishelman-Charny
@@ -10,6 +10,7 @@
 #include "FourMomUtils/xAODP4Helpers.h"
 #include <xAODTracking/VertexContainer.h>
 #include <AsgDataHandles/ReadHandle.h>
+#include <AsgDataHandles/ReadDecorHandle.h>
 #include "egammaUtils/egPhotonWrtPoint.h"
 
 namespace Easyjet
@@ -25,6 +26,9 @@ namespace Easyjet
     ATH_CHECK (m_inHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
+
+    m_ORDecorKey = m_inHandle.getNamePattern() + "." + m_ORDecorName;
+    ATH_CHECK (m_ORDecorKey.initialize());
 
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
@@ -42,6 +46,8 @@ namespace Easyjet
 
   StatusCode PhotonSelectorAlg::execute()
   {
+
+    SG::ReadDecorHandle<xAOD::PhotonContainer, char> ORDecorHandle(m_ORDecorKey);
 
     // vertex related objects and variables
     SG::ReadHandle<xAOD::VertexContainer> vertices_(m_vertexContainerInKey);
@@ -72,7 +78,13 @@ namespace Easyjet
 
       for (const xAOD::Photon *photon : *inContainer)
       {
-        // Recompute photon pt and eta with respect to the hardest vertex z position
+        // skip OR photons
+        if ( m_checkOR ){
+          bool passOR = ORDecorHandle(*photon);
+          if ( !passOR ) continue;
+        }
+
+	// Recompute photon pt and eta with respect to the hardest vertex z position
         auto thisPhoton = std::make_unique<xAOD::Photon>(*photon);
 
         if(m_recomputePhotons){

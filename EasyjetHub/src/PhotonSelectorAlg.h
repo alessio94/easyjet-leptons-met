@@ -47,6 +47,10 @@ private:
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_inHandle{ this, "containerInKey", "",   "Photon container to read" };
 
+    Gaudi::Property<std::string> m_ORDecorName
+      { this, "ORDecorKey", "passesOR", "Decoration for photons OR" };
+    SG::ReadDecorHandleKey<xAOD::PhotonContainer> m_ORDecorKey;
+
     // \brief Setup syst-aware input decorations
     CP::SysReadDecorHandle<char> m_isLoose {"DFCommonPhotonsIsEMLoose", this};
 
@@ -70,7 +74,8 @@ private:
     Gaudi::Property<float> m_maxEta           {this, "maxEta", 2.37, "Maximum eta of photons"};
     Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of photons to consider"}; // -1 means ignores this
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort photons by pT"};
-    Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra photons after pT sorting"}; // -1 means keep them all  
+    Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra photons after pT sorting"}; // -1 means keep them all
+    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
     Gaudi::Property<bool>  m_recomputePhotons {this, "recomputePhotons", true, "Recompute photon eta (and subsequently pT) w.r.t. hardest vertex"}; 
 
   };

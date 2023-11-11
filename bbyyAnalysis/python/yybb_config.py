@@ -12,6 +12,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             containerInKey=photonkey,
             containerOutKey="yybbAnalysisPhotons_%SYS%",
             pTsort=True,
+            checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
