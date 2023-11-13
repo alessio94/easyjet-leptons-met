@@ -22,6 +22,14 @@ small_R:
     #- GN120220509_FixedCutBEff_77
     #- GN120220509_FixedCutBEff_85
 
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "NonIso"
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto

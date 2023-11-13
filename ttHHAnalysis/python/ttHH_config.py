@@ -7,20 +7,22 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
 
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
-            containerInKey=muonkey,
+            containerInKey=MuonWPLabel + muonkey,
             containerOutKey="ttHHAnalysisMuons",
             minPt=10e3,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
-            containerInKey=electronkey,
+            containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="ttHHAnalysisElectrons",
             minPt=10e3,
             checkOR=flags.Analysis.do_overlap_removal,

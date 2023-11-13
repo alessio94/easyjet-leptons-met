@@ -17,11 +17,25 @@ def validate_do_obj_flags(flags):
             "MET requires small R jets to be run"
         )
     if flags.Analysis.do_photons:
-        assert flags.Analysis.PhotonID, (
-            "Photons require ID working point e.g. PhotonID: 'Tight'"
+        assert flags.Analysis.Photon.ID, (
+            "Photons require ID working point e.g. Photon.ID: 'Tight'"
         )
-        assert flags.Analysis.PhotonIso, (
-            "Photons require isolation working point e.g. PhotonIso: 'FixedCutLoose'"
+        assert flags.Analysis.Photon.Iso, (
+            "Photons require isolation working point e.g. Photon.Iso: 'FixedCutLoose'"
+        )
+    if flags.Analysis.do_electrons:
+        assert flags.Analysis.Electron.ID, (
+            "Electrons require ID working point e.g. Electron.ID: 'LooseBLayerLH'"
+        )
+        assert flags.Analysis.Electron.Iso, (
+            "Electrons require isolation working point e.g. Electron.Iso: 'NonIso'"
+        )
+    if flags.Analysis.do_muons:
+        assert flags.Analysis.Muon.ID, (
+            "Muons require ID working point e.g. Muon.ID: 'Loose'"
+        )
+        assert flags.Analysis.Muon.Iso, (
+            "Muons require isolation working point e.g. Muon.Iso: 'Loose_VarRad'"
         )
 
 

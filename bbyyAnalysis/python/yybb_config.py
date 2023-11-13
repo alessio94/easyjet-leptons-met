@@ -6,9 +6,11 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 
 def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
+
     cfg.addEventAlgo(
         CompFactory.Easyjet.PhotonSelectorAlg(
             "PhotonSelectorAlg",
+            # Keep inclusive photon collection for cutflow
             containerInKey=photonkey,
             containerOutKey="yybbAnalysisPhotons_%SYS%",
             pTsort=True,
@@ -16,20 +18,22 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         )
     )
 
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
-            containerInKey=muonkey,
+            containerInKey=MuonWPLabel + muonkey,
             containerOutKey="yybbAnalysisMuons_%SYS%",
             minPt=10e3,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
-            containerInKey=electronkey,
+            containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="yybbAnalysisElectrons_%SYS%",
             minPt=10e3,
             checkOR=flags.Analysis.do_overlap_removal,

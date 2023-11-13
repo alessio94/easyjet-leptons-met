@@ -2,7 +2,6 @@ include: EasyjetHub/base-config.yaml
 
 # Toggles for object types
 do_small_R_jets: true
-do_muons: true
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]

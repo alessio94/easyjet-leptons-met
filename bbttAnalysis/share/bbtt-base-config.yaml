@@ -21,6 +21,21 @@ small_R:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
 
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "NonIso"
+  extra_wps:
+    - ["TightLH", "NonIso"]
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+  extra_wps:
+    - ["Medium", "Loose_VarRad"]
+
+Tau:
+  ID: "Loose"
+
 # list of triggers per year to consider
 trigger_chains:
   include: bbttAnalysis/trigger.yaml

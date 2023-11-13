@@ -6,19 +6,21 @@ import AthenaCommon.SystemOfUnits as Units
 def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg = ComponentAccumulator()
 
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
-            containerInKey='loose' + muonkey,
+            containerInKey=MuonWPLabel + muonkey,
             containerOutKey="bbttAnalysisMuons_%SYS%",
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
-            containerInKey='loose' + electronkey,
+            containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="bbttAnalysisElectrons_%SYS%",
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -27,6 +29,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg.addEventAlgo(
         CompFactory.Easyjet.TauSelectorAlg(
             "TauSelectorAlg",
+            # Baseline always needed for anti-taus
             containerInKey='baseline' + taukey,
             containerOutKey="bbttAnalysisTaus_%SYS%",
             checkOR=flags.Analysis.do_overlap_removal,

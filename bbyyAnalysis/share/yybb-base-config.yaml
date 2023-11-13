@@ -35,9 +35,18 @@ small_R:
     - GN2v00LegacyWP_FixedCutBEff_77
     - GN2v00NewAliasWP_FixedCutBEff_77
 
+Electron:
+  ID: "MediumLH"
+  Iso: "Loose_VarRad"
+
+Muon:
+  ID: "Medium"
+  Iso: "PflowLoose_VarRad"
+
 # photon ID and isolation requirements
-PhotonID: "Tight" # Loose, Tight
-PhotonIso: "FixedCutLoose" 
+Photon:
+  ID: "Tight" # Loose, Tight
+  Iso: "FixedCutLoose" 
 
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22

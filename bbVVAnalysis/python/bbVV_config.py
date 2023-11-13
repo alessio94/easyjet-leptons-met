@@ -5,19 +5,21 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
 
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
-            containerInKey='loose' + muonkey,
+            containerInKey=MuonWPLabel + muonkey,
             containerOutKey="bbVVAnalysisMuons_%SYS%",
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
-            containerInKey='loose' + electronkey,
+            containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="bbVVAnalysisElectrons_%SYS%",
             checkOR=flags.Analysis.do_overlap_removal,
         )

@@ -21,7 +21,7 @@ def photon_sequence(flags, configAcc):
     #     enableCutflow=False,
     #     enableKinematicHistograms=False,
 
-    PhotonWPLabel = "%s_%s" % (flags.Analysis.PhotonID, flags.Analysis.PhotonIso)
+    PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
 
     configSeq = ConfigSequence()
 
@@ -29,13 +29,14 @@ def photon_sequence(flags, configAcc):
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.photons)
     configSeq += makeConfig('Photons', output_name)
+    configSeq.setOptionValue('.recomputeIsEM', False)
+    configSeq.setOptionValue('.crackVeto', True)
 
     # PID configuration
-    configSeq.setOptionValue('.recomputeIsEM', False)
     configSeq += makeConfig('Photons.Selection', output_name + '.' + PhotonWPLabel)
-    configSeq.setOptionValue('.qualityWP', flags.Analysis.PhotonID)
-    configSeq.setOptionValue('.isolationWP', flags.Analysis.PhotonIso)
-    if (flags.Analysis.PhotonIso == "NonIso"):
+    configSeq.setOptionValue('.qualityWP', flags.Analysis.Photon.ID)
+    configSeq.setOptionValue('.isolationWP', flags.Analysis.Photon.Iso)
+    if (flags.Analysis.Photon.Iso == "NonIso"):
         configSeq.setOptionValue('.noEffSF', True)
 
     # Kinematic selection

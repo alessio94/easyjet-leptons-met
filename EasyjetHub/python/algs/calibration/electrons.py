@@ -21,18 +21,31 @@ def electron_sequence(flags, configAcc):
     #     enableCutflow=False,
     #     enableKinematicHistograms=False,
 
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+
     configSeq = ConfigSequence()
 
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.electrons)
     configSeq += makeConfig('Electrons', output_name)
+    configSeq.setOptionValue('.crackVeto', True)
 
     # PID configuration
-    configSeq += makeConfig('Electrons.Selection', output_name + '.loose')
-    configSeq.setOptionValue('.likelihoodWP', 'LooseBLayerLH')
-    configSeq.setOptionValue('.isolationWP', 'NonIso')
+    configSeq += makeConfig('Electrons.Selection', output_name + '.' + ElectronWPLabel)
+    configSeq.setOptionValue('.likelihoodWP', flags.Analysis.Electron.ID)
+    configSeq.setOptionValue('.isolationWP', flags.Analysis.Electron.Iso)
     configSeq.setOptionValue('.recomputeLikelihood', False)
+    if 'extra_wps' in flags.Analysis.Electron:
+        for wp in flags.Analysis.Electron.extra_wps:
+            id = wp[0]
+            iso = wp[1]
+            wpLabel = f'{id}_{iso}'
+            configSeq += makeConfig('Electrons.Selection',
+                                    output_name + '.' + wpLabel)
+            configSeq.setOptionValue('.likelihoodWP', id)
+            configSeq.setOptionValue('.isolationWP', iso)
+            configSeq.setOptionValue('.recomputeLikelihood', False)
 
     # Kinematic selection
     configSeq += makeConfig('Selection.PtEta', output_name)
@@ -48,10 +61,10 @@ def electron_sequence(flags, configAcc):
     # Add working point selection
     makeViewSelectionConfig(
         configSeq,
-        'loose' + output_name,
+        ElectronWPLabel + output_name,
         input=output_name,
         original=flags.Analysis.container_names.input.electrons,
-        selection='loose'
+        selection=ElectronWPLabel
     )
 
     return configSeq

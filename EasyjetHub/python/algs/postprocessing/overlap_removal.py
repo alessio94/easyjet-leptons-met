@@ -19,19 +19,17 @@ def overlap_sequence(flags):
                 "Specified small-R jet type is invalid"
             )
 
-    # TODO: May want to make these configurable
     container_names = flags.Analysis.container_names
 
     # Add whatever collections are active in the job to the
     # mapping of type to name
     preOR_collections = {}
     objflags = {x:f'do_{x}' for x in ['electrons','photons','muons','taus']}
-    # Reproduced from MET for now
-    # TODO: Make configurable
     ORselections = dict(
-        electrons='loose',
-        photons='tight',
-        muons='loose',
+        electrons=f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}',
+        photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
+        muons=f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}',
+        # Baseline always needed for TauAntiTauJet OR
         taus='baseline',
     )
     # Construct the names of the view containers with working point selection

@@ -19,6 +19,8 @@ def muon_sequence(flags, configAcc):
     #     enableKinematicHistograms=False,
     #     isRun3Geo=(flags.Analysis.Run == 3),
 
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+
     configSeq = ConfigSequence()
 
     # Temporary hack, we should do this in a more systematic way
@@ -27,12 +29,18 @@ def muon_sequence(flags, configAcc):
     configSeq += makeConfig('Muons', output_name)
 
     # PID configuration
-    configSeq += makeConfig('Muons.Selection', output_name + '.loose')
-    configSeq.setOptionValue('.quality', 'Loose')
-    configSeq.setOptionValue('.isolation', 'Loose_VarRad')
-    configSeq += makeConfig('Muons.Selection', output_name + '.medium')
-    configSeq.setOptionValue('.quality', 'Medium')
-    configSeq.setOptionValue('.isolation', 'Loose_VarRad')
+    configSeq += makeConfig('Muons.Selection', output_name + '.' + MuonWPLabel)
+    configSeq.setOptionValue('.quality', flags.Analysis.Muon.ID)
+    configSeq.setOptionValue('.isolation', flags.Analysis.Muon.Iso)
+    if 'extra_wps' in flags.Analysis.Muon:
+        for wp in flags.Analysis.Muon.extra_wps:
+            id = wp[0]
+            iso = wp[1]
+            wpLabel = f'{id}_{iso}'
+            configSeq += makeConfig('Muons.Selection',
+                                    output_name + '.' + wpLabel)
+            configSeq.setOptionValue('.quality', id)
+            configSeq.setOptionValue('.isolation', iso)
 
     # TODO: MCP should restore this when the recommendations for Tight WP exist in R23
     # configSeq += makeConfig('Muons.Selection', output_name + '.tight')
@@ -52,13 +60,12 @@ def muon_sequence(flags, configAcc):
     makeViewSelectionConfig(configSeq, output_name)
 
     # Add working point selection
-    for wp in ['loose','medium']:
-        makeViewSelectionConfig(
-            configSeq,
-            wp + output_name,
-            input=output_name,
-            original=flags.Analysis.container_names.input.muons,
-            selection=wp
-        )
+    makeViewSelectionConfig(
+        configSeq,
+        MuonWPLabel + output_name,
+        input=output_name,
+        original=flags.Analysis.container_names.input.muons,
+        selection=MuonWPLabel
+    )
 
     return configSeq

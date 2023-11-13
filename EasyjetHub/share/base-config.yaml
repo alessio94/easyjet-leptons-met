@@ -22,6 +22,20 @@ small_R:
   # select jet type
   jet_type: 'reco4PFlowJet'
 
+Photon:
+  ID: ""
+  Iso: ""
+
+Electron:
+  ID: ""
+  Iso: ""
+
+Muon:
+  ID: ""
+  Iso: ""
+
+Tau:
+  ID: ""
 
 # large R config
 large_R:

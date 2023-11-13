@@ -21,6 +21,14 @@ small_R:
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
 
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "NonIso"
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+
 # list of triggers per year to consider
 trigger_chains:
   include: trigger.yaml

@@ -8,7 +8,7 @@ def tau_decor_cfg(flags, **kwargs):
     elecoll = flags.Analysis.container_names.input.electrons
     taucoll = flags.Analysis.container_names.input.taus
 
-    kwargs.setdefault("tauIDWP", "Loose")
+    kwargs.setdefault("tauIDWP", flags.Analysis.Tau.ID)
 
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(

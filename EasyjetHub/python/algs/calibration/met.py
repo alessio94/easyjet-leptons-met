@@ -12,15 +12,24 @@ def met_sequence(flags, configAcc):
 
     configSeq = ConfigSequence()
 
-    # Suggested for bbtt
-    # TODO: Make selections configurable
     container_names = flags.Analysis.container_names
-    met_selections = dict(
-        electrons=f'{drop_sys(container_names.output.electrons)}.loose',
-        photons=f'{drop_sys(container_names.output.photons)}.tight',
-        muons=f'{drop_sys(container_names.output.muons)}.medium',
-        taus=f'{drop_sys(container_names.output.taus)}.loose',
+
+    preMET_collections = {}
+    objflags = {x:f'do_{x}' for x in ['electrons','photons','muons','taus']}
+    METselections = dict(
+        electrons=f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}',
+        photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
+        muons=f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}',
+        taus=flags.Analysis.Tau.ID,
     )
+    # Construct the names of the view containers with working point selection
+    # We need to use the '.' style so that the algs operate on the full
+    # container, and avoid incomplete decorations
+    for objtype, objflag in objflags.items():
+        if flags.Analysis[objflag]:
+            collname = drop_sys(container_names.output[objtype])
+            selection = METselections[objtype]
+            preMET_collections[objtype] = f'{collname}.{selection}'
 
     configSeq += makeConfig('MissingET', drop_sys(container_names.output.met))
     # Pass all the calibrated jets
@@ -29,8 +38,7 @@ def met_sequence(flags, configAcc):
         drop_sys(container_names.allcalib[flags.Analysis.small_R.jet_type])
     )
     # Add whatever collections are active in the job
-    for objtype, selection in met_selections.items():
-        if flags.Analysis[f"do_{objtype}"]:
-            configSeq.setOptionValue(f'.{objtype}', selection)
+    for objtype, coll in preMET_collections.items():
+        configSeq.setOptionValue(f'.{objtype}', coll)
 
     return configSeq
