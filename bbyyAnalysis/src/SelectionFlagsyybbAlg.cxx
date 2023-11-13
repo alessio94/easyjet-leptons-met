@@ -54,9 +54,13 @@ namespace HHBBYY
 
     //After filling the CutManager, book your histograms.
     const unsigned int nbins = m_yybbCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TH1F ("AbsoluteEfficiency", "Absolute Efficiency of HH->yybb cuts", nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TH1F ("RelativeEfficiency", "Relative Efficiency of HH->yybb cuts", nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TH1F ("StandardCutFlow",       "Standard Cutflow of HH->yybb cuts", nbins, 0.5, nbins + 0.5))); 
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->yybb cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5))); 
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->yybb cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->yybb cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));    
 
     return StatusCode::SUCCESS;
   }
@@ -155,14 +159,16 @@ namespace HHBBYY
     m_yybbCuts.CheckCutResults(); // Print CheckCutResults
 
     if(m_saveCutFlow) {
-      m_yybbCuts.DoAbsoluteEfficiency(m_total_events, hist("AbsoluteEfficiency"));
-      m_yybbCuts.DoRelativeEfficiency(m_total_events, hist("RelativeEfficiency"));
-      m_yybbCuts.DoStandardCutFlow(m_total_events, hist("StandardCutFlow"));
+      m_yybbCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
+      m_yybbCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
+      m_yybbCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
+      m_yybbCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
     }
     else {
-      delete hist("AbsoluteEfficiency");
-      delete hist("RelativeEfficiency");
-      delete hist("StandardCutFlow");
+      delete efficiency("AbsoluteEfficiency");
+      delete efficiency("RelativeEfficiency");
+      delete efficiency("StandardCutFlow");
+      delete hist("EventsPassed_BinLabeling");
     }
 
 

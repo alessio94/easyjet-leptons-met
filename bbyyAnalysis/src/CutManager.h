@@ -11,6 +11,7 @@
 #define CUTMANAGER_H
 
 #include <AthenaBaseComps/AthMessaging.h>
+#include <TEfficiency.h>
 #include <TH1.h>
 #include <vector>
 #include <iostream>
@@ -82,9 +83,10 @@ class CutManager : public AthMessaging, public std::vector<CutEntry>
         }
 
         void CheckCutResults();
-        void DoAbsoluteEfficiency(long long int nEvents, TH1* histo);
-        void DoRelativeEfficiency(long long int nEvents, TH1* histo);
-        void DoStandardCutFlow(long long int nEvents, TH1* histo);
+        void DoAbsoluteEfficiency(long long int nEvents, TEfficiency* eff);
+        void DoRelativeEfficiency(long long int nEvents, TEfficiency* eff);
+        void DoStandardCutFlow(long long int nEvents, TEfficiency* eff);
+        void DoCutflowLabeling(long long int nEvents, TH1* histo);
         void CheckInputCutList(std::vector<std::string> inputCutList, std::vector<std::string> standard_cuts );
 
         int PassAllCuts{0};

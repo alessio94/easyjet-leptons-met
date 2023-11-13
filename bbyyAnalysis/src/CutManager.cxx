@@ -14,38 +14,28 @@ void CutManager::CheckCutResults() {
 
 }
 
-void CutManager::DoAbsoluteEfficiency(long long int nEvents, TH1* histo)
+void CutManager::DoAbsoluteEfficiency(long long int nEvents, TEfficiency* eff)
 {
 
     /* Absolute efficiency histogram of yybb cuts */
     /* Absolute effiency is defined as :  (Events passed by the cut/ Total events) */
     // N_events(pass_i) / N_events 
-    // N_events(pass_i+1) / N_events etc.
-    //Fill first bin of total events.
-    histo->SetBinContent(1, 100);
+    // N_events(pass_i+1) / N_events etc.   
+
+    // Set First bin to total number of events.
+    eff->SetTotalEvents(1,nEvents);
+    eff->SetPassedEvents(1,nEvents); 
 
     for (size_t i = 0; i < size(); ++i)
     {
-        int bin = i + 2;
-        float percentage = static_cast<float>((*this)[i].counter) / nEvents * 100;
-        histo->SetBinContent(bin, percentage);
+        int bin = i+2;
+        eff->SetTotalEvents(bin, nEvents);
+        eff->SetPassedEvents(bin, (*this)[i].counter);
     }
-
-    // Set bin labels for each bin using the cut names
-    histo->GetXaxis()->SetBinLabel(1, "All events");
-
-    for (size_t i = 0; i < size(); ++i)
-    {
-        int bin = i + 2;
-        histo->GetXaxis()->SetBinLabel(bin, (*this)[i].name.c_str());
-    }
-
-    histo->GetYaxis()->SetTitle("Absolute Efficiency %");
-    histo->GetXaxis()->SetTitle("Cuts");
-
+    
 }
 
-void  CutManager::DoRelativeEfficiency(long long int nEvents, TH1* histo)
+void  CutManager::DoRelativeEfficiency(long long int nEvents, TEfficiency* eff)
 {
 
     /* Relative efficiency histogram of yybb cuts */
@@ -57,30 +47,24 @@ void  CutManager::DoRelativeEfficiency(long long int nEvents, TH1* histo)
     // Then for the third bin, divide its bin contents by the bin content of the second bin.
     // Definition of relative efficiency for the i-cut would be:
 
-    histo->SetBinContent(1, 100); // Set First bin 100% of events.
-    histo->SetBinContent(2, static_cast<float>((*this)[0].relativeCounter) / nEvents * 100);
+    // Set First bin to total number of events.
+    eff->SetTotalEvents(1,nEvents);
+    eff->SetPassedEvents(1,nEvents); 
+    
+    // Set second bin to events passed by first cut divided by total number of events.
+    eff->SetTotalEvents(2,nEvents);
+    eff->SetPassedEvents(2, (*this)[0].relativeCounter);
     
     for (size_t i = 1; i < size(); ++i)
     {
         int bin = i + 2;
-        histo->SetBinContent(bin, static_cast<float>((*this)[i].relativeCounter) / (*this)[i - 1].relativeCounter * 100);
+        eff->SetTotalEvents(bin,(*this)[i-1].relativeCounter);
+        eff->SetPassedEvents(bin,(*this)[i].relativeCounter);
     }
-
-    // Set bin labels for each bin using the cut names
-    histo->GetXaxis()->SetBinLabel(1, "All events");
-
-    for (size_t i = 0; i < size(); ++i)
-    {
-        int bin = i + 2;
-        histo->GetXaxis()->SetBinLabel(bin, (*this)[i].name.c_str());
-    }
-
-    histo->GetYaxis()->SetTitle("Relative Efficiency %");
-    histo->GetXaxis()->SetTitle("Cuts");
 
 }
 
-void CutManager::DoStandardCutFlow(long long int nEvents, TH1* histo)
+void CutManager::DoStandardCutFlow(long long int nEvents, TEfficiency* eff)
 {
 
     /* Standard CutFlow Plot */
@@ -89,14 +73,39 @@ void CutManager::DoStandardCutFlow(long long int nEvents, TH1* histo)
     // Set bin labels for each bin using the cut names
     // Set Bin Content for Standard CutFlow plot
 
-    histo->SetBinContent(1, 100); // Set First bin 100% of events.
+    // Set First bin to total number of events.
+    eff->SetTotalEvents(1,nEvents);
+    eff->SetPassedEvents(1,nEvents); 
 
     for (size_t i = 0; i < size(); ++i)
     {
         int bin = i + 2;
-        histo->SetBinContent(bin, static_cast<float>((*this)[i].relativeCounter) / nEvents * 100);
+        eff->SetTotalEvents(bin,nEvents);
+        eff->SetPassedEvents(bin,(*this)[i].relativeCounter);
     }
 
+}
+
+
+void CutManager::DoCutflowLabeling(long long int nEvents, TH1* histo)
+{
+
+    /* TEfficiency doesn't support directly bin labeling.
+       We create, this Absolute Efficiency TH1 histogram which entails bin labels,
+       corresponding to each cut. It should help the user to identify the cuts 
+       for each of the bins in TEfficiency plots, while also
+       filling the bins with the event yields. */
+
+    // Set First bin to total number of events.
+    histo->SetBinContent(1,nEvents);
+
+    for (size_t i = 0; i < size(); ++i)
+    {
+        int bin = i+2;
+        histo->SetBinContent(bin, (*this)[i].counter);
+    }
+    
+    // Set bin labels for each bin using the cut names
     histo->GetXaxis()->SetBinLabel(1, "All events");
 
     for (size_t i = 0; i < size(); ++i)
@@ -105,9 +114,9 @@ void CutManager::DoStandardCutFlow(long long int nEvents, TH1* histo)
         histo->GetXaxis()->SetBinLabel(bin, (*this)[i].name.c_str());
     }
 
-    histo->GetYaxis()->SetTitle("Efficiency %");
+    histo->GetYaxis()->SetTitle("Events Passed");
     histo->GetXaxis()->SetTitle("Cuts");
-
+    
 }
 
 
