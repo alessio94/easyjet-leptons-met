@@ -63,8 +63,7 @@ namespace HHBBTT
     ATH_CHECK(m_selected_tau.initialize(m_systematicsList, m_tauHandle));
 
     // make trigger decorators
-    for (auto trig : m_triggers)
-    {
+    for (auto trig : m_triggers){
       CP::SysReadDecorHandle<bool> deco {this, "trig"+trig, trig, "Name of trigger"};
       m_triggerdecos.emplace(trig, deco);
       ATH_CHECK(m_triggerdecos.at(trig).initialize(m_systematicsList, m_eventHandle));
@@ -72,7 +71,6 @@ namespace HHBBTT
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
-
     for ( auto name : m_channel_names){
       if( name == "lephad") m_channels.push_back(HHBBTT::LepHad);
       else if ( name == "hadhad") m_channels.push_back(HHBBTT::HadHad);
@@ -81,6 +79,14 @@ namespace HHBBTT
         return StatusCode::FAILURE;
       }
     }
+
+    //finding which years are set in the config
+    is15 = std::find(m_years.begin(), m_years.end(), 2015) != m_years.end();
+    is16 = std::find(m_years.begin(), m_years.end(), 2016) != m_years.end();
+    is17 = std::find(m_years.begin(), m_years.end(), 2017) != m_years.end();
+    is18 = std::find(m_years.begin(), m_years.end(), 2018) != m_years.end();
+    is22 = std::find(m_years.begin(), m_years.end(), 2022) != m_years.end();
+    is23 = std::find(m_years.begin(), m_years.end(), 2023) != m_years.end();
 
     return StatusCode::SUCCESS;
   }
@@ -97,8 +103,7 @@ namespace HHBBTT
     SG::ReadDecorHandle<xAOD::MuonContainer, char> muonPreselDecorHandle(m_muonPreselDecorKey);
 
     // Loop over all systs
-    for (const auto& sys : m_systematicsList.systematicsVector())
-    {
+    for (const auto& sys : m_systematicsList.systematicsVector()){
       CP::SysFilterReporter filter (filterCombiner, sys);
 
       // Retrive inputs
@@ -131,13 +136,13 @@ namespace HHBBTT
       //if (taus->size() != 2) continue;
       //if (! (taus->at(0)->pt() > 60000)) continue;
 
-      std::vector<std::string> channels = {"SLT", "LTT", "STT", "DTT"};
+      std::vector<std::string> trigger_channels = {"SLT", "LTT", "STT", "DTT"};
       std::vector<std::string> vars = {"ele", "mu", "leadingtau", "subleadingtau", "leadingjet", "subleadingjet"};
       std::vector<std::string> jvars = {"leadingjet", "subleadingjet"};
 
-      for (const auto& channel : channels) {
+      for (const auto& trigger_channel : trigger_channels) {
           for (const auto& var : vars) {
-              m_pt_threshold[channel][var] = 0.0;
+              m_pt_threshold[trigger_channel][var] = 0.0;
           }
       }
 
@@ -284,9 +289,9 @@ namespace HHBBTT
       bool jet_ptcut_STT = false;
       bool jet_ptcut_DTT = false;
       std::unordered_map<std::string, std::unordered_map<std::string, bool>> jet_ptcut;
-      for (const auto& channel : channels) {
+      for (const auto& trigger_channel : trigger_channels) {
           for (const auto& jvar : jvars) {
-              jet_ptcut[channel][jvar] = false;
+              jet_ptcut[trigger_channel][jvar] = false;
           }
       }
       bool jet_deltaR_DTT = false;
@@ -311,11 +316,11 @@ namespace HHBBTT
       if (n_jets >= 2)
       {
         TWO_JETS = true;
-        for (const auto& channel : channels) {
-            if (jets->at(0)->pt() > m_pt_threshold[channel]["leadingjet"])
-              jet_ptcut[channel]["leadingjet"] = true;
-            if (jets->at(1)->pt() > m_pt_threshold[channel]["subleadingjet"])
-              jet_ptcut[channel]["subleadingjet"] = true;
+        for (const auto& trigger_channel : trigger_channels) {
+            if (jets->at(0)->pt() > m_pt_threshold[trigger_channel]["leadingjet"])
+              jet_ptcut[trigger_channel]["leadingjet"] = true;
+            if (jets->at(1)->pt() > m_pt_threshold[trigger_channel]["subleadingjet"])
+              jet_ptcut[trigger_channel]["subleadingjet"] = true;
         }
         if (DTT_DeltaR_cut)
         {
@@ -389,8 +394,8 @@ namespace HHBBTT
 
       bool pass = false;
       for(const auto& channel : m_channels){
-	if(channel == HHBBTT::LepHad) pass |= (pass_SLT || pass_LTT);
-	else if(channel == HHBBTT::HadHad) pass |= (pass_STT || pass_DTT);
+       if(channel == HHBBTT::LepHad) pass |= (pass_SLT || pass_LTT);
+       else if(channel == HHBBTT::HadHad) pass |= (pass_STT || pass_DTT);
       }
       if (!m_bypass && !pass) continue;
 
@@ -398,7 +403,7 @@ namespace HHBBTT
       // if event is passed to output writing or not
       filter.setPassed(true);
     }
-    
+
     return StatusCode::SUCCESS;
   }
 
@@ -406,7 +411,7 @@ namespace HHBBTT
     ANA_CHECK (m_filterParams.finalize ());
     return StatusCode::SUCCESS;
   }
-  
+
   void HHbbttSelectorAlg::applyTriggerSelection(const xAOD::TauJetContainer* taus, const xAOD::EventInfo* event, const CP::SystematicSet& sys){
     //************
     // trigger selecton
@@ -424,33 +429,51 @@ namespace HHBBTT
       rdmNumber = m_runNumber.get(*event, sys);
     }
 
-    const bool is15 = std::find(m_years.begin(), m_years.end(), 2015) != m_years.end();
-    const bool is16 = std::find(m_years.begin(), m_years.end(), 2016) != m_years.end();
-    const bool is17 = std::find(m_years.begin(), m_years.end(), 2017) != m_years.end();
-    const bool is18 = std::find(m_years.begin(), m_years.end(), 2018) != m_years.end();
-    const bool is22 = std::find(m_years.begin(), m_years.end(), 2022) != m_years.end();
-    const bool is23 = std::find(m_years.begin(), m_years.end(), 2023) != m_years.end();
-
     // References:
     // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/rBR_Period_Report.php
     // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
     //
-    const bool is16PeriodA = 296939 <= rdmNumber && rdmNumber <= 300287;
-    const bool is16PeriodB_D3 = 300345 <= rdmNumber && rdmNumber <= 302872;
-    const bool is16PeriodD4_end = 302919 <= rdmNumber && rdmNumber <= 311481;
-    const bool is17PeriodB1_B4 = 325713 <= rdmNumber && rdmNumber <= 326695;
-    const bool is17PeriodB5_B7 = 326834 <= rdmNumber && rdmNumber <= 327490;
-    const bool is17PeriodB8_end = 327582 <= rdmNumber && rdmNumber <= 341649;
-    const bool is18PeriodB_end = 348885 <= rdmNumber && rdmNumber <= 364485;
-    const bool is18PeriodK_end = 355529 <= rdmNumber && rdmNumber <= 364485;
+    is16PeriodA = 296939 <= rdmNumber && rdmNumber <= 300287;
+    is16PeriodB_D3 = 300345 <= rdmNumber && rdmNumber <= 302872;
+    is16PeriodD4_end = 302919 <= rdmNumber && rdmNumber <= 311481;
+    is17PeriodB1_B4 = 325713 <= rdmNumber && rdmNumber <= 326695;
+    is17PeriodB5_B7 = 326834 <= rdmNumber && rdmNumber <= 327490;
+    is17PeriodB8_end = 327582 <= rdmNumber && rdmNumber <= 341649;
+    is18PeriodB_end = 348885 <= rdmNumber && rdmNumber <= 364485;
+    is18PeriodK_end = 355529 <= rdmNumber && rdmNumber <= 364485;
 
     // Runs in which the L1Topo was mistakingly disabled
-    const bool l1topo_disabled = (rdmNumber == 336506) || (rdmNumber == 336548) || (rdmNumber == 336567);
+    l1topo_disabled = (rdmNumber == 336506) || (rdmNumber == 336548) ||
+                      (rdmNumber == 336567);
 
     // lephad
     trigPassed_SLT = false;
     trigPassed_LTT = false;
 
+    // hadhad
+    trigPassed_STT = false;
+    trigPassed_DTT = false;
+    DTT_DeltaR_cut = false;
+
+    // only run trigger selection if in channel
+    for (const auto &channel : m_channels){
+      if (channel == HHBBTT::LepHad)
+      {
+        applyLepHadTriggerSelection(taus, event,
+                                    sys); // maybe split this as well
+      }
+      else if (channel == HHBBTT::HadHad)
+      {
+        applySingleTauTriggerSelection(event, sys);
+        applyDiTauTriggerSelection(event, sys);
+      }
+    }
+  }
+
+  void HHbbttSelectorAlg ::applyLepHadTriggerSelection(
+      const xAOD::TauJetContainer *taus, const xAOD::EventInfo *event,
+      const CP::SystematicSet &sys)
+  {
     bool trigPassed_SET = false;
     bool trigPassed_SMT = false;
     bool trigPassed_ETT = false;
@@ -610,18 +633,18 @@ namespace HHBBTT
       m_pt_threshold["LTT"]["subleadingjet"] = 45000;
     }
 
-    if (trigPassed_ETT || trigPassed_MTT || trigPassed_MTT_low || trigPassed_MTT_high) trigPassed_LTT = true;
+    if(trigPassed_ETT || trigPassed_MTT || trigPassed_MTT_low ||
+        trigPassed_MTT_high)
+      trigPassed_LTT = true;
+  }
+
+  void HHbbttSelectorAlg ::applySingleTauTriggerSelection(
+      const xAOD::EventInfo *event,
+      const CP::SystematicSet &sys)
+  {
 
     // hadhad
-    trigPassed_STT = false;
-    trigPassed_DTT = false;
-
-    DTT_DeltaR_cut = false;
-
     std::vector<std::string> single_tau_paths;
-    std::vector<std::string> ditau_paths;
-    std::vector<std::string> ditau_paths_4J12;
-
     // STT
     m_pt_threshold["STT"]["subleadingtau"] = 25000;
     m_pt_threshold["STT"]["leadingjet"] = 45000;
@@ -664,6 +687,14 @@ namespace HHBBTT
      trigPassed_STT |= m_triggerdecos.at(path).get(*event, sys);
      if(trigPassed_STT) break;
     }
+  }
+
+  void HHbbttSelectorAlg ::applyDiTauTriggerSelection(
+      const xAOD::EventInfo *event,
+      const CP::SystematicSet &sys)
+  {
+    std::vector<std::string> ditau_paths;
+    std::vector<std::string> ditau_paths_4J12;
 
     // DTT
     m_pt_threshold["DTT"]["leadingtau"] = 40000;

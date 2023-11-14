@@ -152,9 +152,33 @@ private:
     bool pass_DTT;
     std::unordered_map<std::string, std::unordered_map<std::string, float>> m_pt_threshold;
     bool DTT_DeltaR_cut;
+
+
+    bool is15;
+    bool is16;
+    bool is17;
+    bool is18;
+    bool is22;
+    bool is23;
+
+
+    bool is16PeriodA;
+    bool is16PeriodB_D3;
+    bool is16PeriodD4_end;
+    bool is17PeriodB1_B4;
+    bool is17PeriodB5_B7;
+    bool is17PeriodB8_end;
+    bool is18PeriodB_end;
+    bool is18PeriodK_end;
+
+    bool l1topo_disabled;
+
     
 
     void applyTriggerSelection(const xAOD::TauJetContainer* taus, const xAOD::EventInfo* event, const CP::SystematicSet& sys);
+    void applyLepHadTriggerSelection(const xAOD::TauJetContainer* taus, const xAOD::EventInfo* event, const CP::SystematicSet& sys);
+    void applySingleTauTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
+    void applyDiTauTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
 
   };
 }
