@@ -9,6 +9,31 @@ find_package(nlohmann_json REQUIRED)
 # We don't want any warnings in compilation
 add_compile_options(-Werror)
 
+# Component(s) in the package:
+atlas_add_library( EasyjetHubLib
+		   Easyjet/CutManager.h
+		   src/CutManager.cxx
+                   PUBLIC_HEADERS EasyjetHub
+                   LINK_LIBRARIES
+                   AthenaBaseComps
+                   AthContainers
+                   AthLinks
+                   AsgTools
+                   xAODBase
+                   xAODBTagging
+                   xAODEventInfo
+                   xAODJet
+                   xAODTau
+                   xAODTruth
+                   egammaUtils
+                   StoreGateLib
+                   SystematicsHandlesLib
+                   FourMomUtils
+                   TruthUtils
+                   FlavorTagDiscriminants
+)
+
+
 # Build the Athena component library
 atlas_add_component(EasyjetHub
   src/BTaggingDecoratorAlg.cxx
@@ -26,24 +51,7 @@ atlas_add_component(EasyjetHub
   src/JetDeepCopyAlg.cxx
   src/TauDecoratorAlg.cxx
   src/components/*.cxx
-  LINK_LIBRARIES
-  #GaudiKernel
-  AthenaBaseComps
-  AthContainers
-  AthLinks
-  AsgTools
-  xAODBase
-  xAODBTagging
-  xAODEventInfo
-  xAODJet
-  xAODTau
-  xAODTruth
-  egammaUtils
-  StoreGateLib
-  SystematicsHandlesLib
-  FourMomUtils
-  TruthUtils
-  FlavorTagDiscriminants
+  LINK_LIBRARIES EasyjetHubLib
 )
 
 # Install python modules, joboptions, and share content

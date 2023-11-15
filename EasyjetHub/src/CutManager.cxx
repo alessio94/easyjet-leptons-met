@@ -2,7 +2,7 @@
   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "CutManager.h"
+#include "EasyjetHub/CutManager.h"
 
 void CutManager::CheckCutResults() {
 

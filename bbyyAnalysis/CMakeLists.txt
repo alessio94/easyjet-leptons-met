@@ -12,7 +12,6 @@ atlas_add_component(bbyyAnalysis
   src/BaselineVarsyybbAlg.cxx
   src/SelectionFlagsyybbAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
-  src/CutManager.cxx
   LINK_LIBRARIES
   AthenaBaseComps
   AsgTools
@@ -27,6 +26,7 @@ atlas_add_component(bbyyAnalysis
   SystematicsHandlesLib
   FourMomUtils
   TruthUtils
+  EasyjetHubLib
 )
 
 # Install python modules, joboptions, and share content

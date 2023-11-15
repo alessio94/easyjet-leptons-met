@@ -22,7 +22,7 @@
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
-#include "CutManager.h"
+#include <EasyjetHub/CutManager.h>
 
 class CutManager;
 
