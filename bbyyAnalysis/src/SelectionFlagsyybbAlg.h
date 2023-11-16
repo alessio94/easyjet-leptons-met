@@ -11,6 +11,7 @@
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
+#include <AsgDataHandles/ReadDecorHandle.h>
 
 #include <AthContainers/ConstDataVector.h>
 
@@ -45,9 +46,7 @@ namespace HHBBYY
 
       const std::vector<std::string> m_STANDARD_CUTS{
           "PASS_TRIGGER",
-          "TWO_LOOSE_PHOTONS",
-          "TWO_TIGHTID_PHOTONS",
-          "TWO_ISO_PHOTONS",
+          "TWO_TIGHTID_ISO_PHOTONS",
           "PASS_RELPT",
           "DIPHOTON_MASS",
           "EXACTLY_ZERO_LEPTONS",
@@ -61,7 +60,8 @@ namespace HHBBYY
 
       static void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
                           const std::vector<std::string> &photonTriggers, CutManager& yybbCuts);
-      static void evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& yybbCuts);
+      static void evaluatePhotonCuts(const xAOD::PhotonContainer& photons,
+				     CutManager& yybbCuts);
       static void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& yybbCuts);
       static void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
@@ -108,4 +108,3 @@ namespace HHBBYY
 }
 
 #endif // SELECTIONFLAGSYYBBALG_H
- 

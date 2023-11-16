@@ -82,9 +82,7 @@ save_yybb_cutflow: true
 
 CutList :
       - PASS_TRIGGER
-      - TWO_LOOSE_PHOTONS
-      - TWO_TIGHTID_PHOTONS
-      - TWO_ISO_PHOTONS
+      - TWO_TIGHTID_ISO_PHOTONS
       - PASS_RELPT
       - DIPHOTON_MASS
       - EXACTLY_ZERO_LEPTONS

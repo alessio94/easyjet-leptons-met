@@ -32,8 +32,6 @@ namespace Easyjet
 
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_isLoose.initialize(m_systematicsList, m_inHandle));
-    ATH_CHECK (m_isClean.initialize(m_systematicsList, m_inHandle));
 
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -90,17 +88,6 @@ namespace Easyjet
         if(m_recomputePhotons){
           photonWrtPoint::correctForZ(*thisPhoton, primary->z());
         };
-
-        // From DF, Quality
-        if(!thisPhoton->isGoodOQ(xAOD::EgammaParameters::BADCLUSPHOTON))
-          continue ; 
-        // From DF, Identification
-        if(!m_isLoose.get(*thisPhoton, sys))
-          continue ;
-        
-        // E-gamma cleaning
-        if(!m_isClean.get(*thisPhoton, sys))
-          continue ;
         
         if (thisPhoton->pt() < m_minPt)
           continue;

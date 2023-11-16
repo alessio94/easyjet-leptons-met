@@ -7,11 +7,11 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
 
+    PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.PhotonSelectorAlg(
             "PhotonSelectorAlg",
-            # Keep inclusive photon collection for cutflow
-            containerInKey=photonkey,
+            containerInKey=PhotonWPLabel + photonkey,
             containerOutKey="yybbAnalysisPhotons_%SYS%",
             pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,

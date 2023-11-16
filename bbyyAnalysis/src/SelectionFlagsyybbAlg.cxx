@@ -195,38 +195,23 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsyybbAlg::evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& yybbCuts)
+  void SelectionFlagsyybbAlg::evaluatePhotonCuts
+  (const xAOD::PhotonContainer& photons, CutManager& yybbCuts)
   {
-
-    static const SG::AuxElement::ConstAccessor<char>  DFCommonPhotonsIsEMTight ("DFCommonPhotonsIsEMTight");
-
-    if (yybbCuts.exists("TWO_LOOSE_PHOTONS"))
-      yybbCuts("TWO_LOOSE_PHOTONS").passed = (photons.size() == 2);
-
-    double myy = -99;
-    bool PassIso = 0;
-    std::vector<float> PassTightIDs;
-    std::vector<float> PassIsos;
-    std::vector<float> ptOverMasses;
+    if (yybbCuts.exists("TWO_TIGHTID_ISO_PHOTONS"))
+      yybbCuts("TWO_TIGHTID_ISO_PHOTONS").passed = (photons.size() == 2);
 
     // photon isolation and selection pT/myy
     if (photons.size() >= 2)
     {
-      myy = (photons.at(0)->p4() + photons.at(1)->p4()).M();
+      double myy = (photons.at(0)->p4() + photons.at(1)->p4()).M();
+      std::vector<float> ptOverMasses;
 
       for (const xAOD::Photon* photon : {photons.at(0), photons.at(1)})
       {
-        PassIso = (photon->isolation(xAOD::Iso::topoetcone20) / photon->pt()) < 0.065 &&
-                (photon->isolation(xAOD::Iso::ptcone20) / photon->pt()) < 0.05;
-        PassTightIDs.push_back(DFCommonPhotonsIsEMTight(*photon));
-        PassIsos.push_back(PassIso);
         ptOverMasses.push_back(photon->pt() / myy);
       }
 
-      if (PassTightIDs[0] == 1 && PassTightIDs[1] == 1 && yybbCuts.exists("TWO_TIGHTID_PHOTONS"))
-        yybbCuts("TWO_TIGHTID_PHOTONS").passed = true;
-      if (PassIsos[0] == 1 && PassIsos[1] == 1 && yybbCuts.exists("TWO_ISO_PHOTONS"))
-        yybbCuts("TWO_ISO_PHOTONS").passed = true;
       if (ptOverMasses[0] > 0.35 && ptOverMasses[1] > 0.25 && yybbCuts.exists("PASS_RELPT"))
         yybbCuts("PASS_RELPT").passed = true;
       if (myy >= 105000. && myy < 160000. && yybbCuts.exists("DIPHOTON_MASS"))
