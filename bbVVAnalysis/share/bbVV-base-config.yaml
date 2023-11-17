@@ -17,10 +17,14 @@ small_R:
 Electron:
   ID: "LooseBLayerLH"
   Iso: "NonIso"
+  extra_wps:
+    - ["TightLH", "NonIso"]
 
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
+  extra_wps:
+    - ["Medium", "PflowLoose_VarRad"]
 
 # list of triggers per year to consider
 trigger_chains:

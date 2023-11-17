@@ -61,49 +61,28 @@ namespace ttHH
     SG::ReadHandle<ConstDataVector<xAOD::ElectronContainer> > electrons_(
         m_electronContainerInKey);
 
-    static const SG::AuxElement::ConstAccessor<char>  DFCommonElectronsLHMedium ("DFCommonElectronsLHMedium");
-    static const SG::AuxElement::ConstAccessor<char>  DFCommonMuonPassIDCuts ("DFCommonMuonPassIDCuts");
-    static const SG::AuxElement::ConstAccessor<char>  DFCommonMuonPassPreselection ("DFCommonMuonPassPreselection");
-
     ATH_CHECK(smallRJets_BTag.isValid());
     ATH_CHECK(smallRJets.isValid());
     ATH_CHECK(muons_.isValid());
     ATH_CHECK(electrons_.isValid());
     ConstDataVector<xAOD::JetContainer> btag_jets = *smallRJets_BTag;
     
-    int n_leptons=0;
+    int n_leptons = (*electrons_).size() + (*muons_).size();
     
     double HT = 0; // scalar sum of jet pT
 
     
-    // electron isolation
-    for (const xAOD::Electron *electron : *electrons_)
+    // Fill electron variables
+    /*for (const xAOD::Electron *electron : *electrons_)
     {
-      bool PassElectronIso = 0;
-      bool PassElectronMedium = 0;
-      /*Loose_VarRad WP based on 
-        https://twiki.cern.ch/twiki/bin/view/AtlasProtected/RecommendedIsolationWPsRel22#Electron_isolation_working_point*/
-      PassElectronIso = electron->isolation(xAOD::Iso::topoetcone20)/electron->pt() < 0.20 &&  
-                  electron->isolation(xAOD::Iso::ptvarcone30_Nonprompt_All_MaxWeightTTVALooseCone_pt1000)/electron->pt() < 0.15;
+      ...
+      }*/
 
-      PassElectronMedium = DFCommonElectronsLHMedium(*electron);
-      if (PassElectronIso && PassElectronMedium)
-        n_leptons+=1;
-    }
-
-    // muon isolation
-    for (const xAOD::Muon *muon : *muons_)
+    // Fill muon variables
+    /*for (const xAOD::Muon *muon : *muons_)
     {
-      bool PassMuonIso = 0;
-      bool PassMuonMedium = 0;
-      /*Loose_VarRad WP based on
-      https://twiki.cern.ch/twiki/bin/view/AtlasProtected/RecommendedIsolationWPsRel22#Muon_isolation_working_points*/
-      PassMuonIso = muon->isolation(xAOD::Iso::topoetcone20)/muon->pt() < 0.30 &&  
-                      muon->isolation(xAOD::Iso::ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt1000)/muon->pt() < 0.15 ;
-      PassMuonMedium = DFCommonMuonPassIDCuts(*muon) && DFCommonMuonPassPreselection(*muon);
-      if (PassMuonIso && PassMuonMedium)
-        n_leptons+=1;
-    }
+      ...
+      }*/
 
     if (smallRJets_BTag->size()>=4)
     {

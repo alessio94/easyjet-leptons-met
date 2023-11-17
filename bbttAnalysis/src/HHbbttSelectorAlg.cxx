@@ -48,15 +48,16 @@ namespace HHBBTT
       ATH_CHECK(m_Bbranches.at(var).initialize(m_systematicsList, m_eventHandle));
     };
 
-    m_IDTauDecorKey = m_tauHandle.getNamePattern() + "." + m_IDTauDecorName;
-    m_eleIdDecorKey = m_electronHandle.getNamePattern() + "." + m_eleIdDecorName;
-    m_muonIdDecorKey = m_muonHandle.getNamePattern() + "." + m_muonIdDecorName;
-    m_muonPreselDecorKey = m_muonHandle.getNamePattern() + "." + m_muonPreselDecorName;
+    m_tauWPDecorKey = m_tauHandle.getNamePattern() +
+      ".baselineSelection_" + m_tauWPName;
+    m_eleWPDecorKey = m_electronHandle.getNamePattern() +
+      ".baselineSelection_" + m_eleWPName;
+    m_muonWPDecorKey = m_muonHandle.getNamePattern() +
+      ".baselineSelection_" + m_muonWPName;
 
-    ATH_CHECK (m_IDTauDecorKey.initialize());
-    ATH_CHECK (m_eleIdDecorKey.initialize());
-    ATH_CHECK (m_muonIdDecorKey.initialize());
-    ATH_CHECK (m_muonPreselDecorKey.initialize());
+    ATH_CHECK (m_tauWPDecorKey.initialize());
+    ATH_CHECK (m_eleWPDecorKey.initialize());
+    ATH_CHECK (m_muonWPDecorKey.initialize());
 
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -97,10 +98,9 @@ namespace HHBBTT
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
-    SG::ReadDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
-    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleIdDecorHandle(m_eleIdDecorKey);
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonIdDecorHandle(m_muonIdDecorKey);
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonPreselDecorHandle(m_muonPreselDecorKey);
+    SG::ReadDecorHandle<xAOD::TauJetContainer, char> tauWPDecorHandle(m_tauWPDecorKey);
+    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleWPDecorHandle(m_eleWPDecorKey);
+    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonWPDecorHandle(m_muonWPDecorKey);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()){
@@ -183,10 +183,9 @@ namespace HHBBTT
       bool lep_ptcut_LTT = false;
       for (const xAOD::Electron *electron : *electrons)
       {
-        bool passElectronTight = 0;
-        passElectronTight = eleIdDecorHandle(*electron);
+        bool passElectronWP = eleWPDecorHandle(*electron);
         m_selected_el.set(*electron, false, sys);
-        if (passElectronTight && electron->pt() > m_pt_threshold["LTT"]["ele"])
+        if (passElectronWP && electron->pt() > m_pt_threshold["LTT"]["ele"])
         {
           if (electron->pt() > m_pt_threshold["LTT"]["ele"] && electron->pt() < m_pt_threshold["SLT"]["ele"])
             lep_ptcut_LTT = true;
@@ -202,13 +201,13 @@ namespace HHBBTT
 
       for (const xAOD::Muon *muon : *muons)
       {
-        bool passMuonMedium = 0;
-        passMuonMedium =
-            muonIdDecorHandle(*muon) && muonPreselDecorHandle(*muon);
+        bool passMuonWP = muonWPDecorHandle(*muon);
         m_selected_mu.set(*muon, false, sys);
-        if (passMuonMedium && abs(muon->eta()) < 2.5 && muon->pt() > m_pt_threshold["LTT"]["mu"])
+        if (passMuonWP && std::abs(muon->eta()) < 2.5
+	    && muon->pt() > m_pt_threshold["LTT"]["mu"])
         {
-          if (muon->pt() >  m_pt_threshold["LTT"]["mu"] && muon->pt() <  m_pt_threshold["SLT"]["mu"])
+          if (muon->pt() >  m_pt_threshold["LTT"]["mu"]
+	      && muon->pt() <  m_pt_threshold["SLT"]["mu"])
             lep_ptcut_LTT = true;
           else if (muon->pt() >  m_pt_threshold["SLT"]["mu"])
             lep_ptcut_SLT = true;
@@ -242,11 +241,11 @@ namespace HHBBTT
       bool tau_ptcut_DTT = false;
       for (const xAOD::TauJet *tau : *taus)
       {
-        bool isTauID = idTauDecorHandle(*tau);
+        bool isTauID = tauWPDecorHandle(*tau);
         m_selected_tau.set(*tau, false, sys);
         if (isTauID && tau->pt() > 20000)
         {
-          if (abs(tau->eta()) < 2.3) {
+          if (std::abs(tau->eta()) < 2.3) {
             if (tau->pt() >  m_pt_threshold["SLT"]["leadingtau"])
               tau_ptcut_SLT = true;
             if (tau->pt() > m_pt_threshold["LTT"]["leadingtau"])
@@ -313,6 +312,7 @@ namespace HHBBTT
           }
         }
       }
+
       if (n_jets >= 2)
       {
         TWO_JETS = true;

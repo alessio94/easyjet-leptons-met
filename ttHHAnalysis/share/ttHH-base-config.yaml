@@ -23,11 +23,11 @@ small_R:
     #- GN120220509_FixedCutBEff_85
 
 Electron:
-  ID: "LooseBLayerLH"
-  Iso: "NonIso"
+  ID: "MediumLH"
+  Iso: "Loose_VarRad"
 
 Muon:
-  ID: "Loose"
+  ID: "Medium"
   Iso: "PflowLoose_VarRad"
 
 # list of triggers to apply

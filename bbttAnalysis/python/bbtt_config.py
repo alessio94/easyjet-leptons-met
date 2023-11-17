@@ -54,6 +54,10 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
         for c in flags.Analysis.TriggerChains
     ]
 
+    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
+    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
+    TightEleWP = flags.Analysis.Electron.extra_wps[0]
+    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
@@ -63,6 +67,9 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey):
             taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
+            tauWP=flags.Analysis.Tau.ID,
+            muonWP=TightMuonWPLabel,
+            eleWP=TightEleWPLabel,
             eventDecisionOutputDecoration="bbtt_pass_sr_noMMC_%SYS%",
             triggerLists=trigger_branches,
             channel=flags.Analysis.channel,

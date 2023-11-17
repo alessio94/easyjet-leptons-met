@@ -220,48 +220,16 @@ namespace HHBBYY
   }
 
 
-  void SelectionFlagsyybbAlg::evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
-                                const xAOD::MuonContainer& muons, CutManager& yybbCuts)
+  void SelectionFlagsyybbAlg::evaluateLeptonCuts
+  (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
+   CutManager& yybbCuts)
   {
 
     if (!yybbCuts.exists("EXACTLY_ZERO_LEPTONS"))
       return;
 
-    int n_leptons=0;
-
-    static const SG::AuxElement::ConstAccessor<char>  DFCommonElectronsLHMedium ("DFCommonElectronsLHMedium");
-    static const SG::AuxElement::ConstAccessor<char>  DFCommonMuonPassIDCuts ("DFCommonMuonPassIDCuts");
-    static const SG::AuxElement::ConstAccessor<char>  DFCommonMuonPassPreselection ("DFCommonMuonPassPreselection");
-
-    //electron isolation
-    for (const xAOD::Electron *electron : electrons)
-    {
-      bool PassElectronIso = 0;
-      bool PassElectronMedium = 0;
-      /*Loose_VarRad WP based on 
-        https://twiki.cern.ch/twiki/bin/view/AtlasProtected/RecommendedIsolationWPsRel22#Electron_isolation_working_point*/
-      PassElectronIso = electron->isolation(xAOD::Iso::topoetcone20)/electron->pt() < 0.20 &&  
-                  electron->isolation(xAOD::Iso::ptvarcone30_Nonprompt_All_MaxWeightTTVALooseCone_pt1000)/electron->pt() < 0.15;
-      PassElectronMedium = DFCommonElectronsLHMedium(*electron);
-      if (PassElectronIso && PassElectronMedium)
-        n_leptons+=1;
-    }
-
-    //muon isolation
-    for (const xAOD::Muon *muon : muons)
-    {
-      bool PassMuonIso = 0;
-      bool PassMuonMedium = 0;
-      /*PflowLoose_VarRad WP based on
-      https://twiki.cern.ch/twiki/bin/view/AtlasProtected/RecommendedIsolationWPsRel22#Muon_isolation_working_points*/
-      PassMuonIso = 	( muon->isolation(xAOD::Iso::ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt500) 
-                      + 0.4*muon->isolation(xAOD::Iso::neflowisol20) ) / muon->pt() < 0.16;
-      PassMuonMedium = DFCommonMuonPassIDCuts(*muon) && DFCommonMuonPassPreselection(*muon);
-      if (PassMuonIso && PassMuonMedium)
-        n_leptons+=1;
-    }
-
     // No medium+isolated electrons and muons.
+    int n_leptons = electrons.size() + muons.size();
     if (n_leptons==0)
       yybbCuts("EXACTLY_ZERO_LEPTONS").passed = true;
 

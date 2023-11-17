@@ -36,13 +36,13 @@ namespace HHBBVV
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    m_eleIdDecorKey = m_electronHandle.getNamePattern() + "." + m_eleIdDecorName;
-    m_muonIdDecorKey = m_muonHandle.getNamePattern() + "." + m_muonIdDecorName;
-    m_muonPreselDecorKey = m_muonHandle.getNamePattern() + "." + m_muonPreselDecorName;
+    m_eleWPDecorKey = m_electronHandle.getNamePattern() +
+      ".baselineSelection_" + m_eleWPName;
+    m_muonWPDecorKey = m_muonHandle.getNamePattern() +
+      ".baselineSelection_" + m_muonWPName;
 
-    ATH_CHECK (m_eleIdDecorKey.initialize());
-    ATH_CHECK (m_muonIdDecorKey.initialize());
-    ATH_CHECK (m_muonPreselDecorKey.initialize());
+    ATH_CHECK (m_eleWPDecorKey.initialize());
+    ATH_CHECK (m_muonWPDecorKey.initialize());
 
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -79,9 +79,8 @@ namespace HHBBVV
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
-    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleIdDecorHandle(m_eleIdDecorKey);
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonIdDecorHandle(m_muonIdDecorKey);
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonPreselDecorHandle(m_muonPreselDecorKey);
+    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleWPDecorHandle(m_eleWPDecorKey);
+    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonWPDecorHandle(m_muonWPDecorKey);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
@@ -126,10 +125,9 @@ namespace HHBBVV
       //example - needs to match bbVV definition
       for (const xAOD::Electron *electron : *electrons)
       {
-        bool passElectronTight = 0;
-        passElectronTight = eleIdDecorHandle(*electron);
+        bool passElectronWP = eleWPDecorHandle(*electron);
         m_selected_el.set(*electron, false, sys);
-        if (passElectronTight && electron->pt() > 18000)
+        if (passElectronWP && electron->pt() > 18000)
         {
           m_selected_el.set(*electron, true, sys);
           n_leptons += 1;
@@ -140,11 +138,9 @@ namespace HHBBVV
 
       for (const xAOD::Muon *muon : *muons)
       {
-        bool passMuonMedium = 0;
-        passMuonMedium =
-            muonIdDecorHandle(*muon) && muonPreselDecorHandle(*muon);
+        bool passMuonWP = muonWPDecorHandle(*muon);
         m_selected_mu.set(*muon, false, sys);
-        if (passMuonMedium && abs(muon->eta()) < 2.5 && muon->pt() > 15000)
+        if (passMuonWP && std::abs(muon->eta()) < 2.5 && muon->pt() > 15000)
         {
           m_selected_mu.set(*muon, true, sys);
           n_leptons += 1;

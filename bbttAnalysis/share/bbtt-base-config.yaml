@@ -31,7 +31,7 @@ Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
   extra_wps:
-    - ["Medium", "Loose_VarRad"]
+    - ["Medium", "PflowLoose_VarRad"]
 
 Tau:
   ID: "Loose"

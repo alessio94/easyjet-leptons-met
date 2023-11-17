@@ -120,6 +120,10 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         )
 
     # Selection
+    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
+    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
+    TightEleWP = flags.Analysis.Electron.extra_wps[0]
+    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.HHBBVV.HHbbVVSelectorAlg(
             "HHbbVVSelectorAlg",
@@ -130,6 +134,8 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             met="AnalysisMET_%SYS%",
             eventDecisionOutputDecoration="bbVV_pass_sr_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
+            muonWP=TightMuonWPLabel,
+            eleWP=TightEleWPLabel,
             channel=flags.Analysis.channel,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),

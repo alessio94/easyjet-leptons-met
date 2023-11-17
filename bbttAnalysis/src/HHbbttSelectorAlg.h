@@ -86,9 +86,9 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-    Gaudi::Property<std::string> m_IDTauDecorName
-      { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
+    Gaudi::Property<std::string> m_tauWPName
+      { this, "tauWP", "", "Tau ID working point" };
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_tauWPDecorKey;
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
@@ -98,17 +98,13 @@ private:
 
     std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
 
-    Gaudi::Property<std::string> m_eleIdDecorName
-      { this, "eleIdDecorKey", "DFCommonElectronsLHTight","Decoration for electron ID working point" };
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleIdDecorKey;
+    Gaudi::Property<std::string> m_eleWPName
+      { this, "eleWP", "","Electron ID + Iso working point" };
+    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleWPDecorKey;
 		      
-    Gaudi::Property<std::string> m_muonIdDecorName
-      { this, "muonIdDecorKey", "DFCommonMuonPassIDCuts","Decoration for muon ID cuts" };
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonIdDecorKey;
-
-    Gaudi::Property<std::string> m_muonPreselDecorName
-      { this, "muonPreselDecorKey", "DFCommonMuonPassPreselection","Decoration for muon preselection" };
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
+    Gaudi::Property<std::string> m_muonWPName
+      { this, "muonWP", "","Muon ID + Iso cuts" };
+    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonWPDecorKey;
 
     Gaudi::Property<std::vector<std::string>> m_triggers 
           {this, "triggerLists", {}, "Name list of trigger"};
