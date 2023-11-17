@@ -33,6 +33,15 @@ namespace HHBBYY
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    //Initialize trigger decorations
+    for (const std::string &trig : m_photonTriggers)
+    {
+      std::string triggerDecorName = "trigPassed_"+trig;
+      SG::ReadDecorHandleKey< xAOD::EventInfo > triggerDecorKey = m_eventHandle.getNamePattern() + "." + triggerDecorName;
+      m_triggerDecorKeys.emplace(trig,triggerDecorKey);
+      ATH_CHECK(m_triggerDecorKeys.at(trig).initialize());
+    }
+    
     for (const std::string &string_var: m_inputCutList) {
       CP::SysWriteDecorHandle<bool> var {string_var+"_%SYS%", this};
       m_Bbranches.emplace(string_var, var);
@@ -101,7 +110,7 @@ namespace HHBBYY
         cut.passed = false;
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
-
+    
       if (!m_photonTriggers.empty()) {
         evaluateTriggerCuts(*event, m_photonTriggers, m_yybbCuts);
       }
@@ -184,10 +193,10 @@ namespace HHBBYY
 
     for (const std::string &trigger : photonTriggers)
     {
-      std::string trigAccessorName = "trigPassed_"+trigger;
-      const SG::AuxElement::ConstAccessor<bool> TriggerAccessor(trigAccessorName);
+      SG::ReadDecorHandleKey<xAOD::EventInfo>& triggerDecorKey = m_triggerDecorKeys.at(trigger);
+      SG::ReadDecorHandle<xAOD::EventInfo, bool> m_triggerDecorHandle(triggerDecorKey);
       //If the event passes any of the available (single or di-) photon triggers, set the overall trigger cut to true.
-      if (TriggerAccessor(event)) {
+      if (m_triggerDecorHandle(event)) {
         yybbCuts("PASS_TRIGGER").passed = true;
         break;
       }

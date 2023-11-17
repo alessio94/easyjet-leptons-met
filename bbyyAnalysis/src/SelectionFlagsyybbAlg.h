@@ -12,7 +12,6 @@
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
 #include <AsgDataHandles/ReadDecorHandle.h>
-
 #include <AthContainers/ConstDataVector.h>
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
@@ -58,13 +57,12 @@ namespace HHBBYY
           "EXACTLY_TWO_B_JETS"
       };
 
-      static void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
+      void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
                           const std::vector<std::string> &photonTriggers, CutManager& yybbCuts);
-      static void evaluatePhotonCuts(const xAOD::PhotonContainer& photons,
-				     CutManager& yybbCuts);
-      static void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
+      void evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& yybbCuts);
+      void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& yybbCuts);
-      static void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
+      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                           const xAOD::JetContainer& jets, CutManager& yybbCuts);
 
     private :
@@ -94,8 +92,10 @@ namespace HHBBYY
       m_muonHandle{ this, "muons", "",   "Muon container to read" };
 
       std::vector<std::string> m_inputCutList{};
-      std::vector<std::string> m_photonTriggers{};
-      std::string m_triggerCut{};
+
+      std::vector<std::string> m_photonTriggers;
+
+      std::unordered_map<std::string,  SG::ReadDecorHandleKey<xAOD::EventInfo>> m_triggerDecorKeys;
 
       bool m_saveCutFlow;
       long long int m_total_events{0};
