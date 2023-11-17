@@ -48,14 +48,16 @@ namespace HHBBTT
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
 
-    // Intialise syst-aware output decorators
-    for (const std::string &var : m_Fvarnames){
+
+    for (const std::string &var : m_floatVariables){
+      ATH_MSG_DEBUG("initializing float variable: " << var);
       CP::SysWriteDecorHandle<float> whandle{var+"_%SYS%", this};
       m_Fbranches.emplace(var, whandle);
       ATH_CHECK(m_Fbranches.at(var).initialize(m_systematicsList, m_eventHandle));
     };
 
-    for (const std::string &var : m_Ivarnames){
+    for (const std::string &var : m_intVariables){
+      ATH_MSG_DEBUG("initializing integer variable: " << var);
       CP::SysWriteDecorHandle<int> whandle{var+"_%SYS%", this};
       m_Ibranches.emplace(var, whandle);
       ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
@@ -63,7 +65,6 @@ namespace HHBBTT
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
-
     return StatusCode::SUCCESS;
   }
 
@@ -98,12 +99,12 @@ namespace HHBBTT
 	return StatusCode::FAILURE;	
       }
 
-      // Calculate vars
-      for (const auto& var: m_Fvarnames) {
-        m_Fbranches.at(var).set(*event, -99., sys);
+      for (const auto& var: m_floatVariables) {
+          m_Fbranches.at(var).set(*event, -99, sys);
       }
-      for (const auto& var: m_Ivarnames) {
-        m_Ibranches.at(var).set(*event, -99, sys);
+
+      for (const auto& var: m_intVariables) {
+          m_Ibranches.at(var).set(*event, -99, sys);
       }
 
       // selected leptons ; 
@@ -117,7 +118,7 @@ namespace HHBBTT
           lepton = electron->p4();
           lepton_charge = electron->charge();
           lepton_pdgid = electron->charge() > 0 ? -11 : 11;
-	  found_lepton = true;
+          found_lepton = true;
           break; // At most one lepton selected
 	}
       }
@@ -193,6 +194,17 @@ namespace HHBBTT
       if (bjets->size() > 1){
         bb = bjets->at(0)->p4() + bjets->at(1)->p4();
         found_bb = true;
+        m_Fbranches.at("Leading_Bjet_pt").set(*event,  bjets->at(0)->p4().Pt(), sys);
+        m_Fbranches.at("Leading_Bjet_eta").set(*event, bjets->at(0)->p4().Eta(), sys);
+        m_Fbranches.at("Leading_Bjet_phi").set(*event, bjets->at(0)->p4().Phi(), sys);
+        m_Fbranches.at("Sublead_Bjet_pt").set(*event,  bjets->at(1)->p4().Pt(), sys);
+        m_Fbranches.at("Sublead_Bjet_eta").set(*event, bjets->at(1)->p4().Eta(), sys);
+        m_Fbranches.at("Sublead_Bjet_phi").set(*event, bjets->at(1)->p4().Phi(), sys);
+
+        m_Fbranches.at("H_bb_pt").set(*event, bb.Pt(), sys);
+        m_Fbranches.at("H_bb_eta").set(*event, bb.Eta(), sys);
+        m_Fbranches.at("H_bb_phi").set(*event, bb.Phi(), sys);
+        m_Fbranches.at("H_bb_m").set(*event,  bb.M(), sys);
       }
 
       TLorentzVector tautau_vis(0,0,0,0);
@@ -205,6 +217,10 @@ namespace HHBBTT
           tautau_vis = lead_tau + sublead_tau;
           found_tautau_vis = true;
         }
+        m_Fbranches.at("H_vis_tautau_pt").set(*event, tautau_vis.Pt(), sys);
+        m_Fbranches.at("H_vis_tautau_eta").set(*event, tautau_vis.Eta(), sys);
+        m_Fbranches.at("H_vis_tautau_phi").set(*event, tautau_vis.Phi(), sys);
+        m_Fbranches.at("H_vis_tautau_m").set(*event,  tautau_vis.M(), sys);
       }
 
       if(found_bb && found_tautau_vis){
@@ -227,8 +243,12 @@ namespace HHBBTT
         m_Fbranches.at("HH_eta").set(*event, HH.Eta(), sys);
         m_Fbranches.at("HH_phi").set(*event, HH.Phi(), sys);
         m_Fbranches.at("HH_m").set(*event, HH.M(), sys);
-      }
 
+        if(m_storeHighLevelVariables){
+          m_Fbranches.at("HH_delta_phi").set(*event, bb.DeltaPhi(mmc_vec),sys);
+          m_Fbranches.at("HH_vis_delta_phi").set(*event, bb.DeltaPhi(tautau_vis),sys);
+        }
+      }
     }
 
     return StatusCode::SUCCESS;

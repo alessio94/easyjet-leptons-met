@@ -84,23 +84,23 @@ private:
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
-    /// \brief Setup sys-aware output decorations
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
-    std::vector<std::string> m_Fvarnames{      
-      "Lepton_pt", "Lepton_eta", "Lepton_phi",
-      "Leading_Tau_pt", "Leading_Tau_eta", "Leading_Tau_phi",
-      "Sublead_Tau_pt", "Sublead_Tau_eta", "Sublead_Tau_phi",
-      "HH_pt", "HH_eta", "HH_phi", "HH_m",
-      "HH_vis_pt", "HH_vis_eta", "HH_vis_phi", "HH_vis_m",
-    };
+    Gaudi::Property<bool> m_storeHighLevelVariables
+      { this, "storeHighLevelVariables", false, "Flag to store high level variables in output" };
+    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
 
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
-    std::vector<std::string> m_Ivarnames{      
-      "Lepton_charge", "Lepton_pdgid",
-      "Leading_Tau_charge", "Sublead_Tau_charge"
-    };
+    Gaudi::Property<std::vector<std::string>> m_floatVariables
+          {this, "floatVariableList", {}, "Name list of floating variables"};
+
+    Gaudi::Property<std::vector<std::string>> m_intVariables
+          {this, "intVariableList", {}, "Name list of integer variables"};
+
+    /// \brief Setup sys-aware output decorations
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
+        m_Fbranches;
+
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
   };
-}
+} // namespace HHBBTT
 
 #endif

@@ -47,6 +47,8 @@ channel: ["hadhad","lephad"]
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: true
 
+store_high_level_variables: true
+
 # Include the TTree configuration and update details
 ttree_output:
   - AnalysisMiniTree:
