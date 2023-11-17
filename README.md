@@ -6,7 +6,7 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for instructions on modifying this co
 
 For questions, [join the EasyJet MM team](https://mattermost.web.cern.ch/signup_user_complete/?id=zqgsdao6sffjum15jm11y65gkh&md=link&sbr=su).
 - FW and NTUP users: [easyjet FW](https://mattermost.web.cern.ch/easyjet/channels/easyjet-fw).
-- FW developers and notifications: [easyjet dev](https://mattermost.web.cern.ch/easyjet/channels/easyjet-dev).
+- FW developers, notifications and bug reports: [easyjet dev](https://mattermost.web.cern.ch/easyjet/channels/easyjet-dev).
 - Major HH decay channels have a corresponding mattermost channel, e.g. bbbb, bbtautau, etc.
 
 Meetings will be biweekly at 5 pm on Tuesday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/) or [the dihiggs subgroup indico](https://indico.cern.ch/category/10816/), and announced on the e-group [atlas-phys-hdbs-dihiggs-hhframework@cern.ch](https://e-groups.cern.ch/e-groups/Egroup.do?egroupName=atlas-phys-hdbs-dihiggs-hhframework)
