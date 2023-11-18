@@ -136,17 +136,13 @@ namespace HHBBTT
       //if (taus->size() != 2) continue;
       //if (! (taus->at(0)->pt() > 60000)) continue;
 
-      std::vector<std::string> trigger_channels = {"SLT", "LTT", "STT", "DTT"};
-      std::vector<std::string> vars = {"ele", "mu", "leadingtau", "subleadingtau", "leadingjet", "subleadingjet"};
-      std::vector<std::string> jvars = {"leadingjet", "subleadingjet"};
-
       for (const auto& trigger_channel : trigger_channels) {
           for (const auto& var : vars) {
               m_pt_threshold[trigger_channel][var] = 0.0;
           }
       }
 
-      applyTriggerSelection(taus, event, sys);
+      applyTriggerSelection(event, sys);
       m_Bbranches.at("pass_trigger_SLT").set(*event, trigPassed_SLT, sys);
       m_Bbranches.at("pass_trigger_LTT").set(*event, trigPassed_LTT, sys);
       m_Bbranches.at("pass_trigger_STT").set(*event, trigPassed_STT, sys);
@@ -185,11 +181,11 @@ namespace HHBBTT
       {
         bool passElectronWP = eleWPDecorHandle(*electron);
         m_selected_el.set(*electron, false, sys);
-        if (passElectronWP && electron->pt() > m_pt_threshold["LTT"]["ele"])
+        if (passElectronWP && electron->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::ele])
         {
-          if (electron->pt() > m_pt_threshold["LTT"]["ele"] && electron->pt() < m_pt_threshold["SLT"]["ele"])
+          if (electron->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::ele] && electron->pt() < m_pt_threshold[HHBBTT::SLT][HHBBTT::ele])
             lep_ptcut_LTT = true;
-          else if (electron->pt() > m_pt_threshold["SLT"]["ele"])
+          else if (electron->pt() > m_pt_threshold[HHBBTT::SLT][HHBBTT::ele])
             lep_ptcut_SLT = true;
           charge_lepton = electron->charge();
           m_selected_el.set(*electron, true, sys);
@@ -204,12 +200,12 @@ namespace HHBBTT
         bool passMuonWP = muonWPDecorHandle(*muon);
         m_selected_mu.set(*muon, false, sys);
         if (passMuonWP && std::abs(muon->eta()) < 2.5
-	    && muon->pt() > m_pt_threshold["LTT"]["mu"])
+	    && muon->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::mu])
         {
-          if (muon->pt() >  m_pt_threshold["LTT"]["mu"]
-	      && muon->pt() <  m_pt_threshold["SLT"]["mu"])
+          if (muon->pt() >  m_pt_threshold[HHBBTT::LTT][HHBBTT::mu] 
+        && muon->pt() <  m_pt_threshold[HHBBTT::SLT][HHBBTT::mu])
             lep_ptcut_LTT = true;
-          else if (muon->pt() >  m_pt_threshold["SLT"]["mu"])
+          else if (muon->pt() >  m_pt_threshold[HHBBTT::SLT][HHBBTT::mu])
             lep_ptcut_SLT = true;
           charge_lepton = muon->charge();
           m_selected_mu.set(*muon, true, sys);
@@ -239,6 +235,7 @@ namespace HHBBTT
       int tau_ptcut_DTT_sublead = 0;
       bool tau_ptcut_STT = false;
       bool tau_ptcut_DTT = false;
+      bool tau_deltaR_DTT = false;
       for (const xAOD::TauJet *tau : *taus)
       {
         bool isTauID = tauWPDecorHandle(*tau);
@@ -246,18 +243,24 @@ namespace HHBBTT
         if (isTauID && tau->pt() > 20000)
         {
           if (std::abs(tau->eta()) < 2.3) {
-            if (tau->pt() >  m_pt_threshold["SLT"]["leadingtau"])
+            if (tau->pt() >  m_pt_threshold[HHBBTT::SLT][HHBBTT::leadingtau])
               tau_ptcut_SLT = true;
-            if (tau->pt() > m_pt_threshold["LTT"]["leadingtau"])
-              tau_ptcut_LTT = true;
+            if (m_pt_threshold[HHBBTT::LTT].find(HHBBTT::leadingtauupper) != m_pt_threshold[HHBBTT::LTT].end()){
+              if (tau->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau] && tau->pt() < m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtauupper])
+                tau_ptcut_LTT = true;
+            }
+            else {
+              if (tau->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau])
+                tau_ptcut_LTT = true;
+            } 
           }
-          if (tau->pt() > m_pt_threshold["STT"]["leadingtau"])
+          if (tau->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau])
             tau_ptcut_STT_lead = true;
-          if (tau->pt() > m_pt_threshold["STT"]["subleadingtau"])
+          if (tau->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau])
             tau_ptcut_STT_sublead++;
-          if (tau->pt() > m_pt_threshold["DTT"]["leadingtau"])
+          if (tau->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau])
             tau_ptcut_DTT_lead = true;
-          if (tau->pt() > m_pt_threshold["DTT"]["subleadingtau"])
+          if (tau->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau])
             tau_ptcut_DTT_sublead++;
           m_selected_tau.set(*tau, true, sys);
           n_taus += 1;
@@ -273,9 +276,15 @@ namespace HHBBTT
 
       if (n_taus == 2) {
         TWO_TAU = true;
+        if (DTT_DeltaR_cut)
+        {
+          if (taus->at(0)->p4().DeltaR(taus->at(1)->p4()) <= 2.5)
+              tau_deltaR_DTT = true;
+        }
+        else  tau_deltaR_DTT = true;
         if (tau_ptcut_STT_lead && tau_ptcut_STT_sublead >= 2)
           tau_ptcut_STT = true;
-        if (tau_ptcut_DTT_lead && tau_ptcut_DTT_sublead >= 2)
+        if (tau_ptcut_DTT_lead && tau_ptcut_DTT_sublead >= 2 && tau_deltaR_DTT)
           tau_ptcut_DTT = true;
       }
 
@@ -287,13 +296,12 @@ namespace HHBBTT
       bool jet_ptcut_LTT = false;
       bool jet_ptcut_STT = false;
       bool jet_ptcut_DTT = false;
-      std::unordered_map<std::string, std::unordered_map<std::string, bool>> jet_ptcut;
+      std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, bool>> jet_ptcut;
       for (const auto& trigger_channel : trigger_channels) {
           for (const auto& jvar : jvars) {
               jet_ptcut[trigger_channel][jvar] = false;
           }
       }
-      bool jet_deltaR_DTT = false;
       TLorentzVector bb(0, 0, 0, 0);
       float mbb = 0;
       bool WPgiven = !m_isBtag.empty();
@@ -317,17 +325,11 @@ namespace HHBBTT
       {
         TWO_JETS = true;
         for (const auto& trigger_channel : trigger_channels) {
-            if (jets->at(0)->pt() > m_pt_threshold[trigger_channel]["leadingjet"])
-              jet_ptcut[trigger_channel]["leadingjet"] = true;
-            if (jets->at(1)->pt() > m_pt_threshold[trigger_channel]["subleadingjet"])
-              jet_ptcut[trigger_channel]["subleadingjet"] = true;
+            if (jets->at(0)->pt() > m_pt_threshold[trigger_channel][HHBBTT::leadingjet])
+              jet_ptcut[trigger_channel][HHBBTT::leadingjet] = true;
+            if (jets->at(1)->pt() > m_pt_threshold[trigger_channel][HHBBTT::subleadingjet])
+              jet_ptcut[trigger_channel][HHBBTT::subleadingjet] = true;
         }
-        if (DTT_DeltaR_cut)
-        {
-          if (jets->at(0)->p4().DeltaR(jets->at(1)->p4()) <= 2.5) 
-              jet_deltaR_DTT = true;
-        }
-        else  jet_deltaR_DTT = true;
         if (bjets->size() == 2)
         {
           TWO_BJETS = true;
@@ -335,13 +337,13 @@ namespace HHBBTT
           mbb = bb.M();
         }
       }
-      if (jet_ptcut["SLT"]["leadingjet"] && jet_ptcut["SLT"]["subleadingjet"])
+      if (jet_ptcut[HHBBTT::SLT][HHBBTT::leadingjet] && jet_ptcut[HHBBTT::SLT][HHBBTT::subleadingjet])
           jet_ptcut_SLT = true;
-      if (jet_ptcut["LTT"]["leadingjet"] && jet_ptcut["LTT"]["subleadingjet"])
+      if (jet_ptcut[HHBBTT::LTT][HHBBTT::leadingjet] && jet_ptcut[HHBBTT::LTT][HHBBTT::subleadingjet])
           jet_ptcut_LTT = true;
-      if (jet_ptcut["STT"]["leadingjet"] && jet_ptcut["STT"]["subleadingjet"])
+      if (jet_ptcut[HHBBTT::STT][HHBBTT::leadingjet] && jet_ptcut[HHBBTT::STT][HHBBTT::subleadingjet])
           jet_ptcut_STT = true;
-      if (jet_ptcut["DTT"]["leadingjet"] && jet_ptcut["DTT"]["subleadingjet"] && jet_deltaR_DTT)
+      if (jet_ptcut[HHBBTT::DTT][HHBBTT::leadingjet] && jet_ptcut[HHBBTT::DTT][HHBBTT::subleadingjet])
           jet_ptcut_DTT = true;
 
       //****************
@@ -412,7 +414,7 @@ namespace HHBBTT
     return StatusCode::SUCCESS;
   }
 
-  void HHbbttSelectorAlg::applyTriggerSelection(const xAOD::TauJetContainer* taus, const xAOD::EventInfo* event, const CP::SystematicSet& sys){
+  void HHbbttSelectorAlg::applyTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys){
     //************
     // trigger selecton
     //************
@@ -459,8 +461,7 @@ namespace HHBBTT
     for (const auto &channel : m_channels){
       if (channel == HHBBTT::LepHad)
       {
-        applyLepHadTriggerSelection(taus, event,
-                                    sys); // maybe split this as well
+        applyLepHadTriggerSelection(event, sys); // maybe split this as well
       }
       else if (channel == HHBBTT::HadHad)
       {
@@ -471,7 +472,7 @@ namespace HHBBTT
   }
 
   void HHbbttSelectorAlg ::applyLepHadTriggerSelection(
-      const xAOD::TauJetContainer *taus, const xAOD::EventInfo *event,
+      const xAOD::EventInfo *event,
       const CP::SystematicSet &sys)
   {
     bool trigPassed_SET = false;
@@ -490,30 +491,30 @@ namespace HHBBTT
     std::vector<std::string> mu_tau_paths_high;
 
     // SLT
-    m_pt_threshold["SLT"]["leadingtau"] = 20000;
-    m_pt_threshold["SLT"]["leadingjet"] = 45000;
-    m_pt_threshold["SLT"]["subleadingjet"] = 20000;
+    m_pt_threshold[HHBBTT::SLT][HHBBTT::leadingtau] = 20000;
+    m_pt_threshold[HHBBTT::SLT][HHBBTT::leadingjet] = 45000;
+    m_pt_threshold[HHBBTT::SLT][HHBBTT::subleadingjet] = 20000;
     if(is15){
-      m_pt_threshold["SLT"]["ele"] = 25000;
-      m_pt_threshold["SLT"]["mu"] = 21000;
+      m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 25000;
+      m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 21000;
       single_ele_paths = {"trigPassed_HLT_e24_lhmedium_L1EM20VH", "trigPassed_HLT_e60_lhmedium", "trigPassed_HLT_e120_lhloose"};
       single_mu_paths = {"trigPassed_HLT_mu20_iloose_L1MU15", "trigPassed_HLT_mu50"};
     }
     else if(is16 || is17 || is18){
-      m_pt_threshold["SLT"]["ele"] = 27000;
-      m_pt_threshold["SLT"]["mu"] = 27000;
+      m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 27000;
+      m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 27000;
       single_ele_paths = {"trigPassed_HLT_e26_lhtight_nod0_ivarloose", "trigPassed_HLT_e60_lhmedium_nod0", "trigPassed_HLT_e140_lhloose_nod0"};
       single_mu_paths = {"trigPassed_HLT_mu26_ivarmedium", "trigPassed_HLT_mu50"};
     }
     else if (is22) {
-      m_pt_threshold["SLT"]["ele"] = 27000;
-      m_pt_threshold["SLT"]["mu"] = 27000;
+      m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 27000;
+      m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 27000;
       single_ele_paths = {"trigPassed_HLT_e26_lhtight_ivarloose_L1EM22VHI", "trigPassed_HLT_e60_lhmedium_L1EM22VHI", "trigPassed_HLT_e140_lhloose_L1EM22VHI"};
       single_mu_paths = {"trigPassed_HLT_mu24_ivarmedium_L1MU14FCH", "trigPassed_HLT_mu50_L1MU14FCH"};
     }
     else if (is23) {
-      m_pt_threshold["SLT"]["ele"] = 27000;
-      m_pt_threshold["SLT"]["mu"] = 27000;
+      m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 27000;
+      m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 27000;
       single_ele_paths = {"trigPassed_HLT_e26_lhtight_ivarloose_L1eEM26M", "trigPassed_HLT_e60_lhmedium_L1eEM26M", "trigPassed_HLT_e140_lhloose_L1eEM26M"};
       single_mu_paths = {"trigPassed_HLT_mu24_ivarmedium_L1MU14FCH", "trigPassed_HLT_mu50_L1MU14FCH"};
     }
@@ -533,11 +534,11 @@ namespace HHBBTT
     if (trigPassed_SET || trigPassed_SMT) trigPassed_SLT = true;
 
     // LTT
-    m_pt_threshold["LTT"]["ele"] = 18000;
-    m_pt_threshold["LTT"]["mu"] = 15000;
-    m_pt_threshold["LTT"]["leadingtau"] = 30000;
-    m_pt_threshold["LTT"]["leadingjet"] = 45000; // default value
-    m_pt_threshold["LTT"]["subleadingjet"] = 20000; // default value
+    m_pt_threshold[HHBBTT::LTT][HHBBTT::ele] = 18000;
+    m_pt_threshold[HHBBTT::LTT][HHBBTT::mu] = 15000;
+    m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau] = 30000;
+    m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingjet] = 45000; // default value
+    m_pt_threshold[HHBBTT::LTT][HHBBTT::subleadingjet] = 20000; // default value
     if(is15 || is16PeriodA){
       ele_tau_paths = {"trigPassed_HLT_e17_lhmedium_nod0_tau25_medium1_tracktwo"};
       mu_tau_paths = {"trigPassed_HLT_mu14_tau25_medium1_tracktwo"};
@@ -581,8 +582,8 @@ namespace HHBBTT
     for(const auto& path : ele_tau_paths_4J12){
      trigPassed_ETT |= m_triggerdecos.at(path).get(*event, sys);
      if(trigPassed_ETT) {
-        m_pt_threshold["LTT"]["leadingjet"] = 45000;
-        m_pt_threshold["LTT"]["subleadingjet"] = 45000;
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingjet] = 45000;
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::subleadingjet] = 45000;
         break;
      }
     }
@@ -590,8 +591,8 @@ namespace HHBBTT
       for(const auto& path : ele_tau_paths){
         trigPassed_ETT |= m_triggerdecos.at(path).get(*event, sys);
         if(trigPassed_ETT) {
-           m_pt_threshold["LTT"]["leadingjet"] = 80000;
-           m_pt_threshold["LTT"]["subleadingjet"] = 20000;
+           m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingjet] = 80000;
+           m_pt_threshold[HHBBTT::LTT][HHBBTT::subleadingjet] = 20000;
            break;
         }
        }
@@ -601,36 +602,30 @@ namespace HHBBTT
     for(const auto& path : mu_tau_paths){
      trigPassed_MTT |= m_triggerdecos.at(path).get(*event, sys);
      if(trigPassed_MTT) {
-        m_pt_threshold["LTT"]["leadingjet"] = 80000;
-        m_pt_threshold["LTT"]["subleadingjet"] = 20000;
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingjet] = 80000;
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::subleadingjet] = 20000;
         break;
      }
     }
 
     for(const auto& path : mu_tau_paths_high){
      trigPassed_MTT_high |= m_triggerdecos.at(path).get(*event, sys);
-     if(trigPassed_MTT_high) break;
-    }
-    bool trig_pass_tau_high_pt = false;
-    for (const xAOD::TauJet *tau : *taus){
-       trig_pass_tau_high_pt |= tau->pt() > 40000;
-       if(trig_pass_tau_high_pt) break;
-    }
-    trigPassed_MTT_high &= trig_pass_tau_high_pt;
-    if(trigPassed_MTT_high){
-      m_pt_threshold["LTT"]["leadingjet"] = 45000;
-      m_pt_threshold["LTT"]["subleadingjet"] = 20000;
+     if(trigPassed_MTT_high) {
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau] = 40000;
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingjet] = 45000;
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::subleadingjet] = 20000;
+        break;
+      }
     }
 
     for(const auto& path : mu_tau_paths_low){
      trigPassed_MTT_low |= m_triggerdecos.at(path).get(*event, sys);
-     if(trigPassed_MTT_low) break;
-    }
-    bool trig_pass_tau_low_pt = !trig_pass_tau_high_pt;
-    trigPassed_MTT_low &= trig_pass_tau_low_pt;
-    if(trigPassed_MTT_low){
-      m_pt_threshold["LTT"]["leadingjet"] = 45000;
-      m_pt_threshold["LTT"]["subleadingjet"] = 45000;
+     if(trigPassed_MTT_low) {
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtauupper] = 40000;
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingjet] = 45000;
+        m_pt_threshold[HHBBTT::LTT][HHBBTT::subleadingjet] = 45000;
+        break;
+      }
     }
 
     if(trigPassed_ETT || trigPassed_MTT || trigPassed_MTT_low ||
@@ -646,40 +641,40 @@ namespace HHBBTT
     // hadhad
     std::vector<std::string> single_tau_paths;
     // STT
-    m_pt_threshold["STT"]["subleadingtau"] = 25000;
-    m_pt_threshold["STT"]["leadingjet"] = 45000;
-    m_pt_threshold["STT"]["subleadingjet"] = 20000;
+    m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau] = 25000;
+    m_pt_threshold[HHBBTT::STT][HHBBTT::leadingjet] = 45000;
+    m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingjet] = 20000;
 
     if(is15 || is16PeriodA){
-      m_pt_threshold["STT"]["leadingtau"] = 100000;
+      m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = 100000;
       single_tau_paths = {"trigPassed_HLT_tau80_medium1_tracktwo_L1TAU60"};
     }
     else if(is16PeriodB_D3){
-      m_pt_threshold["STT"]["leadingtau"] = 140000;
+      m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = 140000;
       single_tau_paths = {"trigPassed_HLT_tau125_medium1_tracktwo"};
     }
     else if(is16PeriodD4_end || is17PeriodB1_B4){
-      m_pt_threshold["STT"]["leadingtau"] = 180000;
+      m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = 180000;
       single_tau_paths = {"trigPassed_HLT_tau160_medium1_tracktwo"};
     }
     else if(is17PeriodB5_B7 || is17PeriodB8_end){
-      m_pt_threshold["STT"]["leadingtau"] = 180000;
+      m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = 180000;
       single_tau_paths = {"trigPassed_HLT_tau160_medium1_tracktwo_L1TAU100"};
     }
     else if(is18){
-      m_pt_threshold["STT"]["leadingtau"] = 180000;
+      m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = 180000;
       single_tau_paths = {"trigPassed_HLT_tau160_medium1_tracktwoEF_L1TAU100"};
     }
     else if(is18PeriodK_end){
-      m_pt_threshold["STT"]["leadingtau"] = 180000;
+      m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = 180000;
       single_tau_paths = {"trigPassed_HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
     }
     else if(is22){
-      m_pt_threshold["STT"]["leadingtau"] = 180000;
+      m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = 180000;
       single_tau_paths = {"trigPassed_HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
     }
     else if(is23){
-      m_pt_threshold["STT"]["leadingtau"] = 180000;
+      m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = 180000;
       single_tau_paths = {"trigPassed_HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"};
     }
     // Pass single tau trigger
@@ -697,10 +692,10 @@ namespace HHBBTT
     std::vector<std::string> ditau_paths_4J12;
 
     // DTT
-    m_pt_threshold["DTT"]["leadingtau"] = 40000;
-    m_pt_threshold["DTT"]["subleadingtau"] = 30000;
-    m_pt_threshold["DTT"]["leadingjet"] = 45000; // default value
-    m_pt_threshold["DTT"]["subleadingjet"] = 20000; // default value
+    m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40000;
+    m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30000;
+    m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingjet] = 45000; // default value
+    m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingjet] = 20000; // default value
 
     if(is15){
       ditau_paths = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM"};
@@ -733,16 +728,16 @@ namespace HHBBTT
     for(const auto& path : ditau_paths_4J12){
      trigPassed_DTT |= m_triggerdecos.at(path).get(*event, sys);
      if(trigPassed_DTT) {
-        m_pt_threshold["DTT"]["leadingjet"] = 45000;
-        m_pt_threshold["DTT"]["subleadingjet"] = 45000;
+        m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingjet] = 45000;
+        m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingjet] = 45000;
         break;}
     }
     if(!trigPassed_DTT){
       for(const auto& path : ditau_paths){
        trigPassed_DTT |= m_triggerdecos.at(path).get(*event, sys);
        if(trigPassed_DTT) {
-          m_pt_threshold["DTT"]["leadingjet"] = 80000;
-          m_pt_threshold["DTT"]["subleadingjet"] = 20000;
+          m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingjet] = 80000;
+          m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingjet] = 20000;
           if(!(is15 || is16)) DTT_DeltaR_cut = true;
           break;}
       }

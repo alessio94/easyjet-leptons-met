@@ -33,6 +33,25 @@
 namespace HHBBTT
 {
 
+  enum TriggerChannel
+  {
+    SLT = 0, 
+    LTT = 1, 
+    STT = 2, 
+    DTT = 3,
+  };
+
+  enum Var
+  {
+    ele = 0, 
+    mu = 1, 
+    leadingtau = 2, 
+    subleadingtau = 3, 
+    leadingjet = 4, 
+    subleadingjet = 5,
+    leadingtauupper = 6,
+  };
+
   /// \brief An algorithm for counting containers
   class HHbbttSelectorAlg final : public EL::AnaAlgorithm
   {
@@ -116,6 +135,10 @@ private:
       "pass_SLT", "pass_LTT", "pass_STT", "pass_DTT",
     };
 
+    std::vector<HHBBTT::TriggerChannel> trigger_channels {HHBBTT::SLT, HHBBTT::LTT, HHBBTT::STT, HHBBTT::DTT};
+    std::vector<HHBBTT::Var> vars {HHBBTT::ele, HHBBTT::mu, HHBBTT::leadingtau, HHBBTT::subleadingtau, HHBBTT::leadingjet, HHBBTT::subleadingjet};
+    std::vector<HHBBTT::Var> jvars {HHBBTT::leadingjet, HHBBTT::subleadingjet};
+
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
@@ -146,7 +169,7 @@ private:
     bool pass_baseline_DTT;
     bool pass_STT;
     bool pass_DTT;
-    std::unordered_map<std::string, std::unordered_map<std::string, float>> m_pt_threshold;
+    std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>> m_pt_threshold;
     bool DTT_DeltaR_cut;
 
 
@@ -171,8 +194,8 @@ private:
 
     
 
-    void applyTriggerSelection(const xAOD::TauJetContainer* taus, const xAOD::EventInfo* event, const CP::SystematicSet& sys);
-    void applyLepHadTriggerSelection(const xAOD::TauJetContainer* taus, const xAOD::EventInfo* event, const CP::SystematicSet& sys);
+    void applyTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
+    void applyLepHadTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
     void applySingleTauTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
     void applyDiTauTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
 
