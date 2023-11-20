@@ -1,6 +1,6 @@
 # Analysis Package for bbyy
 
-This analysis package is currently used for investigating the potential use of the `DAOD_PHYS` (PHYS) or `DAOD_PHYSLITE` (PHYSLITE) data formats for Run 3 HH to bbyy [HDBS workshop talk](https://indico.cern.ch/event/1132691/sessions/436749/attachments/2503571/4301659/PHYSLITE_HDBSWorkshop_Sep2022.pdf).
+This analysis package is currently used for investigating the potential use of the `DAOD_PHYS` (PHYS) or `DAOD_PHYSLITE` (PHYSLITE) data formats for Run-3 HH to bbyy [HDBS workshop talk](https://indico.cern.ch/event/1132691/sessions/436749/attachments/2503571/4301659/PHYSLITE_HDBSWorkshop_Sep2022.pdf).
 
 For any questions, comments, or feedback on the package feel free to contact:
 
@@ -11,47 +11,6 @@ Skype: `abe_t-c`
 
 Participation and development on this package from: Giulia Di Gregorio, Sayuka Kita, Spyros Merianos, Lorenzo Santi
 
-## Set up easyjet
-
-Suggest to begin by creating a new working directory where you will keep `easyjet`, and your `build` and `run` directories:
-
-```
-mkdir easyjet
-cd easyjet
-```
-
-Then clone `easyjet` following the instructions in the main README:
-
-Via ssh protocol:
-```
-git clone --recursive ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
-```
-
-Via https protocol:
-
-```
-git clone --recursive https://gitlab.cern.ch/easyjet/easyjet.git
-```
-
-Then create your build directory and build:
-
-```
-mkdir build \
-cd build \
-source ../easyjet/setup.sh \
-cmake ../easyjet/ \
-make \
-source */setup.sh 
-```
-
-(Optional): Then create a run directory where you will run from, and navigate there:
-
-```
-cd ..
-mkdir run
-cd run
-```
-
 ## Producing bbyy ntuples
 
 bbyy ntuples are produced by running the `bbyy-ntupler` executable. Example commands for processing 100 events of a `DAOD_PHYS` or `DAOD_PHYSLITE` file can be found below:
@@ -59,14 +18,14 @@ bbyy ntuples are produced by running the `bbyy-ntupler` executable. Example comm
 PHYS:
 
 ```
-bbyy-ntupler /eos/atlas/atlascerngroupdisk/phys-hdbs/diHiggs/Run3/yybb/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.deriv.DAOD_PHYS.e8222_s3681_r13167_p5631/DAOD_PHYS.33464338._000003.pool.root.1 \
+bbyy-ntupler /eos/atlas/atlascerngroupdisk/phys-hdbs/diHiggs/Run3/yybb/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.deriv.DAOD_PHYS.e8222_s3681_r13167_p5855/DAOD_PHYS.35180056._000001.pool.root.1 \
   --run-config ../easyjet/bbyyAnalysis/share/RunConfig-PHYS-bbyy.yaml --evtMax 100 --out-file bbyy_PHYS_ntuple.root
 ```
 
 PHYSLITE:
 
 ```
-bbyy-ntupler /eos/atlas/atlascerngroupdisk/phys-hdbs/diHiggs/Run3/yybb/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.deriv.DAOD_PHYSLITE.e8222_s3681_r13167_p5631/DAOD_PHYSLITE.33440027._000003.pool.root.1 \
+bbyy-ntupler /eos/atlas/atlascerngroupdisk/phys-hdbs/diHiggs/Run3/yybb/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.deriv.DAOD_PHYSLITE.e8222_s3681_r13167_p5855/DAOD_PHYSLITE.35180056._000001.pool.root.1 \
   --run-config ../easyjet/bbyyAnalysis/share/RunConfig-PHYSLITE-bbyy.yaml --evtMax 100 \
   --out-file bbyy_PHYSLITE_ntuple.root
 ```
@@ -74,29 +33,20 @@ bbyy-ntupler /eos/atlas/atlascerngroupdisk/phys-hdbs/diHiggs/Run3/yybb/mc20_13Te
 If these run properly, your outputs files should contain a TTree `AnalysisMiniTree` containing:
 
 * Standard event info, e.g. `runNumber`, `eventNumber` etc.
-* Truth information on the Higgs
-* All photon kinematics: `ph_NOSYS_pt`, `ph_NOSYS_eta`, `ph_NOSYS_phi`
+* Truth information on the Higgs: `truth_H1_X` and `truth_H2_X`
+* All photon kinematics: `ph_NOSYS_X`
 * Reco jet kinematics: `recojet_antikt4PFlow_NOSYS_X`
-* Truth jet information: `truthjet_...`
+* Truth jet information: `truthjet_antikt4_X`
 * Standard set of `bbyy` variables, including:
-  * `N_LOOSE_PHOTONS`
-  * `TWO_TIGHTID_PHOTONS`
-  * `myy`
-  * `Leading/Subleading_Photon/Jet_<kinematic>`
+  * reco photons: `NOSYS_Leading_Photon_X` and `NOSYS_Subleading_Photon_X` + the related variables `NOSYS_myy` etc.
+  * reco jets: `NOSYS_Jet_X_b1` and `NOSYS_Jet_X_b2` + the related variables `NOSYS_mbb` etc.
+  * HH variables: `NOSYS_mbbyy` etc.
+  * gloabl variables: `NOSYS_nJets`, `NOSYS_nPhotons`etc.
+  * cuts to pass: `NOSYS_PASS_TRIGGER`, `NOSYS_TWO_TIGHTID_ISO_PHOTONS`
 
 Note that running with the `bbyy-ntupler` executable will add the standard `bbyy` variables above, defined in `bbyyAnalysis/src/BaselineVarsbbyyAlg.cxx` and `bbyyAnalysis/python/bbyy_config.py`. 
 
-One can change the outputs saved in the TTree by adjusting the base bbyy configuration file `bbyyAnalysis/share/bbyy-base-config.yaml`.
-
-## Development
-
-Currently, the development branch for `bbyy` additions is here:
-
-https://gitlab.cern.ch/atishelm/easyjet/-/tree/bbyy_dev?ref_type=heads
-
-This is to allow for review among `bbyy` analyzers before updating `bbyy` developments, before making merge requests to [the main easyjet repository](https://gitlab.cern.ch/easyjet/easyjet).
-
-If you would like to update the `bbyy` analysis package, start from [bbyy dev](https://gitlab.cern.ch/atishelm/easyjet/-/tree/bbyy_dev?ref_type=heads), commit your changes locally, and push to a new branch in [Forked repo](https://gitlab.cern.ch/atishelm/easyjet) with a meaningful name e.g. `bbyy_cutflow`, `bbyy_systematics`, etc, and assign `@atishelm` as a reviewer. 
+One can change the outputs saved in the TTree by adjusting the base bbyy configuration file `bbyyAnalysis/share/bbyy-base-config.yaml`, which also defines the identification and isolation WP of the different objects.
 
 ## Package structure
 
