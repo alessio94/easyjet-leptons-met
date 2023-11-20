@@ -4,7 +4,7 @@
 # For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
 
 # get an ath analysis image
-image: gitlab-registry.cern.ch/atlas/athena/athanalysis:24.2.28
+image: gitlab-registry.cern.ch/atlas/athena/athanalysis:24.2.30
 
 stages:
   - linting
