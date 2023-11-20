@@ -2,12 +2,12 @@
   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "SelectionFlagsyybbAlg.h"
+#include "SelectionFlagsbbyyAlg.h"
 
 namespace HHBBYY
 {
 
-  SelectionFlagsyybbAlg::SelectionFlagsyybbAlg(const std::string &name,
+  SelectionFlagsbbyyAlg::SelectionFlagsbbyyAlg(const std::string &name,
                                 ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
@@ -17,10 +17,10 @@ namespace HHBBYY
   }
 
 
-  StatusCode SelectionFlagsyybbAlg::initialize()
+  StatusCode SelectionFlagsbbyyAlg::initialize()
   {
     ATH_MSG_INFO("*********************************\n");
-    ATH_MSG_INFO("      SelectionFlagsyybbAlg      \n");
+    ATH_MSG_INFO("      SelectionFlagsbbyyAlg      \n");
     ATH_MSG_INFO("*********************************\n");
 
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
@@ -54,20 +54,20 @@ namespace HHBBYY
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize()); 
 
-    m_yybbCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
+    m_bbyyCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
 
     for (const std::string &cut : m_inputCutList)  { 
       // Initialize a vector of CutEntry structs based on the input Cut List
-      m_yybbCuts.add(cut);
+      m_bbyyCuts.add(cut);
     }
 
     //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_yybbCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->yybb cuts;Cuts;#epsilon", 
+    const unsigned int nbins = m_bbyyCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->yybb cuts;Cuts;#epsilon", 
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->yybb cuts;Cuts;#epsilon", 
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbyy cuts;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5)));
     ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));    
 
@@ -75,7 +75,7 @@ namespace HHBBYY
   }
 
 
-  StatusCode SelectionFlagsyybbAlg::execute()
+  StatusCode SelectionFlagsbbyyAlg::execute()
   {
 
     // Loop over all systs
@@ -106,21 +106,21 @@ namespace HHBBYY
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
       
       // reset all cut flags to default=false
-      for (CutEntry& cut : m_yybbCuts) {
+      for (CutEntry& cut : m_bbyyCuts) {
         cut.passed = false;
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
     
       if (!m_photonTriggers.empty()) {
-        evaluateTriggerCuts(*event, m_photonTriggers, m_yybbCuts);
+        evaluateTriggerCuts(*event, m_photonTriggers, m_bbyyCuts);
       }
 
-      evaluatePhotonCuts(*photons, m_yybbCuts);
-      evaluateLeptonCuts(*electrons, *muons, m_yybbCuts);
-      evaluateJetCuts(*bjets, *jets, m_yybbCuts);
+      evaluatePhotonCuts(*photons, m_bbyyCuts);
+      evaluateLeptonCuts(*electrons, *muons, m_bbyyCuts);
+      evaluateJetCuts(*bjets, *jets, m_bbyyCuts);
 
       bool passedall = true;
-      for (CutEntry& cut : m_yybbCuts) {
+      for (CutEntry& cut : m_bbyyCuts) {
         passedall = passedall && cut.passed;
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
@@ -134,16 +134,16 @@ namespace HHBBYY
 
       // Count how many cuts the event passed and increase the relative counter
       for (const auto &cut : m_inputCutList) {
-        if(m_yybbCuts.exists(cut)) {
-          if (m_yybbCuts(cut).passed)
-            m_yybbCuts(cut).counter+=1;
+        if(m_bbyyCuts.exists(cut)) {
+          if (m_bbyyCuts(cut).passed)
+            m_bbyyCuts(cut).counter+=1;
         }
       }
 
       // Check how many consecutive cuts are passed by the event.
       unsigned int consecutive_cuts = 0;
-      for (size_t i = 0; i < m_yybbCuts.size(); ++i) {
-        if (m_yybbCuts[i].passed)
+      for (size_t i = 0; i < m_bbyyCuts.size(); ++i) {
+        if (m_bbyyCuts[i].passed)
           consecutive_cuts++;
         else
           break;
@@ -152,7 +152,7 @@ namespace HHBBYY
       // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
       // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
       for (unsigned int i=0; i<consecutive_cuts; i++) {
-        m_yybbCuts[i].relativeCounter+=1;
+        m_bbyyCuts[i].relativeCounter+=1;
       }
 
     }
@@ -160,18 +160,18 @@ namespace HHBBYY
     return StatusCode::SUCCESS;
   }
 
-  StatusCode SelectionFlagsyybbAlg::finalize()
+  StatusCode SelectionFlagsbbyyAlg::finalize()
   {
 
     //adapt the following for each syst TODO
     ATH_MSG_INFO("Total events = " << m_total_events <<std::endl);
-    m_yybbCuts.CheckCutResults(); // Print CheckCutResults
+    m_bbyyCuts.CheckCutResults(); // Print CheckCutResults
 
     if(m_saveCutFlow) {
-      m_yybbCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
-      m_yybbCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
-      m_yybbCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
-      m_yybbCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
+      m_bbyyCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
+      m_bbyyCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
+      m_bbyyCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
+      m_bbyyCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
     }
     else {
       delete efficiency("AbsoluteEfficiency");
@@ -185,10 +185,10 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsyybbAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &photonTriggers, 
-                                                  CutManager& yybbCuts) {
+  void SelectionFlagsbbyyAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &photonTriggers, 
+                                                  CutManager& bbyyCuts) {
 
-    if (!yybbCuts.exists("PASS_TRIGGER"))
+    if (!bbyyCuts.exists("PASS_TRIGGER"))
         return;
 
     for (const std::string &trigger : photonTriggers)
@@ -197,18 +197,18 @@ namespace HHBBYY
       SG::ReadDecorHandle<xAOD::EventInfo, bool> m_triggerDecorHandle(triggerDecorKey);
       //If the event passes any of the available (single or di-) photon triggers, set the overall trigger cut to true.
       if (m_triggerDecorHandle(event)) {
-        yybbCuts("PASS_TRIGGER").passed = true;
+        bbyyCuts("PASS_TRIGGER").passed = true;
         break;
       }
     }
 
   }
 
-  void SelectionFlagsyybbAlg::evaluatePhotonCuts
-  (const xAOD::PhotonContainer& photons, CutManager& yybbCuts)
+  void SelectionFlagsbbyyAlg::evaluatePhotonCuts
+  (const xAOD::PhotonContainer& photons, CutManager& bbyyCuts)
   {
-    if (yybbCuts.exists("TWO_TIGHTID_ISO_PHOTONS"))
-      yybbCuts("TWO_TIGHTID_ISO_PHOTONS").passed = (photons.size() == 2);
+    if (bbyyCuts.exists("TWO_TIGHTID_ISO_PHOTONS"))
+      bbyyCuts("TWO_TIGHTID_ISO_PHOTONS").passed = (photons.size() == 2);
 
     // photon isolation and selection pT/myy
     if (photons.size() >= 2)
@@ -221,35 +221,35 @@ namespace HHBBYY
         ptOverMasses.push_back(photon->pt() / myy);
       }
 
-      if (ptOverMasses[0] > 0.35 && ptOverMasses[1] > 0.25 && yybbCuts.exists("PASS_RELPT"))
-        yybbCuts("PASS_RELPT").passed = true;
-      if (myy >= 105000. && myy < 160000. && yybbCuts.exists("DIPHOTON_MASS"))
-        yybbCuts("DIPHOTON_MASS").passed = true;
+      if (ptOverMasses[0] > 0.35 && ptOverMasses[1] > 0.25 && bbyyCuts.exists("PASS_RELPT"))
+        bbyyCuts("PASS_RELPT").passed = true;
+      if (myy >= 105000. && myy < 160000. && bbyyCuts.exists("DIPHOTON_MASS"))
+        bbyyCuts("DIPHOTON_MASS").passed = true;
     }
   }
 
 
-  void SelectionFlagsyybbAlg::evaluateLeptonCuts
+  void SelectionFlagsbbyyAlg::evaluateLeptonCuts
   (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
-   CutManager& yybbCuts)
+   CutManager& bbyyCuts)
   {
 
-    if (!yybbCuts.exists("EXACTLY_ZERO_LEPTONS"))
+    if (!bbyyCuts.exists("EXACTLY_ZERO_LEPTONS"))
       return;
 
     // No medium+isolated electrons and muons.
     int n_leptons = electrons.size() + muons.size();
     if (n_leptons==0)
-      yybbCuts("EXACTLY_ZERO_LEPTONS").passed = true;
+      bbyyCuts("EXACTLY_ZERO_LEPTONS").passed = true;
 
   }
 
-  void SelectionFlagsyybbAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
-                            const xAOD::JetContainer& jets, CutManager& yybbCuts)
+  void SelectionFlagsbbyyAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
+                            const xAOD::JetContainer& jets, CutManager& bbyyCuts)
   {
     int CentralJets=0;
 
-    ///All jets in the containers should have pT>25GeV. Check minPt of your JetSelectorAlg in the yybb_config file.
+    ///All jets in the containers should have pT>25GeV. Check minPt of your JetSelectorAlg in the bbyy_config file.
     for (const xAOD::Jet *jet : jets)
     {// Jets here can be every type of jet (No Working point selected)
       // check if jet is central
@@ -257,21 +257,21 @@ namespace HHBBYY
         CentralJets+=1;
     }
 
-    if (CentralJets<6 && yybbCuts.exists("LESS_THAN_SIX_CENTRAL_JETS"))
-      yybbCuts("LESS_THAN_SIX_CENTRAL_JETS").passed = true;
+    if (CentralJets<6 && bbyyCuts.exists("LESS_THAN_SIX_CENTRAL_JETS"))
+      bbyyCuts("LESS_THAN_SIX_CENTRAL_JETS").passed = true;
 
     // If Forward Jets + Central jets >=2 --> The event passes.
-    if (jets.size() >= 2 && yybbCuts.exists("AT_LEAST_TWO_JETS"))
-      yybbCuts("AT_LEAST_TWO_JETS").passed = true;
+    if (jets.size() >= 2 && bbyyCuts.exists("AT_LEAST_TWO_JETS"))
+      bbyyCuts("AT_LEAST_TWO_JETS").passed = true;
 
-    if (bjets.size()>=1 && yybbCuts.exists("AT_LEAST_ONE_B_JET"))
-      yybbCuts("AT_LEAST_ONE_B_JET").passed = true;
-    if (bjets.size()==1 && yybbCuts.exists("EXACTLY_ONE_B_JET"))
-      yybbCuts("EXACTLY_ONE_B_JET").passed = true;
-    if (bjets.size()>=2 && yybbCuts.exists("AT_LEAST_TWO_B_JETS"))
-      yybbCuts("AT_LEAST_TWO_B_JETS").passed = true;
-    if (bjets.size()==2 && yybbCuts.exists("EXACTLY_TWO_B_JETS")) 
-      yybbCuts("EXACTLY_TWO_B_JETS").passed = true;
+    if (bjets.size()>=1 && bbyyCuts.exists("AT_LEAST_ONE_B_JET"))
+      bbyyCuts("AT_LEAST_ONE_B_JET").passed = true;
+    if (bjets.size()==1 && bbyyCuts.exists("EXACTLY_ONE_B_JET"))
+      bbyyCuts("EXACTLY_ONE_B_JET").passed = true;
+    if (bjets.size()>=2 && bbyyCuts.exists("AT_LEAST_TWO_B_JETS"))
+      bbyyCuts("AT_LEAST_TWO_B_JETS").passed = true;
+    if (bjets.size()==2 && bbyyCuts.exists("EXACTLY_TWO_B_JETS")) 
+      bbyyCuts("EXACTLY_TWO_B_JETS").passed = true;
 
   }
 

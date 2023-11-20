@@ -3,22 +3,22 @@
 */
 
 #include "AthContainers/AuxElement.h"
-#include "BaselineVarsyybbAlg.h"
+#include "BaselineVarsbbyyAlg.h"
 #include <FourMomUtils/xAODP4Helpers.h>
 
 namespace HHBBYY
 {
-  BaselineVarsyybbAlg::BaselineVarsyybbAlg(const std::string &name,
+  BaselineVarsbbyyAlg::BaselineVarsbbyyAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
     declareProperty("isMC", m_isMC);
   }
 
-  StatusCode BaselineVarsyybbAlg::initialize()
+  StatusCode BaselineVarsbbyyAlg::initialize()
   {
     ATH_MSG_INFO("*********************************\n");
-    ATH_MSG_INFO("       BaselineVarsyybbAlg       \n");
+    ATH_MSG_INFO("       BaselineVarsbbyyAlg       \n");
     ATH_MSG_INFO("*********************************\n");
 
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
@@ -47,7 +47,7 @@ namespace HHBBYY
     return StatusCode::SUCCESS;
   }
 
-  StatusCode BaselineVarsyybbAlg::execute()
+  StatusCode BaselineVarsbbyyAlg::execute()
   {
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())

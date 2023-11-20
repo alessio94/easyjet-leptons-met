@@ -19,12 +19,12 @@ from EasyjetHub.hub import (
 )
 from EasyjetHub.output.ttree.minituple_config import minituple_cfg
 
-from bbyyAnalysis.yybb_config import yybb_branches
-from bbyyAnalysis.yybb_config import yybb_cfg
+from bbyyAnalysis.bbyy_config import bbyy_branches
+from bbyyAnalysis.bbyy_config import bbyy_cfg
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 
 
-def yybb_job_cfg():
+def bbyy_job_cfg():
     parser = AnalysisArgumentParser()
 
     # Fill the configuration flags from the
@@ -42,10 +42,10 @@ def yybb_job_cfg():
     # Extend the list of output branches via flags
     # For more sophistication this could be done using
     # custom BranchManagers
-    extra_yybb_branches = []
-    if flags.Analysis.do_yybb_analysis:
+    extra_bbyy_branches = []
+    if flags.Analysis.do_bbyy_analysis:
         cfg.merge(
-            yybb_cfg(
+            bbyy_cfg(
                 flags,
                 smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
                 photonkey=flags.Analysis.container_names.output.photons,
@@ -54,9 +54,9 @@ def yybb_job_cfg():
             ),
             seqname
         )
-        cfg.merge(event_counter_cfg("n_yybb"), seqname)
+        cfg.merge(event_counter_cfg("n_bbyy"), seqname)
 
-        extra_yybb_branches = yybb_branches(flags)
+        extra_bbyy_branches = bbyy_branches(flags)
 
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
@@ -67,7 +67,7 @@ def yybb_job_cfg():
                 minituple_cfg(
                     flags,tree_flags,
                     flags.Analysis.out_file,
-                    extra_output_branches = extra_yybb_branches
+                    extra_output_branches = extra_bbyy_branches
                 ),
                 seqname,
             )
@@ -82,7 +82,7 @@ def main():
     # record the total run time
     starttime = time.process_time()
 
-    cfg, flags, args = yybb_job_cfg()
+    cfg, flags, args = bbyy_job_cfg()
 
     if args.dry_run:
         return_code = 1

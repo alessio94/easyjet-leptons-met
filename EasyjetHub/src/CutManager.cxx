@@ -17,7 +17,7 @@ void CutManager::CheckCutResults() {
 void CutManager::DoAbsoluteEfficiency(long long int nEvents, TEfficiency* eff)
 {
 
-    /* Absolute efficiency histogram of yybb cuts */
+    /* Absolute efficiency histogram of selection cuts */
     /* Absolute effiency is defined as :  (Events passed by the cut/ Total events) */
     // N_events(pass_i) / N_events 
     // N_events(pass_i+1) / N_events etc.   
@@ -38,7 +38,7 @@ void CutManager::DoAbsoluteEfficiency(long long int nEvents, TEfficiency* eff)
 void  CutManager::DoRelativeEfficiency(long long int nEvents, TEfficiency* eff)
 {
 
-    /* Relative efficiency histogram of yybb cuts */
+    /* Relative efficiency histogram of slection cuts */
     /* Relative efficiency  is defined as :  
     (Events passed by the cut with respect to the previous cuts / Total events passed by the previous cut) */
     // N_events(pass_i  AND pass_i-1  AND ... AND pass_0) / N_events (pass_i-1 AND ..... AND pass_0)

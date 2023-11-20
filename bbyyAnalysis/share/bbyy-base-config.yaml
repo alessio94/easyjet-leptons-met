@@ -66,7 +66,7 @@ disable_calib: false
 loose_jet_cleaning: true
 
 # if you want to run a baseline diHiggs analyses
-do_yybb_analysis: true
+do_bbyy_analysis: true
 
 # if you want to truth match (is MC protected)
 # Whether to activate CP alg systematic variations
@@ -78,7 +78,7 @@ systematics_regex: [".*"]
 do_overlap_removal: false
 
 #Enable cutflow 
-save_yybb_cutflow: true
+save_bbyy_cutflow: true
 
 CutList :
       - PASS_TRIGGER

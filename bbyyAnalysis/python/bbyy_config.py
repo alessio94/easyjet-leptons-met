@@ -1,10 +1,10 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-# yybb analysis chain
+# bbyy analysis chain
 
 
-def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
+def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
 
     PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
@@ -12,7 +12,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.Easyjet.PhotonSelectorAlg(
             "PhotonSelectorAlg",
             containerInKey=PhotonWPLabel + photonkey,
-            containerOutKey="yybbAnalysisPhotons_%SYS%",
+            containerOutKey="bbyyAnalysisPhotons_%SYS%",
             pTsort=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -23,7 +23,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
             containerInKey=MuonWPLabel + muonkey,
-            containerOutKey="yybbAnalysisMuons_%SYS%",
+            containerOutKey="bbyyAnalysisMuons_%SYS%",
             minPt=10e3,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -34,7 +34,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
             containerInKey=ElectronWPLabel + electronkey,
-            containerOutKey="yybbAnalysisElectrons_%SYS%",
+            containerOutKey="bbyyAnalysisElectrons_%SYS%",
             minPt=10e3,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -44,32 +44,32 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.Easyjet.JetSelectorAlg(
             "JetSelectorAlg",
             containerInKey=smalljetkey,
-            containerOutKey="yybbAnalysisJets_%SYS%",
+            containerOutKey="bbyyAnalysisJets_%SYS%",
             bTagWPDecorName="",
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
     cfg.addEventAlgo(
-        CompFactory.HHBBYY.BaselineVarsyybbAlg(
-            "BaselineVarsyybbAlg",
-            photons="yybbAnalysisPhotons_%SYS%",
-            jets="yybbAnalysisJets_%SYS%",
+        CompFactory.HHBBYY.BaselineVarsbbyyAlg(
+            "BaselineVarsbbyyAlg",
+            photons="bbyyAnalysisPhotons_%SYS%",
+            jets="bbyyAnalysisJets_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
             isMC=flags.Input.isMC
         )
     )
 
     cfg.addEventAlgo(
-        CompFactory.HHBBYY.SelectionFlagsyybbAlg(
-            "SelectionFlagsyybbAlg",
-            photons="yybbAnalysisPhotons_%SYS%",
-            jets="yybbAnalysisJets_%SYS%",
+        CompFactory.HHBBYY.SelectionFlagsbbyyAlg(
+            "SelectionFlagsbbyyAlg",
+            photons="bbyyAnalysisPhotons_%SYS%",
+            jets="bbyyAnalysisJets_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
-            muons="yybbAnalysisMuons_%SYS%",
-            electrons="yybbAnalysisElectrons_%SYS%",
+            muons="bbyyAnalysisMuons_%SYS%",
+            electrons="bbyyAnalysisElectrons_%SYS%",
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_yybb_cutflow,
+            saveCutFlow=flags.Analysis.save_bbyy_cutflow,
             photonTriggers=flags.Analysis.TriggerChains
         )
     )
@@ -77,7 +77,7 @@ def yybb_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     return cfg
 
 
-def yybb_branches(flags):
+def bbyy_branches(flags):
     branches = []
 
     # Photons
@@ -120,7 +120,7 @@ def yybb_branches(flags):
 
     branches += ["EventInfo.PassAllCuts_%SYS% -> %SYS%_PassAllCuts"]
 
-    if (flags.Analysis.save_yybb_cutflow):
+    if (flags.Analysis.save_bbyy_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> %SYS%_{cut}"]

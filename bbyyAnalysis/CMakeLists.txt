@@ -9,8 +9,8 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(bbyyAnalysis
-  src/BaselineVarsyybbAlg.cxx
-  src/SelectionFlagsyybbAlg.cxx
+  src/BaselineVarsbbyyAlg.cxx
+  src/SelectionFlagsbbyyAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -35,12 +35,12 @@ atlas_install_scripts(
 )
 
 atlas_install_python_modules(
-  python/yybb_config.py
+  python/bbyy_config.py
 )
 atlas_install_data(
-  share/yybb-base-config.yaml
-  share/RunConfig-PHYS-yybb.yaml
-  share/RunConfig-PHYSLITE-yybb.yaml
+  share/bbyy-base-config.yaml
+  share/RunConfig-PHYS-bbyy.yaml
+  share/RunConfig-PHYSLITE-bbyy.yaml
   share/trigger.yaml
 )
 

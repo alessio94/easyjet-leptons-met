@@ -30,10 +30,10 @@ namespace HHBBYY
 {
 
   /// \brief An algorithm for counting containers
-  class SelectionFlagsyybbAlg final : public AthHistogramAlgorithm {
+  class SelectionFlagsbbyyAlg final : public AthHistogramAlgorithm {
 
     public:
-      SelectionFlagsyybbAlg(const std::string &name, ISvcLocator *pSvcLocator);
+      SelectionFlagsbbyyAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
       /// \brief Initialisation method, for setting up tools and other persistent
       /// configs
@@ -58,19 +58,19 @@ namespace HHBBYY
       };
 
       void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
-                          const std::vector<std::string> &photonTriggers, CutManager& yybbCuts);
-      void evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& yybbCuts);
+                          const std::vector<std::string> &photonTriggers, CutManager& bbyyCuts);
+      void evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& bbyyCuts);
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
-                          const xAOD::MuonContainer& muons, CutManager& yybbCuts);
+                          const xAOD::MuonContainer& muons, CutManager& bbyyCuts);
       void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
-                          const xAOD::JetContainer& jets, CutManager& yybbCuts);
+                          const xAOD::JetContainer& jets, CutManager& bbyyCuts);
 
     private :
       // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
       // "someInfo"};
 
       /// \brief Setup syst-aware input container handles
-      CutManager m_yybbCuts;
+      CutManager m_bbyyCuts;
       CP::SysListHandle m_systematicsList {this};
 
       CP::SysReadHandle<xAOD::JetContainer>

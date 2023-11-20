@@ -24,11 +24,11 @@ namespace HHBBYY
 {
 
   /// \brief An algorithm for counting containers
-  class BaselineVarsyybbAlg final : public AthHistogramAlgorithm
+  class BaselineVarsbbyyAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
   public:
-    BaselineVarsyybbAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    BaselineVarsbbyyAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
