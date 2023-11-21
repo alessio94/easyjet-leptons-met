@@ -37,6 +37,8 @@ namespace HHBBYY
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
+    float compute_Topness(const xAOD::JetContainer *jets);
+
   private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
@@ -76,7 +78,7 @@ namespace HHBBYY
       "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star",
 
       // mva variables
-      "HT",
+	"HT", "topness", 
     };
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;

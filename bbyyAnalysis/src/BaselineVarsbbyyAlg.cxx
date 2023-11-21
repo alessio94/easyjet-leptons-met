@@ -181,6 +181,11 @@ namespace HHBBYY
 
       m_Fbranches.at("HT").set(*event, HT, sys);
 
+      if(jets->size()>=3){
+	float topness = compute_Topness(jets);
+	m_Fbranches.at("topness").set(*event, topness, sys);
+      }
+
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
@@ -190,4 +195,24 @@ namespace HHBBYY
 
     return StatusCode::SUCCESS;
   }
+  
+  float BaselineVarsbbyyAlg::compute_Topness(const xAOD::JetContainer *jets){
+    float minTopness=std::numeric_limits<float>::max();
+    const float wmass=80e3;
+    const float topmass=173e3;
+    for(unsigned int j1=0;j1<jets->size()-2;j1++){
+      for(unsigned int j2=j1+1;j2<jets->size()-1;j2++){
+	for(unsigned int j3=j2+1;j3<jets->size();j3++){
+	  // compute m_j1j2 and m_j1j2j3
+	  float m_j1j2=((*jets)[j1]->p4()+(*jets)[j2]->p4()).M();
+	  float m_j1j2j3=((*jets)[j1]->p4()+(*jets)[j2]->p4()+(*jets)[j3]->p4()).M();
+	  // find minimum topness
+	  float topness=std::hypot((m_j1j2-wmass)/wmass, (m_j1j2j3-topmass)/topmass);
+	  if(topness<minTopness) minTopness=topness;
+	}
+      }
+    }    
+    return minTopness;
+  }
+
 }
