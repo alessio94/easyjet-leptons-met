@@ -11,8 +11,16 @@ from EasyjetHub.steering.utils.config_files import run_config_arg
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mc-list", help="Text file containing MC datasets")
-    parser.add_argument("--data-list", help="Text file containing data datasets")
+
+    in_list = parser.add_mutually_exclusive_group(required=True)
+    in_list.add_argument(
+        "--mc-list",
+        help="Text file containing MC datasets")
+    in_list.add_argument(
+        "--data-list",
+        help="Text file containing data datasets"
+    )
+
     parser.add_argument(
         "--run-config",
         type=str,
@@ -97,13 +105,11 @@ def main():
     else:
         submit_opts["athenaTag"] = args.asetup
 
+    # check some stuff
+    if not which("prun"):
+        raise RuntimeError("you have not set up panda, run `lsetup panda!`")
+
     nickname = getGridNickname()
-    if not nickname:
-        raise OSError(
-            1,
-            "Could not find proxy information."
-            + ' Try typing "voms-proxy-init -voms atlas" and try again',
-        )
 
     # copy the runconfig to the submit dir to be available for the exec cmd
     try:
@@ -184,17 +190,22 @@ def main():
             submit_opts["outputs"].removeprefix("TREE:"),
         )
 
-        cmd = ["prun", "--inDS", io["inDS"], "--outDS", io["outDS"], "--exec", exec_cmd]
+        cmd = [
+            "prun",
+            "--inDS", io["inDS"],
+            "--outDS", io["outDS"],
+            "--exec", exec_cmd,
+        ]
 
         for k, v in submit_opts.items():
             if isinstance(v, bool):
                 if v:
-                    cmd += ["--{0}".format(k)]
+                    cmd.append(f"--{k}")
             else:
                 if isinstance(v, (list, tuple)):
                     v = ",".join(map(str, v))
 
-                cmd += ["--{0}".format(k), v]
+                cmd += [f"--{k}", v]
 
         print(" ".join(cmd))
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -211,9 +222,15 @@ def getGridNickname():
         nickname_index = voms_proxy_info.find("nickname")
         nickname_parts = voms_proxy_info[nickname_index:].split()
         nickname = nickname_parts[2]
+        return nickname
+    # this is slightly sloppy: we shoudl figure out what exception was
+    # actually thrown before assuming it was a missing init.
     except Exception:
-        nickname = ""
-    return nickname
+        raise OSError(
+            1,
+            "Could not find proxy information."
+            + ' Try typing "voms-proxy-init -voms atlas" and try again',
+        )
 
 
 if __name__ == "__main__":
