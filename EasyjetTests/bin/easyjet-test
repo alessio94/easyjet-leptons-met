@@ -8,136 +8,123 @@ set -Eeu
 ################################################
 
 #tag from easyjet/hh4b-test-files
-TAG=p5855bbbb
+TAG=p5855ttbar
 
 # standard samples
+# Data
 PHYS_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYS_10evts.r13286_p5855.pool.root
 PHYSLITE_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYSLITE_10evts.r13286_p5855.pool.root
 PHYS_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14190_p5858.pool.root
 PHYSLITE_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYSLITE_10evts.r14190_p5858.pool.root
-PHYS_JETS_MC20=mc20_13TeV.364704.Pythia8EvtGen_A14NNPDF23LO_jetjet_JZ4WithSW.DAOD_PHYS_10evts.e7142_s3681_r13145_p5855.pool.root
-PHYS_TTBAR_MC20=mc20_13TeV.410471.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e6337_s3681_r13145_p5855.pool.root
-PHYS_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a907_r14860_p5855.pool.root
-PHYSLITE_SH4B_BOOSTED_MC20=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a907_r14860_p5855.pool.root
-PHYS_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5855.pool.root
-PHYSLITE_HH4B_MC21=mc21_13p6TeV.601479.PhPy8EG_HH4b_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5855.pool.root
-PHYS_TTBAR_MC21=mc21_13p6TeV.601237.PhPy8EG_A14_ttbar_hdamp258p75_allhad.DAOD_PHYS_10evts.e8453_s3873_r13829_p5855.pool.root
-PHYS_JETS_MC21=mc21_13p6TeV.801170.Py8EG_A14NNPDF23LO_jj_JZ5.DAOD_PHYS_10evts.e8453_s3873_r13829_p5855.pool.root
-PHYS_JETS_MC23=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_s4111_r14622_p5855.pool.root
+
+# MC20
+PHYS_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYS_10evts.e6337_s3681_r13144_p5855.pool.root
+PHYSLITE_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYSLITE_10evts.e6337_s3681_r13144_p5855.pool.root
+PHYS_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a907_r14860_p5855.pool.root
+PHYSLITE_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a907_r14860_p5855.pool.root
+
+# MC23
+PHYS_TTBAR_MC23=mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYS_10evts.e8514_s4162_r14622_p5855.pool.root
+PHYSLITE_TTBAR_MC23=mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYSLITE_10evts.e8514_s4162_r14622_p5855.pool.root
 PHYS_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_a911_s4114_r14908_p5855.pool.root
-PHYS_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13144_p5855.pool.root
-PHYSLITE_YYBB_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13144_p5855.pool.root
-PHYS_BBTT_HH_MC21=mc21_13p6TeV.601477.PhPy8EG_HHbbttHadHad_cHHH01d0.DAOD_PHYS_10evts.e8472_s3873_r13829_p5855.pool.root
-PHYSLITE_BBTT_HH_MC21=mc21_13p6TeV.601477.PhPy8EG_HHbbttHadHad_cHHH01d0.DAOD_PHYSLITE_10evts.e8472_s3873_r13829_p5855.pool.root
+PHYSLITE_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYSLITE_10evts.e8514_a911_s4114_r14908_p5855.pool.root
+
+# Test name convention
+# [CONFIG_INPUTTYPE]
 
 
 declare -A DATAFILES=(
-    [data18-fast]=${PHYS_DATA_2018}
-    [lite-data18-fast]=${PHYSLITE_DATA_2018}
-    [data18]=${PHYS_DATA_2018}
-    [data22-fast]=${PHYS_DATA_2022}
-    [lite-data22-fast]=${PHYSLITE_DATA_2022}
-    [jets-mc20-fast]=${PHYS_JETS_MC20}
-    [jets-mc20]=${PHYS_JETS_MC20}
-    [ttbar-mc20-fast]=${PHYS_TTBAR_MC20}
-    [ttbar-mc20]=${PHYS_TTBAR_MC20}
-    [hh4b-mc21]=${PHYS_HH4B_MC21}
-    [hh4b-resolved-mc21]=${PHYS_HH4B_MC21}
-    [sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED_MC20}
-    [ttbar-mc21-fast]=${PHYS_TTBAR_MC21}
-    [ttbar-mc21]=${PHYS_TTBAR_MC21}
-    [jets-mc21]=${PHYS_JETS_MC21}
-    [jets-mc23]=${PHYS_JETS_MC23}
-    [jets-mc23-af3]=${PHYS_JETS_MC23_AF3}
-    [lite-sh4b-boosted-mc20-fast]=${PHYSLITE_SH4B_BOOSTED_MC20}
-    [lite-sh4b-boosted-mc20]=${PHYSLITE_SH4B_BOOSTED_MC20}
-    [lite-hh4b-mc21-fast]=${PHYSLITE_HH4B_MC21}
-    [lite-hh4b-mc21]=${PHYSLITE_HH4B_MC21}
-    [sh4b-boosted-mc20]=${PHYS_SH4B_BOOSTED_MC20}
-    [bbyy-mc20]=${PHYS_YYBB_MC20}
-    [lite-bbyy-mc20]=${PHYSLITE_YYBB_MC20}
+    # Data
+    [fast-data18]=${PHYS_DATA_2018}
+    [fast-data22]=${PHYS_DATA_2022}
+    # MC20
+    [mc20]=${PHYS_TTBAR_MC20}
+    [fast-mc20]=${PHYS_TTBAR_MC20}
+    [bbyy-mc20]=${PHYS_TTBAR_MC20}
+    [bbyy-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [ttHH-mc20]=${PHYS_TTBAR_MC20}
-    [lite-ttHH-mc20]=${PHYSLITE_YYBB_MC20}
-    [lite-bbll-data18]=${PHYSLITE_DATA_2018}
+    [ttHH-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [bbll-mc20]=${PHYS_TTBAR_MC20}
-    [lite-bbtt-mc21]=${PHYSLITE_BBTT_HH_MC21}
-    [bbtt-mc21]=${PHYS_BBTT_HH_MC21}
+    [bbll-mc20-lite]=${PHYSLITE_TTBAR_MC20}
+    # MC20 AF3
+    [mc20af3-lite]=${PHYSLITE_SH4B_BOOSTED_MC20_AF3}
+    [fast-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
+    [fast-mc20af3-lite]=${PHYSLITE_SH4B_BOOSTED_MC20_AF3}
+    [sh4b-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
+    [fast-awkward-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
+    # MC23
+    [mc23]=${PHYS_TTBAR_MC23}
+    [fast-mc23]=${PHYS_TTBAR_MC23}
+    [mc23af3]=${PHYS_JETS_MC23_AF3}
+    [bbbb-mc23]=${PHYS_TTBAR_MC23}
+    [bbtt-mc23]=${PHYS_TTBAR_MC23}
+    [bbtt-mc23-lite]=${PHYSLITE_TTBAR_MC23}
     # systematics enabled
-    [syst-ttbar-mc21]=${PHYS_TTBAR_MC21}
-    [syst-hh4b-mc21]=${PHYS_HH4B_MC21}
+    [syst-mc23]=${PHYS_TTBAR_MC23}
     # non-ntupler workflows
-    [aod-hh4b-mc21-fast]=${PHYS_HH4B_MC21}
-    [h5-hh4b-mc21]=${PHYS_HH4B_MC21}
-    [hist-syst-hh4b-mc21]=${PHYS_HH4B_MC21}
-    [awkward-sh4b-boosted-mc20-fast]=${PHYS_SH4B_BOOSTED_MC20}
+    [aod-fast-bbbb-mc23]=${PHYS_TTBAR_MC23}
+    [h5-fast-mc23]=${PHYS_TTBAR_MC23}
+    [hist-syst-bbbb-mc23]=${PHYS_TTBAR_MC23}
     # test mode
-    [fail]=${PHYS_HH4B_MC21}
+    [fail]=${PHYS_TTBAR_MC23}
 )
 
 declare -A TESTS=(
-    [data18-fast]="data-fast easyjet-ntupler"
-    [lite-data18-fast]="data-fast easyjet-ntupler"
-    [data22-fast]="data-fast easyjet-ntupler"
-    [lite-data22-fast]="data-fast easyjet-ntupler"
-    [jets-mc20-fast]="fast easyjet-ntupler"
-    [jets-mc20]="simple easyjet-ntupler"
-    [ttbar-mc20-fast]="fast easyjet-ntupler"
-    [ttbar-mc20]="simple easyjet-ntupler"
-    [sh4b-boosted-mc20-fast]="fast easyjet-ntupler"
-    [hh4b-mc21]="simple easyjet-ntupler"
-    [hh4b-resolved-mc21]="simple bbbb-ntupler"
-    [ttbar-mc21-fast]="fast easyjet-ntupler"
-    [ttbar-mc21]="simple easyjet-ntupler"
-    [jets-mc21]="simple easyjet-ntupler"
-    [jets-mc23]="simple easyjet-ntupler"
-    [jets-mc23-af3]="simple easyjet-ntupler"
-    [lite-sh4b-boosted-mc20-fast]="fast easyjet-ntupler"
-    [lite-sh4b-boosted-mc20]="simple easyjet-ntupler"
-    [lite-hh4b-mc21-fast]="fast easyjet-ntupler"
-    [lite-hh4b-mc21]="simple easyjet-ntupler"
-    [sh4b-boosted-mc20]="simple bbbb-ntupler"
+    # Data
+    [fast-data18]="data-fast easyjet-ntupler"
+    [fast-data22]="data-fast easyjet-ntupler"
+    # MC20
+    [mc20]="simple easyjet-ntupler"
+    [fast-mc20]="fast easyjet-ntupler"
     [bbyy-mc20]="simple bbyy-ntupler"
-    [lite-bbyy-mc20]="simple bbyy-ntupler"
+    [bbyy-mc20-lite]="simple bbyy-ntupler"
     [ttHH-mc20]="simple ttHH-ntupler"
-    [lite-ttHH-mc20]="simple ttHH-ntupler"
+    [ttHH-mc20-lite]="simple ttHH-ntupler"
     [bbll-mc20]="simple bbll-ntupler"
-    [lite-bbll-data18]="simple bbll-ntupler"
-    [bbtt-mc21]="simple bbtt-ntupler"
-    [lite-bbtt-mc21]="simple bbtt-ntupler"
-    # systamatics
-    [syst-ttbar-mc21]="systematics easyjet-ntupler"
-    [syst-hh4b-mc21]="systematics easyjet-ntupler"
+    [bbll-mc20-lite]="simple bbll-ntupler"
+    # MC20 AF3
+    [mc20af3-lite]="simple easyjet-ntupler"
+    [fast-mc20af3]="fast easyjet-ntupler"
+    [fast-mc20af3-lite]="fast easyjet-ntupler"
+    [sh4b-mc20af3]="simple bbbb-ntupler"
+    [fast-awkward-mc20af3]="fast easyjet-ntupler"
+    # MC23
+    [fast-mc23]="fast easyjet-ntupler"
+    [mc23]="simple easyjet-ntupler"
+    [mc23af3]="simple easyjet-ntupler"
+    [bbbb-mc23]="simple bbbb-ntupler"
+    [bbtt-mc23]="simple bbtt-ntupler"
+    [bbtt-mc23-lite]="simple bbtt-ntupler"
+    [syst-mc23]="systematics easyjet-ntupler"
     # non-ntupler
-    [aod-hh4b-mc21-fast]="aod-fast bbbb-ntupler"
-    [h5-hh4b-mc21]="h5-fast easyjet-ntupler"
-    [hist-syst-hh4b-mc21]="hist-syst bbbb-ntupler"
-    [awkward-sh4b-boosted-mc20-fast]="fast easyjet-ntupler"
+    [aod-fast-bbbb-mc23]="aod-fast bbbb-ntupler"
+    [h5-fast-mc23]="h5-fast easyjet-ntupler"
+    [hist-syst-bbbb-mc23]="hist-syst bbbb-ntupler"
     # test mode
     [fail]=false
 )
 
 DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
 declare -A CONFIGS=(
-    [lite-data18-fast]=EasyjetHub/RunConfig-PHYSLITE.yaml
-    [lite-data22-fast]=EasyjetHub/RunConfig-PHYSLITE.yaml
-    [lite-sh4b-boosted-mc20-fast]=EasyjetHub/RunConfig-PHYSLITE.yaml
-    [lite-sh4b-boosted-mc20]=EasyjetHub/RunConfig-PHYSLITE.yaml
-    [lite-hh4b-mc21-fast]=EasyjetHub/RunConfig-PHYSLITE.yaml
-    [lite-hh4b-mc21]=EasyjetHub/RunConfig-PHYSLITE.yaml
-    [sh4b-boosted-mc20]=bbbbAnalysis/RunConfig-SH4b.yaml
-    [hh4b-resolved-mc21]=bbbbAnalysis/RunConfig-Resolved.yaml
+    # MC20
     [bbyy-mc20]=bbyyAnalysis/RunConfig-PHYS-bbyy.yaml
-    [lite-bbyy-mc20]=bbyyAnalysis/RunConfig-PHYSLITE-bbyy.yaml
+    [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-PHYSLITE-bbyy.yaml
     [ttHH-mc20]=ttHHAnalysis/RunConfig-PHYS-ttHH.yaml
-    [lite-ttHH-mc20]=ttHHAnalysis/RunConfig-PHYSLITE-ttHH.yaml
-    [lite-bbll-data18]=bbllAnalysis/RunConfig-PHYSLITE-bbll.yaml
+    [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-PHYSLITE-ttHH.yaml
     [bbll-mc20]=bbllAnalysis/RunConfig-PHYS-bbll.yaml
-    [lite-bbtt-mc21]=bbttAnalysis/RunConfig-PHYSLITE-bbtt-bypass.yaml
-    [bbtt-mc21]=bbttAnalysis/RunConfig-PHYS-bbtt-bypass.yaml
+    [bbll-mc20-lite]=bbllAnalysis/RunConfig-PHYSLITE-bbll.yaml
+    # MC20 AF3
+    [fast-mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE.yaml
+    [mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE.yaml
+    [sh4b-mc20af3]=bbbbAnalysis/RunConfig-SH4b.yaml
+    [fast-awkward-mc20af3]=EasyjetHub/awkward-config.yaml
+    # MC23
+    [bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
+    [bbtt-mc23]=bbttAnalysis/RunConfig-PHYS-bbtt-bypass.yaml
+    [bbtt-mc23-lite]=bbttAnalysis/RunConfig-PHYSLITE-bbtt-bypass.yaml
     # non-ntupler
-    [aod-hh4b-mc21-fast]=bbbbAnalysis/RunConfig-Resolved.yaml
-    [hist-syst-hh4b-mc21]=bbbbAnalysis/histonly-config.yaml
-    [awkward-sh4b-boosted-mc20-fast]=EasyjetHub/awkward-config.yaml
+    [aod-fast-bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
+    [hist-syst-bbbb-mc23]=bbbbAnalysis/histonly-config.yaml
 )
 
 # some common variables in the tests

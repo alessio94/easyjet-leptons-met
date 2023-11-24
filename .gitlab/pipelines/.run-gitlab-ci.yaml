@@ -12,173 +12,145 @@ variables:
       - $EASYJET_TESTDIR/output-branches-analysis.txt
       - $EASYJET_TESTDIR/userJobMetadata.json
 
-ntupler_data18_fast:
-  extends: .ntupler
-  script:
-    - easyjet-test data18-fast
+# Data
 
-ntupler_data22_fast:
+ntupler_fast_data18:
   extends: .ntupler
   script:
-    - easyjet-test data22-fast
+    - easyjet-test fast-data18
 
-ntupler_jets_mc20:
+ntupler_fast_data22:
   extends: .ntupler
   script:
-    - easyjet-test jets-mc20
+    - easyjet-test fast-data22
 
-ntupler_jets_mc20_fast:
-  extends: .ntupler
-  script:
-    - easyjet-test jets-mc20-fast
+# MC20
 
-ntupler_jets_mc23:
+ntupler_mc20:
   extends: .ntupler
   script:
-    - easyjet-test jets-mc23
+    - easyjet-test mc20
 
-ntupler_jets_mc23_af3:
+ntupler_fast_mc20:
   extends: .ntupler
   script:
-    - easyjet-test jets-mc23-af3
-
-ntupler_ttbar_mc20:
-  extends: .ntupler
-  script:
-    - easyjet-test ttbar-mc20
-
-ntupler_ttbar_mc20_fast:
-  extends: .ntupler
-  script:
-    - easyjet-test ttbar-mc20-fast
-
-ntupler_sh4b_boosted_mc20_fast:
-  extends: .ntupler
-  script:
-    - easyjet-test sh4b-boosted-mc20-fast
+    - easyjet-test fast-mc20
 
 ntupler_bbyy_mc20:
   extends: .ntupler
   script:
     - easyjet-test bbyy-mc20
 
+ntupler_bbyy_mc20_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test bbyy-mc20-lite
+
 ntupler_ttHH_mc20:
   extends: .ntupler
   script:
     - easyjet-test ttHH-mc20
+
+ntupler_ttHH_mc20_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test ttHH-mc20-lite
 
 ntupler_bbll_mc20:
   extends: .ntupler
   script:
     - easyjet-test bbll-mc20
 
-ntupler_ttbar-mc21:
+ntupler_bbll_mc20_lite:
   extends: .ntupler
   script:
-    - easyjet-test ttbar-mc21
+    - easyjet-test bbll-mc20-lite
 
-ntupler_ttbar_mc21_fast:
-  extends: .ntupler
-  script:
-    - easyjet-test ttbar-mc21-fast
+# MC20 AF3
 
-ntupler_hh4b-mc21:
+ntupler_mc20af3_lite:
   extends: .ntupler
   script:
-    - easyjet-test hh4b-mc21
+    - easyjet-test mc20af3-lite
 
-ntupler_hh4b_resolved_mc21:
+ntupler_fast_mc20af3:
   extends: .ntupler
   script:
-    - easyjet-test hh4b-resolved-mc21
+    - easyjet-test fast-mc20af3
 
-ntupler_lite_hh4b_mc21:
+ntupler_fast_mc20af3_lite:
   extends: .ntupler
   script:
-    - easyjet-test lite-hh4b-mc21
+    - easyjet-test fast-mc20af3-lite
 
-ntupler_lite_hh4b-mc21_fast:
+ntupler_sh4b_mc20af3:
   extends: .ntupler
   script:
-    - easyjet-test lite-hh4b-mc21-fast
+    - easyjet-test sh4b-mc20af3
 
-ntupler_lite_sh4b_boosted_mc20:
+ntupler_fast_awkward_mc20af3:
   extends: .ntupler
   script:
-    - easyjet-test lite-sh4b-boosted-mc20
+    - easyjet-test fast-awkward-mc20af3
 
-ntupler_lite_sh4b_boosted_mc20_fast:
-  extends: .ntupler
-  script:
-    - easyjet-test lite-sh4b-boosted-mc20-fast
+# MC23
 
-ntupler_lite_bbyy_mc20:
+ntupler_mc23:
   extends: .ntupler
   script:
-    - easyjet-test lite-bbyy-mc20
+    - easyjet-test mc23
 
-ntupler_lite_ttHH_mc20:
+ntupler_fast_mc23:
   extends: .ntupler
   script:
-    - easyjet-test lite-ttHH-mc20
+    - easyjet-test fast-mc23
 
-ntupler_lite_bbll_data18:
+ntupler_mc23af3:
   extends: .ntupler
   script:
-    - easyjet-test lite-bbll-data18
+    - easyjet-test mc23af3
 
-ntupler_bbtt_mc21:
+ntupler_bbbb_mc23:
   extends: .ntupler
   script:
-    - easyjet-test bbtt-mc21
+    - easyjet-test bbbb-mc23
 
-ntupler_lite_bbtt_mc21:
+ntupler_bbtt_mc23:
   extends: .ntupler
   script:
-    - easyjet-test lite-bbtt-mc21
+    - easyjet-test bbtt-mc23
 
-ntupler_sh4b_boosted_mc20:
+ntupler_bbtt_mc23_lite:
   extends: .ntupler
   script:
-    - easyjet-test sh4b-boosted-mc20
+    - easyjet-test bbtt-mc23-lite
 
 # systematics enabled
 
-syst_ttbar_mc21_syst:
+syst_mc23:
   extends: .ntupler
   script:
-    - easyjet-test syst-ttbar-mc21
-
-syst_hh4b_mc21_syst:
-  extends: .ntupler
-  script:
-    - easyjet-test syst-hh4b-mc21
+    - easyjet-test syst-mc23
 
 # non-ntupler workflows
 
-aod_hh4b_mc21_fast:
+aod_fast_bbbb_mc23:
   stage: run
   needs: [compile]
   script:
-    - easyjet-test aod-hh4b-mc21-fast
+    - easyjet-test aod-fast-bbbb-mc23
 
-h5_hh4b_mc21_fast:
+h5_fast_mc23:
   stage: run
   needs: [compile]
   script:
-    - easyjet-test h5-hh4b-mc21
+    - easyjet-test h5-fast-mc23
 
-hist_syst_hh4b_mc21:
+hist_syst_bbbb_mc23:
   stage: run
   needs: [compile]
   script:
-    - easyjet-test hist-syst-hh4b-mc21
-
-awkward_sh4b_boosted_mc20_fast:
-  stage: run
-  needs: [compile]
-  script:
-    - easyjet-test awkward-sh4b-boosted-mc20-fast
+    - easyjet-test hist-syst-bbbb-mc23
 
 # metatests
 
