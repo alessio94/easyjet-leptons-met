@@ -126,6 +126,7 @@ def bbtt_cfg(
             storeHighLevelVariables=flags.Analysis.store_high_level_variables,
             floatVariableList=float_variables,
             intVariableList=int_variables,
+            tauEffSFDecorator=f"tau_effSF_{flags.Analysis.Tau.ID}_%SYS%",
         )
     )
 
@@ -146,6 +147,8 @@ def get_BaselineVarsbbttAlg_variables(flags):
     for particle in particles:
         for var in ["pt", "eta", "phi"]:
             float_variable_names.append(f"{particle}_{var}")
+
+    float_variable_names += ["Leading_Tau_effSF", "Sublead_Tau_effSF"]
 
     int_variable_names = [
         "Lepton_charge",

@@ -74,15 +74,18 @@ private:
     CP::SysReadDecorHandle<float> 
     m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
 
+    CP::SysReadDecorHandle<float>
+    m_tau_effSF { this, "tauEffSFDecorator", "tau_effSF_Loose_%SYS%", "tau eff scalefactor decorator"};
+
     CP::SysReadDecorHandle<bool> 
-    m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input dectorator for selected el"};
+    m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};
     CP::SysReadDecorHandle<bool> 
-    m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input dectorator for selected mu"};
+    m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input decorator for selected mu"};
     CP::SysReadDecorHandle<bool> 
-    m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input dectorator for selected tau"};
+    m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input decorator for selected tau"};
     
     CP::SysReadDecorHandle<char> 
-    m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+    m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
 
     Gaudi::Property<bool> m_storeHighLevelVariables
       { this, "storeHighLevelVariables", false, "Flag to store high level variables in output" };

@@ -40,6 +40,8 @@ namespace HHBBTT
     ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_eventHandle));
+
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
@@ -146,20 +148,25 @@ namespace HHBBTT
       TLorentzVector sublead_tau(0,0,0,0);
       int lead_tau_charge = -99;
       int sublead_tau_charge = -99;
+      float lead_tau_effSF = 1;
+      float sublead_tau_effSF = 1;
       bool found_lead_tau = false;
       bool found_sublead_tau = false;
+
 
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
           if(!found_lead_tau){
             lead_tau = tau->p4();
             lead_tau_charge = tau->charge();
+            lead_tau_effSF = m_tau_effSF.get(*tau,sys);
             found_lead_tau = true;
             continue;
           }
 
           sublead_tau = tau->p4();
           sublead_tau_charge = tau->charge();
+          sublead_tau_effSF = m_tau_effSF.get(*tau,sys);
           found_sublead_tau = true;
           break; 
         }
@@ -169,6 +176,7 @@ namespace HHBBTT
         m_Fbranches.at("Leading_Tau_pt").set(*event, lead_tau.Pt(), sys);
         m_Fbranches.at("Leading_Tau_eta").set(*event, lead_tau.Eta(), sys);
         m_Fbranches.at("Leading_Tau_phi").set(*event, lead_tau.Phi(), sys);
+        m_Fbranches.at("Leading_Tau_effSF").set(*event, lead_tau_effSF, sys);
         m_Ibranches.at("Leading_Tau_charge").set(*event, lead_tau_charge, sys);
       }
 
@@ -176,6 +184,7 @@ namespace HHBBTT
         m_Fbranches.at("Sublead_Tau_pt").set(*event, sublead_tau.Pt(), sys);
         m_Fbranches.at("Sublead_Tau_eta").set(*event, sublead_tau.Eta(), sys);
         m_Fbranches.at("Sublead_Tau_phi").set(*event, sublead_tau.Phi(), sys);
+        m_Fbranches.at("Sublead_Tau_effSF").set(*event, sublead_tau_effSF, sys);
         m_Ibranches.at("Sublead_Tau_charge").set(*event, sublead_tau_charge, sys);
       }
 
