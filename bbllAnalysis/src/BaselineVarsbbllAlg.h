@@ -41,11 +41,11 @@ public:
     /// \brief Execute method, for actions to be taken in the event loop
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
-
+    
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
-
+    
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
@@ -71,14 +71,23 @@ private:
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
-      //Leading lepton kinematics
-      "Leading_Muon_pt", "Leading_Muon_eta", "Leading_Electron_pt", "Leading_Electron_eta",
-
+    "TWO_ISO_ELECTRONS", "TWO_ISO_MUONS", "EXACTLY_TWO_B_JETS", "Pass_ee", "Pass_mumu", "Mee", "Mmumu",
+    "Leading_Electron_pt", "Leading_Electron_eta", "Leading_Electron_phi", "Leading_Electron_E",
+    "Subleading_Electron_pt", "Subleading_Electron_eta", "Subleading_Electron_phi", "Subleading_Electron_E",
+    "Leading_Muon_pt", "Leading_Muon_eta", "Leading_Muon_phi", "Leading_Muon_E",
+    "Subleading_Muon_pt", "Subleading_Muon_eta", "Subleading_Muon_phi", "Subleading_Muon_E",
+    "mee", "pTee", "dRee", "Etaee", "Phiee", "mmumu", "pTmumu", "dRmumu", "Etamumu", "Phimumu",
+    "Jet_pt_b1", "Jet_eta_b1", "Jet_phi_b1", "Jet_E_b1", "Jet_pt_b2", "Jet_eta_b2", "Jet_phi_b2", "Jet_E_b2",
+    "mbb", "pTbb", "dRbb", "Etabb", "Phibb",         
+    "Leading_Jet_pt", "Leading_Jet_eta", "Leading_Jet_phi", "Leading_Jet_E", 
+    "Subleading_Jet_pt", "Subleading_Jet_eta", "Subleading_Jet_phi", "Subleading_Jet_E",
     };
 
-    // Local variables and functions
-
-  };
+   std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
+   std::vector<std::string> m_Ivarnames{
+   "nBJets", "nMuons", "nElectrons", "nJets",
+   };
+    
+ };
 }
-
 #endif
