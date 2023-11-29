@@ -1,6 +1,6 @@
 .flake8_check_template: &flake8_check_template
   stage: linting
-  image: registry.cern.ch/docker.io/library/python:3.9-slim
+  image: registry.cern.ch/docker.io/library/python:3.9-slim-bullseye
   before_script:
     - pip install flake8
   script:
@@ -14,7 +14,7 @@
 
 .black_check_template: &black_check_template
   stage: linting
-  image: registry.cern.ch/docker.io/library/python:3.9-slim
+  image: registry.cern.ch/docker.io/library/python:3.9-slim-bullseye
   before_script:
     - pip install black==22.3.0
   script:
@@ -34,7 +34,7 @@
 
 .mypy_check_template: &mypy_check_template
   stage: linting
-  image: registry.cern.ch/docker.io/library/python:3.9-slim
+  image: registry.cern.ch/docker.io/library/python:3.9-slim-bullseye
   before_script:
     - pip install mypy --quiet
     - pip install types-PyYAML
