@@ -35,22 +35,31 @@ namespace HHBBTT
 
   enum TriggerChannel
   {
-    SLT = 0, 
-    LTT = 1, 
-    STT = 2, 
-    DTT = 3,
+    SLT = 0,
+    LTT = 1,
+    ETT = 2,
+    ETT_4J12 = 3,
+    MTT_2016 = 4,
+    MTT_high = 5,
+    MTT_low = 6,
+    STT = 7,
+    DTT = 8,
+    DTT_2016 = 9,
+    DTT_4J12 = 10,
+    DTT_L1Topo = 11,
   };
 
   enum Var
   {
-    ele = 0, 
-    mu = 1, 
-    leadingtau = 2, 
-    subleadingtau = 3, 
-    leadingjet = 4, 
-    subleadingjet = 5,
-    leadingtauupper = 6,
+    ele = 0,
+    mu = 1,
+    leadingtau = 2,
+    leadingtaumax = 3,
+    subleadingtau = 4,
+    leadingjet = 5,
+    subleadingjet = 6,
   };
+
 
   /// \brief An algorithm for counting containers
   class HHbbttSelectorAlg final : public EL::AnaAlgorithm
@@ -115,6 +124,9 @@ private:
     CP::SysReadDecorHandle<unsigned int>
     m_runNumber {this, "runNumber", "runNumber", "Runnumber"};
 
+    CP::SysReadDecorHandle<unsigned int>
+    m_rdmRunNumber {this, "randomRunNumber", "RandomRunNumber", "Random run number for MC"};
+
     std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
 
     Gaudi::Property<std::string> m_eleWPName
@@ -130,14 +142,15 @@ private:
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
     std::vector<std::string> m_Bvarnames{      
-      "pass_trigger_SLT", "pass_trigger_LTT", "pass_trigger_STT", "pass_trigger_DTT",
-      "pass_baseline_SLT", "pass_baseline_LTT", "pass_baseline_STT", "pass_baseline_DTT",
-      "pass_SLT", "pass_LTT", "pass_STT", "pass_DTT",
+      "pass_trigger_SLT", "pass_trigger_LTT", "pass_trigger_STT",
+      "pass_trigger_DTT_2016", "pass_trigger_DTT_4J12",
+      "pass_trigger_DTT_L1Topo", "pass_trigger_DTT",
+      "pass_baseline_SLT", "pass_baseline_LTT", "pass_baseline_STT",
+      "pass_baseline_DTT_2016", "pass_baseline_DTT_4J12",
+      "pass_baseline_DTT_L1Topo", "pass_baseline_DTT",
+      "pass_SLT", "pass_LTT", "pass_STT",
+      "pass_DTT_2016", "pass_DTT_4J12", "pass_DTT_L1Topo",  "pass_DTT"
     };
-
-    std::vector<HHBBTT::TriggerChannel> trigger_channels {HHBBTT::SLT, HHBBTT::LTT, HHBBTT::STT, HHBBTT::DTT};
-    std::vector<HHBBTT::Var> vars {HHBBTT::ele, HHBBTT::mu, HHBBTT::leadingtau, HHBBTT::subleadingtau, HHBBTT::leadingjet, HHBBTT::subleadingjet};
-    std::vector<HHBBTT::Var> jvars {HHBBTT::leadingjet, HHBBTT::subleadingjet};
 
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
@@ -148,10 +161,16 @@ private:
     
     /// \brief Internal variables
 
+    std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>> m_pt_threshold;
+
     bool trigPassed_SLT;
     bool trigPassed_LTT;
     bool trigPassed_STT;
     bool trigPassed_DTT;
+    bool trigPassed_DTT_2016;
+    bool trigPassed_DTT_4J12;
+    bool trigPassed_DTT_L1Topo;
+
     bool TWO_JETS;
     bool TWO_BJETS;
     bool MBB_MASS;
@@ -166,38 +185,58 @@ private:
     bool TWO_TAU;
     bool OS_CHARGE_HADHAD;
     bool pass_baseline_STT;
+    bool pass_baseline_DTT_2016;
+    bool pass_baseline_DTT_4J12;
+    bool pass_baseline_DTT_L1Topo;
     bool pass_baseline_DTT;
     bool pass_STT;
+    bool pass_DTT_2016;
+    bool pass_DTT_4J12;
+    bool pass_DTT_L1Topo;
     bool pass_DTT;
-    std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>> m_pt_threshold;
-    bool DTT_DeltaR_cut;
 
+    bool m_is15;
+    bool m_is16;
+    bool m_is17;
+    bool m_is18;
+    bool m_is22;
+    bool m_is23;
 
-    bool is15;
-    bool is16;
-    bool is17;
-    bool is18;
-    bool is22;
-    bool is23;
+    bool m_is16PeriodA;
+    bool m_is16PeriodB_D3;
+    bool m_is16PeriodD4_end;
+    bool m_is17PeriodB1_B4;
+    bool m_is17PeriodB5_B7;
+    bool m_is17PeriodB8_end;
+    bool m_is18PeriodB_end;
+    bool m_is18PeriodK_end;
+    bool m_l1topo_disabled;
 
+    void applyTriggerSelection(const xAOD::EventInfo* event,
+			       const xAOD::ElectronContainer* electrons,
+			       const xAOD::MuonContainer* muons,
+			       const xAOD::TauJetContainer* taus,
+			       const xAOD::JetContainer* jets,
+			       const CP::SystematicSet& sys);
+    void applySingleLepTriggerSelection(const xAOD::EventInfo* event,
+					const xAOD::ElectronContainer* electrons,
+					const xAOD::MuonContainer* muons,
+					const CP::SystematicSet& sys);
+    void applyLepHadTriggerSelection(const xAOD::EventInfo* event,
+				     const xAOD::ElectronContainer* electrons,
+				     const xAOD::MuonContainer* muons,
+				     const xAOD::TauJetContainer* taus,
+				     const xAOD::JetContainer* jets,
+				     const CP::SystematicSet& sys);
+    void applySingleTauTriggerSelection(const xAOD::EventInfo* event,
+					const xAOD::TauJetContainer* taus,
+					const CP::SystematicSet& sys);
+    void applyDiTauTriggerSelection(const xAOD::EventInfo* event,
+				    const xAOD::TauJetContainer* taus,
+				    const xAOD::JetContainer* jets,
+				    const CP::SystematicSet& sys);
 
-    bool is16PeriodA;
-    bool is16PeriodB_D3;
-    bool is16PeriodD4_end;
-    bool is17PeriodB1_B4;
-    bool is17PeriodB5_B7;
-    bool is17PeriodB8_end;
-    bool is18PeriodB_end;
-    bool is18PeriodK_end;
-
-    bool l1topo_disabled;
-
-    
-
-    void applyTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
-    void applyLepHadTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
-    void applySingleTauTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
-    void applyDiTauTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
+    void setRunNumberQuantities(unsigned int rdmNumber);
 
   };
 }
