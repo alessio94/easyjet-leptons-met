@@ -82,12 +82,8 @@ namespace Easyjet
         if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
           continue;
 
-        // select btagging wp
-        if (WPgiven && m_isBtag.get(*jet, sys))
-          workContainer->push_back(jet);
-        // if no btag wp is given take all
-        else
-          workContainer->push_back(jet);
+        // select btagging wp if given. if not given always push back
+        if (!WPgiven || m_isBtag.get(*jet, sys)) workContainer->push_back(jet);
       }
       
       int nJets = workContainer->size();
