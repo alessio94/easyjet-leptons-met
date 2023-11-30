@@ -1,28 +1,27 @@
-Analysis Package for the $HH\rightarrow b\bar{b} VV$ analyis
+Analysis Package for the $HH\rightarrow b\bar{b} \tau\tau$ analyis
 =========================
 
 # Folder structure
 
 - `bin/`: Executables
-  - `bbVV-ntupler`
+  - `ttHH-ntupler`
 - `python/`: Main python code to configure the components (objects, selections as well as the variables to save)
-  - `bbVV_config`
+  - `ttHH_config`
 - `share/`: yaml files containing configurations used by the components
-  - `bbVV-base`: where all the common flags are set;
-  - `RunConfig-X-bbVV[-bypass]`: configurations called by the executables (see below);
+  - `ttHH-base-config`: where all the common flags are set;
+  - `RunConfig-X-ttHH`: configurations called by the executables (see below);
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
-  - `HHbbVVSelectorAlg`: Find if the event pass the baseline bbVV selection;
-  - `BaselineVarsbbVVAlg`: Compute the baseline variables for the analysis.
+  - `JetPairingAlgttHH`: Pair jets from HH decay;
+  - `BaselineVarsttHHAlg`: Compute the baseline variables for the analysis.
 
 # How to Run
 
 1. Get the files to make the test: have a look at the general [README section](https://gitlab.cern.ch/easyjet/easyjet#running-on-files) for updated informations.
 
 2. Run the ntupler on those files:
-- run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbVV-ntupler ttbar_PHYS_10evt.root --run-config bbVVAnalysis/RunConfig-PHYS-bbVV-bypass.yaml --out-file output_PHYS_bbVV.root```
-- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbVV-ntupler ttbar_PHYSLITE_10evt.root --run-config bbVVAnalysis/RunConfig-PHYSLITE-bbVV-bypass.yaml --out-file output_PHYSLITE_bbVV.root```
-An alternative is to use the preselection step using the configuration `RunConfig-PHYS-bbVV.yaml` instead of `RunConfig-PHYS-bbVV-bypass.yaml`, however fewer events would be recorded.
+- run the analysis on <span style="color: #F2385A">PHYS</span>: ```ttHH-ntupler ttbar_PHYS_10evt.root --run-config ttHHAnalysis/RunConfig-PHYS-ttHH.yaml --out-file output_PHYS_ttHH.root```
+- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```ttHH-ntupler ttbar_PHYSLITE_10evt.root --run-config ttHHAnalysis/RunConfig-PHYSLITE-ttHH.yaml --out-file output_PHYSLITE_ttHH.root```
 
 # Output
 
@@ -33,14 +32,14 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
 * Reconstructed objects:
     * electron / muon  kinematics (implemented as a vector): `el_NOSYS_X` / `mu_NOSYS_X`;
     * jet kinematics (implemented as a vector): `recojet_antikt4PFlow_NOSYS_X`;
-    * fat jet kinematics (implemented as a vector): `recojet_antikt10UFO_NOSYS_X`;
-    * $E_T^{miss}$ : `met_NOSYS_X`.
-* Standard set of `bbVV` variables, including:
-    * cuts to pass: `bbVV_pass_SR_NOSYS`;
-    * selected lepton: `bbVV_NOSYS_Selected_Lepton_X`.
-
+    * Higgses kinematics: `H1_X` /`H2_X`;
+    * global quantities `n_leptons`, `njets`, `nBjets`, `HT`.
+* Standard set of `ttHH` variables, including:
+    * selected jet kinematics (Y from 1 to 4): `Jet_X_BY`;
+    * their delta R (M,N,O,P from 1 to 4): `Jets_DeltaRMN`, `Jets_DeltaRMNO` and `Jets_DeltaRMNOP`;
+    * the jet pairing outputs: `Jets_DeltaR[Max,Min,Mean]` and `Jets_DeltaREta[Max,Min,Mean]`.
 
 # Main developers
 
 The main developments have been performed by (non extensive list, feel free to add your name):
-Kira Abeling.
+Giulia Di Gregorio, Luis Falda Coelho.

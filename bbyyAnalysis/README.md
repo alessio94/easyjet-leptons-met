@@ -1,55 +1,49 @@
-# Analysis Package for bbyy
+Analysis Package for $HH\rightarrow b\bar{b} \gamma\gamma$ analyis
+=========================
 
-This analysis package is currently used for investigating the potential use of the `DAOD_PHYS` (PHYS) or `DAOD_PHYSLITE` (PHYSLITE) data formats for Run-3 HH to bbyy [HDBS workshop talk](https://indico.cern.ch/event/1132691/sessions/436749/attachments/2503571/4301659/PHYSLITE_HDBSWorkshop_Sep2022.pdf).
+# Folder structure
+- `bin/`: Executables
+  - `bbyy-ntupler`
+- `python/`: Main python code to configure the components (objects, selections as well as the variables to save)
+  - `bbyy_config`
+- `share/`: yaml files containing configurations used by the components
+  - `bbyy-base-config`: where all the common flags are set;
+  - `RunConfig-X-bbyy`: configurations called by the executables (see below);
+  - `trigger`: list of the triggers to use per year.
+- `src/`: C++ code
+  - `SelectionFlagsbbyyAlg`: Find if the event pass the baseline bbyy selection;
+  - `BaselineVarsbbyyAlg`: Compute the baseline variables for the analysis.
 
-For any questions, comments, or feedback on the package feel free to contact:
 
-Abraham Tishelman-Charny \
-Email: `abraham.tishelman.charny@cern.ch` \
-Mattermost: `@atishelm` \
-Skype: `abe_t-c`
+# How to Run
 
-Participation and development on this package from: Giulia Di Gregorio, Sayuka Kita, Spyros Merianos, Lorenzo Santi
+1. Get the files to make the test: have a look at the general [README section](https://gitlab.cern.ch/easyjet/easyjet#running-on-files) for updated informations.
 
-## Producing bbyy ntuples
+2. Run the ntupler on those files:
+- run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbyy-ntupler ttbar_PHYS_10evt.root --run-config bbyyAnalysis/RunConfig-PHYS-bbyy.yaml --out-file output_PHYS_bbyy.root```
+- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbyy-ntupler ttbar_PHYSLITE_10evt.root --run-config bbyyAnalysis/RunConfig-PHYSLITE-bbyy.yaml --out-file output_PHYSLITE_bbyy.root```
 
-bbyy ntuples are produced by running the `bbyy-ntupler` executable. Example commands for processing 100 events of a `DAOD_PHYS` or `DAOD_PHYSLITE` file can be found below:
+# Output
 
-PHYS:
-
-```
-bbyy-ntupler /eos/atlas/atlascerngroupdisk/phys-hdbs/diHiggs/Run3/yybb/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.deriv.DAOD_PHYS.e8222_s3681_r13167_p5855/DAOD_PHYS.35180056._000001.pool.root.1 \
-  --run-config ../easyjet/bbyyAnalysis/share/RunConfig-PHYS-bbyy.yaml --evtMax 100 --out-file bbyy_PHYS_ntuple.root
-```
-
-PHYSLITE:
-
-```
-bbyy-ntupler /eos/atlas/atlascerngroupdisk/phys-hdbs/diHiggs/Run3/yybb/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.deriv.DAOD_PHYSLITE.e8222_s3681_r13167_p5855/DAOD_PHYSLITE.35180056._000001.pool.root.1 \
-  --run-config ../easyjet/bbyyAnalysis/share/RunConfig-PHYSLITE-bbyy.yaml --evtMax 100 \
-  --out-file bbyy_PHYSLITE_ntuple.root
-```
-
-If these run properly, your outputs files should contain a TTree `AnalysisMiniTree` containing:
-
-* Standard event info, e.g. `runNumber`, `eventNumber` etc.
-* Truth information on the Higgs: `truth_H1_X` and `truth_H2_X`
-* All photon kinematics: `ph_NOSYS_X`
-* Reco jet kinematics: `recojet_antikt4PFlow_NOSYS_X`
-* Truth jet information: `truthjet_antikt4_X`
+If these run properly, your outputs files should contain a TTree `AnalysisMiniTree` with the following content (X denotes a set of variables associated to the object, usually pT, Eta ...):
+* Some information saved for every analyses displayed in the main [README section](https://gitlab.cern.ch/easyjet/easyjet#have-a-look-at-the-output);
+* Truth information:
+    * jets (implemented as a vector): `truthjet_antikt4_X`.
+* Reconstructed objects:
+    * photon kinematics (implemented as a vector): `ph_NOSYS_X`;
+    * jet kinematics (implemented as a vector): `recojet_antikt4PFlow_NOSYS_X`;
+    * global variables: `NOSYS_nJets`, `NOSYS_nPhotons`...
 * Standard set of `bbyy` variables, including:
-  * reco photons: `NOSYS_Leading_Photon_X` and `NOSYS_Subleading_Photon_X` + the related variables `NOSYS_myy` etc.
-  * reco jets: `NOSYS_Jet_X_b1` and `NOSYS_Jet_X_b2` + the related variables `NOSYS_mbb` etc.
-  * HH variables: `NOSYS_mbbyy` etc.
-  * gloabl variables: `NOSYS_nJets`, `NOSYS_nPhotons`etc.
-  * cuts to pass: `NOSYS_PASS_TRIGGER`, `NOSYS_TWO_TIGHTID_ISO_PHOTONS`
+    * cuts to pass: `NOSYS_PASS_TRIGGER`, `NOSYS_TWO_TIGHTID_ISO_PHOTONS`...
+    * leading and sub-leading photons: `NOSYS_Leading_Photon_X` and `NOSYS_Subleading_Photon_X` + the related variables `NOSYS_myy`...
+    * leading and sub-leading b-tagged jets: `NOSYS_Jet_X_b1` and `NOSYS_Jet_X_b2` + the related variables `NOSYS_mbb`...
+    * HH variables: `NOSYS_mbbyy`...
 
 Note that running with the `bbyy-ntupler` executable will add the standard `bbyy` variables above, defined in `bbyyAnalysis/src/BaselineVarsbbyyAlg.cxx` and `bbyyAnalysis/python/bbyy_config.py`. 
 
 One can change the outputs saved in the TTree by adjusting the base bbyy configuration file `bbyyAnalysis/share/bbyy-base-config.yaml`, which also defines the identification and isolation WP of the different objects.
 
-## Package structure
+# Main developers
 
-The main file which defines the `bbyy` part of the easyjet sequence is `easyjet/bbyyAnalysis/python/bbyy_config.py`. It is here that the [`PhotonSelectorAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/main/EasyjetHub/src/PhotonSelectorAlg.cxx) and [`JetSelectorAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/main/EasyjetHub/src/JetSelectorAlg.cxx) are called from `EasyjetHub` (because they are not `bbyy` specific packages). These are run with `bbyy` parameters and the output collections are saved.
-
-These are then input to [`BaselineVarsbbyyAlg`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/main/bbyyAnalysis/src/BaselineVarsbbyyAlg.cxx), where these input collections are used to compute final variables saved in the TTree.
+The main developments have been performed by (non extensive list, feel free to add your name):
+Giulia Di Gregorio, Sayuka Kita, Spyros Merianos, Lorenzo Santi, Abraham Tishelman-Charny.

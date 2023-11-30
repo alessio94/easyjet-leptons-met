@@ -87,19 +87,39 @@ When changing branches with `git checkout` or `git switch`, also be sure to use 
 
 # Running on files
 
-To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example run config `easyjet/EasyjetHub/share/RunConfig.yaml`.:
+The first step to run on some test files is:
+### Getting test MC files
+Most of test can be done, as for the pipelines, with $t\bar{t}$ events:
+- <span style="color: #F2385A">PHYS</span>: ``` curl -s -o ttbar_PHYS_10evt.root https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw/p5855ttbar/mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYS_10evts.e8514_s4162_r14622_p5855.pool.root```
+- <span style="color: #4BD9D9;">PHYSLITE</span>: ``` curl -s -o ttbar_PHYSLITE_10evt.root https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw/p5855ttbar/mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYSLITE_10evts.e6337_s3681_r13144_p5855.pool.root```
+
+The next step is:
+### Running some local jobs
+To make some exploratory pileup and invariant mass plots, as well as getting a tree of variables, run with the example run config `easyjet/EasyjetHub/share/RunConfig.yaml`:
 
 ```
-easyjet-ntupler data.myinputfile.DAOD_PHYS.pool.root --run-config [path-to-runconfig] --evtMax 10 --out-file analysis-variables.root
+easyjet-ntupler ttbar_PHYS_10evt.root --run-config EasyjetHub/RunConfig.yaml --out-file analysis-variables.root
 ```
->Your build also installs this one into the build area so you can also do --run-config ${EasyjetHub_DIR}/data/EasyjetHub/RunConfig.yaml
-Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
+>Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
 You should find a new ROOT files, `analysis-variables.root`.
 
-*To run analysis specific code run the executable of the analysis you want to run. For example to run the bbtautau analysis run `bbtt-ntupler <file> ...`. For more information on each individual analyis read the README in the analysis subfolder. 
+* To run analysis specific code run the executable of the analysis you want to run. For example to run the bbtautau analysis run `bbtt-ntupler <file> ...`. For more information on each individual analyis read the README in the analysis subfolder. 
 
 To process Monte Carlo or PHYSLITE samples the command is exactly the same: configuration is automatically setup from the sample's metadata.
 
+Then you can:
+### Have a look at the output
+
+If these run properly, your outputs files should contain a TTree `AnalysisMiniTree` with the following content (X denotes a set of variables associated to the object, usually pT, Eta ...):
+* Standard event info, e.g. `runNumber`, `eventNumber` ...
+* Event passing a certain trigger: `trigPassed_X`;
+* Truth information:
+    * Higgs: `truth_H1_X` and `truth_H1_X`;
+    * their decay products (implemented as a vector): `truth_children_fromH1_X` and `truth_children_fromH2_X`;
+
+Other analysis specific variables are also described in each of the analysis READMEs.
+
+Now it's time for:
 ### Getting oriented with the configuration
 
 For an overview of the core package structure and basic instructions for building an analysis custom executable, see [EasyjetHub/README.md](./EasyjetHub/README.md)
