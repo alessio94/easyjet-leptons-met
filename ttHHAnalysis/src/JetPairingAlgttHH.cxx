@@ -21,93 +21,103 @@ namespace ttHH
 
   StatusCode JetPairingAlgttHH ::initialize()
   {
-    ATH_CHECK(m_containerInKey.initialize());
-    ATH_CHECK(m_containerOutKey.initialize());
+    ATH_MSG_INFO("*********************************\n");
+    ATH_MSG_INFO("        JetPairingAlgttHH        \n");
+    ATH_MSG_INFO("*********************************\n");
+
+    // Read syst-aware input/output handles
+    ATH_CHECK (m_inHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_outHandle.initialize(m_systematicsList));
+
+
+    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
   }
 
   StatusCode JetPairingAlgttHH ::execute()
   {
-    // container we read in
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer>> inContainer(
-        m_containerInKey);
-    ATH_CHECK(inContainer.isValid());
-
-    // fill workContainer with "views" of the inContainer
-    // see TJ's tutorial for this
-    auto workContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
-        inContainer->begin(), inContainer->end(), SG::VIEW_ELEMENTS);
-
-    // this assumes that container is pt sorted (use the JetSelectorAlg for
-    // this) and checks if we have at least 4 jets otherwise exit this alg
-    if (m_pairingStrategy == "minDeltaR" && workContainer->size() >= 4)
+    // Loop over all systs
+    for (const auto& sys : m_systematicsList.systematicsVector())
     {
-      // calculate dR to the next three leading jets and decorate jet
-      const SG::AuxElement::Decorator<float> dRtoLeadingJet_dec(
-          "dRtoLeadingJet");
-      const SG::AuxElement::ConstAccessor<float> dRtoLeadingJet_acc(
-          "dRtoLeadingJet");
 
-      // decorate dR(jet,leading jet) to each jet
-      bool firstJet = true;
-      for (const xAOD::Jet *jet : *workContainer)
+      // Retrive inputs
+      const xAOD::JetContainer *inContainer = nullptr;
+      ANA_CHECK (m_inHandle.retrieve (inContainer, sys));    
+
+      // fill workContainer with "views" of the inContainer
+      // see TJ's tutorial for this
+      auto workContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
+          inContainer->begin(), inContainer->end(), SG::VIEW_ELEMENTS);
+
+      // this assumes that container is pt sorted (use the JetSelectorAlg for
+      // this) and checks if we have at least 4 jets otherwise exit this alg
+      if (m_pairingStrategy == "minDeltaR" && workContainer->size() >= 4)
       {
-        // more instructive than done with iterators
-        if (firstJet)
+        // calculate dR to the next three leading jets and decorate jet
+        const SG::AuxElement::Decorator<float> dRtoLeadingJet_dec(
+            "dRtoLeadingJet");
+        const SG::AuxElement::ConstAccessor<float> dRtoLeadingJet_acc(
+            "dRtoLeadingJet");
+
+        // decorate dR(jet,leading jet) to each jet
+        bool firstJet = true;
+        for (const xAOD::Jet *jet : *workContainer)
         {
-          dRtoLeadingJet_dec(*jet) = 0;
-          firstJet = false;
-          continue;
+          // more instructive than done with iterators
+          if (firstJet)
+          {
+            dRtoLeadingJet_dec(*jet) = 0;
+            firstJet = false;
+            continue;
+          }
+          dRtoLeadingJet_dec(*jet) =
+              xAOD::P4Helpers::deltaR(jet, (*workContainer)[0]);
         }
-        dRtoLeadingJet_dec(*jet) =
-            xAOD::P4Helpers::deltaR(jet, (*workContainer)[0]);
-      }
 
-      // now sort them for their closeness
-      std::partial_sort(
-          workContainer->begin(),     // Iterator from which to start sorting
-          workContainer->begin() + 4, // Use begin + N to sort first N
-          workContainer->end(),       // Iterator marking the end of the range
-          [dRtoLeadingJet_dec, dRtoLeadingJet_acc](
-              const xAOD::IParticle *left, const xAOD::IParticle *right)
-          { return dRtoLeadingJet_acc(*left) < dRtoLeadingJet_acc(*right); });
+        // now sort them for their closeness
+        std::partial_sort(
+            workContainer->begin(),     // Iterator from which to start sorting
+            workContainer->begin() + 4, // Use begin + N to sort first N
+            workContainer->end(),       // Iterator marking the end of the range
+            [dRtoLeadingJet_dec, dRtoLeadingJet_acc](
+                const xAOD::IParticle *left, const xAOD::IParticle *right)
+            { return dRtoLeadingJet_acc(*left) < dRtoLeadingJet_acc(*right); });
 
-      // lets return the pairing of the leading (h1) and subleading (h2) Higgs
-      // candidates as four jets in the order:
-      // h1_leading_pt_jet
-      // h1_subleading_pt_jet
-      // h2_leading_pt_jet
-      // h2_subleading_pt_jet
-      if ((*workContainer)[2]->pt() < (*workContainer)[3]->pt())
-      {
-        // no swap method on ConstDataVector, so by hand
-        const xAOD::Jet *temp = (*workContainer)[2];
-        (*workContainer)[2] = (*workContainer)[3];
-        (*workContainer)[3] = temp;
-      }
-      // keep only the higgs candidate ones to avoid confusion
-      workContainer->erase(workContainer->begin() + 4, workContainer->end());
-    } else if (m_pairingStrategy == "chiSquare" && workContainer->size() >= 4)
-    {	    
-        auto [hh_bJets, chi_hh] = bJetChiSquarePairing(*workContainer, 125., 125.); // using 125 GeV for higgs mass
-
-	    // TODO: change this!
+        // lets return the pairing of the leading (h1) and subleading (h2) Higgs
+        // candidates as four jets in the order:
+        // h1_leading_pt_jet
+        // h1_subleading_pt_jet
+        // h2_leading_pt_jet
+        // h2_subleading_pt_jet
+        if ((*workContainer)[2]->pt() < (*workContainer)[3]->pt())
+        {
+          // no swap method on ConstDataVector, so by hand
+          const xAOD::Jet *temp = (*workContainer)[2];
+          (*workContainer)[2] = (*workContainer)[3];
+          (*workContainer)[3] = temp;
+        }
+        // keep only the higgs candidate ones to avoid confusion
         workContainer->erase(workContainer->begin() + 4, workContainer->end());
-	    (*workContainer)[0] = hh_bJets[0];
-	    (*workContainer)[1] = hh_bJets[1];
-	    (*workContainer)[2] = hh_bJets[2];
-	    (*workContainer)[3] = hh_bJets[3];
+      } else if (m_pairingStrategy == "chiSquare" && workContainer->size() >= 4)
+      {	    
+          auto [hh_bJets, chi_hh] = bJetChiSquarePairing(*workContainer, 125., 125.); // using 125 GeV for higgs mass
 
-        //auto [hz_bJets, chi_hz] = bJetPairing(workContainer, 125., 91.2); // using 91 GeV for Z mass
-        //auto [zz_bJets, chi_zz] = bJetPairing(workContainer, 91.2, 91.2);
+       // TODO: change this!
+          workContainer->erase(workContainer->begin() + 4, workContainer->end());
+       (*workContainer)[0] = hh_bJets[0];
+       (*workContainer)[1] = hh_bJets[1];
+       (*workContainer)[2] = hh_bJets[2];
+       (*workContainer)[3] = hh_bJets[3];
+
+          //auto [hz_bJets, chi_hz] = bJetPairing(workContainer, 125., 91.2); // using 91 GeV for Z mass
+          //auto [zz_bJets, chi_zz] = bJetPairing(workContainer, 91.2, 91.2);
+      }
+
+      // Write to eventstore
+      ATH_CHECK(m_outHandle.record(std::move(workContainer), sys));   
     }
-
-    // write to EventStore
-    SG::WriteHandle<ConstDataVector<xAOD::JetContainer>> Writer(
-        m_containerOutKey);
-    ATH_CHECK(Writer.record(std::move(workContainer)));
-
     return StatusCode::SUCCESS;
   }
 

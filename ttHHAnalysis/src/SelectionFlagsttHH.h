@@ -1,0 +1,101 @@
+/*
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+*/
+
+// Always protect against multiple includes!
+
+#ifndef SELECTIONFLAGSTTHHALG_H
+#define SELECTIONFLAGSTTHHALG_H
+
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
+#include <AsgDataHandles/ReadDecorHandle.h>
+
+#include <AthContainers/ConstDataVector.h>
+
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
+#include <FourMomUtils/xAODP4Helpers.h>
+
+#include <xAODEventInfo/EventInfo.h>
+#include <xAODJet/JetContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
+#include <xAODMuon/MuonContainer.h>
+#include <EasyjetHub/CutManager.h>
+
+#include <algorithm>
+
+class CutManager;
+
+namespace ttHH
+{
+
+  /// \brief An algorithm for counting containers
+  class SelectionFlagsttHHAlg final : public AthHistogramAlgorithm {
+
+    public:
+      SelectionFlagsttHHAlg(const std::string &name, ISvcLocator *pSvcLocator);
+
+      /// \brief Initialisation method, for setting up tools and other persistent
+      /// configs
+      StatusCode initialize() override;
+      /// \brief Execute method, for actions to be taken in the event loop
+      StatusCode execute() override;
+      /// \brief This is the mirror of initialize() and is called after all events are processed.
+      StatusCode finalize() override; ///I added this to write the cutflow histogram.
+
+      const std::vector<std::string> m_STANDARD_CUTS{
+          "PASS_TRIGGER",
+           "NLEPTONS",
+           "NJETS", 
+           "NBJETS"
+      };
+
+      void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
+                          const std::vector<std::string> &Triggers, CutManager& Cuts);
+      void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
+                          const xAOD::MuonContainer& muons, CutManager& ttHHCuts);
+      void evaluateJetCuts(const xAOD::JetContainer& bjets,
+                          const xAOD::JetContainer& jets, CutManager& ttHHCuts);
+
+    private :
+      // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
+      // "someInfo"};
+
+      /// \brief Setup syst-aware input container handles
+      CutManager m_ttHHCuts;
+      CP::SysListHandle m_systematicsList {this};
+
+      CP::SysReadHandle<xAOD::JetContainer>
+      m_bjetHandle{ this, "bjets", "",   "BJet container to read" };
+
+      CP::SysReadHandle<xAOD::JetContainer>
+      m_jetHandle{ this, "jets", "",   "Jet container to read" };
+
+      CP::SysReadHandle<xAOD::EventInfo>
+      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+
+      CP::SysReadHandle<xAOD::ElectronContainer>
+      m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+
+      CP::SysReadHandle<xAOD::MuonContainer>
+      m_muonHandle{ this, "muons", "",   "Muon container to read" };
+
+      std::vector<std::string> m_inputCutList{};
+      std::vector<std::string> m_Triggers;
+      std::unordered_map<std::string,  SG::ReadDecorHandleKey<xAOD::EventInfo>> m_triggerDecorKeys;
+
+      bool m_saveCutFlow;
+      long long int m_total_events{0};
+
+      bool m_nLeptons;
+
+      std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+
+      CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+  };
+
+}
+
+#endif // SELECTIONFLAGSTTHHALG_H

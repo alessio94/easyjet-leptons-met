@@ -12,7 +12,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
             containerInKey=MuonWPLabel + muonkey,
-            containerOutKey="ttHHAnalysisMuons",
+            containerOutKey="ttHHAnalysisMuons_%SYS%",
             minPt=10e3,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -23,7 +23,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
             containerInKey=ElectronWPLabel + electronkey,
-            containerOutKey="ttHHAnalysisElectrons",
+            containerOutKey="ttHHAnalysisElectrons_%SYS%",
             minPt=10e3,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -33,7 +33,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
         CompFactory.Easyjet.JetSelectorAlg(
             "SmallRJet_BTag_SelectorAlg",
             containerInKey=smalljetkey,
-            containerOutKey="ttHHAnalysisJets_BTag",
+            containerOutKey="ttHHAnalysisJets_BTag_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             maxEta=2.5,
             checkOR=flags.Analysis.do_overlap_removal,
@@ -44,7 +44,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
         CompFactory.Easyjet.JetSelectorAlg(
             "SmallRJet_SelectorAlg",
             containerInKey=smalljetkey,
-            containerOutKey="ttHHAnalysisJets",
+            containerOutKey="ttHHAnalysisJets_%SYS%",
             bTagWPDecorName="",
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -53,21 +53,37 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
     cfg.addEventAlgo(
         CompFactory.ttHH.JetPairingAlgttHH(
             "JetPairingAlg",
-            containerInKey="ttHHAnalysisJets_BTag",
+            containerInKey="ttHHAnalysisJets_BTag_%SYS%",
             containerOutKey="pairedttHHAnalysisJets_"
-            + flags.Analysis.small_R_jet.btag_wp,
+            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             pairingStrategy="chiSquare",
         )
     )
 
     cfg.addEventAlgo(
         CompFactory.ttHH.BaselineVarsttHHAlg(
-            "FinalVarsttHHAlg",
-            smallRJets_BTag_ContainerInKey="pairedttHHAnalysisJets_"
-            + flags.Analysis.small_R_jet.btag_wp,
-            smallRJets_ContainerInKey="ttHHAnalysisJets",
-            muonContainerInKey="ttHHAnalysisMuons",
-            electronContainerInKey="ttHHAnalysisElectrons",
+            "BaselineVarsttHHAlg",
+            bjets="pairedttHHAnalysisJets_"
+            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            jets="ttHHAnalysisJets_%SYS%",
+            muons="ttHHAnalysisMuons_%SYS%",
+            electrons="ttHHAnalysisElectrons_%SYS%",
+            isMC=flags.Input.isMC
+        )
+    )
+
+    cfg.addEventAlgo(
+        CompFactory.ttHH.SelectionFlagsttHHAlg(
+            "SelectionFlagsttHHAlg",
+            bjets="pairedttHHAnalysisJets_"
+            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            jets="ttHHAnalysisJets_%SYS%",
+            muons="ttHHAnalysisMuons_%SYS%",
+            electrons="ttHHAnalysisElectrons_%SYS%",
+            cutList=flags.Analysis.CutList,
+            saveCutFlow=flags.Analysis.save_ttHH_cutflow,
+            triggers=flags.Analysis.TriggerChains,
+            nLeptons=flags.Analysis.nLeptons
         )
     )
 
@@ -77,37 +93,29 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
 def ttHH_branches(flags):
     branches = []
 
-    variables = [
-        "n_leptons",
-    ]
-
-    if (flags.Analysis.do_ttHH_cutflow):
-        for var in variables:
-            var_str = "EventInfo.%s -> %s" % (var, var)
-            branches.append(var_str)
+    if (flags.Analysis.save_ttHH_cutflow):
+        cutList = flags.Analysis.CutList
+        for cut in cutList:
+            branches += [f"EventInfo.{cut}_%SYS% -> %SYS%_{cut}"]
 
     # BJets
-    btag_variables = ["pt", "eta", "phi", "E"]
-    btag_pt_ords = ["B1", "B2", "B3", "B4", "B5", "B6"]
+    btag_variables = ["pt", "eta", "phi", "E", "truthLabel"]
+    btag_pt_ords = ["b1", "b2", "b3", "b4", "b5", "b6"]
     for pt_ord in btag_pt_ords:
         for kin in btag_variables:
-            v = "EventInfo.Jet_%s_%s -> Jet_%s_%s" % \
-                (kin, pt_ord, kin, pt_ord)
-            branches += [v]
+            branches += [f"EventInfo.Jet_{kin}_{pt_ord}_%SYS% -> %SYS%_Jet_{kin}_{pt_ord}"] # noqa
 
     H_candidate_variables = [
-        "H1_m", "H1_pT", "H1_eta", "H1_phi",
-        "H2_m", "H2_pT", "H2_eta", "H2_phi"
+        "H1_m", "H1_pt", "H1_eta", "H1_phi",
+        "H2_m", "H2_pt", "H2_eta", "H2_phi"
     ]
     for var in H_candidate_variables:
-        var_str = "EventInfo.%s -> %s" % (var, var)
-        branches.append(var_str)
+        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
     # additional variables
-    additional_variables = ["HT", "njets", "nBjets"]
+    additional_variables = ["HT", "nJets", "nBJets"]
     for var in additional_variables:
-        var_str = "EventInfo.%s -> %s" % (var, var)
-        branches.append(var_str)
+        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
     angular_variables = [
         "DeltaR12", "DeltaR34", "DeltaR56",
@@ -121,7 +129,27 @@ def ttHH_branches(flags):
     ]
 
     for var in angular_variables:
-        var_str = "EventInfo.Jets_%s -> Jets_%s" % (var, var)
-        branches.append(var_str)
+        branches += [f"EventInfo.Jets_{var}_%SYS% -> %SYS%_Jets_{var}"]
+
+    branches += ["EventInfo.PassAllCuts_%SYS% -> %SYS%_PassAllCuts"]
+
+    lepton_variables = ["pt", "eta", "phi", "E"]
+    leptons = [
+        "Leading_Electron", "Subleading_Electron",
+        "Leading_Muon", "Subleading_Muon"
+    ]
+
+    for lep in leptons:
+        for var in lepton_variables:
+            branches += [f"EventInfo.{lep}_{var}_%SYS% -> %SYS%_{lep}_{var}"]
+
+    leptonPair_variables = ["pt", "eta", "phi", "m", "dR"]
+    leptonPairs = [
+        "ee", "mumu", "emu"
+    ]
+
+    for lep in leptonPairs:
+        for var in leptonPair_variables:
+            branches += [f"EventInfo.{lep}_{var}_%SYS% -> %SYS%_{lep}_{var}"]
 
     return branches

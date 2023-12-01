@@ -37,12 +37,28 @@ trigger_chains:
 # apply loose jet cleaning only
 loose_jet_cleaning: true
 
+# if you want to run a baseline diHiggs analyses
+do_ttHH_analysis: true
+
+# if you want to truth match (is MC protected)
+# Whether to activate CP alg systematic variations
+do_CP_systematics: false
+systematics_regex: [".*"]
+
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
 
+nLeptons: 0
+
 #Enable cutflow 
-do_ttHH_cutflow: true
+save_ttHH_cutflow: true
+
+CutList:
+  - PASS_TRIGGER
+  - NLEPTONS
+  - NJETS
+  - NBJETS
 
 # Include the TTree configuration and update details
 ttree_output:

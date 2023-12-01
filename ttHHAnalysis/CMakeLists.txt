@@ -11,6 +11,7 @@ add_compile_options(-Werror)
 atlas_add_component(ttHHAnalysis
   src/JetPairingAlgttHH.cxx
   src/BaselineVarsttHHAlg.cxx
+  src/SelectionFlagsttHH.cxx
   src/components/ttHHAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -23,6 +24,7 @@ atlas_add_component(ttHHAnalysis
   SystematicsHandlesLib
   FourMomUtils
   TruthUtils
+  EasyjetHubLib
 )
 
 # Install python modules, joboptions, and share content

@@ -2,15 +2,13 @@
   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-/// @author Frederic Renner
+/// @author Giulia Di Gregorio, Luis Falda
 
 #include "AthContainers/AuxElement.h"
 #include "BaselineVarsttHHAlg.h"
 #include <FourMomUtils/xAODP4Helpers.h>
 #include <AthContainers/ConstDataVector.h>
 #include <xAODJet/JetContainer.h>
-#include <xAODEgamma/ElectronContainer.h>
-#include <xAODMuon/MuonContainer.h>
 
 namespace ttHH
 {
@@ -18,198 +16,270 @@ namespace ttHH
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
-
+        declareProperty("isMC", m_isMC);
+        declareProperty("nLeptons", m_nLeptons);
   }
 
   StatusCode BaselineVarsttHHAlg::initialize()
   {
-    ATH_CHECK(m_smallRJets_BTag_ContainerInKey.initialize());
-    ATH_CHECK(m_smallRJets_ContainerInKey.initialize());
-    ATH_CHECK(m_muonContainerInKey.initialize());
-    ATH_CHECK(m_electronContainerInKey.initialize());
-    ATH_CHECK(m_EventInfoKey.initialize());
+    ATH_MSG_INFO("*********************************\n");
+    ATH_MSG_INFO("       BaselineVarsttHHAlg       \n");
+    ATH_MSG_INFO("*********************************\n");
 
-    for (const std::string &var : m_vars)
-    {
-      std::string deco_var = var; 
-      SG::AuxElement::Decorator<float> deco(deco_var);
-      m_decos.emplace(deco_var, deco);
-    };
+    ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+
+    for (const std::string &string_var: m_Fvarnames) {
+      CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
+      m_Fbranches.emplace(string_var, var);
+      ATH_CHECK (m_Fbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
+    }
+
+    for (const std::string &string_var: m_Ivarnames) {
+      CP::SysWriteDecorHandle<int> var {string_var+"_%SYS%", this};
+      m_Ibranches.emplace(string_var, var);
+      ATH_CHECK (m_Ibranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
+    }
+
+    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
   }
 
   StatusCode BaselineVarsttHHAlg::execute()
   {
-    // container we read in
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    ATH_CHECK(eventInfo.isValid());
-
-    for (const std::string &var : m_vars)
+    //Loop over all systs
+    for (const auto& sys : m_systematicsList.systematicsVector())
     {
-      std::string deco_var = var; 
-      m_decos.at(deco_var)(*eventInfo) = -99.; 
-    };
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRJets_BTag(
-       m_smallRJets_BTag_ContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer> > smallRJets(
-       m_smallRJets_ContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::MuonContainer> > muons_(
-        m_muonContainerInKey);
-    SG::ReadHandle<ConstDataVector<xAOD::ElectronContainer> > electrons_(
-        m_electronContainerInKey);
+      const xAOD::JetContainer *bjets = nullptr;
+      ANA_CHECK (m_bjetHandle.retrieve (bjets, sys));
 
-    ATH_CHECK(smallRJets_BTag.isValid());
-    ATH_CHECK(smallRJets.isValid());
-    ATH_CHECK(muons_.isValid());
-    ATH_CHECK(electrons_.isValid());
-    ConstDataVector<xAOD::JetContainer> btag_jets = *smallRJets_BTag;
-    
-    int n_leptons = (*electrons_).size() + (*muons_).size();
-    
-    double HT = 0; // scalar sum of jet pT
+      const xAOD::MuonContainer *muons = nullptr;
+      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
 
-    
-    // Fill electron variables
-    /*for (const xAOD::Electron *electron : *electrons_)
-    {
-      ...
-      }*/
+      const xAOD::ElectronContainer *electrons = nullptr;
+      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
-    // Fill muon variables
-    /*for (const xAOD::Muon *muon : *muons_)
-    {
-      ...
-      }*/
+      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
-    if (smallRJets_BTag->size()>=4)
-    {
-      // fill all b-jet kinematics for at least 6 b-jets
-      for (std::size_t i=0; i<std::min(smallRJets_BTag->size(),(std::size_t)6); i++){	
+      TLorentzVector H1(0, 0, 0, 0);
+      TLorentzVector H2(0, 0, 0, 0);
+      TLorentzVector e1(0.,0.,0.,0.);
+      TLorentzVector e2(0.,0.,0.,0.);
+      TLorentzVector ee(0.,0.,0.,0.);
+      TLorentzVector mu1(0.,0.,0.,0.);
+      TLorentzVector mu2(0.,0.,0.,0.);
+      TLorentzVector mumu(0.,0.,0.,0.);
+      TLorentzVector emu(0.,0.,0.,0.);
 
-        m_decos.at("Jet_pt_B" + std::to_string(i+1))(*eventInfo) = btag_jets[i]->pt();
-        m_decos.at("Jet_eta_B"+ std::to_string(i+1))(*eventInfo) = btag_jets[i]->eta();
-        m_decos.at("Jet_phi_B"+ std::to_string(i+1))(*eventInfo) = btag_jets[i]->phi();
-        m_decos.at("Jet_E_B"+ std::to_string(i+1))(*eventInfo) = btag_jets[i]->e();
-      }        
+      //auto btag_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      //auto btag_jets = *bjets;
+      const xAOD::JetContainer btag_jets = *bjets;
 
-      // construct Higgs Candidates
-      xAOD::JetFourMom_t h1 = btag_jets[0]->jetP4() + btag_jets[1]->jetP4();
-      xAOD::JetFourMom_t h2 = btag_jets[2]->jetP4() + btag_jets[3]->jetP4();
+      double HT = 0; // scalar sum of jet pT
+      int truthLabel = -99;
 
-      // calculate deltaR, deltaPhi and deltaEta for 12, 34, 56 b-jet combinations
-      auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(btag_jets); 
-
-      m_decos.at("Jets_DeltaR12")(*eventInfo) = DeltaR[0];
-      m_decos.at("Jets_DeltaR34")(*eventInfo) = DeltaR[1];
-      m_decos.at("Jets_DeltaPhi12")(*eventInfo) = DeltaPhi[0];
-      m_decos.at("Jets_DeltaPhi34")(*eventInfo) = DeltaPhi[1];
-      m_decos.at("Jets_DeltaEta12")(*eventInfo) = DeltaEta[0];
-      m_decos.at("Jets_DeltaEta34")(*eventInfo) = DeltaEta[1];
-
-      m_decos.at("H1_m")(*eventInfo) = h1.M();
-      m_decos.at("H1_pT")(*eventInfo) = h1.Pt();
-      m_decos.at("H1_eta")(*eventInfo) = h1.Eta();
-      m_decos.at("H1_phi")(*eventInfo) = h1.Phi();
-
-      m_decos.at("H2_m")(*eventInfo) = h2.M();
-      m_decos.at("H2_pT")(*eventInfo) = h2.Pt();
-      m_decos.at("H2_eta")(*eventInfo) = h2.Eta();
-      m_decos.at("H2_phi")(*eventInfo) = h2.Phi();
-
-      //m_decos.at("HH_m")(*eventInfo) = (h1 + h2).M();
-
-       
-      // Create a new JetContainer
-      xAOD::Jet jj12 = xAOD::Jet();
-      jj12 = *btag_jets[0]; // TODO: breaks if jj12 is empty, not sure what it the best approach...
-      xAOD::Jet jj34 = xAOD::Jet();
-      jj34 = *btag_jets[0];
-
-      jj12.setJetP4(xAOD::JetFourMom_t(h1.Pt(), h1.Eta(), h1.Phi(), h1.M()));
-      jj34.setJetP4(xAOD::JetFourMom_t(h2.Pt(), h2.Eta(), h2.Phi(), h2.M()));
-
-      // calculate deltaR, deltaPhi and deltaEta for jj12_jj34, jj34_jj56, jj56_jj12 combinations
-      float deltaR_1234 = xAOD::P4Helpers::deltaR(jj12, jj34);
-      DeltaR.push_back(deltaR_1234);
-      m_decos.at("Jets_DeltaR1234")(*eventInfo) = deltaR_1234;
-
-      float deltaEta_1234 = xAOD::P4Helpers::deltaEta(jj12, jj34);
-      DeltaEta.push_back(deltaEta_1234);
-      m_decos.at("Jets_DeltaEta1234")(*eventInfo) = deltaEta_1234;
-
-      float deltaPhi_1234 = xAOD::P4Helpers::deltaPhi(jj12, jj34);
-      m_decos.at("Jets_DeltaPhi1234")(*eventInfo) = deltaPhi_1234;
-
-      // do the same if we have more than 5 jets
-      if (btag_jets.size() > 5)
-      {
-      	m_decos.at("Jets_DeltaR56")(*eventInfo) = DeltaR[2];
-	m_decos.at("Jets_DeltaPhi56")(*eventInfo) = DeltaPhi[2];
-	m_decos.at("Jets_DeltaEta56")(*eventInfo) = DeltaEta[2];
-
-        // construct 56 jet combination
-        xAOD::JetFourMom_t jj56_p4 = btag_jets[4]->jetP4() + btag_jets[5]->jetP4();
-        xAOD::Jet jj56 = xAOD::Jet();
-        jj56 = *btag_jets[0];
-        jj56.setJetP4(jj56_p4);
-
-        float deltaR_5612 = xAOD::P4Helpers::deltaR(jj56, jj12);
-        DeltaR.push_back(deltaR_5612);
-        m_decos.at("Jets_DeltaR5612")(*eventInfo) = deltaR_5612;
-
-        float deltaEta_5612 = xAOD::P4Helpers::deltaEta(jj56, jj12);
-        DeltaEta.push_back(deltaEta_5612);
-        m_decos.at("Jets_DeltaEta5612")(*eventInfo) = deltaEta_5612;      
-
-        float deltaPhi_5612 = xAOD::P4Helpers::deltaPhi(jj56, jj12);
-        m_decos.at("Jets_DeltaPhi5612")(*eventInfo) = deltaPhi_5612;
-
-        float deltaR_3456 = xAOD::P4Helpers::deltaR(jj34, jj56);
-        DeltaR.push_back(deltaR_3456);
-        m_decos.at("Jets_DeltaR3456")(*eventInfo) = deltaR_3456;
-
-        float deltaEta_3456 = xAOD::P4Helpers::deltaEta(jj34, jj56);
-        DeltaEta.push_back(deltaEta_3456);
-        m_decos.at("Jets_DeltaEta3456")(*eventInfo) = deltaEta_3456;
+      for (const std::string &string_var: m_Fvarnames) {
+        m_Fbranches.at(string_var).set(*event, -99., sys);
+      }
       
-        float deltaPhi_3456 = xAOD::P4Helpers::deltaPhi(jj34, jj56);
-        //DeltaPhi.push_back(deltaPhi_3456);
-        m_decos.at("Jets_DeltaPhi3456")(*eventInfo) = deltaPhi_3456;
-      } 
+      for (const std::string &string_var: m_Ivarnames) {
+        m_Ibranches.at(string_var).set(*event, -99, sys);
+      }
 
-      // calculate max, min and mean of mass, deltaEta and deltaR
-      auto [DeltaRMax, DeltaRMin, DeltaRMean] = calculateVectorStats(DeltaR);
-      auto [DeltaEtaMax, DeltaEtaMin, DeltaEtaMean] = calculateVectorStats(DeltaEta);
+      if (bjets->size()>=4) {
+        // fill all b-jet kinematics for at least 6 b-jets
+        for (std::size_t i=0; i<std::min(bjets->size(),(std::size_t)6); i++){	
 
-      m_decos.at("Jets_DeltaRMax")(*eventInfo) = DeltaRMax;
-      m_decos.at("Jets_DeltaRMin")(*eventInfo) = DeltaRMin;
-      m_decos.at("Jets_DeltaRMean")(*eventInfo) = DeltaRMean;
+          if (m_isMC) truthLabel = HadronConeExclTruthLabelID(*bjets->at(i));
 
-      m_decos.at("Jets_DeltaEtaMax")(*eventInfo) = DeltaEtaMax;
-      m_decos.at("Jets_DeltaEtaMin")(*eventInfo) = DeltaEtaMin;
-      m_decos.at("Jets_DeltaEtaMean")(*eventInfo) = DeltaEtaMean;
+          m_Fbranches.at("Jet_pt_b"+std::to_string(i+1)).set(*event, bjets->at(i)->p4().Pt(), sys);
+          m_Fbranches.at("Jet_eta_b"+std::to_string(i+1)).set(*event, bjets->at(i)->p4().Eta(), sys);
+          m_Fbranches.at("Jet_phi_b"+std::to_string(i+1)).set(*event, bjets->at(i)->p4().Phi(), sys);
+          m_Fbranches.at("Jet_E_b"+std::to_string(i+1)).set(*event, bjets->at(i)->p4().E(), sys);
+
+          m_Fbranches.at("Jet_truthLabel_b"+std::to_string(i+1)).set(*event, truthLabel, sys);
+        }
+ 
+        // Build the Higgs candidates
+        H1 = bjets->at(0)->p4() + bjets->at(1)->p4();
+        H2 = bjets->at(2)->p4() + bjets->at(3)->p4();;
+
+        auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(btag_jets);
+
+        m_Fbranches.at("Jets_DeltaR12").set(*event, DeltaR[0], sys);
+        m_Fbranches.at("Jets_DeltaR34").set(*event, DeltaR[1], sys);
+        m_Fbranches.at("Jets_DeltaPhi12").set(*event, DeltaPhi[0], sys);
+        m_Fbranches.at("Jets_DeltaPhi34").set(*event, DeltaPhi[1], sys);
+        m_Fbranches.at("Jets_DeltaEta12").set(*event, DeltaEta[0], sys);
+        m_Fbranches.at("Jets_DeltaEta34").set(*event, DeltaEta[1], sys);
+
+        m_Fbranches.at("H1_m").set(*event, H1.M(), sys);
+        m_Fbranches.at("H1_pt").set(*event, H1.Pt(), sys);
+        m_Fbranches.at("H1_eta").set(*event, H1.Eta(), sys);
+        m_Fbranches.at("H1_phi").set(*event, H1.Phi(), sys);
+
+        m_Fbranches.at("H2_m").set(*event, H2.M(), sys);
+        m_Fbranches.at("H2_pt").set(*event, H2.Pt(), sys);
+        m_Fbranches.at("H2_eta").set(*event, H2.Eta(), sys);
+        m_Fbranches.at("H2_phi").set(*event, H2.Phi(), sys);
+
+        // Create a new JetContainer
+        xAOD::Jet jj12 = xAOD::Jet();
+        jj12 = *btag_jets[0]; // TODO: breaks if jj12 is empty, not sure what it the best approach...
+        xAOD::Jet jj34 = xAOD::Jet();
+        jj34 = *btag_jets[0];
+
+        jj12.setJetP4(xAOD::JetFourMom_t(H1.Pt(), H1.Eta(), H1.Phi(), H1.M()));
+        jj34.setJetP4(xAOD::JetFourMom_t(H2.Pt(), H2.Eta(), H2.Phi(), H2.M()));
+
+        // calculate deltaR, deltaPhi and deltaEta for jj12_jj34, jj34_jj56, jj56_jj12 combinations
+        float deltaR_1234 = xAOD::P4Helpers::deltaR(jj12, jj34);
+        DeltaR.push_back(deltaR_1234);
+        m_Fbranches.at("Jets_DeltaR1234").set(*event, deltaR_1234, sys);
+
+        float deltaEta_1234 = xAOD::P4Helpers::deltaEta(jj12, jj34);
+        DeltaEta.push_back(deltaEta_1234);
+        m_Fbranches.at("Jets_DeltaEta1234").set(*event, deltaR_1234, sys);
+
+        float deltaPhi_1234 = xAOD::P4Helpers::deltaPhi(jj12, jj34);
+        m_Fbranches.at("Jets_DeltaEta1234").set(*event, deltaPhi_1234, sys);
+
+        if (btag_jets.size() > 5)
+        {
+          m_Fbranches.at("Jets_DeltaR56").set(*event, DeltaR[2], sys);
+          m_Fbranches.at("Jets_DeltaPhi56").set(*event, DeltaPhi[2], sys);
+          m_Fbranches.at("Jets_DeltaEta56").set(*event, DeltaEta[2], sys);
+
+          // construct 56 jet combination
+          xAOD::JetFourMom_t jj56_p4 = btag_jets[4]->jetP4() + btag_jets[5]->jetP4();
+          xAOD::Jet jj56 = xAOD::Jet();
+          jj56 = *btag_jets[0];
+          jj56.setJetP4(jj56_p4);
+
+          float deltaR_5612 = xAOD::P4Helpers::deltaR(jj56, jj12);
+          DeltaR.push_back(deltaR_5612);
+          m_Fbranches.at("Jets_DeltaR5612").set(*event, deltaR_5612, sys);
+
+          float deltaEta_5612 = xAOD::P4Helpers::deltaEta(jj56, jj12);
+          DeltaEta.push_back(deltaEta_5612);
+          m_Fbranches.at("Jets_DeltaEta5612").set(*event, deltaEta_5612, sys);      
+
+          float deltaPhi_5612 = xAOD::P4Helpers::deltaPhi(jj56, jj12);
+          m_Fbranches.at("Jets_DeltaPhi5612").set(*event, deltaPhi_5612, sys);
+
+          float deltaR_3456 = xAOD::P4Helpers::deltaR(jj34, jj56);
+          DeltaR.push_back(deltaR_3456);
+          m_Fbranches.at("Jets_DeltaR3456").set(*event, deltaR_3456, sys);
+
+          float deltaEta_3456 = xAOD::P4Helpers::deltaEta(jj34, jj56);
+          DeltaEta.push_back(deltaEta_3456);
+          m_Fbranches.at("Jets_DeltaEta3456").set(*event, deltaEta_3456, sys);
+
+          float deltaPhi_3456 = xAOD::P4Helpers::deltaPhi(jj34, jj56);
+          m_Fbranches.at("Jets_DeltaPhi3456").set(*event, deltaPhi_3456, sys);
+        }   
+
+        // calculate max, min and mean of mass, deltaEta and deltaR
+        auto [DeltaRMax, DeltaRMin, DeltaRMean] = calculateVectorStats(DeltaR);
+        auto [DeltaEtaMax, DeltaEtaMin, DeltaEtaMean] = calculateVectorStats(DeltaEta);
+
+        m_Fbranches.at("Jets_DeltaRMax").set(*event, DeltaRMax, sys);
+        m_Fbranches.at("Jets_DeltaRMin").set(*event, DeltaRMin, sys);
+        m_Fbranches.at("Jets_DeltaRMean").set(*event, DeltaRMean, sys);
+
+        m_Fbranches.at("Jets_DeltaEtaMax").set(*event, DeltaEtaMax, sys);
+        m_Fbranches.at("Jets_DeltaEtaMin").set(*event, DeltaEtaMin, sys);
+        m_Fbranches.at("Jets_DeltaEtaMean").set(*event, DeltaEtaMean, sys);
+      }
+
+      // store electron kinematics
+      if (electrons->size() >= 1) {
+        e1 = electrons->at(0)->p4();
+        m_Fbranches.at("Leading_Electron_pt").set(*event, e1.Pt(), sys);
+        m_Fbranches.at("Leading_Electron_eta").set(*event, e1.Eta(), sys);
+        m_Fbranches.at("Leading_Electron_phi").set(*event, e1.Phi(), sys);
+        m_Fbranches.at("Leading_Electron_E").set(*event, e1.E(), sys);
+      }
+      if (electrons->size() >= 2) {
+        e2 = electrons->at(1)->p4();
+        m_Fbranches.at("Subleading_Electron_pt").set(*event, e2.Pt(), sys);
+        m_Fbranches.at("Subleading_Electron_eta").set(*event, e2.Eta(), sys);
+        m_Fbranches.at("Subleading_Electron_phi").set(*event, e2.Phi(), sys);
+        m_Fbranches.at("Subleading_Electron_E").set(*event, e2.E(), sys);
+
+        // ee
+        e1 = electrons->at(0)->p4();
+        ee = e1 + e2;
+        m_Fbranches.at("ee_m").set(*event, ee.M(), sys);
+        m_Fbranches.at("ee_pt").set(*event, ee.Pt(), sys);
+        m_Fbranches.at("ee_eta").set(*event, ee.Eta(), sys);
+        m_Fbranches.at("ee_phi").set(*event, ee.Phi(), sys);
+        m_Fbranches.at("ee_dR").set(*event, (e1).DeltaR(e2), sys);
+      }
+
+      // store muon kinematics
+      if (muons->size() >= 1) {
+        mu1 = muons->at(0)->p4();
+        m_Fbranches.at("Leading_Muon_pt").set(*event, mu1.Pt(), sys);
+        m_Fbranches.at("Leading_Muon_eta").set(*event, mu1.Eta(), sys);
+        m_Fbranches.at("Leading_Muon_phi").set(*event, mu1.Phi(), sys);
+        m_Fbranches.at("Leading_Muon_E").set(*event, mu1.E(), sys);
+      }
+      if (muons->size() >= 2) {
+        mu2 = muons->at(1)->p4();
+        m_Fbranches.at("Subleading_Muon_pt").set(*event, mu2.Pt(), sys);
+        m_Fbranches.at("Subleading_Muon_eta").set(*event, mu2.Eta(), sys);
+        m_Fbranches.at("Subleading_Muon_phi").set(*event, mu2.Phi(), sys);
+        m_Fbranches.at("Subleading_Muon_E").set(*event, mu2.E(), sys);
+
+        // mumu
+        mu1 = muons->at(0)->p4();
+        mumu = mu1 + mu2;
+        m_Fbranches.at("mumu_m").set(*event, mumu.M(), sys);
+        m_Fbranches.at("mumu_pt").set(*event, mumu.Pt(), sys);
+        m_Fbranches.at("mumu_eta").set(*event, mumu.Eta(), sys);
+        m_Fbranches.at("mumu_phi").set(*event, mumu.Phi(), sys);
+        m_Fbranches.at("mumu_dR").set(*event, (mu1).DeltaR(mu2), sys);
+      }
+
+      if (muons->size() >= 1 and electrons->size() >= 1) {
+        mu1 = muons->at(0)->p4();
+        e1 = electrons->at(0)->p4();
+        emu = e1 + mu1;
+        m_Fbranches.at("emu_m").set(*event, emu.M(), sys);
+        m_Fbranches.at("emu_pt").set(*event, emu.Pt(), sys);
+        m_Fbranches.at("emu_eta").set(*event, emu.Eta(), sys);
+        m_Fbranches.at("emu_phi").set(*event, emu.Phi(), sys);
+        m_Fbranches.at("emu_dR").set(*event, (mu1).DeltaR(e1), sys);
+      }
+
+      m_Ibranches.at("nJets").set(*event, jets->size(), sys);
+      m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
+
+      for (const xAOD::Jet *jet : *jets) // Jets here can be every type of jet (No Working point selected)
+      {
+        HT += jet->pt();
+      }
+      m_Fbranches.at("HT").set(*event, HT, sys);
+
+      m_Ibranches.at("n_leptons").set(*event, m_nLeptons, sys);
     }
-
-    m_decos.at("njets")(*eventInfo) = smallRJets->size();
-    m_decos.at("nBjets")(*eventInfo) = smallRJets_BTag->size();
-
-
-    for (const xAOD::Jet *jet : *smallRJets) // Jets here can be every type of jet (No Working point selected)
-    {
-      HT += jet->pt();
-    }
-    m_decos.at("HT")(*eventInfo) = HT;
-
-    // Save cutflow booleans
-    m_decos.at("n_leptons")(*eventInfo) = n_leptons; 
-
     return StatusCode::SUCCESS;
+
   }
 
-  std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> BaselineVarsttHHAlg::getPairKinematics(const ConstDataVector<xAOD::JetContainer>& jetPairs)
+  std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> BaselineVarsttHHAlg::getPairKinematics(const xAOD::JetContainer& jetPairs)
   {
 
     std::vector<double> DeltaR = {xAOD::P4Helpers::deltaR(jetPairs[0], jetPairs[1]), xAOD::P4Helpers::deltaR(jetPairs[2], jetPairs[3])};

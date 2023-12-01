@@ -6,11 +6,15 @@
 #ifndef TTHHANALYSIS_FINALVARSTTHHALG
 #define TTHHANALYSIS_FINALVARSTTHHALG
 
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
+
 #include <AthContainers/ConstDataVector.h>
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <FourMomUtils/xAODP4Helpers.h>
-#include <SystematicsHandles/SysReadHandle.h>
-#include <SystematicsHandles/SysReadDecorHandle.h>
+
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
@@ -37,51 +41,47 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer> >
-    m_smallRJets_BTag_ContainerInKey{ this, "smallRJets_BTag_ContainerInKey",
-                            "",   "containerName to read" };
+    /// \brief Setup syst-aware input container handles
+    CP::SysListHandle m_systematicsList {this};
 
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_bjetHandle{ this, "bjets", "",   "BJet container to read" };
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer> >
-    m_smallRJets_ContainerInKey{ this, "smallRJets_ContainerInKey",
-                            "",   "Jet container without WP to read" };
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_jetHandle{ this, "jets", "",   "Jet container to read" };
 
+    CP::SysReadHandle<xAOD::MuonContainer>
+    m_muonHandle{ this, "muons", "",   "Muon container to read" };
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::MuonContainer> >
-    m_muonContainerInKey{ this, "muonContainerInKey",
-                            "",   "containerName to read" };
+    CP::SysReadHandle<xAOD::ElectronContainer>
+    m_electronHandle{ this, "electrons", "",   "Electron container to read" };
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::ElectronContainer> >
-    m_electronContainerInKey{ this, "electronContainerInKey",
-                            "",   "containerName to read" };
+    CP::SysReadHandle<xAOD::EventInfo>
+    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-      this, "EventInfoKey", "EventInfo", "EventInfo container to dump"
-    };
-
-    std::unordered_map<std::string, SG::AuxElement::Decorator<float> > m_decos;
-    std::vector<std::string> m_vars{
-      //lepton info
-      "n_leptons",
-
+    bool m_isMC;
+    bool m_nLeptons;
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
+    std::vector<std::string> m_Fvarnames{
       // b-jet kinematics
-      "Jet_pt_B1", "Jet_eta_B1", "Jet_phi_B1", "Jet_E_B1",
-      "Jet_pt_B2", "Jet_eta_B2", "Jet_phi_B2", "Jet_E_B2", 
-      "Jet_pt_B3", "Jet_eta_B3", "Jet_phi_B3", "Jet_E_B3", 
-      "Jet_pt_B4", "Jet_eta_B4", "Jet_phi_B4", "Jet_E_B4", 
-      "Jet_pt_B5", "Jet_eta_B5", "Jet_phi_B5", "Jet_E_B5",
-      "Jet_pt_B6", "Jet_eta_B6", "Jet_phi_B6", "Jet_E_B6",
+      "Jet_pt_b1", "Jet_eta_b1", "Jet_phi_b1", "Jet_E_b1",
+      "Jet_pt_b2", "Jet_eta_b2", "Jet_phi_b2", "Jet_E_b2", 
+      "Jet_pt_b3", "Jet_eta_b3", "Jet_phi_b3", "Jet_E_b3", 
+      "Jet_pt_b4", "Jet_eta_b4", "Jet_phi_b4", "Jet_E_b4", 
+      "Jet_pt_b5", "Jet_eta_b5", "Jet_phi_b5", "Jet_E_b5",
+      "Jet_pt_b6", "Jet_eta_b6", "Jet_phi_b6", "Jet_E_b6",
+
+      //truth information b-jets
+      "Jet_truthLabel_b1", "Jet_truthLabel_b2", "Jet_truthLabel_b3",
+      "Jet_truthLabel_b4", "Jet_truthLabel_b5", "Jet_truthLabel_b6",
 
 
       // additional variables
       "HT",
 
-      //jets info
-      "njets", "nBjets",
-
       //Higgs candidate invariant mass
-      "H1_m", "H1_pT", "H1_eta", "H1_phi",
-      "H2_m", "H2_pT", "H2_eta", "H2_phi",
+      "H1_m", "H1_pt", "H1_eta", "H1_phi",
+      "H2_m", "H2_pt", "H2_eta", "H2_phi",
 
       //HH pair variables
 
@@ -99,10 +99,32 @@ private:
 
       //mean, max and min DeltaR and DeltaPhi
       "Jets_DeltaRMax", "Jets_DeltaRMin", "Jets_DeltaRMean",
-      "Jets_DeltaEtaMax", "Jets_DeltaEtaMin", "Jets_DeltaEtaMean"
+      "Jets_DeltaEtaMax", "Jets_DeltaEtaMin", "Jets_DeltaEtaMean",
+
+      //leptons
+      "Leading_Electron_pt", "Leading_Electron_eta", 
+      "Leading_Electron_phi", "Leading_Electron_E",
+      "Subleading_Electron_pt", "Subleading_Electron_eta", 
+      "Subleading_Electron_phi", "Subleading_Electron_E",
+      "Leading_Muon_pt", "Leading_Muon_eta", 
+      "Leading_Muon_phi", "Leading_Muon_E",
+      "Subleading_Muon_pt", "Subleading_Muon_eta", 
+      "Subleading_Muon_phi", "Subleading_Muon_E",
+      "ee_m", "ee_pt", "ee_dR", "ee_eta", "ee_phi", 
+      "mumu_m", "mumu_pt", "mumu_dR", "mumu_eta", "mumu_phi",
+      "emu_m", "emu_pt", "emu_dR", "emu_eta", "emu_phi"
     };
 
-    std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> getPairKinematics(const ConstDataVector<xAOD::JetContainer>& jetPairs);
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
+    std::vector<std::string> m_Ivarnames{
+      //lepton info
+      "n_leptons",
+      //jets info
+      "nJets", "nBJets",
+    };
+
+
+    std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> getPairKinematics(const xAOD::JetContainer& jetPairs);
     std::tuple<double, double, double> calculateVectorStats(const std::vector<double>& inputVector);
   };
 }
