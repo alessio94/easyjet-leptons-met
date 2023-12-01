@@ -21,7 +21,7 @@ def jet_sequence(
     # We need to make the filtered jet container explicitly different
     # because for MET we need the unfiltered container
 
-    jet_type = flags.Analysis.small_R.jet_type
+    jet_type = flags.Analysis.small_R_jet.jet_type
     allcalib_name = flags.Analysis.container_names.allcalib[jet_type]
     # Need to keep DAOD_PHYS collection name regardless of input
     # due to CP algs configs in Athena
@@ -51,9 +51,9 @@ def jet_sequence(
     # )
 
     if jet_type != "reco4EMTopoJet":
-        btag_wps = [flags.Analysis.small_R.btag_wp]
-        if 'btag_extra_wps' in flags.Analysis.small_R:
-            btag_wps += flags.Analysis.small_R.btag_extra_wps
+        btag_wps = [flags.Analysis.small_R_jet.btag_wp]
+        if 'btag_extra_wps' in flags.Analysis.small_R_jet:
+            btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
@@ -67,10 +67,10 @@ def jet_sequence(
             configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
             configSeq.setOptionValue('.kinematicSelection', True)
-            if 'btagCDI' in flags.Analysis.small_R:
+            if 'btagCDI' in flags.Analysis.small_R_jet:
                 configSeq.setOptionValue(
                     '.bTagCalibFile',
-                    flags.Analysis.small_R.btagCDI
+                    flags.Analysis.small_R_jet.btagCDI
                 )
             # if GN2 in tagger name overwrite the CDI
             if "GN2" in tagger:
@@ -94,7 +94,7 @@ def jet_sequence(
             )
             configSeq.setOptionValue(
                 '.btagSelDecor',
-                "ftag_select_" + flags.Analysis.small_R.btag_wp,
+                "ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             )
 
     # Add systematic object links
@@ -110,7 +110,7 @@ def jet_sequence(
     )
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
-    configSeq.setOptionValue('.maxEta', flags.Analysis.small_R.max_eta)
+    configSeq.setOptionValue('.maxEta', flags.Analysis.small_R_jet.max_eta)
 
     # Apply selection as view container
 
@@ -155,7 +155,7 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 def vr_jet_sequence(flags, configAcc):
 
     # Previous configuration, to be reproduced
-    # for tagger_wp in flags.Analysis.large_R.vr_btag_wps:
+    # for tagger_wp in flags.Analysis.large_R_jet.vr_btag_wps:
     #     tagger, btag_wp = tagger_wp.split("_", 1)
     #     makeFTagAnalysisSequence(
     #         vr_jet_sequence,
@@ -185,7 +185,7 @@ def vr_jet_sequence(flags, configAcc):
 
     # There is no output container, we just operate on the input one
     input_name = flags.Analysis.container_names.input.vrJet
-    for tagger_wp in flags.Analysis.large_R.vr_btag_wps:
+    for tagger_wp in flags.Analysis.large_R_jet.vr_btag_wps:
         tagger, btag_wp = tagger_wp.split("_", 1)
         # Default CDI in FTag config which is:
         #   "xAODBTaggingEfficiency/13TeV/2022-22-13TeV-MC20-CDI-2022-07-28_v1.root"
@@ -223,7 +223,7 @@ def lr_jet_ghost_vr_jet_association_cfg(
             isMC=flags.Input.isMC,
             LargeJetInKey=flags.Analysis.container_names.input[
                 f"reco10{lr_jet_type}Jet"].replace("%SYS%", "NOSYS"),
-            workingPoints=flags.Analysis.large_R.vr_btag_wps,
+            workingPoints=flags.Analysis.large_R_jet.vr_btag_wps,
             EventInfoDecorSuffix=lr_jet_type,
         )
     )

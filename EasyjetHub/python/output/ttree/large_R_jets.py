@@ -88,7 +88,7 @@ def get_ghost_vr_branches(flags):
         "leadingVRTrackJetsDeltaR32",
     ] + [
         f"leadingVRTrackJetsBtag_{wp}"
-        for wp in flags.Analysis.large_R.vr_btag_wps
+        for wp in flags.Analysis.large_R_jet.vr_btag_wps
     ]
     if flags.Input.isMC:
         vr_vars += [

@@ -14,7 +14,7 @@ do_met: false
 do_mmc: false
 
 # Toggles for reconstructed objects decorations
-small_R:
+small_R_jet:
   max_eta: 100
   # nominal btagging working point, used for b-jet pT calibration in particular
   btag_wp: ""
@@ -23,7 +23,7 @@ small_R:
   # select jet type
   jet_type: 'reco4PFlowJet'
 
-large_R:
+large_R_jet:
   # btagging working points for Variable Radius Track jets
   vr_btag_wps: []
 

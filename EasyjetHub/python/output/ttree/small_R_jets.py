@@ -24,13 +24,13 @@ def get_small_R_jet_branches(
 
     small_R_jet_branches.add_four_mom_branches(do_mass=True)
 
-    if flags.Analysis.small_R.jet_type != "reco4EMTopoJet":
+    if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
         small_R_jet_branches.variables += ["NNJvtPass"]
 
         if tree_flags.collection_options.small_R_jets.btag_info:
-            btag_wps = [flags.Analysis.small_R.btag_wp]
-            if 'btag_extra_wps' in flags.Analysis.small_R:
-                btag_wps += flags.Analysis.small_R.btag_extra_wps
+            btag_wps = [flags.Analysis.small_R_jet.btag_wp]
+            if 'btag_extra_wps' in flags.Analysis.small_R_jet:
+                btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
             small_R_jet_branches.variables += [
                 f"ftag_select_{btag_wp}"
                 for btag_wp in btag_wps

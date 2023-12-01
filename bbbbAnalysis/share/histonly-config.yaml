@@ -1,14 +1,18 @@
 include: EasyjetHub/base-config.yaml
 
-# Toggles for object types
-do_small_R_jets: true
-do_muons: true
+# Which analysis to consider
+do_resolved_dihiggs: false
+do_boosted_dihiggs: false
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]
 
-# small R config
-small_R:
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+
+# Toggles for reconstructed objects decorations
+small_R_jet:
   # nominal btagging working point, used for b-jet pT calibration in particular
   btag_wp: "DL1dv01_FixedCutBEff_77"
   # additional btagging working points, available for selections and per-jet SFs
@@ -22,9 +26,6 @@ trigger_chains:
 
 # apply loose jet cleaning only
 loose_jet_cleaning: true
-
-do_resolved_dihiggs: false
-do_boosted_dihiggs: false
 
 do_CP_systematics: true
 systematics_regex: [".*"]

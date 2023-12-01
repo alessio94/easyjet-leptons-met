@@ -14,7 +14,10 @@ def overlap_sequence(flags):
         raise ValueError('Overlap removal only works with one Large R collection')
 
     if flags.Analysis.do_small_R_jets:
-        if flags.Analysis.small_R.jet_type not in {'reco4PFlowJet','reco4EMTopoJet'}:
+        if (
+            flags.Analysis.small_R_jet.jet_type not in
+            {'reco4PFlowJet','reco4EMTopoJet'}
+        ):
             raise ValueError(
                 "Specified small-R jet type is invalid"
             )
@@ -50,10 +53,10 @@ def overlap_sequence(flags):
     # Jets have different flag naming conventions
     if flags.Analysis.do_small_R_jets:
         preOR_collections['jets'] = drop_sys(
-            container_names.output[flags.Analysis.small_R.jet_type]
+            container_names.output[flags.Analysis.small_R_jet.jet_type]
         )
         original_names['jets'] = flags.Analysis.container_names.input[
-            flags.Analysis.small_R.jet_type
+            flags.Analysis.small_R_jet.jet_type
         ]
 
     # Large-R jets need more special handling
@@ -78,7 +81,7 @@ def overlap_sequence(flags):
     # config for TauAntiTauOR
     configSeq.setOptionValue('.antiTauIDTauLabel', 'isIDTau')
     configSeq.setOptionValue('.antiTauBJetLabel',
-                             "ftag_select_" + flags.Analysis.small_R.btag_wp)
+                             "ftag_select_" + flags.Analysis.small_R_jet.btag_wp)
     configSeq.setOptionValue('.antiTauLabel', 'isAntiTau')
     configSeq.setOptionValue('.doTauAntiTauJetOR', True)
 
@@ -110,7 +113,7 @@ def overlap_sequence(flags):
         doEleEleOR=False,
         doTaus=flags.Analysis.do_taus,
         enableUserPriority=False,
-        antiTauBJetLabel="ftag_select_" + flags.Analysis.small_R.btag_wp,
+        antiTauBJetLabel="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         antiTauLabel="isAntiTau",
         doTauAntiTauJetOR=True,
         boostedLeptons=False,

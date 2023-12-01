@@ -13,7 +13,7 @@ do_electrons: true
 do_photons: false
 
 # Toggles for reconstructed objects decorations
-small_R:
+small_R_jet:
   btag_wp: DL1dv01_FixedCutBEff_77
     #- DL1dv01_FixedCutBEff_70
     #- DL1dv01_FixedCutBEff_77

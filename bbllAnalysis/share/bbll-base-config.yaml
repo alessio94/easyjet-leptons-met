@@ -14,7 +14,7 @@ do_met : true
 do_mmc : true
 
 # Toggles for reconstructed objects decorations
-small_R:
+small_R_jet:
   # btagging working points 
   btag_wp: "DL1dv01_FixedCutBEff_77"
 

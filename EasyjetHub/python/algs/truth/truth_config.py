@@ -14,7 +14,7 @@ def truth_info_cfg(
         cfg.merge(jet_parent_decorator_cfg(
             flags,
             jet_collection=flags.Analysis.container_names.input[
-                flags.Analysis.small_R.jet_type
+                flags.Analysis.small_R_jet.jet_type
             ],
             name_prefix="smallR",
             match_dr=0.3

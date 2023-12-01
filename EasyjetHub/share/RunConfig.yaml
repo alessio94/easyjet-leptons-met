@@ -1,18 +1,16 @@
 include: base-config.yaml
 
+# Decay mode considered for truth decoration
+truthDecayModes: ["bbbb"]
+
 # Toggles for object types
 do_muons: true
 do_electrons: true
 do_small_R_jets: true
 do_large_R_UFO_jets: true
-# No b-tagging recommendation available for VR jets in p5855 samples
-do_VR_jets: false
 
-# Decay mode considered for truth decoration
-truthDecayModes: ["bbbb"]
-
-# small R config
-small_R:
+# Toggles for reconstructed objects decorations
+small_R_jet:
   # nominal btagging working point, used for b-jet pT calibration in particular
   btag_wp: "DL1dv01_FixedCutBEff_77"
   # additional btagging working points, available for selections and per-jet SFs
@@ -31,15 +29,16 @@ Muon:
 # list of triggers per year to consider
 trigger_chains:
   include: trigger.yaml
+
 # apply trigger lists to filter events
 do_trigger_filtering: true
+
 # apply loose jet cleaning only
 loose_jet_cleaning: true
+
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: true
-# enable all systematics
-systematics_regex: [".*"]
 
 # Include the TTree configuration and update details
 ttree_output:

@@ -15,7 +15,7 @@ do_electrons: true
 do_met : true
 
 # Toggles for reconstructed objects decorations
-small_R:
+small_R_jet:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
 

@@ -55,7 +55,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             "BaselineVarsbbyyAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
             jets="bbyyAnalysisJets_%SYS%",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             isMC=flags.Input.isMC
         )
     )
@@ -65,7 +65,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             "SelectionFlagsbbyyAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
             jets="bbyyAnalysisJets_%SYS%",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             muons="bbyyAnalysisMuons_%SYS%",
             electrons="bbyyAnalysisElectrons_%SYS%",
             cutList=flags.Analysis.CutList,

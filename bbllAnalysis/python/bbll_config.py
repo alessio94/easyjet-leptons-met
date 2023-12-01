@@ -51,7 +51,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
             electrons="bbllAnalysisElectrons_%SYS%",
             met="AnalysisMET_%SYS%",
             eventDecisionOutputDecoration="bbll_pass_sr_%SYS%",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
     )
     # MMC decoration
@@ -74,7 +74,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
             muons="bbllAnalysisMuons_%SYS%",
             electrons="bbllAnalysisElectrons_%SYS%",
             met="AnalysisMET_%SYS%",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
     )
 

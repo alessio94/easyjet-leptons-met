@@ -20,7 +20,7 @@ do_mmc : true
 do_baseline : false
 
 # Toggles for reconstructed objects decorations
-small_R:
+small_R_jet:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
 

@@ -34,7 +34,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             "SmallRJet_BTag_SelectorAlg",
             containerInKey=smalljetkey,
             containerOutKey="ttHHAnalysisJets_BTag",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             maxEta=2.5,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -55,7 +55,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             "JetPairingAlg",
             containerInKey="ttHHAnalysisJets_BTag",
             containerOutKey="pairedttHHAnalysisJets_"
-            + flags.Analysis.small_R.btag_wp,
+            + flags.Analysis.small_R_jet.btag_wp,
             pairingStrategy="chiSquare",
         )
     )
@@ -64,7 +64,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
         CompFactory.ttHH.BaselineVarsttHHAlg(
             "FinalVarsttHHAlg",
             smallRJets_BTag_ContainerInKey="pairedttHHAnalysisJets_"
-            + flags.Analysis.small_R.btag_wp,
+            + flags.Analysis.small_R_jet.btag_wp,
             smallRJets_ContainerInKey="ttHHAnalysisJets",
             muonContainerInKey="ttHHAnalysisMuons",
             electronContainerInKey="ttHHAnalysisElectrons",

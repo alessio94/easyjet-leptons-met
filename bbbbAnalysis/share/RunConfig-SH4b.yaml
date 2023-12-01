@@ -14,7 +14,7 @@ do_large_R_UFO_jets: true
 do_VR_jets: true
 
 # Toggles for reconstructed objects decorations
-small_R:
+small_R_jet:
   # nominal btagging working point, used for b-jet pT calibration in particular
   btag_wp: "DL1dv01_FixedCutBEff_77"
   # additional btagging working points, available for selections and per-jet SFs

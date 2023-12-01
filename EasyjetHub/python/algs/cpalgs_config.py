@@ -107,7 +107,7 @@ def cpalgs_cfg(flags):
                     # rather than accessing from xAOD::BTagging
                     # We perform the decoration on the uncalibrated jets
                     # so as to avoid any systematics-dependence or filtering
-                    if flags.Analysis.small_R.jet_type != "reco4EMTopoJet":
+                    if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
                         cfg.merge(btag_decor_cfg(flags))
                 elif objtype == 'taus':
                     # Schedule the alg to decorate taus with nProng info
