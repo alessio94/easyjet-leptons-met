@@ -1,3 +1,6 @@
+# Decay mode considered for truth decoration
+truthDecayModes: []
+
 # Toggles for object types
 do_small_R_jets: false
 do_large_R_Topo_jets: false
@@ -9,10 +12,8 @@ do_photons: false
 do_taus: false
 do_met: false
 do_mmc: false
-# Decay mode considered for truth decoration
-truthDecayModes: []
 
-# small R config
+# Toggles for reconstructed objects decorations
 small_R:
   max_eta: 100
   # nominal btagging working point, used for b-jet pT calibration in particular
@@ -21,6 +22,10 @@ small_R:
   btag_extra_wps: []
   # select jet type
   jet_type: 'reco4PFlowJet'
+
+large_R:
+  # btagging working points for Variable Radius Track jets
+  vr_btag_wps: []
 
 Photon:
   ID: ""
@@ -36,11 +41,6 @@ Muon:
 
 Tau:
   ID: ""
-
-# large R config
-large_R:
-  # btagging working points for Variable Radius Track jets
-  vr_btag_wps: []
 
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22

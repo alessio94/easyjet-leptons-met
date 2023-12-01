@@ -1,33 +1,20 @@
 include: EasyjetHub/base-config.yaml
 
-# Toggles for object types
-do_small_R_jets: true
-do_large_R_Topo_jets: false
-do_large_R_UFO_jets: false
-do_VR_jets: false
-do_muons: true
-do_electrons: true
-do_photons: true
+# Which analysis to consider
+do_bbyy_analysis: true
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbyy"]
 
-# small R config
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_photons: true
+
+# Toggles for reconstructed objects decorations
 small_R:
-  # For other CDIs see
-  # https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/BTagRel22HighLevelSummary
-  # btagCDI:
-  #  "xAODBTaggingEfficiency/13p6TeV/2023-22-13p6TeV-MC21-CDI_Test_2023-08-1_v1.root"
-
-    # For other CDIs see
-    # https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/BTagRel22HighLevelSummary
-
-  # {ALG}_{EFFWP}
-  # {ALG} = DL1r, 
-  #         DL1dv01, DL1dv01, 
-  #         GN120220509, 
-  #         GN2v00LegacyWP, GN2v00NewAliasWP
-  # {EFFWP} = FixedCutBEff_60, FixedCutBEff_70, FixedCutBEff_77, FixedCutBEff_85
+  # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
  
   # to use multiple btagging WPs
@@ -48,30 +35,12 @@ Photon:
   ID: "Tight" # Loose, Tight
   Iso: "FixedCutLoose" 
 
-# list of triggers to apply
-# "Auto" configures mc from the r-tag, data from year, e.g. data22
-trigger_year: Auto
-
 # list of triggers per year to consider
 trigger_chains:
   include: bbyyAnalysis/trigger.yaml
 
-# apply trigger lists to filter events
-do_trigger_filtering: false
-
-# disable CP Algs for calibration
-disable_calib: false
-
 # apply loose jet cleaning only
 loose_jet_cleaning: true
-
-# if you want to run a baseline diHiggs analyses
-do_bbyy_analysis: true
-
-# if you want to truth match (is MC protected)
-# Whether to activate CP alg systematic variations
-do_CP_systematics: false
-systematics_regex: [".*"]
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection

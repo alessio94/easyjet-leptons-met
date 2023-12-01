@@ -1,11 +1,17 @@
 include: EasyjetHub/base-config.yaml
 
+# Which analysis and channels to consider
+do_bbtt_analysis: true
+channel: ["hadhad","lephad"]
+
 # Toggles to bypass event selection
 bypass: false
 
+# Decay mode considered for truth decoration
+truthDecayModes: ["bbtt"]
+
 # Toggles for object types
 do_small_R_jets: true
-do_large_R_UFO_jets: false
 do_muons: true
 do_electrons: true
 do_taus: true
@@ -13,10 +19,7 @@ do_met : true
 do_mmc : true
 do_baseline : false
 
-# Decay mode considered for truth decoration
-truthDecayModes: ["bbtt"]
-
-# small R config
+# Toggles for reconstructed objects decorations
 small_R:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
@@ -39,9 +42,6 @@ Tau:
 # list of triggers per year to consider
 trigger_chains:
   include: bbttAnalysis/trigger.yaml
-
-do_bbtt_analysis: true
-channel: ["hadhad","lephad"]
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
@@ -67,7 +67,3 @@ ttree_output:
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'
-
-do_CP_systematics: false
-systematics_regex: [".*"]
-

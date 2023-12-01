@@ -1,16 +1,19 @@
 include: EasyjetHub/base-config.yaml
+
+# Which analysis to consider
+do_bbll_analysis: true
+
+# Decay mode considered for truth decoration
+truthDecayModes: ["bbtt", "bbWW", "bbZZ"]
+
 # Toggles for object types
 do_small_R_jets: true
-do_large_R_UFO_jets: false
 do_muons: true
 do_electrons: true
 do_met : true
 do_mmc : true
 
-# Decay mode considered for truth decoration
-truthDecayModes: ["bbtt", "bbWW", "bbZZ"]
-
-# small R config
+# Toggles for reconstructed objects decorations
 small_R:
   # btagging working points 
   btag_wp: "DL1dv01_FixedCutBEff_77"
@@ -26,8 +29,6 @@ Muon:
 # list of triggers per year to consider
 trigger_chains:
   include: bbllAnalysis/trigger.yaml
-
-do_bbll_analysis: true
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
@@ -50,7 +51,3 @@ ttree_output:
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'
-
-do_CP_systematics: false
-systematics_regex: [".*"]
-
