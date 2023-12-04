@@ -34,7 +34,7 @@
 
 .mypy_check_template: &mypy_check_template
   stage: linting
-  image: registry.cern.ch/docker.io/library/python:3.9-slim-bullseye
+  image: registry.cern.ch/docker.io/library/python:3.9-slim
   before_script:
     - pip install mypy --quiet
     - pip install types-PyYAML
