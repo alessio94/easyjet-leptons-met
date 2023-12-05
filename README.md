@@ -180,3 +180,8 @@ For more options you can do:
 easyjet-gridsubmit -h
 ```
 
+Remember that in order to submit you need to do:
+
+```
+lsetup panda
+```
