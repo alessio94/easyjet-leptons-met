@@ -37,9 +37,6 @@ trigger_chains:
 # apply loose jet cleaning only
 loose_jet_cleaning: true
 
-# if you want to run a baseline diHiggs analyses
-do_ttHH_analysis: true
-
 # if you want to truth match (is MC protected)
 # Whether to activate CP alg systematic variations
 do_CP_systematics: false
