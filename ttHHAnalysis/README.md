@@ -1,4 +1,4 @@
-Analysis Package for the $HH\rightarrow b\bar{b} \tau\tau$ analyis
+Analysis Package for the $t\bar{t} HH$ analyis
 =========================
 
 # Folder structure
