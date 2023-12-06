@@ -11,6 +11,7 @@ variables:
     paths:
       - $EASYJET_TESTDIR/output-branches-analysis.txt
       - $EASYJET_TESTDIR/userJobMetadata.json
+    expire_in: 1 week      
 
 # Data
 
