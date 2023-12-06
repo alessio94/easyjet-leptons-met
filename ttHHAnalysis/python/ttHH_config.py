@@ -52,13 +52,39 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
 
     cfg.addEventAlgo(
         CompFactory.ttHH.JetPairingAlgttHH(
-            "JetPairingAlg",
+            "JetPairingAlgHH",
             containerInKey="ttHHAnalysisJets_BTag_%SYS%",
             containerOutKey="pairedttHHAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             pairingStrategy="chiSquare",
         )
     )
+
+    # TODO: store variables from HZ and ZZ pairing
+    '''
+    cfg.addEventAlgo(
+        CompFactory.ttHH.JetPairingAlgttHH(
+            "JetPairingAlgHZ",
+            containerInKey="ttHHAnalysisJets_BTag_%SYS%",
+            containerOutKey="pairedttHZAnalysisJets_"
+            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            pairingStrategy="chiSquare",
+            targetMass1=125 * Units.GeV,
+            targetMass2=91.2 * Units.GeV,
+        )
+    )
+
+    cfg.addEventAlgo(
+        CompFactory.ttHH.JetPairingAlgttHH(
+            "JetPairingAlgZZ",
+            containerInKey="ttHHAnalysisJets_BTag_%SYS%",
+            containerOutKey="pairedttZZAnalysisJets_"
+            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            pairingStrategy="chiSquare",
+            targetMass1=91.2 * Units.GeV,
+            targetMass2=91.2 * Units.GeV,
+        )
+    )'''
 
     cfg.addEventAlgo(
         CompFactory.ttHH.BaselineVarsttHHAlg(

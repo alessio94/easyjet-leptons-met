@@ -102,17 +102,14 @@ namespace ttHH
         workContainer->erase(workContainer->begin() + 4, workContainer->end());
       } else if (m_pairingStrategy == "chiSquare" && workContainer->size() >= 4)
       {	    
-          auto [hh_bJets, chi_hh] = bJetChiSquarePairing(*workContainer, 125., 125.); // using 125 GeV for higgs mass
+          auto [hh_bJets, chi_hh] = bJetChiSquarePairing(*workContainer, m_targetMass1, m_targetMass2);
 
-       // TODO: change this!
+        // TODO: change this!
           workContainer->erase(workContainer->begin() + 4, workContainer->end());
        (*workContainer)[0] = hh_bJets[0];
        (*workContainer)[1] = hh_bJets[1];
        (*workContainer)[2] = hh_bJets[2];
        (*workContainer)[3] = hh_bJets[3];
-
-          //auto [hz_bJets, chi_hz] = bJetPairing(workContainer, 125., 91.2); // using 91 GeV for Z mass
-          //auto [zz_bJets, chi_zz] = bJetPairing(workContainer, 91.2, 91.2);
       }
 
       // Write to eventstore
