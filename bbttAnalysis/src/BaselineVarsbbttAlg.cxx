@@ -40,7 +40,7 @@ namespace HHBBTT
     ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
 
-    ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_tauHandle));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -97,16 +97,16 @@ namespace HHBBTT
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
       const xAOD::MissingET* met = (*metCont)["Final"];
       if (!met) {
-	ATH_MSG_ERROR("Could not retrieve MET");
-	return StatusCode::FAILURE;	
+        ATH_MSG_ERROR("Could not retrieve MET");
+        return StatusCode::FAILURE;	
       }
 
       for (const auto& var: m_floatVariables) {
-          m_Fbranches.at(var).set(*event, -99, sys);
+        m_Fbranches.at(var).set(*event, -99, sys);
       }
 
       for (const auto& var: m_intVariables) {
-          m_Ibranches.at(var).set(*event, -99, sys);
+        m_Ibranches.at(var).set(*event, -99, sys);
       }
 
       // selected leptons ; 
@@ -122,7 +122,7 @@ namespace HHBBTT
           lepton_pdgid = electron->charge() > 0 ? -11 : 11;
           found_lepton = true;
           break; // At most one lepton selected
-	}
+      	}
       }
       for(const xAOD::Muon* muon : *muons) {
         if(found_lepton) break;
@@ -132,7 +132,7 @@ namespace HHBBTT
           lepton_pdgid = muon->charge() > 0 ? -13 : 13;
           found_lepton = true;
           break; 
-	}
+        }
       }
 
       if(found_lepton){

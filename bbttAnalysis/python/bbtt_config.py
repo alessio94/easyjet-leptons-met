@@ -218,7 +218,8 @@ def bbtt_branches(flags):
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
-            if tree_flags['write_object_systs_only_for_pt'] and "pt" not in var:
+            if tree_flags['write_object_systs_only_for_pt'] and \
+               "pt" not in var and "SF" not in var:
                 branches += [f"EventInfo.{var}_NOSYS -> bbtt_{var}"]
             else:
                 branches += [f"EventInfo.{var}_%SYS% -> bbtt_{var}_%SYS%"]
