@@ -15,13 +15,14 @@ def jet_sequence(
 ):
 
     configSeq = ConfigSequence()
+    jet_flags = flags.Analysis.small_R_jet
 
     # We define the basic sequence to produce all calibrated jets
     # Filtering on kinematics and JVT is done later
     # We need to make the filtered jet container explicitly different
     # because for MET we need the unfiltered container
 
-    jet_type = flags.Analysis.small_R_jet.jet_type
+    jet_type = jet_flags.jet_type
     allcalib_name = flags.Analysis.container_names.allcalib[jet_type]
     # Need to keep DAOD_PHYS collection name regardless of input
     # due to CP algs configs in Athena
@@ -35,6 +36,32 @@ def jet_sequence(
     # don't run JVT only for EMTopo jets
     configSeq.setOptionValue(".runNNJvtUpdate", jet_type != "reco4EMTopoJet")
     configSeq.setOptionValue(".runJvtSelection", jet_type != "reco4EMTopoJet")
+
+    # Set options for calibration tool if given
+    if jet_flags.calibToolConfigFile and jet_flags.calibToolCalibArea:
+        configSeq.setOptionValue(
+            ".calibToolConfigFile",
+            jet_flags.calibToolConfigFile
+        )
+        configSeq.setOptionValue(
+            ".calibToolCalibArea",
+            jet_flags.calibToolCalibArea)
+
+    # Set options for uncertainties tool if given
+    if jet_flags.uncertToolConfigPath and jet_flags.uncertToolCalibArea:
+        configSeq.setOptionValue(
+            ".uncertToolConfigPath",
+            jet_flags.uncertToolConfigPath
+        )
+        configSeq.setOptionValue(
+            ".uncertToolCalibArea",
+            jet_flags.uncertToolCalibArea
+        )
+    if jet_flags.uncertToolMCType:
+        configSeq.setOptionValue(
+            ".uncertToolMCType",
+            jet_flags.uncertToolMCType
+        )
 
     # jet_sequence = makeJetAnalysisSequence(
     #     flags.Analysis.DataType,
@@ -51,9 +78,9 @@ def jet_sequence(
     # )
 
     if jet_type != "reco4EMTopoJet":
-        btag_wps = [flags.Analysis.small_R_jet.btag_wp]
-        if 'btag_extra_wps' in flags.Analysis.small_R_jet:
-            btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
+        btag_wps = [jet_flags.btag_wp]
+        if 'btag_extra_wps' in jet_flags:
+            btag_wps += jet_flags.btag_extra_wps
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
@@ -67,10 +94,10 @@ def jet_sequence(
             configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
             configSeq.setOptionValue('.kinematicSelection', True)
-            if 'btagCDI' in flags.Analysis.small_R_jet:
+            if 'btagCDI' in jet_flags:
                 configSeq.setOptionValue(
                     '.bTagCalibFile',
-                    flags.Analysis.small_R_jet.btagCDI
+                    jet_flags.btagCDI
                 )
             # if GN2 in tagger name overwrite the CDI
             if "GN2" in tagger:
@@ -94,7 +121,7 @@ def jet_sequence(
             )
             configSeq.setOptionValue(
                 '.btagSelDecor',
-                "ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                "ftag_select_" + jet_flags.btag_wp,
             )
 
     # Add systematic object links
@@ -110,7 +137,7 @@ def jet_sequence(
     )
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
-    configSeq.setOptionValue('.maxEta', flags.Analysis.small_R_jet.max_eta)
+    configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
 
     # Apply selection as view container
 
