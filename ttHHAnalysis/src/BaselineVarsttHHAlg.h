@@ -56,6 +56,12 @@ private:
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "",   "Electron container to read" };
 
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_HZPairsHandle{ this, "HZPairs", "",   "Container containing jets from HZ pairing to read" };
+
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_ZZPairsHandle{ this, "ZZPairs", "",   "Container containing jets from ZZ pairing to read" };
+
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
@@ -75,7 +81,6 @@ private:
       "Jet_truthLabel_b1", "Jet_truthLabel_b2", "Jet_truthLabel_b3",
       "Jet_truthLabel_b4", "Jet_truthLabel_b5", "Jet_truthLabel_b6",
 
-
       // additional variables
       "HT",
 
@@ -83,7 +88,18 @@ private:
       "H1_m", "H1_pt", "H1_eta", "H1_phi",
       "H2_m", "H2_pt", "H2_eta", "H2_phi",
 
-      //HH pair variables
+      //Invariant mass of jet pair reconstructed using HZ target masses
+      "HZ_H_m", "HZ_H_pt", "HZ_H_eta", "HZ_H_phi",
+      "HZ_Z_m", "HZ_Z_pt", "HZ_Z_eta", "HZ_Z_phi",
+
+      //Invariant mass of jet pair reconstructed using ZZ target masses
+      "ZZ_Z1_m", "ZZ_Z1_pt", "ZZ_Z1_eta", "ZZ_Z1_phi",
+      "ZZ_Z2_m", "ZZ_Z2_pt", "ZZ_Z2_eta", "ZZ_Z2_phi",
+
+      //Pair mass and CHI square
+      "HH_m", "HH_CHI",
+      "HZ_m", "HZ_CHI",
+      "ZZ_m", "ZZ_CHI",
 
       //DeltaR difference
       "Jets_DeltaR12", "Jets_DeltaR34", "Jets_DeltaR56", 
@@ -123,9 +139,13 @@ private:
       "nJets", "nBJets",
     };
 
+    const float m_targetMassH = 125e3; // Higgs target mass to be used in chi square calculation
+    const float m_targetMassZ = 91.2e3; // Z boson target mass to be used in chi square calculation
+    const float m_massResolution = 20.0e3; // Mass resolution used in chi square calculation
 
     std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> getPairKinematics(const xAOD::JetContainer& jetPairs);
     std::tuple<double, double, double> calculateVectorStats(const std::vector<double>& inputVector);
+    float computeChiSquare(float observedMass1, float observedMass2, float targetMass1, float targetMass2, float massResolution);
   };
 }
 

@@ -48,7 +48,7 @@ private:
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
     m_outHandle{ this, "containerOutKey", "",   "Jet container to write" };
 
-    std::tuple<std::vector<const xAOD::Jet*>, float> bJetChiSquarePairing(const ConstDataVector<xAOD::JetContainer>& Jets, float target_mass_1, float target_mass_2);
+    std::vector<const xAOD::Jet*> bJetChiSquarePairing(const ConstDataVector<xAOD::JetContainer>& Jets, float target_mass_1, float target_mass_2);
 
     std::tuple<const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, float> minChiSquared(const ConstDataVector<xAOD::JetContainer>& Jets, const std::vector<size_t>& indexes, float target_mass_1, float target_mass_2);
 

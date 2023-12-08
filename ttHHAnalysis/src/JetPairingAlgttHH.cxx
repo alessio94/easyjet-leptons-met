@@ -102,7 +102,7 @@ namespace ttHH
         workContainer->erase(workContainer->begin() + 4, workContainer->end());
       } else if (m_pairingStrategy == "chiSquare" && workContainer->size() >= 4)
       {	    
-          auto [hh_bJets, chi_hh] = bJetChiSquarePairing(*workContainer, m_targetMass1, m_targetMass2);
+          auto hh_bJets = bJetChiSquarePairing(*workContainer, m_targetMass1, m_targetMass2);
 
         // TODO: change this!
           workContainer->erase(workContainer->begin() + 4, workContainer->end());
@@ -118,7 +118,7 @@ namespace ttHH
     return StatusCode::SUCCESS;
   }
 
-std::tuple<std::vector<const xAOD::Jet*>, float> JetPairingAlgttHH ::bJetChiSquarePairing(const ConstDataVector<xAOD::JetContainer>& Jets, float target_mass_1, float target_mass_2)
+std::vector<const xAOD::Jet*> JetPairingAlgttHH ::bJetChiSquarePairing(const ConstDataVector<xAOD::JetContainer>& Jets, float target_mass_1, float target_mass_2)
   {
     // This method checks for each bJet combination, and save that combinations that
     // are closer to the target mass based on the CHI^2
@@ -172,7 +172,7 @@ std::tuple<std::vector<const xAOD::Jet*>, float> JetPairingAlgttHH ::bJetChiSqua
       std::swap(outJets[2], outJets[3]);
     }
 
-    return {outJets, chi_min};
+    return outJets;
   }
 
 
@@ -194,11 +194,11 @@ std::tuple<const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet
     //std::cout << "mX_12 " << mX_12 << " mX_34 " << mX_34 << std::endl;
   
     // ratio between target mass and invariant mass of the jet pair
-    float r_12 = (1 - mX_12/target_mass_1);
-    float r_34 = (1 - mX_34/target_mass_2);
-  
+    float r_12 = (target_mass_1 - mX_12);
+    float r_34 = (target_mass_2 - mX_34);
+
     // calculate the CHI squared
-    float chi_squared = 10 * ( r_12 * r_12 + r_34 * r_34 );
+    float chi_squared = r_12 * r_12 + r_34 * r_34;
   
     return {jet1, jet2, jet3, jet4, chi_squared};
   }

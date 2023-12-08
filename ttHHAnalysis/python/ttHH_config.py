@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+import AthenaCommon.SystemOfUnits as Units
 
 # ttHH analysis chain
 
@@ -60,8 +61,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
         )
     )
 
-    # TODO: store variables from HZ and ZZ pairing
-    '''
     cfg.addEventAlgo(
         CompFactory.ttHH.JetPairingAlgttHH(
             "JetPairingAlgHZ",
@@ -84,7 +83,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             targetMass1=91.2 * Units.GeV,
             targetMass2=91.2 * Units.GeV,
         )
-    )'''
+    )
 
     cfg.addEventAlgo(
         CompFactory.ttHH.BaselineVarsttHHAlg(
@@ -94,6 +93,10 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             jets="ttHHAnalysisJets_%SYS%",
             muons="ttHHAnalysisMuons_%SYS%",
             electrons="ttHHAnalysisElectrons_%SYS%",
+            HZPairs="pairedttHZAnalysisJets_"
+            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            ZZPairs="pairedttZZAnalysisJets_"
+            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             isMC=flags.Input.isMC
         )
     )
@@ -133,7 +136,14 @@ def ttHH_branches(flags):
 
     H_candidate_variables = [
         "H1_m", "H1_pt", "H1_eta", "H1_phi",
-        "H2_m", "H2_pt", "H2_eta", "H2_phi"
+        "H2_m", "H2_pt", "H2_eta", "H2_phi",
+        "HZ_H_m", "HZ_H_pt", "HZ_H_eta", "HZ_H_phi",
+        "HZ_Z_m", "HZ_Z_pt", "HZ_Z_eta", "HZ_Z_phi",
+        "ZZ_Z1_m", "ZZ_Z1_pt", "ZZ_Z1_eta", "ZZ_Z1_phi",
+        "ZZ_Z2_m", "ZZ_Z2_pt", "ZZ_Z2_eta", "ZZ_Z2_phi",
+        "HH_m", "HH_CHI",
+        "HZ_m", "HZ_CHI",
+        "ZZ_m", "ZZ_CHI"
     ]
     for var in H_candidate_variables:
         branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]

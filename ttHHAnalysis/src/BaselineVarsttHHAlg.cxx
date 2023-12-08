@@ -30,6 +30,8 @@ namespace ttHH
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_HZPairsHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ZZPairsHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     for (const std::string &string_var: m_Fvarnames) {
@@ -70,10 +72,20 @@ namespace ttHH
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
+      const xAOD::JetContainer *HZPairs = nullptr;
+      ANA_CHECK (m_HZPairsHandle.retrieve (HZPairs, sys));
+
+      const xAOD::JetContainer *ZZPairs = nullptr;
+      ANA_CHECK (m_ZZPairsHandle.retrieve (ZZPairs, sys));
+
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
       TLorentzVector H1(0, 0, 0, 0);
       TLorentzVector H2(0, 0, 0, 0);
+      TLorentzVector HZ_H(0, 0, 0, 0);
+      TLorentzVector HZ_Z(0, 0, 0, 0);
+      TLorentzVector ZZ_Z1(0, 0, 0, 0);
+      TLorentzVector ZZ_Z2(0, 0, 0, 0);
       TLorentzVector e1(0.,0.,0.,0.);
       TLorentzVector e2(0.,0.,0.,0.);
       TLorentzVector ee(0.,0.,0.,0.);
@@ -113,7 +125,14 @@ namespace ttHH
  
         // Build the Higgs candidates
         H1 = bjets->at(0)->p4() + bjets->at(1)->p4();
-        H2 = bjets->at(2)->p4() + bjets->at(3)->p4();;
+        H2 = bjets->at(2)->p4() + bjets->at(3)->p4();
+
+        // TODO: should it be leading and subleading? 
+        HZ_H = HZPairs->at(0)->p4() + HZPairs->at(1)->p4();
+        HZ_Z = HZPairs->at(2)->p4() + HZPairs->at(3)->p4();
+
+        ZZ_Z1 = ZZPairs->at(0)->p4() + ZZPairs->at(1)->p4();
+        ZZ_Z2 = ZZPairs->at(2)->p4() + ZZPairs->at(3)->p4();
 
         auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(btag_jets);
 
@@ -124,6 +143,7 @@ namespace ttHH
         m_Fbranches.at("Jets_DeltaEta12").set(*event, DeltaEta[0], sys);
         m_Fbranches.at("Jets_DeltaEta34").set(*event, DeltaEta[1], sys);
 
+        // Jet pairing variables
         m_Fbranches.at("H1_m").set(*event, H1.M(), sys);
         m_Fbranches.at("H1_pt").set(*event, H1.Pt(), sys);
         m_Fbranches.at("H1_eta").set(*event, H1.Eta(), sys);
@@ -133,6 +153,34 @@ namespace ttHH
         m_Fbranches.at("H2_pt").set(*event, H2.Pt(), sys);
         m_Fbranches.at("H2_eta").set(*event, H2.Eta(), sys);
         m_Fbranches.at("H2_phi").set(*event, H2.Phi(), sys);
+
+        m_Fbranches.at("HZ_H_m").set(*event, HZ_H.M(), sys);
+        m_Fbranches.at("HZ_H_pt").set(*event, HZ_H.Pt(), sys);
+        m_Fbranches.at("HZ_H_eta").set(*event, HZ_H.Eta(), sys);
+        m_Fbranches.at("HZ_H_phi").set(*event, HZ_H.Phi(), sys);
+
+        m_Fbranches.at("HZ_Z_m").set(*event, HZ_Z.M(), sys);
+        m_Fbranches.at("HZ_Z_pt").set(*event, HZ_Z.Pt(), sys);
+        m_Fbranches.at("HZ_Z_eta").set(*event, HZ_Z.Eta(), sys);
+        m_Fbranches.at("HZ_Z_phi").set(*event, HZ_Z.Phi(), sys);
+
+        m_Fbranches.at("ZZ_Z1_m").set(*event, ZZ_Z1.M(), sys);
+        m_Fbranches.at("ZZ_Z1_pt").set(*event, ZZ_Z1.Pt(), sys);
+        m_Fbranches.at("ZZ_Z1_eta").set(*event, ZZ_Z1.Eta(), sys);
+        m_Fbranches.at("ZZ_Z1_phi").set(*event, ZZ_Z1.Phi(), sys);
+
+        m_Fbranches.at("ZZ_Z2_m").set(*event, ZZ_Z2.M(), sys);
+        m_Fbranches.at("ZZ_Z2_pt").set(*event, ZZ_Z2.Pt(), sys);
+        m_Fbranches.at("ZZ_Z2_eta").set(*event, ZZ_Z2.Eta(), sys);
+        m_Fbranches.at("ZZ_Z2_phi").set(*event, ZZ_Z2.Phi(), sys);
+
+        m_Fbranches.at("HH_m").set(*event, (H1+H2).M(), sys);
+        m_Fbranches.at("HZ_m").set(*event, (HZ_H+HZ_Z).M(), sys);
+        m_Fbranches.at("ZZ_m").set(*event, (ZZ_Z1+ZZ_Z2).M(), sys);
+
+        m_Fbranches.at("HH_CHI").set(*event, computeChiSquare(H1.M(), H2.M(), m_targetMassH, m_targetMassH, m_massResolution), sys);
+        m_Fbranches.at("HZ_CHI").set(*event, computeChiSquare(HZ_H.M(), HZ_Z.M(), m_targetMassH, m_targetMassZ, m_massResolution), sys);
+        m_Fbranches.at("ZZ_CHI").set(*event, computeChiSquare(ZZ_Z1.M(), ZZ_Z2.M(), m_targetMassZ, m_targetMassZ, m_massResolution), sys);
 
         // Create a new JetContainer
         xAOD::Jet jj12 = xAOD::Jet();
@@ -318,5 +366,19 @@ namespace ttHH
     double mean = sum / inputVector.size();
 
     return {max_value, min_value, mean};
+  }
+
+  float BaselineVarsttHHAlg::computeChiSquare(float observedMass1, float observedMass2, float targetMass1, float targetMass2, float massResolution)
+  {
+    // Function to calculate chi square of jet pairs
+
+    // ratio between target mass and invariant mass of the jet pair
+    float r_12 = (targetMass1 - observedMass1);
+    float r_34 = (targetMass2 - observedMass2);
+
+    // calculate the CHI squared
+    float chi_squared = ( r_12 * r_12 + r_34 * r_34 ) / (massResolution * massResolution);
+
+    return chi_squared;
   }
 }
