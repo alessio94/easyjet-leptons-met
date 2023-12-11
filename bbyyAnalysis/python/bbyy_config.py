@@ -55,6 +55,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             "BaselineVarsbbyyAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
             jets="bbyyAnalysisJets_%SYS%",
+            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             isMC=flags.Input.isMC
         )
@@ -114,7 +115,7 @@ def bbyy_branches(flags):
         branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
     # mva variables
-    mva_variables = ["HT", "topness"]
+    mva_variables = ["HT", "topness","missEt","metphi"]
     for var in mva_variables:
         branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 

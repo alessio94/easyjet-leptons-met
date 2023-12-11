@@ -28,6 +28,7 @@ namespace HHBBYY
 
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
 
     for (const std::string &string_var: m_Fvarnames) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
@@ -61,6 +62,14 @@ namespace HHBBYY
 
       const xAOD::PhotonContainer *photons = nullptr;
       ANA_CHECK (m_photonHandle.retrieve (photons, sys));
+
+      const xAOD::MissingETContainer *metCont = nullptr;
+      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
+      const xAOD::MissingET* met = (*metCont)["Final"];
+      if (!met) {
+        ATH_MSG_ERROR("Could not retrieve MET");
+        return StatusCode::FAILURE;	
+      }
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
@@ -185,6 +194,8 @@ namespace HHBBYY
 	float topness = compute_Topness(jets);
 	m_Fbranches.at("topness").set(*event, topness, sys);
       }
+      m_Fbranches.at("missEt").set(*event, met->met(), sys);
+      m_Fbranches.at("metphi").set(*event, met->phi(), sys);
 
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);

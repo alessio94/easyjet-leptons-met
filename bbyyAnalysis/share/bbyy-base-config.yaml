@@ -11,6 +11,7 @@ do_small_R_jets: true
 do_muons: true
 do_electrons: true
 do_photons: true
+do_met: true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:

@@ -19,6 +19,7 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
+#include <xAODMissingET/MissingETContainer.h>
 
 namespace HHBBYY
 {
@@ -55,6 +56,9 @@ namespace HHBBYY
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_photonHandle{ this, "photons", "",   "Photons container to read" };
 
+    CP::SysReadHandle<xAOD::MissingETContainer>
+    m_metHandle{ this, "met", "",   "MET container to read" };
+
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
@@ -78,7 +82,7 @@ namespace HHBBYY
       "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star",
 
       // mva variables
-	"HT", "topness", 
+	"HT", "topness", "missEt", "metphi",
     };
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
