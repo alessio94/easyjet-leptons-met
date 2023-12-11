@@ -35,6 +35,10 @@ def get_small_R_jet_branches(
                 f"ftag_select_{btag_wp}"
                 for btag_wp in btag_wps
             ]
+            if flags.Input.isMC:
+                small_R_jet_branches.variables += [
+                    f"ftag_effSF_{btag_wp}_%SYS%" for btag_wp in btag_wps
+                ]
 
         if (
             tree_flags.collection_options.small_R_jets.no_bjet_calib_p4
@@ -54,6 +58,9 @@ def get_small_R_jet_branches(
                 "NNJvt",
                 "NNJvtRpt",
             ]
+
+            if flags.Input.isMC:
+                small_R_jet_branches.variables += ["jvt_effSF_%SYS%"]
 
     if (
         flags.Input.isMC

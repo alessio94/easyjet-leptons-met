@@ -63,6 +63,8 @@ def jet_sequence(
             jet_flags.uncertToolMCType
         )
 
+    configSeq += makeConfig('Jets.Jvt', drop_sys(allcalib_name))
+
     # jet_sequence = makeJetAnalysisSequence(
     #     flags.Analysis.DataType,
     #     jetCollection=flags.Analysis.container_names.input.reco4PFlowJet,

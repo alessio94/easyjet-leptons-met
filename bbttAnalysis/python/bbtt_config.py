@@ -50,6 +50,19 @@ def bbtt_cfg(
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
+    if flags.Input.isMC:
+        cfg.addEventAlgo(
+            CompFactory.CP.AsgEventScaleFactorAlg(
+                "ftagEfficiencyCalculator",
+                particles="bbttAnalysisJets_%SYS%",
+                preselection="ftag_kin_select_"
+                + flags.Analysis.small_R_jet.btag_wp + ",as_char",
+                scaleFactorInputDecoration="ftag_effSF_"
+                + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+                scaleFactorOutputDecoration="weight_ftag_effSF_"
+                + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            )
+        )
 
     # Selection
     trigger_branches = [
@@ -228,6 +241,15 @@ def bbtt_branches(flags):
                 branches += [f"EventInfo.{var}_%SYS% -> bbtt_{var}_%SYS%"]
 
     branches += ["EventInfo.bbtt_pass_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
+
+    if flags.Input.isMC:
+        branches += ["EventInfo.weight_ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%"
+                     " -> weight_ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%",]
+
+        # jvt is effSF is now centrally calcalutad by CP tools
+        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbttSelectorAlg
