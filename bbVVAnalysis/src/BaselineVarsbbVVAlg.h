@@ -64,6 +64,17 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    Gaudi::Property<std::string> m_eleWPName
+      { this, "eleWP", "","Electron ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_idSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_isoSF{"", this};
+
+    Gaudi::Property<std::string> m_muWPName
+      { this, "muonWP", "","Muon ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_mu_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_mu_isoSF{"", this};
+
     CP::SysReadDecorHandle<bool> 
     m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input dectorator for selected el"};
     CP::SysReadDecorHandle<bool> 
@@ -89,8 +100,10 @@ private:
     CP::SysWriteDecorHandle<float> m_selected_lepton_pt {"Selected_Lepton_pt_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_selected_lepton_eta {"Selected_Lepton_eta_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_selected_lepton_phi {"Selected_Lepton_phi_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_charge {"Selected_Lepton_charge_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_pdgid {"Selected_Lepton_pdgid_%SYS%", this};
+    CP::SysWriteDecorHandle<int> m_selected_lepton_charge {"Selected_Lepton_charge_%SYS%", this};
+    CP::SysWriteDecorHandle<int> m_selected_lepton_pdgid {"Selected_Lepton_pdgid_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_SF {"Selected_Lepton_SF_%SYS%", this};
+
 
     // Local variables and functions
 

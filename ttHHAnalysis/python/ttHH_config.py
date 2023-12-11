@@ -97,6 +97,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             ZZPairs="pairedttZZAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            muonWP=MuonWPLabel,
+            eleWP=ElectronWPLabel,
             isMC=flags.Input.isMC
         )
     )
@@ -169,7 +171,7 @@ def ttHH_branches(flags):
 
     branches += ["EventInfo.PassAllCuts_%SYS% -> %SYS%_PassAllCuts"]
 
-    lepton_variables = ["pt", "eta", "phi", "E"]
+    lepton_variables = ["pt", "eta", "phi", "E", "SF"]
     leptons = [
         "Leading_Electron", "Subleading_Electron",
         "Leading_Muon", "Subleading_Muon"

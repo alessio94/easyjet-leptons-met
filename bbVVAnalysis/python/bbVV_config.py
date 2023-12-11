@@ -150,6 +150,8 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             lrjets="bbVVAnalysisLRJets_%SYS%",
             muons="bbVVAnalysisMuons_%SYS%",
             electrons="bbVVAnalysisElectrons_%SYS%",
+            muonWP=TightMuonWPLabel,
+            eleWP=TightEleWPLabel,
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
@@ -166,6 +168,7 @@ def bbVV_branches(flags):
         "Selected_Lepton_eta",
         "Selected_Lepton_charge",
         "Selected_Lepton_pdgid",
+        "Selected_Lepton_SF",
     ]
 
     for tree_flags in flags.Analysis.ttree_output:

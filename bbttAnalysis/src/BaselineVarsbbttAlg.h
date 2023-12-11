@@ -74,8 +74,20 @@ private:
     CP::SysReadDecorHandle<float> 
     m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
 
-    CP::SysReadDecorHandle<float>
-    m_tau_effSF { this, "tauEffSFDecorator", "tau_effSF_Loose_%SYS%", "tau eff scalefactor decorator"};
+    Gaudi::Property<std::string> m_eleWPName
+      { this, "eleWP", "","Electron ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_idSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_isoSF{"", this};
+
+    Gaudi::Property<std::string> m_muWPName
+      { this, "muonWP", "","Muon ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_mu_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_mu_isoSF{"", this};
+
+    Gaudi::Property<std::string> m_tauWPName
+      { this, "tauWP", "","Tau ID working point" };
+    CP::SysReadDecorHandle<float> m_tau_effSF{"", this};
 
     CP::SysReadDecorHandle<bool> 
     m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};

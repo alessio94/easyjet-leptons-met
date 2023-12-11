@@ -30,6 +30,18 @@ namespace HHBBLL
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
+    m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
+    m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle));
+
+    m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
+    m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle));
+
     // Intialise syst-aware output decorators
     for (const std::string &string_var: m_Fvarnames) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
@@ -157,18 +169,26 @@ namespace HHBBLL
       if (electrons->size() > 0)
       {
         // Leading electron
-        m_Fbranches.at("Leading_Electron_pt").set(*event, electrons->at(0)->pt(), sys);
-        m_Fbranches.at("Leading_Electron_eta").set(*event, electrons->at(0)->eta(), sys);
-        m_Fbranches.at("Leading_Electron_phi").set(*event, electrons->at(0)->phi(), sys);
-        m_Fbranches.at("Leading_Electron_E").set(*event, electrons->at(0)->e(), sys);
+        const xAOD::Electron* ele0 = electrons->at(0);
+        m_Fbranches.at("Leading_Electron_pt").set(*event, ele0->pt(), sys);
+        m_Fbranches.at("Leading_Electron_eta").set(*event, ele0->eta(), sys);
+        m_Fbranches.at("Leading_Electron_phi").set(*event, ele0->phi(), sys);
+        m_Fbranches.at("Leading_Electron_E").set(*event, ele0->e(), sys);
+        float ele_SF = m_ele_recoSF.get(*ele0, sys) *
+          m_ele_idSF.get(*ele0, sys) * m_ele_isoSF.get(*ele0, sys);
+        m_Fbranches.at("Leading_Electron_SF").set(*event, ele_SF, sys);
       }
       if (electrons->size() >= 2)
       {
         // Subleading electron
-        m_Fbranches.at("Subleading_Electron_pt").set(*event, electrons->at(1)->pt(), sys);
-        m_Fbranches.at("Subleading_Electron_eta").set(*event, electrons->at(1)->eta(), sys);
-        m_Fbranches.at("Subleading_Electron_phi").set(*event, electrons->at(1)->phi(), sys);
-        m_Fbranches.at("Subleading_Electron_E").set(*event, electrons->at(1)->e(), sys);
+        const xAOD::Electron* ele1 = electrons->at(1);
+        m_Fbranches.at("Subleading_Electron_pt").set(*event, ele1->pt(), sys);
+        m_Fbranches.at("Subleading_Electron_eta").set(*event, ele1->eta(), sys);
+        m_Fbranches.at("Subleading_Electron_phi").set(*event, ele1->phi(), sys);
+        m_Fbranches.at("Subleading_Electron_E").set(*event, ele1->e(), sys);
+        float ele_SF = m_ele_recoSF.get(*ele1, sys) *
+          m_ele_idSF.get(*ele1, sys) * m_ele_isoSF.get(*ele1, sys);
+        m_Fbranches.at("Subleading_Electron_SF").set(*event, ele_SF, sys);
 
         // ee
         ee = electrons->at(0)->p4() + electrons->at(1)->p4();
@@ -184,18 +204,24 @@ namespace HHBBLL
       if (muons->size() >= 1)
       {
         // Leading muon
-        m_Fbranches.at("Leading_Muon_pt").set(*event, muons->at(0)->pt(), sys);
-        m_Fbranches.at("Leading_Muon_eta").set(*event, muons->at(0)->eta(), sys);
-        m_Fbranches.at("Leading_Muon_phi").set(*event, muons->at(0)->phi(), sys);
-        m_Fbranches.at("Leading_Muon_E").set(*event, muons->at(0)->e(), sys);
+        const xAOD::Muon* mu0 = muons->at(0);
+        m_Fbranches.at("Leading_Muon_pt").set(*event, mu0->pt(), sys);
+        m_Fbranches.at("Leading_Muon_eta").set(*event, mu0->eta(), sys);
+        m_Fbranches.at("Leading_Muon_phi").set(*event, mu0->phi(), sys);
+        m_Fbranches.at("Leading_Muon_E").set(*event, mu0->e(), sys);
+        float mu_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
+        m_Fbranches.at("Leading_Muon_SF").set(*event, mu_SF, sys);
       }
       if (muons->size() >= 2) 
       { 
         // Subleading muon
-        m_Fbranches.at("Subleading_Muon_pt").set(*event, muons->at(1)->pt(), sys);
-        m_Fbranches.at("Subleading_Muon_eta").set(*event, muons->at(1)->eta(), sys);
-        m_Fbranches.at("Subleading_Muon_phi").set(*event, muons->at(1)->phi(), sys);
-        m_Fbranches.at("Subleading_Muon_E").set(*event, muons->at(1)->e(), sys);
+        const xAOD::Muon* mu1 = muons->at(1);
+        m_Fbranches.at("Subleading_Muon_pt").set(*event, mu1->pt(), sys);
+        m_Fbranches.at("Subleading_Muon_eta").set(*event, mu1->eta(), sys);
+        m_Fbranches.at("Subleading_Muon_phi").set(*event, mu1->phi(), sys);
+        m_Fbranches.at("Subleading_Muon_E").set(*event, mu1->e(), sys);
+        float mu_SF = m_mu_recoSF.get(*mu1, sys) * m_mu_isoSF.get(*mu1, sys);
+        m_Fbranches.at("Subleading_Muon_SF").set(*event, mu_SF, sys);
 
         // mumu
         mumu = muons->at(0)->p4() + muons->at(1)->p4();

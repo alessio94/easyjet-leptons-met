@@ -34,6 +34,18 @@ namespace ttHH
     ATH_CHECK (m_ZZPairsHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
+    m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
+    m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle));
+
+    m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
+    m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle));
+
     for (const std::string &string_var: m_Fvarnames) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
       m_Fbranches.emplace(string_var, var);
@@ -253,18 +265,26 @@ namespace ttHH
 
       // store electron kinematics
       if (electrons->size() >= 1) {
-        e1 = electrons->at(0)->p4();
+        const xAOD::Electron* ele1 = electrons->at(0);
+        e1 = ele1->p4();
         m_Fbranches.at("Leading_Electron_pt").set(*event, e1.Pt(), sys);
         m_Fbranches.at("Leading_Electron_eta").set(*event, e1.Eta(), sys);
         m_Fbranches.at("Leading_Electron_phi").set(*event, e1.Phi(), sys);
         m_Fbranches.at("Leading_Electron_E").set(*event, e1.E(), sys);
+        float ele_SF = m_ele_recoSF.get(*ele1, sys) * m_ele_idSF.get(*ele1, sys) *
+          m_ele_isoSF.get(*ele1, sys);
+        m_Fbranches.at("Leading_Electron_SF").set(*event, ele_SF, sys);
       }
       if (electrons->size() >= 2) {
-        e2 = electrons->at(1)->p4();
+        const xAOD::Electron* ele2 = electrons->at(1);
+        e2 = ele2->p4();
         m_Fbranches.at("Subleading_Electron_pt").set(*event, e2.Pt(), sys);
         m_Fbranches.at("Subleading_Electron_eta").set(*event, e2.Eta(), sys);
         m_Fbranches.at("Subleading_Electron_phi").set(*event, e2.Phi(), sys);
         m_Fbranches.at("Subleading_Electron_E").set(*event, e2.E(), sys);
+        float ele_SF = m_ele_recoSF.get(*ele2, sys) * m_ele_idSF.get(*ele2, sys) *
+          m_ele_isoSF.get(*ele2, sys);
+        m_Fbranches.at("Subleading_Electron_SF").set(*event, ele_SF, sys);
 
         // ee
         e1 = electrons->at(0)->p4();
@@ -278,18 +298,24 @@ namespace ttHH
 
       // store muon kinematics
       if (muons->size() >= 1) {
-        mu1 = muons->at(0)->p4();
+        const xAOD::Muon* muon1 = muons->at(0);
+        mu1 = muon1->p4();
         m_Fbranches.at("Leading_Muon_pt").set(*event, mu1.Pt(), sys);
         m_Fbranches.at("Leading_Muon_eta").set(*event, mu1.Eta(), sys);
         m_Fbranches.at("Leading_Muon_phi").set(*event, mu1.Phi(), sys);
         m_Fbranches.at("Leading_Muon_E").set(*event, mu1.E(), sys);
+        float mu_SF = m_mu_recoSF.get(*muon1, sys) * m_mu_isoSF.get(*muon1, sys);
+        m_Fbranches.at("Leading_Muon_SF").set(*event, mu_SF, sys);
       }
       if (muons->size() >= 2) {
-        mu2 = muons->at(1)->p4();
+        const xAOD::Muon* muon2 = muons->at(1);
+        mu2 = muon2->p4();
         m_Fbranches.at("Subleading_Muon_pt").set(*event, mu2.Pt(), sys);
         m_Fbranches.at("Subleading_Muon_eta").set(*event, mu2.Eta(), sys);
         m_Fbranches.at("Subleading_Muon_phi").set(*event, mu2.Phi(), sys);
         m_Fbranches.at("Subleading_Muon_E").set(*event, mu2.E(), sys);
+        float mu_SF = m_mu_recoSF.get(*muon2, sys) * m_mu_isoSF.get(*muon2, sys);
+        m_Fbranches.at("Subleading_Muon_SF").set(*event, mu_SF, sys);
 
         // mumu
         mu1 = muons->at(0)->p4();

@@ -73,6 +73,8 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
             jets="bbllAnalysisJets_%SYS%",
             muons="bbllAnalysisMuons_%SYS%",
             electrons="bbllAnalysisElectrons_%SYS%",
+            muonWP=MuonWPLabel,
+            eleWP=ElectronWPLabel,
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
@@ -93,21 +95,25 @@ def bbll_branches(flags):
         "Leading_Electron_eta",
         "Leading_Electron_phi",
         "Leading_Electron_E",
+        "Leading_Electron_SF",
         # Subleading electron
         "Subleading_Electron_pt",
         "Subleading_Electron_eta",
         "Subleading_Electron_phi",
         "Subleading_Electron_E",
+        "Subleading_Electron_SF",
         # Leading muon
         "Leading_Muon_pt",
         "Leading_Muon_eta",
         "Leading_Muon_phi",
         "Leading_Muon_E",
+        "Leading_Muon_SF",
         # Subleading muon
         "Subleading_Muon_pt",
         "Subleading_Muon_eta",
         "Subleading_Muon_phi",
         "Subleading_Muon_E",
+        "Subleading_Muon_SF",
         # Leading jet
         "Leading_Jet_pt",
         "Leading_Jet_eta",

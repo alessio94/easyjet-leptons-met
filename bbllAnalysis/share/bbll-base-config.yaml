@@ -19,8 +19,10 @@ small_R_jet:
   btag_wp: "DL1dv01_FixedCutBEff_77"
 
 Electron:
-  ID: "LooseBLayerLH"
-  Iso: "NonIso"
+  ID: "MediumLH"
+  Iso: "Loose_VarRad"
+  extra_wps:
+    - ["TightLH", "Loose_VarRad"]
 
 Muon:
   ID: "Loose"

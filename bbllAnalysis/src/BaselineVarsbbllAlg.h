@@ -64,6 +64,17 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    Gaudi::Property<std::string> m_eleWPName
+      { this, "eleWP", "","Electron ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_idSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_isoSF{"", this};
+
+    Gaudi::Property<std::string> m_muWPName
+      { this, "muonWP", "","Muon ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_mu_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_mu_isoSF{"", this};
+
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
@@ -72,10 +83,10 @@ private:
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
     "TWO_ISO_ELECTRONS", "TWO_ISO_MUONS", "EXACTLY_TWO_B_JETS", "Pass_ee", "Pass_mumu", "Mee", "Mmumu",
-    "Leading_Electron_pt", "Leading_Electron_eta", "Leading_Electron_phi", "Leading_Electron_E",
-    "Subleading_Electron_pt", "Subleading_Electron_eta", "Subleading_Electron_phi", "Subleading_Electron_E",
-    "Leading_Muon_pt", "Leading_Muon_eta", "Leading_Muon_phi", "Leading_Muon_E",
-    "Subleading_Muon_pt", "Subleading_Muon_eta", "Subleading_Muon_phi", "Subleading_Muon_E",
+    "Leading_Electron_pt", "Leading_Electron_eta", "Leading_Electron_phi", "Leading_Electron_E", "Leading_Electron_SF",
+    "Subleading_Electron_pt", "Subleading_Electron_eta", "Subleading_Electron_phi", "Subleading_Electron_E", "Subleading_Electron_SF",
+    "Leading_Muon_pt", "Leading_Muon_eta", "Leading_Muon_phi", "Leading_Muon_E", "Leading_Muon_SF",
+    "Subleading_Muon_pt", "Subleading_Muon_eta", "Subleading_Muon_phi", "Subleading_Muon_E", "Subleading_Muon_SF",
     "mee", "pTee", "dRee", "Etaee", "Phiee", "mmumu", "pTmumu", "dRmumu", "Etamumu", "Phimumu",
     "Jet_pt_b1", "Jet_eta_b1", "Jet_phi_b1", "Jet_E_b1", "Jet_pt_b2", "Jet_eta_b2", "Jet_phi_b2", "Jet_E_b2",
     "mbb", "pTbb", "dRbb", "Etabb", "Phibb",         

@@ -21,9 +21,9 @@ small_R_jet:
 
 Electron:
   ID: "LooseBLayerLH"
-  Iso: "NonIso"
+  Iso: "Loose_VarRad"
   extra_wps:
-    - ["TightLH", "NonIso"]
+    - ["TightLH", "Loose_VarRad"]
 
 Muon:
   ID: "Loose"

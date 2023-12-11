@@ -122,11 +122,13 @@ def bbtt_cfg(
             electrons="bbttAnalysisElectrons_%SYS%",
             taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
+            tauWP=flags.Analysis.Tau.ID,
+            muonWP=TightMuonWPLabel,
+            eleWP=TightEleWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             storeHighLevelVariables=flags.Analysis.store_high_level_variables,
             floatVariableList=float_variables,
-            intVariableList=int_variables,
-            tauEffSFDecorator=f"tau_effSF_{flags.Analysis.Tau.ID}_%SYS%",
+            intVariableList=int_variables
         )
     )
 
@@ -148,7 +150,8 @@ def get_BaselineVarsbbttAlg_variables(flags):
         for var in ["pt", "eta", "phi"]:
             float_variable_names.append(f"{particle}_{var}")
 
-    float_variable_names += ["Leading_Tau_effSF", "Sublead_Tau_effSF"]
+    float_variable_names += ["Leading_Tau_effSF", "Sublead_Tau_effSF",
+                             "Lepton_SF"]
 
     int_variable_names = [
         "Lepton_charge",

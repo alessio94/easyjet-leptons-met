@@ -65,6 +65,17 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    Gaudi::Property<std::string> m_eleWPName
+      { this, "eleWP", "","Electron ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_idSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_isoSF{"", this};
+
+    Gaudi::Property<std::string> m_muWPName
+      { this, "muonWP", "","Muon ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_mu_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_mu_isoSF{"", this};
+
     bool m_isMC;
     bool m_nLeptons;
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
@@ -120,12 +131,16 @@ private:
       //leptons
       "Leading_Electron_pt", "Leading_Electron_eta", 
       "Leading_Electron_phi", "Leading_Electron_E",
+      "Leading_Electron_SF",
       "Subleading_Electron_pt", "Subleading_Electron_eta", 
       "Subleading_Electron_phi", "Subleading_Electron_E",
+      "Subleading_Electron_SF",
       "Leading_Muon_pt", "Leading_Muon_eta", 
       "Leading_Muon_phi", "Leading_Muon_E",
+      "Leading_Muon_SF",
       "Subleading_Muon_pt", "Subleading_Muon_eta", 
       "Subleading_Muon_phi", "Subleading_Muon_E",
+      "Subleading_Muon_SF",
       "ee_m", "ee_pt", "ee_dR", "ee_eta", "ee_phi", 
       "mumu_m", "mumu_pt", "mumu_dR", "mumu_eta", "mumu_phi",
       "emu_m", "emu_pt", "emu_dR", "emu_eta", "emu_phi"
