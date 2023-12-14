@@ -163,13 +163,13 @@ private:
 
     std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>> m_pt_threshold;
 
-    bool trigPassed_SLT;
-    bool trigPassed_LTT;
-    bool trigPassed_STT;
-    bool trigPassed_DTT;
-    bool trigPassed_DTT_2016;
-    bool trigPassed_DTT_4J12;
-    bool trigPassed_DTT_L1Topo;
+    bool m_trigPassed_SLT;
+    bool m_trigPassed_LTT;
+    bool m_trigPassed_STT;
+    bool m_trigPassed_DTT;
+    bool m_trigPassed_DTT_2016;
+    bool m_trigPassed_DTT_4J12;
+    bool m_trigPassed_DTT_L1Topo;
 
     bool TWO_JETS;
     bool TWO_BJETS;

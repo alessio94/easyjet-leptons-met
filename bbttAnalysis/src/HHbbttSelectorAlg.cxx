@@ -187,13 +187,13 @@ namespace HHBBTT
       // Apply selection
 
       applyTriggerSelection(event, electrons, muons, taus, jets, sys);
-      m_Bbranches.at("pass_trigger_SLT").set(*event, trigPassed_SLT, sys);
-      m_Bbranches.at("pass_trigger_LTT").set(*event, trigPassed_LTT, sys);
-      m_Bbranches.at("pass_trigger_STT").set(*event, trigPassed_STT, sys);
-      m_Bbranches.at("pass_trigger_DTT_2016").set(*event, trigPassed_DTT_2016, sys);
-      m_Bbranches.at("pass_trigger_DTT_4J12").set(*event, trigPassed_DTT_4J12, sys);
-      m_Bbranches.at("pass_trigger_DTT_L1Topo").set(*event, trigPassed_DTT_L1Topo, sys);
-      m_Bbranches.at("pass_trigger_DTT").set(*event, trigPassed_DTT, sys);
+      m_Bbranches.at("pass_trigger_SLT").set(*event, m_trigPassed_SLT, sys);
+      m_Bbranches.at("pass_trigger_LTT").set(*event, m_trigPassed_LTT, sys);
+      m_Bbranches.at("pass_trigger_STT").set(*event, m_trigPassed_STT, sys);
+      m_Bbranches.at("pass_trigger_DTT_2016").set(*event, m_trigPassed_DTT_2016, sys);
+      m_Bbranches.at("pass_trigger_DTT_4J12").set(*event, m_trigPassed_DTT_4J12, sys);
+      m_Bbranches.at("pass_trigger_DTT_L1Topo").set(*event, m_trigPassed_DTT_L1Topo, sys);
+      m_Bbranches.at("pass_trigger_DTT").set(*event, m_trigPassed_DTT, sys);
 
       // flags
       TWO_JETS = false;
@@ -367,8 +367,7 @@ namespace HHBBTT
       bool jet_ptcut_DTT_L1Topo = false;
       if (n_jets >= 2)
       {
-        TWO_JETS = (jets->at(0)->pt() > 45. * Athena::Units::GeV &&
-		    jets->at(1)->pt() > 20. * Athena::Units::GeV);
+        TWO_JETS = true;
         if (jets->at(0)->pt() > m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet])
           jet_ptcut_DTT_2016 = true;
         if (jets->at(0)->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet])
@@ -379,7 +378,8 @@ namespace HHBBTT
 
         if (bjets->size() == 2)
         {
-          TWO_BJETS = true;
+          TWO_BJETS = (bjets->at(0)->pt() > 45. * Athena::Units::GeV &&
+          bjets->at(1)->pt() > 20. * Athena::Units::GeV);
           bb = bjets->at(0)->p4() + bjets->at(1)->p4();
           mbb = bb.M();
         }
@@ -399,13 +399,13 @@ namespace HHBBTT
         // SLT
         if (lep_ptcut_SLT && tau_ptcut_SLT){
           pass_baseline_SLT = true;
-          if (trigPassed_SLT && TWO_BJETS && MBB_MASS && OS_CHARGE_LEPHAD)
+          if (m_trigPassed_SLT && TWO_BJETS && MBB_MASS && OS_CHARGE_LEPHAD)
             pass_SLT = true;
         }
         // LTT
         if (lep_ptcut_LTT && tau_ptcut_LTT){
           pass_baseline_LTT = true;
-          if (!pass_SLT && trigPassed_LTT && TWO_BJETS && MBB_MASS
+          if (!pass_SLT && m_trigPassed_LTT && TWO_BJETS && MBB_MASS
               && OS_CHARGE_LEPHAD)
             pass_LTT = true;
         }
@@ -415,7 +415,7 @@ namespace HHBBTT
         // STT
         if (tau_ptcut_STT){
           pass_baseline_STT = true;
-          if (trigPassed_STT && TWO_BJETS && OS_CHARGE_HADHAD)
+          if (m_trigPassed_STT && TWO_BJETS && OS_CHARGE_HADHAD)
             pass_STT = true;
         }
         // DTT
@@ -423,18 +423,18 @@ namespace HHBBTT
           if(m_is15 || m_is16){
             if(jet_ptcut_DTT_2016){
               pass_baseline_DTT_2016 = true;
-              if (trigPassed_DTT_2016 && TWO_BJETS && OS_CHARGE_HADHAD)
+              if (m_trigPassed_DTT_2016 && TWO_BJETS && OS_CHARGE_HADHAD)
                 pass_DTT_2016 = true;
             }
           }
           else if(jet_ptcut_DTT_4J12){
             pass_baseline_DTT_4J12 = true;
-            if (trigPassed_DTT_4J12 && TWO_BJETS && OS_CHARGE_HADHAD)
+            if (m_trigPassed_DTT_4J12 && TWO_BJETS && OS_CHARGE_HADHAD)
               pass_DTT_4J12 = true;
           }
           else if(jet_ptcut_DTT_L1Topo && tau_DR_L1Topo){
             pass_baseline_DTT_L1Topo = true;
-            if (trigPassed_DTT_L1Topo && TWO_BJETS && OS_CHARGE_HADHAD)
+            if (m_trigPassed_DTT_L1Topo && TWO_BJETS && OS_CHARGE_HADHAD)
               pass_DTT_L1Topo = true;
           }
         }
@@ -493,12 +493,12 @@ namespace HHBBTT
     //************
 
     // lephad
-    trigPassed_SLT = false;
-    trigPassed_LTT = false;
+    m_trigPassed_SLT = false;
+    m_trigPassed_LTT = false;
 
     // hadhad
-    trigPassed_STT = false;
-    trigPassed_DTT = false;
+    m_trigPassed_STT = false;
+    m_trigPassed_DTT = false;
 
     // only run trigger selection if in channel
     for (const auto &channel : m_channels){
@@ -579,7 +579,7 @@ namespace HHBBTT
       trigPassed_SMT &=
 	((*muons)[0]->pt() > m_pt_threshold[HHBBTT::SLT][HHBBTT::mu]);
 
-    trigPassed_SLT = (trigPassed_SET || trigPassed_SMT);
+    m_trigPassed_SLT = (trigPassed_SET || trigPassed_SMT);
   }
 
   void HHbbttSelectorAlg ::applyLepHadTriggerSelection(
@@ -715,7 +715,7 @@ namespace HHBBTT
 	 (*jets)[0]->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::leadingjet] &&
 	 (*jets)[1]->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::subleadingjet]);
 
-    trigPassed_LTT = (trigPassed_ETT || trigPassed_ETT_4J12 ||
+    m_trigPassed_LTT = (trigPassed_ETT || trigPassed_ETT_4J12 ||
 		      trigPassed_MTT_2016 || trigPassed_MTT_low ||
 		      trigPassed_MTT_high);
   }
@@ -742,9 +742,9 @@ namespace HHBBTT
     }
     else if(m_is18){
       single_tau_paths = {"trigPassed_HLT_tau160_medium1_tracktwoEF_L1TAU100"};
-    }
-    else if(m_is18PeriodK_end){
-      single_tau_paths = {"trigPassed_HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
+      if(m_is18PeriodK_end){
+        single_tau_paths.push_back("trigPassed_HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100");
+      }
     }
     else if(m_is22){
       single_tau_paths = {"trigPassed_HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
@@ -754,13 +754,13 @@ namespace HHBBTT
     }
     // Pass single tau trigger
     for(const auto& path : single_tau_paths){
-     trigPassed_STT |= m_triggerdecos.at(path).get(*event, sys);
-     if(trigPassed_STT) break;
+     m_trigPassed_STT |= m_triggerdecos.at(path).get(*event, sys);
+     if(m_trigPassed_STT) break;
     }
 
-    trigPassed_STT &= (*taus).size()>0;
-    if(trigPassed_STT)
-      trigPassed_STT &=
+    m_trigPassed_STT &= (*taus).size()>0;
+    if(m_trigPassed_STT)
+      m_trigPassed_STT &=
 	(*taus)[0]->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau];
 
   }
@@ -771,9 +771,9 @@ namespace HHBBTT
       const xAOD::JetContainer* jets,
       const CP::SystematicSet &sys)
   {
-    bool trigPassed_DTT_2016 = false;
-    bool trigPassed_DTT_L1Topo = false;
-    bool trigPassed_DTT_4J12 = false;
+    m_trigPassed_DTT_2016 = false;
+    m_trigPassed_DTT_L1Topo = false;
+    m_trigPassed_DTT_4J12 = false;
 
     std::vector<std::string> ditau_paths_2016;
     std::vector<std::string> ditau_paths_L1Topo;
@@ -782,25 +782,32 @@ namespace HHBBTT
     if(m_is15){
       ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM"};
     }
-    else if(m_is16PeriodA || m_is16PeriodB_D3 || m_is16PeriodD4_end || m_is17PeriodB1_B4){
-      ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-    }
-    else if(m_is17){
-      ditau_paths_4J12 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM_4J12"};
-    }
-    else if(m_l1topo_disabled){
-      ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-    }
-    else if(m_is17PeriodB5_B7 || m_is17PeriodB8_end){
-      ditau_paths_L1Topo = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1DR_TAU20ITAU12I_J25"};
+    else if(m_is16 || m_is17){
+      if(m_is16PeriodA || m_is16PeriodB_D3 || m_is16PeriodD4_end){
+        ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
+      }
+      else if(m_l1topo_disabled){
+        ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
+      }
+
+      if(m_is17){
+        ditau_paths_4J12 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM_4J12"};
+      }
+
+      if(m_is17PeriodB1_B4){// For Period B1 to B4 in 2017, should use this trigger but go to L1Topo selection
+        ditau_paths_L1Topo = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
+      }
+      else if(!m_l1topo_disabled && (m_is17PeriodB5_B7 || m_is17PeriodB8_end)){
+        ditau_paths_L1Topo = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1DR_TAU20ITAU12I_J25"};
+      }
     }
     else if(m_is18){
       ditau_paths_L1Topo = {"trigPassed_HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"trigPassed_HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1TAU20IM_2TAU12IM_4J12p0ETA23"};
-    }
-    else if(m_is18PeriodK_end){
-      ditau_paths_L1Topo = {"trigPassed_HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1DR_TAU20ITAU12I_J25"};
-      ditau_paths_4J12 = {"trigPassed_HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1TAU20IM_2TAU12IM_4J12p0ETA23"};
+      if(m_is18PeriodK_end){
+        ditau_paths_L1Topo.push_back("trigPassed_HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1DR_TAU20ITAU12I_J25");
+        ditau_paths_4J12.push_back("trigPassed_HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1TAU20IM_2TAU12IM_4J12p0ETA23");
+      }
     }
     else if(m_is22 || m_is23){
       ditau_paths_L1Topo = {"trigPassed_HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
@@ -808,48 +815,48 @@ namespace HHBBTT
     }
 
     for(const auto& path : ditau_paths_2016){
-      trigPassed_DTT_2016 |= m_triggerdecos.at(path).get(*event, sys);
-      if(trigPassed_DTT_2016) break;
+      m_trigPassed_DTT_2016 |= m_triggerdecos.at(path).get(*event, sys);
+      if(m_trigPassed_DTT_2016) break;
     }
 
-    trigPassed_DTT_2016 &= ((*taus).size()>1 &&
+    m_trigPassed_DTT_2016 &= ((*taus).size()>1 &&
 			    (*jets).size()>0);
-    if(trigPassed_DTT_2016)
-      trigPassed_DTT_2016 &=
+    if(m_trigPassed_DTT_2016)
+      m_trigPassed_DTT_2016 &=
 	((*taus)[0]->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
 	 (*taus)[1]->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
 	 (*jets)[0]->pt() > m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet]);
 
     for(const auto& path : ditau_paths_4J12){
-      trigPassed_DTT_4J12 |= m_triggerdecos.at(path).get(*event, sys);
-      if(trigPassed_DTT_4J12) break;
+      m_trigPassed_DTT_4J12 |= m_triggerdecos.at(path).get(*event, sys);
+      if(m_trigPassed_DTT_4J12) break;
     }
 
-    trigPassed_DTT_4J12 &= ((*taus).size()>1 &&
+    m_trigPassed_DTT_4J12 &= ((*taus).size()>1 &&
 			    (*jets).size()>1);
-    if(trigPassed_DTT_4J12)
-      trigPassed_DTT_4J12 &=
+    if(m_trigPassed_DTT_4J12)
+      m_trigPassed_DTT_4J12 &=
 	((*taus)[0]->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
 	 (*taus)[1]->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
 	 (*jets)[0]->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
 	 (*jets)[1]->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet]);
 
     for(const auto& path : ditau_paths_L1Topo){
-      trigPassed_DTT_L1Topo |= m_triggerdecos.at(path).get(*event, sys);
-      if(trigPassed_DTT_L1Topo) break;
+      m_trigPassed_DTT_L1Topo |= m_triggerdecos.at(path).get(*event, sys);
+      if(m_trigPassed_DTT_L1Topo) break;
     }
 
-    trigPassed_DTT_L1Topo &= ((*taus).size()>1 &&
+    m_trigPassed_DTT_L1Topo &= ((*taus).size()>1 &&
 			      (*jets).size()>0);
-    if(trigPassed_DTT_L1Topo)
-      trigPassed_DTT_L1Topo &=
+    if(m_trigPassed_DTT_L1Topo)
+      m_trigPassed_DTT_L1Topo &=
 	((*taus)[0]->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
 	 (*taus)[1]->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
 	 (*taus)[0]->p4().DeltaR((*taus)[1]->p4())<2.5 &&
 	 (*jets)[0]->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
 
-    trigPassed_DTT = (trigPassed_DTT_2016 || trigPassed_DTT_4J12 ||
-		      trigPassed_DTT_L1Topo);
+    m_trigPassed_DTT = (m_trigPassed_DTT_2016 || m_trigPassed_DTT_4J12 ||
+		      m_trigPassed_DTT_L1Topo);
   }
 
   void HHbbttSelectorAlg::setRunNumberQuantities(unsigned int rdmNumber){
@@ -858,7 +865,7 @@ namespace HHBBTT
     // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
 
     // MC20a covers both 2015 and 2016 in MC
-    if(m_isMC && m_is15 && m_is16){
+    if(m_isMC && (m_is15 || m_is16)){
       m_is15 = 266904 <= rdmNumber && rdmNumber <= 284484;
       m_is16 = 296939 <= rdmNumber && rdmNumber <= 311481;
     }
