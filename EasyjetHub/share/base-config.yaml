@@ -88,8 +88,11 @@ systematics_regex: [".*"]
 do_overlap_removal: false
 
 # Definition of container names
-container_names:
-  include: container-names-DAOD_PHYS.yaml
+full_container_names:
+  phys:
+    include: container-names-DAOD_PHYS.yaml
+  physlite:
+    include: container-names-DAOD_PHYSLITE.yaml
 
 histograms: false
 h5:

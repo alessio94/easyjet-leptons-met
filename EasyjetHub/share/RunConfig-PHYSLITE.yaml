@@ -1,7 +1,4 @@
 include: base-config.yaml
-# Replace container names with PHYSLITE ones
-container_names:
-    include: container-names-DAOD_PHYSLITE.yaml
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]

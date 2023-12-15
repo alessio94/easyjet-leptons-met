@@ -36,9 +36,7 @@ atlas_install_python_modules(
   python/ttHH_config.py
 )
 atlas_install_data(
-  share/ttHH-base-config.yaml
-  share/RunConfig-PHYS-ttHH.yaml
-  share/RunConfig-PHYSLITE-ttHH.yaml
+  share/RunConfig-ttHH.yaml
   share/trigger.yaml
 )
 

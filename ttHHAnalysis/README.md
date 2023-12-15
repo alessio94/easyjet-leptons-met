@@ -9,7 +9,7 @@ Analysis Package for the $t\bar{t} HH$ analyis
   - `ttHH_config`
 - `share/`: yaml files containing configurations used by the components
   - `ttHH-base-config`: where all the common flags are set;
-  - `RunConfig-X-ttHH`: configurations called by the executables (see below);
+  - `RunConfig-ttHH`: configurations called by the executables (see below);
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
   - `JetPairingAlgttHH`: Pair jets from HH decay;
@@ -20,8 +20,8 @@ Analysis Package for the $t\bar{t} HH$ analyis
 1. Get the files to make the test: have a look at the general [README section](https://gitlab.cern.ch/easyjet/easyjet#running-on-files) for updated informations.
 
 2. Run the ntupler on those files:
-- run the analysis on <span style="color: #F2385A">PHYS</span>: ```ttHH-ntupler ttbar_PHYS_10evt.root --run-config ttHHAnalysis/RunConfig-PHYS-ttHH.yaml --out-file output_PHYS_ttHH.root```
-- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```ttHH-ntupler ttbar_PHYSLITE_10evt.root --run-config ttHHAnalysis/RunConfig-PHYSLITE-ttHH.yaml --out-file output_PHYSLITE_ttHH.root```
+- run the analysis on <span style="color: #F2385A">PHYS</span>: ```ttHH-ntupler ttbar_PHYS_10evt.root --run-config ttHHAnalysis/RunConfig-ttHH.yaml --out-file output_PHYS_ttHH.root```
+- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```ttHH-ntupler ttbar_PHYSLITE_10evt.root --run-config ttHHAnalysis/RunConfig-ttHH.yaml --out-file output_PHYSLITE_ttHH.root```
 
 # Output
 

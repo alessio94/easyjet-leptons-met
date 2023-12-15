@@ -9,7 +9,7 @@ Analysis Package for the $HH\rightarrow b\bar{b} VV$ analyis
   - `bbVV_config`
 - `share/`: yaml files containing configurations used by the components
   - `bbVV-base`: where all the common flags are set;
-  - `RunConfig-X-bbVV[-bypass]`: configurations called by the executables (see below);
+  - `RunConfig-bbVV[-bypass]`: configurations called by the executables (see below);
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
   - `HHbbVVSelectorAlg`: Find if the event pass the baseline bbVV selection;
@@ -20,9 +20,9 @@ Analysis Package for the $HH\rightarrow b\bar{b} VV$ analyis
 1. Get the files to make the test: have a look at the general [README section](https://gitlab.cern.ch/easyjet/easyjet#running-on-files) for updated informations.
 
 2. Run the ntupler on those files:
-- run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbVV-ntupler ttbar_PHYS_10evt.root --run-config bbVVAnalysis/RunConfig-PHYS-bbVV-bypass.yaml --out-file output_PHYS_bbVV.root```
-- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbVV-ntupler ttbar_PHYSLITE_10evt.root --run-config bbVVAnalysis/RunConfig-PHYSLITE-bbVV-bypass.yaml --out-file output_PHYSLITE_bbVV.root```
-An alternative is to use the preselection step using the configuration `RunConfig-PHYS-bbVV.yaml` instead of `RunConfig-PHYS-bbVV-bypass.yaml`, however fewer events would be recorded.
+- run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbVV-ntupler ttbar_PHYS_10evt.root --run-config bbVVAnalysis/RunConfig-bbVV-bypass.yaml --out-file output_PHYS_bbVV.root```
+- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbVV-ntupler ttbar_PHYSLITE_10evt.root --run-config bbVVAnalysis/RunConfig-bbVV-bypass.yaml --out-file output_PHYSLITE_bbVV.root```
+An alternative is to use the preselection step using the configuration `RunConfig-bbVV.yaml` instead of `RunConfig-bbVV-bypass.yaml`, however fewer events would be recorded.
 
 # Output
 

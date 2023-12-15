@@ -9,7 +9,7 @@ Analysis Package for the $HH\rightarrow b\bar{b} ll$ analyis
   - `bbll_config`
 - `share/`: yaml files containing configurations used by the components
   - `bbll-base`: where all the common flags are set;
-  - `RunConfig-X-bbll`: configurations called by the executables (see below);
+  - `RunConfig-bbll`: configurations called by the executables (see below);
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
   - `HHbbllSelectorAlg`: Find if the event pass the baseline bbll selection;
@@ -21,8 +21,8 @@ Analysis Package for the $HH\rightarrow b\bar{b} ll$ analyis
 1. Get the files to make the test: have a look at the general [README section](https://gitlab.cern.ch/easyjet/easyjet#running-on-files) for updated informations.
 
 2. Run the ntupler on those files:
-- run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbll-ntupler ttbar_PHYS_10evt.root --run-config bbllAnalysis/RunConfig-PHYS-bbll.yaml --out-file output_PHYS_bbll.root```
-- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbll-ntupler ttbar_PHYSLITE_10evt.root --run-config bbllAnalysis/RunConfig-PHYSLITE-bbll.yaml --out-file output_PHYSLITE_bbll.root```
+- run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbll-ntupler ttbar_PHYS_10evt.root --run-config bbllAnalysis/RunConfig-bbll.yaml --out-file output_PHYS_bbll.root```
+- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbll-ntupler ttbar_PHYSLITE_10evt.root --run-config bbllAnalysis/RunConfig-bbll.yaml --out-file output_PHYSLITE_bbll.root```
 
 # Output
 

@@ -7,8 +7,7 @@ Analysis Package for $HH\rightarrow b\bar{b} \gamma\gamma$ analyis
 - `python/`: Main python code to configure the components (objects, selections as well as the variables to save)
   - `bbyy_config`
 - `share/`: yaml files containing configurations used by the components
-  - `bbyy-base-config`: where all the common flags are set;
-  - `RunConfig-X-bbyy`: configurations called by the executables (see below);
+  - `RunConfig-bbyy`: where all the common flags are set, configurations called by the executables (see below);
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
   - `SelectionFlagsbbyyAlg`: Find if the event pass the baseline bbyy selection;
@@ -20,8 +19,8 @@ Analysis Package for $HH\rightarrow b\bar{b} \gamma\gamma$ analyis
 1. Get the files to make the test: have a look at the general [README section](https://gitlab.cern.ch/easyjet/easyjet#running-on-files) for updated informations.
 
 2. Run the ntupler on those files:
-- run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbyy-ntupler ttbar_PHYS_10evt.root --run-config bbyyAnalysis/RunConfig-PHYS-bbyy.yaml --out-file output_PHYS_bbyy.root```
-- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbyy-ntupler ttbar_PHYSLITE_10evt.root --run-config bbyyAnalysis/RunConfig-PHYSLITE-bbyy.yaml --out-file output_PHYSLITE_bbyy.root```
+- run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbyy-ntupler ttbar_PHYS_10evt.root --run-config bbyyAnalysis/RunConfig-bbyy.yaml --out-file output_PHYS_bbyy.root```
+- run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbyy-ntupler ttbar_PHYSLITE_10evt.root --run-config bbyyAnalysis/RunConfig-bbyy.yaml --out-file output_PHYSLITE_bbyy.root```
 
 # Output
 
@@ -41,7 +40,7 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
 
 Note that running with the `bbyy-ntupler` executable will add the standard `bbyy` variables above, defined in `bbyyAnalysis/src/BaselineVarsbbyyAlg.cxx` and `bbyyAnalysis/python/bbyy_config.py`. 
 
-One can change the outputs saved in the TTree by adjusting the base bbyy configuration file `bbyyAnalysis/share/bbyy-base-config.yaml`, which also defines the identification and isolation WP of the different objects.
+One can change the outputs saved in the TTree by adjusting the base bbyy configuration file `bbyyAnalysis/share/RunConfig-bbyy.yaml`, which also defines the identification and isolation WP of the different objects.
 
 # Main developers
 

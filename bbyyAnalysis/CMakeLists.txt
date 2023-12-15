@@ -38,9 +38,7 @@ atlas_install_python_modules(
   python/bbyy_config.py
 )
 atlas_install_data(
-  share/bbyy-base-config.yaml
-  share/RunConfig-PHYS-bbyy.yaml
-  share/RunConfig-PHYSLITE-bbyy.yaml
+  share/RunConfig-bbyy.yaml
   share/trigger.yaml
 )
 

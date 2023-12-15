@@ -44,12 +44,17 @@ def analysis_configuration(parser="default"):
     setRogueLoggers(flags.Exec.OutputLevel)
     # Write user options to flags.Analysis
     fill_flags_from_runconfig(args, flags, parser.overwrites)
+    flags.loadAllDynamicFlags()
 
     # Determined from input file without explicitly reading metadata
     def is_physlite(flags):
         return flags.Input.ProcessingTags == ["StreamDAOD_PHYSLITE"]
 
     flags.addFlag("Input.isPHYSLITE", lambda prevFlags: is_physlite(prevFlags))
+
+    flags = flags.cloneAndReplace("Analysis.container_names", (
+        "Analysis.full_container_names." + (
+            "physlite" if flags.Input.isPHYSLITE else "phys")))
 
     # disable some sequences for fast-run
     if flags.Analysis.fast_test:

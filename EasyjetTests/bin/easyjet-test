@@ -107,12 +107,12 @@ declare -A TESTS=(
 DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
 declare -A CONFIGS=(
     # MC20
-    [bbyy-mc20]=bbyyAnalysis/RunConfig-PHYS-bbyy.yaml
-    [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-PHYSLITE-bbyy.yaml
-    [ttHH-mc20]=ttHHAnalysis/RunConfig-PHYS-ttHH.yaml
-    [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-PHYSLITE-ttHH.yaml
-    [bbll-mc20]=bbllAnalysis/RunConfig-PHYS-bbll.yaml
-    [bbll-mc20-lite]=bbllAnalysis/RunConfig-PHYSLITE-bbll.yaml
+    [bbyy-mc20]=bbyyAnalysis/RunConfig-bbyy.yaml
+    [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-bbyy.yaml
+    [ttHH-mc20]=ttHHAnalysis/RunConfig-ttHH.yaml
+    [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-ttHH.yaml
+    [bbll-mc20]=bbllAnalysis/RunConfig-bbll.yaml
+    [bbll-mc20-lite]=bbllAnalysis/RunConfig-bbll.yaml
     # MC20 AF3
     [fast-mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE.yaml
     [mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE.yaml
@@ -120,8 +120,8 @@ declare -A CONFIGS=(
     [fast-awkward-mc20af3]=EasyjetHub/awkward-config.yaml
     # MC23
     [bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
-    [bbtt-mc23]=bbttAnalysis/RunConfig-PHYS-bbtt-bypass.yaml
-    [bbtt-mc23-lite]=bbttAnalysis/RunConfig-PHYSLITE-bbtt-bypass.yaml
+    [bbtt-mc23]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
+    [bbtt-mc23-lite]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     # non-ntupler
     [aod-fast-bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
     [hist-syst-bbbb-mc23]=bbbbAnalysis/histonly-config.yaml
