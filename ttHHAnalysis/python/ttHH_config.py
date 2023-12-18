@@ -57,7 +57,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey="ttHHAnalysisJets_BTag_%SYS%",
             containerOutKey="pairedttHHAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
-            pairingStrategy="chiSquare",
+            pairingStrategyName="chiSquare",
         )
     )
 
@@ -67,7 +67,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey="ttHHAnalysisJets_BTag_%SYS%",
             containerOutKey="pairedttHZAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
-            pairingStrategy="chiSquare",
+            pairingStrategyName="chiSquare",
             targetMass1=125 * Units.GeV,
             targetMass2=91.2 * Units.GeV,
         )
@@ -79,7 +79,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey="ttHHAnalysisJets_BTag_%SYS%",
             containerOutKey="pairedttZZAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
-            pairingStrategy="chiSquare",
+            pairingStrategyName="chiSquare",
             targetMass1=91.2 * Units.GeV,
             targetMass2=91.2 * Units.GeV,
         )

@@ -20,6 +20,11 @@
 namespace ttHH
 {
 
+  enum PairingStrategy {
+      ChiSquare,
+      MinDeltaR,
+  };
+
   /// \brief An algorithm for counting containers
   class JetPairingAlgttHH final : public AthHistogramAlgorithm
   {
@@ -52,7 +57,9 @@ private:
 
     std::tuple<const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, float> minChiSquared(const ConstDataVector<xAOD::JetContainer>& Jets, const std::vector<size_t>& indexes, float target_mass_1, float target_mass_2);
 
-    std::string m_pairingStrategy;
+    std::string m_pairingStrategyName;
+
+    PairingStrategy m_pairingStrategy;
 
     Gaudi::Property<float> m_targetMass1 {this, "targetMass1", 125e3, "First target mass of boson to be used in chi square pairing"};
     Gaudi::Property<float> m_targetMass2 {this, "targetMass2", 125e3, "Second target mass of boson to be used in chi square pairing"};
