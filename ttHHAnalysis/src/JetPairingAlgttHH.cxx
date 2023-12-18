@@ -156,7 +156,7 @@ std::vector<const xAOD::Jet*> JetPairingAlgttHH ::bJetChiSquarePairing(const Con
           
             std::vector<std::vector<size_t>> permutations;
             // if the target masses are not the same we also need to test for mX12 <-> mX_34
-            if (targetMass1 != targetMass2) {
+            if (std::abs(targetMass1-targetMass2)>std::numeric_limits<float>::epsilon()) {
               permutations = {{i,j,k,l}, {i,l,j,k}, {i,k,j,l}, {k,l,i,j}, {j,k,i,l}, {j,l,i,k}};
             } else {
               permutations = {{i,j,k,l}, {i,l,j,k}, {i,k,j,l}};
@@ -215,7 +215,7 @@ std::tuple<const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet
     float chiSquared = r12 * r12 + r34 * r34;
 
     // If the two target masses are the same sort pair by pT
-    if (targetMass1 == targetMass2 and p1.Pt() < p2.Pt()) {
+    if (std::abs(targetMass1-targetMass2)<std::numeric_limits<float>::epsilon() and p1.Pt() < p2.Pt()) {
         return {jet3, jet4, jet1, jet2, chiSquared};
     }
     return {jet1, jet2, jet3, jet4, chiSquared};
