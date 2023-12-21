@@ -25,6 +25,7 @@ small_R_jet:
   # calib tool options
   calibToolCalibArea: ""
   calibToolConfigFile: ""
+  calibToolCalibSeq: ""
   # uncertainties tool options
   uncertToolCalibArea: ""
   uncertToolConfigPath: ""

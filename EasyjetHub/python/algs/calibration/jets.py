@@ -46,6 +46,11 @@ def jet_sequence(
         configSeq.setOptionValue(
             ".calibToolCalibArea",
             jet_flags.calibToolCalibArea)
+    if jet_flags.calibToolCalibSeq:
+        configSeq.setOptionValue(
+            ".calibToolCalibSeq",
+            jet_flags.calibToolCalibSeq
+        )
 
     # Set options for uncertainties tool if given
     if jet_flags.uncertToolConfigPath and jet_flags.uncertToolCalibArea:
@@ -63,7 +68,8 @@ def jet_sequence(
             jet_flags.uncertToolMCType
         )
 
-    configSeq += makeConfig('Jets.Jvt', drop_sys(allcalib_name))
+    if jet_type != "reco4EMTopoJet":
+        configSeq += makeConfig('Jets.Jvt', drop_sys(allcalib_name))
 
     # jet_sequence = makeJetAnalysisSequence(
     #     flags.Analysis.DataType,
