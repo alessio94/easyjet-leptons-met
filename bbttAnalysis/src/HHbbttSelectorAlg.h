@@ -26,6 +26,8 @@
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+#include <EasyjetHub/CutManager.h>
+
 #include <SystematicsHandles/SysFilterReporterParams.h>
 
 #include "HHbbttChannels.h"
@@ -76,6 +78,7 @@ public:
     /// \brief Finalisation method, for cleanup, final print out etc
     StatusCode finalize() override;
 
+
 private:
 
     /// \brief Steerable properties
@@ -92,6 +95,12 @@ private:
     
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
+    
+    /// \brief Cutflow Variables
+    CutManager m_bbttCuts;
+    Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
+    Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
+    long long int m_total_events{0};
 
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};

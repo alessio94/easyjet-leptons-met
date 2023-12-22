@@ -19,7 +19,6 @@ namespace HHBBTT
                                   ISvcLocator *pSvcLocator)
     : EL::AnaAlgorithm(name, pSvcLocator)
   {
-
   }
 
   StatusCode HHbbttSelectorAlg ::initialize()
@@ -137,6 +136,25 @@ namespace HHBBTT
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
 
+    // CutFlow
+    m_bbttCuts.CheckInputCutList(m_inputCutList,m_Bvarnames);
+    for (const std::string &cut : m_inputCutList)  { 
+      // Initialize a vector of CutEntry structs based on the input Cut List
+      m_bbttCuts.add(cut);
+    }
+
+    //After filling the CutManager, book your histograms.
+    const unsigned int nbins = m_bbttCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5))); 
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbyy cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));    
+    
+
+    
     return StatusCode::SUCCESS;
   }
 
@@ -466,6 +484,51 @@ namespace HHBBTT
        if(channel == HHBBTT::LepHad) pass |= (pass_SLT || pass_LTT);
        else if(channel == HHBBTT::HadHad) pass |= (pass_STT || pass_DTT);
       }
+
+      //****************
+      // Cutflow
+      //****************
+
+      // do the CUTFLOW only with sys="" -> NOSYS
+      if (sys.name()!="") continue;
+
+      // Compute total_events
+      m_total_events+=1; 
+
+
+      // reset all cut flags to default=false
+      for (CutEntry& cut : m_bbttCuts) {
+        cut.passed = false;
+      }
+
+      m_bbttCuts("pass_trigger_DTT").passed = m_trigPassed_DTT;
+      m_bbttCuts("pass_baseline_DTT").passed = pass_baseline_DTT;
+      m_bbttCuts("pass_DTT").passed = pass_DTT;
+      
+      // Count how many cuts the event passed and increase the relative counter
+      for (const auto &cut : m_inputCutList) {
+        if(m_bbttCuts.exists(cut)) {
+          if (m_bbttCuts(cut).passed)
+            m_bbttCuts(cut).counter+=1;
+        }
+      }
+
+      // Check how many consecutive cuts are passed by the event.
+      unsigned int consecutive_cuts = 0;
+      for (size_t i = 0; i < m_bbttCuts.size(); ++i) {
+        if (m_bbttCuts[i].passed)
+          consecutive_cuts++;
+        else
+          break;
+      }
+
+      // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
+      for (unsigned int i=0; i<consecutive_cuts; i++) {
+        m_bbttCuts[i].relativeCounter+=1;
+      }
+
+
+
       if (!m_bypass && !pass) continue;
 
       // Global event filter true if any syst passes and controls
@@ -478,6 +541,22 @@ namespace HHBBTT
 
   StatusCode HHbbttSelectorAlg::finalize() {
     ANA_CHECK (m_filterParams.finalize ());
+
+    m_bbttCuts.CheckCutResults(); // Print CheckCutResults
+
+    if(m_saveCutFlow) {
+      m_bbttCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
+      m_bbttCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
+      m_bbttCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
+      m_bbttCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
+    }
+    else {
+      delete efficiency("AbsoluteEfficiency");
+      delete efficiency("RelativeEfficiency");
+      delete efficiency("StandardCutFlow");
+      delete hist("EventsPassed_BinLabeling");
+    }
+
     return StatusCode::SUCCESS;
   }
 

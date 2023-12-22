@@ -43,6 +43,16 @@ Tau:
 trigger_chains:
   include: bbttAnalysis/trigger.yaml
 
+
+#Enable cutflow 
+save_bbtt_cutflow: true
+
+# list of cuts in cutflow
+CutList :
+  - pass_trigger_DTT
+  - pass_baseline_DTT
+  - pass_DTT
+
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: true

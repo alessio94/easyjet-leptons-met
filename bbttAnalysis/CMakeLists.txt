@@ -30,6 +30,7 @@ atlas_add_component(bbttAnalysis
   TruthUtils
   DiTauMassToolsLib
   EventBookkeeperToolsLib
+  EasyjetHubLib
 )
 
 # Install python modules, joboptions, and share content

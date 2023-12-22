@@ -92,6 +92,8 @@ def bbtt_cfg(
             isMC=flags.Input.isMC,
             Years=flags.Analysis.Years,
             bypass=flags.Analysis.bypass,
+            saveCutFlow=flags.Analysis.save_bbtt_cutflow,
+            cutList=flags.Analysis.CutList,
         )
     )
 
