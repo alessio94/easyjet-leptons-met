@@ -6,6 +6,7 @@ from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
 from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetPtCalibrationConfig
 
 from EasyjetHub.algs.calibration.view_select import makeViewSelectionConfig
+from EasyjetHub.algs.calibration.FTagEventSFConfig import makeFTagEventSFConfig
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
@@ -85,10 +86,11 @@ def jet_sequence(
     #     runJvtSelection=not flags.Input.isPHYSLITE,
     # )
 
+    btag_wps = [jet_flags.btag_wp]
+    if 'btag_extra_wps' in jet_flags:
+        btag_wps += jet_flags.btag_extra_wps
+
     if jet_type != "reco4EMTopoJet":
-        btag_wps = [jet_flags.btag_wp]
-        if 'btag_extra_wps' in jet_flags:
-            btag_wps += jet_flags.btag_extra_wps
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
@@ -160,6 +162,19 @@ def jet_sequence(
         original=input_name,
         selection='selectPtEta&&jvt',
     )
+
+    # Event-level FTAG scale factor
+    if jet_type != "reco4EMTopoJet":
+
+        for tagger_wp in btag_wps:
+            tagger, btag_wp = tagger_wp.split("_", 1)
+            makeFTagEventSFConfig(
+                configSeq,
+                drop_sys(output_name),
+                tagger_wp,
+            )
+            configSeq.setOptionValue('.btagger', tagger)
+            configSeq.setOptionValue('.btagWP', btag_wp)
 
     return configSeq
 

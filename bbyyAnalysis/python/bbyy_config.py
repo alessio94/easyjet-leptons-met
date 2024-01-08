@@ -99,6 +99,14 @@ def bbyy_branches(flags):
         for kin in btag_variables:
             branches += [f"EventInfo.Jet_{kin}_{pt_ord}_%SYS% -> %SYS%_Jet_{kin}_{pt_ord}"]  # noqa
 
+    if flags.Input.isMC:
+        branches += ["EventInfo.ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%"
+                     " -> weight_ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%",]
+
+        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
+
     dibjet_variables = ["mbb", "pTbb", "dRbb", "Etabb", "Phibb"]
     for var in dibjet_variables:
         branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]

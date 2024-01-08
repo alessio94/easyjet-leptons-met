@@ -136,6 +136,14 @@ def ttHH_branches(flags):
         for kin in btag_variables:
             branches += [f"EventInfo.Jet_{kin}_{pt_ord}_%SYS% -> %SYS%_Jet_{kin}_{pt_ord}"] # noqa
 
+    if flags.Input.isMC:
+        branches += ["EventInfo.ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%"
+                     " -> weight_ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%",]
+
+        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
+
     H_candidate_variables = [
         "H1_m", "H1_pt", "H1_eta", "H1_phi",
         "H2_m", "H2_pt", "H2_eta", "H2_phi",

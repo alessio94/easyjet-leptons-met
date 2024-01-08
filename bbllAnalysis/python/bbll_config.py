@@ -162,6 +162,15 @@ def bbll_branches(flags):
                         f"EventInfo.Jet_{kin}_{pt_ord}_%SYS% -> "
                         f"%SYS%_Jet_{kin}_{pt_ord}"
                     ]
+
+    if flags.Input.isMC:
+        branches += ["EventInfo.ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%"
+                     " -> weight_ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%",]
+
+        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
+
     branches += ["EventInfo.nBJets_%SYS% -> %SYS%_nBJets"]
     branches += ["EventInfo.nElectrons_%SYS% -> %SYS%_nElectrons"]
     branches += ["EventInfo.nMuons_%SYS% -> %SYS%_nMuons"]
