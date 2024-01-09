@@ -12,6 +12,7 @@ atlas_add_component(bbllAnalysis
   src/BaselineVarsbbllAlg.cxx
   src/MMCDecoratorAlg.cxx
   src/HHbbllSelectorAlg.cxx
+  src/SelectionFlagsbbllAlg.cxx
   src/components/bbllAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -27,6 +28,7 @@ atlas_add_component(bbllAnalysis
   TruthUtils
   DiTauMassToolsLib
   EventBookkeeperToolsLib
+  EasyjetHubLib
 )
 
 # Install python modules, joboptions, and share content

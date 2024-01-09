@@ -80,6 +80,20 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
         )
     )
 
+    cfg.addEventAlgo(
+        CompFactory.HHBBLL.SelectionFlagsbbllAlg(
+            "SelectionFlagsbbllAlg",
+            jets="bbllAnalysisJets_%SYS%",
+            muons="bbllAnalysisMuons_%SYS%",
+            electrons="bbllAnalysisElectrons_%SYS%",
+            cutList=flags.Analysis.CutList,
+            categoryList=flags.Analysis.Categories,
+            saveCutFlow=flags.Analysis.save_bbll_cutflow,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            passTriggers=flags.Analysis.TriggerChains
+        )
+    )
+
     return cfg
 
 
@@ -87,9 +101,6 @@ def bbll_branches(flags):
     branches = []
 
     bbll_vars = [
-        "TWO_ISO_MUONS", "TWO_ISO_ELECTRONS",
-        "Mee", "Mmumu", "Pass_ee",
-        "EXACTLY_TWO_B_JETS", "Pass_mumu",
         # Leading electron
         "Leading_Electron_pt",
         "Leading_Electron_eta",
@@ -114,6 +125,16 @@ def bbll_branches(flags):
         "Subleading_Muon_phi",
         "Subleading_Muon_E",
         "Subleading_Muon_SF",
+        # Leading lepton
+        "lepton_1_pt",
+        "lepton_1_eta",
+        "lepton_1_phi",
+        "lepton_1_E",
+        # Subleading lepton
+        "lepton_2_pt",
+        "lepton_2_eta",
+        "lepton_2_phi",
+        "lepton_2_E",
         # Leading jet
         "Leading_Jet_pt",
         "Leading_Jet_eta",
@@ -134,7 +155,8 @@ def bbll_branches(flags):
                 branches += [f"EventInfo.{var}_%SYS% -> bbll_%SYS%_{var}"]
 
     dilepton_variables = ["dRee", "Etaee", "Phiee",
-                          "dRmumu", "Etamumu", "Phimumu"]
+                          "dRmumu", "Etamumu", "Phimumu",
+                          "dRemu", "Etaemu", "Phiemu"]
     for tree_flags in flags.Analysis.ttree_output:
         for var in dilepton_variables:
             if tree_flags['write_object_systs_only_for_pt'] and "pt" not in var:
@@ -146,6 +168,10 @@ def bbll_branches(flags):
     branches += ["EventInfo.pTee_%SYS% -> %SYS%_pTee"]
     branches += ["EventInfo.mmumu_%SYS% -> %SYS%_mmumu"]
     branches += ["EventInfo.pTmumu_%SYS% -> %SYS%_pTmumu"]
+    branches += ["EventInfo.memu_%SYS% -> %SYS%_memu"]
+    branches += ["EventInfo.pTemu_%SYS% -> %SYS%_pTemu"]
+    branches += ["EventInfo.mll_%SYS% -> %SYS%_mll"]
+    branches += ["EventInfo.pTll_%SYS% -> %SYS%_pTll"]
 
     # BJets
     btag_variables = ["pt", "eta", "phi", "E"]
@@ -195,5 +221,10 @@ def bbll_branches(flags):
                 branches += [f"EventInfo.mmc_{var}_%SYS% -> mmc_%SYS%_{var}"]
 
     branches += ["EventInfo.bbll_pass_sr_%SYS% -> bbll_pass_SR_%SYS%"]
+
+    if (flags.Analysis.save_bbll_cutflow):
+        cutList = flags.Analysis.CutList + flags.Analysis.Categories
+        for cut in cutList:
+            branches += [f"EventInfo.{cut}_%SYS% -> %SYS%_{cut}"]
 
     return branches

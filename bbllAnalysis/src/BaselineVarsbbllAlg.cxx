@@ -61,7 +61,7 @@ namespace HHBBLL
     }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
-    ATH_CHECK (m_systematicsList.initialize()); 
+    ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
   }
@@ -104,20 +104,16 @@ namespace HHBBLL
       TLorentzVector bb;
       TLorentzVector ee;
       TLorentzVector mumu;
+      TLorentzVector emu;
+      TLorentzVector Leading_lep;
+      TLorentzVector Subleading_lep;
 
-      bool TWO_ISO_MUONS = false;
-      bool TWO_ISO_ELECTRONS = false;
-      bool pass_ee = false;
-      bool pass_mumu = false;
-      bool EXACTLY_TWO_B_JETS = 0;
       int n_jets=0;
       int n_bjets=0;
       int n_electrons=0;
       int n_muons=0;
       std::vector<float> PassElectronIsos;
       std::vector<float> PassMuonIsos;
-      double Mee = -99;
-      double Mmumu = -99;
 
       // Count electrons
       n_electrons = electrons->size();
@@ -128,15 +124,6 @@ namespace HHBBLL
       // Count jets
       n_jets = jets->size();
 
-      if(electrons->size() >= 2){
-        Mee = (electrons->at(0)->p4() + electrons->at(1)->p4()).M();
-        TWO_ISO_ELECTRONS = true;
-      }
-      if(muons->size() >= 2){
-        Mmumu = (muons->at(0)->p4() + muons->at(1)->p4()).M();
-        TWO_ISO_MUONS = true;
-      }
-
       // b-jet sector
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
@@ -145,20 +132,7 @@ namespace HHBBLL
           if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
         }
       }
-      n_bjets = bjets->size();       
-
-      EXACTLY_TWO_B_JETS = (n_bjets==2);
-
-      pass_ee = TWO_ISO_ELECTRONS && EXACTLY_TWO_B_JETS;          
-      pass_mumu = TWO_ISO_MUONS && EXACTLY_TWO_B_JETS;
-
-      m_Fbranches.at("TWO_ISO_ELECTRONS").set(*event, TWO_ISO_ELECTRONS, sys);
-      m_Fbranches.at("TWO_ISO_MUONS").set(*event, TWO_ISO_MUONS, sys);
-      m_Fbranches.at("EXACTLY_TWO_B_JETS").set(*event, EXACTLY_TWO_B_JETS, sys);
-      m_Fbranches.at("Pass_ee").set(*event, pass_ee, sys);
-      m_Fbranches.at("Pass_mumu").set(*event, pass_mumu, sys);
-      m_Fbranches.at("Mee").set(*event, Mee, sys);
-      m_Fbranches.at("Mmumu").set(*event, Mmumu, sys);
+      n_bjets = bjets->size();
 
       m_Ibranches.at("nJets").set(*event, n_jets, sys);
       m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
@@ -212,8 +186,8 @@ namespace HHBBLL
         float mu_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
         m_Fbranches.at("Leading_Muon_SF").set(*event, mu_SF, sys);
       }
-      if (muons->size() >= 2) 
-      { 
+      if (muons->size() >= 2)
+      {
         // Subleading muon
         const xAOD::Muon* mu1 = muons->at(1);
         m_Fbranches.at("Subleading_Muon_pt").set(*event, mu1->pt(), sys);
@@ -230,14 +204,87 @@ namespace HHBBLL
         m_Fbranches.at("Etamumu").set(*event, mumu.Eta(), sys);
         m_Fbranches.at("Phimumu").set(*event, mumu.Phi(), sys);
         m_Fbranches.at("dRmumu").set(*event, (muons->at(0)->p4()).DeltaR(muons->at(1)->p4()), sys);
-      }// end muon 
+      }// end muon
+
+      //emu
+      if (electrons->size() == 1 && muons->size() == 1)
+      {
+        emu = electrons->at(0)->p4() + muons->at(0)->p4();
+        m_Fbranches.at("memu").set(*event, emu.M(), sys);
+        m_Fbranches.at("pTemu").set(*event, emu.Pt(), sys);
+        m_Fbranches.at("Etaemu").set(*event, emu.Eta(), sys);
+        m_Fbranches.at("Phiemu").set(*event, emu.Phi(), sys);
+        m_Fbranches.at("dRemu").set(*event, (electrons->at(0)->p4()).DeltaR(muons->at(0)->p4()), sys);
+      }
+
+      //Leading lepton
+      if (electrons->size() >= 1 || muons->size() >= 1)
+      {
+        const xAOD::Muon* mu0 = nullptr;
+        const xAOD::Electron* ele0 = nullptr;
+	if (electrons->size() >= 1)
+          ele0 = electrons->at(0);
+        if (muons->size() >= 1)
+          mu0 = muons->at(0);
+	if (ele0 && !mu0)
+          Leading_lep = ele0->p4();
+	else if (!ele0 && mu0)
+          Leading_lep = mu0->p4();
+	else if (ele0 && mu0)
+	  Leading_lep = (ele0->pt() > mu0->pt()) ? ele0->p4() : mu0->p4();
+        m_Fbranches.at("lepton_1_pt").set(*event, Leading_lep.Pt(), sys);
+        m_Fbranches.at("lepton_1_eta").set(*event, Leading_lep.Eta(), sys);
+        m_Fbranches.at("lepton_1_phi").set(*event, Leading_lep.Phi(), sys);
+        m_Fbranches.at("lepton_1_E").set(*event, Leading_lep.E(), sys);
+      }
+
+      //Subleading lepton
+      if (electrons->size() + muons->size() == 2)
+      {
+        const xAOD::Electron* ele0 = nullptr;
+	const xAOD::Muon* mu0 = nullptr;
+	const xAOD::Electron* ele1 = nullptr;
+        const xAOD::Muon* mu1 = nullptr;
+
+	if (electrons->size() == 2 && muons->size() == 0)
+          ele1 = electrons->at(1);
+	else if (electrons->size() == 0 && muons->size() == 2)
+          mu1 = muons->at(1);
+        else if (electrons->size() + muons->size() == 2) {
+	  ele0 = electrons->at(0);
+          mu0 = muons->at(0);
+	}
+
+	if (ele1)
+          Subleading_lep = ele1->p4();
+        else if (mu1)
+          Subleading_lep = mu1->p4();
+	else if (ele0 && mu0)
+          Subleading_lep = (ele0->pt() > mu0->pt()) ? mu0->p4() : ele0->p4();
+        m_Fbranches.at("lepton_2_pt").set(*event, Subleading_lep.Pt(), sys);
+        m_Fbranches.at("lepton_2_eta").set(*event, Subleading_lep.Eta(), sys);
+        m_Fbranches.at("lepton_2_phi").set(*event, Subleading_lep.Phi(), sys);
+        m_Fbranches.at("lepton_2_E").set(*event, Subleading_lep.E(), sys);
+      }
+
+      //ll_m
+      double ll_m = (electrons->size() == 2 && muons->size() == 0) ? ee.M() :
+        (electrons->size() == 0 && muons->size() == 2) ? mumu.M() :
+        (electrons->size() == 1 && muons->size() == 1 ) ? emu.M() : -99;
+      m_Fbranches.at("mll").set(*event, ll_m, sys);
+
+      //ll_pt
+      double ll_pt = (electrons->size() == 2 && muons->size() == 0) ? ee.Pt() :
+        (electrons->size() == 0 && muons->size() == 2) ? mumu.Pt() :
+        (electrons->size() == 1 && muons->size() == 1 ) ? emu.Pt() : -99;
+      m_Fbranches.at("pTll").set(*event, ll_pt, sys);
 
       if (jets->size()>=1)
       {
         m_Fbranches.at("Leading_Jet_pt").set(*event, jets->at(0)->pt(), sys);
         m_Fbranches.at("Leading_Jet_eta").set(*event, jets->at(0)->eta(), sys);
         m_Fbranches.at("Leading_Jet_phi").set(*event, jets->at(0)->phi(), sys);
-        m_Fbranches.at("Leading_Jet_E").set(*event, jets->at(0)->e(), sys);   
+        m_Fbranches.at("Leading_Jet_E").set(*event, jets->at(0)->e(), sys);
       }
 
       if (jets->size()>=2)

@@ -21,11 +21,9 @@ small_R_jet:
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
-  extra_wps:
-    - ["TightLH", "Loose_VarRad"]
 
 Muon:
-  ID: "Loose"
+  ID: "Medium"
   Iso: "PflowLoose_VarRad"
 
 # list of triggers per year to consider
@@ -35,6 +33,26 @@ trigger_chains:
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: true
+
+#Enable cutflow 
+save_bbll_cutflow: true
+
+CutList :
+      - EXACTLY_TWO_LEPTONS
+      - PASS_TRIGGER
+      - TWO_OPPOSITE_CHARGE_LEPTONS
+      - EXACTLY_TWO_B_JETS
+      - DILEPTON_MASS_SR1
+      - VBFVETO_SR1
+      - DILEPTON_MASS_SR2
+      - DIBJET_MASS_SR2
+
+Categories :
+      - IS_SF
+      - IS_ee
+      - IS_mm
+      - IS_em
+      - Pass_ll
 
 # Include the TTree configuration and update details
 ttree_output:

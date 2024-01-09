@@ -15,6 +15,7 @@ Analysis Package for the $HH\rightarrow b\bar{b} ll$ analyis
   - `HHbbllSelectorAlg`: Find if the event pass the baseline bbll selection;
   - `MMCDecoratorAlg`: Compute the tau tau MMC mass;
   - `BaselineVarsbbllAlg`: Compute the baseline variables for the analysis.
+  - `SelectionFlagsbbllAlg`: Find if the event pass the baseline bbll selection;
 
 # How to Run
 
@@ -38,7 +39,7 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
     * some (duplicated ?) di-b variables: `NOSYS_mbb`, `NOSYS_pTbb`.
 * Missing Mass Calculator (MMC) outputs: `mmc_X`
 * Standard set of `bbll` variables, including:
-      * cuts to pass:  `bbll_TWO_ISO_MUONS`,  `bbll_EXACTLY_TWO_B_JETS` ...
+      * cuts to pass:  `NOSYS_PASS_TRIGGER`,  `NOSYS_TWO_MEDIUM_ISO_LEPTONS` ...
       * di-lepton mass / delta R / phi / eta : `bbll_MXX` / `bbll_dRXX` / `bbll_EtaXX` / `bbll_PhiXX`;
       * leading and sub-leading electron and muon (kinematics): `bbll_Leading_Electron_X` / `bbll_Sublead_Electron_X` and `bbll_Leading_Muon_X` / `bbll_Sublead_Muon_X`;
       * leading and sub-leading jet and b-tagged jet (kinematics): `bbll_Leading_Jet_X` / `bbll_Sublead_Jet_X` and `bbll_Jet_X_b1` / `bbll_Jet_X_b2`;

@@ -82,12 +82,13 @@ private:
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
-    "TWO_ISO_ELECTRONS", "TWO_ISO_MUONS", "EXACTLY_TWO_B_JETS", "Pass_ee", "Pass_mumu", "Mee", "Mmumu",
     "Leading_Electron_pt", "Leading_Electron_eta", "Leading_Electron_phi", "Leading_Electron_E", "Leading_Electron_SF",
+    "lepton_1_pt", "lepton_1_eta", "lepton_1_phi", "lepton_1_E",
+    "lepton_2_pt", "lepton_2_eta", "lepton_2_phi", "lepton_2_E",
     "Subleading_Electron_pt", "Subleading_Electron_eta", "Subleading_Electron_phi", "Subleading_Electron_E", "Subleading_Electron_SF",
     "Leading_Muon_pt", "Leading_Muon_eta", "Leading_Muon_phi", "Leading_Muon_E", "Leading_Muon_SF",
     "Subleading_Muon_pt", "Subleading_Muon_eta", "Subleading_Muon_phi", "Subleading_Muon_E", "Subleading_Muon_SF",
-    "mee", "pTee", "dRee", "Etaee", "Phiee", "mmumu", "pTmumu", "dRmumu", "Etamumu", "Phimumu",
+    "mee", "pTee", "dRee", "Etaee", "Phiee", "mmumu", "pTmumu", "dRmumu", "Etamumu", "Phimumu", "memu", "pTemu", "dRemu", "Etaemu", "Phiemu", "mll", "pTll",
     "Jet_pt_b1", "Jet_eta_b1", "Jet_phi_b1", "Jet_E_b1", "Jet_pt_b2", "Jet_eta_b2", "Jet_phi_b2", "Jet_E_b2",
     "mbb", "pTbb", "dRbb", "Etabb", "Phibb",         
     "Leading_Jet_pt", "Leading_Jet_eta", "Leading_Jet_phi", "Leading_Jet_E", 
