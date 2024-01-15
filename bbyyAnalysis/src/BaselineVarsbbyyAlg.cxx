@@ -140,6 +140,9 @@ namespace HHBBYY
         m_Fbranches.at("Etayy").set(*event, H_yy.Eta(), sys);
         m_Fbranches.at("Phiyy").set(*event, H_yy.Phi(), sys);
         m_Fbranches.at("dRyy").set(*event, dRyy, sys);
+
+        m_Fbranches.at("Photon1_ptOvermyy").set(*event, y1.Pt()/H_yy.M(), sys);
+        m_Fbranches.at("Photon2_ptOvermyy").set(*event, y2.Pt()/H_yy.M(), sys);
       }
 
       // b-jet sector

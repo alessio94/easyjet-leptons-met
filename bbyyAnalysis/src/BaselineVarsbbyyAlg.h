@@ -79,7 +79,7 @@ namespace HHBBYY
       "mbb", "pTbb", "dRbb", "Etabb", "Phibb", 
 
       // di-higgs variables
-      "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star",
+      "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star", "Photon1_ptOvermyy", "Photon2_ptOvermyy",
 
       // mva variables
 	"HT", "topness", "missEt", "metphi",

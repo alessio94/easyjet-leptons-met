@@ -88,7 +88,8 @@ def bbyy_branches(flags):
         for kin in photon_kinematics:
             branches += [f"EventInfo.{pt_ord}_Photon_{kin}_%SYS% -> %SYS%_{pt_ord}_Photon_{kin}"]  # noqa
 
-    diphoton_variables = ["myy", "pTyy", "dRyy", "Etayy", "Phiyy"]
+    diphoton_variables = ["myy", "pTyy", "dRyy", "Etayy", "Phiyy",
+                          "Photon1_ptOvermyy", "Photon2_ptOvermyy"]
     for var in diphoton_variables:
         branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
 
