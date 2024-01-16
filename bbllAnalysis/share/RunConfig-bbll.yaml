@@ -17,14 +17,21 @@ do_mmc : true
 small_R_jet:
   # btagging working points 
   btag_wp: "DL1dv01_FixedCutBEff_77"
+  amount: 2
+  amount_bjet: 2
 
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
+  amount: 2
 
 Muon:
   ID: "Medium"
   Iso: "PflowLoose_VarRad"
+  amount: 2
+
+Lepton:
+  amount: 2
 
 # list of triggers per year to consider
 trigger_chains:
@@ -59,7 +66,7 @@ ttree_output:
   - AnalysisMiniTree:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
-    write_object_systs_only_for_pt: true
+    slim_variables_with_syst: true
     reco_outputs:
       small_R_jets: 'container_names.output.reco4PFlowJet'
       muons: 'container_names.output.muons'

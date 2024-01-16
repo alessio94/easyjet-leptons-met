@@ -1,7 +1,9 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-# this is a resolved dihiggs analysis chain
+from EasyjetHub.output.ttree.selected_objects import (
+    get_selected_objects_branches,
+)
 
 
 def resolved_cfg(flags, smalljetkey):
@@ -56,6 +58,11 @@ def resolved_cfg(flags, smalljetkey):
 def resolved_branches(flags):
     branches = []
 
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    branches += get_selected_objects_branches(flags, "bbbb_resolved")
+
     btag_wps = [flags.Analysis.small_R_jet.btag_wp]
     btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
     for btag_wp in btag_wps:
@@ -73,7 +80,7 @@ def resolved_branches(flags):
 
         for var in resolved_vars:
             branches += [
-                f"EventInfo.resolved_{var}_{btag_wp} -> resolved_{btag_wp}_{var}"
+                f"EventInfo.resolved_{var}_{btag_wp} -> bbbb_resolved_{btag_wp}_{var}"
             ]
 
         if flags.Input.isMC:

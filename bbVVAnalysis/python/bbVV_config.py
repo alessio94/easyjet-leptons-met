@@ -1,6 +1,10 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+from EasyjetHub.output.ttree.selected_objects import (
+    get_selected_objects_branches,
+)
+
 
 def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
@@ -163,24 +167,14 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
 def bbVV_branches(flags):
     branches = []
 
-    bbVV_vars = [
-        "Selected_Lepton_pt",
-        "Selected_Lepton_eta",
-        "Selected_Lepton_charge",
-        "Selected_Lepton_pdgid",
-        "Selected_Lepton_SF",
-    ]
-
-    for tree_flags in flags.Analysis.ttree_output:
-        for var in bbVV_vars:
-            if tree_flags['write_object_systs_only_for_pt'] and "pt" not in var:
-                branches += [f"EventInfo.{var}_NOSYS -> bbVV_{var}"]
-            else:
-                branches += [f"EventInfo.{var}_%SYS% -> bbVV_%SYS%_{var}"]
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    branches += get_selected_objects_branches(flags, "bbVV")
 
     #     for hh in ["HH", "HH_vis", "HH_visMet"]:
     #         for var in ["pt", "eta", "phi", "m"]:
-    #             if tree_flags['write_object_systs_only_for_pt'] and "pt" not in var:
+    #             if tree_flags['slim_variables_with_syst'] and "pt" not in var:
     #                 branches += [f"EventInfo.{hh}_{var}_NOSYS -> {hh}_{var}"]
     #             else:
     #                 branches += [f"EventInfo.{hh}_{var}_%SYS% -> {hh}_%SYS%_{var}"]

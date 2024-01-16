@@ -31,6 +31,9 @@ Muon:
   extra_wps:
     - ["Medium", "PflowLoose_VarRad"]
 
+Lepton:
+  amount: 1
+
 # list of triggers per year to consider
 trigger_chains:
   include: bbVVAnalysis/trigger.yaml
@@ -44,7 +47,7 @@ ttree_output:
   - AnalysisMiniTree:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
-    write_object_systs_only_for_pt: true
+    slim_variables_with_syst: true
     reco_outputs:
       small_R_jets: 'container_names.output.reco4PFlowJet'
       large_R_UFO_jets: 'container_names.output.reco10UFOJet'

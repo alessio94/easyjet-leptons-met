@@ -23,7 +23,7 @@ def get_large_R_jet_branches(
         systematics_option=_syst_option,
     )
 
-    if tree_flags.write_object_systs_only_for_pt:
+    if tree_flags.slim_variables_with_syst:
         large_R_jet_branches.syst_only_for = ["pt"]
 
     # The LargeJetGhostVRJetAssociationAlg does not support systematics

@@ -13,7 +13,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
         systematics_option=_syst_option,
     )
 
-    if tree_flags.write_object_systs_only_for_pt:
+    if tree_flags.slim_variables_with_syst:
         tau_branches.syst_only_for = ["pt"]
 
     tau_branches.add_four_mom_branches(do_mass=False)

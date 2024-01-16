@@ -82,21 +82,27 @@ private:
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
-    "Leading_Electron_pt", "Leading_Electron_eta", "Leading_Electron_phi", "Leading_Electron_E", "Leading_Electron_SF",
-    "lepton_1_pt", "lepton_1_eta", "lepton_1_phi", "lepton_1_E",
-    "lepton_2_pt", "lepton_2_eta", "lepton_2_phi", "lepton_2_E",
-    "Subleading_Electron_pt", "Subleading_Electron_eta", "Subleading_Electron_phi", "Subleading_Electron_E", "Subleading_Electron_SF",
-    "Leading_Muon_pt", "Leading_Muon_eta", "Leading_Muon_phi", "Leading_Muon_E", "Leading_Muon_SF",
-    "Subleading_Muon_pt", "Subleading_Muon_eta", "Subleading_Muon_phi", "Subleading_Muon_E", "Subleading_Muon_SF",
-    "mee", "pTee", "dRee", "Etaee", "Phiee", "mmumu", "pTmumu", "dRmumu", "Etamumu", "Phimumu", "memu", "pTemu", "dRemu", "Etaemu", "Phiemu", "mll", "pTll",
-    "Jet_pt_b1", "Jet_eta_b1", "Jet_phi_b1", "Jet_E_b1", "Jet_pt_b2", "Jet_eta_b2", "Jet_phi_b2", "Jet_E_b2",
-    "mbb", "pTbb", "dRbb", "Etabb", "Phibb",         
-    "Leading_Jet_pt", "Leading_Jet_eta", "Leading_Jet_phi", "Leading_Jet_E", 
-    "Subleading_Jet_pt", "Subleading_Jet_eta", "Subleading_Jet_phi", "Subleading_Jet_E",
+    "Electron1_pt", "Electron1_eta", "Electron1_phi", "Electron1_E", "Electron1_effSF",
+    "Electron2_pt", "Electron2_eta", "Electron2_phi", "Electron2_E", "Electron2_effSF",
+    "Muon1_pt", "Muon1_eta", "Muon1_phi", "Muon1_E", "Muon1_effSF",
+    "Muon2_pt", "Muon2_eta", "Muon2_phi", "Muon2_E", "Muon2_effSF",
+    "Lepton1_pt", "Lepton1_eta", "Lepton1_phi", "Lepton1_E", "Lepton1_effSF",
+    "Lepton2_pt", "Lepton2_eta", "Lepton2_phi", "Lepton2_E", "Lepton2_effSF",
+    "mee", "pTee", "dRee", "Etaee", "Phiee", 
+    "mmumu", "pTmumu", "dRmumu", "Etamumu", "Phimumu",
+    "memu", "pTemu","dRemu", "Etaemu", "Phiemu",
+    "mll", "pTll",
+    "Jet_b1_pt", "Jet_b1_eta", "Jet_b1_phi", "Jet_b1_E",
+    "Jet_b2_pt", "Jet_b2_eta", "Jet_b2_phi", "Jet_b2_E",
+    "mbb", "pTbb", "dRbb", "Etabb", "Phibb",
+    "Jet1_pt", "Jet1_eta", "Jet1_phi", "Jet1_E",
+    "Jet2_pt", "Jet2_eta", "Jet2_phi", "Jet2_E",
     };
 
    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
    std::vector<std::string> m_Ivarnames{
+    "Lepton1_charge", "Lepton1_pdgid",
+    "Lepton2_charge", "Lepton2_pdgid",
    "nBJets", "nMuons", "nElectrons", "nJets",
    };
     

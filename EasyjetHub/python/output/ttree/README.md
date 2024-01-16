@@ -42,7 +42,7 @@ collection_options:
   large_R_jets:
     substructure_info: True
 ```
-- `write_object_systs_only_for_pt`: Forwarded to all `BranchManager` objects steering the configuration of this TTree.
+- `slim_variables_with_syst`: Forwarded to all `BranchManager` objects steering the configuration of this TTree.
 
 For the full set of flags, see [`EasyjetHub/share/AnalysisMiniTree-config.yaml`](../../../share/AnalysisMiniTree-config.yaml).
 
@@ -104,7 +104,7 @@ AntiKt4EMPFlowJets.NNJvt -> pf_jets_JET__JES__1up_NNJvt
 
 Systematics can be switched only only for certain variables using the `systs_only_for` attribute of the `BranchManager`. 
 Conversely, systematics can we switched off for certain variables using the `syst_not_for` attribute.   The former takes 
-precedence.  Setting the `write_object_systs_only_for_pt` flag only stores systematic variations for pt/Et-related branches.
+precedence.  Setting the `slim_variables_with_syst` flag only stores systematic variations for pt/Et-related branches.
 
 Setting the `do_overlap_removal` flag inserts `OR` into the output prefix, and uses the overlap-removed container:
 ```python

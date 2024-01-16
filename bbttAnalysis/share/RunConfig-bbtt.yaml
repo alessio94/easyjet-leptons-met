@@ -23,6 +23,7 @@ do_baseline : false
 small_R_jet:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
+  amount_bjet: 2
 
 Electron:
   ID: "LooseBLayerLH"
@@ -38,6 +39,10 @@ Muon:
 
 Tau:
   ID: "Loose"
+  amount: 2
+
+Lepton:
+  amount: 1
 
 # list of triggers per year to consider
 trigger_chains:
@@ -64,7 +69,7 @@ ttree_output:
   - AnalysisMiniTree:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
-    write_object_systs_only_for_pt: true
+    slim_variables_with_syst: true
     reco_outputs:
       small_R_jets: 'container_names.output.reco4PFlowJet'
       muons: 'container_names.output.muons'

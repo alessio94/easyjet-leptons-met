@@ -127,12 +127,12 @@ namespace ttHH
 
           if (m_isMC) truthLabel = HadronConeExclTruthLabelID(*bjets->at(i));
 
-          m_Fbranches.at("Jet_pt_b"+std::to_string(i+1)).set(*event, bjets->at(i)->p4().Pt(), sys);
-          m_Fbranches.at("Jet_eta_b"+std::to_string(i+1)).set(*event, bjets->at(i)->p4().Eta(), sys);
-          m_Fbranches.at("Jet_phi_b"+std::to_string(i+1)).set(*event, bjets->at(i)->p4().Phi(), sys);
-          m_Fbranches.at("Jet_E_b"+std::to_string(i+1)).set(*event, bjets->at(i)->p4().E(), sys);
+          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_pt").set(*event, bjets->at(i)->p4().Pt(), sys);
+          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_eta").set(*event, bjets->at(i)->p4().Eta(), sys);
+          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_phi").set(*event, bjets->at(i)->p4().Phi(), sys);
+          m_Fbranches.at("Je_b"+std::to_string(i+1)+"_E").set(*event, bjets->at(i)->p4().E(), sys);
 
-          m_Fbranches.at("Jet_truthLabel_b"+std::to_string(i+1)).set(*event, truthLabel, sys);
+          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel, sys);
         }
  
         // Build the Higgs candidates
@@ -267,24 +267,28 @@ namespace ttHH
       if (electrons->size() >= 1) {
         const xAOD::Electron* ele1 = electrons->at(0);
         e1 = ele1->p4();
-        m_Fbranches.at("Leading_Electron_pt").set(*event, e1.Pt(), sys);
-        m_Fbranches.at("Leading_Electron_eta").set(*event, e1.Eta(), sys);
-        m_Fbranches.at("Leading_Electron_phi").set(*event, e1.Phi(), sys);
-        m_Fbranches.at("Leading_Electron_E").set(*event, e1.E(), sys);
-        float ele_SF = m_ele_recoSF.get(*ele1, sys) * m_ele_idSF.get(*ele1, sys) *
+        m_Fbranches.at("Electron1_pt").set(*event, e1.Pt(), sys);
+        m_Fbranches.at("Electron1_eta").set(*event, e1.Eta(), sys);
+        m_Fbranches.at("Electron1_phi").set(*event, e1.Phi(), sys);
+        m_Fbranches.at("Electron1_E").set(*event, e1.E(), sys);
+        if (m_Fbranches.find("Electron1_effSF")!=m_Fbranches.end()){
+          float ele_SF = m_ele_recoSF.get(*ele1, sys) * m_ele_idSF.get(*ele1, sys) *
           m_ele_isoSF.get(*ele1, sys);
-        m_Fbranches.at("Leading_Electron_SF").set(*event, ele_SF, sys);
+          m_Fbranches.at("Electron1_effSF").set(*event, ele_SF, sys);
+        }
       }
       if (electrons->size() >= 2) {
         const xAOD::Electron* ele2 = electrons->at(1);
         e2 = ele2->p4();
-        m_Fbranches.at("Subleading_Electron_pt").set(*event, e2.Pt(), sys);
-        m_Fbranches.at("Subleading_Electron_eta").set(*event, e2.Eta(), sys);
-        m_Fbranches.at("Subleading_Electron_phi").set(*event, e2.Phi(), sys);
-        m_Fbranches.at("Subleading_Electron_E").set(*event, e2.E(), sys);
-        float ele_SF = m_ele_recoSF.get(*ele2, sys) * m_ele_idSF.get(*ele2, sys) *
+        m_Fbranches.at("Electron2_pt").set(*event, e2.Pt(), sys);
+        m_Fbranches.at("Electron2_eta").set(*event, e2.Eta(), sys);
+        m_Fbranches.at("Electron2_phi").set(*event, e2.Phi(), sys);
+        m_Fbranches.at("Electron2_E").set(*event, e2.E(), sys);
+        if (m_Fbranches.find("Electron2_effSF")!=m_Fbranches.end()){
+          float ele_SF = m_ele_recoSF.get(*ele2, sys) * m_ele_idSF.get(*ele2, sys) *
           m_ele_isoSF.get(*ele2, sys);
-        m_Fbranches.at("Subleading_Electron_SF").set(*event, ele_SF, sys);
+          m_Fbranches.at("Electron2_effSF").set(*event, ele_SF, sys);
+        }
 
         // ee
         e1 = electrons->at(0)->p4();
@@ -300,22 +304,26 @@ namespace ttHH
       if (muons->size() >= 1) {
         const xAOD::Muon* muon1 = muons->at(0);
         mu1 = muon1->p4();
-        m_Fbranches.at("Leading_Muon_pt").set(*event, mu1.Pt(), sys);
-        m_Fbranches.at("Leading_Muon_eta").set(*event, mu1.Eta(), sys);
-        m_Fbranches.at("Leading_Muon_phi").set(*event, mu1.Phi(), sys);
-        m_Fbranches.at("Leading_Muon_E").set(*event, mu1.E(), sys);
-        float mu_SF = m_mu_recoSF.get(*muon1, sys) * m_mu_isoSF.get(*muon1, sys);
-        m_Fbranches.at("Leading_Muon_SF").set(*event, mu_SF, sys);
+        m_Fbranches.at("Muon1_pt").set(*event, mu1.Pt(), sys);
+        m_Fbranches.at("Muon1_eta").set(*event, mu1.Eta(), sys);
+        m_Fbranches.at("Muon1_phi").set(*event, mu1.Phi(), sys);
+        m_Fbranches.at("Muon1_E").set(*event, mu1.E(), sys);
+        if (m_Fbranches.find("Muon1_effSF")!=m_Fbranches.end()){
+          float mu_SF = m_mu_recoSF.get(*muon1, sys) * m_mu_isoSF.get(*muon1, sys);
+          m_Fbranches.at("Muon1_effSF").set(*event, mu_SF, sys);
+        }
       }
       if (muons->size() >= 2) {
         const xAOD::Muon* muon2 = muons->at(1);
         mu2 = muon2->p4();
-        m_Fbranches.at("Subleading_Muon_pt").set(*event, mu2.Pt(), sys);
-        m_Fbranches.at("Subleading_Muon_eta").set(*event, mu2.Eta(), sys);
-        m_Fbranches.at("Subleading_Muon_phi").set(*event, mu2.Phi(), sys);
-        m_Fbranches.at("Subleading_Muon_E").set(*event, mu2.E(), sys);
-        float mu_SF = m_mu_recoSF.get(*muon2, sys) * m_mu_isoSF.get(*muon2, sys);
-        m_Fbranches.at("Subleading_Muon_SF").set(*event, mu_SF, sys);
+        m_Fbranches.at("Muon2_pt").set(*event, mu2.Pt(), sys);
+        m_Fbranches.at("Muon2_eta").set(*event, mu2.Eta(), sys);
+        m_Fbranches.at("Muon2_phi").set(*event, mu2.Phi(), sys);
+        m_Fbranches.at("Muon2_E").set(*event, mu2.E(), sys);
+        if (m_Fbranches.find("Muon2_effSF")!=m_Fbranches.end()){
+          float mu_SF = m_mu_recoSF.get(*muon2, sys) * m_mu_isoSF.get(*muon2, sys);
+          m_Fbranches.at("Muon2_effSF").set(*event, mu_SF, sys);
+        }
 
         // mumu
         mu1 = muons->at(0)->p4();

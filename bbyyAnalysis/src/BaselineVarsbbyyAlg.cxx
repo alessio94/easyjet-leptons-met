@@ -118,10 +118,10 @@ namespace HHBBYY
       if (photons->size() >= 1) {
         y1 = photons->at(0)->p4();
 
-        m_Fbranches.at("Leading_Photon_pt").set(*event, y1.Pt(), sys);
-        m_Fbranches.at("Leading_Photon_eta").set(*event, y1.Eta(), sys);
-        m_Fbranches.at("Leading_Photon_phi").set(*event, y1.Phi(), sys);
-        m_Fbranches.at("Leading_Photon_E").set(*event, y1.E(), sys);
+        m_Fbranches.at("Photon1_pt").set(*event, y1.Pt(), sys);
+        m_Fbranches.at("Photon1_eta").set(*event, y1.Eta(), sys);
+        m_Fbranches.at("Photon1_phi").set(*event, y1.Phi(), sys);
+        m_Fbranches.at("Photon1_E").set(*event, y1.E(), sys);
       }
       if (photons->size() >= 2) {
         y2 = photons->at(1)->p4();
@@ -130,10 +130,10 @@ namespace HHBBYY
         H_yy = y1 + y2;
         dRyy = (y1).DeltaR(y2);
 
-        m_Fbranches.at("Subleading_Photon_pt").set(*event, y2.Pt(), sys);
-        m_Fbranches.at("Subleading_Photon_eta").set(*event, y2.Eta(), sys);
-        m_Fbranches.at("Subleading_Photon_phi").set(*event, y2.Phi(), sys);
-        m_Fbranches.at("Subleading_Photon_E").set(*event, y2.E(), sys);
+        m_Fbranches.at("Photon2_pt").set(*event, y2.Pt(), sys);
+        m_Fbranches.at("Photon2_eta").set(*event, y2.Eta(), sys);
+        m_Fbranches.at("Photon2_phi").set(*event, y2.Phi(), sys);
+        m_Fbranches.at("Photon2_E").set(*event, y2.E(), sys);
 
         m_Fbranches.at("myy").set(*event, H_yy.M(), sys);
         m_Fbranches.at("pTyy").set(*event, H_yy.Pt(), sys);
@@ -150,11 +150,11 @@ namespace HHBBYY
         b1 = bjets->at(0)->p4();
         if (m_isMC) truthLabel_b1 = HadronConeExclTruthLabelID(*bjets->at(0));
 
-        m_Fbranches.at("Jet_pt_b1").set(*event, b1.Pt(), sys);
-        m_Fbranches.at("Jet_eta_b1").set(*event, b1.Eta(), sys);
-        m_Fbranches.at("Jet_phi_b1").set(*event, b1.Phi(), sys);
-        m_Fbranches.at("Jet_E_b1").set(*event, b1.E(), sys);
-        if (m_isMC) m_Ibranches.at("Jet_truthLabel_b1").set(*event, truthLabel_b1, sys);
+        m_Fbranches.at("Jet_b1_pt").set(*event, b1.Pt(), sys);
+        m_Fbranches.at("Jet_b1_eta").set(*event, b1.Eta(), sys);
+        m_Fbranches.at("Jet_b1_phi").set(*event, b1.Phi(), sys);
+        m_Fbranches.at("Jet_b1_E").set(*event, b1.E(), sys);
+        if (m_isMC) m_Ibranches.at("Jet_b1_truthLabel").set(*event, truthLabel_b1, sys);
       }
       if (bjets->size() >= 2) {
         b2 = bjets->at(1)->p4();
@@ -164,11 +164,11 @@ namespace HHBBYY
         H_bb = b1 + b2;
         dRbb = (b1).DeltaR(b2);
 
-        m_Fbranches.at("Jet_pt_b2").set(*event, b2.Pt(), sys);
-        m_Fbranches.at("Jet_eta_b2").set(*event, b2.Eta(), sys);
-        m_Fbranches.at("Jet_phi_b2").set(*event, b2.Phi(), sys);
-        m_Fbranches.at("Jet_E_b2").set(*event, b2.E(), sys);
-        if (m_isMC) m_Ibranches.at("Jet_truthLabel_b2").set(*event, truthLabel_b2, sys);
+        m_Fbranches.at("Jet_b2_pt").set(*event, b2.Pt(), sys);
+        m_Fbranches.at("Jet_b2_eta").set(*event, b2.Eta(), sys);
+        m_Fbranches.at("Jet_b2_phi").set(*event, b2.Phi(), sys);
+        m_Fbranches.at("Jet_b2_E").set(*event, b2.E(), sys);
+        if (m_isMC) m_Ibranches.at("Jet_b2_truthLabel").set(*event, truthLabel_b2, sys);
 
         m_Fbranches.at("mbb").set(*event, H_bb.M(), sys);
         m_Fbranches.at("pTbb").set(*event, H_bb.Pt(), sys);

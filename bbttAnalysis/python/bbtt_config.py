@@ -2,6 +2,10 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
+from EasyjetHub.output.ttree.selected_objects import (
+    get_selected_objects_branches_variables,
+)
+
 
 def bbtt_cfg(
         flags, smalljetkey, muonkey, electronkey,
@@ -139,28 +143,7 @@ def bbtt_cfg(
 
 def get_BaselineVarsbbttAlg_variables(flags):
     float_variable_names = []
-
-    particles = [
-        "Lepton",
-        "Leading_Tau",
-        "Sublead_Tau",
-        "Leading_Bjet",
-        "Sublead_Bjet",
-    ]
-
-    for particle in particles:
-        for var in ["pt", "eta", "phi"]:
-            float_variable_names.append(f"{particle}_{var}")
-
-    float_variable_names += ["Leading_Tau_effSF", "Sublead_Tau_effSF",
-                             "Lepton_SF"]
-
-    int_variable_names = [
-        "Lepton_charge",
-        "Lepton_pdgid",
-        "Leading_Tau_charge",
-        "Sublead_Tau_charge",
-    ]
+    int_variable_names = []
 
     if flags.Analysis.do_mmc:
         combined_particles = [
@@ -198,12 +181,17 @@ def bbtt_branches(flags):
     # this will be all the variables that are calculated by the
     # BaselineVarsbbttAlg algorithm
     all_baseline_variable_names = []
+    float_variable_names = []
+    int_variable_names = []
 
-    # these are the variables that will always be stored by easyjet
+    # these are the variables that will always be stored by easyjet specific to HHbbtt
     # further below there are more high level variables which can be
     # stored using the flag
     # flags.Analysis.store_high_level_variables
-    float_variable_names, int_variable_names = get_BaselineVarsbbttAlg_variables(flags)
+    baseline_float_variables, baseline_int_variables \
+        = get_BaselineVarsbbttAlg_variables(flags)
+    float_variable_names += baseline_float_variables
+    int_variable_names += baseline_int_variables
 
     if flags.Analysis.do_mmc:
         # do not append mmc variables to float_variable_names
@@ -218,16 +206,25 @@ def bbtt_branches(flags):
         float_variable_names += high_level_float_variables
         int_variable_names += high_level_int_variables
 
-    all_baseline_variable_names += float_variable_names
-    all_baseline_variable_names += int_variable_names
+    all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
-            if tree_flags['write_object_systs_only_for_pt'] and \
+            if tree_flags['slim_variables_with_syst'] and \
                "pt" not in var and "SF" not in var:
                 branches += [f"EventInfo.{var}_NOSYS -> bbtt_{var}"]
             else:
                 branches += [f"EventInfo.{var}_%SYS% -> bbtt_{var}_%SYS%"]
+
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    object_level_branches, object_level_float_variables, object_level_int_variables \
+        = get_selected_objects_branches_variables(flags, "bbtt")
+    float_variable_names += object_level_float_variables
+    int_variable_names += object_level_int_variables
+
+    branches += object_level_branches
 
     branches += ["EventInfo.bbtt_pass_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
 
@@ -247,4 +244,4 @@ def bbtt_branches(flags):
                     "DTT_2016", "DTT_4J12", "DTT_L1Topo"]:
             branches += [f"EventInfo.pass{var}{cat}_%SYS% -> bbtt_pass{var}{cat}_%SYS%"]
 
-    return branches,float_variable_names,int_variable_names
+    return branches, float_variable_names, int_variable_names

@@ -156,9 +156,11 @@ namespace HHBBTT
         m_Fbranches.at("Lepton_pt").set(*event, lepton.Pt(), sys);
         m_Fbranches.at("Lepton_eta").set(*event, lepton.Eta(), sys);
         m_Fbranches.at("Lepton_phi").set(*event, lepton.Phi(), sys);
+        m_Fbranches.at("Lepton_E").set(*event, lepton.E(), sys);
+        if (m_Fbranches.find("Lepton_effSF")!=m_Fbranches.end())
+          m_Fbranches.at("Lepton_effSF").set(*event, lepton_SF, sys);
         m_Ibranches.at("Lepton_charge").set(*event, lepton_charge, sys);
         m_Ibranches.at("Lepton_pdgid").set(*event, lepton_pdgid, sys);
-        m_Fbranches.at("Lepton_SF").set(*event, lepton_SF, sys);
       }
 
       //selected tau
@@ -191,19 +193,23 @@ namespace HHBBTT
       }
 
       if(found_lead_tau){
-        m_Fbranches.at("Leading_Tau_pt").set(*event, lead_tau.Pt(), sys);
-        m_Fbranches.at("Leading_Tau_eta").set(*event, lead_tau.Eta(), sys);
-        m_Fbranches.at("Leading_Tau_phi").set(*event, lead_tau.Phi(), sys);
-        m_Fbranches.at("Leading_Tau_effSF").set(*event, lead_tau_effSF, sys);
-        m_Ibranches.at("Leading_Tau_charge").set(*event, lead_tau_charge, sys);
+        m_Fbranches.at("Tau1_pt").set(*event, lead_tau.Pt(), sys);
+        m_Fbranches.at("Tau1_eta").set(*event, lead_tau.Eta(), sys);
+        m_Fbranches.at("Tau1_phi").set(*event, lead_tau.Phi(), sys);
+        m_Fbranches.at("Tau1_E").set(*event, lead_tau.E(), sys);
+        if (m_Fbranches.find("Tau1_effSF")!=m_Fbranches.end())
+          m_Fbranches.at("Tau1_effSF").set(*event, lead_tau_effSF, sys);
+        m_Ibranches.at("Tau1_charge").set(*event, lead_tau_charge, sys);
       }
 
       if(found_sublead_tau){
-        m_Fbranches.at("Sublead_Tau_pt").set(*event, sublead_tau.Pt(), sys);
-        m_Fbranches.at("Sublead_Tau_eta").set(*event, sublead_tau.Eta(), sys);
-        m_Fbranches.at("Sublead_Tau_phi").set(*event, sublead_tau.Phi(), sys);
-        m_Fbranches.at("Sublead_Tau_effSF").set(*event, sublead_tau_effSF, sys);
-        m_Ibranches.at("Sublead_Tau_charge").set(*event, sublead_tau_charge, sys);
+        m_Fbranches.at("Tau2_pt").set(*event, sublead_tau.Pt(), sys);
+        m_Fbranches.at("Tau2_eta").set(*event, sublead_tau.Eta(), sys);
+        m_Fbranches.at("Tau2_phi").set(*event, sublead_tau.Phi(), sys);
+        m_Fbranches.at("Tau2_E").set(*event, sublead_tau.E(), sys);
+        if (m_Fbranches.find("Tau2_effSF")!=m_Fbranches.end())
+          m_Fbranches.at("Tau2_effSF").set(*event, sublead_tau_effSF, sys);
+        m_Ibranches.at("Tau2_charge").set(*event, sublead_tau_charge, sys);
       }
 
       // DiHiggs mass 
@@ -221,12 +227,15 @@ namespace HHBBTT
       if (bjets->size() > 1){
         bb = bjets->at(0)->p4() + bjets->at(1)->p4();
         found_bb = true;
-        m_Fbranches.at("Leading_Bjet_pt").set(*event,  bjets->at(0)->p4().Pt(), sys);
-        m_Fbranches.at("Leading_Bjet_eta").set(*event, bjets->at(0)->p4().Eta(), sys);
-        m_Fbranches.at("Leading_Bjet_phi").set(*event, bjets->at(0)->p4().Phi(), sys);
-        m_Fbranches.at("Sublead_Bjet_pt").set(*event,  bjets->at(1)->p4().Pt(), sys);
-        m_Fbranches.at("Sublead_Bjet_eta").set(*event, bjets->at(1)->p4().Eta(), sys);
-        m_Fbranches.at("Sublead_Bjet_phi").set(*event, bjets->at(1)->p4().Phi(), sys);
+        m_Fbranches.at("Jet_b1_pt").set(*event,  bjets->at(0)->p4().Pt(), sys);
+        m_Fbranches.at("Jet_b1_eta").set(*event, bjets->at(0)->p4().Eta(), sys);
+        m_Fbranches.at("Jet_b1_phi").set(*event, bjets->at(0)->p4().Phi(), sys);
+        m_Fbranches.at("Jet_b1_E").set(*event,   bjets->at(0)->p4().E(), sys);
+        m_Fbranches.at("Jet_b2_pt").set(*event,  bjets->at(1)->p4().Pt(), sys);
+        m_Fbranches.at("Jet_b2_eta").set(*event, bjets->at(1)->p4().Eta(), sys);
+        m_Fbranches.at("Jet_b2_phi").set(*event, bjets->at(1)->p4().Phi(), sys);
+        m_Fbranches.at("Jet_b2_E").set(*event,   bjets->at(0)->p4().E(), sys);
+
 
         m_Fbranches.at("H_bb_pt").set(*event, bb.Pt(), sys);
         m_Fbranches.at("H_bb_eta").set(*event, bb.Eta(), sys);

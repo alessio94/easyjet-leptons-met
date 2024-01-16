@@ -30,6 +30,10 @@ small_R_jet:
   uncertToolCalibArea: ""
   uncertToolConfigPath: ""
   uncertToolMCType: ""
+  amount: 0
+  amount_bjet: 0
+  variables: ["pt", "eta", "phi", "E"]
+  variables_int: []
 
 large_R_jet:
   # btagging working points for Variable Radius Track jets
@@ -38,17 +42,34 @@ large_R_jet:
 Photon:
   ID: ""
   Iso: ""
+  amount: 0
+  variables: ["pt", "eta", "phi", "E"]
+  variables_int: []
 
 Electron:
   ID: ""
   Iso: ""
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: []
 
 Muon:
   ID: ""
   Iso: ""
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: []
 
 Tau:
   ID: ""
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: ["charge"]
+
+Lepton:
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: ["charge", "pdgid"]
 
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22

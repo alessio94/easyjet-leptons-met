@@ -81,16 +81,16 @@ private:
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
       // b-jet kinematics
-      "Jet_pt_b1", "Jet_eta_b1", "Jet_phi_b1", "Jet_E_b1",
-      "Jet_pt_b2", "Jet_eta_b2", "Jet_phi_b2", "Jet_E_b2", 
-      "Jet_pt_b3", "Jet_eta_b3", "Jet_phi_b3", "Jet_E_b3", 
-      "Jet_pt_b4", "Jet_eta_b4", "Jet_phi_b4", "Jet_E_b4", 
-      "Jet_pt_b5", "Jet_eta_b5", "Jet_phi_b5", "Jet_E_b5",
-      "Jet_pt_b6", "Jet_eta_b6", "Jet_phi_b6", "Jet_E_b6",
+      "Jet_b1_pt", "Jet_b1_eta", "Jet_b1_phi", "Jet_b1_E",
+      "Jet_b2_pt", "Jet_b2_eta", "Jet_b2_phi", "Jet_b2_E", 
+      "Jet_b3_pt", "Jet_b3_eta", "Jet_b3_phi", "Jet_b3_E", 
+      "Jet_b4_pt", "Jet_b4_eta", "Jet_b4_phi", "Jet_b4_E", 
+      "Jet_b5_pt", "Jet_b5_eta", "Jet_b5_phi", "Jet_b5_E",
+      "Jet_b6_pt", "Jet_b6_eta", "Jet_b6_phi", "Jet_b6_E",
 
       //truth information b-jets
-      "Jet_truthLabel_b1", "Jet_truthLabel_b2", "Jet_truthLabel_b3",
-      "Jet_truthLabel_b4", "Jet_truthLabel_b5", "Jet_truthLabel_b6",
+      "Jet_b1_truthLabel", "Jet_b2_truthLabel", "Jet_b3_truthLabel",
+      "Jet_b4_truthLabel", "Jet_b5_truthLabel", "Jet_b6_truthLabel",
 
       // additional variables
       "HT",
@@ -129,18 +129,10 @@ private:
       "Jets_DeltaEtaMax", "Jets_DeltaEtaMin", "Jets_DeltaEtaMean",
 
       //leptons
-      "Leading_Electron_pt", "Leading_Electron_eta", 
-      "Leading_Electron_phi", "Leading_Electron_E",
-      "Leading_Electron_SF",
-      "Subleading_Electron_pt", "Subleading_Electron_eta", 
-      "Subleading_Electron_phi", "Subleading_Electron_E",
-      "Subleading_Electron_SF",
-      "Leading_Muon_pt", "Leading_Muon_eta", 
-      "Leading_Muon_phi", "Leading_Muon_E",
-      "Leading_Muon_SF",
-      "Subleading_Muon_pt", "Subleading_Muon_eta", 
-      "Subleading_Muon_phi", "Subleading_Muon_E",
-      "Subleading_Muon_SF",
+      "Electron1_pt", "Electron1_eta", "Electron1_phi", "Electron1_E", "Electron1_effSF",
+      "Electron2_pt", "Electron2_eta", "Electron2_phi", "Electron2_E", "Electron2_effSF",
+      "Muon1_pt", "Muon1_eta", "Muon1_phi", "Muon1_E", "Muon1_effSF",
+      "Muon2_pt", "Muon2_eta", "Muon2_phi", "Muon2_E", "Muon2_effSF",
       "ee_m", "ee_pt", "ee_dR", "ee_eta", "ee_phi", 
       "mumu_m", "mumu_pt", "mumu_dR", "mumu_eta", "mumu_phi",
       "emu_m", "emu_pt", "emu_dR", "emu_eta", "emu_phi"

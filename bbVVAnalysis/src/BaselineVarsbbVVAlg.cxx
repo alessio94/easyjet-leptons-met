@@ -66,6 +66,7 @@ namespace HHBBVV
     ATH_CHECK(m_selected_lepton_pt.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_selected_lepton_eta.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_selected_lepton_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_selected_lepton_E.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_selected_lepton_charge.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_selected_lepton_pdgid.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_selected_lepton_SF.initialize(m_systematicsList, m_eventHandle));
@@ -117,6 +118,7 @@ namespace HHBBVV
       float lepton_pt = -99;
       float lepton_eta = -99;
       float lepton_phi = -99;
+      float lepton_E = -99;
       int lepton_charge = -99;
       int lepton_pdgid = -99;
       float lepton_SF = -99;
@@ -126,6 +128,7 @@ namespace HHBBVV
           lepton_pt = electron->pt();
           lepton_eta = electron->eta();
           lepton_phi = electron->phi();
+          lepton_E = electron->e();
           lepton_charge = electron->charge();
           lepton_pdgid = electron->charge() > 0 ? -11 : 11;
           lepton_SF = m_ele_recoSF.get(*electron,sys) *
@@ -138,6 +141,7 @@ namespace HHBBVV
           lepton_pt = muon->pt();
           lepton_eta = muon->eta();
           lepton_phi = muon->phi();
+          lepton_E = muon->e();
           lepton_charge = muon->charge();
           lepton_pdgid = muon->charge() > 0 ? -13 : 13;
           lepton_SF = m_mu_recoSF.get(*muon,sys) * m_mu_isoSF.get(*muon,sys);
@@ -147,6 +151,7 @@ namespace HHBBVV
       m_selected_lepton_pt.set(*event, lepton_pt, sys);
       m_selected_lepton_eta.set(*event, lepton_eta, sys);
       m_selected_lepton_phi.set(*event, lepton_phi, sys);
+      m_selected_lepton_E.set(*event, lepton_E, sys);
       m_selected_lepton_charge.set(*event, lepton_charge, sys);
       m_selected_lepton_pdgid.set(*event, lepton_pdgid, sys);
       m_selected_lepton_SF.set(*event, lepton_SF, sys);

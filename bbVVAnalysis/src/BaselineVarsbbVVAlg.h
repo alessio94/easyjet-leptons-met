@@ -97,12 +97,13 @@ private:
     // CP::SysWriteDecorHandle<float> m_HH_visMet_phi {"HH_visMet_phi_%SYS%", this};
     // CP::SysWriteDecorHandle<float> m_HH_visMet_m {"HH_visMet_m_%SYS%", this};
 
-    CP::SysWriteDecorHandle<float> m_selected_lepton_pt {"Selected_Lepton_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_eta {"Selected_Lepton_eta_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_phi {"Selected_Lepton_phi_%SYS%", this};
-    CP::SysWriteDecorHandle<int> m_selected_lepton_charge {"Selected_Lepton_charge_%SYS%", this};
-    CP::SysWriteDecorHandle<int> m_selected_lepton_pdgid {"Selected_Lepton_pdgid_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_SF {"Selected_Lepton_SF_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_pt {"Lepton_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_eta {"Lepton_eta_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_phi {"Lepton_phi_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_E {"Lepton_E_%SYS%", this};
+    CP::SysWriteDecorHandle<int> m_selected_lepton_charge {"Lepton_charge_%SYS%", this};
+    CP::SysWriteDecorHandle<int> m_selected_lepton_pdgid {"Lepton_pdgid_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_selected_lepton_SF {"Lepton_effSF_%SYS%", this};
 
 
     // Local variables and functions

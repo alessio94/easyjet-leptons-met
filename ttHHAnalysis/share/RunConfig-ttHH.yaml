@@ -21,14 +21,18 @@ small_R_jet:
     #- GN120220509_FixedCutBEff_70
     #- GN120220509_FixedCutBEff_77
     #- GN120220509_FixedCutBEff_85
+  amount_bjet: 6
+  variables: ["truthLabel"]
 
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
+  amount: 2
 
 Muon:
   ID: "Medium"
   Iso: "PflowLoose_VarRad"
+  amount: 2
 
 # list of triggers per year to consider
 trigger_chains:

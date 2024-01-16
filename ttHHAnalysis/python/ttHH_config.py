@@ -2,7 +2,9 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
-# ttHH analysis chain
+from EasyjetHub.output.ttree.selected_objects import (
+    get_selected_objects_branches,
+)
 
 
 def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
@@ -124,18 +126,17 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
 def ttHH_branches(flags):
     branches = []
 
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    branches += get_selected_objects_branches(flags, "ttHH")
+
     if (flags.Analysis.save_ttHH_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
-            branches += [f"EventInfo.{cut}_%SYS% -> %SYS%_{cut}"]
+            branches += [f"EventInfo.{cut}_%SYS% -> ttHH_{cut}_%SYS%"]
 
     # BJets
-    btag_variables = ["pt", "eta", "phi", "E", "truthLabel"]
-    btag_pt_ords = ["b1", "b2", "b3", "b4", "b5", "b6"]
-    for pt_ord in btag_pt_ords:
-        for kin in btag_variables:
-            branches += [f"EventInfo.Jet_{kin}_{pt_ord}_%SYS% -> %SYS%_Jet_{kin}_{pt_ord}"] # noqa
-
     if flags.Input.isMC:
         branches += ["EventInfo.ftag_effSF_"
                      f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%"
@@ -156,12 +157,12 @@ def ttHH_branches(flags):
         "ZZ_m", "ZZ_CHI"
     ]
     for var in H_candidate_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
+        branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}_%SYS%"]
 
     # additional variables
     additional_variables = ["HT", "nJets", "nBJets"]
     for var in additional_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
+        branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}_%SYS%"]
 
     angular_variables = [
         "DeltaR12", "DeltaR34", "DeltaR56",
@@ -175,19 +176,9 @@ def ttHH_branches(flags):
     ]
 
     for var in angular_variables:
-        branches += [f"EventInfo.Jets_{var}_%SYS% -> %SYS%_Jets_{var}"]
+        branches += [f"EventInfo.Jets_{var}_%SYS% -> ttHH_Jets_{var}_%SYS%"]
 
-    branches += ["EventInfo.PassAllCuts_%SYS% -> %SYS%_PassAllCuts"]
-
-    lepton_variables = ["pt", "eta", "phi", "E", "SF"]
-    leptons = [
-        "Leading_Electron", "Subleading_Electron",
-        "Leading_Muon", "Subleading_Muon"
-    ]
-
-    for lep in leptons:
-        for var in lepton_variables:
-            branches += [f"EventInfo.{lep}_{var}_%SYS% -> %SYS%_{lep}_{var}"]
+    branches += ["EventInfo.PassAllCuts_%SYS% -> ttHH_PassAllCuts_%SYS%"]
 
     leptonPair_variables = ["pt", "eta", "phi", "m", "dR"]
     leptonPairs = [
@@ -196,6 +187,6 @@ def ttHH_branches(flags):
 
     for lep in leptonPairs:
         for var in leptonPair_variables:
-            branches += [f"EventInfo.{lep}_{var}_%SYS% -> %SYS%_{lep}_{var}"]
+            branches += [f"EventInfo.{lep}_{var}_%SYS% -> ttHH_{lep}_{var}_%SYS%"]
 
     return branches

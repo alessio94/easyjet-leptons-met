@@ -1,7 +1,9 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-# bbyy analysis chain
+from EasyjetHub.output.ttree.selected_objects import (
+    get_selected_objects_branches,
+)
 
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
@@ -81,25 +83,16 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
 def bbyy_branches(flags):
     branches = []
 
-    # Photons
-    photon_kinematics = ["pt", "eta", "phi", "E"]
-    pt_ords = ["Leading", "Subleading"]
-    for pt_ord in pt_ords:
-        for kin in photon_kinematics:
-            branches += [f"EventInfo.{pt_ord}_Photon_{kin}_%SYS% -> %SYS%_{pt_ord}_Photon_{kin}"]  # noqa
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    branches += get_selected_objects_branches(flags, "bbyy")
 
-    diphoton_variables = ["myy", "pTyy", "dRyy", "Etayy", "Phiyy",
-                          "Photon1_ptOvermyy", "Photon2_ptOvermyy"]
+    diphoton_variables = ["myy", "pTyy", "dRyy", "Etayy", "Phiyy"]
     for var in diphoton_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
+        branches += [f"EventInfo.{var}_%SYS% -> bbyy_Diphoton_{var}_%SYS%"]
 
     # BJets
-    btag_variables = ["pt", "eta", "phi", "E", "truthLabel"]
-    btag_pt_ords = ["b1", "b2"]
-    for pt_ord in btag_pt_ords:
-        for kin in btag_variables:
-            branches += [f"EventInfo.Jet_{kin}_{pt_ord}_%SYS% -> %SYS%_Jet_{kin}_{pt_ord}"]  # noqa
-
     if flags.Input.isMC:
         branches += ["EventInfo.ftag_effSF_"
                      f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%"
@@ -110,29 +103,29 @@ def bbyy_branches(flags):
 
     dibjet_variables = ["mbb", "pTbb", "dRbb", "Etabb", "Phibb"]
     for var in dibjet_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
+        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     # di-higgs variables
     dihiggs_variables = [
         "mbbyy", "pTbbyy", "Etabbyy", "Phibbyy", "dRbbyy", "mbbyy_star"
     ]
     for var in dihiggs_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
+        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     n_object = ["nPhotons", "nJets", "nCentralJets", "nBJets"]
     for var in n_object:
-        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
+        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     # mva variables
     mva_variables = ["HT", "topness","missEt","metphi"]
     for var in mva_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> %SYS%_{var}"]
+        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
-    branches += ["EventInfo.PassAllCuts_%SYS% -> %SYS%_PassAllCuts"]
+    branches += ["EventInfo.PassAllCuts_%SYS% -> bbyy_PassAllCuts_%SYS%"]
 
     if (flags.Analysis.save_bbyy_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
-            branches += [f"EventInfo.{cut}_%SYS% -> %SYS%_{cut}"]
+            branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_%SYS%"]
 
     return branches

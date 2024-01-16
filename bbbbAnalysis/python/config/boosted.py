@@ -1,7 +1,9 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-# this is a boosted analysis chain
+from EasyjetHub.output.ttree.selected_objects import (
+    get_selected_objects_branches,
+)
 
 
 def boosted_cfg(flags, largejetkey):
@@ -91,6 +93,11 @@ def boosted_cfg(flags, largejetkey):
 def boosted_branches(flags):
     branches = []
 
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    branches += get_selected_objects_branches(flags, "bbbb_boosted")
+
     for btag_wp in flags.Analysis.large_R_jet.vr_btag_wps:
         boosted_vars = [
             "h1_m",
@@ -106,7 +113,7 @@ def boosted_branches(flags):
 
         for var in boosted_vars:
             branches += [
-                f"EventInfo.boosted_{var}_{btag_wp} -> boosted_{btag_wp}_{var}"
+                f"EventInfo.boosted_{var}_{btag_wp} -> bbbb_boosted_{btag_wp}_{var}"
             ]
 
     return branches

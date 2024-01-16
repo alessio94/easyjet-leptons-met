@@ -3,7 +3,7 @@ tree_name: AnalysisMiniTree
 directory_name: ''
 stream_name: ANALYSIS
 # Do we apply object systs only for pt/et
-write_object_systs_only_for_pt: false
+slim_variables_with_syst: false
 # which objects to write
 reco_outputs:
   small_R_jets: ''

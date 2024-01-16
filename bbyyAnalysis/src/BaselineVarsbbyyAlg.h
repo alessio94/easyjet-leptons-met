@@ -67,14 +67,14 @@ namespace HHBBYY
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
       // Leading/Subleading photon kinematics
-      "Leading_Photon_pt", "Leading_Photon_eta", "Leading_Photon_phi", "Leading_Photon_E",
-      "Subleading_Photon_pt", "Subleading_Photon_eta", "Subleading_Photon_phi", "Subleading_Photon_E",
+      "Photon1_pt", "Photon1_eta", "Photon1_phi", "Photon1_E",
+      "Photon2_pt", "Photon2_eta", "Photon2_phi", "Photon2_E",
 
       "myy", "pTyy", "dRyy", "Etayy", "Phiyy", 
 
       // Leading/Subleading b-tagged jet kinematics
-      "Jet_pt_b1", "Jet_eta_b1", "Jet_phi_b1", "Jet_E_b1", 
-      "Jet_pt_b2", "Jet_eta_b2", "Jet_phi_b2", "Jet_E_b2", 
+      "Jet_b1_pt", "Jet_b1_eta", "Jet_b1_phi", "Jet_b1_E", 
+      "Jet_b2_pt", "Jet_b2_eta", "Jet_b2_phi", "Jet_b2_E", 
 
       "mbb", "pTbb", "dRbb", "Etabb", "Phibb", 
 
@@ -82,13 +82,13 @@ namespace HHBBYY
       "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star", "Photon1_ptOvermyy", "Photon2_ptOvermyy",
 
       // mva variables
-	"HT", "topness", "missEt", "metphi",
+	    "HT", "topness", "missEt", "metphi",
     };
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
     std::vector<std::string> m_Ivarnames{
       "nPhotons", "nBJets", "nJets", "nCentralJets",
-      "Jet_truthLabel_b1", "Jet_truthLabel_b2",
+      "Jet_b1_truthLabel", "Jet_b2_truthLabel",
     };
 
   };
