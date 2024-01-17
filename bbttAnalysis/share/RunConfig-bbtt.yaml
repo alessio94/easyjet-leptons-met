@@ -48,6 +48,8 @@ Lepton:
 trigger_chains:
   include: bbttAnalysis/trigger.yaml
 
+# apply trigger lists to filter events
+do_trigger_filtering: true
 
 #Enable cutflow 
 save_bbtt_cutflow: true
