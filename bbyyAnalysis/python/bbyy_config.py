@@ -56,6 +56,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         CompFactory.HHBBYY.BaselineVarsbbyyAlg(
             "BaselineVarsbbyyAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
+            photonWP=PhotonWPLabel,
             jets="bbyyAnalysisJets_%SYS%",
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,

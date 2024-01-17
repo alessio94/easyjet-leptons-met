@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "AthContainers/AuxElement.h"
@@ -11,9 +11,7 @@ namespace HHBBYY
   BaselineVarsbbyyAlg::BaselineVarsbbyyAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
-  {
-    declareProperty("isMC", m_isMC);
-  }
+  {}
 
   StatusCode BaselineVarsbbyyAlg::initialize()
   {
@@ -29,6 +27,18 @@ namespace HHBBYY
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
+
+    if(m_isMC){
+      m_ph_idSF = CP::SysReadDecorHandle<float>("ph_id_effSF_"+m_photonWPName+"_%SYS%", this);
+      m_ph_isoSF = CP::SysReadDecorHandle<float>("ph_isol_effSF_"+m_photonWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_ph_idSF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ph_isoSF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
+
+    // Intialise syst-aware output decorators
+
+    // Add MC var
+    if(m_isMC) m_Fvarnames.insert(m_Fvarnames.end(), m_Fvarnames_MC.begin(), m_Fvarnames_MC.end());
 
     for (const std::string &string_var: m_Fvarnames) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
@@ -113,18 +123,23 @@ namespace HHBBYY
         }
       }
 
-
       // photon sector
       if (photons->size() >= 1) {
-        y1 = photons->at(0)->p4();
-
+        const xAOD::Photon* ph1 = photons->at(0);
+        y1 = ph1->p4();
         m_Fbranches.at("Photon1_pt").set(*event, y1.Pt(), sys);
         m_Fbranches.at("Photon1_eta").set(*event, y1.Eta(), sys);
         m_Fbranches.at("Photon1_phi").set(*event, y1.Phi(), sys);
         m_Fbranches.at("Photon1_E").set(*event, y1.E(), sys);
+        if(m_isMC){
+          float ph_SF = m_ph_idSF.get(*ph1, sys) * m_ph_isoSF.get(*ph1, sys);
+          m_Fbranches.at("Photon1_effSF").set(*event, ph_SF, sys);
+        }
       }
+
       if (photons->size() >= 2) {
-        y2 = photons->at(1)->p4();
+        const xAOD::Photon* ph2 = photons->at(1);
+        y2 = ph2->p4();
 
         // Build the H(yy) candidate
         H_yy = y1 + y2;
@@ -134,6 +149,10 @@ namespace HHBBYY
         m_Fbranches.at("Photon2_eta").set(*event, y2.Eta(), sys);
         m_Fbranches.at("Photon2_phi").set(*event, y2.Phi(), sys);
         m_Fbranches.at("Photon2_E").set(*event, y2.E(), sys);
+        if(m_isMC){
+          float ph_SF = m_ph_idSF.get(*ph2, sys) * m_ph_isoSF.get(*ph2, sys);
+          m_Fbranches.at("Photon2_effSF").set(*event, ph_SF, sys);
+        }
 
         m_Fbranches.at("myy").set(*event, H_yy.M(), sys);
         m_Fbranches.at("pTyy").set(*event, H_yy.Pt(), sys);

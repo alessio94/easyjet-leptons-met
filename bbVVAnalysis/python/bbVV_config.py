@@ -150,6 +150,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     cfg.addEventAlgo(
         CompFactory.HHBBVV.BaselineVarsbbVVAlg(
             "FinalVarsbbVVAlg",
+            isMC=flags.Input.isMC,
             jets="bbVVAnalysisJets_%SYS%",
             lrjets="bbVVAnalysisLRJets_%SYS%",
             muons="bbVVAnalysisMuons_%SYS%",

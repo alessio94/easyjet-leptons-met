@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -40,20 +40,26 @@ namespace HHBBTT
     ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
 
-    m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
-    m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
-    m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
-    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle));
+    if(m_isMC){
+      m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
-    m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
-    m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
-    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle));
-    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle));
+    if(m_isMC){
+      m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
+      m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
+    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
-    m_tau_effSF = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
-    ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_tauHandle));
+    if(m_isMC){
+      m_tau_effSF = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_tauHandle, SG::AllowEmpty));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -134,8 +140,10 @@ namespace HHBBTT
           lepton = electron->p4();
           lepton_charge = electron->charge();
           lepton_pdgid = electron->charge() > 0 ? -11 : 11;
-          lepton_SF = m_ele_recoSF.get(*electron,sys) *
-	    m_ele_idSF.get(*electron,sys) * m_ele_isoSF.get(*electron,sys);
+          if(m_isMC){
+	    lepton_SF = m_ele_recoSF.get(*electron,sys) *
+	      m_ele_idSF.get(*electron,sys) * m_ele_isoSF.get(*electron,sys);
+	  }
           found_lepton = true;
           break; // At most one lepton selected
       	}
@@ -146,7 +154,7 @@ namespace HHBBTT
           lepton = muon->p4();
           lepton_charge = muon->charge();
           lepton_pdgid = muon->charge() > 0 ? -13 : 13;
-          lepton_SF = m_mu_recoSF.get(*muon,sys) * m_mu_isoSF.get(*muon,sys);
+          if(m_isMC) lepton_SF = m_mu_recoSF.get(*muon,sys) * m_mu_isoSF.get(*muon,sys);
           found_lepton = true;
           break; 
         }
@@ -157,8 +165,7 @@ namespace HHBBTT
         m_Fbranches.at("Lepton_eta").set(*event, lepton.Eta(), sys);
         m_Fbranches.at("Lepton_phi").set(*event, lepton.Phi(), sys);
         m_Fbranches.at("Lepton_E").set(*event, lepton.E(), sys);
-        if (m_Fbranches.find("Lepton_effSF")!=m_Fbranches.end())
-          m_Fbranches.at("Lepton_effSF").set(*event, lepton_SF, sys);
+        if(m_isMC) m_Fbranches.at("Lepton_effSF").set(*event, lepton_SF, sys);
         m_Ibranches.at("Lepton_charge").set(*event, lepton_charge, sys);
         m_Ibranches.at("Lepton_pdgid").set(*event, lepton_pdgid, sys);
       }
@@ -179,14 +186,14 @@ namespace HHBBTT
           if(!found_lead_tau){
             lead_tau = tau->p4();
             lead_tau_charge = tau->charge();
-            lead_tau_effSF = m_tau_effSF.get(*tau,sys);
+            if(m_isMC) lead_tau_effSF = m_tau_effSF.get(*tau,sys);
             found_lead_tau = true;
             continue;
           }
 
           sublead_tau = tau->p4();
           sublead_tau_charge = tau->charge();
-          sublead_tau_effSF = m_tau_effSF.get(*tau,sys);
+          if(m_isMC) sublead_tau_effSF = m_tau_effSF.get(*tau,sys);
           found_sublead_tau = true;
           break; 
         }
@@ -197,8 +204,7 @@ namespace HHBBTT
         m_Fbranches.at("Tau1_eta").set(*event, lead_tau.Eta(), sys);
         m_Fbranches.at("Tau1_phi").set(*event, lead_tau.Phi(), sys);
         m_Fbranches.at("Tau1_E").set(*event, lead_tau.E(), sys);
-        if (m_Fbranches.find("Tau1_effSF")!=m_Fbranches.end())
-          m_Fbranches.at("Tau1_effSF").set(*event, lead_tau_effSF, sys);
+        if(m_isMC) m_Fbranches.at("Tau1_effSF").set(*event, lead_tau_effSF, sys);
         m_Ibranches.at("Tau1_charge").set(*event, lead_tau_charge, sys);
       }
 
@@ -207,8 +213,7 @@ namespace HHBBTT
         m_Fbranches.at("Tau2_eta").set(*event, sublead_tau.Eta(), sys);
         m_Fbranches.at("Tau2_phi").set(*event, sublead_tau.Phi(), sys);
         m_Fbranches.at("Tau2_E").set(*event, sublead_tau.E(), sys);
-        if (m_Fbranches.find("Tau2_effSF")!=m_Fbranches.end())
-          m_Fbranches.at("Tau2_effSF").set(*event, sublead_tau_effSF, sys);
+        if(m_isMC) m_Fbranches.at("Tau2_effSF").set(*event, sublead_tau_effSF, sys);
         m_Ibranches.at("Tau2_charge").set(*event, sublead_tau_charge, sys);
       }
 

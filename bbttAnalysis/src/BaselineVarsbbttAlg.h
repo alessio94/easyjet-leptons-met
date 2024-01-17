@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -73,6 +73,9 @@ private:
     m_mmc_phi { this, "mmc_phi", "mmc_phi_%SYS%", "MMC phi key"};
     CP::SysReadDecorHandle<float> 
     m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
+
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };

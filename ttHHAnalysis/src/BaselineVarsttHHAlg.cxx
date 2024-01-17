@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Giulia Di Gregorio, Luis Falda
@@ -15,10 +15,7 @@ namespace ttHH
   BaselineVarsttHHAlg::BaselineVarsttHHAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
-  {
-        declareProperty("isMC", m_isMC);
-        declareProperty("nLeptons", m_nLeptons);
-  }
+  { }
 
   StatusCode BaselineVarsttHHAlg::initialize()
   {
@@ -34,17 +31,26 @@ namespace ttHH
     ATH_CHECK (m_ZZPairsHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
-    m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
-    m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
-    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle));
+    if(m_isMC){
+      m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
-    m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
-    m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
-    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle));
-    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle));
+    if(m_isMC){
+      m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
+      m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
+    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
+
+    // Intialise syst-aware output decorators
+
+    // Add MC var
+    if(m_isMC) m_Fvarnames.insert(m_Fvarnames.end(), m_Fvarnames_MC.begin(), m_Fvarnames_MC.end());
 
     for (const std::string &string_var: m_Fvarnames) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
@@ -271,11 +277,11 @@ namespace ttHH
         m_Fbranches.at("Electron1_eta").set(*event, e1.Eta(), sys);
         m_Fbranches.at("Electron1_phi").set(*event, e1.Phi(), sys);
         m_Fbranches.at("Electron1_E").set(*event, e1.E(), sys);
-        if (m_Fbranches.find("Electron1_effSF")!=m_Fbranches.end()){
+        if (m_isMC){
           float ele_SF = m_ele_recoSF.get(*ele1, sys) * m_ele_idSF.get(*ele1, sys) *
-          m_ele_isoSF.get(*ele1, sys);
+	    m_ele_isoSF.get(*ele1, sys);
           m_Fbranches.at("Electron1_effSF").set(*event, ele_SF, sys);
-        }
+	}
       }
       if (electrons->size() >= 2) {
         const xAOD::Electron* ele2 = electrons->at(1);
@@ -284,9 +290,9 @@ namespace ttHH
         m_Fbranches.at("Electron2_eta").set(*event, e2.Eta(), sys);
         m_Fbranches.at("Electron2_phi").set(*event, e2.Phi(), sys);
         m_Fbranches.at("Electron2_E").set(*event, e2.E(), sys);
-        if (m_Fbranches.find("Electron2_effSF")!=m_Fbranches.end()){
+        if (m_isMC){
           float ele_SF = m_ele_recoSF.get(*ele2, sys) * m_ele_idSF.get(*ele2, sys) *
-          m_ele_isoSF.get(*ele2, sys);
+	    m_ele_isoSF.get(*ele2, sys);
           m_Fbranches.at("Electron2_effSF").set(*event, ele_SF, sys);
         }
 
@@ -308,7 +314,7 @@ namespace ttHH
         m_Fbranches.at("Muon1_eta").set(*event, mu1.Eta(), sys);
         m_Fbranches.at("Muon1_phi").set(*event, mu1.Phi(), sys);
         m_Fbranches.at("Muon1_E").set(*event, mu1.E(), sys);
-        if (m_Fbranches.find("Muon1_effSF")!=m_Fbranches.end()){
+        if (m_isMC){
           float mu_SF = m_mu_recoSF.get(*muon1, sys) * m_mu_isoSF.get(*muon1, sys);
           m_Fbranches.at("Muon1_effSF").set(*event, mu_SF, sys);
         }
@@ -320,7 +326,7 @@ namespace ttHH
         m_Fbranches.at("Muon2_eta").set(*event, mu2.Eta(), sys);
         m_Fbranches.at("Muon2_phi").set(*event, mu2.Phi(), sys);
         m_Fbranches.at("Muon2_E").set(*event, mu2.E(), sys);
-        if (m_Fbranches.find("Muon2_effSF")!=m_Fbranches.end()){
+        if (m_isMC){
           float mu_SF = m_mu_recoSF.get(*muon2, sys) * m_mu_isoSF.get(*muon2, sys);
           m_Fbranches.at("Muon2_effSF").set(*event, mu_SF, sys);
         }

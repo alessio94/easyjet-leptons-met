@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "AthContainers/AuxElement.h"
@@ -30,23 +30,31 @@ namespace HHBBLL
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
-    m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
-    m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
-    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle));
+    if(m_isMC){
+      m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
-    m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
-    m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
-    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle));
-    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle));
+    if(m_isMC){
+      m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
+      m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
+    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     // Intialise syst-aware output decorators
-    for (const std::string &string_var: m_Fvarnames) {
-      CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
-      m_Fbranches.emplace(string_var, var);
-      ATH_CHECK (m_Fbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
+
+    // Add MC var
+    if(m_isMC) m_Fvarnames.insert(m_Fvarnames.end(), m_Fvarnames_MC.begin(), m_Fvarnames_MC.end());
+
+    for (const std::string &var : m_Fvarnames) {
+      CP::SysWriteDecorHandle<float> whandle{var+"_%SYS%", this};
+      m_Fbranches.emplace(var, whandle);
+      ATH_CHECK (m_Fbranches.at(var).initialize(m_systematicsList, m_eventHandle));
     }
 
     for (const std::string &var : m_Ivarnames){
@@ -148,10 +156,11 @@ namespace HHBBLL
         m_Fbranches.at("Electron1_eta").set(*event, ele0->eta(), sys);
         m_Fbranches.at("Electron1_phi").set(*event, ele0->phi(), sys);
         m_Fbranches.at("Electron1_E").set(*event, ele0->e(), sys);
-        float ele_SF = m_ele_recoSF.get(*ele0, sys) *
-          m_ele_idSF.get(*ele0, sys) * m_ele_isoSF.get(*ele0, sys);
-        if (m_Fbranches.find("Electron1_effSF")!=m_Fbranches.end())
+        if(m_isMC){
+          float ele_SF = m_ele_recoSF.get(*ele0, sys) *
+            m_ele_idSF.get(*ele0, sys) * m_ele_isoSF.get(*ele0, sys);
           m_Fbranches.at("Electron1_effSF").set(*event, ele_SF, sys);
+        }
       }
       if (electrons->size() >= 2)
       {
@@ -161,10 +170,11 @@ namespace HHBBLL
         m_Fbranches.at("Electron2_eta").set(*event, ele1->eta(), sys);
         m_Fbranches.at("Electron2_phi").set(*event, ele1->phi(), sys);
         m_Fbranches.at("Electron2_E").set(*event, ele1->e(), sys);
-        float ele_SF = m_ele_recoSF.get(*ele1, sys) *
-          m_ele_idSF.get(*ele1, sys) * m_ele_isoSF.get(*ele1, sys);
-        if (m_Fbranches.find("Electron2_effSF")!=m_Fbranches.end())
+        if(m_isMC){
+          float ele_SF = m_ele_recoSF.get(*ele1, sys) *
+            m_ele_idSF.get(*ele1, sys) * m_ele_isoSF.get(*ele1, sys);
           m_Fbranches.at("Electron2_effSF").set(*event, ele_SF, sys);
+        }
 
         // ee
         ee = electrons->at(0)->p4() + electrons->at(1)->p4();
@@ -185,9 +195,10 @@ namespace HHBBLL
         m_Fbranches.at("Muon1_eta").set(*event, mu0->eta(), sys);
         m_Fbranches.at("Muon1_phi").set(*event, mu0->phi(), sys);
         m_Fbranches.at("Muon1_E").set(*event, mu0->e(), sys);
-        float mu_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
-        if (m_Fbranches.find("Muon1_effSF")!=m_Fbranches.end())
+        if(m_isMC){
+          float mu_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
           m_Fbranches.at("Muon1_effSF").set(*event, mu_SF, sys);
+        }
       }
       if (muons->size() >= 2)
       {
@@ -197,9 +208,10 @@ namespace HHBBLL
         m_Fbranches.at("Muon2_eta").set(*event, mu1->eta(), sys);
         m_Fbranches.at("Muon2_phi").set(*event, mu1->phi(), sys);
         m_Fbranches.at("Muon2_E").set(*event, mu1->e(), sys);
-        float mu_SF = m_mu_recoSF.get(*mu1, sys) * m_mu_isoSF.get(*mu1, sys);
-        if (m_Fbranches.find("Muon2_effSF")!=m_Fbranches.end())
+        if(m_isMC){
+          float mu_SF = m_mu_recoSF.get(*mu1, sys) * m_mu_isoSF.get(*mu1, sys);
           m_Fbranches.at("Muon2_effSF").set(*event, mu_SF, sys);
+        }
 
         // mumu
         mumu = muons->at(0)->p4() + muons->at(1)->p4();
@@ -233,35 +245,46 @@ namespace HHBBLL
           ele0 = electrons->at(0);
         if (muons->size() >= 1)
           mu0 = muons->at(0);
+
         if (ele0 && !mu0){
           Leading_lep = ele0->p4();
-          lep1_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) * m_ele_isoSF.get(*ele0, sys);
+          if(m_isMC){
+	    lep1_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) *
+	      m_ele_isoSF.get(*ele0, sys);
+	  }
           lep1_charge = ele0->charge();
           lep1_pdgid = ele0->charge() > 0 ? -11 : 11;
-        } else if (!ele0 && mu0){
+        }
+
+	else if (!ele0 && mu0) {
           Leading_lep = mu0->p4();
-          lep1_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
+	  if(m_isMC) lep1_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
           lep1_charge = mu0->charge();
           lep1_pdgid = mu0->charge() > 0 ? -13 : 13;
-        } else if (ele0 && mu0){
+        }
+
+	else if (ele0 && mu0) {
           if (ele0->pt() > mu0->pt()){
             Leading_lep =  ele0->p4();
-            lep1_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) * m_ele_isoSF.get(*ele0, sys);
+            if(m_isMC){
+	      lep1_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) *
+		m_ele_isoSF.get(*ele0, sys);
+	    }
             lep1_charge = ele0->charge();
             lep1_pdgid = ele0->charge() > 0 ? -11 : 11;
           } else {
             Leading_lep = mu0->p4();
-            lep1_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
+            if(m_isMC) lep1_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
             lep1_charge = mu0->charge();
             lep1_pdgid = mu0->charge() > 0 ? -13 : 13;
           }
         }
+
         m_Fbranches.at("Lepton1_pt").set(*event, Leading_lep.Pt(), sys);
         m_Fbranches.at("Lepton1_eta").set(*event, Leading_lep.Eta(), sys);
         m_Fbranches.at("Lepton1_phi").set(*event, Leading_lep.Phi(), sys);
         m_Fbranches.at("Lepton1_E").set(*event, Leading_lep.E(), sys);
-        if (m_Fbranches.find("Lepton1_effSF")!=m_Fbranches.end())
-          m_Fbranches.at("Lepton1_effSF").set(*event, lep1_SF, sys);
+        if(m_isMC) m_Fbranches.at("Lepton1_effSF").set(*event, lep1_SF, sys);
         m_Ibranches.at("Lepton1_charge").set(*event, lep1_charge, sys);
         m_Ibranches.at("Lepton1_pdgid").set(*event, lep1_pdgid, sys);
       }
@@ -288,33 +311,43 @@ namespace HHBBLL
 
         if (ele1){
           Subleading_lep = ele1->p4();
-          lep2_SF = m_ele_recoSF.get(*ele1, sys) * m_ele_idSF.get(*ele1, sys) * m_ele_isoSF.get(*ele1, sys);
+          if(m_isMC){
+	    lep2_SF = m_ele_recoSF.get(*ele1, sys) * m_ele_idSF.get(*ele1, sys) *
+	      m_ele_isoSF.get(*ele1, sys);
+	  }
           lep2_charge = ele1->charge();
           lep2_pdgid = ele1->charge() > 0 ? -11 : 11;
-        } else if (mu1) {
+        }
+
+	else if (mu1) {
           Subleading_lep = mu1->p4();
-          lep2_SF = m_mu_recoSF.get(*mu1, sys) * m_mu_isoSF.get(*mu1, sys);
+          if(m_isMC) lep2_SF = m_mu_recoSF.get(*mu1, sys) * m_mu_isoSF.get(*mu1, sys);
           lep2_charge = mu1->charge();
           lep2_pdgid = mu1->charge() > 0 ? -13 : 13;
-        } else if (ele0 && mu0){
+        }
+
+	else if (ele0 && mu0) {
           if (ele0->pt() > mu0->pt()){
             Subleading_lep = mu0->p4();
-            lep2_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
+            if(m_isMC) lep2_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
             lep2_charge = mu0->charge();
             lep2_pdgid = mu0->charge() > 0 ? -13 : 13;
           } else {
             Subleading_lep = ele0->p4();
-            lep2_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) * m_ele_isoSF.get(*ele0, sys);
+            if(m_isMC){
+	      lep2_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) *
+		m_ele_isoSF.get(*ele0, sys);
+	    }
             lep2_charge = ele0->charge();
             lep2_pdgid = ele0->charge() > 0 ? -11 : 11;
           }
         }
+
         m_Fbranches.at("Lepton2_pt").set(*event, Subleading_lep.Pt(), sys);
         m_Fbranches.at("Lepton2_eta").set(*event, Subleading_lep.Eta(), sys);
         m_Fbranches.at("Lepton2_phi").set(*event, Subleading_lep.Phi(), sys);
         m_Fbranches.at("Lepton2_E").set(*event, Subleading_lep.E(), sys);
-        if (m_Fbranches.find("Lepton2_effSF")!=m_Fbranches.end())
-          m_Fbranches.at("Lepton2_effSF").set(*event, lep2_SF, sys);
+        if(m_isMC) m_Fbranches.at("Lepton2_effSF").set(*event, lep2_SF, sys);
         m_Ibranches.at("Lepton2_charge").set(*event, lep2_charge, sys);
         m_Ibranches.at("Lepton2_pdgid").set(*event, lep2_pdgid, sys);
       }

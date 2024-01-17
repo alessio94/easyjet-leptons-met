@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -34,17 +34,21 @@ namespace HHBBVV
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
-    m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
-    m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
-    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle));
+    if(m_isMC){
+      m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
-    m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
-    m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
-    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle));
-    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle));
+    if(m_isMC){
+      m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
+      m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty ));
+    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -69,7 +73,11 @@ namespace HHBBVV
     ATH_CHECK(m_selected_lepton_E.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_selected_lepton_charge.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_selected_lepton_pdgid.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_SF.initialize(m_systematicsList, m_eventHandle));
+
+    if(m_isMC){
+      m_selected_lepton_SF = CP::SysWriteDecorHandle<float>("Selected_Lepton_SF_%SYS%", this);
+    }
+    ATH_CHECK(m_selected_lepton_SF.initialize(m_systematicsList, m_eventHandle, SG::AllowEmpty));
 
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
@@ -131,8 +139,10 @@ namespace HHBBVV
           lepton_E = electron->e();
           lepton_charge = electron->charge();
           lepton_pdgid = electron->charge() > 0 ? -11 : 11;
-          lepton_SF = m_ele_recoSF.get(*electron,sys) *
-            m_ele_idSF.get(*electron,sys) * m_ele_isoSF.get(*electron,sys);
+          if(m_isMC){
+            lepton_SF = m_ele_recoSF.get(*electron,sys) *
+              m_ele_idSF.get(*electron,sys) * m_ele_isoSF.get(*electron,sys);
+          }
           break; // At most one lepton selected
       	}
       }
@@ -144,8 +154,9 @@ namespace HHBBVV
           lepton_E = muon->e();
           lepton_charge = muon->charge();
           lepton_pdgid = muon->charge() > 0 ? -13 : 13;
-          lepton_SF = m_mu_recoSF.get(*muon,sys) * m_mu_isoSF.get(*muon,sys);
-          break; 
+          if(m_isMC)
+            lepton_SF = m_mu_recoSF.get(*muon,sys) * m_mu_isoSF.get(*muon,sys);
+          break;
 	}
       }
       m_selected_lepton_pt.set(*event, lepton_pt, sys);
@@ -154,7 +165,7 @@ namespace HHBBVV
       m_selected_lepton_E.set(*event, lepton_E, sys);
       m_selected_lepton_charge.set(*event, lepton_charge, sys);
       m_selected_lepton_pdgid.set(*event, lepton_pdgid, sys);
-      m_selected_lepton_SF.set(*event, lepton_SF, sys);
+      if(m_isMC) m_selected_lepton_SF.set(*event, lepton_SF, sys);
 
       // DiHiggs mass 
       TLorentzVector bb(0,0,0,0);

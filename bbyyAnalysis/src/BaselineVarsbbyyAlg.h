@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -56,13 +56,19 @@ namespace HHBBYY
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_photonHandle{ this, "photons", "",   "Photons container to read" };
 
+    Gaudi::Property<std::string> m_photonWPName
+      { this, "photonWP", "","Photon ID + Iso working point" };
+    CP::SysReadDecorHandle<float> m_ph_idSF{"", this};
+    CP::SysReadDecorHandle<float> m_ph_isoSF{"", this};
+
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "",   "MET container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-    bool m_isMC;
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
@@ -83,6 +89,10 @@ namespace HHBBYY
 
       // mva variables
 	    "HT", "topness", "missEt", "metphi",
+    };
+
+    std::vector<std::string> m_Fvarnames_MC{
+      "Photon1_effSF", "Photon2_effSF",
     };
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;

@@ -15,7 +15,7 @@ def get_selected_objects_branches_variables(flags, analysis):
     # small R jets
     for var in [*flags.Analysis.small_R_jet.variables,
                 *flags.Analysis.small_R_jet.variables_int]:
-        if flags.Input.isMC and "SF" in var:
+        if not flags.Input.isMC and "SF" in var:
             continue
         for index in range(flags.Analysis.small_R_jet.amount):
             # Store the float and int variables
@@ -47,7 +47,7 @@ def get_selected_objects_branches_variables(flags, analysis):
     # Photons
     for var in [*flags.Analysis.Photon.variables,
                 *flags.Analysis.Photon.variables_int]:
-        if flags.Input.isMC and "SF" in var:
+        if not flags.Input.isMC and "SF" in var:
             continue
         for index in range(flags.Analysis.Photon.amount):
             # Store the float and int variables
@@ -66,7 +66,7 @@ def get_selected_objects_branches_variables(flags, analysis):
     # Electrons
     for var in [*flags.Analysis.Electron.variables,
                 *flags.Analysis.Electron.variables_int]:
-        if flags.Input.isMC and "SF" in var:
+        if not flags.Input.isMC and "SF" in var:
             continue
         for index in range(flags.Analysis.Electron.amount):
             # Store the float and int variables
@@ -85,7 +85,7 @@ def get_selected_objects_branches_variables(flags, analysis):
     # Muons
     for var in [*flags.Analysis.Muon.variables,
                 *flags.Analysis.Muon.variables_int]:
-        if flags.Input.isMC and "SF" in var:
+        if not flags.Input.isMC and "SF" in var:
             continue
         for index in range(flags.Analysis.Muon.amount):
             # Store the float and int variables
@@ -104,7 +104,7 @@ def get_selected_objects_branches_variables(flags, analysis):
     # Taus
     for var in [*flags.Analysis.Tau.variables,
                 *flags.Analysis.Tau.variables_int]:
-        if flags.Input.isMC and "SF" in var:
+        if not flags.Input.isMC and "SF" in var:
             continue
         for index in range(flags.Analysis.Tau.amount):
             # Store the float and int variables
@@ -123,7 +123,7 @@ def get_selected_objects_branches_variables(flags, analysis):
     # Selected Lepton
     for var in [*flags.Analysis.Lepton.variables,
                 *flags.Analysis.Lepton.variables_int]:
-        if flags.Input.isMC and "SF" in var:
+        if not flags.Input.isMC and "SF" in var:
             continue
         for index in range(flags.Analysis.Lepton.amount):
             index_str = "" if flags.Analysis.Lepton.amount == 1 else f"{index+1}"

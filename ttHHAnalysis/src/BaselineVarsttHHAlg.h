@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -76,8 +76,11 @@ private:
     CP::SysReadDecorHandle<float> m_mu_recoSF{"", this};
     CP::SysReadDecorHandle<float> m_mu_isoSF{"", this};
 
-    bool m_isMC;
-    bool m_nLeptons;
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+    Gaudi::Property<int> m_nLeptons
+      { this, "nLeptons", 0 };
+
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
       // b-jet kinematics
@@ -129,13 +132,17 @@ private:
       "Jets_DeltaEtaMax", "Jets_DeltaEtaMin", "Jets_DeltaEtaMean",
 
       //leptons
-      "Electron1_pt", "Electron1_eta", "Electron1_phi", "Electron1_E", "Electron1_effSF",
-      "Electron2_pt", "Electron2_eta", "Electron2_phi", "Electron2_E", "Electron2_effSF",
-      "Muon1_pt", "Muon1_eta", "Muon1_phi", "Muon1_E", "Muon1_effSF",
-      "Muon2_pt", "Muon2_eta", "Muon2_phi", "Muon2_E", "Muon2_effSF",
+      "Electron1_pt", "Electron1_eta", "Electron1_phi", "Electron1_E",
+      "Electron2_pt", "Electron2_eta", "Electron2_phi", "Electron2_E",
+      "Muon1_pt", "Muon1_eta", "Muon1_phi", "Muon1_E",
+      "Muon2_pt", "Muon2_eta", "Muon2_phi", "Muon2_E",
       "ee_m", "ee_pt", "ee_dR", "ee_eta", "ee_phi", 
       "mumu_m", "mumu_pt", "mumu_dR", "mumu_eta", "mumu_phi",
       "emu_m", "emu_pt", "emu_dR", "emu_eta", "emu_phi"
+    };
+    std::vector<std::string> m_Fvarnames_MC{
+      "Electron1_effSF", "Electron2_effSF",
+      "Muon1_effSF", "Muon2_effSF",
     };
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;

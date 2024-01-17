@@ -43,7 +43,7 @@ Photon:
   ID: ""
   Iso: ""
   amount: 0
-  variables: ["pt", "eta", "phi", "E"]
+  variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
 
 Electron:

@@ -123,6 +123,7 @@ def bbtt_cfg(
     cfg.addEventAlgo(
         CompFactory.HHBBTT.BaselineVarsbbttAlg(
             "FinalVarsbbttAlg",
+            isMC=flags.Input.isMC,
             jets="bbttAnalysisJets_%SYS%",
             muons="bbttAnalysisMuons_%SYS%",
             electrons="bbttAnalysisElectrons_%SYS%",

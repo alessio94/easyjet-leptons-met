@@ -72,6 +72,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
     cfg.addEventAlgo(
         CompFactory.HHBBLL.BaselineVarsbbllAlg(
             "FinalVarsbbllAlg",
+            isMC=flags.Input.isMC,
             jets="bbllAnalysisJets_%SYS%",
             muons="bbllAnalysisMuons_%SYS%",
             electrons="bbllAnalysisElectrons_%SYS%",

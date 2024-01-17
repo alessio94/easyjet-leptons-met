@@ -89,6 +89,7 @@ def resolved_branches(flags):
                          " -> weight_ftag_effSF_"
                          f"{btag_wp}_%SYS%",]
 
-    branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
+    if flags.Input.isMC:
+        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
 
     return branches

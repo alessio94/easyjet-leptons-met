@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -64,6 +64,9 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
@@ -104,7 +107,6 @@ private:
     CP::SysWriteDecorHandle<int> m_selected_lepton_charge {"Lepton_charge_%SYS%", this};
     CP::SysWriteDecorHandle<int> m_selected_lepton_pdgid {"Lepton_pdgid_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_selected_lepton_SF {"Lepton_effSF_%SYS%", this};
-
 
     // Local variables and functions
 

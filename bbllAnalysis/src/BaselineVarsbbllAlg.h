@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -64,6 +64,9 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
@@ -82,12 +85,12 @@ private:
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
-    "Electron1_pt", "Electron1_eta", "Electron1_phi", "Electron1_E", "Electron1_effSF",
-    "Electron2_pt", "Electron2_eta", "Electron2_phi", "Electron2_E", "Electron2_effSF",
-    "Muon1_pt", "Muon1_eta", "Muon1_phi", "Muon1_E", "Muon1_effSF",
-    "Muon2_pt", "Muon2_eta", "Muon2_phi", "Muon2_E", "Muon2_effSF",
-    "Lepton1_pt", "Lepton1_eta", "Lepton1_phi", "Lepton1_E", "Lepton1_effSF",
-    "Lepton2_pt", "Lepton2_eta", "Lepton2_phi", "Lepton2_E", "Lepton2_effSF",
+    "Electron1_pt", "Electron1_eta", "Electron1_phi", "Electron1_E",
+    "Electron2_pt", "Electron2_eta", "Electron2_phi", "Electron2_E",
+    "Muon1_pt", "Muon1_eta", "Muon1_phi", "Muon1_E",
+    "Muon2_pt", "Muon2_eta", "Muon2_phi", "Muon2_E",
+    "Lepton1_pt", "Lepton1_eta", "Lepton1_phi", "Lepton1_E",
+    "Lepton2_pt", "Lepton2_eta", "Lepton2_phi", "Lepton2_E",
     "mee", "pTee", "dRee", "Etaee", "Phiee", 
     "mmumu", "pTmumu", "dRmumu", "Etamumu", "Phimumu",
     "memu", "pTemu","dRemu", "Etaemu", "Phiemu",
@@ -98,6 +101,13 @@ private:
     "Jet1_pt", "Jet1_eta", "Jet1_phi", "Jet1_E",
     "Jet2_pt", "Jet2_eta", "Jet2_phi", "Jet2_E",
     };
+
+    std::vector<std::string> m_Fvarnames_MC{
+      "Electron1_effSF", "Electron2_effSF",
+      "Muon1_effSF", "Muon2_effSF",
+      "Lepton1_effSF", "Lepton2_effSF",	
+    };
+
 
    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
    std::vector<std::string> m_Ivarnames{
