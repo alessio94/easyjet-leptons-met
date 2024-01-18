@@ -216,7 +216,7 @@ def get_data_type(flags, is_prw=False):
         "",
         "FullG4",
         "FullG4_QS",
-        "FullG4_Longlived",
+        "FullG4_LongLived",
     ]:
         data_type = "mc"
     if flags.Input.SimulationFlavour in ["ATLFAST3_QS"] and not is_prw:
