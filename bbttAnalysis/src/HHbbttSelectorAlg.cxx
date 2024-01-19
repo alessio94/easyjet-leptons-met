@@ -943,12 +943,8 @@ namespace HHBBTT
     // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/rBR_Period_Report.php
     // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
 
-    // MC20a covers both 2015 and 2016 in MC
-    if(m_isMC && (m_is15 || m_is16)){
-      m_is15 = 266904 <= rdmNumber && rdmNumber <= 284484;
-      m_is16 = 296939 <= rdmNumber && rdmNumber <= 311481;
-    }
-
+    m_is15 = 266904 <= rdmNumber && rdmNumber <= 284484;
+    m_is16 = 296939 <= rdmNumber && rdmNumber <= 311481;
     m_is16PeriodA = 296939 <= rdmNumber && rdmNumber <= 300287;
     m_is16PeriodB_D3 = 300345 <= rdmNumber && rdmNumber <= 302872;
     m_is16PeriodD4_end = 302919 <= rdmNumber && rdmNumber <= 311481;
