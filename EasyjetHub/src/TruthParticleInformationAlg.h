@@ -133,6 +133,8 @@ private:
 
     void debugPrintParticleKinematics(const xAOD::TruthParticle *p) const;
 
+    std::array<float, 4> calcHHKinematics(const xAOD::TruthParticle *p1, const xAOD::TruthParticle *p2) const;
+
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
@@ -162,6 +164,8 @@ private:
 
     std::vector<std::vector<SG::AuxElement::Decorator<std::vector<float>>>>
         m_truthChildrenKinFromHiggsesDecorators;
+
+    std::vector<SG::AuxElement::Decorator<float>> m_truthHHKinDecorators;
 
     std::array<std::string, 4> m_kinVars{"pt", "eta", "phi", "m"};
   };

@@ -71,6 +71,12 @@ namespace Easyjet
         ATH_MSG_ERROR("Decay mode "<<decayMode<<" is not supported");
     }
 
+    for (const std::string &var : m_kinVars)
+    {
+      m_truthHHKinDecorators.emplace_back(
+          "truth_HH_" + var);
+    }
+
     return StatusCode::SUCCESS;
   }
 
@@ -137,7 +143,6 @@ namespace Easyjet
     SG::WriteHandle<ConstDataVector<xAOD::TruthParticleContainer>> writeHandle(
         m_truthParticleInfoOutKey);
     ATH_CHECK(writeHandle.record(std::move(higgsesTruthParticles)));
-
     return StatusCode::SUCCESS;
   }
 
@@ -161,8 +166,25 @@ namespace Easyjet
             higgses[h].children_p4(i);
       }
     }
-  }
 
+    // Reconstruct the HH system
+    // Assume exactly two Higgs for now & check for nullptrs 
+    if (higgses.size() < 2 || higgses[0] == nullptr || higgses[1] == nullptr) 
+    {
+      for (size_t i = 0; i < m_kinVars.size(); i++)
+      {
+        m_truthHHKinDecorators[i](eventInfo) = -999;
+      }
+    } else 
+    {
+      std::array<float, 4> coords = calcHHKinematics(higgses[0], higgses[1]);
+      for (size_t i = 0; i < m_kinVars.size(); i++)
+      {
+        m_truthHHKinDecorators[i](eventInfo) = coords[i];
+      }
+    }
+  }
+  
   void TruthParticleInformationAlg::verbosePrintParticleAndChildren(
       const xAOD::TruthParticle *p, int counter = 1) const
   {
@@ -258,4 +280,33 @@ namespace Easyjet
     }
     return higgses;
   }
+
+
+   std::array<float, 4> TruthParticleInformationAlg::calcHHKinematics(
+       const xAOD::TruthParticle *p1, const xAOD::TruthParticle *p2) const
+   {
+     
+    ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>> h1;
+    ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>> h2;
+    h1.SetCoordinates(p1->pt(), p1->eta(), p1->phi(), p1->m());
+    h2.SetCoordinates(p2->pt(), p2->eta(), p2->phi(), p2->m());
+    auto hh = h1 + h2;
+
+    ATH_MSG_DEBUG("Particle " << p1->pdgId() << ", pt " << p1->pt() << ", phi "
+                                << p1->phi() << ", eta " << p1->eta() << ", mass "
+                                << p1->m());
+    ATH_MSG_DEBUG("Particle " << p2->pdgId() << ", pt " << p2->pt() << ", phi "
+                                << p2->phi() << ", eta " << p2->eta() << ", mass "
+                                << p2->m());
+    ATH_MSG_DEBUG("Particle " << " pt " << hh.pt() << ", phi "
+                                << hh.phi() << ", eta " << hh.eta() << ", mass "
+                                << hh.M());
+
+    std::array<float, 4> coords;
+    hh.GetCoordinates(coords.begin());
+
+    return coords;
+   }
+
+
 }

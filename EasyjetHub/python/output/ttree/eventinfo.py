@@ -36,6 +36,7 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
         for truthpart in [
             "truth_H1", "truth_H2",
             "truth_children_fromH1", "truth_children_fromH2",
+            "truth_HH"
         ]:
             eventinfo_branches.variables += [
                 f"{truthpart}_{var}"
