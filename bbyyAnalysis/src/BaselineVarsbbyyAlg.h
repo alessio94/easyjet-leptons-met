@@ -79,10 +79,14 @@ namespace HHBBYY
       "myy", "pTyy", "dRyy", "Etayy", "Phiyy", 
 
       // Leading/Subleading b-tagged jet kinematics
-      "Jet_b1_pt", "Jet_b1_eta", "Jet_b1_phi", "Jet_b1_E", 
-      "Jet_b2_pt", "Jet_b2_eta", "Jet_b2_phi", "Jet_b2_E", 
+      "Jet_b1_pt", "Jet_b1_eta", "Jet_b1_phi", "Jet_b1_E",
+      "Jet_b2_pt", "Jet_b2_eta", "Jet_b2_phi", "Jet_b2_E",
 
       "mbb", "pTbb", "dRbb", "Etabb", "Phibb", 
+
+      // Inclusive jet kinematics
+      "Jet1_pt", "Jet1_eta", "Jet1_phi", "Jet1_E",
+      "Jet2_pt", "Jet2_eta", "Jet2_phi", "Jet2_E",
 
       // di-higgs variables
       "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star", "Photon1_ptOvermyy", "Photon2_ptOvermyy",
@@ -99,6 +103,8 @@ namespace HHBBYY
     std::vector<std::string> m_Ivarnames{
       "nPhotons", "nBJets", "nJets", "nCentralJets",
       "Jet_b1_truthLabel", "Jet_b2_truthLabel",
+      "Jet1_truthLabel", "Jet2_truthLabel",
+      "Jet1_PassWP", "Jet2_PassWP",
     };
 
   };

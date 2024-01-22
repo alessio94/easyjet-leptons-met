@@ -32,8 +32,10 @@ small_R_jet:
   uncertToolMCType: ""
   amount: 0
   amount_bjet: 0
-  variables: ["pt", "eta", "phi", "E"]
-  variables_int: []
+  variables_bjets: ["pt", "eta", "phi", "E"]
+  variables_allJets: ["pt", "eta", "phi", "E"]
+  variables_int_bjets: []
+  variables_int_allJets: []
 
 large_R_jet:
   # btagging working points for Variable Radius Track jets

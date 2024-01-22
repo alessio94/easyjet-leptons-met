@@ -21,8 +21,10 @@ small_R_jet:
   btag_extra_wps:
     - GN2v00LegacyWP_FixedCutBEff_77
     - GN2v00NewAliasWP_FixedCutBEff_77
+  amount: 2
   amount_bjet: 2
-  variables: ["truthLabel"]
+  variables_int_bjets: ["truthLabel"]
+  variables_int_allJets: ["truthLabel","PassWP"]
 
 Electron:
   ID: "MediumLH"
