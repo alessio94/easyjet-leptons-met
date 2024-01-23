@@ -67,7 +67,7 @@ private:
     m_outHandle{ this, "containerOutKey", "",   "Electron container to write" };
 
     /// \brief Setup sys-aware output decorations
-    CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nElecrons_%SYS%", 
+    CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nElectrons_%SYS%", 
         "Name out output decorator for number of selected electrons"};
 
     Gaudi::Property<float> m_minPt            {this, "minPt", 7e3, "Minimum pT of electrons"};
