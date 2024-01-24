@@ -101,7 +101,6 @@ private:
 
     Gaudi::Property<bool> m_storeHighLevelVariables
       { this, "storeHighLevelVariables", false, "Flag to store high level variables in output" };
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};
