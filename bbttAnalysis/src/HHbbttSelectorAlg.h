@@ -62,6 +62,58 @@ namespace HHBBTT
     subleadingjet = 6,
   };
 
+  enum Booleans
+  {
+    pass_trigger_SLT,
+    pass_trigger_LTT,
+    pass_trigger_STT,
+    pass_trigger_DTT,
+    pass_trigger_DTT_2016,
+    pass_trigger_DTT_4J12,
+    pass_trigger_DTT_L1Topo,
+
+    TWO_JETS,
+    TWO_BJETS,
+    MBB_MASS,
+    N_LEPTONS_CUT_LEPHAD,
+    ONE_TAU,
+    OS_CHARGE_LEPHAD,
+    pass_baseline_SLT,
+    pass_baseline_LTT,
+    pass_SLT,
+    pass_LTT,
+    N_LEPTONS_CUT_HADHAD,
+    TWO_TAU,
+    OS_CHARGE_HADHAD,
+    pass_baseline_STT,
+    pass_baseline_DTT_2016,
+    pass_baseline_DTT_4J12,
+    pass_baseline_DTT_L1Topo,
+    pass_baseline_DTT,
+    pass_STT,
+    pass_DTT_2016,
+    pass_DTT_4J12,
+    pass_DTT_L1Topo,
+    pass_DTT,
+
+    is15,
+    is16,
+    is17,
+    is18,
+    is22,
+    is23,
+
+    is16PeriodA,
+    is16PeriodB_D3,
+    is16PeriodD4_end,
+    is17PeriodB1_B4,
+    is17PeriodB5_B7,
+    is17PeriodB8_end,
+    is18PeriodB_end,
+    is18PeriodK_end,
+    l1topo_disabled,
+  };
+
 
   /// \brief An algorithm for counting containers
   class HHbbttSelectorAlg final : public EL::AnaAlgorithm
@@ -96,12 +148,6 @@ private:
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
     
-    /// \brief Cutflow Variables
-    CutManager m_bbttCuts;
-    Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
-    Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
-    long long int m_total_events{0};
-
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
@@ -149,18 +195,6 @@ private:
     Gaudi::Property<std::vector<std::string>> m_triggers 
           {this, "triggerLists", {}, "Name list of trigger"};
 
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
-    std::vector<std::string> m_Bvarnames{      
-      "pass_trigger_SLT", "pass_trigger_LTT", "pass_trigger_STT",
-      "pass_trigger_DTT_2016", "pass_trigger_DTT_4J12",
-      "pass_trigger_DTT_L1Topo", "pass_trigger_DTT",
-      "pass_baseline_SLT", "pass_baseline_LTT", "pass_baseline_STT",
-      "pass_baseline_DTT_2016", "pass_baseline_DTT_4J12",
-      "pass_baseline_DTT_L1Topo", "pass_baseline_DTT",
-      "pass_SLT", "pass_LTT", "pass_STT",
-      "pass_DTT_2016", "pass_DTT_4J12", "pass_DTT_L1Topo",  "pass_DTT"
-    };
-
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
@@ -168,59 +202,76 @@ private:
     /// \brief Setup sys-aware output decorations
     CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
     
+    /// \brief Booleans
+    /*
+     * We have a lot of booleans. Most of these have to be saved in the output root file and some used for the cutflow algorithm.
+     * In both cases, additionally to the value of the boolean, its name is required.
+     * In order to easily access both and having both connected, we use the enum Booleans defined above.
+     * We then define a map m_bools mapping the enum to the boolean value and a map m_boolnames mapping the enum to the boolean name.
+     * Additionally, m_Bbranches is a map of SysWriteDecorHandles taking care of saving the variables.
+     */
+    std::unordered_map < HHBBTT::Booleans, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+    std::unordered_map < HHBBTT::Booleans, bool > m_bools;
+    std::unordered_map < HHBBTT::Booleans, std::string > m_boolnames{
+    {HHBBTT::pass_trigger_SLT, "pass_trigger_SLT"},
+    {HHBBTT::pass_trigger_LTT, "pass_trigger_LTT"},
+    {HHBBTT::pass_trigger_STT, "pass_trigger_STT"},
+    {HHBBTT::pass_trigger_DTT, "pass_trigger_DTT"},
+    {HHBBTT::pass_trigger_DTT_2016, "pass_trigger_DTT_2016"},
+    {HHBBTT::pass_trigger_DTT_4J12, "pass_trigger_DTT_4J12"},
+    {HHBBTT::pass_trigger_DTT_L1Topo, "pass_trigger_DTT_L1Topo"},
+    {HHBBTT::TWO_JETS, "TWO_JETS"},
+    {HHBBTT::TWO_BJETS, "TWO_BJETS"},
+    {HHBBTT::MBB_MASS, "MBB_MASS"},
+    {HHBBTT::N_LEPTONS_CUT_LEPHAD, "N_LEPTONS_CUT_LEPHAD"},
+    {HHBBTT::ONE_TAU, "ONE_TAU"},
+    {HHBBTT::OS_CHARGE_LEPHAD, "OS_CHARGE_LEPHAD"},
+    {HHBBTT::pass_baseline_SLT, "pass_baseline_SLT"},
+    {HHBBTT::pass_baseline_LTT, "pass_baseline_LTT"},
+    {HHBBTT::pass_SLT, "pass_SLT"},
+    {HHBBTT::pass_LTT, "pass_LTT"},
+    {HHBBTT::N_LEPTONS_CUT_HADHAD, "N_LEPTONS_CUT_HADHAD"},
+    {HHBBTT::TWO_TAU, "TWO_TAU"},
+    {HHBBTT::OS_CHARGE_HADHAD, "OS_CHARGE_HADHAD"},
+    {HHBBTT::pass_baseline_STT, "pass_baseline_STT"},
+    {HHBBTT::pass_baseline_DTT_2016, "pass_baseline_DTT_2016"},
+    {HHBBTT::pass_baseline_DTT_4J12, "pass_baseline_DTT_4J12"},
+    {HHBBTT::pass_baseline_DTT_L1Topo, "pass_baseline_DTT_L1Topo"},
+    {HHBBTT::pass_baseline_DTT, "pass_baseline_DTT"},
+    {HHBBTT::pass_STT, "pass_STT"},
+    {HHBBTT::pass_DTT_2016, "pass_DTT_2016"},
+    {HHBBTT::pass_DTT_4J12, "pass_DTT_4J12"},
+    {HHBBTT::pass_DTT_L1Topo, "pass_DTT_L1Topo"},
+    {HHBBTT::pass_DTT, "pass_DTT"},
+    {HHBBTT::is15, "is15"},
+    {HHBBTT::is16, "is16"},
+    {HHBBTT::is17, "is17"},
+    {HHBBTT::is18, "is18"},
+    {HHBBTT::is22, "is22"},
+    {HHBBTT::is23, "is23"},
+    {HHBBTT::is16PeriodA, "is16PeriodA"},
+    {HHBBTT::is16PeriodB_D3, "is16PeriodB_D3"},
+    {HHBBTT::is16PeriodD4_end, "is16PeriodD4_end"},
+    {HHBBTT::is17PeriodB1_B4, "is17PeriodB1_B4"},
+    {HHBBTT::is17PeriodB5_B7, "is17PeriodB5_B7"},
+    {HHBBTT::is17PeriodB8_end, "is17PeriodB8_end"},
+    {HHBBTT::is18PeriodB_end, "is18PeriodB_end"},
+    {HHBBTT::is18PeriodK_end, "is18PeriodK_end"},
+    {HHBBTT::l1topo_disabled, "l1topo_disabled"},
+    };
+
+    /// \brief Cutflow Variables
+    CutManager m_bbttCuts;
+    Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
+    std::vector<HHBBTT::Booleans> m_inputCutKeys;
+    Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
+    long long int m_total_events{0};
+
     /// \brief Internal variables
 
     std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>> m_pt_threshold;
 
-    bool m_trigPassed_SLT;
-    bool m_trigPassed_LTT;
-    bool m_trigPassed_STT;
-    bool m_trigPassed_DTT;
-    bool m_trigPassed_DTT_2016;
-    bool m_trigPassed_DTT_4J12;
-    bool m_trigPassed_DTT_L1Topo;
-
-    bool TWO_JETS;
-    bool TWO_BJETS;
-    bool MBB_MASS;
-    bool N_LEPTONS_CUT_LEPHAD;
-    bool ONE_TAU;
-    bool OS_CHARGE_LEPHAD;
-    bool pass_baseline_SLT;
-    bool pass_baseline_LTT;
-    bool pass_SLT;
-    bool pass_LTT;
-    bool N_LEPTONS_CUT_HADHAD;
-    bool TWO_TAU;
-    bool OS_CHARGE_HADHAD;
-    bool pass_baseline_STT;
-    bool pass_baseline_DTT_2016;
-    bool pass_baseline_DTT_4J12;
-    bool pass_baseline_DTT_L1Topo;
-    bool pass_baseline_DTT;
-    bool pass_STT;
-    bool pass_DTT_2016;
-    bool pass_DTT_4J12;
-    bool pass_DTT_L1Topo;
-    bool pass_DTT;
-
-    bool m_is15;
-    bool m_is16;
-    bool m_is17;
-    bool m_is18;
-    bool m_is22;
-    bool m_is23;
-
-    bool m_is16PeriodA;
-    bool m_is16PeriodB_D3;
-    bool m_is16PeriodD4_end;
-    bool m_is17PeriodB1_B4;
-    bool m_is17PeriodB5_B7;
-    bool m_is17PeriodB8_end;
-    bool m_is18PeriodB_end;
-    bool m_is18PeriodK_end;
-    bool m_l1topo_disabled;
-
+    StatusCode initialiseCutflow();
     void applyTriggerSelection(const xAOD::EventInfo* event,
 			       const xAOD::ElectronContainer* electrons,
 			       const xAOD::MuonContainer* muons,
