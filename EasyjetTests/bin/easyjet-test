@@ -59,7 +59,7 @@ declare -A DATAFILES=(
     [mc23af3]=${PHYS_JETS_MC23_AF3}
     [bbbb-mc23]=${PHYS_TTBAR_MC23}
     [bbtt-mc23]=${PHYS_TTBAR_MC23}
-    [bbtt-mc23-lite]=${PHYSLITE_TTBAR_MC23}
+    [bbtt-mc23-lite-syst]=${PHYSLITE_TTBAR_MC23}
     # systematics enabled
     [syst-mc23]=${PHYS_TTBAR_MC23}
     # non-ntupler workflows
@@ -96,7 +96,7 @@ declare -A TESTS=(
     [mc23af3]="simple easyjet-ntupler"
     [bbbb-mc23]="simple bbbb-ntupler"
     [bbtt-mc23]="simple bbtt-ntupler"
-    [bbtt-mc23-lite]="simple bbtt-ntupler"
+    [bbtt-mc23-lite-syst]="simple bbtt-ntupler"
     [syst-mc23]="systematics easyjet-ntupler"
     # non-ntupler
     [aod-fast-bbbb-mc23]="aod-fast bbbb-ntupler"
@@ -125,7 +125,7 @@ declare -A CONFIGS=(
     # MC23
     [bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
     [bbtt-mc23]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
-    [bbtt-mc23-lite]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
+    [bbtt-mc23-lite-syst]=bbttAnalysis/RunConfig-bbtt-bypass-syst.yaml
     # non-ntupler
     [aod-fast-bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
     [hist-syst-bbbb-mc23]=bbbbAnalysis/histonly-config.yaml

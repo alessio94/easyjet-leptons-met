@@ -126,10 +126,10 @@ ntupler_bbtt_mc23:
   script:
     - easyjet-test bbtt-mc23
 
-ntupler_bbtt_mc23_lite:
+ntupler_bbtt_mc23_lite_syst:
   extends: .ntupler
   script:
-    - easyjet-test bbtt-mc23-lite
+    - easyjet-test bbtt-mc23-lite-syst
 
 # systematics enabled
 
