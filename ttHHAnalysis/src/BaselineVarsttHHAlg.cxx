@@ -130,7 +130,7 @@ namespace ttHH
           m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_pt").set(*event, bjets->at(i)->p4().Pt(), sys);
           m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_eta").set(*event, bjets->at(i)->p4().Eta(), sys);
           m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_phi").set(*event, bjets->at(i)->p4().Phi(), sys);
-          m_Fbranches.at("Je_b"+std::to_string(i+1)+"_E").set(*event, bjets->at(i)->p4().E(), sys);
+          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_E").set(*event, bjets->at(i)->p4().E(), sys);
 
           m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel, sys);
         }
