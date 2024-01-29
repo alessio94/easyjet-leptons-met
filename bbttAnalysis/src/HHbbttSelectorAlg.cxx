@@ -462,32 +462,33 @@ namespace HHBBTT
       //****************
 
       // do the CUTFLOW only with sys="" -> NOSYS
-      if (sys.name()!="") continue;
+      if (sys.name()==""){
 
-      // Compute total_events
-      m_total_events+=1; 
+        // Compute total_events
+        m_total_events+=1; 
 
-      // Count which cuts the event passed
-      for (const auto &cut : m_inputCutKeys) {
-        if(m_bbttCuts.exists(m_boolnames.at(cut))) {
-          m_bbttCuts(m_boolnames.at(cut)).passed = m_bools.at(cut);
-          if (m_bbttCuts(m_boolnames.at(cut)).passed)
-            m_bbttCuts(m_boolnames.at(cut)).counter+=1;
+        // Count which cuts the event passed
+        for (const auto &cut : m_inputCutKeys) {
+          if(m_bbttCuts.exists(m_boolnames.at(cut))) {
+            m_bbttCuts(m_boolnames.at(cut)).passed = m_bools.at(cut);
+            if (m_bbttCuts(m_boolnames.at(cut)).passed)
+              m_bbttCuts(m_boolnames.at(cut)).counter+=1;
+          }
         }
-      }
 
-      // Check how many consecutive cuts are passed by the event.
-      unsigned int consecutive_cuts = 0;
-      for (size_t i = 0; i < m_bbttCuts.size(); ++i) {
-        if (m_bbttCuts[i].passed)
-          consecutive_cuts++;
-        else
-          break;
-      }
+        // Check how many consecutive cuts are passed by the event.
+        unsigned int consecutive_cuts = 0;
+        for (size_t i = 0; i < m_bbttCuts.size(); ++i) {
+          if (m_bbttCuts[i].passed)
+            consecutive_cuts++;
+          else
+            break;
+        }
 
-      // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
-      for (unsigned int i=0; i<consecutive_cuts; i++) {
-        m_bbttCuts[i].relativeCounter+=1;
+        // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
+        for (unsigned int i=0; i<consecutive_cuts; i++) {
+          m_bbttCuts[i].relativeCounter+=1;
+        }
       }
 
       // Fill syst-aware output decorators
