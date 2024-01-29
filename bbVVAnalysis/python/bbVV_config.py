@@ -15,6 +15,8 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             "MuonSelectorAlg",
             containerInKey=MuonWPLabel + muonkey,
             containerOutKey="bbVVAnalysisMuons_%SYS%",
+            muonSF_WP=MuonWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -25,6 +27,8 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             "ElectronSelectorAlg",
             containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="bbVVAnalysisElectrons_%SYS%",
+            eleSF_WP=ElectronWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )

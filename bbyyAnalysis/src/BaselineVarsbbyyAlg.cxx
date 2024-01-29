@@ -29,11 +29,9 @@ namespace HHBBYY
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      m_ph_idSF = CP::SysReadDecorHandle<float>("ph_id_effSF_"+m_photonWPName+"_%SYS%", this);
-      m_ph_isoSF = CP::SysReadDecorHandle<float>("ph_isol_effSF_"+m_photonWPName+"_%SYS%", this);
+      m_ph_SF = CP::SysReadDecorHandle<float>("ph_effSF_"+m_photonWPName+"_%SYS%", this);
     }
-    ATH_CHECK (m_ph_idSF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ph_isoSF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
 
     // Intialise syst-aware output decorators
     // Add MC var
@@ -135,7 +133,7 @@ namespace HHBBYY
         m_Fbranches.at("Photon1_phi").set(*event, y1.Phi(), sys);
         m_Fbranches.at("Photon1_E").set(*event, y1.E(), sys);
         if(m_isMC){
-          float ph_SF = m_ph_idSF.get(*ph1, sys) * m_ph_isoSF.get(*ph1, sys);
+          float ph_SF = m_ph_SF.get(*ph1, sys);
           m_Fbranches.at("Photon1_effSF").set(*event, ph_SF, sys);
         }
       }
@@ -153,7 +151,7 @@ namespace HHBBYY
         m_Fbranches.at("Photon2_phi").set(*event, y2.Phi(), sys);
         m_Fbranches.at("Photon2_E").set(*event, y2.E(), sys);
         if(m_isMC){
-          float ph_SF = m_ph_idSF.get(*ph2, sys) * m_ph_isoSF.get(*ph2, sys);
+          float ph_SF = m_ph_SF.get(*ph2, sys);
           m_Fbranches.at("Photon2_effSF").set(*event, ph_SF, sys);
         }
 

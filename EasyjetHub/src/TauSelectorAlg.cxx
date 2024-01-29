@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -30,6 +30,13 @@ namespace Easyjet
     ATH_CHECK (m_IDTauDecorKey.initialize());
     ATH_CHECK (m_antiTauDecorKey.initialize());
     ATH_CHECK (m_ORTauDecorKey.initialize());
+
+    if(m_isMC){
+      m_tau_SF_in = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
+      m_tau_SF_out = CP::SysWriteDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_tau_SF_in.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_tau_SF_out.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Initialise syst-aware input/output decorators 
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
@@ -85,7 +92,10 @@ namespace Easyjet
             this_tau_eta_abs < m_maxEtaVeto) ||
             (this_tau_eta_abs > m_maxEta))
           continue;
-    
+
+	// For some reason this decoration needs to be explicitly copied
+	if(m_isMC) m_tau_SF_out.set(*tau, m_tau_SF_in.get(*tau,sys), sys);
+
         // If cuts are passed, save the object
         workContainer->push_back(tau);
        }

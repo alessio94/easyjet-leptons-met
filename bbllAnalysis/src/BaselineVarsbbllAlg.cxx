@@ -31,20 +31,14 @@ namespace HHBBLL
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
-      m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
-      m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
     }
-    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
     if(m_isMC){
-      m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
-      m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+      m_mu_SF = CP::SysReadDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
     }
-    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
-    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
+    ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     // Intialise syst-aware output decorators
 
@@ -157,8 +151,7 @@ namespace HHBBLL
         m_Fbranches.at("Electron1_phi").set(*event, ele0->phi(), sys);
         m_Fbranches.at("Electron1_E").set(*event, ele0->e(), sys);
         if(m_isMC){
-          float ele_SF = m_ele_recoSF.get(*ele0, sys) *
-            m_ele_idSF.get(*ele0, sys) * m_ele_isoSF.get(*ele0, sys);
+          float ele_SF = m_ele_SF.get(*ele0, sys);
           m_Fbranches.at("Electron1_effSF").set(*event, ele_SF, sys);
         }
       }
@@ -171,8 +164,7 @@ namespace HHBBLL
         m_Fbranches.at("Electron2_phi").set(*event, ele1->phi(), sys);
         m_Fbranches.at("Electron2_E").set(*event, ele1->e(), sys);
         if(m_isMC){
-          float ele_SF = m_ele_recoSF.get(*ele1, sys) *
-            m_ele_idSF.get(*ele1, sys) * m_ele_isoSF.get(*ele1, sys);
+          float ele_SF = m_ele_SF.get(*ele1, sys);
           m_Fbranches.at("Electron2_effSF").set(*event, ele_SF, sys);
         }
 
@@ -196,7 +188,7 @@ namespace HHBBLL
         m_Fbranches.at("Muon1_phi").set(*event, mu0->phi(), sys);
         m_Fbranches.at("Muon1_E").set(*event, mu0->e(), sys);
         if(m_isMC){
-          float mu_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
+          float mu_SF = m_mu_SF.get(*mu0, sys);
           m_Fbranches.at("Muon1_effSF").set(*event, mu_SF, sys);
         }
       }
@@ -209,7 +201,7 @@ namespace HHBBLL
         m_Fbranches.at("Muon2_phi").set(*event, mu1->phi(), sys);
         m_Fbranches.at("Muon2_E").set(*event, mu1->e(), sys);
         if(m_isMC){
-          float mu_SF = m_mu_recoSF.get(*mu1, sys) * m_mu_isoSF.get(*mu1, sys);
+          float mu_SF = m_mu_SF.get(*mu1, sys);
           m_Fbranches.at("Muon2_effSF").set(*event, mu_SF, sys);
         }
 
@@ -248,17 +240,14 @@ namespace HHBBLL
 
         if (ele0 && !mu0){
           Leading_lep = ele0->p4();
-          if(m_isMC){
-	    lep1_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) *
-	      m_ele_isoSF.get(*ele0, sys);
-	  }
+          if(m_isMC) lep1_SF = m_ele_SF.get(*ele0, sys);
           lep1_charge = ele0->charge();
           lep1_pdgid = ele0->charge() > 0 ? -11 : 11;
         }
 
 	else if (!ele0 && mu0) {
           Leading_lep = mu0->p4();
-	  if(m_isMC) lep1_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
+	  if(m_isMC) lep1_SF = m_mu_SF.get(*mu0, sys);
           lep1_charge = mu0->charge();
           lep1_pdgid = mu0->charge() > 0 ? -13 : 13;
         }
@@ -266,15 +255,12 @@ namespace HHBBLL
 	else if (ele0 && mu0) {
           if (ele0->pt() > mu0->pt()){
             Leading_lep =  ele0->p4();
-            if(m_isMC){
-	      lep1_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) *
-		m_ele_isoSF.get(*ele0, sys);
-	    }
+            if(m_isMC) lep1_SF = m_ele_SF.get(*ele0, sys);
             lep1_charge = ele0->charge();
             lep1_pdgid = ele0->charge() > 0 ? -11 : 11;
           } else {
             Leading_lep = mu0->p4();
-            if(m_isMC) lep1_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
+            if(m_isMC) lep1_SF = m_mu_SF.get(*mu0, sys);
             lep1_charge = mu0->charge();
             lep1_pdgid = mu0->charge() > 0 ? -13 : 13;
           }
@@ -311,17 +297,14 @@ namespace HHBBLL
 
         if (ele1){
           Subleading_lep = ele1->p4();
-          if(m_isMC){
-	    lep2_SF = m_ele_recoSF.get(*ele1, sys) * m_ele_idSF.get(*ele1, sys) *
-	      m_ele_isoSF.get(*ele1, sys);
-	  }
+          if(m_isMC) lep2_SF = m_ele_SF.get(*ele1, sys);
           lep2_charge = ele1->charge();
           lep2_pdgid = ele1->charge() > 0 ? -11 : 11;
         }
 
 	else if (mu1) {
           Subleading_lep = mu1->p4();
-          if(m_isMC) lep2_SF = m_mu_recoSF.get(*mu1, sys) * m_mu_isoSF.get(*mu1, sys);
+          if(m_isMC) lep2_SF = m_mu_SF.get(*mu1, sys);
           lep2_charge = mu1->charge();
           lep2_pdgid = mu1->charge() > 0 ? -13 : 13;
         }
@@ -329,15 +312,12 @@ namespace HHBBLL
 	else if (ele0 && mu0) {
           if (ele0->pt() > mu0->pt()){
             Subleading_lep = mu0->p4();
-            if(m_isMC) lep2_SF = m_mu_recoSF.get(*mu0, sys) * m_mu_isoSF.get(*mu0, sys);
+            if(m_isMC) lep2_SF = m_mu_SF.get(*mu0, sys);
             lep2_charge = mu0->charge();
             lep2_pdgid = mu0->charge() > 0 ? -13 : 13;
           } else {
             Subleading_lep = ele0->p4();
-            if(m_isMC){
-	      lep2_SF = m_ele_recoSF.get(*ele0, sys) * m_ele_idSF.get(*ele0, sys) *
-		m_ele_isoSF.get(*ele0, sys);
-	    }
+            if(m_isMC) lep2_SF = m_ele_SF.get(*ele0, sys);
             lep2_charge = ele0->charge();
             lep2_pdgid = ele0->charge() > 0 ? -11 : 11;
           }

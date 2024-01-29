@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Abraham Tishelman-Charny
@@ -32,6 +32,16 @@ namespace Easyjet
 
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
+
+    if(m_isMC){
+      m_ph_idSF = CP::SysReadDecorHandle<float>("ph_id_effSF_"+m_photonWPName+"_%SYS%", this);
+      if(m_photonWPName.value().find("NonIso")!=std::string::npos) m_isoIncluded = false;
+      else m_ph_isoSF = CP::SysReadDecorHandle<float>("ph_isol_effSF_"+m_photonWPName+"_%SYS%", this);
+      m_ph_SF = CP::SysWriteDecorHandle<float>("ph_effSF_"+m_photonWPName+"_%SYS%", this);
+    }
+    ATH_CHECK (m_ph_idSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ph_isoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -97,6 +107,13 @@ namespace Easyjet
             this_photon_eta_abs < m_maxEtaVeto) ||
             (this_photon_eta_abs > m_maxEta ))
           continue ;
+
+	// For some reason this decoration needs to be explicitly copied
+	if(m_isMC){
+	  float SF = m_ph_idSF.get(*thisPhoton,sys);
+	  if(m_isoIncluded) SF *= m_ph_isoSF.get(*thisPhoton,sys);
+	  m_ph_SF.set(*thisPhoton, SF, sys);
+	}
 
         workContainer->push_back(thisPhoton.release());
       }

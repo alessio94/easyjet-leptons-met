@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Minori Fujimoto
@@ -28,6 +28,19 @@ namespace Easyjet
 
     m_ORElDecorKey = m_inHandle.getNamePattern() + "." + m_ORElDecorName;
     ATH_CHECK (m_ORElDecorKey.initialize());
+
+    if(m_isMC){
+      m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
+      if(m_eleWPName.value().find("NonIso")!=std::string::npos) m_isoIncluded = false;
+      else m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_SF = CP::SysWriteDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
+    }
+
+    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -72,7 +85,14 @@ namespace Easyjet
             this_electron_eta_abs < m_maxEtaVeto) ||
             (this_electron_eta_abs > m_maxEta ))
           continue;
-        
+
+	// For some reason this decoration needs to be explicitly copied
+	if(m_isMC){
+	  float SF = m_ele_recoSF.get(*electron,sys) * m_ele_idSF.get(*electron,sys);
+	  if(m_isoIncluded) SF *= m_ele_isoSF.get(*electron,sys);
+	  m_ele_SF.set(*electron, SF, sys);
+	}
+
         // If cuts are passed, save the object
         workContainer->push_back(electron);
       }

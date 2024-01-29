@@ -58,8 +58,7 @@ namespace HHBBYY
 
     Gaudi::Property<std::string> m_photonWPName
       { this, "photonWP", "","Photon ID + Iso working point" };
-    CP::SysReadDecorHandle<float> m_ph_idSF{"", this};
-    CP::SysReadDecorHandle<float> m_ph_isoSF{"", this};
+    CP::SysReadDecorHandle<float> m_ph_SF{"", this};
 
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "",   "MET container to read" };

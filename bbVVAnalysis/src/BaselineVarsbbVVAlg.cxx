@@ -35,20 +35,14 @@ namespace HHBBVV
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
-      m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
-      m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
     }
-    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
     if(m_isMC){
-      m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
-      m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+      m_mu_SF = CP::SysReadDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
     }
-    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty ));
-    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
+    ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty ));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -139,10 +133,7 @@ namespace HHBBVV
           lepton_E = electron->e();
           lepton_charge = electron->charge();
           lepton_pdgid = electron->charge() > 0 ? -11 : 11;
-          if(m_isMC){
-            lepton_SF = m_ele_recoSF.get(*electron,sys) *
-              m_ele_idSF.get(*electron,sys) * m_ele_isoSF.get(*electron,sys);
-          }
+          if(m_isMC) lepton_SF = m_ele_SF.get(*electron,sys);
           break; // At most one lepton selected
       	}
       }
@@ -154,8 +145,7 @@ namespace HHBBVV
           lepton_E = muon->e();
           lepton_charge = muon->charge();
           lepton_pdgid = muon->charge() > 0 ? -13 : 13;
-          if(m_isMC)
-            lepton_SF = m_mu_recoSF.get(*muon,sys) * m_mu_isoSF.get(*muon,sys);
+          if(m_isMC) lepton_SF = m_mu_SF.get(*muon,sys);
           break;
 	}
       }

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef EASYJET_MUONSELECTORALG
@@ -8,6 +8,7 @@
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysWriteHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 
@@ -48,6 +49,17 @@ private:
     Gaudi::Property<std::string> m_ORMuDecorName
       { this, "ORDecorKey", "passesOR", "Decoration for muons OR" };
     SG::ReadDecorHandleKey<xAOD::MuonContainer> m_ORMuDecorKey;
+
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
+    Gaudi::Property<std::string> m_muWPName
+      { this, "muonSF_WP", "","Muon ID + Iso working point for the scale factors" };
+    bool m_isoIncluded = true;
+    CP::SysReadDecorHandle<float> m_mu_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_mu_isoSF{"", this};
+
+    CP::SysWriteDecorHandle<float> m_mu_SF{"", this};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::MuonContainer>>

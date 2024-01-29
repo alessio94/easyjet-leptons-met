@@ -15,7 +15,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             "PhotonSelectorAlg",
             containerInKey=PhotonWPLabel + photonkey,
             containerOutKey="bbyyAnalysisPhotons_%SYS%",
-            pTsort=True,
+            photonSF_WP=PhotonWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -27,6 +28,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             containerInKey=MuonWPLabel + muonkey,
             containerOutKey="bbyyAnalysisMuons_%SYS%",
             minPt=10e3,
+            muonSF_WP=MuonWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -38,6 +41,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="bbyyAnalysisElectrons_%SYS%",
             minPt=10e3,
+            eleSF_WP=ElectronWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )

@@ -13,22 +13,30 @@ def bbtt_cfg(
 
     cfg = ComponentAccumulator()
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
+    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
-            containerInKey=MuonWPLabel + muonkey,
+            containerInKey=LooseMuonWPLabel + muonkey,
             containerOutKey="bbttAnalysisMuons_%SYS%",
+            muonSF_WP=TightMuonWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    TightEleWP = flags.Analysis.Electron.extra_wps[0]
+    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
-            containerInKey=ElectronWPLabel + electronkey,
+            containerInKey=LooseElectronWPLabel + electronkey,
             containerOutKey="bbttAnalysisElectrons_%SYS%",
+            eleSF_WP=TightEleWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -39,6 +47,8 @@ def bbtt_cfg(
             # Baseline always needed for anti-taus
             containerInKey='baseline' + taukey,
             containerOutKey="bbttAnalysisTaus_%SYS%",
+            tauSF_WP=flags.Analysis.Tau.ID,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -61,10 +71,6 @@ def bbtt_cfg(
         for c in flags.Analysis.TriggerChains
     ]
 
-    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
-    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
-    TightEleWP = flags.Analysis.Electron.extra_wps[0]
-    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",

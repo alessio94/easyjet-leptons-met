@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef EASYJET_TAUSELECTORALG
@@ -9,6 +9,7 @@
 #include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysWriteHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 
@@ -57,6 +58,15 @@ private:
     Gaudi::Property<std::string> m_ORTauDecorName
       { this, "ORDecorKey", "passesOR", "Decoration for ID taus" };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_ORTauDecorKey;
+
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
+    Gaudi::Property<std::string> m_tauWPName
+      { this, "tauSF_WP", "","Tau ID working point for the scale factors" };
+    CP::SysReadDecorHandle<float> m_tau_SF_in{"", this};
+
+    CP::SysWriteDecorHandle<float> m_tau_SF_out{"", this};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::TauJetContainer>>

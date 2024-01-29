@@ -69,14 +69,11 @@ private:
 
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
-    CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
-    CP::SysReadDecorHandle<float> m_ele_idSF{"", this};
-    CP::SysReadDecorHandle<float> m_ele_isoSF{"", this};
+    CP::SysReadDecorHandle<float> m_ele_SF{"", this};
 
     Gaudi::Property<std::string> m_muWPName
       { this, "muonWP", "","Muon ID + Iso working point" };
-    CP::SysReadDecorHandle<float> m_mu_recoSF{"", this};
-    CP::SysReadDecorHandle<float> m_mu_isoSF{"", this};
+    CP::SysReadDecorHandle<float> m_mu_SF{"", this};
 
     CP::SysReadDecorHandle<bool> 
     m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input dectorator for selected el"};

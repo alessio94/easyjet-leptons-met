@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Minori Fujimoto
@@ -29,6 +29,17 @@ namespace Easyjet
 
     m_ORMuDecorKey = m_inHandle.getNamePattern() + "." + m_ORMuDecorName;
     ATH_CHECK (m_ORMuDecorKey.initialize());
+
+    if(m_isMC){
+      m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
+      if(m_muWPName.value().find("NonIso")!=std::string::npos) m_isoIncluded = false;
+      else m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
+      m_mu_SF = CP::SysWriteDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
+    }
+
+    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -66,7 +77,14 @@ namespace Easyjet
         // pT and eta cuts
         if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
           continue;
-        
+
+	// For some reason this decoration needs to be explicitly copied
+	if(m_isMC){
+	  float SF = m_mu_recoSF.get(*muon,sys);
+	  if(m_isoIncluded) SF *= m_mu_isoSF.get(*muon,sys);
+	  m_mu_SF.set(*muon, SF, sys);
+	}
+
         // If cuts are passed, save the object
         workContainer->push_back(muon);
       }

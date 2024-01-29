@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef EASYJET_PHOTONSELECTORALG
@@ -50,6 +50,17 @@ private:
     Gaudi::Property<std::string> m_ORDecorName
       { this, "ORDecorKey", "passesOR", "Decoration for photons OR" };
     SG::ReadDecorHandleKey<xAOD::PhotonContainer> m_ORDecorKey;
+
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
+    Gaudi::Property<std::string> m_photonWPName
+      { this, "photonSF_WP", "","Photon ID + Iso working point for the scale factors" };
+    bool m_isoIncluded = true;
+    CP::SysReadDecorHandle<float> m_ph_idSF{"", this};
+    CP::SysReadDecorHandle<float> m_ph_isoSF{"", this};
+
+    CP::SysWriteDecorHandle<float> m_ph_SF{"", this};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::PhotonContainer>>

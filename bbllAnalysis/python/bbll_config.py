@@ -16,6 +16,8 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
             "MuonSelectorAlg",
             containerInKey=MuonWPLabel + muonkey,
             containerOutKey="bbllAnalysisMuons_%SYS%",
+            muonSF_WP=MuonWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
             minPt=9 * Units.GeV,
         )
@@ -28,6 +30,8 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="bbllAnalysisElectrons_%SYS%",
             checkOR=flags.Analysis.do_overlap_removal,
+            eleSF_WP=ElectronWPLabel,
+            isMC=flags.Input.isMC,
             minPt=10 * Units.GeV,
         )
     )

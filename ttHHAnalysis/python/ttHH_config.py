@@ -17,6 +17,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey=MuonWPLabel + muonkey,
             containerOutKey="ttHHAnalysisMuons_%SYS%",
             minPt=10e3,
+            muonSF_WP=MuonWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -28,6 +30,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="ttHHAnalysisElectrons_%SYS%",
             minPt=10e3,
+            eleSF_WP=ElectronWPLabel,
+            isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
