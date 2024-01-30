@@ -21,6 +21,8 @@
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+
+
 namespace HHBBYY
 {
 
@@ -39,6 +41,7 @@ namespace HHBBYY
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
     float compute_Topness(const xAOD::JetContainer *jets);
+    float* compute_EventShapes(const xAOD::JetContainer *jets, const xAOD::PhotonContainer *photons);
 
   private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
@@ -91,7 +94,7 @@ namespace HHBBYY
       "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star", "Photon1_ptOvermyy", "Photon2_ptOvermyy",
 
       // mva variables
-	    "HT", "topness", "missEt", "metphi",
+        "HT", "topness", "sphericityT", "planarFlow", "missEt", "metphi",
     };
 
     std::vector<std::string> m_Fvarnames_MC{

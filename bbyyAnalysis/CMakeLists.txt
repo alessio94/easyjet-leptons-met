@@ -2,7 +2,7 @@
 atlas_subdir(bbyyAnalysis)
 
 # Find an external package (i.e. ROOT)
-find_package(ROOT COMPONENTS Core Tree Hist REQUIRED)
+find_package(ROOT COMPONENTS Core Tree Hist Matrix MathCore REQUIRED)
 
 # We don't want any warnings in compilation
 add_compile_options(-Werror)
@@ -12,7 +12,7 @@ atlas_add_component(bbyyAnalysis
   src/BaselineVarsbbyyAlg.cxx
   src/SelectionFlagsbbyyAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
-  LINK_LIBRARIES
+  LINK_LIBRARIES ${ROOT_LIBRARIES}
   AthenaBaseComps
   AsgTools
   AthContainers

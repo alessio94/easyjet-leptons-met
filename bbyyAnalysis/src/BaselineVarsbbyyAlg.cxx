@@ -6,6 +6,10 @@
 #include "BaselineVarsbbyyAlg.h"
 #include <FourMomUtils/xAODP4Helpers.h>
 
+#include "TMatrixDSym.h"
+#include "TMatrixDSymEigen.h"
+#include "TVectorD.h"
+
 namespace HHBBYY
 {
   BaselineVarsbbyyAlg::BaselineVarsbbyyAlg(const std::string &name,
@@ -255,11 +259,15 @@ namespace HHBBYY
       m_Fbranches.at("HT").set(*event, HT, sys);
 
       if(jets->size()>=3){
-	float topness = compute_Topness(jets);
-	m_Fbranches.at("topness").set(*event, topness, sys);
+        float topness = compute_Topness(jets);
+        m_Fbranches.at("topness").set(*event, topness, sys);
       }
       m_Fbranches.at("missEt").set(*event, met->met(), sys);
       m_Fbranches.at("metphi").set(*event, met->phi(), sys);
+      
+      float* eventShapes = compute_EventShapes(jets, photons);
+      m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
+      m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
 
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
@@ -277,17 +285,79 @@ namespace HHBBYY
     const float topmass=173e3;
     for(unsigned int j1=0;j1<jets->size()-2;j1++){
       for(unsigned int j2=j1+1;j2<jets->size()-1;j2++){
-	for(unsigned int j3=j2+1;j3<jets->size();j3++){
-	  // compute m_j1j2 and m_j1j2j3
-	  float m_j1j2=((*jets)[j1]->p4()+(*jets)[j2]->p4()).M();
-	  float m_j1j2j3=((*jets)[j1]->p4()+(*jets)[j2]->p4()+(*jets)[j3]->p4()).M();
-	  // find minimum topness
-	  float topness=std::hypot((m_j1j2-wmass)/wmass, (m_j1j2j3-topmass)/topmass);
-	  if(topness<minTopness) minTopness=topness;
-	}
+        for(unsigned int j3=j2+1;j3<jets->size();j3++){
+          // compute m_j1j2 and m_j1j2j3
+          float m_j1j2=((*jets)[j1]->p4()+(*jets)[j2]->p4()).M();
+          float m_j1j2j3=((*jets)[j1]->p4()+(*jets)[j2]->p4()+(*jets)[j3]->p4()).M();
+          // find minimum topness
+          float topness=std::hypot((m_j1j2-wmass)/wmass, (m_j1j2j3-topmass)/topmass);
+          if(topness<minTopness) minTopness=topness;
+        }
       }
-    }    
+    }
     return minTopness;
   }
 
+  /*
+  eventShapes[0] = sphericityT;
+  eventShapes[1] = planarFlow;
+  */
+  float* BaselineVarsbbyyAlg::compute_EventShapes(const xAOD::JetContainer *jets,
+                                                 const xAOD::PhotonContainer *photons){
+    static float eventShapes[2] = {0};
+    if (jets->size() >= 2 && photons->size() >= 2) {
+      TLorentzVector photon1 = photons->at(0)->p4();
+      TLorentzVector photon2 = photons->at(1)->p4();
+      TLorentzVector jet1 = jets->at(0)->p4();
+      TLorentzVector jet2 = jets->at(1)->p4();
+      std::vector<TLorentzVector> p4_vec = {photon1, photon2, jet1, jet2};
+
+      TMatrixDSym MomentumTensor = TMatrixDSym(3);
+      TMatrixDSym MomentumTensorT = TMatrixDSym(3);
+
+      double Sxx = 0.0, Sxy = 0.0, Sxz = 0.0, Syy = 0.0, Syz = 0.0, Szz = 0.0, normal = 0.0;
+      for(const auto& p4 : p4_vec){
+        Sxx += p4.Px()*p4.Px();
+        Sxy += p4.Px()*p4.Py();
+        Sxz += p4.Px()*p4.Pz();
+        Syy += p4.Py()*p4.Py();
+        Syz += p4.Py()*p4.Pz();
+        Szz += p4.Pz()*p4.Pz();
+        normal += p4.P()*p4.P();
+      }
+
+      MomentumTensor[0][0] = Sxx / normal;
+      MomentumTensor[0][1] = Sxy / normal;
+      MomentumTensor[0][2] = Sxz / normal;
+      MomentumTensor[1][0] = MomentumTensor[0][1];
+      MomentumTensor[1][1] = Syy / normal;
+      MomentumTensor[1][2] = Syz / normal;
+      MomentumTensor[2][0] = MomentumTensor[0][2];
+      MomentumTensor[2][1] = MomentumTensor[1][2];
+      MomentumTensor[2][2] = Szz / normal;
+
+      MomentumTensorT[0][0] = MomentumTensor[0][0];
+      MomentumTensorT[0][1] = MomentumTensor[0][1];
+      MomentumTensorT[1][1] = MomentumTensor[1][1];
+      MomentumTensorT[1][0] = MomentumTensor[1][0];
+
+      TMatrixDSymEigen EigenValues = TMatrixDSymEigen(MomentumTensor);
+      TMatrixDSymEigen EigenValuesT = TMatrixDSymEigen(MomentumTensorT);
+
+      TVectorD eigenVec = EigenValues.GetEigenValues();
+      TVectorD eigenVecT = EigenValuesT.GetEigenValues();
+
+      float sphericityT = 2.0 * eigenVecT[1] / (eigenVecT[0] + eigenVecT[1]);
+      float planarFlow = -99;
+
+      if ((eigenVec[0] + eigenVec [1]) != 0) {
+        planarFlow = 4.0 * eigenVec[0] * eigenVec[1] / std::pow(eigenVec[0] + eigenVec [1], 2);
+      }
+
+      eventShapes[0] = sphericityT;
+      eventShapes[1] = planarFlow;
+    }
+
+    return eventShapes;
+  }
 }
