@@ -12,7 +12,7 @@ atlas_add_component(EasyjetPlus
   src/*.cxx
   src/components/EasyjetPlus_entries.cxx
   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-  LINK_LIBRARIES ${ROOT_LIBRARIES} GaudiKernel AthenaBaseComps
+  LINK_LIBRARIES ${ROOT_LIBRARIES} GaudiKernel AthenaBaseComps AsgTools PMGAnalysisInterfacesLib
 )
 
 atlas_install_joboptions( share/*.py )

@@ -1,0 +1,5 @@
+XSection_paths:
+  # Path to official PMG txt file
+  PMG: "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/2024-01-22"
+  # Path to your custom PMG-like txt file
+  Custom: "../easyjet/bbyyAnalysis/share/"

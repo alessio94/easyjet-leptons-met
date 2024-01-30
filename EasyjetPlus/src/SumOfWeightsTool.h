@@ -33,7 +33,7 @@ class SumOfWeightsTool final: public extends<AthAlgTool, IPostProcessTool>
      std::unique_ptr<TFile> m_inFile;
      TH1F* m_inHisto; 
      float m_sumOfEventWeight = -1.;
-
+     
 };
 
 #endif
