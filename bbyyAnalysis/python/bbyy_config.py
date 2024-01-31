@@ -65,7 +65,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             jets="bbyyAnalysisJets_%SYS%",
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            isMC=flags.Input.isMC
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years
         )
     )
 
@@ -133,5 +134,7 @@ def bbyy_branches(flags):
         cutList = flags.Analysis.CutList
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_%SYS%"]
+
+    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches

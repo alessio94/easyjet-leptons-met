@@ -32,6 +32,7 @@ namespace HHBBYY
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
 
+
     if(m_isMC){
       m_ph_SF = CP::SysReadDecorHandle<float>("ph_effSF_"+m_photonWPName+"_%SYS%", this);
     }
@@ -52,6 +53,10 @@ namespace HHBBYY
       m_Ibranches.emplace(string_var, var);
       ATH_CHECK (m_Ibranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
+
+    ATH_CHECK(m_YearsDecorKey.initialize());
+    ATH_CHECK(m_runNumberKey.initialize());
+    ATH_CHECK(m_rdmRunNumberKey.initialize());    
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -275,6 +280,20 @@ namespace HHBBYY
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
 
     }
+
+    // Save Year of Data taking per event
+    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_eventHandle.getNamePattern());
+    ATH_CHECK(eventInfo.isValid());
+    SG::WriteDecorHandle<xAOD::EventInfo, unsigned int> m_YearsDecorHandle(m_YearsDecorKey);
+    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_runNumberHandle(m_runNumberKey);
+    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_rdmRunNumberHandle(m_rdmRunNumberKey);
+
+    unsigned int rdmNumber = m_isMC ? m_rdmRunNumberHandle(*eventInfo) : m_runNumberHandle(*eventInfo);
+
+    if (getDataTakingYear(m_years,rdmNumber)==0)
+      return StatusCode::FAILURE;
+
+    m_YearsDecorHandle(*eventInfo) = getDataTakingYear(m_years,rdmNumber);
 
     return StatusCode::SUCCESS;
   }
