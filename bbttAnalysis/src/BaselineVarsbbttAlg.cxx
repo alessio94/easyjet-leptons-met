@@ -221,16 +221,18 @@ namespace HHBBTT
       }
      
       if (bjets->size() > 1){
-        bb = bjets->at(0)->p4() + bjets->at(1)->p4();
+        TLorentzVector b1 = bjets->at(0)->p4();
+        TLorentzVector b2 = bjets->at(1)->p4();
+        bb = b1+b2;
         found_bb = true;
-        m_Fbranches.at("Jet_b1_pt").set(*event,  bjets->at(0)->p4().Pt(), sys);
-        m_Fbranches.at("Jet_b1_eta").set(*event, bjets->at(0)->p4().Eta(), sys);
-        m_Fbranches.at("Jet_b1_phi").set(*event, bjets->at(0)->p4().Phi(), sys);
-        m_Fbranches.at("Jet_b1_E").set(*event,   bjets->at(0)->p4().E(), sys);
-        m_Fbranches.at("Jet_b2_pt").set(*event,  bjets->at(1)->p4().Pt(), sys);
-        m_Fbranches.at("Jet_b2_eta").set(*event, bjets->at(1)->p4().Eta(), sys);
-        m_Fbranches.at("Jet_b2_phi").set(*event, bjets->at(1)->p4().Phi(), sys);
-        m_Fbranches.at("Jet_b2_E").set(*event,   bjets->at(0)->p4().E(), sys);
+        m_Fbranches.at("Jet_b1_pt").set(*event,  b1.Pt(), sys);
+        m_Fbranches.at("Jet_b1_eta").set(*event, b1.Eta(), sys);
+        m_Fbranches.at("Jet_b1_phi").set(*event, b1.Phi(), sys);
+        m_Fbranches.at("Jet_b1_E").set(*event,   b1.E(), sys);
+        m_Fbranches.at("Jet_b2_pt").set(*event,  b2.Pt(), sys);
+        m_Fbranches.at("Jet_b2_eta").set(*event, b2.Eta(), sys);
+        m_Fbranches.at("Jet_b2_phi").set(*event, b2.Phi(), sys);
+        m_Fbranches.at("Jet_b2_E").set(*event,   b2.E(), sys);
 
 
         m_Fbranches.at("H_bb_pt").set(*event, bb.Pt(), sys);
