@@ -124,6 +124,13 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
         )
     )
 
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.EventInfoGlobalAlg(
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years,
+        )
+    )
+
     return cfg
 
 
@@ -192,5 +199,7 @@ def ttHH_branches(flags):
     for lep in leptonPairs:
         for var in leptonPair_variables:
             branches += [f"EventInfo.{lep}_{var}_%SYS% -> ttHH_{lep}_{var}_%SYS%"]
+
+    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches

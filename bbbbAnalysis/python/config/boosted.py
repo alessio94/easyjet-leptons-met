@@ -87,6 +87,13 @@ def boosted_cfg(flags, largejetkey):
             )
         )
 
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.EventInfoGlobalAlg(
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years,
+        )
+    )
+
     return cfg
 
 
@@ -115,5 +122,7 @@ def boosted_branches(flags):
             branches += [
                 f"EventInfo.boosted_{var}_{btag_wp} -> bbbb_boosted_{btag_wp}_{var}"
             ]
+
+    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches

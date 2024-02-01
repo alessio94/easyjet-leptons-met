@@ -145,6 +145,13 @@ def bbtt_cfg(
         )
     )
 
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.EventInfoGlobalAlg(
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years,
+        )
+    )
+
     return cfg
 
 
@@ -250,5 +257,7 @@ def bbtt_branches(flags):
         for cat in ["SLT", "LTT", "STT", "DTT",
                     "DTT_2016", "DTT_4J12", "DTT_L1Topo"]:
             branches += [f"EventInfo.pass{var}{cat}_%SYS% -> bbtt_pass{var}{cat}_%SYS%"]
+
+    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches, float_variable_names, int_variable_names

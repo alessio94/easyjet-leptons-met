@@ -166,6 +166,13 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         )
     )
 
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.EventInfoGlobalAlg(
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years,
+        )
+    )
+
     return cfg
 
 
@@ -193,5 +200,7 @@ def bbVV_branches(flags):
                      f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%",]
 
         branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
+
+    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches

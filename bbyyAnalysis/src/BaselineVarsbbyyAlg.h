@@ -21,9 +21,6 @@
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
-#include <AsgDataHandles/WriteDecorHandle.h>
-#include <StoreGate/ReadDecorHandle.h>
-
 
 namespace HHBBYY
 {
@@ -44,29 +41,6 @@ namespace HHBBYY
 
     float compute_Topness(const xAOD::JetContainer *jets);
     float* compute_EventShapes(const xAOD::JetContainer *jets, const xAOD::PhotonContainer *photons);
-
-    // Get year of data taking
-    inline unsigned int getDataTakingYear(std::vector<unsigned int> years, unsigned int rNumber ) {
-
-        if (years.size() == 1)
-            return years.at(0);
-        //Get single run year per event in case of MC20a which corresponds to 2015+2016
-        else if (years.size() == 2) {
-            if (266904 <= rNumber && rNumber <= 284484)
-                return 2015;
-            else if (296939 <= rNumber && rNumber <= 311481)
-                return 2016;
-            else { 
-              ATH_MSG_ERROR("Wrong (or unkown) combination of year and (Random)runNumber");
-              return 0;
-            }
-
-        }
-        else
-          ATH_MSG_ERROR("Wrong (or unkown) combination of year and (Random)runNumber");
-
-        return 0;
-    }
 
   private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
@@ -133,18 +107,6 @@ namespace HHBBYY
       "Jet1_truthLabel", "Jet2_truthLabel",
       "Jet1_PassWP", "Jet2_PassWP",
     };
-
-
-    // Necessary additions to get the year of data taking per event.
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_runNumberKey{
-      this, "runNumberDecorKey", "EventInfo.runNumber", "Run number"};
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_rdmRunNumberKey{
-      this, "RandomRunNumberDecorKey", "EventInfo.RandomRunNumber", "Random run number"};
-    SG::WriteDecorHandleKey<xAOD::EventInfo> m_YearsDecorKey{
-      this, "YearDecorKey", "EventInfo.dataTakingYear", "Data taking year"};
-
-    Gaudi::Property<std::vector<unsigned int>> m_years
-      { this, "Years", false, "which years are running" };
 
   };
 }

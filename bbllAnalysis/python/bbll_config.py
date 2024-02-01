@@ -101,6 +101,13 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
         )
     )
 
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.EventInfoGlobalAlg(
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years,
+        )
+    )
+
     return cfg
 
 
@@ -169,5 +176,7 @@ def bbll_branches(flags):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> bbll_{cut}_%SYS%"]
+
+    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches

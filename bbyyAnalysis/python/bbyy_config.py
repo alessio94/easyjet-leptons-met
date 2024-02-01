@@ -66,7 +66,6 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years
         )
     )
 
@@ -81,6 +80,13 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_bbyy_cutflow,
             photonTriggers=flags.Analysis.TriggerChains
+        )
+    )
+
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.EventInfoGlobalAlg(
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years,
         )
     )
 
