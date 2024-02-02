@@ -11,9 +11,7 @@ namespace PostProc
     {
       Int = 0,
       Long = 1,
-      Float = 2,
-      VecInt = 3,
-      VecFloat = 4
+      Float = 2
     };
 
   struct varTypePointer{

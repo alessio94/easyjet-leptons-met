@@ -13,11 +13,12 @@ SumOfWeightsTool::SumOfWeightsTool(const std::string &t, const std::string &n, c
 StatusCode SumOfWeightsTool::initialize(){
 
   const std::unordered_map<std::string, VarType> inVars = {};
+  const std::vector<std::string> inVecVars = {};
   const std::unordered_map<std::string, VarType> outVars = {
     {"sumOfWeights", VarType::Float}
   };
 
-  setIOVariables(inVars, outVars);
+  setIOVariables(inVars, inVecVars, outVars);
 
   m_inFile = std::make_unique<TFile>(m_inFileName.value().c_str(), "READ");
 
@@ -44,6 +45,7 @@ StatusCode SumOfWeightsTool::finalize(){
 
 void SumOfWeightsTool::computeVariables
 (const std::unordered_map<std::string, varTypePointer>& /*inVars*/,
+ const std::unordered_map<std::string, std::vector<float>*>& /*inVecVars*/,
  std::unordered_map<std::string, varTypePointer>& outVars) const{
 
   setContent<float>(outVars, "sumOfWeights", m_sumOfEventWeight);

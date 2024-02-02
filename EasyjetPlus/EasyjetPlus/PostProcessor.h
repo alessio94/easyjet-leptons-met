@@ -35,6 +35,7 @@ class PostProcessor : public AthAlgorithm
  private:
 
   StatusCode addIOVars(const std::unordered_map<std::string, VarType>& inVars,
+		       const std::vector<std::string>& inVecVars,
 		       const std::unordered_map<std::string, VarType>& outVars);
 
   void setBranchIn();
@@ -54,6 +55,7 @@ class PostProcessor : public AthAlgorithm
   std::unique_ptr<TFile> m_outFile;
 
   std::unordered_map<std::string, varTypePointer> m_inVars;
+  std::unordered_map<std::string, std::vector<float>*> m_inVecVars;
   std::unordered_map<std::string, varTypePointer> m_outVars;
   
 };

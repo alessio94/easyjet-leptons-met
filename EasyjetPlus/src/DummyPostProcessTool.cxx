@@ -13,11 +13,12 @@ StatusCode DummyPostProcessTool::initialize(){
   const std::unordered_map<std::string, VarType> inVars = {
     {"runNumber", VarType::Int}
   };
+  const std::vector<std::string> inVecVars = {};
   const std::unordered_map<std::string, VarType> outVars = {
     {"test", VarType::Float}
   };
 
-  setIOVariables(inVars, outVars);
+  setIOVariables(inVars, inVecVars, outVars);
 
   return StatusCode::SUCCESS;
 }
@@ -28,6 +29,7 @@ StatusCode DummyPostProcessTool::finalize(){
 
 void DummyPostProcessTool::computeVariables
 (const std::unordered_map<std::string, varTypePointer>& inVars,
+ const std::unordered_map<std::string, std::vector<float>*>& /*inVecVars*/,
  std::unordered_map<std::string, varTypePointer>& outVars) const{
 
   unsigned int runNumber = getContent<unsigned int>(inVars, "runNumber");

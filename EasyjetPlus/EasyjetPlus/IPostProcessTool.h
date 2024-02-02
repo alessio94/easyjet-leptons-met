@@ -26,14 +26,17 @@ public:
 
   virtual void computeVariables
   (const std::unordered_map<std::string, varTypePointer>& inVars,
+   const std::unordered_map<std::string, std::vector<float>*>& inVecVars,
    std::unordered_map<std::string, varTypePointer>& outVars) const = 0;
 
   const std::unordered_map<std::string, VarType> inputVariables() const { return m_inVars; }
+  const std::vector<std::string> inputVecVariables() const { return m_inVecVars; }
   const std::unordered_map<std::string, VarType> outputVariables() const { return m_outVars; }
 
   void setIOVariables(const std::unordered_map<std::string, VarType>& inVars,
+		      const std::vector<std::string>& inVecVars,
 		      const std::unordered_map<std::string, VarType>& outVars)
-  { m_inVars=inVars; m_outVars=outVars; }
+  { m_inVars=inVars; m_inVecVars=inVecVars; m_outVars=outVars; }
 
 protected:
   template <typename T>
@@ -50,6 +53,7 @@ protected:
 private:
 
   std::unordered_map<std::string, VarType> m_inVars;
+  std::vector<std::string> m_inVecVars;
   std::unordered_map<std::string, VarType> m_outVars;
 
 };

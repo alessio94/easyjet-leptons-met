@@ -17,7 +17,8 @@ StatusCode PostProcessor::initialize(){
   }
 
   for(const auto& tool : m_tools){
-    ATH_CHECK(addIOVars(tool->inputVariables(), tool->outputVariables()));
+    ATH_CHECK(addIOVars(tool->inputVariables(), tool->inputVecVariables(),
+			tool->outputVariables()));
   }
   
   m_inTree = std::make_unique<TChain>(m_inTreeName.value().c_str());
@@ -51,7 +52,7 @@ StatusCode PostProcessor::execute(){
     
     // Computing variables
     for(const auto& tool : m_tools){
-      tool->computeVariables(m_inVars, m_outVars);
+      tool->computeVariables(m_inVars, m_inVecVars, m_outVars);
     }
 			    
     // Filling output tree
@@ -71,6 +72,7 @@ StatusCode PostProcessor::finalize(){
 
 StatusCode PostProcessor::addIOVars
 (const std::unordered_map<std::string, VarType>& inVars,
+ const std::vector<std::string>& inVecVars,
  const std::unordered_map<std::string, VarType>& outVars){
 
   for(const auto& [name, type]: inVars){
@@ -84,13 +86,11 @@ StatusCode PostProcessor::addIOVars
     case VarType::Float:
       m_inVars[name] = varTypePointer{type, new float};
       break;
-    case VarType::VecInt:
-      m_inVars[name] = varTypePointer{type, new std::vector<int>};
-      break;
-    case VarType::VecFloat:
-      m_inVars[name] = varTypePointer{type, new std::vector<float>};
-      break;
     }
+  }
+
+  for(const auto& name: inVecVars){
+    m_inVecVars[name] = new std::vector<float>;
   }
 
   for(const auto& [name, type]: outVars){
@@ -117,6 +117,12 @@ void PostProcessor::setBranchIn(){
 
   for(const auto& [name, type_pointer]: m_inVars){
     m_inTree->SetBranchAddress(name.c_str(), type_pointer.pointer);
+  }
+
+  for(const auto& [name, pointer]: m_inVecVars){
+    // You would think so and yet...
+    //m_inTree->SetBranchAddress(name.c_str(), pointer);
+    m_inTree->SetBranchAddress(name.c_str(), &(m_inVecVars.at(name)));
   }
 
 }

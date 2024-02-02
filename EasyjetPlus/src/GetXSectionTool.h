@@ -24,6 +24,7 @@ class GetXSectionTool final: public extends<AthAlgTool, IPostProcessTool>
   
   virtual void computeVariables
     (const std::unordered_map<std::string, varTypePointer>& inVars,
+     const std::unordered_map<std::string, std::vector<float>*>& inVecVars,
      std::unordered_map<std::string, varTypePointer>& outVars) const override;
 
   private:

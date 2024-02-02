@@ -15,6 +15,7 @@ StatusCode GetXSectionTool::initialize(){
     {"dataTakingYear", VarType::Int},
     {"mcChannelNumber", VarType::Int},
   };
+  const std::vector<std::string> inVecVars = {};
   const std::unordered_map<std::string, VarType> outVars = {
     {"AMIXsection", VarType::Float},
     {"kFactor", VarType::Float},
@@ -22,7 +23,7 @@ StatusCode GetXSectionTool::initialize(){
     {"Luminosity", VarType::Float},
   };
 
-  setIOVariables(inVars, outVars);
+  setIOVariables(inVars, inVecVars, outVars);
 
   ATH_CHECK(m_pmgHandle.retrieve());
 
@@ -54,6 +55,7 @@ StatusCode GetXSectionTool::finalize(){
 
 void GetXSectionTool::computeVariables
 (const std::unordered_map<std::string, varTypePointer>& inVars,
+ const std::unordered_map<std::string, std::vector<float>*>& /*inVecVars*/,
  std::unordered_map<std::string, varTypePointer>& outVars) const{
   
   unsigned int dataTakingYear = getContent<unsigned int>(inVars, "dataTakingYear");
