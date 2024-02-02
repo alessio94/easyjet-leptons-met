@@ -1,5 +1,5 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
-from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
+from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
@@ -11,6 +11,8 @@ def met_sequence(flags, configAcc):
     )
 
     configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
 
     container_names = flags.Analysis.container_names
 
@@ -31,7 +33,8 @@ def met_sequence(flags, configAcc):
             selection = METselections[objtype]
             preMET_collections[objtype] = f'{collname}.{selection}'
 
-    configSeq += makeConfig('MissingET', drop_sys(container_names.output.met))
+    configSeq += makeConfig('MissingET',
+                            containerName=drop_sys(container_names.output.met))
     # Pass all the calibrated jets
     configSeq.setOptionValue(
         '.jets',

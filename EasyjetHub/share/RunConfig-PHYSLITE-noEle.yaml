@@ -5,7 +5,7 @@ truthDecayModes: ["bbbb"]
 
 # Toggles for object types
 do_muons: true
-do_electrons: true
+do_electrons: false
 do_small_R_jets: true
 do_large_R_UFO_jets: true
 
@@ -18,9 +18,9 @@ small_R_jet:
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
 
-Electron:
-  ID: "LooseBLayerLH"
-  Iso: "NonIso"
+#Electron:
+#  ID: "LooseBLayerLH"
+#  Iso: "NonIso"
 
 Muon:
   ID: "Loose"
@@ -51,7 +51,7 @@ ttree_output:
       small_R_jets: 'container_names.output.reco4PFlowJet'
       large_R_UFO_jets: 'container_names.output.reco10UFOJet'
       muons: 'container_names.output.muons'
-      electrons: 'container_names.output.electrons'
+      #electrons: 'container_names.output.electrons'
     collection_options:
       small_R_jets:
         higgs_parent_info: true

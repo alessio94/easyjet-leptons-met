@@ -1,5 +1,5 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
-from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
+from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
 from EasyjetHub.algs.calibration.view_select import makeViewSelectionConfig
 from EasyjetHub.steering.utils.name_helper import drop_sys
@@ -24,15 +24,18 @@ def electron_sequence(flags, configAcc):
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
 
     configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
 
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.electrons)
-    configSeq += makeConfig('Electrons', output_name)
+    configSeq += makeConfig('Electrons', containerName=output_name)
     configSeq.setOptionValue('.crackVeto', True)
 
     # PID configuration
-    configSeq += makeConfig('Electrons.Selection', output_name + '.' + ElectronWPLabel)
+    configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
+                            selectionName=ElectronWPLabel)
     configSeq.setOptionValue('.likelihoodWP', flags.Analysis.Electron.ID)
     configSeq.setOptionValue('.isolationWP', flags.Analysis.Electron.Iso)
     configSeq.setOptionValue('.recomputeLikelihood', False)
@@ -41,20 +44,20 @@ def electron_sequence(flags, configAcc):
             id = wp[0]
             iso = wp[1]
             wpLabel = f'{id}_{iso}'
-            configSeq += makeConfig('Electrons.Selection',
-                                    output_name + '.' + wpLabel)
+            configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
+                                    selectionName=wpLabel)
             configSeq.setOptionValue('.likelihoodWP', id)
             configSeq.setOptionValue('.isolationWP', iso)
             configSeq.setOptionValue('.recomputeLikelihood', False)
 
     # Kinematic selection
-    configSeq += makeConfig('Selection.PtEta', output_name)
+    configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name)
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 4.5e3)
     configSeq.setOptionValue('.maxEta', 2.47)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', f'SystObjectLink.{output_name}')
+    configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
     # Apply selection as view container
     makeViewSelectionConfig(configSeq, output_name)

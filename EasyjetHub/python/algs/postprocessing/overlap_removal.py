@@ -1,11 +1,13 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
-from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
+from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
 def overlap_sequence(flags):
     configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
 
     if (
         flags.Analysis.do_large_R_Topo_jets
@@ -72,7 +74,7 @@ def overlap_sequence(flags):
         original_names['fatJets'] = flags.Analysis.container_names.input.reco10UFOJet
 
     # Include, and then set up the overlap analysis algorithm config:
-    configSeq += makeConfig('OverlapRemoval', None)
+    configSeq += makeConfig('OverlapRemoval')
     configSeq.setOptionValue('.inputLabel',  'preselectOR')
     configSeq.setOptionValue('.outputLabel', 'passesOR')
     for objtype, coll in preOR_collections.items():

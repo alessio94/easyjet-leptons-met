@@ -1,12 +1,14 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
-from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
+from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from EasyjetHub.steering.sample_metadata import get_grl_files
 
 
 def event_selection_sequence(flags):
     configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
 
-    configSeq += makeConfig('Event.Cleaning', None)
+    configSeq += makeConfig('EventCleaning')
     configSeq.setOptionValue('.runPrimaryVertexSelection', True)
     configSeq.setOptionValue('.runEventCleaning', True)
     configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
@@ -32,12 +34,14 @@ def event_selection_sequence(flags):
 
 def trigger_sequence(flags):
     configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
 
     # TODO: We could pass trigger chains per year to also apply scale factors
     # However, for that the sequence needs to be pushed to after the calibration,
     # while we want to have the earliest possible rejection. So we may need to
     # split this and/or see if the config blocks need reworking
-    configSeq += makeConfig('Trigger.Chains', None)
+    configSeq += makeConfig('Trigger')
     configSeq.setOptionValue(
         '.triggerChainsForSelection',
         list(flags.Analysis.TriggerChains),

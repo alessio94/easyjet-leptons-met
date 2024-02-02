@@ -5,7 +5,7 @@ truthDecayModes: ["bbbb"]
 
 # Toggles for object types
 do_muons: true
-do_electrons: true
+do_electrons: false
 do_small_R_jets: true
 do_large_R_UFO_jets: true
 
@@ -18,9 +18,9 @@ small_R_jet:
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
 
-Electron:
-  ID: "LooseBLayerLH"
-  Iso: "NonIso"
+#Electron:
+#  ID: "LooseBLayerLH"
+#  Iso: "NonIso"
 
 Muon:
   ID: "Loose"
@@ -42,22 +42,25 @@ do_overlap_removal: true
 
 # Include the TTree configuration and update details
 ttree_output:
-  -
+  - 
     include: AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
-    # Read from input containers, as the CP calibration
-    # is disabled
     reco_outputs:
+      muons: 'container_names.output.muons'
+      #electrons: 'container_names.output.electrons'
       small_R_jets: 'container_names.output.reco4PFlowJet'
       large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-      muons: 'container_names.output.muons'
-      electrons: 'container_names.output.electrons'
+      #VR_jets: 'container_names.output.vrJets'
     collection_options:
       small_R_jets:
         higgs_parent_info: true
+        btag_info: true
+        JVT_details: true
+        no_bjet_calib_p4: true
         gn2_branches: true
       large_R_jets:
         substructure_info: true
+        truth_labels: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       large_R_jets: 'container_names.input.truth10SoftDropJet'

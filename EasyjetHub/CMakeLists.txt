@@ -70,19 +70,7 @@ atlas_install_python_modules(
   test
 )
 atlas_install_data(
-  share/RunConfig-PHYSLITE.yaml
-  share/RunConfig.yaml
-  share/base-config.yaml
-  share/awkward-config.yaml
-  share/AnalysisMiniTree-config.yaml
-  share/container-names-DAOD_PHYS.yaml
-  share/container-names-DAOD_PHYSLITE.yaml
-  share/grl_years.yaml
-  share/general_grl.yaml
-  share/bjet_grl.yaml
-  share/prw.yaml
-  share/lumicalc.yaml
-  share/trigger.yaml
+  share/*.yaml
 )
 
 # atlas_install_data( data/* )

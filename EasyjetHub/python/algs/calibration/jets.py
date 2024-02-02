@@ -1,7 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
-from AnalysisAlgorithmsConfig.ConfigFactory import makeConfig
+from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
 from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetPtCalibrationConfig
 
@@ -16,6 +16,8 @@ def jet_sequence(
 ):
 
     configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
     jet_flags = flags.Analysis.small_R_jet
 
     # We define the basic sequence to produce all calibrated jets
@@ -33,7 +35,8 @@ def jet_sequence(
         else "AntiKt4EMTopoJets"
     )
 
-    configSeq += makeConfig("Jets", drop_sys(allcalib_name), jetCollection=jetColl)
+    configSeq += makeConfig("Jets", containerName=drop_sys(allcalib_name),
+                            jetCollection=jetColl)
     # don't run JVT only for EMTopo jets
     configSeq.setOptionValue(".runNNJvtUpdate", jet_type != "reco4EMTopoJet")
     configSeq.setOptionValue(".runJvtSelection", jet_type != "reco4EMTopoJet")
@@ -70,21 +73,7 @@ def jet_sequence(
         )
 
     if jet_type != "reco4EMTopoJet":
-        configSeq += makeConfig('Jets.Jvt', drop_sys(allcalib_name))
-
-    # jet_sequence = makeJetAnalysisSequence(
-    #     flags.Analysis.DataType,
-    #     jetCollection=flags.Analysis.container_names.input.reco4PFlowJet,
-    #     postfix="smallR",
-    #     deepCopyOutput=False,
-    #     shallowViewOutput=True,
-    #     runGhostMuonAssociation=not flags.Input.isPHYSLITE,
-    #     enableCutflow=False,
-    #     enableKinematicHistograms=False,
-    #     runJvtUpdate=not flags.Input.isPHYSLITE,
-    #     runNNJvtUpdate=not flags.Input.isPHYSLITE,
-    #     runJvtSelection=not flags.Input.isPHYSLITE,
-    # )
+        configSeq += makeConfig('Jets.JVT', containerName=drop_sys(allcalib_name))
 
     btag_wps = [jet_flags.btag_wp]
     if 'btag_extra_wps' in jet_flags:
@@ -94,10 +83,9 @@ def jet_sequence(
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
-            configSeq += makeConfig(
-                'FlavourTagging',
-                f'{drop_sys(allcalib_name)}.{tagger_wp}'
-            )
+            configSeq += makeConfig('Jets.FlavourTagging',
+                                    containerName=drop_sys(allcalib_name),
+                                    selectionName=tagger_wp)
             configSeq.setOptionValue('.btagger', tagger)
             # set the MC/MC SF to default for now, this was broken by
             # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
@@ -135,16 +123,11 @@ def jet_sequence(
             )
 
     # Add systematic object links
-    configSeq += makeConfig(
-        'SystObjectLink',
-        f'SystObjectLink.{drop_sys(allcalib_name)}'
-    )
+    configSeq += makeConfig('SystObjectLink', containerName=drop_sys(allcalib_name))
 
     # Apply kinematic selection
-    configSeq += makeConfig(
-        'Selection.PtEta',
-        drop_sys(allcalib_name)
-    )
+    configSeq += makeConfig('Jets.PtEtaSelection',
+                            containerName=drop_sys(allcalib_name))
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
     configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
@@ -182,6 +165,8 @@ def jet_sequence(
 # lr = large-R
 def lr_jet_sequence(flags, lr_jet_type, configAcc):
     configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
 
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
@@ -189,11 +174,12 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
         f"reco10{lr_jet_type}Jet"]
     output_name = flags.Analysis.container_names.output[
         f"reco10{lr_jet_type}Jet"].replace('_%SYS%','')
-    configSeq += makeConfig('Jets', output_name, jetCollection=input_name)
+    configSeq += makeConfig('Jets', containerName=output_name,
+                            jetCollection=input_name)
     configSeq.setOptionValue('.postfix', f'largeR_{lr_jet_type}jets')
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', f'SystObjectLink.{output_name}')
+    configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
     # Apply selection as view container
     makeViewSelectionConfig(configSeq, output_name)
@@ -203,35 +189,9 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 
 # vr = variable R
 def vr_jet_sequence(flags, configAcc):
-
-    # Previous configuration, to be reproduced
-    # for tagger_wp in flags.Analysis.large_R_jet.vr_btag_wps:
-    #     tagger, btag_wp = tagger_wp.split("_", 1)
-    #     makeFTagAnalysisSequence(
-    #         vr_jet_sequence,
-    #         flags.Analysis.DataType,
-    #         jetCollection=vr_jet_btag_name,
-    #         btagWP=btag_wp,
-    #         btagger=tagger,
-    #         minPt=10e3,
-    #         postfix=btag_wp,
-    #         preselection=None,
-    #         kinematicSelection=True,
-    #         noEfficiency=False,
-    #         legacyRecommendations=False,
-    #         enableCutflow=False,
-    #     )
-    #
-    # cfg.addSequence(CompFactory.AthSequencer(vr_jet_sequence.getName()))
-    # # Hack until this is merged:
-    # # https://gitlab.cern.ch/atlas/athena/-/merge_requests/54939]
-    # for alg in vr_jet_sequence.getGaudiConfig2Components():
-    #     if "FTagSelectionAlg" in alg.getName():
-    #         alg.selectionTool.FlvTagCutDefinitionsFileName = btag_calib_file
-    #     if "FTagEfficiencyScaleFactorAlg" in alg.getName():
-    #         alg.efficiencyTool.ScaleFactorFileName = btag_calib_file
-
     configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
 
     # There is no output container, we just operate on the input one
     input_name = flags.Analysis.container_names.input.vrJet
@@ -242,7 +202,8 @@ def vr_jet_sequence(flags, configAcc):
         # supports only DL1dv00 and GN2 in PFlow jets, for testing
         # minPt defaults to 10 GeV for VR
         # kinematic selection is on by default
-        configSeq += makeConfig('FlavourTagging', f'{input_name}.{tagger_wp}')
+        configSeq += makeConfig('FlavourTagging', containerName=input_name,
+                                selectionName=tagger_wp)
         configSeq.setOptionValue('.btagger', tagger)
         configSeq.setOptionValue('.btagWP', btag_wp)
         # Set up CDI compatible with DL1r for VR
