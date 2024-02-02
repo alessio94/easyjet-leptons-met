@@ -40,8 +40,8 @@ namespace HHBBYY
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
     float compute_Topness(const xAOD::JetContainer *jets);
-    float* compute_EventShapes(const xAOD::JetContainer *jets, const xAOD::PhotonContainer *photons);
-    float compute_pTBalance(const xAOD::JetContainer *jets, const xAOD::PhotonContainer *photons);
+    float* compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
+    float compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
 
   private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",

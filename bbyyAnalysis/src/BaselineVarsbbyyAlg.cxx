@@ -266,11 +266,11 @@ namespace HHBBYY
       m_Fbranches.at("missEt").set(*event, met->met(), sys);
       m_Fbranches.at("metphi").set(*event, met->phi(), sys);
       
-      float* eventShapes = compute_EventShapes(jets, photons);
+      float* eventShapes = compute_EventShapes(bjets, photons);
       m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
       m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
 
-      float pTBalance = compute_pTBalance(jets, photons);
+      float pTBalance = compute_pTBalance(bjets, photons);
       m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
 
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
@@ -306,15 +306,15 @@ namespace HHBBYY
   eventShapes[0] = sphericityT;
   eventShapes[1] = planarFlow;
   */
-  float* BaselineVarsbbyyAlg::compute_EventShapes(const xAOD::JetContainer *jets,
+  float* BaselineVarsbbyyAlg::compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets,
                                                  const xAOD::PhotonContainer *photons){
     static float eventShapes[2] = {0};
-    if (jets->size() >= 2 && photons->size() >= 2) {
+    if (bjets->size() >= 2 && photons->size() >= 2) {
       TLorentzVector photon1 = photons->at(0)->p4();
       TLorentzVector photon2 = photons->at(1)->p4();
-      TLorentzVector jet1 = jets->at(0)->p4();
-      TLorentzVector jet2 = jets->at(1)->p4();
-      std::vector<TLorentzVector> p4_vec = {photon1, photon2, jet1, jet2};
+      TLorentzVector bjet1 = bjets->at(0)->p4();
+      TLorentzVector bjet2 = bjets->at(1)->p4();
+      std::vector<TLorentzVector> p4_vec = {photon1, photon2, bjet1, bjet2};
 
       TMatrixDSym MomentumTensor = TMatrixDSym(3);
       TMatrixDSym MomentumTensorT = TMatrixDSym(3);
@@ -365,16 +365,16 @@ namespace HHBBYY
     return eventShapes;
   }
 
-  float BaselineVarsbbyyAlg::compute_pTBalance(const xAOD::JetContainer *jets,
+    float BaselineVarsbbyyAlg::compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets,
                                               const xAOD::PhotonContainer *photons){
     float pTBalance = -99;
-    if (jets->size() >= 2 && photons->size() >= 2) {
+    if (bjets->size() >= 2 && photons->size() >= 2) {
       TLorentzVector photon1 = photons->at(0)->p4();
       TLorentzVector photon2 = photons->at(1)->p4();
-      TLorentzVector jet1 = jets->at(0)->p4();
-      TLorentzVector jet2 = jets->at(1)->p4();
+      TLorentzVector bjet1 = bjets->at(0)->p4();
+      TLorentzVector bjet2 = bjets->at(1)->p4();
       float numerator, denominator;
-      std::vector<TLorentzVector> p4_vec = {photon1, photon2, jet1, jet2};
+      std::vector<TLorentzVector> p4_vec = {photon1, photon2, bjet1, bjet2};
       TLorentzVector numerator_p4(0.,0.,0.,0.);
       denominator = 0;
       for(const auto& p4 : p4_vec){
