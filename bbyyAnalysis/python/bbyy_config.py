@@ -79,7 +79,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             electrons="bbyyAnalysisElectrons_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_bbyy_cutflow,
-            photonTriggers=flags.Analysis.TriggerChains
+            photonTriggers=flags.Analysis.TriggerChains,
+            isMC=flags.Input.isMC,
         )
     )
 

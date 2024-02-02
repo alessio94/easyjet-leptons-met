@@ -20,9 +20,11 @@ struct CutEntry
 {
     std::string name{}; // Name of the cut
     int counter{0}; //Counts the events passed by the cut.
+    float w_counter{0.f}; //Counts the events passed by the cut in terms of mcEventWeights.at(0)
     bool passed{0}; // If event is passed this should be set to true. Otherwise, it should be set to false.
     int relativeCounter{0}; // Counts the events passed with respect to the previous cuts. 
-
+    float w_relativeCounter{0.f}; // Counts the events passed with respect to the previous cuts in terms of mcEventWeights.at(0)
+    
     CutEntry(const std::string& n)
         : name(n) {}
 };
@@ -87,6 +89,9 @@ class CutManager : public AthMessaging, public std::vector<CutEntry>
         void DoRelativeEfficiency(long long int nEvents, TEfficiency* eff);
         void DoStandardCutFlow(long long int nEvents, TEfficiency* eff);
         void DoCutflowLabeling(long long int nEvents, TH1* histo);
+        void DoWeightedAbsoluteEfficiency(float totalWeight, TEfficiency* eff);
+        void DoWeightedRelativeEfficiency(float totalWeight, TEfficiency* eff);
+        void DoWeightedStandardCutFlow(float totalWeight, TEfficiency* eff);
         void CheckInputCutList(std::vector<std::string> inputCutList, std::vector<std::string> standard_cuts );
 
         int PassAllCuts{0};

@@ -35,6 +35,36 @@ void CutManager::DoAbsoluteEfficiency(long long int nEvents, TEfficiency* eff)
     
 }
 
+void CutManager::DoWeightedAbsoluteEfficiency(float totalWeight, TEfficiency* eff)
+{
+
+    /* Absolute efficiency histogram of selection cuts weighted by mcEventWeights */
+
+    int nbins = eff->GetTotalHistogram()->GetNbinsX();
+    TH1D *h_tot = new TH1D("h_tot","tot",nbins,0.5,nbins+0.5);
+    TH1D *h_pass = new TH1D("h_pass","pass",nbins,0.5,nbins+0.5);
+
+    h_tot->SetBinContent(1,totalWeight);
+    h_pass->SetBinContent(1,totalWeight);
+
+    for (size_t i = 0; i < size(); ++i)
+    {
+        int bin = i+2;
+        h_tot->SetBinContent(bin,totalWeight);
+        h_pass->SetBinContent(bin,(*this)[i].w_counter);
+    }
+
+    if(TEfficiency::CheckConsistency(*h_pass,*h_tot))
+    {
+         eff->SetTotalHistogram(*h_tot,"");
+         eff->SetPassedHistogram(*h_pass,"");
+    }
+    
+    delete h_tot;
+    delete h_pass;
+    
+}
+
 void  CutManager::DoRelativeEfficiency(long long int nEvents, TEfficiency* eff)
 {
 
@@ -64,6 +94,38 @@ void  CutManager::DoRelativeEfficiency(long long int nEvents, TEfficiency* eff)
 
 }
 
+void  CutManager::DoWeightedRelativeEfficiency(float totalWeight, TEfficiency* eff)
+{
+    /* Relative efficiency histogram of selection cuts weighted by mcEventWeights */
+
+    int nbins = eff->GetTotalHistogram()->GetNbinsX();
+    TH1D *h_tot = new TH1D("h_tot","tot",nbins,0.5,nbins+0.5);
+    TH1D *h_pass = new TH1D("h_pass","pass",nbins,0.5,nbins+0.5);
+
+    h_tot->SetBinContent(1,totalWeight);
+    h_pass->SetBinContent(1,totalWeight);
+    
+    h_tot->SetBinContent(2,totalWeight);
+    h_pass->SetBinContent(2, (*this)[0].w_relativeCounter);
+    
+    for (size_t i = 1; i < size(); ++i)
+    {
+        int bin = i + 2;
+        h_tot->SetBinContent(bin,(*this)[i-1].w_relativeCounter);
+        h_pass->SetBinContent(bin,(*this)[i].w_relativeCounter);
+    }
+
+    if(TEfficiency::CheckConsistency(*h_pass,*h_tot))
+    {
+         eff->SetTotalHistogram(*h_tot,"");
+         eff->SetPassedHistogram(*h_pass,"");
+    }
+    
+    delete h_tot;    
+    delete h_pass;
+
+}
+
 void CutManager::DoStandardCutFlow(long long int nEvents, TEfficiency* eff)
 {
 
@@ -86,6 +148,36 @@ void CutManager::DoStandardCutFlow(long long int nEvents, TEfficiency* eff)
 
 }
 
+
+void CutManager::DoWeightedStandardCutFlow(float totalWeight, TEfficiency* eff)
+{
+
+/* Weighted Standard Cutflow histogram of selection cuts weighted by mcEventWeights */
+
+    int nbins = eff->GetTotalHistogram()->GetNbinsX();
+    TH1D *h_tot = new TH1D("h_tot","tot",nbins,0.5,nbins+0.5);
+    TH1D *h_pass = new TH1D("h_pass","pass",nbins,0.5,nbins+0.5);
+
+    h_tot->SetBinContent(1,totalWeight);
+    h_pass->SetBinContent(1,totalWeight);
+
+    for (size_t i = 0; i < size(); ++i)
+    {
+        int bin = i + 2;
+        h_tot->SetBinContent(bin,totalWeight);
+        h_pass->SetBinContent(bin,(*this)[i].w_relativeCounter);
+    }
+
+    if(TEfficiency::CheckConsistency(*h_pass,*h_tot))
+    {
+         eff->SetTotalHistogram(*h_tot,"");
+         eff->SetPassedHistogram(*h_pass,"");
+    }
+
+    delete h_tot;    
+    delete h_pass;
+
+}
 
 void CutManager::DoCutflowLabeling(long long int nEvents, TH1* histo)
 {

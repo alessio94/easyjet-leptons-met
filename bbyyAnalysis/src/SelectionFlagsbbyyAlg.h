@@ -99,6 +99,14 @@ namespace HHBBYY
 
       bool m_saveCutFlow;
       long long int m_total_events{0};
+      float m_total_mcEventWeight{0.f};
+      std::vector<float> eventWeights{0.f};
+
+      Gaudi::Property<bool> m_isMC
+        { this, "isMC", false, "Is this simulation?" };
+
+      SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
+        this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};
 
       std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
 

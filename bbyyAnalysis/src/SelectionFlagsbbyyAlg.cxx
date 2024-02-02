@@ -32,6 +32,7 @@ namespace HHBBYY
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_mcEventWeightsKey.initialize());
 
     //Initialize trigger decorations
     for (const std::string &trig : m_photonTriggers)
@@ -69,7 +70,13 @@ namespace HHBBYY
                                   nbins, 0.5, nbins + 0.5)));
     ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbyy cuts;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));    
+    ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5))); 
+    ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->bbyy cuts;Cuts;#epsilon", 
+                                  nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));  
 
     return StatusCode::SUCCESS;
   }
@@ -90,6 +97,11 @@ namespace HHBBYY
 
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+
+      if(m_isMC) {
+        SG::ReadDecorHandle<xAOD::EventInfo, std::vector<float>> mcEventWeightsHandle(m_mcEventWeightsKey);
+        eventWeights = mcEventWeightsHandle(*event);
+      }
 
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
@@ -131,12 +143,16 @@ namespace HHBBYY
 
       // Compute total_events
       m_total_events+=1; 
+      if(m_isMC) m_total_mcEventWeight+= eventWeights.at(0);
+
 
       // Count how many cuts the event passed and increase the relative counter
       for (const auto &cut : m_inputCutList) {
         if(m_bbyyCuts.exists(cut)) {
-          if (m_bbyyCuts(cut).passed)
+          if (m_bbyyCuts(cut).passed) {
             m_bbyyCuts(cut).counter+=1;
+            if(m_isMC) m_bbyyCuts(cut).w_counter += eventWeights.at(0);
+          }
         }
       }
 
@@ -153,6 +169,7 @@ namespace HHBBYY
       // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
       for (unsigned int i=0; i<consecutive_cuts; i++) {
         m_bbyyCuts[i].relativeCounter+=1;
+        if(m_isMC) m_bbyyCuts[i].w_relativeCounter += eventWeights.at(0);
       }
 
     }
@@ -171,12 +188,18 @@ namespace HHBBYY
       m_bbyyCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
       m_bbyyCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
       m_bbyyCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
+      m_bbyyCuts.DoWeightedAbsoluteEfficiency(m_total_mcEventWeight, efficiency("WeightedAbsoluteEfficiency"));
+      m_bbyyCuts.DoWeightedRelativeEfficiency(m_total_mcEventWeight, efficiency("WeightedRelativeEfficiency"));
+      m_bbyyCuts.DoWeightedStandardCutFlow(m_total_mcEventWeight, efficiency("WeightedStandardCutFlow"));
       m_bbyyCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
     }
     else {
       delete efficiency("AbsoluteEfficiency");
       delete efficiency("RelativeEfficiency");
       delete efficiency("StandardCutFlow");
+      delete efficiency("WeightedAbsoluteEfficiency");
+      delete efficiency("WeightedRelativeEfficiency");
+      delete efficiency("WeightedStandardCutFlow");
       delete hist("EventsPassed_BinLabeling");
     }
 
