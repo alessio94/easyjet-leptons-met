@@ -10,13 +10,11 @@ def btag_decor_cfg(flags):
         "DL1dv01_pb",
         "DL1dv01_pc",
         "DL1dv01_pu",
+        "GN2v00_pb",
+        "GN2v00_pc",
+        "GN2v00_pu"
     ]
-    if not flags.Input.isPHYSLITE:
-        btag_vars += [
-            "GN2v00_pb",
-            "GN2v00_pc",
-            "GN2v00_pu",
-        ]
+
     cfg.addEventAlgo(
         CompFactory.Easyjet.BTaggingDecoratorAlg(
             f"BTagDecor_{jetcoll}",

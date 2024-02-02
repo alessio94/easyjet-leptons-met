@@ -21,7 +21,6 @@
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
-
 namespace HHBBYY
 {
 
@@ -54,7 +53,10 @@ namespace HHBBYY
     m_jetHandle{ this, "jets", "",   "Jet container to read" };
 
     CP::SysReadDecorHandle<char> 
-    m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+    m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
+
+    CP::SysReadDecorHandle<int> 
+    m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_photonHandle{ this, "photons", "",   "Photons container to read" };
@@ -104,9 +106,13 @@ namespace HHBBYY
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
     std::vector<std::string> m_Ivarnames{
       "nPhotons", "nBJets", "nJets", "nCentralJets",
+      // leading and subleading btagged jets
       "Jet_b1_truthLabel", "Jet_b2_truthLabel",
+      "Jet_b1_pcbt", "Jet_b2_pcbt",
+      // leading and subleading jets
       "Jet1_truthLabel", "Jet2_truthLabel",
       "Jet1_PassWP", "Jet2_PassWP",
+      "Jet1_pcbt", "Jet2_pcbt"
     };
 
   };

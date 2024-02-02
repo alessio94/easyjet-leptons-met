@@ -65,7 +65,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             jets="bbyyAnalysisJets_%SYS%",
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            isMC=flags.Input.isMC,
+            PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0], # noqa
+            isMC=flags.Input.isMC
         )
     )
 

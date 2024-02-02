@@ -88,13 +88,8 @@ def get_small_R_bjet_branches(
         ],
     )
 
-    # GN2 scores
-    # not available in PHYSLITE... yet
-    # TODO: Handle this properly (drop PHYSLITE check when ptag updated)
-    if (
-        tree_flags.collection_options.small_R_jets.gn2_branches
-        and not flags.Input.isPHYSLITE
-    ):
+    # ftag scores pb, pc, pl
+    if tree_flags.collection_options.small_R_jets.gn2_branches:
         small_R_bjet_branches.variables += [
             "GN2v00_pb",
             "GN2v00_pc",

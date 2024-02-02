@@ -27,6 +27,9 @@ namespace HHBBYY
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
+    if (!m_PCBT.empty()) {
+      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
+    }
 
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
@@ -113,15 +116,15 @@ namespace HHBBYY
       double HT = 0.; // scalar sum of jet pT
 
       bool WPgiven = !m_isBtag.empty();
+      bool PCBTgiven = !m_PCBT.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+
       for(const xAOD::Jet* jet : *jets) {
         // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.4
         HT += jet->pt();
 
         // count central jets
-        if (std::abs(jet->eta())<2.5) {
-          nCentralJets++;
-        }
+        if (std::abs(jet->eta())<2.5) nCentralJets++;
 
         // check if jet is btagged
         if (WPgiven) {
@@ -182,6 +185,10 @@ namespace HHBBYY
         j1_passWP = static_cast<int>(m_isBtag.get(*jets->at(0), sys));
         m_Ibranches.at("Jet1_PassWP").set(*event,j1_passWP,sys);
 
+        if(PCBTgiven){
+      	  m_Ibranches.at("Jet1_pcbt").set(*event,m_PCBT.get(*jets->at(0), sys),sys);
+        }
+
         if (m_isMC) {
           truthLabel_j1 = HadronConeExclTruthLabelID(*jets->at(0));
           m_Ibranches.at("Jet1_truthLabel").set(*event, truthLabel_j1, sys);
@@ -199,6 +206,10 @@ namespace HHBBYY
         j2_passWP = static_cast<int>(m_isBtag.get(*jets->at(1), sys));
         m_Ibranches.at("Jet2_PassWP").set(*event,j2_passWP,sys);
 
+        if(PCBTgiven){
+          m_Ibranches.at("Jet2_pcbt").set(*event,m_PCBT.get(*jets->at(1), sys),sys);
+        }
+
         if (m_isMC) {
           truthLabel_j2 = HadronConeExclTruthLabelID(*jets->at(1));
           m_Ibranches.at("Jet2_truthLabel").set(*event, truthLabel_j2, sys);
@@ -213,6 +224,10 @@ namespace HHBBYY
         m_Fbranches.at("Jet_b1_eta").set(*event, b1.Eta(), sys);
         m_Fbranches.at("Jet_b1_phi").set(*event, b1.Phi(), sys);
         m_Fbranches.at("Jet_b1_E").set(*event, b1.E(), sys);
+
+        if(PCBTgiven){
+          m_Ibranches.at("Jet_b1_pcbt").set(*event,m_PCBT.get(*bjets->at(0), sys),sys);
+        }
 
         if (m_isMC) {
           truthLabel_b1 = HadronConeExclTruthLabelID(*bjets->at(0));
@@ -230,6 +245,10 @@ namespace HHBBYY
         m_Fbranches.at("Jet_b2_eta").set(*event, b2.Eta(), sys);
         m_Fbranches.at("Jet_b2_phi").set(*event, b2.Phi(), sys);
         m_Fbranches.at("Jet_b2_E").set(*event, b2.E(), sys);
+
+        if(PCBTgiven){
+          m_Ibranches.at("Jet_b2_pcbt").set(*event,m_PCBT.get(*bjets->at(1), sys),sys);
+        }
 
         if (m_isMC) {
           truthLabel_b2 = HadronConeExclTruthLabelID(*bjets->at(1));
