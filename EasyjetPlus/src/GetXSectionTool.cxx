@@ -11,7 +11,10 @@ GetXSectionTool::GetXSectionTool(const std::string &t, const std::string &n, con
 StatusCode GetXSectionTool::initialize(){
 
   // For simply copying input variables, a tool with empty outVars can be set up
-  const std::unordered_map<std::string, VarType> inVars = {};
+  const std::unordered_map<std::string, VarType> inVars = {
+    {"dataTakingYear", VarType::Int},
+    {"mcChannelNumber", VarType::Int},
+  };
   const std::unordered_map<std::string, VarType> outVars = {
     {"AMIXsection", VarType::Float},
     {"kFactor", VarType::Float},
@@ -36,42 +39,11 @@ StatusCode GetXSectionTool::initialize(){
     return StatusCode::FAILURE;
     } 
 
+    m_allPaths += path + "\n";
   }
   
   // Get PMG or Custom File(s) Info From Directory
   m_pmgHandle->readInfosFromFiles(m_pathsToPMGFiles.value());
-
-  if (AMIXsection(m_DSID)<0){ // When no DSID is found, IPMGCrossSectionTool::getAMIXsection returns -1. 
-    ATH_MSG_FATAL("\n\n"      // Script execution should be stopped.
-                  "****************  WRONG DATASET NUMBER (DSID)  *************************\n"
-                  "Couldn't find the dataset number in the following files :\n"
-                  << m_pathsToPMGFiles.value() << "\n"
-                  "*********************************************************************"
-                  "\n");    
-        return StatusCode::FAILURE;
-  }
-
-  // Calculate Total luminosity based on input years
-  for (const std::string &year : m_mcYears.value()) {
-
-    if (luminosities.find(year) == luminosities.end()) {
-        ATH_MSG_ERROR("\n\n"
-                      "****************  WRONG YEAR INPUT  *************************\n"
-                      "No data for year " <<year << " .\n"
-                      "Please input at least one of the following years :"
-                     );
-        for (const auto& lumiYear : luminosities)
-          ATH_MSG_INFO("                    " << lumiYear.first);
-        ATH_MSG_FATAL("EXITING.\n"
-                      "*********************************************************************"
-                      "\n");
-    } 
-    
-    // If we have a correct year input, calculate total luminosity. 
-    else
-         m_TotalLuminosity += luminosities[year];
-   
-  }
 
   return StatusCode::SUCCESS;
 }
@@ -81,12 +53,44 @@ StatusCode GetXSectionTool::finalize(){
 }
 
 void GetXSectionTool::computeVariables
-(const std::unordered_map<std::string, varTypePointer>& /*inVars*/,
+(const std::unordered_map<std::string, varTypePointer>& inVars,
  std::unordered_map<std::string, varTypePointer>& outVars) const{
   
-  setContent<float>(outVars, "AMIXsection", AMIXsection(m_DSID)); 
-  setContent<float>(outVars, "kFactor", kFactor(m_DSID)); 
-  setContent<float>(outVars, "FilterEff", FilterEff(m_DSID)); 
-  setContent<float>(outVars, "Luminosity", m_TotalLuminosity);
+  unsigned int dataTakingYear = getContent<unsigned int>(inVars, "dataTakingYear");
+  unsigned int mcChannelNumber = getContent<unsigned int>(inVars, "mcChannelNumber");
+  float luminosity{0.f};
+
+  if (AMIXsection(mcChannelNumber)<0){ // When no DSID (mcChannelNumber) is found, IPMGCrossSectionTool::getAMIXsection returns -1. 
+      throw std::runtime_error("\n\n"
+                              "      // Script execution should be stopped.\n"
+                              "      ****************  WRONG DATASET NUMBER (DSID)  ***********************\n"
+                              "      Couldn't find the mcChannelNumber number in the following files :\n      " 
+                              + m_allPaths + "\n"
+                              "      Please make sure that the DSID-mcChannelNumber value exists in your input files\n"
+                              "      *******************************************************************************\n");
+  }
+
+
+  if (luminosities.find(dataTakingYear) == luminosities.end()) {
+    ATH_MSG_ERROR("\n\n"
+                  "****************  WRONG YEAR INPUT  *************************\n"
+                  "No data for year " <<dataTakingYear << " .\n"
+                  "Please check the compatibility of the sample's data-taking"
+                  "year value and the available luminosities :"
+                  );
+    for (const auto& lumiYear : luminosities)
+      ATH_MSG_INFO("                    " << lumiYear.first);
+    throw std::runtime_error("EXITING.\n"
+                         "*********************************************************************\n");
+
+  } 
+  else //Get luminosity based on input years
+      luminosity = luminosities.at(dataTakingYear);
+
+
+  setContent<float>(outVars, "AMIXsection", AMIXsection(mcChannelNumber)); 
+  setContent<float>(outVars, "kFactor", kFactor(mcChannelNumber)); 
+  setContent<float>(outVars, "FilterEff", FilterEff(mcChannelNumber)); 
+  setContent<float>(outVars, "Luminosity", luminosity);
 
 }

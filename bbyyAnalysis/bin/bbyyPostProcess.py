@@ -18,11 +18,6 @@ parser.add_argument("--outFile", help="Output file", default="mcNormalisationVar
 parser.add_argument("--maxEvents", help="Number of events to process",
                     default=-1, type=int)
 parser.add_argument("--xSectionsConfig", required=True)
-parser.add_argument("--DSID", help="Dataset number of the sample that was processed",
-                    default=-1, type=int)
-parser.add_argument('--mcYears', type=str,
-                    help='MC Campaign years comma-separated (e.g., 2015,2016)')
-
 
 args = parser.parse_args()
 
@@ -42,11 +37,7 @@ with open(args.xSectionsConfig, 'r') as file:
 
 # Get XSection from either custom file (which is in PMG format)
 # or from an official PMG file
-getXSection = GetXSectionTool(
-    DSID=args.DSID,
-    pathToPMGFile=XSectionData['XSection_paths'],
-    mcYears=args.mcYears.split(',')
-)
+getXSection = GetXSectionTool(pathsToPMGFiles=XSectionData['XSection_paths'])
 
 # Add postProcessing tools
 postProcessor.postProcessTools = [SumOfWeightsTool(inFile=args.inFile),
