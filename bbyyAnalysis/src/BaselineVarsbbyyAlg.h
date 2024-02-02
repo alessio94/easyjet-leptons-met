@@ -41,6 +41,7 @@ namespace HHBBYY
 
     float compute_Topness(const xAOD::JetContainer *jets);
     float* compute_EventShapes(const xAOD::JetContainer *jets, const xAOD::PhotonContainer *photons);
+    float compute_pTBalance(const xAOD::JetContainer *jets, const xAOD::PhotonContainer *photons);
 
   private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
@@ -93,7 +94,7 @@ namespace HHBBYY
       "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star", "Photon1_ptOvermyy", "Photon2_ptOvermyy",
 
       // mva variables
-        "HT", "topness", "sphericityT", "planarFlow", "missEt", "metphi",
+        "HT", "topness", "sphericityT", "planarFlow", "pTBalance", "missEt", "metphi",
     };
 
     std::vector<std::string> m_Fvarnames_MC{

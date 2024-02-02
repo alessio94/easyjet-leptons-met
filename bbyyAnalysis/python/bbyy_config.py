@@ -131,7 +131,8 @@ def bbyy_branches(flags):
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     # mva variables
-    mva_variables = ["HT", "topness", "sphericityT", "planarFlow", "missEt","metphi"]
+    mva_variables = ["HT", "topness", "sphericityT", "planarFlow",
+                     "pTBalance", "missEt", "metphi"]
     for var in mva_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 

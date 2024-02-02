@@ -270,6 +270,9 @@ namespace HHBBYY
       m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
       m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
 
+      float pTBalance = compute_pTBalance(jets, photons);
+      m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
+
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
@@ -361,4 +364,30 @@ namespace HHBBYY
 
     return eventShapes;
   }
+
+  float BaselineVarsbbyyAlg::compute_pTBalance(const xAOD::JetContainer *jets,
+                                              const xAOD::PhotonContainer *photons){
+    float pTBalance = -99;
+    if (jets->size() >= 2 && photons->size() >= 2) {
+      TLorentzVector photon1 = photons->at(0)->p4();
+      TLorentzVector photon2 = photons->at(1)->p4();
+      TLorentzVector jet1 = jets->at(0)->p4();
+      TLorentzVector jet2 = jets->at(1)->p4();
+      float numerator, denominator;
+      std::vector<TLorentzVector> p4_vec = {photon1, photon2, jet1, jet2};
+      TLorentzVector numerator_p4(0.,0.,0.,0.);
+      denominator = 0;
+      for(const auto& p4 : p4_vec){
+          numerator_p4 += p4;
+          denominator += p4.Pt();
+      }
+      numerator = numerator_p4.Pt();
+      if (denominator != 0)
+      {
+        pTBalance = numerator / denominator;
+      }
+    }
+    return pTBalance;
+  }
+
 }
