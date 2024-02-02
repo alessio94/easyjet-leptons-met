@@ -91,13 +91,13 @@ namespace HHBBYY
       TLorentzVector HH(0.,0.,0.,0.);
       TLorentzVector y1(0.,0.,0.,0.);
       TLorentzVector y2(0.,0.,0.,0.);
-      TLorentzVector lj(0.,0.,0.,0.);
-      TLorentzVector sj(0.,0.,0.,0.);
+      TLorentzVector j1(0.,0.,0.,0.);
+      TLorentzVector j2(0.,0.,0.,0.);
       TLorentzVector b1(0.,0.,0.,0.);
       TLorentzVector b2(0.,0.,0.,0.);
 
-      int lj_passWP = -99, sj_passWP = -99;
-      int truthLabel_lj = -99, truthLabel_sj = -99;
+      int j1_passWP = -99, j2_passWP = -99;
+      int truthLabel_j1 = -99, truthLabel_j2 = -99;
       int truthLabel_b1 = -99, truthLabel_b2 = -99;
       double dRHH = -99., dRyy = -99., dRbb = -99.;
 
@@ -172,36 +172,36 @@ namespace HHBBYY
 
       // inclusive jet sector
       if (jets->size()>=1) {
-        lj = jets->at(0)->p4();
+        j1 = jets->at(0)->p4();
 
-        m_Fbranches.at("Jet1_pt").set(*event,lj.Pt(),sys);
-        m_Fbranches.at("Jet1_eta").set(*event,lj.Eta(),sys);
-        m_Fbranches.at("Jet1_phi").set(*event,lj.Phi(),sys);
-        m_Fbranches.at("Jet1_E").set(*event,lj.E(),sys);
+        m_Fbranches.at("Jet1_pt").set(*event,j1.Pt(),sys);
+        m_Fbranches.at("Jet1_eta").set(*event,j1.Eta(),sys);
+        m_Fbranches.at("Jet1_phi").set(*event,j1.Phi(),sys);
+        m_Fbranches.at("Jet1_E").set(*event,j1.E(),sys);
 
-        lj_passWP = static_cast<int>(m_isBtag.get(*jets->at(0), sys));
-        m_Ibranches.at("Jet1_PassWP").set(*event,lj_passWP,sys);
+        j1_passWP = static_cast<int>(m_isBtag.get(*jets->at(0), sys));
+        m_Ibranches.at("Jet1_PassWP").set(*event,j1_passWP,sys);
 
         if (m_isMC) {
-          truthLabel_lj = HadronConeExclTruthLabelID(*jets->at(0));
-          m_Ibranches.at("Jet1_truthLabel").set(*event, truthLabel_lj, sys);
+          truthLabel_j1 = HadronConeExclTruthLabelID(*jets->at(0));
+          m_Ibranches.at("Jet1_truthLabel").set(*event, truthLabel_j1, sys);
         } 
       }
 
       if (jets->size()>=2) {
-        sj = jets->at(1)->p4();
+        j2 = jets->at(1)->p4();
 
-        m_Fbranches.at("Jet2_pt").set(*event,sj.Pt(),sys);
-        m_Fbranches.at("Jet2_eta").set(*event,sj.Eta(),sys);
-        m_Fbranches.at("Jet2_phi").set(*event,sj.Phi(),sys);
-        m_Fbranches.at("Jet2_E").set(*event,sj.E(),sys);
+        m_Fbranches.at("Jet2_pt").set(*event,j2.Pt(),sys);
+        m_Fbranches.at("Jet2_eta").set(*event,j2.Eta(),sys);
+        m_Fbranches.at("Jet2_phi").set(*event,j2.Phi(),sys);
+        m_Fbranches.at("Jet2_E").set(*event,j2.E(),sys);
 
-        sj_passWP = static_cast<int>(m_isBtag.get(*jets->at(1), sys));
-        m_Ibranches.at("Jet2_PassWP").set(*event,sj_passWP,sys);
+        j2_passWP = static_cast<int>(m_isBtag.get(*jets->at(1), sys));
+        m_Ibranches.at("Jet2_PassWP").set(*event,j2_passWP,sys);
 
         if (m_isMC) {
-          truthLabel_sj = HadronConeExclTruthLabelID(*jets->at(1));
-          m_Ibranches.at("Jet2_truthLabel").set(*event, truthLabel_sj, sys);
+          truthLabel_j2 = HadronConeExclTruthLabelID(*jets->at(1));
+          m_Ibranches.at("Jet2_truthLabel").set(*event, truthLabel_j2, sys);
         } 
       }
 
