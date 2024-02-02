@@ -44,7 +44,7 @@ with open(args.xSectionsConfig, 'r') as file:
 # or from an official PMG file
 getXSection = GetXSectionTool(
     DSID=args.DSID,
-    pathToPMGFile=XSectionData['XSection_paths']['Custom'],
+    pathToPMGFile=XSectionData['XSection_paths'],
     mcYears=args.mcYears.split(',')
 )
 

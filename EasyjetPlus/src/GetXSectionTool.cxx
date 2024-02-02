@@ -24,24 +24,28 @@ StatusCode GetXSectionTool::initialize(){
   ATH_CHECK(m_pmgHandle.retrieve());
 
   // Check if the input path exists. If the pmg path isn't found, the readInfosFromDir method won't break the script execution.
-    if (!std::filesystem::exists(m_pathToPMGFile.value())) {
+  for (const std::string& path : m_pathsToPMGFiles.value()) {
+
+    if (!std::filesystem::exists(path)) {
     ATH_MSG_FATAL("\n\n"
                   "****************  WRONG XSECTION FILE PATH  *************************\n"
-                  "You've input a wrong date/file to parse in PMG under the path :\n"
-                  << m_pathToPMGFile << 
+                  "You've input a wrong date/file to parse under the path :\n"
+                  << path << 
                   "*********************************************************************"
                   "\n");
     return StatusCode::FAILURE;
     } 
+
+  }
   
   // Get PMG or Custom File(s) Info From Directory
-  m_pmgHandle->readInfosFromDir(m_pathToPMGFile.value().c_str());
+  m_pmgHandle->readInfosFromFiles(m_pathsToPMGFiles.value());
 
   if (AMIXsection(m_DSID)<0){ // When no DSID is found, IPMGCrossSectionTool::getAMIXsection returns -1. 
     ATH_MSG_FATAL("\n\n"      // Script execution should be stopped.
                   "****************  WRONG DATASET NUMBER (DSID)  *************************\n"
-                  "Couldn't find the input dataset number to in the file :\n"
-                  << m_pathToPMGFile << "\n"
+                  "Couldn't find the dataset number in the following files :\n"
+                  << m_pathsToPMGFiles.value() << "\n"
                   "*********************************************************************"
                   "\n");    
         return StatusCode::FAILURE;

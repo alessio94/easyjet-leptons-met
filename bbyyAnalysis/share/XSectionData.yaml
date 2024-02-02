@@ -1,5 +1,6 @@
 XSection_paths:
-  # Path to official PMG txt file
-  PMG: "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/2024-01-22"
-  # Path to your custom PMG-like txt file
-  Custom: "../easyjet/bbyyAnalysis/share/"
+    # If you add more than 1 files which contain the same input DSID, the last one will be parsed by the code.
+    # Path to official PMG txt file
+    - "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/2024-01-22/PMGxsecDB_mc16.txt"
+    # Path to your custom PMG-like txt file
+    - "../easyjet/bbyyAnalysis/share/CustomXSections_mc20.txt"

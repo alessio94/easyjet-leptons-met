@@ -35,7 +35,7 @@ class GetXSectionTool final: public extends<AthAlgTool, IPostProcessTool>
     float kFactor(int id) const { return m_pmgHandle->getKfactor(id); }
     float FilterEff(int id) const { return m_pmgHandle->getFilterEff(id); }
     
-    Gaudi::Property<std::string> m_pathToPMGFile {this, "pathToPMGFile", "", "Path to Custom XSection txt data file"};
+    Gaudi::Property<std::vector<std::string>> m_pathsToPMGFiles {this, "pathToPMGFile", {}, "Path to Custom XSection txt data file"};
     Gaudi::Property<int> m_DSID {this, "DSID", -1, "Dataset number of the sample that was processed"};
     Gaudi::Property<std::vector<std::string>> m_mcYears {this, "mcYears", {"", ""}, "MC Campaign's years"};
 
