@@ -190,8 +190,16 @@ namespace HHBBTT
 
       // Apply selection
 
-      applyTriggerSelection(event, electrons, muons, taus, jets, sys);
+      //trigger flags
+      m_bools.at(HHBBTT::pass_trigger_SLT) = false;
+      m_bools.at(HHBBTT::pass_trigger_LTT) = false;
+      m_bools.at(HHBBTT::pass_trigger_STT) = false;
+      m_bools.at(HHBBTT::pass_trigger_DTT) = false;
+      m_bools.at(HHBBTT::pass_trigger_DTT_2016) = false;
+      m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = false;
+      m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = false;
 
+      applyTriggerSelection(event, electrons, muons, taus, jets, sys);
 
       // Reset event specific booleans to false.
       m_bools.at(HHBBTT::TWO_JETS) = false;
@@ -219,14 +227,6 @@ namespace HHBBTT
       m_bools.at(HHBBTT::pass_DTT_4J12) = false;
       m_bools.at(HHBBTT::pass_DTT_L1Topo) = false;
       m_bools.at(HHBBTT::pass_DTT) = false;
-      //trigger flags
-      m_bools.at(HHBBTT::pass_trigger_SLT) = false;
-      m_bools.at(HHBBTT::pass_trigger_LTT) = false;
-      m_bools.at(HHBBTT::pass_trigger_STT) = false;
-      m_bools.at(HHBBTT::pass_trigger_DTT) = false;
-      m_bools.at(HHBBTT::pass_trigger_DTT_2016) = false;
-      m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = false;
-      m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = false;
     
 
       //************
@@ -857,25 +857,25 @@ namespace HHBBTT
     std::vector<std::string> ditau_paths_4J12;
 
     if(m_bools.at(HHBBTT::is15)){
-      ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_trackTWO_TAU25_medium1_tracktwo_L1TAU20IM_2TAU12IM"};
+      ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM"};
     }
     else if(m_bools.at(HHBBTT::is16) || m_bools.at(HHBBTT::is17)){
       if(m_bools.at(HHBBTT::is16PeriodA) || m_bools.at(HHBBTT::is16PeriodB_D3) || m_bools.at(HHBBTT::is16PeriodD4_end)){
-        ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_trackTWO_TAU25_medium1_tracktwo"};
+        ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
       }
       else if(m_bools.at(HHBBTT::l1topo_disabled)){
-        ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_trackTWO_TAU25_medium1_tracktwo"};
+        ditau_paths_2016 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
       }
 
       if(m_bools.at(HHBBTT::is17)){
-        ditau_paths_4J12 = {"trigPassed_HLT_tau35_medium1_trackTWO_TAU25_medium1_tracktwo_L1TAU20IM_2TAU12IM_4J12"};
+        ditau_paths_4J12 = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM_4J12"};
       }
 
       if(m_bools.at(HHBBTT::is17PeriodB1_B4)){// For Period B1 to B4 in 2017, should use this trigger but go to L1Topo selection
-        ditau_paths_L1Topo = {"trigPassed_HLT_tau35_medium1_trackTWO_TAU25_medium1_tracktwo"};
+        ditau_paths_L1Topo = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
       }
       else if(!m_bools.at(HHBBTT::l1topo_disabled) && (m_bools.at(HHBBTT::is17PeriodB5_B7) || m_bools.at(HHBBTT::is17PeriodB8_end))){
-        ditau_paths_L1Topo = {"trigPassed_HLT_tau35_medium1_trackTWO_TAU25_medium1_tracktwo_L1DR_TAU20ITAU12I_J25"};
+        ditau_paths_L1Topo = {"trigPassed_HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1DR_TAU20ITAU12I_J25"};
       }
     }
     else if(m_bools.at(HHBBTT::is18)){
