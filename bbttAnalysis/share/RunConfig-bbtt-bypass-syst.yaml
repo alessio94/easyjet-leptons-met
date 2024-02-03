@@ -1,3 +1,4 @@
 include: bbttAnalysis/RunConfig-bbtt-bypass.yaml
 
 do_CP_systematics: true
+systematics_regex: [".*"]

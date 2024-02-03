@@ -10,6 +10,8 @@ def validate_flags(flags):
 
     validate_file_format(flags)
 
+    validate_systematics_flags(flags)
+
 
 def validate_do_obj_flags(flags):
     if flags.Analysis.do_met:
@@ -111,4 +113,12 @@ def validate_file_format(flags):
     else:
         assert not flags.Analysis.disable_calib, (
             "Disabling calibrations is not safe except on PHYSLITE!"
+        )
+
+
+def validate_systematics_flags(flags):
+    if flags.Analysis.do_CP_systematics:
+        assert flags.Analysis.systematics_regex, (
+            "Systematics requested but no regex provided "
+            "e.g. for all systematics_regex: ['.*']"
         )

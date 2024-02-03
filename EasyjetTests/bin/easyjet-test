@@ -143,7 +143,7 @@ simple() {
     metadata-check -v
 }
 systematics() {
-    $1 $2 -c $3 -o $COMMON --do-CP-systematics True
+    $1 $2 -c $3 -o $COMMON --do-CP-systematics True  --systematics-regex ".*"
     metadata-check -v
 }
 fast() {
