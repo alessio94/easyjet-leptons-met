@@ -127,9 +127,7 @@ namespace HHBBYY
         if (std::abs(jet->eta())<2.5) nCentralJets++;
 
         // check if jet is btagged
-        if (WPgiven) {
-          if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
-        }
+        if (WPgiven) if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
       }
 
       // photon sector
@@ -384,8 +382,8 @@ namespace HHBBYY
     return eventShapes;
   }
 
-    float BaselineVarsbbyyAlg::compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets,
-                                              const xAOD::PhotonContainer *photons){
+  float BaselineVarsbbyyAlg::compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets,
+                                            const xAOD::PhotonContainer *photons){
     float pTBalance = -99;
     if (bjets->size() >= 2 && photons->size() >= 2) {
       TLorentzVector photon1 = photons->at(0)->p4();
@@ -408,5 +406,4 @@ namespace HHBBYY
     }
     return pTBalance;
   }
-
 }

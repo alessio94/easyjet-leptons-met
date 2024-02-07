@@ -52,6 +52,9 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             "JetSelectorAlg",
             containerInKey=smalljetkey,
             containerOutKey="bbyyAnalysisJets_%SYS%",
+            PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0], # noqa
+            pTsort=False,
+            PCBTsort=True,
             bTagWPDecorName="",
             checkOR=flags.Analysis.do_overlap_removal,
         )

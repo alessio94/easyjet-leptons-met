@@ -27,13 +27,28 @@ namespace Easyjet
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_inHandle));
     }
+    if (!m_PCBT.empty()) {
+      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_inHandle));
+    }
     m_ORJetDecorKey = m_inHandle.getNamePattern() + "." + m_ORJetDecorName;
     ATH_CHECK (m_ORJetDecorKey.initialize());
 
     ATH_CHECK (m_relativeDeltaRToVRJet.initialize(m_systematicsList, m_inHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
-    ATH_CHECK (m_systematicsList.initialize());    
+    ATH_CHECK (m_systematicsList.initialize());
+
+    // check that m_PCBTsort and m_PCBT are both set or not set
+    if (m_PCBTsort && m_PCBT.empty()) {
+      ATH_MSG_ERROR("PCBT sorting configured but no PCBT decorator given!");
+      return StatusCode::FAILURE;
+    }
+
+    // check that pTsort and PCBTSort are not both set
+    if(m_pTsort && m_PCBTsort){
+      ATH_MSG_ERROR("pT sorting and PCBT sorting are configured simultaneously!");
+      return StatusCode::FAILURE;
+    }
 
     return StatusCode::SUCCESS;
   }
@@ -59,6 +74,10 @@ namespace Easyjet
 
       // check if a btag wp is given
       bool WPgiven = !m_isBtag.empty();
+      bool PCBTaggiven = !m_PCBT.empty();
+
+      // define jets_pcbt as a map of jets to their pcbt
+      std::map<const xAOD::IParticle *, int> workContainer_pcbt;
       
       // loop over jets
       for (const xAOD::Jet *jet : *inContainer)
@@ -84,6 +103,7 @@ namespace Easyjet
 
         // select btagging wp if given. if not given always push back
         if (!WPgiven || m_isBtag.get(*jet, sys)) workContainer->push_back(jet);
+        if (PCBTaggiven) workContainer_pcbt[jet] = m_PCBT.get(*jet, sys);
       }
       
       int nJets = workContainer->size();
@@ -103,30 +123,27 @@ namespace Easyjet
       if (nJets < m_truncateAtAmount) nKeep = nJets;
       else nKeep = m_truncateAtAmount;
       
-      if (m_pTsort)
-      {
+      if (m_pTsort || m_PCBTsort) {
         // if we give -1, sort the whole container
         if (m_truncateAtAmount == -1) nKeep = nJets;
-        
         std::partial_sort(
-                workContainer->begin(), // Iterator from which to start sorting
+          workContainer->begin(), // Iterator from which to start sorting
           workContainer->begin() + nKeep, // Use begin + N to sort first N
           workContainer->end(), // Iterator marking the end of range to sort
-          [](const xAOD::IParticle *left, const xAOD::IParticle *right)
-          {
-            return left->pt() > right->pt();
-          }); // lambda function here just handy, could also be another
-                    // function that returns bool
-
+            [&](const xAOD::IParticle *left, const xAOD::IParticle *right) {
+              // sort by pT if pTsort or as tiebreaker if PCBTSort
+              if (m_pTsort || (m_PCBTsort && workContainer_pcbt[left] == workContainer_pcbt[right]))
+                return left->pt() > right->pt();
+              // else sort by PCBT
+              else
+                return workContainer_pcbt[left] > workContainer_pcbt[right];
+            });
         // keep only the requested amount
-        workContainer->erase(workContainer->begin() + nKeep,
-                workContainer->end());
+        workContainer->erase(workContainer->begin() + nKeep, workContainer->end());
       }
-   
       // Write to eventstore
       ATH_CHECK(m_outHandle.record(std::move(workContainer), sys));   
     }
-   
 
     return StatusCode::SUCCESS;
   }
