@@ -78,40 +78,17 @@ private:
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
+    Gaudi::Property<std::vector<std::string>> m_floatVariables
+          {this, "floatVariableList", {}, "Name list of floating variables"};
+
+    Gaudi::Property<std::vector<std::string>> m_intVariables
+          {this, "intVariableList", {}, "Name list of integer variables"};
 
     /// \brief Setup sys-aware output decorations
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
-    std::vector<std::string> m_Fvarnames{
-    "Electron1_pt", "Electron1_eta", "Electron1_phi", "Electron1_E",
-    "Electron2_pt", "Electron2_eta", "Electron2_phi", "Electron2_E",
-    "Muon1_pt", "Muon1_eta", "Muon1_phi", "Muon1_E",
-    "Muon2_pt", "Muon2_eta", "Muon2_phi", "Muon2_E",
-    "Lepton1_pt", "Lepton1_eta", "Lepton1_phi", "Lepton1_E",
-    "Lepton2_pt", "Lepton2_eta", "Lepton2_phi", "Lepton2_E",
-    "mee", "pTee", "dRee", "Etaee", "Phiee", 
-    "mmumu", "pTmumu", "dRmumu", "Etamumu", "Phimumu",
-    "memu", "pTemu","dRemu", "Etaemu", "Phiemu",
-    "mll", "pTll",
-    "Jet_b1_pt", "Jet_b1_eta", "Jet_b1_phi", "Jet_b1_E",
-    "Jet_b2_pt", "Jet_b2_eta", "Jet_b2_phi", "Jet_b2_E",
-    "mbb", "pTbb", "dRbb", "Etabb", "Phibb",
-    "Jet1_pt", "Jet1_eta", "Jet1_phi", "Jet1_E",
-    "Jet2_pt", "Jet2_eta", "Jet2_phi", "Jet2_E",
-    };
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
+        m_Fbranches;
 
-    std::vector<std::string> m_Fvarnames_MC{
-      "Electron1_effSF", "Electron2_effSF",
-      "Muon1_effSF", "Muon2_effSF",
-      "Lepton1_effSF", "Lepton2_effSF",	
-    };
-
-
-   std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
-   std::vector<std::string> m_Ivarnames{
-    "Lepton1_charge", "Lepton1_pdgid",
-    "Lepton2_charge", "Lepton2_pdgid",
-   "nBJets", "nMuons", "nElectrons", "nJets",
-   };
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
     
  };
 }

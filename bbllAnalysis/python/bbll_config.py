@@ -3,11 +3,13 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.output.ttree.selected_objects import (
-    get_selected_objects_branches,
+    get_selected_objects_branches_variables,
 )
 
 
-def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
+def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
+             float_variables=[], int_variables=[]):
+
     cfg = ComponentAccumulator()
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
@@ -84,6 +86,8 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
             eleWP=ElectronWPLabel,
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            floatVariableList=float_variables,
+            intVariableList=int_variables
         )
     )
 
@@ -111,32 +115,78 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey):
     return cfg
 
 
+def get_BaselineVarsbbllAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    for object in ["ee", "mumu", "emu", "bb"]:
+        for var in ["m", "pT", "dR", "Eta", "Phi"]:
+            float_variable_names.append(f"{var}{object}")
+
+    float_variable_names += ["mll", "pTll"]
+
+    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons"]
+
+    return float_variable_names, int_variable_names
+
+
+def get_BaselineVarsbbllAlg_highlevelvariables(flags):
+    high_level_float_variables = []
+    high_level_int_variables = []
+
+    return high_level_float_variables, high_level_int_variables
+
+
 def bbll_branches(flags):
     branches = []
 
-    # These are the variables always saved with the objects selected by the analysis
-    # This is tunable with the flags amount and variables
-    # in the object configs.
-    branches += get_selected_objects_branches(flags, "bbll")
+    # this will be all the variables that are calculated by the
+    # BaselineVarsbbllAlg algorithm
+    all_baseline_variable_names = []
+    float_variable_names = []
+    int_variable_names = []
 
-    dilepton_variables = ["dRee", "Etaee", "Phiee",
-                          "dRmumu", "Etamumu", "Phimumu",
-                          "dRemu", "Etaemu", "Phiemu"]
+    # these are the variables that will always be stored by easyjet specific to HHbbtt
+    # further below there are more high level variables which can be
+    # stored using the flag
+    # flags.Analysis.store_high_level_variables
+    baseline_float_variables, baseline_int_variables \
+        = get_BaselineVarsbbllAlg_variables(flags)
+    float_variable_names += baseline_float_variables
+    int_variable_names += baseline_int_variables
+
+    if flags.Analysis.do_mmc:
+        # do not append mmc variables to float_variable_names
+        # or int_variable_names as they are stored by the
+        # mmc algortithm not BaselineVarsbbttAlg
+        for var in ["status", "pt", "eta", "phi", "m"]:
+            all_baseline_variable_names.append(f"mmc_{var}")
+
+    if flags.Analysis.store_high_level_variables:
+        high_level_float_variables, high_level_int_variables \
+            = get_BaselineVarsbbllAlg_highlevelvariables(flags)
+        float_variable_names += high_level_float_variables
+        int_variable_names += high_level_int_variables
+
+    all_baseline_variable_names += [*float_variable_names, *int_variable_names]
+
     for tree_flags in flags.Analysis.ttree_output:
-        for var in dilepton_variables:
-            if tree_flags['slim_variables_with_syst'] and "pt" not in var:
+        for var in all_baseline_variable_names:
+            if tree_flags['slim_variables_with_syst'] and \
+               "pt" not in var and "SF" not in var:
                 branches += [f"EventInfo.{var}_NOSYS -> bbll_{var}"]
             else:
                 branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}_%SYS%"]
 
-    branches += ["EventInfo.mee_%SYS% -> bbll_mee_%SYS%"]
-    branches += ["EventInfo.pTee_%SYS% -> bbll_pTee_%SYS%"]
-    branches += ["EventInfo.mmumu_%SYS% -> bbll_mmumu_%SYS%"]
-    branches += ["EventInfo.pTmumu_%SYS% -> bbll_pTmumu_%SYS%"]
-    branches += ["EventInfo.memu_%SYS% -> bbll_memu_%SYS%"]
-    branches += ["EventInfo.pTemu_%SYS% -> bbll_pTemu_%SYS%"]
-    branches += ["EventInfo.mll_%SYS% -> bbll_mll_%SYS%"]
-    branches += ["EventInfo.pTll_%SYS% -> bbll_pTll_%SYS%"]
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    object_level_branches, object_level_float_variables, object_level_int_variables \
+        = get_selected_objects_branches_variables(flags, "bbll")
+    float_variable_names += object_level_float_variables
+    int_variable_names += object_level_int_variables
+
+    branches += object_level_branches
 
     # BJets
     if flags.Input.isMC:
@@ -147,29 +197,6 @@ def bbll_branches(flags):
 
         branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
 
-    branches += ["EventInfo.nBJets_%SYS% -> bbll_nBJets_%SYS%"]
-    branches += ["EventInfo.nElectrons_%SYS% -> bbll_nElectrons_%SYS%"]
-    branches += ["EventInfo.nMuons_%SYS% -> bbll_nMuons_%SYS%"]
-    branches += ["EventInfo.nJets_%SYS% -> bbll_nJets_%SYS%"]
-
-    dibjet_variables = ["dRbb", "Etabb", "Phibb"]
-    for tree_flags in flags.Analysis.ttree_output:
-        for var in dibjet_variables:
-            if tree_flags['slim_variables_with_syst'] and "pt" not in var:
-                branches += [f"EventInfo.{var}_NOSYS -> bbll_{var}"]
-            else:
-                branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}_%SYS%"]
-
-    branches += ["EventInfo.mbb_%SYS% -> bbll_mbb_%SYS%"]
-    branches += ["EventInfo.pTbb_%SYS% -> bbll_pTbb_%SYS%"]
-
-    if flags.Analysis.do_mmc:
-        for var in ["status", "pt", "eta", "phi", "m"]:
-            if tree_flags['slim_variables_with_syst'] and var != "pt":
-                branches += [f"EventInfo.mmc_{var}_NOSYS -> bbll_mmc_{var}"]
-            else:
-                branches += [f"EventInfo.mmc_{var}_%SYS% -> bbll_mmc_{var}_%SYS%"]
-
     branches += ["EventInfo.bbll_pass_sr_%SYS% -> bbll_pass_SR_%SYS%"]
 
     if (flags.Analysis.save_bbll_cutflow):
@@ -179,4 +206,4 @@ def bbll_branches(flags):
 
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
-    return branches
+    return branches, float_variable_names, int_variable_names

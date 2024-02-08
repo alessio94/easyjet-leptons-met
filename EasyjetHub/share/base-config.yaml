@@ -111,6 +111,10 @@ systematics_regex: []
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
 
+# Store high level variables by default 
+# when the config file set the high level variables
+store_high_level_variables: false
+
 # Definition of container names
 full_container_names:
   phys:

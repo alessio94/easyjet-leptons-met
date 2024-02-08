@@ -41,17 +41,13 @@ namespace HHBBLL
     ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     // Intialise syst-aware output decorators
-
-    // Add MC var
-    if(m_isMC) m_Fvarnames.insert(m_Fvarnames.end(), m_Fvarnames_MC.begin(), m_Fvarnames_MC.end());
-
-    for (const std::string &var : m_Fvarnames) {
+    for (const std::string &var : m_floatVariables) {
       CP::SysWriteDecorHandle<float> whandle{var+"_%SYS%", this};
       m_Fbranches.emplace(var, whandle);
       ATH_CHECK (m_Fbranches.at(var).initialize(m_systematicsList, m_eventHandle));
     }
 
-    for (const std::string &var : m_Ivarnames){
+    for (const std::string &var : m_intVariables){
       ATH_MSG_DEBUG("initializing integer variable: " << var);
       CP::SysWriteDecorHandle<int> whandle{var+"_%SYS%", this};
       m_Ibranches.emplace(var, whandle);
@@ -95,11 +91,11 @@ namespace HHBBLL
 	ATH_MSG_ERROR("Could not retrieve MET");
        	return StatusCode::FAILURE;	
       }
-      for (const std::string &string_var: m_Fvarnames) {
+      for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
       }
 
-      for (const auto& var: m_Ivarnames) {
+      for (const auto& var: m_intVariables) {
         m_Ibranches.at(var).set(*event, -99, sys);
       }
 
