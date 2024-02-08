@@ -33,6 +33,7 @@ atlas_add_component(bbyyAnalysis
 atlas_install_scripts(
   bin/bbyy-ntupler
 )
+atlas_install_joboptions( bin/*.py )
 
 atlas_install_python_modules(
   python/bbyy_config.py

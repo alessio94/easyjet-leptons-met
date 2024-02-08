@@ -37,6 +37,7 @@ atlas_add_component(bbttAnalysis
 atlas_install_scripts(
   bin/bbtt-ntupler
 )
+atlas_install_joboptions( bin/*.py )
 
 atlas_install_python_modules(
   python/bbtt_config.py

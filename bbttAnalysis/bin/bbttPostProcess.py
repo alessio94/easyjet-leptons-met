@@ -10,16 +10,12 @@ from AthenaCommon.AppMgr import theApp
 from EasyjetPlus.EasyjetPlusConf import (
     PostProcessor, SumOfWeightsTool, GetXSectionTool, TotalWeightsTool)
 
-import yaml
-
 # Argument parser
 parser = AthArgumentParser()
 parser.add_argument("--inFile", required=True)
 parser.add_argument("--outFile", help="Output file", default="mcNormalisationVars.root")
 parser.add_argument("--maxEvents", help="Number of events to process",
                     default=-1, type=int)
-parser.add_argument("--xSectionsConfig", required=True)
-
 args = parser.parse_args()
 
 # Create top sequence
@@ -29,24 +25,26 @@ topSequence = AlgSequence()
 postProcessor = PostProcessor(
     inFile=args.inFile,
     outFile=args.outFile,
-    maxEvents=args.maxEvents,
+    maxEvents=args.maxEvents
 )
 
-# Get XSection Path
-with open(args.xSectionsConfig, 'r') as file:
-    XSectionData = yaml.safe_load(file)
+XSectionTool = GetXSectionTool(
+    pathsToPMGFiles={"/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/2024-01-22/PMGxsecDB_mc16.txt"})  # noqa: E501
 
-# Get XSection from either custom file (which is in PMG format)
-# or from an official PMG file
-getXSection = GetXSectionTool(pathsToPMGFiles=XSectionData['XSection_paths'])
-
-TotalWeightsTool_bbyy = TotalWeightsTool(
-    analysis="bbyy", nPhotons=2, bTagWP="DL1dv01_FixedCutBEff_77")
+TotalWeightsTool_bbtt_lephad = TotalWeightsTool(
+    analysis="bbtt", nLeptons=1, nTaus=1, bTagWP="DL1dv01_FixedCutBEff_77",
+    totalWeightName="bbtt_lephad_weight_NOSYS")
+TotalWeightsTool_bbtt_hadhad = TotalWeightsTool(
+    analysis="bbtt", nLeptons=0, nTaus=2, bTagWP="DL1dv01_FixedCutBEff_77",
+    totalWeightName="bbtt_hadhad_weight_NOSYS")
 
 # Add postProcessing tools
-postProcessor.postProcessTools = [SumOfWeightsTool(inFile=args.inFile),
-                                  getXSection,
-                                  TotalWeightsTool_bbyy]
+postProcessor.postProcessTools = [
+    SumOfWeightsTool(inFile=args.inFile),
+    XSectionTool,
+    TotalWeightsTool_bbtt_lephad,
+    TotalWeightsTool_bbtt_hadhad,
+]
 
 topSequence += postProcessor
 
