@@ -58,6 +58,7 @@ Electron:
   forceFullSimConfig: false
 
 Muon:
+  max_eta: 2.5
   ID: ""
   Iso: ""
   amount: 0

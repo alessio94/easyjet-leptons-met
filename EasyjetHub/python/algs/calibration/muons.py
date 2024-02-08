@@ -29,6 +29,7 @@ def muon_sequence(flags, configAcc):
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.muons)
     configSeq += makeConfig('Muons', containerName=output_name)
+    configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
 
     # PID configuration
     configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
@@ -49,7 +50,7 @@ def muon_sequence(flags, configAcc):
     configSeq += makeConfig('Muons.PtEtaSelection', containerName=output_name)
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 3e3)
-    configSeq.setOptionValue('.maxEta', 2.7)
+    configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
 
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
