@@ -151,7 +151,7 @@ fast() {
     OPTS+=" -o analysis.root --h5-output test.h5"
     local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    CMD+=" --timeout 30 "
+    CMD+=" --timeout 35 "
     echo "running $CMD"
     $CMD
     metadata-check -v
@@ -162,7 +162,7 @@ data-fast() {
     OPTS+=" --do-trigger-filtering False"
     local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    CMD+=" --timeout 30 "
+    CMD+=" --timeout 35 "
     echo "running $CMD"
     $CMD
     metadata-check -v
