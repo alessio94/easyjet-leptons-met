@@ -353,7 +353,7 @@ namespace ttHH
       }
       m_Fbranches.at("HT").set(*event, HT, sys);
 
-      m_Ibranches.at("n_leptons").set(*event, m_nLeptons, sys);
+      m_Ibranches.at("n_leptons").set(*event, muons->size() + electrons->size(), sys);
     }
     return StatusCode::SUCCESS;
 

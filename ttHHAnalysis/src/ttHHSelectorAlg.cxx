@@ -2,28 +2,32 @@
   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "SelectionFlagsttHH.h"
+#include "ttHHSelectorAlg.h"
+#include <SystematicsHandles/SysFilterReporter.h>
+#include <SystematicsHandles/SysFilterReporterCombiner.h>
 
 namespace ttHH
 {
 
-  SelectionFlagsttHHAlg::SelectionFlagsttHHAlg(const std::string &name,
+  ttHHSelectorAlg::ttHHSelectorAlg(const std::string &name,
                                 ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
     declareProperty("cutList", m_inputCutList);
     declareProperty("saveCutFlow", m_saveCutFlow);
     declareProperty("triggers", m_Triggers);
-    declareProperty("nLeptons", m_nLeptons);
   }
 
 
-  StatusCode SelectionFlagsttHHAlg::initialize()
+  StatusCode ttHHSelectorAlg::initialize()
   {
 
     ATH_MSG_INFO("*********************************\n");
-    ATH_MSG_INFO("      SelectionFlagsttHHAlg      \n");
+    ATH_MSG_INFO("      ttHHSelectorAlg      \n");
     ATH_MSG_INFO("*********************************\n");
+
+    // Initialise global event filter
+    ATH_CHECK (m_filterParams.initialize(m_systematicsList));
 
     ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
@@ -79,12 +83,17 @@ namespace ttHH
   }
 
 
-  StatusCode SelectionFlagsttHHAlg::execute()
+  StatusCode ttHHSelectorAlg::execute()
   {
+
+    // Global filter originally false
+    CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
+      CP::SysFilterReporter filter (filterCombiner, sys);
+
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
@@ -111,7 +120,6 @@ namespace ttHH
         evaluateTriggerCuts(*event, m_Triggers, m_ttHHCuts);
       }
 
-      evaluateLeptonCuts(*electrons, *muons, m_ttHHCuts);
       evaluateJetCuts(*bjets, *jets, m_ttHHCuts);
 
       bool passedall = true;
@@ -152,13 +160,21 @@ namespace ttHH
         m_ttHHCuts[i].relativeCounter+=1;
       }
 
+      if (!m_bypass and !m_ttHHCuts("PASS_BASELINE").passed) continue;
+
+
+      // Global event filter true if any syst passes and controls
+      // if event is passed to output writing or not
+      filter.setPassed(true);
+
     }
 
     return StatusCode::SUCCESS;
   }
 
-  StatusCode SelectionFlagsttHHAlg::finalize()
+  StatusCode ttHHSelectorAlg::finalize()
   {
+    ANA_CHECK (m_filterParams.finalize());
 
     //adapt the following for each syst TODO
     ATH_MSG_INFO("Total events = " << m_total_events <<std::endl);
@@ -182,7 +198,7 @@ namespace ttHH
 
   }
 
-  void SelectionFlagsttHHAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &Triggers, 
+  void ttHHSelectorAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &Triggers, 
                                                   CutManager& ttHHCuts) {
 
     if (!ttHHCuts.exists("PASS_TRIGGER"))
@@ -207,21 +223,7 @@ namespace ttHH
 
   }
 
-  void SelectionFlagsttHHAlg::evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
-                                const xAOD::MuonContainer& muons, CutManager& ttHHCuts)
-  {
-
-    if (!ttHHCuts.exists("NLEPTONS"))
-      return;
-
-    // No medium+isolated electrons and muons.
-    int n_leptons = electrons.size() + muons.size();
-    if (n_leptons==m_nLeptons)
-      ttHHCuts("NLEPTONS").passed = true;
-
-  }
-
-  void SelectionFlagsttHHAlg::evaluateJetCuts(const xAOD::JetContainer& bjets,
+  void ttHHSelectorAlg::evaluateJetCuts(const xAOD::JetContainer& bjets,
                             const xAOD::JetContainer& jets, CutManager& ttHHCuts)
   {
 
@@ -230,6 +232,9 @@ namespace ttHH
 
     if (bjets.size() >= 4 && ttHHCuts.exists("NBJETS"))
         ttHHCuts("NBJETS").passed = true;
+
+    if (ttHHCuts("NBJETS").passed && ttHHCuts("NJETS").passed)
+        ttHHCuts("PASS_BASELINE").passed = true;
 
   }
 

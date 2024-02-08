@@ -11,7 +11,7 @@ add_compile_options(-Werror)
 atlas_add_component(ttHHAnalysis
   src/JetPairingAlgttHH.cxx
   src/BaselineVarsttHHAlg.cxx
-  src/SelectionFlagsttHH.cxx
+  src/ttHHSelectorAlg.cxx
   src/components/ttHHAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -36,8 +36,7 @@ atlas_install_python_modules(
   python/ttHH_config.py
 )
 atlas_install_data(
-  share/RunConfig-ttHH.yaml
-  share/trigger.yaml
+  share/*.yaml
 )
 
 # atlas_install_data( data/* )

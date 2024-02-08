@@ -113,8 +113,8 @@ declare -A CONFIGS=(
     # MC20
     [bbyy-mc20]=bbyyAnalysis/RunConfig-bbyy.yaml
     [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-bbyy.yaml
-    [ttHH-mc20]=ttHHAnalysis/RunConfig-ttHH.yaml
-    [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-ttHH.yaml
+    [ttHH-mc20]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
+    [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [bbll-mc20]=bbllAnalysis/RunConfig-bbll.yaml
     [bbll-mc20-lite]=bbllAnalysis/RunConfig-bbll.yaml
     # MC20 AF3

@@ -68,6 +68,22 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
     )
 
     cfg.addEventAlgo(
+        CompFactory.ttHH.ttHHSelectorAlg(
+            "ttHHSelectorAlg",
+            bjets="pairedttHHAnalysisJets_"
+            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            jets="ttHHAnalysisJets_%SYS%",
+            muons="ttHHAnalysisMuons_%SYS%",
+            electrons="ttHHAnalysisElectrons_%SYS%",
+            cutList=flags.Analysis.CutList,
+            saveCutFlow=flags.Analysis.save_ttHH_cutflow,
+            triggers=flags.Analysis.TriggerChains,
+            eventDecisionOutputDecoration="ttHH_pass_baseline_%SYS%",
+            bypass=flags.Analysis.bypass,
+        )
+    )
+
+    cfg.addEventAlgo(
         CompFactory.ttHH.JetPairingAlgttHH(
             "JetPairingAlgHZ",
             containerInKey="ttHHAnalysisJets_BTag_%SYS%",
@@ -105,22 +121,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            isMC=flags.Input.isMC
-        )
-    )
-
-    cfg.addEventAlgo(
-        CompFactory.ttHH.SelectionFlagsttHHAlg(
-            "SelectionFlagsttHHAlg",
-            bjets="pairedttHHAnalysisJets_"
-            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
-            jets="ttHHAnalysisJets_%SYS%",
-            muons="ttHHAnalysisMuons_%SYS%",
-            electrons="ttHHAnalysisElectrons_%SYS%",
-            cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_ttHH_cutflow,
-            triggers=flags.Analysis.TriggerChains,
-            nLeptons=flags.Analysis.nLeptons
+            isMC=flags.Input.isMC,
         )
     )
 
@@ -190,6 +191,8 @@ def ttHH_branches(flags):
         branches += [f"EventInfo.Jets_{var}_%SYS% -> ttHH_Jets_{var}_%SYS%"]
 
     branches += ["EventInfo.PassAllCuts_%SYS% -> ttHH_PassAllCuts_%SYS%"]
+
+    branches += ["EventInfo.ttHH_pass_baseline_%SYS% -> ttHH_pass_baseline_%SYS%"]
 
     leptonPair_variables = ["pt", "eta", "phi", "m", "dR"]
     leptonPairs = [

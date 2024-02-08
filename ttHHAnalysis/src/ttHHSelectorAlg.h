@@ -24,6 +24,8 @@
 #include <xAODMuon/MuonContainer.h>
 #include <EasyjetHub/CutManager.h>
 
+#include <SystematicsHandles/SysFilterReporterParams.h>
+
 #include <algorithm>
 
 class CutManager;
@@ -32,10 +34,10 @@ namespace ttHH
 {
 
   /// \brief An algorithm for counting containers
-  class SelectionFlagsttHHAlg final : public AthHistogramAlgorithm {
+  class ttHHSelectorAlg final : public AthHistogramAlgorithm {
 
     public:
-      SelectionFlagsttHHAlg(const std::string &name, ISvcLocator *pSvcLocator);
+      ttHHSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
       /// \brief Initialisation method, for setting up tools and other persistent
       /// configs
@@ -47,15 +49,13 @@ namespace ttHH
 
       const std::vector<std::string> m_STANDARD_CUTS{
           "PASS_TRIGGER",
-           "NLEPTONS",
-           "NJETS", 
-           "NBJETS"
+          "NJETS", 
+          "NBJETS",
+          "PASS_BASELINE"
       };
 
       void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
                           const std::vector<std::string> &Triggers, CutManager& Cuts);
-      void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
-                          const xAOD::MuonContainer& muons, CutManager& ttHHCuts);
       void evaluateJetCuts(const xAOD::JetContainer& bjets,
                           const xAOD::JetContainer& jets, CutManager& ttHHCuts);
 
@@ -81,6 +81,11 @@ namespace ttHH
 
       CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "",   "Muon container to read" };
+
+      CP::SysFilterReporterParams m_filterParams {this, "ttHH selection"};
+
+      Gaudi::Property<bool> m_bypass
+      { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
       std::vector<std::string> m_inputCutList{};
       std::vector<std::string> m_Triggers;

@@ -75,8 +75,6 @@ private:
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
-    Gaudi::Property<int> m_nLeptons
-      { this, "nLeptons", 0 };
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
     std::vector<std::string> m_Fvarnames{
