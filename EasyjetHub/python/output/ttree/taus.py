@@ -23,4 +23,10 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
         for tau_id in [flags.Analysis.Tau.ID]:
             tau_branches.variables += [f"tau_effSF_{tau_id}_%SYS%"]
 
+    if tree_flags.collection_options.taus.RNN_branches:
+        tau_branches.variables += [
+            "RNNJetScoreSigTrans",
+            "RNNEleScoreSigTrans"
+        ]
+
     return tau_branches.get_output_list()

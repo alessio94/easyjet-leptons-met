@@ -29,6 +29,9 @@ collection_options:
     substructure_info: false
     truth_labels: false
 
+  taus:
+    RNN_branches: false
+
 # turned off automatically if MC
 truth_outputs:
   small_R_jets: ''
