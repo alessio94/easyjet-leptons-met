@@ -27,12 +27,19 @@ def photon_sequence(flags, configAcc):
     config = ConfigFactory()
     makeConfig = config.makeConfig
 
+    if flags.Analysis.Photon.forceFullSimConfig:
+        print("WARNING! If not already done, you should get in touch with the")
+        print("EGamma group to contribute to the Photon AF3 recommendations as")
+        print("you're relying on them")
+
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.photons)
     configSeq += makeConfig('Photons', containerName=output_name)
     configSeq.setOptionValue('.recomputeIsEM', False)
     configSeq.setOptionValue('.crackVeto', True)
+    configSeq.setOptionValue('.forceFullSimConfig',
+                             flags.Analysis.Photon.forceFullSimConfig)
 
     # PID configuration
     configSeq += makeConfig('Photons.WorkingPoint', containerName=output_name,
@@ -41,6 +48,8 @@ def photon_sequence(flags, configAcc):
     configSeq.setOptionValue('.isolationWP', flags.Analysis.Photon.Iso)
     if (flags.Analysis.Photon.Iso == "NonIso"):
         configSeq.setOptionValue('.noEffSF', True)
+    configSeq.setOptionValue('.forceFullSimConfig',
+                             flags.Analysis.Photon.forceFullSimConfig)
 
     # Kinematic selection
     configSeq += makeConfig('Photons.PtEtaSelection', containerName=output_name)

@@ -47,6 +47,7 @@ Photon:
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
+  forceFullSimConfig: false
 
 Electron:
   ID: ""
@@ -54,6 +55,7 @@ Electron:
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
+  forceFullSimConfig: false
 
 Muon:
   ID: ""

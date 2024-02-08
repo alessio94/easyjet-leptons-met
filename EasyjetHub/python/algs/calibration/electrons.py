@@ -27,11 +27,18 @@ def electron_sequence(flags, configAcc):
     config = ConfigFactory()
     makeConfig = config.makeConfig
 
+    if flags.Analysis.Electron.forceFullSimConfig:
+        print("WARNING! If not already done, you should get in touch with the")
+        print("EGamma group to contribute to the Electron AF3 recommendations as")
+        print("you're relying on them")
+
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.electrons)
     configSeq += makeConfig('Electrons', containerName=output_name)
     configSeq.setOptionValue('.crackVeto', True)
+    configSeq.setOptionValue('.forceFullSimConfig',
+                             flags.Analysis.Electron.forceFullSimConfig)
 
     # PID configuration
     configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
@@ -39,6 +46,8 @@ def electron_sequence(flags, configAcc):
     configSeq.setOptionValue('.likelihoodWP', flags.Analysis.Electron.ID)
     configSeq.setOptionValue('.isolationWP', flags.Analysis.Electron.Iso)
     configSeq.setOptionValue('.recomputeLikelihood', False)
+    configSeq.setOptionValue('.forceFullSimConfig',
+                             flags.Analysis.Electron.forceFullSimConfig)
     if 'extra_wps' in flags.Analysis.Electron:
         for wp in flags.Analysis.Electron.extra_wps:
             id = wp[0]
@@ -49,6 +58,8 @@ def electron_sequence(flags, configAcc):
             configSeq.setOptionValue('.likelihoodWP', id)
             configSeq.setOptionValue('.isolationWP', iso)
             configSeq.setOptionValue('.recomputeLikelihood', False)
+            configSeq.setOptionValue('.forceFullSimConfig',
+                                     flags.Analysis.Electron.forceFullSimConfig)
 
     # Kinematic selection
     configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name)
