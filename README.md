@@ -17,6 +17,8 @@ Meetings will be biweekly at 5 pm on Tuesday, Central European Time, see [the in
 
 First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel free to make an alias with `export WORKDIR=.`) clone the repository :
 ```
+setupATLAS
+lsetup git
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
 git clone --recursive ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 ```
@@ -43,10 +45,14 @@ git checkout main
 git pull --rebase upstream main
 ```
 5. Now you can create a new branch:
-``` git checkout -b YourNewFavoriteBranch ```
-    - Alternatively you can checkout an existing branch on your fork by doing
-    ``` git checkout YourExisitingBranch ```
-    (don't use origin/YourExisitingBranch).
+```
+git checkout -b YourNewFavoriteBranch
+```
+ - Alternatively you can checkout an existing branch on your fork by doing
+```
+git checkout YourExisitingBranch
+```
+(don't use origin/YourExisitingBranch).
 6. Once your changes are done you can create a Merge Request (make sure you merge onto the upstream main)
 7. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
 ```
