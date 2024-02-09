@@ -97,6 +97,11 @@ namespace HHBBYY
 
       // mva variables
         "HT", "topness", "sphericityT", "planarFlow", "pTBalance", "missEt", "metphi",
+
+      // VBF jets kinematics
+	"Jet_vbf1_pt", "Jet_vbf1_eta", "Jet_vbf1_phi", "Jet_vbf1_E",
+	"Jet_vbf2_pt", "Jet_vbf2_eta", "Jet_vbf2_phi", "Jet_vbf2_E",
+	"m_vbfjj", "eta_vbfjj"
     };
 
     std::vector<std::string> m_Fvarnames_MC{

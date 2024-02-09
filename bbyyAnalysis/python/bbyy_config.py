@@ -138,7 +138,8 @@ def bbyy_branches(flags):
 
     # di-higgs variables
     dihiggs_variables = [
-        "mbbyy", "pTbbyy", "Etabbyy", "Phibbyy", "dRbbyy", "mbbyy_star"
+        "mbbyy", "pTbbyy", "Etabbyy", "Phibbyy", "dRbbyy",
+        "mbbyy_star"
     ]
     for var in dihiggs_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
@@ -151,6 +152,15 @@ def bbyy_branches(flags):
     mva_variables = ["HT", "topness", "sphericityT", "planarFlow",
                      "pTBalance", "missEt", "metphi"]
     for var in mva_variables:
+        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
+
+    # VBFJets
+    vbfjet_variables = [
+        "Jet_vbf1_pt", "Jet_vbf1_eta", "Jet_vbf1_phi", "Jet_vbf1_E",
+        "Jet_vbf2_pt", "Jet_vbf2_eta", "Jet_vbf2_phi", "Jet_vbf2_E",
+        "m_vbfjj", "eta_vbfjj"
+    ]
+    for var in vbfjet_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     branches += ["EventInfo.PassAllCuts_%SYS% -> bbyy_PassAllCuts_%SYS%"]
