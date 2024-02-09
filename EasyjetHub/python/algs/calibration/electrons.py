@@ -1,27 +1,15 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
-from EasyjetHub.algs.calibration.view_select import makeViewSelectionConfig
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
 def electron_sequence(flags, configAcc):
 
-    # Previous configuration, to be reproduced
-    #     flags.Analysis.DataType,
-    #     workingPoint="LooseLHElectron.NonIso",
-    #     postfix="loose",
-    #     deepCopyOutput=False,
-    #     shallowViewOutput=True,
-    #     recomputeLikelihood=False,
-    #     chargeIDSelection=False,
-    #     isolationCorrection=False,
-    #     crackVeto=False,
-    #     ptSelectionOutput=True,
-    #     enableCutflow=False,
-    #     enableKinematicHistograms=False,
-
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    wps = [(flags.Analysis.Electron.ID, flags.Analysis.Electron.Iso)]
+    if 'extra_wps' in flags.Analysis.Electron:
+        for wp in flags.Analysis.Electron.extra_wps:
+            wps.append((wp[0], wp[1]))
 
     configSeq = ConfigSequence()
     config = ConfigFactory()
@@ -41,25 +29,14 @@ def electron_sequence(flags, configAcc):
                              flags.Analysis.Electron.forceFullSimConfig)
 
     # PID configuration
-    configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
-                            selectionName=ElectronWPLabel)
-    configSeq.setOptionValue('.likelihoodWP', flags.Analysis.Electron.ID)
-    configSeq.setOptionValue('.isolationWP', flags.Analysis.Electron.Iso)
-    configSeq.setOptionValue('.recomputeLikelihood', False)
-    configSeq.setOptionValue('.forceFullSimConfig',
-                             flags.Analysis.Electron.forceFullSimConfig)
-    if 'extra_wps' in flags.Analysis.Electron:
-        for wp in flags.Analysis.Electron.extra_wps:
-            id = wp[0]
-            iso = wp[1]
-            wpLabel = f'{id}_{iso}'
-            configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
-                                    selectionName=wpLabel)
-            configSeq.setOptionValue('.likelihoodWP', id)
-            configSeq.setOptionValue('.isolationWP', iso)
-            configSeq.setOptionValue('.recomputeLikelihood', False)
-            configSeq.setOptionValue('.forceFullSimConfig',
-                                     flags.Analysis.Electron.forceFullSimConfig)
+    for id, iso in wps:
+        configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
+                                selectionName=id + '_' + iso)
+        configSeq.setOptionValue('.likelihoodWP', id)
+        configSeq.setOptionValue('.isolationWP', iso)
+        configSeq.setOptionValue('.recomputeLikelihood', False)
+        configSeq.setOptionValue('.forceFullSimConfig',
+                                 flags.Analysis.Electron.forceFullSimConfig)
 
     # Kinematic selection
     configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name)
@@ -70,15 +47,15 @@ def electron_sequence(flags, configAcc):
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
-    # Apply selection as view container
-    makeViewSelectionConfig(configSeq, output_name)
-    # Add working point selection
-    makeViewSelectionConfig(
-        configSeq,
-        ElectronWPLabel + output_name,
-        input=output_name,
-        original=flags.Analysis.container_names.input.electrons,
-        selection=ElectronWPLabel
-    )
+    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
+
+    for id, iso in wps:
+        label = id + '_' + iso
+        configSeq += makeConfig('Thinning', containerName=output_name,
+                                configName=f'Thinning_{label}')
+        configSeq.setOptionValue('.selectionName', label)
+        configSeq.setOptionValue('.outputName', label + output_name)
+        configSeq.setOptionValue('.postfix', label)
 
     return configSeq

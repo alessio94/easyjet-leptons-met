@@ -1,27 +1,15 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
-from EasyjetHub.algs.calibration.view_select import makeViewSelectionConfig
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
 def photon_sequence(flags, configAcc):
 
-    # Previous configuration, to be reproduced
-    #     flags.Analysis.DataType,
-    #     workingPoint=flags.Analysis.PhotonWP,
-    #     postfix="loose",
-    #     deepCopyOutput=False,
-    #     shallowViewOutput=True,
-    #     crackVeto=False,
-    #     enableCleaning=True,
-    #     cleaningAllowLate=False,
-    #     recomputeIsEM=False,
-    #     ptSelectionOutput=True,
-    #     enableCutflow=False,
-    #     enableKinematicHistograms=False,
-
-    PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
+    wps = [(flags.Analysis.Photon.ID, flags.Analysis.Photon.Iso)]
+    if 'extra_wps' in flags.Analysis.Photon:
+        for wp in flags.Analysis.Photon.extra_wps:
+            wps.append((wp[0], wp[1]))
 
     configSeq = ConfigSequence()
     config = ConfigFactory()
@@ -42,14 +30,15 @@ def photon_sequence(flags, configAcc):
                              flags.Analysis.Photon.forceFullSimConfig)
 
     # PID configuration
-    configSeq += makeConfig('Photons.WorkingPoint', containerName=output_name,
-                            selectionName=PhotonWPLabel)
-    configSeq.setOptionValue('.qualityWP', flags.Analysis.Photon.ID)
-    configSeq.setOptionValue('.isolationWP', flags.Analysis.Photon.Iso)
-    if (flags.Analysis.Photon.Iso == "NonIso"):
-        configSeq.setOptionValue('.noEffSF', True)
-    configSeq.setOptionValue('.forceFullSimConfig',
-                             flags.Analysis.Photon.forceFullSimConfig)
+    for id, iso in wps:
+        configSeq += makeConfig('Photons.WorkingPoint', containerName=output_name,
+                                selectionName=id + '_' + iso)
+        configSeq.setOptionValue('.qualityWP', id)
+        configSeq.setOptionValue('.isolationWP', iso)
+        if (iso == "NonIso"):
+            configSeq.setOptionValue('.noEffSF', True)
+        configSeq.setOptionValue('.forceFullSimConfig',
+                                 flags.Analysis.Photon.forceFullSimConfig)
 
     # Kinematic selection
     configSeq += makeConfig('Photons.PtEtaSelection', containerName=output_name)
@@ -60,15 +49,15 @@ def photon_sequence(flags, configAcc):
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
-    # Apply selection as view container
-    makeViewSelectionConfig(configSeq, output_name)
-    # Add working point selection
-    makeViewSelectionConfig(
-        configSeq,
-        PhotonWPLabel + output_name,
-        input=output_name,
-        original=flags.Analysis.container_names.input.photons,
-        selection=PhotonWPLabel
-    )
+    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
+
+    for id, iso in wps:
+        label = id + '_' + iso
+        configSeq += makeConfig('Thinning', containerName=output_name,
+                                configName=f'Thinning_{label}')
+        configSeq.setOptionValue('.selectionName', label)
+        configSeq.setOptionValue('.outputName', label + output_name)
+        configSeq.setOptionValue('.postfix', label)
 
     return configSeq

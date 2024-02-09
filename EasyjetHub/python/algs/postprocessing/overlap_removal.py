@@ -35,7 +35,7 @@ def overlap_sequence(flags):
         photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
         muons=f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}',
         # Baseline always needed for TauAntiTauJet OR
-        taus='baseline',
+        taus='Baseline',
     )
     # Construct the names of the view containers with working point selection
     # We need to use the '.' style so that the algs operate on the full
@@ -55,8 +55,8 @@ def overlap_sequence(flags):
     # Jets have different flag naming conventions
     if flags.Analysis.do_small_R_jets:
         preOR_collections['jets'] = drop_sys(
-            container_names.output[flags.Analysis.small_R_jet.jet_type]
-        )
+            container_names.allcalib[flags.Analysis.small_R_jet.jet_type]
+        ) + ".selectPtEta&&jvt"
         original_names['jets'] = flags.Analysis.container_names.input[
             flags.Analysis.small_R_jet.jet_type
         ]
@@ -86,48 +86,5 @@ def overlap_sequence(flags):
                              "ftag_select_" + flags.Analysis.small_R_jet.btag_wp)
     configSeq.setOptionValue('.antiTauLabel', 'isAntiTau')
     configSeq.setOptionValue('.doTauAntiTauJetOR', True)
-
-    # Define output view containers after OR
-    # Need to loop again because of the ConfigSequence convention
-    # that you add and configure blocks one by one
-    # TODO: This doesn't work now because the ConfigBlock setup
-    # attaches a _%SYS% suffix to the passesOR decoration, which
-    # then cannot be read by the view creator alg
-    """
-    for objtype,coll in preOR_collections.items():
-        # Add working point selection
-        makeViewSelectionConfig(
-            configSeq,
-            coll+'_OR',
-            input=coll,
-            original=original_names[objtype],
-            selection='passesOR',
-        )
-    """
-
-    # Old configuration, for reference
-    '''
-    overlapSequence = makeOverlapAnalysisSequence(
-        flags.Analysis.DataType,
-        inputLabel='',
-        outputLabel='passesOR',
-        linkOverlapObjects=False,
-        doEleEleOR=False,
-        doTaus=flags.Analysis.do_taus,
-        enableUserPriority=False,
-        antiTauBJetLabel="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-        antiTauLabel="isAntiTau",
-        doTauAntiTauJetOR=True,
-        boostedLeptons=False,
-        postfix='',
-        shallowViewOutput=True,
-        enableCutflow=False,
-        doJets=flags.Analysis.do_small_R_jets,
-        doMuons=flags.Analysis.do_muons,
-        doElectrons=flags.Analysis.do_electrons,
-        doPhotons=flags.Analysis.do_photons,
-        doFatJets=do_fatJet_OR
-    )
-    '''
 
     return configSeq

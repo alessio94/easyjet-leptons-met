@@ -1,11 +1,15 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
-from EasyjetHub.algs.calibration.view_select import makeViewSelectionConfig
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
 def tau_sequence(flags, configAcc):
+
+    wps = ['Baseline', flags.Analysis.Tau.ID]
+    if 'extra_wps' in flags.Analysis.Tau:
+        for wp in flags.Analysis.Tau.extra_wps:
+            wps.append(wp)
 
     configSeq = ConfigSequence()
     config = ConfigFactory()
@@ -18,14 +22,11 @@ def tau_sequence(flags, configAcc):
     # PID configuration
     configSeq += makeConfig('TauJets', containerName=output_name)
     configSeq.setOptionValue('.rerunTruthMatching', False)
-    # Baseline always needed for TauAntiTauJet OR
-    configSeq += makeConfig('TauJets.WorkingPoint', containerName=output_name,
-                            selectionName='baseline')
-    configSeq.setOptionValue('.quality', 'Baseline')
-
-    configSeq += makeConfig('TauJets.WorkingPoint', containerName=output_name,
-                            selectionName=flags.Analysis.Tau.ID)
-    configSeq.setOptionValue('.quality', flags.Analysis.Tau.ID)
+    for id in wps:
+        configSeq += makeConfig('TauJets.WorkingPoint',
+                                containerName=output_name,
+                                selectionName=id)
+        configSeq.setOptionValue('.quality', id)
 
     # Kinematic selection
     configSeq += makeConfig('TauJets.PtEtaSelection', containerName=output_name)
@@ -36,16 +37,14 @@ def tau_sequence(flags, configAcc):
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
-    # Apply selection as view container
-    makeViewSelectionConfig(configSeq, output_name)
-    # Add working point selection
-    for wp in ['baseline', flags.Analysis.Tau.ID]:
-        makeViewSelectionConfig(
-            configSeq,
-            wp + output_name,
-            input=output_name,
-            original=flags.Analysis.container_names.input.taus,
-            selection=wp
-        )
+    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
+
+    for id in wps:
+        configSeq += makeConfig('Thinning', containerName=output_name,
+                                configName=f'Thinning_{id}')
+        configSeq.setOptionValue('.selectionName', id)
+        configSeq.setOptionValue('.outputName', id + output_name)
+        configSeq.setOptionValue('.postfix', id)
 
     return configSeq

@@ -5,7 +5,6 @@ from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
 from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetPtCalibrationConfig
 
-from EasyjetHub.algs.calibration.view_select import makeViewSelectionConfig
 from EasyjetHub.algs.calibration.FTagEventSFConfig import makeFTagEventSFConfig
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
@@ -21,12 +20,8 @@ def jet_sequence(
     jet_flags = flags.Analysis.small_R_jet
 
     # We define the basic sequence to produce all calibrated jets
-    # Filtering on kinematics and JVT is done later
-    # We need to make the filtered jet container explicitly different
-    # because for MET we need the unfiltered container
-
     jet_type = jet_flags.jet_type
-    allcalib_name = flags.Analysis.container_names.allcalib[jet_type]
+
     # Need to keep DAOD_PHYS collection name regardless of input
     # due to CP algs configs in Athena
     jetColl = (
@@ -35,7 +30,9 @@ def jet_sequence(
         else "AntiKt4EMTopoJets"
     )
 
-    configSeq += makeConfig("Jets", containerName=drop_sys(allcalib_name),
+    calib_name = drop_sys(flags.Analysis.container_names.allcalib[jet_type])
+
+    configSeq += makeConfig("Jets", containerName=calib_name,
                             jetCollection=jetColl)
     # don't run JVT only for EMTopo jets
     configSeq.setOptionValue(".runNNJvtUpdate", jet_type != "reco4EMTopoJet")
@@ -73,7 +70,7 @@ def jet_sequence(
         )
 
     if jet_type != "reco4EMTopoJet":
-        configSeq += makeConfig('Jets.JVT', containerName=drop_sys(allcalib_name))
+        configSeq += makeConfig('Jets.JVT', containerName=calib_name)
 
     btag_wps = [jet_flags.btag_wp]
     if 'btag_extra_wps' in jet_flags:
@@ -84,7 +81,7 @@ def jet_sequence(
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
             configSeq += makeConfig('Jets.FlavourTagging',
-                                    containerName=drop_sys(allcalib_name),
+                                    containerName=calib_name,
                                     selectionName=tagger_wp)
             configSeq.setOptionValue('.btagger', tagger)
             # set the MC/MC SF to default for now, this was broken by
@@ -111,40 +108,31 @@ def jet_sequence(
             # Pick a reasonable b-tag selection?
             makeBJetPtCalibrationConfig(
                 configSeq,
-                drop_sys(allcalib_name),
+                calib_name,
             )
             configSeq.setOptionValue(
                 '.muonName',
-                drop_sys(flags.Analysis.container_names.output.muons),
+                flags.Analysis.container_names.output.muons
             )
             configSeq.setOptionValue(
                 '.btagSelDecor',
                 "ftag_select_" + jet_flags.btag_wp,
             )
 
-    # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=drop_sys(allcalib_name))
-
     # Apply kinematic selection
     configSeq += makeConfig('Jets.PtEtaSelection',
-                            containerName=drop_sys(allcalib_name))
+                            containerName=calib_name)
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
     configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
 
-    # Apply selection as view container
+    # Add systematic object links
+    configSeq += makeConfig('SystObjectLink', containerName=calib_name)
 
-    # Declare the connections between the allcalib and output containers
-    output_name = flags.Analysis.container_names.output[jet_type]
-    input_name = flags.Analysis.container_names.input[jet_type]
-
-    makeViewSelectionConfig(
-        configSeq,
-        drop_sys(output_name),
-        input=drop_sys(allcalib_name),
-        original=input_name,
-        selection='selectPtEta&&jvt',
-    )
+    output_name = drop_sys(flags.Analysis.container_names.output[jet_type])
+    configSeq += makeConfig('Thinning', containerName=calib_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta&&jvt')
+    configSeq.setOptionValue('.outputName', output_name)
 
     # Event-level FTAG scale factor
     if jet_type != "reco4EMTopoJet":
@@ -153,7 +141,7 @@ def jet_sequence(
             tagger, btag_wp = tagger_wp.split("_", 1)
             makeFTagEventSFConfig(
                 configSeq,
-                drop_sys(output_name),
+                flags.Analysis.container_names.output[jet_type],
                 tagger_wp,
             )
             configSeq.setOptionValue('.btagger', tagger)
@@ -181,8 +169,7 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
-    # Apply selection as view container
-    makeViewSelectionConfig(configSeq, output_name)
+    configSeq += makeConfig('Thinning', containerName=output_name)
 
     return configSeq
 

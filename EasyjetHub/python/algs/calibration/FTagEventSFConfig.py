@@ -34,7 +34,7 @@ class FTagEventSFConfig(ConfigBlock):
                                 + 'ftag_kin_select_' + selectionName + ',as_char')
             alg.scaleFactorInputDecoration = 'ftag_effSF_' + selectionName + '_%SYS%'
             alg.scaleFactorOutputDecoration = 'ftag_effSF_' + selectionName + '_%SYS%'
-            alg.particles = config.readName(self.containerName)
+            alg.particles = self.containerName
 
             config.addOutputVar('EventInfo', alg.scaleFactorOutputDecoration,
                                 'weight_ftag_effSF_' + selectionName)

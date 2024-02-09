@@ -45,7 +45,7 @@ def bbtt_cfg(
         CompFactory.Easyjet.TauSelectorAlg(
             "TauSelectorAlg",
             # Baseline always needed for anti-taus
-            containerInKey='baseline' + taukey,
+            containerInKey='Baseline' + taukey,
             containerOutKey="bbttAnalysisTaus_%SYS%",
             tauSF_WP=flags.Analysis.Tau.ID,
             isMC=flags.Input.isMC,

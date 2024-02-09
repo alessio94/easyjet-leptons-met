@@ -1,25 +1,15 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
-from EasyjetHub.algs.calibration.view_select import makeViewSelectionConfig
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
 def muon_sequence(flags, configAcc):
 
-    # Previous configuration, to be reproduced
-    #     flags.Analysis.DataType,
-    #     workingPoint="Loose.NonIso",
-    #     postfix="loose",
-    #     deepCopyOutput=False,
-    #     shallowViewOutput=True,
-    #     ptSelectionOutput=True,
-    #     qualitySelectionOutput=True,
-    #     enableCutflow=False,
-    #     enableKinematicHistograms=False,
-    #     isRun3Geo=(flags.Analysis.Run == 3),
-
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    wps = [(flags.Analysis.Muon.ID, flags.Analysis.Muon.Iso)]
+    if 'extra_wps' in flags.Analysis.Muon:
+        for wp in flags.Analysis.Muon.extra_wps:
+            wps.append((wp[0], wp[1]))
 
     configSeq = ConfigSequence()
     config = ConfigFactory()
@@ -32,19 +22,11 @@ def muon_sequence(flags, configAcc):
     configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
 
     # PID configuration
-    configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
-                            selectionName=MuonWPLabel)
-    configSeq.setOptionValue('.quality', flags.Analysis.Muon.ID)
-    configSeq.setOptionValue('.isolation', flags.Analysis.Muon.Iso)
-    if 'extra_wps' in flags.Analysis.Muon:
-        for wp in flags.Analysis.Muon.extra_wps:
-            id = wp[0]
-            iso = wp[1]
-            wpLabel = f'{id}_{iso}'
-            configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
-                                    selectionName=wpLabel)
-            configSeq.setOptionValue('.quality', id)
-            configSeq.setOptionValue('.isolation', iso)
+    for id, iso in wps:
+        configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
+                                selectionName=id + '_' + iso)
+        configSeq.setOptionValue('.quality', id)
+        configSeq.setOptionValue('.isolation', iso)
 
     # Kinematic selection
     configSeq += makeConfig('Muons.PtEtaSelection', containerName=output_name)
@@ -55,16 +37,15 @@ def muon_sequence(flags, configAcc):
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
-    # Apply kinematic selection as view container
-    makeViewSelectionConfig(configSeq, output_name)
+    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
 
-    # Add working point selection
-    makeViewSelectionConfig(
-        configSeq,
-        MuonWPLabel + output_name,
-        input=output_name,
-        original=flags.Analysis.container_names.input.muons,
-        selection=MuonWPLabel
-    )
+    for id, iso in wps:
+        label = id + '_' + iso
+        configSeq += makeConfig('Thinning', containerName=output_name,
+                                configName=f'Thinning_{label}')
+        configSeq.setOptionValue('.selectionName', label)
+        configSeq.setOptionValue('.outputName', label + output_name)
+        configSeq.setOptionValue('.postfix', label)
 
     return configSeq
