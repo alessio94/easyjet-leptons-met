@@ -3,6 +3,7 @@ atlas_subdir(bbyyAnalysis)
 
 # Find an external package (i.e. ROOT)
 find_package(ROOT COMPONENTS Core Tree Hist Matrix MathCore REQUIRED)
+find_package( lwtnn )
 
 # We don't want any warnings in compilation
 add_compile_options(-Werror)
@@ -12,6 +13,7 @@ atlas_add_component(bbyyAnalysis
   src/BaselineVarsbbyyAlg.cxx
   src/SelectionFlagsbbyyAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
+  src/ResonantPNNbbyyAlg.cxx
   LINK_LIBRARIES ${ROOT_LIBRARIES}
   AthenaBaseComps
   AsgTools
@@ -27,6 +29,7 @@ atlas_add_component(bbyyAnalysis
   FourMomUtils
   TruthUtils
   EasyjetHubLib
+  PathResolver
 )
 
 # Install python modules, joboptions, and share content
@@ -39,8 +42,10 @@ atlas_install_python_modules(
   python/bbyy_config.py
 )
 atlas_install_data(
+  data/*
   share/RunConfig-bbyy.yaml
   share/trigger.yaml
+  share/RunConfig-ResonantPNNbbyy.yaml
 )
 
 # atlas_install_data( data/* )

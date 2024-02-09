@@ -68,7 +68,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             jets="bbyyAnalysisJets_%SYS%",
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0], # noqa
+            PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
             isMC=flags.Input.isMC
         )
     )
@@ -94,6 +94,19 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             Years=flags.Analysis.Years,
         )
     )
+    if flags.Analysis.do_resonant_PNN:
+        cfg.addEventAlgo(
+            CompFactory.SHBBYY.ResonantPNNbbyyAlg(
+                "ResonantPNNbbyyAlg",
+                photons="bbyyAnalysisPhotons_%SYS%",
+                jets="bbyyAnalysisJets_%SYS%",
+                bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                mX_mS_pairs=flags.Analysis.mX_mS_pairs,
+                mS_values=flags.Analysis.mS_values,
+                mX_values=flags.Analysis.mX_values,
+                mX_1bjet=flags.Analysis.mX_1bjet
+            )
+        )
 
     return cfg
 
@@ -148,5 +161,28 @@ def bbyy_branches(flags):
             branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_%SYS%"]
 
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
+
+    if flags.Analysis.do_resonant_PNN:
+        PNN_ScoreLabel = "SH_PNN_Score"
+        PNN_1bjet_ScoreLabel = "SH_PNN_Score_1bjet"
+
+        for pair in flags.Analysis.mX_mS_pairs:
+            m_X = pair[0]
+            m_S = pair[-1]
+            var = str(PNN_ScoreLabel + "_X" + str(m_X) + "_S" + str(m_S))
+            branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
+
+        for m_X in flags.Analysis.mX_values:
+            for m_S in flags.Analysis.mS_values:
+                if m_X > 500 and m_S < 70:
+                    continue
+                if m_X - m_S <= 125:
+                    continue
+                var = str(PNN_ScoreLabel + "_X" + str(m_X) + "_S" + str(m_S))
+                branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
+
+        for m_X in flags.Analysis.mX_1bjet:
+            var = str(PNN_1bjet_ScoreLabel + "_X" + str(m_X))
+            branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     return branches

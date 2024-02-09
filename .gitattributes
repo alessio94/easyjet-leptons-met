@@ -1,1 +1,2 @@
 *.icc gitlab-language=c++
+bbyyAnalysis/data/*.json filter=lfs diff=lfs merge=lfs -text

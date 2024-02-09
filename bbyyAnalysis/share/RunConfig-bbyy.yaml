@@ -2,7 +2,6 @@ include: EasyjetHub/base-config.yaml
 
 # Which analysis to consider
 do_bbyy_analysis: true
-
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbyy"]
 
@@ -56,6 +55,7 @@ do_overlap_removal: false
 
 #Enable cutflow 
 save_bbyy_cutflow: true
+do_resonant_PNN: false
 
 CutList :
       - PASS_TRIGGER
