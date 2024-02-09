@@ -149,7 +149,7 @@ def output_cfg(flags, seqname):
         for tree_flags in flags.Analysis.ttree_output:
             cfg.merge(
                 minituple_cfg(
-                    flags,tree_flags,
+                    flags, tree_flags,
                     flags.Analysis.out_file,
                 ),
                 seqname,

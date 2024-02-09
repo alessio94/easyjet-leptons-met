@@ -18,7 +18,7 @@ def overlap_sequence(flags):
     if flags.Analysis.do_small_R_jets:
         if (
             flags.Analysis.small_R_jet.jet_type not in
-            {'reco4PFlowJet','reco4EMTopoJet'}
+            {'reco4PFlowJet', 'reco4EMTopoJet'}
         ):
             raise ValueError(
                 "Specified small-R jet type is invalid"
@@ -29,7 +29,7 @@ def overlap_sequence(flags):
     # Add whatever collections are active in the job to the
     # mapping of type to name
     preOR_collections = {}
-    objflags = {x:f'do_{x}' for x in ['electrons','photons','muons','taus']}
+    objflags = {x: f'do_{x}' for x in ['electrons', 'photons', 'muons', 'taus']}
     ORselections = dict(
         electrons=f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}',
         photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
@@ -48,8 +48,8 @@ def overlap_sequence(flags):
 
     # For the benefit of the view container creation
     original_names = {
-        objtype:flags.Analysis.container_names.input[objtype]
-        for objtype in ['electrons','photons','muons','taus']
+        objtype: flags.Analysis.container_names.input[objtype]
+        for objtype in ['electrons', 'photons', 'muons', 'taus']
     }
 
     # Jets have different flag naming conventions

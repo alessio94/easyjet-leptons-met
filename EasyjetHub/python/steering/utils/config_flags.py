@@ -27,7 +27,7 @@ class ConfigItem:
     def __init__(self, **args):
         fields = []
         for name, val in args.items():
-            fields.append((name,val))
+            fields.append((name, val))
         try:
             fset = frozenset(fields)
         except TypeError as e:
@@ -89,7 +89,7 @@ class ConfigItem:
 
     def items(self):
         for k in self:
-            yield k,self[k]
+            yield k, self[k]
 
     # Convenient back-conversion to a dict
     # Will convert tuples to lists
@@ -100,15 +100,15 @@ class ConfigItem:
     def as_mutable(self):
 
         def to_mutable(v):
-            if isinstance(v,ConfigItem):
+            if isinstance(v, ConfigItem):
                 return v.as_mutable()
-            elif isinstance(v,tuple):
+            elif isinstance(v, tuple):
                 return [to_mutable(e) for e in v]
             return v
 
         return {
             k: to_mutable(v)
-            for k,v in self.items()
+            for k, v in self.items()
         }
 
     # Provide a nice string representation
@@ -145,8 +145,8 @@ def to_immutable(keydict):
 
 def dict_to_flags(d: dict) -> AthConfigFlags:
     _flags = AthConfigFlags()
-    for k,v in d.items():
-        if isinstance(v,dict):
+    for k, v in d.items():
+        if isinstance(v, dict):
             _flags.addFlagsCategory(
                 k,
                 lambda v=v: dict_to_flags(v),
@@ -154,7 +154,7 @@ def dict_to_flags(d: dict) -> AthConfigFlags:
             )
         else:
             assert v is not None, f"Flag value {k} not assigned"
-            _flags.addFlag(k,v)
+            _flags.addFlag(k, v)
     return _flags
 
 
@@ -180,7 +180,7 @@ def fill_flags_from_runconfig(
     for key, value in run_config_all.items():
         log.info("User configured: " + str(key) + ": " + str(value))
         # if we find a dict, make a flag category
-        if isinstance(value,dict):
+        if isinstance(value, dict):
             flags.addFlagsCategory(
                 f"Analysis.{key}",
                 lambda value=value: dict_to_flags(value),

@@ -62,7 +62,7 @@ def analysis_configuration(parser="default"):
         flags.Analysis.do_muons = False
 
         def disable_reco_muons(tree_flags):
-            _tree_flags = {k:v for k,v in tree_flags.items()}
+            _tree_flags = {k: v for k, v in tree_flags.items()}
             _tree_flags['reco_outputs']['muons'] = ''
             return _tree_flags
         flags.Analysis.ttree_output = [
@@ -116,14 +116,14 @@ def analysis_configuration(parser="default"):
     if args.dump_analysis_config_flags:
         yaml.dump(
             flags.Analysis.as_mutable(),
-            open(args.dump_analysis_config_flags,'w')
+            open(args.dump_analysis_config_flags, 'w')
         )
 
     if args.dump_full_config_flags:
         flags_as_dict = flags.asdict()
         # convert the analysis flags back to a dict too
         flags_as_dict['Analysis'] = flags.Analysis.as_mutable()
-        yaml.dump(flags_as_dict,open(args.dump_full_config_flags,'w'))
+        yaml.dump(flags_as_dict, open(args.dump_full_config_flags, 'w'))
 
     return flags, args
 

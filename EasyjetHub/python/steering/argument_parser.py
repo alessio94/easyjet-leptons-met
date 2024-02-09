@@ -126,7 +126,7 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
 
     # Set flags with dedicated CLI arguments
     for arg_name, flag_name in flags_from_args.items():
-        arg_val = getattr(args,arg_name)
+        arg_val = getattr(args, arg_name)
         if arg_val is not None:
             if arg_name in flag_setters:
                 flag_setters[arg_name](flags, flag_name, arg_val)
@@ -142,7 +142,7 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
     for flag_arg in leftover:
         # Check that these are not set by custom arguments, as
         # this could lead to inconsistencies
-        for k,f in flags_from_args.items():
+        for k, f in flags_from_args.items():
             if flag_arg.startswith(f):
                 raise RuntimeError(
                     f"Flag '{f}' should be set with '{k}', do not override directly."

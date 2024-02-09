@@ -161,7 +161,7 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
     input_name = flags.Analysis.container_names.input[
         f"reco10{lr_jet_type}Jet"]
     output_name = flags.Analysis.container_names.output[
-        f"reco10{lr_jet_type}Jet"].replace('_%SYS%','')
+        f"reco10{lr_jet_type}Jet"].replace('_%SYS%', '')
     configSeq += makeConfig('Jets', containerName=output_name,
                             jetCollection=input_name)
     configSeq.setOptionValue('.postfix', f'largeR_{lr_jet_type}jets')

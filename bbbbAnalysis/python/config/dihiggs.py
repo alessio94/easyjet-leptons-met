@@ -15,7 +15,7 @@ def dihiggs_cfg(
         cfg.merge(
             resolved_cfg(
                 flags,
-                smalljetkey=smalljetkey.replace("%SYS%","NOSYS"),
+                smalljetkey=smalljetkey.replace("%SYS%", "NOSYS"),
             )
         )
         cfg.merge(event_counter_cfg("n_resolved"))

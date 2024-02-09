@@ -17,7 +17,7 @@ def met_sequence(flags, configAcc):
     container_names = flags.Analysis.container_names
 
     preMET_collections = {}
-    objflags = {x:f'do_{x}' for x in ['electrons','photons','muons','taus']}
+    objflags = {x: f'do_{x}' for x in ['electrons', 'photons', 'muons', 'taus']}
     METselections = dict(
         electrons=f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}',
         photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',

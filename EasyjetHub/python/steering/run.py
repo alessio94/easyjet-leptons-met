@@ -2,7 +2,7 @@ from AthenaCommon.Constants import INFO
 from EasyjetHub.algs.event_counter_config import METADATA_FILE
 
 
-def run_job(flags,args,cfg):
+def run_job(flags, args, cfg):
 
     # Print the full job configuration
     if flags.Exec.OutputLevel <= INFO:

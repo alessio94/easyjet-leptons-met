@@ -117,7 +117,7 @@ def cpalgs_cfg(flags):
                 # the given object type
                 # Pass the configAccumulator because we may need to
                 # provide some container name info (e.g. for VR jets)
-                configSeq += analysis_seqs[objtype](flags,configAccumulator)
+                configSeq += analysis_seqs[objtype](flags, configAccumulator)
 
         if flags.Analysis.do_large_R_Topo_jets:
             log.info("Adding large-R jet seq")
@@ -137,7 +137,7 @@ def cpalgs_cfg(flags):
 
         if flags.Analysis.do_met:
             log.info("Adding MET seq")
-            configSeq += met_sequence(flags,configAccumulator)
+            configSeq += met_sequence(flags, configAccumulator)
 
     ########################################################################
     # Begin postprocessing

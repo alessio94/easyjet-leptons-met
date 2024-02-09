@@ -19,7 +19,7 @@ def get_xaod_cfg(flags):
     jetcol = flags.Analysis.container_names.input[flags.Analysis.small_R_jet.jet_type]
     ca.addEventAlgo(CompFactory.Easyjet.JetDeepCopyAlg(
         name="jetdeepcopy",
-        jetsIn=jetcol.replace("%SYS%","NOSYS"),
+        jetsIn=jetcol.replace("%SYS%", "NOSYS"),
         jetsOut="EasyJets",
     ))
     item_list = [
