@@ -53,7 +53,9 @@ git checkout -b YourNewFavoriteBranch
 git checkout YourExisitingBranch
 ```
 (don't use origin/YourExisitingBranch).
+
 6. Once your changes are done you can create a Merge Request (make sure you merge onto the upstream main)
+
 7. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
 ```
 git pull --rebase upstream main
