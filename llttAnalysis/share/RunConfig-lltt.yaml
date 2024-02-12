@@ -1,0 +1,73 @@
+include: EasyjetHub/base-config.yaml
+
+# Which analysis and channels to consider
+do_lltt_analysis: true
+channel: ["leplep", "lephad", "hadhad"]
+
+# Toggles to bypass event selection
+bypass: true
+
+# Toggles for object types
+do_small_R_jets: true
+do_large_R_UFO_jets: false
+do_muons: true
+do_electrons: true
+do_taus: true
+do_met : true
+do_mmc : true
+do_baseline : true
+
+# Decay mode considered for truth decoration
+truthDecayModes: ["mmtt", "eett", "tttt"]
+
+# small R config
+small_R_jet:
+  # btagging nominal working point
+  btag_wp: "DL1dv01_FixedCutBEff_77"
+
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "Loose_VarRad"
+  extra_wps:
+    - ["TightLH", "Loose_VarRad"]
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+  extra_wps:
+    - ["Medium", "PflowLoose_VarRad"]
+
+Tau:
+  ID: "Loose"
+
+# list of triggers per year to consider
+trigger_chains:
+  include: llttAnalysis/trigger.yaml
+
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+
+#store_high_level_variables: true
+
+# Include the TTree configuration and update details
+ttree_output:
+  - AnalysisMiniTree:
+    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
+    slim_variables_with_syst: true
+    reco_outputs:
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
+      taus: 'container_names.output.taus'
+      met : 'container_names.output.met'
+    collection_options:
+      small_R_jets:
+        btag_info: true
+    truth_outputs:
+      small_R_jets: 'container_names.input.truth4Jet'
+      higgs_particle: 'container_names.output.truthHHParticles'

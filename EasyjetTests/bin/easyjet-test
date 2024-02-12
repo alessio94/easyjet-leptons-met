@@ -47,6 +47,8 @@ declare -A DATAFILES=(
     [ttHH-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [bbll-mc20]=${PHYS_TTBAR_MC20}
     [bbll-mc20-lite]=${PHYSLITE_TTBAR_MC20}
+    [lltt-mc20]=${PHYS_TTBAR_MC20}
+    [lltt-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     # MC20 AF3
     [mc20af3-lite]=${PHYSLITE_SH4B_BOOSTED_MC20_AF3}
     [fast-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
@@ -84,6 +86,8 @@ declare -A TESTS=(
     [ttHH-mc20-lite]="simple ttHH-ntupler"
     [bbll-mc20]="simple bbll-ntupler"
     [bbll-mc20-lite]="simple bbll-ntupler"
+    [lltt-mc20]="simple lltt-ntupler"
+    [lltt-mc20-lite]="simple lltt-ntupler"
     # MC20 AF3
     [mc20af3-lite]="simple easyjet-ntupler"
     [fast-mc20af3]="fast easyjet-ntupler"
@@ -117,6 +121,8 @@ declare -A CONFIGS=(
     [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [bbll-mc20]=bbllAnalysis/RunConfig-bbll.yaml
     [bbll-mc20-lite]=bbllAnalysis/RunConfig-bbll.yaml
+    [lltt-mc20]=llttAnalysis/RunConfig-lltt.yaml
+    [lltt-mc20-lite]=llttAnalysis/RunConfig-lltt.yaml
     # MC20 AF3
     [fast-mc20af3]=EasyjetHub/RunConfig-noEle.yaml
     [fast-mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE-noEle.yaml

@@ -1,0 +1,402 @@
+/*
+  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+*/
+
+/// @author Weiming Yao
+
+#include "HllttSelectorAlg.h"
+#include <AsgDataHandles/ReadDecorHandle.h>
+
+#include <SystematicsHandles/SysFilterReporter.h>
+#include <SystematicsHandles/SysFilterReporterCombiner.h>
+#include <AthContainers/ConstDataVector.h>
+
+namespace HLLTT
+{
+  HllttSelectorAlg ::HllttSelectorAlg(const std::string &name,
+                                  ISvcLocator *pSvcLocator)
+    : EL::AnaAlgorithm(name, pSvcLocator)
+  {
+
+  }
+
+  StatusCode HllttSelectorAlg ::initialize()
+  {
+
+    // Initialise global event filter
+    ATH_CHECK (m_filterParams.initialize(m_systematicsList));
+
+    // Read syst-aware input handles
+    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+    }
+
+    ATH_CHECK (m_runNumber.initialize(m_systematicsList, m_eventHandle));
+
+    // Intialise syst-aware output decorators
+    for (const std::string &var : m_Bvarnames){
+      CP::SysWriteDecorHandle<bool> whandle{var+"_%SYS%", this};
+      m_Bbranches.emplace(var, whandle);
+      ATH_CHECK(m_Bbranches.at(var).initialize(m_systematicsList, m_eventHandle));
+    };
+
+    m_tauWPDecorKey = m_tauHandle.getNamePattern() +
+      ".baselineSelection_" + m_tauWPName;
+    m_eleWPDecorKey = m_electronHandle.getNamePattern() +
+      ".baselineSelection_" + m_eleWPName;
+    m_muonWPDecorKey = m_muonHandle.getNamePattern() +
+      ".baselineSelection_" + m_muonWPName;
+
+    ATH_CHECK (m_tauWPDecorKey.initialize());
+    ATH_CHECK (m_eleWPDecorKey.initialize());
+    ATH_CHECK (m_muonWPDecorKey.initialize());
+
+    ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK(m_selected_tau.initialize(m_systematicsList, m_tauHandle));
+
+    // make trigger decorators
+    for (auto trig : m_triggers){
+      CP::SysReadDecorHandle<bool> deco {this, "trig"+trig, trig, "Name of trigger"};
+      m_triggerdecos.emplace(trig, deco);
+      ATH_CHECK(m_triggerdecos.at(trig).initialize(m_systematicsList, m_eventHandle));
+    }
+
+    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize());    
+    for ( auto name : m_channel_names){
+      if( name == "leplep") m_channels.push_back(HLLTT::LepLep);
+      else if( name == "lephad") m_channels.push_back(HLLTT::LepHad);
+      else if ( name == "hadhad") m_channels.push_back(HLLTT::HadHad);
+      else{
+        ATH_MSG_ERROR("Unknown channel");
+        return StatusCode::FAILURE;
+      }
+    }
+
+    //finding which years are set in the config
+    is15 = std::find(m_years.begin(), m_years.end(), 2015) != m_years.end();
+    is16 = std::find(m_years.begin(), m_years.end(), 2016) != m_years.end();
+    is17 = std::find(m_years.begin(), m_years.end(), 2017) != m_years.end();
+    is18 = std::find(m_years.begin(), m_years.end(), 2018) != m_years.end();
+    is22 = std::find(m_years.begin(), m_years.end(), 2022) != m_years.end();
+    is23 = std::find(m_years.begin(), m_years.end(), 2023) != m_years.end();
+
+    return StatusCode::SUCCESS;
+  }
+
+  StatusCode HllttSelectorAlg ::execute()
+  {
+
+    // Global filter originally false
+    CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
+
+    SG::ReadDecorHandle<xAOD::TauJetContainer, char> tauWPDecorHandle(m_tauWPDecorKey);
+    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleWPDecorHandle(m_eleWPDecorKey);
+    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonWPDecorHandle(m_muonWPDecorKey);
+
+    // Loop over all systs
+    for (const auto& sys : m_systematicsList.systematicsVector()){
+      CP::SysFilterReporter filter (filterCombiner, sys);
+
+      // Retrive inputs
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
+
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+
+      const xAOD::MuonContainer *muons = nullptr;
+      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+
+      const xAOD::ElectronContainer *electrons = nullptr;
+      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+
+      const xAOD::TauJetContainer *taus = nullptr;
+      ANA_CHECK (m_tauHandle.retrieve (taus, sys));
+
+      const xAOD::MissingETContainer *metCont = nullptr;
+      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
+      const xAOD::MissingET* met = (*metCont)["Final"];
+      if (!met) {
+	ATH_MSG_ERROR("Could not retrieve MET");
+	return StatusCode::FAILURE;	
+      }
+
+      applyTriggerSelection(event, sys);
+      m_Bbranches.at("pass_trigger_SLT").set(*event, trigPassed_SLT, sys);
+      m_Bbranches.at("pass_trigger_DLT").set(*event, trigPassed_DLT, sys);
+
+      // flags for leplep
+      N_LEPTONS_CUT_LEPLEP = false;
+      pass_baseline_LEPLEP = false;
+      pass_LEPLEP = false;
+      // flags for lephad
+      N_LEPTONS_CUT_LEPHAD = false;
+      pass_baseline_LEPHAD = false;
+      pass_LEPHAD = false;
+      // flags for hadhad
+      N_LEPTONS_CUT_HADHAD = false;
+      pass_baseline_HADHAD = false;
+      pass_HADHAD = false;
+
+      //************
+      // lepton
+      //************
+      int n_looseele = 0;
+      int n_loosemuo = 0;
+      bool lep_ptcut_DLT = false;
+      int n_lep = 0;
+      TLorentzVector p4lep[4]; 
+
+      for (const xAOD::Muon *muon : *muons)
+      {
+        bool passMuonWP = muonWPDecorHandle(*muon);
+        m_selected_mu.set(*muon, false, sys);
+        if (passMuonWP && std::abs(muon->eta()) < 2.5
+	    && muon->pt() > m_pt_threshold[HLLTT::DLT][HLLTT::subleadinglep])
+        {
+          if (muon->pt() >  m_pt_threshold[HLLTT::DLT][HLLTT::leadinglep])
+            lep_ptcut_DLT = true;
+          m_selected_mu.set(*muon, true, sys);
+	  if(n_lep<4){ 
+	    p4lep[n_lep] = muon->p4(); 
+	    ++n_lep; 
+	  }
+        }
+        else
+          n_loosemuo += 1;
+      }
+
+      for (const xAOD::Electron *electron : *electrons)
+	{
+	  bool passElectronWP = eleWPDecorHandle(*electron);
+	  m_selected_el.set(*electron, false, sys);
+	  if (passElectronWP && electron->pt() > m_pt_threshold[HLLTT::DLT][HLLTT::subleadinglep])
+	    {
+	      if (electron->pt() > m_pt_threshold[HLLTT::DLT][HLLTT::leadinglep])
+		lep_ptcut_DLT = true;
+	      m_selected_el.set(*electron, true, sys);
+	      if(n_lep<4){
+		p4lep[n_lep] = electron->p4();
+		++n_lep;
+	      }
+	    }
+	  else
+	    n_looseele += 1;
+	}
+
+      if (n_looseele == 0 && n_loosemuo == 0)
+      {
+	// try to save both eetautau, mmtautau 
+	if (n_lep == 4)
+	  N_LEPTONS_CUT_LEPLEP = true;
+	else if (n_lep == 3)
+	  N_LEPTONS_CUT_LEPHAD = true;	      
+	else if (n_lep == 2)
+	  N_LEPTONS_CUT_HADHAD = true;
+      }
+      //************
+      // taujet
+      //************
+      int n_taus = 0;
+      for (const xAOD::TauJet *tau : *taus)
+      {
+        bool isTauID = tauWPDecorHandle(*tau);
+        m_selected_tau.set(*tau, false, sys);
+        if (isTauID && tau->pt() > 20000)
+        {
+          if (std::abs(tau->eta()) < 2.5) {
+	    n_taus += 1;
+	  }
+        }
+      }
+      //************
+      // jet
+      //************
+      int n_jets = 0;
+      bool WPgiven = !m_isBtag.empty();
+      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
+          SG::VIEW_ELEMENTS);
+
+      for (const xAOD::Jet *jet : *jets)
+      {
+	n_jets += 1;
+	if (WPgiven){
+	  if (m_isBtag.get(*jet, sys))
+	    bjets->push_back(jet);	      
+	}
+      }
+      int n_bjets = bjets->size();
+
+      if (N_LEPTONS_CUT_LEPLEP &&n_taus==0){
+        // DLT
+        if (lep_ptcut_DLT){
+	  pass_baseline_LEPLEP = true;
+	  if (trigPassed_DLT && n_bjets==0)
+	    pass_LEPLEP = true;
+        }
+      }
+
+      if (N_LEPTONS_CUT_LEPHAD && n_taus==1){
+        // DLT
+        if (lep_ptcut_DLT){
+           pass_baseline_LEPHAD = true;
+           if (trigPassed_DLT && n_bjets==0)
+              pass_LEPHAD = true;
+        }
+      }
+
+      if (N_LEPTONS_CUT_HADHAD && n_taus ==2 ){
+        // DLT
+	if (lep_ptcut_DLT){
+	  pass_baseline_HADHAD = true;
+	  if (trigPassed_DLT && n_bjets==0)
+	    pass_HADHAD = true;
+        }
+      } 
+
+      pass_baseline_DLT = false;
+      pass_DLT = false;
+ 
+      for(const auto& channel : m_channels){
+	if(channel == HLLTT::LepLep) {
+	  pass_baseline_DLT |= (pass_baseline_LEPLEP);
+	  pass_DLT |= (pass_LEPLEP);
+	}
+	else if(channel == HLLTT::LepHad){
+	  pass_baseline_DLT |= (pass_baseline_LEPHAD);
+          pass_DLT |= (pass_LEPHAD);
+	} 
+	else if(channel == HLLTT::HadHad){
+	  pass_baseline_DLT |= (pass_baseline_HADHAD);
+	  pass_DLT |= (pass_HADHAD);
+	}
+      }
+      m_Bbranches.at("pass_baseline_DLT").set(*event, pass_baseline_DLT, sys);
+      m_Bbranches.at("pass_DLT").set(*event, pass_DLT, sys);
+      m_Bbranches.at("pass_baseline_LEPLEP").set(*event, pass_baseline_LEPLEP, sys);
+      m_Bbranches.at("pass_LEPLEP").set(*event, pass_LEPLEP, sys);
+      m_Bbranches.at("pass_baseline_LEPHAD").set(*event, pass_baseline_LEPHAD, sys);
+      m_Bbranches.at("pass_LEPHAD").set(*event, pass_LEPHAD, sys);
+      m_Bbranches.at("pass_baseline_HADHAD").set(*event, pass_baseline_HADHAD, sys);
+      m_Bbranches.at("pass_HADHAD").set(*event, pass_HADHAD, sys);
+
+      if (!m_bypass && !pass_baseline_DLT) continue;
+
+      // Global event filter true if any syst passes and controls
+      // if event is passed to output writing or not
+      filter.setPassed(true);
+    }
+
+    return StatusCode::SUCCESS;
+  }
+
+  StatusCode HllttSelectorAlg::finalize() {
+    ANA_CHECK (m_filterParams.finalize ());
+    return StatusCode::SUCCESS;
+  }
+
+  void HllttSelectorAlg::applyTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys){
+    //************
+    // trigger selecton
+    //************
+
+    trigPassed_SLT = false;
+    trigPassed_DLT = false;
+    applySLTTriggerSelection(event, sys);
+    applyDiLepTriggerSelection(event, sys);
+  }
+
+
+  void HllttSelectorAlg ::applySLTTriggerSelection(
+						     const xAOD::EventInfo *event,
+						     const CP::SystematicSet &sys)
+  {
+    bool trigPassed_SET = false;
+    bool trigPassed_SMT = false;
+    trigPassed_SLT = false;
+
+    std::vector<std::string> single_ele_paths;
+    std::vector<std::string> single_mu_paths;
+
+    // SLT
+    if(is15){
+      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 25000;
+      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 21000;
+      single_ele_paths = {"trigPassed_HLT_e24_lhmedium_L1EM20VH", "trigPassed_HLT_e60_lhmedium", "trigPassed_HLT_e120_lhloose"};
+      single_mu_paths = {"trigPassed_HLT_mu20_iloose_L1MU15", "trigPassed_HLT_mu50"};
+    }
+    else if(is16 || is17 || is18){
+      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27000;
+      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27000;
+      single_ele_paths = {"trigPassed_HLT_e26_lhtight_nod0_ivarloose", "trigPassed_HLT_e60_lhmedium_nod0", "trigPassed_HLT_e140_lhloose_nod0"};
+      single_mu_paths = {"trigPassed_HLT_mu26_ivarmedium", "trigPassed_HLT_mu50"};
+    }
+    else if (is22) {
+      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27000;
+      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27000;
+      single_ele_paths = {"trigPassed_HLT_e26_lhtight_ivarloose_L1EM22VHI", "trigPassed_HLT_e60_lhmedium_L1EM22VHI", "trigPassed_HLT_e140_lhloose_L1EM22VHI"
+      };
+      single_mu_paths = {"trigPassed_HLT_mu24_ivarmedium_L1MU14FCH", "trigPassed_HLT_mu50_L1MU14FCH"};
+    }
+    else if (is23) {
+      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27000;
+      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27000;
+      single_ele_paths = {"trigPassed_HLT_e26_lhtight_ivarloose_L1eEM26M", "trigPassed_HLT_e60_lhmedium_L1eEM26M", "trigPassed_HLT_e140_lhloose_L1eEM26M"};
+      single_mu_paths = {"trigPassed_HLT_mu24_ivarmedium_L1MU14FCH", "trigPassed_HLT_mu50_L1MU14FCH"};
+    }
+
+    // Pass single electron trigger
+    for(const auto& path : single_ele_paths){
+      trigPassed_SET |= m_triggerdecos.at(path).get(*event, sys);
+      if(trigPassed_SET) break;
+    }
+
+    // Pass single muon trigger
+    for(const auto& path : single_mu_paths){
+      trigPassed_SMT |= m_triggerdecos.at(path).get(*event, sys);
+      if(trigPassed_SMT) break;
+    }
+
+    if (trigPassed_SET || trigPassed_SMT) trigPassed_SLT = true;
+  }
+
+  void HllttSelectorAlg ::applyDiLepTriggerSelection(
+      const xAOD::EventInfo *event,
+      const CP::SystematicSet &sys)
+  {
+    trigPassed_DLT = false;
+
+    std::vector<std::string> dilep_paths;
+
+    // SLT
+    m_pt_threshold[HLLTT::DLT][HLLTT::leadinglep] = 20000;
+    m_pt_threshold[HLLTT::DLT][HLLTT::subleadinglep] = 7000;
+    if(is15){
+      dilep_paths = {"trigPassed_HLT_2e12_lhvloose_L12EM10VH","trigPassed_HLT_mu18_mu8noL1","trigPassed_HLT_e17_lhloose_mu14"};
+    }
+    else if(is16 || is17 || is18){
+      dilep_paths = {"trigPassed_HLT_2e17_lhvloose_nod0_L12EM15VHI","trigPassed_HLT_mu22_mu8noL1","trigPassed_HLT_e17_lhloose_nod0_mu14"};
+    }
+    else if (is22) {
+      dilep_paths = {"trigPassed_HLT_2e17_lhvloose_L12EM15VHI","trigPassed_HLT_mu22_mu8noL1_L1MU14FCH","trigPassed_HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
+    }
+    else if (is23) {
+      dilep_paths = {"trigPassed_HLT_2e17_lhvloose_L12eEM18M","trigPassed_HLT_mu22_mu8noL1_L1MU14FCH","trigPassed_HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
+    }
+
+    // Pass single electron trigger
+    for(const auto& path : dilep_paths){
+     trigPassed_DLT |= m_triggerdecos.at(path).get(*event, sys);
+     if(trigPassed_DLT) break;
+    }
+  }
+}
