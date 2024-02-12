@@ -2,12 +2,15 @@
   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "SelectionFlagsbbyyAlg.h"
+#include "bbyySelectorAlg.h"
+#include <SystematicsHandles/SysFilterReporter.h>
+#include <SystematicsHandles/SysFilterReporterCombiner.h>
+
 
 namespace HHBBYY
 {
 
-  SelectionFlagsbbyyAlg::SelectionFlagsbbyyAlg(const std::string &name,
+  bbyySelectorAlg::bbyySelectorAlg(const std::string &name,
                                 ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
@@ -17,11 +20,13 @@ namespace HHBBYY
   }
 
 
-  StatusCode SelectionFlagsbbyyAlg::initialize()
+  StatusCode bbyySelectorAlg::initialize()
   {
     ATH_MSG_INFO("*********************************\n");
-    ATH_MSG_INFO("      SelectionFlagsbbyyAlg      \n");
+    ATH_MSG_INFO("      bbyySelectorAlg      \n");
     ATH_MSG_INFO("*********************************\n");
+
+    ATH_CHECK (m_filterParams.initialize(m_systematicsList));
 
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     if (!m_isBtag.empty()) {
@@ -82,12 +87,15 @@ namespace HHBBYY
   }
 
 
-  StatusCode SelectionFlagsbbyyAlg::execute()
+  StatusCode bbyySelectorAlg::execute()
   {
-
+    // Global filter originally false
+    CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
+      CP::SysFilterReporter filter (filterCombiner, sys);
+
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
@@ -172,12 +180,18 @@ namespace HHBBYY
         if(m_isMC) m_bbyyCuts[i].w_relativeCounter += eventWeights.at(0);
       }
 
+      if (not (m_bypass or passedall) ) continue;
+
+      // Global event filter true if any syst passes and controls
+      // if event is passed to output writing or not
+      filter.setPassed(true);
+
     }
 
     return StatusCode::SUCCESS;
   }
 
-  StatusCode SelectionFlagsbbyyAlg::finalize()
+  StatusCode bbyySelectorAlg::finalize()
   {
 
     //adapt the following for each syst TODO
@@ -208,7 +222,7 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsbbyyAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &photonTriggers, 
+  void bbyySelectorAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &photonTriggers, 
                                                   CutManager& bbyyCuts) {
 
     if (!bbyyCuts.exists("PASS_TRIGGER"))
@@ -227,7 +241,7 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsbbyyAlg::evaluatePhotonCuts
+  void bbyySelectorAlg::evaluatePhotonCuts
   (const xAOD::PhotonContainer& photons, CutManager& bbyyCuts)
   {
     if (bbyyCuts.exists("TWO_TIGHTID_ISO_PHOTONS"))
@@ -252,7 +266,7 @@ namespace HHBBYY
   }
 
 
-  void SelectionFlagsbbyyAlg::evaluateLeptonCuts
+  void bbyySelectorAlg::evaluateLeptonCuts
   (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
    CutManager& bbyyCuts)
   {
@@ -267,7 +281,7 @@ namespace HHBBYY
 
   }
 
-  void SelectionFlagsbbyyAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
+  void bbyySelectorAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                             const xAOD::JetContainer& jets, CutManager& bbyyCuts)
   {
     int CentralJets=0;

@@ -8,9 +8,13 @@ Analysis Package for $HH\rightarrow b\bar{b} \gamma\gamma$ analyis
   - `bbyy_config`
 - `share/`: yaml files containing configurations used by the components
   - `RunConfig-bbyy`: where all the common flags are set, configurations called by the executables (see below);
+  - `RunConfig-bbyy-bypass`: sets bypass flag to true, flags for the cuts are saved, but no cut is actually applied
+  - Skimming configs, events that do not pass the selection are not saved:
+    - `RunConfig-bbyy-skimming-legacy`: config for ntuple skimming with legacy selection, CutList overwrites default one
+    - `RunConfig-bbyy-skimming-loose`: config for ntuple skimming with loose selection, CutList overwrites default one
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
-  - `SelectionFlagsbbyyAlg`: Find if the event pass the baseline bbyy selection;
+  - `bbyySelectorAlg`: Find if the event pass the bbyy selection defined in the config passed to the ntupler;
   - `BaselineVarsbbyyAlg`: Compute the baseline variables for the analysis.
 
 
@@ -45,4 +49,4 @@ One can change the outputs saved in the TTree by adjusting the base bbyy configu
 # Main developers
 
 The main developments have been performed by (non extensive list, feel free to add your name):
-Giulia Di Gregorio, Sayuka Kita, Spyros Merianos, Lorenzo Santi, Abraham Tishelman-Charny.
+Giulia Di Gregorio, Sayuka Kita, Spyros Merianos, Lorenzo Santi, Abraham Tishelman-Charny, Francesco Curcio.

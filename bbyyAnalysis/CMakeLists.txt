@@ -11,7 +11,7 @@ add_compile_options(-Werror)
 # Build the Athena component library
 atlas_add_component(bbyyAnalysis
   src/BaselineVarsbbyyAlg.cxx
-  src/SelectionFlagsbbyyAlg.cxx
+  src/bbyySelectorAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
   src/ResonantPNNbbyyAlg.cxx
   LINK_LIBRARIES ${ROOT_LIBRARIES}
@@ -43,9 +43,7 @@ atlas_install_python_modules(
 )
 atlas_install_data(
   data/*
-  share/RunConfig-bbyy.yaml
-  share/trigger.yaml
-  share/RunConfig-ResonantPNNbbyy.yaml
+  share/*.yaml
 )
 
 # atlas_install_data( data/* )

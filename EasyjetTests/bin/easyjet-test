@@ -111,8 +111,8 @@ declare -A CONFIGS=(
     # Data
     [bbtt-data22-lite]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     # MC20
-    [bbyy-mc20]=bbyyAnalysis/RunConfig-bbyy.yaml
-    [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-bbyy.yaml
+    [bbyy-mc20]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
+    [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
     [ttHH-mc20]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [bbll-mc20]=bbllAnalysis/RunConfig-bbll.yaml

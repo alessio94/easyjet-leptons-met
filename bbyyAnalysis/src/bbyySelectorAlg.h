@@ -24,16 +24,18 @@
 #include <xAODMuon/MuonContainer.h>
 #include <EasyjetHub/CutManager.h>
 
+#include <SystematicsHandles/SysFilterReporterParams.h>
+
 class CutManager;
 
 namespace HHBBYY
 {
 
   /// \brief An algorithm for counting containers
-  class SelectionFlagsbbyyAlg final : public AthHistogramAlgorithm {
+  class bbyySelectorAlg final : public AthHistogramAlgorithm {
 
     public:
-      SelectionFlagsbbyyAlg(const std::string &name, ISvcLocator *pSvcLocator);
+      bbyySelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
       /// \brief Initialisation method, for setting up tools and other persistent
       /// configs
@@ -54,7 +56,7 @@ namespace HHBBYY
           "AT_LEAST_ONE_B_JET",
           "AT_LEAST_TWO_B_JETS",
           "EXACTLY_ONE_B_JET",
-          "EXACTLY_TWO_B_JETS"
+          "EXACTLY_TWO_B_JETS",
       };
 
       void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
@@ -104,6 +106,10 @@ namespace HHBBYY
 
       Gaudi::Property<bool> m_isMC
         { this, "isMC", false, "Is this simulation?" };
+
+      CP::SysFilterReporterParams m_filterParams {this, "bbyy selection"};
+      Gaudi::Property<bool> m_bypass
+        { this, "bypass", false, "Run the selector algorithm in run-through mode" };
 
       SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
         this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};

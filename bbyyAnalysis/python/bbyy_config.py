@@ -73,9 +73,11 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
         )
     )
 
+    selection_name = flags.Analysis.selection_name
+
     cfg.addEventAlgo(
-        CompFactory.HHBBYY.SelectionFlagsbbyyAlg(
-            "SelectionFlagsbbyyAlg",
+        CompFactory.HHBBYY.bbyySelectorAlg(
+            "bbyySelectorAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
             jets="bbyyAnalysisJets_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
@@ -84,7 +86,9 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_bbyy_cutflow,
             photonTriggers=flags.Analysis.TriggerChains,
+            eventDecisionOutputDecoration=f"bbyy_pass_{selection_name}_%SYS%",
             isMC=flags.Input.isMC,
+            bypass=flags.Analysis.bypass,
         )
     )
 
@@ -163,7 +167,9 @@ def bbyy_branches(flags):
     for var in vbfjet_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
-    branches += ["EventInfo.PassAllCuts_%SYS% -> bbyy_PassAllCuts_%SYS%"]
+    s_name = flags.Analysis.selection_name
+    branches += \
+        [f"EventInfo.bbyy_pass_{s_name}_%SYS% -> bbyy_pass_{s_name}_%SYS%"]
 
     if (flags.Analysis.save_bbyy_cutflow):
         cutList = flags.Analysis.CutList
