@@ -62,6 +62,9 @@ namespace HHBBTT
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
+    if (!m_PCBT.empty()) {
+      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
+    }
 
 
     for (const std::string &var : m_floatVariables){
@@ -213,6 +216,7 @@ namespace HHBBTT
       bool found_bb = false;
 
       bool WPgiven = !m_isBtag.empty();
+      bool PCBTgiven = !m_PCBT.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       for(const xAOD::Jet* jet : *jets) {
         if (WPgiven) {
@@ -233,6 +237,10 @@ namespace HHBBTT
         m_Fbranches.at("Jet_b2_eta").set(*event, b2.Eta(), sys);
         m_Fbranches.at("Jet_b2_phi").set(*event, b2.Phi(), sys);
         m_Fbranches.at("Jet_b2_E").set(*event,   b2.E(), sys);
+        if(PCBTgiven){
+          m_Ibranches.at("Jet_b1_pcbt").set(*event,m_PCBT.get(*bjets->at(0), sys),sys);
+          m_Ibranches.at("Jet_b2_pcbt").set(*event,m_PCBT.get(*bjets->at(1), sys),sys);
+        }
 
 
         m_Fbranches.at("H_bb_pt").set(*event, bb.Pt(), sys);

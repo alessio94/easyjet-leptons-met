@@ -98,6 +98,8 @@ private:
     
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
+    CP::SysReadDecorHandle<int> 
+    m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
     Gaudi::Property<bool> m_storeHighLevelVariables
       { this, "storeHighLevelVariables", false, "Flag to store high level variables in output" };

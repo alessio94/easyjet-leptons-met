@@ -1,0 +1,8 @@
+include: bbttAnalysis/RunConfig-bbtt.yaml
+
+# For PCBT
+small_R_jet:
+  btag_wp: "GN2v00LegacyWP_FixedCutBEff_77"
+  btag_extra_wps:
+    - GN2v00LegacyWP_Continuous
+  variables_int_bjets: ["pcbt"]

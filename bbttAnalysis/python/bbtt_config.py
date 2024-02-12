@@ -125,6 +125,9 @@ def bbtt_cfg(
             )
         )
 
+    btag_pcbt_wps \
+        = [wp for wp in flags.Analysis.small_R_jet.btag_extra_wps if "Continuous" in wp] # noqa
+
     # calculate final bbtt vars
     cfg.addEventAlgo(
         CompFactory.HHBBTT.BaselineVarsbbttAlg(
@@ -139,6 +142,7 @@ def bbtt_cfg(
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            PCBTDecorName=("ftag_quantile_" + btag_pcbt_wps[0]) if len(btag_pcbt_wps)>0 else "", # noqa
             storeHighLevelVariables=flags.Analysis.store_high_level_variables,
             floatVariableList=float_variables,
             intVariableList=int_variables
