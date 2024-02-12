@@ -191,3 +191,5 @@ Remember that in order to submit you need to do:
 ```
 lsetup panda
 ```
+
+Note: if you want to retrieve CutFlows saved as TEfficiency, you will need to set `mergeOutput` to `False` in [easyjet-gridsubmit](https://gitlab.cern.ch/easyjet/easyjet/-/blame/main/EasyjetHub/bin/easyjet-gridsubmit#L76), as the merge step doesn't support TEfficiency merging.
