@@ -65,6 +65,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             "BaselineVarsbbyyAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
             photonWP=PhotonWPLabel,
+            muons="bbyyAnalysisMuons_%SYS%",
+            electrons="bbyyAnalysisElectrons_%SYS%",
             jets="bbyyAnalysisJets_%SYS%",
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
@@ -148,7 +150,7 @@ def bbyy_branches(flags):
     for var in dihiggs_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
-    n_object = ["nPhotons", "nJets", "nCentralJets", "nBJets"]
+    n_object = ["nPhotons", "nJets", "nCentralJets", "nBJets", "nLeptons"]
     for var in n_object:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 

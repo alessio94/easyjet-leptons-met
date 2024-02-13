@@ -18,6 +18,8 @@
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
+#include <xAODMuon/MuonContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
@@ -60,6 +62,12 @@ namespace HHBBYY
 
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_photonHandle{ this, "photons", "",   "Photons container to read" };
+
+    CP::SysReadHandle<xAOD::ElectronContainer>
+    m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+
+    CP::SysReadHandle<xAOD::MuonContainer>
+    m_muonHandle{ this, "muons", "",   "Muon container to read" };
 
     Gaudi::Property<std::string> m_photonWPName
       { this, "photonWP", "","Photon ID + Iso working point" };
@@ -110,7 +118,7 @@ namespace HHBBYY
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
     std::vector<std::string> m_Ivarnames{
-      "nPhotons", "nBJets", "nJets", "nCentralJets",
+      "nPhotons", "nBJets", "nJets", "nCentralJets", "nLeptons",
       // leading and subleading btagged jets
       "Jet_b1_truthLabel", "Jet_b2_truthLabel",
       "Jet_b1_pcbt", "Jet_b2_pcbt",
