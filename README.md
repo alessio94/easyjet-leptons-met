@@ -29,7 +29,13 @@ Note the `--recursive` argument, which is needed to get the submodules in the pa
 In case you want to make some developments to the software itself, we recommend you to:
 1. Fork the branch using [this link](https://gitlab.cern.ch/easyjet/easyjet/-/forks/new). Please remember to put your username in the Project URL.
 2. Clone the repository and set it as upstream:
-``` git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git ```
+
+``` 
+setupATLAS
+lsetup git
+git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+```
+
 3. Go to the directory and set your forked branch as origin and fetch it:
 ``` 
 cd easyjet
