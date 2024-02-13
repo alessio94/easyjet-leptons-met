@@ -7,8 +7,9 @@ Analysis Package for $HH\rightarrow b\bar{b} \gamma\gamma$ analyis
 - `python/`: Main python code to configure the components (objects, selections as well as the variables to save)
   - `bbyy_config`
 - `share/`: yaml files containing configurations used by the components
-  - `RunConfig-bbyy`: where all the common flags are set, configurations called by the executables (see below);
-  - `RunConfig-bbyy-bypass`: sets bypass flag to true, flags for the cuts are saved, but no cut is actually applied
+  - `RunConfig-bbyy-base`: where all the common flags are set, configurations called by the executables, no `CutList` defined here, all configs that define a `CutList` should include this (see below);
+  -`RunConfig-bbyy`: includes `RunConfig-bbyy-base` adding a `CutList`;
+  - `RunConfig-bbyy-bypass`: sets bypass flag to true, flags for the cuts are saved, but no cut is actually applied;
   - Skimming configs, events that do not pass the selection are not saved:
     - `RunConfig-bbyy-skimming-legacy`: config for ntuple skimming with legacy selection, CutList overwrites default one
     - `RunConfig-bbyy-skimming-loose`: config for ntuple skimming with loose selection, CutList overwrites default one
