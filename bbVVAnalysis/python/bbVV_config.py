@@ -10,24 +10,28 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
+    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
             containerInKey=MuonWPLabel + muonkey,
             containerOutKey="bbVVAnalysisMuons_%SYS%",
-            muonSF_WP=MuonWPLabel,
+            muonSF_WP=TightMuonWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    TightEleWP = flags.Analysis.Electron.extra_wps[0]
+    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
             containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="bbVVAnalysisElectrons_%SYS%",
-            eleSF_WP=ElectronWPLabel,
+            eleSF_WP=TightEleWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -128,10 +132,6 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         )
 
     # Selection
-    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
-    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
-    TightEleWP = flags.Analysis.Electron.extra_wps[0]
-    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.HHBBVV.HHbbVVSelectorAlg(
             "HHbbVVSelectorAlg",
