@@ -17,6 +17,16 @@ namespace ttHH
       : AthHistogramAlgorithm(name, pSvcLocator)
   { }
 
+
+  template<typename ParticleType>
+  std::pair<int, int> BaselineVarsttHHAlg::truthOrigin(const ParticleType* particle) {
+    static const SG::AuxElement::ConstAccessor<int> lepttruthOrigin("truthOrigin");
+    static const SG::AuxElement::ConstAccessor<int> lepttruthType("truthType");
+    
+    return {lepttruthOrigin(*particle), lepttruthType(*particle)};
+  }
+
+  
   StatusCode BaselineVarsttHHAlg::initialize()
   {
     ATH_MSG_INFO("*********************************\n");
@@ -105,7 +115,7 @@ namespace ttHH
       TLorentzVector mu2(0.,0.,0.,0.);
       TLorentzVector mumu(0.,0.,0.,0.);
       TLorentzVector emu(0.,0.,0.,0.);
-
+      
       //auto btag_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       //auto btag_jets = *bjets;
       const xAOD::JetContainer btag_jets = *bjets;
@@ -347,12 +357,65 @@ namespace ttHH
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
 
+      //----------------------------------------------------------
+      //-- Multileptons
+
+      size_t muonSize = muons->size();
+      size_t electronSize = electrons->size();
+      int leptonCount = muonSize + electronSize;
+        
+      if (leptonCount == 2){
+
+        //-- total charge
+        int totalCharge = 0;
+        for (const auto& muon : *muons) 
+          totalCharge += muon->charge();
+        for (const auto& electron : *electrons) 
+          totalCharge += electron->charge();
+        
+        m_Ibranches.at("total_charge").set(*event, totalCharge, sys);
+        m_Ibranches.at("dilept_type").set(*event, muonSize == 2 ? 3 : (muonSize == 1 ? 2 : 1), sys);
+
+        //-- Filling Lepton branches
+        if (muonSize==2){ // mumu
+          
+          const xAOD::Muon* muon0 = muons->at(0);
+          const xAOD::Muon* muon1 = muons->at(1);
+          updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
+          updateLeptonBranch(event, 2, muon1, 13, m_isMC ? m_mu_SF.get(*muon1, sys) : 1.0 , sys);
+          
+        } else if (muonSize==1){ // emu
+          
+          const xAOD::Muon* muon0 = muons->at(0);
+          const xAOD::Electron* electron0 = electrons->at(0);
+          if (muon0->pt()>electron0->pt()){
+            updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
+            updateLeptonBranch(event, 2, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+          } else {
+            updateLeptonBranch(event, 2, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
+            updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+          }
+          
+        } else { //ee
+          
+          const xAOD::Electron* electron0 = electrons->at(0);
+          const xAOD::Electron* electron1 = electrons->at(1);          
+          updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+          updateLeptonBranch(event, 2, electron1, 11, m_isMC ? m_ele_SF.get(*electron1, sys) : 1.0 , sys);
+          
+        }
+      } else { //not 2l
+        m_Ibranches.at("dilept_type").set(*event, 0, sys);
+      }
+      //-- 3l
+      m_Ibranches.at("trilept_type").set(*event, (leptonCount == 3) ? 1 : 0, sys);
+      //--
+      
       for (const xAOD::Jet *jet : *jets) // Jets here can be every type of jet (No Working point selected)
       {
         HT += jet->pt();
       }
       m_Fbranches.at("HT").set(*event, HT, sys);
-
       m_Ibranches.at("n_leptons").set(*event, muons->size() + electrons->size(), sys);
     }
     return StatusCode::SUCCESS;
@@ -413,4 +476,49 @@ namespace ttHH
 
     return chi_squared;
   }
+
+
+//-------------------------------------------------------------------------------------------
+// Fill the branches Lepton*_*
+  
+template<typename ParticleType>
+void BaselineVarsttHHAlg::updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
+                                       int lep_pdgid, float lep_sf, 
+                                       const auto& sys) {
+
+  
+    // Branch name using lepton index
+    std::string prefix = "Lepton" + std::to_string(leptonIndex) + "_";
+
+    TLorentzVector lep = particle->p4();
+    
+    // Kinematics
+    m_Fbranches.at(prefix + "pt").set(*event, lep.Pt(), sys);
+    m_Fbranches.at(prefix + "E").set(*event, lep.E(), sys);
+    m_Fbranches.at(prefix + "eta").set(*event, lep.Eta(), sys);
+    m_Fbranches.at(prefix + "phi").set(*event, lep.Phi(), sys);
+
+    // Easyjet properties
+    m_Ibranches.at(prefix + "charge").set(*event, particle->charge(), sys);
+    m_Ibranches.at(prefix + "pdgid").set(*event, -1*lep_pdgid*particle->charge(), sys);
+    if(m_isMC) m_Fbranches.at(prefix + "effSF").set(*event, lep_sf, sys);
+
+    // Truth
+    auto [lep_truthOrigin, lep_truthType] = truthOrigin(particle);
+    m_Ibranches.at(prefix + "truthOrigin").set(*event, lep_truthOrigin, sys);
+    m_Ibranches.at(prefix + "truthType").set(*event, lep_truthType, sys);
+    int lep_isPrompt = 0;
+    
+    if (lep_pdgid==13){ // simplistic
+      if (lep_truthType==6) lep_isPrompt=1; // isolated prompts
+    } else if (lep_pdgid==11){
+      if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
+    }
+    
+    m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
+    m_Ibranches.at(prefix + "isTight").set(*event, 1, sys);
+
+}
+
+
 }

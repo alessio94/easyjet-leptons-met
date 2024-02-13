@@ -36,11 +36,20 @@ public:
     /// \brief Execute method, for actions to be taken in the event loop
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
+
     
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
+    
+    template<typename ParticleType>
+      std::pair<int, int> truthOrigin(const ParticleType* particle);
+    template<typename ParticleType>
+      void updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
+                                       int lep_pdgid, float lep_sf, 
+                                             const auto& sys);
+    
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
@@ -133,7 +142,15 @@ private:
       "Muon2_pt", "Muon2_eta", "Muon2_phi", "Muon2_E",
       "ee_m", "ee_pt", "ee_dR", "ee_eta", "ee_phi", 
       "mumu_m", "mumu_pt", "mumu_dR", "mumu_eta", "mumu_phi",
-      "emu_m", "emu_pt", "emu_dR", "emu_eta", "emu_phi"
+        "emu_m", "emu_pt", "emu_dR", "emu_eta", "emu_phi",
+
+        "Lepton1_pt", "Lepton1_eta", 
+        "Lepton1_phi", "Lepton1_E",
+        "Lepton1_effSF",
+        "Lepton2_pt", "Lepton2_eta", 
+        "Lepton2_phi", "Lepton2_E",
+        "Lepton2_effSF",
+        
     };
     std::vector<std::string> m_Fvarnames_MC{
       "Electron1_effSF", "Electron2_effSF",
@@ -144,8 +161,23 @@ private:
     std::vector<std::string> m_Ivarnames{
       //lepton info
       "n_leptons",
+        "Lepton1_isPrompt",
+        "Lepton2_isPrompt",
+        "Lepton1_charge",
+        "Lepton2_charge",
+        "Lepton1_pdgid",
+        "Lepton2_pdgid",
+        "Lepton1_isTight",
+        "Lepton2_isTight",
+        "Lepton1_truthOrigin",
+        "Lepton2_truthOrigin",
+        "Lepton1_truthType",
+        "Lepton2_truthType",
       //jets info
       "nJets", "nBJets",
+        // ML specific
+        "dilept_type","total_charge",
+        "trilept_type",
     };
 
     const float m_targetMassH = 125e3; // Higgs target mass to be used in chi square calculation

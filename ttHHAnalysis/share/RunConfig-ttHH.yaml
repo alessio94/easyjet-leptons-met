@@ -31,6 +31,10 @@ Muon:
   Iso: "PflowLoose_VarRad"
   amount: 2
 
+Lepton:
+  amount: 2
+  variables_int: ["isPrompt", "isTight", "truthOrigin", "truthType"]
+
 # list of triggers per year to consider
 trigger_chains:
   include: ttHHAnalysis/trigger.yaml

@@ -203,6 +203,11 @@ def ttHH_branches(flags):
         for var in leptonPair_variables:
             branches += [f"EventInfo.{lep}_{var}_%SYS% -> ttHH_{lep}_{var}_%SYS%"]
 
+    # ML variables
+    ml_variables = ["dilept_type", "total_charge", "trilept_type"]
+    for var in ml_variables:
+        branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}_%SYS%"]
+
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches
