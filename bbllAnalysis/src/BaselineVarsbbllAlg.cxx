@@ -18,7 +18,7 @@ namespace HHBBLL
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
-   
+
   }
 
   StatusCode BaselineVarsbbllAlg::initialize()
@@ -98,6 +98,8 @@ namespace HHBBLL
       for (const auto& var: m_intVariables) {
         m_Ibranches.at(var).set(*event, -99, sys);
       }
+      
+      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
       TLorentzVector bb;
       TLorentzVector ee;
@@ -112,6 +114,9 @@ namespace HHBBLL
       int n_muons=0;
       std::vector<float> PassElectronIsos;
       std::vector<float> PassMuonIsos;
+      int truthLabel_b1 = -99;
+      int truthLabel_b2 = -99;
+      int nCentralJets = 0;
 
       // Count electrons
       n_electrons = electrons->size();
@@ -126,6 +131,11 @@ namespace HHBBLL
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       for(const xAOD::Jet* jet : *jets) {
+	// count central jets
+        if (std::abs(jet->eta())<2.5) {
+          nCentralJets++;
+        }
+
         if (WPgiven) {
           if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
         }
@@ -136,6 +146,7 @@ namespace HHBBLL
       m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
       m_Ibranches.at("nMuons").set(*event, n_muons, sys);
       m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
+      m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
 
       // Electron sector
       if (electrons->size() > 0)
@@ -340,6 +351,7 @@ namespace HHBBLL
         (electrons->size() == 1 && muons->size() == 1 ) ? emu.Pt() : -99;
       m_Fbranches.at("pTll").set(*event, ll_pt, sys);
 
+      //jet sector
       if (jets->size()>=1)
       {
         m_Fbranches.at("Jet1_pt").set(*event, jets->at(0)->pt(), sys);
@@ -356,12 +368,18 @@ namespace HHBBLL
         m_Fbranches.at("Jet2_E").set(*event, jets->at(1)->e(), sys);
       }
 
+      //b-jet sector
       if (bjets->size()>=1)
       {
         m_Fbranches.at("Jet_b1_pt").set(*event, bjets->at(0)->pt(), sys);
         m_Fbranches.at("Jet_b1_eta").set(*event, bjets->at(0)->eta(), sys);
         m_Fbranches.at("Jet_b1_phi").set(*event, bjets->at(0)->phi(), sys);
         m_Fbranches.at("Jet_b1_E").set(*event, bjets->at(0)->e(), sys);
+
+	if (m_isMC) {
+          truthLabel_b1 = HadronConeExclTruthLabelID(*bjets->at(0));
+          m_Ibranches.at("Jet_b1_truthLabel").set(*event, truthLabel_b1, sys);
+        }
       }
       if (bjets->size()>=2)
       {
@@ -369,6 +387,11 @@ namespace HHBBLL
         m_Fbranches.at("Jet_b2_eta").set(*event, bjets->at(1)->eta(), sys);
         m_Fbranches.at("Jet_b2_phi").set(*event, bjets->at(1)->phi(), sys);
         m_Fbranches.at("Jet_b2_E").set(*event, bjets->at(1)->e(), sys);
+
+	if (m_isMC) {
+          truthLabel_b2 = HadronConeExclTruthLabelID(*bjets->at(1));
+          m_Ibranches.at("Jet_b2_truthLabel").set(*event, truthLabel_b2, sys);
+        }
 
         // build the H(bb) candidate
         bb = bjets->at(0)->p4()+bjets->at(1)->p4();

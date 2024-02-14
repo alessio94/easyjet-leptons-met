@@ -55,7 +55,7 @@ namespace HHBBLL
       "IS_SF",
       "IS_ee",
       "IS_mm",
-      "IS_em"
+      "IS_em",
       };
 
       void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
@@ -63,7 +63,7 @@ namespace HHBBLL
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& bbllCuts);
       void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
-                          const xAOD::JetContainer& jets, CutManager& bbllCuts);
+                          const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts);
       void evaluateBJetLeptonCuts(const xAOD::EventInfo& eventInfo,
 		          const ConstDataVector<xAOD::JetContainer>& bjets,
                           const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons);

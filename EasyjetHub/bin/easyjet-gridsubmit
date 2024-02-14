@@ -73,7 +73,7 @@ def main():
 
     # Prepare some of the prun options here
     submit_opts = {
-        "mergeOutput": True,
+        "mergeOutput": False,
         "outputs": "TREE:output-tree.root",
         "writeInputToTxt": "IN:in.txt",
         "useAthenaPackages": True,

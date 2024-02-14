@@ -97,9 +97,11 @@ namespace HHBBLL
 
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      auto nonbjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       for(const xAOD::Jet* jet : *jets) {
         if (WPgiven) {
           if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+	  else nonbjets->push_back(jet);
         }
       }
 
@@ -120,7 +122,7 @@ namespace HHBBLL
       }
 
       evaluateLeptonCuts(*electrons, *muons, m_bbllCuts);
-      evaluateJetCuts(*bjets, *jets, m_bbllCuts);
+      evaluateJetCuts(*bjets, *nonbjets, m_bbllCuts);
       evaluateBJetLeptonCuts(*event, *bjets, *electrons, *muons);
 
       bool passedall = true;
@@ -229,6 +231,7 @@ namespace HHBBLL
     {
       mee = (electrons.at(0)->p4() + electrons.at(1)->p4()).M();
       Two_Opposite_Sign_Electrons = electrons.at(0)->charge()*electrons.at(1)->charge() == -1;
+
     }
     if (muons.size() >= 2)
     {
@@ -258,23 +261,45 @@ namespace HHBBLL
   }
 
   void SelectionFlagsbbllAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
-                            const xAOD::JetContainer& jets, CutManager& bbllCuts)
+                            const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts)
   {
 
     ///All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the bbll_config file.
 
     bool VBFVeto = false;
     double mbb = -99;
+    float max_mjj = 0;
+    float max_delta_eta_jj = 0;
 
-    if (jets.size() >= 2){
-      double VBF_Max_Delta_Eta_JJ = std::abs(jets.at(0)->p4().Eta() - jets.at(1)->p4().Eta());
-      double VBF_Max_MJJ = (jets.at(0)->p4() + jets.at(1)->p4()).M();
-      VBFVeto = (jets.at(0)->pt() >= 30. * Athena::Units::GeV && jets.at(1)->pt() >= 30. * Athena::Units::GeV && VBF_Max_Delta_Eta_JJ > 4 && VBF_Max_MJJ > 600. * Athena::Units::GeV);
+    if (nonbjets.size() >= 2){
+      bool jetsFound = false;
+
+      for(unsigned int i=0;i<nonbjets.size();i++){
+        for(unsigned int j=0;j<nonbjets.size();j++){
+          if(i==j) continue;
+	  const xAOD::Jet* nonbjet1 = nonbjets.at(i);
+          const xAOD::Jet* nonbjet2 = nonbjets.at(j);
+
+	  if (nonbjet1->pt() >= 30. * Athena::Units::GeV
+            && nonbjet2->pt() >= 30. * Athena::Units::GeV) {
+	    jetsFound = true;
+
+            float mjj = (nonbjet1->p4() + nonbjet2->p4()).M();
+	    float delta_eta_jj = std::abs(nonbjet1->eta() - nonbjet2->eta());
+
+	    if (mjj > max_mjj){
+              max_mjj = mjj;
+	      max_delta_eta_jj = delta_eta_jj;
+            }
+	  }
+        }
+      }
+
+      if (jetsFound) {
+        VBFVeto = !(max_delta_eta_jj > 4 && max_mjj > 600. * Athena::Units::GeV);
+      }
     }
     if(bbllCuts.exists("VBFVETO_SR1")) bbllCuts("VBFVETO_SR1").passed = VBFVeto;
-
-    if (jets.size() >= 2 && bbllCuts.exists("AT_LEAST_TWO_JETS"))
-      bbllCuts("AT_LEAST_TWO_JETS").passed = true;
 
     if (bjets.size()==2 && bbllCuts.exists("EXACTLY_TWO_B_JETS"))
       bbllCuts("EXACTLY_TWO_B_JETS").passed = true;

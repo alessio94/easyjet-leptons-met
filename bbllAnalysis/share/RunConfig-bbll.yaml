@@ -20,6 +20,11 @@ small_R_jet:
   amount: 2
   amount_bjet: 2
 
+  # to use multiple btagging WPs
+  btag_extra_wps:
+    - GN2v00LegacyWP_FixedCutBEff_77
+    - GN2v00NewAliasWP_FixedCutBEff_77
+
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"

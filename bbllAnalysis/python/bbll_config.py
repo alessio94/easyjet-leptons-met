@@ -34,7 +34,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             checkOR=flags.Analysis.do_overlap_removal,
             eleSF_WP=ElectronWPLabel,
             isMC=flags.Input.isMC,
-            minPt=10 * Units.GeV,
+            minPt=9 * Units.GeV,
         )
     )
 
@@ -125,7 +125,8 @@ def get_BaselineVarsbbllAlg_variables(flags):
 
     float_variable_names += ["mll", "pTll"]
 
-    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons"]
+    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets",
+                           "Jet_b1_truthLabel", "Jet_b2_truthLabel"]
 
     return float_variable_names, int_variable_names
 

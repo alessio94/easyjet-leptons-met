@@ -141,6 +141,16 @@ ntupler_bbtt_mc23_lite_syst:
   script:
     - easyjet-test bbtt-mc23-lite-syst
 
+ntupler_bbll_mc23_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test bbll-mc23-lite
+
+ntupler_bbll_mc23_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test bbll-mc23-lite
+
 # systematics enabled
 
 syst_mc23:
