@@ -25,6 +25,7 @@ MCSampleYears = {
     'r14622': (2022,),
     'r14799': (2023,),
     'r14908': (2023,),
+    'r15224': (2023,),
 }
 
 
@@ -39,6 +40,7 @@ class SampleTypes(Enum):
     mc23a = "r14622"  # run3, 2022
     mc23c = "r14799"  # run3, 2023
     mc23c_af3 = "r14908"  # run3, 2023, fastsim
+    mc23d = "r15224"  # run3, 2023 reprocessed
     # ptag
     mc20 = "p5057"
     # ptag for Xbb tagger
@@ -147,6 +149,8 @@ def get_campaign(flags):
         campaign = SampleTypes.mc23c
     elif SampleTypes.mc23c_af3.value in tags:
         campaign = SampleTypes.mc23c_af3
+    elif SampleTypes.mc23d.value in tags:
+        campaign = SampleTypes.mc23d
     else:
         raise LookupError(
             "Cannot determine campaign "
