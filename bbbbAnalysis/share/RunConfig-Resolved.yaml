@@ -24,6 +24,9 @@ orthogonality:
   include: EasyjetHub/orth-config.yaml 
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
+grl_years:
+  include: EasyjetHub/bjet_grl_years.yaml
+
 grl_files:
   include: EasyjetHub/bjet_grl.yaml
 

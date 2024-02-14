@@ -110,6 +110,9 @@ where `general_grl.yaml` contains only the file names by year:
 or for analysis relying on b-jet triggers,
 
 ```yaml
+grl_years:
+  include: bjet_grl_years.yaml
+
 grl_files:
   include: bjet_grl.yaml
 ```
