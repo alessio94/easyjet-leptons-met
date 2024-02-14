@@ -22,6 +22,8 @@ from EasyjetHub.output.ttree.minituple_config import minituple_cfg
 from bbyyAnalysis.bbyy_config import bbyy_branches
 from bbyyAnalysis.bbyy_config import bbyy_cfg
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
+from EasyjetHub.algs.orthogonality.orth_config import orth_branches
+from EasyjetHub.algs.orthogonality.orth_config import orth_cfg
 
 
 def bbyy_job_cfg():
@@ -39,6 +41,20 @@ def bbyy_job_cfg():
     seqname = "bbyySeq"
     cfg = default_sequence_cfg(flags, seqname)
 
+    # Optionally run orthogonality check (only runs if you set do_orth_check to true in your RunConfig)
+    extra_orth_branches = []
+    if(flags.Analysis.orthogonality.do_orth_check):
+        cfg.merge(
+            orth_cfg(
+                flags,
+                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
+                photonkey=flags.Analysis.container_names.output.photons,
+            ),
+            seqname
+        )
+        
+        extra_orth_branches = orth_branches(flags)
+    
     # Extend the list of output branches via flags
     # For more sophistication this could be done using
     # custom BranchManagers
@@ -57,24 +73,25 @@ def bbyy_job_cfg():
         cfg.merge(event_counter_cfg("n_bbyy"), seqname)
 
         extra_bbyy_branches = bbyy_branches(flags)
-
+        
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
     # rather than statically in the yaml
+    extra_branches = extra_bbyy_branches + extra_orth_branches
     if flags.Analysis.out_file:
         for tree_flags in flags.Analysis.ttree_output:
             cfg.merge(
                 minituple_cfg(
                     flags,tree_flags,
                     flags.Analysis.out_file,
-                    extra_output_branches = extra_bbyy_branches
+                    extra_output_branches = extra_branches
                 ),
                 seqname,
             )
 
     # Record the number of events for logging and tests
     cfg.merge(event_counter_cfg("n_events"), seqname)
-
+    
     return cfg, flags, args
 
 

@@ -98,6 +98,10 @@ def analysis_configuration(parser="default"):
     do_PRW = flags.Input.isMC and not flags.Input.isPHYSLITE
     flags.addFlag("Analysis.doPRW", do_PRW)
 
+    # set HH orthogonality flags, if orthogonality is contained in the given config
+    if 'orthogonality' in flags.Analysis:
+        setHHOrthFlags(flags)
+
     log.info(
         f"Self-configured: datatype: '{flags.Analysis.DataType}', "
         f"is PHYSLITE? {flags.Input.isPHYSLITE}"
@@ -148,3 +152,72 @@ def get_trigger_chains(flags):
             raise err
 
     return list(trigger_chains)
+
+
+def setHHOrthFlags(flags):
+    # If running orthogonality checks, need to ensure you process
+    # the collections required by the orthogonality algorithm,
+    # which may or may not be specified to run in your given ntupler
+    # In this case, only assuming the HH orthogonality check exists.
+    # This can be configured differently if different
+    # orthogonality checks and algorithms are introduced
+    if flags.Analysis.orthogonality.do_orth_check:
+
+        # need to process small R jets and photons for the HH orthogonality checks
+        # Also need to set all other objects to True and define a baseline ID
+        # because of overlap removal
+        flags.Analysis.do_small_R_jets = True
+        flags.Analysis.do_photons = True
+        flags.Analysis.do_electrons = True
+        flags.Analysis.do_muons = True
+        flags.Analysis.do_met = True
+        flags.Analysis.do_taus = True
+
+        # if nominal analysis is running a WP different
+        # from the orthogonality WP, should make sure both
+        # are run so that they're accessible by the time you
+        # get to the analysis and orthogonality algorithms
+
+        # b-jets
+        HHBjet_WP = flags.Analysis.orthogonality.HHBjet.btag_wp
+        # Take WP from orthogonality configuration if
+        # the collection was not already going to be run
+        if flags.Analysis.small_R_jet.btag_wp == "":
+            flags.Analysis.small_R_jet.btag_wp = HHBjet_WP
+        # WP is there but it differs from the orthogonality WP
+        elif flags.Analysis.small_R_jet.btag_wp != "" and flags.Analysis.small_R_jet.btag_wp != HHBjet_WP: # noqa
+            flags.Analysis.small_R_jet.btag_extra_wps += [HHBjet_WP]
+
+        # Photons (ID and Iso)
+        HHPhoton_ID = flags.Analysis.orthogonality.HHPhoton.ID
+        HHPhoton_Iso = flags.Analysis.orthogonality.HHPhoton.Iso
+        if flags.Analysis.Photon.ID == "" and flags.Analysis.Photon.Iso == "":
+            flags.Analysis.Photon.ID = HHPhoton_ID
+            flags.Analysis.Photon.Iso = HHPhoton_Iso
+        elif flags.Analysis.Photon.ID != HHPhoton_ID or flags.Analysis.Photon.Iso != HHPhoton_Iso: # noqa
+            flags.Analysis.Photon.extra_wps += [(HHPhoton_ID, HHPhoton_Iso)]
+
+        # Electrons (ID and Iso)
+        HHElectron_ID = flags.Analysis.orthogonality.HHElectron.ID
+        HHElectron_Iso = flags.Analysis.orthogonality.HHElectron.Iso
+        if flags.Analysis.Electron.ID == "" and flags.Analysis.Electron.Iso == "":
+            flags.Analysis.Electron.ID = HHElectron_ID
+            flags.Analysis.Electron.Iso = HHElectron_Iso
+        elif flags.Analysis.Electron.ID != HHElectron_ID or flags.Analysis.Electron.Iso != HHElectron_Iso: # noqa
+            flags.Analysis.Electron.extra_wps += [(HHElectron_ID, HHElectron_Iso)]
+
+        # Muon (ID and Iso)
+        HHMuon_ID = flags.Analysis.orthogonality.HHMuon.ID
+        HHMuon_Iso = flags.Analysis.orthogonality.HHMuon.Iso
+        if flags.Analysis.Muon.ID == "" and flags.Analysis.Muon.Iso == "":
+            flags.Analysis.Muon.ID = HHMuon_ID
+            flags.Analysis.Muon.Iso = HHMuon_Iso
+        elif flags.Analysis.Muon.ID != HHMuon_ID or flags.Analysis.Muon.Iso != HHMuon_Iso: # noqa
+            flags.Analysis.Muon.extra_wps += [(HHMuon_ID, HHMuon_Iso)]
+
+        # Taus (ID only, no Iso)
+        HHTau_ID = flags.Analysis.orthogonality.HHTau.ID
+        if flags.Analysis.Tau.ID == "":
+            flags.Analysis.Tau.ID = HHTau_ID
+        elif flags.Analysis.Tau.ID != HHTau_ID:
+            flags.Analysis.Tau.extra_wps += [HHTau_ID]

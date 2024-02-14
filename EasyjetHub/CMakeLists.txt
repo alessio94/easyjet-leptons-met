@@ -51,6 +51,7 @@ atlas_add_component(EasyjetHub
   src/JetDeepCopyAlg.cxx
   src/TauDecoratorAlg.cxx
   src/EventInfoGlobalAlg.cxx
+  src/OrthogonalityAlg.cxx
   src/components/*.cxx
   LINK_LIBRARIES EasyjetHubLib
 )

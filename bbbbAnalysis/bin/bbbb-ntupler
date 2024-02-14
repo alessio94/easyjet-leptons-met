@@ -27,7 +27,8 @@ from bbbbAnalysis.utils.option_validation import validate_hh4b_analysis_prerequi
 from bbbbAnalysis.config.dihiggs import dihiggs_cfg
 from bbbbAnalysis.config.boosted import boosted_branches
 from bbbbAnalysis.config.resolved import resolved_branches
-
+from EasyjetHub.algs.orthogonality.orth_config import orth_branches
+from EasyjetHub.algs.orthogonality.orth_config import orth_cfg
 
 def hh4b_parser():
     # Get and customise the parser
@@ -64,6 +65,20 @@ def hh4b_job_cfg():
         seqname,
     )
 
+    # Optionally run orthogonality check (only runs if you set do_orth_check to true in your RunConfig)
+    extra_orth_branches = []
+    if(flags.Analysis.orthogonality.do_orth_check):
+        cfg.merge(
+            orth_cfg(
+                flags,
+                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
+                photonkey=flags.Analysis.container_names.output.photons,
+            ),
+            seqname
+        )
+        
+        extra_orth_branches = orth_branches(flags)
+
     # Determine the list of output branches
     # For more sophistication this could be done using
     # custom BranchManagers
@@ -73,6 +88,8 @@ def hh4b_job_cfg():
             bbbb_branches += boosted_branches(flags)
         if flags.Analysis.do_resolved_dihiggs:
             bbbb_branches += resolved_branches(flags)
+        if(flags.Analysis.orthogonality.do_orth_check):
+            bbbb_branches += extra_orth_branches
 
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically

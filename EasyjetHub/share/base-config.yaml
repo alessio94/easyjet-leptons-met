@@ -48,6 +48,7 @@ Photon:
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
   forceFullSimConfig: false
+  extra_wps: []
 
 Electron:
   ID: ""
@@ -56,6 +57,7 @@ Electron:
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
   forceFullSimConfig: false
+  extra_wps: []
 
 Muon:
   max_eta: 2.5
@@ -64,12 +66,14 @@ Muon:
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
+  extra_wps: []
 
 Tau:
   ID: ""
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: ["charge"]
+  extra_wps: []
 
 Lepton:
   amount: 0

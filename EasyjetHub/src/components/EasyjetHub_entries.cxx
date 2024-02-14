@@ -12,6 +12,7 @@
 #include "../TauDecoratorAlg.h"
 #include "../TruthParticleInformationAlg.h"
 #include "../EventInfoGlobalAlg.h"
+#include "../OrthogonalityAlg.h"
 
 using namespace Easyjet;
 
@@ -29,3 +30,4 @@ DECLARE_COMPONENT(JetDeepCopyAlg)
 DECLARE_COMPONENT(TauDecoratorAlg)
 DECLARE_COMPONENT(TruthParticleInformationAlg)
 DECLARE_COMPONENT(EventInfoGlobalAlg)
+DECLARE_COMPONENT(OrthogonalityAlg)
