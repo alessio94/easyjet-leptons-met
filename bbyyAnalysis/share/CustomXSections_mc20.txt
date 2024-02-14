@@ -1,3 +1,16 @@
-dataset_number/I:physics_short/C:crossSection_pb/D:genFiltEff/D:kFactor/D:relUncertUP/D:relUncertDOWN/D:generator_name/C:etag/C
-600021          PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0               0.0000820991808                1.0            1.0             0.0             0.0             Powheg+Pythia8(v.244p3)+EvtGen(v.1.7.0)     e8222
-600022          PhPy8EG_PDF4LHC15_HHbbyy_cHHH10d0               0.00177736            1.0            1.0             0.0             0.0             Powheg+Pythia8(v.244p3)+EvtGen(v.1.7.0)         e8222
+dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUncertUP/D:relUncertDOWN/D
+600021  PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0                          8.20992E-05  1.0  1.0  0.0  0.0
+600022  PhPy8EG_PDF4LHC15_HHbbyy_cHHH10d0                          1.77736E-03  1.0  1.0  0.0  0.0
+503004  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1cv1                        4.56371E-06  1.0  1.0  0.0  0.0
+503007  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1p5cv1                      8.87359E-06  1.0  1.0  0.0  0.0
+503011  MGPy8EG_hh_bbyy_vbf_novhh_l2cvv1cv1                        4.12215E-06  1.0  1.0  0.0  0.0
+503012  MGPy8EG_hh_bbyy_vbf_novhh_l10cvv1cv1                       2.59277E-04  1.0  1.0  0.0  0.0
+503013  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1cv0p5                      2.89740E-05  1.0  1.0  0.0  0.0
+508689  MGPy8EG_hh_bbyy_vbf_novhh_l5mcvv1cv0p5                     1.71126E-05  1.0  1.0  0.0  0.0
+343981  PowhegPythia8EvtGen_NNLOPS_nnlo_30_ggH125_gamgam           1.10277E-01  1.0  1.0  0.0  0.0
+346214  PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_gamgam            8.58514E-03  1.0  1.0  0.0  0.0
+345318  PowhegPythia8EvtGen_NNPDF30_AZNLO_WpH125J_Hyy_Wincl_MINLO  1.90680E-03  1.0  1.0  0.0  0.0
+345317  PowhegPythia8EvtGen_NNPDF30_AZNLO_WmH125J_Hyy_Wincl_MINLO  1.20946E-03  1.0  1.0  0.0  0.0
+345319  PowhegPythia8EvtGen_NNPDF30_AZNLO_ZH125J_Hyy_Zincl_MINLO   1.72792E-03  1.0  1.0  0.0  0.0
+345061  PowhegPythia8EvtGen_NNPDF3_AZNLO_ggZH125_HgamgamZinc       2.78529E-04  1.0  1.0  0.0  0.0
+346525  PowhegPythia8EvtGen_A14NNPDF23_NNPDF30ME_ttH125_gamgam     1.15112E-03  1.0  1.0  0.0  0.0
