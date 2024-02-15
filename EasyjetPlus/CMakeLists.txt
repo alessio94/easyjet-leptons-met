@@ -15,5 +15,7 @@ atlas_add_component(EasyjetPlus
   LINK_LIBRARIES ${ROOT_LIBRARIES} GaudiKernel AthenaBaseComps AsgTools PMGAnalysisInterfacesLib
 )
 
-atlas_install_joboptions( share/*.py )
+atlas_install_runtime( scripts/*.py POST_BUILD_CMD ${ATLAS_FLAKE8} )
+
+
 

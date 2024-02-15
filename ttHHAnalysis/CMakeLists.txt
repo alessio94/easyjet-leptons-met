@@ -31,6 +31,7 @@ atlas_add_component(ttHHAnalysis
 atlas_install_scripts(
   bin/ttHH-ntupler
 )
+atlas_install_runtime( scripts/*.py POST_BUILD_CMD ${ATLAS_FLAKE8} )
 
 atlas_install_python_modules(
   python/ttHH_config.py
