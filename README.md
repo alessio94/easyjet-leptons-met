@@ -26,6 +26,8 @@ Note the `--recursive` argument, which is needed to get the submodules in the pa
 
 ### Installation as developer
 
+If not familiar with git already, pleas have a look at the [ATLAS git tutorial](https://atlassoftwaredocs.web.cern.ch/gittutorial/)
+
 In case you want to make some developments to the software itself, we recommend you to:
 1. Fork the branch using [this link](https://gitlab.cern.ch/easyjet/easyjet/-/forks/new). Please remember to put your username in the Project URL.
 2. Clone the repository and set it as upstream:
@@ -60,9 +62,21 @@ git checkout YourExisitingBranch
 ```
 (don't use origin/YourExisitingBranch).
 
-6. Once your changes are done you can create a Merge Request (make sure you merge onto the upstream main)
+6. Once your local changes you should commit them and push them on your fork
 
-7. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
+```
+git add UpdatedFile1
+git add UpdatedFile2
+...
+git commit -m "Your description"
+git push origin YourNewFavoriteBranch
+```
+
+This can be repeated several times if needed
+
+7. When your development is complet, you can create a Merge Request (make sure you merge onto the upstream main). Please favour small and contained MRs, instead of big ones introducing several features.
+
+8. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
 ```
 git pull --rebase upstream main
 ```
@@ -72,7 +86,7 @@ git push -f origin $(git symbolic-ref --short HEAD)
 ```
 Please favour `rebase` over `merge` as it can badly affect the commit history. By default `git pull`, will use merge, unless you provide the explicit `--rebase` option.
 
-And repeat 4 - 7 as many times as necessary up until the analysis is published.
+And repeat 4 - 8 as many times as necessary up until the analysis is published.
 
 ### How to compile
 
