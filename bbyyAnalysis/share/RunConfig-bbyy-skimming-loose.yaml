@@ -6,8 +6,11 @@ bypass: false
 # name that will go in the tree bbyy_pass_<selection_name>_%SYS%
 selection_name: "loose"
 
+small_R_jets:
+    doExpVars: true
+
 CutList :
-      - PASS_TRIGGER
-      - TWO_TIGHTID_ISO_PHOTONS
-      - DIPHOTON_MASS
-      - AT_LEAST_TWO_JETS
+    - PASS_TRIGGER
+    - TWO_TIGHTID_ISO_PHOTONS
+    - DIPHOTON_MASS
+    - AT_LEAST_TWO_JETS

@@ -79,6 +79,7 @@ ttree_output:
     collection_options:
       small_R_jets:
         gn2_branches: true
+        gn2_experimental_branches: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'

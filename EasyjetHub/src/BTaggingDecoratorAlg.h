@@ -39,6 +39,8 @@ public:
     /// \brief Execute method, for actions to be taken in the event loop
     StatusCode execute(const EventContext& ctx) const override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
+    float evaluate_Db(const xAOD::Jet& jet) const;
+    int evaluate_pcbtExp(float Db) const;
 
 private:
 
@@ -55,6 +57,10 @@ private:
       this, "floatVars", {}, "Float variables to be decorated onto jets"
     };
 
+    Gaudi::Property<bool > m_doExp{
+      this, "expVars", false, "Flag to add experimental decorations to jets"
+    };
+
     // Internal members
     // Hold accessor as data member to avoid multiple SG lookups
     SG::AuxElement::ConstAccessor<ElementLink<xAOD::BTaggingContainer> > m_btagLinkAcc;
@@ -63,7 +69,6 @@ private:
         SG::AuxElement::ConstAccessor<float>,
         SG::AuxElement::Decorator<float>
     > > m_floatHandlers;
-
   };
 }
 

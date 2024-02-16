@@ -96,6 +96,16 @@ def get_small_R_bjet_branches(
             "GN2v00_pu",
             "DL1dv01_pb",
             "DL1dv01_pc",
-            "DL1dv01_pu",
+            "DL1dv01_pu"
+        ]
+    if hasattr(flags.Analysis.small_R_jet, 'doExpVars'):
+        doExpVars = flags.Analysis.small_R_jet.doExpVars
+    else:
+        doExpVars = False
+
+    if doExpVars:
+        small_R_bjet_branches.variables += [
+            "GN2v00_Db",
+            "GN2v00_pcbtExp"
         ]
     return small_R_bjet_branches.get_output_list()

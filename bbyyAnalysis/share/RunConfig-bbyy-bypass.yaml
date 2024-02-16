@@ -5,3 +5,6 @@ bypass: true
 
 # flag that toggles trigger filtering, before any cuts
 do_trigger_filtering: false
+
+small_R_jets:
+  doExpVars: true

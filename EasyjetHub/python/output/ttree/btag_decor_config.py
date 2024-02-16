@@ -15,11 +15,17 @@ def btag_decor_cfg(flags):
         "GN2v00_pu"
     ]
 
+    if hasattr(flags.Analysis.small_R_jet, 'doExpVars'):
+        doExpVars = flags.Analysis.small_R_jet.doExpVars
+    else:
+        doExpVars = False
+
     cfg.addEventAlgo(
         CompFactory.Easyjet.BTaggingDecoratorAlg(
             f"BTagDecor_{jetcoll}",
             jetsIn=jetcoll,
             floatVars=btag_vars,
+            expVars=doExpVars
         )
     )
 
