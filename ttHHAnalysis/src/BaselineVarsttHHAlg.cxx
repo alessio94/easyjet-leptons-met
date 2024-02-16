@@ -484,7 +484,7 @@ namespace ttHH
 template<typename ParticleType>
 void BaselineVarsttHHAlg::updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
                                        int lep_pdgid, float lep_sf, 
-                                       const auto& sys) {
+                                       const CP::SystematicSet& sys) {
 
   
     // Branch name using lepton index

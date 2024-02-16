@@ -48,7 +48,7 @@ private:
     template<typename ParticleType>
       void updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
                                        int lep_pdgid, float lep_sf, 
-                                             const auto& sys);
+                                             const CP::SystematicSet& sys);
     
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
