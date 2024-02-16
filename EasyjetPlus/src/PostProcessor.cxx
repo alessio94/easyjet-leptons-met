@@ -26,12 +26,12 @@ StatusCode PostProcessor::initialize(){
 
   // Set address of input branches
   setBranchIn();
-  
+
   m_outTree = std::make_unique<TTree>(m_outTreeName.value().c_str(),
 				      m_outTreeName.value().c_str());
 
   // Set address of output branches
-  setBranchOut(m_inVars);
+  if(m_copyInputs) setBranchOut(m_inVars);
   setBranchOut(m_outVars);
 
   return StatusCode::SUCCESS;

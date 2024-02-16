@@ -48,6 +48,8 @@ class PostProcessor : public AthAlgorithm
   Gaudi::Property<std::string> m_outFileName {this, "outFile", "", "Output file"};
   Gaudi::Property<std::string> m_outTreeName {this, "outTree", "AnalysisMiniTree", "Output tree"};
 
+  Gaudi::Property<bool> m_copyInputs {this, "copyInputs", true, "Copy input variables of tools"};
+
   ToolHandleArray<IPostProcessTool> m_tools {this, "postProcessTools", {}, "List of postprocess tools"};
 
   std::unique_ptr<TChain> m_inTree;
