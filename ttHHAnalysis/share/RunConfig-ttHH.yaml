@@ -57,7 +57,7 @@ systematics_regex: [".*"]
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
-do_overlap_removal: false
+do_overlap_removal: true
 
 #Enable cutflow 
 save_ttHH_cutflow: true
