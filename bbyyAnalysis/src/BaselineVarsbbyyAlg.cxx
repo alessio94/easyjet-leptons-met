@@ -102,14 +102,15 @@ namespace HHBBYY
       TLorentzVector HH(0.,0.,0.,0.);
       TLorentzVector y1(0.,0.,0.,0.);
       TLorentzVector y2(0.,0.,0.,0.);
-      TLorentzVector j1(0.,0.,0.,0.);
-      TLorentzVector j2(0.,0.,0.,0.);
-      TLorentzVector b1(0.,0.,0.,0.);
-      TLorentzVector b2(0.,0.,0.,0.);
+      TLorentzVector j(0.,0.,0.,0.);
+      TLorentzVector Hbb_candidate1(0.,0.,0.,0.);
+      TLorentzVector Hbb_candidate2(0.,0.,0.,0.);
 
-      int j1_passWP = -99, j2_passWP = -99;
-      int truthLabel_j1 = -99, truthLabel_j2 = -99;
+      int j_passWP=-99;
+      int truthLabel_j = -99;
+      int PCBTjet = -99;
       int truthLabel_b1 = -99, truthLabel_b2 = -99;
+      int PCBT_candidate1 = -99, PCBT_candidate2 = -99;
       double dRHH = -99., dRyy = -99., dRbb = -99.;
 
       for (const std::string &string_var: m_Fvarnames) {
@@ -180,92 +181,78 @@ namespace HHBBYY
       }
 
       // inclusive jet sector
-      if (jets->size()>=1) {
-        j1 = jets->at(0)->p4();
+      for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)4); i++){	 
+        j = jets->at(i)->p4();
+        if (m_isMC) 
+          truthLabel_j = HadronConeExclTruthLabelID(*jets->at(i));
+        j_passWP = static_cast<int>(m_isBtag.get(*jets->at(i), sys));
+        PCBTjet= m_PCBT.get(*jets->at(i), sys);
+      
+        m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, j.Pt(), sys);
+        m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, j.Eta(), sys);
+        m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, j.Phi(), sys);
+        m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, j.E(), sys);
 
-        m_Fbranches.at("Jet1_pt").set(*event,j1.Pt(),sys);
-        m_Fbranches.at("Jet1_eta").set(*event,j1.Eta(),sys);
-        m_Fbranches.at("Jet1_phi").set(*event,j1.Phi(),sys);
-        m_Fbranches.at("Jet1_E").set(*event,j1.E(),sys);
+        m_Ibranches.at("Jet"+std::to_string(i+1)+"_PassWP").set(*event,j_passWP,sys);
 
-        j1_passWP = static_cast<int>(m_isBtag.get(*jets->at(0), sys));
-        m_Ibranches.at("Jet1_PassWP").set(*event,j1_passWP,sys);
+        if(PCBTgiven)
+          m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,PCBTjet,sys);
 
-        if(PCBTgiven){
-      	  m_Ibranches.at("Jet1_pcbt").set(*event,m_PCBT.get(*jets->at(0), sys),sys);
-        }
-
-        if (m_isMC) {
-          truthLabel_j1 = HadronConeExclTruthLabelID(*jets->at(0));
-          m_Ibranches.at("Jet1_truthLabel").set(*event, truthLabel_j1, sys);
-        } 
+        if (m_isMC)
+          m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel_j, sys);
       }
 
-      if (jets->size()>=2) {
-        j2 = jets->at(1)->p4();
+      const xAOD::Jet *Hbb_Jet1;
+      const xAOD::Jet *Hbb_Jet2;
+      if (jets->size() >= 2) {
+        if (bjets->size() == 0 ) {
+          Hbb_Jet1 = jets->at(0);
+          Hbb_Jet2 = jets->at(1);
+        } else if (bjets->size() ==1 ) {
+          Hbb_Jet1 = bjets->at(0);
+          int index2 = (jets->at(0)==Hbb_Jet1) ? 1 : 0;
+          Hbb_Jet2 = jets->at(index2);
+        } else{
+          Hbb_Jet1 = bjets->at(0);
+          Hbb_Jet2 = bjets->at(1);
+        }
+        Hbb_candidate1= Hbb_Jet1->p4();
+        Hbb_candidate2= Hbb_Jet2->p4();
+        PCBT_candidate1 = m_PCBT.get(*Hbb_Jet1, sys);
+        PCBT_candidate2 = m_PCBT.get(*Hbb_Jet2, sys);
+        truthLabel_b1 = HadronConeExclTruthLabelID(*Hbb_Jet1);
+        truthLabel_b2 = HadronConeExclTruthLabelID(*Hbb_Jet2);
 
-        m_Fbranches.at("Jet2_pt").set(*event,j2.Pt(),sys);
-        m_Fbranches.at("Jet2_eta").set(*event,j2.Eta(),sys);
-        m_Fbranches.at("Jet2_phi").set(*event,j2.Phi(),sys);
-        m_Fbranches.at("Jet2_E").set(*event,j2.E(),sys);
 
-        j2_passWP = static_cast<int>(m_isBtag.get(*jets->at(1), sys));
-        m_Ibranches.at("Jet2_PassWP").set(*event,j2_passWP,sys);
+        m_Fbranches.at("HbbCandidate_Jet1_pt").set(*event, Hbb_candidate1.Pt(), sys);
+        m_Fbranches.at("HbbCandidate_Jet1_eta").set(*event, Hbb_candidate1.Eta(), sys);
+        m_Fbranches.at("HbbCandidate_Jet1_phi").set(*event, Hbb_candidate1.Phi(), sys);
+        m_Fbranches.at("HbbCandidate_Jet1_E").set(*event, Hbb_candidate1.E(), sys);
+
+        m_Fbranches.at("HbbCandidate_Jet2_pt").set(*event, Hbb_candidate2.Pt(), sys);
+        m_Fbranches.at("HbbCandidate_Jet2_eta").set(*event, Hbb_candidate2.Eta(), sys);
+        m_Fbranches.at("HbbCandidate_Jet2_phi").set(*event, Hbb_candidate2.Phi(), sys);
+        m_Fbranches.at("HbbCandidate_Jet2_E").set(*event, Hbb_candidate2.E(), sys);
 
         if(PCBTgiven){
-          m_Ibranches.at("Jet2_pcbt").set(*event,m_PCBT.get(*jets->at(1), sys),sys);
+          m_Ibranches.at("HbbCandidate_Jet1_pcbt").set(*event,PCBT_candidate1,sys);
+          m_Ibranches.at("HbbCandidate_Jet2_pcbt").set(*event,PCBT_candidate2,sys);
         }
 
         if (m_isMC) {
-          truthLabel_j2 = HadronConeExclTruthLabelID(*jets->at(1));
-          m_Ibranches.at("Jet2_truthLabel").set(*event, truthLabel_j2, sys);
-        } 
-      }
-
-      // b-jet sector
-      if (bjets->size() >= 1) {
-        b1 = bjets->at(0)->p4();
-
-        m_Fbranches.at("Jet_b1_pt").set(*event, b1.Pt(), sys);
-        m_Fbranches.at("Jet_b1_eta").set(*event, b1.Eta(), sys);
-        m_Fbranches.at("Jet_b1_phi").set(*event, b1.Phi(), sys);
-        m_Fbranches.at("Jet_b1_E").set(*event, b1.E(), sys);
-
-        if(PCBTgiven){
-          m_Ibranches.at("Jet_b1_pcbt").set(*event,m_PCBT.get(*bjets->at(0), sys),sys);
+          m_Ibranches.at("HbbCandidate_Jet1_truthLabel").set(*event, truthLabel_b1, sys);
+          m_Ibranches.at("HbbCandidate_Jet2_truthLabel").set(*event, truthLabel_b2, sys);
         }
 
-        if (m_isMC) {
-          truthLabel_b1 = HadronConeExclTruthLabelID(*bjets->at(0));
-          m_Ibranches.at("Jet_b1_truthLabel").set(*event, truthLabel_b1, sys);
-        } 
-      }
-      if (bjets->size() >= 2) {
-        b2 = bjets->at(1)->p4();
-
-        // Build the H(bb) candidate
-        H_bb = b1 + b2;
-        dRbb = (b1).DeltaR(b2);
-
-        m_Fbranches.at("Jet_b2_pt").set(*event, b2.Pt(), sys);
-        m_Fbranches.at("Jet_b2_eta").set(*event, b2.Eta(), sys);
-        m_Fbranches.at("Jet_b2_phi").set(*event, b2.Phi(), sys);
-        m_Fbranches.at("Jet_b2_E").set(*event, b2.E(), sys);
-
-        if(PCBTgiven){
-          m_Ibranches.at("Jet_b2_pcbt").set(*event,m_PCBT.get(*bjets->at(1), sys),sys);
-        }
-
-        if (m_isMC) {
-          truthLabel_b2 = HadronConeExclTruthLabelID(*bjets->at(1));
-          m_Ibranches.at("Jet_b2_truthLabel").set(*event, truthLabel_b2, sys);
-        }
+        H_bb = Hbb_candidate1 + Hbb_candidate2;
+        dRbb = (Hbb_candidate1).DeltaR(Hbb_candidate2);
 
         m_Fbranches.at("mbb").set(*event, H_bb.M(), sys);
         m_Fbranches.at("pTbb").set(*event, H_bb.Pt(), sys);
         m_Fbranches.at("Etabb").set(*event, H_bb.Eta(), sys);
         m_Fbranches.at("Phibb").set(*event, H_bb.Phi(), sys);
         m_Fbranches.at("dRbb").set(*event, dRbb, sys);
+        
       }
 
       // Build the HH candidate
@@ -316,7 +303,7 @@ namespace HHBBYY
           j1=(*jets)[ii]->p4();
           for(unsigned int jj=ii+1;jj<jets->size();jj++){
             j2=(*jets)[jj]->p4();
-            if((*jets)[ii]==(*bjets)[0]||(*jets)[jj]==(*bjets)[1]) continue; 
+            if((*jets)[ii]->p4()==Hbb_candidate1||(*jets)[jj]->p4()==Hbb_candidate2) continue; 
 	    float tmpvbfmass=(j1+j2).M();
 	    float tmpvbfeta=std::abs(j1.Eta()-j2.Eta());
 	    if(vbfmass<tmpvbfmass){

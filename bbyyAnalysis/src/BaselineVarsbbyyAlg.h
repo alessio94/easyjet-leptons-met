@@ -90,15 +90,17 @@ namespace HHBBYY
 
       "myy", "pTyy", "dRyy", "Etayy", "Phiyy", 
 
-      // Leading/Subleading b-tagged jet kinematics
-      "Jet_b1_pt", "Jet_b1_eta", "Jet_b1_phi", "Jet_b1_E",
-      "Jet_b2_pt", "Jet_b2_eta", "Jet_b2_phi", "Jet_b2_E",
+      // HbbCandidate jet kinematics
+      "HbbCandidate_Jet1_pt", "HbbCandidate_Jet1_phi", "HbbCandidate_Jet1_eta", "HbbCandidate_Jet1_E",
+      "HbbCandidate_Jet2_pt", "HbbCandidate_Jet2_phi", "HbbCandidate_Jet2_eta", "HbbCandidate_Jet2_E",
 
       "mbb", "pTbb", "dRbb", "Etabb", "Phibb", 
 
       // Inclusive jet kinematics
       "Jet1_pt", "Jet1_eta", "Jet1_phi", "Jet1_E",
       "Jet2_pt", "Jet2_eta", "Jet2_phi", "Jet2_E",
+      "Jet3_pt", "Jet3_eta", "Jet3_phi", "Jet3_E",
+      "Jet4_pt", "Jet4_eta", "Jet4_phi", "Jet4_E",
 
       // di-higgs variables
       "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star", "Photon1_ptOvermyy", "Photon2_ptOvermyy",
@@ -107,9 +109,9 @@ namespace HHBBYY
         "HT", "topness", "sphericityT", "planarFlow", "pTBalance", "missEt", "metphi",
 
       // VBF jets kinematics
-	"Jet_vbf1_pt", "Jet_vbf1_eta", "Jet_vbf1_phi", "Jet_vbf1_E",
-	"Jet_vbf2_pt", "Jet_vbf2_eta", "Jet_vbf2_phi", "Jet_vbf2_E",
-	"m_vbfjj", "eta_vbfjj"
+	    "Jet_vbf1_pt", "Jet_vbf1_eta", "Jet_vbf1_phi", "Jet_vbf1_E",
+	    "Jet_vbf2_pt", "Jet_vbf2_eta", "Jet_vbf2_phi", "Jet_vbf2_E",
+	    "m_vbfjj", "eta_vbfjj"
     };
 
     std::vector<std::string> m_Fvarnames_MC{
@@ -120,12 +122,15 @@ namespace HHBBYY
     std::vector<std::string> m_Ivarnames{
       "nPhotons", "nBJets", "nJets", "nCentralJets", "nLeptons",
       // leading and subleading btagged jets
-      "Jet_b1_truthLabel", "Jet_b2_truthLabel",
-      "Jet_b1_pcbt", "Jet_b2_pcbt",
+      "HbbCandidate_Jet1_truthLabel", "HbbCandidate_Jet2_truthLabel",
+      "HbbCandidate_Jet1_pcbt", "HbbCandidate_Jet2_pcbt",
       // leading and subleading jets
       "Jet1_truthLabel", "Jet2_truthLabel",
+      "Jet3_truthLabel", "Jet4_truthLabel",
       "Jet1_PassWP", "Jet2_PassWP",
-      "Jet1_pcbt", "Jet2_pcbt"
+      "Jet3_PassWP", "Jet4_PassWP",
+      "Jet1_pcbt", "Jet2_pcbt",
+      "Jet3_pcbt", "Jet4_pcbt"
     };
 
   };

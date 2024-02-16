@@ -142,6 +142,16 @@ def bbyy_branches(flags):
     for var in dibjet_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
+    # HbbCandidate jets
+    Hbbcandidate_jets_variables = []
+    for i in range(1,3):
+        prefix = f"HbbCandidate_Jet{i}_"
+        for var in ["pt", "phi", "eta", "E", "truthLabel", "pcbt"]:
+            Hbbcandidate_jets_variables += [prefix + var]
+
+    for var in Hbbcandidate_jets_variables:
+        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
+
     # di-higgs variables
     dihiggs_variables = [
         "mbbyy", "pTbbyy", "Etabbyy", "Phibbyy", "dRbbyy",
