@@ -1,5 +1,16 @@
 include: bbttAnalysis/RunConfig-bbtt-base.yaml
 
+bypass: true
+do_trigger_filtering: false
+
+do_large_R_UFO_jets: true
+
+small_R_jet:
+  btag_wp: "GN2v00LegacyWP_FixedCutBEff_77"
+  btag_extra_wps:
+    - GN2v00LegacyWP_Continuous
+  variables_int_bjets: ["pcbt"]
+
 # Include the TTree configuration and update details
 ttree_output:
   - AnalysisMiniTree:
@@ -12,9 +23,12 @@ ttree_output:
       electrons: 'container_names.output.electrons'
       taus: 'container_names.output.taus'
       met : 'container_names.output.met'
+      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
     collection_options:
       small_R_jets:
         btag_info: true
+      large_R_jets:
+        substructure_info: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'

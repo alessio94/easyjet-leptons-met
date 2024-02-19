@@ -62,7 +62,7 @@ def get_large_R_jet_branches(
         large_R_jet_branches.variables += get_ghost_vr_branches(flags)
 
     if tree_flags.collection_options.large_R_jets.substructure_info:
-        large_R_jet_branches.variables += get_substructure_branches(lr_jet_type)
+        large_R_jet_branches.variables += get_substructure_branches(flags, lr_jet_type)
 
     split_tags = flags.Input.AMITag.split("_")
     is_valid_ptag = get_valid_ami_tag(split_tags, "p", SampleTypes.mc20x)
@@ -98,7 +98,7 @@ def get_ghost_vr_branches(flags):
     return vr_vars
 
 
-def get_substructure_branches(lr_jet_type):
+def get_substructure_branches(flags, lr_jet_type):
     substructure_vars = [
         "Tau1_wta",
         "Tau2_wta",
@@ -114,6 +114,10 @@ def get_substructure_branches(lr_jet_type):
         substructure_vars += [
             "NTrimSubjets",
             "TrackSumPt",
+        ]
+    if flags.Input.isPHYSLITE:
+        substructure_vars += [
+            "D2",
         ]
     return substructure_vars
 
