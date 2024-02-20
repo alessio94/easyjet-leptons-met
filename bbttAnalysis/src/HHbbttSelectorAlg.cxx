@@ -199,8 +199,6 @@ namespace HHBBTT
       m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = false;
       m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = false;
 
-      applyTriggerSelection(event, electrons, muons, taus, jets, sys);
-
       // Reset event specific booleans to false.
       m_bools.at(HHBBTT::TWO_JETS) = false;
       m_bools.at(HHBBTT::TWO_BJETS) = false;
@@ -234,9 +232,8 @@ namespace HHBBTT
       //************
       int n_leptons = 0;
       int n_looseleptons = 0;
-      int charge_lepton = 0;
-      bool lep_ptcut_SLT = false;
-      bool lep_ptcut_LTT = false;
+
+      const xAOD::Electron* ele0 = nullptr;
       for (const xAOD::Electron *electron : *electrons)
       {
         bool passElectronWP = eleWPDecorHandle(*electron);
@@ -244,18 +241,15 @@ namespace HHBBTT
         if (passElectronWP &&
 	    electron->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::ele])
 	{
-          if (electron->pt() > m_pt_threshold[HHBBTT::SLT][HHBBTT::ele])
-            lep_ptcut_SLT = true;
-          else
-            lep_ptcut_LTT = true;
-          charge_lepton = electron->charge();
           m_selected_el.set(*electron, true, sys);
+          if(!ele0) ele0 = electron;
           n_leptons += 1;
         }
         else
           n_looseleptons += 1;
       }
 
+      const xAOD::Muon* mu0 = nullptr;
       for (const xAOD::Muon *muon : *muons)
       {
         bool passMuonWP = muonWPDecorHandle(*muon);
@@ -263,16 +257,31 @@ namespace HHBBTT
         if (passMuonWP && std::abs(muon->eta()) < 2.5 &&
 	    muon->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::mu])
         {
-          if (muon->pt() > m_pt_threshold[HHBBTT::SLT][HHBBTT::mu])
-            lep_ptcut_SLT = true;
-          else
-            lep_ptcut_LTT = true;
-          charge_lepton = muon->charge();
           m_selected_mu.set(*muon, true, sys);
+          if(!mu0) mu0 = muon;
           n_leptons += 1;
         }
         else
           n_looseleptons += 1;
+      }
+
+
+      int charge_lepton = 0;
+      bool lep_ptcut_SLT = false;
+      bool lep_ptcut_LTT = false;
+      if(ele0){
+	charge_lepton = ele0->charge();
+	if (ele0->pt() > m_pt_threshold[HHBBTT::SLT][HHBBTT::ele])
+	  lep_ptcut_SLT = true;
+	else
+	  lep_ptcut_LTT = true;
+      }
+      if(mu0){
+	charge_lepton = mu0->charge();
+	if (mu0->pt() > m_pt_threshold[HHBBTT::SLT][HHBBTT::mu])
+	  lep_ptcut_SLT = true;
+	else
+	  lep_ptcut_LTT = true;
       }
 
       if (n_leptons == 1 && n_looseleptons == 0)
@@ -285,19 +294,9 @@ namespace HHBBTT
       // taujet
       //************
       int n_taus = 0;
-      TLorentzVector tlv_tau0;
-      TLorentzVector tlv_tau1;
-      int charge_tau0 = 0;
-      int charge_tau1 = 0;
-      bool tau_ptcut_SLT = false;
-      bool tau_ptcut_LTT = false;
-      bool tau_ptcut_STT_lead = false;
-      bool tau_ptcut_STT_sublead = false;
-      bool tau_ptcut_DTT_lead = false;
-      bool tau_ptcut_DTT_sublead = false;
-      bool tau_ptcut_STT = false;
-      bool tau_ptcut_DTT = false;
 
+      const xAOD::TauJet* tau0 = nullptr;
+      const xAOD::TauJet* tau1 = nullptr;
       for (const xAOD::TauJet *tau : *taus)
       {
         bool isTauID = tauWPDecorHandle(*tau);
@@ -306,31 +305,24 @@ namespace HHBBTT
         {
           m_selected_tau.set(*tau, true, sys);
           n_taus += 1;
-          if (n_taus==1) {
-            charge_tau0 = tau->charge();
-            tlv_tau0 = tau->p4();
-
-            if (std::abs(tau->eta()) < 2.3) {
-              tau_ptcut_SLT = true;
-              if (tau->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau])
-        	tau_ptcut_LTT = true;
-            }
-
-            if (tau->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau])
-              tau_ptcut_STT_lead = true;
-            if (tau->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau])
-              tau_ptcut_DTT_lead = true;
-          }
-          else if (n_taus==2) {
-            charge_tau1 = tau->charge();
-            tlv_tau1 = tau->p4();
-            if (tau->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau])
-              tau_ptcut_STT_sublead = true;
-            if (tau->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau])
-              tau_ptcut_DTT_sublead = true;
-          }
+          if(n_taus==1) tau0 = tau;
+          else if(n_taus==2) tau1 = tau;
         }
       }
+
+      bool tau_ptcut_SLT = n_taus>0 && std::abs(tau0->eta());
+      bool tau_ptcut_LTT = n_taus>0 && std::abs(tau0->eta()) &&
+	tau0->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau];
+      bool tau_ptcut_STT_lead = n_taus>0 &&
+	tau0->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau];
+      bool tau_ptcut_STT_sublead = n_taus>1 &&
+	tau1->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau];
+      bool tau_ptcut_DTT_lead = n_taus>0 &&
+	tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau];
+      bool tau_ptcut_DTT_sublead = n_taus>1 &&
+	tau1->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau];
+      bool tau_ptcut_STT = tau_ptcut_STT_lead && tau_ptcut_STT_sublead;
+      bool tau_ptcut_DTT = tau_ptcut_DTT_lead && tau_ptcut_DTT_sublead;
 
       if (n_taus == 1)
         m_bools.at(HHBBTT::ONE_TAU) = true;
@@ -338,13 +330,10 @@ namespace HHBBTT
       bool tau_DR_L1Topo = false;
       if (n_taus == 2) {
         m_bools.at(HHBBTT::TWO_TAU) = true;
-        if (tau_ptcut_STT_lead && tau_ptcut_STT_sublead)
-          tau_ptcut_STT = true;
-        if (tau_ptcut_DTT_lead && tau_ptcut_DTT_sublead)
-          tau_ptcut_DTT = true;
-        tau_DR_L1Topo = tlv_tau0.DeltaR(tlv_tau1)<2.5;
+        tau_DR_L1Topo = tau0->p4().DeltaR(tau1->p4())<2.5;
       }
 
+      applyTriggerSelection(event, electrons, muons, taus, jets, sys);
 
       //************
       // jet
@@ -397,9 +386,9 @@ namespace HHBBTT
       //****************
       if (mbb < 150. * Athena::Units::GeV)
         m_bools.at(HHBBTT::MBB_MASS) = true;
-      if (charge_tau0 != charge_lepton)
+      if (n_taus==1 && n_leptons==1 && tau0->charge() != charge_lepton)
         m_bools.at(HHBBTT::OS_CHARGE_LEPHAD) = true;
-      if (charge_tau0 == - charge_tau1)
+      if (n_taus==2 && tau0->charge() == -tau1->charge())
         m_bools.at(HHBBTT::OS_CHARGE_HADHAD) = true;
 
       if (m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) && m_bools.at(HHBBTT::ONE_TAU) && m_bools.at(HHBBTT::TWO_JETS)){
