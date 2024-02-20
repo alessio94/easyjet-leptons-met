@@ -56,7 +56,7 @@ def overlap_sequence(flags):
     if flags.Analysis.do_small_R_jets:
         preOR_collections['jets'] = drop_sys(
             container_names.allcalib[flags.Analysis.small_R_jet.jet_type]
-        ) + ".selectPtEta&&jvt"
+        ) + ".selectPtEta"
         original_names['jets'] = flags.Analysis.container_names.input[
             flags.Analysis.small_R_jet.jet_type
         ]
