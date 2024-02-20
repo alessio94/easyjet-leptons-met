@@ -220,9 +220,10 @@ namespace HHBBYY
         Hbb_candidate2= Hbb_Jet2->p4();
         PCBT_candidate1 = m_PCBT.get(*Hbb_Jet1, sys);
         PCBT_candidate2 = m_PCBT.get(*Hbb_Jet2, sys);
-        truthLabel_b1 = HadronConeExclTruthLabelID(*Hbb_Jet1);
-        truthLabel_b2 = HadronConeExclTruthLabelID(*Hbb_Jet2);
-
+        if (m_isMC) {      
+          truthLabel_b1 = HadronConeExclTruthLabelID(*Hbb_Jet1);
+          truthLabel_b2 = HadronConeExclTruthLabelID(*Hbb_Jet2);
+        }
 
         m_Fbranches.at("HbbCandidate_Jet1_pt").set(*event, Hbb_candidate1.Pt(), sys);
         m_Fbranches.at("HbbCandidate_Jet1_eta").set(*event, Hbb_candidate1.Eta(), sys);
