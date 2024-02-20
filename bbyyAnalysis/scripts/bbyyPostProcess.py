@@ -43,7 +43,7 @@ XSectionTool = CompFactory.GetXSectionTool(
     pathsToPMGFiles=XSectionData['XSection_paths'])
 
 TotalWeightsTool_bbyy = CompFactory.TotalWeightsTool(
-    analysis="bbyy", nPhotons=2, bTagWP="DL1dv01_FixedCutBEff_77")
+    analysis="bbyy", nPhotons=2, bTagWP="GN2v00LegacyWP_FixedCutBEff_77")
 
 acc.addEventAlgo(CompFactory.PostProcessor(
     inFile=args.inFile,

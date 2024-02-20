@@ -51,3 +51,11 @@ One can change the outputs saved in the TTree by adjusting the base bbyy configu
 
 The main developments have been performed by (non extensive list, feel free to add your name):
 Giulia Di Gregorio, Sayuka Kita, Spyros Merianos, Lorenzo Santi, Abraham Tishelman-Charny, Francesco Curcio.
+
+# Post processing
+To run the post-processing, the following command needs to be executed:
+
+`bbyyPostProcess.py --inFile name_easyJet_ntuple.root --xSectionsConfig ../easyjet/bbyyAnalysis/share/XSectionData.yaml --outFile name_PostProcessed_ntuple.root`
+
+The output file (`name_PostProcessed_ntuple.root`) contains the final weight (`weight`) which is evaluated considering the final sum of weights, cross-section, luminosity, MC weight and the different scale factors (`SF = weight_ftag_effSF_GN2v00LegacyWP_FixedCutBEff_77_NOSYS * weight_jvt_effSF_NOSYS * bbyy_Photon1_effSF_NOSYS * bbyy_Photon2_effSF_NOSYS`):
+`weight = mcEventWeights * Luminosity * AMIXsection * kFactor * FilterEff * SF / sumOfWeights`
