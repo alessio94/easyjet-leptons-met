@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Carl Gwilliam
@@ -8,6 +8,7 @@
 #include "TauDecoratorAlg.h"
 #include <AsgDataHandles/ReadDecorHandle.h>
 #include <AsgDataHandles/WriteDecorHandle.h>
+#include "TauAnalysisTools/HelperFunctions.h"
 
 namespace Easyjet
 {
@@ -30,10 +31,12 @@ namespace Easyjet
     ATH_CHECK (m_eleIdDecorKey.initialize());
 
     m_nProngDecorKey = m_tausInKey.key() + "." + m_nProngDecorName;
+    m_truthTypeDecorKey = m_tausInKey.key() + "." + m_truthTypeDecorName;
     m_IDTauDecorKey = m_tausInKey.key() + "." + m_IDTauDecorName;
     m_antiTauDecorKey = m_tausInKey.key() + "." + m_antiTauDecorName;
 
     ATH_CHECK (m_nProngDecorKey.initialize());
+    ATH_CHECK (m_truthTypeDecorKey.initialize(m_isMC));
     ATH_CHECK (m_IDTauDecorKey.initialize());
     ATH_CHECK (m_antiTauDecorKey.initialize());
 
@@ -71,11 +74,17 @@ namespace Easyjet
     for(const xAOD::TauJet* tau : *tausIn) {
 
       nProngDecorHandle(*tau) = tau->nTracks();
-
       bool isTauID = tau->isTau(m_tauIDWP);
       if(isTauID) nidtau++; 
       idTauDecorHandle(*tau) = isTauID;
 
+    }
+
+    if(m_isMC){
+      SG::WriteDecorHandle<xAOD::TauJetContainer, int> truthTypeDecorHandle(m_truthTypeDecorKey);
+      for(const xAOD::TauJet* tau : *tausIn) {
+	truthTypeDecorHandle(*tau) = int(TauAnalysisTools::getTruthParticleType(*tau));
+      }
     }
 
     int nlepton = 0;
@@ -101,6 +110,7 @@ namespace Easyjet
       if (isAntiTau) nantitau++;
       antiTauDecorHandle(*tau) = isAntiTau;
     }
+
     return StatusCode::SUCCESS;
   }
 }

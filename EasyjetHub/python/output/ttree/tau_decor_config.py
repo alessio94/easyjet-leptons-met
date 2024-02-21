@@ -8,12 +8,12 @@ def tau_decor_cfg(flags, **kwargs):
     elecoll = flags.Analysis.container_names.input.electrons
     taucoll = flags.Analysis.container_names.input.taus
 
-    kwargs.setdefault("tauIDWP", flags.Analysis.Tau.ID)
-
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
         CompFactory.Easyjet.TauDecoratorAlg(
             f"TagDecor_{taucoll}",
+            isMC=flags.Input.isMC,
+            tauIDWP=flags.Analysis.Tau.ID,
             muonsIn=muoncoll,
             elesIn=elecoll,
             tausIn=taucoll,

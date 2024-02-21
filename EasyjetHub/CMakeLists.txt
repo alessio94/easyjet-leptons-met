@@ -31,6 +31,7 @@ atlas_add_library( EasyjetHubLib
                    FourMomUtils
                    TruthUtils
                    FlavorTagDiscriminants
+                   TauAnalysisToolsLib
 )
 
 

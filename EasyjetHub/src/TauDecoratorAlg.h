@@ -47,6 +47,9 @@ private:
 
     // Members for configurable properties
 
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
     // Muons
     SG::ReadHandleKey<xAOD::MuonContainer> m_muonsInKey{
       this, "muonsIn", "", "containerName to read"
@@ -81,6 +84,11 @@ private:
       this, "nProngDecorKey", "nProng", "Decoration for nProng"
     };
     SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_nProngDecorKey;
+
+    Gaudi::Property<std::string> m_truthTypeDecorName{
+      this, "truthTypeDecorKey", "truthType", "Decoration for truthType"
+    };
+    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_truthTypeDecorKey;
 
     Gaudi::Property<std::string> m_IDTauDecorName{
       this, "idTauDecorKey", "isIDTau", "Decoration for ID taus"
