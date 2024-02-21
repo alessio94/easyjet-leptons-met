@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -9,15 +9,13 @@
 #include <memory>
 
 #include "AnaAlgorithm/AnaAlgorithm.h"
-#include <FourMomUtils/xAODP4Helpers.h>
 #include <AsgDataHandles/ReadDecorHandleKey.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
-#include <SystematicsHandles/ISysHandleBase.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
-#include <AsgDataHandles/WriteDecorHandleKey.h>
+#include <SystematicsHandles/SysFilterReporterParams.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
@@ -26,9 +24,10 @@
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+#include "TriggerMatchingTool/IMatchingTool.h"
+
 #include <EasyjetHub/CutManager.h>
 
-#include <SystematicsHandles/SysFilterReporterParams.h>
 
 #include "HHbbttChannels.h"
 
@@ -201,6 +200,11 @@ private:
 
     /// \brief Setup sys-aware output decorations
     CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
+
+    ToolHandle<Trig::IMatchingTool> m_matchingTool{this, "trigMatchingTool", "",
+	"Trigger matching tool"};
+
+    Gaudi::Property<bool> m_useDiTauTrigMatch{this, "diTauTrigMatch", true, "Run di-tau trigger matching"};
     
     /// \brief Booleans
     /*
@@ -273,27 +277,25 @@ private:
 
     StatusCode initialiseCutflow();
     void applyTriggerSelection(const xAOD::EventInfo* event,
-			       const xAOD::ElectronContainer* electrons,
-			       const xAOD::MuonContainer* muons,
-			       const xAOD::TauJetContainer* taus,
-			       const xAOD::JetContainer* jets,
+			       const xAOD::Electron* ele, const xAOD::Muon* mu,
+			       const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
+			       const xAOD::Jet* jet0, const xAOD::Jet* jet1,
 			       const CP::SystematicSet& sys);
     void applySingleLepTriggerSelection(const xAOD::EventInfo* event,
-					const xAOD::ElectronContainer* electrons,
-					const xAOD::MuonContainer* muons,
+					const xAOD::Electron* ele,
+					const xAOD::Muon* mu,
 					const CP::SystematicSet& sys);
     void applyLepHadTriggerSelection(const xAOD::EventInfo* event,
-				     const xAOD::ElectronContainer* electrons,
-				     const xAOD::MuonContainer* muons,
-				     const xAOD::TauJetContainer* taus,
-				     const xAOD::JetContainer* jets,
+				     const xAOD::Electron* ele, const xAOD::Muon* mu,
+				     const xAOD::TauJet* tau,
+				     const xAOD::Jet* jet0, const xAOD::Jet* jet1,
 				     const CP::SystematicSet& sys);
     void applySingleTauTriggerSelection(const xAOD::EventInfo* event,
-					const xAOD::TauJetContainer* taus,
+					const xAOD::TauJet* tau0,
 					const CP::SystematicSet& sys);
     void applyDiTauTriggerSelection(const xAOD::EventInfo* event,
-				    const xAOD::TauJetContainer* taus,
-				    const xAOD::JetContainer* jets,
+				    const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
+				    const xAOD::Jet* jet0, const xAOD::Jet* jet1,
 				    const CP::SystematicSet& sys);
 
     void setRunNumberQuantities(unsigned int rdmNumber);

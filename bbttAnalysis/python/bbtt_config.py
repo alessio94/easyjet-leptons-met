@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
@@ -71,6 +73,9 @@ def bbtt_cfg(
         for c in flags.Analysis.TriggerChains
     ]
 
+    from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
+    from AthenaConfiguration.Enums import LHCPeriod
+
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
@@ -85,6 +90,10 @@ def bbtt_cfg(
             eleWP=TightEleWPLabel,
             eventDecisionOutputDecoration="bbtt_pass_sr_noMMC_%SYS%",
             triggerLists=trigger_branches,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
+            # Not available in current Run2 PHYSLITE
+            diTauTrigMatch=not (flags.Input.isPHYSLITE and \
+                                flags.GeoModel.Run == LHCPeriod.Run2),
             channel=flags.Analysis.channel,
             isMC=flags.Input.isMC,
             Years=flags.Analysis.Years,
