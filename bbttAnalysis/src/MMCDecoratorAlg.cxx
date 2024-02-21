@@ -32,6 +32,8 @@ namespace HHBBTT
     ATH_CHECK (m_pass_LTT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_STT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_DTT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_STT_1B.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_DTT_1B.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -50,6 +52,7 @@ namespace HHBBTT
     for ( auto name : m_channel_names){
       if( name == "lephad") m_channels.push_back(HHBBTT::LepHad);
       else if ( name == "hadhad") m_channels.push_back(HHBBTT::HadHad);
+      else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -124,9 +127,13 @@ namespace HHBBTT
           is_lephad =
             m_pass_SLT.get(*event, sys) || m_pass_LTT.get(*event, sys);
         }
-        else if(channel == HHBBTT::HadHad){
-          is_hadhad =
-            m_pass_STT.get(*event, sys) || m_pass_DTT.get(*event, sys);
+        else if(channel == HHBBTT::HadHad || channel == HHBBTT::HadHad1B){
+          if(channel == HHBBTT::HadHad)
+            is_hadhad |=
+              m_pass_STT.get(*event, sys) || m_pass_DTT.get(*event, sys);
+          if(channel == HHBBTT::HadHad1B)
+            is_hadhad |=
+              m_pass_STT_1B.get(*event, sys) || m_pass_DTT_1B.get(*event, sys);
         }
       }
 
