@@ -7,4 +7,4 @@ bypass: true
 do_trigger_filtering: false
 
 small_R_jets:
-  doExpVars: true
+  doBtagExpVars: true

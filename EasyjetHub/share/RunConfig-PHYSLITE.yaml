@@ -55,7 +55,7 @@ ttree_output:
     collection_options:
       small_R_jets:
         higgs_parent_info: true
-        gn2_branches: true
+        btag_details: true
       large_R_jets:
         substructure_info: true
     truth_outputs:

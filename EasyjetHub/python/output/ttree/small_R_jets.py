@@ -1,5 +1,6 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from EasyjetHub.output.ttree.truth_jets import get_small_R_jet_truth_labels
+from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 
 def get_small_R_jet_branches(
@@ -89,23 +90,26 @@ def get_small_R_bjet_branches(
     )
 
     # ftag scores pb, pc, pl
-    if tree_flags.collection_options.small_R_jets.gn2_branches:
+    if tree_flags.collection_options.small_R_jets.btag_details:
         small_R_bjet_branches.variables += [
-            "GN2v00_pb",
-            "GN2v00_pc",
-            "GN2v00_pu",
             "DL1dv01_pb",
             "DL1dv01_pc",
             "DL1dv01_pu"
         ]
-    if hasattr(flags.Analysis.small_R_jet, 'doExpVars'):
-        doExpVars = flags.Analysis.small_R_jet.doExpVars
-    else:
-        doExpVars = False
 
-    if doExpVars:
-        small_R_bjet_branches.variables += [
-            "GN2v00_Db",
-            "GN2v00_pcbtExp"
-        ]
+        split_tags = flags.Input.AMITag.split("_")
+        gn2_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5855")
+        if gn2_valid_ptag:
+            small_R_bjet_branches.variables += [
+                "GN2v00_pb",
+                "GN2v00_pc",
+                "GN2v00_pu",
+            ]
+
+        if flags.Analysis.small_R_jet.doBtagExpVars:
+            small_R_bjet_branches.variables += [
+                "GN2v00_Db",
+                "GN2v00_pcbtExp"
+            ]
+
     return small_R_bjet_branches.get_output_list()

@@ -23,7 +23,7 @@ collection_options:
     btag_info: false
     JVT_details: false
     no_bjet_calib_p4: false
-    gn2_branches: false
+    btag_details: false
 
   large_R_jets:
     substructure_info: false

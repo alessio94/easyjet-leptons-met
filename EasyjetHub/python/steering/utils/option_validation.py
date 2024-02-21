@@ -76,7 +76,7 @@ def validate_do_write_obj_flags(flags, tree_flags):
                 small_R_flags.higgs_parent_info,
                 small_R_flags.JVT_details,
                 small_R_flags.no_bjet_calib_p4,
-                small_R_flags.gn2_branches,
+                small_R_flags.btag_details,
             ]):
                 assert tree_flags.reco_outputs.small_R_jets
             if any([

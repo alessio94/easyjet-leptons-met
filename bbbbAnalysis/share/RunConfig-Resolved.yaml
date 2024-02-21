@@ -50,7 +50,7 @@ ttree_output:
         btag_info: true
         JVT_details: true
         no_bjet_calib_p4: true
-        gn2_branches: true
+        btag_details: true
       large_R_jets:
         truth_labels: true
     truth_outputs:

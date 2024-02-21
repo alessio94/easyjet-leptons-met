@@ -7,7 +7,7 @@ bypass: false
 selection_name: "loose"
 
 small_R_jets:
-    doExpVars: true
+    doBtagExpVars: true
 
 CutList :
     - PASS_TRIGGER
