@@ -1,9 +1,6 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from EasyjetHub.output.ttree.truth_jets import get_large_R_jet_truth_labels
-from EasyjetHub.steering.sample_metadata import (
-    get_valid_ami_tag,
-    SampleTypes,
-)
+from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 
 def get_large_R_jet_branches(
@@ -65,7 +62,7 @@ def get_large_R_jet_branches(
         large_R_jet_branches.variables += get_substructure_branches(flags, lr_jet_type)
 
     split_tags = flags.Input.AMITag.split("_")
-    is_valid_ptag = get_valid_ami_tag(split_tags, "p", SampleTypes.mc20x)
+    is_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5657")
     if lr_jet_type == "UFO" and is_valid_ptag:
         large_R_jet_branches.variables += get_large_R_gn2_branches()
 

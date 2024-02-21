@@ -1,50 +1,18 @@
 import json
 import pickle
-from enum import Enum
 from pathlib import Path
 from PathResolver import PathResolver
-
-
-class DataSampleYears(Enum):
-    data15 = (2015,)
-    data16 = (2016,)
-    data17 = (2017,)
-    data18 = (2018,)
-    data22 = (2022,)
-    data23 = (2023,)
+from Campaigns.Utils import Campaign
 
 
 MCSampleYears = {
-    'r13167': (2015, 2016),
-    'r14859': (2015, 2016),
-    'r13144': (2017,),
-    'r14860': (2017,),
-    'r13145': (2018,),
-    'r14861': (2018,),
-    'r13829': (2022,),
-    'r14622': (2022,),
-    'r14799': (2023,),
-    'r14908': (2023,),
-    'r15224': (2023,),
+    Campaign.MC20a: (2015, 2016),
+    Campaign.MC20d: (2017,),
+    Campaign.MC20e: (2018,),
+    Campaign.MC21a: (2022,),
+    Campaign.MC23a: (2022,),
+    Campaign.MC23c: (2023,),
 }
-
-
-class SampleTypes(Enum):
-    mc20a = "r13167"  # run2, 2015-16
-    mc20a_af3 = "r14859"  # run2, 2015-16, fastsim
-    mc20d = "r13144"  # run2, 2017
-    mc20d_af3 = "r14860"  # run2, 2017, fastsim
-    mc20e = "r13145"  # run2, 2018
-    mc20e_af3 = "r14861"  # run2, 2018, fastsim
-    mc21a = "r13829"  # run3, 2022
-    mc23a = "r14622"  # run3, 2022
-    mc23c = "r14799"  # run3, 2023
-    mc23c_af3 = "r14908"  # run3, 2023, fastsim
-    mc23d = "r15224"  # run3, 2023 reprocessed
-    # ptag
-    mc20 = "p5057"
-    # ptag for Xbb tagger
-    mc20x = "p5657"
 
 
 def cache_metadata(path):
@@ -103,11 +71,11 @@ def has_metadata(flags, path=Path("metadata.json")):
     return True
 
 
-def get_valid_ami_tag(tags, check_tag="p", min_valid_tag=SampleTypes.mc20):
+def get_valid_ami_tag(tags, check_tag="p", min_valid_tag="p5657"):
     is_valid_tag = False
     for tag in tags:
         if check_tag in tag:
-            is_valid_tag = int(tag[1:]) > int(min_valid_tag.value[1:])
+            is_valid_tag = int(tag[1:]) > int(min_valid_tag[1:])
     return is_valid_tag
 
 
@@ -129,40 +97,9 @@ def get_lumicalc_files(flags):
     return list(lumicalc_files)
 
 
-def get_campaign(flags):
-    """Return campaign based on AMI tags"""
-
-    tags = flags.Input.AMITag
-    dsid = flags.Input.MCChannelNumber
-
-    if SampleTypes.mc20a.value in tags:
-        campaign = SampleTypes.mc20a
-    elif SampleTypes.mc20d.value in tags:
-        campaign = SampleTypes.mc20d
-    elif SampleTypes.mc20e.value in tags:
-        campaign = SampleTypes.mc20e
-    elif SampleTypes.mc21a.value in tags:
-        campaign = SampleTypes.mc21a
-    elif SampleTypes.mc23a.value in tags:
-        campaign = SampleTypes.mc23a
-    elif SampleTypes.mc23c.value in tags:
-        campaign = SampleTypes.mc23c
-    elif SampleTypes.mc23c_af3.value in tags:
-        campaign = SampleTypes.mc23c_af3
-    elif SampleTypes.mc23d.value in tags:
-        campaign = SampleTypes.mc23d
-    else:
-        raise LookupError(
-            "Cannot determine campaign "
-            f"for AMI tags {tags} and DSID {dsid}."
-        )
-
-    return campaign.name
-
-
 def get_prw_files(flags):
     """Return the PRW (Pileup ReWeighting) config files."""
-    campaign = get_campaign(flags)
+    campaign = flags.Input.MCCampaign
 
     prw_files = set()
     for year in flags.Analysis.Years:
@@ -198,19 +135,9 @@ def get_prw_files(flags):
 def get_run_years(flags):
     years = []
     if flags.Analysis.DataType != "data":
-        # use rtag for figuring out year in MC
-        tags = flags.Input.AMITag
-        for mc_campaign in MCSampleYears:
-            if mc_campaign in tags:
-                years += MCSampleYears[mc_campaign]
-                break
+        years += MCSampleYears[flags.Input.MCCampaign]
     else:
-        # Use projet_name for figuring out which year in data
-        project_name = flags.Input.ProjectName
-        for data_campaign in DataSampleYears:
-            if data_campaign.name in project_name:
-                years += data_campaign.value
-                break
+        years.append(flags.Input.DataYear)
     return years
 
 
