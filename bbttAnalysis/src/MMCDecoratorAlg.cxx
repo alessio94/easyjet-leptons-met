@@ -46,6 +46,16 @@ namespace HHBBTT
     ATH_CHECK(m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_mmc_m.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK(m_mmc_nu1_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_mmc_nu1_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_mmc_nu1_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_mmc_nu1_m.initialize(m_systematicsList, m_eventHandle));
+
+    ATH_CHECK(m_mmc_nu2_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_mmc_nu2_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_mmc_nu2_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_mmc_nu2_m.initialize(m_systematicsList, m_eventHandle));
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ANA_CHECK (m_systematicsList.initialize());    
 
@@ -117,6 +127,8 @@ namespace HHBBTT
       const xAOD::IParticle* part2 = nullptr;
       int status = 0;      
       TLorentzVector res(0,0,0,0);
+      TLorentzVector nu1(0,0,0,0);
+      TLorentzVector nu2(0,0,0,0);
       const auto method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
 
       bool is_lephad = false;
@@ -175,15 +187,28 @@ namespace HHBBTT
 	status = m_mmcTool->GetFitStatus(method);	
 	if (status == 1) {
 	  res = m_mmcTool->GetResonanceVec(method)*1e3;	
+	  nu1 = m_mmcTool->GetNeutrino4vec(method, 0)*1e3;	
+	  nu2 = m_mmcTool->GetNeutrino4vec(method, 1)*1e3;	
 	}
       }
 
       // Decorate ouput
       m_mmc_status.set(*event, status, sys);
+
       m_mmc_pt.set(*event, res.Pt(), sys);
       m_mmc_eta.set(*event, res.Eta(), sys);
       m_mmc_phi.set(*event, res.Phi(), sys);
       m_mmc_m.set(*event, res.M(), sys);            
+
+      m_mmc_nu1_pt.set(*event, nu1.Pt(), sys);
+      m_mmc_nu1_eta.set(*event, nu1.Eta(), sys);
+      m_mmc_nu1_phi.set(*event, nu1.Phi(), sys);
+      m_mmc_nu1_m.set(*event, nu1.M(), sys);            
+
+      m_mmc_nu2_pt.set(*event, nu2.Pt(), sys);
+      m_mmc_nu2_eta.set(*event, nu2.Eta(), sys);
+      m_mmc_nu2_phi.set(*event, nu2.Phi(), sys);
+      m_mmc_nu2_m.set(*event, nu2.M(), sys);            
 
     }
 

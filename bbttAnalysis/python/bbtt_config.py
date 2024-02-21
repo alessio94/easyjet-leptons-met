@@ -228,6 +228,9 @@ def bbtt_branches(flags):
         # mmc algortithm not BaselineVarsbbttAlg
         for var in ["status", "pt", "eta", "phi", "m"]:
             all_baseline_variable_names.append(f"mmc_{var}")
+        for var in ["pt", "eta", "phi", "m"]:
+            all_baseline_variable_names.append(f"mmc_nu1_{var}")
+            all_baseline_variable_names.append(f"mmc_nu2_{var}")
 
     if flags.Analysis.store_high_level_variables:
         high_level_float_variables, high_level_int_variables \

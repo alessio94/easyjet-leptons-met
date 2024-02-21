@@ -85,6 +85,14 @@ private:
     CP::SysWriteDecorHandle<float> m_mmc_eta {"mmc_eta_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_mmc_phi {"mmc_phi_%SYS%", this};
     CP::SysWriteDecorHandle<float> m_mmc_m {"mmc_m_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_mmc_nu1_pt {"mmc_nu1_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_mmc_nu1_eta {"mmc_nu1_eta_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_mmc_nu1_phi {"mmc_nu1_phi_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_mmc_nu1_m {"mmc_nu1_m_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_mmc_nu2_pt {"mmc_nu2_pt_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_mmc_nu2_eta {"mmc_nu2_eta_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_mmc_nu2_phi {"mmc_nu2_phi_%SYS%", this};
+    CP::SysWriteDecorHandle<float> m_mmc_nu2_m {"mmc_nu2_m_%SYS%", this};
 
     /// \brief Steerable properties
     Gaudi::Property<std::string> m_method_str { this, "Method", "MLNU3P", 
