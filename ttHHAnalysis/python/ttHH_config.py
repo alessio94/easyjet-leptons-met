@@ -3,11 +3,13 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.output.ttree.selected_objects import (
-    get_selected_objects_branches,
+    get_selected_objects_branches_variables,
 )
 
 
-def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
+def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
+             float_variables=[], int_variables=[]):
+
     cfg = ComponentAccumulator()
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
@@ -122,6 +124,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
             isMC=flags.Input.isMC,
+            floatVariableList=float_variables,
+            intVariableList=int_variables
         )
     )
 
@@ -135,27 +139,13 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey):
     return cfg
 
 
-def ttHH_branches(flags):
-    branches = []
+def get_BaselineVarsttHHAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
 
-    # These are the variables always saved with the objects selected by the analysis
-    # This is tunable with the flags amount and variables
-    # in the object configs.
-    branches += get_selected_objects_branches(flags, "ttHH")
-
-    if (flags.Analysis.save_ttHH_cutflow):
-        cutList = flags.Analysis.CutList
-        for cut in cutList:
-            branches += [f"EventInfo.{cut}_%SYS% -> ttHH_{cut}_%SYS%"]
-
-    # BJets
-    if flags.Input.isMC:
-        branches += ["EventInfo.ftag_effSF_"
-                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%"
-                     " -> weight_ftag_effSF_"
-                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%",]
-
-        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
+    for object in ["ee", "mumu", "emu"]:
+        for var in ["m", "pt", "dR", "eta", "phi"]:
+            float_variable_names.append(f"{object}_{var}")
 
     H_candidate_variables = [
         "H1_m", "H1_pt", "H1_eta", "H1_phi",
@@ -168,46 +158,101 @@ def ttHH_branches(flags):
         "HZ_m", "HZ_CHI",
         "ZZ_m", "ZZ_CHI"
     ]
-    for var in H_candidate_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}_%SYS%"]
 
-    # additional variables
-    additional_variables = ["HT", "nJets", "nBJets"]
-    for var in additional_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}_%SYS%"]
+    float_variable_names += H_candidate_variables
 
     angular_variables = [
-        "DeltaR12", "DeltaR34", "DeltaR56",
-        "DeltaR1234", "DeltaR3456", "DeltaR5612",
-        "DeltaPhi12", "DeltaPhi34", "DeltaPhi56",
-        "DeltaPhi1234", "DeltaPhi3456", "DeltaPhi5612",
-        "DeltaEta12", "DeltaEta34", "DeltaEta56",
-        "DeltaEta1234", "DeltaEta3456", "DeltaEta5612",
-        "DeltaRMax", "DeltaRMin", "DeltaRMean",
-        "DeltaEtaMax", "DeltaEtaMin", "DeltaEtaMean"
+        "Jets_DeltaR12", "Jets_DeltaR34", "Jets_DeltaR56",
+        "Jets_DeltaR1234", "Jets_DeltaR3456", "Jets_DeltaR5612",
+        "Jets_DeltaPhi12", "Jets_DeltaPhi34", "Jets_DeltaPhi56",
+        "Jets_DeltaPhi1234", "Jets_DeltaPhi3456", "Jets_DeltaPhi5612",
+        "Jets_DeltaEta12", "Jets_DeltaEta34", "Jets_DeltaEta56",
+        "Jets_DeltaEta1234", "Jets_DeltaEta3456", "Jets_DeltaEta5612",
+        "Jets_DeltaRMax", "Jets_DeltaRMin", "Jets_DeltaRMean",
+        "Jets_DeltaEtaMax", "Jets_DeltaEtaMin", "Jets_DeltaEtaMean"
     ]
 
-    for var in angular_variables:
-        branches += [f"EventInfo.Jets_{var}_%SYS% -> ttHH_Jets_{var}_%SYS%"]
+    float_variable_names += angular_variables
+
+    float_variable_names += ["HT"]
+
+    int_variable_names += [
+        "nJets", "nBJets", "nLeptons",
+        "dilept_type", "trilept_type", "total_charge"
+    ]
+
+    return float_variable_names, int_variable_names
+
+
+def get_BaselineVarsttHHAlg_highlevelvariables(flags):
+    high_level_float_variables = []
+    high_level_int_variables = []
+
+    return high_level_float_variables, high_level_int_variables
+
+
+def ttHH_branches(flags):
+    branches = []
+
+    # this will be all the variables that are calculated by the
+    # BaselineVarsttHHAlg algorithm
+    all_baseline_variable_names = []
+    float_variable_names = []
+    int_variable_names = []
+
+    # these are the variables that will always be stored by easyjet specific to ttHH
+    # further below there are more high level variables which can be
+    # stored using the flag
+    # flags.Analysis.store_high_level_variables
+    baseline_float_variables, baseline_int_variables \
+        = get_BaselineVarsttHHAlg_variables(flags)
+    float_variable_names += baseline_float_variables
+    int_variable_names += baseline_int_variables
+
+    if flags.Analysis.store_high_level_variables:
+        high_level_float_variables, high_level_int_variables \
+            = get_BaselineVarsttHHAlg_highlevelvariables(flags)
+        float_variable_names += high_level_float_variables
+        int_variable_names += high_level_int_variables
+
+    all_baseline_variable_names += [*float_variable_names, *int_variable_names]
+
+    for tree_flags in flags.Analysis.ttree_output:
+        for var in all_baseline_variable_names:
+            if tree_flags['slim_variables_with_syst'] and \
+               "pt" not in var and "SF" not in var:
+                branches += [f"EventInfo.{var}_NOSYS -> ttHH_{var}"]
+            else:
+                branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}_%SYS%"]
+
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    object_level_branches, object_level_float_variables, object_level_int_variables \
+        = get_selected_objects_branches_variables(flags, "ttHH")
+    float_variable_names += object_level_float_variables
+    int_variable_names += object_level_int_variables
+
+    branches += object_level_branches
+
+    # BJets
+    if flags.Input.isMC:
+        branches += ["EventInfo.ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%"
+                     " -> weight_ftag_effSF_"
+                     f"{flags.Analysis.small_R_jet.btag_wp}_%SYS%",]
+
+        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
 
     branches += ["EventInfo.PassAllCuts_%SYS% -> ttHH_PassAllCuts_%SYS%"]
 
     branches += ["EventInfo.ttHH_pass_baseline_%SYS% -> ttHH_pass_baseline_%SYS%"]
 
-    leptonPair_variables = ["pt", "eta", "phi", "m", "dR"]
-    leptonPairs = [
-        "ee", "mumu", "emu"
-    ]
-
-    for lep in leptonPairs:
-        for var in leptonPair_variables:
-            branches += [f"EventInfo.{lep}_{var}_%SYS% -> ttHH_{lep}_{var}_%SYS%"]
-
-    # ML variables
-    ml_variables = ["dilept_type", "total_charge", "trilept_type"]
-    for var in ml_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}_%SYS%"]
+    if (flags.Analysis.save_ttHH_cutflow):
+        cutList = flags.Analysis.CutList
+        for cut in cutList:
+            branches += [f"EventInfo.{cut}_%SYS% -> ttHH_{cut}_%SYS%"]
 
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
-    return branches
+    return branches, float_variable_names, int_variable_names

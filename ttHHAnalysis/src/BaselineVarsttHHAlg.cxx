@@ -53,20 +53,18 @@ namespace ttHH
 
     // Intialise syst-aware output decorators
 
-    // Add MC var
-    if(m_isMC) m_Fvarnames.insert(m_Fvarnames.end(), m_Fvarnames_MC.begin(), m_Fvarnames_MC.end());
-
-    for (const std::string &string_var: m_Fvarnames) {
-      CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
-      m_Fbranches.emplace(string_var, var);
-      ATH_CHECK (m_Fbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
+    for (const std::string &var : m_floatVariables) {
+      CP::SysWriteDecorHandle<float> whandle{var+"_%SYS%", this};
+      m_Fbranches.emplace(var, whandle);
+      ATH_CHECK (m_Fbranches.at(var).initialize(m_systematicsList, m_eventHandle));
     }
 
-    for (const std::string &string_var: m_Ivarnames) {
-      CP::SysWriteDecorHandle<int> var {string_var+"_%SYS%", this};
-      m_Ibranches.emplace(string_var, var);
-      ATH_CHECK (m_Ibranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
-    }
+    for (const std::string &var : m_intVariables){
+      ATH_MSG_DEBUG("initializing integer variable: " << var);
+      CP::SysWriteDecorHandle<int> whandle{var+"_%SYS%", this};
+      m_Ibranches.emplace(var, whandle);
+      ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
+    };
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -123,11 +121,11 @@ namespace ttHH
       double HT = 0; // scalar sum of jet pT
       int truthLabel = -99;
 
-      for (const std::string &string_var: m_Fvarnames) {
+      for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
       }
       
-      for (const std::string &string_var: m_Ivarnames) {
+      for (const auto& string_var: m_intVariables) {
         m_Ibranches.at(string_var).set(*event, -99, sys);
       }
 
@@ -144,7 +142,7 @@ namespace ttHH
 
           m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel, sys);
         }
- 
+
         // Build the Higgs candidates
         H1 = bjets->at(0)->p4() + bjets->at(1)->p4();
         H2 = bjets->at(2)->p4() + bjets->at(3)->p4();
@@ -321,6 +319,7 @@ namespace ttHH
           m_Fbranches.at("Muon1_effSF").set(*event, mu_SF, sys);
         }
       }
+
       if (muons->size() >= 2) {
         const xAOD::Muon* muon2 = muons->at(1);
         mu2 = muon2->p4();
@@ -363,7 +362,7 @@ namespace ttHH
       size_t muonSize = muons->size();
       size_t electronSize = electrons->size();
       int leptonCount = muonSize + electronSize;
-        
+
       if (leptonCount == 2){
 
         //-- total charge
@@ -372,8 +371,8 @@ namespace ttHH
           totalCharge += muon->charge();
         for (const auto& electron : *electrons) 
           totalCharge += electron->charge();
-        
-        m_Ibranches.at("total_charge").set(*event, totalCharge, sys);
+
+	m_Ibranches.at("total_charge").set(*event, totalCharge, sys);
         m_Ibranches.at("dilept_type").set(*event, muonSize == 2 ? 3 : (muonSize == 1 ? 2 : 1), sys);
 
         //-- Filling Lepton branches
@@ -410,13 +409,14 @@ namespace ttHH
       //-- 3l
       m_Ibranches.at("trilept_type").set(*event, (leptonCount == 3) ? 1 : 0, sys);
       //--
-      
+
       for (const xAOD::Jet *jet : *jets) // Jets here can be every type of jet (No Working point selected)
       {
         HT += jet->pt();
       }
+
       m_Fbranches.at("HT").set(*event, HT, sys);
-      m_Ibranches.at("n_leptons").set(*event, muons->size() + electrons->size(), sys);
+      m_Ibranches.at("nLeptons").set(*event, muons->size() + electrons->size(), sys);
     }
     return StatusCode::SUCCESS;
 
@@ -477,15 +477,13 @@ namespace ttHH
     return chi_squared;
   }
 
-
-//-------------------------------------------------------------------------------------------
-// Fill the branches Lepton*_*
+  //-------------------------------------------------------------------------------------------
+  // Fill the branches Lepton*_*
   
-template<typename ParticleType>
-void BaselineVarsttHHAlg::updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
+  template<typename ParticleType>
+  void BaselineVarsttHHAlg::updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
                                        int lep_pdgid, float lep_sf, 
                                        const CP::SystematicSet& sys) {
-
   
     // Branch name using lepton index
     std::string prefix = "Lepton" + std::to_string(leptonIndex) + "_";
@@ -517,8 +515,5 @@ void BaselineVarsttHHAlg::updateLeptonBranch(const xAOD::EventInfo *event, int l
     
     m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
     m_Ibranches.at(prefix + "isTight").set(*event, 1, sys);
-
-}
-
-
+  }
 }

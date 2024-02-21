@@ -19,7 +19,7 @@ do_photons: false
 small_R_jet:
   btag_wp: GN2v00LegacyWP_FixedCutBEff_77
   amount_bjet: 6
-  variables: ["truthLabel"]
+  variables_bjets: ["truthLabel"]
 
 Electron:
   ID: "MediumLH"
@@ -73,10 +73,10 @@ ttree_output:
   - AnalysisMiniTree:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
-    reco_outputs:
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      electrons: 'container_names.output.electrons'
-      muons: 'container_names.output.muons'
+    #reco_outputs:
+    #  small_R_jets: 'container_names.output.reco4PFlowJet'
+    #  electrons: 'container_names.output.electrons'
+    #  muons: 'container_names.output.muons'
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'
