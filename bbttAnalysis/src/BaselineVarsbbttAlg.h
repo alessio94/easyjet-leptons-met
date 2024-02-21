@@ -101,6 +101,9 @@ private:
     CP::SysReadDecorHandle<int> 
     m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
+    CP::SysReadDecorHandle<int>
+    m_truthFlav{ this, "truthFlav", "HadronConeExclTruthLabelID", "Jet truth flavor" };
+
     Gaudi::Property<bool> m_storeHighLevelVariables
       { this, "storeHighLevelVariables", false, "Flag to store high level variables in output" };
 

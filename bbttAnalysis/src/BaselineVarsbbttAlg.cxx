@@ -65,7 +65,9 @@ namespace HHBBTT
     if (!m_PCBT.empty()) {
       ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
     }
-
+    if (m_isMC) {
+      ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
+    }
 
     for (const std::string &var : m_floatVariables){
       ATH_MSG_DEBUG("initializing float variable: " << var);
@@ -225,24 +227,24 @@ namespace HHBBTT
       }
      
       if (bjets->size() > 1){
+
+        for(unsigned int i=0; i<2; i++){
+          std::string prefix = "Jet_b"+std::to_string(i+1);
+          TLorentzVector tlv = bjets->at(i)->p4();
+          m_Fbranches.at(prefix+"_pt").set(*event,  tlv.Pt(), sys);
+          m_Fbranches.at(prefix+"_eta").set(*event, tlv.Eta(), sys);
+          m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
+          m_Fbranches.at(prefix+"_E").set(*event,   tlv.E(), sys);
+          if(m_isMC) m_Ibranches.at(prefix+"_truthLabel").set
+                       (*event, m_truthFlav.get(*bjets->at(i), sys), sys);
+          if(PCBTgiven) m_Ibranches.at(prefix+"_pcbt").set
+                          (*event, m_PCBT.get(*bjets->at(i), sys), sys);
+        }
+
         TLorentzVector b1 = bjets->at(0)->p4();
         TLorentzVector b2 = bjets->at(1)->p4();
         bb = b1+b2;
         found_bb = true;
-        m_Fbranches.at("Jet_b1_pt").set(*event,  b1.Pt(), sys);
-        m_Fbranches.at("Jet_b1_eta").set(*event, b1.Eta(), sys);
-        m_Fbranches.at("Jet_b1_phi").set(*event, b1.Phi(), sys);
-        m_Fbranches.at("Jet_b1_E").set(*event,   b1.E(), sys);
-        m_Fbranches.at("Jet_b2_pt").set(*event,  b2.Pt(), sys);
-        m_Fbranches.at("Jet_b2_eta").set(*event, b2.Eta(), sys);
-        m_Fbranches.at("Jet_b2_phi").set(*event, b2.Phi(), sys);
-        m_Fbranches.at("Jet_b2_E").set(*event,   b2.E(), sys);
-        if(PCBTgiven){
-          m_Ibranches.at("Jet_b1_pcbt").set(*event,m_PCBT.get(*bjets->at(0), sys),sys);
-          m_Ibranches.at("Jet_b2_pcbt").set(*event,m_PCBT.get(*bjets->at(1), sys),sys);
-        }
-
-
         m_Fbranches.at("H_bb_pt").set(*event, bb.Pt(), sys);
         m_Fbranches.at("H_bb_eta").set(*event, bb.Eta(), sys);
         m_Fbranches.at("H_bb_phi").set(*event, bb.Phi(), sys);
