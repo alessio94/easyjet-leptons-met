@@ -75,7 +75,7 @@ Tau:
   ID: ""
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
-  variables_int: ["charge"]
+  variables_int: ["charge", "nProng", "isTauID", "isAntiTau"]
   extra_wps: []
 
 Lepton:

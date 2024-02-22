@@ -23,6 +23,8 @@
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+#include <AsgDataHandles/ReadDecorHandle.h>
+
 namespace HHBBTT
 {
 
@@ -89,6 +91,16 @@ private:
       { this, "tauWP", "","Tau ID working point" };
     CP::SysReadDecorHandle<float> m_tau_effSF{"", this};
 
+    // tauID and anti-tauID decorators
+    Gaudi::Property<std::string> 
+    m_IDTauDecorName { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
+
+    Gaudi::Property<std::string>
+    m_antiTauDecorName { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
+
+
     CP::SysReadDecorHandle<bool> 
     m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};
     CP::SysReadDecorHandle<bool> 
@@ -123,3 +135,4 @@ private:
 } // namespace HHBBTT
 
 #endif
+

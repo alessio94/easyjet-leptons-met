@@ -150,6 +150,8 @@ def bbtt_cfg(
             taus="bbttAnalysisTaus_%SYS%",
             met="AnalysisMET_%SYS%",
             tauWP=flags.Analysis.Tau.ID,
+            idTauDecorKey="isIDTau",
+            antiTauDecorKey="isAntiTau",
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
