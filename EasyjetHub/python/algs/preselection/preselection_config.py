@@ -9,8 +9,9 @@ def event_selection_sequence(flags):
     makeConfig = config.makeConfig
 
     configSeq += makeConfig('EventCleaning')
-    configSeq.setOptionValue('.runPrimaryVertexSelection', True)
-    configSeq.setOptionValue('.runEventCleaning', True)
+    configSeq.setOptionValue('.runPrimaryVertexSelection',
+                             flags.Analysis.do_event_cleaning)
+    configSeq.setOptionValue('.runEventCleaning', flags.Analysis.do_event_cleaning)
     configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
 
     if not flags.Analysis.loose_jet_cleaning:
