@@ -11,7 +11,7 @@ def tau_decor_cfg(flags, **kwargs):
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
         CompFactory.Easyjet.TauDecoratorAlg(
-            f"TagDecor_{taucoll}",
+            f"TauDecor_{taucoll}",
             isMC=flags.Input.isMC,
             tauIDWP=flags.Analysis.Tau.ID,
             muonsIn=muoncoll,
