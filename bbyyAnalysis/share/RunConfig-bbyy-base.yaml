@@ -63,7 +63,7 @@ do_resonant_PNN: false
 bypass: false
 
 # flag for trigger filtering
-do_trigger_filtering: true
+do_trigger_filtering: false
 
 # name that will go in the tree bbyy_pass_<selection_name>_%SYS%
 selection_name: "allcuts"
