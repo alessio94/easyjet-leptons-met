@@ -2,7 +2,7 @@ include: EasyjetHub/base-config.yaml
 
 # Which analysis and channels to consider
 do_bbtt_analysis: true
-channel: ["hadhad","hadhad1b","lephad"]
+channel: ["hadhad","hadhad1b","lephad","ZCR","TopEMuCR"]
 
 # Toggles to bypass event selection
 bypass: false

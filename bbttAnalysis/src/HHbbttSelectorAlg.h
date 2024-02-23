@@ -85,6 +85,7 @@ namespace HHBBTT
     N_LEPTONS_CUT_HADHAD,
     TWO_TAU,
     OS_CHARGE_HADHAD,
+    OS_CHARGE_LEPTONS,
     pass_baseline_STT,
     pass_baseline_DTT_2016,
     pass_baseline_DTT_4J12,
@@ -100,6 +101,8 @@ namespace HHBBTT
     pass_DTT_4J12_1B,
     pass_DTT_L1Topo_1B,
     pass_DTT_1B,
+    pass_ZCR,
+    pass_TopEMuCR,
 
     is15,
     is16,
@@ -116,6 +119,9 @@ namespace HHBBTT
     is17PeriodB8_end,
     is18PeriodB_end,
     is18PeriodK_end,
+    is22_75bunches,
+    is23_75bunches,
+    is23_400bunches,
     l1topo_disabled,
   };
 
@@ -237,6 +243,7 @@ private:
     {HHBBTT::N_LEPTONS_CUT_LEPHAD, "N_LEPTONS_CUT_LEPHAD"},
     {HHBBTT::ONE_TAU, "ONE_TAU"},
     {HHBBTT::OS_CHARGE_LEPHAD, "OS_CHARGE_LEPHAD"},
+    {HHBBTT::OS_CHARGE_LEPTONS, "OS_CHARGE_LEPTONS"},
     {HHBBTT::pass_baseline_SLT, "pass_baseline_SLT"},
     {HHBBTT::pass_baseline_LTT, "pass_baseline_LTT"},
     {HHBBTT::pass_SLT, "pass_SLT"},
@@ -259,6 +266,8 @@ private:
     {HHBBTT::pass_DTT_4J12_1B, "pass_DTT_4J12_1B"},
     {HHBBTT::pass_DTT_L1Topo_1B, "pass_DTT_L1Topo_1B"},
     {HHBBTT::pass_DTT_1B, "pass_DTT_1B"},
+    {HHBBTT::pass_ZCR, "pass_ZCR"},
+    {HHBBTT::pass_TopEMuCR, "pass_TopEMuCR"},
     {HHBBTT::is15, "is15"},
     {HHBBTT::is16, "is16"},
     {HHBBTT::is17, "is17"},
@@ -273,6 +282,9 @@ private:
     {HHBBTT::is17PeriodB8_end, "is17PeriodB8_end"},
     {HHBBTT::is18PeriodB_end, "is18PeriodB_end"},
     {HHBBTT::is18PeriodK_end, "is18PeriodK_end"},
+    {HHBBTT::is22_75bunches, "is22_75bunches"},
+    {HHBBTT::is23_75bunches, "is23_75bunches"},
+    {HHBBTT::is23_400bunches, "is23_400bunches"},
     {HHBBTT::l1topo_disabled, "l1topo_disabled"},
     };
 

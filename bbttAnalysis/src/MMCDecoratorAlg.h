@@ -74,6 +74,8 @@ private:
     CP::SysReadDecorHandle<bool> m_pass_DTT {this, "passDTT", "", "events pass (baseline) DTT"};
     CP::SysReadDecorHandle<bool> m_pass_STT_1B {this, "passSTT_1B", "", "events pass baseline STT"};
     CP::SysReadDecorHandle<bool> m_pass_DTT_1B {this, "passDTT_1B", "", "events pass baseline DTT"};
+    CP::SysReadDecorHandle<bool> m_pass_ZCR {this, "passZCR", "", "events pass ZCR"};
+    CP::SysReadDecorHandle<bool> m_pass_TopEMuCR {this, "passTopEMuCR", "", "events pass TopEMuCR"};
 
     CP::SysReadDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};

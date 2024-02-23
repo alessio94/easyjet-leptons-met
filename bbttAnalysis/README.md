@@ -23,7 +23,7 @@ Analysis Package for the $HH\rightarrow b\bar{b} \tau\tau$ analyis
 - run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbtt-ntupler ttbar_PHYS_10evt.root --run-config bbttAnalysis/RunConfig-bbtt-bypass.yaml --out-file output_PHYS_bbtt.root```
 - run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbtt-ntupler ttbar_PHYSLITE_10evt.root --run-config bbttAnalysis/RunConfig-bbtt-bypass.yaml --out-file output_PHYSLITE_bbtt.root```
 An alternative is to use the preselection step using the configuration `RunConfig-bbtt.yaml` instead of `RunConfig-bbtt-bypass.yaml`, however fewer events would be recorded.
-- possible channels are `lephad`, `hadhad` and `hadhad1b` (`hadhad` one b-tag region)
+- possible channels are `lephad`, `hadhad`, `hadhad1b` (`hadhad` one b-tag region), `ZCR` (Z+HF control region) and `TopEMuCR` (top control region, similar to ZCR but with different flavour leptons)
 
 # Output
 

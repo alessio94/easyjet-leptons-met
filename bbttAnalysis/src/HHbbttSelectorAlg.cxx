@@ -79,6 +79,8 @@ namespace HHBBTT
       if( name == "lephad") m_channels.push_back(HHBBTT::LepHad);
       else if ( name == "hadhad") m_channels.push_back(HHBBTT::HadHad);
       else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
+      else if ( name == "ZCR") m_channels.push_back(HHBBTT::ZCR);
+      else if ( name == "TopEMuCR") m_channels.push_back(HHBBTT::TopEMuCR);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -210,6 +212,7 @@ namespace HHBBTT
       m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) = false;
       m_bools.at(HHBBTT::ONE_TAU) = false;
       m_bools.at(HHBBTT::OS_CHARGE_LEPHAD) = false;
+      m_bools.at(HHBBTT::OS_CHARGE_LEPTONS) = false;
       m_bools.at(HHBBTT::pass_baseline_SLT) = false;
       m_bools.at(HHBBTT::pass_baseline_LTT) = false;
       m_bools.at(HHBBTT::pass_SLT) = false;
@@ -233,6 +236,8 @@ namespace HHBBTT
       m_bools.at(HHBBTT::pass_DTT_4J12_1B) = false;
       m_bools.at(HHBBTT::pass_DTT_L1Topo_1B) = false;
       m_bools.at(HHBBTT::pass_DTT_1B) = false;
+      m_bools.at(HHBBTT::pass_ZCR) = false;
+      m_bools.at(HHBBTT::pass_TopEMuCR) = false;
     
 
       //************
@@ -242,6 +247,7 @@ namespace HHBBTT
       int n_looseleptons = 0;
 
       const xAOD::Electron* ele0 = nullptr;
+      const xAOD::Electron* ele1 = nullptr;
       for (const xAOD::Electron *electron : *electrons)
       {
         bool passElectronWP = eleWPDecorHandle(*electron);
@@ -251,13 +257,19 @@ namespace HHBBTT
 	{
           m_selected_el.set(*electron, true, sys);
           if(!ele0) ele0 = electron;
+          else if(!ele1) ele1 = electron;
           n_leptons += 1;
         }
         else
           n_looseleptons += 1;
       }
+      if (ele1) {
+        if (ele0->charge() != ele1->charge())
+          m_bools.at(HHBBTT::OS_CHARGE_LEPTONS) = true;
+      }
 
       const xAOD::Muon* mu0 = nullptr;
+      const xAOD::Muon* mu1 = nullptr;
       for (const xAOD::Muon *muon : *muons)
       {
         bool passMuonWP = muonWPDecorHandle(*muon);
@@ -267,10 +279,18 @@ namespace HHBBTT
         {
           m_selected_mu.set(*muon, true, sys);
           if(!mu0) mu0 = muon;
+          else if(!mu1) mu1 = muon;
           n_leptons += 1;
         }
         else
           n_looseleptons += 1;
+      }
+      if (mu1) {
+        if (mu0->charge() != mu1->charge())
+          m_bools.at(HHBBTT::OS_CHARGE_LEPTONS) = true;
+      } else if (n_leptons == 2 && mu0) {
+        if (ele0->charge() != mu0->charge())
+          m_bools.at(HHBBTT::OS_CHARGE_LEPTONS) = true;
       }
 
 
@@ -476,11 +496,39 @@ namespace HHBBTT
 	 m_bools.at(HHBBTT::pass_DTT_L1Topo));
       m_bools.at(HHBBTT::pass_DTT_1B) = (m_bools.at(HHBBTT::pass_DTT_2016_1B) || m_bools.at(HHBBTT::pass_DTT_4J12_1B) || m_bools.at(HHBBTT::pass_DTT_L1Topo_1B));
 
+      // Z+HF and top (e+mu) control regions
+      if (m_bools.at(HHBBTT::pass_trigger_SLT) && m_bools.at(HHBBTT::TWO_BJETS)){
+        if((jets->at(0)->pt() > 45. * Athena::Units::GeV) &&
+            (n_leptons == 2) && m_bools.at(HHBBTT::OS_CHARGE_LEPTONS)) {
+          float mll = -999.;
+          float lep1_pt = -999.;
+          if (ele1) {
+            mll = (ele0->p4() + ele1->p4()).M();
+            lep1_pt = ele1->pt();
+          }
+          else if (mu1) {
+            mll = (mu0->p4() + mu1->p4()).M();
+            lep1_pt = mu1->pt();
+          }
+          m_bools.at(HHBBTT::pass_ZCR) = !(mbb > 40. * Athena::Units::GeV && mbb < 210. * Athena::Units::GeV) &&
+                  (mll > 75. * Athena::Units::GeV && mll < 110. * Athena::Units::GeV) &&
+                  (lep1_pt > 40. * Athena::Units::GeV);
+          if(!ele1 && !mu1 &&
+                          !(mbb > 40. * Athena::Units::GeV && mbb < 210. * Athena::Units::GeV) &&
+                          (mll > 75. * Athena::Units::GeV && mll < 110. * Athena::Units::GeV) &&
+                          (ele0->pt() > 40. * Athena::Units::GeV) &&
+                          (mu0->pt() > 40. * Athena::Units::GeV))
+            m_bools.at(HHBBTT::pass_TopEMuCR) = true;
+        }
+      }
+
       bool pass = false;
       for(const auto& channel : m_channels){
        if(channel == HHBBTT::LepHad) pass |= (m_bools.at(HHBBTT::pass_SLT) || m_bools.at(HHBBTT::pass_LTT));
        else if(channel == HHBBTT::HadHad) pass |= (m_bools.at(HHBBTT::pass_STT) || m_bools.at(HHBBTT::pass_DTT));
        else if(channel == HHBBTT::HadHad1B) pass |= (m_bools.at(HHBBTT::pass_STT_1B) || m_bools.at(HHBBTT::pass_DTT_1B));
+       else if(channel == HHBBTT::ZCR) pass |= (m_bools.at(HHBBTT::pass_ZCR));
+       else if(channel == HHBBTT::TopEMuCR) pass |= (m_bools.at(HHBBTT::pass_TopEMuCR));
       }
 
       //****************
@@ -575,6 +623,10 @@ namespace HHBBTT
         applySingleTauTriggerSelection(event, tau0, sys);
         applyDiTauTriggerSelection(event, tau0, tau1, jet0, jet1, sys);
       }
+      else if (channel == HHBBTT::ZCR || channel == HHBBTT::TopEMuCR)
+      {
+        applySingleLepTriggerSelection(event, ele, mu, sys);
+      }
     }
   }
 
@@ -628,63 +680,51 @@ namespace HHBBTT
   {
     bool trigPassed_SET = false;
     bool trigPassed_SMT = false;
+    std::vector<std::string> ele_trigs;
+    std::vector<std::string> mu_trigs;
 
-    std::vector<std::string> single_ele_paths;
-    std::vector<std::string> single_mu_paths;
-
-    // SLT
     if(m_bools.at(HHBBTT::is15)){
-      single_ele_paths = {"trigPassed_HLT_e24_lhmedium_L1EM20VH",
-			  "trigPassed_HLT_e60_lhmedium",
-			  "trigPassed_HLT_e120_lhloose"};
-      single_mu_paths = {"trigPassed_HLT_mu20_iloose_L1MU15",
-			 "trigPassed_HLT_mu50"};
+      ele_trigs = {"HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium", "HLT_e120_lhloose"};
+      mu_trigs = {"HLT_mu20_iloose_L1MU15", "HLT_mu50"};
     }
-    else if(m_bools.at(HHBBTT::is16) || m_bools.at(HHBBTT::is17) ||
-	    m_bools.at(HHBBTT::is18)){
-      single_ele_paths = {"trigPassed_HLT_e26_lhtight_nod0_ivarloose",
-			  "trigPassed_HLT_e60_lhmedium_nod0",
-			  "trigPassed_HLT_e140_lhloose_nod0"};
-      single_mu_paths = {"trigPassed_HLT_mu26_ivarmedium",
-			 "trigPassed_HLT_mu50"};
+    else if(m_bools.at(HHBBTT::is16) || m_bools.at(HHBBTT::is17) || m_bools.at(HHBBTT::is18)){
+      ele_trigs = {"HLT_e26_lhtight_nod0_ivarloose", "HLT_e60_lhmedium_nod0", "HLT_e140_lhloose_nod0"};
+      mu_trigs = {"HLT_mu26_ivarmedium", "HLT_mu50"};
+    }
+    else if(m_bools.at(HHBBTT::is22_75bunches)){
+      ele_trigs = {"HLT_e17_lhvloose_L1EM15VHI", "HLT_e20_lhvloose_L1EM15VH", "HLT_e250_etcut_L1EM22VHI"};
     }
     else if(m_bools.at(HHBBTT::is22)){
-      single_ele_paths = {"trigPassed_HLT_e26_lhtight_ivarloose_L1EM22VHI",
-			  "trigPassed_HLT_e60_lhmedium_L1EM22VHI",
-			  "trigPassed_HLT_e140_lhloose_L1EM22VHI"};
-      single_mu_paths = {"trigPassed_HLT_mu24_ivarmedium_L1MU14FCH",
-			 "trigPassed_HLT_mu50_L1MU14FCH"};
+      ele_trigs = {"HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI", "HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"};
+      mu_trigs = {"HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH", "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH", "HLT_mu80_msonly_3layersEC_L1MU14FCH"};
+    }
+    else if (m_bools.at(HHBBTT::is23_75bunches)){
+      ele_trigs = {"HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI", "HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI"};
+    }
+    else if(m_bools.at(HHBBTT::is23_400bunches)){
+      ele_trigs = {"HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M", "HLT_e140_lhloose_L1eEM26M", "HLT_e300_etcut_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M"};
     }
     else if(m_bools.at(HHBBTT::is23)){
-      single_ele_paths = {"trigPassed_HLT_e26_lhtight_ivarloose_L1eEM26M",
-			  "trigPassed_HLT_e60_lhmedium_L1eEM26M",
-			  "trigPassed_HLT_e140_lhloose_L1eEM26M"};
-      single_mu_paths = {"trigPassed_HLT_mu24_ivarmedium_L1MU14FCH",
-			 "trigPassed_HLT_mu50_L1MU14FCH"};
+      ele_trigs = {"HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M", "HLT_e140_lhloose_L1eEM26M", "HLT_e300_etcut_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M"};
+      mu_trigs = {"HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH", "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH", "HLT_mu80_msonly_3layersEC_L1MU14FCH"};
     }
 
-    // Pass single electron trigger
-    for(const auto& path : single_ele_paths){
-      // Drop trigPassed_ prefix
-      std::string trig = path.substr(11,path.size());
-      trigPassed_SET |= (m_triggerdecos.at(path).get(*event, sys) &&
-			 ele && m_matchingTool->match(*ele, trig));
-      if(trigPassed_SET) break;
+    // check electron triggers passing
+    for (const auto& trig : ele_trigs) {
+      trigPassed_SET |= (m_triggerdecos.at(std::string("trigPassed_") + trig).get(*event, sys) && ele && m_matchingTool->match(*ele, trig));;
+      if (trigPassed_SET)
+        break;
     }
-
     if(!ele) trigPassed_SET = false;
     if(trigPassed_SET)
       trigPassed_SET &= ele->pt() > m_pt_threshold[HHBBTT::SLT][HHBBTT::ele];
 
-    // Pass single muon trigger
-    for(const auto& path : single_mu_paths){
-      // Drop trigPassed_ prefix
-      std::string trig = path.substr(11,path.size());
-      trigPassed_SMT |= (m_triggerdecos.at(path).get(*event, sys) &&
-			 mu && m_matchingTool->match(*mu, trig));
-      if(trigPassed_SMT) break;
+    // check muon triggers passing
+    for (const auto& trig : mu_trigs) {
+      trigPassed_SMT |= (m_triggerdecos.at(std::string("trigPassed_") + trig).get(*event, sys) && mu && m_matchingTool->match(*mu, trig));;
+      if (trigPassed_SMT)
+        break;
     }
-
     if(!mu) trigPassed_SMT = false;
     if(trigPassed_SMT)
       trigPassed_SMT &= mu->pt() > m_pt_threshold[HHBBTT::SLT][HHBBTT::mu];
@@ -1023,13 +1063,21 @@ namespace HHBBTT
     m_bools.at(HHBBTT::is17PeriodB8_end) = 327582 <= rdmNumber && rdmNumber <= 341649;
     m_bools.at(HHBBTT::is18PeriodB_end) = 348885 <= rdmNumber && rdmNumber <= 364485;
     m_bools.at(HHBBTT::is18PeriodK_end) = 355529 <= rdmNumber && rdmNumber <= 364485;
+    m_bools.at(HHBBTT::is22_75bunches) = 427882 <= rdmNumber && rdmNumber < 428071;
+    m_bools.at(HHBBTT::is23_75bunches) = 450360 <= rdmNumber && rdmNumber < 450894;
+    m_bools.at(HHBBTT::is23_400bunches) = 450894 <= rdmNumber && rdmNumber < 451094;
 
     // Runs in which the L1Topo was mistakingly disabled
     m_bools.at(HHBBTT::l1topo_disabled) = (rdmNumber == 336506) || (rdmNumber == 336548) || (rdmNumber == 336567);
 
-    // Single-lepton triggers
-    m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = (m_bools.at(HHBBTT::is15) ? 25. : 27.) * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = (m_bools.at(HHBBTT::is15) ? 21. : 27.) * Athena::Units::GeV;
+    // Single electron triggers
+    if(m_bools.at(HHBBTT::is15)) m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 25. * Athena::Units::GeV;
+    else if(m_bools.at(HHBBTT::is22_75bunches)) m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 18. * Athena::Units::GeV;
+    else m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 27. * Athena::Units::GeV;
+    // Single muon triggers
+    if(m_bools.at(HHBBTT::is15)) m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 21. * Athena::Units::GeV;
+    else if(m_bools.at(HHBBTT::is22) || m_bools.at(HHBBTT::is22)) m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 25. * Athena::Units::GeV;
+    else m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 27. * Athena::Units::GeV;
 
     // Single tau triggers
     float min_tau_STT = 180. * Athena::Units::GeV;

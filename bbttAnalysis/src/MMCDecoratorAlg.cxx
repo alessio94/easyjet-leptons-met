@@ -34,6 +34,8 @@ namespace HHBBTT
     ATH_CHECK (m_pass_DTT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_STT_1B.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_DTT_1B.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_ZCR.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_TopEMuCR.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -63,6 +65,8 @@ namespace HHBBTT
       if( name == "lephad") m_channels.push_back(HHBBTT::LepHad);
       else if ( name == "hadhad") m_channels.push_back(HHBBTT::HadHad);
       else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
+      else if ( name == "ZCR") m_channels.push_back(HHBBTT::ZCR);
+      else if ( name == "TopEMuCR") m_channels.push_back(HHBBTT::TopEMuCR);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -97,11 +101,35 @@ namespace HHBBTT
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
-
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
+      // Bail out early for CRs
+      for(const auto& channel : m_channels){
+        if ((channel == HHBBTT::ZCR && m_pass_ZCR.get(*event, sys)) ||
+            (channel == HHBBTT::TopEMuCR && m_pass_TopEMuCR.get(*event, sys))) {
+          m_mmc_status.set(*event, -999, sys);
+          m_mmc_pt.set(*event, -999., sys);
+          m_mmc_eta.set(*event, -999., sys);
+          m_mmc_phi.set(*event, -999., sys);
+          m_mmc_m.set(*event, -999., sys);
+
+          m_mmc_nu1_pt.set(*event, -999., sys);
+          m_mmc_nu1_eta.set(*event, -999., sys);
+          m_mmc_nu1_phi.set(*event, -999., sys);
+          m_mmc_nu1_m.set(*event, -999., sys);
+
+          m_mmc_nu2_pt.set(*event, -999., sys);
+          m_mmc_nu2_eta.set(*event, -999., sys);
+          m_mmc_nu2_phi.set(*event, -999., sys);
+          m_mmc_nu2_m.set(*event, -999., sys);
+
+          return StatusCode::SUCCESS;
+        }
+      }
+
+      // Retrive inputs
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
@@ -194,11 +222,10 @@ namespace HHBBTT
 
       // Decorate ouput
       m_mmc_status.set(*event, status, sys);
-
       m_mmc_pt.set(*event, res.Pt(), sys);
       m_mmc_eta.set(*event, res.Eta(), sys);
       m_mmc_phi.set(*event, res.Phi(), sys);
-      m_mmc_m.set(*event, res.M(), sys);            
+      m_mmc_m.set(*event, res.M(), sys);
 
       m_mmc_nu1_pt.set(*event, nu1.Pt(), sys);
       m_mmc_nu1_eta.set(*event, nu1.Eta(), sys);
@@ -209,7 +236,6 @@ namespace HHBBTT
       m_mmc_nu2_eta.set(*event, nu2.Eta(), sys);
       m_mmc_nu2_phi.set(*event, nu2.Phi(), sys);
       m_mmc_nu2_m.set(*event, nu2.M(), sys);            
-
     }
 
     return StatusCode::SUCCESS;

@@ -123,6 +123,8 @@ def bbtt_cfg(
                 passDTT="pass" + baseline + "DTT_%SYS%",
                 passSTT_1B="pass_baseline_STT_%SYS%",
                 passDTT_1B="pass_baseline_DTT_%SYS%",
+                passZCR="pass_ZCR_%SYS%",
+                passTopEMuCR="pass_TopEMuCR_%SYS%",
                 channel=flags.Analysis.channel,
             )
         )
