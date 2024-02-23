@@ -502,18 +502,21 @@ namespace ttHH
     if(m_isMC) m_Fbranches.at(prefix + "effSF").set(*event, lep_sf, sys);
 
     // Truth
-    auto [lep_truthOrigin, lep_truthType] = truthOrigin(particle);
-    m_Ibranches.at(prefix + "truthOrigin").set(*event, lep_truthOrigin, sys);
-    m_Ibranches.at(prefix + "truthType").set(*event, lep_truthType, sys);
-    int lep_isPrompt = 0;
+    if (m_isMC) {
+      auto [lep_truthOrigin, lep_truthType] = truthOrigin(particle);
+      m_Ibranches.at(prefix + "truthOrigin").set(*event, lep_truthOrigin, sys);
+      m_Ibranches.at(prefix + "truthType").set(*event, lep_truthType, sys);
     
-    if (lep_pdgid==13){ // simplistic
-      if (lep_truthType==6) lep_isPrompt=1; // isolated prompts
-    } else if (lep_pdgid==11){
-      if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
+      int lep_isPrompt = 0;
+    
+      if (lep_pdgid==13){ // simplistic
+        if (lep_truthType==6) lep_isPrompt=1; // isolated prompts
+      } else if (lep_pdgid==11){
+        if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
+      }
+    
+      m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
+      m_Ibranches.at(prefix + "isTight").set(*event, 1, sys);
     }
-    
-    m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
-    m_Ibranches.at(prefix + "isTight").set(*event, 1, sys);
   }
 }
