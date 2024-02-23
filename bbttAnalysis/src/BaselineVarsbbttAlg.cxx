@@ -137,42 +137,97 @@ namespace HHBBTT
       }
 
       // selected leptons ; 
-      TLorentzVector lepton(0,0,0,0);
-      int lepton_charge = -99;
-      int lepton_pdgid = -99;
-      float lepton_SF = 1.;
-      bool found_lepton = false;
+      TLorentzVector lead_lep(0,0,0,0);
+      TLorentzVector sublead_lep(0,0,0,0);
+      int lead_lep_charge = -99;
+      int sublead_lep_charge = -99;
+      int lead_lep_pdgid = -99;
+      int sublead_lep_pdgid = -99;
+      float lead_lep_SF = 1.;
+      float sublead_lep_SF = 1.;
+      bool found_lead_lep = false;
+      bool found_sublead_lep = false;
 
       for(const xAOD::Electron* electron : *electrons) {
-        if (m_selected_el.get(*electron, sys)){
-          lepton = electron->p4();
-          lepton_charge = electron->charge();
-          lepton_pdgid = electron->charge() > 0 ? -11 : 11;
-          if(m_isMC) lepton_SF = m_ele_SF.get(*electron,sys);
-          found_lepton = true;
-          break; // At most one lepton selected
+        if (m_selected_el.get(*electron, sys) && !found_lead_lep){
+          lead_lep = electron->p4();
+          lead_lep_charge = electron->charge();
+          lead_lep_pdgid = electron->charge() > 0 ? -11 : 11;
+          if(m_isMC) lead_lep_SF = m_ele_SF.get(*electron,sys);
+          found_lead_lep = true;
       	}
+        else if (m_selected_el.get(*electron, sys) && found_lead_lep){
+          sublead_lep = electron->p4();
+          sublead_lep_charge = electron->charge();
+          sublead_lep_pdgid = electron->charge() > 0 ? -11 : 11;
+          if(m_isMC) sublead_lep_SF = m_ele_SF.get(*electron,sys);
+          found_sublead_lep = true;
+          break; // At most two leptons selected
+        }
       }
       for(const xAOD::Muon* muon : *muons) {
-        if(found_lepton) break;
-        if (m_selected_mu.get(*muon, sys)){
-          lepton = muon->p4();
-          lepton_charge = muon->charge();
-          lepton_pdgid = muon->charge() > 0 ? -13 : 13;
-          if(m_isMC) lepton_SF = m_mu_SF.get(*muon,sys);
-          found_lepton = true;
+        if (m_selected_mu.get(*muon, sys) && !found_lead_lep){
+          lead_lep = muon->p4();
+          lead_lep_charge = muon->charge();
+          lead_lep_pdgid = muon->charge() > 0 ? -13 : 13;
+          if(m_isMC) lead_lep_SF = m_mu_SF.get(*muon,sys);
+          found_lead_lep = true;
           break; 
+        }
+        if (m_selected_mu.get(*muon, sys) && found_lead_lep){
+          if (found_sublead_lep) {
+            if (sublead_lep.Pt() > muon->p4().Pt()) break;
+          }
+          sublead_lep = muon->p4();
+          sublead_lep_charge = muon->charge();
+          sublead_lep_pdgid = muon->charge() > 0 ? -13 : 13;
+          if(m_isMC) sublead_lep_SF = m_mu_SF.get(*muon,sys);
+          found_sublead_lep = true;
+          break;
+        }
+      }
+      // the muon might actually be the leading lepton
+      if (found_sublead_lep) {
+        if (lead_lep.Pt() < sublead_lep.Pt()) {
+          TLorentzVector temp(0,0,0,0);
+          int temp_charge = -99;
+          int temp_pdgid = -99;
+          float temp_SF = 1.;
+
+          temp = lead_lep;
+          temp_charge = lead_lep_charge;
+          temp_pdgid = lead_lep_pdgid;
+          if(m_isMC) temp_SF = lead_lep_SF;
+
+          lead_lep = sublead_lep;
+          lead_lep_charge = sublead_lep_charge;
+          lead_lep_pdgid = sublead_lep_pdgid;
+          if(m_isMC) lead_lep_SF = sublead_lep_SF;
+
+          sublead_lep = temp;
+          sublead_lep_charge = temp_charge;
+          sublead_lep_pdgid = temp_pdgid;
+          if(m_isMC) sublead_lep_SF = temp_SF;
         }
       }
 
-      if(found_lepton){
-        m_Fbranches.at("Lepton_pt").set(*event, lepton.Pt(), sys);
-        m_Fbranches.at("Lepton_eta").set(*event, lepton.Eta(), sys);
-        m_Fbranches.at("Lepton_phi").set(*event, lepton.Phi(), sys);
-        m_Fbranches.at("Lepton_E").set(*event, lepton.E(), sys);
-        if(m_isMC) m_Fbranches.at("Lepton_effSF").set(*event, lepton_SF, sys);
-        m_Ibranches.at("Lepton_charge").set(*event, lepton_charge, sys);
-        m_Ibranches.at("Lepton_pdgid").set(*event, lepton_pdgid, sys);
+      if(found_lead_lep){
+        m_Fbranches.at("Lepton1_pt").set(*event, lead_lep.Pt(), sys);
+        m_Fbranches.at("Lepton1_eta").set(*event, lead_lep.Eta(), sys);
+        m_Fbranches.at("Lepton1_phi").set(*event, lead_lep.Phi(), sys);
+        m_Fbranches.at("Lepton1_E").set(*event, lead_lep.E(), sys);
+        if(m_isMC) m_Fbranches.at("Lepton1_effSF").set(*event, lead_lep_SF, sys);
+        m_Ibranches.at("Lepton1_charge").set(*event, lead_lep_charge, sys);
+        m_Ibranches.at("Lepton1_pdgid").set(*event, lead_lep_pdgid, sys);
+      }
+      if(found_sublead_lep){
+        m_Fbranches.at("Lepton2_pt").set(*event, sublead_lep.Pt(), sys);
+        m_Fbranches.at("Lepton2_eta").set(*event, sublead_lep.Eta(), sys);
+        m_Fbranches.at("Lepton2_phi").set(*event, sublead_lep.Phi(), sys);
+        m_Fbranches.at("Lepton2_E").set(*event, sublead_lep.E(), sys);
+        if(m_isMC) m_Fbranches.at("Lepton2_effSF").set(*event, sublead_lep_SF, sys);
+        m_Ibranches.at("Lepton2_charge").set(*event, sublead_lep_charge, sys);
+        m_Ibranches.at("Lepton2_pdgid").set(*event, sublead_lep_pdgid, sys);
       }
 
       //selected tau
@@ -281,8 +336,8 @@ namespace HHBBTT
       TLorentzVector tautau_vis(0,0,0,0);
       bool found_tautau_vis = false;
       if(found_lead_tau){
-        if(found_lepton){
-          tautau_vis = lead_tau + lepton;
+        if(found_lead_lep){
+          tautau_vis = lead_tau + lead_lep;
           found_tautau_vis = true;
         }else if(found_sublead_tau){
           tautau_vis = lead_tau + sublead_tau;
