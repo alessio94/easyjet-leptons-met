@@ -1076,7 +1076,7 @@ namespace HHBBTT
     else m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 27. * Athena::Units::GeV;
     // Single muon triggers
     if(m_bools.at(HHBBTT::is15)) m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 21. * Athena::Units::GeV;
-    else if(m_bools.at(HHBBTT::is22) || m_bools.at(HHBBTT::is22)) m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 25. * Athena::Units::GeV;
+    else if(m_bools.at(HHBBTT::is22) || m_bools.at(HHBBTT::is23)) m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 25. * Athena::Units::GeV;
     else m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 27. * Athena::Units::GeV;
 
     // Single tau triggers
