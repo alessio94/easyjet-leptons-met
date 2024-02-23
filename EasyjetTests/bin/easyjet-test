@@ -39,6 +39,7 @@ declare -A DATAFILES=(
     [fast-data22]=${PHYS_DATA_2022}
     [bbtt-data22-lite]=${PHYSLITE_DATA_2022}
     [ttHH-data22-lite]=${PHYSLITE_DATA_2022}
+    [bbyy-data22-lite]=${PHYSLITE_DATA_2022}
     # MC20
     [mc20]=${PHYS_TTBAR_MC20}
     [fast-mc20]=${PHYS_TTBAR_MC20}
@@ -80,6 +81,7 @@ declare -A TESTS=(
     [fast-data22]="data-fast easyjet-ntupler"
     [bbtt-data22-lite]="simple bbtt-ntupler"
     [ttHH-data22-lite]="simple ttHH-ntupler"
+    [bbyy-data22-lite]="simple bbyy-ntupler"
     # MC20
     [mc20]="simple easyjet-ntupler"
     [fast-mc20]="fast easyjet-ntupler"
@@ -119,6 +121,7 @@ declare -A CONFIGS=(
     # Data
     [bbtt-data22-lite]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     [ttHH-data22-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
+    [bbyy-data22-lite]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
     # MC20
     [bbyy-mc20]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
     [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
