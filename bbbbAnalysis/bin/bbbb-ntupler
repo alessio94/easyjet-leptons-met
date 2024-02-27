@@ -113,7 +113,7 @@ def hh4b_job_cfg():
 
     if flags.Output.AODFileName:
         cfg.merge(
-            get_xaod_cfg(flags),
+            get_xaod_cfg(flags, seqname),
             seqname
         )
 

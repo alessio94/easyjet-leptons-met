@@ -163,7 +163,7 @@ def output_cfg(flags, seqname):
 
     if flags.Output.AODFileName:
         cfg.merge(
-            get_xaod_cfg(flags),
+            get_xaod_cfg(flags, seqname),
             seqname
         )
 

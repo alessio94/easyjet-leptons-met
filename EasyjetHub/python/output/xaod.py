@@ -13,10 +13,11 @@ def container(typename, key, items=[]):
     ]
 
 
-def get_xaod_cfg(flags):
+def get_xaod_cfg(flags, seqname):
     ca = ComponentAccumulator()
     # first we make copies of the jet collection, because reasons
     jetcol = flags.Analysis.container_names.input[flags.Analysis.small_R_jet.jet_type]
+    AcceptAlgs = [seqname]
     ca.addEventAlgo(CompFactory.Easyjet.JetDeepCopyAlg(
         name="jetdeepcopy",
         jetsIn=jetcol.replace("%SYS%", "NOSYS"),
@@ -30,6 +31,11 @@ def get_xaod_cfg(flags):
         flags,
         "AOD",
         ItemList=item_list,
+        AcceptAlgs=AcceptAlgs,
     ))
-    ca.merge(SetupMetaDataForStreamCfg(flags, streamName="AOD"))
+    ca.merge(SetupMetaDataForStreamCfg(
+        flags,
+        streamName="AOD",
+        AcceptAlgs=AcceptAlgs
+    ))
     return ca
