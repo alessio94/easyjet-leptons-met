@@ -47,11 +47,6 @@ def core_services_cfg(flags):
     if flags.PerfMon.doFullMonMT:
         cfg.merge(PerfMonMTSvcCfg(flags))
 
-    # Avoid stack traces to the exception handler. These traces
-    # aren't very useful since they just point to the handler, not
-    # the original bug.
-    cfg.addService(CompFactory.ExceptionSvc(Catch="NONE"))
-
     # Needed for filtering, Athena only for now
     # Create CutFlowSvc otherwise the default CutFlowSvc that has only
     # one CutflowBookkeeper object, and can't deal with multiple weights
