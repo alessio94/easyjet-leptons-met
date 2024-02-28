@@ -272,10 +272,9 @@ namespace HHBBYY
 
       m_Fbranches.at("HT").set(*event, HT, sys);
 
-      if(jets->size()>=3){
-        float topness = compute_Topness(jets);
-        m_Fbranches.at("topness").set(*event, topness, sys);
-      }
+      float topness = compute_Topness(jets);
+      m_Fbranches.at("topness").set(*event, topness, sys);
+      
       m_Fbranches.at("missEt").set(*event, met->met(), sys);
       m_Fbranches.at("metphi").set(*event, met->phi(), sys);
       
@@ -335,12 +334,25 @@ namespace HHBBYY
     float minTopness=std::numeric_limits<float>::max();
     const float wmass=80e3;
     const float topmass=173e3;
-    for(unsigned int j1=0;j1<jets->size()-2;j1++){
-      for(unsigned int j2=j1+1;j2<jets->size()-1;j2++){
-        for(unsigned int j3=j2+1;j3<jets->size();j3++){
+    std::vector< TLorentzVector > temp_jets;
+    for (unsigned int i = 0; i < jets->size(); i++) {
+        temp_jets.push_back(jets->at(i)->p4());
+    }
+    // If there are < 3 jets (min. # required to define ChiWt) fill out the rest with 0, 0, 0, 0 dummy jets
+    if (jets->size() < 3) {
+        for (unsigned int i = 0; i < 3 - jets->size(); i++) {
+            temp_jets.push_back(TLorentzVector(0, 0, 0, 0));
+        }
+    }
+
+    for(unsigned int j1=0;j1<temp_jets.size();j1++){ // W->j1j2, bjet=j3
+      for(unsigned int j2=j1+1;j2<temp_jets.size();j2++){
+        for(unsigned int j3=0;j3<temp_jets.size();j3++){
           // compute m_j1j2 and m_j1j2j3
-          float m_j1j2=((*jets)[j1]->p4()+(*jets)[j2]->p4()).M();
-          float m_j1j2j3=((*jets)[j1]->p4()+(*jets)[j2]->p4()+(*jets)[j3]->p4()).M();
+          if(j3==j1 || j3==j2) 
+              continue;
+          float m_j1j2=(temp_jets.at(j1)+temp_jets.at(j2)).M();
+          float m_j1j2j3=(temp_jets.at(j1)+temp_jets.at(j2)+temp_jets.at(j3)).M();
           // find minimum topness
           float topness=std::hypot((m_j1j2-wmass)/wmass, (m_j1j2j3-topmass)/topmass);
           if(topness<minTopness) minTopness=topness;
