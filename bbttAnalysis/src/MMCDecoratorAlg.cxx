@@ -36,8 +36,6 @@ namespace HHBBTT
     ATH_CHECK (m_pass_DTT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_STT_1B.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_DTT_1B.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_pass_ZCR.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_pass_TopEMuCR.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -68,12 +66,6 @@ namespace HHBBTT
       else if ( name == "hadhad") m_channels.push_back(HHBBTT::HadHad);
       else if ( name == "lephad1b") m_channels.push_back(HHBBTT::LepHad1B);
       else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
-      else if ( name == "ZCR") m_channels.push_back(HHBBTT::ZCR);
-      else if ( name == "TopEMuCR") m_channels.push_back(HHBBTT::TopEMuCR);
-      else{
-        ATH_MSG_ERROR("Unknown channel");
-        return StatusCode::FAILURE;
-      }
     }
 
     // Initialise MMC tool
@@ -108,28 +100,40 @@ namespace HHBBTT
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-      // Bail out early for CRs
+      // Check if one of the signal regions
+      bool is_lephad = false;
+      bool is_hadhad = false;
+
       for(const auto& channel : m_channels){
-        if ((channel == HHBBTT::ZCR && m_pass_ZCR.get(*event, sys)) ||
-            (channel == HHBBTT::TopEMuCR && m_pass_TopEMuCR.get(*event, sys))) {
-          m_mmc_status.set(*event, -999, sys);
-          m_mmc_pt.set(*event, -999., sys);
-          m_mmc_eta.set(*event, -999., sys);
-          m_mmc_phi.set(*event, -999., sys);
-          m_mmc_m.set(*event, -999., sys);
+        if(channel == HHBBTT::LepHad)
+          is_lephad |= m_pass_SLT.get(*event, sys) || m_pass_LTT.get(*event, sys);
+        else if(channel == HHBBTT::LepHad1B)
+          is_lephad |= m_pass_SLT_1B.get(*event, sys) || m_pass_LTT_1B.get(*event, sys);
+        else if(channel == HHBBTT::HadHad)
+            is_hadhad |= m_pass_STT.get(*event, sys) || m_pass_DTT.get(*event, sys);
+        else if(channel == HHBBTT::HadHad1B)
+            is_hadhad |= m_pass_STT_1B.get(*event, sys) || m_pass_DTT_1B.get(*event, sys);
+      }
 
-          m_mmc_nu1_pt.set(*event, -999., sys);
-          m_mmc_nu1_eta.set(*event, -999., sys);
-          m_mmc_nu1_phi.set(*event, -999., sys);
-          m_mmc_nu1_m.set(*event, -999., sys);
+      // Bail out early for CRs
+      if (!(is_lephad || is_hadhad)) {
+        m_mmc_status.set(*event, -999, sys);
+        m_mmc_pt.set(*event, -999., sys);
+        m_mmc_eta.set(*event, -999., sys);
+        m_mmc_phi.set(*event, -999., sys);
+        m_mmc_m.set(*event, -999., sys);
 
-          m_mmc_nu2_pt.set(*event, -999., sys);
-          m_mmc_nu2_eta.set(*event, -999., sys);
-          m_mmc_nu2_phi.set(*event, -999., sys);
-          m_mmc_nu2_m.set(*event, -999., sys);
+        m_mmc_nu1_pt.set(*event, -999., sys);
+        m_mmc_nu1_eta.set(*event, -999., sys);
+        m_mmc_nu1_phi.set(*event, -999., sys);
+        m_mmc_nu1_m.set(*event, -999., sys);
 
-          return StatusCode::SUCCESS;
-        }
+        m_mmc_nu2_pt.set(*event, -999., sys);
+        m_mmc_nu2_eta.set(*event, -999., sys);
+        m_mmc_nu2_phi.set(*event, -999., sys);
+        m_mmc_nu2_m.set(*event, -999., sys);
+
+        continue;
       }
 
       // Retrive inputs
@@ -161,24 +165,6 @@ namespace HHBBTT
       TLorentzVector nu1(0,0,0,0);
       TLorentzVector nu2(0,0,0,0);
       const auto method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
-
-      bool is_lephad = false;
-      bool is_hadhad = false;
-
-      for(const auto& channel : m_channels){
-        if(channel == HHBBTT::LepHad)
-          is_lephad |=
-            m_pass_SLT.get(*event, sys) || m_pass_LTT.get(*event, sys);
-        else if(channel == HHBBTT::LepHad1B)
-          is_lephad |=
-            m_pass_SLT_1B.get(*event, sys) || m_pass_LTT_1B.get(*event, sys);
-        else if(channel == HHBBTT::HadHad)
-          is_hadhad |=
-            m_pass_STT.get(*event, sys) || m_pass_DTT.get(*event, sys);
-        else if(channel == HHBBTT::HadHad1B)
-          is_hadhad |=
-            m_pass_STT_1B.get(*event, sys) || m_pass_DTT_1B.get(*event, sys);
-      }
 
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
