@@ -274,9 +274,8 @@ namespace HHBBLL
     if (nonbjets.size() >= 2){
       bool jetsFound = false;
 
-      for(unsigned int i=0;i<nonbjets.size();i++){
-        for(unsigned int j=0;j<nonbjets.size();j++){
-          if(i==j) continue;
+      for(unsigned int i=0;i<nonbjets.size()-1;i++){
+        for(unsigned int j=i+1;j<nonbjets.size();j++){
 	  const xAOD::Jet* nonbjet1 = nonbjets.at(i);
           const xAOD::Jet* nonbjet2 = nonbjets.at(j);
 
@@ -285,12 +284,10 @@ namespace HHBBLL
 	    jetsFound = true;
 
             float mjj = (nonbjet1->p4() + nonbjet2->p4()).M();
-	    float delta_eta_jj = std::abs(nonbjet1->eta() - nonbjet2->eta());
+	    float delta_eta_jj = nonbjet1->eta() - nonbjet2->eta();
 
-	    if (mjj > max_mjj){
-              max_mjj = mjj;
-	      max_delta_eta_jj = delta_eta_jj;
-            }
+	    if (mjj > max_mjj) max_mjj = mjj;
+	    if (delta_eta_jj > max_delta_eta_jj)  max_delta_eta_jj = delta_eta_jj;
 	  }
         }
       }
