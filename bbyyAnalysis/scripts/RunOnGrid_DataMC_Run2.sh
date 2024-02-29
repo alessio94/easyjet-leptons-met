@@ -115,3 +115,24 @@ easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/m
     --exec bbyy-ntupler \
     --nGBperJob 2 \
     --campaign v1
+
+#tHjb
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.tHjb.p5855.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 2 \
+    --campaign v1
+
+#tWHyy
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.tWHyy.p5855.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 2 \
+    --campaign v1
+
+#ttyy non all had 
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.ttyy_nonallhad.p5855.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 2 \
+    --campaign v1

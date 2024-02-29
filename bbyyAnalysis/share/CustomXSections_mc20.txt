@@ -14,3 +14,6 @@ dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUnc
 345319  PowhegPythia8EvtGen_NNPDF30_AZNLO_ZH125J_Hyy_Zincl_MINLO   1.72792E-03  1.0  1.0  0.0  0.0
 345061  PowhegPythia8EvtGen_NNPDF3_AZNLO_ggZH125_HgamgamZinc       2.78529E-04  1.0  1.0  0.0  0.0
 346525  PowhegPythia8EvtGen_A14NNPDF23_NNPDF30ME_ttH125_gamgam     1.15112E-03  1.0  1.0  0.0  0.0
+346677  aMcAtNloPythia8EvtGen_tHjb125_4fl_CPalpha_0_gamgam         1.68548E-04  1.0  1.0  0.0  0.0
+346759  aMcAtNloPythia8EvtGen_tWH125_CPalpha_0_gamgam              3.44359E-05  1.0  1.0  0.0  0.0
+508781  MGPy8EG_ttyy_nonallhad_LO                                  6.4820E-03   1.0  1.0  0.0  0.0
