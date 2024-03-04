@@ -50,6 +50,8 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
         )
     )
 
+    from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
+
     # Selection
     cfg.addEventAlgo(
         CompFactory.HHBBLL.HHbbllSelectorAlg(
@@ -101,7 +103,9 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             categoryList=flags.Analysis.Categories,
             saveCutFlow=flags.Analysis.save_bbll_cutflow,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            passTriggers=flags.Analysis.TriggerChains
+            passTriggers=flags.Analysis.TriggerChains,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
+            Years=flags.Analysis.Years,
         )
     )
 

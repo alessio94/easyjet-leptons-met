@@ -27,6 +27,7 @@ atlas_add_component(bbllAnalysis
   FourMomUtils
   TruthUtils
   DiTauMassToolsLib
+  TriggerMatchingToolLib
   EventBookkeeperToolsLib
   EasyjetHubLib
 )

@@ -117,8 +117,31 @@ namespace HHBBLL
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
 
+      // Leptons
+      const xAOD::Electron* ele0 = nullptr;
+      const xAOD::Electron* ele1 = nullptr;
+
+      const xAOD::Muon* mu0 = nullptr;
+      const xAOD::Muon* mu1 = nullptr;
+
+      if (electrons->size() >= 2) {
+        ele0 = electrons->at(0);
+        ele1 = electrons->at(1);
+      }
+
+      if (muons->size() >= 2) {
+        mu0 = muons->at(0);
+        mu1 = muons->at(1);
+      }
+
+      if (electrons->size() == 1 && muons->size() == 1) {
+        ele0 = electrons->at(0);
+        mu0 = muons->at(0);
+      }
+      //
+
       if (!m_passTriggers.empty()) {
-        evaluateTriggerCuts(*event, m_passTriggers, m_bbllCuts);
+        evaluateTriggerCuts(*event, m_passTriggers, ele0, ele1, mu0, mu1, m_bbllCuts);
       }
 
       evaluateLeptonCuts(*electrons, *muons, m_bbllCuts);
@@ -192,11 +215,18 @@ namespace HHBBLL
 
   }
 
-  void SelectionFlagsbbllAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &passTriggers,
-                                                  CutManager& bbllCuts) {
+  void SelectionFlagsbbllAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &passTriggers, 
+                                                  const xAOD::Electron* ele0, const xAOD::Electron* ele1, const xAOD::Muon* mu0,
+                                                  const xAOD::Muon* mu1, CutManager& bbllCuts) {
 
     if (!bbllCuts.exists("PASS_TRIGGER"))
         return;
+
+    bool pass_trigger_ele0 = false;
+    bool pass_trigger_ele1 = false;
+    bool pass_trigger_mu0 = false;
+    bool pass_trigger_mu1 = false;
+    bool pass_trigger_2e = false;
 
     for (const std::string &trigger : passTriggers)
     {
@@ -204,11 +234,14 @@ namespace HHBBLL
       SG::ReadDecorHandle<xAOD::EventInfo, bool> m_triggerDecorHandle(triggerDecorKey);
       //If the event passes any of the available (single or di-) lepton triggers, set the overall trigger cut to true.
       if (m_triggerDecorHandle(event)) {
-        bbllCuts("PASS_TRIGGER").passed = true;
-        break;
+        if (trigger.find("_e") != std::string::npos && (ele0) && !(pass_trigger_ele0) && m_matchingTool->match(*ele0, trigger)) pass_trigger_ele0 = true;
+        if (trigger.find("_e") != std::string::npos && (ele1) && !(pass_trigger_ele1) && m_matchingTool->match(*ele1, trigger)) pass_trigger_ele1 = true;
+        if (trigger.find("_mu") != std::string::npos && (mu0) && !(pass_trigger_mu0) && m_matchingTool->match(*mu0, trigger)) pass_trigger_mu0 = true;
+        if (trigger.find("_mu") != std::string::npos && (mu1) && !(pass_trigger_mu1) && m_matchingTool->match(*mu1, trigger)) pass_trigger_mu1 = true;
+        if (trigger.find("_2e") != std::string::npos && (ele0) && (ele1) && !(pass_trigger_2e) && m_matchingTool->match({ele0, ele1}, trigger)) pass_trigger_2e = true;
       }
     }
-
+    if ((pass_trigger_ele0 && pass_trigger_ele1) || (pass_trigger_mu0 && pass_trigger_mu1) || (pass_trigger_ele0 && pass_trigger_mu0) || (pass_trigger_2e)) bbllCuts("PASS_TRIGGER").passed = true;
   }
 
   void SelectionFlagsbbllAlg::evaluateLeptonCuts

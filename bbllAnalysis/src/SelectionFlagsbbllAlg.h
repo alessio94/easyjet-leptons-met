@@ -20,6 +20,7 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
+#include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
 
 namespace HHBBLL
@@ -58,8 +59,8 @@ namespace HHBBLL
       "IS_em",
       };
 
-      void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
-                          const std::vector<std::string> &passTriggers, CutManager& bbllCuts);
+      void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, const std::vector<std::string> &passTriggers, const xAOD::Electron* ele0,  
+                          const xAOD::Electron* ele1, const xAOD::Muon* mu0, const xAOD::Muon* mu1, CutManager& bbllCuts);
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& bbllCuts);
       void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
@@ -71,6 +72,9 @@ namespace HHBBLL
     private :
       // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
       // "someInfo"};
+
+      Gaudi::Property<std::vector<int>> m_years
+      { this, "Years", false, "which years are running" };
 
       /// \brief Setup syst-aware input container handles
       CutManager m_bbllCuts;
@@ -105,6 +109,9 @@ namespace HHBBLL
       std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
 
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+
+      ToolHandle<Trig::IMatchingTool> m_matchingTool{this, "trigMatchingTool", "",
+	    "Trigger matching tool"};
   };
 
 }
