@@ -48,10 +48,7 @@ atlas_install_python_modules(
   python/utils
 )
 atlas_install_data(
-  share/RunConfig-Resolved.yaml
-  share/RunConfig-SH4b.yaml
-  share/run-config-boosted-minimal.yaml
-  share/histonly-config.yaml
+  share/*.yaml
 )
 
 # atlas_install_data( data/* )

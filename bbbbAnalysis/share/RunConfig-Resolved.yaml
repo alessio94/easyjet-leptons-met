@@ -16,8 +16,12 @@ small_R_jet:
   btag_wp: "DL1dv01_FixedCutBEff_77"
   # additional btagging working points, available for selections and per-jet SFs
   btag_extra_wps:
-    - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
+    - GN2v00LegacyWP_FixedCutBEff_60
+    - GN2v00LegacyWP_FixedCutBEff_70
+    - GN2v00LegacyWP_FixedCutBEff_77
+    - GN2v00LegacyWP_FixedCutBEff_85
+    - GN2v00NewAliasWP_FixedCutBEff_85
 
 # orthogonality studies  
 orthogonality:
@@ -30,9 +34,12 @@ grl_years:
 grl_files:
   include: EasyjetHub/bjet_grl.yaml
 
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
 # list of triggers per year to consider
 trigger_chains:
-  include: EasyjetHub/trigger.yaml
+  include: bbbbAnalysis/resolved-triggers.yaml
 
 # apply loose jet cleaning only
 loose_jet_cleaning: true
