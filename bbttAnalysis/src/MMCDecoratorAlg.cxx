@@ -30,6 +30,8 @@ namespace HHBBTT
 
     ATH_CHECK (m_pass_SLT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_LTT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_SLT_1B.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_LTT_1B.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_STT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_DTT.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_pass_STT_1B.initialize(m_systematicsList, m_eventHandle));
@@ -64,6 +66,7 @@ namespace HHBBTT
     for ( auto name : m_channel_names){
       if( name == "lephad") m_channels.push_back(HHBBTT::LepHad);
       else if ( name == "hadhad") m_channels.push_back(HHBBTT::HadHad);
+      else if ( name == "lephad1b") m_channels.push_back(HHBBTT::LepHad1B);
       else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
       else if ( name == "ZCR") m_channels.push_back(HHBBTT::ZCR);
       else if ( name == "TopEMuCR") m_channels.push_back(HHBBTT::TopEMuCR);
@@ -163,18 +166,18 @@ namespace HHBBTT
       bool is_hadhad = false;
 
       for(const auto& channel : m_channels){
-        if(channel == HHBBTT::LepHad){
-          is_lephad =
+        if(channel == HHBBTT::LepHad)
+          is_lephad |=
             m_pass_SLT.get(*event, sys) || m_pass_LTT.get(*event, sys);
-        }
-        else if(channel == HHBBTT::HadHad || channel == HHBBTT::HadHad1B){
-          if(channel == HHBBTT::HadHad)
-            is_hadhad |=
-              m_pass_STT.get(*event, sys) || m_pass_DTT.get(*event, sys);
-          if(channel == HHBBTT::HadHad1B)
-            is_hadhad |=
-              m_pass_STT_1B.get(*event, sys) || m_pass_DTT_1B.get(*event, sys);
-        }
+        else if(channel == HHBBTT::LepHad1B)
+          is_lephad |=
+            m_pass_SLT_1B.get(*event, sys) || m_pass_LTT_1B.get(*event, sys);
+        else if(channel == HHBBTT::HadHad)
+          is_hadhad |=
+            m_pass_STT.get(*event, sys) || m_pass_DTT.get(*event, sys);
+        else if(channel == HHBBTT::HadHad1B)
+          is_hadhad |=
+            m_pass_STT_1B.get(*event, sys) || m_pass_DTT_1B.get(*event, sys);
       }
 
       for(const xAOD::TauJet* tau : *taus) {
@@ -230,12 +233,12 @@ namespace HHBBTT
       m_mmc_nu1_pt.set(*event, nu1.Pt(), sys);
       m_mmc_nu1_eta.set(*event, nu1.Eta(), sys);
       m_mmc_nu1_phi.set(*event, nu1.Phi(), sys);
-      m_mmc_nu1_m.set(*event, nu1.M(), sys);            
+      m_mmc_nu1_m.set(*event, nu1.M(), sys);
 
       m_mmc_nu2_pt.set(*event, nu2.Pt(), sys);
       m_mmc_nu2_eta.set(*event, nu2.Eta(), sys);
       m_mmc_nu2_phi.set(*event, nu2.Phi(), sys);
-      m_mmc_nu2_m.set(*event, nu2.M(), sys);            
+      m_mmc_nu2_m.set(*event, nu2.M(), sys);
     }
 
     return StatusCode::SUCCESS;

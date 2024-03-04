@@ -70,6 +70,8 @@ private:
 
     CP::SysReadDecorHandle<bool> m_pass_SLT {this, "passSLT", "", "events pass (baseline) SLT"};
     CP::SysReadDecorHandle<bool> m_pass_LTT {this, "passLTT", "", "events pass (baseline) LTT"};
+    CP::SysReadDecorHandle<bool> m_pass_SLT_1B {this, "passSLT_1B", "", "events pass baseline SLT"};
+    CP::SysReadDecorHandle<bool> m_pass_LTT_1B {this, "passLTT_1B", "", "events pass baseline LTT"};
     CP::SysReadDecorHandle<bool> m_pass_STT {this, "passSTT", "", "events pass (baseline) STT"};
     CP::SysReadDecorHandle<bool> m_pass_DTT {this, "passDTT", "", "events pass (baseline) DTT"};
     CP::SysReadDecorHandle<bool> m_pass_STT_1B {this, "passSTT_1B", "", "events pass baseline STT"};

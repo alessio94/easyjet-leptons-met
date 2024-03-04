@@ -8,9 +8,10 @@ namespace HHBBTT
   {
     LepHad = 0,
     HadHad = 1,
-    HadHad1B = 2,
-    ZCR = 3,
-    TopEMuCR = 4,
+    LepHad1B = 2,
+    HadHad1B = 3,
+    ZCR = 4,
+    TopEMuCR = 5,
   };
 
 }

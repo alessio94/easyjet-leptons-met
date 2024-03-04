@@ -119,6 +119,8 @@ def bbtt_cfg(
                 met="AnalysisMET_%SYS%",
                 passSLT="pass" + baseline + "SLT_%SYS%",
                 passLTT="pass" + baseline + "LTT_%SYS%",
+                passSLT_1B="pass_baseline_SLT_%SYS%",
+                passLTT_1B="pass_baseline_LTT_%SYS%",
                 passSTT="pass" + baseline + "STT_%SYS%",
                 passDTT="pass" + baseline + "DTT_%SYS%",
                 passSTT_1B="pass_baseline_STT_%SYS%",
