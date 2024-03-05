@@ -1,4 +1,4 @@
 #dataset_number/I:physics_short/C:crossSection/D:genFiltEff/D:kFactor/D:relUncertUP/D:relUncertDOWN/D:generator_name/C:etag/C
-523072          MGPy8EG_A14NNPDF23LO_ttHH_semilep               0.000775              4.8211E-06            1.0             0.0             0.0             aMcAtNlo+Pythia8(v.308)         e8531
-523073          MGPy8EG_A14NNPDF23LO_ttHH_dilep                 0.000775              3.8012E-07            1.0             0.0             0.0             aMcAtNlo+Pythia8(v.308)         e8531
-523074          MGPy8EG_A14NNPDF23LO_ttHH_fullhad               0.000775              1.5286E-05            1.0             0.0             0.0             aMcAtNlo+Pythia8(v.308)         e8531
+523072          MGPy8EG_A14NNPDF23LO_ttHH_semilep               0.000775              1.4878E-01            1.0             0.0             0.0             aMcAtNlo+Pythia8(v.308)         e8531
+523073          MGPy8EG_A14NNPDF23LO_ttHH_dilep                 0.000775              3.5954E-02            1.0             0.0             0.0             aMcAtNlo+Pythia8(v.308)         e8531
+523074          MGPy8EG_A14NNPDF23LO_ttHH_fullhad               0.000775              1.5392E-01            1.0             0.0             0.0             aMcAtNlo+Pythia8(v.308)         e8531
