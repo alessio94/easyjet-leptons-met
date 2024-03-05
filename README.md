@@ -175,8 +175,8 @@ You will have to install [Docker](https://www.docker.com).
 Preferably, do this in `$WORKDIR`.
 
 ```
-docker pull gitlab-registry.cern.ch/atlas/athena/athanalysis:24.2.XXX
-docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:24.2.XXX
+docker pull gitlab-registry.cern.ch/atlas/athena/athanalysis:25.2.XXX
+docker run -t -i -v $PWD:/workarea:delegated -v $HOME:$HOME:delegated atlas/athanalysis:25.2.XXX
 ```
 
 where you should be careful to change XXX in the lines above to the

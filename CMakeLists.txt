@@ -8,7 +8,7 @@
 cmake_minimum_required( VERSION 3.7 FATAL_ERROR )
 project( easyjet VERSION 1.0.0 )
 
-find_package( AthAnalysis 24.2 REQUIRED )
+find_package( AthAnalysis 25.2 REQUIRED )
 
 # Set up CTest:
 atlas_ctest_setup()

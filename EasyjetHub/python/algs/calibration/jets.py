@@ -89,6 +89,9 @@ def jet_sequence(
             configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
             configSeq.setOptionValue('.kinematicSelection', True)
+            # Keep using the Easyjet version for now, while the Athena
+            # config is being adjusted
+            configSeq.setOptionValue('.globalSF', False)
             if 'btagCDI' in jet_flags:
                 configSeq.setOptionValue(
                     '.bTagCalibFile',
