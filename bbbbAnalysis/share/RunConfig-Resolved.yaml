@@ -1,11 +1,10 @@
-include: EasyjetHub/base-config.yaml
-
-# Which analysis to consider
-do_resolved_dihiggs: true
-do_boosted_dihiggs: false
+include: bbbbAnalysis/RunConfig-bbbb-base.yaml
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbbb"]
+
+# Which analysis to consider
+do_resolved_dihiggs: true
 
 # Toggles for object types
 do_small_R_jets: true
@@ -23,26 +22,12 @@ small_R_jet:
     - GN2v00LegacyWP_FixedCutBEff_85
     - GN2v00NewAliasWP_FixedCutBEff_85
 
-# orthogonality studies  
-orthogonality:
-  include: EasyjetHub/orth-config.yaml 
-  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
-
-grl_years:
-  include: EasyjetHub/bjet_grl_years.yaml
-
-grl_files:
-  include: EasyjetHub/bjet_grl.yaml
-
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
 # list of triggers per year to consider
 trigger_chains:
   include: bbbbAnalysis/resolved-triggers.yaml
-
-# apply loose jet cleaning only
-loose_jet_cleaning: true
 
 # Include the TTree configuration and update details
 ttree_output:
@@ -58,8 +43,6 @@ ttree_output:
         JVT_details: true
         no_bjet_calib_p4: true
         btag_details: true
-      large_R_jets:
-        truth_labels: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'
