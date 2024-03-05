@@ -67,9 +67,9 @@ namespace HHBBTT
 
       for(const auto& channel : m_channels){
         if(channel == HHBBTT::LepHad)
-          is_lephad = m_pass_SLT.get(*event, sys) || m_pass_LTT.get(*event, sys);
+          is_lephad |= m_pass_SLT.get(*event, sys) || m_pass_LTT.get(*event, sys);
         else if(channel == HHBBTT::LepHad1B)
-          is_lephad = m_pass_SLT_1B.get(*event, sys) || m_pass_LTT_1B.get(*event, sys);
+          is_lephad |= m_pass_SLT_1B.get(*event, sys) || m_pass_LTT_1B.get(*event, sys);
         else if(channel == HHBBTT::HadHad)
             is_hadhad |= m_pass_STT.get(*event, sys) || m_pass_DTT.get(*event, sys);
         else if(channel == HHBBTT::HadHad1B)
