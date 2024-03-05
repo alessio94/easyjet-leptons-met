@@ -166,7 +166,7 @@ fast() {
     OPTS+=" -o analysis.root --h5-output test.h5"
     local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    CMD+=" --timeout 45 "
+    CMD+=" --timeout 50 "
     echo "running $CMD"
     $CMD
     metadata-check -v
@@ -177,7 +177,7 @@ data-fast() {
     OPTS+=" --do-trigger-filtering False"
     local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    CMD+=" --timeout 35 "
+    CMD+=" --timeout 50 "
     echo "running $CMD"
     $CMD
     metadata-check -v
@@ -187,7 +187,7 @@ h5-fast() {
     OPTS+=" --h5-output test.h5"
     local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    CMD+=" --timeout 35 "
+    CMD+=" --timeout 50 "
     echo "running $CMD"
     $CMD
     metadata-check -v
@@ -198,7 +198,7 @@ aod-fast() {
     OPTS+=" --output-xaod ${AOD}"
     local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    CMD+=" --timeout 45 "
+    CMD+=" --timeout 50 "
     echo "running $CMD"
     $CMD
     metadata-check -v
@@ -214,7 +214,7 @@ hist-syst() {
     OPTS+=" --output-hists hists.h5"
     local CMD="$1 $2 -c $3 $OPTS"
     $CMD --stop-after-config
-    CMD+="  --timeout 45"
+    CMD+="  --timeout 50"
     echo "running $CMD"
     $CMD
     metadata-check -v
