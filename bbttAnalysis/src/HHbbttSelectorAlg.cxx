@@ -678,33 +678,46 @@ namespace HHBBTT
    const xAOD::Jet* jet0, const xAOD::Jet* jet1){
 
     // only run trigger selection if in channel
+    bool use_SLT = false;
+    bool use_LTT = false;
+    bool use_STT = false;
+    bool use_DTT = false;
     for (const auto &channel : m_channels){
-      if (channel == HHBBTT::LepHad)
-	{
-	  applySingleLepTriggerSelection(event, triggerdecos,
-                                         ele, ele_trigMatchDecos,
-                                         mu, mu_trigMatchDecos);
-	  applyLepHadTriggerSelection(event, triggerdecos,
-                                      ele, ele_trigMatchDecos,
-                                      mu, mu_trigMatchDecos,
-                                      tau0, tau_trigMatchDecos,
-                                      jet0, jet1);
-	}
-      else if (channel == HHBBTT::HadHad)
-	{
-	  applySingleTauTriggerSelection(event, triggerdecos,
-                                         tau0, tau_trigMatchDecos);
-	  applyDiTauTriggerSelection(event, triggerdecos,
-                                     tau0, tau1, tau_trigMatchDecos,
-                                     jet0, jet1);
-	}
-      else if (channel == HHBBTT::ZCR || channel == HHBBTT::TopEMuCR)
-	{
-	  applySingleLepTriggerSelection(event, triggerdecos,
-                                         ele, ele_trigMatchDecos,
-                                         mu, mu_trigMatchDecos);
-	}
+      if (channel == HHBBTT::LepHad || channel == HHBBTT::LepHad1B){
+	use_SLT = true;
+	use_LTT = true;
+      }
+      else if (channel == HHBBTT::HadHad || channel == HHBBTT::HadHad1B){
+	use_STT = true;
+	use_DTT = true;
+      }
+      else if (channel == HHBBTT::ZCR || channel == HHBBTT::TopEMuCR){
+	use_SLT = true;
+      }
     }
+
+    if(use_SLT){
+      applySingleLepTriggerSelection(event, triggerdecos,
+				     ele, ele_trigMatchDecos,
+				     mu, mu_trigMatchDecos);
+    }
+    if(use_LTT){
+      applyLepHadTriggerSelection(event, triggerdecos,
+				  ele, ele_trigMatchDecos,
+				  mu, mu_trigMatchDecos,
+				  tau0, tau_trigMatchDecos,
+				  jet0, jet1);
+    }
+    if(use_STT){
+      applySingleTauTriggerSelection(event, triggerdecos,
+				     tau0, tau_trigMatchDecos);
+    }
+    if(use_DTT){
+      applyDiTauTriggerSelection(event, triggerdecos,
+				 tau0, tau1, tau_trigMatchDecos,
+				 jet0, jet1);
+    }
+
   }
 
   void HHbbttSelectorAlg::applySingleLepTriggerSelection
