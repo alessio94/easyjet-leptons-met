@@ -4,6 +4,7 @@
 
 #include "GetXSectionTool.h"
 #include <filesystem>
+#include <PathResolver/PathResolver.h>
 
 GetXSectionTool::GetXSectionTool(const std::string &t, const std::string &n, const IInterface *p)
   : base_class(t, n, p){}
@@ -27,10 +28,12 @@ StatusCode GetXSectionTool::initialize(){
 
   ATH_CHECK(m_pmgHandle.retrieve());
 
+  std::vector<std::string> resolved_paths = {};
   // Check if the input path exists. If the pmg path isn't found, the readInfosFromDir method won't break the script execution.
   for (const std::string& path : m_pathsToPMGFiles.value()) {
 
-    if (!std::filesystem::exists(path)) {
+    const std::string& full_path = PathResolverFindCalibFile(path);
+    if (full_path=="") {
     ATH_MSG_FATAL("\n\n"
                   "****************  WRONG XSECTION FILE PATH  *************************\n"
                   "You've input a wrong date/file to parse under the path :\n"
@@ -39,12 +42,12 @@ StatusCode GetXSectionTool::initialize(){
                   "\n");
     return StatusCode::FAILURE;
     } 
-
+    resolved_paths.push_back(full_path);
     m_allPaths += path + "\n";
   }
   
   // Get PMG or Custom File(s) Info From Directory
-  m_pmgHandle->readInfosFromFiles(m_pathsToPMGFiles.value());
+  m_pmgHandle->readInfosFromFiles(resolved_paths);
 
   return StatusCode::SUCCESS;
 }

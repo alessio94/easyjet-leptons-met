@@ -12,7 +12,7 @@ atlas_add_component(EasyjetPlus
   src/*.cxx
   src/components/EasyjetPlus_entries.cxx
   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-  LINK_LIBRARIES ${ROOT_LIBRARIES} GaudiKernel AthenaBaseComps AsgTools PMGAnalysisInterfacesLib
+  LINK_LIBRARIES ${ROOT_LIBRARIES} GaudiKernel AthenaBaseComps AsgTools PMGAnalysisInterfacesLib PathResolver
 )
 
 atlas_install_runtime( scripts/*.py POST_BUILD_CMD ${ATLAS_FLAKE8} )
