@@ -18,9 +18,19 @@ namespace Easyjet
 
   StatusCode TauDecoratorAlg ::initialize()
   {
+    ATH_CHECK (m_tausInKey.initialize());
+
+    m_nProngDecorKey = m_tausInKey.key() + "." + m_nProngDecorName;
+    m_truthTypeDecorKey = m_tausInKey.key() + "." + m_truthTypeDecorName;
+    m_IDTauDecorKey = m_tausInKey.key() + "." + m_IDTauDecorName;
+
+    ATH_CHECK (m_nProngDecorKey.initialize());
+    ATH_CHECK (m_truthTypeDecorKey.initialize(m_isMC));
+    ATH_CHECK (m_IDTauDecorKey.initialize());
+
+    // Muons + ele stuff to be cleaned up after trigger matching is used
     ATH_CHECK (m_muonsInKey.initialize());
     ATH_CHECK (m_elesInKey.initialize());
-    ATH_CHECK (m_tausInKey.initialize());
 
     m_muonIdDecorKey = m_muonsInKey.key() + "." + m_muonIdDecorName;
     m_muonPreselDecorKey = m_muonsInKey.key() + "." + m_muonPreselDecorName;
@@ -30,14 +40,7 @@ namespace Easyjet
     ATH_CHECK (m_muonPreselDecorKey.initialize());
     ATH_CHECK (m_eleIdDecorKey.initialize());
 
-    m_nProngDecorKey = m_tausInKey.key() + "." + m_nProngDecorName;
-    m_truthTypeDecorKey = m_tausInKey.key() + "." + m_truthTypeDecorName;
-    m_IDTauDecorKey = m_tausInKey.key() + "." + m_IDTauDecorName;
     m_antiTauDecorKey = m_tausInKey.key() + "." + m_antiTauDecorName;
-
-    ATH_CHECK (m_nProngDecorKey.initialize());
-    ATH_CHECK (m_truthTypeDecorKey.initialize(m_isMC));
-    ATH_CHECK (m_IDTauDecorKey.initialize());
     ATH_CHECK (m_antiTauDecorKey.initialize());
 
     if(m_tauIDWP_name=="Loose") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
@@ -57,6 +60,9 @@ namespace Easyjet
     SG::ReadHandle<xAOD::TauJetContainer> tausIn(m_tausInKey,ctx);
     ATH_CHECK (tausIn.isValid());
 
+    SG::WriteDecorHandle<xAOD::TauJetContainer, int> nProngDecorHandle(m_nProngDecorKey);
+    SG::WriteDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
+
     SG::ReadHandle<xAOD::MuonContainer> muonsIn(m_muonsInKey,ctx);
     SG::ReadHandle<xAOD::ElectronContainer> elesIn(m_elesInKey,ctx);
     ATH_CHECK (muonsIn.isValid());
@@ -66,8 +72,6 @@ namespace Easyjet
     SG::ReadDecorHandle<xAOD::MuonContainer, char> muonPreselDecorHandle(m_muonPreselDecorKey);
     SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleIdDecorHandle(m_eleIdDecorKey);
 
-    SG::WriteDecorHandle<xAOD::TauJetContainer, int> nProngDecorHandle(m_nProngDecorKey);
-    SG::WriteDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
     SG::WriteDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
     
     int nidtau = 0;
@@ -87,28 +91,33 @@ namespace Easyjet
       }
     }
 
-    int nlepton = 0;
-    for(const xAOD::Muon* muon : *muonsIn) {
-      if(muonIdDecorHandle(*muon) && muonPreselDecorHandle(*muon)) nlepton++;
-    }
-    for(const xAOD::Electron* ele : *elesIn) {
-      if(eleIdDecorHandle(*ele)) nlepton++;
-    }
-
-    int nantitau = 0;
-    int nantitau_max = -1;
-    if(nlepton>0) nantitau_max = 1 - nidtau;
-    else nantitau_max = 2 - nidtau;
-
-    for(const xAOD::TauJet* tau : *tausIn) {
-      bool isAntiTau = false;
-      if(nantitau < nantitau_max){
-        bool isTauID = idTauDecorHandle(*tau);
-        float RNNScore = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
-        isAntiTau = !isTauID && RNNScore>0.01;
+    if(m_doAntiTauDecor){
+      int nlepton = 0;
+      for(const xAOD::Muon* muon : *muonsIn) {
+	if(muonIdDecorHandle(*muon) && muonPreselDecorHandle(*muon)) nlepton++;
       }
-      if (isAntiTau) nantitau++;
-      antiTauDecorHandle(*tau) = isAntiTau;
+      for(const xAOD::Electron* ele : *elesIn) {
+	if(eleIdDecorHandle(*ele)) nlepton++;
+      }
+
+      int nantitau = 0;
+      int nantitau_max = -1;
+      if(nlepton>0) nantitau_max = 1 - nidtau;
+      else nantitau_max = 2 - nidtau;
+
+      for(const xAOD::TauJet* tau : *tausIn) {
+	bool isAntiTau = false;
+
+	// Trigger matching to be added here
+	if(nantitau < nantitau_max){
+	  bool isTauID = idTauDecorHandle(*tau);
+	  float RNNScore = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
+	  isAntiTau = !isTauID && RNNScore>0.01;
+	}
+	if (isAntiTau) nantitau++;
+
+	antiTauDecorHandle(*tau) = isAntiTau;
+      }
     }
 
     return StatusCode::SUCCESS;

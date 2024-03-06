@@ -14,6 +14,22 @@ namespace HHBBTT
     TopEMuCR = 5,
   };
 
+    enum TriggerChannel
+  {
+    SLT,
+    LTT,
+    ETT,
+    ETT_4J12,
+    MTT_2016,
+    MTT_high,
+    MTT_low,
+    STT,
+    DTT,
+    DTT_2016,
+    DTT_4J12,
+    DTT_L1Topo,
+  };
+
 }
 
 #endif

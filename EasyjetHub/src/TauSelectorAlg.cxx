@@ -72,11 +72,10 @@ namespace Easyjet
       // loop over taus 
       for (const xAOD::TauJet *tau : *inContainer) {
 
-        // If not not ID tau nor anti tau, skip
+        // If not ID tau nor anti tau, skip
         bool isTauID = idTauDecorHandle(*tau);
-        bool isAntiTau = antiTauDecorHandle(*tau);
-        if ( !isAntiTau && !isTauID ) 
-          continue;
+        if(m_keepAntiTaus) isTauID |= antiTauDecorHandle(*tau);
+        if( !isTauID ) continue;
 
         // If not passing OR, skip
         if( m_checkOR ){
@@ -98,7 +97,7 @@ namespace Easyjet
 
         // If cuts are passed, save the object
         workContainer->push_back(tau);
-       }
+      }
 
       int nTaus = workContainer->size();      
       m_nSelPart.set(*event, nTaus, sys);

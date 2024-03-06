@@ -44,8 +44,7 @@ def lltt_cfg(
     cfg.addEventAlgo(
         CompFactory.Easyjet.TauSelectorAlg(
             "TauSelectorAlg",
-            # Baseline always needed for anti-taus
-            containerInKey='Baseline' + taukey,
+            containerInKey=flags.Analysis.Tau.ID + taukey,
             containerOutKey="llttAnalysisTaus_%SYS%",
             tauSF_WP=flags.Analysis.Tau.ID,
             isMC=flags.Input.isMC,

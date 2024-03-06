@@ -9,10 +9,7 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(bbttAnalysis
-  src/BaselineVarsbbttAlg.cxx
-  src/MMCDecoratorAlg.cxx
-  src/MMCSelectorAlg.cxx
-  src/HHbbttSelectorAlg.cxx
+  src/*.cxx
   src/components/bbttAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -40,7 +37,7 @@ atlas_install_scripts(
 )
 
 atlas_install_python_modules(
-  python/bbtt_config.py
+  python/*.py
 )
 atlas_install_data(
   share/*.yaml

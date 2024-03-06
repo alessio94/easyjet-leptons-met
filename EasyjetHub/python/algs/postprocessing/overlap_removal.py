@@ -80,11 +80,15 @@ def overlap_sequence(flags):
     for objtype, coll in preOR_collections.items():
         configSeq.setOptionValue(f'.{objtype}', coll)
 
-    # config for TauAntiTauOR
-    configSeq.setOptionValue('.antiTauIDTauLabel', 'isIDTau')
-    configSeq.setOptionValue('.antiTauBJetLabel',
-                             "ftag_select_" + flags.Analysis.small_R_jet.btag_wp)
-    configSeq.setOptionValue('.antiTauLabel', 'isAntiTau')
-    configSeq.setOptionValue('.doTauAntiTauJetOR', True)
+    # Config for TauAntiTauOR
+    # Should be equivalent to regular tau-jet OR for taus + b-jets
+    # Differences expected for light-jets
+    # => light jets should not be used for HH orthogonality
+    if flags.Analysis.do_bbtt_analysis:
+        configSeq.setOptionValue('.antiTauIDTauLabel', 'isIDTau')
+        configSeq.setOptionValue('.antiTauBJetLabel',
+                                 "ftag_select_" + flags.Analysis.small_R_jet.btag_wp)
+        configSeq.setOptionValue('.antiTauLabel', 'isAntiTau')
+        configSeq.setOptionValue('.doTauAntiTauJetOR', True)
 
     return configSeq

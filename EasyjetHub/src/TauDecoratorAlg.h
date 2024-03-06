@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
   TauDecoratorAlg:
   An alg that copies tau information to aux decorations so can be
@@ -17,9 +17,6 @@
 
 #include <AsgDataHandles/WriteDecorHandleKey.h>
 #include <AthenaBaseComps/AthReentrantAlgorithm.h>
-#include <AthContainers/AuxElement.h>
-#include <AthLinks/ElementLink.h>
-#include <xAODEventInfo/EventInfo.h>
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
@@ -95,6 +92,8 @@ private:
     };
     SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
 
+    Gaudi::Property<bool> m_doAntiTauDecor
+      { this, "doAntiTauDecor", false, "Add anti-tau decoration" };
     Gaudi::Property<std::string> m_antiTauDecorName{
       this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus"
     };

@@ -10,6 +10,7 @@
 
 #include "AnaAlgorithm/AnaAlgorithm.h"
 #include <AsgDataHandles/ReadDecorHandleKey.h>
+#include <AsgDataHandles/ReadDecorHandle.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
@@ -24,8 +25,6 @@
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
-#include "TriggerMatchingTool/IMatchingTool.h"
-
 #include <EasyjetHub/CutManager.h>
 
 
@@ -33,22 +32,6 @@
 
 namespace HHBBTT
 {
-
-  enum TriggerChannel
-  {
-    SLT = 0,
-    LTT = 1,
-    ETT = 2,
-    ETT_4J12 = 3,
-    MTT_2016 = 4,
-    MTT_high = 5,
-    MTT_low = 6,
-    STT = 7,
-    DTT = 8,
-    DTT_2016 = 9,
-    DTT_4J12 = 10,
-    DTT_L1Topo = 11,
-  };
 
   enum Var
   {
@@ -105,26 +88,6 @@ namespace HHBBTT
     pass_DTT_1B,
     pass_ZCR,
     pass_TopEMuCR,
-
-    is15,
-    is16,
-    is17,
-    is18,
-    is22,
-    is23,
-
-    is16PeriodA,
-    is16PeriodB_D3,
-    is16PeriodD4_end,
-    is17PeriodB1_B4,
-    is17PeriodB5_B7,
-    is17PeriodB8_end,
-    is18PeriodB_end,
-    is18PeriodK_end,
-    is22_75bunches,
-    is23_75bunches,
-    is23_400bunches,
-    l1topo_disabled,
   };
 
 
@@ -157,6 +120,7 @@ private:
 
     Gaudi::Property<std::vector<int>> m_years
       { this, "Years", false, "which years are running" };
+    int m_year;
     
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
@@ -195,8 +159,6 @@ private:
     CP::SysReadDecorHandle<unsigned int>
     m_rdmRunNumber {this, "randomRunNumber", "RandomRunNumber", "Random run number for MC"};
 
-    std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
-
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleWPDecorKey;
@@ -205,20 +167,38 @@ private:
       { this, "muonWP", "","Muon ID + Iso cuts" };
     SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonWPDecorKey;
 
-    Gaudi::Property<std::vector<std::string>> m_triggers 
-          {this, "triggerLists", {}, "Name list of trigger"};
-
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
 
+    std::unordered_map<HHBBTT::TriggerChannel, std::string> m_triggerChannels =
+      {
+	{HHBBTT::SLT, "SLT"},
+	{HHBBTT::LTT, "LTT"},
+	{HHBBTT::ETT, "ETT"},
+	{HHBBTT::ETT_4J12, "ETT_4J12"},
+	{HHBBTT::MTT_2016, "MTT_2016"},
+	{HHBBTT::MTT_high, "MTT_high"},
+	{HHBBTT::MTT_low, "MTT_low"},
+	{HHBBTT::STT, "STT"},
+	{HHBBTT::DTT, "DTT"},
+	{HHBBTT::DTT_2016, "DTT_2016"},
+	{HHBBTT::DTT_4J12, "DTT_4J12"},
+	{HHBBTT::DTT_L1Topo, "DTT_L1Topo"}
+      };
+
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::ReadDecorHandleKey<xAOD::EventInfo> > m_trigPass_DecorKey;
+
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::ReadDecorHandleKey<xAOD::MuonContainer> > m_mu_trigMatch_DecorKey;
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::ReadDecorHandleKey<xAOD::ElectronContainer> > m_ele_trigMatch_DecorKey;
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::ReadDecorHandleKey<xAOD::TauJetContainer> > m_tau_trigMatch_DecorKey;
+
     /// \brief Setup sys-aware output decorations
     CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
-
-    ToolHandle<Trig::IMatchingTool> m_matchingTool{this, "trigMatchingTool", "",
-	"Trigger matching tool"};
-
-    Gaudi::Property<bool> m_useDiTauTrigMatch{this, "diTauTrigMatch", true, "Run di-tau trigger matching"};
     
     /// \brief Booleans
     /*
@@ -272,24 +252,6 @@ private:
     {HHBBTT::pass_DTT_1B, "pass_DTT_1B"},
     {HHBBTT::pass_ZCR, "pass_ZCR"},
     {HHBBTT::pass_TopEMuCR, "pass_TopEMuCR"},
-    {HHBBTT::is15, "is15"},
-    {HHBBTT::is16, "is16"},
-    {HHBBTT::is17, "is17"},
-    {HHBBTT::is18, "is18"},
-    {HHBBTT::is22, "is22"},
-    {HHBBTT::is23, "is23"},
-    {HHBBTT::is16PeriodA, "is16PeriodA"},
-    {HHBBTT::is16PeriodB_D3, "is16PeriodB_D3"},
-    {HHBBTT::is16PeriodD4_end, "is16PeriodD4_end"},
-    {HHBBTT::is17PeriodB1_B4, "is17PeriodB1_B4"},
-    {HHBBTT::is17PeriodB5_B7, "is17PeriodB5_B7"},
-    {HHBBTT::is17PeriodB8_end, "is17PeriodB8_end"},
-    {HHBBTT::is18PeriodB_end, "is18PeriodB_end"},
-    {HHBBTT::is18PeriodK_end, "is18PeriodK_end"},
-    {HHBBTT::is22_75bunches, "is22_75bunches"},
-    {HHBBTT::is23_75bunches, "is23_75bunches"},
-    {HHBBTT::is23_400bunches, "is23_400bunches"},
-    {HHBBTT::l1topo_disabled, "l1topo_disabled"},
     };
 
     /// \brief Cutflow Variables
@@ -304,29 +266,40 @@ private:
     std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>> m_pt_threshold;
 
     StatusCode initialiseCutflow();
-    void applyTriggerSelection(const xAOD::EventInfo* event,
-			       const xAOD::Electron* ele, const xAOD::Muon* mu,
-			       const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
-			       const xAOD::Jet* jet0, const xAOD::Jet* jet1,
-			       const CP::SystematicSet& sys);
-    void applySingleLepTriggerSelection(const xAOD::EventInfo* event,
-					const xAOD::Electron* ele,
-					const xAOD::Muon* mu,
-					const CP::SystematicSet& sys);
-    void applyLepHadTriggerSelection(const xAOD::EventInfo* event,
-				     const xAOD::Electron* ele, const xAOD::Muon* mu,
-				     const xAOD::TauJet* tau,
-				     const xAOD::Jet* jet0, const xAOD::Jet* jet1,
-				     const CP::SystematicSet& sys);
-    void applySingleTauTriggerSelection(const xAOD::EventInfo* event,
-					const xAOD::TauJet* tau0,
-					const CP::SystematicSet& sys);
-    void applyDiTauTriggerSelection(const xAOD::EventInfo* event,
-				    const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
-				    const xAOD::Jet* jet0, const xAOD::Jet* jet1,
-				    const CP::SystematicSet& sys);
 
-    void setRunNumberQuantities(unsigned int rdmNumber);
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::EventInfo, bool> > trigPassReadDecoMap;
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::MuonContainer, bool> > muTrigMatchReadDecoMap;
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::ElectronContainer, bool> > eleTrigMatchReadDecoMap;
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::TauJetContainer, bool> > tauTrigMatchReadDecoMap;
+
+    void applyTriggerSelection
+      (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+       const xAOD::Electron* ele, const eleTrigMatchReadDecoMap& ele_trigMatchDecos,
+       const xAOD::Muon* mu, const muTrigMatchReadDecoMap& mu_trigMatchDecos,
+       const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
+       const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
+       const xAOD::Jet* jet0, const xAOD::Jet* jet1);
+
+    void applySingleLepTriggerSelection
+      (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+       const xAOD::Electron* ele, const eleTrigMatchReadDecoMap& ele_trigMatchDecos,
+       const xAOD::Muon* mu, const muTrigMatchReadDecoMap& mu_trigMatchDecos);
+    void applyLepHadTriggerSelection
+      (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+       const xAOD::Electron* ele, const eleTrigMatchReadDecoMap& ele_trigMatchDecos,
+       const xAOD::Muon* mu, const muTrigMatchReadDecoMap& mu_trigMatchDecos,
+       const xAOD::TauJet* tau, const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
+       const xAOD::Jet* jet0, const xAOD::Jet* jet1);
+    void applySingleTauTriggerSelection
+      (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+       const xAOD::TauJet* tau, const tauTrigMatchReadDecoMap& tau_trigMatchDecos);
+    void applyDiTauTriggerSelection
+      (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+       const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
+       const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
+       const xAOD::Jet* jet0, const xAOD::Jet* jet1);
+
+    void setRunNumberQuantities(unsigned int runNumber);
 
   };
 }

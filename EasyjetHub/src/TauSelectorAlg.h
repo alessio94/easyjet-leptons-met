@@ -51,6 +51,8 @@ private:
       { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
 
+    Gaudi::Property<bool>  m_keepAntiTaus
+      {this, "keepAntiTaus", false, "Keep anti-taus in addition to ID taus"};
     Gaudi::Property<std::string> m_antiTauDecorName
       { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;

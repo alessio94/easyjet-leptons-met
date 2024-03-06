@@ -66,6 +66,46 @@ def cpalgs_cfg(flags):
     selectionSvc = CompFactory.CP.SelectionNameSvc("SelectionNameSvc")
     cfg.addService(selectionSvc)
 
+    # Some decoration algorithms require the RandomRunNumber from PRW
+    # Make sure this is available by adding first the relevant configs
+    weightConfigSeq = ConfigSequence()
+
+    weightSeq = CompFactory.AthSequencer('WeightSequence')
+    weightConfigAccumulator = ConfigAccumulator(
+        weightSeq,
+        autoconfigFromFlags=flags,
+    )
+
+    if not flags.Analysis.disable_calib:
+        if flags.Analysis.doPRW:
+            log.info("Adding PRW sequence")
+            # Adds variable to EventInfo if for pileup weight, for example:
+            # EventInfo.PileWeight_%SYS$
+            weightConfigSeq += pileup_sequence(flags)
+
+        if flags.Analysis.DataType != "data":
+            log.info("Adding generator analysis sequence")
+            # Adds variable to EventInfo if for generator weight, for example:
+            # EventInfo.generatorWeight_%SYS%
+            weightConfigSeq += generator_sequence(flags)
+
+    weightConfigSeq.fullConfigure(weightConfigAccumulator)
+    cfg.merge(weightConfigAccumulator.CA)
+
+    # Extra decoration algorithms
+    if flags.Analysis.do_small_R_jets:
+        # Schedule the alg to decorate btag info onto jets
+        # rather than accessing from xAOD::BTagging
+        # We perform the decoration on the uncalibrated jets
+        # so as to avoid any systematics-dependence or filtering
+        if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
+            cfg.merge(btag_decor_cfg(flags))
+
+    if flags.Analysis.do_taus:
+        # Schedule the alg to decorate taus with extra info
+        # in particular anti-tau label
+        cfg.merge(tau_decor_cfg(flags))
+
     # Aggregate the configured CP algs in one ConfigSequence,
     # which will handle the container names, copying etc
     configSeq = ConfigSequence()
@@ -80,17 +120,6 @@ def cpalgs_cfg(flags):
     )
 
     if not flags.Analysis.disable_calib:
-        if flags.Analysis.doPRW:
-            log.info("Adding PRW sequence")
-            # Adds variable to EventInfo if for pileup weight, for example:
-            # EventInfo.PileWeight_%SYS$
-            configSeq += pileup_sequence(flags)
-
-        if flags.Analysis.DataType != "data":
-            log.info("Adding generator analysis sequence")
-            # Adds variable to EventInfo if for generator weight, for example:
-            # EventInfo.generatorWeight_%SYS%
-            configSeq += generator_sequence(flags)
 
         for objtype in [
             "electrons",
@@ -102,16 +131,6 @@ def cpalgs_cfg(flags):
         ]:
             if flags.Analysis[f"do_{objtype}"]:
                 log.info(f"Adding {objtype} seq")
-                if objtype == 'small_R_jets':
-                    # Schedule the alg to decorate btag info onto jets
-                    # rather than accessing from xAOD::BTagging
-                    # We perform the decoration on the uncalibrated jets
-                    # so as to avoid any systematics-dependence or filtering
-                    if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
-                        cfg.merge(btag_decor_cfg(flags))
-                elif objtype == 'taus':
-                    # Schedule the alg to decorate taus with nProng info
-                    cfg.merge(tau_decor_cfg(flags))
 
                 # Append the configured CP calibration sequence for
                 # the given object type

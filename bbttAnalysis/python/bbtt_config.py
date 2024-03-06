@@ -48,6 +48,7 @@ def bbtt_cfg(
             "TauSelectorAlg",
             # Baseline always needed for anti-taus
             containerInKey='Baseline' + taukey,
+            keepAntiTaus=True,
             containerOutKey="bbttAnalysisTaus_%SYS%",
             tauSF_WP=flags.Analysis.Tau.ID,
             isMC=flags.Input.isMC,
@@ -67,15 +68,6 @@ def bbtt_cfg(
         )
     )
 
-    # Selection
-    trigger_branches = [
-        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
-        for c in flags.Analysis.TriggerChains
-    ]
-
-    from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
-    from AthenaConfiguration.Enums import LHCPeriod
-
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
@@ -89,11 +81,6 @@ def bbtt_cfg(
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             eventDecisionOutputDecoration="bbtt_pass_sr_noMMC_%SYS%",
-            triggerLists=trigger_branches,
-            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
-            # Not available in current Run2 PHYSLITE
-            diTauTrigMatch=not (flags.Input.isPHYSLITE and \
-                                flags.GeoModel.Run == LHCPeriod.Run2),
             channel=flags.Analysis.channel,
             isMC=flags.Input.isMC,
             Years=flags.Analysis.Years,

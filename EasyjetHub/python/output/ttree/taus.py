@@ -17,7 +17,9 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
         tau_branches.syst_only_for = ["pt"]
 
     tau_branches.add_four_mom_branches(do_mass=False)
-    tau_branches.variables += ["charge", "nProng", "isIDTau", "isAntiTau"]
+    tau_branches.variables += ["charge", "nProng", "isIDTau"]
+    if flags.Analysis.do_bbtt_analysis:
+        tau_branches.variables += ["isAntiTau"]
 
     if flags.Input.isMC:
         for tau_id in [flags.Analysis.Tau.ID]:
