@@ -493,8 +493,7 @@ namespace HHBBTT
         if (lep_ptcut_SLT && tau_ptcut_SLT){
           m_bools.at(pass_baseline_SLT) = true;
           if (m_bools.at(HHBBTT::pass_trigger_SLT)){
-            if (m_bools.at(HHBBTT::TWO_BJETS) &&
-                m_bools.at(HHBBTT::MBB_MASS))
+            if (m_bools.at(HHBBTT::TWO_BJETS))
               m_bools.at(HHBBTT::pass_SLT) = true;
             else if (m_bools.at(HHBBTT::ONE_BJET))
               m_bools.at(HHBBTT::pass_SLT_1B) = true;
@@ -506,8 +505,7 @@ namespace HHBBTT
           m_bools.at(HHBBTT::pass_baseline_LTT) = true;
           if (m_bools.at(HHBBTT::pass_trigger_LTT)){
             if (!m_bools.at(HHBBTT::pass_SLT) &&
-                m_bools.at(HHBBTT::TWO_BJETS) &&
-                m_bools.at(HHBBTT::MBB_MASS))
+                m_bools.at(HHBBTT::TWO_BJETS))
               m_bools.at(HHBBTT::pass_LTT) = true;
             else if(!m_bools.at(HHBBTT::pass_SLT_1B) &&
                     m_bools.at(HHBBTT::ONE_BJET))
