@@ -33,6 +33,8 @@ class TotalWeightsTool final: public extends<AthAlgTool, IPostProcessTool>
   Gaudi::Property<std::string> m_bTagWP {this, "bTagWP", "", "btagging working point"};
   Gaudi::Property<std::string> m_totalWeightName {this, "totalWeightName", "weight", "Name of total weight branch"};
 
+  Gaudi::Property<std::string> m_MCWeightName {this, "MCWeightName", "generatorWeight_NOSYS", "Name of MC weight"};
+
   std::vector<std::string> m_SF_names;
   
 };

@@ -34,11 +34,12 @@ StatusCode TotalWeightsTool::initialize(){
     }
   } 
 
+  inVars[m_MCWeightName] = VarType::Float;
   for(const auto& name : m_SF_names){
     inVars[name] = VarType::Float;
   }
 
-  const std::vector<std::string> inVecVars = {"mcEventWeights"};
+  const std::vector<std::string> inVecVars = {};
   const std::unordered_map<std::string, VarType> outVars = {
     {m_totalWeightName, VarType::Float}
   };
@@ -54,11 +55,10 @@ StatusCode TotalWeightsTool::finalize(){
 
 void TotalWeightsTool::computeVariables
 (const std::unordered_map<std::string, varTypePointer>& inVars,
- const std::unordered_map<std::string, std::vector<float>*>& inVecVars,
+ const std::unordered_map<std::string, std::vector<float>*>& /*inVecVars*/,
  std::unordered_map<std::string, varTypePointer>& outVars) const{
 
-  std::vector<float> mcWeights = *(inVecVars.at("mcEventWeights"));
-  float weight = mcWeights[0];
+  float weight = getContent<float>(inVars, m_MCWeightName);
 
   // Need to run SumOfWeightsTool first to get this in outVars
   weight /= getContent<float>(outVars, "sumOfWeights");

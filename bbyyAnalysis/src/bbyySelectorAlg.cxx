@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "bbyySelectorAlg.h"
@@ -37,7 +37,9 @@ namespace HHBBYY
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_mcEventWeightsKey.initialize());
+
+    ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
+
 
     //Initialize trigger decorations
     for (const std::string &trig : m_photonTriggers)
@@ -106,11 +108,6 @@ namespace HHBBYY
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-      if(m_isMC) {
-        SG::ReadDecorHandle<xAOD::EventInfo, std::vector<float>> mcEventWeightsHandle(m_mcEventWeightsKey);
-        eventWeights = mcEventWeightsHandle(*event);
-      }
-
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       for(const xAOD::Jet* jet : *jets) {
@@ -151,15 +148,14 @@ namespace HHBBYY
 
       // Compute total_events
       m_total_events+=1; 
-      if(m_isMC) m_total_mcEventWeight+= eventWeights.at(0);
-
+      if(m_isMC) m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);
 
       // Count how many cuts the event passed and increase the relative counter
       for (const auto &cut : m_inputCutList) {
         if(m_bbyyCuts.exists(cut)) {
           if (m_bbyyCuts(cut).passed) {
             m_bbyyCuts(cut).counter+=1;
-            if(m_isMC) m_bbyyCuts(cut).w_counter += eventWeights.at(0);
+            if(m_isMC) m_bbyyCuts(cut).w_counter += m_generatorWeight.get(*event, sys);
           }
         }
       }
@@ -177,7 +173,7 @@ namespace HHBBYY
       // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
       for (unsigned int i=0; i<consecutive_cuts; i++) {
         m_bbyyCuts[i].relativeCounter+=1;
-        if(m_isMC) m_bbyyCuts[i].w_relativeCounter += eventWeights.at(0);
+        if(m_isMC) m_bbyyCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
       }
 
       if (not (m_bypass or passedall) ) continue;

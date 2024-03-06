@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -75,6 +75,12 @@ namespace HHBBYY
       CutManager m_bbyyCuts;
       CP::SysListHandle m_systematicsList {this};
 
+      CP::SysReadHandle<xAOD::EventInfo>
+      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+
+      CP::SysReadDecorHandle<float>
+      m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
+  
       CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "",   "Jet container to read" };
 
@@ -83,9 +89,6 @@ namespace HHBBYY
 
       CP::SysReadHandle<xAOD::PhotonContainer>
       m_photonHandle{ this, "photons", "",   "Photons container to read" };
-
-      CP::SysReadHandle<xAOD::EventInfo>
-      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
       CP::SysReadHandle<xAOD::ElectronContainer>
       m_electronHandle{ this, "electrons", "",   "Electron container to read" };
@@ -102,7 +105,6 @@ namespace HHBBYY
       bool m_saveCutFlow;
       long long int m_total_events{0};
       float m_total_mcEventWeight{0.f};
-      std::vector<float> eventWeights{0.f};
 
       Gaudi::Property<bool> m_isMC
         { this, "isMC", false, "Is this simulation?" };
@@ -110,9 +112,6 @@ namespace HHBBYY
       CP::SysFilterReporterParams m_filterParams {this, "bbyy selection"};
       Gaudi::Property<bool> m_bypass
         { this, "bypass", false, "Run the selector algorithm in run-through mode" };
-
-      SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
-        this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};
 
       std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
 
