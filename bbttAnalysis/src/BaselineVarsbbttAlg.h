@@ -110,8 +110,10 @@ private:
     
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
-    CP::SysReadDecorHandle<int> 
-    m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
+    Gaudi::Property<std::vector<std::string>> m_PCBTnames
+          {this, "PCBTDecorList", {}, "Name list of pseudo-continuous b-tagging decorator"};
+    std::unordered_map<std::string, CP::SysReadDecorHandle<int>>
+        m_PCBTs;
 
     CP::SysReadDecorHandle<int>
     m_truthFlav{ this, "truthFlav", "HadronConeExclTruthLabelID", "Jet truth flavor" };

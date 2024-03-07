@@ -152,7 +152,7 @@ def bbtt_cfg(
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            PCBTDecorName=("ftag_quantile_" + btag_pcbt_wps[0]) if len(btag_pcbt_wps)>0 else "", # noqa
+            PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
             storeHighLevelVariables=flags.Analysis.store_high_level_variables,
             floatVariableList=float_variables,
             intVariableList=int_variables

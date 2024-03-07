@@ -62,9 +62,12 @@ namespace HHBBTT
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
-    if (!m_PCBT.empty()) {
-      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
-    }
+    for (const std::string &var : m_PCBTnames){
+      ATH_MSG_DEBUG("initializing PCBT: " << var);
+      CP::SysReadDecorHandle<int> rhandle{var, this};
+      m_PCBTs.emplace(var, rhandle);
+      ATH_CHECK(m_PCBTs.at(var).initialize(m_systematicsList, m_jetHandle));
+    };
     if (m_isMC) {
       ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
     }
@@ -306,7 +309,6 @@ namespace HHBBTT
       bool found_bb = false;
 
       bool WPgiven = !m_isBtag.empty();
-      bool PCBTgiven = !m_PCBT.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       for(const xAOD::Jet* jet : *jets) {
         if (WPgiven) {
@@ -325,8 +327,12 @@ namespace HHBBTT
           m_Fbranches.at(prefix+"_E").set(*event,   tlv.E(), sys);
           if(m_isMC) m_Ibranches.at(prefix+"_truthLabel").set
                        (*event, m_truthFlav.get(*bjets->at(i), sys), sys);
-          if(PCBTgiven) m_Ibranches.at(prefix+"_pcbt").set
-                          (*event, m_PCBT.get(*bjets->at(i), sys), sys);
+          for (const auto& var: m_PCBTnames) {
+            std::string new_var = var;
+            new_var.erase(0, 14); // remove 'ftag_quantile_' from var name
+            new_var.erase(new_var.length() - 11, new_var.length()); // remove '_Continuous' from var name
+            m_Ibranches.at(prefix+"_pcbt_"+new_var).set(*event, m_PCBTs.at(var).get(*bjets->at(i), sys), sys);
+          }
         }
 
         TLorentzVector b1 = bjets->at(0)->p4();
