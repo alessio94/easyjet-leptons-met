@@ -41,6 +41,7 @@ Muon:
 Tau:
   ID: "Loose"
   amount: 2
+  variables: ["RNN"]
 
 Lepton:
   amount: 2

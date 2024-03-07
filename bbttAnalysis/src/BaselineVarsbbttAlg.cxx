@@ -243,6 +243,8 @@ namespace HHBBTT
       int sublead_tau_isTauID = -99;
       int lead_tau_isAntiTau = -99;
       int sublead_tau_isAntiTau = -99;
+      float lead_tau_RNN = -99.;
+      float sublead_tau_RNN = -99.;
 
       bool found_lead_tau = false;
       bool found_sublead_tau = false;
@@ -255,7 +257,8 @@ namespace HHBBTT
             lead_tau_nTracks = tau->nTracks();
             lead_tau_isTauID = static_cast<int>(idTauDecorHandle(*tau));
             lead_tau_isAntiTau = static_cast<int>(antiTauDecorHandle(*tau));
-            if(m_isMC) lead_tau_effSF = m_tau_effSF.get(*tau,sys);
+            lead_tau_RNN = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
+	    if(m_isMC) lead_tau_effSF = m_tau_effSF.get(*tau,sys);
             found_lead_tau = true;
             continue;
           }
@@ -265,6 +268,7 @@ namespace HHBBTT
           sublead_tau_nTracks = tau->nTracks();
           sublead_tau_isTauID = static_cast<int>(idTauDecorHandle(*tau));
           sublead_tau_isAntiTau = static_cast<int>(antiTauDecorHandle(*tau));
+	  sublead_tau_RNN = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
           if(m_isMC) sublead_tau_effSF = m_tau_effSF.get(*tau,sys);
           found_sublead_tau = true;
           break; 
@@ -276,6 +280,7 @@ namespace HHBBTT
         m_Fbranches.at("Tau1_eta").set(*event, lead_tau.Eta(), sys);
         m_Fbranches.at("Tau1_phi").set(*event, lead_tau.Phi(), sys);
         m_Fbranches.at("Tau1_E").set(*event, lead_tau.E(), sys);
+	m_Fbranches.at("Tau1_RNN").set(*event, lead_tau_RNN, sys);
         if(m_isMC) m_Fbranches.at("Tau1_effSF").set(*event, lead_tau_effSF, sys);
         m_Ibranches.at("Tau1_charge").set(*event, lead_tau_charge, sys);
         m_Ibranches.at("Tau1_nProng").set(*event, lead_tau_nTracks, sys);
@@ -288,6 +293,7 @@ namespace HHBBTT
         m_Fbranches.at("Tau2_eta").set(*event, sublead_tau.Eta(), sys);
         m_Fbranches.at("Tau2_phi").set(*event, sublead_tau.Phi(), sys);
         m_Fbranches.at("Tau2_E").set(*event, sublead_tau.E(), sys);
+	m_Fbranches.at("Tau2_RNN").set(*event, sublead_tau_RNN, sys);
         if(m_isMC) m_Fbranches.at("Tau2_effSF").set(*event, sublead_tau_effSF, sys);
         m_Ibranches.at("Tau2_charge").set(*event, sublead_tau_charge, sys);
         m_Ibranches.at("Tau2_nProng").set(*event, sublead_tau_nTracks, sys);
