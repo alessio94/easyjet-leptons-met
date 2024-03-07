@@ -98,11 +98,17 @@ def jet_sequence(
                     jet_flags.btagCDI
                 )
             # if GN2 in tagger name overwrite the CDI
-            if "GN2" in tagger:
+            if "GN2v00" in tagger:
                 configSeq.setOptionValue(
                     '.bTagCalibFile',
                     'xAODBTaggingEfficiency/13p6TeV/'
                     '2023-22-13p6TeV-MC21-CDI_Test_2023-08-1_v1.root'
+                ) # noqa
+            elif "GN2v01" in tagger:
+                configSeq.setOptionValue(
+                    '.bTagCalibFile',
+                    'xAODBTaggingEfficiency/13p6TeV/'
+                    '2023-02_MC23_CDI_GN2v01-noSF.root'
                 ) # noqa
 
         # Run this by default, but will fail if muon and btag calib sequences not run
