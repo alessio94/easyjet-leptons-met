@@ -317,7 +317,7 @@ namespace HHBBLL
 	    jetsFound = true;
 
             float mjj = (nonbjet1->p4() + nonbjet2->p4()).M();
-	    float delta_eta_jj = nonbjet1->eta() - nonbjet2->eta();
+	    float delta_eta_jj = std::abs(nonbjet1->eta() - nonbjet2->eta());
 
 	    if (mjj > max_mjj) max_mjj = mjj;
 	    if (delta_eta_jj > max_delta_eta_jj)  max_delta_eta_jj = delta_eta_jj;
