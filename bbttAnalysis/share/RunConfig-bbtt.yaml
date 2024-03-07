@@ -8,9 +8,9 @@ ttree_output:
     slim_variables_with_syst: true
     reco_outputs:
       small_R_jets: 'container_names.output.reco4PFlowJet'
-      muons: 'container_names.output.muons'
-      electrons: 'container_names.output.electrons'
-      taus: 'container_names.output.taus'
+      # muons: 'container_names.output.muons'
+      # electrons: 'container_names.output.electrons'
+      # taus: 'container_names.output.taus'
       met : 'container_names.output.met'
     collection_options:
       small_R_jets:
