@@ -1,37 +1,65 @@
 '2015':
-  # resolved
-- 'HLT_2j35_btight_2j35_L13J25.0ETA23'
-- 'HLT_j100_2j55_bmedium'
-- 'HLT_j225_bloose'
+# Single lepton triggers
+- 'HLT_e24_lhmedium_L1EM20VH'
+- 'HLT_e60_lhmedium'
+- 'HLT_e120_lhloose'
+- 'HLT_mu20_iloose_L1MU15'
+- 'HLT_mu50'
+# Dilepton triggers
+- 'HLT_2e12_lhvloose_L12EM10VH'
+- 'HLT_e17_lhloose_mu14'
+- 'HLT_e7_lhmedium_mu24'
+- 'HLT_2mu10'
+- 'HLT_mu18_mu8noL1'
 '2016':
-  # resolved
-- 'HLT_j175_bmv2c2040_split'
-- 'HLT_j225_bmv2c2060_split'
+# bjets triggers
 - 'HLT_2j35_bmv2c2060_split_2j35_L14J15.0ETA25'
-- 'HLT_2j55_bmv2c2060_split_ht300_L14J15'
 - 'HLT_j100_2j55_bmv2c2060_split'
-- 'HLT_j150_bmv2c2060_split_j50_bmv2c2060_split'
+# Single lepton triggers
+- 'HLT_e26_lhtight_nod0_ivarloose'
+- 'HLT_e60_lhmedium_nod0'
+- 'HLT_e140_lhloose_nod0'
+- 'HLT_mu26_ivarmedium'
+- 'HLT_mu50'
+# Dilepton triggers
+- 'HLT_e17_lhloose_nod0_mu14'
+- 'HLT_e7_lhmedium_nod0_mu24'
+- 'HLT_2mu14'
+- 'HLT_mu22_mu8noL1'
 '2017':
-  # resolved
-- 'HLT_j175_gsc225_bmv2c1040_split'
-- 'HLT_j225_gsc275_bmv2c1060_split'
-- 'HLT_j225_gsc300_bmv2c1070_split'
-- 'HLT_j150_gsc175_bmv2c1060_split_j45_gsc60_bmv2c1060_split'
+# bjets triggers
 - 'HLT_j110_gsc150_boffperf_split_2j35_gsc55_bmv2c1070_split_L1J85_3J30'
 - 'HLT_2j15_gsc35_bmv2c1040_split_2j15_gsc35_boffperf_split_L14J15.0ETA25'
-- 'HLT_2j35_gsc55_bmv2c1050_split_ht300_L1HT190-J15s5.ETA21'
-- 'HLT_2j35_gsc55_bmv2c1060_split_ht300_L1HT190-J15s5.ETA21'
+# Single lepton triggers
+- 'HLT_e26_lhtight_nod0_ivarloose'
+- 'HLT_e60_lhmedium_nod0'
+- 'HLT_e140_lhloose_nod0'
+- 'HLT_mu26_ivarmedium'
+- 'HLT_mu50'
+# Dilepton triggers
+- 'HLT_2e24_lhvloose_nod0'
+- 'HLT_e17_lhloose_nod0_mu14'
+- 'HLT_e7_lhmedium_nod0_mu24'
+- 'HLT_2mu14'
+- 'HLT_mu22_mu8noL1'
 '2018':
-  # resolved
-- 'HLT_j225_gsc275_bhmv2c1060_split'
-- 'HLT_j225_gsc300_bmv2c1070_split'
+#bjets triggers
 - 'HLT_j110_gsc150_boffperf_split_2j45_gsc55_bmv2c1070_split_L1J85_3J30'
 - 'HLT_2j35_bmv2c1060_split_2j35_L14J15.0ETA25'
-- 'HLT_2j45_gsc55_bmv2c1050_split_ht300_L1HT190-J15s5.ETA21'
-- 'HLT_j175_gsc225_bmv2c1040_split'
-- 'HLT_j150_gsc175_bmv2c1060_split_j45_gsc60_bmv2c1060_split'
+# Single lepton triggers
+- 'HLT_e26_lhtight_nod0_ivarloose'
+- 'HLT_e60_lhmedium_nod0'
+- 'HLT_e140_lhloose_nod0'
+- 'HLT_mu26_ivarmedium'
+- 'HLT_mu50'
+# Dilepton triggers
+- 'HLT_2e24_lhvloose_nod0'
+- 'HLT_e17_lhloose_nod0_mu14'
+- 'HLT_e7_lhmedium_nod0_mu24'
+- 'HLT_2mu14'
+- 'HLT_mu22_mu8noL1'
 '2022':
-  # resolved
+  # bjets triggers
 - 'HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_3j20c_020jvt_bdl1d82_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25'
 - 'HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25'
 - 'HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1MU8F_2J15_J20'

@@ -45,6 +45,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             containerOutKey="ttHHAnalysisJets_BTag_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             maxEta=2.5,
+            minPt=20e3,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
@@ -55,6 +56,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             containerInKey=smalljetkey,
             containerOutKey="ttHHAnalysisJets_%SYS%",
             bTagWPDecorName="",
+            minPt=20e3,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
