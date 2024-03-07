@@ -237,18 +237,6 @@ def ttHH_branches(flags):
 
     branches += object_level_branches
 
-    # BJets
-    if flags.Input.isMC:
-        btag_wps = [flags.Analysis.small_R_jet.btag_wp]
-        if 'btag_extra_wps' in flags.Analysis.small_R_jet:
-            btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
-
-        for wp in btag_wps:
-            branches += [f"EventInfo.ftag_effSF_{wp}_%SYS%"
-                         f" -> weight_ftag_effSF_{wp}_%SYS%",]
-
-        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
-
     branches += ["EventInfo.PassAllCuts_%SYS% -> ttHH_PassAllCuts_%SYS%"]
 
     branches += ["EventInfo.ttHH_pass_baseline_%SYS% -> ttHH_pass_baseline_%SYS%"]

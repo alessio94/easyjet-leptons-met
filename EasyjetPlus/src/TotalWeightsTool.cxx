@@ -12,8 +12,8 @@ StatusCode TotalWeightsTool::initialize(){
   std::unordered_map<std::string, VarType> inVars;
 
   m_SF_names = {
-    "weight_ftag_effSF_"+m_bTagWP+"_NOSYS",
-    "weight_jvt_effSF_NOSYS"
+    "ftag_effSF_"+m_bTagWP+"_NOSYS",
+    "jvt_effSF_NOSYS"
   };
 
   const std::vector<std::pair<std::string, int>> objects = {

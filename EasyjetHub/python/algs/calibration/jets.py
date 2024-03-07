@@ -89,9 +89,11 @@ def jet_sequence(
             configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
             configSeq.setOptionValue('.kinematicSelection', True)
+
             # Keep using the Easyjet version for now, while the Athena
-            # config is being adjusted
+            # config for globalSF is being adjusted
             configSeq.setOptionValue('.globalSF', False)
+
             if 'btagCDI' in jet_flags:
                 configSeq.setOptionValue(
                     '.bTagCalibFile',
@@ -110,6 +112,7 @@ def jet_sequence(
                     'xAODBTaggingEfficiency/13p6TeV/'
                     '2023-02_MC23_CDI_GN2v01-noSF.root'
                 ) # noqa
+                configSeq.setOptionValue('.noEffSF', True)
 
         # Run this by default, but will fail if muon and btag calib sequences not run
         # TODO: Add a toggle?
@@ -148,6 +151,10 @@ def jet_sequence(
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
+
+            if "GN2v01" in tagger:
+                continue
+
             makeFTagEventSFConfig(
                 configSeq,
                 flags.Analysis.container_names.output[jet_type],

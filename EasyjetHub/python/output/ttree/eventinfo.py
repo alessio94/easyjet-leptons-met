@@ -29,6 +29,21 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
     ]
     eventinfo_branches.variables += trigger_branches
 
+    # Event-level scale factors
+    if flags.Input.isMC:
+        btag_wps = [flags.Analysis.small_R_jet.btag_wp]
+        if 'btag_extra_wps' in flags.Analysis.small_R_jet:
+            btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
+
+        for wp in btag_wps:
+            # No GN2v01 SF in CDI for now
+            if "GN2v01" in wp:
+                continue
+            eventinfo_branches.variables += [f"ftag_effSF_{wp}_%SYS%"]
+
+        # jvt is effSF is now centrally calculated by CP tools
+        eventinfo_branches.variables += ["jvt_effSF_%SYS%"]
+
     if tree_flags.truth_outputs.higgs_particle and flags.Input.isMC:
         eventinfo_branches.variables += ["truth_H1_pdgId", "truth_H2_pdgId",
                                          "truth_children_fromH1_pdgId",

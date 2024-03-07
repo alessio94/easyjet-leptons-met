@@ -129,18 +129,6 @@ def bbyy_branches(flags):
     for var in diphoton_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_Diphoton_{var}_%SYS%"]
 
-    # BJets
-    if flags.Input.isMC:
-        btag_wps = [flags.Analysis.small_R_jet.btag_wp]
-        if 'btag_extra_wps' in flags.Analysis.small_R_jet:
-            btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
-
-        for wp in btag_wps:
-            branches += [f"EventInfo.ftag_effSF_{wp}_%SYS%"
-                         f" -> weight_ftag_effSF_{wp}_%SYS%",]
-
-        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
-
     dibjet_variables = ["mbb", "pTbb", "dRbb", "Etabb", "Phibb"]
     for var in dibjet_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]

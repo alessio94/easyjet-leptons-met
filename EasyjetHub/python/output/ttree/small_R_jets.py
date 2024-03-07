@@ -32,14 +32,19 @@ def get_small_R_jet_branches(
             btag_wps = [flags.Analysis.small_R_jet.btag_wp]
             if 'btag_extra_wps' in flags.Analysis.small_R_jet:
                 btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
+
             small_R_jet_branches.variables += [
                 f"ftag_select_{btag_wp}"
                 for btag_wp in btag_wps
             ]
             if flags.Input.isMC:
-                small_R_jet_branches.variables += [
-                    f"ftag_effSF_{btag_wp}_%SYS%" for btag_wp in btag_wps
-                ]
+                for btag_wp in btag_wps:
+                    # No GN2v01 SF in CDI for now
+                    if "GN2v01" in btag_wp:
+                        continue
+                    small_R_jet_branches.variables += [
+                        f"ftag_effSF_{btag_wp}_%SYS%"
+                    ]
 
         if (
             tree_flags.collection_options.small_R_jets.no_bjet_calib_p4

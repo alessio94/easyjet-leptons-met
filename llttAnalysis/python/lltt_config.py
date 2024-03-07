@@ -227,18 +227,6 @@ def lltt_branches(flags):
 
     branches += object_level_branches
 
-    if flags.Input.isMC:
-        btag_wps = [flags.Analysis.small_R_jet.btag_wp]
-        if 'btag_extra_wps' in flags.Analysis.small_R_jet:
-            btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
-
-        for wp in btag_wps:
-            branches += [f"EventInfo.ftag_effSF_{wp}_%SYS%"
-                         f" -> weight_ftag_effSF_{wp}_%SYS%",]
-
-        # jvt is effSF is now centrally calculated by CP tools
-        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
-
     # trigger variables do not need to be added to variable_names
     # as it is written out in HllttSelectorAlg
     for var in ["pass_trigger_SLT"]:

@@ -193,18 +193,6 @@ def bbll_branches(flags):
 
     branches += object_level_branches
 
-    # BJets
-    if flags.Input.isMC:
-        btag_wps = [flags.Analysis.small_R_jet.btag_wp]
-        if 'btag_extra_wps' in flags.Analysis.small_R_jet:
-            btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
-
-        for wp in btag_wps:
-            branches += [f"EventInfo.ftag_effSF_{wp}_%SYS%"
-                         f" -> weight_ftag_effSF_{wp}_%SYS%",]
-
-        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
-
     branches += ["EventInfo.bbll_pass_sr_%SYS% -> bbll_pass_SR_%SYS%"]
 
     if (flags.Analysis.save_bbll_cutflow):
