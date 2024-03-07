@@ -13,7 +13,8 @@ StatusCode TotalWeightsTool::initialize(){
 
   m_SF_names = {
     "ftag_effSF_"+m_bTagWP+"_NOSYS",
-    "jvt_effSF_NOSYS"
+    "jvt_effSF_NOSYS",
+    "PileupWeight_NOSYS"
   };
 
   const std::vector<std::pair<std::string, int>> objects = {

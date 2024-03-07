@@ -18,7 +18,7 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
     if flags.Input.isMC and not flags.Input.isPHYSLITE:
         eventinfo_branches.variables += ["generatorWeight_%SYS%"]
 
-    if do_PRW and not flags.Analysis.disable_calib:
+    if flags.Input.isMC:
         eventinfo_branches.variables += ["PileupWeight_%SYS%"]
 
     # Replace L1Topo characters, formatting as done by the

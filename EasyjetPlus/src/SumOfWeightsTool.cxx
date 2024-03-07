@@ -30,7 +30,8 @@ StatusCode SumOfWeightsTool::initialize(){
     if (st.Index(re) == kNPOS) continue;
     break;
   }
-  m_inHisto = dynamic_cast<TH1F*>(m_inFile->Get(key->GetName()));  
+  if (key==nullptr){return StatusCode::FAILURE;} 
+  m_inHisto = dynamic_cast<TH1F*>(m_inFile->Get(key->GetName())); 
   m_sumOfEventWeight = m_inHisto->GetBinContent(2);
 
   delete m_inHisto;

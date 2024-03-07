@@ -12,6 +12,7 @@ add_compile_options(-Werror)
 atlas_add_component(bbyyAnalysis
   src/BaselineVarsbbyyAlg.cxx
   src/bbyySelectorAlg.cxx
+  src/bbyyFilterDalitzAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
   src/ResonantPNNbbyyAlg.cxx
   LINK_LIBRARIES ${ROOT_LIBRARIES}
@@ -30,6 +31,7 @@ atlas_add_component(bbyyAnalysis
   TruthUtils
   EasyjetHubLib
   PathResolver
+  EventBookkeeperToolsLib
 )
 
 # Install python modules, joboptions, and share content
@@ -43,7 +45,7 @@ atlas_install_python_modules(
 )
 atlas_install_data(
   data/*
-  share/*.yaml
+  share/*
 )
 
 # atlas_install_data( data/* )

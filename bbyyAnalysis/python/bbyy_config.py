@@ -5,6 +5,9 @@ from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches,
 )
 
+import pathlib
+import os
+
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
@@ -117,6 +120,24 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
     return cfg
 
 
+def bbyy_filter_dalitz_cfg(flags):
+    cfg = ComponentAccumulator()
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBYY.bbyyFilterDalitzAlg(
+            "bbyyFilterDalitzAlg",
+            TruthParticleSMInKey=(
+                flags.Analysis.container_names.input.truthSMParticles
+            ),
+            TruthParticleBSMInKey=(
+                flags.Analysis.container_names.input.truthBSMParticles
+            ),
+        ),
+    )
+
+    return cfg
+
+
 def bbyy_branches(flags):
     branches = []
 
@@ -205,3 +226,22 @@ def bbyy_branches(flags):
             branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     return branches
+
+
+def FullPath(rawpath):
+    fpath = pathlib.Path(rawpath)
+    for dirpath in [""] + os.environ["DATAPATH"].split(":"):
+        fullpath = dirpath / fpath
+        if fullpath.exists():
+            return fullpath
+
+
+def contain_dalitz(flags):
+    dsid = str(flags.Input.MCChannelNumber)
+    # file name hard-coded
+    with open(FullPath("bbyyAnalysis/DalitzDataset.txt"), 'r') as file_in:
+        dataset_list = file_in.readlines()
+        for dataset in dataset_list:
+            if dsid in dataset:
+                return True
+    return False

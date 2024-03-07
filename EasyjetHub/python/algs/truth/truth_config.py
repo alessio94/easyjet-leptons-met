@@ -1,4 +1,5 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
+from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.algs.truth.jet_parent_decorator_config import jet_parent_decorator_cfg
 from EasyjetHub.algs.truth_particle_info_config import truth_particle_info_cfg
@@ -39,6 +40,18 @@ def truth_info_cfg(
     log.info("Adding truth particle info seq")
     cfg.merge(
         truth_particle_info_cfg(flags)
+    )
+
+    return cfg
+
+
+def sumofweightsalg_cfg(flags):
+    cfg = ComponentAccumulator()
+
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.SumOfWeightsAlg(
+            "SumOfWeightsAlg",
+        ),
     )
 
     return cfg

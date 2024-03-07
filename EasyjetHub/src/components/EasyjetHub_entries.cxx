@@ -13,6 +13,7 @@
 #include "../TruthParticleInformationAlg.h"
 #include "../EventInfoGlobalAlg.h"
 #include "../OrthogonalityAlg.h"
+#include "../SumOfWeightsAlg.h"
 
 using namespace Easyjet;
 
@@ -31,3 +32,4 @@ DECLARE_COMPONENT(TauDecoratorAlg)
 DECLARE_COMPONENT(TruthParticleInformationAlg)
 DECLARE_COMPONENT(EventInfoGlobalAlg)
 DECLARE_COMPONENT(OrthogonalityAlg)
+DECLARE_COMPONENT(SumOfWeightsAlg)

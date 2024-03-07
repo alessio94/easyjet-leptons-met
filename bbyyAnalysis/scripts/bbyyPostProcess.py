@@ -15,6 +15,8 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 
+from bbyyAnalysis.bbyy_config import FullPath
+
 
 def RunEasyjetPlus(args):
     flags = initConfigFlags()
@@ -26,11 +28,12 @@ def RunEasyjetPlus(args):
 
     acc = MainServicesCfg(flags)
 
-    # Dummy tools for demonstration; replace with your actual tools and configuration
     SOWTool = CompFactory.SumOfWeightsTool(inFile=args.inFile)
+    if bool(args.containDalitz):
+        SOWTool.inHisto = "SumOfWeights"
 
     # Get XSection Path
-    with open(args.xSectionsConfig, 'r') as file:
+    with open(FullPath(args.xSectionsConfig), 'r') as file:
         XSectionData = yaml.safe_load(file)
     # Get XSection from either custom file (which is in PMG format)
     # or from an official PMG file
@@ -91,6 +94,8 @@ if __name__ == "__main__":
                         help="Copy pre-processed branches to outFile.")
     parser.add_argument("--mergeMyFiles", action='store_true',
                         help="Merge branches of outFile into the inFile.")
+    parser.add_argument("--containDalitz", default=0, type=int,
+                        help="Whether dalitz events are included in MC sample.")
 
     args = parser.parse_args()
 
