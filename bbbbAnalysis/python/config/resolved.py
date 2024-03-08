@@ -90,15 +90,6 @@ def resolved_branches(flags):
                 f"EventInfo.resolved_{var}_{btag_wp} -> bbbb_resolved_{btag_wp}_{var}"
             ]
 
-        if flags.Input.isMC:
-            branches += ["EventInfo.ftag_effSF_"
-                         f"{btag_wp}_%SYS%"
-                         " -> weight_ftag_effSF_"
-                         f"{btag_wp}_%SYS%",]
-
-    if flags.Input.isMC:
-        branches += ["EventInfo.jvt_effSF_%SYS% -> weight_jvt_effSF_%SYS%"]
-
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches
