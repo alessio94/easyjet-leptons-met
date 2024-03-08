@@ -184,9 +184,14 @@ def bbyy_branches(flags):
 
     # VBFJets
     vbfjet_variables = [
-        "Jet_vbf1_pt", "Jet_vbf1_eta", "Jet_vbf1_phi", "Jet_vbf1_E",
-        "Jet_vbf2_pt", "Jet_vbf2_eta", "Jet_vbf2_phi", "Jet_vbf2_E",
-        "m_vbfjj", "eta_vbfjj"
+        "Jet_vbf_j1_pt", "Jet_vbf_j1_eta", "Jet_vbf_j1_phi", "Jet_vbf_j1_E",
+        "Jet_vbf_j2_pt", "Jet_vbf_j2_eta", "Jet_vbf_j2_phi", "Jet_vbf_j2_E",
+        "Jet_vbf_jj_m", "Jet_vbf_jj_deta",
+        "Jet_vbf_j1_yybb_dR", "Jet_vbf_j2_yybb_dR",
+        "Jet_vbf_j1_yybb_deta", "Jet_vbf_j2_yybb_deta",
+        "Jet_vbf_jj_yybb_dR", "Jet_vbf_jj_yybb_deta",
+        "Jet_vbf_jj_yybb_pT", "Jet_vbf_jj_yybb_eta",
+        "Jet_vbf_jj_yybb_phi", "Jet_vbf_jj_yybb_m"
     ]
     for var in vbfjet_variables:
         branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]

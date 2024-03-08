@@ -292,39 +292,66 @@ namespace HHBBYY
       m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
       
       // Find VBF jets
-      float vbfmass=-1.;
-      float vbfeta=-1.;
-      TLorentzVector j_vbf1(0.,0.,0.,0.);
-      TLorentzVector j_vbf2(0.,0.,0.,0.);
+      float vbf_jj_deta = -999;
+      float vbf_mjj    = -999;
+      float dR_yybb_vbfj1 = -999;
+      float dR_yybb_vbfj2 = -999;
+      float deta_yybb_vbfj1 = -999;
+      float deta_yybb_vbfj2 = -999;
+      float dR_yybb_jj = -999;
+      float deta_yybb_jj = -999;
+      
+      TLorentzVector vbf_j[2];
+      TLorentzVector vbf_jj(0.,0.,0.,0.);
+      TLorentzVector yybbjj(0.,0.,0.,0.);
+
       if(jets->size()>=4&&bjets->size()>=2){
-        TLorentzVector j1(0.,0.,0.,0.);
-        TLorentzVector j2(0.,0.,0.,0.);
-        for(unsigned int ii=0;ii<jets->size()-1;ii++){
-          j1=(*jets)[ii]->p4();
-          for(unsigned int jj=ii+1;jj<jets->size();jj++){
-            j2=(*jets)[jj]->p4();
-            if((*jets)[ii]->p4()==Hbb_candidate1||(*jets)[jj]->p4()==Hbb_candidate2) continue; 
-	    float tmpvbfmass=(j1+j2).M();
-	    float tmpvbfeta=std::abs(j1.Eta()-j2.Eta());
-	    if(vbfmass<tmpvbfmass){
-	      vbfmass=tmpvbfmass;
-	      vbfeta=tmpvbfeta;
-	      j_vbf1=j1;
-	      j_vbf2=j2;
-	    }
+        for (size_t i=0; i<jets->size()-1; i++){
+          TLorentzVector j1 = (*jets)[i]->p4();
+          if((*jets)[i]->p4()==Hbb_candidate1||(*jets)[i]->p4()==Hbb_candidate2) continue;
+          for (size_t j = i+1; j<jets->size(); j++){
+            TLorentzVector j2 = (*jets)[j]->p4();
+            if((*jets)[j]->p4()==Hbb_candidate1||(*jets)[j]->p4()==Hbb_candidate2) continue;
+            
+            TLorentzVector iPair = j1 + j2;
+            if(iPair.M() > vbf_mjj){
+              vbf_mjj = iPair.M();
+              vbf_j[0] = j1;
+              vbf_j[1] = j2;
+              vbf_jj = iPair;
+            }
           }
         }
-      }      
-      m_Fbranches.at("Jet_vbf1_pt").set(*event, j_vbf1.Pt(), sys);
-      m_Fbranches.at("Jet_vbf1_eta").set(*event, j_vbf1.Eta(), sys);
-      m_Fbranches.at("Jet_vbf1_phi").set(*event, j_vbf1.Phi(), sys);
-      m_Fbranches.at("Jet_vbf1_E").set(*event, j_vbf1.E(), sys);      
-      m_Fbranches.at("Jet_vbf2_pt").set(*event, j_vbf2.Pt(), sys);
-      m_Fbranches.at("Jet_vbf2_eta").set(*event, j_vbf2.Eta(), sys);
-      m_Fbranches.at("Jet_vbf2_phi").set(*event, j_vbf2.Phi(), sys);
-      m_Fbranches.at("Jet_vbf2_E").set(*event, j_vbf2.E(), sys);      
-      m_Fbranches.at("m_vbfjj").set(*event, vbfmass, sys);
-      m_Fbranches.at("eta_vbfjj").set(*event, vbfeta, sys);
+        vbf_jj_deta = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
+        yybbjj = vbf_jj + HH;
+        dR_yybb_vbfj1 = vbf_j[0].DeltaR(HH); 
+        dR_yybb_vbfj2 = vbf_j[1].DeltaR(HH);
+        dR_yybb_jj = vbf_jj.DeltaR(HH);
+        deta_yybb_vbfj1 = std::fabs(vbf_j[0].Eta() - HH.Eta()); 
+        deta_yybb_vbfj2 = std::fabs(vbf_j[1].Eta() - HH.Eta()); 
+        deta_yybb_jj = std::fabs(vbf_jj.Eta() - HH.Eta());
+      }
+
+      for(unsigned int i=0; i<2; i++){
+        std::string prefix = "Jet_vbf_j"+std::to_string(i+1);
+        m_Fbranches.at(prefix+"_pt").set(*event, vbf_j[i].Pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, vbf_j[i].Eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, vbf_j[i].Phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, vbf_j[i].E(), sys);
+      }
+      m_Fbranches.at("Jet_vbf_jj_m").set(*event, vbf_mjj, sys);
+      m_Fbranches.at("Jet_vbf_jj_deta").set(*event, vbf_jj_deta, sys);
+
+      m_Fbranches.at("Jet_vbf_j1_yybb_dR").set(*event, dR_yybb_vbfj1, sys);
+      m_Fbranches.at("Jet_vbf_j2_yybb_dR").set(*event, dR_yybb_vbfj2, sys);
+      m_Fbranches.at("Jet_vbf_j1_yybb_deta").set(*event, deta_yybb_vbfj1, sys);
+      m_Fbranches.at("Jet_vbf_j2_yybb_deta").set(*event, deta_yybb_vbfj2, sys);
+      m_Fbranches.at("Jet_vbf_jj_yybb_dR").set(*event, dR_yybb_jj, sys);
+      m_Fbranches.at("Jet_vbf_jj_yybb_deta").set(*event, deta_yybb_jj, sys);
+      m_Fbranches.at("Jet_vbf_jj_yybb_pT").set(*event, yybbjj.Pt(), sys);
+      m_Fbranches.at("Jet_vbf_jj_yybb_eta").set(*event, yybbjj.Eta(), sys);
+      m_Fbranches.at("Jet_vbf_jj_yybb_phi").set(*event, yybbjj.Phi(), sys);
+      m_Fbranches.at("Jet_vbf_jj_yybb_m").set(*event, yybbjj.M(), sys);    
     }
 
     return StatusCode::SUCCESS;
