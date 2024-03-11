@@ -63,7 +63,8 @@ def get_large_R_jet_branches(
 
     split_tags = flags.Input.AMITag.split("_")
     is_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5657")
-    if lr_jet_type == "UFO" and is_valid_ptag:
+    if lr_jet_type == "UFO" and is_valid_ptag and \
+       tree_flags.collection_options.large_R_jets.btag_details:
         large_R_jet_branches.variables += get_large_R_gn2_branches()
 
     return (

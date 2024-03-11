@@ -28,6 +28,7 @@ collection_options:
   large_R_jets:
     substructure_info: false
     truth_labels: false
+    btag_details: true
 
   taus:
     RNN_branches: false
