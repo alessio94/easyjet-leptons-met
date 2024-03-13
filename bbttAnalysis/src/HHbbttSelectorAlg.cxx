@@ -39,6 +39,9 @@ namespace HHBBTT
 
     ATH_CHECK (m_runNumber.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_rdmRunNumber.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
+
+
 
     
     // Intialise booleans with value false. Also initialise syst-aware output decorators
@@ -213,7 +216,6 @@ namespace HHBBTT
     for (const auto& [channel, key] : m_tau_trigMatch_DecorKey){
       tau_trigMatchDecos.emplace(channel, key);
     }
-
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()){
@@ -607,14 +609,18 @@ namespace HHBBTT
       if (sys.name()==""){
 
         // Compute total_events
-        m_total_events+=1; 
+        m_total_events+=1;
+        if(m_isMC) m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);
+
 
         // Count which cuts the event passed
         for (const auto &cut : m_inputCutKeys) {
           if(m_bbttCuts.exists(m_boolnames.at(cut))) {
             m_bbttCuts(m_boolnames.at(cut)).passed = m_bools.at(cut);
-            if (m_bbttCuts(m_boolnames.at(cut)).passed)
-              m_bbttCuts(m_boolnames.at(cut)).counter+=1;
+            if (m_bbttCuts(m_boolnames.at(cut)).passed) {
+              m_bbttCuts(m_boolnames.at(cut)).counter += 1;
+              if(m_isMC) m_bbttCuts(m_boolnames.at(cut)).w_counter += m_generatorWeight.get(*event, sys);
+            }
           }
         }
 
@@ -629,7 +635,8 @@ namespace HHBBTT
 
         // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
         for (unsigned int i=0; i<consecutive_cuts; i++) {
-          m_bbttCuts[i].relativeCounter+=1;
+          m_bbttCuts[i].relativeCounter += 1;
+          m_bbttCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
         }
       }
 
@@ -657,12 +664,22 @@ namespace HHBBTT
       m_bbttCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
       m_bbttCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
       m_bbttCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
+      if(m_isMC) {
+        m_bbttCuts.DoWeightedAbsoluteEfficiency(m_total_events, efficiency("WeightedAbsoluteEfficiency"));
+        m_bbttCuts.DoWeightedRelativeEfficiency(m_total_events, efficiency("WeightedRelativeEfficiency"));
+        m_bbttCuts.DoWeightedStandardCutFlow(m_total_events, efficiency("WeightedStandardCutFlow"));
+      }
       m_bbttCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
     }
     else {
       delete efficiency("AbsoluteEfficiency");
       delete efficiency("RelativeEfficiency");
       delete efficiency("StandardCutFlow");
+      if(m_isMC) {
+        delete efficiency("WeightedAbsoluteEfficiency");
+        delete efficiency("WeightedRelativeEfficiency");
+        delete efficiency("WeightedStandardCutFlow");
+      }
       delete hist("EventsPassed_BinLabeling");
     }
 
@@ -908,12 +925,20 @@ namespace HHBBTT
 
     //After filling the CutManager, book your histograms.
     const unsigned int nbins = m_bbttCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbyy cuts;Cuts;#epsilon",
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbtt cuts;Cuts;#epsilon",
 				 nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbyy cuts;Cuts;#epsilon",
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbtt cuts;Cuts;#epsilon",
 				 nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbyy cuts;Cuts;#epsilon",
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbtt cuts;Cuts;#epsilon",
                                   nbins, 0.5, nbins + 0.5)));
+    if(m_isMC) {
+      ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->bbtt cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->bbtt cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->bbtt cuts;Cuts;#epsilon",
+         nbins, 0.5, nbins + 0.5)));
+    }
     ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
     return StatusCode::SUCCESS;
   }

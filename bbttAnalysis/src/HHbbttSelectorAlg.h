@@ -260,6 +260,9 @@ private:
     std::vector<HHBBTT::Booleans> m_inputCutKeys;
     Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
     long long int m_total_events{0};
+    float m_total_mcEventWeight{0.f};
+    CP::SysReadDecorHandle<float>
+      m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
 
     /// \brief Internal variables
 
