@@ -10,12 +10,12 @@ Analysis Package for the $HH\rightarrow b\bar{b} ll$ analyis
 - `share/`: yaml files containing configurations used by the components
   - `bbll-base`: where all the common flags are set;
   - `RunConfig-bbll`: configurations called by the executables (see below);
+  - `RunConfig-bbll-bypass`: configurations called by the executables (see below). Runs the code in "pass-through" mode aka no-skimming is applied;		
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
   - `HHbbllSelectorAlg`: Find if the event pass the baseline bbll selection;
   - `MMCDecoratorAlg`: Compute the tau tau MMC mass;
   - `BaselineVarsbbllAlg`: Compute the baseline variables for the analysis.
-  - `SelectionFlagsbbllAlg`: Find if the event pass the baseline bbll selection;
 
 # How to Run
 
@@ -48,4 +48,4 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
 # Main developers
 
 The main developments have been performed by (non extensive list, feel free to add your name):
-Adam Campbell Anderson, Fatima Bendebba.
+Adam Campbell Anderson, Fatima Bendebba, Giuseppe Callea.

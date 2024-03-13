@@ -3,6 +3,8 @@ include: EasyjetHub/base-config.yaml
 # Which analysis to consider
 do_bbll_analysis: true
 
+bypass: false
+
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbtt", "bbWW", "bbZZ"]
 

@@ -5,6 +5,8 @@
 /// @author Carl Gwilliam
 
 #include "MMCDecoratorAlg.h"
+#include <SystematicsHandles/SysFilterReporter.h>
+#include <SystematicsHandles/SysFilterReporterCombiner.h>
 
 #include "TLorentzVector.h"
 

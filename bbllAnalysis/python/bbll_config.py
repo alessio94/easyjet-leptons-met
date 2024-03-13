@@ -60,10 +60,19 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             muons="bbllAnalysisMuons_%SYS%",
             electrons="bbllAnalysisElectrons_%SYS%",
             met="AnalysisMET_%SYS%",
-            eventDecisionOutputDecoration="bbll_pass_sr_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            eventDecisionOutputDecoration="bbll_pass_sr_%SYS%",
+            cutList=flags.Analysis.CutList,
+            categoryList=flags.Analysis.Categories,
+            saveCutFlow=flags.Analysis.save_bbll_cutflow,
+            passTriggers=flags.Analysis.TriggerChains,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
+            Years=flags.Analysis.Years,
+            bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
+                    else False),
         )
     )
+
     # MMC decoration
     if flags.Analysis.do_mmc:
         cfg.addEventAlgo(
@@ -90,22 +99,6 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables
-        )
-    )
-
-    cfg.addEventAlgo(
-        CompFactory.HHBBLL.SelectionFlagsbbllAlg(
-            "SelectionFlagsbbllAlg",
-            jets="bbllAnalysisJets_%SYS%",
-            muons="bbllAnalysisMuons_%SYS%",
-            electrons="bbllAnalysisElectrons_%SYS%",
-            cutList=flags.Analysis.CutList,
-            categoryList=flags.Analysis.Categories,
-            saveCutFlow=flags.Analysis.save_bbll_cutflow,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            passTriggers=flags.Analysis.TriggerChains,
-            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
-            Years=flags.Analysis.Years,
         )
     )
 

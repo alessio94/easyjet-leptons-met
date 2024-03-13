@@ -141,7 +141,7 @@ declare -A CONFIGS=(
     [bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
     [bbtt-mc23]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     [bbtt-mc23-lite-syst]=bbttAnalysis/RunConfig-bbtt-bypass-syst.yaml
-    [bbll-mc23-lite]=bbllAnalysis/RunConfig-bbll.yaml
+    [bbll-mc23-lite]=bbllAnalysis/RunConfig-bbll-bypass.yaml
     # MC23 AF3
     [mc23af3]=EasyjetHub/RunConfig-noEle.yaml
     # non-ntupler
