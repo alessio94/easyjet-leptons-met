@@ -6,7 +6,7 @@ bypass: false
 # name that will go in the tree bbyy_pass_<selection_name>_%SYS%
 selection_name: "loose"
 
-small_R_jets:
+small_R_jet:
     doBtagExpVars: true
 
 CutList :
