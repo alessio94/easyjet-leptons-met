@@ -5,6 +5,8 @@ do_trigger_filtering: false
 
 do_large_R_UFO_jets: true
 
+do_jet_large_R_jet_OR: false
+
 small_R_jet:
   btag_wp: "GN2v00LegacyWP_FixedCutBEff_77"
   btag_extra_wps:

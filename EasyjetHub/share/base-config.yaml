@@ -124,6 +124,9 @@ systematics_regex: []
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
+# apply overlap removal between small-R jets and large-R jets
+# Athena default is true
+do_jet_large_R_jet_OR: true
 
 # Store high level variables by default 
 # when the config file set the high level variables
