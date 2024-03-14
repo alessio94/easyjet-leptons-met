@@ -198,7 +198,7 @@ void CutManager::DoCutflowLabeling(long long int nEvents, TH1* histo)
     }
     
     // Set bin labels for each bin using the cut names
-    histo->GetXaxis()->SetBinLabel(1, "All events");
+    histo->GetXaxis()->SetBinLabel(1, "PASS_EVENT_CLEANING_AND_OR_OTHER_FILTERS");
 
     for (size_t i = 0; i < size(); ++i)
     {

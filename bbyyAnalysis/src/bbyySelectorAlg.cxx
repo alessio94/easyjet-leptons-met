@@ -71,17 +71,17 @@ namespace HHBBYY
 
     //After filling the CutManager, book your histograms.
     const unsigned int nbins = m_bbyyCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbyy cuts;Cuts;#epsilon", 
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
+    ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->bbyy cuts;Cuts;#epsilon", 
+    ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->bbyy cuts;Cuts;#epsilon", 
+    ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
                                   nbins, 0.5, nbins + 0.5)));
     ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));  
 

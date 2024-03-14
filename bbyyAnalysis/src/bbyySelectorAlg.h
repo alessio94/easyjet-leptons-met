@@ -104,7 +104,7 @@ namespace HHBBYY
 
       bool m_saveCutFlow;
       long long int m_total_events{0};
-      float m_total_mcEventWeight{0.f};
+      double m_total_mcEventWeight{0.f};
 
       Gaudi::Property<bool> m_isMC
         { this, "isMC", false, "Is this simulation?" };

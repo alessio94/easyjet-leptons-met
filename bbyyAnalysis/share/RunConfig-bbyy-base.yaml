@@ -65,6 +65,9 @@ bypass: false
 # flag for trigger filtering
 do_trigger_filtering: false
 
+# flag for event cleaning
+do_event_cleaning: true
+
 # name that will go in the tree bbyy_pass_<selection_name>_%SYS%
 selection_name: "allcuts"
 
