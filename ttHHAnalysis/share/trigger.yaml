@@ -22,6 +22,7 @@
 - 'HLT_mu26_ivarmedium'
 - 'HLT_mu50'
 # Dilepton triggers
+- 'HLT_2e24_lhvloose_nod0'
 - 'HLT_e17_lhloose_nod0_mu14'
 - 'HLT_e7_lhmedium_nod0_mu24'
 - 'HLT_2mu14'
@@ -54,6 +55,7 @@
 - 'HLT_mu50'
 # Dilepton triggers
 - 'HLT_2e24_lhvloose_nod0'
+- 'HLT_2e24_lhvloose_nod0_L12EM15VHI'
 - 'HLT_e17_lhloose_nod0_mu14'
 - 'HLT_e7_lhmedium_nod0_mu24'
 - 'HLT_2mu14'
