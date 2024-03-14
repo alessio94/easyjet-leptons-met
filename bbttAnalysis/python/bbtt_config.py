@@ -127,6 +127,7 @@ def bbtt_cfg(
                 passDTT="pass" + baseline + "DTT_%SYS%",
                 passSTT_1B="pass_baseline_STT_%SYS%",
                 passDTT_1B="pass_baseline_DTT_%SYS%",
+                channel=flags.Analysis.channel,
                 MMC_min=60 * Units.GeV,
                 eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
                 bypass=flags.Analysis.bypass,
