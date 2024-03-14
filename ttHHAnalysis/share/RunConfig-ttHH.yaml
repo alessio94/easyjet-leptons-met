@@ -13,6 +13,7 @@ truthDecayModes: ["bbbb"]
 do_small_R_jets: true
 do_muons: true
 do_electrons: true
+do_met: true
 do_photons: false
 
 # Toggles for reconstructed objects decorations
@@ -24,12 +25,10 @@ small_R_jet:
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
-  amount: 2
 
 Muon:
   ID: "Medium"
   Iso: "PflowLoose_VarRad"
-  amount: 2
 
 Lepton:
   amount: 2
@@ -60,7 +59,7 @@ systematics_regex: [".*"]
 do_overlap_removal: true
 
 #Enable cutflow 
-save_ttHH_cutflow: true
+save_ttHH_cutflow: false
 
 CutList:
   - PASS_TRIGGER

@@ -39,6 +39,7 @@ namespace ttHH
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_HZPairsHandle.initialize(m_systematicsList));
     ATH_CHECK (m_ZZPairsHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
@@ -88,6 +89,14 @@ namespace ttHH
 
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+
+      const xAOD::MissingETContainer *metCont = nullptr;
+      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
+      const xAOD::MissingET* met = (*metCont)["Final"];
+      if (!met) {
+        ATH_MSG_ERROR("Could not retrieve MET");
+        return StatusCode::FAILURE;	
+      }
 
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
@@ -271,86 +280,39 @@ namespace ttHH
         m_Fbranches.at("Jets_DeltaEtaMean").set(*event, DeltaEtaMean, sys);
       }
 
-      // store electron kinematics
-      if (electrons->size() >= 1) {
-        const xAOD::Electron* ele1 = electrons->at(0);
-        e1 = ele1->p4();
-        m_Fbranches.at("Electron1_pt").set(*event, e1.Pt(), sys);
-        m_Fbranches.at("Electron1_eta").set(*event, e1.Eta(), sys);
-        m_Fbranches.at("Electron1_phi").set(*event, e1.Phi(), sys);
-        m_Fbranches.at("Electron1_E").set(*event, e1.E(), sys);
-        if (m_isMC){
-          float ele_SF = m_ele_SF.get(*ele1, sys);
-          m_Fbranches.at("Electron1_effSF").set(*event, ele_SF, sys);
-	}
-      }
       if (electrons->size() >= 2) {
-        const xAOD::Electron* ele2 = electrons->at(1);
-        e2 = ele2->p4();
-        m_Fbranches.at("Electron2_pt").set(*event, e2.Pt(), sys);
-        m_Fbranches.at("Electron2_eta").set(*event, e2.Eta(), sys);
-        m_Fbranches.at("Electron2_phi").set(*event, e2.Phi(), sys);
-        m_Fbranches.at("Electron2_E").set(*event, e2.E(), sys);
-        if (m_isMC){
-          float ele_SF = m_ele_SF.get(*ele2, sys);
-          m_Fbranches.at("Electron2_effSF").set(*event, ele_SF, sys);
-        }
-
         // ee
         e1 = electrons->at(0)->p4();
+        e2 = electrons->at(1)->p4();
         ee = e1 + e2;
-        m_Fbranches.at("ee_m").set(*event, ee.M(), sys);
-        m_Fbranches.at("ee_pt").set(*event, ee.Pt(), sys);
-        m_Fbranches.at("ee_eta").set(*event, ee.Eta(), sys);
-        m_Fbranches.at("ee_phi").set(*event, ee.Phi(), sys);
-        m_Fbranches.at("ee_dR").set(*event, (e1).DeltaR(e2), sys);
-      }
-
-      // store muon kinematics
-      if (muons->size() >= 1) {
-        const xAOD::Muon* muon1 = muons->at(0);
-        mu1 = muon1->p4();
-        m_Fbranches.at("Muon1_pt").set(*event, mu1.Pt(), sys);
-        m_Fbranches.at("Muon1_eta").set(*event, mu1.Eta(), sys);
-        m_Fbranches.at("Muon1_phi").set(*event, mu1.Phi(), sys);
-        m_Fbranches.at("Muon1_E").set(*event, mu1.E(), sys);
-        if (m_isMC){
-          float mu_SF = m_mu_SF.get(*muon1, sys);
-          m_Fbranches.at("Muon1_effSF").set(*event, mu_SF, sys);
-        }
+        m_Fbranches.at("ll_m").set(*event, ee.M(), sys);
+        m_Fbranches.at("ll_pt").set(*event, ee.Pt(), sys);
+        m_Fbranches.at("ll_eta").set(*event, ee.Eta(), sys);
+        m_Fbranches.at("ll_phi").set(*event, ee.Phi(), sys);
+        m_Fbranches.at("ll_dR").set(*event, (e1).DeltaR(e2), sys);
       }
 
       if (muons->size() >= 2) {
-        const xAOD::Muon* muon2 = muons->at(1);
-        mu2 = muon2->p4();
-        m_Fbranches.at("Muon2_pt").set(*event, mu2.Pt(), sys);
-        m_Fbranches.at("Muon2_eta").set(*event, mu2.Eta(), sys);
-        m_Fbranches.at("Muon2_phi").set(*event, mu2.Phi(), sys);
-        m_Fbranches.at("Muon2_E").set(*event, mu2.E(), sys);
-        if (m_isMC){
-          float mu_SF = m_mu_SF.get(*muon2, sys);
-          m_Fbranches.at("Muon2_effSF").set(*event, mu_SF, sys);
-        }
-
         // mumu
         mu1 = muons->at(0)->p4();
+        mu2 = muons->at(1)->p4();
         mumu = mu1 + mu2;
-        m_Fbranches.at("mumu_m").set(*event, mumu.M(), sys);
-        m_Fbranches.at("mumu_pt").set(*event, mumu.Pt(), sys);
-        m_Fbranches.at("mumu_eta").set(*event, mumu.Eta(), sys);
-        m_Fbranches.at("mumu_phi").set(*event, mumu.Phi(), sys);
-        m_Fbranches.at("mumu_dR").set(*event, (mu1).DeltaR(mu2), sys);
+        m_Fbranches.at("ll_m").set(*event, mumu.M(), sys);
+        m_Fbranches.at("ll_pt").set(*event, mumu.Pt(), sys);
+        m_Fbranches.at("ll_eta").set(*event, mumu.Eta(), sys);
+        m_Fbranches.at("ll_phi").set(*event, mumu.Phi(), sys);
+        m_Fbranches.at("ll_dR").set(*event, (mu1).DeltaR(mu2), sys);
       }
 
       if (muons->size() >= 1 and electrons->size() >= 1) {
         mu1 = muons->at(0)->p4();
         e1 = electrons->at(0)->p4();
         emu = e1 + mu1;
-        m_Fbranches.at("emu_m").set(*event, emu.M(), sys);
-        m_Fbranches.at("emu_pt").set(*event, emu.Pt(), sys);
-        m_Fbranches.at("emu_eta").set(*event, emu.Eta(), sys);
-        m_Fbranches.at("emu_phi").set(*event, emu.Phi(), sys);
-        m_Fbranches.at("emu_dR").set(*event, (mu1).DeltaR(e1), sys);
+        m_Fbranches.at("ll_m").set(*event, emu.M(), sys);
+        m_Fbranches.at("ll_pt").set(*event, emu.Pt(), sys);
+        m_Fbranches.at("ll_eta").set(*event, emu.Eta(), sys);
+        m_Fbranches.at("ll_phi").set(*event, emu.Phi(), sys);
+        m_Fbranches.at("ll_dR").set(*event, (mu1).DeltaR(e1), sys);
       }
 
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
@@ -416,7 +378,9 @@ namespace ttHH
       }
 
       m_Fbranches.at("HT").set(*event, HT, sys);
-      m_Ibranches.at("nLeptons").set(*event, muons->size() + electrons->size(), sys);
+      m_Fbranches.at("missEt").set(*event, met->met(), sys);
+      m_Fbranches.at("metphi").set(*event, met->phi(), sys);
+      m_Ibranches.at("nLeptons").set(*event, leptonCount, sys);
     }
     return StatusCode::SUCCESS;
 

@@ -19,6 +19,7 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
+#include <xAODMissingET/MissingETContainer.h>
 
 namespace ttHH
 {
@@ -64,6 +65,9 @@ private:
 
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+
+    CP::SysReadHandle<xAOD::MissingETContainer>
+    m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
     m_HZPairsHandle{ this, "HZPairs", "",   "Container containing jets from HZ pairing to read" };

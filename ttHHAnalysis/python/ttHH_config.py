@@ -119,6 +119,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             jets="ttHHAnalysisJets_%SYS%",
             muons="ttHHAnalysisMuons_%SYS%",
             electrons="ttHHAnalysisElectrons_%SYS%",
+            met="AnalysisMET_%SYS%",
             HZPairs="pairedttHZAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             ZZPairs="pairedttZZAnalysisJets_"
@@ -145,7 +146,7 @@ def get_BaselineVarsttHHAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ee", "mumu", "emu"]:
+    for object in ["ll"]:
         for var in ["m", "pt", "dR", "eta", "phi"]:
             float_variable_names.append(f"{object}_{var}")
 
@@ -176,7 +177,7 @@ def get_BaselineVarsttHHAlg_variables(flags):
 
     float_variable_names += angular_variables
 
-    float_variable_names += ["HT"]
+    float_variable_names += ["HT", "missEt", "metphi"]
 
     int_variable_names += [
         "nJets", "nBJets", "nLeptons",
