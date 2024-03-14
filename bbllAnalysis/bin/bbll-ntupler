@@ -71,7 +71,8 @@ def bbll_job_cfg():
             ),
             seqname
         )
-        cfg.merge(event_counter_cfg("n_bbll"), seqname)
+        if not flags.Analysis.suppress_metadata_json:
+            cfg.merge(event_counter_cfg("n_bbll"), seqname)
 
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
@@ -89,7 +90,8 @@ def bbll_job_cfg():
             )
 
     # Record the number of events for logging and tests
-    cfg.merge(event_counter_cfg("n_events"), seqname)
+    if not flags.Analysis.suppress_metadata_json:
+        cfg.merge(event_counter_cfg("n_events"), seqname)
 
     return cfg, flags, args
 

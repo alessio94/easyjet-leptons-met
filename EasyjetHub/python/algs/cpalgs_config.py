@@ -42,7 +42,8 @@ def cpalgs_cfg(flags):
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
 
     cfg = ComponentAccumulator()
-    cfg.merge(event_counter_cfg("n_input"))
+    if not flags.Analysis.suppress_metadata_json:
+        cfg.merge(event_counter_cfg("n_input"))
 
     # Create SystematicsSvc explicitly:
     sysSvc = CompFactory.CP.SystematicsSvc("SystematicsSvc")

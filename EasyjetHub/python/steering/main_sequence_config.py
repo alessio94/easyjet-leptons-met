@@ -86,12 +86,14 @@ def preselection_cfg(flags, seqname):
     # if trigger passed or not, for example:
     # EventInfo.trigger_name
     configSeq += trigger_sequence(flags)
-    makeEventCounterConfig(configSeq, "n_trigger")
+    if not flags.Analysis.suppress_metadata_json:
+        makeEventCounterConfig(configSeq, "n_trigger")
 
     log.info("Add DQ event filter sequence")
     # Remove events failing DQ criteria
     configSeq += event_selection_sequence(flags)
-    makeEventCounterConfig(configSeq, "n_data_quality")
+    if not flags.Analysis.suppress_metadata_json:
+        makeEventCounterConfig(configSeq, "n_data_quality")
 
     # Create the output CA to set the sequence correctly
     cfg = ComponentAccumulator()
@@ -171,6 +173,7 @@ def output_cfg(flags, seqname):
             seqname
         )
 
-    cfg.merge(event_counter_cfg("n_events"), seqname)
+    if not flags.Analysis.suppress_metadata_json:
+        cfg.merge(event_counter_cfg("n_events"), seqname)
 
     return cfg

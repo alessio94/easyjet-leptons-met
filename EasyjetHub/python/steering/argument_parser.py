@@ -281,6 +281,12 @@ class AnalysisArgumentParser(ArgumentParser):
             ),
             overwrite=True,
         )
+        self.add_analysis_arg(
+            "-sm",
+            "--suppress-metadata-json",
+            action="store_true",
+            help="Do not create metadata JSON file. For running batch jobs locally"
+        )
 
         # Overwrite options
 
