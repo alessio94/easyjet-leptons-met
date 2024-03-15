@@ -76,7 +76,7 @@ def get_valid_ami_tag(tags, check_tag="p", min_valid_tag="p5657"):
     is_valid_tag = False
     for tag in tags:
         if check_tag in tag:
-            is_valid_tag = int(tag[1:]) > int(min_valid_tag[1:])
+            is_valid_tag = int(tag[1:]) >= int(min_valid_tag[1:])
     return is_valid_tag
 
 
