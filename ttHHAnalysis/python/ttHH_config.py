@@ -6,6 +6,9 @@ from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
+import pathlib
+import os
+
 
 def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
              float_variables=[], int_variables=[]):
@@ -250,3 +253,11 @@ def ttHH_branches(flags):
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
     return branches, float_variable_names, int_variable_names
+
+
+def FullPath(rawpath):
+    fpath = pathlib.Path(rawpath)
+    for dirpath in [""] + os.environ["DATAPATH"].split(":"):
+        fullpath = dirpath / fpath
+        if fullpath.exists():
+            return fullpath
