@@ -2,6 +2,8 @@ XSection_paths:
     # If you add more than 1 files which contain the same input DSID, the last one will be parsed by the code.
     # Path to official PMG txt file
     - "dev/PMGTools/2024-01-22/PMGxsecDB_mc16.txt"
+    - "dev/PMGTools/2024-01-22/PMGxsecDB_mc23.txt "
     #- "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/2024-01-22/PMGxsecDB_mc23.txt"
     # Path to your custom PMG-like txt file
     - "bbyyAnalysis/CustomXSections_mc20.txt"
+    - "bbyyAnalysis/CustomXSections_mc23.txt"
