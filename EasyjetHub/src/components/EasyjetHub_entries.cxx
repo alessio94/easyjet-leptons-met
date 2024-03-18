@@ -14,6 +14,7 @@
 #include "../EventInfoGlobalAlg.h"
 #include "../OrthogonalityAlg.h"
 #include "../SumOfWeightsAlg.h"
+#include "../ThresholdHelper.h"
 
 using namespace Easyjet;
 
