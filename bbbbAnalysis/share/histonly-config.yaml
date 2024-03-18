@@ -20,6 +20,10 @@ small_R_jet:
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
 
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+
 # orthogonality studies  
 orthogonality:
   include: EasyjetHub/orth-config.yaml 

@@ -39,6 +39,18 @@ def validate_do_obj_flags(flags):
         assert flags.Analysis.Muon.Iso, (
             "Muons require isolation working point e.g. Muon.Iso: 'Loose_VarRad'"
         )
+    if flags.Analysis.do_small_R_jets and flags.Analysis.small_R_jet.runBJetPtCalib:
+        assert flags.Analysis.do_muons, (
+            "B-jet pT calibration requires muons to be run"
+        )
+        assert len(flags.Analysis.small_R_jet.btag_wp) > 0, (
+            "B-jet pT calibration requires some btag WP to be set"
+        )
+        assert "Continuous" not in flags.Analysis.small_R_jet.btag_wp, (
+            "Pseudo-continuous b-tagging cannot be used as nominal btag_wp with B-jet "
+            "pT calibration. A fixed cut should be used for nominal and PCBT can be "
+            "used as btag_extra_wp"
+        )
 
 
 def validate_do_write_obj_flags(flags, tree_flags):

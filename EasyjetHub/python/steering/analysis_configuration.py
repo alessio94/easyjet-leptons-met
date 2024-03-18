@@ -60,6 +60,7 @@ def analysis_configuration(parser="default"):
     if flags.Analysis.fast_test:
         flags.Analysis.do_overlap_removal = False
         flags.Analysis.do_muons = False
+        flags.Analysis.small_R_jet.runBJetPtCalib = False
 
         def disable_reco_muons(tree_flags):
             _tree_flags = {k: v for k, v in tree_flags.items()}

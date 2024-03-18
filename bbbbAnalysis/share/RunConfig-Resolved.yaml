@@ -8,6 +8,7 @@ do_resolved_dihiggs: true
 
 # Toggles for object types
 do_small_R_jets: true
+do_muons: true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
@@ -21,6 +22,10 @@ small_R_jet:
     - GN2v00LegacyWP_FixedCutBEff_77
     - GN2v00LegacyWP_FixedCutBEff_85
     - GN2v00NewAliasWP_FixedCutBEff_85
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
 
 # apply trigger lists to filter events
 do_trigger_filtering: true

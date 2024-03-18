@@ -12,6 +12,7 @@ do_small_R_jets: true
 do_large_R_Topo_jets: false
 do_large_R_UFO_jets: true
 do_VR_jets: true
+do_muons: true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
@@ -21,6 +22,10 @@ small_R_jet:
   btag_extra_wps:
     - DL1dv01_FixedCutBEff_70
     - DL1dv01_FixedCutBEff_85
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
 
 # orthogonality studies  
 orthogonality:

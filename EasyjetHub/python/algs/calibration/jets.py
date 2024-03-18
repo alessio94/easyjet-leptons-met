@@ -114,9 +114,7 @@ def jet_sequence(
                 ) # noqa
                 configSeq.setOptionValue('.noEffSF', True)
 
-        # Run this by default, but will fail if muon and btag calib sequences not run
-        # TODO: Add a toggle?
-        if flags.Analysis.do_muons:
+        if jet_flags.runBJetPtCalib:
             # Pick a reasonable b-tag selection?
             makeBJetPtCalibrationConfig(
                 configSeq,
