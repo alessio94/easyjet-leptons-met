@@ -35,7 +35,7 @@ def main():
     )
     parser.add_argument(
         "--campaign",
-        default="EJ_%Y_%m_%d",
+        default="EJ_%Y_%m_%d_T%H%M%S",
         help=(
             "The name of the campaign. Will be prepended to the output dataset"
             " name. Can include datetime.strftime replacement fields"
@@ -70,6 +70,11 @@ def main():
     # check ntupler command is available before submitting
     if which(args.exec) is None:
         raise ValueError(f"Failed to find {args.exec}. Check that it is installed")
+
+    campaign = datetime.datetime.now().strftime(args.campaign)
+
+    if not args.noSubmit:
+        create_git_tag(campaign)
 
     # Prepare some of the prun options here
     submit_opts = {
@@ -109,7 +114,7 @@ def main():
     if not which("prun"):
         raise RuntimeError("you have not set up panda, run `lsetup panda!`")
 
-    nickname = getGridNickname()
+    grid_nickname = get_grid_nickname()
 
     # copy the runconfig to the submit dir to be available for the exec cmd
     try:
@@ -122,7 +127,7 @@ def main():
         [
             "prun",
             "--outDS",
-            "user.{0}.NONE".format(nickname),
+            "user.{0}.NONE".format(grid_nickname),
             "--exec",
             "NONE",
             "--noSubmit",
@@ -137,48 +142,30 @@ def main():
 
     submit_opts["inTarBall"] = "code.tar.gz"
 
-    campaign = datetime.datetime.now().strftime(args.campaign)
-
     io_list = []
-    if args.mc_list is not None:
-        with open(args.mc_list) as fp:
-            mc_list = fp.readlines()
-        for line in mc_list:
-            line = line.strip()
-            if line.startswith("*"):
-                continue
-            if not line:
-                continue
-            ds_name = line.rpartition(":")[2]
-            project, dsid, physics_short, prod_step, dtype, tags = ds_name.split(".")
-            io_list.append(
-                {
-                    "inDS": ds_name,
-                    "outDS": "user.{0}.{1}.{2}.{3}.{4}".format(
-                        nickname, campaign, dsid, physics_short, tags
-                    ),
-                }
-            )
-
-    if args.data_list is not None:
-        with open(args.data_list) as fp:
-            data_list = fp.readlines()
-        for line in data_list:
-            line = line.strip()
-            if line.startswith("*"):
-                continue
-            if not line:
-                continue
-            ds_name = line.rpartition(":")[2]
-            split = ds_name.split(".")
-            io_list.append(
-                {
-                    "inDS": ds_name,
-                    "outDS": "user.{0}.{1}.{2}.{3}.{4}".format(
-                        nickname, campaign, split[0], split[1], split[-1]
-                    ),
-                }
-            )
+    with open(args.mc_list or args.data_list) as fp:
+        ds_list = fp.readlines()
+    for ds in ds_list:
+        ds = ds.strip()
+        if ds.startswith("*"):
+            continue
+        if not ds:
+            continue
+        ds_name = ds.rpartition(":")[2]
+        ds_name_split = ds_name.split(".")
+        ds_tags = ds_name_split[-1]
+        if args.mc_list is not None:
+            dsid = ds_name_split[1]
+        else:
+            dsid = f"{ds_name_split[0]}.{ds_name_split[1]}"
+        io_list.append(
+            {
+                "inDS": ds_name,
+                "outDS": "user.{0}.{1}.{2}.{3}".format(
+                    grid_nickname, campaign, dsid, ds_tags
+                ),
+            }
+        )
 
     if not io_list:
         raise ValueError("No inputs defined")
@@ -215,7 +202,7 @@ def main():
             raise OSError(proc.returncode, err)
 
 
-def getGridNickname():
+def get_grid_nickname():
     try:
         voms_proxy_info = subprocess.check_output(["voms-proxy-info", "--all"])
         voms_proxy_info = voms_proxy_info.decode("utf-8")
@@ -231,6 +218,12 @@ def getGridNickname():
             "Could not find proxy information."
             + ' Try typing "voms-proxy-init -voms atlas" and try again',
         )
+
+
+def create_git_tag(tag_name: str):
+    result = subprocess.run(["easyjet-create-git-tag", tag_name], capture_output=True)
+    if result.returncode != 0:
+        raise ValueError(result.stdout.decode("utf-8").strip())
 
 
 if __name__ == "__main__":

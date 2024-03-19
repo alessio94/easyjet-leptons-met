@@ -63,6 +63,7 @@ atlas_install_scripts(
   bin/easyjet-ntupler
   bin/easyjet-gridsubmit
   bin/easyjet-merge-configs
+  bin/easyjet-create-git-tag
 )
 atlas_install_python_modules(
   python/*.py

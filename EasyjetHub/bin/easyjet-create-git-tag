@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# This script should not be sourced, we don't need anything in here to
+# propigate to the surrounding environment.
+if [[ $- == *i* ]] ; then
+    echo "Don't source me!" >&2
+    return 1
+else
+  # set the shell to exit if there's an error (-e), and to error if
+  # there's an unset variable (-u)
+    set -eu
+fi
+
+help() {
+    echo "This script is used to create the given tag and push it to the remote repository."
+    echo "Usage: $(basename $0) <tag>"
+}
+
+# if no arguments are given, print the help message
+if [ $# -eq 0 ]; then
+    help
+    exit 1
+fi
+
+REPO_BASE=$(realpath --relative-to=$PWD $(dirname $(readlink -e ${BASH_SOURCE[0]}))/../..)
+USER_GRID_NAME=${RUCIO_ACCOUNT-${USER}}
+
+cd ${REPO_BASE}
+
+# Check if the repository is dirty
+if ! git diff --quiet; then
+    echo "There are uncommitted changes. Please commit your changes before proceeding."
+    exit 1
+fi
+
+if [[ "$(git remote get-url origin)" != *"$USER_GRID_NAME"* ]]; then
+    echo "ERROR: Remote URL for \"origin\" is not a fork, please submit from a fork."
+    exit 1
+fi
+
+# get script argument and store it in a variable
+TAG_ID=$1
+
+# Get the latest tag on HEAD
+LATEST_TAG=$(git tag --points-at)
+
+# check if TAG_ID and LATEST_TAG are different, if they are create it
+if [ "$TAG_ID" != "$LATEST_TAG" ]; then
+    git tag $TAG_ID
+fi
+
+# make sure the tag/latest tag is pushed to the remote repository
+git push --quiet origin $TAG_ID
