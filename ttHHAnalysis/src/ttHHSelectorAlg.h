@@ -54,8 +54,6 @@ namespace ttHH
           "PASS_BASELINE"
       };
 
-      void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
-                          const std::vector<std::string> &Triggers, CutManager& Cuts);
       void evaluateJetCuts(const xAOD::JetContainer& bjets,
                           const xAOD::JetContainer& jets, CutManager& ttHHCuts);
 
@@ -82,14 +80,16 @@ namespace ttHH
       CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "",   "Muon container to read" };
 
+      CP::SysReadDecorHandle<bool> m_passTriggerDilep {this, "passTriggerDilep", "ttHH_pass_trigger_dilep", "events pass any dilepton triggers"};
+      CP::SysReadDecorHandle<bool> m_passTriggerSinglep {this, "passTriggerSinglep", "ttHH_pass_trigger_singlep", "events pass any singlep triggers"};
+      CP::SysReadDecorHandle<bool> m_passTriggerBjet {this, "passTriggerBjet", "ttHH_pass_trigger_bjet", "events pass any bjets triggers"};
+
       CP::SysFilterReporterParams m_filterParams {this, "ttHH selection"};
 
       Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
       std::vector<std::string> m_inputCutList{};
-      std::vector<std::string> m_Triggers;
-      std::unordered_map<std::string,  SG::ReadDecorHandleKey<xAOD::EventInfo>> m_triggerDecorKeys;
 
       bool m_saveCutFlow;
       long long int m_total_events{0};

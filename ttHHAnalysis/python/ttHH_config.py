@@ -75,6 +75,15 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
     )
 
     cfg.addEventAlgo(
+        CompFactory.ttHH.TriggerDecoratorAlg(
+            "ttHHTriggerDecoratorAlg",
+            isMC=flags.Input.isMC,
+            Years=flags.Analysis.Years,
+            triggerLists=flags.Analysis.TriggerChains,
+        )
+    )
+
+    cfg.addEventAlgo(
         CompFactory.ttHH.ttHHSelectorAlg(
             "ttHHSelectorAlg",
             bjets="pairedttHHAnalysisJets_"
@@ -84,7 +93,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             electrons="ttHHAnalysisElectrons_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_ttHH_cutflow,
-            triggers=flags.Analysis.TriggerChains,
             eventDecisionOutputDecoration="ttHH_pass_baseline_%SYS%",
             bypass=flags.Analysis.bypass,
         )
@@ -244,6 +252,10 @@ def ttHH_branches(flags):
     branches += ["EventInfo.PassAllCuts_%SYS% -> ttHH_PassAllCuts_%SYS%"]
 
     branches += ["EventInfo.ttHH_pass_baseline_%SYS% -> ttHH_pass_baseline_%SYS%"]
+
+    for trig in ["dilep", "singlep", "bjet"]:
+        branches += [f"EventInfo.ttHH_pass_trigger_{trig} \
+                             -> ttHH_pass_trigger_{trig}"]
 
     if (flags.Analysis.save_ttHH_cutflow):
         cutList = flags.Analysis.CutList

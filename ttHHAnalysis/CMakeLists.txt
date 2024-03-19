@@ -12,6 +12,7 @@ atlas_add_component(ttHHAnalysis
   src/JetPairingAlgttHH.cxx
   src/BaselineVarsttHHAlg.cxx
   src/ttHHSelectorAlg.cxx
+  src/TriggerDecoratorAlg.cxx
   src/components/ttHHAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps

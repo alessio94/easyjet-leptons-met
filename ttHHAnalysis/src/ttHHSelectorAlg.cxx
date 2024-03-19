@@ -15,7 +15,6 @@ namespace ttHH
   {
     declareProperty("cutList", m_inputCutList);
     declareProperty("saveCutFlow", m_saveCutFlow);
-    declareProperty("triggers", m_Triggers);
   }
 
 
@@ -29,26 +28,15 @@ namespace ttHH
     // Initialise global event filter
     ATH_CHECK (m_filterParams.initialize(m_systematicsList));
 
+    ATH_CHECK(m_passTriggerDilep.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_passTriggerSinglep.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_passTriggerBjet.initialize(m_systematicsList, m_eventHandle));
+
     ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
-
-    //Initialize trigger decorations
-    for (const std::string &trig : m_Triggers)
-    {
-      // CP alg should convert trigger names
-      std::string modifiedTrigName = trig;
-      std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '-', '_');
-      std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '.', 'p');
-
-      std::string triggerDecorName = "trigPassed_"+modifiedTrigName;
-      SG::ReadDecorHandleKey< xAOD::EventInfo > triggerDecorKey = m_eventHandle.getNamePattern() + "." + triggerDecorName;
-
-      m_triggerDecorKeys.emplace(modifiedTrigName,triggerDecorKey);
-      ATH_CHECK(m_triggerDecorKeys.at(modifiedTrigName).initialize());
-    }
 
     for (const std::string &string_var: m_inputCutList) {
       CP::SysWriteDecorHandle<bool> var {string_var+"_%SYS%", this};
@@ -116,8 +104,15 @@ namespace ttHH
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
 
-      if (!m_Triggers.empty()) {
-        evaluateTriggerCuts(*event, m_Triggers, m_ttHHCuts);
+
+      if (m_ttHHCuts.exists("PASS_TRIGGER")) {
+        if (!m_passTriggerBjet.empty() and m_passTriggerBjet.get(*event, sys)) {
+          m_ttHHCuts("PASS_TRIGGER").passed = true;
+        } else if (!m_passTriggerSinglep.empty() and m_passTriggerSinglep.get(*event, sys)) {
+          m_ttHHCuts("PASS_TRIGGER").passed = true;
+        } else if (!m_passTriggerDilep.empty() and m_passTriggerDilep.get(*event, sys)) {
+          m_ttHHCuts("PASS_TRIGGER").passed = true;
+        }
       }
 
       evaluateJetCuts(*bjets, *jets, m_ttHHCuts);
@@ -162,7 +157,6 @@ namespace ttHH
 
       if (!m_bypass and !m_ttHHCuts("PASS_BASELINE").passed) continue;
 
-
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
       filter.setPassed(true);
@@ -195,31 +189,6 @@ namespace ttHH
 
 
      return StatusCode::SUCCESS;
-
-  }
-
-  void ttHHSelectorAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &Triggers, 
-                                                  CutManager& ttHHCuts) {
-
-    if (!ttHHCuts.exists("PASS_TRIGGER"))
-        return;
-
-    for (const std::string &trigger : Triggers)
-    {
-      // CP alg should convert trigger names
-      std::string modifiedTrigName = trigger;
-      std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '-', '_');
-      std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '.', 'p');
-
-      SG::ReadDecorHandleKey<xAOD::EventInfo>& triggerDecorKey = m_triggerDecorKeys.at(modifiedTrigName);
-      SG::ReadDecorHandle<xAOD::EventInfo, bool> m_triggerDecorHandle(triggerDecorKey);
-
-      //If the event passes any of the available triggers, set the overall trigger cut to true.
-      if (m_triggerDecorHandle(event)) {
-        ttHHCuts("PASS_TRIGGER").passed = true;
-        break;
-      }
-    }
 
   }
 
