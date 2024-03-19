@@ -355,10 +355,12 @@ namespace HHBBTT
           tautau_vis = lead_tau + sublead_tau;
           found_tautau_vis = true;
         }
-        m_Fbranches.at("H_vis_tautau_pt").set(*event, tautau_vis.Pt(), sys);
-        m_Fbranches.at("H_vis_tautau_eta").set(*event, tautau_vis.Eta(), sys);
-        m_Fbranches.at("H_vis_tautau_phi").set(*event, tautau_vis.Phi(), sys);
-        m_Fbranches.at("H_vis_tautau_m").set(*event,  tautau_vis.M(), sys);
+        if(found_tautau_vis){
+          m_Fbranches.at("H_vis_tautau_pt").set(*event, tautau_vis.Pt(), sys);
+          m_Fbranches.at("H_vis_tautau_eta").set(*event, tautau_vis.Eta(), sys);
+          m_Fbranches.at("H_vis_tautau_phi").set(*event, tautau_vis.Phi(), sys);
+          m_Fbranches.at("H_vis_tautau_m").set(*event,  tautau_vis.M(), sys);
+        }
       }
 
       if(found_bb && found_tautau_vis){
