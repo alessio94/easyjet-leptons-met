@@ -967,7 +967,7 @@ namespace HHBBTT
 
     if(m_year==2015)
       m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 21. * Athena::Units::GeV;
-    else if(m_year<=2016 && m_year<=2018)
+    else if(2016<=m_year && m_year<=2018)
       m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 27. * Athena::Units::GeV;
     else
       m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 25. * Athena::Units::GeV;
