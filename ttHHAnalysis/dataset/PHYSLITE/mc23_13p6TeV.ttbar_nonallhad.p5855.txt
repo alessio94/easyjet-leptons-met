@@ -1,2 +1,0 @@
-mc23_13p6TeV.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.deriv.DAOD_PHYSLITE.e8549_s4159_r14799_p5855
-mc23_13p6TeV.601589.PhPy8EG_A14_ttbar_hdamp258p75_nonallhadron.deriv.DAOD_PHYSLITE.e8549_s4162_r14622_p5855
