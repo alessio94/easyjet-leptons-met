@@ -100,6 +100,8 @@ private:
     m_antiTauDecorName { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
 
+    CP::SysReadDecorHandle<int>
+      m_truthTypeTau{ this, "truthTypeTau", "truthType", "Tau truth type" };
 
     CP::SysReadDecorHandle<bool> 
     m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};

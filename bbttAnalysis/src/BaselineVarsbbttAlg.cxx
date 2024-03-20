@@ -79,6 +79,10 @@ namespace HHBBTT
     m_antiTauDecorKey = m_tauHandle.getNamePattern() + "." + m_antiTauDecorName;
     ATH_CHECK (m_antiTauDecorKey.initialize());
 
+    if (m_isMC) {
+      ATH_CHECK (m_truthTypeTau.initialize(m_systematicsList, m_tauHandle));
+    }
+
     for (const std::string &var : m_floatVariables){
       ATH_MSG_DEBUG("initializing float variable: " << var);
       CP::SysWriteDecorHandle<float> whandle{var+"_%SYS%", this};
@@ -234,74 +238,41 @@ namespace HHBBTT
       }
 
       //selected tau
-      TLorentzVector lead_tau(0,0,0,0);
-      TLorentzVector sublead_tau(0,0,0,0);
-      int lead_tau_charge = -99;
-      int sublead_tau_charge = -99;
-      int lead_tau_nTracks = -99;
-      int sublead_tau_nTracks = -99.;
-      float lead_tau_effSF = 1;
-      float sublead_tau_effSF = 1;
-      int lead_tau_isTauID = -99;
-      int sublead_tau_isTauID = -99;
-      int lead_tau_isAntiTau = -99;
-      int sublead_tau_isAntiTau = -99;
-      float lead_tau_RNN = -99.;
-      float sublead_tau_RNN = -99.;
-
-      bool found_lead_tau = false;
-      bool found_sublead_tau = false;
+      const xAOD::TauJet* tau0 = nullptr;
+      const xAOD::TauJet* tau1 = nullptr;
 
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
-          if(!found_lead_tau){
-            lead_tau = tau->p4();
-            lead_tau_charge = tau->charge();
-            lead_tau_nTracks = tau->nTracks();
-            lead_tau_isTauID = static_cast<int>(idTauDecorHandle(*tau));
-            lead_tau_isAntiTau = static_cast<int>(antiTauDecorHandle(*tau));
-            lead_tau_RNN = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
-	    if(m_isMC) lead_tau_effSF = m_tau_effSF.get(*tau,sys);
-            found_lead_tau = true;
-            continue;
-          }
-
-          sublead_tau = tau->p4();
-          sublead_tau_charge = tau->charge();
-          sublead_tau_nTracks = tau->nTracks();
-          sublead_tau_isTauID = static_cast<int>(idTauDecorHandle(*tau));
-          sublead_tau_isAntiTau = static_cast<int>(antiTauDecorHandle(*tau));
-	  sublead_tau_RNN = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
-          if(m_isMC) sublead_tau_effSF = m_tau_effSF.get(*tau,sys);
-          found_sublead_tau = true;
-          break; 
+          if(!tau0) tau0 = tau;
+	  else if(!tau1){
+	    tau1 = tau;
+	    break;
+	  }
         }
       }
 
-      if(found_lead_tau){
-        m_Fbranches.at("Tau1_pt").set(*event, lead_tau.Pt(), sys);
-        m_Fbranches.at("Tau1_eta").set(*event, lead_tau.Eta(), sys);
-        m_Fbranches.at("Tau1_phi").set(*event, lead_tau.Phi(), sys);
-        m_Fbranches.at("Tau1_E").set(*event, lead_tau.E(), sys);
-	m_Fbranches.at("Tau1_RNN").set(*event, lead_tau_RNN, sys);
-        if(m_isMC) m_Fbranches.at("Tau1_effSF").set(*event, lead_tau_effSF, sys);
-        m_Ibranches.at("Tau1_charge").set(*event, lead_tau_charge, sys);
-        m_Ibranches.at("Tau1_nProng").set(*event, lead_tau_nTracks, sys);
-        m_Ibranches.at("Tau1_isTauID").set(*event, lead_tau_isTauID, sys);
-        m_Ibranches.at("Tau1_isAntiTau").set(*event, lead_tau_isAntiTau, sys);
-      }
+      std::vector<const xAOD::TauJet*> sel_taus = {tau0, tau1};
 
-      if(found_sublead_tau){
-        m_Fbranches.at("Tau2_pt").set(*event, sublead_tau.Pt(), sys);
-        m_Fbranches.at("Tau2_eta").set(*event, sublead_tau.Eta(), sys);
-        m_Fbranches.at("Tau2_phi").set(*event, sublead_tau.Phi(), sys);
-        m_Fbranches.at("Tau2_E").set(*event, sublead_tau.E(), sys);
-	m_Fbranches.at("Tau2_RNN").set(*event, sublead_tau_RNN, sys);
-        if(m_isMC) m_Fbranches.at("Tau2_effSF").set(*event, sublead_tau_effSF, sys);
-        m_Ibranches.at("Tau2_charge").set(*event, sublead_tau_charge, sys);
-        m_Ibranches.at("Tau2_nProng").set(*event, sublead_tau_nTracks, sys);
-        m_Ibranches.at("Tau2_isTauID").set(*event, sublead_tau_isTauID, sys);
-        m_Ibranches.at("Tau2_isAntiTau").set(*event, sublead_tau_isAntiTau, sys);
+      for(unsigned int i=0; i<2; i++){
+	const xAOD::TauJet* tau = sel_taus[i];
+	if(!tau) break;
+	std::string prefix = "Tau"+std::to_string(i+1);
+	TLorentzVector tlv = tau->p4();
+	m_Fbranches.at(prefix+"_pt").set(*event, tlv.Pt(), sys);
+	m_Fbranches.at(prefix+"_eta").set(*event, tlv.Eta(), sys);
+	m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
+	m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
+	m_Fbranches.at(prefix+"_RNN").set(*event, tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans), sys);
+
+	m_Ibranches.at(prefix+"_charge").set(*event, tau->charge(), sys);
+	m_Ibranches.at(prefix+"_nProng").set(*event, tau->nTracks(), sys);
+	m_Ibranches.at(prefix+"_isTauID").set(*event, idTauDecorHandle(*tau), sys);
+	m_Ibranches.at(prefix+"_isAntiTau").set(*event, antiTauDecorHandle(*tau), sys);
+
+	if(m_isMC){
+	  m_Fbranches.at(prefix+"_effSF").set(*event, m_tau_effSF.get(*tau, sys), sys);
+	  m_Ibranches.at(prefix+"_truthType").set(*event, m_truthTypeTau.get(*tau, sys), sys);
+	}
       }
 
       // DiHiggs mass 
@@ -347,12 +318,12 @@ namespace HHBBTT
 
       TLorentzVector tautau_vis(0,0,0,0);
       bool found_tautau_vis = false;
-      if(found_lead_tau){
+      if(tau0){
         if(found_lead_lep){
-          tautau_vis = lead_tau + lead_lep;
+          tautau_vis = tau0->p4() + lead_lep;
           found_tautau_vis = true;
-        }else if(found_sublead_tau){
-          tautau_vis = lead_tau + sublead_tau;
+        }else if(tau1){
+          tautau_vis = tau0->p4() + tau1->p4();
           found_tautau_vis = true;
         }
         if(found_tautau_vis){
