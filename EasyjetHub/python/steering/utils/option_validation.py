@@ -51,6 +51,11 @@ def validate_do_obj_flags(flags):
             "pT calibration. A fixed cut should be used for nominal and PCBT can be "
             "used as btag_extra_wp"
         )
+    if flags.Analysis.do_small_R_jet_large_R_jet_OR:
+        assert flags.Analysis.do_large_R_jets_OR, (
+            "Small-R / Large-R jets overlap removal requires for the Large-R jets "
+            "overlap removal to be enabled"
+        )
 
 
 def validate_do_write_obj_flags(flags, tree_flags):

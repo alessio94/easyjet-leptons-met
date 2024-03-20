@@ -62,12 +62,12 @@ def overlap_sequence(flags):
         ]
 
     # Large-R jets need more special handling
-    if flags.Analysis.do_large_R_Topo_jets:
+    if flags.Analysis.do_large_R_Topo_jets and flags.Analysis.do_large_R_jets_OR:
         preOR_collections['fatJets'] = (
             drop_sys(flags.Analysis.container_names.output.reco10TopoJet)
         )
         original_names['fatJets'] = flags.Analysis.container_names.input.reco10TopoJet
-    if flags.Analysis.do_large_R_UFO_jets:
+    if flags.Analysis.do_large_R_UFO_jets and flags.Analysis.do_large_R_jets_OR:
         preOR_collections['fatJets'] = (
             drop_sys(flags.Analysis.container_names.output.reco10UFOJet)
         )
@@ -77,7 +77,8 @@ def overlap_sequence(flags):
     configSeq += makeConfig('OverlapRemoval')
     configSeq.setOptionValue('.inputLabel',  'preselectOR')
     configSeq.setOptionValue('.outputLabel', 'passesOR')
-    configSeq.setOptionValue('.doJetFatJetOR', flags.Analysis.do_jet_large_R_jet_OR)
+    configSeq.setOptionValue('.doJetFatJetOR',
+                             flags.Analysis.do_small_R_jet_large_R_jet_OR)
     for objtype, coll in preOR_collections.items():
         configSeq.setOptionValue(f'.{objtype}', coll)
 
