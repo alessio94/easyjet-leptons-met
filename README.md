@@ -99,7 +99,7 @@ Please favour `rebase` over `merge` as it can badly affect the commit history. B
 
 And repeat 4 - 8 as many times as necessary up until the analysis is published.
 
-### How to compile
+### How to compile and run
 
 ```
 mkdir build
@@ -108,6 +108,10 @@ source ../easyjet/setup.sh
 cmake ../easyjet/
 make
 source */setup.sh
+cd ..
+mkdir run
+cd run
+# Launch your favorite easyjet command
 ```
 
 *If you are working in a container (described [below](#athanalysis-in-docker)), source the `/release_setup.sh` script, instead of the `setupATLAS; asetup` commands.*. The setup.sh will provide the current working AthAnalysis version
