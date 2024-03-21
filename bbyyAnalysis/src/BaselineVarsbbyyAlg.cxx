@@ -10,6 +10,8 @@
 #include "TMatrixDSymEigen.h"
 #include "TVectorD.h"
 
+#include <AthenaKernel/Units.h>
+
 namespace HHBBYY
 {
   BaselineVarsbbyyAlg::BaselineVarsbbyyAlg(const std::string &name,
@@ -42,22 +44,18 @@ namespace HHBBYY
       m_ph_SF = CP::SysReadDecorHandle<float>("ph_effSF_"+m_photonWPName+"_%SYS%", this);
     }
     ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
-
-    // Intialise syst-aware output decorators
-    // Add MC var
-    if(m_isMC) m_Fvarnames.insert(m_Fvarnames.end(), m_Fvarnames_MC.begin(), m_Fvarnames_MC.end());
-
-    for (const std::string &string_var: m_Fvarnames) {
+    
+    for (const std::string &string_var: m_floatVariables) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
       m_Fbranches.emplace(string_var, var);
       ATH_CHECK (m_Fbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
 
-    for (const std::string &string_var: m_Ivarnames) {
+    for (const std::string &string_var: m_intVariables) {
       CP::SysWriteDecorHandle<int> var {string_var+"_%SYS%", this};
       m_Ibranches.emplace(string_var, var);
       ATH_CHECK (m_Ibranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
-    } 
+    }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -113,11 +111,11 @@ namespace HHBBYY
       int PCBT_candidate1 = -99, PCBT_candidate2 = -99;
       double dRHH = -99., dRyy = -99., dRbb = -99.;
 
-      for (const std::string &string_var: m_Fvarnames) {
+      for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
       }
       
-      for (const std::string &string_var: m_Ivarnames) {
+      for (const std::string &string_var: m_intVariables) {
         m_Ibranches.at(string_var).set(*event, -99, sys);
       }
 
@@ -261,35 +259,15 @@ namespace HHBBYY
         HH = H_yy + H_bb;
         dRHH = H_yy.DeltaR(H_bb);
 
+        double Higgs_mass = 125. * Athena::Units::GeV;
+        m_Fbranches.at("mbbyy").set(*event, HH.M(), sys);
+        m_Fbranches.at("mbbyy_star").set(*event, HH.M() - (H_bb.M() - Higgs_mass)-(H_yy.M() - Higgs_mass), sys);
+
         m_Fbranches.at("pTbbyy").set(*event, HH.Pt(), sys);
         m_Fbranches.at("Etabbyy").set(*event, HH.Eta(), sys);
         m_Fbranches.at("Phibbyy").set(*event, HH.Phi(), sys);
         m_Fbranches.at("dRbbyy").set(*event, dRHH, sys);
-
-        m_Fbranches.at("mbbyy").set(*event, HH.M(), sys);
-        m_Fbranches.at("mbbyy_star").set(*event, HH.M()-(H_bb.M()-125e3)-(H_yy.M()-125e3), sys);
       }
-
-      m_Fbranches.at("HT").set(*event, HT, sys);
-
-      float topness = compute_Topness(jets);
-      m_Fbranches.at("topness").set(*event, topness, sys);
-      
-      m_Fbranches.at("missEt").set(*event, met->met(), sys);
-      m_Fbranches.at("metphi").set(*event, met->phi(), sys);
-      
-      float* eventShapes = compute_EventShapes(bjets, photons);
-      m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
-      m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
-
-      float pTBalance = compute_pTBalance(bjets, photons);
-      m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
-
-      m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
-      m_Ibranches.at("nJets").set(*event, jets->size(), sys);
-      m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
-      m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
-      m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
       
       // Find VBF jets
       float vbf_jj_deta = -999;
@@ -339,28 +317,49 @@ namespace HHBBYY
         m_Fbranches.at(prefix+"_phi").set(*event, vbf_j[i].Phi(), sys);
         m_Fbranches.at(prefix+"_E").set(*event, vbf_j[i].E(), sys);
       }
-      m_Fbranches.at("Jet_vbf_jj_m").set(*event, vbf_mjj, sys);
-      m_Fbranches.at("Jet_vbf_jj_deta").set(*event, vbf_jj_deta, sys);
-
       m_Fbranches.at("Jet_vbf_j1_yybb_dR").set(*event, dR_yybb_vbfj1, sys);
       m_Fbranches.at("Jet_vbf_j2_yybb_dR").set(*event, dR_yybb_vbfj2, sys);
       m_Fbranches.at("Jet_vbf_j1_yybb_deta").set(*event, deta_yybb_vbfj1, sys);
       m_Fbranches.at("Jet_vbf_j2_yybb_deta").set(*event, deta_yybb_vbfj2, sys);
+
+      m_Fbranches.at("Jet_vbf_jj_m").set(*event, vbf_mjj, sys);
+      m_Fbranches.at("Jet_vbf_jj_deta").set(*event, vbf_jj_deta, sys);
       m_Fbranches.at("Jet_vbf_jj_yybb_dR").set(*event, dR_yybb_jj, sys);
       m_Fbranches.at("Jet_vbf_jj_yybb_deta").set(*event, deta_yybb_jj, sys);
       m_Fbranches.at("Jet_vbf_jj_yybb_pT").set(*event, yybbjj.Pt(), sys);
       m_Fbranches.at("Jet_vbf_jj_yybb_eta").set(*event, yybbjj.Eta(), sys);
       m_Fbranches.at("Jet_vbf_jj_yybb_phi").set(*event, yybbjj.Phi(), sys);
       m_Fbranches.at("Jet_vbf_jj_yybb_m").set(*event, yybbjj.M(), sys);    
-    }
+    
+      // More global variables
+      m_Fbranches.at("HT").set(*event, HT, sys);
 
+      float topness = compute_Topness(jets);
+      m_Fbranches.at("topness").set(*event, topness, sys);
+      
+      m_Fbranches.at("missEt").set(*event, met->met(), sys);
+      m_Fbranches.at("metphi").set(*event, met->phi(), sys);
+      
+      float* eventShapes = compute_EventShapes(bjets, photons);
+      m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
+      m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
+
+      float pTBalance = compute_pTBalance(bjets, photons);
+      m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
+
+      m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
+      m_Ibranches.at("nJets").set(*event, jets->size(), sys);
+      m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
+      m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
+      m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);    
+    }
     return StatusCode::SUCCESS;
   }
   
   float BaselineVarsbbyyAlg::compute_Topness(const xAOD::JetContainer *jets){
     float minTopness=std::numeric_limits<float>::max();
-    const float wmass=80e3;
-    const float topmass=173e3;
+    const float wmass=80 * Athena::Units::GeV;
+    const float topmass=173 * Athena::Units::GeV;
     std::vector< TLorentzVector > temp_jets;
     for (unsigned int i = 0; i < jets->size(); i++) {
         temp_jets.push_back(jets->at(i)->p4());

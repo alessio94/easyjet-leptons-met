@@ -81,61 +81,18 @@ namespace HHBBYY
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
+    
+    Gaudi::Property<std::vector<std::string>> m_floatVariables
+      {this, "floatVariableList", {}, "Name list of float variables"};
+    
+    Gaudi::Property<std::vector<std::string>> m_intVariables
+      {this, "intVariableList", {}, "Name list of integer variables"};
 
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
-    std::vector<std::string> m_Fvarnames{
-      // Leading/Subleading photon kinematics
-      "Photon1_pt", "Photon1_eta", "Photon1_phi", "Photon1_E",
-      "Photon2_pt", "Photon2_eta", "Photon2_phi", "Photon2_E",
+    /// \brief Setup sys-aware output decorations
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 
-      "myy", "pTyy", "dRyy", "Etayy", "Phiyy", 
-
-      // HbbCandidate jet kinematics
-      "HbbCandidate_Jet1_pt", "HbbCandidate_Jet1_phi", "HbbCandidate_Jet1_eta", "HbbCandidate_Jet1_E",
-      "HbbCandidate_Jet2_pt", "HbbCandidate_Jet2_phi", "HbbCandidate_Jet2_eta", "HbbCandidate_Jet2_E",
-
-      "mbb", "pTbb", "dRbb", "Etabb", "Phibb", 
-
-      // Inclusive jet kinematics
-      "Jet1_pt", "Jet1_eta", "Jet1_phi", "Jet1_E",
-      "Jet2_pt", "Jet2_eta", "Jet2_phi", "Jet2_E",
-      "Jet3_pt", "Jet3_eta", "Jet3_phi", "Jet3_E",
-      "Jet4_pt", "Jet4_eta", "Jet4_phi", "Jet4_E",
-
-      // di-higgs variables
-      "mbbyy", "pTbbyy", "dRbbyy", "Etabbyy", "Phibbyy", "mbbyy_star", "Photon1_ptOvermyy", "Photon2_ptOvermyy",
-
-      // mva variables
-        "HT", "topness", "sphericityT", "planarFlow", "pTBalance", "missEt", "metphi",
-
-      // VBF jets kinematics
-      "Jet_vbf_j1_pt", "Jet_vbf_j1_eta", "Jet_vbf_j1_phi", "Jet_vbf_j1_E",
-      "Jet_vbf_j2_pt", "Jet_vbf_j2_eta", "Jet_vbf_j2_phi", "Jet_vbf_j2_E",
-      "Jet_vbf_jj_m", "Jet_vbf_jj_deta",
-      "Jet_vbf_j1_yybb_dR", "Jet_vbf_j2_yybb_dR", "Jet_vbf_j1_yybb_deta", "Jet_vbf_j2_yybb_deta",
-      "Jet_vbf_jj_yybb_dR", "Jet_vbf_jj_yybb_deta", 
-      "Jet_vbf_jj_yybb_pT", "Jet_vbf_jj_yybb_eta", "Jet_vbf_jj_yybb_phi", "Jet_vbf_jj_yybb_m"
-    };
-
-    std::vector<std::string> m_Fvarnames_MC{
-      "Photon1_effSF", "Photon2_effSF"
-    };
-
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
-    std::vector<std::string> m_Ivarnames{
-      "nPhotons", "nBJets", "nJets", "nCentralJets", "nLeptons",
-      // leading and subleading btagged jets
-      "HbbCandidate_Jet1_truthLabel", "HbbCandidate_Jet2_truthLabel",
-      "HbbCandidate_Jet1_pcbt", "HbbCandidate_Jet2_pcbt",
-      // leading and subleading jets
-      "Jet1_truthLabel", "Jet2_truthLabel",
-      "Jet3_truthLabel", "Jet4_truthLabel",
-      "Jet1_PassWP", "Jet2_PassWP",
-      "Jet3_PassWP", "Jet4_PassWP",
-      "Jet1_pcbt", "Jet2_pcbt",
-      "Jet3_pcbt", "Jet4_pcbt"
-    };
-
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
+    
   };
 }
 #endif

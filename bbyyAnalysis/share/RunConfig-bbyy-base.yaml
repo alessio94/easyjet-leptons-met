@@ -55,6 +55,10 @@ loose_jet_cleaning: true
 # write objects with overlap removal applied
 do_overlap_removal: true
 
+# Store high level variables by default 
+# when the config file set the high level variables
+store_high_level_variables: false
+
 #Enable cutflow 
 save_bbyy_cutflow: true
 do_resonant_PNN: false

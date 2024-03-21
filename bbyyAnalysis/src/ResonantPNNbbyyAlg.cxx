@@ -30,37 +30,22 @@ namespace SHBBYY
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    //Low Mass Grid
-    for (const auto& mX_mS : m_mX_mS_pairs) {
-      double mX = mX_mS.first;
-      double mS = mX_mS.second;
-      std::string branch_name =  m_PNN_ScoreLabel+ "_X" + std::to_string(int(mX)) + "_S" + std::to_string(int(mS));
-      m_mX_mS_all_pairs.push_back(std::make_pair(mX, mS));
-      m_Fvarnames.push_back(branch_name);
+    for (const std::string &string_var: m_floatVariables) {
+      CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
+      m_Fbranches.emplace(string_var, var);
+      ATH_CHECK (m_Fbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
+
+    //Low Mass Grid
+    for (const auto& mX_mS : m_mX_mS_pairs)
+      m_mX_mS_all_pairs.push_back(mX_mS);
 
     //High Mass Grid
     for (const auto& mX : m_mX_values) {
       for (const auto& mS : m_mS_values) {
-        if (mX > 500 and mS < 70) { continue; }
-        if (mX - mS <= 125) { continue; }
-        std::string branch_name =  m_PNN_ScoreLabel+ "_X" + std::to_string(int(mX)) + "_S" + std::to_string(int(mS));
+        if ((mX > 500 && mS < 70) || ((mX - mS) <= 125)) continue;
         m_mX_mS_all_pairs.push_back(std::make_pair(mX, mS));
-        m_Fvarnames.push_back(branch_name);
       }
-    }
-
-    for (const auto& mX : m_mX_1bjet) {
-      std::string branch_name =  m_PNN_1bjet_ScoreLabel+ "_X" + std::to_string(int(mX));
-      m_Fvarnames.push_back(branch_name);
-    }
-
-    // Intialise syst-aware output decorators
-
-    for (const std::string &string_var: m_Fvarnames) {
-      CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
-      m_Fbranches.emplace(string_var, var);
-      ATH_CHECK (m_Fbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
@@ -111,7 +96,7 @@ namespace SHBBYY
       TLorentzVector b2(0.,0.,0.,0.);
       TLorentzVector yyb(0.,0.,0.,0.);
 
-      for (const std::string &string_var: m_Fvarnames) {
+      for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
       }
 

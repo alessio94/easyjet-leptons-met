@@ -2,14 +2,15 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 from EasyjetHub.output.ttree.selected_objects import (
-    get_selected_objects_branches,
+    get_selected_objects_branches_variables,
 )
 
 import pathlib
 import os
 
 
-def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
+def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
+             float_variables=[], int_variables=[]):
     cfg = ComponentAccumulator()
 
     PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
@@ -74,7 +75,9 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
-            isMC=flags.Input.isMC
+            isMC=flags.Input.isMC,
+            floatVariableList=float_variables,
+            intVariableList=int_variables
         )
     )
 
@@ -103,7 +106,9 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
             Years=flags.Analysis.Years,
         )
     )
+
     if flags.Analysis.do_resonant_PNN:
+        float_SH_var = [var for var in float_variables if "SH_" in var]
         cfg.addEventAlgo(
             CompFactory.SHBBYY.ResonantPNNbbyyAlg(
                 "ResonantPNNbbyyAlg",
@@ -113,7 +118,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey):
                 mX_mS_pairs=flags.Analysis.mX_mS_pairs,
                 mS_values=flags.Analysis.mS_values,
                 mX_values=flags.Analysis.mX_values,
-                mX_1bjet=flags.Analysis.mX_1bjet
+                mX_1bjet=flags.Analysis.mX_1bjet,
+                floatVariableList=float_SH_var
             )
         )
 
@@ -138,64 +144,125 @@ def bbyy_filter_dalitz_cfg(flags):
     return cfg
 
 
+def get_BaselineVarsbbyyAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    # Number of objects
+    int_variable_names += ["nPhotons", "nJets", "nCentralJets", "nBJets", "nLeptons"]
+
+    # Reconstructed Higgses
+    float_variable_names += ["myy", "pTyy", "Etayy", "Phiyy", "dRyy"]
+    float_variable_names += ["mbb", "pTbb", "Etabb", "Phibb", "dRbb"]
+
+    # HbbCandidate jets
+    for i in range(1,3):
+        for var in ["pt", "phi", "eta", "E"]:
+            float_variable_names += [f"HbbCandidate_Jet{i}_" + var]
+        for var in ["truthLabel", "pcbt"]:
+            int_variable_names += [f"HbbCandidate_Jet{i}_" + var]
+
+    # di-higgs variables
+    float_variable_names += ["mbbyy", "mbbyy_star", "pTbbyy", "Etabbyy",
+                             "Phibbyy", "dRbbyy"]
+
+    # VBFJets
+    for i in range(1,3):
+        for var in ["pt", "eta", "phi", "E", "yybb_dR", "yybb_deta"]:
+            float_variable_names += [f"Jet_vbf_j{i}_" + var]
+    for var in ["m", "deta", "yybb_dR", "yybb_deta", "yybb_pT",
+                "yybb_eta", "yybb_phi", "yybb_m"]:
+        float_variable_names += ["Jet_vbf_jj_" + var]
+
+    # mva variables
+    float_variable_names += ["HT", "topness", "sphericityT", "planarFlow",
+                             "pTBalance", "missEt", "metphi"]
+
+    return float_variable_names, int_variable_names
+
+
+def get_BaselineVarsbbyyAlg_highlevelvariables(flags):
+    high_level_float_variables = []
+    high_level_int_variables = []
+
+    return high_level_float_variables, high_level_int_variables
+
+
+def get_BaselineVarsbbyyAlg_SH(flags):
+    SH_float_variable_names = []
+    SH_int_variable_names = []
+
+    for pair in flags.Analysis.mX_mS_pairs:
+        m_X = pair[0]
+        m_S = pair[1]
+        SH_float_variable_names += [f"SH_PNN_Score_X{m_X}_S{m_S}"]
+
+    for m_X in flags.Analysis.mX_values:
+        for m_S in flags.Analysis.mS_values:
+            if m_X > 500 and m_S < 70:
+                continue
+            if m_X - m_S <= 125:
+                continue
+            SH_float_variable_names += [f"SH_PNN_Score_X{m_X}_S{m_S}"]
+
+    for m_X in flags.Analysis.mX_1bjet:
+        SH_float_variable_names += [f"SH_PNN_Score_1bjet_X{m_X}"]
+
+    return SH_float_variable_names, SH_int_variable_names
+
+
 def bbyy_branches(flags):
     branches = []
+
+    # this will be all the variables that are calculated by the
+    # BaselineVarsbbllAlg algorithm
+    all_baseline_variable_names = []
+    float_variable_names = []
+    int_variable_names = []
+
+    # these are the variables that will always be stored by easyjet specific to HHbbyy
+    baseline_float_variables, baseline_int_variables \
+        = get_BaselineVarsbbyyAlg_variables(flags)
+    float_variable_names += baseline_float_variables
+    int_variable_names += baseline_int_variables
+
+    # Here are more high level variables which can be stored using the flag
+    # flags.Analysis.store_high_level_variables
+    if flags.Analysis.store_high_level_variables:
+        high_level_float_variables, high_level_int_variables \
+            = get_BaselineVarsbbyyAlg_highlevelvariables(flags)
+        float_variable_names += high_level_float_variables
+        int_variable_names += high_level_int_variables
+
+    # Here are special variables to be stored for the SH resonant search
+    # flags.Analysis.do_resonant_PNN
+    if flags.Analysis.do_resonant_PNN:
+        SH_float_variables, SH_int_variables \
+            = get_BaselineVarsbbyyAlg_SH(flags)
+        float_variable_names += SH_float_variables
+        int_variable_names += SH_int_variables
+
+    all_baseline_variable_names += [*float_variable_names, *int_variable_names]
+
+    for tree_flags in flags.Analysis.ttree_output:
+        for var in all_baseline_variable_names:
+            if tree_flags['slim_variables_with_syst'] and \
+                    "pt" not in var and "SF" not in var:
+                branches += [f"EventInfo.{var}_NOSYS -> bbyy_{var}"]
+            else:
+                branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
     # in the object configs.
-    branches += get_selected_objects_branches(flags, "bbyy")
+    object_level_branches, object_level_float_variables, object_level_int_variables \
+        = get_selected_objects_branches_variables(flags, "bbyy")
+    float_variable_names += object_level_float_variables
+    int_variable_names += object_level_int_variables
 
-    diphoton_variables = ["myy", "pTyy", "dRyy", "Etayy", "Phiyy"]
-    for var in diphoton_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_Diphoton_{var}_%SYS%"]
+    branches += object_level_branches
 
-    dibjet_variables = ["mbb", "pTbb", "dRbb", "Etabb", "Phibb"]
-    for var in dibjet_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
-    # HbbCandidate jets
-    Hbbcandidate_jets_variables = []
-    for i in range(1,3):
-        prefix = f"HbbCandidate_Jet{i}_"
-        for var in ["pt", "phi", "eta", "E", "truthLabel", "pcbt"]:
-            Hbbcandidate_jets_variables += [prefix + var]
-
-    for var in Hbbcandidate_jets_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
-    # di-higgs variables
-    dihiggs_variables = [
-        "mbbyy", "pTbbyy", "Etabbyy", "Phibbyy", "dRbbyy",
-        "mbbyy_star"
-    ]
-    for var in dihiggs_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
-    n_object = ["nPhotons", "nJets", "nCentralJets", "nBJets", "nLeptons"]
-    for var in n_object:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
-    # mva variables
-    mva_variables = ["HT", "topness", "sphericityT", "planarFlow",
-                     "pTBalance", "missEt", "metphi"]
-    for var in mva_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
-    # VBFJets
-    vbfjet_variables = [
-        "Jet_vbf_j1_pt", "Jet_vbf_j1_eta", "Jet_vbf_j1_phi", "Jet_vbf_j1_E",
-        "Jet_vbf_j2_pt", "Jet_vbf_j2_eta", "Jet_vbf_j2_phi", "Jet_vbf_j2_E",
-        "Jet_vbf_jj_m", "Jet_vbf_jj_deta",
-        "Jet_vbf_j1_yybb_dR", "Jet_vbf_j2_yybb_dR",
-        "Jet_vbf_j1_yybb_deta", "Jet_vbf_j2_yybb_deta",
-        "Jet_vbf_jj_yybb_dR", "Jet_vbf_jj_yybb_deta",
-        "Jet_vbf_jj_yybb_pT", "Jet_vbf_jj_yybb_eta",
-        "Jet_vbf_jj_yybb_phi", "Jet_vbf_jj_yybb_m"
-    ]
-    for var in vbfjet_variables:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
+    # More event info variables:
     s_name = flags.Analysis.selection_name
     branches += \
         [f"EventInfo.bbyy_pass_{s_name}_%SYS% -> bbyy_pass_{s_name}_%SYS%"]
@@ -207,30 +274,7 @@ def bbyy_branches(flags):
 
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
-    if flags.Analysis.do_resonant_PNN:
-        PNN_ScoreLabel = "SH_PNN_Score"
-        PNN_1bjet_ScoreLabel = "SH_PNN_Score_1bjet"
-
-        for pair in flags.Analysis.mX_mS_pairs:
-            m_X = pair[0]
-            m_S = pair[-1]
-            var = str(PNN_ScoreLabel + "_X" + str(m_X) + "_S" + str(m_S))
-            branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
-        for m_X in flags.Analysis.mX_values:
-            for m_S in flags.Analysis.mS_values:
-                if m_X > 500 and m_S < 70:
-                    continue
-                if m_X - m_S <= 125:
-                    continue
-                var = str(PNN_ScoreLabel + "_X" + str(m_X) + "_S" + str(m_S))
-                branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
-        for m_X in flags.Analysis.mX_1bjet:
-            var = str(PNN_1bjet_ScoreLabel + "_X" + str(m_X))
-            branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
-
-    return branches
+    return branches, float_variable_names, int_variable_names
 
 
 def FullPath(rawpath):

@@ -53,22 +53,31 @@ namespace SHBBYY
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    Gaudi::Property<std::vector<std::string>> m_floatVariables
+      {this, "floatVariableList", {}, "Name list of float variables"};
+
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
+
+    Gaudi::Property <std::vector<std::pair<double, double>>> m_mX_mS_pairs {this, "mX_mS_pairs", {}, "Low Mass mX and mS pairs"};
+
+    Gaudi::Property <std::vector<double>> m_mX_values {this, "mX_values", {}, "High Mass mX values"};
+
+    Gaudi::Property <std::vector<double>> m_mS_values {this, "mS_values", {}, "High Mass mS values"};
+
+    Gaudi::Property <std::vector<double>> m_mX_1bjet {this, "mX_1bjet", {}, "mX values for 1-bjet"};
+
+    std::vector<std::pair<double, double>> m_mX_mS_all_pairs{};
+
     const std::string m_PNN_ScoreLabel = "SH_PNN_Score" ;
     const std::string m_PNN_1bjet_ScoreLabel = "SH_PNN_Score_1bjet";
-    std::vector<std::string> m_Fvarnames{};
+
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_cv1;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_cv2;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_cv3;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_1bjet_cv1;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_1bjet_cv2;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_1bjet_cv3;
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
-    std::vector<std::pair<double, double>>m_mX_mS_all_pairs{};
-    Gaudi::Property <std::vector<std::pair<double, double>>> m_mX_mS_pairs {this, "mX_mS_pairs", {}, "Low Mass mX and mS pairs"};
-    Gaudi::Property <std::vector<double>> m_mX_values {this, "mX_values", {}, "High Mass mX values"};
-    Gaudi::Property <std::vector<double>> m_mS_values {this, "mS_values", {}, "High Mass mS values"};
-    Gaudi::Property <std::vector<double>> m_mX_1bjet {this, "mX_1bjet", {}, "mX values for 1-bjet"};      
+          
   };
 }
 #endif
