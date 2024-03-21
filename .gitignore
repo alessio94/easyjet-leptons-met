@@ -5,3 +5,8 @@ __pycache__/
 # macOS and VSCode related files
 *.DS_Store
 .vscode/*
+
+*.root
+*PoolFileCatalog.xml
+*userJobMetadata.json
+*eventLoopHeartBeat.txt
