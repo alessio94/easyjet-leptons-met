@@ -3,6 +3,7 @@ XSection_paths:
     # Path to official PMG txt file
     - "dev/PMGTools/2024-01-22/PMGxsecDB_mc16.txt"
     - "dev/PMGTools/2024-01-22/PMGxsecDB_mc23.txt "
+    - "dev/PMGTools/2024-01-22/PMGxsecDB_mc21.txt "
     #- "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/2024-01-22/PMGxsecDB_mc23.txt"
     # Path to your custom PMG-like txt file
     - "bbyyAnalysis/CustomXSections_mc20.txt"
