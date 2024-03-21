@@ -35,7 +35,7 @@ def overlap_sequence(flags):
         photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
         muons=f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}',
         # Baseline always needed for TauAntiTauJet OR
-        taus='Baseline',
+        taus='Baseline' if flags.Analysis.do_bbtt_analysis else flags.Analysis.Tau.ID,
     )
     # Construct the names of the view containers with working point selection
     # We need to use the '.' style so that the algs operate on the full
