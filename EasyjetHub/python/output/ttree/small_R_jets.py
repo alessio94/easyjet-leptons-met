@@ -111,7 +111,8 @@ def get_small_R_bjet_branches(
                 "GN2v00_pu",
             ]
 
-        gn2v01_valid_ptag = get_valid_ami_tag(split_tags, "p", "p6026")
+        gn2v01_valid_ptag = (
+            get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
         if gn2v01_valid_ptag:
             small_R_bjet_branches.variables += [
                 "GN2v01_pb",
