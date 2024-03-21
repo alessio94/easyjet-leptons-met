@@ -286,6 +286,14 @@ namespace HHBBTT
           if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
         }
       }
+
+      // Expand b-jets with extra jet for 1-btag events
+      if(bjets->size()==1){
+	if(bjets->at(0)==jets->at(0) && jets->size()>1)
+	  bjets->push_back(jets->at(1));
+	else
+	  bjets->push_back(jets->at(0));
+      }
      
       if (bjets->size() > 1){
 
