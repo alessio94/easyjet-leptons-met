@@ -8,25 +8,27 @@ set -Eeu
 ################################################
 
 #tag from easyjet/hh4b-test-files
-TAG=p5855ttbar
+TAG=p6026
 
 # standard samples
 # Data
-PHYS_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYS_10evts.r13286_p5855.pool.root
-PHYSLITE_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYSLITE_10evts.r13286_p5855.pool.root
-PHYS_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14190_p5858.pool.root
-PHYSLITE_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYSLITE_10evts.r14190_p5858.pool.root
+PHYS_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYS_10evts.r13286_p6026.pool.root
+PHYSLITE_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYSLITE_10evts.r13286_p6026.pool.root
+PHYS_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14190_p6026.pool.root
+PHYSLITE_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYSLITE_10evts.r14190_p6026.pool.root
 
 # MC20
-PHYS_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYS_10evts.e6337_s3681_r13144_p5855.pool.root
-PHYSLITE_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYSLITE_10evts.e6337_s3681_r13144_p5855.pool.root
-PHYS_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a907_r14860_p5855.pool.root
+PHYS_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYS_10evts.e6337_s3681_r13144_p6026.pool.root
+PHYSLITE_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYSLITE_10evts.e6337_s3681_r13144_p6026.pool.root
+PHYS_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a907_r14860_p6026.pool.root
+# No PHYSLITE for p6026 FastSim
 PHYSLITE_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a907_r14860_p5855.pool.root
 
 # MC23
-PHYS_TTBAR_MC23=mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYS_10evts.e8514_s4162_r14622_p5855.pool.root
-PHYSLITE_TTBAR_MC23=mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYSLITE_10evts.e8514_s4162_r14622_p5855.pool.root
-PHYS_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_a911_s4114_r14908_p5855.pool.root
+PHYS_TTBAR_MC23=mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYS_10evts.e8514_s4162_r14622_p6026.pool.root
+PHYSLITE_TTBAR_MC23=mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYSLITE_10evts.e8514_s4162_r14622_p6026.pool.root
+PHYS_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_a911_s4114_r14908_p6026.pool.root
+# No PHYSLITE for p6026 FastSim
 PHYSLITE_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYSLITE_10evts.e8514_a911_s4114_r14908_p5855.pool.root
 
 # Test name convention
@@ -37,6 +39,7 @@ declare -A DATAFILES=(
     # Data
     [fast-data18]=${PHYS_DATA_2018}
     [fast-data22]=${PHYS_DATA_2022}
+    [bbtt-data22]=${PHYS_DATA_2022}
     [bbtt-data22-lite]=${PHYSLITE_DATA_2022}
     [ttHH-data22-lite]=${PHYSLITE_DATA_2022}
     [bbyy-data22-lite]=${PHYSLITE_DATA_2022}
@@ -63,6 +66,7 @@ declare -A DATAFILES=(
     [mc23af3]=${PHYS_JETS_MC23_AF3}
     [bbbb-mc23]=${PHYS_TTBAR_MC23}
     [bbtt-mc23]=${PHYS_TTBAR_MC23}
+    [bbtt-mc23-syst]=${PHYS_TTBAR_MC23}
     [bbtt-mc23-lite-syst]=${PHYSLITE_TTBAR_MC23}
     [bbll-mc23-lite]=${PHYSLITE_TTBAR_MC23}
     # systematics enabled
@@ -79,6 +83,7 @@ declare -A TESTS=(
     # Data
     [fast-data18]="data-fast easyjet-ntupler"
     [fast-data22]="data-fast easyjet-ntupler"
+    [bbtt-data22]="simple bbtt-ntupler"
     [bbtt-data22-lite]="simple bbtt-ntupler"
     [ttHH-data22-lite]="simple ttHH-ntupler"
     [bbyy-data22-lite]="simple bbyy-ntupler"
@@ -105,6 +110,7 @@ declare -A TESTS=(
     [mc23af3]="simple easyjet-ntupler"
     [bbbb-mc23]="simple bbbb-ntupler"
     [bbtt-mc23]="simple bbtt-ntupler"
+    [bbtt-mc23-syst]="simple bbtt-ntupler"
     [bbtt-mc23-lite-syst]="simple bbtt-ntupler"
     [bbll-mc23-lite]="simple bbll-ntupler"
     [syst-mc23]="systematics easyjet-ntupler"
@@ -119,6 +125,7 @@ declare -A TESTS=(
 DEFAULT_CONFIG=EasyjetHub/RunConfig.yaml
 declare -A CONFIGS=(
     # Data
+    [bbtt-data22]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     [bbtt-data22-lite]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     [ttHH-data22-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [bbyy-data22-lite]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
@@ -140,6 +147,7 @@ declare -A CONFIGS=(
     # MC23
     [bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
     [bbtt-mc23]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
+    [bbtt-mc23-syst]=bbttAnalysis/RunConfig-bbtt-bypass-syst.yaml
     [bbtt-mc23-lite-syst]=bbttAnalysis/RunConfig-bbtt-bypass-syst.yaml
     [bbll-mc23-lite]=bbllAnalysis/RunConfig-bbll-bypass.yaml
     # MC23 AF3

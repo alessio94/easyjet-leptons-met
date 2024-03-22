@@ -1,9 +1,0 @@
-include: bbttAnalysis/RunConfig-bbtt.yaml
-
-# For PCBT
-small_R_jet:
-  btag_wp: "GN2v01_FixedCutBEff_85"
-  btag_extra_wps:
-    - GN2v01_Continuous
-    - DL1dv01_Continuous
-  variables_int_bjets: ["pcbt_GN2v01","pcbt_DL1dv01"]
