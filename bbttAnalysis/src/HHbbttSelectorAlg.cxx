@@ -399,8 +399,8 @@ namespace HHBBTT
         }
       }
 
-      bool tau_ptcut_SLT = n_taus>0 && std::abs(tau0->eta())<2.3;
-      bool tau_ptcut_LTT = n_taus>0 && std::abs(tau0->eta())<2.3 &&
+      bool tau_ptcut_SLT = n_taus>0;
+      bool tau_ptcut_LTT = n_taus>0 &&
 	tau0->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau];
       bool tau_ptcut_STT_lead = n_taus>0 &&
 	tau0->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau];
