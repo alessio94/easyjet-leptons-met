@@ -143,98 +143,59 @@ namespace HHBBTT
         m_Ibranches.at(var).set(*event, -99, sys);
       }
 
-      // selected leptons ; 
-      TLorentzVector lead_lep(0,0,0,0);
-      TLorentzVector sublead_lep(0,0,0,0);
-      int lead_lep_charge = -99;
-      int sublead_lep_charge = -99;
-      int lead_lep_pdgid = -99;
-      int sublead_lep_pdgid = -99;
-      float lead_lep_SF = 1.;
-      float sublead_lep_SF = 1.;
-      bool found_lead_lep = false;
-      bool found_sublead_lep = false;
+      // selected leptons ;
+      const xAOD::Electron* ele0 = nullptr;
+      const xAOD::Electron* ele1 = nullptr;
 
       for(const xAOD::Electron* electron : *electrons) {
-        if (m_selected_el.get(*electron, sys) && !found_lead_lep){
-          lead_lep = electron->p4();
-          lead_lep_charge = electron->charge();
-          lead_lep_pdgid = electron->charge() > 0 ? -11 : 11;
-          if(m_isMC) lead_lep_SF = m_ele_SF.get(*electron,sys);
-          found_lead_lep = true;
-      	}
-        else if (m_selected_el.get(*electron, sys) && found_lead_lep){
-          sublead_lep = electron->p4();
-          sublead_lep_charge = electron->charge();
-          sublead_lep_pdgid = electron->charge() > 0 ? -11 : 11;
-          if(m_isMC) sublead_lep_SF = m_ele_SF.get(*electron,sys);
-          found_sublead_lep = true;
-          break; // At most two leptons selected
-        }
-      }
-      for(const xAOD::Muon* muon : *muons) {
-        if (m_selected_mu.get(*muon, sys) && !found_lead_lep){
-          lead_lep = muon->p4();
-          lead_lep_charge = muon->charge();
-          lead_lep_pdgid = muon->charge() > 0 ? -13 : 13;
-          if(m_isMC) lead_lep_SF = m_mu_SF.get(*muon,sys);
-          found_lead_lep = true;
-          break; 
-        }
-        if (m_selected_mu.get(*muon, sys) && found_lead_lep){
-          if (found_sublead_lep) {
-            if (sublead_lep.Pt() > muon->p4().Pt()) break;
+        if (m_selected_el.get(*electron, sys)){
+          if(!ele0) ele0 = electron;
+          else{
+            ele1 = electron;
+            break;
           }
-          sublead_lep = muon->p4();
-          sublead_lep_charge = muon->charge();
-          sublead_lep_pdgid = muon->charge() > 0 ? -13 : 13;
-          if(m_isMC) sublead_lep_SF = m_mu_SF.get(*muon,sys);
-          found_sublead_lep = true;
-          break;
-        }
-      }
-      // the muon might actually be the leading lepton
-      if (found_sublead_lep) {
-        if (lead_lep.Pt() < sublead_lep.Pt()) {
-          TLorentzVector temp(0,0,0,0);
-          int temp_charge = -99;
-          int temp_pdgid = -99;
-          float temp_SF = 1.;
-
-          temp = lead_lep;
-          temp_charge = lead_lep_charge;
-          temp_pdgid = lead_lep_pdgid;
-          if(m_isMC) temp_SF = lead_lep_SF;
-
-          lead_lep = sublead_lep;
-          lead_lep_charge = sublead_lep_charge;
-          lead_lep_pdgid = sublead_lep_pdgid;
-          if(m_isMC) lead_lep_SF = sublead_lep_SF;
-
-          sublead_lep = temp;
-          sublead_lep_charge = temp_charge;
-          sublead_lep_pdgid = temp_pdgid;
-          if(m_isMC) sublead_lep_SF = temp_SF;
         }
       }
 
-      if(found_lead_lep){
-        m_Fbranches.at("Lepton1_pt").set(*event, lead_lep.Pt(), sys);
-        m_Fbranches.at("Lepton1_eta").set(*event, lead_lep.Eta(), sys);
-        m_Fbranches.at("Lepton1_phi").set(*event, lead_lep.Phi(), sys);
-        m_Fbranches.at("Lepton1_E").set(*event, lead_lep.E(), sys);
-        if(m_isMC) m_Fbranches.at("Lepton1_effSF").set(*event, lead_lep_SF, sys);
-        m_Ibranches.at("Lepton1_charge").set(*event, lead_lep_charge, sys);
-        m_Ibranches.at("Lepton1_pdgid").set(*event, lead_lep_pdgid, sys);
+      const xAOD::Muon* mu0 = nullptr;
+      const xAOD::Muon* mu1 = nullptr;
+      for(const xAOD::Muon* muon : *muons) {
+        if (m_selected_mu.get(*muon, sys)){
+          if(!mu0) mu0 = muon;
+          else{
+            mu1 = muon;
+            break;
+          }
+        }
       }
-      if(found_sublead_lep){
-        m_Fbranches.at("Lepton2_pt").set(*event, sublead_lep.Pt(), sys);
-        m_Fbranches.at("Lepton2_eta").set(*event, sublead_lep.Eta(), sys);
-        m_Fbranches.at("Lepton2_phi").set(*event, sublead_lep.Phi(), sys);
-        m_Fbranches.at("Lepton2_E").set(*event, sublead_lep.E(), sys);
-        if(m_isMC) m_Fbranches.at("Lepton2_effSF").set(*event, sublead_lep_SF, sys);
-        m_Ibranches.at("Lepton2_charge").set(*event, sublead_lep_charge, sys);
-        m_Ibranches.at("Lepton2_pdgid").set(*event, sublead_lep_pdgid, sys);
+
+      std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
+      if(ele0) leptons.emplace_back(ele0, -11*ele0->charge());
+      if(mu0) leptons.emplace_back(mu0, -13*mu0->charge());
+      if(ele1) leptons.emplace_back(ele1, -11*ele1->charge());
+      if(mu1) leptons.emplace_back(mu1, -13*mu1->charge());
+
+      std::sort(leptons.begin(), leptons.end(),
+		[](const std::pair<const xAOD::IParticle*, int>& a,
+		   const std::pair<const xAOD::IParticle*, int>& b) {
+		  return a.first->pt() > b.first->pt(); });
+
+      for(unsigned int i=0; i<std::min(size_t(2),leptons.size()); i++){
+        std::string prefix = "Lepton"+std::to_string(i+1);
+        TLorentzVector tlv = leptons[i].first->p4();
+        m_Fbranches.at(prefix+"_pt").set(*event, tlv.Pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, tlv.Eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
+        if(m_isMC){
+          float SF = std::abs(leptons[i].second)==11 ?
+            m_ele_SF.get(*leptons[i].first,sys) :
+            m_mu_SF.get(*leptons[i].first,sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
+        }
+        int charge = leptons[i].second>0 ? -1 : 1;
+        m_Ibranches.at(prefix+"_charge").set(*event, charge, sys);
+        m_Ibranches.at(prefix+"_pdgid").set(*event, leptons[i].second, sys);
       }
 
       //selected tau
@@ -327,8 +288,8 @@ namespace HHBBTT
       TLorentzVector tautau_vis(0,0,0,0);
       bool found_tautau_vis = false;
       if(tau0){
-        if(found_lead_lep){
-          tautau_vis = tau0->p4() + lead_lep;
+        if(leptons.size()>0){
+          tautau_vis = tau0->p4() + leptons[0].first->p4();
           found_tautau_vis = true;
         }else if(tau1){
           tautau_vis = tau0->p4() + tau1->p4();
