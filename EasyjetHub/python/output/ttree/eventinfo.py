@@ -28,7 +28,10 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
     eventinfo_branches.variables += trigger_branches
 
     # Event-level scale factors
-    if flags.Input.isMC:
+    if (
+        flags.Input.isMC
+        and flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet"
+    ):
         btag_wps = [flags.Analysis.small_R_jet.btag_wp]
         if 'btag_extra_wps' in flags.Analysis.small_R_jet:
             btag_wps += flags.Analysis.small_R_jet.btag_extra_wps

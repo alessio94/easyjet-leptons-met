@@ -72,11 +72,9 @@ def jet_sequence(
     if jet_type != "reco4EMTopoJet":
         configSeq += makeConfig('Jets.JVT', containerName=calib_name)
 
-    btag_wps = [jet_flags.btag_wp]
-    if 'btag_extra_wps' in jet_flags:
-        btag_wps += jet_flags.btag_extra_wps
-
-    if jet_type != "reco4EMTopoJet":
+        btag_wps = [jet_flags.btag_wp]
+        if 'btag_extra_wps' in jet_flags:
+            btag_wps += jet_flags.btag_extra_wps
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
