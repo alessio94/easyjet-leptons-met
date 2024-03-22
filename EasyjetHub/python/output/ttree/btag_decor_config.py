@@ -14,12 +14,22 @@ def btag_decor_cfg(flags):
     ]
 
     split_tags = flags.Input.AMITag.split("_")
-    gn2_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5855")
-    if gn2_valid_ptag:
+    gn2v00_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5855")
+    if gn2v00_valid_ptag:
         btag_vars += [
             "GN2v00_pb",
             "GN2v00_pc",
             "GN2v00_pu"
+        ]
+
+    gn2v01_valid_ptag = (
+        get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
+    if gn2v01_valid_ptag:
+        btag_vars += [
+            "GN2v01_pb",
+            "GN2v01_pc",
+            "GN2v01_pu",
+            "GN2v01_ptau",
         ]
 
     cfg.addEventAlgo(

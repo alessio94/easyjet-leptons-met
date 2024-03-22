@@ -118,6 +118,7 @@ def get_small_R_bjet_branches(
                 "GN2v01_pb",
                 "GN2v01_pc",
                 "GN2v01_pu",
+                "GN2v01_ptau",
             ]
 
         if flags.Analysis.small_R_jet.doBtagExpVars:
