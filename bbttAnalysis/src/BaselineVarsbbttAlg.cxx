@@ -229,6 +229,11 @@ namespace HHBBTT
 	m_Ibranches.at(prefix+"_nProng").set(*event, tau->nTracks(), sys);
 	m_Ibranches.at(prefix+"_isTauID").set(*event, idTauDecorHandle(*tau), sys);
 	m_Ibranches.at(prefix+"_isAntiTau").set(*event, antiTauDecorHandle(*tau), sys);
+	int tau_EleRNN_WP = 0;
+	if(tau->isTau(xAOD::TauJetParameters::EleRNNTight)) tau_EleRNN_WP = 3;
+	else if(tau->isTau(xAOD::TauJetParameters::EleRNNMedium)) tau_EleRNN_WP = 2;
+	else if(tau->isTau(xAOD::TauJetParameters::EleRNNLoose)) tau_EleRNN_WP = 1;
+	m_Ibranches.at(prefix+"_EleRNN_WP").set(*event, tau_EleRNN_WP, sys);
 
 	if(m_isMC){
 	  m_Fbranches.at(prefix+"_effSF").set(*event, m_tau_effSF.get(*tau, sys), sys);
