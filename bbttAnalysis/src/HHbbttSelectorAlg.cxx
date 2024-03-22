@@ -556,19 +556,22 @@ namespace HHBBTT
       }
 
       m_bools.at(HHBBTT::pass_baseline_DTT) =
-	(m_bools.at(HHBBTT::pass_baseline_DTT_2016) ||
-	 m_bools.at(HHBBTT::pass_baseline_DTT_4J12) ||
-	 m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo));
+	      (m_bools.at(HHBBTT::pass_baseline_DTT_2016) ||
+	       m_bools.at(HHBBTT::pass_baseline_DTT_4J12) ||
+	       m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo));
       m_bools.at(HHBBTT::pass_DTT) =
-	(m_bools.at(HHBBTT::pass_DTT_2016) ||
-	 m_bools.at(HHBBTT::pass_DTT_4J12) ||
-	 m_bools.at(HHBBTT::pass_DTT_L1Topo));
-      m_bools.at(HHBBTT::pass_DTT_1B) = (m_bools.at(HHBBTT::pass_DTT_2016_1B) || m_bools.at(HHBBTT::pass_DTT_4J12_1B) || m_bools.at(HHBBTT::pass_DTT_L1Topo_1B));
+	      (m_bools.at(HHBBTT::pass_DTT_2016) ||
+	       m_bools.at(HHBBTT::pass_DTT_4J12) ||
+	       m_bools.at(HHBBTT::pass_DTT_L1Topo));
+      m_bools.at(HHBBTT::pass_DTT_1B) = 
+        (m_bools.at(HHBBTT::pass_DTT_2016_1B) ||
+         m_bools.at(HHBBTT::pass_DTT_4J12_1B) ||
+         m_bools.at(HHBBTT::pass_DTT_L1Topo_1B));
 
       // Z+HF and top (e+mu) control regions
       if (m_bools.at(HHBBTT::pass_trigger_SLT) && m_bools.at(HHBBTT::TWO_BJETS)){
-        if((jets->at(0)->pt() > 45. * Athena::Units::GeV) &&
-            (n_leptons == 2)) {
+        if(jets->at(0)->pt() > 45. * Athena::Units::GeV && n_leptons == 2 &&
+            !(mbb > 40. * Athena::Units::GeV && mbb < 210. * Athena::Units::GeV)) {
           float mll = -999.;
           float lep1_pt = -999.;
           if (ele1) {
@@ -579,15 +582,11 @@ namespace HHBBTT
             mll = (mu0->p4() + mu1->p4()).M();
             lep1_pt = mu1->pt();
           }
-          m_bools.at(HHBBTT::pass_ZCR) = !(mbb > 40. * Athena::Units::GeV && mbb < 210. * Athena::Units::GeV) &&
-                  (mll > 75. * Athena::Units::GeV && mll < 110. * Athena::Units::GeV) &&
-                  (lep1_pt > 40. * Athena::Units::GeV);
-          if(!ele1 && !mu1 &&
-                          !(mbb > 40. * Athena::Units::GeV && mbb < 210. * Athena::Units::GeV) &&
-                          (mll > 75. * Athena::Units::GeV && mll < 110. * Athena::Units::GeV) &&
-                          (ele0->pt() > 40. * Athena::Units::GeV) &&
-                          (mu0->pt() > 40. * Athena::Units::GeV))
-            m_bools.at(HHBBTT::pass_TopEMuCR) = true;
+          m_bools.at(HHBBTT::pass_ZCR) = mll > 75. * Athena::Units::GeV && mll < 110. * Athena::Units::GeV &&
+            lep1_pt > 40. * Athena::Units::GeV;
+
+          // No subleading ele + muon = e+mu event
+          m_bools.at(HHBBTT::pass_TopEMuCR) = !ele1 && !mu1 && ele0->pt() > 40. * Athena::Units::GeV && mu0->pt() > 40. * Athena::Units::GeV;
         }
       }
 
