@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Weiming Yao
@@ -214,8 +214,9 @@ namespace HLLTT
         if (isTauID && tau->pt() > 20000)
         {
           if (std::abs(tau->eta()) < 2.5) {
-	    n_taus += 1;
-	  }
+            m_selected_tau.set(*tau, true, sys);
+            n_taus += 1;
+          }
         }
       }
       //************
