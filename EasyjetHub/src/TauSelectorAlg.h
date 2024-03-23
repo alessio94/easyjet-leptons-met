@@ -57,9 +57,7 @@ private:
       { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
 
-    Gaudi::Property<std::string> m_ORTauDecorName
-      { this, "ORDecorKey", "passesOR", "Decoration for ID taus" };
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_ORTauDecorKey;
+    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };

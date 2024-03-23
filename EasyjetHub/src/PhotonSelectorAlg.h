@@ -47,9 +47,7 @@ private:
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_inHandle{ this, "containerInKey", "",   "Photon container to read" };
 
-    Gaudi::Property<std::string> m_ORDecorName
-      { this, "ORDecorKey", "passesOR", "Decoration for photons OR" };
-    SG::ReadDecorHandleKey<xAOD::PhotonContainer> m_ORDecorKey;
+    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };

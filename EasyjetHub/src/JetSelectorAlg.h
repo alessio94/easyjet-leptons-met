@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -52,9 +52,7 @@ private:
 
     CP::SysReadDecorHandle<int> m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
-    Gaudi::Property<std::string> m_ORJetDecorName
-      { this, "ORDecorKey", "passesOR", "Decoration for jets OR" };
-    SG::ReadDecorHandleKey<xAOD::JetContainer> m_ORJetDecorKey;
+    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
 
     CP::SysReadDecorHandle<float> m_relativeDeltaRToVRJet {"relativeDeltaRToVRJet", this};
 

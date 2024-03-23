@@ -46,9 +46,7 @@ private:
     CP::SysReadHandle<xAOD::MuonContainer>
     m_inHandle{ this, "containerInKey", "",   "Muon container to read" };
 
-    Gaudi::Property<std::string> m_ORMuDecorName
-      { this, "ORDecorKey", "passesOR", "Decoration for muons OR" };
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_ORMuDecorKey;
+    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };

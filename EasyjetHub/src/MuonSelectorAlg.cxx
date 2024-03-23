@@ -5,10 +5,6 @@
 /// @author Minori Fujimoto
 
 #include "MuonSelectorAlg.h"
-#include "AthContainers/AuxElement.h"
-#include <xAODMuon/MuonContainer.h>
-#include "FourMomUtils/xAODP4Helpers.h"
-#include <AsgDataHandles/ReadDecorHandle.h>
 
 namespace Easyjet
 {
@@ -27,8 +23,7 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    m_ORMuDecorKey = m_inHandle.getNamePattern() + "." + m_ORMuDecorName;
-    ATH_CHECK (m_ORMuDecorKey.initialize());
+    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
     if(m_isMC){
       m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
@@ -48,8 +43,6 @@ namespace Easyjet
 
   StatusCode MuonSelectorAlg::execute()
   {
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> ORDecorHandle(m_ORMuDecorKey);
-
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
 
@@ -70,8 +63,8 @@ namespace Easyjet
       {
         // skip OR muons
         if ( m_checkOR ){
-          bool ispassORMu = ORDecorHandle(*muon);
-          if ( !ispassORMu ) continue;
+          bool passesOR = m_passesOR.get(*muon, sys);
+          if ( !passesOR ) continue;
         }
 
         // pT and eta cuts

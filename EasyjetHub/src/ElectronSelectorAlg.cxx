@@ -5,10 +5,6 @@
 /// @author Minori Fujimoto
 
 #include "ElectronSelectorAlg.h"
-#include "AthContainers/AuxElement.h"
-#include <xAODEgamma/ElectronContainer.h>
-#include "FourMomUtils/xAODP4Helpers.h"
-#include <AsgDataHandles/ReadDecorHandle.h>
 
 namespace Easyjet
 {
@@ -26,8 +22,7 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    m_ORElDecorKey = m_inHandle.getNamePattern() + "." + m_ORElDecorName;
-    ATH_CHECK (m_ORElDecorKey.initialize());
+    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
     if(m_isMC){
       m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
@@ -50,8 +45,6 @@ namespace Easyjet
 
   StatusCode ElectronSelectorAlg::execute()
   {
-    SG::ReadDecorHandle<xAOD::ElectronContainer, char> ORDecorHandle(m_ORElDecorKey);
-
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
 
@@ -72,8 +65,8 @@ namespace Easyjet
       {
         // skip OR electrons
         if ( m_checkOR ){
-          bool ispassOREl = ORDecorHandle(*electron);
-          if ( !ispassOREl ) continue;
+          bool passesOR = m_passesOR.get(*electron, sys);
+          if ( !passesOR ) continue;
         }
 
         // cuts

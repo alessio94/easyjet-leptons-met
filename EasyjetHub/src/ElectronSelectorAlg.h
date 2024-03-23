@@ -46,9 +46,7 @@ private:
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_inHandle{ this, "containerInKey", "",   "Electron container to read" };
 
-    Gaudi::Property<std::string> m_ORElDecorName
-      { this, "ORDecorKey", "passesOR", "Decoration for electrons OR" };
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_ORElDecorKey;
+    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };

@@ -2,12 +2,8 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-
 #include "TauSelectorAlg.h"
-#include "AthContainers/AuxElement.h"
 #include <AsgDataHandles/ReadDecorHandle.h>
-#include <xAODTau/TauJetContainer.h>
-#include "FourMomUtils/xAODP4Helpers.h"
 
 namespace Easyjet
 {
@@ -25,11 +21,11 @@ namespace Easyjet
 
     m_IDTauDecorKey = m_inHandle.getNamePattern() + "." + m_IDTauDecorName;
     m_antiTauDecorKey = m_inHandle.getNamePattern() + "." + m_antiTauDecorName;
-    m_ORTauDecorKey = m_inHandle.getNamePattern() + "." + m_ORTauDecorName;
 
     ATH_CHECK (m_IDTauDecorKey.initialize());
     ATH_CHECK (m_antiTauDecorKey.initialize());
-    ATH_CHECK (m_ORTauDecorKey.initialize());
+
+    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
     if(m_isMC){
       m_tau_SF_in = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
@@ -52,7 +48,6 @@ namespace Easyjet
 
     SG::ReadDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
     SG::ReadDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
-    SG::ReadDecorHandle<xAOD::TauJetContainer, char> ORDecorHandle(m_ORTauDecorKey);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
@@ -79,8 +74,8 @@ namespace Easyjet
 
         // If not passing OR, skip
         if( m_checkOR ){
-          bool ispassORTau = ORDecorHandle(*tau);
-          if ( !ispassORTau ) continue;
+          bool passesOR = m_passesOR.get(*tau, sys);
+          if ( !passesOR ) continue;
         }
 	
         if (tau->pt() < m_minPt)

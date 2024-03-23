@@ -5,12 +5,7 @@
 /// @author Abraham Tishelman-Charny
 
 #include "PhotonSelectorAlg.h"
-#include "AthContainers/AuxElement.h"
-#include <xAODEgamma/PhotonContainer.h>
-#include "FourMomUtils/xAODP4Helpers.h"
-#include <xAODTracking/VertexContainer.h>
 #include <AsgDataHandles/ReadHandle.h>
-#include <AsgDataHandles/ReadDecorHandle.h>
 #include "egammaUtils/egPhotonWrtPoint.h"
 
 namespace Easyjet
@@ -27,8 +22,7 @@ namespace Easyjet
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
 
-    m_ORDecorKey = m_inHandle.getNamePattern() + "." + m_ORDecorName;
-    ATH_CHECK (m_ORDecorKey.initialize());
+    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
@@ -54,9 +48,6 @@ namespace Easyjet
 
   StatusCode PhotonSelectorAlg::execute()
   {
-
-    SG::ReadDecorHandle<xAOD::PhotonContainer, char> ORDecorHandle(m_ORDecorKey);
-
     // vertex related objects and variables
     SG::ReadHandle<xAOD::VertexContainer> vertices_(m_vertexContainerInKey);
     const xAOD::Vertex* primary = nullptr;
@@ -88,8 +79,8 @@ namespace Easyjet
       {
         // skip OR photons
         if ( m_checkOR ){
-          bool passOR = ORDecorHandle(*photon);
-          if ( !passOR ) continue;
+          bool passesOR = m_passesOR.get(*photon, sys);
+          if ( !passesOR ) continue;
         }
 
 	// Recompute photon pt and eta with respect to the hardest vertex z position

@@ -1,13 +1,10 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Frederic Renner
 
 #include "JetSelectorAlg.h"
-#include "AthContainers/AuxElement.h"
-#include <xAODJet/JetContainer.h>
-#include <AsgDataHandles/ReadDecorHandle.h>
 
 namespace Easyjet
 {
@@ -30,8 +27,8 @@ namespace Easyjet
     if (!m_PCBT.empty()) {
       ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_inHandle));
     }
-    m_ORJetDecorKey = m_inHandle.getNamePattern() + "." + m_ORJetDecorName;
-    ATH_CHECK (m_ORJetDecorKey.initialize());
+
+    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
     ATH_CHECK (m_relativeDeltaRToVRJet.initialize(m_systematicsList, m_inHandle));
 
@@ -55,8 +52,6 @@ namespace Easyjet
 
   StatusCode JetSelectorAlg ::execute()
   {
-    SG::ReadDecorHandle<xAOD::JetContainer, char> ORDecorHandle(m_ORJetDecorKey);
-
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
 
@@ -84,8 +79,8 @@ namespace Easyjet
       {
         // skip OR jets
         if( m_checkOR ){
-          bool ispassORJet = ORDecorHandle(*jet);
-          if ( !ispassORJet ) continue;
+          bool passesOR = m_passesOR.get(*jet, sys);
+          if ( !passesOR ) continue;
         }
 
         // jump out if VR jets overlap
