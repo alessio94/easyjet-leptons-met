@@ -1,38 +1,34 @@
 include: bbbbAnalysis/RunConfig-bbbb-base.yaml
 
-# Decay mode considered for truth decoration
-truthDecayModes: ["bbbb"]
-
-# Which analysis to consider
+# do the bbbb resolved analysis
 do_resolved_dihiggs: true
 
 # Toggles for object types
 do_small_R_jets: true
 do_muons: true
 
-# Toggles for reconstructed objects decorations
 small_R_jet:
-  # nominal btagging working point, used for b-jet pT calibration in particular
-  btag_wp: "DL1dv01_FixedCutBEff_77"
-  # additional btagging working points, available for selections and per-jet SFs
+  btag_wp: "GN2v01_FixedCutBEff_85"
   btag_extra_wps:
+    - DL1dv01_FixedCutBEff_70
+    - DL1dv01_FixedCutBEff_77
     - DL1dv01_FixedCutBEff_85
-    - GN2v00LegacyWP_FixedCutBEff_60
-    - GN2v00LegacyWP_FixedCutBEff_70
-    - GN2v00LegacyWP_FixedCutBEff_77
-    - GN2v00LegacyWP_FixedCutBEff_85
-    - GN2v00NewAliasWP_FixedCutBEff_85
+    - GN2v01_FixedCutBEff_60
+    - GN2v01_FixedCutBEff_70
+    - GN2v01_FixedCutBEff_77
 
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
 
-# apply trigger lists to filter events
-do_trigger_filtering: true
+do_overlap_removal: true
 
 # list of triggers per year to consider
 trigger_chains:
   include: bbbbAnalysis/resolved-triggers.yaml
+
+do_CP_systematics: true
+systematics_regex: ["PRW_DATASF", "GEN"]
 
 # Include the TTree configuration and update details
 ttree_output:
