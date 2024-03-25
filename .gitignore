@@ -10,3 +10,5 @@ __pycache__/
 *PoolFileCatalog.xml
 *userJobMetadata.json
 *eventLoopHeartBeat.txt
+
+*.h5
