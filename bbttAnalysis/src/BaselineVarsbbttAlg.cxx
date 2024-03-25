@@ -317,20 +317,23 @@ namespace HHBBTT
         m_Fbranches.at("HH_vis_phi").set(*event, HH_vis.Phi(), sys);
         m_Fbranches.at("HH_vis_m").set(*event, HH_vis.M(), sys);
 
-        TLorentzVector mmc_vec(0,0,0,0);
-        mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
-			     m_mmc_eta.get(*event, sys),
-			     m_mmc_phi.get(*event, sys),
-			     m_mmc_m.get(*event, sys));
-        TLorentzVector HH = bb+mmc_vec;
+        float MMC_m = m_mmc_m.get(*event, sys);
+	TLorentzVector mmc_vec(0,0,0,0);
+        if(MMC_m>0){
+          mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
+                               m_mmc_eta.get(*event, sys),
+                               m_mmc_phi.get(*event, sys),
+                               MMC_m);
 
-        m_Fbranches.at("HH_pt").set(*event, HH.Pt(), sys);
-        m_Fbranches.at("HH_eta").set(*event, HH.Eta(), sys);
-        m_Fbranches.at("HH_phi").set(*event, HH.Phi(), sys);
-        m_Fbranches.at("HH_m").set(*event, HH.M(), sys);
+          TLorentzVector HH = bb+mmc_vec;
+          m_Fbranches.at("HH_pt").set(*event, HH.Pt(), sys);
+          m_Fbranches.at("HH_eta").set(*event, HH.Eta(), sys);
+          m_Fbranches.at("HH_phi").set(*event, HH.Phi(), sys);
+          m_Fbranches.at("HH_m").set(*event, HH.M(), sys);
+        }
 
         if(m_storeHighLevelVariables){
-          m_Fbranches.at("HH_delta_phi").set(*event, bb.DeltaPhi(mmc_vec),sys);
+          if(MMC_m>0) m_Fbranches.at("HH_delta_phi").set(*event, bb.DeltaPhi(mmc_vec),sys);
           m_Fbranches.at("HH_vis_delta_phi").set(*event, bb.DeltaPhi(tautau_vis),sys);
         }
       }
