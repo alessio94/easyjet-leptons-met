@@ -1,0 +1,16 @@
+DIHIGGS #########################################
+601477.PhPy8EG_HHbbttHadHad_cHHH01d0    Used rtag 14668, we will need rtag 14622 (mc23a) and 15224 (mc23d)
+601478.PhPy8EG_HHbbttHadHad_cHHH10d0    Used rtag 14668, we will need rtag 14622 (mc23a) and 15224 (mc23d)
+
+HHbbttLepHad_cHHH01d0   Cannot find anything in /eos/atlas/atlascerngroupdisk/asg-calib/dev/PMGTools/PMGxsecDB_mc23.txt
+HHbbttLepHad_cHHH10d0   Cannot find anything in /eos/atlas/atlascerngroupdisk/asg-calib/dev/PMGTools/PMGxsecDB_mc23.txt
+
+hh_bbtt_vbf_novhh_lh_<all variations>   Cannot find anything in /eos/atlas/atlascerngroupdisk/asg-calib/dev/PMGTools/PMGxsecDB_mc23.txt (hhbbyy exists..)
+
+SINGLE HIGGS ######################################
+
+All missing
+
+ALL TOP ###########################################
+
+All ttV missing
