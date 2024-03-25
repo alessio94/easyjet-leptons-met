@@ -230,3 +230,25 @@ lsetup panda
 ```
 
 Note: if you want to retrieve CutFlows saved as TEfficiency, you will need to set `mergeOutput` to `False` in [easyjet-gridsubmit](https://gitlab.cern.ch/easyjet/easyjet/-/blame/main/EasyjetHub/bin/easyjet-gridsubmit#L76), as the merge step doesn't support TEfficiency merging.
+
+# Editing with VSCode support
+
+You may already be using VSCode to edit easyjet -- if you aren't, this is a remarkably convenient tool with which to get helpful hints in your coding.
+First, off you can get started from the [atlassoftwaredocs](https://atlassoftwaredocs.web.cern.ch/guides/vscode/) instructions.
+Below are specific tips to get this set up more effectively, or specifically for easyjet.
+
+- Unlike a sparse checkout of the `athena` repository, you do not need to add the `.vscode` directory -- it is present already.
+- The `clangd` extension has been found to be more effective than the Microsoft `IntelliSense` extension. To use this, you need to:
+  1. Ensure that `clang-tools-extra` is installed. If you are running on a local machine or container, do `sudo dnf install clang-tools-extra`. If you're on a cluster, see if your sysadmins are nice enough to do this for you.
+  2. Install the `clangd` extension
+  3. Disable the `C/C++ IntelliSense` extension
+  4. Reload your session
+- Take care that you *must* compile in a `build/` dir that is on the same level as the `easyjet` source dir (i.e. you navigate there from inside `easyjet` with the path `../build`). This is assumed by the `.vscode` configuration.
+- The `.vscode` setup seems to work best when opening the `easyjet` top-level folder directly in VSCode. If you want to edit files in your run directory etc, you can simply `Add Folder to Workspace` in the options menu, which creates an `Untitled` workspace whose configuration you can then save (`Save Workspace As...`). 
+
+Recommended extensions:
+- `Python`, `Pylance`, `autopep8` -- for python coding support
+- `clangd` -- for C++ coding support
+- `GitLens` -- for git integration, diffs, viewing commits etc
+- `CMake` -- maybe. It is possible to set up CMake for compilation and debugging but may not be trivial.
+- Some markdown extension -- for writing READMEs like this

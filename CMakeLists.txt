@@ -13,9 +13,16 @@ find_package( AthAnalysis 25.2 REQUIRED )
 # Set up CTest:
 atlas_ctest_setup()
 
+# Generate a compile_commands.json file, which VS Code can use to interpret
+# our code correctly.
+set( CMAKE_EXPORT_COMPILE_COMMANDS TRUE CACHE BOOL
+   "Create compile_commands.json" FORCE )
+
 # Set up a work directory project:
 atlas_project( easyjet 1.0.0
-   USE AthAnalysis ${AthAnalysis_VERSION} )
+   USE AthAnalysis ${AthAnalysis_VERSION}
+   PROJECT_ROOT ${CMAKE_SOURCE_DIR}/
+)
 
 # Set up the runtime environment setup script(s):
 lcg_generate_env( SH_FILE ${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh )
@@ -28,6 +35,15 @@ file(APPEND ${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh.in
   )
 install( FILES ${CMAKE_BINARY_DIR}/${ATLAS_PLATFORM}/env_setup.sh
    DESTINATION . )
+
+# Setup IDE integration:
+set( ATLAS_ENABLE_IDE_HELPERS OFF CACHE BOOL "Enable IDE helpers" )
+if( ATLAS_ENABLE_IDE_HELPERS )
+   set( ATLAS_IDEHELPERSCRIPTS_SETUP
+      "${CMAKE_SOURCE_DIR}/.vscode/IDEHelperScripts/Setup.cmake"
+      CACHE FILEPATH "Setup file for the IDE / VS Code helpers" )
+   include( "${ATLAS_IDEHELPERSCRIPTS_SETUP}" )
+endif()
 
 # Set up CPack:
 atlas_cpack_setup()
