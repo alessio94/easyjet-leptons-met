@@ -2,6 +2,7 @@ include: EasyjetHub/base-config.yaml
 
 # Which analysis and channels to consider
 do_bbtt_analysis: true
+enable_MMC_cut: false
 channel: ["hadhad","hadhad1b","lephad","lephad1b","ZCR","TopEMuCR"]
 
 # Toggles to bypass event selection

@@ -80,7 +80,9 @@ def bbtt_cfg(
             tauWP=flags.Analysis.Tau.ID,
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
-            eventDecisionOutputDecoration="bbtt_pass_sr_noMMC_%SYS%",
+            eventDecisionOutputDecoration=(
+                "bbtt_pass_sr_noMMC_%SYS%" if flags.Analysis.enable_MMC_cut
+                else "bbtt_pass_sr_%SYS%"),
             channel=flags.Analysis.channel,
             isMC=flags.Input.isMC,
             Years=flags.Analysis.Years,
@@ -116,23 +118,24 @@ def bbtt_cfg(
             )
         )
 
-        cfg.addEventAlgo(
-            CompFactory.HHBBTT.MMCSelectorAlg(
-                "MMCSelectorAlg",
-                passSLT="pass" + baseline + "SLT_%SYS%",
-                passLTT="pass" + baseline + "LTT_%SYS%",
-                passSLT_1B="pass_baseline_SLT_%SYS%",
-                passLTT_1B="pass_baseline_LTT_%SYS%",
-                passSTT="pass" + baseline + "STT_%SYS%",
-                passDTT="pass" + baseline + "DTT_%SYS%",
-                passSTT_1B="pass_baseline_STT_%SYS%",
-                passDTT_1B="pass_baseline_DTT_%SYS%",
-                channel=flags.Analysis.channel,
-                MMC_min=60 * Units.GeV,
-                eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
-                bypass=flags.Analysis.bypass,
+        if flags.Analysis.enable_MMC_cut:
+            cfg.addEventAlgo(
+                CompFactory.HHBBTT.MMCSelectorAlg(
+                    "MMCSelectorAlg",
+                    passSLT="pass" + baseline + "SLT_%SYS%",
+                    passLTT="pass" + baseline + "LTT_%SYS%",
+                    passSLT_1B="pass_baseline_SLT_%SYS%",
+                    passLTT_1B="pass_baseline_LTT_%SYS%",
+                    passSTT="pass" + baseline + "STT_%SYS%",
+                    passDTT="pass" + baseline + "DTT_%SYS%",
+                    passSTT_1B="pass_baseline_STT_%SYS%",
+                    passDTT_1B="pass_baseline_DTT_%SYS%",
+                    channel=flags.Analysis.channel,
+                    MMC_min=60 * Units.GeV,
+                    eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
+                    bypass=flags.Analysis.bypass,
+                )
             )
-        )
 
     btag_pcbt_wps \
         = [wp for wp in flags.Analysis.small_R_jet.btag_extra_wps if "Continuous" in wp] # noqa
