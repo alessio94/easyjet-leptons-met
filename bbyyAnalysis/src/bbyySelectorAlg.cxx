@@ -32,6 +32,8 @@ namespace HHBBYY
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
+    ATH_CHECK (m_runNumber.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_rdmRunNumber.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
@@ -39,8 +41,7 @@ namespace HHBBYY
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
-
-
+    
     //Initialize trigger decorations
     for (const std::string &trig : m_photonTriggers)
     {
@@ -55,6 +56,13 @@ namespace HHBBYY
       m_Bbranches.emplace(string_var, var);
       ATH_CHECK (m_Bbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
+    // Intialise booleans with value false.
+    for (auto& [key, value] : m_boolnames) {
+      m_bools.emplace(key, false);
+      CP::SysWriteDecorHandle<bool> var {value+"_%SYS%", this};
+      m_Bbranches.emplace(value, var);
+      ATH_CHECK(m_Bbranches.at(value).initialize(m_systematicsList, m_eventHandle));
+    };
   
     // special flag for all cuts
     ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
@@ -69,6 +77,10 @@ namespace HHBBYY
       m_bbyyCuts.add(cut);
     }
 
+    // Intialise booleans with value false.
+    for (auto& [key, value] : m_boolnames) {
+      m_bools.emplace(key, false);
+    };
     //After filling the CutManager, book your histograms.
     const unsigned int nbins = m_bbyyCuts.size() + 1; //  need an extra bin for the total num of events.
     ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon", 
@@ -101,6 +113,12 @@ namespace HHBBYY
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
+     
+      // Set run number dependent quantities for nominal systematics
+      if(sys.name()==""){
+        unsigned int rdmNumber = m_isMC ? m_rdmRunNumber.get(*event, sys) : m_runNumber.get(*event,sys);
+        setRunNumberQuantities(rdmNumber);
+      }
 
       const xAOD::PhotonContainer *photons = nullptr;
       ANA_CHECK (m_photonHandle.retrieve (photons, sys));
@@ -131,6 +149,8 @@ namespace HHBBYY
       if (!m_photonTriggers.empty()) {
         evaluateTriggerCuts(*event, m_photonTriggers, m_bbyyCuts);
       }
+      m_Bbranches.at("pass_trigger_single_photon").set(*event, m_bools.at(HHBBYY::pass_trigger_single_photon), sys);
+      m_Bbranches.at("pass_trigger_diphoton").set(*event, m_bools.at(HHBBYY::pass_trigger_diphoton), sys);
 
       evaluatePhotonCuts(*photons, m_bbyyCuts);
       evaluateLeptonCuts(*electrons, *muons, m_bbyyCuts);
@@ -139,6 +159,8 @@ namespace HHBBYY
       bool passedall = true;
       for (CutEntry& cut : m_bbyyCuts) {
         passedall = passedall && cut.passed;
+        if (not m_enableSinglePhotonTrigger and cut.name == "PASS_TRIGGER")
+            passedall = passedall && m_bools.at(HHBBYY::pass_trigger_diphoton);
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
       m_passallcuts.set(*event, passedall, sys);
@@ -154,8 +176,11 @@ namespace HHBBYY
       for (const auto &cut : m_inputCutList) {
         if(m_bbyyCuts.exists(cut)) {
           if (m_bbyyCuts(cut).passed) {
-            m_bbyyCuts(cut).counter+=1;
-            if(m_isMC) m_bbyyCuts(cut).w_counter += m_generatorWeight.get(*event, sys);
+            bool pass = true;
+            if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER") 
+                pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
+            m_bbyyCuts(cut).counter += pass;
+            if(m_isMC) m_bbyyCuts(cut).w_counter += m_generatorWeight.get(*event, sys) * pass;
           }
         }
       }
@@ -164,7 +189,12 @@ namespace HHBBYY
       unsigned int consecutive_cuts = 0;
       for (size_t i = 0; i < m_bbyyCuts.size(); ++i) {
         if (m_bbyyCuts[i].passed)
-          consecutive_cuts++;
+        {
+          if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER")
+            consecutive_cuts += m_bools.at(HHBBYY::pass_trigger_diphoton);
+          else
+            consecutive_cuts++;
+        }
         else
           break;
       }
@@ -172,8 +202,12 @@ namespace HHBBYY
       // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
       // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
       for (unsigned int i=0; i<consecutive_cuts; i++) {
-        m_bbyyCuts[i].relativeCounter+=1;
-        if(m_isMC) m_bbyyCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
+        std::string cut = m_inputCutList.at(i);
+        bool pass = true;
+        if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER")
+            pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
+        m_bbyyCuts[i].relativeCounter += pass;
+        if(m_isMC) m_bbyyCuts(cut).w_relativeCounter += m_generatorWeight.get(*event, sys) * pass;
       }
 
       if (not (m_bypass or passedall) ) continue;
@@ -224,17 +258,34 @@ namespace HHBBYY
     if (!bbyyCuts.exists("PASS_TRIGGER"))
         return;
 
+    bool pass_trigger_single_photon = false;
+    bool pass_trigger_diphoton = false;
+
     for (const std::string &trigger : photonTriggers)
     {
+      
       SG::ReadDecorHandleKey<xAOD::EventInfo>& triggerDecorKey = m_triggerDecorKeys.at(trigger);
       SG::ReadDecorHandle<xAOD::EventInfo, bool> m_triggerDecorHandle(triggerDecorKey);
-      //If the event passes any of the available (single or di-) photon triggers, set the overall trigger cut to true.
-      if (m_triggerDecorHandle(event)) {
-        bbyyCuts("PASS_TRIGGER").passed = true;
-        break;
-      }
-    }
 
+      if (m_triggerMap.at(trigger) == "single_photon")
+      {
+        if (!m_bools.at(HHBBYY::is15) && trigger == "HLT_g120_loose")
+        {
+          continue;
+        }
+        else
+          pass_trigger_single_photon = m_triggerDecorHandle(event);
+      }
+      else
+      {
+        pass_trigger_diphoton = m_triggerDecorHandle(event);
+      }
+     
+    }
+    // OR between single and double photon triggers
+    bbyyCuts("PASS_TRIGGER").passed = pass_trigger_diphoton || pass_trigger_single_photon;
+    m_bools.at(HHBBYY::pass_trigger_diphoton) = pass_trigger_diphoton;
+    m_bools.at(HHBBYY::pass_trigger_single_photon) = pass_trigger_single_photon;
   }
 
   void bbyySelectorAlg::evaluatePhotonCuts
@@ -306,6 +357,14 @@ namespace HHBBYY
     if (bjets.size()==2 && bbyyCuts.exists("EXACTLY_TWO_B_JETS")) 
       bbyyCuts("EXACTLY_TWO_B_JETS").passed = true;
 
+  }
+  void bbyySelectorAlg::setRunNumberQuantities(unsigned int rdmNumber){
+    // References:
+    // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/rBR_Period_Report.php
+    // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
+
+    m_bools.at(HHBBYY::is15) = 266904 <= rdmNumber && rdmNumber <= 284484;
+    m_bools.at(HHBBYY::is16) = 296939 <= rdmNumber && rdmNumber <= 311481;
   }
 
 }

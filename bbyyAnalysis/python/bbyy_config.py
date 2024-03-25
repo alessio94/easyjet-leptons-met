@@ -97,6 +97,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             eventDecisionOutputDecoration=f"bbyy_pass_{selection_name}_%SYS%",
             isMC=flags.Input.isMC,
             bypass=flags.Analysis.bypass,
+            enableSinglePhotonTrigger=flags.Analysis.enable_single_photon_trigger,
         )
     )
 
@@ -270,9 +271,20 @@ def bbyy_branches(flags):
     if (flags.Analysis.save_bbyy_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
-            branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_%SYS%"]
+            if cut == "PASS_TRIGGER":
+                extra = "SINGLE_OR_DIPHOTON"
+                branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_{extra}_%SYS%"]
+            else:
+                branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_%SYS%"]
 
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
+
+    photon_triggers = [
+        "pass_trigger_single_photon",
+        "pass_trigger_diphoton"]
+
+    for trigger in photon_triggers:
+        branches += [f"EventInfo.{trigger}_%SYS% -> {trigger}_%SYS%"]
 
     return branches, float_variable_names, int_variable_names
 

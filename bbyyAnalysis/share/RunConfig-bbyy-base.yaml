@@ -63,6 +63,10 @@ store_high_level_variables: false
 save_bbyy_cutflow: true
 do_resonant_PNN: false
 
+# flag that toggles single photon trigger in the cutflow
+# so that PASS_TRIGGER = single || diphoton
+enable_single_photon_trigger: false
+
 # flag that toggles run-through mode in SelectorAlg
 bypass: false
 

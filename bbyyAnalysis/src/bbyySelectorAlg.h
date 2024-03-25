@@ -30,6 +30,13 @@ class CutManager;
 
 namespace HHBBYY
 {
+    enum Booleans
+    {
+        is15,
+        is16,
+        pass_trigger_single_photon,
+        pass_trigger_diphoton,
+    };
 
   /// \brief An algorithm for counting containers
   class bbyySelectorAlg final : public AthHistogramAlgorithm {
@@ -85,7 +92,7 @@ namespace HHBBYY
       m_jetHandle{ this, "jets", "",   "Jet container to read" };
 
       CP::SysReadDecorHandle<char> 
-      m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+      m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
 
       CP::SysReadHandle<xAOD::PhotonContainer>
       m_photonHandle{ this, "photons", "",   "Photons container to read" };
@@ -112,10 +119,33 @@ namespace HHBBYY
       CP::SysFilterReporterParams m_filterParams {this, "bbyy selection"};
       Gaudi::Property<bool> m_bypass
         { this, "bypass", false, "Run the selector algorithm in run-through mode" };
+      Gaudi::Property<bool> m_enableSinglePhotonTrigger
+        { this, "enableSinglePhotonTrigger", false, "Enable single photon trigger in the CutFlow" };
 
       std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+      std::unordered_map < HHBBYY::Booleans, bool > m_bools;
+      std::unordered_map < HHBBYY::Booleans, std::string > m_boolnames{
+          {HHBBYY::is15, "is15"},
+          {HHBBYY::is16, "is16"},
+          {HHBBYY::pass_trigger_single_photon, "pass_trigger_single_photon"},
+          {HHBBYY::pass_trigger_diphoton, "pass_trigger_diphoton"},
+      };
+
+      // map to check if single or diphoton trigger
+      std::unordered_map<std::string, std::string> m_triggerMap{
+        {"HLT_g120_loose", "single_photon"},
+        {"HLT_g140_loose", "single_photon"},
+        {"HLT_g35_loose_g25_loose", "diphoton"},
+        {"HLT_g35_medium_g25_medium_L12EM20VH", "diphoton"}
+    };
 
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+      CP::SysReadDecorHandle<unsigned int> m_runNumber 
+        {this, "runNumber", "runNumber", "Runnumber"};
+      CP::SysReadDecorHandle<unsigned int> m_rdmRunNumber 
+        {this, "randomRunNumber", "RandomRunNumber", "Random run number for MC"};
+      
+      void setRunNumberQuantities(unsigned int rdmNumber);
   };
 
 }

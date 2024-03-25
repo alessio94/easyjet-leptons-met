@@ -1,6 +1,9 @@
 include: bbyyAnalysis/RunConfig-bbyy.yaml
 
 do_resonant_PNN: true
+# flag that toggles single photon trigger in the cutflow
+# so that PASS_TRIGGER = single || diphoton
+enable_single_photon_trigger: true
 #Mass points for PNN 
 #Low Mass Grid
 mX_mS_pairs: [[170, 30], [180, 50], [185, 30], [190, 50], [200, 70], [205, 30], [205, 50],
