@@ -65,7 +65,7 @@ void TotalWeightsTool::computeVariables
   
   for(const auto& name : m_SF_names){
     float SF = getContent<float>(inVars, name);
-    if(SF>0) weight *= SF;
+    if(SF >= 0) weight *= SF;
   }
   
   // Need to run GetXSectionTool first to get those in outVars
