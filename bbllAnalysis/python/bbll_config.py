@@ -116,7 +116,7 @@ def get_BaselineVarsbbllAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ee", "mumu", "emu", "bb"]:
+    for object in ["ee", "mumu", "emu", "bb", "bl"]:
         for var in ["m", "pT", "dR", "Eta", "Phi"]:
             float_variable_names.append(f"{var}{object}")
 

@@ -102,6 +102,7 @@ namespace HHBBLL
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
       TLorentzVector bb;
+      TLorentzVector bl;
       TLorentzVector ee;
       TLorentzVector mumu;
       TLorentzVector emu;
@@ -402,7 +403,15 @@ namespace HHBBLL
         m_Fbranches.at("dRbb").set(*event, (bjets->at(0)->p4()).DeltaR(bjets->at(1)->p4()), sys);
       }
 
-
+      // b-jet + lepton sector
+      if (n_bjets>=1 && (n_electrons>=1 || n_muons>=1)) {
+          bl = bjets->at(0)->p4()+Leading_lep;
+          m_Fbranches.at("mbl").set(*event, bl.M(), sys);
+          m_Fbranches.at("pTbl").set(*event, bl.Pt(), sys);
+          m_Fbranches.at("Etabl").set(*event, bl.Eta(), sys);
+          m_Fbranches.at("Phibl").set(*event, bl.Phi(), sys);
+          m_Fbranches.at("dRbl").set(*event, (bjets->at(0)->p4()).DeltaR(Leading_lep), sys);
+      }
     }
     return StatusCode::SUCCESS;
   }
