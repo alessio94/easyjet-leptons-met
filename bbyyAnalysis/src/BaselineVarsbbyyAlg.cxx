@@ -267,6 +267,20 @@ namespace HHBBYY
         m_Fbranches.at("Etabbyy").set(*event, HH.Eta(), sys);
         m_Fbranches.at("Phibbyy").set(*event, HH.Phi(), sys);
         m_Fbranches.at("dRbbyy").set(*event, dRHH, sys);
+
+	//additional angular variables in referential of center of frame of HH and H
+
+	std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(y1,y2,Hbb_candidate1,Hbb_candidate2);
+	
+	m_Fbranches.at("cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);
+	m_Fbranches.at("phi_yy_cm_bbyy").set(*event,vec_angular_variables_CM[1], sys);
+	
+	m_Fbranches.at("Photon1_cos_theta_cm_gamgam").set(*event,vec_angular_variables_CM[2], sys);
+	m_Fbranches.at("Photon1_phi_cm_gamgam").set(*event,vec_angular_variables_CM[3], sys);
+	
+	m_Fbranches.at("HbbCandidate_Jet1_cos_theta_cm_bb").set(*event,vec_angular_variables_CM[4], sys);
+	m_Fbranches.at("HbbCandidate_Jet1_phi_cm_bb").set(*event,vec_angular_variables_CM[5], sys);
+	m_Fbranches.at("DeltaPhi_bb_yy_cm_bbyy").set(*event,vec_angular_variables_CM[6], sys);
       }
       
       // Find VBF jets
@@ -475,4 +489,326 @@ namespace HHBBYY
     }
     return pTBalance;
   }
+
+  //#######################################################################################################################################################################################################
+  std::vector<double> BaselineVarsbbyyAlg::compute_angular_variables_CM(
+									const TLorentzVector& lz_photon1,
+									const TLorentzVector& lz_photon2,
+									const TLorentzVector& lz_b_jet1,
+									const TLorentzVector& lz_b_jet2)
+  {
+    //for principles considered, consider page 8 of
+    //https://indico.cern.ch/event/1384215/contributions/5854190/attachments/2817099/4918457/escalier_11_March_2024.pdf
+
+    double cos_theta_gamgam_cm_yybb=-99999;
+    double phi_gamgam_cm_yybb=-99999;
+    double cos_theta_photon1_cm_gamgam=-99999;
+    double phi_photon1_cm_gamgam=-99999;
+    double cos_theta_b_jet1_cm_bb=-99999;
+    double phi_b_jet1_cm_bb=-99999;
+    double DeltaPhi_gamgam_bb_cm_yybb=-99999;
+
+    TLorentzVector lz_bbgamgam=lz_photon1+lz_photon2+lz_b_jet1+lz_b_jet2;
+    //- - - - - - - - - - - - - - - - - - - - - - - -
+    //step 1 : a) rotate around z-axis particles so that X=bbyy is in xOz, in order to suppress arbitrary phase of system of 4 particles
+    //         b) rotate around y-axis for next steps
+    //         c) boost in X center-of-mass (cm) frame
+    
+    double theta_bbgamgam=lz_bbgamgam.Theta();
+    double phi_bbgamgam=lz_bbgamgam.Phi();
+
+    ATH_MSG_DEBUG("================\n");
+    ATH_MSG_DEBUG("BaselineVarsbbyyAlg::compute_angular_variables_CM\n");
+    ATH_MSG_DEBUG("new event\n");
+    ATH_MSG_DEBUG("--------------------\n");
+    ATH_MSG_DEBUG("begin step 1\n");
+    ATH_MSG_DEBUG("theta_bbgamgam"+std::to_string(theta_bbgamgam)+", phi_bbgamgam="+std::to_string(phi_bbgamgam)+"\n\n");
+  
+    //a)
+    std::vector<TLorentzVector> yybb_particles = {lz_photon1, lz_photon2,
+                                                  lz_b_jet1, lz_b_jet2};
+
+    TLorentzVector lz_bbgamgam_step_a;
+    for (auto &lz : yybb_particles) {
+      lz.RotateZ(-phi_bbgamgam);
+      lz_bbgamgam_step_a+=lz;
+    }
+
+    //operations done so far : rotZ_minus_phi_bbgamgam;
+
+    ATH_MSG_DEBUG("sanity check: Py should be null\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Px() after rotZ_minus_phi_bbgamgam="+std::to_string(lz_bbgamgam_step_a.Px())+"\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Py() after rotZ_minus_phi_bbgamgam="+std::to_string(lz_bbgamgam_step_a.Py())+"\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Pz() after rotZ_minus_phi_bbgamgam="+std::to_string(lz_bbgamgam_step_a.Pz())+"\n");
+    ATH_MSG_DEBUG("\n");
+    
+    //b) //this quantity is used for step 2
+    TLorentzVector lz_bbgamgam_step_b;
+    for (auto &lz : yybb_particles) {
+      lz.RotateY(-theta_bbgamgam);
+      lz_bbgamgam_step_b+=lz;
+    }
+
+    //operations done so far : rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam
+
+    ATH_MSG_DEBUG("second sanity check: Px and Py should be null\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Px() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam="+std::to_string(lz_bbgamgam_step_b.Px())+"\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Py() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam="+std::to_string(lz_bbgamgam_step_b.Py())+"\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Pz() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam="+std::to_string(lz_bbgamgam_step_b.Pz())+"\n\n");
+
+    //c)
+    //Boost in X center of mass
+    
+    //careful: Boost() moves from rod frame to the original frame, so one applies a "-" sign
+    //https://root.cern.ch/doc/master/classTLorentzVector.html
+    //see also discussion: https://root-forum.cern.ch/t/how-to-use-boost-in-tlorentzvector/4102
+    
+    TVector3 boost_vector_bbgamgam=lz_bbgamgam_step_b.BoostVector();
+
+    TLorentzVector lz_bbgamgam_step_c;
+
+    for (auto &lz : yybb_particles) {
+      lz.Boost(-boost_vector_bbgamgam);
+      lz_bbgamgam_step_c+=lz;      
+    }
+    
+    //operations done so far : rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb
+
+    //mandatory to keep this information for the last step of the code (DeltaPhi between the two planes : plane yy and plane bb)
+    TLorentzVector lz_photon1_step_1=yybb_particles[0];
+    TLorentzVector lz_photon2_step_1=yybb_particles[1];
+    TLorentzVector lz_b_jet1_step_1=yybb_particles[2];
+    TLorentzVector lz_b_jet2_step_1=yybb_particles[3];
+    
+    ATH_MSG_DEBUG("sanity check: 3-vector bbgamgam should be null\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Px() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb="+std::to_string(lz_bbgamgam_step_c.Px())+"\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Py() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb="+std::to_string(lz_bbgamgam_step_c.Py())+"\n");
+    ATH_MSG_DEBUG("lz_bbgamgam.Pz() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb="+std::to_string(lz_bbgamgam_step_c.Pz())+"\n\n");
+
+    ATH_MSG_DEBUG("sanity check that gamgam and bb are opposite in cm of X\n");
+    ATH_MSG_DEBUG("gamgam_cm_yybb.Px()="+std::to_string((yybb_particles[0]+yybb_particles[1]).Px())+"\n");
+    ATH_MSG_DEBUG("gamgam_cm_yybb.Py()="+std::to_string((yybb_particles[0]+yybb_particles[1]).Py())+"\n");
+    ATH_MSG_DEBUG("gamgam_cm_yybb.Pz()="+std::to_string((yybb_particles[0]+yybb_particles[1]).Pz())+"\n");
+
+    ATH_MSG_DEBUG("bb_cm_yybb.Px()="+std::to_string((yybb_particles[2]+yybb_particles[3]).Px())+"\n");
+    ATH_MSG_DEBUG("bb_cm_yybb.Py()="+std::to_string((yybb_particles[2]+yybb_particles[3]).Py())+"\n");
+    ATH_MSG_DEBUG("bb_cm_yybb.Pz()="+std::to_string((yybb_particles[2]+yybb_particles[3]).Pz())+"\n");
+    
+    //double m_p_gamgam_cms_yybb=(lz_photon1_step_1+lz_photon2_step_1).P(); //potential additional variable for prospects
+    //- - - - - - - - - - - - - - - - - - - - - - - -
+    //step 2 : at this stage, X is in the LHC frame (x'Oz') : protons axis and axis to center of LHC ring
+    //compute theta_gamgam, phi_gamgam, and prepare next frame
+    
+    ATH_MSG_DEBUG("--------------------\n");
+    ATH_MSG_DEBUG("begin step 2\n");
+
+    TLorentzVector lz_gamgam_step_2=yybb_particles[0]+yybb_particles[1];
+    double theta_gamgam_cm_yybb=lz_bbgamgam_step_b.Angle(lz_gamgam_step_2.Vect());
+    cos_theta_gamgam_cm_yybb=cos(theta_gamgam_cm_yybb);
+    phi_gamgam_cm_yybb=lz_gamgam_step_2.Phi();
+
+    ATH_MSG_DEBUG("theta_gamgam_cm_yybb="+std::to_string(theta_gamgam_cm_yybb)+"\n");
+    ATH_MSG_DEBUG("phi_gamgam_cm_yybb="+std::to_string(phi_gamgam_cm_yybb)+"\n");
+    
+    //sanity check : compute theta_bb
+    TLorentzVector lz_bb_step_2=yybb_particles[2]+yybb_particles[3]; //this lorentzvector is used also afterwards, at step 4
+    double theta_bb_cm_yybb=lz_bbgamgam_step_b.Angle(lz_bb_step_2.Vect());
+    double phi_bb_cm_yybb=lz_bb_step_2.Phi();
+    
+    ATH_MSG_DEBUG("sanity check : check that theta_bb+theta_gamgam=pi and that phi_gamgam-phi_bb=pi\n");
+    ATH_MSG_DEBUG("theta_bb_cm_yybb="+std::to_string(theta_bb_cm_yybb)+", theta_gamgam_cm_yybb+theta_bb_cm_yybb="+std::to_string(theta_gamgam_cm_yybb+theta_bb_cm_yybb)+"\n");
+    ATH_MSG_DEBUG("phi_bb_cm_yybb="+std::to_string(phi_bb_cm_yybb)+"\n");
+    ATH_MSG_DEBUG("phi_gamgam_cm_yybb-phi_bb_cm_yybb="+std::to_string(phi_gamgam_cm_yybb-phi_bb_cm_yybb)+"\n");
+    //- - - - - - - - - - - - - - - - - - - - - - - -
+    //step 3 : from X center of frame, rotate particles and go in yy cm frame
+    
+    ATH_MSG_DEBUG("--------------------\n");
+    ATH_MSG_DEBUG("begin step 3\n");
+    
+    //rotate particles
+    //rotate around z axis
+
+    std::vector<TLorentzVector> yy_particles = {yybb_particles[0],yybb_particles[1]};
+    TLorentzVector lz_gamgam_step_a;
+    
+    for (auto &lz : yy_particles) {
+      lz.RotateZ(-phi_gamgam_cm_yybb);
+      lz_gamgam_step_a+=lz;
+    }
+
+    ATH_MSG_DEBUG("sanity check: Py should be null\n");
+    ATH_MSG_DEBUG("lz_gamgam_step_a.Px()="+std::to_string(lz_gamgam_step_a.Px())+"\n");
+    ATH_MSG_DEBUG("lz_gamgam_step_a.Py()="+std::to_string(lz_gamgam_step_a.Py())+"\n");
+    ATH_MSG_DEBUG("lz_gamgam_step_a.Pz()="+std::to_string(lz_gamgam_step_a.Pz())+"\n");
+
+    //rotate around y axis
+    
+    TLorentzVector lz_gamgam_step_b;
+    
+    for (auto &lz : yy_particles) {
+      lz.RotateY(-theta_gamgam_cm_yybb);
+      lz_gamgam_step_b+=lz;
+    }
+
+    ATH_MSG_DEBUG("second sanity check: Px and Py should be null\n");
+    ATH_MSG_DEBUG("lz_gamgam_step_b.Px()="+std::to_string(lz_gamgam_step_b.Px())+"\n");
+    ATH_MSG_DEBUG("lz_gamgam_step_b.Py()="+std::to_string(lz_gamgam_step_b.Py())+"\n");
+    ATH_MSG_DEBUG("lz_gamgam_step_b.Pz()="+std::to_string(lz_gamgam_step_b.Pz())+"\n");
+
+    //boost to center of frame of gamgam
+    
+    TVector3 boost_vector_gamgam_step_b=lz_gamgam_step_b.BoostVector();
+    
+    //info for debugging (not used for computation): before rotation
+    TVector3 boost_vector_gamgam_step_2=lz_gamgam_step_2.BoostVector();
+    
+    ATH_MSG_DEBUG("sanity check: check that boost vector gamgam (here) is in opposite direction to the one of bb (in step 5)\n");
+    ATH_MSG_DEBUG("boost_vector_gamgam_step_b.Px()="+std::to_string(boost_vector_gamgam_step_b.Px())+"\n");
+    ATH_MSG_DEBUG("boost_vector_gamgam_step_b.Py()="+std::to_string(boost_vector_gamgam_step_b.Py())+"\n");
+    ATH_MSG_DEBUG("boost_vector_gamgam_step_b.Pz()="+std::to_string(boost_vector_gamgam_step_b.Pz())+"\n");
+    
+    ATH_MSG_DEBUG("boost_vector_gamgam_step_2.Px()="+std::to_string(boost_vector_gamgam_step_2.Px())+"\n");
+    ATH_MSG_DEBUG("boost_vector_gamgam_step_2.Py()="+std::to_string(boost_vector_gamgam_step_2.Py())+"\n");
+    ATH_MSG_DEBUG("boost_vector_gamgam_step_2.Pz()="+std::to_string(boost_vector_gamgam_step_2.Pz())+"\n");
+    
+    for (auto &lz : yy_particles)
+      lz.Boost(-boost_vector_gamgam_step_b);
+
+    //operations done so far : rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_gamgam_rotY_minus_theta_gamgam_boosted_cm_gamgam
+
+    double theta_photon1_cm_gamgam=lz_gamgam_step_b.Angle(yy_particles[0].Vect());
+    cos_theta_photon1_cm_gamgam=cos(theta_photon1_cm_gamgam);
+    phi_photon1_cm_gamgam=yy_particles[0].Phi();
+
+    ATH_MSG_DEBUG("theta_photon1_cm_gamgam="+std::to_string(theta_photon1_cm_gamgam)+", phi_photon1_cm_gamgam="+std::to_string(phi_photon1_cm_gamgam)+"\n");
+    
+    bool debug=0; //0 by default in order not to slow down code
+    if (debug) { //only or debugging : sanity check : compute theta_photon2, phi_photon2 (it should be opposite to those of photon1)
+      double theta_photon2_cm_gamgam=lz_gamgam_step_b.Angle(yy_particles[1].Vect());
+      double cos_theta_photon2_cm_gamgam=cos(theta_photon2_cm_gamgam); //unused variable : only for check
+      double phi_photon2_cm_gamgam=yy_particles[1].Phi(); //unused variable : only for check
+    
+      ATH_MSG_DEBUG("sanity check : check that theta_photon1_cm_gamgam+theta_photon2_cm_gamgam=pi and that theta_photon2_cm_gamgam-theta_photon1_cm_gamgam=pi\n");
+      ATH_MSG_DEBUG("theta_photon2_cm_gamgam="+std::to_string(theta_photon2_cm_gamgam)+", theta_photon1_cm_gamgam+theta_photon2_cm_gamgam="+std::to_string(theta_photon1_cm_gamgam+theta_photon2_cm_gamgam)+"\n");
+      ATH_MSG_DEBUG("cos_theta_photon2_cm_gamgam="+std::to_string(cos_theta_photon2_cm_gamgam)+"\n");
+      ATH_MSG_DEBUG("phi_photon2_cm_gamgam="+std::to_string(phi_photon2_cm_gamgam)+", phi_photon2_cm_gamgam-phi_photon1_cm_gamgam="+std::to_string(phi_photon2_cm_gamgam-phi_photon1_cm_gamgam)+"\n");
+    }
+
+    ATH_MSG_DEBUG("photon1.Px() in cm gamgam : "+std::to_string(yybb_particles[0].Px())+"\n");
+    ATH_MSG_DEBUG("photon1.Py() in cm gamgam : "+std::to_string(yybb_particles[0].Py())+"\n");
+    ATH_MSG_DEBUG("photon1.Pz() in cm gamgam : "+std::to_string(yybb_particles[0].Pz())+"\n");
+    ATH_MSG_DEBUG("photon2.Px() in cm gamgam : "+std::to_string(yybb_particles[1].Px())+"\n");
+    ATH_MSG_DEBUG("photon2.Py() in cm gamgam : "+std::to_string(yybb_particles[1].Py())+"\n");
+    ATH_MSG_DEBUG("photon2.Pz() in cm gamgam : "+std::to_string(yybb_particles[1].Pz())+"\n");
+    //- - - - - - - - - - - - - - - - - - - - - - - -
+    //step 4 : from X center of frame, rotate particles and go in bb cm frame
+    
+    ATH_MSG_DEBUG("--------------------\n");
+    ATH_MSG_DEBUG("begin step 4\n");
+    
+    //rotate particles around z axis
+
+    std::vector<TLorentzVector> bb_particles = {yybb_particles[2],yybb_particles[3]};
+    TLorentzVector lz_bb_step_a;
+    
+    for (auto &lz : bb_particles) {
+      lz.RotateZ(-phi_bb_cm_yybb);
+      lz_bb_step_a+=lz;
+    }
+
+    //operations done so far : rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb;
+    
+    ATH_MSG_DEBUG("sanity check: Py should be null\n");
+    ATH_MSG_DEBUG("lz_bb.Px() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb="+std::to_string(lz_bb_step_a.Px())+"\n");
+    ATH_MSG_DEBUG("lz_bb.Py() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb="+std::to_string(lz_bb_step_a.Py())+"\n");
+    ATH_MSG_DEBUG("lz_bb.Pz() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb="+std::to_string(lz_bb_step_a.Pz())+"\n");
+    
+    //rotate particles around y axis
+
+    TLorentzVector lz_bb_step_b; //operations done : rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb_rotY_minus_theta_bb;
+    
+    for (auto &lz : bb_particles) {
+      lz.RotateY(-theta_bb_cm_yybb);
+      lz_bb_step_b+=lz;
+    }
+
+    //operations done so far : rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb_rotY_minus_theta_bb;
+
+    ATH_MSG_DEBUG("second sanity check after operations rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb_rotY_minus_theta_bb : Px and Py should be null\n");
+    ATH_MSG_DEBUG("lz_bb.Px() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb_rotY_minus_theta_bb="+std::to_string(lz_bb_step_b.Px())+"\n");
+    ATH_MSG_DEBUG("lz_bb.Py() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb_rotY_minus_theta_bb="+std::to_string(lz_bb_step_b.Py())+"\n");
+    ATH_MSG_DEBUG("lz_bb.Pz() after rotZ_minus_phi_bbgamgam_rotY_minus_theta_bbgamgam_boosted_cm_yybb_rotZ_minus_phi_bb_rotY_minus_theta_bb="+std::to_string(lz_bb_step_b.Pz())+"\n\n");
+    
+    //boost to center of frame of bb
+    TVector3 boost_vector_bb_step_b=lz_bb_step_b.BoostVector();
+    
+    //info for debugging (not used for computation): before rotation
+    TVector3 boost_vector_bb_step_2=lz_bb_step_2.BoostVector();
+    
+    ATH_MSG_DEBUG("sanity check: check that boost vector gamgam (in step 3) is in opposite direction to the one of bb (here)\n");
+    ATH_MSG_DEBUG("boost_vector_bb_step_b.Px()="+std::to_string(boost_vector_bb_step_b.Px())+"\n");
+    ATH_MSG_DEBUG("boost_vector_bb_step_b.Py()="+std::to_string(boost_vector_bb_step_b.Py())+"\n");
+    ATH_MSG_DEBUG("boost_vector_bb_step_b.Pz()="+std::to_string(boost_vector_bb_step_b.Pz())+"\n");
+
+    ATH_MSG_DEBUG("boost_vector_bb_step_2.Px()="+std::to_string(boost_vector_bb_step_2.Px())+"\n");
+    ATH_MSG_DEBUG("boost_vector_bb_step_2.Py()="+std::to_string(boost_vector_bb_step_2.Py())+"\n");
+    ATH_MSG_DEBUG("boost_vector_bb_step_2.Pz()="+std::to_string(boost_vector_bb_step_2.Pz())+"\n");
+    
+    for (auto &lz : bb_particles)
+      lz.Boost(-boost_vector_bb_step_b);
+    //- - - - - - - - - - - - - - - - - - - - - - - -
+    //step 5 : from X center of frame, rotate particles and go in bb cm frame
+    
+    ATH_MSG_DEBUG("--------------------\n");
+    ATH_MSG_DEBUG("begin step 5\n");
+    
+    double theta_b_jet1_cm_bb=lz_bb_step_b.Angle(bb_particles[0].Vect());
+    cos_theta_b_jet1_cm_bb=cos(theta_b_jet1_cm_bb);
+    phi_b_jet1_cm_bb=bb_particles[0].Phi();
+    
+    ATH_MSG_DEBUG("theta_b_jet1_cm_bb="+std::to_string(theta_b_jet1_cm_bb)+", phi_b_jet1_cm_bb="+std::to_string(phi_b_jet1_cm_bb)+"\n");
+    
+    //sanity check : compute theta_b_jet2, phi_b_jet2
+    double theta_b_jet2_cm_bb=lz_bb_step_b.Angle(bb_particles[1].Vect());
+    double phi_b_jet2_cm_bb=bb_particles[1].Phi();
+
+    ATH_MSG_DEBUG("sanity check : check that theta_b_jet1_cm_bb+theta_b_jet2_cm_bb=pi and that theta_b_jet2_cm_bb-theta_b_jet1_cm_bb=pi\n");
+    ATH_MSG_DEBUG("theta_b_jet2_cm_bb="+std::to_string(theta_b_jet2_cm_bb)+", theta_b_jet1_cm_bb+theta_b_jet2_cm_bb="+std::to_string(theta_b_jet1_cm_bb+theta_b_jet2_cm_bb)+"\n");
+    ATH_MSG_DEBUG("phi_b_jet2_cm_bb="+std::to_string(phi_b_jet2_cm_bb)+", phi_b_jet2_cm_bb-phi_b_jet1_cm_bb="+std::to_string(phi_b_jet2_cm_bb-phi_b_jet1_cm_bb)+"\n");
+    
+    ATH_MSG_DEBUG("b_jet1.Px() in cm bb : "+std::to_string(bb_particles[0].Px())+"\n");
+    ATH_MSG_DEBUG("b_jet1.Py() in cm bb : "+std::to_string(bb_particles[0].Py())+"\n");
+    ATH_MSG_DEBUG("b_jet1.Pz() in cm bb : "+std::to_string(bb_particles[0].Pz())+"\n");
+
+    ATH_MSG_DEBUG("b_jet2.Px() in cm bb : "+std::to_string(bb_particles[1].Px())+"\n");
+    ATH_MSG_DEBUG("b_jet2.Py() in cm bb : "+std::to_string(bb_particles[1].Py())+"\n");
+    ATH_MSG_DEBUG("b_jet2.Pz() in cm bb : "+std::to_string(bb_particles[1].Pz())+"\n");
+    //- - - - - - - - - - - - - - - - - - - - - - - -
+    //angle btw (gam, gam) and (b, b), in cm X
+
+    TVector3 vec3_photon1_step_1=lz_photon1_step_1.Vect();
+    TVector3 vec3_photon2_step_1=lz_photon2_step_1.Vect();
+    
+    TVector3 vec3_cross_product_photon1_photon2_cm_yybb=vec3_photon1_step_1.Cross(vec3_photon2_step_1);
+
+    TVector3 vec3_b_jet1_step_1=lz_b_jet1_step_1.Vect();
+    TVector3 vec3_b_jet2_step_1=lz_b_jet2_step_1.Vect();
+    
+    TVector3 vec3_cross_product_b_jet1_b_jet2_cm_yybb=vec3_b_jet1_step_1.Cross(vec3_b_jet2_step_1);
+    
+    DeltaPhi_gamgam_bb_cm_yybb=vec3_cross_product_photon1_photon2_cm_yybb.Angle(vec3_cross_product_b_jet1_b_jet2_cm_yybb);
+    std::vector<double> vec_angular_variables_CM;
+    
+    vec_angular_variables_CM.push_back(cos_theta_gamgam_cm_yybb);
+    vec_angular_variables_CM.push_back(phi_gamgam_cm_yybb);
+    vec_angular_variables_CM.push_back(cos_theta_photon1_cm_gamgam);
+    vec_angular_variables_CM.push_back(phi_photon1_cm_gamgam);
+    vec_angular_variables_CM.push_back(cos_theta_b_jet1_cm_bb);
+    vec_angular_variables_CM.push_back(phi_b_jet1_cm_bb);
+    vec_angular_variables_CM.push_back(DeltaPhi_gamgam_bb_cm_yybb);
+
+    return vec_angular_variables_CM;
+  }
+  //#######################################################################################################################################################################################################
+
 }
