@@ -41,7 +41,8 @@ def photon_sequence(flags, configAcc):
                                  flags.Analysis.Photon.forceFullSimConfig)
 
     # Kinematic selection
-    configSeq += makeConfig('Photons.PtEtaSelection', containerName=output_name)
+    configSeq += makeConfig('Photons.PtEtaSelection', containerName=output_name,
+                            selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 10e3)
     configSeq.setOptionValue('.maxEta', 2.37)

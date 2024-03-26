@@ -52,13 +52,15 @@ private:
       { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<std::string> m_eleWPName
-      { this, "eleSF_WP", "","Electron ID + Iso working point for the scale factors" };
+      { this, "ele_WP", "","Electron ID + Iso working point" };
     bool m_isoIncluded = true;
     CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
     CP::SysReadDecorHandle<float> m_ele_idSF{"", this};
     CP::SysReadDecorHandle<float> m_ele_isoSF{"", this};
-
     CP::SysWriteDecorHandle<float> m_ele_SF{"", this};
+
+    CP::SysReadDecorHandle<char> m_select_in{"", this};
+    CP::SysWriteDecorHandle<char> m_select_out{"", this};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::ElectronContainer>>

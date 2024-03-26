@@ -21,7 +21,7 @@ def lltt_cfg(
             "MuonSelectorAlg",
             containerInKey=LooseMuonWPLabel + muonkey,
             containerOutKey="llttAnalysisMuons_%SYS%",
-            muonSF_WP=TightMuonWPLabel,
+            muon_WP=TightMuonWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -35,7 +35,7 @@ def lltt_cfg(
             "ElectronSelectorAlg",
             containerInKey=LooseElectronWPLabel + electronkey,
             containerOutKey="llttAnalysisElectrons_%SYS%",
-            eleSF_WP=TightElectronWPLabel,
+            ele_WP=TightElectronWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -46,7 +46,7 @@ def lltt_cfg(
             "TauSelectorAlg",
             containerInKey=flags.Analysis.Tau.ID + taukey,
             containerOutKey="llttAnalysisTaus_%SYS%",
-            tauSF_WP=flags.Analysis.Tau.ID,
+            tau_WP=flags.Analysis.Tau.ID,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )

@@ -53,12 +53,14 @@ private:
       { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<std::string> m_photonWPName
-      { this, "photonSF_WP", "","Photon ID + Iso working point for the scale factors" };
+      { this, "photon_WP", "","Photon ID + Iso working point" };
     bool m_isoIncluded = true;
     CP::SysReadDecorHandle<float> m_ph_idSF{"", this};
     CP::SysReadDecorHandle<float> m_ph_isoSF{"", this};
-
     CP::SysWriteDecorHandle<float> m_ph_SF{"", this};
+
+    CP::SysReadDecorHandle<char> m_select_in{"", this};
+    CP::SysWriteDecorHandle<char> m_select_out{"", this};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::PhotonContainer>>

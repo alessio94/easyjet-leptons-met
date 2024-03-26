@@ -37,6 +37,11 @@ namespace Easyjet
     ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
+    m_select_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_eleWPName+"_%SYS%", this);
+    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_eleWPName+"_%SYS%", this);
+    ATH_CHECK (m_select_in.initialize(m_systematicsList, m_inHandle));
+    ATH_CHECK (m_select_out.initialize(m_systematicsList, m_outHandle));
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
 
@@ -79,12 +84,13 @@ namespace Easyjet
             (this_electron_eta_abs > m_maxEta ))
           continue;
 
-	// For some reason this decoration needs to be explicitly copied
-	if(m_isMC){
-	  float SF = m_ele_recoSF.get(*electron,sys) * m_ele_idSF.get(*electron,sys);
-	  if(m_isoIncluded) SF *= m_ele_isoSF.get(*electron,sys);
-	  m_ele_SF.set(*electron, SF, sys);
-	}
+        // For some reason this decoration needs to be explicitly copied
+        if(m_isMC){
+          float SF = m_ele_recoSF.get(*electron,sys) * m_ele_idSF.get(*electron,sys);
+          if(m_isoIncluded) SF *= m_ele_isoSF.get(*electron,sys);
+          m_ele_SF.set(*electron, SF, sys);
+        }
+        m_select_out.set(*electron, m_select_in.get(*electron,sys), sys);
 
         // If cuts are passed, save the object
         workContainer->push_back(electron);

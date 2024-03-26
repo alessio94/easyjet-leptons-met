@@ -148,7 +148,7 @@ private:
 
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_tauWPDecorKey;
+    CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
@@ -161,11 +161,11 @@ private:
 
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleWPDecorKey;
+    CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
 		      
     Gaudi::Property<std::string> m_muonWPName
       { this, "muonWP", "","Muon ID + Iso cuts" };
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonWPDecorKey;
+    CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
 
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};

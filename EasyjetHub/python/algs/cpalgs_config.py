@@ -20,6 +20,8 @@ from EasyjetHub.algs.calibration.electrons import electron_sequence
 from EasyjetHub.algs.calibration.photons import photon_sequence
 from EasyjetHub.algs.calibration.taus import tau_sequence
 from EasyjetHub.algs.calibration.met import met_sequence
+from EasyjetHub.algs.calibration.SelectionDecorationConfig import (
+    selection_decoration_sequence)
 from EasyjetHub.algs.postprocessing.overlap_removal import overlap_sequence
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.steering.utils.systematics_helper import consolidate_systematics_regex
@@ -167,6 +169,8 @@ def cpalgs_cfg(flags):
         log.info("Adding Overlap Removal sequence")
 
         configSeq += overlap_sequence(flags)
+
+    configSeq += selection_decoration_sequence(flags)
 
     configSeq.fullConfigure(configAccumulator)
 

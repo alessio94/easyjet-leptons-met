@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -99,6 +99,8 @@ private:
 
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
+    CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
+
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_tauWPDecorKey;
 
     CP::SysReadDecorHandle<char> 
@@ -111,11 +113,11 @@ private:
 
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleWPDecorKey;
+    CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
 		      
     Gaudi::Property<std::string> m_muonWPName
       { this, "muonWP", "","Muon ID + Iso cuts" };
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonWPDecorKey;
+    CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
 
     Gaudi::Property<std::vector<std::string>> m_triggers 
           {this, "triggerLists", {}, "Name list of trigger"};

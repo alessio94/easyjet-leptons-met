@@ -63,10 +63,12 @@ private:
       { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<std::string> m_tauWPName
-      { this, "tauSF_WP", "","Tau ID working point for the scale factors" };
+      { this, "tau_WP", "","Tau ID working point" };
     CP::SysReadDecorHandle<float> m_tau_SF_in{"", this};
-
     CP::SysWriteDecorHandle<float> m_tau_SF_out{"", this};
+
+    CP::SysReadDecorHandle<char> m_select_in{"", this};
+    CP::SysWriteDecorHandle<char> m_select_out{"", this};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::TauJetContainer>>

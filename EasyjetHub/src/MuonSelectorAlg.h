@@ -52,12 +52,14 @@ private:
       { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<std::string> m_muWPName
-      { this, "muonSF_WP", "","Muon ID + Iso working point for the scale factors" };
+      { this, "muon_WP", "","Muon ID + Iso working point" };
     bool m_isoIncluded = true;
     CP::SysReadDecorHandle<float> m_mu_recoSF{"", this};
     CP::SysReadDecorHandle<float> m_mu_isoSF{"", this};
-
     CP::SysWriteDecorHandle<float> m_mu_SF{"", this};
+
+    CP::SysReadDecorHandle<char> m_select_in{"", this};
+    CP::SysWriteDecorHandle<char> m_select_out{"", this};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::MuonContainer>>

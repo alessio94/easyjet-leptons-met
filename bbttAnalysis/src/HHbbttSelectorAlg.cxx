@@ -52,16 +52,16 @@ namespace HHBBTT
       ATH_CHECK(m_Bbranches.at(key).initialize(m_systematicsList, m_eventHandle));
     };
 
-    m_tauWPDecorKey = m_tauHandle.getNamePattern() +
-      ".baselineSelection_" + m_tauWPName;
-    m_eleWPDecorKey = m_electronHandle.getNamePattern() +
-      ".baselineSelection_" + m_eleWPName;
-    m_muonWPDecorKey = m_muonHandle.getNamePattern() +
-      ".baselineSelection_" + m_muonWPName;
+    m_tauWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_" + m_tauWPName+"_%SYS%", this);
+    m_eleWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
+    m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
 
-    ATH_CHECK (m_tauWPDecorKey.initialize());
-    ATH_CHECK (m_eleWPDecorKey.initialize());
-    ATH_CHECK (m_muonWPDecorKey.initialize());
+    ATH_CHECK(m_tauWPDecorHandle.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
 
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -193,10 +193,6 @@ namespace HHBBTT
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
-    SG::ReadDecorHandle<xAOD::TauJetContainer, char> tauWPDecorHandle(m_tauWPDecorKey);
-    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleWPDecorHandle(m_eleWPDecorKey);
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonWPDecorHandle(m_muonWPDecorKey);
-
     trigPassReadDecoMap trigPass_decos;
     for (const auto& [channel, key] : m_trigPass_DecorKey){
       trigPass_decos.emplace(channel, key);
@@ -311,7 +307,7 @@ namespace HHBBTT
       const xAOD::Electron* ele1 = nullptr;
       for (const xAOD::Electron *electron : *electrons)
       {
-        bool passElectronWP = eleWPDecorHandle(*electron);
+        bool passElectronWP = m_eleWPDecorHandle.get(*electron, sys);
         m_selected_el.set(*electron, false, sys);
         if (passElectronWP &&
 	    electron->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::ele])
@@ -333,7 +329,7 @@ namespace HHBBTT
       const xAOD::Muon* mu1 = nullptr;
       for (const xAOD::Muon *muon : *muons)
       {
-        bool passMuonWP = muonWPDecorHandle(*muon);
+        bool passMuonWP = m_muonWPDecorHandle.get(*muon, sys);
         m_selected_mu.set(*muon, false, sys);
         if (passMuonWP && std::abs(muon->eta()) < 2.5 &&
 	    muon->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::mu])
@@ -388,9 +384,9 @@ namespace HHBBTT
       const xAOD::TauJet* tau1 = nullptr;
       for (const xAOD::TauJet *tau : *taus)
       {
-        bool isTauID = tauWPDecorHandle(*tau);
+        bool passTauWP = m_tauWPDecorHandle.get(*tau, sys);
         m_selected_tau.set(*tau, false, sys);
-        if (isTauID && tau->pt() > 20. * Athena::Units::GeV)
+        if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)
         {
           m_selected_tau.set(*tau, true, sys);
           n_taus += 1;

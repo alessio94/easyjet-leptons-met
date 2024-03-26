@@ -29,7 +29,8 @@ def tau_sequence(flags, configAcc):
         configSeq.setOptionValue('.quality', id)
 
     # Kinematic selection
-    configSeq += makeConfig('TauJets.PtEtaSelection', containerName=output_name)
+    configSeq += makeConfig('TauJets.PtEtaSelection', containerName=output_name,
+                            selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
     configSeq.setOptionValue('.maxEta', 2.5)

@@ -158,6 +158,35 @@ def dict_to_flags(d: dict) -> AthConfigFlags:
     return _flags
 
 
+####
+# Temporary needed until 25.2.4
+###
+
+def flags_to_dict(flags: AthConfigFlags, subflag_name='Analysis') -> dict:
+    flag_dict = flags[subflag_name].asdict()
+
+    # Renamed flags from cloneAndReplace
+    renames = {key.removeprefix(subflag_name + '.'):
+               value.removeprefix(subflag_name + '.')
+               for key, value in flags._renames.items() if value != ""}
+
+    for key, value in renames.items():
+        # Retrieve the subdictionary to copy
+        values = value.split('.')
+        copy = flag_dict
+        for v in values:
+            copy = copy[v]
+
+        # Set the right subdictionary to hold the copy
+        keys = key.split('.')
+        nested_dict = flag_dict
+        for k in keys[:-1]:
+            nested_dict = nested_dict.setdefault(k, {})
+        nested_dict[keys[-1]] = copy
+
+    return flag_dict
+
+
 def fill_flags_from_runconfig(
     args: Namespace,
     flags: AthConfigFlags,
@@ -198,7 +227,12 @@ def lock_merged_config_flags(flags, subflag_name='Analysis'):
 
     This should be the only thing that users need to call.
     """
-    flag_dict = flags[subflag_name].asdict()
+
+    # Temporary fix until 25.2.4
+
+    # flag_dict = flags[subflag_name].asdict()
+    flag_dict = flags_to_dict(flags, subflag_name)
+
     tup_flags = to_immutable(flag_dict)
     del flags[subflag_name]
     flags.addFlag(subflag_name, tup_flags)

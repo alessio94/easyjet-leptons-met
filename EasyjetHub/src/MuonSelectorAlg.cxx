@@ -36,6 +36,11 @@ namespace Easyjet
     ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
+    m_select_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_muWPName+"_%SYS%", this);
+    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_muWPName+"_%SYS%", this);
+    ATH_CHECK (m_select_in.initialize(m_systematicsList, m_inHandle));
+    ATH_CHECK (m_select_out.initialize(m_systematicsList, m_outHandle));
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
     return StatusCode::SUCCESS;
@@ -71,12 +76,13 @@ namespace Easyjet
         if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
           continue;
 
-	// For some reason this decoration needs to be explicitly copied
-	if(m_isMC){
-	  float SF = m_mu_recoSF.get(*muon,sys);
-	  if(m_isoIncluded) SF *= m_mu_isoSF.get(*muon,sys);
-	  m_mu_SF.set(*muon, SF, sys);
-	}
+        // For some reason this decoration needs to be explicitly copied
+        if(m_isMC){
+          float SF = m_mu_recoSF.get(*muon,sys);
+          if(m_isoIncluded) SF *= m_mu_isoSF.get(*muon,sys);
+          m_mu_SF.set(*muon, SF, sys);
+        }
+        m_select_out.set(*muon, m_select_in.get(*muon,sys), sys);
 
         // If cuts are passed, save the object
         workContainer->push_back(muon);

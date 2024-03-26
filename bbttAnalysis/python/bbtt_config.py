@@ -23,7 +23,7 @@ def bbtt_cfg(
             "MuonSelectorAlg",
             containerInKey=LooseMuonWPLabel + muonkey,
             containerOutKey="bbttAnalysisMuons_%SYS%",
-            muonSF_WP=TightMuonWPLabel,
+            muon_WP=TightMuonWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -37,7 +37,7 @@ def bbtt_cfg(
             "ElectronSelectorAlg",
             containerInKey=LooseElectronWPLabel + electronkey,
             containerOutKey="bbttAnalysisElectrons_%SYS%",
-            eleSF_WP=TightEleWPLabel,
+            ele_WP=TightEleWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -50,7 +50,7 @@ def bbtt_cfg(
             containerInKey='Baseline' + taukey,
             keepAntiTaus=True,
             containerOutKey="bbttAnalysisTaus_%SYS%",
-            tauSF_WP=flags.Analysis.Tau.ID,
+            tau_WP=flags.Analysis.Tau.ID,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )

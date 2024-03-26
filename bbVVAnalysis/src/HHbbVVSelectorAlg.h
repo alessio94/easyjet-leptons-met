@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -10,7 +10,6 @@
 
 #include "AnaAlgorithm/AnaAlgorithm.h"
 #include <FourMomUtils/xAODP4Helpers.h>
-#include <AsgDataHandles/ReadDecorHandleKey.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
@@ -91,11 +90,11 @@ private:
 
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleWPDecorKey;
+    CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
 
     Gaudi::Property<std::string> m_muonWPName
       { this, "muonWP", "","Muon ID + Iso cuts" };
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonWPDecorKey;
+    CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<bool> m_pass_sr {"pass_bbVV_sr_%SYS%", this};

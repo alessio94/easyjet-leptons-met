@@ -39,7 +39,8 @@ def electron_sequence(flags, configAcc):
                                  flags.Analysis.Electron.forceFullSimConfig)
 
     # Kinematic selection
-    configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name)
+    configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name,
+                            selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 4.5e3)
     configSeq.setOptionValue('.maxEta', 2.47)

@@ -34,6 +34,11 @@ namespace Easyjet
     ATH_CHECK (m_tau_SF_in.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_tau_SF_out.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
+    m_select_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_tauWPName+"_%SYS%", this);
+    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_tauWPName+"_%SYS%", this);
+    ATH_CHECK (m_select_in.initialize(m_systematicsList, m_inHandle));
+    ATH_CHECK (m_select_out.initialize(m_systematicsList, m_outHandle));
+
     // Initialise syst-aware input/output decorators 
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
@@ -87,8 +92,9 @@ namespace Easyjet
             (this_tau_eta_abs > m_maxEta))
           continue;
 
-	// For some reason this decoration needs to be explicitly copied
-	if(m_isMC) m_tau_SF_out.set(*tau, m_tau_SF_in.get(*tau,sys), sys);
+        // For some reason this decoration needs to be explicitly copied
+        if(m_isMC) m_tau_SF_out.set(*tau, m_tau_SF_in.get(*tau,sys), sys);
+        m_select_out.set(*tau, m_select_in.get(*tau,sys), sys);
 
         // If cuts are passed, save the object
         workContainer->push_back(tau);

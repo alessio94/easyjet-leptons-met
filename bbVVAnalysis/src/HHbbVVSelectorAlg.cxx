@@ -1,13 +1,10 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Kira Abeling
 
 #include "HHbbVVSelectorAlg.h"
-#include <AsgDataHandles/ReadDecorHandle.h>
-#include <AsgDataHandles/WriteDecorHandle.h>
-
 
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
@@ -36,13 +33,13 @@ namespace HHBBVV
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    m_eleWPDecorKey = m_electronHandle.getNamePattern() +
-      ".baselineSelection_" + m_eleWPName;
-    m_muonWPDecorKey = m_muonHandle.getNamePattern() +
-      ".baselineSelection_" + m_muonWPName;
+    m_eleWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
+    m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
 
-    ATH_CHECK (m_eleWPDecorKey.initialize());
-    ATH_CHECK (m_muonWPDecorKey.initialize());
+    ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
 
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -78,9 +75,6 @@ namespace HHBBVV
 
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
-
-    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleWPDecorHandle(m_eleWPDecorKey);
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonWPDecorHandle(m_muonWPDecorKey);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
@@ -125,7 +119,7 @@ namespace HHBBVV
       //example - needs to match bbVV definition
       for (const xAOD::Electron *electron : *electrons)
       {
-        bool passElectronWP = eleWPDecorHandle(*electron);
+        bool passElectronWP = m_eleWPDecorHandle.get(*electron, sys);
         m_selected_el.set(*electron, false, sys);
         if (passElectronWP && electron->pt() > 18000)
         {
@@ -138,7 +132,7 @@ namespace HHBBVV
 
       for (const xAOD::Muon *muon : *muons)
       {
-        bool passMuonWP = muonWPDecorHandle(*muon);
+        bool passMuonWP = m_muonWPDecorHandle.get(*muon, sys);
         m_selected_mu.set(*muon, false, sys);
         if (passMuonWP && std::abs(muon->eta()) < 2.5 && muon->pt() > 15000)
         {

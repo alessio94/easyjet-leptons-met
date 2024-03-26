@@ -128,8 +128,8 @@ def jet_sequence(
             )
 
     # Apply kinematic selection
-    configSeq += makeConfig('Jets.PtEtaSelection',
-                            containerName=calib_name)
+    configSeq += makeConfig('Jets.PtEtaSelection', containerName=calib_name,
+                            selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
     configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
@@ -139,7 +139,7 @@ def jet_sequence(
 
     output_name = drop_sys(flags.Analysis.container_names.output[jet_type])
     configSeq += makeConfig('Thinning', containerName=calib_name)
-    configSeq.setOptionValue('.selectionName', 'selectPtEta&&jvt')
+    configSeq.setOptionValue('.selectionName', 'selectPtEta&&baselineJvt')
     configSeq.setOptionValue('.outputName', output_name)
 
     # Event-level FTAG scale factor
