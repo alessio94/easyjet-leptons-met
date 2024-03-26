@@ -1,5 +1,5 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
-from EasyjetHub.output.ttree.truth_jets import get_large_R_jet_truth_labels
+from EasyjetHub.output.ttree.truth_jets import get_TopHiggs_jet_truth_labels
 from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 
@@ -128,3 +128,17 @@ def get_large_R_gn2_branches():
         "GN2Xv01_pqcd",
     ]
     return gn2_branches
+
+
+def get_large_R_jet_truth_labels(flags):
+    parent_bosons = ["Higgs", "Scalar", "Top"]
+
+    truth_labels = []
+    if not flags.Input.isPHYSLITE:
+        truth_labels += [
+            f"parent{p}NMatchedChildren" for p in parent_bosons
+        ]
+
+    truth_labels += get_TopHiggs_jet_truth_labels(flags)
+
+    return truth_labels

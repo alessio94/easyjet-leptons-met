@@ -1,5 +1,5 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
-from EasyjetHub.output.ttree.truth_jets import get_small_R_jet_truth_labels
+from EasyjetHub.output.ttree.truth_jets import get_TopHiggs_jet_truth_labels
 from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 
@@ -27,6 +27,9 @@ def get_small_R_jet_branches(
 
     if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
         small_R_jet_branches.variables += ["NNJvtPass"]
+        if flags.Input.isMC:
+            # truth label used by Jet/Etmiss - always add it when running on MC
+            small_R_jet_branches.variables += ["PartonTruthLabelID"]
 
         if tree_flags.collection_options.small_R_jets.btag_info:
             btag_wps = [flags.Analysis.small_R_jet.btag_wp]
@@ -35,9 +38,15 @@ def get_small_R_jet_branches(
 
             small_R_jet_branches.variables += [
                 f"ftag_select_{btag_wp}"
-                for btag_wp in btag_wps
+                for btag_wp in btag_wps if "Continuous" not in btag_wp
+            ]
+            small_R_jet_branches.variables += [
+                f"ftag_quantile_{btag_wp}"
+                for btag_wp in btag_wps if "Continuous" in btag_wp
             ]
             if flags.Input.isMC:
+                # always add btag truth label if btag is used, when running on MC
+                small_R_jet_branches.variables += ["HadronConeExclTruthLabelID"]
                 for btag_wp in btag_wps:
                     # No GN2v01 SF in CDI for now
                     if "GN2v01" in btag_wp:
@@ -70,9 +79,9 @@ def get_small_R_jet_branches(
 
     if (
         flags.Input.isMC
-        and tree_flags.collection_options.small_R_jets.higgs_parent_info
+        and (tree_flags.collection_options.small_R_jets.higgs_parent_info)
     ):
-        small_R_jet_branches.variables += get_small_R_jet_truth_labels(flags)
+        small_R_jet_branches.variables += get_TopHiggs_jet_truth_labels(flags)
 
     return small_R_jet_branches.get_output_list()
 

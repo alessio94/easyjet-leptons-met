@@ -1,37 +1,13 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager
 
 
-def get_common_jet_truth_labels(flags):
+def get_TopHiggs_jet_truth_labels(flags):
     truth_labels = []
     if not flags.Input.isPHYSLITE:
         truth_labels += [
             *[f"nTopTo{p}Children" for p in "BW"],
             *[f"parent{p}ParentsMask" for p in ["Higgs", "Scalar", "Top"]],
         ]
-
-    return truth_labels
-
-
-def get_small_R_jet_truth_labels(flags):
-    # Add the standard b-tagging truth labels
-    truth_labels = [
-        "HadronConeExclTruthLabelID",
-    ]
-    truth_labels += get_common_jet_truth_labels(flags)
-
-    return truth_labels
-
-
-def get_large_R_jet_truth_labels(flags):
-    parent_bosons = ["Higgs", "Scalar", "Top"]
-
-    truth_labels = []
-    if not flags.Input.isPHYSLITE:
-        truth_labels += [
-            f"parent{p}NMatchedChildren" for p in parent_bosons
-        ]
-
-    truth_labels += get_common_jet_truth_labels(flags)
 
     return truth_labels
 
