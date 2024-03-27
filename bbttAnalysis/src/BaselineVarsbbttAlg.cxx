@@ -143,6 +143,8 @@ namespace HHBBTT
         m_Ibranches.at(var).set(*event, -99, sys);
       }
 
+      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
+
       // selected leptons ;
       const xAOD::Electron* ele0 = nullptr;
       const xAOD::Electron* ele1 = nullptr;
@@ -278,6 +280,7 @@ namespace HHBBTT
             new_var.erase(new_var.length() - 11, new_var.length()); // remove '_Continuous' from var name
             m_Ibranches.at(prefix+"_pcbt_"+new_var).set(*event, m_PCBTs.at(var).get(*bjets->at(i), sys), sys);
           }
+          m_Ibranches.at(prefix+"_nmuons").set(*event, cacc_NMu(*bjets->at(i)), sys);
         }
 
         TLorentzVector b1 = bjets->at(0)->p4();
