@@ -75,6 +75,7 @@ CutList :
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: true
+doTauAntiTauJetOR: true
 
 store_high_level_variables: true
 

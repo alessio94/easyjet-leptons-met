@@ -125,6 +125,8 @@ systematics_regex: []
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
+# Enable specific TauAntiTauJet overlap removal, mostly for bbtt analysis
+doTauAntiTauJetOR: false
 # Enable overlap removal between large-R jets and all objects
 do_large_R_jets_OR: true
 # Enable overlap removal between small-R jets and large-R jets

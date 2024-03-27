@@ -35,7 +35,7 @@ def overlap_sequence(flags):
         photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
         muons=f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}',
         # Baseline always needed for TauAntiTauJet OR
-        taus='Baseline' if flags.Analysis.do_bbtt_analysis else flags.Analysis.Tau.ID,
+        taus='Baseline' if flags.Analysis.doTauAntiTauJetOR else flags.Analysis.Tau.ID,
     )
     # Construct the names of the view containers with working point selection
     # We need to use the '.' style so that the algs operate on the full
@@ -86,7 +86,7 @@ def overlap_sequence(flags):
     # Should be equivalent to regular tau-jet OR for taus + b-jets
     # Differences expected for light-jets
     # => light jets should not be used for HH orthogonality
-    if flags.Analysis.do_bbtt_analysis:
+    if flags.Analysis.doTauAntiTauJetOR:
         configSeq.setOptionValue('.antiTauIDTauLabel', 'isIDTau')
         configSeq.setOptionValue('.antiTauBJetLabel',
                                  "ftag_select_" + flags.Analysis.small_R_jet.btag_wp)
