@@ -144,6 +144,8 @@ namespace HHBBTT
       }
 
       static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
+      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
+      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
 
       // selected leptons ;
       const xAOD::Electron* ele0 = nullptr;
@@ -281,6 +283,8 @@ namespace HHBBTT
             m_Ibranches.at(prefix+"_pcbt_"+new_var).set(*event, m_PCBTs.at(var).get(*bjets->at(i), sys), sys);
           }
           m_Ibranches.at(prefix+"_nmuons").set(*event, cacc_NMu(*bjets->at(i)), sys);
+	  m_Fbranches.at(prefix+"_uncorrPt").set(*event, cacc_UncorrPt(*bjets->at(i)), sys);
+	  m_Fbranches.at(prefix+"_muonCorrPt").set(*event, cacc_MuonCorrPt(*bjets->at(i)), sys);
         }
 
         TLorentzVector b1 = bjets->at(0)->p4();

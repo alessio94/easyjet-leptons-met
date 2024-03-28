@@ -27,6 +27,7 @@ small_R_jet:
   btag_extra_wps:
     - GN2v01_Continuous
     - DL1dv01_Continuous
+  variables_bjets: ["uncorrPt", "muonCorrPt"]
   variables_int_bjets: ["truthLabel", "pcbt_GN2v01", "pcbt_DL1dv01", "nmuons"]
   amount_bjet: 2
 
