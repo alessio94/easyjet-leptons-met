@@ -85,6 +85,7 @@ def bbtt_cfg(
                 else "bbtt_pass_sr_%SYS%"),
             channel=flags.Analysis.channel,
             isMC=flags.Input.isMC,
+            useTriggerSelections=flags.Analysis.do_trigger_offline_filtering,
             Years=flags.Analysis.Years,
             bypass=flags.Analysis.bypass,
             saveCutFlow=flags.Analysis.save_bbtt_cutflow,

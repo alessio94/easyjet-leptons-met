@@ -103,6 +103,8 @@ trigger_chains:
 
 # apply trigger lists to filter events
 do_trigger_filtering: false
+# use trigger selections in offline algorithms
+do_trigger_offline_filtering: true
 # list of directories to search for files
 grl_years:
   include: grl_years.yaml

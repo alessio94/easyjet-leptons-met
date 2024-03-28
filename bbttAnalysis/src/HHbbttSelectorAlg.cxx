@@ -421,11 +421,22 @@ namespace HHBBTT
       const xAOD::Jet* jet0 = jets->size()>0 ? jets->at(0) : nullptr;
       const xAOD::Jet* jet1 = jets->size()>1 ? jets->at(1) : nullptr;
 
-      applyTriggerSelection(event, trigPass_decos,
-                            ele0, ele_trigMatchDecos,
-                            mu0, mu_trigMatchDecos,
-                            tau0, tau1, tau_trigMatchDecos,
-                            jet0, jet1);
+      if(m_useTriggerSel){
+	applyTriggerSelection(event, trigPass_decos,
+			      ele0, ele_trigMatchDecos,
+			      mu0, mu_trigMatchDecos,
+			      tau0, tau1, tau_trigMatchDecos,
+			      jet0, jet1);
+      }
+      else{
+	m_bools.at(HHBBTT::pass_trigger_SLT) = true;
+	m_bools.at(HHBBTT::pass_trigger_LTT) = true;
+	m_bools.at(HHBBTT::pass_trigger_STT) = true;
+	m_bools.at(HHBBTT::pass_trigger_DTT) = true;
+	m_bools.at(HHBBTT::pass_trigger_DTT_2016) = true;
+	m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = true;
+	m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = true;
+      }
 
       //************
       // jet

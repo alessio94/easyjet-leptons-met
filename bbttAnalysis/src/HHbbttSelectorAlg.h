@@ -117,6 +117,8 @@ private:
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
+    Gaudi::Property<bool> m_useTriggerSel
+      { this, "useTriggerSelections", true, "Apply trigger-related selections" };
 
     Gaudi::Property<std::vector<int>> m_years
       { this, "Years", false, "which years are running" };
