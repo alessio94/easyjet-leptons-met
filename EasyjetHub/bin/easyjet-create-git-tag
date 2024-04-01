@@ -27,6 +27,11 @@ USER_GRID_NAME=${RUCIO_ACCOUNT-${USER}}
 
 cd ${REPO_BASE}
 
+if [[ ! -v easyjet_DIR ]]; then
+    echo "CMake project is not easyjet. Skipping tag creation."
+    exit 0
+fi
+
 # Check if the repository is dirty
 if ! git diff --quiet; then
     echo "There are uncommitted changes. Please commit your changes before proceeding."
