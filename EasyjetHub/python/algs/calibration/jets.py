@@ -88,10 +88,6 @@ def jet_sequence(
             configSeq.setOptionValue('.btagWP', btag_wp)
             configSeq.setOptionValue('.kinematicSelection', True)
 
-            # Keep using the Easyjet version for now, while the Athena
-            # config for globalSF is being adjusted
-            configSeq.setOptionValue('.globalSF', False)
-
             if 'btagCDI' in jet_flags:
                 configSeq.setOptionValue(
                     '.bTagCalibFile',
@@ -143,6 +139,7 @@ def jet_sequence(
     configSeq.setOptionValue('.outputName', output_name)
 
     # Event-level FTAG scale factor
+    # Can be moved to Athena config in 25.2.5
     if jet_type != "reco4EMTopoJet":
 
         for tagger_wp in btag_wps:

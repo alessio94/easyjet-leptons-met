@@ -23,8 +23,8 @@ def pileup_sequence(flags):
     """
 
     configSeq += makeConfig('PileupReweighting')
-    configSeq.setOptionValue('.campaign', flags.Input.MCCampaign, noneAction='ignore')
-    configSeq.setOptionValue('.files', flags.Input.Files, noneAction='ignore')
+    configSeq.setOptionValue('.campaign', flags.Input.MCCampaign)
+    configSeq.setOptionValue('.files', flags.Input.Files)
     if 'prw_files' in flags.Analysis:
         configSeq.setOptionValue('.userPileupConfigs', get_prw_files(flags))
     else:

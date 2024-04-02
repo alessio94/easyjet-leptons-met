@@ -22,7 +22,7 @@ def event_counter_cfg(step, filename=METADATA_FILE, alg_name=None):
 # with CP alg preselection configuration
 class EventCounterConfig(ConfigBlock):
     def __init__(self, step):
-        super().__init__('EventCounter')
+        super(EventCounterConfig, self).__init__()
         self.step = step
         self.addOption('alg_name', '', type=str)
         self.addOption('output', METADATA_FILE, type=None)

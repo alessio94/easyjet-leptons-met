@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
 # AnaAlgorithm import(s):
 from AnalysisAlgorithmsConfig.ConfigBlock import ConfigBlock
@@ -9,7 +9,7 @@ class FTagEventSFConfig(ConfigBlock):
     """the ConfigBlock for the event-level FTAG scale factor"""
 
     def __init__(self, containerName, selectionName):
-        super(FTagEventSFConfig, self).__init__(containerName + '.' + selectionName)
+        super(FTagEventSFConfig, self).__init__()
         self.containerName = containerName
         self.postfix = selectionName
         self.addOption('btagWP', "FixedCutBEff_77", type=str)
