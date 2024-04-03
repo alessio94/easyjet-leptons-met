@@ -99,7 +99,8 @@ private:
     /// \brief Steerable properties
     Gaudi::Property<std::string> m_method_str { this, "Method", "MLNU3P", 
 						 "MMC method to use"};
-    Gaudi::Property<std::string> m_calib_set { this, "CalibSet", "2019", 
+    // Keep 2016MC15C as default, as 2019 has higher rate of non-converging fir for bbtt
+    Gaudi::Property<std::string> m_calib_set { this, "CalibSet", "2016MC15C", 
 						 "MMC calibration to use"};
     Gaudi::Property<bool> m_float_stop { this, "FloatStoppingCrit", false, 
 					   "Activate MMC floating stopping criterion"};
