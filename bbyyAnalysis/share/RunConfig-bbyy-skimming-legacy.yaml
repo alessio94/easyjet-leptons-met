@@ -9,6 +9,7 @@ selection_name: "legacy"
 CutList :
       - PASS_TRIGGER
       - TWO_TIGHTID_ISO_PHOTONS
+      - PASS_TRIGGER_MATCHING
       - PASS_RELPT
       - DIPHOTON_MASS
       - EXACTLY_ZERO_LEPTONS

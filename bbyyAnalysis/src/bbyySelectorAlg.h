@@ -22,6 +22,7 @@
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
+#include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
 
 #include <SystematicsHandles/SysFilterReporterParams.h>
@@ -36,6 +37,8 @@ namespace HHBBYY
         is16,
         pass_trigger_single_photon,
         pass_trigger_diphoton,
+        pass_matching_trigger_single_photon,
+        pass_matching_trigger_diphoton,
     };
 
   /// \brief An algorithm for counting containers
@@ -54,6 +57,7 @@ namespace HHBBYY
 
       const std::vector<std::string> m_STANDARD_CUTS{
           "PASS_TRIGGER",
+          "PASS_TRIGGER_MATCHING",
           "TWO_TIGHTID_ISO_PHOTONS",
           "PASS_RELPT",
           "DIPHOTON_MASS",
@@ -68,6 +72,8 @@ namespace HHBBYY
 
       void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
                           const std::vector<std::string> &photonTriggers, CutManager& bbyyCuts);
+      void evaluateTriggerMatchingCuts(const std::vector<std::string> &photonTriggers, 
+                                        const xAOD::PhotonContainer* photons, CutManager& bbyyCuts);
       void evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& bbyyCuts);
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& bbyyCuts);
@@ -129,6 +135,8 @@ namespace HHBBYY
           {HHBBYY::is16, "is16"},
           {HHBBYY::pass_trigger_single_photon, "pass_trigger_single_photon"},
           {HHBBYY::pass_trigger_diphoton, "pass_trigger_diphoton"},
+          {HHBBYY::pass_matching_trigger_single_photon, "pass_matching_trigger_single_photon"},
+          {HHBBYY::pass_matching_trigger_diphoton, "pass_matching_trigger_diphoton"},
       };
 
       // map to check if single or diphoton trigger
@@ -136,10 +144,13 @@ namespace HHBBYY
         {"HLT_g120_loose", "single_photon"},
         {"HLT_g140_loose", "single_photon"},
         {"HLT_g35_loose_g25_loose", "diphoton"},
-        {"HLT_g35_medium_g25_medium_L12EM20VH", "diphoton"}
+        {"HLT_g35_medium_g25_medium_L12EM20VH", "diphoton"},
+        {"HLT_g35_medium_g25_medium_L12eEM24L", "diphoton"}
     };
 
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+      ToolHandle<Trig::IMatchingTool> m_matchingTool{this, "trigMatchingTool", "",
+	    "Trigger matching tool"};
       CP::SysReadDecorHandle<unsigned int> m_runNumber 
         {this, "runNumber", "runNumber", "Runnumber"};
       CP::SysReadDecorHandle<unsigned int> m_rdmRunNumber 

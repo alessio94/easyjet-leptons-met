@@ -1,5 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
+
 
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
@@ -94,6 +96,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_bbyy_cutflow,
             photonTriggers=flags.Analysis.TriggerChains,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             eventDecisionOutputDecoration=f"bbyy_pass_{selection_name}_%SYS%",
             isMC=flags.Input.isMC,
             bypass=flags.Analysis.bypass,
@@ -280,7 +283,7 @@ def bbyy_branches(flags):
     if (flags.Analysis.save_bbyy_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
-            if cut == "PASS_TRIGGER":
+            if cut == "PASS_TRIGGER" or cut == "PASS_TRIGGER_MATCHING":
                 extra = "SINGLE_OR_DIPHOTON"
                 branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_{extra}_%SYS%"]
             else:
@@ -290,7 +293,9 @@ def bbyy_branches(flags):
 
     photon_triggers = [
         "pass_trigger_single_photon",
-        "pass_trigger_diphoton"]
+        "pass_trigger_diphoton",
+        "pass_matching_trigger_single_photon",
+        "pass_matching_trigger_diphoton"]
 
     for trigger in photon_triggers:
         branches += [f"EventInfo.{trigger}_%SYS% -> {trigger}_%SYS%"]

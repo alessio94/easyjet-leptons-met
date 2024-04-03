@@ -32,6 +32,7 @@ atlas_add_component(bbyyAnalysis
   EasyjetHubLib
   PathResolver
   EventBookkeeperToolsLib
+  TriggerMatchingToolLib
 )
 
 # Install python modules, joboptions, and share content

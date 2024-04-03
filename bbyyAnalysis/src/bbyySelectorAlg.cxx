@@ -148,9 +148,13 @@ namespace HHBBYY
     
       if (!m_photonTriggers.empty()) {
         evaluateTriggerCuts(*event, m_photonTriggers, m_bbyyCuts);
+        evaluateTriggerMatchingCuts(m_photonTriggers, photons, m_bbyyCuts);
       }
       m_Bbranches.at("pass_trigger_single_photon").set(*event, m_bools.at(HHBBYY::pass_trigger_single_photon), sys);
       m_Bbranches.at("pass_trigger_diphoton").set(*event, m_bools.at(HHBBYY::pass_trigger_diphoton), sys);
+
+      m_Bbranches.at("pass_matching_trigger_single_photon").set(*event, m_bools.at(HHBBYY::pass_matching_trigger_single_photon), sys);
+      m_Bbranches.at("pass_matching_trigger_diphoton").set(*event, m_bools.at(HHBBYY::pass_matching_trigger_diphoton), sys);
 
       evaluatePhotonCuts(*photons, m_bbyyCuts);
       evaluateLeptonCuts(*electrons, *muons, m_bbyyCuts);
@@ -160,7 +164,9 @@ namespace HHBBYY
       for (CutEntry& cut : m_bbyyCuts) {
         passedall = passedall && cut.passed;
         if (not m_enableSinglePhotonTrigger and cut.name == "PASS_TRIGGER")
-            passedall = passedall && m_bools.at(HHBBYY::pass_trigger_diphoton);
+          passedall = passedall && m_bools.at(HHBBYY::pass_trigger_diphoton);
+        else if (not m_enableSinglePhotonTrigger and cut.name == "PASS_TRIGGER_MATCHING")
+          passedall = passedall && m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
       m_passallcuts.set(*event, passedall, sys);
@@ -178,7 +184,9 @@ namespace HHBBYY
           if (m_bbyyCuts(cut).passed) {
             bool pass = true;
             if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER") 
-                pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
+              pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
+            else if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER_MATCHING")
+              pass = m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
             m_bbyyCuts(cut).counter += pass;
             if(m_isMC) m_bbyyCuts(cut).w_counter += m_generatorWeight.get(*event, sys) * pass;
           }
@@ -192,6 +200,8 @@ namespace HHBBYY
         {
           if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER")
             consecutive_cuts += m_bools.at(HHBBYY::pass_trigger_diphoton);
+          else if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER_MATCHING")
+            consecutive_cuts += m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
           else
             consecutive_cuts++;
         }
@@ -205,7 +215,9 @@ namespace HHBBYY
         std::string cut = m_inputCutList.at(i);
         bool pass = true;
         if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER")
-            pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
+          pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
+        else if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER_MATCHING")
+          pass = m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
         m_bbyyCuts[i].relativeCounter += pass;
         if(m_isMC) m_bbyyCuts(cut).w_relativeCounter += m_generatorWeight.get(*event, sys) * pass;
       }
@@ -286,6 +298,44 @@ namespace HHBBYY
     bbyyCuts("PASS_TRIGGER").passed = pass_trigger_diphoton || pass_trigger_single_photon;
     m_bools.at(HHBBYY::pass_trigger_diphoton) = pass_trigger_diphoton;
     m_bools.at(HHBBYY::pass_trigger_single_photon) = pass_trigger_single_photon;
+  }
+
+
+  void bbyySelectorAlg::evaluateTriggerMatchingCuts(const std::vector<std::string> &photonTriggers, 
+                                                  const xAOD::PhotonContainer* photons, CutManager& bbyyCuts) {
+
+    if (!bbyyCuts.exists("PASS_TRIGGER_MATCHING"))
+        return;
+
+    bool pass_matching_trigger_single_photon = false;
+    bool pass_matching_trigger_diphoton = false;
+    if (photons->size() >= 2){
+
+      for (const std::string &trigger : photonTriggers)
+      {
+      
+
+        if (m_triggerMap.at(trigger) == "single_photon")
+        {
+          if (!m_bools.at(HHBBYY::is15) && trigger == "HLT_g120_loose") {
+            continue;
+          }
+          else
+            pass_matching_trigger_single_photon = m_matchingTool->match(*photons->at(0), trigger) || m_matchingTool->match(*photons->at(1), trigger);
+        }
+        else
+        {
+          pass_matching_trigger_diphoton = m_matchingTool->match({photons->at(0), photons->at(1)}, trigger);
+        }
+     
+      }
+    
+    }
+    //OR between single and di-photon trigger for matching studies
+    bbyyCuts("PASS_TRIGGER_MATCHING").passed = pass_matching_trigger_single_photon || pass_matching_trigger_diphoton;
+    m_bools.at(HHBBYY::pass_matching_trigger_single_photon) = pass_matching_trigger_single_photon;
+    m_bools.at(HHBBYY::pass_matching_trigger_diphoton) = pass_matching_trigger_diphoton;
+
   }
 
   void bbyySelectorAlg::evaluatePhotonCuts
