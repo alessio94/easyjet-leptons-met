@@ -2,7 +2,7 @@ include: EasyjetHub/base-config.yaml
 
 # Which analysis and channels to consider
 do_bbtt_analysis: true
-do_anti_ID_regions: true
+do_antiID_regions: true
 enable_MMC_cut: false
 channel: ["hadhad","hadhad1b","lephad","lephad1b","ZCR","TopEMuCR"]
 
