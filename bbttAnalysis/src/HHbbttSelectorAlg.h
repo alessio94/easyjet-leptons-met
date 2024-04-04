@@ -119,6 +119,9 @@ private:
       { this, "isMC", false, "Is this simulation?" };
     Gaudi::Property<bool> m_useTriggerSel
       { this, "useTriggerSelections", true, "Apply trigger-related selections" };
+    Gaudi::Property<bool> m_doAntiIDRegions
+      { this, "doAntiIDRegions", false, "Select anti-ID taus for fake estimates" };
+
 
     Gaudi::Property<std::vector<int>> m_years
       { this, "Years", false, "which years are running" };
@@ -126,7 +129,7 @@ private:
     
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
-    
+
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
@@ -151,6 +154,10 @@ private:
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
     CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
+    Gaudi::Property<std::string> m_antiTauDecorName
+      { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
+
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};

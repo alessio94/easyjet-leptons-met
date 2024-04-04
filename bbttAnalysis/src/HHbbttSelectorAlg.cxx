@@ -59,7 +59,10 @@ namespace HHBBTT
     m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
 
+    m_antiTauDecorKey = m_tauHandle.getNamePattern() + "." + m_antiTauDecorName;
+
     ATH_CHECK(m_tauWPDecorHandle.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK(m_antiTauDecorKey.initialize(m_doAntiIDRegions));
     ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
 
@@ -385,6 +388,10 @@ namespace HHBBTT
       for (const xAOD::TauJet *tau : *taus)
       {
         bool passTauWP = m_tauWPDecorHandle.get(*tau, sys);
+        if (m_doAntiIDRegions) {
+	  SG::ReadDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
+          passTauWP |= antiTauDecorHandle(*tau);
+        }
         m_selected_tau.set(*tau, false, sys);
         if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)
         {
