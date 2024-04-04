@@ -584,8 +584,7 @@ namespace HHBBTT
 
       // Z+HF and top (e+mu) control regions
       if (m_bools.at(HHBBTT::pass_trigger_SLT) && m_bools.at(HHBBTT::TWO_BJETS)){
-        if(jets->at(0)->pt() > 45. * Athena::Units::GeV && n_leptons == 2 &&
-            !(mbb > 40. * Athena::Units::GeV && mbb < 210. * Athena::Units::GeV)) {
+        if(jets->at(0)->pt() > 45. * Athena::Units::GeV && n_leptons == 2) {
           float mll = -999.;
           float lep1_pt = -999.;
           if (ele1) {
