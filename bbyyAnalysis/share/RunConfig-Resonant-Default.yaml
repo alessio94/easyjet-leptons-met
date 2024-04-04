@@ -15,3 +15,14 @@ mS_values: [30, 70, 110, 170, 200, 300, 400, 500]
 mX_values: [300, 350, 400, 450, 500, 550, 600, 675, 750, 875, 1000]
 #1 bjet Mass Grid
 mX_1bjet: [190, 210, 230, 250, 400, 500, 750, 1000]
+
+Electron:
+  forceFullSimConfig: true
+
+Photon:
+  forceFullSimConfig: true
+
+bypass: true
+
+small_R_jet:
+  btag_wp: "DL1dv01_FixedCutBEff_77"

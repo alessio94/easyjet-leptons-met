@@ -46,6 +46,11 @@ ntupler_bbyy_data22_lite:
   extends: .ntupler
   script:
     - easyjet-test bbyy-data22-lite
+
+ntupler_SHbbyy_data22_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test SHbbyy-data22-lite
     
 # MC20
 
@@ -63,6 +68,11 @@ ntupler_bbyy_mc20:
   extends: .ntupler
   script:
     - easyjet-test bbyy-mc20
+
+ntupler_SHbbyy_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test SHbbyy-mc20
 
 ntupler_bbyy_mc20_lite:
   extends: .ntupler
@@ -126,6 +136,11 @@ ntupler_fast_awkward_mc20af3:
   script:
     - easyjet-test fast-awkward-mc20af3
 
+ntupler_SHbbyy_mc20af3_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test SHbbyy-mc20af3-lite
+
 # MC23
 
 ntupler_mc23:
@@ -152,6 +167,11 @@ ntupler_bbtt_mc23:
   extends: .ntupler
   script:
     - easyjet-test bbtt-mc23
+
+ntupler_SHbbyy_mc23af3:
+  extends: .ntupler
+  script:
+    - easyjet-test SHbbyy-mc23af3
 
 # Cannot run with GN2v01
 # To be restored with next p-tag
