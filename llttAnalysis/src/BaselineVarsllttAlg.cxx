@@ -395,14 +395,14 @@ namespace HLLTT
 	m_Fbranches.at("Tau1_pt").set(*event, p4LeadTau.Pt(), sys);
 	m_Fbranches.at("Tau1_eta").set(*event, p4LeadTau.Eta(), sys);
 	m_Fbranches.at("Tau1_phi").set(*event, p4LeadTau.Phi(), sys);
-	m_Fbranches.at("Tau1_m").set(*event, p4LeadTau.M(), sys);
+	m_Fbranches.at("Tau1_E").set(*event, p4LeadTau.E(), sys);
 	if(m_isMC)m_Fbranches.at("Tau1_effSF").set(*event, leadTau_sf, sys);
 	m_Ibranches.at("Tau1_pdgid").set(*event, leadTau_pdgId, sys);
 
         m_Fbranches.at("Tau2_pt").set(*event, p4SubleadTau.Pt(), sys);
         m_Fbranches.at("Tau2_eta").set(*event, p4SubleadTau.Eta(), sys);
         m_Fbranches.at("Tau2_phi").set(*event, p4SubleadTau.Phi(), sys);
-        m_Fbranches.at("Tau2_m").set(*event, p4SubleadTau.M(), sys);
+        m_Fbranches.at("Tau2_E").set(*event, p4SubleadTau.E(), sys);
 	if(m_isMC)m_Fbranches.at("Tau2_effSF").set(*event, subleadTau_sf, sys);
         m_Ibranches.at("Tau2_pdgid").set(*event, subleadTau_pdgId, sys);
 

@@ -39,6 +39,11 @@ Muon:
 
 Tau:
   ID: "Loose"
+  amount: 2
+  variables_int: ["pdgid"]
+
+Lepton:
+  amount: 2
 
 # list of triggers per year to consider
 trigger_chains:
