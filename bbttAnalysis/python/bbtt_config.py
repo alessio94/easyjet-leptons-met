@@ -81,8 +81,8 @@ def bbtt_cfg(
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             eventDecisionOutputDecoration=(
-                "bbtt_pass_sr_noMMC_%SYS%" if flags.Analysis.enable_MMC_cut
-                else "bbtt_pass_sr_%SYS%"),
+                "bbtt_pass_presel_noMMC_%SYS%" if flags.Analysis.enable_MMC_cut
+                else "bbtt_pass_presel_%SYS%"),
             channel=flags.Analysis.channel,
             isMC=flags.Input.isMC,
             doAntiIDRegions=flags.Analysis.do_antiID_regions,
@@ -134,7 +134,7 @@ def bbtt_cfg(
                     passDTT_1B="pass_baseline_DTT_%SYS%",
                     channel=flags.Analysis.channel,
                     MMC_min=60 * Units.GeV,
-                    eventDecisionOutputDecoration="bbtt_pass_sr_%SYS%",
+                    eventDecisionOutputDecoration="bbtt_pass_presel_%SYS%",
                     bypass=flags.Analysis.bypass,
                 )
             )
@@ -263,12 +263,12 @@ def bbtt_branches(flags):
 
     branches += object_level_branches
 
-    branches += ["EventInfo.bbtt_pass_sr_%SYS% -> bbtt_pass_SR_%SYS%"]
+    branches += ["EventInfo.bbtt_pass_presel_%SYS% -> bbtt_pass_presel_%SYS%"]
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbttSelectorAlg
     for var in ["_trigger_", "_baseline_", "_"]:
-        for cat in ["SLT", "LTT", "STT", "DTT",
+        for cat in ["SR", "SLT", "LTT", "STT", "DTT",
                     "DTT_2016", "DTT_4J12", "DTT_L1Topo"]:
             branches += [f"EventInfo.pass{var}{cat}_%SYS% -> bbtt_pass{var}{cat}_%SYS%"]
 

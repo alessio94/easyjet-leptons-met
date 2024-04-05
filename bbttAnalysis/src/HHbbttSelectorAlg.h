@@ -46,6 +46,7 @@ namespace HHBBTT
 
   enum Booleans
   {
+    pass_trigger_SR,
     pass_trigger_SLT,
     pass_trigger_LTT,
     pass_trigger_STT,
@@ -76,11 +77,13 @@ namespace HHBBTT
     pass_baseline_DTT_4J12,
     pass_baseline_DTT_L1Topo,
     pass_baseline_DTT,
+    pass_baseline_SR,
     pass_STT,
     pass_DTT_2016,
     pass_DTT_4J12,
     pass_DTT_L1Topo,
     pass_DTT,
+    pass_SR,
     pass_STT_1B,
     pass_DTT_2016_1B,
     pass_DTT_4J12_1B,
@@ -220,6 +223,7 @@ private:
     std::unordered_map < HHBBTT::Booleans, CP::SysWriteDecorHandle<bool> > m_Bbranches;
     std::unordered_map < HHBBTT::Booleans, bool > m_bools;
     std::unordered_map < HHBBTT::Booleans, std::string > m_boolnames{
+    {HHBBTT::pass_trigger_SR, "pass_trigger_SR"},
     {HHBBTT::pass_trigger_SLT, "pass_trigger_SLT"},
     {HHBBTT::pass_trigger_LTT, "pass_trigger_LTT"},
     {HHBBTT::pass_trigger_STT, "pass_trigger_STT"},
@@ -249,11 +253,13 @@ private:
     {HHBBTT::pass_baseline_DTT_4J12, "pass_baseline_DTT_4J12"},
     {HHBBTT::pass_baseline_DTT_L1Topo, "pass_baseline_DTT_L1Topo"},
     {HHBBTT::pass_baseline_DTT, "pass_baseline_DTT"},
+    {HHBBTT::pass_baseline_SR, "pass_baseline_SR"},
     {HHBBTT::pass_STT, "pass_STT"},
     {HHBBTT::pass_DTT_2016, "pass_DTT_2016"},
     {HHBBTT::pass_DTT_4J12, "pass_DTT_4J12"},
     {HHBBTT::pass_DTT_L1Topo, "pass_DTT_L1Topo"},
     {HHBBTT::pass_DTT, "pass_DTT"},
+    {HHBBTT::pass_SR, "pass_SR"},
     {HHBBTT::pass_STT_1B, "pass_STT_1B"},
     {HHBBTT::pass_DTT_2016_1B, "pass_DTT_2016_1B"},
     {HHBBTT::pass_DTT_4J12_1B, "pass_DTT_4J12_1B"},

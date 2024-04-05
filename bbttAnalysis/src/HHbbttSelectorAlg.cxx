@@ -253,6 +253,7 @@ namespace HHBBTT
       // Apply selection
 
       //trigger flags
+      m_bools.at(HHBBTT::pass_trigger_SR) = false;
       m_bools.at(HHBBTT::pass_trigger_SLT) = false;
       m_bools.at(HHBBTT::pass_trigger_LTT) = false;
       m_bools.at(HHBBTT::pass_trigger_STT) = false;
@@ -445,6 +446,12 @@ namespace HHBBTT
 	m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = true;
       }
 
+      m_bools.at(HHBBTT::pass_trigger_SR) =
+	(m_bools.at(HHBBTT::pass_trigger_SLT) ||
+	 m_bools.at(HHBBTT::pass_trigger_LTT) ||
+	 m_bools.at(HHBBTT::pass_trigger_STT) ||
+	 m_bools.at(HHBBTT::pass_trigger_DTT));
+
       //************
       // jet
       //************
@@ -581,6 +588,18 @@ namespace HHBBTT
         (m_bools.at(HHBBTT::pass_DTT_2016_1B) ||
          m_bools.at(HHBBTT::pass_DTT_4J12_1B) ||
          m_bools.at(HHBBTT::pass_DTT_L1Topo_1B));
+
+      m_bools.at(HHBBTT::pass_baseline_SR) =
+	(m_bools.at(HHBBTT::pass_baseline_SLT) ||
+	 m_bools.at(HHBBTT::pass_baseline_LTT) ||
+	 m_bools.at(HHBBTT::pass_baseline_STT) ||
+	 m_bools.at(HHBBTT::pass_baseline_DTT));
+
+      m_bools.at(HHBBTT::pass_SR) =
+	(m_bools.at(HHBBTT::pass_SLT) ||
+	 m_bools.at(HHBBTT::pass_LTT) ||
+	 m_bools.at(HHBBTT::pass_STT) ||
+	 m_bools.at(HHBBTT::pass_DTT));
 
       // Z+HF and top (e+mu) control regions
       if (m_bools.at(HHBBTT::pass_trigger_SLT) && m_bools.at(HHBBTT::TWO_BJETS)){
