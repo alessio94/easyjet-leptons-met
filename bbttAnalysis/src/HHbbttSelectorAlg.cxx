@@ -912,7 +912,8 @@ namespace HHBBTT
       trigPassed_DTT_L1Topo &=
 	(tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
 	 tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
-	 jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet]);
+         tau0->p4().DeltaR(tau1->p4())<2.5 &&
+	 jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
     }
     else trigPassed_DTT_L1Topo = false;
     m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = trigPassed_DTT_L1Topo;
