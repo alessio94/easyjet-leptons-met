@@ -1,0 +1,57 @@
+#######################################################ALL TOP
+410647.PowhegPythia8EvtGen_A14_Wt_DR_inclusive_antitop               	                                            #r13167 DAOD still being produced at prod_v2 time
+410654.PowhegPythia8EvtGen_A14_Wt_DS_inclusive_top              	                                            #r13167 DAOD still being produced at prod_v2 time
+410655.PowhegPythia8EvtGen_A14_Wt_DS_inclusive_antitop              	                                            #r13144 and r13167 DAOD still being produced at prod_v2 time
+700000.Sh_228_ttW              	                                            #r13167 DAOD still being produced at prod_v2 time
+413023.Sherpa_221_ttll_multileg_NLO              	                                            #no mc20 DAOD PHYS available
+413024.Sherpa_221_ttZnnqq_multileg_NLO               	                                            #no mc20 DAOD PHYS available
+
+#######################################################DI-HIGGS
+502991.MGPy8EG_hh_bbtt_vbf_novhh_hh_l1cvv1cv0p5              	                                            #r13144 DAOD still being produces at prod_v2 time
+
+#######################################################SINGLE HIGGS
+IN GENERAL: We Should use 601192-601197. But they are not available in mc20_13TeV
+
+601194.PhPy8EG_NNPDF3_AZNLO_ZH125J_llbb              	                                            #All periods unavailable (iterated with higgs conveners)
+600686.PhPy8EG_NNPDF3_AZNLO_ggZH125_Htautau_Zinc              	                                            #All periods unavailable (iterated with higgs conveners)
+346343.PhPy8EG_A14NNPDF23_NNPDF30ME_ttH125_allhad              	                                            #r13167 DAOD still being produced at prod_v2 time
+346344.PhPy8EG_A14NNPDF23_NNPDF30ME_ttH125_semilep              	                                            #r13145 and r13167 DAOD still being produced at prod_v2 time
+346345.PhPy8EG_A14NNPDF23_NNPDF30ME_ttH125_dilep              	                                            #r13167 DAOD still being produced at prod_v2 time
+345055.PowhegPythia8EvtGen_NNPDF3_AZNLO_ZH125J_MINLO_llbb_VpT              	                                            #r13167 DAOD still being produced at prod_v2 time
+345057.PowhegPythia8EvtGen_NNPDF3_AZNLO_ggZH125_llbb              	                                            #r13167 DAOD still being produced at prod_v2 time
+
+345217.PowhegPy8EG_NNPDF30_AZNLO_ZH125J_Zinc_MINLO_tautau              	                                            #r13167 DAOD still being produced at prod_v2 time
+345053.PowhegPythia8EvtGen_NNPDF3_AZNLO_WmH125J_MINLO_lvbb_VpT              	                                            #r13167 DAOD still being produced at prod_v2 time
+345054.PowhegPythia8EvtGen_NNPDF3_AZNLO_WpH125J_MINLO_lvbb_VpT              	                                            #r13167 DAOD still being produced at prod_v2 time
+345211.PowhegPy8EG_NNPDF30_AZNLO_WmH125J_Winc_MINLO_tautau              	                                            #r13167 DAOD still being produced at prod_v2 time
+345212.PowhegPy8EG_NNPDF30_AZNLO_WpH125J_Winc_MINLO_tautau              	                                            #r13167 DAOD still being produced at prod_v2 time
+345120.PowhegPy8EG_NNLOPS_nnlo_30_ggH125_tautaul13l7              	                                            #r13167 DAOD still being produced at prod_v2 time
+345121.PowhegPy8EG_NNLOPS_nnlo_30_ggH125_tautaulm15hp20              	                                            #r13167 DAOD still being produced at prod_v2 time
+345122.PowhegPy8EG_NNLOPS_nnlo_30_ggH125_tautaulp15hm20              	                                            #r13167 DAOD still being produced at prod_v2 time
+345123.PowhegPy8EG_NNLOPS_nnlo_30_ggH125_tautauh30h20              	                                            #r13167 DAOD still being produced at prod_v2 time
+346190.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_tautaul13l7              	                                            #r13167 DAOD still being produced at prod_v2 time
+346191.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_tautaulm15hp20              	                                            #r13167 DAOD still being produced at prod_v2 time
+346192.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_tautaulp15hm20              	                                            #r13167 DAOD still being produced at prod_v2 time
+346193.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_tautauh30h20.e7259_s3681_r13145_p6026              	                                            #r13167 DAOD still being produced at prod_v2 time
+346190.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_tautaul13l7              	                                            #r13167 DAOD still being produced at prod_v2 time
+346191.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_tautaulm15hp20              	                                            #r13167 DAOD still being produced at prod_v2 time
+346192.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_tautaulp15hm20              	                                            #r13167 DAOD still being produced at prod_v2 time
+346193.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_tautauh30h20              	                                            #r13167 DAOD still being produced at prod_v2 time
+
+#######################################################ZJETS
+700467 - 700472 Not available in mc20. These are the Zee and Zmumu in m10_40_pT5
+
+
+#######################################################DIBOSON SH2214
+701095.Sh_2214_ZqqZvv              	                                            #r13144 and r13145 DAOD still being produced at prod_v2 time
+701085.Sh_2214_ZqqZll              	                                            #r13144 and r13145 DAOD still being produced at prod_v2 time
+701105.Sh_2214_WqqZll              	                                            #r13144 and r13145 DAOD still being produced at prod_v2 time
+701125.Sh_2214_WlvWqq              	                                            #r13144 and r13145 DAOD still being produced at prod_v2 time
+701115.Sh_2214_WlvZqq              	                                            #r13144 and r13145 DAOD still being produced at prod_v2 time
+701110.Sh_2214_WqqZvv              	                                            #DSID 701110 all periods still being produced at prod_v2 time
+
+#######################################################DIBOSON SH221
+363357.Sherpa_221_NNPDF30NNLO_WqqZvv                       #r13167 DAOD still being produced at prod_v2 time
+363359.Sherpa_221_NNPDF30NNLO_WpqqWmlv                   #r13167 DAOD still being produced at prod_v2 time
+363360.Sherpa_221_NNPDF30NNLO_WplvWmqq                   #r13144 and r13166 DAOD still being produced at prod_v2 time
+363489.Sherpa_221_NNPDF30NNLO_WlvZqq                       #r13167 DAOD still being produced at prod_v2 time
