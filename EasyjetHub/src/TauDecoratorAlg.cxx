@@ -28,13 +28,14 @@ namespace Easyjet
     ATH_CHECK (m_tausInKey.initialize());
 
     m_nProngDecorKey = m_tausInKey.key() + "." + m_nProngDecorName;
+    m_decayModeDecorKey = m_tausInKey.key() + "." + m_decayModeDecorName;
     m_truthTypeDecorKey = m_tausInKey.key() + "." + m_truthTypeDecorName;
     m_IDTauDecorKey = m_tausInKey.key() + "." + m_IDTauDecorName;
 
     ATH_CHECK (m_nProngDecorKey.initialize());
+    ATH_CHECK (m_decayModeDecorKey.initialize());
     ATH_CHECK (m_truthTypeDecorKey.initialize(m_isMC));
     ATH_CHECK (m_IDTauDecorKey.initialize());
-
 
     ATH_CHECK (m_muonsInKey.initialize(m_doAntiTauDecor));
     ATH_CHECK (m_elesInKey.initialize(m_doAntiTauDecor));
@@ -90,21 +91,24 @@ namespace Easyjet
     SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_runNumberHandle(m_runNumberKey);
     SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_rdmRunNumberHandle(m_rdmRunNumberKey);
     SG::WriteDecorHandle<xAOD::TauJetContainer, int> nProngDecorHandle(m_nProngDecorKey);
+    SG::WriteDecorHandle<xAOD::TauJetContainer, int> decayModeDecorHandle(m_decayModeDecorKey);
     SG::WriteDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
-
 
     if(m_isMC){
       SG::WriteDecorHandle<xAOD::TauJetContainer, int> truthTypeDecorHandle(m_truthTypeDecorKey);
       for(const xAOD::TauJet* tau : *tausIn) {
-	      truthTypeDecorHandle(*tau) = int(TauAnalysisTools::getTruthParticleType(*tau));
+	truthTypeDecorHandle(*tau) = int(TauAnalysisTools::getTruthParticleType(*tau));
       }
     }
 
     for(const xAOD::TauJet* tau : *tausIn) {
       nProngDecorHandle(*tau) = tau->nTracks();
+      int decayMode = -1;
+      tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
+      decayModeDecorHandle(*tau) = decayMode;
       bool isTauID = tau->isTau(m_tauIDWP);
       idTauDecorHandle(*tau) = isTauID;
-      }
+    }
     
     if(m_doAntiTauDecor){
       // lepton read handles
@@ -152,14 +156,14 @@ namespace Easyjet
       bool passLeptonPtSLTThreshold = false;
       
       for(const xAOD::Muon* muon : *muonsIn) {
-	      if(muonIdDecorHandle(*muon) && muonPreselDecorHandle(*muon) &&
-         muon->pt() > 7 * Athena::Units::GeV) {
+	if(muonIdDecorHandle(*muon) && muonPreselDecorHandle(*muon) &&
+	   muon->pt() > 7 * Athena::Units::GeV) {
           nLeptons++;
           passLeptonPtSLTThreshold |= muon->pt() > ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::mu];
         }
       }
       for(const xAOD::Electron* ele : *elesIn) {
-	      if(eleIdDecorHandle(*ele) && ele->pt() > 7 * Athena::Units::GeV){
+	if(eleIdDecorHandle(*ele) && ele->pt() > 7 * Athena::Units::GeV){
           nLeptons++;
           passLeptonPtSLTThreshold |= ele->pt() > ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::ele];
         }
@@ -173,7 +177,10 @@ namespace Easyjet
       for(const xAOD::TauJet* tau : *tausIn) {
         bool isTauID = tau->isTau(m_tauIDWP);
         float RNNScore = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
-        bool isAntiTau = !isTauID && RNNScore>m_antiTauRNNThreshold;
+        int decayMode = -1;
+        tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
+        bool isAntiTau = !isTauID && RNNScore>m_antiTauRNNThreshold &&
+          decayMode!=xAOD::TauJetParameters::Mode_NotSet;
     
         // for SLT no anti-tau trigger matching is required
         if (LTT) isAntiTau &= isLTTMatched(*tau);

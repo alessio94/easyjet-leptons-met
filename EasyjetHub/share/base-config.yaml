@@ -81,7 +81,7 @@ Tau:
   ID: ""
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
-  variables_int: ["charge", "nProng"]
+  variables_int: ["charge", "nProng", "decayMode"]
   extra_wps: []
 
 Lepton:

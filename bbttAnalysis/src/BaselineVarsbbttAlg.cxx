@@ -231,6 +231,9 @@ namespace HHBBTT
 
 	m_Ibranches.at(prefix+"_charge").set(*event, tau->charge(), sys);
 	m_Ibranches.at(prefix+"_nProng").set(*event, tau->nTracks(), sys);
+	int decayMode=-1;
+	tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
+	m_Ibranches.at(prefix+"_decayMode").set(*event, decayMode, sys);
 	m_Ibranches.at(prefix+"_isTauID").set(*event, idTauDecorHandle(*tau), sys);
 	m_Ibranches.at(prefix+"_isAntiTau").set(*event, antiTauDecorHandle(*tau), sys);
 	int tau_EleRNN_WP = 0;

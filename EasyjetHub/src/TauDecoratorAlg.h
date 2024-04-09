@@ -100,6 +100,11 @@ private:
     };
     SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_nProngDecorKey;
 
+    Gaudi::Property<std::string> m_decayModeDecorName{
+      this, "decayMode", "decayMode", "Decoration for decayMode"
+    };
+    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_decayModeDecorKey;
+
     Gaudi::Property<std::string> m_truthTypeDecorName{
       this, "truthTypeDecorKey", "truthType", "Decoration for truthType"
     };
