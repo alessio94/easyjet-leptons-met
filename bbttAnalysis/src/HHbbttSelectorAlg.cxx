@@ -696,9 +696,9 @@ namespace HHBBTT
       m_bbttCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
       m_bbttCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
       if(m_isMC) {
-        m_bbttCuts.DoWeightedAbsoluteEfficiency(m_total_events, efficiency("WeightedAbsoluteEfficiency"));
-        m_bbttCuts.DoWeightedRelativeEfficiency(m_total_events, efficiency("WeightedRelativeEfficiency"));
-        m_bbttCuts.DoWeightedStandardCutFlow(m_total_events, efficiency("WeightedStandardCutFlow"));
+        m_bbttCuts.DoWeightedAbsoluteEfficiency(m_total_mcEventWeight, efficiency("WeightedAbsoluteEfficiency"));
+        m_bbttCuts.DoWeightedRelativeEfficiency(m_total_mcEventWeight, efficiency("WeightedRelativeEfficiency"));
+        m_bbttCuts.DoWeightedStandardCutFlow(m_total_mcEventWeight, efficiency("WeightedStandardCutFlow"));
       }
       m_bbttCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
     }
