@@ -64,6 +64,11 @@ def main():
         action="store_true",
         help="Don't submit the jobs, just create the tarball",
     )
+    parser.add_argument(
+        "--noTag",
+        action="store_true",
+        help="Skip git tag creation",
+    )
 
     args = parser.parse_args()
 
@@ -73,7 +78,7 @@ def main():
 
     campaign = datetime.datetime.now().strftime(args.campaign)
 
-    if not args.noSubmit:
+    if not args.noSubmit and not args.noTag:
         create_git_tag(campaign)
 
     # Prepare some of the prun options here
