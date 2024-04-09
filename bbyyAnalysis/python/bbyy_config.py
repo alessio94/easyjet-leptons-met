@@ -16,12 +16,14 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
     cfg = ComponentAccumulator()
 
     PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
+    TightPhotonWP = flags.Analysis.Photon.extra_wps[0]
+    TightPhotonWPLabel = f'{TightPhotonWP[0]}_{TightPhotonWP[1]}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.PhotonSelectorAlg(
             "PhotonSelectorAlg",
             containerInKey=PhotonWPLabel + photonkey,
             containerOutKey="bbyyAnalysisPhotons_%SYS%",
-            photon_WP=PhotonWPLabel,
+            photon_WP=TightPhotonWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -66,29 +68,13 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
         )
     )
 
-    cfg.addEventAlgo(
-        CompFactory.HHBBYY.BaselineVarsbbyyAlg(
-            "BaselineVarsbbyyAlg",
-            photons="bbyyAnalysisPhotons_%SYS%",
-            photonWP=PhotonWPLabel,
-            muons="bbyyAnalysisMuons_%SYS%",
-            electrons="bbyyAnalysisElectrons_%SYS%",
-            jets="bbyyAnalysisJets_%SYS%",
-            met="AnalysisMET_%SYS%",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
-            isMC=flags.Input.isMC,
-            floatVariableList=float_variables,
-            intVariableList=int_variables
-        )
-    )
-
     selection_name = flags.Analysis.selection_name
 
     cfg.addEventAlgo(
         CompFactory.HHBBYY.bbyySelectorAlg(
             "bbyySelectorAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
+            photonWP=TightPhotonWPLabel,
             jets="bbyyAnalysisJets_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             muons="bbyyAnalysisMuons_%SYS%",
@@ -101,6 +87,23 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             isMC=flags.Input.isMC,
             bypass=flags.Analysis.bypass,
             enableSinglePhotonTrigger=flags.Analysis.enable_single_photon_trigger,
+        )
+    )
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBYY.BaselineVarsbbyyAlg(
+            "BaselineVarsbbyyAlg",
+            photons="bbyyAnalysisPhotons_%SYS%",
+            photonWP=TightPhotonWPLabel,
+            muons="bbyyAnalysisMuons_%SYS%",
+            electrons="bbyyAnalysisElectrons_%SYS%",
+            jets="bbyyAnalysisJets_%SYS%",
+            met="AnalysisMET_%SYS%",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
+            isMC=flags.Input.isMC,
+            floatVariableList=float_variables,
+            intVariableList=int_variables
         )
     )
 

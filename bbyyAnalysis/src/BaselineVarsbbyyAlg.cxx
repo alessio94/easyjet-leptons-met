@@ -39,6 +39,7 @@ namespace HHBBYY
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
 
+    ATH_CHECK (m_selected_ph.initialize(m_systematicsList, m_photonHandle));
 
     if(m_isMC){
       m_ph_SF = CP::SysReadDecorHandle<float>("ph_effSF_"+m_photonWPName+"_%SYS%", this);
@@ -137,9 +138,20 @@ namespace HHBBYY
         if (WPgiven) if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
       }
 
+      const xAOD::Photon* ph1 = nullptr;
+      const xAOD::Photon* ph2 = nullptr;
+      for(const xAOD::Photon* photon : *photons) {
+        if (m_selected_ph.get(*photon, sys)){
+          if(!ph1) ph1 = photon;
+          else if (!ph2){
+            ph2 = photon;
+            break;
+          }
+        }
+      }
+
       // photon sector
-      if (photons->size() >= 1) {
-        const xAOD::Photon* ph1 = photons->at(0);
+      if (ph1){
         y1 = ph1->p4();
         m_Fbranches.at("Photon1_pt").set(*event, y1.Pt(), sys);
         m_Fbranches.at("Photon1_eta").set(*event, y1.Eta(), sys);
@@ -151,8 +163,7 @@ namespace HHBBYY
         }
       }
 
-      if (photons->size() >= 2) {
-        const xAOD::Photon* ph2 = photons->at(1);
+      if (ph1 && ph2) {
         y2 = ph2->p4();
 
         // Build the H(yy) candidate
@@ -255,7 +266,7 @@ namespace HHBBYY
       }
 
       // Build the HH candidate
-      if (photons->size() >= 2 && bjets->size() >= 2) {
+      if (ph1 && ph2 && bjets->size() >= 2) {
         HH = H_yy + H_bb;
         dRHH = H_yy.DeltaR(H_bb);
 

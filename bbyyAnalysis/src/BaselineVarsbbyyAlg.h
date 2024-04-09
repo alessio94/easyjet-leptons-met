@@ -90,6 +90,10 @@ namespace HHBBYY
     Gaudi::Property<std::vector<std::string>> m_intVariables
       {this, "intVariableList", {}, "Name list of integer variables"};
 
+    CP::SysReadDecorHandle<bool> 
+    m_selected_ph { this, "selected_ph", "selected_ph_%SYS%", "Name of input decorator for selected ph"};
+
+
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 

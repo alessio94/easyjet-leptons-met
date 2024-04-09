@@ -57,6 +57,7 @@ namespace HHBBYY
 
       const std::vector<std::string> m_STANDARD_CUTS{
           "PASS_TRIGGER",
+          "TWO_LOOSE_PHOTONS",
           "PASS_TRIGGER_MATCHING",
           "TWO_TIGHTID_ISO_PHOTONS",
           "PASS_RELPT",
@@ -74,7 +75,7 @@ namespace HHBBYY
                           const std::vector<std::string> &photonTriggers, CutManager& bbyyCuts);
       void evaluateTriggerMatchingCuts(const std::vector<std::string> &photonTriggers, 
                                         const xAOD::PhotonContainer* photons, CutManager& bbyyCuts);
-      void evaluatePhotonCuts(const xAOD::PhotonContainer& photons, CutManager& bbyyCuts);
+      void evaluatePhotonCuts(const std::vector<const xAOD::Photon*>& photons, CutManager& bbyyCuts);
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& bbyyCuts);
       void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
@@ -108,6 +109,12 @@ namespace HHBBYY
 
       CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "",   "Muon container to read" };
+
+      Gaudi::Property<std::string> m_photonWPName
+      { this, "photonWP", "","Photon ID + Iso cuts" };
+      CP::SysReadDecorHandle<char> m_photonWPDecorHandle{"", this};
+
+      CP::SysWriteDecorHandle<bool> m_selected_ph {"selected_ph_%SYS%", this};
 
       std::vector<std::string> m_inputCutList{};
 

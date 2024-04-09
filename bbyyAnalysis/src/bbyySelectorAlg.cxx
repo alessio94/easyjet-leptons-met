@@ -42,6 +42,12 @@ namespace HHBBYY
 
     ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
     
+    m_photonWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_photonWPName+"_%SYS%", this);
+
+    ATH_CHECK(m_photonWPDecorHandle.initialize(m_systematicsList, m_photonHandle));
+
+    ATH_CHECK(m_selected_ph.initialize(m_systematicsList, m_photonHandle));
     //Initialize trigger decorations
     for (const std::string &trig : m_photonTriggers)
     {
@@ -156,7 +162,29 @@ namespace HHBBYY
       m_Bbranches.at("pass_matching_trigger_single_photon").set(*event, m_bools.at(HHBBYY::pass_matching_trigger_single_photon), sys);
       m_Bbranches.at("pass_matching_trigger_diphoton").set(*event, m_bools.at(HHBBYY::pass_matching_trigger_diphoton), sys);
 
-      evaluatePhotonCuts(*photons, m_bbyyCuts);
+      if (m_bbyyCuts.exists("TWO_LOOSE_PHOTONS"))
+      m_bbyyCuts("TWO_LOOSE_PHOTONS").passed = (photons->size() >= 2);
+
+      int n_photons = 0;
+
+      const xAOD::Photon* photon1 = nullptr;
+      const xAOD::Photon* photon2 = nullptr;
+
+      for (const xAOD::Photon* photon : *photons){
+        bool passPhotonWP = m_photonWPDecorHandle.get(*photon, sys);
+        m_selected_ph.set(*photon, false, sys);
+        if (passPhotonWP){
+          m_selected_ph.set(*photon, true, sys);
+          n_photons +=1;
+          if (!photon1) photon1 = photon;
+          else if (!photon2) photon2 = photon;
+        }
+      }
+
+      if (n_photons >=2){
+        std::vector<const xAOD::Photon*> sel_photons = {photon1, photon2};
+        evaluatePhotonCuts(sel_photons, m_bbyyCuts);
+      }
       evaluateLeptonCuts(*electrons, *muons, m_bbyyCuts);
       evaluateJetCuts(*bjets, *jets, m_bbyyCuts);
 
@@ -339,27 +367,25 @@ namespace HHBBYY
   }
 
   void bbyySelectorAlg::evaluatePhotonCuts
-  (const xAOD::PhotonContainer& photons, CutManager& bbyyCuts)
+  (const std::vector<const xAOD::Photon*>& photons, CutManager& bbyyCuts)
   {
-    if (bbyyCuts.exists("TWO_TIGHTID_ISO_PHOTONS"))
-      bbyyCuts("TWO_TIGHTID_ISO_PHOTONS").passed = (photons.size() == 2);
-
     // photon isolation and selection pT/myy
-    if (photons.size() >= 2)
+   
+    if (bbyyCuts.exists("TWO_TIGHTID_ISO_PHOTONS"))
+    bbyyCuts("TWO_TIGHTID_ISO_PHOTONS").passed = (photons.size() >= 2);
+
+    double myy = (photons.at(0)->p4() + photons.at(1)->p4()).M();
+    std::vector<float> ptOverMasses;
+
+    for (const xAOD::Photon* photon : {photons.at(0), photons.at(1)})
     {
-      double myy = (photons.at(0)->p4() + photons.at(1)->p4()).M();
-      std::vector<float> ptOverMasses;
-
-      for (const xAOD::Photon* photon : {photons.at(0), photons.at(1)})
-      {
-        ptOverMasses.push_back(photon->pt() / myy);
-      }
-
-      if (ptOverMasses[0] > 0.35 && ptOverMasses[1] > 0.25 && bbyyCuts.exists("PASS_RELPT"))
-        bbyyCuts("PASS_RELPT").passed = true;
-      if (myy >= 105000. && myy < 160000. && bbyyCuts.exists("DIPHOTON_MASS"))
-        bbyyCuts("DIPHOTON_MASS").passed = true;
+      ptOverMasses.push_back(photon->pt() / myy);
     }
+
+    if (ptOverMasses[0] > 0.35 && ptOverMasses[1] > 0.25 && bbyyCuts.exists("PASS_RELPT"))
+      bbyyCuts("PASS_RELPT").passed = true;
+    if (myy >= 105000. && myy < 160000. && bbyyCuts.exists("DIPHOTON_MASS"))
+      bbyyCuts("DIPHOTON_MASS").passed = true;
   }
 
 

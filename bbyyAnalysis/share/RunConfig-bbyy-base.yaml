@@ -35,10 +35,12 @@ Muon:
 
 # photon ID and isolation requirements
 Photon:
-  ID: "Tight" # Loose, Tight
-  Iso: "FixedCutLoose"
+  ID: "Loose" # Loose, Tight
+  Iso: "NonIso"
   amount: 2
   variables: ["ptOvermyy"]
+  extra_wps: 
+    - ["Tight", "FixedCutLoose"]
 
 # orthogonality studies  
 orthogonality:
