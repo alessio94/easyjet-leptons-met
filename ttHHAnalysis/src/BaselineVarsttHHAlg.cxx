@@ -325,8 +325,19 @@ namespace ttHH
       size_t electronSize = electrons->size();
       int leptonCount = muonSize + electronSize;
 
-      if (leptonCount == 2){
+      if (leptonCount == 1){
+        //-- Filling Lepton branches
+        if (muonSize==1){ // mu
+          const xAOD::Muon* muon0 = muons->at(0);
+          m_Ibranches.at("total_charge").set(*event, muon0->charge(), sys);
+          updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
+        } else { // ele 
+          const xAOD::Electron* electron0 = electrons->at(0);
+          m_Ibranches.at("total_charge").set(*event, electron0->charge(), sys);
+          updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+        }
 
+      } else if (leptonCount == 2){
         //-- total charge
         int totalCharge = 0;
         for (const auto& muon : *muons) 
