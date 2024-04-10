@@ -33,6 +33,7 @@ atlas_add_component(bbyyAnalysis
   PathResolver
   EventBookkeeperToolsLib
   TriggerMatchingToolLib
+  MVAUtils
 )
 
 # Install python modules, joboptions, and share content

@@ -101,6 +101,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
+            BDT_path=flags.Analysis.BDT_path,
             isMC=flags.Input.isMC,
             floatVariableList=float_variables,
             intVariableList=int_variables
@@ -156,7 +157,8 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     int_variable_names = []
 
     # Number of objects
-    int_variable_names += ["nPhotons", "nJets", "nCentralJets", "nBJets", "nLeptons"]
+    int_variable_names += ["nPhotons", "nJets", "nCentralJets", "nBJets", "nLeptons",
+                           "bdtSel_category"]
 
     # Reconstructed Higgses
     float_variable_names += ["myy", "pTyy", "Etayy", "Phiyy", "dRyy"]
@@ -178,7 +180,7 @@ def get_BaselineVarsbbyyAlg_variables(flags):
 
     # di-higgs variables
     float_variable_names += ["mbbyy", "mbbyy_star", "pTbbyy", "Etabbyy",
-                             "Phibbyy", "dRbbyy"]
+                             "Phibbyy", "dRbbyy", "bdtSel_score"]
 
     float_variable_names += ["DeltaPhi_bb_yy_cm_bbyy"]
 

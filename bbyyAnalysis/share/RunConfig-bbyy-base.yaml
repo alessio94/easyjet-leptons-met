@@ -81,6 +81,12 @@ do_event_cleaning: true
 # name that will go in the tree bbyy_pass_<selection_name>_%SYS%
 selection_name: "allcuts"
 
+# bdt models used for categorisation
+# They should appear in this order lowMass / highMass
+BDT_path:
+  - "bbyyAnalysis/bdt_legacy_lowMass.root"
+  - "bbyyAnalysis/bdt_legacy_highMass.root"
+
 # Include the TTree configuration and update details
 ttree_output:
   - AnalysisMiniTree:

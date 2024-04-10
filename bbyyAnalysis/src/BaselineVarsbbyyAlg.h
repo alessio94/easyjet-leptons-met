@@ -22,9 +22,56 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
+#include "MVAUtils/BDT.h"
+#include "xAODEgamma/PhotonFwd.h"
+
 
 namespace HHBBYY
 {
+  enum Var {
+    y1_ptOverMyy = 0,
+    y1_eta,
+    y1y1_deltaPhi,
+    y2_ptOverMyy,
+    y2_eta,
+    y1y2_deltaPhi,
+    met,
+    y1met_deltaPhi,
+    j1_pt,
+    j1_eta,
+    y1j1_deltaPhi,
+    j1_pcbt,
+    j2_pt,
+    j2_eta,
+    y1j2_deltaPhi,
+    j2_pcbt,
+    bb_pt,
+    bb_eta,
+    y1bb_deltaPhi,
+    bb_m,
+    jets_HT,
+    topness,
+    j3_pt,
+    j3_eta,
+    y1j3_deltaPhi,
+    j3_pcbt,
+    j4_pt,
+    j4_eta,
+    y1j4_deltaPhi,
+    j4_pcbt,
+    vbfjj_dEta,
+    vbfjj_m,
+    bbyy_mStar,
+    yy_dR,
+    bb_dR,
+    sphericityT,
+    planarFlow,
+    bbyy_ptOverSumPt,
+    NVars,
+    bdt_sel_score,
+    bdt_sel_category,
+    size_enum,
+  };
 
   /// \brief An algorithm for counting containers
   class BaselineVarsbbyyAlg final : public AthHistogramAlgorithm
@@ -43,6 +90,22 @@ namespace HHBBYY
     float compute_Topness(const xAOD::JetContainer *jets);
     float* compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
     float compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
+
+    std::vector<float> makeXGBoostDMatrixLegacyNonres(const xAOD::Photon *ph1, const xAOD::Photon *ph2, 
+                                                      ConstDataVector<xAOD::JetContainer> &categorisation_jets,
+                                                      const xAOD::MissingETContainer *met, const auto &sys,
+                                                      const std::map<HHBBYY::Var, float> &m_eventFloats);
+
+    void performCategorisationBDT(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+                                  const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, 
+                                  const xAOD::JetContainer *jets,
+                                  const xAOD::MissingETContainer *met,
+                                  const auto &sys, std::map<HHBBYY::Var, float> &m_eventFloats,
+                                  std::map<HHBBYY::Var, int> &m_eventInts);
+
+    void loadBDT(const std::string &filePath, std::unique_ptr<MVAUtils::BDT> &bdt);
+
+    ConstDataVector<xAOD::JetContainer> categorisation_jets(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::JetContainer *jets);
 
     std::vector<double> compute_angular_variables_CM(const TLorentzVector& lz_photon1,const TLorentzVector& lz_photon2,const TLorentzVector& lz_b_jet1,const TLorentzVector& lz_b_jet2);
 
@@ -90,15 +153,20 @@ namespace HHBBYY
     Gaudi::Property<std::vector<std::string>> m_intVariables
       {this, "intVariableList", {}, "Name list of integer variables"};
 
+    Gaudi::Property<std::vector<std::string>> m_bdts_path 
+      {this, "BDT_path", {}, "Path to BDT model"};
+
     CP::SysReadDecorHandle<bool> 
     m_selected_ph { this, "selected_ph", "selected_ph_%SYS%", "Name of input decorator for selected ph"};
 
-
+    
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
-
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
-    
+
+    // Declare the BDTs
+    std::vector<std::unique_ptr<MVAUtils::BDT>> m_bdts;
+
   };
 }
 #endif
