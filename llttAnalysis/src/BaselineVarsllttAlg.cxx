@@ -28,6 +28,7 @@ namespace HLLTT
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    ATH_CHECK (m_mmc_status.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_mmc_types.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_mmc_pt.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_mmc_eta.initialize(m_systematicsList, m_eventHandle));
@@ -192,6 +193,12 @@ namespace HLLTT
       int iamu1(-1);
       int iamu2(-1);
       float apt(0);
+      float drmin(99.);
+      // alternative combination with subleading lepton
+      int iamu1x(-1);
+      int iamu2x(-1);
+      float aptx(0);
+      float drminx(99.);
       // find the leading lepton to decide ee or mumu OS 
       // 1 = mumu - 2 = ee - 3 = emu  Positive is SS, negative is OS
       int dil_type(0);
@@ -201,6 +208,9 @@ namespace HLLTT
       // 2 = OS pair + OS/SS lepton-tau pair
       // 3 = OS pair + OS/SS tau-tau pair
       int isr(-1);
+      // recid=0, default for a->mumu by taking the leading lepton;
+      // recid=1 for doing second pass to select the correct muon pair 
+      int recid(0); 
       int iatau1(-1);
       int iatau2(-1);
       // ditau_type: Index to save event type
@@ -236,7 +246,6 @@ namespace HLLTT
 	  }
 	}
 	// Select OS muon pair with minidr, for higher ma, need to revisit
-        float drmin(99);
 	// Muons are stored as the first elements in the lepton container
         for(int i = 0; i<n_lep; ++i){
 	  if(iamu1 !=i){
@@ -247,8 +256,42 @@ namespace HLLTT
 	    }
 	  }
         }
+	//alternative combination with subleading lepton
+	if(n_lep>2){
+          for(int i = 0; i<n_lep; ++i){
+            if(i!=iamu1&&i!=iamu2&&p4lep[i].Pt()>aptx){
+              iamu1x = i;
+              aptx = p4lep[i].Pt();
+            }
+          }
+          for(int i = 0; i<n_lep; ++i){
+            if(iamu1x !=i){
+              float dr = p4lep[iamu1x].DeltaR(p4lep[i]);
+              if( dr<drminx){
+                iamu2x = i;
+                drminx = dr;
+              }
+            }
+          }
+	  //selecting with smaller dr
+	  if(drmin>1.5||abs(lepid[iamu1])!=13||abs(lepid[iamu2])!=13){
+	    ATH_MSG_DEBUG("Atternative pair of leptons selected event: "<<event->eventNumber()<<" default iamu1="<<iamu1<<" iamu2="<<iamu2<<" drmin="<<drmin
+			    <<" alternative iamu1x="<<iamu1x<<" iamu2x="<<iamu2x<<" drminx="<<drminx<<" nlep="<<n_lep);
+	    if(p4lep[iamu2x].Pt()>aptx){
+	      iamu1 = iamu2x;
+	      iamu2 = iamu1x;
+	    }
+	    else{
+	      iamu1 = iamu1x;
+	      iamu2 = iamu2x;
+	    }
+            drmin = drminx;
+	    recid=1;
+          }
+        }
         if(iamu2>-1){
 	  isr = 0;
+	  ATH_MSG_DEBUG(" Reconstructed isr:"<<isr<<" iamu1:"<<iamu1<<" iamu2:"<<iamu2);
 	  if(abs(lepid[iamu1])==13&&abs(lepid[iamu2])==13)dil_type=1;
 	  else if(abs(lepid[iamu1])==11&&abs(lepid[iamu2])==11)dil_type=2;
 	  else if(abs(lepid[iamu1])!=abs(lepid[iamu2]))dil_type=3;
@@ -280,6 +323,7 @@ namespace HLLTT
 		ditau_type = 1; 
 	      else if(abs(lepid[iatau1])==11&&abs(lepid[iatau2])==11)
 		ditau_type = 2;
+	      ATH_MSG_DEBUG(" Reconstructed isr:"<<isr<<" iatau1:"<<iatau1<<" iatau2:"<<iatau2<<" ditau type:"<<ditau_type);
 	      osatt = lepid[iatau1]*lepid[iatau2]>0?ditau_type:-ditau_type;
 	      TLorentzVector p4atau = p4lep[iatau1]+p4lep[iatau2];
               matt = p4atau.M();
@@ -303,6 +347,7 @@ namespace HLLTT
               isr = 2;
 	      iatau2 = 0;
 	      ditau_type = abs(lepid[iatau1])==13?4:5;
+	      ATH_MSG_DEBUG(" Reconstructed isr:"<<isr<<" iatau1:"<<iatau1<<" iatau2:"<<iatau2<<" ditau type:"<<ditau_type);
               osatt = lepid[iatau1]*lead_tau_id>0?ditau_type:-ditau_type;
 	      TLorentzVector p4atau = p4lep[iatau1]+lead_tau;
               matt = p4atau.M();
@@ -315,11 +360,12 @@ namespace HLLTT
             }
           }
 	  // dilep + ditau had-had
-	  if(n_taus ==2){
+	  if(n_lep==2&&n_taus ==2){
             isr = 3;
 	    iatau1 = 0; 
-	    iatau2 = 1; 
-            osatt = lead_tau_id*sublead_tau_id>0?6:-6;
+	    iatau2 = 1;
+	    ATH_MSG_DEBUG(" Reconstructed isr:"<<isr<<" iatau1:"<<iatau1<<" iatau2:"<<iatau2<<" ditau type:"<<"hadhad");
+            osatt = lead_tau_id*sublead_tau_id>0?6:-6;	    
 	    TLorentzVector p4atau = lead_tau + sublead_tau;
             matt = p4atau.M();
             ptatt = p4atau.Pt();
@@ -333,6 +379,7 @@ namespace HLLTT
       }
       // save stuff here:  
       m_Ibranches.at("isr").set(*event, isr, sys);
+      m_Ibranches.at("recid").set(*event, recid, sys);
       m_Ibranches.at("nlep").set(*event, n_lep, sys);      
       m_Ibranches.at("nmuo").set(*event, n_muo, sys);
       m_Ibranches.at("nele").set(*event, n_ele, sys);
@@ -340,6 +387,7 @@ namespace HLLTT
       m_Ibranches.at("njets").set(*event, n_jets, sys);
       m_Ibranches.at("nbjets").set(*event, n_bjets, sys);
       m_Ibranches.at("diltype").set(*event, dil_type, sys);
+      ATH_MSG_DEBUG(" Saving isr:"<<isr<<" nlep:"<<n_lep<<" nmuo:"<<n_muo<<" nele:"<<n_ele<<" ntaus:"<<n_taus);
       if(isr>0){ 	
 	m_Fbranches.at("Lepton1_pt").set(*event, p4lep[iamu1].Pt(), sys);
         m_Fbranches.at("Lepton1_eta").set(*event, p4lep[iamu1].Eta(), sys);
@@ -433,6 +481,10 @@ namespace HLLTT
 	  ATH_MSG_WARNING("Ditau idexes in MMC do not match with selected: ditau_indexes "
 			  << ditau_index<<", mmc_types "<<mmc_types);
 	}
+	if(mmc_types>0)ATH_MSG_DEBUG(" mmc dump: event "<<event->eventNumber()<<" status "<<m_mmc_status.get(*event, sys)<<" mmc pt "
+			<<m_mmc_pt.get(*event, sys)<<" mmc eta "<<m_mmc_eta.get(*event, sys)<<" mmc phi "<<m_mmc_phi.get(*event, sys)
+			<<" mmc m "<<m_mmc_m.get(*event, sys)<<" mmc maa "<<mmc_maa<<" mmc ptaa "<<mmc_ptaa<<" mmc draa "<<mmc_draa
+			<<" maa "<<maa<<" ptaa "<<ptaa<<" draa "<<draa);
 	m_Fbranches.at("mmc_maa").set(*event, mmc_maa, sys);
 	m_Fbranches.at("mmc_ptaa").set(*event, mmc_ptaa, sys);
 	m_Fbranches.at("mmc_draa").set(*event, mmc_draa, sys);

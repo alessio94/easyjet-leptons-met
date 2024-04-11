@@ -47,9 +47,10 @@ namespace HLLTT
 
       MMC_MASS = false;
 
-      if (m_mmc_m.get(*event, sys) > m_mmc_min)
+      if (m_mmc_m.get(*event, sys) > m_mmc_min){
         MMC_MASS = true;
-
+	ATH_MSG_DEBUG(" MMCSelectorAlg: event "<<event->eventNumber()<<" mmc m "<<m_mmc_m.get(*event, sys)<<" mmc_min "<<m_mmc_min);
+      }
       if (!m_bypass && !MMC_MASS) continue;
 
       // Global event filter true if any syst passes and controls

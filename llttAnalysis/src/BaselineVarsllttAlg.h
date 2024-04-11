@@ -61,6 +61,8 @@ private:
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
     CP::SysReadDecorHandle<int>
+      m_mmc_status { this, "mmc_status", "mmc_status_%SYS%", "MMC status key"};
+    CP::SysReadDecorHandle<int>
       m_mmc_types { this, "mmc_types", "mmc_types_%SYS%", "MMC types key"};
     CP::SysReadDecorHandle<float> 
     m_mmc_pt { this, "mmc_pt", "mmc_pt_%SYS%", "MMC pt key"};

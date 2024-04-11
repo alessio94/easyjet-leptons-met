@@ -152,7 +152,7 @@ def get_BaselineVarsllttAlg_variables(flags):
                 "maa","ptaa","draa","dphimetatt"]:
         float_variable_names.append(var)
 
-    for var in ["isr", "nlep", "osatt", "nmuo", "nele", "ntaus",
+    for var in ["isr", "recid", "nlep", "osatt", "nmuo", "nele", "ntaus",
                 "njets", "nbjets", "diltype"]:
         int_variable_names.append(var)
 
@@ -181,13 +181,12 @@ def lltt_branches(flags):
         # do not append mmc variables to float_variable_names
         # or int_variable_names as they are stored by the
         # mmc algortithm not BaselineVarsllttAlg
-        for var in ["maa", "ptaa", "draa", "pt", "eta", "phi", "m"]:
+        for var in ["status", "pt", "eta", "phi", "m"]:
+            all_baseline_variable_names.append(f"mmc_{var}")
+        for var in ["maa", "ptaa", "draa"]:
             float_variable_names.append(f"mmc_{var}")
-        for var in ["status"]:
-            int_variable_names.append(f"mmc_{var}")
 
-    all_baseline_variable_names += float_variable_names
-    all_baseline_variable_names += int_variable_names
+    all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
@@ -199,6 +198,7 @@ def lltt_branches(flags):
 
     branches += ["EventInfo.lltt_pass_sr_%SYS% -> lltt_pass_SR_%SYS%"]
     branches += ["EventInfo.isr_%SYS% -> lltt_isr_%SYS%"]
+    branches += ["EventInfo.recid_%SYS% -> lltt_recid_%SYS%"]
     branches += ["EventInfo.osatt_%SYS% -> lltt_osatt_%SYS%"]
     branches += ["EventInfo.njets_%SYS% -> lltt_njets_%SYS%"]
     branches += ["EventInfo.nbjets_%SYS% -> lltt_nbjets_%SYS%"]
@@ -211,11 +211,6 @@ def lltt_branches(flags):
     branches += ["EventInfo.maa_%SYS% -> lltt_maa_%SYS%"]
     branches += ["EventInfo.draa_%SYS% -> lltt_draa_%SYS%"]
     branches += ["EventInfo.dphimetatt_%SYS% -> lltt_dphimetatt_%SYS%"]
-
-    if flags.Analysis.do_mmc:
-        branches += ["EventInfo.mmc_maa_%SYS% -> lltt_mmc_maa_%SYS%"]
-        branches += ["EventInfo.mmc_draa_%SYS% -> lltt_mmc_draa_%SYS%"]
-        branches += ["EventInfo.mmc_m_%SYS% -> lltt_mmc_m_%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables

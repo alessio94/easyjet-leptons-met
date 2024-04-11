@@ -119,13 +119,21 @@ namespace HLLTT
 
       int n_lep(0);
       TLorentzVector p4lep[4];
+      int lepid[4];
       int iamu1(-1);
       int iamu2(-1);
       int isr(-1);
       int iatau1(-1);
       int iatau2(-1);
       float apt(0);
+      float drmin(99.);
+      // alternative combination with second leading pt
+      int iamu1x(-1);
+      int iamu2x(-1);
+      float aptx(0);
+      float drminx(99.);
       int types(0); //iatau1+10*iatau2 +100*isr
+      int n_taus(0);
       //
       int nlep(0);
 
@@ -133,6 +141,7 @@ namespace HLLTT
 	if (m_selected_mu.get(*muon, sys)){
 	  if(n_lep<4){
             p4lep[n_lep] = muon->p4();
+	    lepid[n_lep] = muon->charge()>0?-13: 13;
             ++n_lep;
           }
         }
@@ -142,8 +151,15 @@ namespace HLLTT
 	if (m_selected_el.get(*electron, sys)){
 	  if(n_lep<4){
 	    p4lep[n_lep] = electron->p4();
+	    lepid[n_lep] = electron->charge()>0? -11:11;
 	    ++n_lep;
 	  }
+	}
+      }
+
+      for(const xAOD::TauJet* tau : *taus) {
+        if (m_selected_tau.get(*tau, sys)){
+          ++n_taus;
 	}
       }
 
@@ -155,14 +171,43 @@ namespace HLLTT
             apt = p4lep[i].Pt();
           }
         }
-        float drmin(99);
-        for(int i = 1; i<n_lep; ++i){
+        for(int i = 0; i<n_lep; ++i){
           if(iamu1 != i){
             float dr = p4lep[iamu1].DeltaR(p4lep[i]);
             if( dr<drmin){
               iamu2 = i;
               drmin = dr;
             }
+          }
+        }
+	//alternarive with second leading pt                                                                                                                                                          
+        if(n_lep>2){
+	  for(int i = 0; i<n_lep; ++i){
+            if(iamu1!=i&&iamu2!=i&&p4lep[i].Pt()>aptx){
+              iamu1x = i;
+              aptx = p4lep[i].Pt();
+            }
+          }
+          for(int i = 0; i<n_lep; ++i){
+            if(iamu1x != i){
+              float dr = p4lep[iamu1x].DeltaR(p4lep[i]);
+              if( dr<drminx){
+                iamu2x = i;
+                drminx = dr;
+              }
+            }
+          }
+          // selecting with smaller dr
+          if(drmin>1.5||abs(lepid[iamu1])!=13||abs(lepid[iamu2])!=13){
+	    if(p4lep[iamu2x].Pt()>aptx){
+	      iamu1 = iamu2x;
+	      iamu2 = iamu1x;
+	    }
+	    else{
+	      iamu1 = iamu1x;
+	      iamu2 = iamu2x;
+	    }
+            drmin = drminx;
           }
         }
 	if(iamu2>-1){
@@ -184,7 +229,7 @@ namespace HLLTT
               isr = 1;
             }
           }
-	  if(n_lep==3){
+	  if(n_lep==3&&n_taus==1){
             iatau1 = -1;
             for(int j = 0; j<n_lep; ++j){
               if(j !=iamu1 && j !=iamu2){
@@ -196,7 +241,7 @@ namespace HLLTT
 	      iatau2 = 0;
             }
           }
-          if(n_lep ==2){
+          if(n_lep ==2&&n_taus==2){
             isr = 3;
 	    iatau1 = 0;
 	    iatau2 = 1;
@@ -287,14 +332,15 @@ namespace HLLTT
       }
 
       // Decorate ouput
-      types = iatau1+10*iatau2+100*isr; 
+      types = iatau1+10*iatau2+100*isr;
+      ATH_MSG_DEBUG(" MMCDecoratorAlg fits:  event "<<event->eventNumber()<<" mmc m "<< res.M()<<" types "<<types
+		    <<" nlep "<<n_lep<<" ntaus "<<n_taus<<" isr "<<isr<<" iatau1 "<<iatau1<<" iatau2 "<<iatau2);
       m_mmc_status.set(*event, status, sys);
       m_mmc_types.set(*event, types, sys);
       m_mmc_pt.set(*event, res.Pt(), sys);
       m_mmc_eta.set(*event, res.Eta(), sys);
       m_mmc_phi.set(*event, res.Phi(), sys);
       m_mmc_m.set(*event, res.M(), sys);            
-
     }
 
     return StatusCode::SUCCESS;
