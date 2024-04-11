@@ -9,9 +9,7 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(bbllAnalysis
-  src/BaselineVarsbbllAlg.cxx
-  src/MMCDecoratorAlg.cxx
-  src/HHbbllSelectorAlg.cxx
+  src/*.cxx
   src/components/bbllAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -39,7 +37,7 @@ atlas_install_scripts(
 atlas_install_runtime( scripts/*.py POST_BUILD_CMD ${ATLAS_FLAKE8} )
 
 atlas_install_python_modules(
-  python/bbll_config.py
+  python/*.py
 )
 atlas_install_data(
   share/*.yaml

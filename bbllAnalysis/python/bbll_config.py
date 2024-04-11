@@ -53,6 +53,12 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
     # Selection
+    trigger_branches = [
+        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
+        for c in flags.Analysis.TriggerChains
+    ]
+
+    # Selection
     cfg.addEventAlgo(
         CompFactory.HHBBLL.HHbbllSelectorAlg(
             "HHbbllSelectorAlg",
@@ -63,11 +69,12 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="bbll_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
-            categoryList=flags.Analysis.Categories,
             saveCutFlow=flags.Analysis.save_bbll_cutflow,
             passTriggers=flags.Analysis.TriggerChains,
-            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
+            isMC=flags.Input.isMC,
             Years=flags.Analysis.Years,
+            triggerLists=trigger_branches,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
         )
@@ -192,6 +199,12 @@ def bbll_branches(flags):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> bbll_{cut}_%SYS%"]
+
+    # trigger variables do not need to be added to variable_names
+    # as it is written out in HHbbllSelectorAlg
+    for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
+        branches += \
+            [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}_%SYS%"]
 
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
