@@ -86,6 +86,11 @@ private:
       { this, "muonWP", "","Muon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_mu_SF{"", this};
 
+    CP::SysReadDecorHandle<bool> 
+      m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};
+    CP::SysReadDecorHandle<bool> 
+      m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input decorator for selected mu"};
+
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 

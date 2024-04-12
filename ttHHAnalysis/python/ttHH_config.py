@@ -15,27 +15,31 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
 
     cfg = ComponentAccumulator()
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
+    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.MuonSelectorAlg(
             "MuonSelectorAlg",
-            containerInKey=MuonWPLabel + muonkey,
+            containerInKey=LooseMuonWPLabel + muonkey,
             containerOutKey="ttHHAnalysisMuons_%SYS%",
             minPt=10e3,
-            muon_WP=MuonWPLabel,
+            muon_WP=TightMuonWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    TightEleWP = flags.Analysis.Electron.extra_wps[0]
+    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.Easyjet.ElectronSelectorAlg(
             "ElectronSelectorAlg",
-            containerInKey=ElectronWPLabel + electronkey,
+            containerInKey=LooseElectronWPLabel + electronkey,
             containerOutKey="ttHHAnalysisElectrons_%SYS%",
             minPt=10e3,
-            ele_WP=ElectronWPLabel,
+            ele_WP=TightEleWPLabel,
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -91,6 +95,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             jets="ttHHAnalysisJets_%SYS%",
             muons="ttHHAnalysisMuons_%SYS%",
             electrons="ttHHAnalysisElectrons_%SYS%",
+            muonWP=TightMuonWPLabel,
+            eleWP=TightEleWPLabel,
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_ttHH_cutflow,
             eventDecisionOutputDecoration="ttHH_pass_baseline_%SYS%",
@@ -135,8 +141,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             ZZPairs="pairedttZZAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
-            muonWP=MuonWPLabel,
-            eleWP=ElectronWPLabel,
+            muonWP=TightMuonWPLabel,
+            eleWP=TightEleWPLabel,
             isMC=flags.Input.isMC,
             floatVariableList=float_variables,
             intVariableList=int_variables

@@ -38,12 +38,23 @@ namespace ttHH
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+
     for (const std::string &string_var: m_inputCutList) {
       CP::SysWriteDecorHandle<bool> var {string_var+"_%SYS%", this};
       m_Bbranches.emplace(string_var, var);
       ATH_CHECK (m_Bbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
-  
+
+    m_eleWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
+    m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
+
+    ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
+
     // special flag for all cuts
     ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
 
@@ -97,13 +108,24 @@ namespace ttHH
 
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
-     
+
+      // lepton WP
+      for (const xAOD::Electron *electron : *electrons)
+      {
+        bool passElectronWP = m_eleWPDecorHandle.get(*electron, sys);
+        m_selected_el.set(*electron, passElectronWP, sys);
+      }
+      for (const xAOD::Muon *muon : *muons)
+      {
+        bool passMuonWP = m_muonWPDecorHandle.get(*muon, sys);
+        m_selected_mu.set(*muon, passMuonWP, sys);
+      }
+
       // reset all cut flags to default=false
       for (CutEntry& cut : m_ttHHCuts) {
         cut.passed = false;
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
-
 
       if (m_ttHHCuts.exists("PASS_TRIGGER")) {
         if (!m_passTriggerBjet.empty() and m_passTriggerBjet.get(*event, sys)) {

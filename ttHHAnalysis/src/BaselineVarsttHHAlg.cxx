@@ -52,6 +52,9 @@ namespace ttHH
     }
     ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
+    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+
     // Intialise syst-aware output decorators
 
     for (const std::string &var : m_floatVariables) {
@@ -476,6 +479,12 @@ namespace ttHH
     m_Ibranches.at(prefix + "pdgid").set(*event, -1*lep_pdgid*particle->charge(), sys);
     if(m_isMC) m_Fbranches.at(prefix + "effSF").set(*event, lep_sf, sys);
 
+    if (lep_pdgid==13){ 
+      m_Ibranches.at(prefix + "isTight").set(*event, m_selected_mu.get(*particle, sys), sys);
+    } else if (lep_pdgid==11){
+      m_Ibranches.at(prefix + "isTight").set(*event, m_selected_el.get(*particle, sys), sys);
+    }
+
     // Truth
     if (m_isMC) {
       auto [lep_truthOrigin, lep_truthType] = truthOrigin(particle);
@@ -491,7 +500,6 @@ namespace ttHH
       }
     
       m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
-      m_Ibranches.at(prefix + "isTight").set(*event, 1, sys);
     }
   }
 }

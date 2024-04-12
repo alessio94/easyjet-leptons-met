@@ -80,6 +80,17 @@ namespace ttHH
       CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "",   "Muon container to read" };
 
+      Gaudi::Property<std::string> m_eleWPName
+      { this, "eleWP", "","Electron ID + Iso working point" };
+      CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
+		      
+      Gaudi::Property<std::string> m_muonWPName
+      { this, "muonWP", "","Muon ID + Iso cuts" };
+      CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
+
+      CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
+      CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
+
       CP::SysReadDecorHandle<bool> m_passTriggerDilep {this, "passTriggerDilep", "ttHH_pass_trigger_dilep", "events pass any dilepton triggers"};
       CP::SysReadDecorHandle<bool> m_passTriggerSinglep {this, "passTriggerSinglep", "ttHH_pass_trigger_singlep", "events pass any singlep triggers"};
       CP::SysReadDecorHandle<bool> m_passTriggerBjet {this, "passTriggerBjet", "ttHH_pass_trigger_bjet", "events pass any bjets triggers"};
