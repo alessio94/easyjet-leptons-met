@@ -105,6 +105,9 @@ namespace HHBBYY
       }
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
+      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
+      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
+      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
 
       // initialize
       TLorentzVector H_bb(0.,0.,0.,0.);
@@ -261,12 +264,17 @@ namespace HHBBYY
           truthLabel_b1 = HadronConeExclTruthLabelID(*Hbb_Jet1);
           truthLabel_b2 = HadronConeExclTruthLabelID(*Hbb_Jet2);
         }
-
+        m_Ibranches.at("HbbCandidate_Jet1_n_muons").set(*event, cacc_NMu(*Hbb_Jet1), sys);
+        m_Fbranches.at("HbbCandidate_Jet1_uncorrPt").set(*event, cacc_UncorrPt(*Hbb_Jet1), sys);
+        m_Fbranches.at("HbbCandidate_Jet1_muonCorrPt").set(*event, cacc_MuonCorrPt(*Hbb_Jet1), sys);
         m_Fbranches.at("HbbCandidate_Jet1_pt").set(*event, Hbb_candidate1.Pt(), sys);
         m_Fbranches.at("HbbCandidate_Jet1_eta").set(*event, Hbb_candidate1.Eta(), sys);
         m_Fbranches.at("HbbCandidate_Jet1_phi").set(*event, Hbb_candidate1.Phi(), sys);
         m_Fbranches.at("HbbCandidate_Jet1_E").set(*event, Hbb_candidate1.E(), sys);
 
+        m_Ibranches.at("HbbCandidate_Jet2_n_muons").set(*event, cacc_NMu(*Hbb_Jet2), sys);
+        m_Fbranches.at("HbbCandidate_Jet2_uncorrPt").set(*event, cacc_UncorrPt(*Hbb_Jet2), sys);
+        m_Fbranches.at("HbbCandidate_Jet2_muonCorrPt").set(*event, cacc_MuonCorrPt(*Hbb_Jet2), sys);
         m_Fbranches.at("HbbCandidate_Jet2_pt").set(*event, Hbb_candidate2.Pt(), sys);
         m_Fbranches.at("HbbCandidate_Jet2_eta").set(*event, Hbb_candidate2.Eta(), sys);
         m_Fbranches.at("HbbCandidate_Jet2_phi").set(*event, Hbb_candidate2.Phi(), sys);

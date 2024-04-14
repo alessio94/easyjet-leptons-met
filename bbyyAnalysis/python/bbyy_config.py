@@ -170,9 +170,9 @@ def get_BaselineVarsbbyyAlg_variables(flags):
 
     # HbbCandidate jets
     for i in range(1,3):
-        for var in ["pt", "phi", "eta", "E"]:
+        for var in ["pt", "phi", "eta", "E","uncorrPt","muonCorrPt"]:
             float_variable_names += [f"HbbCandidate_Jet{i}_" + var]
-        for var in ["truthLabel", "pcbt"]:
+        for var in ["truthLabel", "pcbt","n_muons"]:
             int_variable_names += [f"HbbCandidate_Jet{i}_" + var]
 
     float_variable_names += ["HbbCandidate_Jet1_cos_theta_cm_bb",
