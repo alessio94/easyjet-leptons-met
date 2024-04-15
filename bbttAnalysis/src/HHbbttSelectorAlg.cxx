@@ -667,7 +667,7 @@ namespace HHBBTT
         // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
         for (unsigned int i=0; i<consecutive_cuts; i++) {
           m_bbttCuts[i].relativeCounter += 1;
-          m_bbttCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
+          if(m_isMC) m_bbttCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
         }
       }
 
