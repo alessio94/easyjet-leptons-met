@@ -40,9 +40,8 @@ namespace Easyjet
       { this, "event", "EventInfo", "EventInfo to read" };
 
       long long int m_total_mcEvent{0};
-      float m_total_mcEventWeight{0.f};
-      float m_total_mcEventWeight_squared{0.f};
-      std::vector<float> m_eventWeights{0.f};
+      double m_total_mcEventWeight{0.0};
+      double m_total_mcEventWeight_squared{0.0};
 
       SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
         this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};

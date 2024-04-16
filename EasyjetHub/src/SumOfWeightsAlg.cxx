@@ -39,11 +39,11 @@ namespace Easyjet
     ATH_CHECK (event.isValid());
 
     SG::ReadDecorHandle<xAOD::EventInfo, std::vector<float>> mcEventWeightsHandle(m_mcEventWeightsKey);
-    m_eventWeights = mcEventWeightsHandle(*event);
+    std::vector<float> eventWeights = mcEventWeightsHandle(*event);
 
     m_total_mcEvent += 1;
-    m_total_mcEventWeight += m_eventWeights.at(0);
-    m_total_mcEventWeight_squared += m_eventWeights.at(0)*m_eventWeights.at(0);
+    m_total_mcEventWeight += eventWeights.at(0);
+    m_total_mcEventWeight_squared += eventWeights.at(0)*eventWeights.at(0);
 
     return StatusCode::SUCCESS;
   }
