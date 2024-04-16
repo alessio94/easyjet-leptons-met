@@ -11,13 +11,31 @@ else
     set -eu
 fi
 
+PUSH_TAG=true
+TAG=""
+
 help() {
     echo "This script is used to create the given tag and push it to the remote repository."
-    echo "Usage: $(basename $0) <tag>"
+    echo "Usage: $(basename $0) <tag> [-p|--push]"
 }
 
-# if no arguments are given, print the help message
-if [ $# -eq 0 ]; then
+while (( "$#" )); do
+  case "$1" in
+    *) # preserve positional arguments
+      if [ -z "$TAG" ]; then
+        TAG="$1"
+      else
+        echo "Error: Multiple tags provided"
+        help
+        exit 1
+      fi
+      shift
+      ;;
+  esac
+done
+
+# if no tag is given, print the help message
+if [ -z "$TAG" ]; then
     help
     exit 1
 fi
@@ -27,11 +45,6 @@ USER_GRID_NAME=${RUCIO_ACCOUNT-${USER}}
 
 cd ${REPO_BASE}
 
-if [[ ! -v easyjet_DIR ]]; then
-    echo "CMake project is not easyjet. Skipping tag creation."
-    exit 0
-fi
-
 # Check if the repository is dirty
 if ! git diff --quiet; then
     echo "There are uncommitted changes. Please commit your changes before proceeding."
@@ -39,20 +52,16 @@ if ! git diff --quiet; then
 fi
 
 if [[ "$(git remote get-url origin)" != *"$USER_GRID_NAME"* ]]; then
-    echo "ERROR: Remote URL for \"origin\" is not a fork, please submit from a fork."
-    exit 1
+    echo "WARNING: Remote URL for \"origin\" is not a fork, we recommend working from a fork. Please see instructions in main README.md."
 fi
 
-# get script argument and store it in a variable
-TAG_ID=$1
-
-# Get the latest tag on HEAD
-LATEST_TAG=$(git tag --points-at)
-
-# check if TAG_ID and LATEST_TAG are different, if they are create it
-if [ "$TAG_ID" != "$LATEST_TAG" ]; then
-    git tag $TAG_ID
+# Check if the tag already exists
+if git rev-parse "$TAG" >/dev/null 2>&1; then
+    echo "Reusing tag: $TAG"
+else
+    git tag $TAG
+    # push the tag to the remote repository if the PUSH_TAG flag is set
+    if "$PUSH_TAG" = true; then
+        git push origin $TAG
+    fi
 fi
-
-# make sure the tag/latest tag is pushed to the remote repository
-git push --quiet origin $TAG_ID

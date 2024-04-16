@@ -1,11 +1,12 @@
 #!/bin/env python
 
+import os
+import re
+import yaml
 import argparse
 import datetime
-import os
 import subprocess
 from shutil import which
-import yaml
 from EasyjetHub.steering.utils.config_files import run_config_arg
 
 
@@ -73,13 +74,25 @@ def main():
     args = parser.parse_args()
 
     # check ntupler command is available before submitting
-    if which(args.exec) is None:
-        raise ValueError(f"Failed to find {args.exec}. Check that it is installed")
+    if not which(args.exec):
+        raise RuntimeError(f"Failed to find `{args.exec}`. Check that it is installed")
 
-    campaign = datetime.datetime.now().strftime(args.campaign)
+    # check prun is available before submitting
+    if not which("prun"):
+        raise RuntimeError("You have not set up panda, run `lsetup panda`")
+    
+    grid_nickname = check_grid_credentials(return_nickname=True)
+
+    now = datetime.datetime.now()
+
+    # will just return the args.campaign if it doesn't contain any strftime fields (%Y, %m, etc.)
+    campaign = now.strftime(args.campaign)
 
     if not args.noSubmit and not args.noTag:
         create_git_tag(campaign)
+        campaign_is_default = args.campaign == parser.get_default("campaign")
+        # Avoid creating same dataset names which will cause failing grid jobs
+        campaign = campaign if campaign_is_default else f"{campaign}.{now.strftime('%Y_%m_%d_T%H%M%S')}"
 
     # Prepare some of the prun options here
     submit_opts = {
@@ -114,12 +127,6 @@ def main():
         submit_opts["athenaTag"] = ",".join([atlas_project, project_version])
     else:
         submit_opts["athenaTag"] = args.asetup
-
-    # check some stuff
-    if not which("prun"):
-        raise RuntimeError("you have not set up panda, run `lsetup panda!`")
-
-    grid_nickname = get_grid_nickname()
 
     # copy the runconfig to the submit dir to be available for the exec cmd
     try:
@@ -207,28 +214,26 @@ def main():
             raise OSError(proc.returncode, err)
 
 
-def get_grid_nickname():
-    try:
-        voms_proxy_info = subprocess.check_output(["voms-proxy-info", "--all"])
-        voms_proxy_info = voms_proxy_info.decode("utf-8")
-        nickname_index = voms_proxy_info.find("nickname")
-        nickname_parts = voms_proxy_info[nickname_index:].split()
-        nickname = nickname_parts[2]
-        return nickname
-    # this is slightly sloppy: we shoudl figure out what exception was
-    # actually thrown before assuming it was a missing init.
-    except Exception:
-        raise OSError(
-            1,
-            "Could not find proxy information."
-            + ' Try typing "voms-proxy-init -voms atlas" and try again',
-        )
-
-
-def create_git_tag(tag_name: str):
-    result = subprocess.run(["easyjet-create-git-tag", tag_name], capture_output=True)
+def check_grid_credentials(return_nickname=False):
+    result = subprocess.run(["voms-proxy-info", "--all"], capture_output=True)
+    result_output = (result.stdout or result.stderr).decode("utf-8").strip()
     if result.returncode != 0:
-        raise ValueError(result.stdout.decode("utf-8").strip())
+        raise RuntimeError(result_output)
+
+    if return_nickname:
+        nickname_re = re.search(r'nickname = (\w+)', result_output)
+        return nickname_re.group(1) if nickname_re else None
+
+
+def create_git_tag(tag_name: str, return_tag_exists: bool = False):
+    result = subprocess.run(["easyjet-create-git-tag", tag_name], capture_output=True)
+    result_message = (result.stderr or result.stdout).decode("utf-8").strip()
+    if result.returncode != 0:
+        raise RuntimeError(result_message)
+    else:
+        print(result_message)
+        if return_tag_exists:
+            return "reusing tag" in result_message.lower()
 
 
 if __name__ == "__main__":
