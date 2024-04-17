@@ -66,7 +66,7 @@ submit_jobs "${folder_name_PHYSLITE}/nominal/mc20_13TeV.ttt.516978.p5855.txt"
 #submit_jobs "${folder_name_PHYSLITE}/variations/mc20_13TeV.ttt.304014.p5855.txt"
 
 # V+jets
-submit_jobs "${folder_name_PHYSLITE}/nominal/mc23_13p6TeV.Vjets.all_nominal.p5855.txt"
+submit_jobs "${folder_name_PHYSLITE}/nominal/mc20_13TeV.Vjets.all_nominal.p5855.txt"
 
 # single top
 submit_jobs "${folder_name_PHYSLITE}/nominal/mc20_13TeV.singleTop.all_nominal.p5855.txt"
