@@ -37,8 +37,6 @@ namespace ttHH
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_HZPairsHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_ZZPairsHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
@@ -104,20 +102,10 @@ namespace ttHH
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
-      const xAOD::JetContainer *HZPairs = nullptr;
-      ANA_CHECK (m_HZPairsHandle.retrieve (HZPairs, sys));
-
-      const xAOD::JetContainer *ZZPairs = nullptr;
-      ANA_CHECK (m_ZZPairsHandle.retrieve (ZZPairs, sys));
-
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
       TLorentzVector H1(0, 0, 0, 0);
       TLorentzVector H2(0, 0, 0, 0);
-      TLorentzVector HZ_H(0, 0, 0, 0);
-      TLorentzVector HZ_Z(0, 0, 0, 0);
-      TLorentzVector ZZ_Z1(0, 0, 0, 0);
-      TLorentzVector ZZ_Z2(0, 0, 0, 0);
       TLorentzVector e1(0.,0.,0.,0.);
       TLorentzVector e2(0.,0.,0.,0.);
       TLorentzVector ee(0.,0.,0.,0.);
@@ -159,19 +147,10 @@ namespace ttHH
         H1 = bjets->at(0)->p4() + bjets->at(1)->p4();
         H2 = bjets->at(2)->p4() + bjets->at(3)->p4();
 
-        // TODO: should it be leading and subleading? 
-        HZ_H = HZPairs->at(0)->p4() + HZPairs->at(1)->p4();
-        HZ_Z = HZPairs->at(2)->p4() + HZPairs->at(3)->p4();
-
-        ZZ_Z1 = ZZPairs->at(0)->p4() + ZZPairs->at(1)->p4();
-        ZZ_Z2 = ZZPairs->at(2)->p4() + ZZPairs->at(3)->p4();
-
         auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(btag_jets);
 
         m_Fbranches.at("Jets_DeltaR12").set(*event, DeltaR[0], sys);
         m_Fbranches.at("Jets_DeltaR34").set(*event, DeltaR[1], sys);
-        m_Fbranches.at("Jets_DeltaPhi12").set(*event, DeltaPhi[0], sys);
-        m_Fbranches.at("Jets_DeltaPhi34").set(*event, DeltaPhi[1], sys);
         m_Fbranches.at("Jets_DeltaEta12").set(*event, DeltaEta[0], sys);
         m_Fbranches.at("Jets_DeltaEta34").set(*event, DeltaEta[1], sys);
 
@@ -186,33 +165,8 @@ namespace ttHH
         m_Fbranches.at("H2_eta").set(*event, H2.Eta(), sys);
         m_Fbranches.at("H2_phi").set(*event, H2.Phi(), sys);
 
-        m_Fbranches.at("HZ_H_m").set(*event, HZ_H.M(), sys);
-        m_Fbranches.at("HZ_H_pt").set(*event, HZ_H.Pt(), sys);
-        m_Fbranches.at("HZ_H_eta").set(*event, HZ_H.Eta(), sys);
-        m_Fbranches.at("HZ_H_phi").set(*event, HZ_H.Phi(), sys);
-
-        m_Fbranches.at("HZ_Z_m").set(*event, HZ_Z.M(), sys);
-        m_Fbranches.at("HZ_Z_pt").set(*event, HZ_Z.Pt(), sys);
-        m_Fbranches.at("HZ_Z_eta").set(*event, HZ_Z.Eta(), sys);
-        m_Fbranches.at("HZ_Z_phi").set(*event, HZ_Z.Phi(), sys);
-
-        m_Fbranches.at("ZZ_Z1_m").set(*event, ZZ_Z1.M(), sys);
-        m_Fbranches.at("ZZ_Z1_pt").set(*event, ZZ_Z1.Pt(), sys);
-        m_Fbranches.at("ZZ_Z1_eta").set(*event, ZZ_Z1.Eta(), sys);
-        m_Fbranches.at("ZZ_Z1_phi").set(*event, ZZ_Z1.Phi(), sys);
-
-        m_Fbranches.at("ZZ_Z2_m").set(*event, ZZ_Z2.M(), sys);
-        m_Fbranches.at("ZZ_Z2_pt").set(*event, ZZ_Z2.Pt(), sys);
-        m_Fbranches.at("ZZ_Z2_eta").set(*event, ZZ_Z2.Eta(), sys);
-        m_Fbranches.at("ZZ_Z2_phi").set(*event, ZZ_Z2.Phi(), sys);
-
         m_Fbranches.at("HH_m").set(*event, (H1+H2).M(), sys);
-        m_Fbranches.at("HZ_m").set(*event, (HZ_H+HZ_Z).M(), sys);
-        m_Fbranches.at("ZZ_m").set(*event, (ZZ_Z1+ZZ_Z2).M(), sys);
-
         m_Fbranches.at("HH_CHI").set(*event, computeChiSquare(H1.M(), H2.M(), m_targetMassH, m_targetMassH, m_massResolution), sys);
-        m_Fbranches.at("HZ_CHI").set(*event, computeChiSquare(HZ_H.M(), HZ_Z.M(), m_targetMassH, m_targetMassZ, m_massResolution), sys);
-        m_Fbranches.at("ZZ_CHI").set(*event, computeChiSquare(ZZ_Z1.M(), ZZ_Z2.M(), m_targetMassZ, m_targetMassZ, m_massResolution), sys);
 
         // Create a new JetContainer
         xAOD::Jet jj12 = xAOD::Jet();
@@ -226,19 +180,13 @@ namespace ttHH
         // calculate deltaR, deltaPhi and deltaEta for jj12_jj34, jj34_jj56, jj56_jj12 combinations
         float deltaR_1234 = xAOD::P4Helpers::deltaR(jj12, jj34);
         DeltaR.push_back(deltaR_1234);
-        m_Fbranches.at("Jets_DeltaR1234").set(*event, deltaR_1234, sys);
 
         float deltaEta_1234 = xAOD::P4Helpers::deltaEta(jj12, jj34);
         DeltaEta.push_back(deltaEta_1234);
-        m_Fbranches.at("Jets_DeltaEta1234").set(*event, deltaR_1234, sys);
-
-        float deltaPhi_1234 = xAOD::P4Helpers::deltaPhi(jj12, jj34);
-        m_Fbranches.at("Jets_DeltaEta1234").set(*event, deltaPhi_1234, sys);
 
         if (btag_jets.size() > 5)
         {
           m_Fbranches.at("Jets_DeltaR56").set(*event, DeltaR[2], sys);
-          m_Fbranches.at("Jets_DeltaPhi56").set(*event, DeltaPhi[2], sys);
           m_Fbranches.at("Jets_DeltaEta56").set(*event, DeltaEta[2], sys);
 
           // construct 56 jet combination
@@ -249,25 +197,15 @@ namespace ttHH
 
           float deltaR_5612 = xAOD::P4Helpers::deltaR(jj56, jj12);
           DeltaR.push_back(deltaR_5612);
-          m_Fbranches.at("Jets_DeltaR5612").set(*event, deltaR_5612, sys);
 
           float deltaEta_5612 = xAOD::P4Helpers::deltaEta(jj56, jj12);
           DeltaEta.push_back(deltaEta_5612);
-          m_Fbranches.at("Jets_DeltaEta5612").set(*event, deltaEta_5612, sys);      
-
-          float deltaPhi_5612 = xAOD::P4Helpers::deltaPhi(jj56, jj12);
-          m_Fbranches.at("Jets_DeltaPhi5612").set(*event, deltaPhi_5612, sys);
 
           float deltaR_3456 = xAOD::P4Helpers::deltaR(jj34, jj56);
           DeltaR.push_back(deltaR_3456);
-          m_Fbranches.at("Jets_DeltaR3456").set(*event, deltaR_3456, sys);
 
           float deltaEta_3456 = xAOD::P4Helpers::deltaEta(jj34, jj56);
           DeltaEta.push_back(deltaEta_3456);
-          m_Fbranches.at("Jets_DeltaEta3456").set(*event, deltaEta_3456, sys);
-
-          float deltaPhi_3456 = xAOD::P4Helpers::deltaPhi(jj34, jj56);
-          m_Fbranches.at("Jets_DeltaPhi3456").set(*event, deltaPhi_3456, sys);
         }   
 
         // calculate max, min and mean of mass, deltaEta and deltaR

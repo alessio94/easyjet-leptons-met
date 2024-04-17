@@ -69,12 +69,6 @@ private:
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
 
-    CP::SysReadHandle<xAOD::JetContainer>
-    m_HZPairsHandle{ this, "HZPairs", "",   "Container containing jets from HZ pairing to read" };
-
-    CP::SysReadHandle<xAOD::JetContainer>
-    m_ZZPairsHandle{ this, "ZZPairs", "",   "Container containing jets from ZZ pairing to read" };
-
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
@@ -107,7 +101,6 @@ private:
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;
 
     const float m_targetMassH = 125e3; // Higgs target mass to be used in chi square calculation
-    const float m_targetMassZ = 91.2e3; // Z boson target mass to be used in chi square calculation
     const float m_massResolution = 20.0e3; // Mass resolution used in chi square calculation
 
     std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> getPairKinematics(const xAOD::JetContainer& jetPairs);

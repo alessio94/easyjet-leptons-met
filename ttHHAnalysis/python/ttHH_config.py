@@ -1,6 +1,5 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
@@ -105,30 +104,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
     )
 
     cfg.addEventAlgo(
-        CompFactory.ttHH.JetPairingAlgttHH(
-            "JetPairingAlgHZ",
-            containerInKey="ttHHAnalysisJets_BTag_%SYS%",
-            containerOutKey="pairedttHZAnalysisJets_"
-            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
-            pairingStrategyName="chiSquare",
-            targetMass1=125 * Units.GeV,
-            targetMass2=91.2 * Units.GeV,
-        )
-    )
-
-    cfg.addEventAlgo(
-        CompFactory.ttHH.JetPairingAlgttHH(
-            "JetPairingAlgZZ",
-            containerInKey="ttHHAnalysisJets_BTag_%SYS%",
-            containerOutKey="pairedttZZAnalysisJets_"
-            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
-            pairingStrategyName="chiSquare",
-            targetMass1=91.2 * Units.GeV,
-            targetMass2=91.2 * Units.GeV,
-        )
-    )
-
-    cfg.addEventAlgo(
         CompFactory.ttHH.BaselineVarsttHHAlg(
             "BaselineVarsttHHAlg",
             bjets="pairedttHHAnalysisJets_"
@@ -137,10 +112,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             muons="ttHHAnalysisMuons_%SYS%",
             electrons="ttHHAnalysisElectrons_%SYS%",
             met="AnalysisMET_%SYS%",
-            HZPairs="pairedttHZAnalysisJets_"
-            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
-            ZZPairs="pairedttZZAnalysisJets_"
-            + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             isMC=flags.Input.isMC,
@@ -170,24 +141,14 @@ def get_BaselineVarsttHHAlg_variables(flags):
     H_candidate_variables = [
         "H1_m", "H1_pt", "H1_eta", "H1_phi",
         "H2_m", "H2_pt", "H2_eta", "H2_phi",
-        "HZ_H_m", "HZ_H_pt", "HZ_H_eta", "HZ_H_phi",
-        "HZ_Z_m", "HZ_Z_pt", "HZ_Z_eta", "HZ_Z_phi",
-        "ZZ_Z1_m", "ZZ_Z1_pt", "ZZ_Z1_eta", "ZZ_Z1_phi",
-        "ZZ_Z2_m", "ZZ_Z2_pt", "ZZ_Z2_eta", "ZZ_Z2_phi",
         "HH_m", "HH_CHI",
-        "HZ_m", "HZ_CHI",
-        "ZZ_m", "ZZ_CHI"
     ]
 
     float_variable_names += H_candidate_variables
 
     angular_variables = [
         "Jets_DeltaR12", "Jets_DeltaR34", "Jets_DeltaR56",
-        "Jets_DeltaR1234", "Jets_DeltaR3456", "Jets_DeltaR5612",
-        "Jets_DeltaPhi12", "Jets_DeltaPhi34", "Jets_DeltaPhi56",
-        "Jets_DeltaPhi1234", "Jets_DeltaPhi3456", "Jets_DeltaPhi5612",
         "Jets_DeltaEta12", "Jets_DeltaEta34", "Jets_DeltaEta56",
-        "Jets_DeltaEta1234", "Jets_DeltaEta3456", "Jets_DeltaEta5612",
         "Jets_DeltaRMax", "Jets_DeltaRMin", "Jets_DeltaRMean",
         "Jets_DeltaEtaMax", "Jets_DeltaEtaMin", "Jets_DeltaEtaMean"
     ]
