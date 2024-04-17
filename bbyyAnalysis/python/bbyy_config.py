@@ -9,6 +9,7 @@ from EasyjetHub.output.ttree.selected_objects import (
 
 import pathlib
 import os
+import re
 
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
@@ -87,6 +88,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             isMC=flags.Input.isMC,
             bypass=flags.Analysis.bypass,
             enableSinglePhotonTrigger=flags.Analysis.enable_single_photon_trigger,
+            weightIndex=get_weight_index(flags),
         )
     )
 
@@ -296,6 +298,8 @@ def bbyy_branches(flags):
 
     branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
 
+    branches += ["EventInfo.eventWeight -> eventWeight"]
+
     photon_triggers = [
         "pass_trigger_single_photon",
         "pass_trigger_diphoton",
@@ -325,3 +329,18 @@ def contain_dalitz(flags):
             if dsid in dataset:
                 return True
     return False
+
+
+def get_weight_index(flags):
+    dsid = str(flags.Input.MCChannelNumber)
+    # file name hard-coded
+    with open(FullPath("bbyyAnalysis/SpecialWeightIndices.yaml"), 'r') as file_in:
+        pattern = r"DSID:\s*(\d+)\s*\n\s*weightIndex:\s*(\d+)"
+        content = file_in.read()
+        matches = re.findall(pattern, content)
+
+        for match_dsid, weight_index in matches:
+            if match_dsid == dsid:
+                return int(weight_index)
+
+    return 0  # in case no matching DSID is found, set the nominal weight index to 0.

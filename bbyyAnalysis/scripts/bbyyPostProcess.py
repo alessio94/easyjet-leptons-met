@@ -29,7 +29,7 @@ def RunEasyjetPlus(args):
     acc = MainServicesCfg(flags)
 
     SOWTool = CompFactory.SumOfWeightsTool(inFile=args.inFile)
-    if bool(args.containDalitz):
+    if bool(args.containDalitzOrSpecialWeight):
         SOWTool.inHisto = "SumOfWeights"
 
     # Get XSection Path
@@ -41,7 +41,8 @@ def RunEasyjetPlus(args):
         pathsToPMGFiles=XSectionData['XSection_paths'])
 
     TotalWeightsTool_bbyy = CompFactory.TotalWeightsTool(
-        analysis="bbyy", nPhotons=2, bTagWP="GN2v00LegacyWP_FixedCutBEff_77")
+        analysis="bbyy", nPhotons=2, bTagWP="GN2v00LegacyWP_FixedCutBEff_77",
+        MCWeightName="eventWeight")
 
     acc.addEventAlgo(CompFactory.PostProcessor(
         inFile=args.inFile,
@@ -94,8 +95,9 @@ if __name__ == "__main__":
                         help="Copy pre-processed branches to outFile.")
     parser.add_argument("--mergeMyFiles", action='store_true',
                         help="Merge branches of outFile into the inFile.")
-    parser.add_argument("--containDalitz", default=0, type=int,
-                        help="Whether dalitz events are included in MC sample.")
+    parser.add_argument("--containDalitzOrSpecialWeight", default=0, type=int,
+                        help="Whether dalitz events or/and \
+                        special weight are included in MC sample.")
 
     args = parser.parse_args()
 

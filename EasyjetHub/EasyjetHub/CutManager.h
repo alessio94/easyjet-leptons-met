@@ -20,10 +20,10 @@ struct CutEntry
 {
     std::string name{}; // Name of the cut
     int counter{0}; //Counts the events passed by the cut.
-    double w_counter{0.0}; //Counts the events passed by the cut in terms of mcEventWeights.at(0)
+    double w_counter{0.0}; //Counts the events passed by the cut in terms of event weights
     bool passed{0}; // If event is passed this should be set to true. Otherwise, it should be set to false.
     int relativeCounter{0}; // Counts the events passed with respect to the previous cuts. 
-    double w_relativeCounter{0.0}; // Counts the events passed with respect to the previous cuts in terms of mcEventWeights.at(0)
+    double w_relativeCounter{0.0}; // Counts the events passed with respect to the previous cuts in terms of event weights
     
     CutEntry(const std::string& n)
         : name(n) {}

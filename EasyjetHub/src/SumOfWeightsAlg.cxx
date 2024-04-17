@@ -42,8 +42,8 @@ namespace Easyjet
     std::vector<float> eventWeights = mcEventWeightsHandle(*event);
 
     m_total_mcEvent += 1;
-    m_total_mcEventWeight += eventWeights.at(0);
-    m_total_mcEventWeight_squared += eventWeights.at(0)*eventWeights.at(0);
+    m_total_mcEventWeight += eventWeights.at(m_weightIndex);
+    m_total_mcEventWeight_squared += eventWeights.at(m_weightIndex)*eventWeights.at(m_weightIndex);
 
     return StatusCode::SUCCESS;
   }

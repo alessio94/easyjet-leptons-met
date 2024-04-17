@@ -101,10 +101,12 @@ def preselection_cfg(flags, seqname):
     cfg.addSequence(CompFactory.AthSequencer(seqname))
 
     if flags.Analysis.do_bbyy_analysis and flags.Input.isMC:
-        from bbyyAnalysis.bbyy_config import contain_dalitz
+        from bbyyAnalysis.bbyy_config import contain_dalitz, get_weight_index
         if contain_dalitz(flags):
             from bbyyAnalysis.bbyy_config import bbyy_filter_dalitz_cfg
             cfg.merge(bbyy_filter_dalitz_cfg(flags), seqname)
+
+        if contain_dalitz(flags) or get_weight_index(flags):
             from EasyjetHub.algs.truth.truth_config import sumofweightsalg_cfg
             cfg.merge(sumofweightsalg_cfg(flags), seqname)
 

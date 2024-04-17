@@ -11,6 +11,7 @@
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
+#include <AsgDataHandles/WriteDecorHandle.h>
 #include <AsgDataHandles/ReadDecorHandle.h>
 #include <AthContainers/ConstDataVector.h>
 
@@ -91,9 +92,6 @@ namespace HHBBYY
 
       CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
-
-      CP::SysReadDecorHandle<float>
-      m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
   
       CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "",   "Jet container to read" };
@@ -164,6 +162,18 @@ namespace HHBBYY
         {this, "randomRunNumber", "RandomRunNumber", "Random run number for MC"};
       
       void setRunNumberQuantities(unsigned int rdmNumber);
+
+      std::vector<float> eventWeights{};
+
+      SG::WriteDecorHandleKey<xAOD::EventInfo> m_eventWeightDecorKey{
+          this, "mcEventWeightsOut", "EventInfo.eventWeight", "Event Weight of correct weight index"};
+
+      SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
+        this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};
+
+      Gaudi::Property<int> m_weightIndex
+        { this, "weightIndex", -1, "Special weight Index based on MCChannelNumber"}; 
+
   };
 
 }

@@ -48,9 +48,12 @@ def truth_info_cfg(
 def sumofweightsalg_cfg(flags):
     cfg = ComponentAccumulator()
 
+    from bbyyAnalysis.bbyy_config import get_weight_index
+
     cfg.addEventAlgo(
         CompFactory.Easyjet.SumOfWeightsAlg(
             "SumOfWeightsAlg",
+            weightIndex=get_weight_index(flags),
         ),
     )
 

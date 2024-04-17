@@ -57,7 +57,7 @@ To run the post-processing, the following command needs to be executed:
 
 `bbyyPostProcess.py --inFile name_easyJet_ntuple.root --xSectionsConfig bbyyAnalysis/XSectionData.yaml --outFile name_PostProcessed_ntuple.root`
 
-if the MC generation contains Dalitz events (e.g. Run 2 HH and H samples), please add  `--containDalitz 1` as additional arguement to use the correct initial sum of weights.
+if the MC generation contains Dalitz events or/and the nominal weight index is not by default at 0 (e.g. Run 2 HH and H samples), please add  `--containDalitzOrSpecialWeight 1` as additional arguement to use the correct initial sum of weights.
 
 The output file (`name_PostProcessed_ntuple.root`) contains the final weight (`weight`) which is evaluated considering the final sum of weights, cross-section, luminosity, MC weight and the different scale factors (`SF = weight_ftag_effSF_GN2v00LegacyWP_FixedCutBEff_77_NOSYS * weight_jvt_effSF_NOSYS * bbyy_Photon1_effSF_NOSYS * bbyy_Photon2_effSF_NOSYS`):
-`weight = generatorWeight * PileupWeight * Luminosity * AMIXsection * kFactor * FilterEff * SF / sumOfWeights`
+`weight = eventWeight * PileupWeight * Luminosity * AMIXsection * kFactor * FilterEff * SF / sumOfWeights`

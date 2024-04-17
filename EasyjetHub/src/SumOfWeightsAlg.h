@@ -46,6 +46,9 @@ namespace Easyjet
       SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
         this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};
 
+    Gaudi::Property<int> m_weightIndex
+      { this, "weightIndex", -1, "Special weight Index based on MCChannelNumber"};        
+
   };
 
 }
