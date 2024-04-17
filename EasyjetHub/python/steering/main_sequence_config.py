@@ -30,6 +30,7 @@ from EasyjetHub.steering.utils.log_helper import log
 def default_sequence_cfg(flags, seqname):
     cfg = core_services_cfg(flags)
     cfg.merge(preselection_cfg(flags, seqname))
+    cfg.merge(metadata_cfg(flags), seqname)
     cfg.merge(event_building_cfg(flags, seqname))
 
     return cfg
@@ -145,6 +146,7 @@ def output_cfg(flags, seqname):
 
     cfg = ComponentAccumulator()
     cfg.addSequence(CompFactory.AthSequencer(seqname), "AthAlgSeq")
+
     # Configure however many TTree outputs are configured.
     # This config only handles one output file, as it comes from the
     # command line arguments. In principle we could set up multiple
@@ -176,4 +178,26 @@ def output_cfg(flags, seqname):
     if not flags.Analysis.suppress_metadata_json:
         cfg.merge(event_counter_cfg("n_events"), seqname)
 
+    return cfg
+
+
+def metadata_cfg(flags):
+    cfg = ComponentAccumulator()
+
+    if flags.Input.isMC:
+        if flags.Sim.ISF.Simulator.usesFastCaloSim():
+            dataType = "fastsim"
+        else:
+            dataType = "fullsim"
+    else:
+        dataType = "data"
+
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.MetadataHistAlg(
+            "MetadataHistAlg",
+            dataType=dataType,
+            mcCampaign=str(flags.Input.MCCampaign),
+            mcChannelNumber=str(flags.Input.MCChannelNumber),
+        )
+    )
     return cfg

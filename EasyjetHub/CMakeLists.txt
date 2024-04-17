@@ -54,6 +54,7 @@ atlas_add_component(EasyjetHub
   src/EventInfoGlobalAlg.cxx
   src/OrthogonalityAlg.cxx
   src/SumOfWeightsAlg.cxx
+  src/MetadataHistAlg.cxx
   src/components/*.cxx
   LINK_LIBRARIES EasyjetHubLib
 )
