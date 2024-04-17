@@ -219,6 +219,8 @@ namespace HHBBTT
       450360 <= runNumber && runNumber < 450894;
     runBoolMap.at(HHBBTT::is23_400bunches) =
       450894 <= runNumber && runNumber < 451094;
+    runBoolMap.at(HHBBTT::is23_first_2400bunches) =
+      451896 <= runNumber;
 
     runBoolMap.at(HHBBTT::l1topo_disabled) =
       (runNumber == 336506) || (runNumber == 336548) || (runNumber == 336567);
@@ -515,7 +517,10 @@ namespace HHBBTT
       single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
     }
     else if(year==2023){
-      single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"};
+      single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU100"};
+      if(runBoolMap.at(HHBBTT::is23_first_2400bunches)){
+        single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"};
+      }
     }
 
     bool trigPassed_STT = false;
@@ -585,10 +590,15 @@ namespace HHBBTT
       }
     }
     
-    else if(2022<=year && year<=2023){
+    else if(year>=2022){
       ditau_paths_L1Topo = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
+      if (runBoolMap.at(HHBBTT::is23_first_2400bunches)){
+        ditau_paths_L1Topo = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
+        ditau_paths_4J12 = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
+      }
     }
+    
 
     std::unordered_map<HHBBTT::TriggerChannel, std::vector<std::string>> mapPaths;
     mapPaths.emplace(HHBBTT::DTT_2016, ditau_paths_2016);
@@ -599,6 +609,7 @@ namespace HHBBTT
     mapDecisions.emplace(HHBBTT::DTT_2016, false);
     mapDecisions.emplace(HHBBTT::DTT_4J12, false);
     mapDecisions.emplace(HHBBTT::DTT_L1Topo, false);
+
 
     for(const auto& [channel, paths] : mapPaths){
       for(const auto& trig : paths){

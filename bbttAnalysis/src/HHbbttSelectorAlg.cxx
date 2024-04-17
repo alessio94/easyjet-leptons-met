@@ -175,16 +175,13 @@ namespace HHBBTT
     m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau] = 25. * Athena::Units::GeV;
 
     // Di-tau triggers
-    m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30. * Athena::Units::GeV;
-
+    //DTT cuts setted in setRunNumberQuantities
     m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
 
-    ATH_CHECK (initialiseCutflow());
 
+    ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
 
@@ -192,7 +189,6 @@ namespace HHBBTT
 
   StatusCode HHbbttSelectorAlg ::execute()
   {
-    
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
@@ -413,9 +409,11 @@ namespace HHBBTT
       bool tau_ptcut_DTT_lead = n_taus>0 &&
 	tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau];
       bool tau_ptcut_DTT_sublead = n_taus>1 &&
-	tau1->pt() > m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau];
+	tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau];
       bool tau_ptcut_STT = tau_ptcut_STT_lead && tau_ptcut_STT_sublead;
       bool tau_ptcut_DTT = tau_ptcut_DTT_lead && tau_ptcut_DTT_sublead;
+
+
 
       if (n_taus == 1)
         m_bools.at(HHBBTT::ONE_TAU) = true;
@@ -444,6 +442,7 @@ namespace HHBBTT
 	m_bools.at(HHBBTT::pass_trigger_DTT_2016) = true;
 	m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = true;
 	m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = true;
+
       }
 
       m_bools.at(HHBBTT::pass_trigger_SR) =
@@ -478,6 +477,7 @@ namespace HHBBTT
       bool jet_ptcut_DTT_2016 = false;
       bool jet_ptcut_DTT_4J12 = false;
       bool jet_ptcut_DTT_L1Topo = false;
+
       if (n_jets >= 2)
       {
         m_bools.at(HHBBTT::TWO_JETS) = true;
@@ -488,6 +488,7 @@ namespace HHBBTT
         if (jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
 	    jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet])
           jet_ptcut_DTT_4J12 = true;
+
 
         if (bjets->size() == 2)
         {
@@ -549,7 +550,7 @@ namespace HHBBTT
           }
         }
         // DTT
-        if(!m_bools.at(HHBBTT::pass_STT) && tau_ptcut_DTT){
+        if(!m_bools.at(HHBBTT::pass_STT) && tau_ptcut_DTT){ 
           if(2015<=m_year && m_year<=2016){
             if(jet_ptcut_DTT_2016){
               m_bools.at(HHBBTT::pass_baseline_DTT_2016) = true;
@@ -577,16 +578,16 @@ namespace HHBBTT
       }
 
       m_bools.at(HHBBTT::pass_baseline_DTT) =
-	      (m_bools.at(HHBBTT::pass_baseline_DTT_2016) ||
-	       m_bools.at(HHBBTT::pass_baseline_DTT_4J12) ||
-	       m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo));
+	      (m_bools.at(HHBBTT::pass_baseline_DTT_2016)  ||
+	       m_bools.at(HHBBTT::pass_baseline_DTT_4J12)  ||
+              m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo));
       m_bools.at(HHBBTT::pass_DTT) =
-	      (m_bools.at(HHBBTT::pass_DTT_2016) ||
-	       m_bools.at(HHBBTT::pass_DTT_4J12) ||
-	       m_bools.at(HHBBTT::pass_DTT_L1Topo));
+	      (m_bools.at(HHBBTT::pass_DTT_2016)  ||
+	       m_bools.at(HHBBTT::pass_DTT_4J12)  ||
+              m_bools.at(HHBBTT::pass_DTT_L1Topo));
       m_bools.at(HHBBTT::pass_DTT_1B) = 
-        (m_bools.at(HHBBTT::pass_DTT_2016_1B) ||
-         m_bools.at(HHBBTT::pass_DTT_4J12_1B) ||
+        (m_bools.at(HHBBTT::pass_DTT_2016_1B)  ||
+         m_bools.at(HHBBTT::pass_DTT_4J12_1B)  ||
          m_bools.at(HHBBTT::pass_DTT_L1Topo_1B));
 
       m_bools.at(HHBBTT::pass_baseline_SR) =
@@ -910,11 +911,11 @@ namespace HHBBTT
       trigPassed_DTT_L1Topo &= tau_trigMatchDecos.at(HHBBTT::DTT_L1Topo)(*tau0);
       trigPassed_DTT_L1Topo &= tau_trigMatchDecos.at(HHBBTT::DTT_L1Topo)(*tau1);
       trigPassed_DTT_L1Topo &=
-	(tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
-	 tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
+	 (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
+	  tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
          tau0->p4().DeltaR(tau1->p4())<2.5 &&
-	 jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
-    }
+	  jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
+  }
     else trigPassed_DTT_L1Topo = false;
     m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = trigPassed_DTT_L1Topo;
 
@@ -1014,6 +1015,15 @@ namespace HHBBTT
       min_tau_STT = 140. * Athena::Units::GeV;
 
     m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = min_tau_STT;
+
+    m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
+    if(m_year >= 2022){
+      m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 20. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
+    }
   }
 
 }

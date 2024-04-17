@@ -44,6 +44,7 @@ namespace HHBBTT
     is22_75bunches,
     is23_75bunches,
     is23_400bunches,
+    is23_first_2400bunches,
     l1topo_disabled,
     Count
   };
@@ -72,7 +73,7 @@ namespace HHBBTT
 	{HHBBTT::DTT, "DTT"},
 	{HHBBTT::DTT_2016, "DTT_2016"},
 	{HHBBTT::DTT_4J12, "DTT_4J12"},
-	{HHBBTT::DTT_L1Topo, "DTT_L1Topo"}
+	{HHBBTT::DTT_L1Topo, "DTT_L1Topo"},
       };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey

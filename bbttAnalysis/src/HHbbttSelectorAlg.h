@@ -196,7 +196,7 @@ private:
 	{HHBBTT::DTT, "DTT"},
 	{HHBBTT::DTT_2016, "DTT_2016"},
 	{HHBBTT::DTT_4J12, "DTT_4J12"},
-	{HHBBTT::DTT_L1Topo, "DTT_L1Topo"}
+	{HHBBTT::DTT_L1Topo, "DTT_L1Topo"},
       };
 
     std::unordered_map<HHBBTT::TriggerChannel,
