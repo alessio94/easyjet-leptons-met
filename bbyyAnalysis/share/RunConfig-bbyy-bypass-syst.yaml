@@ -1,0 +1,4 @@
+include: bbyyAnalysis/RunConfig-bbyy-bypass.yaml
+
+do_CP_systematics: true
+systematics_regex: [".*"]

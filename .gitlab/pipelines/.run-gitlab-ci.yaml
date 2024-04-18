@@ -69,6 +69,11 @@ ntupler_bbyy_mc20:
   script:
     - easyjet-test bbyy-mc20
 
+ntupler_bbyy_mc20_syst:
+  extends: .ntupler
+  script:
+    - easyjet-test bbyy-mc20-syst
+
 ntupler_SHbbyy_mc20:
   extends: .ntupler
   script:
