@@ -55,6 +55,11 @@ def get_small_R_jet_branches(
                         f"ftag_effSF_{btag_wp}_%SYS%"
                     ]
 
+        if flags.Analysis.small_R_jet.runBJetPtCalib:
+            small_R_jet_branches.variables += ["uncorrPt", "muonCorrPt", "n_muons"]
+            if flags.Input.isMC:
+                small_R_jet_branches.variables += ["bJetTruthPt", "bJetTruthDR"]
+
         if (
             tree_flags.collection_options.small_R_jets.no_bjet_calib_p4
             and flags.Analysis.do_muons

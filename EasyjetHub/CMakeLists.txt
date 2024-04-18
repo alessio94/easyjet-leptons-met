@@ -37,24 +37,7 @@ atlas_add_library( EasyjetHubLib
 
 # Build the Athena component library
 atlas_add_component(EasyjetHub
-  src/BTaggingDecoratorAlg.cxx
-  src/EventCounterAlg.cxx
-  src/GhostAssocVRJetGetterAlg.cxx
-  src/JetSelectorAlg.cxx
-  src/PhotonSelectorAlg.cxx
-  src/MuonSelectorAlg.cxx
-  src/ElectronSelectorAlg.cxx
-  src/TauSelectorAlg.cxx
-  src/LargeJetGhostVRJetAssociationAlg.cxx
-  src/TruthParentDecoratorAlg.cxx
-  src/TruthParticleInformationAlg.cxx
-  src/H5FileSvc.cxx
-  src/JetDeepCopyAlg.cxx
-  src/TauDecoratorAlg.cxx
-  src/EventInfoGlobalAlg.cxx
-  src/OrthogonalityAlg.cxx
-  src/SumOfWeightsAlg.cxx
-  src/MetadataHistAlg.cxx
+  src/*.cxx
   src/components/*.cxx
   LINK_LIBRARIES EasyjetHubLib
 )

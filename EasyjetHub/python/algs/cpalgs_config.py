@@ -15,6 +15,8 @@ from EasyjetHub.algs.calibration.jets import (
 )
 from EasyjetHub.output.ttree.btag_decor_config import btag_decor_cfg
 from EasyjetHub.output.ttree.tau_decor_config import tau_decor_cfg
+from EasyjetHub.output.ttree.jet_decor_config import jet_decor_cfg
+
 from EasyjetHub.algs.calibration.muons import muon_sequence
 from EasyjetHub.algs.calibration.electrons import electron_sequence
 from EasyjetHub.algs.calibration.photons import photon_sequence
@@ -103,6 +105,10 @@ def cpalgs_cfg(flags):
         # so as to avoid any systematics-dependence or filtering
         if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
             cfg.merge(btag_decor_cfg(flags))
+
+        # For now, only MC decoration added
+        if flags.Input.isMC:
+            cfg.merge(jet_decor_cfg(flags))
 
     if flags.Analysis.do_taus:
         # Schedule the alg to decorate taus with extra info

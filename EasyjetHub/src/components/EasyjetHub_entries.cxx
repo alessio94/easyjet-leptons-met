@@ -10,6 +10,7 @@
 #include "../TruthParentDecoratorAlg.h"
 #include "../JetDeepCopyAlg.h"
 #include "../TauDecoratorAlg.h"
+#include "../JetDecoratorAlg.h"
 #include "../TruthParticleInformationAlg.h"
 #include "../EventInfoGlobalAlg.h"
 #include "../OrthogonalityAlg.h"
@@ -31,6 +32,7 @@ DECLARE_COMPONENT(LargeJetGhostVRJetAssociationAlg)
 DECLARE_COMPONENT(TruthParentDecoratorAlg)
 DECLARE_COMPONENT(JetDeepCopyAlg)
 DECLARE_COMPONENT(TauDecoratorAlg)
+DECLARE_COMPONENT(JetDecoratorAlg)
 DECLARE_COMPONENT(TruthParticleInformationAlg)
 DECLARE_COMPONENT(EventInfoGlobalAlg)
 DECLARE_COMPONENT(OrthogonalityAlg)
