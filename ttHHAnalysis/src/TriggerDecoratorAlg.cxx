@@ -103,6 +103,9 @@ namespace ttHH
 
   const std::unordered_map<int, std::unordered_map<ttHH::TriggerChannel, std::vector<std::string>>> TriggerDecoratorAlg::m_triggerMap = {
         {2015, {
+            {ttHH::BJET, {
+		"HLT_2j35_btight_2j35_L13J25.0ETA23"
+	    }},
             {ttHH::SINGLEP, {
                 "HLT_e24_lhmedium_L1EM20VH",
                 "HLT_e60_lhmedium",
