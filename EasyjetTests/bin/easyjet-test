@@ -8,7 +8,7 @@ set -Eeu
 ################################################
 
 #tag from easyjet/hh4b-test-files
-TAG=p6026
+TAG=p6026yy
 
 # standard samples
 # Data
@@ -20,6 +20,8 @@ PHYSLITE_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYSLITE_10evts.r14
 # MC20
 PHYS_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYS_10evts.e6337_s3681_r13144_p6026.pool.root
 PHYSLITE_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYSLITE_10evts.e6337_s3681_r13144_p6026.pool.root
+PHYS_BBYY_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13167_p6026.pool.root
+PHYSLITE_BBYY_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13167_p6026.pool.root
 PHYS_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a907_r14860_p6026.pool.root
 # No PHYSLITE for p6026 FastSim
 PHYSLITE_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a907_r14860_p5855.pool.root
@@ -47,10 +49,10 @@ declare -A DATAFILES=(
     # MC20
     [mc20]=${PHYS_TTBAR_MC20}
     [fast-mc20]=${PHYS_TTBAR_MC20}
-    [bbyy-mc20]=${PHYS_TTBAR_MC20}
-    [bbyy-mc20-syst]=${PHYS_TTBAR_MC20}
-    [bbyy-mc20-lite]=${PHYSLITE_TTBAR_MC20}
-    [SHbbyy-mc20]=${PHYS_TTBAR_MC20}
+    [bbyy-mc20]=${PHYS_BBYY_MC20}
+    [bbyy-mc20-syst]=${PHYS_BBYY_MC20}
+    [bbyy-mc20-lite]=${PHYSLITE_BBYY_MC20}
+    [SHbbyy-mc20]=${PHYS_BBYY_MC20}
     [ttHH-mc20]=${PHYS_TTBAR_MC20}
     [ttHH-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [bbll-mc20]=${PHYS_TTBAR_MC20}
