@@ -17,3 +17,8 @@ dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUnc
 346677  aMcAtNloPythia8EvtGen_tHjb125_4fl_CPalpha_0_gamgam         1.68548E-04  1.0  1.0  0.0  0.0
 346759  aMcAtNloPythia8EvtGen_tWH125_CPalpha_0_gamgam              3.44359E-05  1.0  1.0  0.0  0.0
 508781  MGPy8EG_ttyy_nonallhad_LO                                  6.4820E-03   1.0  1.0  0.0  0.0
+800904  Py8EG_A14NNPDF23LO_XHS_X170_S030_HyySbb                    1.0E-03      1.0  1.0  0.0  0.0
+800913  Py8EG_A14NNPDF23LO_XHS_X245_S090_HyySbb                    1.0E-03      1.0  1.0  0.0  0.0
+800915  Py8EG_A14NNPDF23LO_XHS_X205_S030_HyySbb                    1.0E-03      1.0  1.0  0.0  0.0
+801367  Py8EG_A14NNPDF23LO_XHS_X750_S170_HyySbb                    1.0E-03      1.0  1.0  0.0  0.0
+801370  Py8EG_A14NNPDF23LO_XHS_X750_S400_HyySbb                    1.0E-03      1.0  1.0  0.0  0.0
