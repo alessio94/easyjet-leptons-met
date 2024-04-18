@@ -90,7 +90,8 @@ def bbtt_cfg(
             Years=flags.Analysis.Years,
             bypass=flags.Analysis.bypass,
             saveCutFlow=flags.Analysis.save_bbtt_cutflow,
-            cutList=flags.Analysis.CutList,
+            cutList=(
+                flags.Analysis.CutList if hasattr(flags.Analysis, "CutList") else []),
         )
     )
 
