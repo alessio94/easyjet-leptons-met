@@ -59,7 +59,8 @@ private:
       { this, "event", "EventInfo", "EventInfo to read" };
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
-
+    Gaudi::Property<std::vector<unsigned int>> m_years
+      { this, "Years", false, "which years are running" };
 
     SG::ReadDecorHandleKey<xAOD::EventInfo> m_runNumberKey{
       this, "runNumberDecorKey", "EventInfo.runNumber", "Run number"};

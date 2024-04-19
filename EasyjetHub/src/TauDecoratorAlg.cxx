@@ -208,8 +208,11 @@ namespace Easyjet
     // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
 
     year = 0;
-    if(266904 <= runNumber && runNumber <= 284484) year = 2015;
-    else if(296939 <= runNumber && runNumber <= 311481) year = 2016;
+    if (m_years.size() == 1) year = m_years[0];
+    else if(m_years.size() == 2){
+      if(266904 <= runNumber && runNumber <= 284484) year = 2015;
+      else if(296939 <= runNumber && runNumber <= 311481) year = 2016;
+    }
   
     // Single-lepton triggers
     if(year==2015)
