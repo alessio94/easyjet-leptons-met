@@ -29,6 +29,7 @@ from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.steering.utils.systematics_helper import consolidate_systematics_regex
 
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
+from EasyjetHub.algs.event_info_global_alg_config import event_info_global_alg_cfg
 
 # Map object types to sequence configurators
 analysis_seqs = {
@@ -98,6 +99,11 @@ def cpalgs_cfg(flags):
     cfg.merge(weightConfigAccumulator.CA)
 
     # Extra decoration algorithms
+
+    # Comput global EventInfo decoration, in particular data-taking year
+    # Needed for MC20a = 2015+2016
+    cfg.merge(event_info_global_alg_cfg(flags))
+
     if flags.Analysis.do_small_R_jets:
         # Schedule the alg to decorate btag info onto jets
         # rather than accessing from xAOD::BTagging

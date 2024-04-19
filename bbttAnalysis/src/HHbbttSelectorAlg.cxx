@@ -37,12 +37,13 @@ namespace HHBBTT
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
 
-    ATH_CHECK (m_runNumber.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_rdmRunNumber.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
-
+    ATH_CHECK(m_is2016_periodA.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is2016_periodB_D3.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is2022_75bunches.initialize(m_systematicsList, m_eventHandle));
     
     // Intialise booleans with value false. Also initialise syst-aware output decorators
     for (auto& [key, value] : m_boolnames) {
@@ -175,11 +176,9 @@ namespace HHBBTT
     m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau] = 25. * Athena::Units::GeV;
 
     // Di-tau triggers
-    //DTT cuts setted in setRunNumberQuantities
     m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
-
 
     ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
@@ -220,11 +219,7 @@ namespace HHBBTT
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-      // Set run number dependent quantities for nominal systematics
-      if(sys.name()==""){
-        unsigned int rdmNumber = m_isMC ? m_rdmRunNumber.get(*event, sys) : m_runNumber.get(*event,sys);
-        setRunNumberQuantities(rdmNumber);
-      }
+      setThresholds(event, sys);
 
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
@@ -550,8 +545,9 @@ namespace HHBBTT
           }
         }
         // DTT
-        if(!m_bools.at(HHBBTT::pass_STT) && tau_ptcut_DTT){ 
-          if(2015<=m_year && m_year<=2016){
+        if(!m_bools.at(HHBBTT::pass_STT) && tau_ptcut_DTT){
+          int year = m_year.get(*event, sys);
+          if(2015<=year && year<=2016){
             if(jet_ptcut_DTT_2016){
               m_bools.at(HHBBTT::pass_baseline_DTT_2016) = true;
               if (m_bools.at(HHBBTT::pass_trigger_DTT_2016)) {
@@ -977,49 +973,38 @@ namespace HHBBTT
   }
 
 
-  void HHbbttSelectorAlg::setRunNumberQuantities(unsigned int runNumber){
-    // References:
-    // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/rBR_Period_Report.php
-    // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
+  void HHbbttSelectorAlg::setThresholds(const xAOD::EventInfo* event,
+					const CP::SystematicSet& sys){
 
-    m_year = 0;
-    if(m_years.size()==1) m_year = m_years[0];
-    else{
-      if(266904 <= runNumber && runNumber <= 284484) m_year = 2015;
-      else if(296939 <= runNumber && runNumber <= 311481) m_year = 2016;
-    }
+    int year = m_year.get(*event, sys);
 
     // Single-lepton triggers
-    if(m_year==2015)
+    if(year==2015)
       m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 25. * Athena::Units::GeV;
-    // 2022 75 bunches
-    else if(427882 <= runNumber && runNumber < 428071)
+    else if(m_is2022_75bunches.get(*event, sys))
       m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 18. * Athena::Units::GeV;
     else
       m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 27. * Athena::Units::GeV;
 
-    if(m_year==2015)
+    if(year==2015)
       m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 21. * Athena::Units::GeV;
-    else if(2016<=m_year && m_year<=2018)
+    else if(2016<=year && year<=2018)
       m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 27. * Athena::Units::GeV;
     else
       m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 25. * Athena::Units::GeV;
 
     // Single tau triggers
     float min_tau_STT = 180. * Athena::Units::GeV;
-    // 2015 + 2016 period A
-    if(m_year==2015 || (296939 <= runNumber && runNumber <= 300287))
+    if(year==2015 || m_is2016_periodA.get(*event, sys))
       min_tau_STT = 100. * Athena::Units::GeV;
-    // 2016 period B-D3
-    else if(300345 <= runNumber && runNumber <= 302872)
+    else if(m_is2016_periodB_D3.get(*event, sys))
       min_tau_STT = 140. * Athena::Units::GeV;
-
     m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = min_tau_STT;
 
     m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
-    if(m_year >= 2022){
+    if(year >= 2022){
       m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 20. * Athena::Units::GeV;
       m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
       m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;

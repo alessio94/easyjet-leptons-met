@@ -21,7 +21,6 @@ def HHbbttTriggerDecoratorCfg(flags):
         CompFactory.HHBBTT.TriggerDecoratorAlg(
             "HHbbttTriggerDecoratorAlg",
             isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
             muons=flags.Analysis.container_names.input.muons,
             electrons=flags.Analysis.container_names.input.electrons,
             taus=flags.Analysis.container_names.input.taus,

@@ -87,7 +87,6 @@ def bbtt_cfg(
             isMC=flags.Input.isMC,
             doAntiIDRegions=flags.Analysis.do_antiID_regions,
             useTriggerSelections=flags.Analysis.do_trigger_offline_filtering,
-            Years=flags.Analysis.Years,
             bypass=flags.Analysis.bypass,
             saveCutFlow=flags.Analysis.save_bbtt_cutflow,
             cutList=(
@@ -163,13 +162,6 @@ def bbtt_cfg(
             storeHighLevelVariables=flags.Analysis.store_high_level_variables,
             floatVariableList=float_variables,
             intVariableList=int_variables
-        )
-    )
-
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.EventInfoGlobalAlg(
-            isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
         )
     )
 

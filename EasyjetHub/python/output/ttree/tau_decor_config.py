@@ -21,7 +21,6 @@ def tau_decor_cfg(flags, **kwargs):
         CompFactory.Easyjet.TauDecoratorAlg(
             f"TauDecor_{taucoll}",
             isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
             tauIDWP=flags.Analysis.Tau.ID,
             doAntiTauDecor=flags.Analysis.do_bbtt_analysis,
             muonsIn=muoncoll,

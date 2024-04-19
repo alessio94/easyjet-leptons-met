@@ -87,7 +87,6 @@ def lltt_cfg(
             triggerLists=trigger_branches,
             channel=flags.Analysis.channel,
             isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
             bypass=flags.Analysis.bypass,
         )
     )

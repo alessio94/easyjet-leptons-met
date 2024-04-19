@@ -25,28 +25,6 @@ public:
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
-    // Get year of data taking
-    inline unsigned int getDataTakingYear(std::vector<unsigned int> years, unsigned int rNumber ) {
-
-        if (years.size() == 1)
-            return years.at(0);
-        //Get single run year per event in case of MC20a which corresponds to 2015+2016
-        else if (years.size() == 2) {
-            if (266904 <= rNumber && rNumber <= 284484)
-                return 2015;
-            else if (296939 <= rNumber && rNumber <= 311481)
-                return 2016;
-            else { 
-              ATH_MSG_ERROR("Wrong (or unkown) combination of year and (Random)runNumber");
-              return 0;
-            }
-
-        }
-        else
-          ATH_MSG_ERROR("Wrong (or unkown) combination of year and (Random)runNumber");
-
-        return 0;
-    }
 
 private:
 
@@ -58,8 +36,31 @@ private:
         this, "runNumberDecorKey", "EventInfo.runNumber", "Run number"};
     SG::ReadDecorHandleKey<xAOD::EventInfo> m_rdmRunNumberKey{
         this, "RandomRunNumberDecorKey", "EventInfo.RandomRunNumber", "Random run number"};
-    SG::WriteDecorHandleKey<xAOD::EventInfo> m_YearsDecorKey{
-        this, "YearDecorKey", "EventInfo.dataTakingYear", "Data taking year"};
+
+    SG::WriteDecorHandleKey<xAOD::EventInfo> m_yearDecorKey;
+
+    // References:
+    // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/rBR_Period_Report.php
+    std::vector<std::tuple<std::string, unsigned int, unsigned int>>
+      m_runPeriods = {
+      {"2016_periodA", 296939, 300287},
+      {"2016_periodB_D3", 300345, 302872},
+      {"2016_periodD4_end", 302919, 311481},
+      {"2017_periodB1_B4", 325713, 326695},
+      {"2017_periodB5_B7", 326834, 327490},
+      {"2017_periodB5_B8", 326834, 328393},
+      {"2017_periodB8_end", 327582, 341649},
+      {"2018_periodB_end", 348885, 364485},
+      {"2018_periodK_end", 355529, 364485},
+      {"2022_75bunches", 427882, 428070},
+      {"2023_75bunches", 450360, 450893},
+      {"2023_400bunches", 450894, 451093},
+      {"2023_first_2400bunches", 451896, 456749}
+    };
+
+    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_runPeriodsDecor_keys;
+
+    SG::WriteDecorHandleKey<xAOD::EventInfo> m_L1TopoDisabledDecorKey;
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };

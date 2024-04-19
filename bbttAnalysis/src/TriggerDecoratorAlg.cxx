@@ -14,8 +14,16 @@ namespace HHBBTT
   StatusCode TriggerDecoratorAlg ::initialize()
   {
     ATH_CHECK (m_eventInfoKey.initialize());
-    ATH_CHECK(m_runNumberKey.initialize());
-    ATH_CHECK(m_rdmRunNumberKey.initialize());
+
+    m_yearKey = "EventInfo.dataTakingYear";
+    ATH_CHECK(m_yearKey.initialize());
+
+    for(const auto& [runBool, name] : m_runBooleans) {
+      SG::ReadDecorHandleKey<xAOD::EventInfo> deco;
+      deco = "EventInfo." + name;
+      m_runBooleans_key.emplace(runBool, deco);
+      ATH_CHECK(m_runBooleans_key.at(runBool).initialize());
+    }
 
     ATH_CHECK (m_muonsKey.initialize());
     ATH_CHECK (m_elesKey.initialize());
@@ -93,11 +101,6 @@ namespace HHBBTT
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_eventInfoKey,ctx);
     ATH_CHECK (eventInfo.isValid());
 
-    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_runNumberHandle
-      (m_runNumberKey);
-    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_rdmRunNumberHandle
-      (m_rdmRunNumberKey);
-
     SG::ReadHandle<xAOD::MuonContainer> muons(m_muonsKey,ctx);
     ATH_CHECK (muons.isValid());
 
@@ -106,6 +109,11 @@ namespace HHBBTT
     
     SG::ReadHandle<xAOD::TauJetContainer> taus(m_tausKey,ctx);
     ATH_CHECK (taus.isValid());
+
+    runBoolReadDecoMap runBoolDecos;
+    for (const auto& [runBool, key] : m_runBooleans_key){
+      runBoolDecos.emplace(runBool, key);
+    }
 
     trigReadDecoMap triggerdecos;
     for (const auto& [name, key] : m_triggerdecoKeys){
@@ -142,95 +150,40 @@ namespace HHBBTT
       }
     }
 
-    unsigned int runNumber = m_isMC ? m_rdmRunNumberHandle(*eventInfo) :
-      m_runNumberHandle(*eventInfo);
+    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> year(m_yearKey);
 
-    int year = 0;
-    std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap;
-    for(unsigned int i=0; i<=HHBBTT::Count; i++){
-      runBoolMap[static_cast<HHBBTT::RunBooleans>(i)] = false;
-    }
-
-    setRunNumberQuantities(runNumber, year, runBoolMap);
-
-    checkSingleMuTriggers(year, runBoolMap,
-			  eventInfo.cptr(), triggerdecos, pass_decos,
+    checkSingleMuTriggers(year(*eventInfo), eventInfo.cptr(),
+			  runBoolDecos, triggerdecos, pass_decos,
 			  muons.cptr(), mu_trigMatchDecos);
 
-    checkSingleEleTriggers(year, runBoolMap,
-			   eventInfo.cptr(), triggerdecos, pass_decos,
+    checkSingleEleTriggers(year(*eventInfo), eventInfo.cptr(),
+			   runBoolDecos, triggerdecos, pass_decos,
 			   electrons.cptr(), ele_trigMatchDecos);
 
-    checkMuTauTriggers(year, runBoolMap,
-		       eventInfo.cptr(), triggerdecos, pass_decos,
+    checkMuTauTriggers(year(*eventInfo), eventInfo.cptr(),
+		       runBoolDecos, triggerdecos, pass_decos,
 		       muons.cptr(), mu_trigMatchDecos,
 		       taus.cptr(), tau_trigMatchDecos);
 
-    checkEleTauTriggers(year, runBoolMap,
-			eventInfo.cptr(), triggerdecos, pass_decos,
+    checkEleTauTriggers(year(*eventInfo), eventInfo.cptr(),
+			runBoolDecos, triggerdecos, pass_decos,
 			electrons.cptr(), ele_trigMatchDecos,
 			taus.cptr(), tau_trigMatchDecos);
 
-    checkSingleTauTriggers(year, runBoolMap,
-			   eventInfo.cptr(), triggerdecos, pass_decos,
+    checkSingleTauTriggers(year(*eventInfo), eventInfo.cptr(),
+			   runBoolDecos, triggerdecos, pass_decos,
 			   taus.cptr(), tau_trigMatchDecos);
 
-    checkDiTauTriggers(year, runBoolMap,
-		       eventInfo.cptr(), triggerdecos, pass_decos,
+    checkDiTauTriggers(year(*eventInfo), eventInfo.cptr(),
+		       runBoolDecos, triggerdecos, pass_decos,
 		       taus.cptr(), tau_trigMatchDecos);
     
     return StatusCode::SUCCESS;
   }
 
-
-  void TriggerDecoratorAlg::setRunNumberQuantities
-  (unsigned int runNumber, int& year,
-   std::unordered_map<HHBBTT::RunBooleans, bool>& runBoolMap) const{
-    // References:
-    // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/rBR_Period_Report.php
-    // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
-
-    year = 0;
-    if(m_years.size()==1) year = m_years[0];
-    else{
-      if(266904 <= runNumber && runNumber <= 284484) year = 2015;
-      else if(296939 <= runNumber && runNumber <= 311481) year = 2016;
-    }
-    
-    runBoolMap.at(HHBBTT::is16PeriodA) =
-      296939 <= runNumber && runNumber <= 300287;
-    runBoolMap.at(HHBBTT::is16PeriodB_D3) =
-      300345 <= runNumber && runNumber <= 302872;
-    runBoolMap.at(HHBBTT::is16PeriodD4_end) =
-      302919 <= runNumber && runNumber <= 311481;
-    runBoolMap.at(HHBBTT::is17PeriodB1_B4) =
-      325713 <= runNumber && runNumber <= 326695;
-    runBoolMap.at(HHBBTT::is17PeriodB5_B7) =
-      326834 <= runNumber && runNumber <= 327490;
-    runBoolMap.at(HHBBTT::is17PeriodB8_end) =
-      327582 <= runNumber && runNumber <= 341649;
-    runBoolMap.at(HHBBTT::is18PeriodB_end) =
-      348885 <= runNumber && runNumber <= 364485;
-    runBoolMap.at(HHBBTT::is18PeriodK_end) =
-      355529 <= runNumber && runNumber <= 364485;
-    runBoolMap.at(HHBBTT::is22_75bunches) =
-      427882 <= runNumber && runNumber < 428071;
-    runBoolMap.at(HHBBTT::is23_75bunches) =
-      450360 <= runNumber && runNumber < 450894;
-    runBoolMap.at(HHBBTT::is23_400bunches) =
-      450894 <= runNumber && runNumber < 451094;
-    runBoolMap.at(HHBBTT::is23_first_2400bunches) =
-      451896 <= runNumber;
-
-    runBoolMap.at(HHBBTT::l1topo_disabled) =
-      (runNumber == 336506) || (runNumber == 336548) || (runNumber == 336567);
-
-    return;
-  }
-
   void TriggerDecoratorAlg::checkSingleMuTriggers
-  (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-   const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+  (int year, const xAOD::EventInfo* eventInfo,
+   const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
    passWriteDecoMap& pass_decos,
    const xAOD::MuonContainer* muons,
    muTrigMatchWriteDecoMap& mu_trigMatchDecos) const{
@@ -244,9 +197,9 @@ namespace HHBBTT
       single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
     }
     else if(2022<=year && year<=2023 &&
-	    !runBoolMap.at(HHBBTT::is22_75bunches) &&
-	    !runBoolMap.at(HHBBTT::is23_75bunches) &&
-	    !runBoolMap.at(HHBBTT::is23_400bunches)){
+	    !runBoolDecos.at(HHBBTT::is22_75bunches)(*eventInfo) &&
+	    !runBoolDecos.at(HHBBTT::is23_75bunches)(*eventInfo) &&
+	    !runBoolDecos.at(HHBBTT::is23_400bunches)(*eventInfo)){
       single_mu_paths = {
 	"HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
 	"HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
@@ -272,8 +225,8 @@ namespace HHBBTT
   }
 
   void TriggerDecoratorAlg::checkSingleEleTriggers
-  (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-   const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+  (int year, const xAOD::EventInfo* eventInfo,
+   const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
    passWriteDecoMap& pass_decos,
    const xAOD::ElectronContainer* electrons,
    eleTrigMatchWriteDecoMap& ele_trigMatchDecos) const{
@@ -292,7 +245,7 @@ namespace HHBBTT
 	"HLT_e140_lhloose_nod0"
       };
     }
-    else if(runBoolMap.at(HHBBTT::is22_75bunches)){
+    else if(runBoolDecos.at(HHBBTT::is22_75bunches)(*eventInfo)){
       single_ele_paths = {
 	"HLT_e17_lhvloose_L1EM15VHI", "HLT_e20_lhvloose_L1EM15VH",
 	"HLT_e250_etcut_L1EM22VHI"
@@ -304,7 +257,7 @@ namespace HHBBTT
 	"HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
       };
     }
-    else if(runBoolMap.at(HHBBTT::is23_75bunches)){
+    else if(runBoolDecos.at(HHBBTT::is23_75bunches)(*eventInfo)){
       single_ele_paths = {
 	"HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
 	"HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
@@ -337,8 +290,8 @@ namespace HHBBTT
   }
 
   void TriggerDecoratorAlg::checkMuTauTriggers
-  (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-   const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+  (int year, const xAOD::EventInfo* eventInfo,
+   const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
    passWriteDecoMap& pass_decos,
    const xAOD::MuonContainer* muons,
    muTrigMatchWriteDecoMap& mu_trigMatchDecos,
@@ -349,23 +302,23 @@ namespace HHBBTT
     std::vector<std::string> mu_tau_paths_low;
     std::vector<std::string> mu_tau_paths_high;
 
-    if(year==2015 || runBoolMap.at(HHBBTT::is16PeriodA)){
+    if(year==2015 || runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo)){
       mu_tau_paths_2016 = {"HLT_mu14_tau25_medium1_tracktwo"};
     }
-    else if(runBoolMap.at(HHBBTT::is16PeriodB_D3) ||
-	    runBoolMap.at(HHBBTT::is16PeriodD4_end)){
+    else if(runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo) ||
+	    runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo)){
       mu_tau_paths_2016 = {"HLT_mu14_ivarloose_tau25_medium1_tracktwo"};
     }
-    else if(runBoolMap.at(HHBBTT::is17PeriodB1_B4) ||
-	    runBoolMap.at(HHBBTT::is17PeriodB5_B7) ||
-	    runBoolMap.at(HHBBTT::is17PeriodB8_end)){
+    else if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo) ||
+	    runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
+	    runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo)){
       mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_medium1_tracktwo_L1MU10_TAU12IM_3J12"};
       mu_tau_paths_high = {"HLT_mu14_ivarloose_tau35_medium1_tracktwo"};
     }
-    else if(runBoolMap.at(HHBBTT::is18PeriodB_end)){
+    else if(runBoolDecos.at(HHBBTT::is18PeriodB_end)(*eventInfo)){
       mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_medium1_tracktwoEF_L1MU10_TAU12IM_3J12"};
       mu_tau_paths_high = {"HLT_mu14_ivarloose_tau35_medium1_tracktwoEF"};
-      if(runBoolMap.at(HHBBTT::is18PeriodK_end)){
+      if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
         mu_tau_paths_low.push_back("HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_L1MU10_TAU12IM_3J12");
         mu_tau_paths_high.push_back("HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA");
       }
@@ -410,8 +363,8 @@ namespace HHBBTT
   }
 
   void TriggerDecoratorAlg::checkEleTauTriggers
-      (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-       const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::ElectronContainer* electrons,
        eleTrigMatchWriteDecoMap& ele_trigMatchDecos,
@@ -421,23 +374,23 @@ namespace HHBBTT
     std::vector<std::string> ele_tau_paths;
     std::vector<std::string> ele_tau_paths_4J12;
  
-    if(year==2015 || runBoolMap.at(HHBBTT::is16PeriodA)){
+    if(year==2015 || runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo)){
       ele_tau_paths = {"HLT_e17_lhmedium_nod0_tau25_medium1_tracktwo"};
     }
-    else if(runBoolMap.at(HHBBTT::is16PeriodB_D3) ||
-	    runBoolMap.at(HHBBTT::is16PeriodD4_end)){
+    else if(runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo) ||
+	    runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo)){
       ele_tau_paths = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo"};
     }
-    else if(runBoolMap.at(HHBBTT::is17PeriodB1_B4) ||
-	    runBoolMap.at(HHBBTT::is17PeriodB5_B7) ||
-	    runBoolMap.at(HHBBTT::is17PeriodB8_end)){
+    else if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo) ||
+	    runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
+	    runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo)){
       ele_tau_paths = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo"};
       ele_tau_paths_4J12 = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo_L1EM15VHI_2TAU12IM_4J12"};
     }
-    else if(runBoolMap.at(HHBBTT::is18PeriodB_end)){
+    else if(runBoolDecos.at(HHBBTT::is18PeriodB_end)(*eventInfo)){
       ele_tau_paths = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwoEF"};
       ele_tau_paths_4J12 = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwoEF_L1EM15VHI_2TAU12IM_4J12"};
-      if(runBoolMap.at(HHBBTT::is18PeriodK_end)){
+      if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
         ele_tau_paths.push_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA");
         ele_tau_paths_4J12.push_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA_L1EM15VHI_2TAU12IM_4J12");
       }
@@ -485,31 +438,31 @@ namespace HHBBTT
 
 
   void TriggerDecoratorAlg::checkSingleTauTriggers
-  (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-   const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+  (int year, const xAOD::EventInfo* eventInfo,
+   const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
    passWriteDecoMap& pass_decos,
    const xAOD::TauJetContainer* taus,
    tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const {
 
     std::vector<std::string> single_tau_paths;
 
-    if(year==2015 || runBoolMap.at(HHBBTT::is16PeriodA)){
+    if(year==2015 || runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo)){
       single_tau_paths = {"HLT_tau80_medium1_tracktwo_L1TAU60"};
     }
-    else if(runBoolMap.at(HHBBTT::is16PeriodB_D3)){
+    else if(runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo)){
       single_tau_paths = {"HLT_tau125_medium1_tracktwo"};
     }
-    else if(runBoolMap.at(HHBBTT::is16PeriodD4_end) ||
-	    runBoolMap.at(HHBBTT::is17PeriodB1_B4)){
+    else if(runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo) ||
+	    runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo)){
       single_tau_paths = {"HLT_tau160_medium1_tracktwo"};
     }
-    else if(runBoolMap.at(HHBBTT::is17PeriodB5_B7) ||
-	    runBoolMap.at(HHBBTT::is17PeriodB8_end)){
+    else if(runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
+	    runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo)){
       single_tau_paths = {"HLT_tau160_medium1_tracktwo_L1TAU100"};
     }
     else if(year==2018){
       single_tau_paths = {"HLT_tau160_medium1_tracktwoEF_L1TAU100"};
-      if(runBoolMap.at(HHBBTT::is18PeriodK_end)){
+      if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
         single_tau_paths.push_back("HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100");
       }
     }
@@ -518,7 +471,7 @@ namespace HHBBTT
     }
     else if(year==2023){
       single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU100"};
-      if(runBoolMap.at(HHBBTT::is23_first_2400bunches)){
+      if(runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
         single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"};
       }
     }
@@ -543,8 +496,8 @@ namespace HHBBTT
 
 
   void TriggerDecoratorAlg::checkDiTauTriggers
-  (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-   const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+  (int year, const xAOD::EventInfo* eventInfo,
+   const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
    passWriteDecoMap& pass_decos,
    const xAOD::TauJetContainer* taus,
    tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const {
@@ -557,12 +510,12 @@ namespace HHBBTT
       ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM"};
     }
     else if(2016<=year && year<=2017){
-      if(runBoolMap.at(HHBBTT::is16PeriodA) ||
-	 runBoolMap.at(HHBBTT::is16PeriodB_D3) ||
-	 runBoolMap.at(HHBBTT::is16PeriodD4_end)){
+      if(runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo) ||
+	 runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo) ||
+	 runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo)){
 	ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
       }
-      else if(runBoolMap.at(HHBBTT::l1topo_disabled)){
+      else if(runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo)){
 	ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
       }
 
@@ -570,13 +523,13 @@ namespace HHBBTT
         ditau_paths_4J12 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM_4J12"};
       }
 
-      if(runBoolMap.at(HHBBTT::is17PeriodB1_B4)){
+      if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo)){
 	// For Period B1 to B4 in 2017, should use this trigger but go to L1Topo selection
         ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
       }
-      else if(!runBoolMap.at(HHBBTT::l1topo_disabled) &&
-	      (runBoolMap.at(HHBBTT::is17PeriodB5_B7) ||
-	       runBoolMap.at(HHBBTT::is17PeriodB8_end))){
+      else if(!runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo) &&
+	      (runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
+	       runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo))){
         ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1DR_TAU20ITAU12I_J25"};
       }
     }
@@ -584,7 +537,7 @@ namespace HHBBTT
     else if(year==2018){
       ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1TAU20IM_2TAU12IM_4J12p0ETA23"};
-      if(runBoolMap.at(HHBBTT::is18PeriodK_end)){
+      if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
         ditau_paths_L1Topo.push_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1DR_TAU20ITAU12I_J25");
         ditau_paths_4J12.push_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1TAU20IM_2TAU12IM_4J12p0ETA23");
       }
@@ -593,7 +546,7 @@ namespace HHBBTT
     else if(year>=2022){
       ditau_paths_L1Topo = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
-      if (runBoolMap.at(HHBBTT::is23_first_2400bunches)){
+      if (runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
         ditau_paths_L1Topo = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
         ditau_paths_4J12 = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
       }

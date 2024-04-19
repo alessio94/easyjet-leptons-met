@@ -22,8 +22,17 @@ namespace Easyjet
   StatusCode TauDecoratorAlg ::initialize()
   {
     ATH_CHECK (m_eventInfoKey.initialize());
-    ATH_CHECK (m_runNumberKey.initialize());
-    ATH_CHECK (m_rdmRunNumberKey.initialize());
+
+    m_yearKey = "EventInfo.dataTakingYear";
+    ATH_CHECK(m_yearKey.initialize());
+
+    m_is2016_periodA_key = "EventInfo.is2016_periodA";
+    m_is2016_periodB_D3_key = "EventInfo.is2016_periodB_D3";
+    m_is2022_75bunches_key = "EventInfo.is2022_75bunches";
+
+    ATH_CHECK(m_is2016_periodA_key.initialize());
+    ATH_CHECK(m_is2016_periodB_D3_key.initialize());
+    ATH_CHECK(m_is2022_75bunches_key.initialize());
 
     ATH_CHECK (m_tausInKey.initialize());
 
@@ -88,8 +97,6 @@ namespace Easyjet
     SG::ReadHandle<xAOD::TauJetContainer> tausIn(m_tausInKey,ctx);
     ATH_CHECK (tausIn.isValid());
 
-    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_runNumberHandle(m_runNumberKey);
-    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_rdmRunNumberHandle(m_rdmRunNumberKey);
     SG::WriteDecorHandle<xAOD::TauJetContainer, int> nProngDecorHandle(m_nProngDecorKey);
     SG::WriteDecorHandle<xAOD::TauJetContainer, int> decayModeDecorHandle(m_decayModeDecorKey);
     SG::WriteDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
@@ -136,10 +143,19 @@ namespace Easyjet
       SG::ReadDecorHandle<xAOD::EventInfo, bool> isSTT(m_passSTTDecorKey);
       SG::ReadDecorHandle<xAOD::EventInfo, bool> isDTT(m_passDTTDecorKey);
 
-      std::unordered_map<Easyjet::TriggerChannel,       std::unordered_map<Easyjet::Var, float>> ptThresholds;
-      unsigned int rdmNumber = m_isMC ? m_rdmRunNumberHandle(*eventInfo) : m_runNumberHandle(*eventInfo);
-      int year = 0;
-      setRunNumberQuantities(rdmNumber, year, ptThresholds);
+      SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> year(m_yearKey);
+
+      SG::ReadDecorHandle<xAOD::EventInfo, bool> is2016_periodA(m_is2016_periodA_key);
+      SG::ReadDecorHandle<xAOD::EventInfo, bool> is2016_periodB_D3(m_is2016_periodB_D3_key);
+      SG::ReadDecorHandle<xAOD::EventInfo, bool> is2022_75bunches(m_is2022_75bunches_key);
+
+      std::unordered_map<Easyjet::TriggerChannel,
+			 std::unordered_map<Easyjet::Var, float>> ptThresholds;
+      setThresholds(year(*eventInfo),
+			     is2016_periodA(*eventInfo),
+			     is2016_periodB_D3(*eventInfo),
+			     is2022_75bunches(*eventInfo),
+			     ptThresholds);
 
       int nIDMatchedTauSTT = 0;
       bool passTauPtSTTThreshold = false;
@@ -201,44 +217,30 @@ namespace Easyjet
     return StatusCode::SUCCESS;
   }
   
-  void TauDecoratorAlg::setRunNumberQuantities(unsigned int runNumber, int& year, std::unordered_map<Easyjet::TriggerChannel, std::unordered_map<Easyjet::Var, float>>& ptThresholds) const{
+  void TauDecoratorAlg::setThresholds
+  (unsigned int year,
+   bool is2016_periodA, bool is2016_periodB_D3,
+   bool is2022_75bunches,
+   std::unordered_map<Easyjet::TriggerChannel, std::unordered_map<Easyjet::Var, float>>& ptThresholds) const{
 
     // References:
-    // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/rBR_Period_Report.php
     // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
-
-    year = 0;
-    if (m_years.size() == 1) year = m_years[0];
-    else if(m_years.size() == 2){
-      if(266904 <= runNumber && runNumber <= 284484) year = 2015;
-      else if(296939 <= runNumber && runNumber <= 311481) year = 2016;
-    }
   
     // Single-lepton triggers
-    if(year==2015)
-      ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::ele] = 25. * Athena::Units::GeV;
-    // 2022 75 bunches
-    else if(427882 <= runNumber && runNumber < 428071)
-      ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::ele] = 18. * Athena::Units::GeV;
-    else
-      ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::ele] = 27. * Athena::Units::GeV;
+    float min_ele = 27. * Athena::Units::GeV;
+    if(year==2015) min_ele = 25. * Athena::Units::GeV;
+    else if(is2022_75bunches) min_ele = 18. * Athena::Units::GeV;
+    ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::ele] = min_ele;
 
-    if(year==2015)
-      ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::mu] = 21. * Athena::Units::GeV;
-    else if(year>=2016 && year<=2018)
-      ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::mu] = 27. * Athena::Units::GeV;
-    else
-      ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::mu] = 25. * Athena::Units::GeV;
+    float min_mu = 25. * Athena::Units::GeV;
+    if(year==2015) min_mu = 21. * Athena::Units::GeV;
+    else if(year>=2016 && year<=2018) min_mu = 27. * Athena::Units::GeV;
+    ptThresholds[Easyjet::TriggerChannel::SLT][Easyjet::Var::mu] = min_mu;
 
     // Single tau triggers
     float min_tau_STT = 180. * Athena::Units::GeV;
-    // 2015 + 2016 period A
-    if(year==2015 || (296939 <= runNumber && runNumber <= 300287))
-      min_tau_STT = 100. * Athena::Units::GeV;
-    // 2016 period B-D3
-    else if(300345 <= runNumber && runNumber <= 302872)
-      min_tau_STT = 140. * Athena::Units::GeV;
-
+    if(year==2015 || is2016_periodA) min_tau_STT = 100. * Athena::Units::GeV;
+    else if(is2016_periodB_D3) min_tau_STT = 140. * Athena::Units::GeV;
     ptThresholds[Easyjet::TriggerChannel::STT][Easyjet::Var::leadingtau] = min_tau_STT;
   }
 

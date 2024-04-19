@@ -41,9 +41,13 @@ namespace HHBBLL
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
 
-    ATH_CHECK (m_runNumber.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_rdmRunNumber.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK(m_is17_periodB5_B8.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is22_75bunches.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is23_75bunches.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is23_400bunches.initialize(m_systematicsList, m_eventHandle));
+    
     ATH_CHECK (m_matchingTool.retrieve());
 
     for (auto& [key, value] : m_boolnames) {
@@ -179,16 +183,7 @@ namespace HHBBLL
       m_bools.at(HHBBLL::DILEPTON_MASS_SR2) = false;
       m_bools.at(HHBBLL::DIBJET_MASS_SR2) = false;
 
-      unsigned int runNumber = m_isMC ? m_rdmRunNumber.get(*event, sys) :
-      m_runNumber.get(*event, sys);
-
-      int year = 0;
-      std::unordered_map<HHBBLL::RunBooleans, bool> runBoolMap;
-      for(unsigned int i=0; i<=HHBBLL::Count; i++){
-        runBoolMap[static_cast<HHBBLL::RunBooleans>(i)] = false;
-      }
-
-      setRunNumberQuantities(runNumber, year, runBoolMap);
+      setThresholds(event, sys);
 
       // Leptons
       const xAOD::Electron* ele0 = nullptr;
@@ -212,7 +207,7 @@ namespace HHBBLL
         mu0 = muons->at(0);
       }
 
-      evaluateTriggerCuts(year, runBoolMap, event, ele0, ele1, mu0, mu1, m_bbllCuts, sys);
+      evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_bbllCuts, sys);
       evaluateLeptonCuts(*electrons, *muons, m_bbllCuts);
       evaluateJetCuts(*bjets, *nonbjets, m_bbllCuts);
       evaluateBJetLeptonCuts(*bjets, *electrons, *muons);
@@ -294,30 +289,36 @@ namespace HHBBLL
     return StatusCode::SUCCESS;
   }
 
-  void HHbbllSelectorAlg::evaluateTriggerCuts(int year, std::unordered_map<HHBBLL::RunBooleans, bool> runBoolMap, const xAOD::EventInfo *event, const xAOD::Electron* ele0,  
-                          const xAOD::Electron* ele1, const xAOD::Muon* mu0, const xAOD::Muon* mu1, CutManager& bbllCuts, const CP::SystematicSet& sys) {
+  void HHbbllSelectorAlg::evaluateTriggerCuts
+  (const xAOD::EventInfo *event,
+   const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+   const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+   CutManager& bbllCuts, const CP::SystematicSet& sys) {
 
     if (!bbllCuts.exists("PASS_TRIGGER"))
         return;
 
-    if (ele0 || mu0) evaluateSingleLeptonTrigger(year, runBoolMap, event, ele0, mu0, sys);
-    if (ele1 || mu1) evaluateSingleLeptonTrigger(year, runBoolMap, event, ele1, mu1, sys);
-    if ((ele0 && ele1) || (mu0 && mu1)) evaluateDiLeptonTrigger(year, runBoolMap, event, ele0, ele1, mu0, mu1, sys);
-    if (ele0 && mu0) evaluateAsymmetricLeptonTrigger(year, event, ele0, mu0, sys);
+    if (ele0 || mu0) evaluateSingleLeptonTrigger(event, ele0, mu0, sys);
+    if (ele1 || mu1) evaluateSingleLeptonTrigger(event, ele1, mu1, sys);
+    if ((ele0 && ele1) || (mu0 && mu1)) evaluateDiLeptonTrigger(event, ele0, ele1, mu0, mu1, sys);
+    if (ele0 && mu0) evaluateAsymmetricLeptonTrigger(event, ele0, mu0, sys);
 
-    bool pass_trigger_ASLT = m_bools.at(HHBBLL::pass_trigger_ASLT1_em) || m_bools.at(HHBBLL::pass_trigger_ASLT1_me) ||
-    m_bools.at(HHBBLL::pass_trigger_ASLT2);
+    bool pass_trigger_ASLT = m_bools.at(HHBBLL::pass_trigger_ASLT1_em) ||
+      m_bools.at(HHBBLL::pass_trigger_ASLT1_me) ||
+      m_bools.at(HHBBLL::pass_trigger_ASLT2);
 
     if (m_bools.at(HHBBLL::pass_trigger_SLT) || m_bools.at(HHBBLL::pass_trigger_DLT) || pass_trigger_ASLT) m_bools.at(HHBBLL::PASS_TRIGGER) = true;
   }
 
-  void HHbbllSelectorAlg::evaluateSingleLeptonTrigger(
-      int year, std::unordered_map<HHBBLL::RunBooleans, bool> runBoolMap, const xAOD::EventInfo *event,
-      const xAOD::Electron *ele, const xAOD::Muon *mu, const CP::SystematicSet& sys)
+  void HHbbllSelectorAlg::evaluateSingleLeptonTrigger
+  (const xAOD::EventInfo *event,
+   const xAOD::Electron *ele, const xAOD::Muon *mu,
+   const CP::SystematicSet& sys)
   {
     // Check single electron triggers
     std::vector<std::string> single_ele_paths;
 
+    int year = m_year.get(*event, sys);
     if(year==2015){
       single_ele_paths = {
         "HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium",
@@ -330,7 +331,7 @@ namespace HHBBLL
         "HLT_e140_lhloose_nod0"
       };
     }
-    else if(runBoolMap.at(HHBBLL::is22_75bunches)){
+    else if(m_is22_75bunches.get(*event, sys)){
       single_ele_paths = {
         "HLT_e17_lhvloose_L1EM15VHI", "HLT_e20_lhvloose_L1EM15VH",
         "HLT_e250_etcut_L1EM22VHI"
@@ -342,7 +343,7 @@ namespace HHBBLL
         "HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
       };
     }
-    else if(runBoolMap.at(HHBBLL::is23_75bunches)){
+    else if(m_is23_75bunches.get(*event, sys)){
       single_ele_paths = {
         "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
         "HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
@@ -379,9 +380,9 @@ namespace HHBBLL
       single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
     }
     else if(2022<=year && year<=2023 &&
-	    !runBoolMap.at(HHBBLL::is22_75bunches) &&
-	    !runBoolMap.at(HHBBLL::is23_75bunches) &&
-	    !runBoolMap.at(HHBBLL::is23_400bunches)){
+	    !m_is22_75bunches.get(*event, sys) &&
+	    !m_is23_75bunches.get(*event, sys) &&
+	    !m_is23_400bunches.get(*event, sys)){
       single_mu_paths = {
         "HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
         "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
@@ -404,20 +405,22 @@ namespace HHBBLL
     m_bools.at(HHBBLL::pass_trigger_SLT) |= (trigPassed_SET || trigPassed_SMT);
   }
 
-  void HHbbllSelectorAlg::evaluateDiLeptonTrigger(
-      int year, std::unordered_map<HHBBLL::RunBooleans, bool> runBoolMap, const xAOD::EventInfo *event,
-      const xAOD::Electron *ele0, const xAOD::Electron *ele1, const xAOD::Muon *mu0,
-      const xAOD::Muon *mu1, const CP::SystematicSet& sys)
+  void HHbbllSelectorAlg::evaluateDiLeptonTrigger
+  (const xAOD::EventInfo *event,
+   const xAOD::Electron *ele0, const xAOD::Electron *ele1,
+   const xAOD::Muon *mu0, const xAOD::Muon *mu1,
+   const CP::SystematicSet& sys)
   {
     std::vector<std::string> di_ele_paths;
-    
+
+    int year = m_year.get(*event, sys);
     if(year==2015){
       di_ele_paths = {"HLT_2e12_lhloose_L12EM10VH"};
     }
     else if(year==2016){
       di_ele_paths = {"HLT_2e17_lhvloose_nod0"};
     }
-    else if (runBoolMap.at(HHBBLL::is17PeriodB5_B8)){
+    else if(m_is17_periodB5_B8.get(*event, sys)){
       di_ele_paths = {
         "HLT_2e24_lhvloose_nod0", "HLT_e24_lhvloose_nod0_2e12_lhvloose_nod0_L1EM20VH_3EM10VH"
       };
@@ -483,9 +486,13 @@ namespace HHBBLL
     m_bools.at(HHBBLL::pass_trigger_DLT) = (trigPassed_DET || trigPassed_DMT);
   }
 
-  void HHbbllSelectorAlg::evaluateAsymmetricLeptonTrigger(
-      int year, const xAOD::EventInfo *event, const xAOD::Electron *ele, const xAOD::Muon *mu, const CP::SystematicSet& sys)
+  void HHbbllSelectorAlg::evaluateAsymmetricLeptonTrigger
+  (const xAOD::EventInfo *event,
+   const xAOD::Electron *ele, const xAOD::Muon *mu,
+   const CP::SystematicSet& sys)
   {
+    int year = m_year.get(*event, sys);
+
     bool trigPassed_ASLT1_em = false;
     bool trigPassed_ASLT1_me = false;
     bool trigPassed_ASLT2 = false;
@@ -685,37 +692,16 @@ namespace HHBBLL
     m_bools.at(HHBBLL::Pass_ll) = ((TWO_ISO_ELECTRONS || TWO_ISO_MUONS || TWO_ISO_ELECMUs) && EXACTLY_TWO_B_JETS);
   }  
 
-  void HHbbllSelectorAlg::setRunNumberQuantities
-  (unsigned int runNumber, int& year,
-   std::unordered_map<HHBBLL::RunBooleans, bool>& runBoolMap) {
-    // References:
-    // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/rBR_Period_Report.php
-    // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
-
-    runBoolMap.at(HHBBLL::is15) =
-      266904 <= runNumber && runNumber <= 284484;
-    runBoolMap.at(HHBBLL::is16) =
-      296939 <= runNumber && runNumber <= 311481;
-    runBoolMap.at(HHBBLL::is17PeriodB5_B8) =
-      326834 <= runNumber && runNumber <= 328393;
-    runBoolMap.at(HHBBLL::is22_75bunches) =
-      427882 <= runNumber && runNumber < 428071;
-    runBoolMap.at(HHBBLL::is23_75bunches) =
-      450360 <= runNumber && runNumber < 450894;
-    runBoolMap.at(HHBBLL::is23_400bunches) =
-      450894 <= runNumber && runNumber < 451094;
-
-    if(m_years.size()==1) year = m_years[0];
-    else{
-      if(runBoolMap.at(HHBBLL::is15)) year = 2015;
-      else if(runBoolMap.at(HHBBLL::is16)) year = 2016;
-    }
+  void HHbbllSelectorAlg::setThresholds(const xAOD::EventInfo* event,
+					const CP::SystematicSet& sys) {
+    
+    int year = m_year.get(*event, sys);
 
     // Single-lepton triggers
     if(year==2015)
       m_pt_threshold[HHBBLL::SLT][HHBBLL::ele] = 25. * Athena::Units::GeV;
     // 2022 75 bunches
-    else if(runBoolMap.at(HHBBLL::is22_75bunches))
+    else if(m_is22_75bunches.get(*event, sys))
       m_pt_threshold[HHBBLL::SLT][HHBBLL::ele] = 18. * Athena::Units::GeV;
     else
       m_pt_threshold[HHBBLL::SLT][HHBBLL::ele] = 27. * Athena::Units::GeV;
@@ -735,7 +721,7 @@ namespace HHBBLL
     }
     // prescaled periods B5-B8
     // https://twiki.cern.ch/twiki/bin/view/Atlas/TrigEgammaRecommendedTriggers2017
-    else if(runBoolMap.at(HHBBLL::is17PeriodB5_B8)) {
+    else if(m_is17_periodB5_B8.get(*event, sys)) {
       m_pt_threshold[HHBBLL::DLT][HHBBLL::leadingele] = 25. * Athena::Units::GeV;
       m_pt_threshold[HHBBLL::DLT][HHBBLL::subleadingele] = 25. * Athena::Units::GeV;
     } else {

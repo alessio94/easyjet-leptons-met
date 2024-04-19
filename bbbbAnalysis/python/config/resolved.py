@@ -52,13 +52,6 @@ def resolved_cfg(flags, smalljetkey):
             )
         )
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.EventInfoGlobalAlg(
-            isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
-        )
-    )
-
     return cfg
 
 

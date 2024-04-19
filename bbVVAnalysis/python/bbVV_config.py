@@ -166,13 +166,6 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         )
     )
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.EventInfoGlobalAlg(
-            isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
-        )
-    )
-
     return cfg
 
 

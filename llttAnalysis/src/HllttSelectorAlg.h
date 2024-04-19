@@ -69,9 +69,6 @@ private:
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
-
-    Gaudi::Property<std::vector<int>> m_years
-      { this, "Years", false, "which years are running" };
     
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
@@ -97,6 +94,9 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
+    CP::SysReadDecorHandle<unsigned int> m_year
+      {this, "year", "dataTakingYear", ""};
+
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
     CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
@@ -105,9 +105,6 @@ private:
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
-
-    CP::SysReadDecorHandle<unsigned int>
-    m_runNumber {this, "runNumber", "runNumber", "Runnumber"};
 
     std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
 
@@ -154,13 +151,6 @@ private:
     bool pass_DLT;
 
     std::unordered_map<HLLTT::TriggerChannel, std::unordered_map<HLLTT::Var, float>> m_pt_threshold;
-
-    bool is15;
-    bool is16;
-    bool is17;
-    bool is18;
-    bool is22;
-    bool is23;
 
     void applyTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
     void applySLTTriggerSelection(const xAOD::EventInfo* event, const CP::SystematicSet& sys);

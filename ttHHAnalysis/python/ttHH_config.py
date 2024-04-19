@@ -81,7 +81,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.ttHH.TriggerDecoratorAlg(
             "ttHHTriggerDecoratorAlg",
             isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
             triggerLists=flags.Analysis.TriggerChains,
         )
     )
@@ -117,13 +116,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             isMC=flags.Input.isMC,
             floatVariableList=float_variables,
             intVariableList=int_variables
-        )
-    )
-
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.EventInfoGlobalAlg(
-            isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
         )
     )
 

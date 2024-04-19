@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -29,18 +29,6 @@
 
 namespace HHBBLL
 {
-
-    enum RunBooleans
-  {
-    is15,
-    is16,
-    is17PeriodB5_B8,
-    is22_75bunches,
-    is23_75bunches,
-    is23_400bunches,
-    Count
-  };
-
   enum TriggerChannel
   {
     SLT,
@@ -114,9 +102,6 @@ namespace HHBBLL
       Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-      Gaudi::Property<std::vector<int>> m_years
-      { this, "Years", false, "which years are running" };
-
       Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
@@ -141,12 +126,18 @@ namespace HHBBLL
       CP::SysReadHandle<xAOD::MissingETContainer>
       m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
 
-      CP::SysReadDecorHandle<unsigned int>
-      m_runNumber {this, "runNumber", "runNumber", "Runnumber"};
+      CP::SysReadDecorHandle<unsigned int> m_year
+	{this, "year", "dataTakingYear", ""};
 
-      CP::SysReadDecorHandle<unsigned int>
-      m_rdmRunNumber {this, "randomRunNumber", "RandomRunNumber", "Random run number for MC"};
-
+      CP::SysReadDecorHandle<bool> m_is17_periodB5_B8
+	{this, "is2017_periodB5_B8", "is2017_periodB5_B8", ""};
+      CP::SysReadDecorHandle<bool> m_is22_75bunches
+	{this, "is2022_75bunches", "is2022_75bunches", ""};
+      CP::SysReadDecorHandle<bool> m_is23_75bunches
+	{this, "is2023_75bunches", "is2023_75bunches", ""};
+      CP::SysReadDecorHandle<bool> m_is23_400bunches
+	{this, "is2023_400bunches", "is2023_400bunches", ""};
+      
       CP::SysFilterReporterParams m_filterParams {this, "HHbbll selection"};
 
       std::vector<std::string> m_passTriggers;
@@ -203,22 +194,33 @@ namespace HHBBLL
 
       std::unordered_map<HHBBLL::TriggerChannel, std::unordered_map<HHBBLL::Var, float>> m_pt_threshold;
 
-      void evaluateTriggerCuts(int year, std::unordered_map<HHBBLL::RunBooleans, bool> runBoolMap, const xAOD::EventInfo* event, const xAOD::Electron* ele0,  
-                          const xAOD::Electron* ele1, const xAOD::Muon* mu0, const xAOD::Muon* mu1, CutManager& bbllCuts, const CP::SystematicSet& sys);
-      void evaluateSingleLeptonTrigger(int year, std::unordered_map<HHBBLL::RunBooleans, bool> runBoolMap, const xAOD::EventInfo* event, 
-                          const xAOD::Electron* ele, const xAOD::Muon* mu, const CP::SystematicSet& sys);
-      void evaluateDiLeptonTrigger(int year, std::unordered_map<HHBBLL::RunBooleans, bool> runBoolMap, const xAOD::EventInfo* event,
-                          const xAOD::Electron* ele0, const xAOD::Electron* ele1, const xAOD::Muon* mu0, const xAOD::Muon* mu1, const CP::SystematicSet& sys);
-      void evaluateAsymmetricLeptonTrigger(int year, const xAOD::EventInfo* event, const xAOD::Electron* ele, const xAOD::Muon* mu, const CP::SystematicSet& sys);
+      void evaluateTriggerCuts
+	(const xAOD::EventInfo* event,
+	 const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+	 const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+	 CutManager& bbllCuts, const CP::SystematicSet& sys);
+      void evaluateSingleLeptonTrigger
+	(const xAOD::EventInfo* event, 
+	 const xAOD::Electron* ele, const xAOD::Muon* mu,
+	 const CP::SystematicSet& sys);
+      void evaluateDiLeptonTrigger
+	(const xAOD::EventInfo* event,
+	 const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+	 const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+	 const CP::SystematicSet& sys);
+      void evaluateAsymmetricLeptonTrigger
+	(const xAOD::EventInfo* event,
+	 const xAOD::Electron* ele, const xAOD::Muon* mu,
+	 const CP::SystematicSet& sys);
+
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& bbllCuts);
       void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                           const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts);
       void evaluateBJetLeptonCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                           const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons);
-      void setRunNumberQuantities
-      (unsigned int runNumber, int& year,
-       std::unordered_map<HHBBLL::RunBooleans, bool>& runBoolMap);
+      void setThresholds(const xAOD::EventInfo* event,
+			 const CP::SystematicSet& sys);
   };
 
 }

@@ -17,8 +17,9 @@ namespace ttHH
   StatusCode TriggerDecoratorAlg::initialize()
   {
     ATH_CHECK(m_eventInfoKey.initialize());
-    ATH_CHECK(m_runNumberKey.initialize());
-    ATH_CHECK(m_rdmRunNumberKey.initialize());
+
+    m_yearKey = "EventInfo.dataTakingYear";
+    ATH_CHECK(m_yearKey.initialize());
 
     // make trigger decorators
     for (const auto& trig : m_triggers){
@@ -50,11 +51,6 @@ namespace ttHH
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_eventInfoKey,ctx);
     ATH_CHECK (eventInfo.isValid());
 
-    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_runNumberHandle
-      (m_runNumberKey);
-    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> m_rdmRunNumberHandle
-      (m_rdmRunNumberKey);
-
     trigReadDecoMap triggerdecos;
     for (const auto& [name, key] : m_triggerdecoKeys){
       triggerdecos.emplace(name, key);
@@ -66,19 +62,11 @@ namespace ttHH
       pass_decos.at(channel)(*eventInfo) = false;
     }
 
-    unsigned int runNumber = m_isMC ? m_rdmRunNumberHandle(*eventInfo) :
-    m_runNumberHandle(*eventInfo);
+    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> year(m_yearKey);
 
-    int year = 0;
-    if(m_years.size()==1) year = m_years[0];
-    else{
-      if(266904 <= runNumber && runNumber <= 284484) year = 2015;
-      else if(296939 <= runNumber && runNumber <= 311481) year = 2016;
-    }
-
-    std::vector<std::string> singLepTrigPaths = m_triggerMap.at(year).at(ttHH::SINGLEP);
-    std::vector<std::string> diLepTrigPaths = m_triggerMap.at(year).at(ttHH::DILEP);
-    std::vector<std::string> bjetTrigPaths = m_triggerMap.at(year).at(ttHH::BJET);
+    std::vector<std::string> singLepTrigPaths = m_triggerMap.at(year(*eventInfo)).at(ttHH::SINGLEP);
+    std::vector<std::string> diLepTrigPaths = m_triggerMap.at(year(*eventInfo)).at(ttHH::DILEP);
+    std::vector<std::string> bjetTrigPaths = m_triggerMap.at(year(*eventInfo)).at(ttHH::BJET);
 
     if (!singLepTrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), singLepTrigPaths, triggerdecos, pass_decos, ttHH::SINGLEP);
     if (!diLepTrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), diLepTrigPaths, triggerdecos, pass_decos, ttHH::DILEP);

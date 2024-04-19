@@ -50,16 +50,10 @@ namespace ttHH
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
       { this, "event", "EventInfo", "EventInfo to read" };
 
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_runNumberKey{
-      this, "runNumberDecorKey", "EventInfo.runNumber", "Run number"};
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_rdmRunNumberKey{
-      this, "RandomRunNumberDecorKey", "EventInfo.RandomRunNumber", "Random run number"};
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_yearKey;
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
-
-    Gaudi::Property<std::vector<int>> m_years
-      { this, "Years", false, "which years are running" };
 
     Gaudi::Property<std::vector<std::string>> m_triggers
       { this, "triggerLists", {}, "Name list of trigger" };

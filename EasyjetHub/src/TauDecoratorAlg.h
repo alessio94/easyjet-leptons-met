@@ -59,13 +59,12 @@ private:
       { this, "event", "EventInfo", "EventInfo to read" };
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
-    Gaudi::Property<std::vector<unsigned int>> m_years
-      { this, "Years", false, "which years are running" };
 
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_runNumberKey{
-      this, "runNumberDecorKey", "EventInfo.runNumber", "Run number"};
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_rdmRunNumberKey{
-      this, "RandomRunNumberDecorKey", "EventInfo.RandomRunNumber", "Random run number"};
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_yearKey;
+
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_is2016_periodA_key;
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_is2016_periodB_D3_key;
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_is2022_75bunches_key;
 
     // Muons
     SG::ReadHandleKey<xAOD::MuonContainer> m_muonsInKey{
@@ -150,7 +149,11 @@ private:
     };
     SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_triggerMatchDTTKey;
 
-    void setRunNumberQuantities(unsigned int runNumber, int& year,  std::unordered_map<Easyjet::TriggerChannel, std::unordered_map<Easyjet::Var, float>>& ptThresholdMap) const;
+    void setThresholds
+    (unsigned int year,
+     bool is2016_periodA, bool is2016_periodB_D3,
+     bool is2022_75bunches,
+     std::unordered_map<Easyjet::TriggerChannel, std::unordered_map<Easyjet::Var, float>>& ptThresholdMap) const;
   };
 }
 

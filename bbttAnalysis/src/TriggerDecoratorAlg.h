@@ -30,7 +30,7 @@
 
 namespace HHBBTT
 {
-  
+
   enum RunBooleans
   {
     is16PeriodA,
@@ -45,9 +45,9 @@ namespace HHBBTT
     is23_75bunches,
     is23_400bunches,
     is23_first_2400bunches,
-    l1topo_disabled,
-    Count
+    l1topo_disabled
   };
+
   
   class TriggerDecoratorAlg final : public AthReentrantAlgorithm
   {
@@ -60,7 +60,7 @@ namespace HHBBTT
 
   private:
 
-    std::unordered_map<HHBBTT::TriggerChannel, std::string> m_triggerChannels =
+    const std::unordered_map<HHBBTT::TriggerChannel, std::string> m_triggerChannels =
       {
 	{HHBBTT::SLT, "SLT"},
 	{HHBBTT::LTT, "LTT"},
@@ -79,15 +79,28 @@ namespace HHBBTT
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
       { this, "event", "EventInfo", "EventInfo to read" };
 
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_runNumberKey{
-      this, "runNumberDecorKey", "EventInfo.runNumber", "Run number"};
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_rdmRunNumberKey{
-      this, "RandomRunNumberDecorKey", "EventInfo.RandomRunNumber", "Random run number"};
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_yearKey;
+
+    const std::unordered_map<HHBBTT::RunBooleans, std::string> m_runBooleans =
+      {
+	{HHBBTT::is16PeriodA, "is2016_periodA"},
+	{HHBBTT::is16PeriodB_D3, "is2016_periodB_D3"},
+	{HHBBTT::is16PeriodD4_end, "is2016_periodD4_end"},
+	{HHBBTT::is17PeriodB1_B4, "is2017_periodB1_B4"},
+	{HHBBTT::is17PeriodB5_B7, "is2017_periodB5_B7"},
+	{HHBBTT::is17PeriodB8_end, "is2017_periodB8_end"},
+	{HHBBTT::is18PeriodB_end, "is2018_periodB_end"},
+	{HHBBTT::is18PeriodK_end, "is2018_periodK_end"},
+	{HHBBTT::is22_75bunches, "is2022_75bunches"},
+	{HHBBTT::is23_75bunches, "is2023_75bunches"},
+	{HHBBTT::is23_400bunches, "is2023_400bunches"},
+	{HHBBTT::is23_first_2400bunches, "is2023_first_2400bunches"},
+	{HHBBTT::l1topo_disabled, "l1TopoDisabled"},
+      };
+    std::map<HHBBTT::RunBooleans, SG::ReadDecorHandleKey<xAOD::EventInfo>> m_runBooleans_key;
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
-    Gaudi::Property<std::vector<int>> m_years
-      { this, "Years", false, "which years are running" };
 
     SG::ReadHandleKey<xAOD::MuonContainer> m_muonsKey
       { this, "muons", "", "Muon container" };
@@ -118,11 +131,8 @@ namespace HHBBTT
 
     Gaudi::Property<bool> m_useDiTauTrigMatch
       { this, "diTauTrigMatch", true, "Run di-tau trigger matching" };
-    
-    void setRunNumberQuantities
-      (unsigned int runNumber, int& year,
-       std::unordered_map<HHBBTT::RunBooleans, bool>& runBoolMap) const;
 
+    typedef std::unordered_map<HHBBTT::RunBooleans, SG::ReadDecorHandle<xAOD::EventInfo, bool> > runBoolReadDecoMap;
     typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::EventInfo, bool> > trigReadDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::EventInfo, bool> > passWriteDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::MuonContainer, bool> > muTrigMatchWriteDecoMap;
@@ -130,22 +140,22 @@ namespace HHBBTT
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::TauJetContainer, bool> > tauTrigMatchWriteDecoMap;
     
     void checkSingleMuTriggers
-      (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-       const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::MuonContainer* muons,
        muTrigMatchWriteDecoMap& mu_trigMatchDecos) const;
 
     void checkSingleEleTriggers
-      (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-       const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::ElectronContainer* electrons,
        eleTrigMatchWriteDecoMap& ele_trigMatchDecos) const;
 
     void checkMuTauTriggers
-      (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-       const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::MuonContainer* muons,
        muTrigMatchWriteDecoMap& mu_trigMatchDecos,
@@ -153,8 +163,8 @@ namespace HHBBTT
        tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const;
 
     void checkEleTauTriggers
-      (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-       const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::ElectronContainer* electrons,
        eleTrigMatchWriteDecoMap& ele_trigMatchDecos,
@@ -162,15 +172,15 @@ namespace HHBBTT
        tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const;
 
     void checkSingleTauTriggers
-      (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-       const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::TauJetContainer* taus,
        tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const;
 
     void checkDiTauTriggers
-      (int year, std::unordered_map<HHBBTT::RunBooleans, bool> runBoolMap,
-       const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::TauJetContainer* taus,
        tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const;

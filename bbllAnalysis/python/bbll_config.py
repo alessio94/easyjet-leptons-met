@@ -72,7 +72,6 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             saveCutFlow=flags.Analysis.save_bbll_cutflow,
             passTriggers=flags.Analysis.TriggerChains,
             isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
@@ -106,13 +105,6 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables
-        )
-    )
-
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.EventInfoGlobalAlg(
-            isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
         )
     )
 

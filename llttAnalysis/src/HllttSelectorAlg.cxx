@@ -10,6 +10,7 @@
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
 #include <AthContainers/ConstDataVector.h>
+#include <AthenaKernel/Units.h>
 
 namespace HLLTT
 {
@@ -38,8 +39,8 @@ namespace HLLTT
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
 
-    ATH_CHECK (m_runNumber.initialize(m_systematicsList, m_eventHandle));
-
+    ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
+    
     // Intialise syst-aware output decorators
     for (const std::string &var : m_Bvarnames){
       CP::SysWriteDecorHandle<bool> whandle{var+"_%SYS%", this};
@@ -80,14 +81,6 @@ namespace HLLTT
         return StatusCode::FAILURE;
       }
     }
-
-    //finding which years are set in the config
-    is15 = std::find(m_years.begin(), m_years.end(), 2015) != m_years.end();
-    is16 = std::find(m_years.begin(), m_years.end(), 2016) != m_years.end();
-    is17 = std::find(m_years.begin(), m_years.end(), 2017) != m_years.end();
-    is18 = std::find(m_years.begin(), m_years.end(), 2018) != m_years.end();
-    is22 = std::find(m_years.begin(), m_years.end(), 2022) != m_years.end();
-    is23 = std::find(m_years.begin(), m_years.end(), 2023) != m_years.end();
 
     return StatusCode::SUCCESS;
   }
@@ -207,7 +200,7 @@ namespace HLLTT
       {
         bool passTauWP = m_tauWPDecorHandle.get(*tau, sys);
         m_selected_tau.set(*tau, false, sys);
-        if (passTauWP && tau->pt() > 20000)
+        if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)
         {
           if (std::abs(tau->eta()) < 2.5) {
             m_selected_tau.set(*tau, true, sys);
@@ -313,9 +306,8 @@ namespace HLLTT
   }
 
 
-  void HllttSelectorAlg ::applySLTTriggerSelection(
-						     const xAOD::EventInfo *event,
-						     const CP::SystematicSet &sys)
+  void HllttSelectorAlg ::applySLTTriggerSelection(const xAOD::EventInfo *event,
+						   const CP::SystematicSet &sys)
   {
     bool trigPassed_SET = false;
     bool trigPassed_SMT = false;
@@ -324,29 +316,31 @@ namespace HLLTT
     std::vector<std::string> single_ele_paths;
     std::vector<std::string> single_mu_paths;
 
+    int year = m_year.get(*event, sys);
+
     // SLT
-    if(is15){
-      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 25000;
-      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 21000;
+    if(year==2015){
+      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 25. * Athena::Units::GeV;
+      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 21. * Athena::Units::GeV;
       single_ele_paths = {"trigPassed_HLT_e24_lhmedium_L1EM20VH", "trigPassed_HLT_e60_lhmedium", "trigPassed_HLT_e120_lhloose"};
       single_mu_paths = {"trigPassed_HLT_mu20_iloose_L1MU15", "trigPassed_HLT_mu50"};
     }
-    else if(is16 || is17 || is18){
-      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27000;
-      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27000;
+    else if(2016<=year && year<=2018){
+      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27. * Athena::Units::GeV;
+      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27. * Athena::Units::GeV;
       single_ele_paths = {"trigPassed_HLT_e26_lhtight_nod0_ivarloose", "trigPassed_HLT_e60_lhmedium_nod0", "trigPassed_HLT_e140_lhloose_nod0"};
       single_mu_paths = {"trigPassed_HLT_mu26_ivarmedium", "trigPassed_HLT_mu50"};
     }
-    else if (is22) {
-      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27000;
-      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27000;
+    else if(year==2022) {
+      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27. * Athena::Units::GeV;
+      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27. * Athena::Units::GeV;
       single_ele_paths = {"trigPassed_HLT_e26_lhtight_ivarloose_L1EM22VHI", "trigPassed_HLT_e60_lhmedium_L1EM22VHI", "trigPassed_HLT_e140_lhloose_L1EM22VHI"
       };
       single_mu_paths = {"trigPassed_HLT_mu24_ivarmedium_L1MU14FCH", "trigPassed_HLT_mu50_L1MU14FCH"};
     }
-    else if (is23) {
-      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27000;
-      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27000;
+    else if(year==2023) {
+      m_pt_threshold[HLLTT::SLT][HLLTT::ele] = 27. * Athena::Units::GeV;
+      m_pt_threshold[HLLTT::SLT][HLLTT::mu] = 27. * Athena::Units::GeV;
       single_ele_paths = {"trigPassed_HLT_e26_lhtight_ivarloose_L1eEM26M", "trigPassed_HLT_e60_lhmedium_L1eEM26M", "trigPassed_HLT_e140_lhloose_L1eEM26M"};
       single_mu_paths = {"trigPassed_HLT_mu24_ivarmedium_L1MU14FCH", "trigPassed_HLT_mu50_L1MU14FCH"};
     }
@@ -373,20 +367,21 @@ namespace HLLTT
     trigPassed_DLT = false;
 
     std::vector<std::string> dilep_paths;
-
+    int year = m_year.get(*event, sys);
+    
     // SLT
-    m_pt_threshold[HLLTT::DLT][HLLTT::leadinglep] = 20000;
-    m_pt_threshold[HLLTT::DLT][HLLTT::subleadinglep] = 7000;
-    if(is15){
+    m_pt_threshold[HLLTT::DLT][HLLTT::leadinglep] = 20. * Athena::Units::GeV;
+    m_pt_threshold[HLLTT::DLT][HLLTT::subleadinglep] = 7. * Athena::Units::GeV;
+    if(year==2015){
       dilep_paths = {"trigPassed_HLT_2e12_lhvloose_L12EM10VH","trigPassed_HLT_mu18_mu8noL1","trigPassed_HLT_e17_lhloose_mu14"};
     }
-    else if(is16 || is17 || is18){
+    else if(2016<=year && year<=2018){
       dilep_paths = {"trigPassed_HLT_2e17_lhvloose_nod0_L12EM15VHI","trigPassed_HLT_mu22_mu8noL1","trigPassed_HLT_e17_lhloose_nod0_mu14"};
     }
-    else if (is22) {
+    else if(year==2022){
       dilep_paths = {"trigPassed_HLT_2e17_lhvloose_L12EM15VHI","trigPassed_HLT_mu22_mu8noL1_L1MU14FCH","trigPassed_HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
     }
-    else if (is23) {
+    else if(year==2023){
       dilep_paths = {"trigPassed_HLT_2e17_lhvloose_L12eEM18M","trigPassed_HLT_mu22_mu8noL1_L1MU14FCH","trigPassed_HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
     }
 

@@ -110,13 +110,6 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
         )
     )
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.EventInfoGlobalAlg(
-            isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
-        )
-    )
-
     if flags.Analysis.do_resonant_PNN:
         float_SH_var = [var for var in float_variables if "SH_" in var]
         cfg.addEventAlgo(

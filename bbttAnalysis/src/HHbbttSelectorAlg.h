@@ -124,11 +124,6 @@ private:
       { this, "useTriggerSelections", true, "Apply trigger-related selections" };
     Gaudi::Property<bool> m_doAntiIDRegions
       { this, "doAntiIDRegions", false, "Select anti-ID taus for fake estimates" };
-
-
-    Gaudi::Property<std::vector<int>> m_years
-      { this, "Years", false, "which years are running" };
-    int m_year;
     
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
@@ -165,11 +160,15 @@ private:
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
-    CP::SysReadDecorHandle<unsigned int>
-    m_runNumber {this, "runNumber", "runNumber", "Runnumber"};
+    CP::SysReadDecorHandle<unsigned int> m_year
+      {this, "year", "dataTakingYear", ""};
 
-    CP::SysReadDecorHandle<unsigned int>
-    m_rdmRunNumber {this, "randomRunNumber", "RandomRunNumber", "Random run number for MC"};
+    CP::SysReadDecorHandle<bool> m_is2016_periodA
+      {this, "is2016_periodA", "is2016_periodA", ""};
+    CP::SysReadDecorHandle<bool> m_is2016_periodB_D3
+      {this, "is2016_periodB_D3", "is2016_periodB_D3", ""};
+    CP::SysReadDecorHandle<bool> m_is2022_75bunches
+      {this, "is2022_75bunches", "is2022_75bunches", ""};
 
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
@@ -317,7 +316,8 @@ private:
        const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
        const xAOD::Jet* jet0, const xAOD::Jet* jet1);
 
-    void setRunNumberQuantities(unsigned int runNumber);
+    void setThresholds(const xAOD::EventInfo* event,
+		       const CP::SystematicSet& sys);
 
   };
 }

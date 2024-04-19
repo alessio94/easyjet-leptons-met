@@ -87,13 +87,6 @@ def boosted_cfg(flags, largejetkey):
             )
         )
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.EventInfoGlobalAlg(
-            isMC=flags.Input.isMC,
-            Years=flags.Analysis.Years,
-        )
-    )
-
     return cfg
 
 
