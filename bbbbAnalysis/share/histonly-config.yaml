@@ -31,7 +31,7 @@ orthogonality:
 
 # list of triggers per year to consider
 trigger:
-  include: EasyjetHub/trigger.yaml
+  include: bbbbAnalysis/triggers.yaml
 
 # apply loose jet cleaning only
 loose_jet_cleaning: true
