@@ -470,7 +470,7 @@ namespace HHBBTT
       single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
     }
     else if(year==2023){
-      single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU100"};
+      single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
       if(runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
         single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"};
       }
