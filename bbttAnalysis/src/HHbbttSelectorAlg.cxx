@@ -173,7 +173,7 @@ namespace HHBBTT
     m_pt_threshold[HHBBTT::MTT_high][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
 
     // Single-tau trigger
-    m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau] = 25. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
 
     // Di-tau triggers
     m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
