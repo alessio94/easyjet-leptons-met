@@ -60,6 +60,7 @@ Photon:
   extra_wps: []
 
 Electron:
+  trackSelection: true
   ID: ""
   Iso: ""
   amount: 0
@@ -70,6 +71,7 @@ Electron:
 
 Muon:
   max_eta: 2.5
+  trackSelection: true
   ID: ""
   Iso: ""
   amount: 0

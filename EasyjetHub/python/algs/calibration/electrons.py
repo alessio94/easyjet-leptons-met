@@ -27,6 +27,8 @@ def electron_sequence(flags, configAcc):
     configSeq.setOptionValue('.crackVeto', True)
     configSeq.setOptionValue('.forceFullSimConfig',
                              flags.Analysis.Electron.forceFullSimConfig)
+    configSeq.setOptionValue('.trackSelection',
+                             flags.Analysis.Electron.trackSelection)
 
     # PID configuration
     for id, iso in wps:

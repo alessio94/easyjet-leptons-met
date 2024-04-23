@@ -20,6 +20,8 @@ def muon_sequence(flags, configAcc):
     output_name = drop_sys(flags.Analysis.container_names.output.muons)
     configSeq += makeConfig('Muons', containerName=output_name)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
+    configSeq.setOptionValue('.trackSelection',
+                             flags.Analysis.Muon.trackSelection)
 
     # PID configuration
     for id, iso in wps:
