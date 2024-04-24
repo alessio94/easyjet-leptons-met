@@ -55,10 +55,14 @@ namespace Easyjet
           "truth_H" + std::to_string(h + 1) + "_" + "pdgId");
       m_truthChildrenPdgIdFromHiggsesDecorators.emplace_back(
           "truth_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
+      m_truthInitialChildrenPdgIdFromHiggsesDecorators.emplace_back(
+          "truth_initial_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
 
       m_truthHiggsesKinDecorators.emplace_back(
           std::vector<SG::AuxElement::Decorator<float>>());
       m_truthChildrenKinFromHiggsesDecorators.emplace_back(
+          std::vector<SG::AuxElement::Decorator<std::vector<float>>>());
+      m_truthInitialChildrenKinFromHiggsesDecorators.emplace_back(
           std::vector<SG::AuxElement::Decorator<std::vector<float>>>());
       for (const std::string &var : m_kinVars)
       {
@@ -66,6 +70,8 @@ namespace Easyjet
             "truth_H" + std::to_string(h + 1) + "_" + var);
         m_truthChildrenKinFromHiggsesDecorators[h].emplace_back(
             "truth_children_fromH" + std::to_string(h + 1) + "_" + var);
+        m_truthInitialChildrenKinFromHiggsesDecorators[h].emplace_back(
+            "truth_initial_children_fromH" + std::to_string(h + 1) + "_" + var);
       }
     }
 
@@ -162,12 +168,15 @@ namespace Easyjet
     {
       m_truthHiggsesPdgIdDecorators[h](eventInfo) = higgses[h].pdgId();
       m_truthChildrenPdgIdFromHiggsesDecorators[h](eventInfo) = higgses[h].children_pdgId();
+      m_truthInitialChildrenPdgIdFromHiggsesDecorators[h](eventInfo) = higgses[h].initial_children_pdgId();
 
       for (size_t i = 0; i < m_kinVars.size(); i++)
       {
         m_truthHiggsesKinDecorators[h][i](eventInfo) = higgses[h].p4(i);
         m_truthChildrenKinFromHiggsesDecorators[h][i](eventInfo) =
             higgses[h].children_p4(i);
+        m_truthInitialChildrenKinFromHiggsesDecorators[h][i](eventInfo) =
+            higgses[h].initial_children_p4(i);
       }
     }
 
@@ -258,6 +267,23 @@ namespace Easyjet
     return children;
   }
 
+  std::vector<const xAOD::TruthParticle *>
+  TruthParticleInformationAlg ::getInitialChildren(const xAOD::TruthParticle *h) const
+  {
+    std::vector<const xAOD::TruthParticle *> initial_children;
+    for (size_t i = 0; i < h->nChildren(); i++)
+    {
+      if (msgLvl(MSG::VERBOSE))
+      {
+        verbosePrintParticleAndChildren(h->child(i));
+      }
+
+      initial_children.push_back(h->child(i));
+    }
+    return initial_children;
+
+  }
+
   std::vector<TruthScalar> TruthParticleInformationAlg ::getFinalHiggses(
       const xAOD::TruthParticleContainer &truthParticlesContainer) const
   {
@@ -277,6 +303,7 @@ namespace Easyjet
         {
           TruthScalar h = final_h;
           h.children(getFinalChildren(final_h));
+          h.initial_children(getInitialChildren(final_h));
           higgses.push_back(h);
           tmp = final_h;
         }

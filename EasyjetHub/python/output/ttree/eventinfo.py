@@ -48,11 +48,14 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
     if tree_flags.truth_outputs.higgs_particle and flags.Input.isMC:
         eventinfo_branches.variables += ["truth_H1_pdgId", "truth_H2_pdgId",
                                          "truth_children_fromH1_pdgId",
-                                         "truth_children_fromH2_pdgId"]
+                                         "truth_children_fromH2_pdgId",
+                                         "truth_initial_children_fromH1_pdgId",
+                                         "truth_initial_children_fromH2_pdgId"]
         for truthpart in [
             "truth_H1", "truth_H2",
             "truth_children_fromH1", "truth_children_fromH2",
-            "truth_HH"
+            "truth_HH",
+            "truth_initial_children_fromH1", "truth_initial_children_fromH2"
         ]:
             eventinfo_branches.variables += [
                 f"{truthpart}_{var}"

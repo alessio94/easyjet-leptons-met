@@ -36,7 +36,9 @@ private:
     const xAOD::TruthParticle *m_source = nullptr;
     // final children
     std::vector<P4> m_children_p4;
+    std::vector<P4> m_initial_children_p4;
     std::vector<const xAOD::TruthParticle *> m_children;
+    std::vector<const xAOD::TruthParticle *> m_initial_children;
 
 public:
     TruthScalar() { m_pdgId = 0; };
@@ -69,11 +71,30 @@ public:
       m_children = std::move(children);
     }
 
+    void initial_children(std::vector<const xAOD::TruthParticle *> initial_children)
+    {
+      for (const xAOD::TruthParticle *initial_child : initial_children)
+      {
+        P4 initial_child_p4{initial_child->pt(), initial_child->eta(), initial_child->phi(), initial_child->m()};
+        m_initial_children_p4.push_back(initial_child_p4);
+      }
+      m_initial_children = std::move(initial_children);
+    }
+
     std::vector<int> children_pdgId(){
       std::vector<int> pdgId_pair;
       for (const xAOD::TruthParticle *child : m_children)
       {
-	pdgId_pair.push_back(child->pdgId());
+	      pdgId_pair.push_back(child->pdgId());
+      }
+      return pdgId_pair;
+    }
+
+    std::vector<int> initial_children_pdgId(){
+      std::vector<int> pdgId_pair;
+      for (const xAOD::TruthParticle *initial_child : m_initial_children)
+      {
+	      pdgId_pair.push_back(initial_child->pdgId());
       }
       return pdgId_pair;
     }
@@ -85,6 +106,18 @@ public:
       {
         std::array<float, 4> coords;
         child_p4.GetCoordinates(coords.begin());
+        coords_pair.push_back(coords[coordIdx]);
+      }
+      return coords_pair;
+    }
+
+    std::vector<float> initial_children_p4(int coordIdx)
+    {
+      std::vector<float> coords_pair;
+      for (P4 initial_child_p4 : m_initial_children_p4)
+      {
+        std::array<float, 4> coords;
+        initial_child_p4.GetCoordinates(coords.begin());
         coords_pair.push_back(coords[coordIdx]);
       }
       return coords_pair;
@@ -125,6 +158,9 @@ private:
     std::vector<const xAOD::TruthParticle *>
     getFinalChildren(const xAOD::TruthParticle *p) const;
 
+    std::vector<const xAOD::TruthParticle *>
+    getInitialChildren(const xAOD::TruthParticle *p) const;
+
     std::vector<TruthScalar>
     getFinalHiggses(const xAOD::TruthParticleContainer &container) const;
 
@@ -162,8 +198,14 @@ private:
     std::vector<SG::AuxElement::Decorator<std::vector<int>>>
         m_truthChildrenPdgIdFromHiggsesDecorators;
 
+    std::vector<SG::AuxElement::Decorator<std::vector<int>>>
+        m_truthInitialChildrenPdgIdFromHiggsesDecorators;
+
     std::vector<std::vector<SG::AuxElement::Decorator<std::vector<float>>>>
         m_truthChildrenKinFromHiggsesDecorators;
+
+    std::vector<std::vector<SG::AuxElement::Decorator<std::vector<float>>>>
+        m_truthInitialChildrenKinFromHiggsesDecorators;
 
     std::vector<SG::AuxElement::Decorator<float>> m_truthHHKinDecorators;
 
