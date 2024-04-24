@@ -156,10 +156,11 @@ namespace HHBBYY
         HT += jet->pt();
 
         // count central jets
-        if (std::abs(jet->eta())<2.5) nCentralJets++;
-
-        // check if jet is btagged
-        if (WPgiven && m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+        if (std::abs(jet->eta())<2.5){
+          nCentralJets++;
+          // check if jet is btagged
+          if (WPgiven && m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+        }
       }
       
       eventFloats.at(HHBBYY::Var::jets_HT) = HT;

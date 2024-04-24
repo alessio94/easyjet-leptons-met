@@ -220,7 +220,7 @@ namespace HLLTT
       {
 	n_jets += 1;
 	if (WPgiven){
-	  if (m_isBtag.get(*jet, sys))
+	  if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5)
 	    bjets->push_back(jet);	      
 	}
       }

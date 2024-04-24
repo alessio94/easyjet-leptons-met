@@ -105,7 +105,7 @@ namespace SHBBYY
       for(const xAOD::Jet* jet : *jets) {
         // check if jet is btagged
         if (WPgiven) {
-          if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+          if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
         }
       }
 

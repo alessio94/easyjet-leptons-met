@@ -97,7 +97,8 @@ namespace Easyjet
           continue;
 
         // select btagging wp if given. if not given always push back
-        if (!WPgiven || m_isBtag.get(*jet, sys)) workContainer->push_back(jet);
+        if (!WPgiven || (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5))
+	    workContainer->push_back(jet);
         if (PCBTaggiven) workContainer_pcbt[jet] = m_PCBT.get(*jet, sys);
       }
       

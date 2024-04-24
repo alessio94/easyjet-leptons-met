@@ -135,11 +135,8 @@ namespace HHBBLL
 	// count central jets
         if (std::abs(jet->eta())<2.5) {
           nCentralJets++;
-        }
-
-        if (WPgiven) {
-          if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
-        }
+	  if (WPgiven && m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+	}
       }
       n_bjets = bjets->size();
 

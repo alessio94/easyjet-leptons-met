@@ -86,7 +86,6 @@ def jet_sequence(
             # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
             configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
-            configSeq.setOptionValue('.kinematicSelection', True)
 
             if 'btagCDI' in jet_flags:
                 configSeq.setOptionValue(

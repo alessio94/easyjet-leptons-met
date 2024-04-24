@@ -169,7 +169,7 @@ namespace HHBBVV
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       for(const xAOD::Jet* jet : *jets) {
         if (WPgiven) {
-          if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+          if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
         }
       }
      

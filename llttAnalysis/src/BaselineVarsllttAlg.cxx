@@ -183,7 +183,8 @@ namespace HLLTT
       for (const xAOD::Jet *jet : *jets)
 	{
 	  n_jets += 1;
-	  if (WPgiven && m_isBtag.get(*jet, sys))bjets->push_back(jet);
+	  if (WPgiven && m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5)
+	    bjets->push_back(jet);
 	}
       n_bjets = bjets->size();
       
