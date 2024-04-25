@@ -67,8 +67,6 @@ save_ttHH_cutflow: false
 
 CutList:
   - PASS_TRIGGER
-  - NJETS
-  - NBJETS
   - PASS_BASELINE
 
 # Include the TTree configuration and update details

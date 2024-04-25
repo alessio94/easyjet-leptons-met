@@ -49,13 +49,13 @@ namespace ttHH
 
       const std::vector<std::string> m_STANDARD_CUTS{
           "PASS_TRIGGER",
-          "NJETS", 
-          "NBJETS",
           "PASS_BASELINE"
       };
 
-      void evaluateJetCuts(const xAOD::JetContainer& bjets,
-                          const xAOD::JetContainer& jets, CutManager& ttHHCuts);
+      void evaluateCuts(const xAOD::JetContainer& bjets,
+			const xAOD::MuonContainer& muons,
+			const xAOD::ElectronContainer& electrons,
+			CutManager& ttHHCuts);
 
     private :
       // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",

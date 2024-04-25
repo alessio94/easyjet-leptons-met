@@ -137,7 +137,7 @@ namespace ttHH
         }
       }
 
-      evaluateJetCuts(*bjets, *jets, m_ttHHCuts);
+      evaluateCuts(*bjets, *muons, *electrons, m_ttHHCuts);
 
       bool passedall = true;
       for (CutEntry& cut : m_ttHHCuts) {
@@ -214,17 +214,16 @@ namespace ttHH
 
   }
 
-  void ttHHSelectorAlg::evaluateJetCuts(const xAOD::JetContainer& bjets,
-                            const xAOD::JetContainer& jets, CutManager& ttHHCuts)
+  void ttHHSelectorAlg::evaluateCuts(const xAOD::JetContainer& bjets,
+                            const xAOD::MuonContainer& muons, 
+			    const xAOD::ElectronContainer& electrons,
+			    CutManager& ttHHCuts)
   {
 
-    if (jets.size() >= 4 && ttHHCuts.exists("NJETS"))
-        ttHHCuts("NJETS").passed = true;
+    int nLeptons = muons.size() + electrons.size();
+    int nBJets = bjets.size();
 
-    if (bjets.size() >= 4 && ttHHCuts.exists("NBJETS"))
-        ttHHCuts("NBJETS").passed = true;
-
-    if (ttHHCuts("NBJETS").passed && ttHHCuts("NJETS").passed)
+    if ((((nLeptons<=1) && (nBJets>=4)) || ((nLeptons>=2) && (nBJets>=2))) && ttHHCuts.exists("PASS_BASELINE"))
         ttHHCuts("PASS_BASELINE").passed = true;
 
   }
