@@ -20,7 +20,7 @@ First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel fre
 setupATLAS
 lsetup git
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
-git clone --recursive ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 ```
 Note the `--recursive` argument, which is needed to get the submodules in the package.
 
@@ -210,6 +210,23 @@ source */setup.sh
 *If you are working in a container, source the `/release_setup.sh` script, instead of the `setupATLAS; asetup --restore` commands.*
 
 ## Running on the grid
+
+To run on the grid, you should either use a central tag
+
+```
+cd easyjet
+git checkout [YourFavoriteTag]
+cd ../run
+```
+
+or make sure your fork is setup, as a tag will be pushed on the fork
+
+```
+cd easyjet
+git remote add origin ssh://git@gitlab.cern.ch:7999/$(git config user.name)/easyjet.git
+cd ../run
+```
+
 
 To run on the grid there is a script available and is used as follows:
 

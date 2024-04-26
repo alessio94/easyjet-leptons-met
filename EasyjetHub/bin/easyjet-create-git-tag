@@ -51,14 +51,15 @@ if ! git diff --quiet; then
     exit 1
 fi
 
-if [[ "$(git remote get-url origin)" != *"$USER_GRID_NAME"* ]]; then
-    echo "WARNING: Remote URL for \"origin\" is not a fork, we recommend working from a fork. Please see instructions in main README.md."
-fi
-
 # Check if the tag already exists
 if git rev-parse "$TAG" >/dev/null 2>&1; then
     echo "Reusing tag: $TAG"
 else
+    if [[ "$(git remote get-url origin)" != *"$USER_GRID_NAME"* ]]; then
+        echo "WARNING: Remote URL for \"origin\" is not a fork and you're not working from an existing tag. Please set up a fork first for instance with "
+        echo "git remote add origin ssh://git@gitlab.cern.ch:7999/$(git config user.name)/easyjet.git"
+        exit 1
+    fi
     git tag $TAG
     # push the tag to the remote repository if the PUSH_TAG flag is set
     if "$PUSH_TAG" = true; then
