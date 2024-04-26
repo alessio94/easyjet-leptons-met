@@ -28,6 +28,12 @@
 
 namespace HHBBYY
 {
+  enum BDT {
+    low_mass  = 0,
+    high_mass = 1,
+    VBFjets   = 2
+  };
+  
   enum Var {
     y1_ptOverMyy = 0,
     y1_eta,
@@ -73,6 +79,26 @@ namespace HHBBYY
     size_enum,
   };
 
+  enum VBFVars {
+    HT = 0,
+    vbf_jj_m,
+    vbf_jj_deta,
+    dR_yybb_vbfj1,
+    dR_yybb_vbfj2,
+    deta_yybb_vbfj1,
+    deta_yybb_vbfj2,
+    dR_yybb_jj,
+    deta_yybb_jj,
+    pT_yybbjj,
+    eta_yybbjj,
+    m_yybbjj,
+    vbf_j1_pt,
+    vbf_j1_eta,
+    vbf_j2_pt,
+    vbf_j2_eta,
+    nVars
+  };
+
   /// \brief An algorithm for counting containers
   class BaselineVarsbbyyAlg final : public AthHistogramAlgorithm
   {
@@ -90,6 +116,9 @@ namespace HHBBYY
     float compute_Topness(const xAOD::JetContainer *jets);
     float* compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
     float compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
+    float getVBFjets_BDT(float ht, const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+                      const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
+                      const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
 
     std::vector<float> makeXGBoostDMatrixLegacyNonres(const xAOD::Photon *ph1, const xAOD::Photon *ph2, 
                                                       ConstDataVector<xAOD::JetContainer> &categorisation_jets,

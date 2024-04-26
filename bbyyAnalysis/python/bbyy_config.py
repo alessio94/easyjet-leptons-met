@@ -183,7 +183,7 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     for i in range(1,3):
         for var in ["pt", "eta", "phi", "E", "yybb_dR", "yybb_deta"]:
             float_variable_names += [f"Jet_vbf_j{i}_" + var]
-    for var in ["m", "deta", "yybb_dR", "yybb_deta", "yybb_pT",
+    for var in ["maxscore", "m", "deta", "yybb_dR", "yybb_deta", "yybb_pt",
                 "yybb_eta", "yybb_phi", "yybb_m"]:
         float_variable_names += ["Jet_vbf_jj_" + var]
 

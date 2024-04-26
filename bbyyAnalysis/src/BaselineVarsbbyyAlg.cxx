@@ -333,71 +333,6 @@ namespace HHBBYY
 	m_Fbranches.at("DeltaPhi_bb_yy_cm_bbyy").set(*event,vec_angular_variables_CM[6], sys);
       }
       
-      // Find VBF jets
-      float vbf_jj_deta = -999;
-      float vbf_mjj    = -999;
-      float dR_yybb_vbfj1 = -999;
-      float dR_yybb_vbfj2 = -999;
-      float deta_yybb_vbfj1 = -999;
-      float deta_yybb_vbfj2 = -999;
-      float dR_yybb_jj = -999;
-      float deta_yybb_jj = -999;
-      
-      TLorentzVector vbf_j[2];
-      TLorentzVector vbf_jj(0.,0.,0.,0.);
-      TLorentzVector yybbjj(0.,0.,0.,0.);
-
-      if(jets->size()>=4&&bjets->size()>=2){
-        for (size_t i=0; i<jets->size()-1; i++){
-          TLorentzVector j1 = (*jets)[i]->p4();
-          if((*jets)[i]->p4()==Hbb_candidate1||(*jets)[i]->p4()==Hbb_candidate2) continue;
-          for (size_t j = i+1; j<jets->size(); j++){
-            TLorentzVector j2 = (*jets)[j]->p4();
-            if((*jets)[j]->p4()==Hbb_candidate1||(*jets)[j]->p4()==Hbb_candidate2) continue;
-            
-            TLorentzVector iPair = j1 + j2;
-            if(iPair.M() > vbf_mjj){
-              vbf_mjj = iPair.M();
-              vbf_j[0] = j1;
-              vbf_j[1] = j2;
-              vbf_jj = iPair;
-            }
-          }
-        }
-        vbf_jj_deta = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
-        yybbjj = vbf_jj + HH;
-        dR_yybb_vbfj1 = vbf_j[0].DeltaR(HH); 
-        dR_yybb_vbfj2 = vbf_j[1].DeltaR(HH);
-        dR_yybb_jj = vbf_jj.DeltaR(HH);
-        deta_yybb_vbfj1 = std::fabs(vbf_j[0].Eta() - HH.Eta()); 
-        deta_yybb_vbfj2 = std::fabs(vbf_j[1].Eta() - HH.Eta()); 
-        deta_yybb_jj = std::fabs(vbf_jj.Eta() - HH.Eta());
-      }
-
-      for(unsigned int i=0; i<2; i++){
-        std::string prefix = "Jet_vbf_j"+std::to_string(i+1);
-        m_Fbranches.at(prefix+"_pt").set(*event, vbf_j[i].Pt(), sys);
-        m_Fbranches.at(prefix+"_eta").set(*event, vbf_j[i].Eta(), sys);
-        m_Fbranches.at(prefix+"_phi").set(*event, vbf_j[i].Phi(), sys);
-        m_Fbranches.at(prefix+"_E").set(*event, vbf_j[i].E(), sys);
-      }
-      m_Fbranches.at("Jet_vbf_j1_yybb_dR").set(*event, dR_yybb_vbfj1, sys);
-      m_Fbranches.at("Jet_vbf_j2_yybb_dR").set(*event, dR_yybb_vbfj2, sys);
-      m_Fbranches.at("Jet_vbf_j1_yybb_deta").set(*event, deta_yybb_vbfj1, sys);
-      m_Fbranches.at("Jet_vbf_j2_yybb_deta").set(*event, deta_yybb_vbfj2, sys);
-      
-      eventFloats.at(HHBBYY::Var::vbfjj_m) = vbf_mjj;
-      eventFloats.at(HHBBYY::Var::vbfjj_dEta) = vbf_jj_deta;
-
-      m_Fbranches.at("Jet_vbf_jj_m").set(*event, vbf_mjj, sys);
-      m_Fbranches.at("Jet_vbf_jj_deta").set(*event, vbf_jj_deta, sys);
-      m_Fbranches.at("Jet_vbf_jj_yybb_dR").set(*event, dR_yybb_jj, sys);
-      m_Fbranches.at("Jet_vbf_jj_yybb_deta").set(*event, deta_yybb_jj, sys);
-      m_Fbranches.at("Jet_vbf_jj_yybb_pT").set(*event, yybbjj.Pt(), sys);
-      m_Fbranches.at("Jet_vbf_jj_yybb_eta").set(*event, yybbjj.Eta(), sys);
-      m_Fbranches.at("Jet_vbf_jj_yybb_phi").set(*event, yybbjj.Phi(), sys);
-      m_Fbranches.at("Jet_vbf_jj_yybb_m").set(*event, yybbjj.M(), sys);    
-    
       // More global variables
       m_Fbranches.at("HT").set(*event, HT, sys);
 
@@ -425,7 +360,43 @@ namespace HHBBYY
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
       m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
 
-      // bdt
+      // bdt (vbf jets selection)
+      TLorentzVector vbf_j[2];
+      TLorentzVector vbf_jj(0.,0.,0.,0.);
+      TLorentzVector yybbjj(0.,0.,0.,0.);
+      float vbf_jj_maxscore = 0;
+    
+      if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
+        vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+        vbf_jj = vbf_j[0] + vbf_j[1];
+        yybbjj = vbf_jj + HH;
+      }
+
+      for(unsigned int i=0; i<2; i++){
+        std::string prefix = "Jet_vbf_j"+std::to_string(i+1);
+        m_Fbranches.at(prefix+"_pt").set(*event, vbf_j[i].Pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, vbf_j[i].Eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, vbf_j[i].Phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, vbf_j[i].E(), sys);
+        m_Fbranches.at(prefix+"_yybb_dR").set(*event, vbf_j[i].DeltaR(HH), sys);
+        m_Fbranches.at(prefix+"_yybb_deta").set(*event, std::fabs(vbf_j[i].Eta() - HH.Eta()), sys);
+      }
+
+      std::string prefix_vbf = "Jet_vbf_jj";
+      m_Fbranches.at(prefix_vbf+"_maxscore").set(*event, vbf_jj_maxscore, sys);
+      m_Fbranches.at(prefix_vbf+"_m").set(*event, vbf_jj.M(), sys);
+      m_Fbranches.at(prefix_vbf+"_deta").set(*event, std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta()), sys);
+      m_Fbranches.at(prefix_vbf+"_yybb_dR").set(*event, vbf_jj.DeltaR(HH), sys);
+      m_Fbranches.at(prefix_vbf+"_yybb_deta").set(*event, std::fabs(vbf_jj.Eta()-HH.Eta()), sys);
+      m_Fbranches.at(prefix_vbf+"_yybb_pt").set(*event, yybbjj.Pt(), sys);
+      m_Fbranches.at(prefix_vbf+"_yybb_eta").set(*event, yybbjj.Eta(), sys);
+      m_Fbranches.at(prefix_vbf+"_yybb_phi").set(*event, yybbjj.Phi(), sys);
+      m_Fbranches.at(prefix_vbf+"_yybb_m").set(*event, yybbjj.M(), sys);
+   
+      eventFloats.at(HHBBYY::Var::vbfjj_m) = vbf_jj.M();
+      eventFloats.at(HHBBYY::Var::vbfjj_dEta) = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
+
+      // bdt (low and high mHH categorations)
       if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
         performCategorisationBDT(ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, metCont, sys, eventFloats, eventInts);
       }
@@ -633,18 +604,13 @@ namespace HHBBYY
     // ChiWt variable
     vars[HHBBYY::Var::topness] = eventFloats.at(HHBBYY::Var::topness);
 
-    // /!\ Missing values for VBF variables. Should be added with the VBF selection
-    if (eventFloats.at(HHBBYY::Var::vbfjj_dEta) <0) {
-      vars[HHBBYY::Var::vbfjj_dEta] = -999;
-    } else {
+    if(categorisation_jets.size()==4){
       vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::vbfjj_dEta);
-    }
-    if (eventFloats.at(HHBBYY::Var::vbfjj_m) <0) {
-      vars[HHBBYY::Var::vbfjj_m] = -999;
-    } else {
       vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m);
+    }else{
+      vars[HHBBYY::Var::vbfjj_dEta] = -999;
+      vars[HHBBYY::Var::vbfjj_m] = -999;
     }
-    
     vars[HHBBYY::Var::bbyy_mStar] = eventFloats.at(HHBBYY::Var::bbyy_mStar);
     vars[HHBBYY::Var::yy_dR] = eventFloats.at(HHBBYY::Var::yy_dR);
     vars[HHBBYY::Var::bb_dR] = categorisation_jets.at(0)->p4().DeltaR(categorisation_jets.at(1)->p4());
@@ -657,6 +623,115 @@ namespace HHBBYY
     return vars;
   }
 
+  //#######################################################################################################################################################################################################
+
+// Selects VBF jets based on VBF jet BDT score
+  float BaselineVarsbbyyAlg::getVBFjets_BDT(float ht, const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+                                         const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
+                                         const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]) {
+
+    std::vector<float> vars(HHBBYY::VBFVars::nVars, 0.0f);
+    vars[HHBBYY::VBFVars::HT] = ht;
+
+    if (m_bdts.size()!=3){
+      ANA_MSG_ERROR("3 BDTs are required: 1 for vbf jets selection");
+      return 0;
+    }
+    
+    int idx1 = -1;
+    int idx2 = -1;
+    float max_jjscore = 0;
+    TLorentzVector yybb(0.,0.,0.,0.);
+
+    const int nCandidateVBFJets = jets->size() - 2;
+    if (nCandidateVBFJets >= 2) {
+
+      // candidate photons
+      TLorentzVector y1 = ph1->p4();
+      TLorentzVector y2 = ph2->p4();
+      TLorentzVector yy = y1 + y2;
+      // candidate bjets
+      TLorentzVector b1 = Hbb_Jet1->p4();
+      TLorentzVector b2 = Hbb_Jet2->p4();
+      TLorentzVector bb = b1 + b2;
+      // yybb system
+      yybb = yy + bb;
+
+      const int nComb = (jets->size() * (jets->size() - 1))/2;
+      std::vector<int> allVBFJetLeadIdx(nComb);
+      std::vector<int> allVBFJetSubIdx(nComb);
+      std::vector<float> scores;
+
+      int curComb = 0;
+      //std::vector<float> vars;
+  
+      for (size_t i = 0; i < jets->size()-1; i++) {
+        // ignore candidate bjets
+        if (jets->at(i)==Hbb_Jet1 || jets->at(i)==Hbb_Jet2) {
+          continue;
+        }
+
+        for (size_t j = i + 1; j < jets->size(); j++) {
+          // ignore candidate bjets
+          if (jets->at(j)==Hbb_Jet1 || jets->at(j)==Hbb_Jet2) {
+            continue;
+          }
+
+          int candidateVBFJetLeadIdx = -1;
+          int candidateVBFJetSubIdx = -1;
+
+          if (jets->at(i)->pt() >= jets->at(j)->pt()) {
+            candidateVBFJetLeadIdx = i;
+            candidateVBFJetSubIdx = j;
+          } else {
+            candidateVBFJetLeadIdx = j;
+            candidateVBFJetSubIdx = i;
+          }
+
+          const TLorentzVector candidateVBFJetLead = jets->at(candidateVBFJetLeadIdx)->p4();
+          const TLorentzVector candidateVBFJetSub = jets->at(candidateVBFJetSubIdx)->p4();
+
+          TLorentzVector candidateVBFJets = candidateVBFJetLead + candidateVBFJetSub;
+          vars[HHBBYY::VBFVars::vbf_jj_m] = candidateVBFJets.M();
+          vars[HHBBYY::VBFVars::vbf_jj_deta] = fabs(candidateVBFJetLead.Eta() - candidateVBFJetSub.Eta());
+          vars[HHBBYY::VBFVars::dR_yybb_vbfj1] = candidateVBFJetLead.DeltaR(yybb);  
+          vars[HHBBYY::VBFVars::dR_yybb_vbfj2] = candidateVBFJetSub.DeltaR(yybb);
+          vars[HHBBYY::VBFVars::deta_yybb_vbfj1] = fabs(candidateVBFJetLead.Eta() - yybb.Eta());
+          vars[HHBBYY::VBFVars::deta_yybb_vbfj2] = fabs(candidateVBFJetSub.Eta() - yybb.Eta());
+          vars[HHBBYY::VBFVars::dR_yybb_jj] = candidateVBFJets.DeltaR(yybb);
+          vars[HHBBYY::VBFVars::deta_yybb_jj] = fabs(candidateVBFJets.Eta() - yybb.Eta());
+
+          TLorentzVector candidate_yybbjj = yybb + candidateVBFJets;
+          vars[HHBBYY::VBFVars::pT_yybbjj] = candidate_yybbjj.Pt();
+          vars[HHBBYY::VBFVars::eta_yybbjj] = candidate_yybbjj.Eta();
+          vars[HHBBYY::VBFVars::m_yybbjj] = candidate_yybbjj.M();
+          vars[HHBBYY::VBFVars::vbf_j1_pt] = candidateVBFJetLead.Pt();
+          vars[HHBBYY::VBFVars::vbf_j1_eta] = candidateVBFJetLead.Eta();
+          vars[HHBBYY::VBFVars::vbf_j2_pt] = candidateVBFJetSub.Pt();
+          vars[HHBBYY::VBFVars::vbf_j2_eta] = candidateVBFJetSub.Eta();
+
+          allVBFJetLeadIdx[curComb] = candidateVBFJetLeadIdx;
+          allVBFJetSubIdx[curComb] = candidateVBFJetSubIdx;
+          curComb++;
+
+          float Score = m_bdts.at(HHBBYY::BDT::VBFjets)->GetClassification(vars);
+          scores.push_back(Score); 
+        } // end loop second jet
+      } // end loop first jet
+
+      auto maxScoreIdx = std::distance(scores.begin(), std::max_element(scores.begin(), scores.end()));
+      max_jjscore = scores[maxScoreIdx];
+      idx1 = allVBFJetLeadIdx[maxScoreIdx];
+      idx2 = allVBFJetSubIdx[maxScoreIdx];
+
+      Jets_vbf[0] = (*jets)[idx1]->p4();
+      Jets_vbf[1] = (*jets)[idx2]->p4();
+    }  // end valid yybb system
+
+    return max_jjscore;
+  }
+  
+  // Low and High mass regions (categorization)
   void BaselineVarsbbyyAlg::performCategorisationBDT(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
                                                      const xAOD::Jet *Hbb_Jet1, 
                                                      const xAOD::Jet *Hbb_Jet2, 
@@ -665,8 +740,8 @@ namespace HHBBYY
                                                      std::map<HHBBYY::Var, float> &eventFloats, 
                                                      std::map<HHBBYY::Var, int> &eventInts) {
 
-    if (m_bdts.size()!=2){
-      ANA_MSG_ERROR("2 BDTs are required for Low and High mass regions");
+    if (m_bdts.size()!=3){
+      ANA_MSG_ERROR("3 BDTs are required: 2 for Low and High mass regions");
       return;
     }
 
@@ -680,7 +755,7 @@ namespace HHBBYY
     // High mass channel Selection
     if (eventFloats.at(HHBBYY::Var::bbyy_mStar) >= 350 * Athena::Units::GeV) {
       // get BDT score
-      const float score = m_bdts.at(1)->GetClassification(vars);
+      const float score = m_bdts.at(HHBBYY::BDT::high_mass)->GetClassification(vars);
 
       if (score >= 0.905) {
         XGBoostCat = 3;
@@ -696,7 +771,7 @@ namespace HHBBYY
 
     } else {
       // get BDT score
-      const float score = m_bdts.at(0)->GetClassification(vars);
+      const float score = m_bdts.at(HHBBYY::BDT::low_mass)->GetClassification(vars);
 
       if (score >= 0.950) {
         XGBoostCat = 1004;
