@@ -16,7 +16,6 @@
 #include "../OrthogonalityAlg.h"
 #include "../SumOfWeightsAlg.h"
 #include "../MetadataHistAlg.h"
-#include "../ThresholdHelper.h"
 
 using namespace Easyjet;
 

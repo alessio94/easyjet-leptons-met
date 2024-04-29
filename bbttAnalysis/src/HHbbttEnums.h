@@ -1,5 +1,5 @@
-#ifndef BBTTANALYSIS_CHANNELS
-#define BBTTANALYSIS_CHANNELS
+#ifndef BBTTANALYSIS_ENUMS
+#define BBTTANALYSIS_ENUMS
 
 namespace HHBBTT
 {
@@ -28,6 +28,17 @@ namespace HHBBTT
     DTT_2016,
     DTT_4J12,
     DTT_L1Topo,
+  };
+
+    enum Var
+  {
+    ele = 0,
+    mu = 1,
+    leadingtau = 2,
+    leadingtaumax = 3,
+    subleadingtau = 4,
+    leadingjet = 5,
+    subleadingjet = 6,
   };
 
 }

@@ -26,7 +26,7 @@
 
 #include "TriggerMatchingTool/IMatchingTool.h"
 
-#include "HHbbttChannels.h"
+#include "HHbbttEnums.h"
 
 namespace HHBBTT
 {

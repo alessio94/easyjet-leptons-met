@@ -27,22 +27,10 @@
 
 #include <EasyjetHub/CutManager.h>
 
-
-#include "HHbbttChannels.h"
+#include "HHbbttEnums.h"
 
 namespace HHBBTT
 {
-
-  enum Var
-  {
-    ele = 0,
-    mu = 1,
-    leadingtau = 2,
-    leadingtaumax = 3,
-    subleadingtau = 4,
-    leadingjet = 5,
-    subleadingjet = 6,
-  };
 
   enum Booleans
   {

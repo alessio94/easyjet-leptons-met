@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -26,7 +26,7 @@
 
 #include <DiTauMassTools/MissingMassToolV2.h>
 
-#include "HHbbttChannels.h"
+#include "HHbbttEnums.h"
 
 namespace HHBBTT
 {

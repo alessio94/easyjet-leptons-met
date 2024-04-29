@@ -3,6 +3,7 @@
 #include "../MMCSelectorAlg.h"
 #include "../HHbbttSelectorAlg.h"
 #include "../TriggerDecoratorAlg.h"
+#include "../AntiTauDecoratorAlg.h"
 
 using namespace HHBBTT;
 
@@ -11,3 +12,4 @@ DECLARE_COMPONENT(MMCDecoratorAlg)
 DECLARE_COMPONENT(MMCSelectorAlg)
 DECLARE_COMPONENT(HHbbttSelectorAlg)
 DECLARE_COMPONENT(TriggerDecoratorAlg)
+DECLARE_COMPONENT(AntiTauDecoratorAlg)

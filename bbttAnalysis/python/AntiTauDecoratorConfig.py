@@ -4,7 +4,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def HHbbttTriggerDecoratorCfg(flags):
+def HHbbttTriggerDecoratorCfg(flags, **kwargs):
 
     cfg = ComponentAccumulator()
 
@@ -28,7 +28,30 @@ def HHbbttTriggerDecoratorCfg(flags):
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             # Not available in current Run2 PHYSLITE
             diTauTrigMatch=not (flags.Input.isPHYSLITE and \
-                                flags.GeoModel.Run == LHCPeriod.Run2)
+                                flags.GeoModel.Run == LHCPeriod.Run2),
+            **kwargs
+        )
+    )
+
+    return cfg
+
+
+def HHbbttAntiTauDecoratorCfg(flags, **kwargs):
+    taucoll = flags.Analysis.container_names.input.taus
+    muoncoll = flags.Analysis.container_names.input.muons
+    elecoll = flags.Analysis.container_names.input.electrons
+
+    cfg = HHbbttTriggerDecoratorCfg(flags)
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBTT.AntiTauDecoratorAlg(
+            f"AntiTauDecor_{taucoll}",
+            isMC=flags.Input.isMC,
+            tauIDWP=flags.Analysis.Tau.ID,
+            muonsIn=muoncoll,
+            elesIn=elecoll,
+            tausIn=taucoll,
+            **kwargs
         )
     )
 

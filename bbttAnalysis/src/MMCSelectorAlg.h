@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef BBTTANALYSIS_MMCSELECTORALG
@@ -14,7 +14,7 @@
 
 #include <xAODEventInfo/EventInfo.h>
 
-#include "HHbbttChannels.h"
+#include "HHbbttEnums.h"
 
 namespace HHBBTT
 {
