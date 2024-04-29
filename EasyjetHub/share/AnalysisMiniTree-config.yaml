@@ -34,6 +34,11 @@ collection_options:
     RNN_branches: false
     truth_branches: false
 
+  photons:
+    shower_shapes: false
+    truth_labels: false
+    iso_variables: false
+
 # turned off automatically if MC
 truth_outputs:
   small_R_jets: ''
