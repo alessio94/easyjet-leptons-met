@@ -25,6 +25,19 @@ Analysis Package for the $HH\rightarrow b\bar{b} ll$ analyis
 - run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbll-ntupler ttbar_PHYS_10evt.root --run-config bbllAnalysis/RunConfig-bbll.yaml --out-file output_PHYS_bbll.root```
 - run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbll-ntupler ttbar_PHYSLITE_10evt.root --run-config bbllAnalysis/RunConfig-bbll.yaml --out-file output_PHYSLITE_bbll.root```
 
+3. Input PHYS and PHYLITE samples can be found in the "datasets" directory
+
+4. Choose your run-config file (e.g. bbllAnalysis/RunConfig-bbll.yaml or bbllAnalysis/RunConfig-bbll-bypass.yaml for skimmed and unskimmed production, respectively)
+
+5. Running on the Grid (* Please test your setup before running bulk grid submission)
+- This is hadled by the easyjet-gridsubmit script. To run a test job on the grid please use the following command:
+"easyjet-gridsubmit --mc-list input_sample.txt --exec bbll-ntupler --run-config bbllAnalysis/RunConfig-bbll.yaml --campaign TestXXX  --nGBperJob 5 --noTag"
+
+- It is recommended to run from a central tag for large scale productions. If you have some local updates, you will be invited to commit them and a tag will be created to be pushed on your fork. If you want to avoid this, you can use the --noTag options.
+
+- Grid submission scripts are now available in the "scripts" directory for NonResonant and Resonant production. Separate scripts are used for skimmed and unskimmed ntuple production (e.g. RunOnGrid_XHH_prod_Run2_skim.sh and  RunOnGrid_XHH_prod_Run2_unskimmed.sh, respectively). 
+
+
 # Output
 
 If these run properly, your outputs files should contain a TTree `AnalysisMiniTree` with the following content (X denotes a set of variables associated to the object, usually pT, Eta ...):
