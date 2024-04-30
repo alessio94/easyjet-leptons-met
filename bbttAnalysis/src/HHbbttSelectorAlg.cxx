@@ -503,7 +503,7 @@ namespace HHBBTT
           }
         }
         // DTT
-        if(!m_bools.at(HHBBTT::pass_STT) && tau_ptcut_DTT){
+        if(!m_bools.at(HHBBTT::pass_baseline_STT) && tau_ptcut_DTT){
           int year = m_year.get(*event, sys);
           if(2015<=year && year<=2016){
             if(jet_ptcut_DTT_2016){
