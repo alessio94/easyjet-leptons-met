@@ -84,7 +84,7 @@ namespace SHBBYY
       const xAOD::PhotonContainer *photons = nullptr;
       ANA_CHECK (m_photonHandle.retrieve (photons, sys));
 
-      int eventNum = event->eventNumber();
+      uint64_t eventNum = event->eventNumber();
 
       // initialize
       TLorentzVector H_bb(0.,0.,0.,0.);
