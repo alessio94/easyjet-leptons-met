@@ -138,48 +138,6 @@ namespace HHBBTT
       }
     }
 
-    // Lepton+tau triggers
-    float min_ele_LTT = 18. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::LTT][HHBBTT::ele] = min_ele_LTT;
-
-    float min_mu_LTT = 15. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::LTT][HHBBTT::mu] = min_mu_LTT;
-
-    float min_tau_LTT = 30. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau] = min_tau_LTT;
-
-    m_pt_threshold[HHBBTT::ETT_4J12][HHBBTT::ele] = min_ele_LTT;
-    m_pt_threshold[HHBBTT::ETT_4J12][HHBBTT::leadingtau] = min_tau_LTT;
-    m_pt_threshold[HHBBTT::ETT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::ETT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
-
-    m_pt_threshold[HHBBTT::ETT][HHBBTT::ele] = min_ele_LTT;
-    m_pt_threshold[HHBBTT::ETT][HHBBTT::leadingtau] = min_tau_LTT;
-    m_pt_threshold[HHBBTT::ETT][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
-
-    m_pt_threshold[HHBBTT::MTT_2016][HHBBTT::mu] = min_mu_LTT;
-    m_pt_threshold[HHBBTT::MTT_2016][HHBBTT::leadingtau] = min_tau_LTT;
-    m_pt_threshold[HHBBTT::MTT_2016][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
-
-    float min_tau_MTT_high = 40. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::mu] = min_mu_LTT;
-    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingtau] = min_tau_MTT_high;
-    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
-
-    m_pt_threshold[HHBBTT::MTT_low][HHBBTT::mu] = min_mu_LTT;
-    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingtau] = min_tau_LTT;
-    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingtaumax] = min_tau_MTT_high;
-    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
-
-    // Single-tau trigger
-    m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
-
-    // Di-tau triggers
-    m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
-
     ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
@@ -975,6 +933,52 @@ namespace HHBBTT
 
   void HHbbttSelectorAlg::setThresholds(const xAOD::EventInfo* event,
 					const CP::SystematicSet& sys){
+
+    // Global thresholds independent from data-taking period
+
+    // Lepton+tau triggers
+    float min_ele_LTT = 18. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::LTT][HHBBTT::ele] = min_ele_LTT;
+
+    float min_mu_LTT = 15. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::LTT][HHBBTT::mu] = min_mu_LTT;
+
+    float min_tau_LTT = 30. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::LTT][HHBBTT::leadingtau] = min_tau_LTT;
+
+    m_pt_threshold[HHBBTT::ETT_4J12][HHBBTT::ele] = min_ele_LTT;
+    m_pt_threshold[HHBBTT::ETT_4J12][HHBBTT::leadingtau] = min_tau_LTT;
+    m_pt_threshold[HHBBTT::ETT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::ETT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
+
+    m_pt_threshold[HHBBTT::ETT][HHBBTT::ele] = min_ele_LTT;
+    m_pt_threshold[HHBBTT::ETT][HHBBTT::leadingtau] = min_tau_LTT;
+    m_pt_threshold[HHBBTT::ETT][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
+
+    m_pt_threshold[HHBBTT::MTT_2016][HHBBTT::mu] = min_mu_LTT;
+    m_pt_threshold[HHBBTT::MTT_2016][HHBBTT::leadingtau] = min_tau_LTT;
+    m_pt_threshold[HHBBTT::MTT_2016][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
+
+    float min_tau_MTT_high = 40. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::mu] = min_mu_LTT;
+    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingtau] = min_tau_MTT_high;
+    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
+
+    m_pt_threshold[HHBBTT::MTT_low][HHBBTT::mu] = min_mu_LTT;
+    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingtau] = min_tau_LTT;
+    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingtaumax] = min_tau_MTT_high;
+    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::MTT_high][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
+
+    // Single-tau trigger
+    m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
+
+    // Di-tau triggers
+    m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
+
+    // Run-dependent thresholds
 
     int year = m_year.get(*event, sys);
 
