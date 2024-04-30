@@ -570,10 +570,11 @@ namespace HHBBTT
 	mapDecisions.at(channel) |= pass;
 	if(pass){
 	  // Naming altered for matching
+	  // Run2 4J12 trigger named with '4J12.0ETA' -> need altering, Run3 4J12 already named with "4J12p0ETA" -> no altering
 	  std::string trig2 = trig;
 	  if(channel==HHBBTT::DTT_4J12)
-	    trig2 = std::regex_replace(trig, std::regex("4J12p0ETA"),
-				      "4J12_0ETA");
+	    trig2 = std::regex_replace(trig, std::regex("4J12p0ETA23"),
+				      "4J12_0ETA23");
 	  else if(channel==HHBBTT::DTT_L1Topo)
 	    trig2 = std::regex_replace(trig,
 				       std::regex("L1DR_TAU20ITAU12I_J25"),
