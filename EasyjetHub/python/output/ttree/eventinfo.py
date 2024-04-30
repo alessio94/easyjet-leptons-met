@@ -78,4 +78,7 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "passRelativeDeltaRToVRJetCutUFO"
         ]
 
+    if flags.Input.MCChannelNumber in flags.Analysis.DSID_nWLep_samples:
+        eventinfo_branches.variables += ["nWLep"]
+
     return eventinfo_branches.get_output_list()

@@ -15,6 +15,7 @@
 #include "../EventInfoGlobalAlg.h"
 #include "../OrthogonalityAlg.h"
 #include "../SumOfWeightsAlg.h"
+#include "../TruthWBosonInformationAlg.h"
 #include "../MetadataHistAlg.h"
 
 using namespace Easyjet;
@@ -36,4 +37,5 @@ DECLARE_COMPONENT(TruthParticleInformationAlg)
 DECLARE_COMPONENT(EventInfoGlobalAlg)
 DECLARE_COMPONENT(OrthogonalityAlg)
 DECLARE_COMPONENT(SumOfWeightsAlg)
+DECLARE_COMPONENT(TruthWBosonInformationAlg)
 DECLARE_COMPONENT(MetadataHistAlg)

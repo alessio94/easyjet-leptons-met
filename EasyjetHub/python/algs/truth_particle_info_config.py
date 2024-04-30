@@ -5,8 +5,16 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 def truth_particle_info_cfg(
     flags,
 ):
-
     cfg = ComponentAccumulator()
+    if flags.Input.MCChannelNumber in flags.Analysis.DSID_nWLep_samples:
+        cfg.addEventAlgo(
+            CompFactory.Easyjet.TruthWBosonInformationAlg(
+                "TruthWBosonInformationAlg",
+                EventInfoKey="EventInfo",
+                TruthBosonParticleInKey="TruthBosonsWithDecayParticles",
+            )
+        )
+
     cfg.addEventAlgo(
         CompFactory.Easyjet.TruthParticleInformationAlg(
             "TruthParticleInformationAlg",

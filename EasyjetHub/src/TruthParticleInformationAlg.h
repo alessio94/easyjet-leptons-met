@@ -139,6 +139,7 @@ public:
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
+
 private:
     using P4 = ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>;
 
@@ -151,9 +152,6 @@ private:
     decorateTruthParticleInformation(const xAOD::EventInfo &eventInfo,
                                      std::vector<TruthScalar>& higgses) const;
 
-    const xAOD::TruthParticle *
-    getFinalParticleOfType(const xAOD::TruthParticle *p,
-                           const std::unordered_set<int> pdgIds) const;
 
     std::vector<const xAOD::TruthParticle *>
     getFinalChildren(const xAOD::TruthParticle *p) const;

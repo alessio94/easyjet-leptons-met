@@ -8,6 +8,7 @@
 // includes
 //
 #include "TruthParticleInformationAlg.h"
+#include "TruthUtils.h"
 #include <algorithm>
 
 #include "TruthUtils/HepMCHelpers.h"
@@ -221,20 +222,6 @@ namespace Easyjet
                               << p->m());
   }
 
-  const xAOD::TruthParticle *
-  TruthParticleInformationAlg ::getFinalParticleOfType(
-      const xAOD::TruthParticle *p, const std::unordered_set<int> ids) const
-  {
-    for (size_t i = 0; i < p->nChildren(); i++)
-    {
-      if (std::find(ids.begin(), ids.end(), p->child(i)->pdgId()) != ids.end())
-      {
-        return getFinalParticleOfType(p->child(i), ids);
-      }
-    }
-    return p;
-  }
-
   std::vector<const xAOD::TruthParticle *>
   TruthParticleInformationAlg ::getFinalChildren(const xAOD::TruthParticle *h) const
   {
@@ -298,7 +285,7 @@ namespace Easyjet
       if ((tp->pdgId() == MC::HIGGSBOSON || tp->pdgId() == MC::SBOSONBSM))
       {
         const xAOD::TruthParticle *final_h =
-	  getFinalParticleOfType(tp, {MC::HIGGSBOSON, MC::SBOSONBSM});
+	         getFinalParticleOfType(tp, {MC::HIGGSBOSON, MC::SBOSONBSM});
         if (!tmp || (final_h->barcode() != tmp->barcode()))
         {
           TruthScalar h = final_h;

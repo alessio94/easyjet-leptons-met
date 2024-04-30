@@ -142,6 +142,23 @@ do_small_R_jet_large_R_jet_OR: true
 # when the config file set the high level variables
 store_high_level_variables: false
 
+# list of DSID of samples for which to store WLep related information
+# for overlap removal between samples
+DSID_nWLep_samples:
+  - 410470 #nonallhad ttbar
+  - 601352 #dyn scale Wt DR
+  - 601355 #dyn scale Wt DR
+  - 601627 #dyn scale Wt DS
+  - 601631 #dyn scale Wt DS
+  - 601626 #hdamp variations DS
+  - 601630 #hdamp variations DS
+  - 601460 #hdamp variations DR
+  - 601462 #hdamp variations DR
+  - 602235 #PS variation
+  - 602236 #PS variation
+  - 602689 #pThard variation
+  - 602690 #pThard variation
+
 # Definition of container names
 full_container_names:
   phys:
