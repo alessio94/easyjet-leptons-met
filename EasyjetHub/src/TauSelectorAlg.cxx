@@ -73,9 +73,10 @@ namespace Easyjet
       for (const xAOD::TauJet *tau : *inContainer) {
 
         // If not ID tau nor anti tau, skip
-        bool isTauID = idTauDecorHandle(*tau);
-        if(m_keepAntiTaus) isTauID |= antiTauDecorHandle(*tau);
-        if( !isTauID ) continue;
+        if(m_keepAntiTaus){
+          bool isTauID = idTauDecorHandle(*tau) || antiTauDecorHandle(*tau);
+          if( !isTauID ) continue;
+        }
 
         // If not passing OR, skip
         if( m_checkOR ){
