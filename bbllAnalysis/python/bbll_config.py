@@ -168,11 +168,7 @@ def bbll_branches(flags):
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
-            if tree_flags['slim_variables_with_syst'] and \
-               "pt" not in var and "SF" not in var:
-                branches += [f"EventInfo.{var}_NOSYS -> bbll_{var}"]
-            else:
-                branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}_%SYS%"]
+            branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}_%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables

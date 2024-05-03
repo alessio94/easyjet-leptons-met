@@ -179,10 +179,7 @@ def bbVV_branches(flags):
 
     #     for hh in ["HH", "HH_vis", "HH_visMet"]:
     #         for var in ["pt", "eta", "phi", "m"]:
-    #             if tree_flags['slim_variables_with_syst'] and "pt" not in var:
-    #                 branches += [f"EventInfo.{hh}_{var}_NOSYS -> {hh}_{var}"]
-    #             else:
-    #                 branches += [f"EventInfo.{hh}_{var}_%SYS% -> {hh}_%SYS%_{var}"]
+    #             branches += [f"EventInfo.{hh}_{var}_%SYS% -> {hh}_%SYS%_{var}"]
 
     branches += ["EventInfo.bbVV_pass_sr_%SYS% -> bbVV_pass_SR_%SYS%"]
 
