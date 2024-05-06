@@ -9,6 +9,7 @@ input:
   electrons:           Electrons
   photons:             Photons
   taus:                TauJets
+  truthtaus:           TruthTaus
   truthBSMParticles:   TruthBSMWithDecayParticles
   truthSMParticles:    TruthBosonsWithDecayParticles
   met:                 AntiKt4EMPFlow

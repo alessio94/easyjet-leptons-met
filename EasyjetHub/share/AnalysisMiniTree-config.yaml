@@ -44,5 +44,6 @@ truth_outputs:
   small_R_jets: ''
   large_R_jets: ''
   higgs_particle: ''
+  taus: ''
 # custom extra output branches
 extra_output_branches: []

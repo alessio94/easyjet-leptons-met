@@ -19,6 +19,7 @@ from EasyjetHub.output.ttree.truth_jets import (
     get_large_R_truthjet_branches,
     get_small_R_truthjet_branches,
 )
+from EasyjetHub.output.ttree.truth_taus import get_truthtau_branches
 from EasyjetHub.output.ttree.met import get_met_branches
 from EasyjetHub.steering.utils.config_flags import ConfigItem
 
@@ -211,6 +212,15 @@ def minituple_cfg(
                 tree_branches += add_large_R_truth(flags, coll)
         else:
             tree_branches += add_large_R_truth(flags, large_R_truth_flags)
+
+    if flags.Input.isMC and tree_flags.truth_outputs.taus:
+        tree_branches += get_truthtau_branches(
+            flags,
+            input_container=substitute_container_name(
+                flags, tree_flags.truth_outputs.taus
+            ),
+            output_prefix="truthtau",
+        )
 
     if extra_output_branches:
         log.info(

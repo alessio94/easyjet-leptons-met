@@ -19,3 +19,4 @@ ttree_output:
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'
+      taus: 'container_names.input.truthtaus'
