@@ -18,7 +18,6 @@ namespace HHBBLL
                                 ISvcLocator *pSvcLocator)
       : EL::AnaAlgorithm(name, pSvcLocator)
   {
-    declareProperty("passTriggers",m_passTriggers);
   }
 
 

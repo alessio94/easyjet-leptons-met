@@ -140,8 +140,6 @@ namespace HHBBLL
       
       CP::SysFilterReporterParams m_filterParams {this, "HHbbll selection"};
 
-      std::vector<std::string> m_passTriggers;
-
       std::unordered_map<std::string,  SG::ReadDecorHandleKey<xAOD::EventInfo>> m_triggerDecorKeys;
 
       std::unordered_map<HHBBLL::TriggerChannel, std::string> m_triggerChannels = 
