@@ -42,7 +42,6 @@ namespace ttHH
 
     std::unordered_map<ttHH::TriggerChannel, std::string> m_triggerChannels =
       {
-	{ttHH::BJET, "bjet"},
         {ttHH::SINGLEP, "singlep"},
         {ttHH::DILEP, "dilep"},
       };

@@ -93,7 +93,6 @@ namespace ttHH
 
       CP::SysReadDecorHandle<bool> m_passTriggerDilep {this, "passTriggerDilep", "ttHH_pass_trigger_dilep", "events pass any dilepton triggers"};
       CP::SysReadDecorHandle<bool> m_passTriggerSinglep {this, "passTriggerSinglep", "ttHH_pass_trigger_singlep", "events pass any singlep triggers"};
-      CP::SysReadDecorHandle<bool> m_passTriggerBjet {this, "passTriggerBjet", "ttHH_pass_trigger_bjet", "events pass any bjets triggers"};
 
       CP::SysFilterReporterParams m_filterParams {this, "ttHH selection"};
 

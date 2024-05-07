@@ -30,7 +30,6 @@ namespace ttHH
 
     ATH_CHECK(m_passTriggerDilep.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_passTriggerSinglep.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_passTriggerBjet.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
@@ -128,9 +127,7 @@ namespace ttHH
       }
 
       if (m_ttHHCuts.exists("PASS_TRIGGER")) {
-        if (!m_passTriggerBjet.empty() and m_passTriggerBjet.get(*event, sys)) {
-          m_ttHHCuts("PASS_TRIGGER").passed = true;
-        } else if (!m_passTriggerSinglep.empty() and m_passTriggerSinglep.get(*event, sys)) {
+        if (!m_passTriggerSinglep.empty() and m_passTriggerSinglep.get(*event, sys)) {
           m_ttHHCuts("PASS_TRIGGER").passed = true;
         } else if (!m_passTriggerDilep.empty() and m_passTriggerDilep.get(*event, sys)) {
           m_ttHHCuts("PASS_TRIGGER").passed = true;
@@ -223,7 +220,7 @@ namespace ttHH
     int nLeptons = muons.size() + electrons.size();
     int nBJets = bjets.size();
 
-    if ((((nLeptons<=1) && (nBJets>=4)) || ((nLeptons>=2) && (nBJets>=2))) && ttHHCuts.exists("PASS_BASELINE"))
+    if ((((nLeptons==1) && (nBJets>=4)) || ((nLeptons>=2) && (nBJets>=2))) && ttHHCuts.exists("PASS_BASELINE"))
         ttHHCuts("PASS_BASELINE").passed = true;
 
   }
