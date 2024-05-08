@@ -130,6 +130,7 @@ def bbtt_cfg(
                     passLTT_1B="pass_baseline_LTT_%SYS%",
                     passSTT="pass" + baseline + "STT_%SYS%",
                     passDTT="pass" + baseline + "DTT_%SYS%",
+                    passDBT="pass" + baseline + "DBT_%SYS%",
                     passSTT_1B="pass_baseline_STT_%SYS%",
                     passDTT_1B="pass_baseline_DTT_%SYS%",
                     channel=flags.Analysis.channel,
@@ -262,7 +263,7 @@ def bbtt_branches(flags):
     # as it is written out in HHbbttSelectorAlg
     for var in ["_trigger_", "_baseline_", "_"]:
         for cat in ["SR", "SLT", "LTT", "STT", "DTT",
-                    "DTT_2016", "DTT_4J12", "DTT_L1Topo"]:
+                    "DTT_2016", "DTT_4J12", "DTT_L1Topo", "DBT"]:
             branches += [f"EventInfo.pass{var}{cat}_%SYS% -> bbtt_pass{var}{cat}_%SYS%"]
 
     for cat in ["STT_1B", "DTT_2016_1B", "DTT_4J12_1B",

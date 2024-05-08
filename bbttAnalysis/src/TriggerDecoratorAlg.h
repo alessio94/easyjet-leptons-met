@@ -44,6 +44,7 @@ namespace HHBBTT
     is22_75bunches,
     is23_75bunches,
     is23_400bunches,
+    is23_from1200bunches,
     is23_first_2400bunches,
     l1topo_disabled
   };
@@ -74,6 +75,7 @@ namespace HHBBTT
 	{HHBBTT::DTT_2016, "DTT_2016"},
 	{HHBBTT::DTT_4J12, "DTT_4J12"},
 	{HHBBTT::DTT_L1Topo, "DTT_L1Topo"},
+	{HHBBTT::DBT, "DBT"},
       };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
@@ -94,6 +96,7 @@ namespace HHBBTT
 	{HHBBTT::is22_75bunches, "is2022_75bunches"},
 	{HHBBTT::is23_75bunches, "is2023_75bunches"},
 	{HHBBTT::is23_400bunches, "is2023_400bunches"},
+	{HHBBTT::is23_from1200bunches, "is2023_from1200bunches"},
 	{HHBBTT::is23_first_2400bunches, "is2023_first_2400bunches"},
 	{HHBBTT::l1topo_disabled, "l1TopoDisabled"},
       };
@@ -185,7 +188,11 @@ namespace HHBBTT
        const xAOD::TauJetContainer* taus,
        tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const;
 
- 
+     void checkDiBJetTriggers
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
+       passWriteDecoMap& pass_decos) const;
+
     
   };
 }

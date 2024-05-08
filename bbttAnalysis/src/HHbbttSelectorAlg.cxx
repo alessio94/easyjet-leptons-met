@@ -210,6 +210,7 @@ namespace HHBBTT
       m_bools.at(HHBBTT::pass_trigger_DTT_2016) = false;
       m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = false;
       m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = false;
+      m_bools.at(HHBBTT::pass_trigger_DBT) = false;
 
       // Reset event specific booleans to false.
       m_bools.at(HHBBTT::TWO_JETS) = false;
@@ -236,16 +237,19 @@ namespace HHBBTT
       m_bools.at(HHBBTT::pass_baseline_DTT_4J12) = false;
       m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo) = false;
       m_bools.at(HHBBTT::pass_baseline_DTT) = false;
+      m_bools.at(HHBBTT::pass_baseline_DBT) = false;
       m_bools.at(HHBBTT::pass_STT) = false;
       m_bools.at(HHBBTT::pass_DTT_2016) = false;
       m_bools.at(HHBBTT::pass_DTT_4J12) = false;
       m_bools.at(HHBBTT::pass_DTT_L1Topo) = false;
       m_bools.at(HHBBTT::pass_DTT) = false;
+      m_bools.at(HHBBTT::pass_DBT) = false;
       m_bools.at(HHBBTT::pass_STT_1B) = false;
       m_bools.at(HHBBTT::pass_DTT_2016_1B) = false;
       m_bools.at(HHBBTT::pass_DTT_4J12_1B) = false;
       m_bools.at(HHBBTT::pass_DTT_L1Topo_1B) = false;
       m_bools.at(HHBBTT::pass_DTT_1B) = false;
+      m_bools.at(HHBBTT::pass_DBT_1B) = false;
       m_bools.at(HHBBTT::pass_ZCR) = false;
       m_bools.at(HHBBTT::pass_TopEMuCR) = false;
     
@@ -395,6 +399,7 @@ namespace HHBBTT
 	m_bools.at(HHBBTT::pass_trigger_DTT_2016) = true;
 	m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = true;
 	m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = true;
+	m_bools.at(HHBBTT::pass_trigger_DBT) = true;
 
       }
 
@@ -402,7 +407,9 @@ namespace HHBBTT
 	(m_bools.at(HHBBTT::pass_trigger_SLT) ||
 	 m_bools.at(HHBBTT::pass_trigger_LTT) ||
 	 m_bools.at(HHBBTT::pass_trigger_STT) ||
-	 m_bools.at(HHBBTT::pass_trigger_DTT));
+	 m_bools.at(HHBBTT::pass_trigger_DTT) ||
+	 m_bools.at(HHBBTT::pass_trigger_DBT));
+
 
       //************
       // jet
@@ -452,6 +459,8 @@ namespace HHBBTT
           m_bools.at(HHBBTT::ONE_BJET) = (bjets->at(0)->pt() > 45. * Athena::Units::GeV);
         }
       }
+
+
 
       //****************
       // event level info
@@ -529,6 +538,15 @@ namespace HHBBTT
               }
           }
         }
+        //DBT
+        int year = m_year.get(*event, sys);
+        if(!m_bools.at(HHBBTT::pass_baseline_STT) && year>=2022){
+          m_bools.at(HHBBTT::pass_baseline_DBT) = true;
+          if(m_bools.at(HHBBTT::pass_trigger_DBT)){
+            if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DBT) = true;
+            else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DBT_1B) = true;
+          }
+        }
       }
 
       m_bools.at(HHBBTT::pass_baseline_DTT) =
@@ -548,13 +566,15 @@ namespace HHBBTT
 	(m_bools.at(HHBBTT::pass_baseline_SLT) ||
 	 m_bools.at(HHBBTT::pass_baseline_LTT) ||
 	 m_bools.at(HHBBTT::pass_baseline_STT) ||
-	 m_bools.at(HHBBTT::pass_baseline_DTT));
+	 m_bools.at(HHBBTT::pass_baseline_DTT) ||
+         m_bools.at(HHBBTT::pass_baseline_DBT));
 
       m_bools.at(HHBBTT::pass_SR) =
 	(m_bools.at(HHBBTT::pass_SLT) ||
 	 m_bools.at(HHBBTT::pass_LTT) ||
 	 m_bools.at(HHBBTT::pass_STT) ||
-	 m_bools.at(HHBBTT::pass_DTT));
+	 m_bools.at(HHBBTT::pass_DTT) ||
+         m_bools.at(HHBBTT::pass_DBT));
 
       // Z+HF and top (e+mu) control regions
       if (m_bools.at(HHBBTT::pass_trigger_SLT) && m_bools.at(HHBBTT::TWO_BJETS)){
@@ -580,7 +600,7 @@ namespace HHBBTT
       bool pass = false;
       for(const auto& channel : m_channels){
        if(channel == HHBBTT::LepHad) pass |= (m_bools.at(HHBBTT::pass_SLT) || m_bools.at(HHBBTT::pass_LTT));
-       else if(channel == HHBBTT::HadHad) pass |= (m_bools.at(HHBBTT::pass_STT) || m_bools.at(HHBBTT::pass_DTT));
+       else if(channel == HHBBTT::HadHad) pass |= (m_bools.at(HHBBTT::pass_STT) || m_bools.at(HHBBTT::pass_DTT) || m_bools.at(HHBBTT::pass_DBT));
        else if(channel == HHBBTT::LepHad1B) pass |= (m_bools.at(HHBBTT::pass_SLT_1B) || m_bools.at(HHBBTT::pass_LTT_1B));
        else if(channel == HHBBTT::HadHad1B) pass |= (m_bools.at(HHBBTT::pass_STT_1B) || m_bools.at(HHBBTT::pass_DTT_1B));
        else if(channel == HHBBTT::ZCR) pass |= (m_bools.at(HHBBTT::pass_ZCR));
@@ -685,6 +705,7 @@ namespace HHBBTT
     bool use_LTT = false;
     bool use_STT = false;
     bool use_DTT = false;
+    bool use_DBT = false;
     for (const auto &channel : m_channels){
       if (channel == HHBBTT::LepHad || channel == HHBBTT::LepHad1B){
 	use_SLT = true;
@@ -693,6 +714,7 @@ namespace HHBBTT
       else if (channel == HHBBTT::HadHad || channel == HHBBTT::HadHad1B){
 	use_STT = true;
 	use_DTT = true;
+	use_DBT = true;
       }
       else if (channel == HHBBTT::ZCR || channel == HHBBTT::TopEMuCR){
 	use_SLT = true;
@@ -719,6 +741,10 @@ namespace HHBBTT
       applyDiTauTriggerSelection(event, triggerdecos,
 				 tau0, tau1, tau_trigMatchDecos,
 				 jet0, jet1);
+    }
+    if(use_DBT){
+      applyDiBJetTriggerSelection(event, triggerdecos,
+         jet0, jet1);
     }
 
   }
@@ -879,6 +905,22 @@ namespace HHBBTT
        m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo));
   }
   
+   void HHbbttSelectorAlg::applyDiBJetTriggerSelection
+  (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+   const xAOD::Jet* jet0, const xAOD::Jet* jet1){
+
+    bool trigPassed_DBT = triggerdecos.at(HHBBTT::DBT)(*event);
+    if( jet0 && jet1){
+      //TO DO: implement bjet trig-matching
+      trigPassed_DBT &=
+	 (jet0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] &&
+          jet1->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet]);
+    }
+    else trigPassed_DBT = false;
+
+    m_bools.at(HHBBTT::pass_trigger_DBT) = trigPassed_DBT;
+  }
+
 
   StatusCode HHbbttSelectorAlg ::initialiseCutflow()
   {
@@ -978,6 +1020,10 @@ namespace HHBBTT
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
 
+    // Di-b-jets triggers
+    m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet] = 20. * Athena::Units::GeV;
+    
     // Run-dependent thresholds
 
     int year = m_year.get(*event, sys);

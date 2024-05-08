@@ -42,6 +42,7 @@ namespace HHBBTT
     pass_trigger_DTT_2016,
     pass_trigger_DTT_4J12,
     pass_trigger_DTT_L1Topo,
+    pass_trigger_DBT,
 
     TWO_JETS,
     TWO_BJETS,
@@ -65,18 +66,21 @@ namespace HHBBTT
     pass_baseline_DTT_4J12,
     pass_baseline_DTT_L1Topo,
     pass_baseline_DTT,
+    pass_baseline_DBT,
     pass_baseline_SR,
     pass_STT,
     pass_DTT_2016,
     pass_DTT_4J12,
     pass_DTT_L1Topo,
     pass_DTT,
+    pass_DBT,
     pass_SR,
     pass_STT_1B,
     pass_DTT_2016_1B,
     pass_DTT_4J12_1B,
     pass_DTT_L1Topo_1B,
     pass_DTT_1B,
+    pass_DBT_1B,
     pass_ZCR,
     pass_TopEMuCR,
   };
@@ -184,6 +188,7 @@ private:
 	{HHBBTT::DTT_2016, "DTT_2016"},
 	{HHBBTT::DTT_4J12, "DTT_4J12"},
 	{HHBBTT::DTT_L1Topo, "DTT_L1Topo"},
+	{HHBBTT::DBT, "DBT"},
       };
 
     std::unordered_map<HHBBTT::TriggerChannel,
@@ -218,6 +223,7 @@ private:
     {HHBBTT::pass_trigger_DTT_2016, "pass_trigger_DTT_2016"},
     {HHBBTT::pass_trigger_DTT_4J12, "pass_trigger_DTT_4J12"},
     {HHBBTT::pass_trigger_DTT_L1Topo, "pass_trigger_DTT_L1Topo"},
+    {HHBBTT::pass_trigger_DBT, "pass_trigger_DBT"},
     {HHBBTT::TWO_JETS, "TWO_JETS"},
     {HHBBTT::TWO_BJETS, "TWO_BJETS"},
     {HHBBTT::ONE_BJET, "ONE_BJET"},
@@ -240,18 +246,21 @@ private:
     {HHBBTT::pass_baseline_DTT_4J12, "pass_baseline_DTT_4J12"},
     {HHBBTT::pass_baseline_DTT_L1Topo, "pass_baseline_DTT_L1Topo"},
     {HHBBTT::pass_baseline_DTT, "pass_baseline_DTT"},
+    {HHBBTT::pass_baseline_DBT, "pass_baseline_DBT"},
     {HHBBTT::pass_baseline_SR, "pass_baseline_SR"},
     {HHBBTT::pass_STT, "pass_STT"},
     {HHBBTT::pass_DTT_2016, "pass_DTT_2016"},
     {HHBBTT::pass_DTT_4J12, "pass_DTT_4J12"},
     {HHBBTT::pass_DTT_L1Topo, "pass_DTT_L1Topo"},
     {HHBBTT::pass_DTT, "pass_DTT"},
+    {HHBBTT::pass_DBT, "pass_DBT"},
     {HHBBTT::pass_SR, "pass_SR"},
     {HHBBTT::pass_STT_1B, "pass_STT_1B"},
     {HHBBTT::pass_DTT_2016_1B, "pass_DTT_2016_1B"},
     {HHBBTT::pass_DTT_4J12_1B, "pass_DTT_4J12_1B"},
     {HHBBTT::pass_DTT_L1Topo_1B, "pass_DTT_L1Topo_1B"},
     {HHBBTT::pass_DTT_1B, "pass_DTT_1B"},
+    {HHBBTT::pass_DBT_1B, "pass_DBT_1B"},
     {HHBBTT::pass_ZCR, "pass_ZCR"},
     {HHBBTT::pass_TopEMuCR, "pass_TopEMuCR"},
     };
@@ -302,6 +311,9 @@ private:
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
        const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
        const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
+       const xAOD::Jet* jet0, const xAOD::Jet* jet1);
+    void applyDiBJetTriggerSelection
+      (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
        const xAOD::Jet* jet0, const xAOD::Jet* jet1);
 
     void setThresholds(const xAOD::EventInfo* event,

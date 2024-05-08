@@ -178,6 +178,10 @@ namespace HHBBTT
 		       runBoolDecos, triggerdecos, pass_decos,
 		       taus.cptr(), tau_trigMatchDecos);
     
+    checkDiBJetTriggers(year(*eventInfo), eventInfo.cptr(),
+		       runBoolDecos, triggerdecos, pass_decos);
+
+
     return StatusCode::SUCCESS;
   }
 
@@ -593,4 +597,46 @@ namespace HHBBTT
     }
 
   }
+
+
+void TriggerDecoratorAlg::checkDiBJetTriggers
+  (int year, const xAOD::EventInfo* eventInfo,
+   const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
+   passWriteDecoMap& pass_decos) const {
+
+    std::vector<std::string> dib_paths;
+    
+    if(year==2022){
+      dib_paths = {"HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"};
+    }
+    else if(year==2023){
+      dib_paths = {"HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bgn177_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"};
+      if (runBoolDecos.at(HHBBTT::is23_from1200bunches)(*eventInfo)){
+        dib_paths = {"HLT_j75c_020jvt_j50c_020jvt_j25c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bgn177_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"};
+      }
+    }
+    std::unordered_map<HHBBTT::TriggerChannel, std::vector<std::string>> mapPaths;
+    mapPaths.emplace(HHBBTT::DBT, dib_paths);
+
+    std::unordered_map<HHBBTT::TriggerChannel, bool> mapDecisions;
+    mapDecisions.emplace(HHBBTT::DBT, false);
+
+    for(const auto& [channel, paths] : mapPaths){
+      for(const auto& trig : paths){
+	bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+	mapDecisions.at(channel) |= pass;
+	if(pass){
+    //TO DO: implement b-jet matching
+	}
+      }
+
+      pass_decos.at(channel)(*eventInfo) |= mapDecisions.at(channel);
+      pass_decos.at(HHBBTT::DBT)(*eventInfo) |= mapDecisions.at(channel);
+    }
+
+
+  }
+
 }
+
+
