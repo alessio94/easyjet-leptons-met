@@ -1058,6 +1058,8 @@ namespace HHBBTT
       m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 20. * Athena::Units::GeV;
       m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
       m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 20. * Athena::Units::GeV;
     }
   }
 
