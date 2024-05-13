@@ -38,7 +38,7 @@ def RunEasyjetPlus(args):
         pathsToPMGFiles=XSectionData['XSection_paths'])
 
     TotalWeightsTool_bbll = CompFactory.TotalWeightsTool(
-        analysis="bbll", bTagWP="DL1dv01_FixedCutBEff_77")
+        analysis="bbll", nLeptons=2, bTagWP="DL1dv01_FixedCutBEff_77")
 
     acc.addEventAlgo(CompFactory.PostProcessor(
         inFile=args.inFile,
