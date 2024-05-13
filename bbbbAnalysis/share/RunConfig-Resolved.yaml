@@ -24,7 +24,7 @@ Muon:
 do_overlap_removal: true
 
 # list of triggers per year to consider
-trigger_chains:
+trigger:
   include: bbbbAnalysis/resolved-triggers.yaml
 
 do_CP_systematics: true

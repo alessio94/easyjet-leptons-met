@@ -46,7 +46,7 @@ Lepton:
   amount: 2
 
 # list of triggers per year to consider
-trigger_chains:
+trigger:
   include: llttAnalysis/trigger.yaml
 
 # apply trigger lists to filter events

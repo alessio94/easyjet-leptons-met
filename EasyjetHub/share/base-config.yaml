@@ -95,14 +95,18 @@ Lepton:
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto
 # list of triggers per year to consider
-trigger_chains:
-  "2015": []
-  "2016": []
-  "2017": []
-  "2018": []
-  "2022": []
-  "2023": []
+trigger:
+  selection:
+    chains:
+      "2015": []
+      "2016": []
+      "2017": []
+      "2018": []
+      "2022": []
+      "2023": []
 
+  scale_factor:
+    doSF: False
 
 # apply trigger lists to filter events
 do_trigger_filtering: false

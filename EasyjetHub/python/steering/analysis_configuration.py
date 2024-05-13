@@ -95,6 +95,10 @@ def analysis_configuration(parser="default"):
         "Analysis.TriggerChains",
         lambda prevFlags: get_trigger_chains(prevFlags)
     )
+    flags.addFlag(
+        "Analysis.TriggerChainsSF",
+        lambda prevFlags: get_trigger_chains_scale_factor(prevFlags)
+    )
 
     do_PRW = flags.Input.isMC and not flags.Input.isPHYSLITE
     flags.addFlag("Analysis.doPRW", do_PRW)
@@ -144,15 +148,26 @@ def get_trigger_chains(flags):
         )
 
     trigger_chains = set()
-    if flags.hasCategory("Analysis.trigger_chains"):
+    if flags.hasCategory("Analysis.trigger"):
         try:
             for year in trigger_year_list:
-                trigger_chains |= set(flags.Analysis.trigger_chains[str(year)])
+                trigger_chains |= set(
+                    flags.Analysis.trigger.selection.chains[str(year)])
         except KeyError as err:
             log.error(f"Trigger chains for {year} not defined.")
             raise err
 
     return list(trigger_chains)
+
+
+def get_trigger_chains_scale_factor(flags):
+    triggerChains = (flags.Analysis.trigger.scale_factor.chains
+                     if hasattr(flags.Analysis.trigger.scale_factor, "chains") else
+                     flags.Analysis.trigger.selection.chains)
+    triggerChainsDict = {
+        str(year): [trigger for trigger in triggerChains[str(year)]]
+        for year in flags.Analysis.Years}
+    return triggerChainsDict
 
 
 def setHHOrthFlags(flags):

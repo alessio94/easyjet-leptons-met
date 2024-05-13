@@ -28,6 +28,16 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
     eventinfo_branches.variables += trigger_branches
 
     # Event-level scale factors
+    if flags.Input.isMC and flags.Analysis.trigger.scale_factor.doSF:
+
+        var = ["globalTriggerEffSF_%SYS%"]
+        # Only dump trigger SF if computed before
+        for year in flags.Analysis.Years:
+            if not flags.Analysis.TriggerChainsSF[str(year)]:
+                var = []
+
+        eventinfo_branches.variables += var
+
     if (
         flags.Input.isMC
         and flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet"

@@ -1,16 +1,43 @@
-'2015':
-- 'HLT_g35_loose_g25_loose'
-- 'HLT_g120_loose'
-'2016':
-- 'HLT_g35_loose_g25_loose'
-- 'HLT_g140_loose'
-'2017':
-- 'HLT_g35_medium_g25_medium_L12EM20VH'
-- 'HLT_g140_loose'
-'2018':
-- 'HLT_g35_medium_g25_medium_L12EM20VH'
-- 'HLT_g140_loose'
-'2022':
-- 'HLT_g35_medium_g25_medium_L12EM20VH'
-'2023':
-- 'HLT_g35_medium_g25_medium_L12eEM24L'
+selection:
+  chains:
+    '2015':
+    - 'HLT_g35_loose_g25_loose'
+    - 'HLT_g120_loose'
+    '2016':
+    - 'HLT_g35_loose_g25_loose'
+    - 'HLT_g140_loose'
+    '2017':
+    - 'HLT_g35_medium_g25_medium_L12EM20VH'
+    - 'HLT_g140_loose'
+    '2018':
+    - 'HLT_g35_medium_g25_medium_L12EM20VH'
+    - 'HLT_g140_loose'
+    '2022':
+    - 'HLT_g35_medium_g25_medium_L12EM20VH'
+    '2023':
+    - 'HLT_g35_medium_g25_medium_L12eEM24L'
+
+scale_factor:
+  doSF: True
+
+  chains:
+    '2015':
+    - 'HLT_g35_loose_g25_loose'
+    '2016':
+    - 'HLT_g35_loose_g25_loose'
+    '2017':
+    - 'HLT_g35_medium_g25_medium_L12EM20VH'
+    '2018':
+    - 'HLT_g35_medium_g25_medium_L12EM20VH'
+
+    # No SF for 2023 trigger yet
+    '2022': []
+    '2023': []
+
+    #'2022':
+    #- 'HLT_g35_medium_g25_medium_L12EM20VH'
+    #'2023': []
+    #- 'HLT_g35_medium_g25_medium_L12eEM24L'
+
+  Photon:
+    Iso: "FixedCutLoose"

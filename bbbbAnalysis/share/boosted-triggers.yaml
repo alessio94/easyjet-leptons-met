@@ -1,3 +1,5 @@
+selection:
+  chains:
 '2015':
   # boosted
 - 'HLT_j360_a10_lcw_sub_L1J100'
