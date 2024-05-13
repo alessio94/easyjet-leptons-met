@@ -101,10 +101,9 @@ def jet_sequence(
             elif "GN2v01" in tagger:
                 configSeq.setOptionValue(
                     '.bTagCalibFile',
-                    'xAODBTaggingEfficiency/13p6TeV/'
-                    '2023-02_MC23_CDI_GN2v01-noSF.root'
+                    'xAODBTaggingEfficiency/13TeV/'
+                    '2023-02_MC20_CDI_GN2v01-noSF_bugFix.root'
                 ) # noqa
-                configSeq.setOptionValue('.noEffSF', True)
 
         if jet_flags.runBJetPtCalib:
             # Pick a reasonable b-tag selection?

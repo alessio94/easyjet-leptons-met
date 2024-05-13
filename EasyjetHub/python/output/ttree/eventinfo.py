@@ -51,9 +51,6 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
 
         for wp in btag_wps:
-            # No GN2v01 SF in CDI for now
-            if "GN2v01" in wp:
-                continue
             eventinfo_branches.variables += [f"ftag_effSF_{wp}_%SYS%"]
 
         # jvt is effSF is now centrally calculated by CP tools
