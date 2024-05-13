@@ -52,15 +52,15 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::string> m_photonWPName
-      { this, "photon_WP", "","Photon ID + Iso working point" };
-    bool m_isoIncluded = true;
-    CP::SysReadDecorHandle<float> m_ph_idSF{"", this};
-    CP::SysReadDecorHandle<float> m_ph_isoSF{"", this};
-    CP::SysWriteDecorHandle<float> m_ph_SF{"", this};
+    Gaudi::Property<std::vector<std::string>> m_photonWPNames
+      { this, "photon_WPs", {},"Photon ID + Iso working points used on top of container" };
 
-    CP::SysReadDecorHandle<char> m_select_in{"", this};
-    CP::SysWriteDecorHandle<char> m_select_out{"", this};
+    std::vector<CP::SysReadDecorHandle<float>> m_ph_idSF;
+    std::vector<CP::SysReadDecorHandle<float>> m_ph_isoSF;
+    std::vector<CP::SysWriteDecorHandle<float>> m_ph_SF;
+
+    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
+    std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::PhotonContainer>>

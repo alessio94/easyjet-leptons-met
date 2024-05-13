@@ -24,7 +24,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             "PhotonSelectorAlg",
             containerInKey=PhotonWPLabel + photonkey,
             containerOutKey="bbyyAnalysisPhotons_%SYS%",
-            photon_WP=TightPhotonWPLabel,
+            photon_WPs=[TightPhotonWPLabel],
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )

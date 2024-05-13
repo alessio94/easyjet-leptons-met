@@ -27,20 +27,28 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    if(m_isMC){
-      m_ph_idSF = CP::SysReadDecorHandle<float>("ph_id_effSF_"+m_photonWPName+"_%SYS%", this);
-      if(m_photonWPName.value().find("NonIso")!=std::string::npos) m_isoIncluded = false;
-      else m_ph_isoSF = CP::SysReadDecorHandle<float>("ph_isol_effSF_"+m_photonWPName+"_%SYS%", this);
-      m_ph_SF = CP::SysWriteDecorHandle<float>("ph_effSF_"+m_photonWPName+"_%SYS%", this);
-    }
-    ATH_CHECK (m_ph_idSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ph_isoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+    for(const auto& wp : m_photonWPNames){
+      // Scale factors
+      CP::SysReadDecorHandle<float> idSF(m_isMC ? "ph_id_effSF_"+wp+"_%SYS%" : "", this);
+      m_ph_idSF.emplace_back(idSF);
+      ATH_CHECK (m_ph_idSF.back().initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+      CP::SysReadDecorHandle<float> isoSF((m_isMC && wp.find("NonIso")!=std::string::npos) ? "ph_isol_effSF_"+wp+"_%SYS%" : "", this);
+      m_ph_isoSF.emplace_back(isoSF);
+      ATH_CHECK (m_ph_isoSF.back().initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
 
-    m_select_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_photonWPName+"_%SYS%", this);
-    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_photonWPName+"_%SYS%", this);
-    ATH_CHECK (m_select_in.initialize(m_systematicsList, m_inHandle));
-    ATH_CHECK (m_select_out.initialize(m_systematicsList, m_outHandle));
+      CP::SysWriteDecorHandle<float> phSF(m_isMC ? "ph_effSF_"+wp+"_%SYS%" : "", this);
+      m_ph_SF.emplace_back(phSF);
+      ATH_CHECK (m_ph_SF.back().initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+
+      // Select flags
+      CP::SysReadDecorHandle<char> sel_in("baselineSelection_"+wp+"_%SYS%", this);
+      m_select_in.emplace_back(sel_in);
+      ATH_CHECK (m_select_in.back().initialize(m_systematicsList, m_inHandle));
+
+      CP::SysWriteDecorHandle<char> sel_out("baselineSelection_"+wp+"_%SYS%", this);
+      m_select_out.emplace_back(sel_out);
+      ATH_CHECK (m_select_out.back().initialize(m_systematicsList, m_outHandle));
+    }
 
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -105,12 +113,15 @@ namespace Easyjet
           continue ;
 
         // For some reason this decoration needs to be explicitly copied
-        if(m_isMC){
-          float SF = m_ph_idSF.get(*thisPhoton,sys);
-          if(m_isoIncluded) SF *= m_ph_isoSF.get(*thisPhoton,sys);
-          m_ph_SF.set(*thisPhoton, SF, sys);
+        for(unsigned int i=0; i<m_photonWPNames.size(); i++){
+          std::string wp = m_photonWPNames[i];
+          if(m_isMC){
+            float SF = m_ph_idSF[i].get(*thisPhoton,sys);
+            if(wp.find("NonIso")!=std::string::npos) SF *= m_ph_isoSF[i].get(*thisPhoton,sys);
+            m_ph_SF[i].set(*thisPhoton, SF, sys);
+          }
+          m_select_out[i].set(*thisPhoton, m_select_in[i].get(*thisPhoton,sys), sys);
         }
-        m_select_out.set(*thisPhoton, m_select_in.get(*thisPhoton,sys), sys);
 
         workContainer->push_back(thisPhoton.release());
       }
