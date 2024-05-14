@@ -271,6 +271,4 @@ def bbtt_branches(flags):
                 "ZCR", "TopEMuCR"]:
         branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}_%SYS%"]
 
-    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
-
     return branches, float_variable_names, int_variable_names

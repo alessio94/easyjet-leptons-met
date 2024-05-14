@@ -221,8 +221,6 @@ def ttHH_branches(flags):
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> ttHH_{cut}_%SYS%"]
 
-    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
-
     return branches, float_variable_names, int_variable_names
 
 

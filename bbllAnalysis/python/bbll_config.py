@@ -198,6 +198,4 @@ def bbll_branches(flags):
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}_%SYS%"]
 
-    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
-
     return branches, float_variable_names, int_variable_names

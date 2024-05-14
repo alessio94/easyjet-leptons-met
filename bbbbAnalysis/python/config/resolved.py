@@ -83,6 +83,4 @@ def resolved_branches(flags):
                 f"EventInfo.resolved_{var}_{btag_wp} -> bbbb_resolved_{btag_wp}_{var}"
             ]
 
-    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
-
     return branches

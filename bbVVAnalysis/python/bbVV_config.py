@@ -186,6 +186,4 @@ def bbVV_branches(flags):
 
     branches += ["EventInfo.bbVV_pass_sr_%SYS% -> bbVV_pass_SR_%SYS%"]
 
-    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
-
     return branches

@@ -9,15 +9,19 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "runNumber",
             "eventNumber",
             "lumiBlock",
-            "mcEventWeights",
+            "dataTakingYear",
             "averageInteractionsPerCrossing",
             "actualInteractionsPerCrossing",
-            "mcChannelNumber",
         ]
     )
     if flags.Input.isMC:
-        eventinfo_branches.variables += ["generatorWeight_%SYS%"]
-        eventinfo_branches.variables += ["PileupWeight_%SYS%"]
+        eventinfo_branches.variables += [
+            "mcEventWeights",
+            "mcChannelNumber",
+            "RandomRunNumber",
+            "generatorWeight_%SYS%",
+            "PileupWeight_%SYS%"
+        ]
 
     # Replace L1Topo characters, formatting as done by the
     # trigger selection CP alg

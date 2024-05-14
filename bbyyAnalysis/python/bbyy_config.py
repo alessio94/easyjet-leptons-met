@@ -289,8 +289,6 @@ def bbyy_branches(flags):
             else:
                 branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_%SYS%"]
 
-    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
-
     branches += ["EventInfo.eventWeight -> eventWeight"]
 
     photon_triggers = [

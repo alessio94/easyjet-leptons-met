@@ -116,6 +116,4 @@ def boosted_branches(flags):
                 f"EventInfo.boosted_{var}_{btag_wp} -> bbbb_boosted_{btag_wp}_{var}"
             ]
 
-    branches += ["EventInfo.dataTakingYear -> dataTakingYear"]
-
     return branches
