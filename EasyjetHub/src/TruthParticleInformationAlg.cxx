@@ -148,6 +148,7 @@ namespace Easyjet
             SG::VIEW_ELEMENTS);
     for (TruthScalar h : higgses)
     {
+      if(!h) continue;
       debugPrintParticleKinematics(h);
       higgsesTruthParticles->push_back(h);
     }
