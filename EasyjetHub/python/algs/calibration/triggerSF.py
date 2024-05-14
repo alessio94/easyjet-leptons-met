@@ -1,9 +1,6 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 
-# Once https://gitlab.cern.ch/atlas/athena/-/merge_requests/69978 is merged
-# from TriggerAnalysisAlgorithms.TriggerAnalysisSFConfig import TriggerAnalysisSFBlock
-# In the meantime
-from EasyjetHub.algs.calibration.TriggerAnalysisSFConfig import TriggerAnalysisSFBlock
+from TriggerAnalysisAlgorithms.TriggerAnalysisSFConfig import TriggerAnalysisSFBlock
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor

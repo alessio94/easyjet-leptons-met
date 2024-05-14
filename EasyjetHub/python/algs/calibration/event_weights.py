@@ -53,7 +53,7 @@ def generator_sequence(flags):
     # we have to disable cutbookkeepers if there's no output file, or
     # if we're looking at one of several broken tags
     is_bad_tag = ptag in ["p5226", "p5278", "p5334"]
-    doCBK = not is_bad_tag and flags.Analysis.out_file
+    doCBK = not is_bad_tag and bool(flags.Analysis.out_file)
     # Include, and then set up the generator analysis sequence:
     configSeq += makeConfig('GeneratorLevelAnalysis')
     configSeq.setOptionValue('.saveCutBookkeepers', doCBK)
