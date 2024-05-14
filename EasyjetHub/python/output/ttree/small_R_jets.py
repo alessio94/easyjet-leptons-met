@@ -117,7 +117,8 @@ def get_small_R_bjet_branches(
         ]
 
         split_tags = flags.Input.AMITag.split("_")
-        gn2v00_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5855")
+        gn2v00_valid_ptag = (get_valid_ami_tag(split_tags, "p", "p5855")
+                             and not get_valid_ami_tag(split_tags, "p", "p6187"))
         if gn2v00_valid_ptag:
             small_R_bjet_branches.variables += [
                 "GN2v00_pb",

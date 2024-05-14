@@ -14,7 +14,8 @@ def btag_decor_cfg(flags):
     ]
 
     split_tags = flags.Input.AMITag.split("_")
-    gn2v00_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5855")
+    gn2v00_valid_ptag = (get_valid_ami_tag(split_tags, "p", "p5855")
+                         and not get_valid_ami_tag(split_tags, "p", "p6187"))
     if gn2v00_valid_ptag:
         btag_vars += [
             "GN2v00_pb",
