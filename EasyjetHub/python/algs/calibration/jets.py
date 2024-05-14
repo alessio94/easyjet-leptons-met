@@ -5,7 +5,6 @@ from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
 from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetPtCalibrationConfig
 
-from EasyjetHub.algs.calibration.FTagEventSFConfig import makeFTagEventSFConfig
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
@@ -122,6 +121,20 @@ def jet_sequence(
                 "ftag_select_" + jet_flags.btag_wp,
             )
 
+        for tagger_wp in btag_wps:
+            tagger, btag_wp = tagger_wp.split("_", 1)
+
+            if "GN2v01" in tagger:
+                continue
+
+            # Note: this is going to run post overlap removal
+            configSeq += config.makeConfig(
+                'Jets.FlavourTaggingEventSF',
+                containerName=calib_name + '.baselineJvt',
+                selectionName=tagger_wp)
+            configSeq.setOptionValue('.btagger', tagger)
+            configSeq.setOptionValue('.btagWP', btag_wp)
+
     # Apply kinematic selection
     configSeq += makeConfig('Jets.PtEtaSelection', containerName=calib_name,
                             selectionName='selectPtEta')
@@ -136,24 +149,6 @@ def jet_sequence(
     configSeq += makeConfig('Thinning', containerName=calib_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta&&baselineJvt')
     configSeq.setOptionValue('.outputName', output_name)
-
-    # Event-level FTAG scale factor
-    # Can be moved to Athena config in 25.2.5
-    if jet_type != "reco4EMTopoJet":
-
-        for tagger_wp in btag_wps:
-            tagger, btag_wp = tagger_wp.split("_", 1)
-
-            if "GN2v01" in tagger:
-                continue
-
-            makeFTagEventSFConfig(
-                configSeq,
-                flags.Analysis.container_names.output[jet_type],
-                tagger_wp,
-            )
-            configSeq.setOptionValue('.btagger', tagger)
-            configSeq.setOptionValue('.btagWP', btag_wp)
 
     return configSeq
 
