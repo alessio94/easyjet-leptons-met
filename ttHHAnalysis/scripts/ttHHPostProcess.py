@@ -8,7 +8,6 @@
 
 import sys
 import yaml
-import ROOT
 
 from argparse import ArgumentParser
 from AthenaConfiguration.ComponentFactory import CompFactory
@@ -16,6 +15,7 @@ from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 
 from ttHHAnalysis.ttHH_config import FullPath
+from EasyjetPlus.PostProcessTools import mergeFiles
 
 
 def RunEasyjetPlus(args):
@@ -58,30 +58,6 @@ def RunEasyjetPlus(args):
         sys.exit(1)
 
 
-def mergeFiles(inFileName, outFileName):
-    inFile = ROOT.TFile.Open(inFileName, "UPDATE")
-    outFile = ROOT.TFile.Open(outFileName, "READ")
-
-    t1 = inFile.Get("AnalysisMiniTree")
-    t2 = outFile.Get("AnalysisMiniTree")
-
-    if not t1:
-        print("Error: Could not retrieve the TTree from inFile.")
-        sys.exit(1)
-
-    if not t2:
-        print("Error: Could not retrieve the TTree from outFile.")
-        sys.exit(1)
-
-    # Save all branches of outFile to the inFile
-    t1.AddFriend(t2, "friendTree")
-    df = ROOT.RDataFrame(t1)
-
-    opts = ROOT.RDF.RSnapshotOptions()
-    opts.fMode = "RECREATE"
-    df.Snapshot("AnalysisMiniTree", inFileName, "", opts)
-
-
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--inFile", required=True)
@@ -91,11 +67,13 @@ if __name__ == "__main__":
     parser.add_argument("--copyInputs", action='store_true',
                         help="Copy pre-processed branches to outFile.")
     parser.add_argument("--mergeMyFiles", action='store_true',
-                        help="Merge branches of outFile into the inFile.")
+                        help="Merge branches. Default is merge output to input")
+    parser.add_argument("--mergeToOutput", action='store_true',
+                        help="Can apply with mergeMyFiles. Merge input to output")
 
     args = parser.parse_args()
 
     RunEasyjetPlus(args)
 
     if (args.mergeMyFiles):
-        mergeFiles(args.inFile, args.outFile)
+        mergeFiles(args.inFile, args.outFile, args.mergeToOutput)
