@@ -1,0 +1,28 @@
+include: bbyyAnalysis/RunConfig-bbyy-base.yaml
+
+do_resonant_PNN: true
+# flag that toggles single photon trigger in the cutflow
+# so that PASS_TRIGGER = single || diphoton
+enable_single_photon_trigger: true
+#Mass points for PNN 
+#Low Mass Grid
+mX_mS_pairs: [[170, 30], [180, 50], [185, 30], [190, 50], [200, 70], [205, 30], [205, 50],
+              [210, 70], [220, 90], [225, 30], [225, 50], [225, 70], [230, 90], [230, 100],
+              [240, 100], [240, 110], [245, 30], [245, 50], [245, 70], [245, 90], [250, 100],
+              [250, 110], [650, 90], [575, 200]]
+#High Mass Grid
+mS_values: [30, 70, 110, 170, 200, 300, 400, 500]
+mX_values: [300, 350, 400, 450, 500, 550, 600, 675, 750, 875, 1000]
+#1 bjet Mass Grid
+mX_1bjet: [190, 210, 230, 250, 400, 500, 750, 1000]
+
+Electron:
+  forceFullSimConfig: true
+
+Photon:
+  forceFullSimConfig: true
+
+bypass: true
+
+small_R_jet:
+  btag_wp: "DL1dv01_FixedCutBEff_77"

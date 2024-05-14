@@ -1,4 +1,6 @@
-include: bbyyAnalysis/RunConfig-bbyy-base.yaml
+include: bbyyAnalysis/RunConfig-Resonant-base.yaml
+
+do_large_R_UFO_jets: true
 
 CutList :
       - PASS_TRIGGER
@@ -11,15 +13,15 @@ CutList :
       #- AT_LEAST_ONE_B_JET
       #- AT_LEAST_TWO_B_JETS
       #- EXACTLY_ONE_B_JET
-      - EXACTLY_TWO_B_JETS
+      #- EXACTLY_TWO_B_JETS
 
-# Include the TTree configuration and update details
 ttree_output:
   - AnalysisMiniTree:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
     reco_outputs:
       small_R_jets: 'container_names.output.reco4PFlowJet'
+      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
       photons: 'container_names.output.photons'
     collection_options:
       small_R_jets:
@@ -28,6 +30,9 @@ ttree_output:
         shower_shapes: false
         truth_labels: false
         iso_variables: false
+      large_R_jets:
+        truth_labels: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
+      large_R_jets: 'container_names.input.truth10SoftDropJet'
       higgs_particle: 'container_names.output.truthHHParticles'
