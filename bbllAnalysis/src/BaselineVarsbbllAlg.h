@@ -41,7 +41,9 @@ public:
     /// \brief Execute method, for actions to be taken in the event loop
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
-    
+
+   float ComputeMT2(const TLorentzVector& Leading_bjet, const TLorentzVector& Subleading_bjet, const TLorentzVector& met_vector);
+
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
@@ -83,6 +85,9 @@ private:
 
     Gaudi::Property<std::vector<std::string>> m_intVariables
           {this, "intVariableList", {}, "Name list of integer variables"};
+
+    CP::SysReadDecorHandle<float>
+    m_met_sig {this, "METSignificance", "significance", "Met Significance"};
 
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>

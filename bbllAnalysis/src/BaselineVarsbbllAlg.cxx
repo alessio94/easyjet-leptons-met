@@ -58,6 +58,8 @@ namespace HHBBLL
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
 
+    ATH_CHECK (m_met_sig.initialize(m_systematicsList, m_metHandle));
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
@@ -91,6 +93,7 @@ namespace HHBBLL
 	ATH_MSG_ERROR("Could not retrieve MET");
        	return StatusCode::FAILURE;	
       }
+
       for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
       }
@@ -102,12 +105,20 @@ namespace HHBBLL
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
       TLorentzVector bb;
-      TLorentzVector bl;
       TLorentzVector ee;
       TLorentzVector mumu;
       TLorentzVector emu;
       TLorentzVector Leading_lep;
       TLorentzVector Subleading_lep;
+      TLorentzVector Leading_bjet;
+      TLorentzVector Subleading_bjet;
+      TLorentzVector met_vector;
+      TLorentzVector bbll;
+      TLorentzVector bbllmet;
+      TLorentzVector b1l1;
+      TLorentzVector b1l2;
+      TLorentzVector b2l1;
+      TLorentzVector b2l2;
 
       int n_jets=0;
       int n_bjets=0;
@@ -349,6 +360,13 @@ namespace HHBBLL
         (electrons->size() == 1 && muons->size() == 1 ) ? emu.Pt() : -99;
       m_Fbranches.at("pTll").set(*event, ll_pt, sys);
 
+      // ll_dR
+      double ll_dR = -99.;
+      if(electrons->size() == 2 && muons->size() == 0) ll_dR = electrons->at(0)->p4().DeltaR(electrons->at(1)->p4());
+      else if(electrons->size() == 0 && muons->size() == 2) ll_dR = muons->at(0)->p4().DeltaR(muons->at(1)->p4());
+      else if(electrons->size() == 1 && muons->size() == 1 ) ll_dR = electrons->at(0)->p4().DeltaR(muons->at(0)->p4());
+      m_Fbranches.at("dRll").set(*event, ll_dR, sys);
+
       //jet sector
       if (jets->size()>=1)
       {
@@ -401,15 +419,110 @@ namespace HHBBLL
       }
 
       // b-jet + lepton sector
-      if (n_bjets>=1 && (n_electrons>=1 || n_muons>=1)) {
-          bl = bjets->at(0)->p4()+Leading_lep;
-          m_Fbranches.at("mbl").set(*event, bl.M(), sys);
-          m_Fbranches.at("pTbl").set(*event, bl.Pt(), sys);
-          m_Fbranches.at("Etabl").set(*event, bl.Eta(), sys);
-          m_Fbranches.at("Phibl").set(*event, bl.Phi(), sys);
-          m_Fbranches.at("dRbl").set(*event, (bjets->at(0)->p4()).DeltaR(Leading_lep), sys);
+      if (bjets->size()>=2 && (n_electrons+n_muons)>=2) {
+	b1l1 = bjets->at(0)->p4()+Leading_lep;
+	b2l1 = bjets->at(1)->p4()+Leading_lep;
+	b1l2 = bjets->at(0)->p4()+Subleading_lep;
+	b2l2 = bjets->at(1)->p4()+Subleading_lep;
+	double m_b1l1 = b1l1.M();
+	double m_b2l1 = b2l1.M();
+	double m_b1l2 = b1l2.M();
+	double m_b2l2 = b2l2.M();
+	double m_bl = std::min(std::max(m_b1l1, m_b2l1), std::max(m_b1l2, m_b2l2));
+        m_Fbranches.at("mbl").set(*event, m_bl, sys);
       }
+
+      // DeltaR_min of all 𝑏-tagged jet and lepton combinations
+      std::vector<const xAOD::IParticle*> allLeptons;
+
+      for (const auto& electron : *electrons) {
+        allLeptons.push_back(electron);
+      }
+
+      for (const auto& muon : *muons) {
+        allLeptons.push_back(muon);
+      }
+
+      std::vector<double> deltaRs;
+      for (const auto& lepton : allLeptons) {
+        for (const auto& bjet : *bjets) {
+          deltaRs.push_back(bjet->p4().DeltaR(lepton->p4()));
+        }
+      }
+      if (!deltaRs.empty()) {
+	auto minDeltaR = *std::min_element(std::begin(deltaRs), std::end(deltaRs));
+        m_Fbranches.at("dRbl_min").set(*event, minDeltaR, sys);
+      }
+
+      // met
+      met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
+      float met_sig = m_met_sig.get(*met, sys);
+      m_Fbranches.at("MET_sig").set(*event, met_sig, sys);
+
+      // combine bb + ll
+      if (bjets->size()>=2 && (n_electrons+n_muons)>=2) {
+        bbll = Leading_lep + Subleading_lep + bb;
+	bbllmet = Leading_lep + Subleading_lep + bb + met_vector;
+	m_Fbranches.at("mbbll").set(*event, bbll.M(), sys);
+	m_Fbranches.at("mbbllmet").set(*event, bbllmet.M(), sys);
+
+        // Ht2r mesure for boostedness of the two Higgs bosons
+        Leading_bjet = bjets->at(0)->p4();
+        Subleading_bjet = bjets->at(1)->p4();
+
+        double ht2 = (met_vector + Leading_lep + Subleading_lep).Perp() + (Leading_bjet + Subleading_bjet).Perp();
+        double ht2r = ht2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + Leading_bjet.Pt() + Subleading_bjet.Pt());
+
+        m_Fbranches.at("HT2").set(*event, ht2, sys);
+        m_Fbranches.at("HT2r").set(*event, ht2r, sys);
+      }
+
+      // Transverse mass of the pT-leading lepton wrt met
+      if ((electrons->size()+muons->size()) >= 1)
+      {
+	float mt_lept1_met = TMath::Sqrt(2 * met->met() * Leading_lep.Pt() * (1 - TMath::Cos(Leading_lep.DeltaPhi(met_vector))));
+	m_Fbranches.at("mT_Lepton1_Met").set(*event, mt_lept1_met, sys);
+
+	if ((electrons->size()+muons->size()) >= 2)
+	{
+	  float mt_lept2_met = TMath::Sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - TMath::Cos(Subleading_lep.DeltaPhi(met_vector))));
+	  float mt_l_min = std::min(mt_lept1_met, mt_lept2_met);
+	  m_Fbranches.at("mT_Lepton2_Met").set(*event, mt_lept2_met, sys);
+	  m_Fbranches.at("mT_L_min").set(*event, mt_l_min, sys);
+	}
+      }
+      // MT2_bb
+      double mT2_bb = ComputeMT2(Leading_bjet, Subleading_bjet, met_vector);
+      m_Fbranches.at("mT2_bb").set(*event, mT2_bb, sys);
+
     }
     return StatusCode::SUCCESS;
   }
+
+  float BaselineVarsbbllAlg::ComputeMT2(const TLorentzVector& Leading_bjet, const TLorentzVector& Subleading_bjet, const TLorentzVector& met_vector){
+
+        // Input parameters for the first b-jet
+        double mass_b1 = Leading_bjet.M();
+        double pT_b1 = Leading_bjet.Pt();
+
+	// Input parameters for the second b-jet
+        double mass_b2 = Subleading_bjet.M();
+        double pT_b2 = Subleading_bjet.Pt();
+
+	// Missing transverse momentum
+        double pTMiss = met_vector.Pt();
+
+	// Calculate mT2 for the two b-tagged jets
+        double ETb1 = std::sqrt(mass_b1 * mass_b1 + pT_b1 * pT_b1);
+        double ETb2 = std::sqrt(mass_b2 * mass_b2 + pT_b2 * pT_b2);
+
+        double mTsq1 = mass_b1 * mass_b1 + 2.0 * pT_b1 * (ETb1 - pT_b1);
+        double mTsq2 = mass_b2 * mass_b2 + 2.0 * pT_b2 * (ETb2 - pT_b2);
+
+	double mt2 = std::sqrt(std::max({mTsq1, mTsq2}) + pTMiss * pTMiss);
+       
+	return mt2;
+  }
 }
+
+
