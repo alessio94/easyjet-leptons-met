@@ -1,0 +1,76 @@
+include: base-config.yaml
+
+# Decay mode considered for truth decoration
+truthDecayModes: ["bbbb"]
+
+# Toggles for object types
+do_muons: true
+do_electrons: true
+do_small_R_jets: true
+do_large_R_UFO_jets: true
+
+# Toggles for reconstructed objects decorations
+small_R_jet:
+  # nominal btagging working point, used for b-jet pT calibration in particular
+  btag_wp: ""
+  # additional btagging working points, available for selections and per-jet SFs
+  btag_extra_wps: []
+  runBJetPtCalib: false
+  # select jet type
+  jet_type: "reco4EMTopoJet"
+  # Calibration tool options
+  calibToolCalibArea: "00-04-82"
+  calibToolConfigFile: "PreRec_R22_EMTopo_ResPU_EtaJES_GSC_December6_231206.config"
+  calibToolCalibSeq: "JetArea_Residual_EtaJES_GSC"
+  # Uncertainties tool options
+  uncertToolCalibArea: "CalibArea-08"   # default setting before pre-recs
+  uncertToolConfigPath: "rel21/Fall2018/R4_AllNuisanceParameters_AllJERNP.config"     # default setting before pre-recs
+  uncertToolMCType: "MC16"    # default setting before pre-recs
+
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "NonIso"
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+
+# list of triggers per year to consider
+trigger_chains:
+  include: trigger.yaml
+
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# apply loose jet cleaning only
+loose_jet_cleaning: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+
+# Include the TTree configuration and update details
+ttree_output:
+  - 
+    include: AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
+    reco_outputs:
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
+      small_R_jets: 'container_names.output.reco4EMTopoJet'
+      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+      #VR_jets: 'container_names.output.vrJets'
+    collection_options:
+      small_R_jets:
+        higgs_parent_info: true
+        btag_info: true
+        JVT_details: true
+        no_bjet_calib_p4: true
+        btag_details: true
+      large_R_jets:
+        substructure_info: true
+        truth_labels: true
+    truth_outputs:
+      small_R_jets: 'container_names.input.truth4Jet'
+      large_R_jets: 'container_names.input.truth10SoftDropJet'
+      higgs_particle: 'container_names.output.truthHHParticles'

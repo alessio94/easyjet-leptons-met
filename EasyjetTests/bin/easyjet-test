@@ -76,6 +76,7 @@ declare -A DATAFILES=(
     [bbtt-mc23-syst]=${PHYS_TTBAR_MC23}
     [bbtt-mc23-lite-syst]=${PHYSLITE_TTBAR_MC23}
     [bbll-mc23-lite]=${PHYSLITE_TTBAR_MC23}
+    [emtopo-mc23]=${PHYS_TTBAR_MC23}
     # systematics enabled
     [syst-mc23]=${PHYS_TTBAR_MC23}
     # non-ntupler workflows
@@ -126,6 +127,7 @@ declare -A TESTS=(
     [bbtt-mc23-lite-syst]="simple bbtt-ntupler"
     [bbll-mc23-lite]="simple bbll-ntupler"
     [syst-mc23]="systematics easyjet-ntupler"
+    [emtopo-mc23]="simple easyjet-ntupler"
     # non-ntupler
     [aod-fast-bbbb-mc23]="aod-fast bbbb-ntupler"
     [h5-fast-mc23]="h5-fast easyjet-ntupler"
@@ -166,6 +168,7 @@ declare -A CONFIGS=(
     [bbtt-mc23-syst]=bbttAnalysis/RunConfig-bbtt-bypass-syst.yaml
     [bbtt-mc23-lite-syst]=bbttAnalysis/RunConfig-bbtt-bypass-syst.yaml
     [bbll-mc23-lite]=bbllAnalysis/RunConfig-bbll-bypass.yaml
+    [emtopo-mc23]=EasyjetHub/RunConfig-EMTopo.yaml
     # MC23 AF3
     [mc23af3]=EasyjetHub/RunConfig-noEle.yaml
     [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-Default.yaml

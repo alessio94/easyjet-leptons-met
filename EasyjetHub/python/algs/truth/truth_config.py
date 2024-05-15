@@ -10,32 +10,33 @@ def truth_info_cfg(
 ):
     cfg = ComponentAccumulator()
 
-    # truth record seems to be broken in physlite
-    if flags.Analysis.do_small_R_jets and not flags.Input.isPHYSLITE:
-        cfg.merge(jet_parent_decorator_cfg(
-            flags,
-            jet_collection=flags.Analysis.container_names.input[
-                flags.Analysis.small_R_jet.jet_type
-            ],
-            name_prefix="smallR",
-            match_dr=0.3
-        ))
+    if flags.Analysis.do_jet_parent_decoration and not flags.Input.isPHYSLITE:
+        # truth record seems to be broken in physlite
+        if flags.Analysis.do_small_R_jets:
+            cfg.merge(jet_parent_decorator_cfg(
+                flags,
+                jet_collection=flags.Analysis.container_names.input[
+                    flags.Analysis.small_R_jet.jet_type
+                ],
+                name_prefix="smallR",
+                match_dr=0.3
+            ))
 
-    if flags.Analysis.do_large_R_UFO_jets and not flags.Input.isPHYSLITE:
-        cfg.merge(jet_parent_decorator_cfg(
-            flags,
-            jet_collection=flags.Analysis.container_names.input.reco10UFOJet,
-            name_prefix="largeR",
-            match_dr=1.0,
-        ))
+        if flags.Analysis.do_large_R_UFO_jets:
+            cfg.merge(jet_parent_decorator_cfg(
+                flags,
+                jet_collection=flags.Analysis.container_names.input.reco10UFOJet,
+                name_prefix="largeR",
+                match_dr=1.0,
+            ))
 
-    if flags.Analysis.do_large_R_Topo_jets and not flags.Input.isPHYSLITE:
-        cfg.merge(jet_parent_decorator_cfg(
-            flags,
-            jet_collection=flags.Analysis.container_names.input.reco10TopoJet,
-            name_prefix="largeRTopo",
-            match_dr=1.0,
-        ))
+        if flags.Analysis.do_large_R_Topo_jets:
+            cfg.merge(jet_parent_decorator_cfg(
+                flags,
+                jet_collection=flags.Analysis.container_names.input.reco10TopoJet,
+                name_prefix="largeRTopo",
+                match_dr=1.0,
+            ))
 
     log.info("Adding truth particle info seq")
     cfg.merge(

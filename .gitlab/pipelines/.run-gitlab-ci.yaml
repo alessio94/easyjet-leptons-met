@@ -195,6 +195,11 @@ ntupler_bbll_mc23_lite:
   script:
     - easyjet-test bbll-mc23-lite
 
+ntupler_EMTopo_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test emtopo-mc23
+
 # systematics enabled
 
 syst_mc23:

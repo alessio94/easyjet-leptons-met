@@ -144,9 +144,13 @@ def jet_sequence(
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=calib_name)
 
+    # Apply thinning
     output_name = drop_sys(flags.Analysis.container_names.output[jet_type])
     configSeq += makeConfig('Thinning', containerName=calib_name)
-    configSeq.setOptionValue('.selectionName', 'selectPtEta&&baselineJvt')
+    selection_string = "selectPtEta"
+    if jet_type != "reco4EMTopoJet":
+        selection_string += "&&baselineJvt"
+    configSeq.setOptionValue('.selectionName', selection_string)
     configSeq.setOptionValue('.outputName', output_name)
 
     return configSeq
