@@ -1,5 +1,5 @@
-ptag = "p6026"
-campaign = "v3"
+ptag=p6026
+campaign=v3
 
 #data 
 easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13p6TeV.Run3.p6029.txt \
@@ -99,12 +99,12 @@ easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/m
     --nGBperJob 2 \
     --campaign ${campaign}
 
-#ggF H(yy) --> This process is underproduction due to an error on the JO name
-#easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.ggFH_yy.${ptag}.txt \
-#    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
-#    --exec bbyy-ntupler \
-#    --nGBperJob 2 \
-#    --campaign ${campaign}
+#ggF H(yy)
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.ggFH_yy.${ptag}.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 2 \
+    --campaign ${campaign}
 
 #VBF H(yy)
 easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.VBFH_yy.${ptag}.txt \
@@ -155,8 +155,15 @@ easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/m
     --nGBperJob 2 \
     --campaign ${campaign}
 
-#yy+jets
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc21_13p6TeV.yyjets.${ptag}.txt \
+#yy+jets MadGraph
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc21_13p6TeV.yyjets_MadGraph.${ptag}.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 2 \
+    --campaign ${campaign}
+
+#yy+jets Sherpa
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc21_13p6TeV.yyjets_Sherpa.${ptag}.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 2 \

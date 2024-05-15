@@ -1,5 +1,5 @@
-ptag = "p6026"
-campaign = "v3"
+ptag=p6026
+campaign=v3
 
 #data 
 easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13TeV.Run2.${ptag}.txt \

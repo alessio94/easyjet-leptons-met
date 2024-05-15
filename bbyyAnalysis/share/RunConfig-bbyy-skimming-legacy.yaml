@@ -17,3 +17,9 @@ CutList :
       - AT_LEAST_TWO_JETS
       - LESS_THAN_SIX_CENTRAL_JETS
       - EXACTLY_TWO_B_JETS
+
+Electron:
+  forceFullSimConfig: true
+
+Photon:
+  forceFullSimConfig: true
