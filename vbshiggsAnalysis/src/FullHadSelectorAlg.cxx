@@ -23,9 +23,8 @@ namespace VBSHIGGS{
     ATH_MSG_INFO("EXECUTE  -----  FullHadSelectorAlg  -----    \n");
 
     // Loop over all systs
-    for (const auto& sys : m_systematicsList.systematicsVector()){
-      
-    }
+    //for (const auto& sys : m_systematicsList.systematicsVector()){}
+
     return StatusCode::SUCCESS;
   }
   StatusCode FullHadSelectorAlg::finalize(){
