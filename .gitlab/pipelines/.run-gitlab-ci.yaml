@@ -114,6 +114,16 @@ ntupler_lltt_mc20_lite:
   script:
     - easyjet-test lltt-mc20-lite
 
+ntupler_vbshiggs_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test vbshiggs-mc20
+
+ntupler_vbshiggs_mc20_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test vbshiggs-mc20-lite
+
 # MC20 AF3
 
 ntupler_mc20af3_lite:

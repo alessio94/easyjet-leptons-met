@@ -1,0 +1,45 @@
+include: vbshiggsAnalysis/RunConfig-common.yaml 
+
+# Which analysis to consider
+Channel: "FullLep"
+
+# Toggles for object types
+do_muons: true
+do_electrons: true
+do_met : true
+
+
+Electron:
+  ID: "MediumLH"
+  Iso: "Loose_VarRad"
+  amount: 2
+
+Muon:
+  ID: "Medium"
+  Iso: "PflowLoose_VarRad"
+  amount: 2
+
+Lepton:
+  amount: 2
+
+# list of triggers per year to consider
+trigger:
+  include: vbshiggsAnalysis/trigger-lep.yaml
+
+CutList :
+      - PASS_TRIGGER
+      - EXACTLY_TWO_LEPTONS
+      - TWO_SS_CHARGE_LEPTONS
+      - PASS_MET
+      - EXACTLY_TWO_B_JETS
+      - PASS_DELTA_R_BB
+      - PASS_mBB
+      - PASS_VBS_BASELINE
+
+Categories :
+      - IS_SF
+      - IS_ee
+      - IS_mm
+      - IS_em
+      - Pass_ll
+

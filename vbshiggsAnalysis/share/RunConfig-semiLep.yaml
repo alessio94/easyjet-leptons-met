@@ -1,0 +1,28 @@
+include: vbshiggsAnalysis/RunConfig-common.yaml 
+
+# Which analysis to consider
+Channel: "SemiLep"
+
+# Toggles for object types
+do_muons: true
+do_electrons: true
+do_met : true
+
+Electron:
+  ID: "MediumLH"
+  Iso: "Loose_VarRad"
+  amount: 1
+
+Muon:
+  ID: "Medium"
+  Iso: "PflowLoose_VarRad"
+  amount: 1
+
+Lepton:
+  amount: 1
+
+
+# list of triggers per year to consider
+trigger:
+  include: vbshiggsAnalysis/trigger-lep.yaml
+

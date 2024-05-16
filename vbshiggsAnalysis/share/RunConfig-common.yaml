@@ -1,0 +1,63 @@
+include: EasyjetHub/base-config.yaml
+
+do_CP_systematics: false
+
+# Toggles for object types
+do_muons: true
+do_electrons: true
+do_met : true
+
+Electron:
+  ID: "MediumLH"
+  Iso: "Loose_VarRad"
+  amount: 0
+
+Muon:
+  ID: "Medium"
+  Iso: "PflowLoose_VarRad"
+  amount: 0
+
+Lepton:
+  amount: 0
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+
+#Enable cutflow 
+save_vbshiggs_cutflow: true
+
+bypass: true
+# Toggles for object types
+do_small_R_jets: true
+
+# Toggles for reconstructed objects decorations
+small_R_jet:
+  # btagging working points 
+  btag_wp: "GN2v01_FixedCutBEff_85"
+  amount: 2
+  amount_bjet: 2
+
+  # to use multiple btagging WPs
+  btag_extra_wps:
+    - GN2v01_FixedCutBEff_65
+    - GN2v01_FixedCutBEff_70
+    - GN2v01_FixedCutBEff_77
+    - GN2v01_FixedCutBEff_90
+  variables_int_bjets: ["truthLabel"]
+# Include the TTree configuration and update details
+ttree_output:
+  - AnalysisMiniTree:
+    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
+    slim_variables_with_syst: true
+    reco_outputs:
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
+      met : 'container_names.output.met'
+    collection_options:
+      small_R_jets:
+        btag_info: true
