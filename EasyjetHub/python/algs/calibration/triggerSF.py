@@ -22,7 +22,8 @@ def triggerSF_sequence(flags):
     configSeq.append(TriggerAnalysisSFBlock())
     configSeq.setOptionValue('.triggerChainsPerYear',
                              get_trigger_chains_scale_factor(flags))
-    configSeq.setOptionValue('.noFilter', not flags.Analysis.do_trigger_filtering)
+    # Disabling the trigger matching requirement
+    configSeq.setOptionValue('.noFilter', True)
 
     if hasattr(trigSF_flags, 'Electron'):
         configSeq.setOptionValue('.electronID',
