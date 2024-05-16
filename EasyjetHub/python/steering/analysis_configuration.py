@@ -161,6 +161,9 @@ def get_trigger_chains(flags):
 
 
 def get_trigger_chains_scale_factor(flags):
+    if not flags.Analysis.trigger.scale_factor.doSF:
+        return {}
+
     triggerChains = (flags.Analysis.trigger.scale_factor.chains
                      if hasattr(flags.Analysis.trigger.scale_factor, "chains") else
                      flags.Analysis.trigger.selection.chains)
