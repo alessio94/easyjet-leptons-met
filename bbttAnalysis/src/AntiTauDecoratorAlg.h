@@ -1,28 +1,15 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
-
-  TauDecoratorAlg:
-  An alg that copies tau information to aux decorations so can be
-  output branch.
 */
 
+#ifndef BBTTANALYSIS_ANTITAUDECORATORALG
+#define BBTTANALYSIS_ANTITAUDECORATORALG
 
-
-// Always protect against multiple includes!
-#ifndef EASYJET_TAUDECORATORALG
-#define EASYJET_TAUDECORATORALG
-
-#include <vector>
-#include <utility>
-#include <string>
-#include <unordered_map>
-
-#include <AsgDataHandles/WriteDecorHandleKey.h>
-#include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <AthenaBaseComps/AthReentrantAlgorithm.h>
+#include <AsgDataHandles/ReadDecorHandleKey.h>
+#include <AsgDataHandles/WriteDecorHandleKey.h>
 
 #include <xAODEventInfo/EventInfo.h>
-
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>

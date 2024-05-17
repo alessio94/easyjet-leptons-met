@@ -6,16 +6,12 @@
 #ifndef BBTTANALYSIS_MMCDECORATORALG
 #define BBTTANALYSIS_MMCDECORATORALG
 
-#include <memory>
-
 #include "AnaAlgorithm/AnaAlgorithm.h"
-#include <FourMomUtils/xAODP4Helpers.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
-#include <SystematicsHandles/SysListHandle.h>
-#include <SystematicsHandles/ISysHandleBase.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>

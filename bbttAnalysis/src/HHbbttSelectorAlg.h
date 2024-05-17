@@ -12,10 +12,10 @@
 #include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <AsgDataHandles/ReadDecorHandle.h>
 
-#include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
-#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysFilterReporterParams.h>
 
 #include <xAODEventInfo/EventInfo.h>
@@ -23,7 +23,6 @@
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODTau/TauJetContainer.h>
-#include <xAODMissingET/MissingETContainer.h>
 
 #include <EasyjetHub/CutManager.h>
 
@@ -144,19 +143,13 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_tauHandle{ this, "taus", "",   "Tau container to read" };
 
-    CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
-
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
     CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
-    Gaudi::Property<std::string> m_antiTauDecorName
-      { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
-
+    CP::SysReadDecorHandle<char> m_antiTauDecorHandle{"isAntiTau", this};
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};

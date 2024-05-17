@@ -2,15 +2,9 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
+#include "BaselineVarsbbttAlg.h"
 
 #include "AthContainers/AuxElement.h"
-#include "BaselineVarsbbttAlg.h"
-#include <FourMomUtils/xAODP4Helpers.h>
-#include <AthContainers/ConstDataVector.h>
-#include <xAODJet/JetContainer.h>
-#include <xAODMuon/MuonContainer.h>
-#include <xAODEgamma/ElectronContainer.h>
-#include <xAODTau/TauJetContainer.h>
 #include <AthContainers/ConstDataVector.h>
 
 #include "TLorentzVector.h"
@@ -72,12 +66,8 @@ namespace HHBBTT
       ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
     }
 
-    // tau ID
-    m_IDTauDecorKey = m_tauHandle.getNamePattern() + "." + m_IDTauDecorName;
-    ATH_CHECK (m_IDTauDecorKey.initialize());
-
-    m_antiTauDecorKey = m_tauHandle.getNamePattern() + "." + m_antiTauDecorName;
-    ATH_CHECK (m_antiTauDecorKey.initialize());
+    ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_tauHandle));
 
     if (m_isMC) {
       ATH_CHECK (m_truthTypeTau.initialize(m_systematicsList, m_tauHandle));
@@ -105,8 +95,6 @@ namespace HHBBTT
 
   StatusCode BaselineVarsbbttAlg::execute()
   {
-    SG::ReadDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
-    SG::ReadDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
 
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
@@ -235,8 +223,8 @@ namespace HHBBTT
 	int decayMode=-1;
 	tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
 	m_Ibranches.at(prefix+"_decayMode").set(*event, decayMode, sys);
-	m_Ibranches.at(prefix+"_isTauID").set(*event, idTauDecorHandle(*tau), sys);
-	m_Ibranches.at(prefix+"_isAntiTau").set(*event, antiTauDecorHandle(*tau), sys);
+	m_Ibranches.at(prefix+"_isTauID").set(*event, m_IDTau.get(*tau, sys), sys);
+	m_Ibranches.at(prefix+"_isAntiTau").set(*event, m_antiTau.get(*tau, sys), sys);
 	int tau_EleRNN_WP = 0;
 	if(tau->isTau(xAOD::TauJetParameters::EleRNNTight)) tau_EleRNN_WP = 3;
 	else if(tau->isTau(xAOD::TauJetParameters::EleRNNMedium)) tau_EleRNN_WP = 2;

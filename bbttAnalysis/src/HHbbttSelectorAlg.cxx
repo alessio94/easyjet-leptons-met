@@ -30,7 +30,6 @@ namespace HHBBTT
     ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if (!m_isBtag.empty()) {
@@ -60,10 +59,8 @@ namespace HHBBTT
     m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
 
-    m_antiTauDecorKey = m_tauHandle.getNamePattern() + "." + m_antiTauDecorName;
-
     ATH_CHECK(m_tauWPDecorHandle.initialize(m_systematicsList, m_tauHandle));
-    ATH_CHECK(m_antiTauDecorKey.initialize(m_doAntiIDRegions));
+    ATH_CHECK(m_antiTauDecorHandle.initialize(m_systematicsList, m_tauHandle));
     ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
 
@@ -190,14 +187,6 @@ namespace HHBBTT
 
       const xAOD::TauJetContainer *taus = nullptr;
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
-
-      const xAOD::MissingETContainer *metCont = nullptr;
-      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
-      const xAOD::MissingET* met = (*metCont)["Final"];
-      if (!met) {
-	ATH_MSG_ERROR("Could not retrieve MET");
-	return StatusCode::FAILURE;	
-      }
 
       // Apply selection
 
@@ -351,8 +340,7 @@ namespace HHBBTT
       {
         bool passTauWP = m_tauWPDecorHandle.get(*tau, sys);
         if (m_doAntiIDRegions) {
-	  SG::ReadDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
-          passTauWP |= antiTauDecorHandle(*tau);
+          passTauWP |= m_antiTauDecorHandle.get(*tau, sys);
         }
         m_selected_tau.set(*tau, false, sys);
         if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)

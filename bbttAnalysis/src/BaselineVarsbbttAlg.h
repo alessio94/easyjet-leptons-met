@@ -6,15 +6,12 @@
 #ifndef BBTTANALYSIS_FINALVARSBBTTALG
 #define BBTTANALYSIS_FINALVARSBBTTALG
 
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
+
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
-
-#include <AthContainers/ConstDataVector.h>
-
-#include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <FourMomUtils/xAODP4Helpers.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
@@ -22,8 +19,6 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
-
-#include <AsgDataHandles/ReadDecorHandle.h>
 
 namespace HHBBTT
 {
@@ -92,13 +87,8 @@ private:
     CP::SysReadDecorHandle<float> m_tau_effSF{"", this};
 
     // tauID and anti-tauID decorators
-    Gaudi::Property<std::string> 
-    m_IDTauDecorName { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
-
-    Gaudi::Property<std::string>
-    m_antiTauDecorName { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
+    CP::SysReadDecorHandle<char> m_IDTau{"isIDTau", this};
+    CP::SysReadDecorHandle<char> m_antiTau{"isAntiTau", this};
 
     CP::SysReadDecorHandle<int>
       m_truthTypeTau{ this, "truthTypeTau", "truthType", "Tau truth type" };
