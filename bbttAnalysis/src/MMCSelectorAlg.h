@@ -49,14 +49,8 @@ namespace HHBBTT
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-    CP::SysReadDecorHandle<bool> m_pass_SLT {this, "passSLT", "", "events pass (baseline) SLT"};
-    CP::SysReadDecorHandle<bool> m_pass_LTT {this, "passLTT", "", "events pass (baseline) LTT"};
-    CP::SysReadDecorHandle<bool> m_pass_SLT_1B {this, "passSLT_1B", "", "events pass baseline SLT"};
-    CP::SysReadDecorHandle<bool> m_pass_LTT_1B {this, "passLTT_1B", "", "events pass baseline LTT"};
-    CP::SysReadDecorHandle<bool> m_pass_STT {this, "passSTT", "", "events pass (baseline) STT"};
-    CP::SysReadDecorHandle<bool> m_pass_DTT {this, "passDTT", "", "events pass (baseline) DTT"};
-    CP::SysReadDecorHandle<bool> m_pass_STT_1B {this, "passSTT_1B", "", "events pass baseline STT"};
-    CP::SysReadDecorHandle<bool> m_pass_DTT_1B {this, "passDTT_1B", "", "events pass baseline DTT"};
+    CP::SysReadDecorHandle<bool> m_pass_LepHad {this, "passLepHad", "pass_baseline_LepHad_%SYS%", "events pass lep-had"};
+    CP::SysReadDecorHandle<bool> m_pass_HadHad {this, "passHadHad", "pass_baseline_HadHad_%SYS%", "events pass had-had"};
 
     CP::SysReadDecorHandle<float> 
       m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
@@ -67,9 +61,6 @@ namespace HHBBTT
       { this, "channel", {}, "Which channel to run" };
 
     std::vector<HHBBTT::Channel> m_channels;
-
-    /// \brief Internal variables
-    bool MMC_MASS;
 
   };
 }

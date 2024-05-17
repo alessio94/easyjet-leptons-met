@@ -6,8 +6,8 @@ namespace HHBBTT
 
   enum Channel
   {
-    LepHad = 0,
-    HadHad = 1,
+    LepHad2B = 0,
+    HadHad2B = 1,
     LepHad1B = 2,
     HadHad1B = 3,
     ZCR = 4,

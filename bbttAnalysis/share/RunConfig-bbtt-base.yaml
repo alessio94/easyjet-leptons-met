@@ -4,7 +4,7 @@ include: EasyjetHub/base-config.yaml
 do_bbtt_analysis: true
 do_antiID_regions: true
 enable_MMC_cut: false
-channel: ["hadhad","hadhad1b","lephad","lephad1b","ZCR","TopEMuCR"]
+channel: ["hadhad2b","hadhad1b","lephad2b","lephad1b","ZCR","TopEMuCR"]
 
 # Toggles to bypass event selection
 bypass: false
@@ -19,7 +19,6 @@ do_electrons: true
 do_taus: true
 do_met : true
 do_mmc : true
-do_baseline : false
 
 # Toggles for reconstructed objects decorations
 small_R_jet:

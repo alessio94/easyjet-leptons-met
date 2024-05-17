@@ -95,10 +95,6 @@ def bbtt_cfg(
     )
 
     # MMC decoration
-    if flags.Analysis.do_baseline:
-        baseline = "_baseline_"
-    else:
-        baseline = "_"
     if flags.Analysis.do_mmc:
         cfg.addEventAlgo(
             CompFactory.HHBBTT.MMCDecoratorAlg(
@@ -108,14 +104,6 @@ def bbtt_cfg(
                 electrons="bbttAnalysisElectrons_%SYS%",
                 taus="bbttAnalysisTaus_%SYS%",
                 met="AnalysisMET_%SYS%",
-                passSLT="pass" + baseline + "SLT_%SYS%",
-                passLTT="pass" + baseline + "LTT_%SYS%",
-                passSLT_1B="pass_baseline_SLT_%SYS%",
-                passLTT_1B="pass_baseline_LTT_%SYS%",
-                passSTT="pass" + baseline + "STT_%SYS%",
-                passDTT="pass" + baseline + "DTT_%SYS%",
-                passSTT_1B="pass_baseline_STT_%SYS%",
-                passDTT_1B="pass_baseline_DTT_%SYS%",
                 channel=flags.Analysis.channel,
             )
         )
@@ -124,15 +112,6 @@ def bbtt_cfg(
             cfg.addEventAlgo(
                 CompFactory.HHBBTT.MMCSelectorAlg(
                     "MMCSelectorAlg",
-                    passSLT="pass" + baseline + "SLT_%SYS%",
-                    passLTT="pass" + baseline + "LTT_%SYS%",
-                    passSLT_1B="pass_baseline_SLT_%SYS%",
-                    passLTT_1B="pass_baseline_LTT_%SYS%",
-                    passSTT="pass" + baseline + "STT_%SYS%",
-                    passDTT="pass" + baseline + "DTT_%SYS%",
-                    passDBT="pass" + baseline + "DBT_%SYS%",
-                    passSTT_1B="pass_baseline_STT_%SYS%",
-                    passDTT_1B="pass_baseline_DTT_%SYS%",
                     channel=flags.Analysis.channel,
                     MMC_min=60 * Units.GeV,
                     eventDecisionOutputDecoration="bbtt_pass_presel_%SYS%",
@@ -264,6 +243,8 @@ def bbtt_branches(flags):
 
     for cat in ["STT_1B", "DTT_2016_1B", "DTT_4J12_1B",
                 "DTT_L1Topo_1B", "DTT_1B", "SLT_1B", "LTT_1B",
+                "baseline_LepHad", "baseline_HadHad",
+                "LepHad_2B", "LepHad_1B", "LepHad", "HadHad_2B", "HadHad_1B", "HadHad",
                 "ZCR", "TopEMuCR"]:
         branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}_%SYS%"]
 
