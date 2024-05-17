@@ -8,7 +8,7 @@ from EasyjetHub.output.ttree.selected_objects import (
 
 
 def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
-             float_variables=[], int_variables=[]):
+             float_variables=[], int_variables=[], float_NW_variables=[]):
 
     cfg = ComponentAccumulator()
 
@@ -90,6 +90,31 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             )
         )
 
+    if flags.Analysis.do_neutrinoweighting:
+        cfg.addEventAlgo(
+            CompFactory.HHBBLL.NeutrinoWeightingAlg(
+                "NeutrinoWeightingAlg",
+                jets="bbllAnalysisJets_%SYS%",
+                muons="bbllAnalysisMuons_%SYS%",
+                electrons="bbllAnalysisElectrons_%SYS%",
+                met="AnalysisMET_%SYS%",
+                bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                floatNWVariables=float_NW_variables,
+                NW_cutList=flags.Analysis.NW_cutList,
+                NeutrinoWeightingTools=[
+                    CompFactory.HHBBLL.NeutrinoWeightingTool(
+                        "NeutrinoWeightingTool_1",
+                        resolution_settings=flags.Analysis.resolution_settings,
+                        resolution_number=flags.Analysis.resolution_number,
+                    ),
+                    CompFactory.HHBBLL.NeutrinoWeightingTool(
+                        "NeutrinoWeightingTool_2",
+                        resolution_settings=flags.Analysis.resolution_settings,
+                        resolution_number=flags.Analysis.resolution_number,
+                    )],
+            )
+        )
+
     # calculate final bbll vars
     cfg.addEventAlgo(
         CompFactory.HHBBLL.BaselineVarsbbllAlg(
@@ -118,9 +143,9 @@ def get_BaselineVarsbbllAlg_variables(flags):
         for var in ["m", "pT", "dR", "Eta", "Phi"]:
             float_variable_names.append(f"{var}{object}")
 
-    float_variable_names += ["mll", "pTll", "mbbll", "dRll", "mbbllmet", "MET_sig",
-                             "mT_Lepton1_Met", "mT_Lepton2_Met", "mT_L_min", "dRbl_min",
-                             "HT2", "HT2r", "mT2_bb", "mbl"]
+    float_variable_names += ["mll", "pTll", "met_x", "met_y", "mbbll", "dRll",
+                             "mbbllmet", "MET_sig", "mT_Lepton1_Met", "mT_Lepton2_Met",
+                             "mT_L_min", "dRbl_min", "HT2", "HT2r", "mT2_bb", "mbl"]
 
     int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets",
                            "Jet_b1_truthLabel", "Jet_b2_truthLabel"]
@@ -156,17 +181,31 @@ def bbll_branches(flags):
     if flags.Analysis.do_mmc:
         # do not append mmc variables to float_variable_names
         # or int_variable_names as they are stored by the
-        # mmc algortithm not BaselineVarsbbttAlg
+        # mmc algortithm not BaselineVarsbbllAlg
         for var in ["status", "pt", "eta", "phi", "m"]:
             all_baseline_variable_names.append(f"mmc_{var}")
 
+    float_NW_variable_names = []
+    if flags.Analysis.do_neutrinoweighting:
+        # do not append TopReco variables to float_variable_names
+        # or int_variable_names as they are stored by the
+        # TopReco algortithm not BaselineVarsbbllAlg
+        all_baseline_variable_names.append("NW_solutions")
+        for var in ["NW_neutrinoweight", "top_pt", "top_eta", "top_phi",
+                    "top_e", "tbar_pt", "tbar_eta", "tbar_phi", "tbar_e", "ttbar_pt",
+                    "ttbar_eta", "ttbar_phi", "ttbar_e", "nu_pt", "nu_eta", "nu_phi",
+                    "nu_e", "nubar_pt", "nubar_eta", "nubar_phi", "nubar_e"]:
+            float_NW_variable_names.append(f"NW_{var}")
     if flags.Analysis.store_high_level_variables:
         high_level_float_variables, high_level_int_variables \
             = get_BaselineVarsbbllAlg_highlevelvariables(flags)
         float_variable_names += high_level_float_variables
         int_variable_names += high_level_int_variables
 
-    all_baseline_variable_names += [*float_variable_names, *int_variable_names]
+    all_baseline_variable_names += [
+        *float_variable_names,
+        *int_variable_names,
+        *float_NW_variable_names]
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
@@ -195,4 +234,4 @@ def bbll_branches(flags):
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}_%SYS%"]
 
-    return branches, float_variable_names, int_variable_names
+    return branches, float_variable_names, int_variable_names, float_NW_variable_names
