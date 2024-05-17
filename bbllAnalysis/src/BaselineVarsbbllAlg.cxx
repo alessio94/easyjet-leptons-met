@@ -121,8 +121,6 @@ namespace HHBBLL
       int n_bjets=0;
       int n_electrons=0;
       int n_muons=0;
-      std::vector<float> PassElectronIsos;
-      std::vector<float> PassMuonIsos;
       int truthLabel_b1 = -99;
       int truthLabel_b2 = -99;
       int nCentralJets = 0;
