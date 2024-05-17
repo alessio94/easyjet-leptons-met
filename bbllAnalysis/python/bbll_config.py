@@ -148,8 +148,7 @@ def get_BaselineVarsbbllAlg_variables(flags):
                              "mbbllmet", "MET_sig", "mT_Lepton1_Met", "mT_Lepton2_Met",
                              "mT_L_min", "dRbl_min", "HT2", "HT2r", "mT2_bb", "mbl"]
 
-    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets",
-                           "Jet_b1_truthLabel", "Jet_b2_truthLabel"]
+    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets"]
 
     return float_variable_names, int_variable_names
 
