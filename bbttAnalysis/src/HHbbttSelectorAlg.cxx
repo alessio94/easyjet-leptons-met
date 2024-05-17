@@ -190,66 +190,7 @@ namespace HHBBTT
 
       // Apply selection
 
-      //trigger flags
-      m_bools.at(HHBBTT::pass_trigger_SR) = false;
-      m_bools.at(HHBBTT::pass_trigger_SLT) = false;
-      m_bools.at(HHBBTT::pass_trigger_LTT) = false;
-      m_bools.at(HHBBTT::pass_trigger_STT) = false;
-      m_bools.at(HHBBTT::pass_trigger_DTT) = false;
-      m_bools.at(HHBBTT::pass_trigger_DTT_2016) = false;
-      m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = false;
-      m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = false;
-      m_bools.at(HHBBTT::pass_trigger_DBT) = false;
-
-      // Reset event specific booleans to false.
-      m_bools.at(HHBBTT::TWO_JETS) = false;
-      m_bools.at(HHBBTT::TWO_BJETS) = false;
-      m_bools.at(HHBBTT::ONE_BJET) = false;
-      m_bools.at(HHBBTT::MBB_MASS) = false;
-      // flags specific for lephad
-      m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) = false;
-      m_bools.at(HHBBTT::ONE_TAU) = false;
-      m_bools.at(HHBBTT::OS_CHARGE_LEPHAD) = false;
-      m_bools.at(HHBBTT::OS_CHARGE_LEPTONS) = false;
-      m_bools.at(HHBBTT::pass_baseline_SLT) = false;
-      m_bools.at(HHBBTT::pass_baseline_LTT) = false;
-      m_bools.at(HHBBTT::pass_SLT) = false;
-      m_bools.at(HHBBTT::pass_LTT) = false;
-      m_bools.at(HHBBTT::pass_SLT_1B) = false;
-      m_bools.at(HHBBTT::pass_LTT_1B) = false;
-      // flags specific for hadhad
-      m_bools.at(HHBBTT::N_LEPTONS_CUT_HADHAD) = false;
-      m_bools.at(HHBBTT::TWO_TAU) = false;
-      m_bools.at(HHBBTT::OS_CHARGE_HADHAD) = false;
-      m_bools.at(HHBBTT::pass_baseline_STT) = false;
-      m_bools.at(HHBBTT::pass_baseline_DTT_2016) = false;
-      m_bools.at(HHBBTT::pass_baseline_DTT_4J12) = false;
-      m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo) = false;
-      m_bools.at(HHBBTT::pass_baseline_DTT) = false;
-      m_bools.at(HHBBTT::pass_baseline_DBT) = false;
-      m_bools.at(HHBBTT::pass_STT) = false;
-      m_bools.at(HHBBTT::pass_DTT_2016) = false;
-      m_bools.at(HHBBTT::pass_DTT_4J12) = false;
-      m_bools.at(HHBBTT::pass_DTT_L1Topo) = false;
-      m_bools.at(HHBBTT::pass_DTT) = false;
-      m_bools.at(HHBBTT::pass_DBT) = false;
-      m_bools.at(HHBBTT::pass_STT_1B) = false;
-      m_bools.at(HHBBTT::pass_DTT_2016_1B) = false;
-      m_bools.at(HHBBTT::pass_DTT_4J12_1B) = false;
-      m_bools.at(HHBBTT::pass_DTT_L1Topo_1B) = false;
-      m_bools.at(HHBBTT::pass_DTT_1B) = false;
-      m_bools.at(HHBBTT::pass_DBT_1B) = false;
-      m_bools.at(HHBBTT::pass_LepHad) = false;
-      m_bools.at(HHBBTT::pass_HadHad) = false;
-      m_bools.at(HHBBTT::pass_LepHad_2B) = false;
-      m_bools.at(HHBBTT::pass_HadHad_2B) = false;
-      m_bools.at(HHBBTT::pass_LepHad_1B) = false;
-      m_bools.at(HHBBTT::pass_HadHad_1B) = false;
-      m_bools.at(HHBBTT::pass_LepHad) = false;
-      m_bools.at(HHBBTT::pass_HadHad) = false;
-      m_bools.at(HHBBTT::pass_ZCR) = false;
-      m_bools.at(HHBBTT::pass_TopEMuCR) = false;
-    
+      for (auto& [key, value] : m_boolnames) m_bools.at(key) = false;
 
       //************
       // lepton
@@ -476,7 +417,7 @@ namespace HHBBTT
           m_bools.at(pass_baseline_SLT) = true;
           if (m_bools.at(HHBBTT::pass_trigger_SLT)){
             if (m_bools.at(HHBBTT::TWO_BJETS))
-              m_bools.at(HHBBTT::pass_SLT) = true;
+              m_bools.at(HHBBTT::pass_SLT_2B) = true;
             else if (m_bools.at(HHBBTT::ONE_BJET))
               m_bools.at(HHBBTT::pass_SLT_1B) = true;
           }
@@ -486,9 +427,9 @@ namespace HHBBTT
         if (lep_ptcut_LTT && tau_ptcut_LTT){
           m_bools.at(HHBBTT::pass_baseline_LTT) = true;
           if (m_bools.at(HHBBTT::pass_trigger_LTT)){
-            if (!m_bools.at(HHBBTT::pass_SLT) &&
+            if (!m_bools.at(HHBBTT::pass_SLT_2B) &&
                 m_bools.at(HHBBTT::TWO_BJETS))
-              m_bools.at(HHBBTT::pass_LTT) = true;
+              m_bools.at(HHBBTT::pass_LTT_2B) = true;
             else if(!m_bools.at(HHBBTT::pass_SLT_1B) &&
                     m_bools.at(HHBBTT::ONE_BJET))
               m_bools.at(HHBBTT::pass_LTT_1B) = true;
@@ -503,7 +444,7 @@ namespace HHBBTT
         if (tau_ptcut_STT){
           m_bools.at(HHBBTT::pass_baseline_STT) = true;
           if (m_bools.at(HHBBTT::pass_trigger_STT)) {
-            if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_STT) = true;
+            if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_STT_2B) = true;
             else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_STT_1B) = true;
           }
         }
@@ -514,7 +455,7 @@ namespace HHBBTT
             if(jet_ptcut_DTT_2016){
               m_bools.at(HHBBTT::pass_baseline_DTT_2016) = true;
               if (m_bools.at(HHBBTT::pass_trigger_DTT_2016)) {
-                if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_2016) = true;
+                if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_2016_2B) = true;
                 else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_2016_1B) = true;
               }
             }
@@ -522,14 +463,14 @@ namespace HHBBTT
           else if(jet_ptcut_DTT_4J12){
             m_bools.at(HHBBTT::pass_baseline_DTT_4J12) = true;
               if (m_bools.at(HHBBTT::pass_trigger_DTT_4J12)) {
-                if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_4J12) = true;
+                if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_4J12_2B) = true;
                 else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_4J12_1B) = true;
               }
           }
           else if(jet_ptcut_DTT_L1Topo && tau_DR_L1Topo){
             m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo) = true;
               if (m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo)) {
-                if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_L1Topo) = true;
+                if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_L1Topo_2B) = true;
                 else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_L1Topo_1B) = true;
               }
           }
@@ -539,7 +480,7 @@ namespace HHBBTT
         if(!m_bools.at(HHBBTT::pass_baseline_STT) && year>=2022){
           m_bools.at(HHBBTT::pass_baseline_DBT) = true;
           if(m_bools.at(HHBBTT::pass_trigger_DBT)){
-            if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DBT) = true;
+            if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DBT_2B) = true;
             else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DBT_1B) = true;
           }
         }
@@ -549,10 +490,10 @@ namespace HHBBTT
 	      (m_bools.at(HHBBTT::pass_baseline_DTT_2016)  ||
 	       m_bools.at(HHBBTT::pass_baseline_DTT_4J12)  ||
               m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo));
-      m_bools.at(HHBBTT::pass_DTT) =
-	      (m_bools.at(HHBBTT::pass_DTT_2016)  ||
-	       m_bools.at(HHBBTT::pass_DTT_4J12)  ||
-              m_bools.at(HHBBTT::pass_DTT_L1Topo));
+      m_bools.at(HHBBTT::pass_DTT_2B) =
+	      (m_bools.at(HHBBTT::pass_DTT_2016_2B)  ||
+	       m_bools.at(HHBBTT::pass_DTT_4J12_2B)  ||
+              m_bools.at(HHBBTT::pass_DTT_L1Topo_2B));
       m_bools.at(HHBBTT::pass_DTT_1B) = 
         (m_bools.at(HHBBTT::pass_DTT_2016_1B)  ||
          m_bools.at(HHBBTT::pass_DTT_4J12_1B)  ||
@@ -565,12 +506,19 @@ namespace HHBBTT
 	 m_bools.at(HHBBTT::pass_baseline_DTT) ||
          m_bools.at(HHBBTT::pass_baseline_DBT));
 
-      m_bools.at(HHBBTT::pass_SR) =
-	(m_bools.at(HHBBTT::pass_SLT) ||
-	 m_bools.at(HHBBTT::pass_LTT) ||
-	 m_bools.at(HHBBTT::pass_STT) ||
-	 m_bools.at(HHBBTT::pass_DTT) ||
-         m_bools.at(HHBBTT::pass_DBT));
+      m_bools.at(HHBBTT::pass_SR_1B) =
+	(m_bools.at(HHBBTT::pass_SLT_1B) ||
+	 m_bools.at(HHBBTT::pass_LTT_1B) ||
+	 m_bools.at(HHBBTT::pass_STT_1B) ||
+	 m_bools.at(HHBBTT::pass_DTT_1B) ||
+	 m_bools.at(HHBBTT::pass_DBT_1B));
+
+      m_bools.at(HHBBTT::pass_SR_2B) =
+	(m_bools.at(HHBBTT::pass_SLT_2B) ||
+	 m_bools.at(HHBBTT::pass_LTT_2B) ||
+	 m_bools.at(HHBBTT::pass_STT_2B) ||
+	 m_bools.at(HHBBTT::pass_DTT_2B) ||
+	 m_bools.at(HHBBTT::pass_DBT_2B));
 
       m_bools.at(HHBBTT::pass_baseline_LepHad) =
 	(m_bools.at(HHBBTT::pass_baseline_SLT) ||
@@ -580,12 +528,12 @@ namespace HHBBTT
 	 m_bools.at(HHBBTT::pass_baseline_DTT) ||
 	 m_bools.at(HHBBTT::pass_baseline_DBT) );
       m_bools.at(HHBBTT::pass_LepHad_2B) =
-	(m_bools.at(HHBBTT::pass_SLT) ||
-	 m_bools.at(HHBBTT::pass_LTT) );
+	(m_bools.at(HHBBTT::pass_SLT_2B) ||
+	 m_bools.at(HHBBTT::pass_LTT_2B) );
       m_bools.at(HHBBTT::pass_HadHad_2B) =
-	(m_bools.at(HHBBTT::pass_STT) ||
-	 m_bools.at(HHBBTT::pass_DTT) ||
-	 m_bools.at(HHBBTT::pass_DBT) );
+	(m_bools.at(HHBBTT::pass_STT_2B) ||
+	 m_bools.at(HHBBTT::pass_DTT_2B) ||
+	 m_bools.at(HHBBTT::pass_DBT_2B) );
       m_bools.at(HHBBTT::pass_LepHad_1B) =
 	(m_bools.at(HHBBTT::pass_SLT_1B) ||
 	 m_bools.at(HHBBTT::pass_LTT_1B) );

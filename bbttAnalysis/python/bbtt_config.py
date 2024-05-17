@@ -233,15 +233,19 @@ def bbtt_branches(flags):
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbttSelectorAlg
-    for var in ["_trigger_", "_baseline_", "_"]:
+    for var in ["_trigger_", "_baseline_"]:
         for cat in ["SR", "SLT", "LTT", "STT", "DTT",
                     "DTT_2016", "DTT_4J12", "DTT_L1Topo", "DBT"]:
             branches += [f"EventInfo.pass{var}{cat}_%SYS% -> bbtt_pass{var}{cat}_%SYS%"]
 
-    for cat in ["STT_1B", "DTT_2016_1B", "DTT_4J12_1B",
-                "DTT_L1Topo_1B", "DTT_1B", "SLT_1B", "LTT_1B",
-                "baseline_LepHad", "baseline_HadHad",
-                "LepHad_2B", "LepHad_1B", "LepHad", "HadHad_2B", "HadHad_1B", "HadHad",
+    for cat in ["SR", "SLT", "LTT", "STT", "DTT",
+                "DTT_2016", "DTT_4J12", "DTT_L1Topo", "DBT",
+                "LepHad", "HadHad"]:
+        for nb in ["1B", "2B"]:
+            branches += [f"EventInfo.pass_{cat}_{nb}_%SYS% ->"
+                         f"bbtt_pass_{cat}_{nb}_%SYS%"]
+
+    for cat in ["baseline_LepHad", "baseline_HadHad", "LepHad", "HadHad",
                 "ZCR", "TopEMuCR"]:
         branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}_%SYS%"]
 

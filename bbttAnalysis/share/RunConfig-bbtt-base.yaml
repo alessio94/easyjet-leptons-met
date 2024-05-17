@@ -71,7 +71,7 @@ save_bbtt_cutflow: true
 CutList :
   - pass_trigger_DTT
   - pass_baseline_DTT
-  - pass_DTT
+  - pass_DTT_2B
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
