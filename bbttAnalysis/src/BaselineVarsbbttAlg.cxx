@@ -81,6 +81,7 @@ namespace HHBBTT
 
     if (m_isMC) {
       ATH_CHECK (m_truthTypeTau.initialize(m_systematicsList, m_tauHandle));
+      ATH_CHECK (m_tauTruthJetLabel.initialize(m_systematicsList, m_tauHandle));
     }
 
     for (const std::string &var : m_floatVariables){
@@ -245,6 +246,7 @@ namespace HHBBTT
 	if(m_isMC){
 	  m_Fbranches.at(prefix+"_effSF").set(*event, m_tau_effSF.get(*tau, sys), sys);
 	  m_Ibranches.at(prefix+"_truthType").set(*event, m_truthTypeTau.get(*tau, sys), sys);
+          m_Ibranches.at(prefix+"_tauTruthJetLabel").set(*event, m_tauTruthJetLabel.get(*tau, sys), sys);
 	}
       }
 

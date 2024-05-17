@@ -48,7 +48,7 @@ Tau:
   ID: "Loose"
   amount: 2
   variables: ["RNN"]
-  variables_int: ["isTauID", "isAntiTau", "truthType", "EleRNN_WP"]
+  variables_int: ["isTauID", "isAntiTau", "truthType", "EleRNN_WP", "tauTruthJetLabel"]
 
 Lepton:
   amount: 2

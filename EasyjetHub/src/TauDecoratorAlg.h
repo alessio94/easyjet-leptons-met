@@ -24,6 +24,7 @@
 #include <xAODEventInfo/EventInfo.h>
 
 #include <xAODTau/TauJetContainer.h>
+#include <xAODJet/JetContainer.h>
 
 namespace Easyjet
 {
@@ -70,6 +71,27 @@ namespace Easyjet
     };
     SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_truthTypeDecorKey;
 
+    // to get the truth jet
+    SG::ReadHandleKey<xAOD::JetContainer> m_truthJetsInKey{
+      this, "jetsIn", "AntiKt4TruthDressedWZJets", "truth jet container"
+    };
+
+    // to get the partontruthlabelID from the truth jet
+    Gaudi::Property<std::string> m_truthLabelDecorName{
+      this, "truthLabelDecorName", "PartonTruthLabelID", "Decoration for PartonTruthLabelID" 
+    };
+    SG::ReadDecorHandleKey<xAOD::JetContainer> m_truthLabelDecorKey;
+
+    Gaudi::Property<std::string> m_tauTruthJetLabelDecorName{ 
+      this, "tauTruthJetLabelDecorKey", "tauTruthJetLabel", "Decoration for tauTruthJetLabel"
+    };
+
+    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_tauTruthJetLabelDecorKey;
+
+    Gaudi::Property<std::string> m_tauLinkedJetDecorName{
+      this, "tauTruthJetDecorName", "truthJetLink", "tau linked truth jet"
+    };
+    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_tauLinkedJetDecorKey;
   };
 
 }

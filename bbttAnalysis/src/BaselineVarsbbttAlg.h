@@ -103,6 +103,9 @@ private:
     CP::SysReadDecorHandle<int>
       m_truthTypeTau{ this, "truthTypeTau", "truthType", "Tau truth type" };
 
+    CP::SysReadDecorHandle<int>
+    m_tauTruthJetLabel { this, "tauTruthJetLabel", "tauTruthJetLabel", "Decoration tauTruthJetLabel" };
+
     CP::SysReadDecorHandle<bool> 
     m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};
     CP::SysReadDecorHandle<bool> 
