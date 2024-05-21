@@ -291,8 +291,7 @@ namespace VBSHIGGS{
           max_mjj = mjj;
           delta_eta_jj = std::abs(nonbjet1->eta() - nonbjet2->eta());;
           vbsJet1 = nonbjet1;
-          vbsJet2 = nonbjet2;   
-  
+          vbsJet2 = nonbjet2;
         } 
       }
     }

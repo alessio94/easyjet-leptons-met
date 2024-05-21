@@ -33,6 +33,10 @@ namespace VBSHIGGS{
             /// We use default finalize() -- this is for cleanup, and we don't do any
 
         private:
+
+        template<typename ParticleType>
+            std::pair<int, int> truthOrigin(const ParticleType* particle);
+
         /// \brief Setup syst-aware input container handles
         CP::SysListHandle m_systematicsList {this};
 
@@ -58,6 +62,10 @@ namespace VBSHIGGS{
         CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
         CP::SysReadDecorHandle<int> m_truthFlav{ this, "truthFlav", "HadronConeExclTruthLabelID", "Jet truth flavor" };
+
+        CP::SysReadDecorHandle<float>
+        m_METSig {this, "METSignificance", "significance", "Met Significance"};
+
 
         Gaudi::Property<std::vector<std::string>> m_floatVariables {this, "floatVariableList", {}, "Name list of floating variables"};
 

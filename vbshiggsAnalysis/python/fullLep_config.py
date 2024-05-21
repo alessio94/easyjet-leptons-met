@@ -50,12 +50,14 @@ def get_BaselineVarsFullLepAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ll", "bb", "bl"]:
-        for var in ["m", "pT", "dR", "Eta", "Phi"]:
+    for object in ["ll", "bb", "b1l1", "b2l2", "jj"]:
+        for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
+    float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET", "METSig"]
+
     int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons",
-                           "nCentralJets"]
+                           "nLeptons", "nCentralJets", "nForwardJets"]
 
     return float_variable_names, int_variable_names
 

@@ -21,13 +21,13 @@ Muon:
 
 Lepton:
   amount: 2
+  variables_int: ["isPrompt","truthOrigin", "truthType"]
 
 # list of triggers per year to consider
 trigger:
   include: vbshiggsAnalysis/trigger-lep.yaml
 
 CutList :
-      - PASS_TRIGGER
       - EXACTLY_TWO_LEPTONS
       - TWO_SS_CHARGE_LEPTONS
       - PASS_MET

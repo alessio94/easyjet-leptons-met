@@ -59,6 +59,7 @@ namespace VBSHIGGS{
         ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
       }
 
+      ATH_CHECK (m_METSig.initialize(m_systematicsList, m_metHandle));
       // Intialise syst list (must come after all syst-aware inputs and outputs)
       ATH_CHECK (m_systematicsList.initialize());
       return StatusCode::SUCCESS;
@@ -98,27 +99,29 @@ namespace VBSHIGGS{
         
         int n_jets = jets->size();
         int nCentralJets = 0;
+        int nForwardJets = 0;
 
         int n_electrons = electrons->size();
         int n_muons = muons->size();
 
-        const xAOD::Electron* ele0 = nullptr;
-        const xAOD::Electron* ele1 = nullptr;
-        const xAOD::Muon* mu0 = nullptr;
-        const xAOD::Muon* mu1 = nullptr;
         // b-jet sector
         bool WPgiven = !m_isBtag.empty();
         auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
         
+        auto nonbjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);;
+
+        // number of central jets
         for(const xAOD::Jet* jet : *jets) {
           // count central jets
-          if (std::abs(jet->eta())<2.5) {
-            nCentralJets++;
-            if (WPgiven) {
-              if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
-            }
+          if (std::abs(jet->eta())<2.5) nCentralJets++;
+          else nForwardJets++;
+
+          if (WPgiven) {
+            if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
+            else nonbjets->push_back(jet);
           }
         }
+
         int n_bjets = bjets->size();
 
         m_Ibranches.at("nJets").set(*event, n_jets, sys);
@@ -126,46 +129,91 @@ namespace VBSHIGGS{
         m_Ibranches.at("nMuons").set(*event, n_muons, sys);
         m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
         m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
-        // Electron sector
-        for (std::size_t i=0; i<std::min(electrons->size(),(std::size_t)2); i++){
-          const xAOD::Electron* ele = electrons->at(i);
-          //leading electron
-          if (i==0) ele0 = ele;
-          //subleading electron
-          else if (i==1) ele1 = ele;
-
-          if(m_isMC){
-            float ele_SF = m_ele_SF.get(*ele, sys);
-            m_Fbranches.at("Electron"+std::to_string(i+1)+"_effSF").set(*event, ele_SF, sys);
-          }
-
-          m_Fbranches.at("Electron"+std::to_string(i+1)+"_pt").set(*event, ele->pt(), sys);
-          m_Fbranches.at("Electron"+std::to_string(i+1)+"_eta").set(*event, ele->eta(), sys);
-          m_Fbranches.at("Electron"+std::to_string(i+1)+"_phi").set(*event, ele->phi(), sys);
-          m_Fbranches.at("Electron"+std::to_string(i+1)+"_E").set(*event, ele->e(), sys);
-
-
-        }
-        // Muon sector
-        for (std::size_t i=0; i< std::min(muons->size(),(std::size_t)2); i++){
-          const xAOD::Muon* mu = muons->at(i);
-          //leading muon
-          if (i==0) mu0 = mu;
-          //subleading muon
-          else if (i==1) mu1 = mu;
-          
-          if(m_isMC){
-            float mu_SF = m_mu_SF.get(*mu, sys);
-            m_Fbranches.at("Muon"+std::to_string(i+1)+"_effSF").set(*event, mu_SF, sys);
-          }
-
-          m_Fbranches.at("Muon"+std::to_string(i+1)+"_pt").set(*event, mu->pt(), sys);
-          m_Fbranches.at("Muon"+std::to_string(i+1)+"_eta").set(*event, mu->eta(), sys);
-          m_Fbranches.at("Muon"+std::to_string(i+1)+"_phi").set(*event, mu->phi(), sys);
-          m_Fbranches.at("Muon"+std::to_string(i+1)+"_E").set(*event, mu->e(), sys);
+        m_Ibranches.at("nForwardJets").set(*event, nForwardJets, sys);
         
+        // selected leptons ;
+        const xAOD::Electron* ele0 = nullptr;
+        const xAOD::Electron* ele1 = nullptr;
+
+        for(const xAOD::Electron* electron : *electrons) {
+          if(!ele0) ele0 = electron;
+          else{
+            ele1 = electron;
+            break;
+          }
         }
+
+        const xAOD::Muon* mu0 = nullptr;
+        const xAOD::Muon* mu1 = nullptr;
+        for(const xAOD::Muon* muon : *muons) {
+          if(!mu0) mu0 = muon;
+          else{
+            mu1 = muon;
+            break;
+          
+          }
+        }
+
+        std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
+        if(ele0) leptons.emplace_back(ele0, -11*ele0->charge());
+        if(mu0) leptons.emplace_back(mu0, -13*mu0->charge());
+        if(ele1) leptons.emplace_back(ele1, -11*ele1->charge());
+        if(mu1) leptons.emplace_back(mu1, -13*mu1->charge());
+
+        int nLeptons = leptons.size();
+        m_Ibranches.at("nLeptons").set(*event, nLeptons, sys);
+
+        std::sort(leptons.begin(), leptons.end(),
+            [](const std::pair<const xAOD::IParticle*, int>& a,
+               const std::pair<const xAOD::IParticle*, int>& b) {
+              return a.first->pt() > b.first->pt(); });
+
+        for(unsigned int i=0; i<std::min(size_t(2),leptons.size()); i++){
+          std::string prefix = "Lepton"+std::to_string(i+1);
+          TLorentzVector tlv = leptons[i].first->p4();
+          int lep_pdgid = leptons[i].second;
+          m_Fbranches.at(prefix+"_pt").set(*event, tlv.Pt(), sys);
+          m_Fbranches.at(prefix+"_eta").set(*event, tlv.Eta(), sys);
+          m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
+          m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
+          if(m_isMC){
+            float SF = std::abs(leptons[i].second)==11 ?
+              m_ele_SF.get(*leptons[i].first,sys) :
+              m_mu_SF.get(*leptons[i].first,sys);
+            m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
+          }
+          int charge = leptons[i].second>0 ? -1 : 1;
+          m_Ibranches.at(prefix+"_charge").set(*event, charge, sys);
+          m_Ibranches.at(prefix+"_pdgid").set(*event, lep_pdgid, sys);
+        
+          // leptons truth information
+          if (m_isMC){
+            auto [lep_truthOrigin, lep_truthType] = truthOrigin(leptons[i].first);
+            m_Ibranches.at(prefix + "_truthOrigin").set(*event, lep_truthOrigin, sys);
+            m_Ibranches.at(prefix + "_truthType").set(*event, lep_truthType, sys);
+            int lep_isPrompt = 0;
+            if (lep_pdgid==13){ // simplistic
+              if (lep_truthType==6) lep_isPrompt=1; // isolated prompts
+            } else if (lep_pdgid==11){
+              if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
+            }
+            
+            m_Ibranches.at(prefix + "_isPrompt").set(*event, lep_isPrompt, sys);
+          }
+          
+        }
+
+        // dilepton kinematics
         TLorentzVector ll;
+        TLorentzVector Leading_lep;
+        TLorentzVector Subleading_lep;
+        TVector3 metVec;
+        metVec.SetPtEtaPhi(met->met(), 0, met->phi());
+
+        //MET Significance 
+        float METSig = m_METSig.get(*met, sys);
+        m_Fbranches.at("METSig").set(*event, METSig, sys);
+
         // ee
         if (ele0 && ele1){
           ll = ele0->p4() + ele1->p4();
@@ -183,100 +231,18 @@ namespace VBSHIGGS{
         m_Fbranches.at("Etall").set(*event, ll.Eta(), sys);
         m_Fbranches.at("Phill").set(*event, ll.Phi(), sys);
         
-        bool is_ee = electrons->size() == 2 && muons->size() == 0 ;
-        bool is_mumu = electrons->size() == 0 && muons->size() == 2;
-        bool is_emu = electrons->size() == 1 && muons->size() == 1 ;
-
-        TLorentzVector Leading_lep;
-        TLorentzVector Subleading_lep;
-
-        float lep1_SF = -99;
-        int lep1_charge = -99;
-        int lep1_pdgid = -99;
-        float lep2_SF = -99;
-        int lep2_charge = -99;
-        int lep2_pdgid = -99;
-
-        if (is_ee) {
-          Leading_lep = ele0->p4();
-          Subleading_lep = ele1->p4();
-
-          lep1_charge = ele0->charge();
-          lep2_charge = ele1->charge();
-
-          lep1_pdgid = ele0->charge() > 0 ? -11 : 11;
-          lep2_pdgid = ele1->charge() > 0 ? -11 : 11;
-
-          if(m_isMC){
-            lep1_SF = m_ele_SF.get(*ele0, sys);
-            lep2_SF = m_ele_SF.get(*ele1, sys);
-          }
+        if (leptons.size() > 2){
+          Leading_lep = leptons[0].first->p4();
+          Subleading_lep = leptons[1].first->p4();
         }
-        else if(is_mumu) {
-          Leading_lep = mu0->p4();
-          Subleading_lep = mu1->p4();
 
-          lep1_charge = mu0->charge();
-          lep2_charge = mu1->charge();
+        m_Fbranches.at("dRll").set(*event, Leading_lep.DeltaR(Subleading_lep), sys);
+        m_Fbranches.at("dPhill").set(*event, Leading_lep.DeltaPhi(Subleading_lep), sys);
+        m_Fbranches.at("dEtall").set(*event, Leading_lep.Eta() - Subleading_lep.Eta(), sys);
 
-          lep1_pdgid = mu0->charge() > 0 ? -13 : 13;
-          lep2_pdgid = mu1->charge() > 0 ? -13 : 13;
-          
-          if(m_isMC){
-            lep1_SF = m_mu_SF.get(*mu0, sys);
-            lep2_SF = m_mu_SF.get(*mu1, sys);
-          }
-          
-        }
-        else if(is_emu) {
-          if (ele0->pt() > mu0->pt()){
-            Leading_lep = ele0->p4();
-            Subleading_lep = mu0->p4();
-
-            lep1_charge = ele0->charge();
-            lep2_charge = mu0->charge();
-            lep1_pdgid = ele0->charge() > 0 ? -11 : 11;
-            lep2_pdgid = mu0->charge() > 0 ? -13 : 13;
-            if(m_isMC){
-              lep1_SF = m_ele_SF.get(*ele0, sys);
-              lep2_SF = m_mu_SF.get(*mu0, sys);
-            }
-          }
-          else{
-            Leading_lep = mu0->p4();
-            Subleading_lep = ele0->p4();
-            
-            lep1_charge = mu0->charge();
-            lep2_charge = ele0->charge();
-            lep1_pdgid = mu0->charge() > 0 ? -13 : 13;
-            lep2_pdgid = ele0->charge() > 0 ? -11 : 11;
-            if(m_isMC){
-              lep1_SF = m_mu_SF.get(*mu0, sys);
-              lep2_SF = m_ele_SF.get(*ele0, sys);
-            }
-
-          }
-          
-        }
-        if(is_ee || is_mumu || is_mumu){
-          m_Fbranches.at("Lepton1_pt").set(*event, Leading_lep.Pt(), sys);
-          m_Fbranches.at("Lepton1_eta").set(*event, Leading_lep.Eta(), sys);
-          m_Fbranches.at("Lepton1_phi").set(*event, Leading_lep.Phi(), sys);
-          m_Fbranches.at("Lepton1_E").set(*event, Leading_lep.E(), sys);
-          if(m_isMC) m_Fbranches.at("Lepton1_effSF").set(*event, lep1_SF, sys);
-          m_Ibranches.at("Lepton1_charge").set(*event, lep1_charge, sys);
-          m_Ibranches.at("Lepton1_pdgid").set(*event, lep1_pdgid, sys);
-
-          m_Fbranches.at("Lepton2_pt").set(*event, Subleading_lep.Pt(), sys);
-          m_Fbranches.at("Lepton2_eta").set(*event, Subleading_lep.Eta(), sys);
-          m_Fbranches.at("Lepton2_phi").set(*event, Subleading_lep.Phi(), sys);
-          m_Fbranches.at("Lepton2_E").set(*event, Subleading_lep.E(), sys);
-          if(m_isMC) m_Fbranches.at("Lepton2_effSF").set(*event, lep2_SF, sys);
-          m_Ibranches.at("Lepton2_charge").set(*event, lep2_charge, sys);
-          m_Ibranches.at("Lepton2_pdgid").set(*event, lep2_pdgid, sys);
-
-          m_Fbranches.at("dRll").set(*event, Leading_lep.DeltaR(Subleading_lep), sys);
-        }
+        m_Fbranches.at("dPhillMET").set(*event, ll.Vect().DeltaPhi(metVec), sys);
+        m_Fbranches.at("dPhil1MET").set(*event, Leading_lep.Vect().DeltaPhi(metVec), sys);
+        m_Fbranches.at("dPhil2MET").set(*event, Subleading_lep.Vect().DeltaPhi(metVec), sys);
 
         //jet sector
         for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)2); i++){
@@ -303,17 +269,78 @@ namespace VBSHIGGS{
           m_Fbranches.at("Etabb").set(*event, bb.Eta(), sys);
           m_Fbranches.at("Phibb").set(*event, bb.Phi(), sys);
           m_Fbranches.at("dRbb").set(*event, (bjets->at(0)->p4()).DeltaR(bjets->at(1)->p4()), sys);
+          m_Fbranches.at("dPhibb").set(*event, (bjets->at(0)->p4()).DeltaPhi(bjets->at(1)->p4()), sys);
+          m_Fbranches.at("dEtabb").set(*event, (bjets->at(0)->eta()) - bjets->at(1)->eta(), sys);
         }
-        // b-jet + lepton sector
-        if (n_bjets>=1 && (n_electrons>=1 || n_muons>=1)) {
+        
+        // leading b-jet + leadinglepton sector
+        if (n_bjets>=1 && nLeptons>=1){
           TLorentzVector bl = bjets->at(0)->p4()+Leading_lep;
-          m_Fbranches.at("mbl").set(*event, bl.M(), sys);
-          m_Fbranches.at("pTbl").set(*event, bl.Pt(), sys);
-          m_Fbranches.at("Etabl").set(*event, bl.Eta(), sys);
-          m_Fbranches.at("Phibl").set(*event, bl.Phi(), sys);
-          m_Fbranches.at("dRbl").set(*event, (bjets->at(0)->p4()).DeltaR(Leading_lep), sys);
+          m_Fbranches.at("mb1l1").set(*event, bl.M(), sys);
+          m_Fbranches.at("pTb1l1").set(*event, bl.Pt(), sys);
+          m_Fbranches.at("Etab1l1").set(*event, bl.Eta(), sys);
+          m_Fbranches.at("Phib1l1").set(*event, bl.Phi(), sys);
+          m_Fbranches.at("dRb1l1").set(*event, (bjets->at(0)->p4()).DeltaR(Leading_lep), sys);
+          m_Fbranches.at("dPhib1l1").set(*event, (bjets->at(0)->p4()).DeltaPhi(Leading_lep), sys);
+          m_Fbranches.at("dEtab1l1").set(*event, (bjets->at(0)->eta()) - Leading_lep.Eta(), sys);
+        }
+
+        // subleading b-jet + subleading lepton sector
+        if (n_bjets>=2 && nLeptons>=2){
+          TLorentzVector bl = bjets->at(1)->p4() + Subleading_lep;
+          m_Fbranches.at("mb2l2").set(*event, bl.M(), sys);
+          m_Fbranches.at("pTb2l2").set(*event, bl.Pt(), sys);
+          m_Fbranches.at("Etab2l2").set(*event, bl.Eta(), sys);
+          m_Fbranches.at("Phib2l2").set(*event, bl.Phi(), sys);
+          m_Fbranches.at("dRb2l2").set(*event, (bjets->at(1)->p4()).DeltaR(Subleading_lep), sys);
+          m_Fbranches.at("dPhib2l2").set(*event, (bjets->at(1)->p4()).DeltaPhi(Subleading_lep), sys);
+          m_Fbranches.at("dEtab2l2").set(*event, (bjets->at(1)->eta()) - Subleading_lep.Eta(), sys);
+        }
+
+        // kinematics of vbs jets
+        float max_mjj = 0.;
+        const xAOD::Jet* vbsJet1 = nullptr;
+        const xAOD::Jet* vbsJet2 = nullptr;
+
+        for(unsigned int i=0;i<nonbjets->size();i++){
+          for(unsigned int j=0;j<i;j++){
+            const xAOD::Jet* nonbjet1 = nonbjets->at(i);
+            const xAOD::Jet* nonbjet2 = nonbjets->at(j);
+
+            if (nonbjet1->eta() * nonbjet2->eta() > 0) continue; //back-to-back?
+          
+            // TODO, perhaps we need a minimum pt requirement on vbs jets
+            //if (nonbjet1->pt() < 30. * Athena::Units::GeV || nonbjet2->pt() < 30. * Athena::Units::GeV) continue;
+            double mjj = (nonbjet1->p4() + nonbjet2->p4()).M();
+            if (mjj > max_mjj) {
+              max_mjj = mjj;
+              vbsJet1 = nonbjet1;
+              vbsJet2 = nonbjet2;
+            } 
+          }
+        }
+        if (vbsJet1 && vbsJet2){
+          TLorentzVector vbs_jj = vbsJet1->p4() + vbsJet2->p4();
+          
+          m_Fbranches.at("mjj").set(*event, vbs_jj.M(), sys);
+          m_Fbranches.at("pTjj").set(*event, vbs_jj.Pt(), sys);
+          m_Fbranches.at("Etajj").set(*event, vbs_jj.Eta(), sys);
+          m_Fbranches.at("Phijj").set(*event, vbs_jj.Phi(), sys);
+          m_Fbranches.at("dRjj").set(*event, (vbsJet1->p4()).DeltaR(vbsJet2->p4()), sys);
+          m_Fbranches.at("dEtajj").set(*event, (vbsJet1->eta())-vbsJet2->eta(), sys);
+          m_Fbranches.at("dPhijj").set(*event, (vbsJet1->p4()).DeltaPhi(vbsJet2->p4()), sys);
+          
         }
       }
+
       return StatusCode::SUCCESS;
     } 
+    template<typename ParticleType>
+    std::pair<int, int> BaselineVarsFullLepAlg::truthOrigin(const ParticleType* particle) {
+      static const SG::AuxElement::ConstAccessor<int> lepttruthOrigin("truthOrigin");
+      static const SG::AuxElement::ConstAccessor<int> lepttruthType("truthType");
+    
+      return {lepttruthOrigin(*particle), lepttruthType(*particle)};
+  }
+
 }
