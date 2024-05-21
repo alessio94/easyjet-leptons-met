@@ -90,7 +90,16 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             )
         )
 
-    if flags.Analysis.do_neutrinoweighting:
+    # NeutrinoWeighting
+    if flags.Analysis.NeutrinoWeighting.doNW:
+        NeutrinoWeightingTool_1 = CompFactory.HHBBLL.NeutrinoWeightingTool(
+            "NeutrinoWeightingTool_1",
+            resolution_settings=flags.Analysis.NeutrinoWeighting.resolution_settings,
+            resolution_number=flags.Analysis.NeutrinoWeighting.resolution_number)
+        NeutrinoWeightingTool_2 = CompFactory.HHBBLL.NeutrinoWeightingTool(
+            "NeutrinoWeightingTool_2",
+            resolution_settings=flags.Analysis.NeutrinoWeighting.resolution_settings,
+            resolution_number=flags.Analysis.NeutrinoWeighting.resolution_number)
         cfg.addEventAlgo(
             CompFactory.HHBBLL.NeutrinoWeightingAlg(
                 "NeutrinoWeightingAlg",
@@ -100,18 +109,10 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
                 met="AnalysisMET_%SYS%",
                 bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
                 floatNWVariables=float_NW_variables,
-                NW_cutList=flags.Analysis.NW_cutList,
+                NW_cutList=flags.Analysis.NeutrinoWeighting.cutList,
                 NeutrinoWeightingTools=[
-                    CompFactory.HHBBLL.NeutrinoWeightingTool(
-                        "NeutrinoWeightingTool_1",
-                        resolution_settings=flags.Analysis.resolution_settings,
-                        resolution_number=flags.Analysis.resolution_number,
-                    ),
-                    CompFactory.HHBBLL.NeutrinoWeightingTool(
-                        "NeutrinoWeightingTool_2",
-                        resolution_settings=flags.Analysis.resolution_settings,
-                        resolution_number=flags.Analysis.resolution_number,
-                    )],
+                    NeutrinoWeightingTool_1,
+                    NeutrinoWeightingTool_2],
             )
         )
 
@@ -186,12 +187,12 @@ def bbll_branches(flags):
             all_baseline_variable_names.append(f"mmc_{var}")
 
     float_NW_variable_names = []
-    if flags.Analysis.do_neutrinoweighting:
+    if flags.Analysis.NeutrinoWeighting.doNW:
         # do not append TopReco variables to float_variable_names
         # or int_variable_names as they are stored by the
         # TopReco algortithm not BaselineVarsbbllAlg
         all_baseline_variable_names.append("NW_solutions")
-        for var in ["NW_neutrinoweight", "top_pt", "top_eta", "top_phi",
+        for var in ["neutrinoweight", "top_pt", "top_eta", "top_phi",
                     "top_e", "tbar_pt", "tbar_eta", "tbar_phi", "tbar_e", "ttbar_pt",
                     "ttbar_eta", "ttbar_phi", "ttbar_e", "nu_pt", "nu_eta", "nu_phi",
                     "nu_e", "nubar_pt", "nubar_eta", "nubar_phi", "nubar_e"]:

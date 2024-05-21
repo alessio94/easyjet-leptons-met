@@ -6,8 +6,6 @@
 #ifndef HHBBLLANALYSIS_NEUTRINOWEIGHTINGALG
 #define HHBBLLANALYSIS_NEUTRINOWEIGHTINGALG
 
-#include <AthContainers/ConstDataVector.h>
-
 #include "AsgTools/ToolHandleArray.h"
 
 #include <SystematicsHandles/SysReadHandle.h>

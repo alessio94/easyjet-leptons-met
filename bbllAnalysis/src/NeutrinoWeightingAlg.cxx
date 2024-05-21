@@ -7,6 +7,8 @@
 #include "NeutrinoWeightingAlg.h"
 #include <AthenaKernel/Units.h>
 
+#include <AthContainers/ConstDataVector.h>
+
 #include "TLorentzVector.h"
 #include "TRandom3.h"
 
@@ -32,7 +34,7 @@ namespace HHBBLL
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     for (const std::string &cut : m_cutList) {
-      CP::SysReadDecorHandle<bool> rhandle{cut, this};
+      CP::SysReadDecorHandle<bool> rhandle{cut+"_%SYS%", this};
       m_cuts.emplace(cut, rhandle);
       ATH_CHECK (m_cuts.at(cut).initialize(m_systematicsList, m_eventHandle));
     }
@@ -196,8 +198,8 @@ namespace HHBBLL
       }
  
       m_solutions.set(*event, solutions, sys);
-
-      m_fBranches.at("NW_NW_neutrinoweight").set(*event, neutrinoweight, sys);
+  
+      m_fBranches.at("NW_neutrinoweight").set(*event, neutrinoweight, sys);
 
       m_fBranches.at("NW_top_pt").set(*event, top.Pt(), sys);
       m_fBranches.at("NW_top_eta").set(*event, top.Eta(), sys);

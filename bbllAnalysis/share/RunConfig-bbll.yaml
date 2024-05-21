@@ -14,7 +14,10 @@ do_muons: true
 do_electrons: true
 do_met : true
 do_mmc : true
-do_neutrinoweighting : false
+
+#NeutrinoWeighting Config
+NeutrinoWeighting:
+  doNW: false
 
 # Toggles for reconstructed objects decorations
 small_R_jet:

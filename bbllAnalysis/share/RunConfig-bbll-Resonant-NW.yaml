@@ -1,10 +1,4 @@
 include: bbllAnalysis/RunConfig-bbll-Resonant.yaml
 
-do_neutrinoweighting: true # Doing neutrino weighting
-
-# Choose between "fixed" or "dynamic" resolution settings
-resolution_settings: dynamic 
-
-# Choose the resolution number (multiplicative factor in the denominator 
-# when the neutrino weight is calculated)
-resolution_number: 4 
+NeutrinoWeighting:
+  include: NeutrinoWeighting.yaml
