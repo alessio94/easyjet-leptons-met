@@ -418,13 +418,12 @@ namespace HHBBLL
     }
     else if(m_is17_periodB5_B8.get(*event, sys)){
       di_ele_paths = {
-        "HLT_2e24_lhvloose_nod0", "HLT_e24_lhvloose_nod0_2e12_lhvloose_nod0_L1EM20VH_3EM10VH"
+        "HLT_2e24_lhvloose_nod0"
       };
     }
     else if(2017<=year && year<=2018){
       di_ele_paths = {
-        "HLT_2e17_lhvloose_nod0_L12EM15VHI", "HLT_2e24_lhvloose_nod0",
-        "HLT_e24_lhvloose_nod0_2e12_lhvloose_nod0_L1EM20VH_3EM10VH"
+        "HLT_2e17_lhvloose_nod0_L12EM15VHI", "HLT_2e24_lhvloose_nod0"
       };
     }
     else if(year==2022){
