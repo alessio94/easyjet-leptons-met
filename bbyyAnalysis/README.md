@@ -1,5 +1,13 @@
-Analysis Package for $HH\rightarrow b\bar{b} \gamma\gamma$ analyis
+Analysis Package for $(S/H)H\rightarrow b\bar{b} \gamma\gamma$ analyis
 =========================
+
+Analyses on GLANCE:
+
+[$HH\rightarrow b\bar{b} \gamma\gamma$](https://atlas-glance.cern.ch/atlas/analysis/analyses/details.php?ref_code=ANA-HDBS-2023-25)
+
+[$SH\rightarrow b\bar{b} \gamma\gamma$](https://atlas-glance.cern.ch/atlas/analysis/analyses/details.php?ref_code=ANA-HDBS-2023-24)
+
+See here a link to the full SH analysis workflow: [[CodiMD]](https://codimd.web.cern.ch/8fyJeyIKQguxXBUaOLa_Dg)
 
 # Folder structure
 - `bin/`: Executables
@@ -13,6 +21,10 @@ Analysis Package for $HH\rightarrow b\bar{b} \gamma\gamma$ analyis
   - Skimming configs, events that do not pass the selection are not saved:
     - `RunConfig-bbyy-skimming-legacy`: config for ntuple skimming with legacy selection, CutList overwrites default one
     - `RunConfig-bbyy-skimming-loose`: config for ntuple skimming with loose selection, CutList overwrites default one
+  - Resonant configs, for the $SH\rightarrow b\bar{b} \gamma\gamma$ analysis:
+    - `RunConfig-Resonant-base`: Contains base parameters for the SH analysis, including PNN score computation and mass pairs.
+    - `RunConfig-Resonant-Default`: Contains parameters for running the default SH analysis, includes the resolved and "1 b-jet" cases.
+    - `RunConfig-Resonant-Boosted`: R&D config for studying the boosted regime of the SH mass grid. Includes GN2X score computation, large R jets.
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
   - `bbyySelectorAlg`: Find if the event pass the bbyy selection defined in the config passed to the ntupler;
