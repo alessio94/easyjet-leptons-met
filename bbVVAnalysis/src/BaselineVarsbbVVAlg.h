@@ -11,10 +11,7 @@
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
 
-#include <AthContainers/ConstDataVector.h>
-
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <FourMomUtils/xAODP4Helpers.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>

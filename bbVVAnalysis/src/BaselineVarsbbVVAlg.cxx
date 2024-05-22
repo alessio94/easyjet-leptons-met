@@ -2,14 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-
-#include "AthContainers/AuxElement.h"
 #include "BaselineVarsbbVVAlg.h"
-#include <FourMomUtils/xAODP4Helpers.h>
-#include <AthContainers/ConstDataVector.h>
-#include <xAODJet/JetContainer.h>
-#include <xAODMuon/MuonContainer.h>
-#include <xAODEgamma/ElectronContainer.h>
 #include <AthContainers/ConstDataVector.h>
 
 #include "TLorentzVector.h"

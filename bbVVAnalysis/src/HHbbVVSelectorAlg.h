@@ -6,25 +6,19 @@
 #ifndef BBVVANALYSIS_HHBBVVSELECTORALG
 #define BBVVANALYSIS_HHBBVVSELECTORALG
 
-#include <memory>
-
 #include "AnaAlgorithm/AnaAlgorithm.h"
-#include <FourMomUtils/xAODP4Helpers.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
-#include <SystematicsHandles/ISysHandleBase.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
-#include <AsgDataHandles/WriteDecorHandleKey.h>
+#include <SystematicsHandles/SysFilterReporterParams.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
-
-#include <SystematicsHandles/SysFilterReporterParams.h>
 
 
 namespace HHBBVV
