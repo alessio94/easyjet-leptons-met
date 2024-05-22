@@ -11,6 +11,7 @@
 #include <xAODMuon/MuonContainer.h>
 
 #include "TLorentzVector.h"
+#include "CalcGenericMT2/MT2_ROOT.h"
 
 namespace HHBBLL
 {
@@ -495,8 +496,9 @@ namespace HHBBLL
 	  m_Fbranches.at("mT_L_min").set(*event, mt_l_min, sys);
 	}
       }
-      // MT2_bb
-      double mT2_bb = ComputeMT2(Leading_bjet, Subleading_bjet, met_vector);
+      // stransverse mass of b-jet pair MT2_bb
+      ComputeMT2 mt2_calculator = ComputeMT2(Leading_bjet, Subleading_bjet, met_vector, 0, 0);
+      double mT2_bb = mt2_calculator.Compute();
       m_Fbranches.at("mT2_bb").set(*event, mT2_bb, sys);
 
     }
@@ -504,30 +506,6 @@ namespace HHBBLL
     return StatusCode::SUCCESS;
   }
 
-  float BaselineVarsbbllAlg::ComputeMT2(const TLorentzVector& Leading_bjet, const TLorentzVector& Subleading_bjet, const TLorentzVector& met_vector){
-
-        // Input parameters for the first b-jet
-        double mass_b1 = Leading_bjet.M();
-        double pT_b1 = Leading_bjet.Pt();
-
-	// Input parameters for the second b-jet
-        double mass_b2 = Subleading_bjet.M();
-        double pT_b2 = Subleading_bjet.Pt();
-
-	// Missing transverse momentum
-        double pTMiss = met_vector.Pt();
-
-	// Calculate mT2 for the two b-tagged jets
-        double ETb1 = std::sqrt(mass_b1 * mass_b1 + pT_b1 * pT_b1);
-        double ETb2 = std::sqrt(mass_b2 * mass_b2 + pT_b2 * pT_b2);
-
-        double mTsq1 = mass_b1 * mass_b1 + 2.0 * pT_b1 * (ETb1 - pT_b1);
-        double mTsq2 = mass_b2 * mass_b2 + 2.0 * pT_b2 * (ETb2 - pT_b2);
-
-	double mt2 = std::sqrt(std::max({mTsq1, mTsq2}) + pTMiss * pTMiss);
-       
-	return mt2;
-  }
 }
 
 

@@ -27,6 +27,7 @@ atlas_add_component(bbllAnalysis
   TriggerMatchingToolLib
   EventBookkeeperToolsLib
   EasyjetHubLib
+  CalcGenericMT2Lib
 )
 
 # Install python modules, joboptions, and share content

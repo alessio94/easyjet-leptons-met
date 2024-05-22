@@ -42,8 +42,6 @@ public:
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
-   float ComputeMT2(const TLorentzVector& Leading_bjet, const TLorentzVector& Subleading_bjet, const TLorentzVector& met_vector);
-
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
