@@ -11,12 +11,16 @@ def get_photon_branches(flags, tree_flags, input_container, output_prefix):
         output_prefix,
         do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
+        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator
     )
 
     if tree_flags.slim_variables_with_syst:
         photon_branches.syst_only_for = ["pt"]
 
     photon_branches.add_four_mom_branches(do_mass=False)
+
+    if flags.Analysis.do_overlap_removal:
+        photon_branches.variables += ["passesOR_%SYS%"]
 
     if tree_flags.collection_options.photons.shower_shapes:
         photon_branches.variables += [

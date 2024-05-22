@@ -11,6 +11,7 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
         output_prefix,
         do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
+        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator
     )
 
     if tree_flags.slim_variables_with_syst:
@@ -18,5 +19,8 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
 
     muon_branches.add_four_mom_branches(do_mass=False)
     muon_branches.variables += ["charge"]
+
+    if flags.Analysis.do_overlap_removal:
+        muon_branches.variables += ["passesOR_%SYS%"]
 
     return muon_branches.get_output_list()

@@ -189,23 +189,10 @@ def lltt_branches(flags):
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> lltt_{var}_%SYS%"]
+            branches += [f"EventInfo.{var}_%SYS% -> lltt_{var}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     branches += ["EventInfo.lltt_pass_sr_%SYS% -> lltt_pass_SR_%SYS%"]
-    branches += ["EventInfo.isr_%SYS% -> lltt_isr_%SYS%"]
-    branches += ["EventInfo.recid_%SYS% -> lltt_recid_%SYS%"]
-    branches += ["EventInfo.osatt_%SYS% -> lltt_osatt_%SYS%"]
-    branches += ["EventInfo.njets_%SYS% -> lltt_njets_%SYS%"]
-    branches += ["EventInfo.nbjets_%SYS% -> lltt_nbjets_%SYS%"]
-
-    branches += ["EventInfo.mll_%SYS% -> lltt_mll_%SYS%"]
-    branches += ["EventInfo.drll_%SYS% -> lltt_drll_%SYS%"]
-    branches += ["EventInfo.dphimetll_%SYS% -> lltt_dphimetll_%SYS%"]
-    branches += ["EventInfo.matt_%SYS% -> lltt_matt_%SYS%"]
-    branches += ["EventInfo.dratt_%SYS% -> lltt_dratt_%SYS%"]
-    branches += ["EventInfo.maa_%SYS% -> lltt_maa_%SYS%"]
-    branches += ["EventInfo.draa_%SYS% -> lltt_draa_%SYS%"]
-    branches += ["EventInfo.dphimetatt_%SYS% -> lltt_dphimetatt_%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
@@ -220,14 +207,19 @@ def lltt_branches(flags):
     # trigger variables do not need to be added to variable_names
     # as it is written out in HllttSelectorAlg
     for var in ["pass_trigger_SLT"]:
-        branches += [f"EventInfo.{var}_%SYS% -> lltt_{var}_%SYS%"]
+        branches += [f"EventInfo.{var}_%SYS% -> lltt_{var}"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for var in ["_trigger_", "_baseline_", "_"]:
         for cat in ["DLT"]:
-            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> lltt_pass{var}{cat}_%SYS%"]
+            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> "
+                         f"lltt_pass{var}{cat}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for var in ["_baseline_", "_"]:
         for cat in ["LEPLEP", "LEPHAD", "HADHAD"]:
-            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> lltt_pass{var}{cat}_%SYS%"]
+            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> "
+                         f"lltt_pass{var}{cat}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches,float_variable_names,int_variable_names

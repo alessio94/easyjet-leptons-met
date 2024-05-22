@@ -1,5 +1,8 @@
 include: EasyjetHub/base-config.yaml
 
+# Use triple underscore to separate variable and systematics
+systematics_suffix_separator: "___"
+
 # Which analysis and channels to consider
 do_bbtt_analysis: true
 do_antiID_regions: true

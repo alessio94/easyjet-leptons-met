@@ -15,6 +15,7 @@ def get_small_R_jet_branches(
         output_prefix,
         do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
+        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator,
         required_flags=[
             flags.Analysis.do_small_R_jets
         ],
@@ -24,6 +25,9 @@ def get_small_R_jet_branches(
         small_R_jet_branches.syst_only_for = ["pt", "jvt_selection"]
 
     small_R_jet_branches.add_four_mom_branches(do_mass=True)
+
+    if flags.Analysis.do_overlap_removal:
+        small_R_jet_branches.variables += ["passesOR_%SYS%"]
 
     if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
         small_R_jet_branches.variables += ["jvt_selection"]
@@ -99,6 +103,7 @@ def get_small_R_bjet_branches(
         output_prefix,
         do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
+        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator,
         required_flags=[
             flags.Analysis.do_small_R_jets
         ],

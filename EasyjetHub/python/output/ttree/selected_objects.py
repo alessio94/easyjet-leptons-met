@@ -29,7 +29,8 @@ def get_selected_objects_branches_variables(flags, analysis):
                             -> {analysis}_Jet{index+1}_{var}"]
             else:
                 branches += [f"EventInfo.Jet{index+1}_{var}_%SYS% \
-                            -> {analysis}_Jet{index+1}_{var}_%SYS%"]
+                            -> {analysis}_Jet{index+1}_{var}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # B tagged jets
     for var in [*flags.Analysis.small_R_jet.variables_int_bjets,
@@ -48,7 +49,8 @@ def get_selected_objects_branches_variables(flags, analysis):
                             -> {analysis}_Jet_b{index+1}_{var}"]
             else:
                 branches += [f"EventInfo.Jet_b{index+1}_{var}_%SYS% \
-                            -> {analysis}_Jet_b{index+1}_{var}_%SYS%"]
+                            -> {analysis}_Jet_b{index+1}_{var}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # Photons
     for var in [*flags.Analysis.Photon.variables,
@@ -67,7 +69,8 @@ def get_selected_objects_branches_variables(flags, analysis):
                             -> {analysis}_Photon{index+1}_{var}"]
             else:
                 branches += [f"EventInfo.Photon{index+1}_{var}_%SYS% \
-                            -> {analysis}_Photon{index+1}_{var}_%SYS%"]
+                            -> {analysis}_Photon{index+1}_{var}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # Electrons
     for var in [*flags.Analysis.Electron.variables,
@@ -86,7 +89,8 @@ def get_selected_objects_branches_variables(flags, analysis):
                             -> {analysis}_Electron{index+1}_{var}"]
             else:
                 branches += [f"EventInfo.Electron{index+1}_{var}_%SYS% \
-                            -> {analysis}_Electron{index+1}_{var}_%SYS%"]
+                            -> {analysis}_Electron{index+1}_{var}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # Muons
     for var in [*flags.Analysis.Muon.variables,
@@ -105,7 +109,8 @@ def get_selected_objects_branches_variables(flags, analysis):
                             -> {analysis}_Muon{index+1}_{var}"]
             else:
                 branches += [f"EventInfo.Muon{index+1}_{var}_%SYS% \
-                            -> {analysis}_Muon{index+1}_{var}_%SYS%"]
+                            -> {analysis}_Muon{index+1}_{var}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # Taus
     for var in [*flags.Analysis.Tau.variables,
@@ -124,7 +129,8 @@ def get_selected_objects_branches_variables(flags, analysis):
                             -> {analysis}_Tau{index+1}_{var}"]
             else:
                 branches += [f"EventInfo.Tau{index+1}_{var}_%SYS% \
-                            -> {analysis}_Tau{index+1}_{var}_%SYS%"]
+                            -> {analysis}_Tau{index+1}_{var}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # Selected Lepton
     for var in [*flags.Analysis.Lepton.variables,
@@ -143,6 +149,7 @@ def get_selected_objects_branches_variables(flags, analysis):
                             -> {analysis}_Lepton{index_str}_{var}"]
             else:
                 branches += [f"EventInfo.Lepton{index_str}_{var}_%SYS% \
-                            -> {analysis}_Lepton{index_str}_{var}_%SYS%"]
+                            -> {analysis}_Lepton{index_str}_{var}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names

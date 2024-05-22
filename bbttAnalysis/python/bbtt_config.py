@@ -217,7 +217,8 @@ def bbtt_branches(flags):
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> bbtt_{var}_%SYS%"]
+            branches += [f"EventInfo.{var}_%SYS% -> bbtt_{var}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
@@ -229,14 +230,17 @@ def bbtt_branches(flags):
 
     branches += object_level_branches
 
-    branches += ["EventInfo.bbtt_pass_presel_%SYS% -> bbtt_pass_presel_%SYS%"]
+    branches += ["EventInfo.bbtt_pass_presel_%SYS% -> bbtt_pass_presel"
+                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbttSelectorAlg
     for var in ["_trigger_", "_baseline_"]:
         for cat in ["SR", "SLT", "LTT", "STT", "DTT",
                     "DTT_2016", "DTT_4J12", "DTT_L1Topo", "DBT"]:
-            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> bbtt_pass{var}{cat}_%SYS%"]
+            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> "
+                         f"bbtt_pass{var}{cat}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for cat in ["SR", "SLT", "LTT", "STT", "DTT",
                 "DTT_2016", "DTT_4J12", "DTT_L1Topo", "DBT",
@@ -247,6 +251,7 @@ def bbtt_branches(flags):
 
     for cat in ["baseline_LepHad", "baseline_HadHad", "LepHad", "HadHad",
                 "ZCR", "TopEMuCR"]:
-        branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}_%SYS%"]
+        branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names

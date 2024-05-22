@@ -177,10 +177,7 @@ def bbVV_branches(flags):
     # in the object configs.
     branches += get_selected_objects_branches(flags, "bbVV")
 
-    #     for hh in ["HH", "HH_vis", "HH_visMet"]:
-    #         for var in ["pt", "eta", "phi", "m"]:
-    #             branches += [f"EventInfo.{hh}_{var}_%SYS% -> {hh}_%SYS%_{var}"]
-
-    branches += ["EventInfo.bbVV_pass_sr_%SYS% -> bbVV_pass_SR_%SYS%"]
+    branches += ["EventInfo.bbVV_pass_sr_%SYS% -> bbVV_pass_SR"
+                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches

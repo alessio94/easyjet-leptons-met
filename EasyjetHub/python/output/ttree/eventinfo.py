@@ -1,10 +1,16 @@
-from EasyjetHub.output.ttree.branch_manager import BranchManager
+from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 
 
 def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
+    _syst_option = SystOption.ALL_SYST
+    if flags.Analysis.disable_calib or not flags.Input.isMC:
+        _syst_option = SystOption.NONE
+
     eventinfo_branches = BranchManager(
         input_container="EventInfo",
         output_prefix="",
+        systematics_option=_syst_option,
+        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator,
         variables=[
             "runNumber",
             "eventNumber",
@@ -22,6 +28,12 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "generatorWeight_%SYS%",
             "PileupWeight_%SYS%"
         ]
+        # Need syst_only_for not to be empty to avoid applying SYST on all
+        # other branches
+        # Any variable with %SYS% will anyway get systematics applied, so the list
+        # doesn't need to be exhaustive with the extra variables added in the config
+        eventinfo_branches.syst_only_for = ["generatorWeight_%SYS%",
+                                            "PileupWeight_%SYS%"]
 
     # Replace L1Topo characters, formatting as done by the
     # trigger selection CP alg

@@ -18,6 +18,7 @@ def get_large_R_jet_branches(
         output_prefix,
         do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
+        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator
     )
 
     if tree_flags.slim_variables_with_syst:
@@ -30,6 +31,7 @@ def get_large_R_jet_branches(
         output_prefix,
         do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=SystOption.NO_SYST,
+        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator
     )
 
     if lr_jet_type == "Topo":
@@ -38,6 +40,9 @@ def get_large_R_jet_branches(
         large_R_jet_branches.required_flags.append(flags.Analysis.do_large_R_UFO_jets)
 
     large_R_jet_branches.add_four_mom_branches(do_mass=True)
+
+    if flags.Analysis.do_overlap_removal:
+        large_R_jet_branches.variables += ["passesOR_%SYS%"]
 
     if flags.Input.isMC and tree_flags.collection_options.large_R_jets.truth_labels:
         large_R_jet_branches.variables += [

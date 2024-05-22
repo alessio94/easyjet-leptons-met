@@ -210,7 +210,8 @@ def bbll_branches(flags):
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}_%SYS%"]
+            branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
@@ -222,17 +223,20 @@ def bbll_branches(flags):
 
     branches += object_level_branches
 
-    branches += ["EventInfo.bbll_pass_sr_%SYS% -> bbll_pass_SR_%SYS%"]
+    branches += ["EventInfo.bbll_pass_sr_%SYS% -> bbll_pass_SR"
+                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     if (flags.Analysis.save_bbll_cutflow):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
-            branches += [f"EventInfo.{cut}_%SYS% -> bbll_{cut}_%SYS%"]
+            branches += [f"EventInfo.{cut}_%SYS% -> bbll_{cut}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbllSelectorAlg
     for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
         branches += \
-            [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}_%SYS%"]
+            [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}"
+             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names, float_NW_variable_names

@@ -259,7 +259,8 @@ def bbyy_branches(flags):
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
+            branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
@@ -274,16 +275,19 @@ def bbyy_branches(flags):
     # More event info variables:
     s_name = flags.Analysis.selection_name
     branches += \
-        [f"EventInfo.bbyy_pass_{s_name}_%SYS% -> bbyy_pass_{s_name}_%SYS%"]
+        [f"EventInfo.bbyy_pass_{s_name}_%SYS% -> bbyy_pass_{s_name}"
+         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     if (flags.Analysis.save_bbyy_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
             if cut == "PASS_TRIGGER" or cut == "PASS_TRIGGER_MATCHING":
                 extra = "SINGLE_OR_DIPHOTON"
-                branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_{extra}_%SYS%"]
+                branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_{extra}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
             else:
-                branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_%SYS%"]
+                branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     branches += ["EventInfo.eventWeight -> eventWeight"]
 
@@ -294,7 +298,8 @@ def bbyy_branches(flags):
         "pass_matching_trigger_diphoton"]
 
     for trigger in photon_triggers:
-        branches += [f"EventInfo.{trigger}_%SYS% -> {trigger}_%SYS%"]
+        branches += [f"EventInfo.{trigger}_%SYS% -> {trigger}"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names
 

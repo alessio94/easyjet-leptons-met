@@ -192,7 +192,8 @@ def ttHH_branches(flags):
 
     for tree_flags in flags.Analysis.ttree_output:
         for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}_%SYS%"]
+            branches += [f"EventInfo.{var}_%SYS% -> ttHH_{var}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
@@ -204,9 +205,11 @@ def ttHH_branches(flags):
 
     branches += object_level_branches
 
-    branches += ["EventInfo.PassAllCuts_%SYS% -> ttHH_PassAllCuts_%SYS%"]
+    branches += ["EventInfo.PassAllCuts_%SYS% -> ttHH_PassAllCuts"
+                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    branches += ["EventInfo.ttHH_pass_baseline_%SYS% -> ttHH_pass_baseline_%SYS%"]
+    branches += ["EventInfo.ttHH_pass_baseline_%SYS% -> ttHH_pass_baseline"
+                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for trig in ["dilep", "singlep"]:
         branches += [f"EventInfo.ttHH_pass_trigger_{trig} \
@@ -215,7 +218,8 @@ def ttHH_branches(flags):
     if (flags.Analysis.save_ttHH_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
-            branches += [f"EventInfo.{cut}_%SYS% -> ttHH_{cut}_%SYS%"]
+            branches += [f"EventInfo.{cut}_%SYS% -> ttHH_{cut}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names
 
