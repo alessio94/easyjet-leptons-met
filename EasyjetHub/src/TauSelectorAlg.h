@@ -6,7 +6,6 @@
 #define EASYJET_TAUSELECTORALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysWriteHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
@@ -47,15 +46,11 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_inHandle{ this, "containerInKey", "",   "Tau container to read" };
 
-    Gaudi::Property<std::string> m_IDTauDecorName
-      { this, "idTauDecorKey", "isIDTau", "Decoration for ID taus" };
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
-
-    Gaudi::Property<bool>  m_keepAntiTaus
+    Gaudi::Property<bool> m_keepAntiTaus
       {this, "keepAntiTaus", false, "Keep anti-taus in addition to ID taus"};
-    Gaudi::Property<std::string> m_antiTauDecorName
-      { this, "antiTauDecorKey", "isAntiTau", "Decoration for anti-taus" };
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
+
+    CP::SysReadDecorHandle<char> m_IDTau{"", this};
+    CP::SysReadDecorHandle<char> m_antiTau{"", this};
 
     CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
 

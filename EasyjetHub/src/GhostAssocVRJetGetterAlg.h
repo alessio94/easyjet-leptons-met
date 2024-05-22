@@ -1,15 +1,12 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
 #ifndef EASYJET_GHOSTASSOCVRJETGETTERALG
 #define EASYJET_GHOSTASSOCVRJETGETTERALG
 
-#include "AthContainers/AuxElement.h"
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <SystematicsHandles/SysReadHandle.h>
-#include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <AthContainers/ConstDataVector.h>
 
@@ -39,8 +36,6 @@ private:
         this, "containerInKey", "", "containerName to read"};
     SG::WriteHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerOutKey{
         this, "containerOutKey", "", "containerName to write"};
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-        this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
     // ghost associated VR track jets are only on the untrimmed 1.0 jets
     Gaudi::Property<unsigned int> m_whichJet {this, "whichJet", -1, "Index of jets to be trimmed"};

@@ -14,9 +14,6 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
 
-#include <AsgDataHandles/WriteDecorHandle.h>
-#include <StoreGate/ReadDecorHandle.h>
-
 
 namespace Easyjet
 {

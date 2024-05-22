@@ -1,13 +1,11 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Frederic Renner
 
 #include "GhostAssocVRJetGetterAlg.h"
 #include "AthContainers/AuxElement.h"
-#include "AthContainers/DataVector.h"
-#include <xAODJet/JetContainer.h>
 
 namespace Easyjet
 {
@@ -18,7 +16,6 @@ namespace Easyjet
   StatusCode GhostAssocVRJetGetterAlg ::initialize()
   {
     ATH_CHECK(m_containerInKey.initialize());
-    ATH_CHECK(m_EventInfoKey.initialize());
     ATH_CHECK(m_containerOutKey.initialize());
 
     return StatusCode::SUCCESS;
@@ -28,9 +25,7 @@ namespace Easyjet
   {
     // container we read in
     SG::ReadHandle<xAOD::JetContainer> inContainer(m_containerInKey);
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
     ATH_CHECK(inContainer.isValid());
-    ATH_CHECK(eventInfo.isValid());
 
     // the accessors
     SG::AuxElement::ConstAccessor<ElementLink<xAOD::JetContainer>>

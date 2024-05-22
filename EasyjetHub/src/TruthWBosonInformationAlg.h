@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 ///////////////////////////////////////////////////////////////////
@@ -14,12 +14,12 @@
 #ifndef HHANALYSIS_TRUTHWBOSONINFORMATIONALG
 #define HHANALYSIS_TRUTHWBOSONINFORMATIONALG
 
-#include "AthContainers/ConstDataVector.h"
-#include <AthContainers/AuxElement.h>
 #include <AthenaBaseComps/AthAlgorithm.h>
+#include <AsgDataHandles/ReadHandleKey.h>
+#include <AsgDataHandles/WriteDecorHandleKey.h>
+
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODTruth/TruthParticleContainer.h>
-#include <AsgDataHandles/WriteDecorHandle.h>
 
 
 namespace Easyjet

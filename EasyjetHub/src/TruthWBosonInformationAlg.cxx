@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Jordy Degens, Osama Karkout
@@ -9,10 +9,11 @@
 //
 #include "TruthWBosonInformationAlg.h"
 #include "TruthUtils.h"
-#include <algorithm>
+
+#include <AsgDataHandles/ReadHandle.h>
+#include <AsgDataHandles/WriteDecorHandle.h>
 
 #include "TruthUtils/HepMCHelpers.h"
-
 
 //
 // method implementations

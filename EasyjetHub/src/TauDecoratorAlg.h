@@ -6,22 +6,13 @@
   output branch.
 */
 
-
-
 // Always protect against multiple includes!
 #ifndef EASYJET_TAUDECORATORALG
 #define EASYJET_TAUDECORATORALG
 
-#include <vector>
-#include <utility>
-#include <string>
-#include <unordered_map>
-
 #include <AsgDataHandles/WriteDecorHandleKey.h>
 #include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <AthenaBaseComps/AthReentrantAlgorithm.h>
-
-#include <xAODEventInfo/EventInfo.h>
 
 #include <xAODTau/TauJetContainer.h>
 #include <xAODJet/JetContainer.h>

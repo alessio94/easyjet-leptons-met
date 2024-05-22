@@ -3,7 +3,6 @@
 */
 
 #include "TauSelectorAlg.h"
-#include <AsgDataHandles/ReadDecorHandle.h>
 
 namespace Easyjet
 {
@@ -19,11 +18,12 @@ namespace Easyjet
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
 
-    m_IDTauDecorKey = m_inHandle.getNamePattern() + "." + m_IDTauDecorName;
-    m_antiTauDecorKey = m_inHandle.getNamePattern() + "." + m_antiTauDecorName;
-
-    ATH_CHECK (m_IDTauDecorKey.initialize());
-    ATH_CHECK (m_antiTauDecorKey.initialize());
+    if(m_keepAntiTaus){
+      m_IDTau = CP::SysReadDecorHandle<char>("isIDTau", this);
+      m_antiTau = CP::SysReadDecorHandle<char>("isAntiTau", this);
+    }
+    ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
 
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
@@ -51,9 +51,6 @@ namespace Easyjet
   StatusCode TauSelectorAlg::execute()
   {
 
-    SG::ReadDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
-    SG::ReadDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
-
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
 
@@ -74,8 +71,8 @@ namespace Easyjet
 
         // If not ID tau nor anti tau, skip
         if(m_keepAntiTaus){
-          bool isTauID = idTauDecorHandle(*tau) || antiTauDecorHandle(*tau);
-          if( !isTauID ) continue;
+          bool keep = m_IDTau.get(*tau, sys) || m_antiTau.get(*tau, sys);
+          if( !keep ) continue;
         }
 
         // If not passing OR, skip
