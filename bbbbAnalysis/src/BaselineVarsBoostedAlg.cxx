@@ -1,14 +1,12 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Frederic Renner
 
-#include "AthContainers/AuxElement.h"
 #include "BaselineVarsBoostedAlg.h"
+#include "AthContainers/AuxElement.h"
 #include "FourMomUtils/xAODP4Helpers.h"
-#include <AthContainers/ConstDataVector.h>
-#include <xAODJet/JetContainer.h>
 
 namespace HH4B
 {

@@ -1,15 +1,13 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
 #ifndef HH4BANALYSIS_JETPAIRINGALG
 #define HH4BANALYSIS_JETPAIRINGRALG
 
-#include "xAODJet/JetContainer.h"
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <SystematicsHandles/SysReadHandle.h>
-#include <xAODEventInfo/EventInfo.h>
+
 #include <xAODJet/JetContainer.h>
 
 namespace HH4B
