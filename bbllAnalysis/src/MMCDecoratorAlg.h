@@ -1,19 +1,15 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
 #ifndef HHBBLLANALYSIS_MMCDECORATORALG
 #define HHBBLLANALYSIS_MMCDECORATORALG
 
-#include <memory>
-
 #include "AnaAlgorithm/AnaAlgorithm.h"
-#include <FourMomUtils/xAODP4Helpers.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
-#include <SystematicsHandles/ISysHandleBase.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>

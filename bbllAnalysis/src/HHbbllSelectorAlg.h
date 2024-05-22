@@ -7,10 +7,7 @@
 #ifndef HHBBLLANALYSIS_HHBBLLSELECTORALG
 #define HHBBLLANALYSIS_HHBBLLSELECTORALG
 
-#include <memory>
 #include "AnaAlgorithm/AnaAlgorithm.h"
-#include <AsgDataHandles/ReadDecorHandleKey.h>
-#include <AsgDataHandles/ReadDecorHandle.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
@@ -139,8 +136,6 @@ namespace HHBBLL
 	{this, "is2023_400bunches", "is2023_400bunches", ""};
       
       CP::SysFilterReporterParams m_filterParams {this, "HHbbll selection"};
-
-      std::unordered_map<std::string,  SG::ReadDecorHandleKey<xAOD::EventInfo>> m_triggerDecorKeys;
 
       std::unordered_map<HHBBLL::TriggerChannel, std::string> m_triggerChannels = 
       {

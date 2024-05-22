@@ -4,12 +4,9 @@
 
 #include "HHbbllSelectorAlg.h"
 #include <AthenaKernel/Units.h>
-
+#include <AthContainers/ConstDataVector.h>
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
-#include <AthContainers/ConstDataVector.h>
-#include <AthenaKernel/Units.h>
-
 
 namespace HHBBLL
 {

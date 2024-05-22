@@ -6,18 +6,12 @@
 #ifndef HHBBLLANALYSIS_FINALVARSBBLLALG
 #define HHBBLLANALYSIS_FINALVARSBBLLALG
 
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
+
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
-
-#include <AthContainers/ConstDataVector.h>
-
-#include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <FourMomUtils/xAODP4Helpers.h>
-
-#include <SystematicsHandles/SysReadHandle.h>
-#include <SystematicsHandles/SysListHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
