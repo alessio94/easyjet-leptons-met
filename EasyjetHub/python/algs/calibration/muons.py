@@ -29,6 +29,10 @@ def muon_sequence(flags, configAcc):
         configSeq.setOptionValue('.isolation', iso)
         configSeq.setOptionValue('.trackSelection',
                                  flags.Analysis.Muon.trackSelection)
+        configSeq.setOptionValue('.maxD0Significance',
+                                 flags.Analysis.Muon.maxD0Significance)
+        configSeq.setOptionValue('.maxDeltaZ0SinTheta',
+                                 flags.Analysis.Muon.maxDeltaZ0SinTheta)
 
     # Kinematic selection
     configSeq += makeConfig('Muons.PtEtaSelection', containerName=output_name,

@@ -62,6 +62,9 @@ Photon:
 
 Electron:
   trackSelection: true
+  maxD0Significance: 5.
+  maxDeltaZ0SinTheta: 0.5
+  chargeIDSelection: false
   ID: ""
   Iso: ""
   amount: 0
@@ -73,6 +76,8 @@ Electron:
 Muon:
   max_eta: 2.5
   trackSelection: true
+  maxD0Significance: 3
+  maxDeltaZ0SinTheta: 0.5
   ID: ""
   Iso: ""
   amount: 0

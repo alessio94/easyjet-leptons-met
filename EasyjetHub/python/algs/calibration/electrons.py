@@ -39,6 +39,12 @@ def electron_sequence(flags, configAcc):
                                  flags.Analysis.Electron.forceFullSimConfig)
         configSeq.setOptionValue('.trackSelection',
                                  flags.Analysis.Electron.trackSelection)
+        configSeq.setOptionValue('.maxD0Significance',
+                                 flags.Analysis.Electron.maxD0Significance)
+        configSeq.setOptionValue('.maxDeltaZ0SinTheta',
+                                 flags.Analysis.Electron.maxDeltaZ0SinTheta)
+        configSeq.setOptionValue('.chargeIDSelection',
+                                 flags.Analysis.Electron.chargeIDSelection)
 
     # Kinematic selection
     configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name,
