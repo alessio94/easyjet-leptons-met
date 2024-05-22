@@ -1,5 +1,5 @@
 dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUncertUP/D:relUncertDOWN/D
-601521  PhPy8EG_PDF4LHC21_ggH_MINLO_gammagamma                      0.11857118  1.0  1.0   0.0  0.0 
+602421  PhPy8EG_PDF4LHC21_ggH_NNLOPS_gammagamma                     0.11857118  1.0  1.0   0.0  0.0 
 601482  PhPy8EG_PDF4LHC21_VBFH125_gammagamma                        0.00925706  1.0  1.0   0.0  0.0
 601484  PhPy8EG_PDF4LHC21_WpH125J_Wincl_MINLO_gammagamma            0.002017803 1.0  1.0   0.0  0.0
 601483  PhPy8EG_PDF4LHC21_WmH125J_Wincl_MINLO_gammagamma            0.001288679 1.0  1.0   0.0  0.0

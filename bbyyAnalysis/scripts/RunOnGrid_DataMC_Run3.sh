@@ -163,7 +163,7 @@ easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/m
     --campaign ${campaign}
 
 #yy+jets Sherpa
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc21_13p6TeV.yyjets_Sherpa.${ptag}.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/mc23_13p6TeV.yyjets_Sherpa.${ptag}.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 2 \
