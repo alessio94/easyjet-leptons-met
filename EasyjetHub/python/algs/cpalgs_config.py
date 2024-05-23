@@ -22,7 +22,7 @@ from EasyjetHub.algs.calibration.electrons import electron_sequence
 from EasyjetHub.algs.calibration.photons import photon_sequence
 from EasyjetHub.algs.calibration.taus import tau_sequence
 from EasyjetHub.algs.calibration.met import met_sequence
-from EasyjetHub.algs.calibration.SelectionDecorationConfig import (
+from EasyjetHub.algs.calibration.selection_decoration import (
     selection_decoration_sequence)
 from EasyjetHub.algs.postprocessing.overlap_removal import overlap_sequence
 from EasyjetHub.algs.calibration.triggerSF import triggerSF_sequence
