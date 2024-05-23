@@ -61,3 +61,7 @@ ttree_output:
     collection_options:
       small_R_jets:
         btag_info: true
+      electrons:
+        id_iso_variables: true
+      muons:
+        id_iso_variables: true

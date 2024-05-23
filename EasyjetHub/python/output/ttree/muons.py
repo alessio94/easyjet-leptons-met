@@ -23,4 +23,15 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.do_overlap_removal:
         muon_branches.variables += ["passesOR_%SYS%"]
 
+    if tree_flags.collection_options.muons.id_iso_variables:
+        id_wps = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
+        if 'extra_wps' in flags.Analysis.Muon:
+            for wp in flags.Analysis.Muon.extra_wps:
+                id_wps.append(wp[0] + "_" + wp[1])
+
+        muon_branches.variables += [
+            f"baselineSelection_{id_wp}_%SYS%"
+            for id_wp in id_wps
+        ]
+
     return muon_branches.get_output_list()

@@ -38,6 +38,12 @@ collection_options:
     shower_shapes: false
     truth_labels: false
     iso_variables: false
+  
+  electrons:
+    id_iso_variables: false
+
+  muons:
+    id_iso_variables: false
 
 # turned off automatically if MC
 truth_outputs:

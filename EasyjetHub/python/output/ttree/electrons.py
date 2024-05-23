@@ -23,4 +23,15 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.do_overlap_removal:
         electron_branches.variables += ["passesOR_%SYS%"]
 
+    if tree_flags.collection_options.electrons.id_iso_variables:
+        id_wps = [f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}']
+        if 'extra_wps' in flags.Analysis.Electron:
+            for wp in flags.Analysis.Electron.extra_wps:
+                id_wps.append(wp[0] + "_" + wp[1])
+
+        electron_branches.variables += [
+            f"baselineSelection_{id_wp}_%SYS%"
+            for id_wp in id_wps
+        ]
+
     return electron_branches.get_output_list()
