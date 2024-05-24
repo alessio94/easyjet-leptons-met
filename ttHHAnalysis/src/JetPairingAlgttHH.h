@@ -1,10 +1,12 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
 #ifndef TTHHANALYSIS_JETPAIRINGALG
 #define TTHHANALYSIS_JETPAIRINGRALG
+
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysWriteHandle.h>
@@ -13,9 +15,6 @@
 #include <SystematicsHandles/SysListHandle.h>
 
 #include "xAODJet/JetContainer.h"
-#include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <xAODEventInfo/EventInfo.h>
-#include <xAODJet/JetContainer.h>
 
 namespace ttHH
 {

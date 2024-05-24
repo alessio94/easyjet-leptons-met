@@ -1,14 +1,14 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Frederic Renner
 
 #include "JetPairingAlgttHH.h"
+
 #include "AthContainers/AuxElement.h"
-#include "FourMomUtils/xAODP4Helpers.h"
-#include "xAODJet/JetContainer.h"
 #include <AthContainers/ConstDataVector.h>
+#include "FourMomUtils/xAODP4Helpers.h"
 
 namespace ttHH
 {

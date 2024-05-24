@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -7,28 +7,22 @@
 #ifndef SELECTIONFLAGSTTHHALG_H
 #define SELECTIONFLAGSTTHHALG_H
 
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
+
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
-#include <AsgDataHandles/ReadDecorHandle.h>
-
-#include <AthContainers/ConstDataVector.h>
-
-#include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <FourMomUtils/xAODP4Helpers.h>
+#include <SystematicsHandles/SysFilterReporterParams.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
+
 #include <EasyjetHub/CutManager.h>
 
-#include <SystematicsHandles/SysFilterReporterParams.h>
-
 #include <algorithm>
-
-class CutManager;
 
 namespace ttHH
 {

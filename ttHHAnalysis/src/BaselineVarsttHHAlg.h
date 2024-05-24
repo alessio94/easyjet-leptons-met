@@ -6,20 +6,17 @@
 #ifndef TTHHANALYSIS_FINALVARSTTHHALG
 #define TTHHANALYSIS_FINALVARSTTHHALG
 
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
+
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
 
-#include <AthContainers/ConstDataVector.h>
-#include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <FourMomUtils/xAODP4Helpers.h>
-
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
-#include <xAODMissingET/MissingETContainer.h>
 
 namespace ttHH
 {
@@ -65,9 +62,6 @@ private:
 
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "",   "Electron container to read" };
-
-    CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };

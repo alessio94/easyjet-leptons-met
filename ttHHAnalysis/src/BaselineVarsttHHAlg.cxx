@@ -4,11 +4,11 @@
 
 /// @author Giulia Di Gregorio, Luis Falda
 
-#include "AthContainers/AuxElement.h"
 #include "BaselineVarsttHHAlg.h"
+
+#include "AthContainers/AuxElement.h"
 #include <FourMomUtils/xAODP4Helpers.h>
 #include <AthContainers/ConstDataVector.h>
-#include <xAODJet/JetContainer.h>
 
 namespace ttHH
 {
@@ -37,7 +37,6 @@ namespace ttHH
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
@@ -90,14 +89,6 @@ namespace ttHH
 
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
-
-      const xAOD::MissingETContainer *metCont = nullptr;
-      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
-      const xAOD::MissingET* met = (*metCont)["Final"];
-      if (!met) {
-        ATH_MSG_ERROR("Could not retrieve MET");
-        return StatusCode::FAILURE;	
-      }
 
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
@@ -330,8 +321,6 @@ namespace ttHH
       }
 
       m_Fbranches.at("HT").set(*event, HT, sys);
-      m_Fbranches.at("missEt").set(*event, met->met(), sys);
-      m_Fbranches.at("metphi").set(*event, met->phi(), sys);
       m_Ibranches.at("nLeptons").set(*event, leptonCount, sys);
     }
     return StatusCode::SUCCESS;

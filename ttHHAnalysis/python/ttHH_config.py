@@ -110,7 +110,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             jets="ttHHAnalysisJets_%SYS%",
             muons="ttHHAnalysisMuons_%SYS%",
             electrons="ttHHAnalysisElectrons_%SYS%",
-            met="AnalysisMET_%SYS%",
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             isMC=flags.Input.isMC,
@@ -147,7 +146,7 @@ def get_BaselineVarsttHHAlg_variables(flags):
 
     float_variable_names += angular_variables
 
-    float_variable_names += ["HT", "missEt", "metphi"]
+    float_variable_names += ["HT"]
 
     int_variable_names += [
         "nJets", "nBJets", "nLeptons",
