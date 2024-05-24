@@ -78,7 +78,6 @@ def lltt_cfg(
             muons="llttAnalysisMuons_%SYS%",
             electrons="llttAnalysisElectrons_%SYS%",
             taus="llttAnalysisTaus_%SYS%",
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             tauWP=flags.Analysis.Tau.ID,
             muonWP=TightMuonWPLabel,

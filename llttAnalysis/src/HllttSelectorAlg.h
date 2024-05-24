@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "AnaAlgorithm/AnaAlgorithm.h"
-#include <AsgDataHandles/ReadDecorHandleKey.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
@@ -21,7 +20,6 @@
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODTau/TauJetContainer.h>
-#include <xAODMissingET/MissingETContainer.h>
 
 #include <SystematicsHandles/SysFilterReporterParams.h>
 
@@ -88,9 +86,6 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_tauHandle{ this, "taus", "",   "Tau container to read" };
 
-    CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
-
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
@@ -100,8 +95,6 @@ private:
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
     CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
-
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_tauWPDecorKey;
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};

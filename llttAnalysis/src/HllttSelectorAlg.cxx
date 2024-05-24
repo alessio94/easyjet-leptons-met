@@ -5,7 +5,6 @@
 /// @author Weiming Yao
 
 #include "HllttSelectorAlg.h"
-#include <AsgDataHandles/ReadDecorHandle.h>
 
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
@@ -32,7 +31,6 @@ namespace HLLTT
     ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if (!m_isBtag.empty()) {
@@ -110,14 +108,6 @@ namespace HLLTT
 
       const xAOD::TauJetContainer *taus = nullptr;
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
-
-      const xAOD::MissingETContainer *metCont = nullptr;
-      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
-      const xAOD::MissingET* met = (*metCont)["Final"];
-      if (!met) {
-	ATH_MSG_ERROR("Could not retrieve MET");
-	return StatusCode::FAILURE;	
-      }
 
       applyTriggerSelection(event, sys);
       m_Bbranches.at("pass_trigger_SLT").set(*event, trigPassed_SLT, sys);
