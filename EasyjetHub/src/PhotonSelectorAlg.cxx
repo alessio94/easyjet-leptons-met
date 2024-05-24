@@ -29,29 +29,29 @@ namespace Easyjet
 
     for(const auto& wp : m_photonWPNames){
       // Scale factors
-      CP::SysReadDecorHandle<float> idSF(m_isMC ? "ph_id_effSF_"+wp+"_%SYS%" : "", this);
-      m_ph_idSF.emplace_back(idSF);
-      ATH_CHECK (m_ph_idSF.back().initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-      CP::SysReadDecorHandle<float> isoSF((m_isMC && wp.find("NonIso")!=std::string::npos) ? "ph_isol_effSF_"+wp+"_%SYS%" : "", this);
-      m_ph_isoSF.emplace_back(isoSF);
-      ATH_CHECK (m_ph_isoSF.back().initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-
-      CP::SysWriteDecorHandle<float> phSF(m_isMC ? "ph_effSF_"+wp+"_%SYS%" : "", this);
-      m_ph_SF.emplace_back(phSF);
-      ATH_CHECK (m_ph_SF.back().initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+      m_ph_idSF.emplace_back(m_isMC ? "ph_id_effSF_"+wp+"_%SYS%" : "", this);
+      m_ph_isoSF.emplace_back((m_isMC && wp.find("NonIso")==std::string::npos) ?
+			      "ph_isol_effSF_"+wp+"_%SYS%" : "", this);
+      m_ph_SF.emplace_back(m_isMC ? "ph_effSF_"+wp+"_%SYS%" : "", this);
 
       // Select flags
-      CP::SysReadDecorHandle<char> sel_in("baselineSelection_"+wp+"_%SYS%", this);
-      m_select_in.emplace_back(sel_in);
-      ATH_CHECK (m_select_in.back().initialize(m_systematicsList, m_inHandle));
-
-      CP::SysWriteDecorHandle<char> sel_out("baselineSelection_"+wp+"_%SYS%", this);
-      m_select_out.emplace_back(sel_out);
-      ATH_CHECK (m_select_out.back().initialize(m_systematicsList, m_outHandle));
+      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+      m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
+    for(auto& handle : m_ph_idSF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_ph_isoSF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_ph_SF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+    for(auto& handle : m_select_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_select_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+
     // Initialise syst list (must come after all syst-aware inputs and outputs)
-    ATH_CHECK (m_systematicsList.initialize());    
+    ATH_CHECK (m_systematicsList.initialize());
 
     // Initialise vertex container for photon pointing
     ATH_CHECK (m_vertexContainerInKey.initialize());
@@ -116,8 +116,8 @@ namespace Easyjet
         for(unsigned int i=0; i<m_photonWPNames.size(); i++){
           std::string wp = m_photonWPNames[i];
           if(m_isMC){
-            float SF = m_ph_idSF[i].get(*thisPhoton,sys);
-            if(wp.find("NonIso")!=std::string::npos) SF *= m_ph_isoSF[i].get(*thisPhoton,sys);
+            float SF = m_ph_idSF[i].get(*thisPhoton, sys);
+            if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*thisPhoton, sys);
             m_ph_SF[i].set(*thisPhoton, SF, sys);
           }
           m_select_out[i].set(*thisPhoton, m_select_in[i].get(*thisPhoton,sys), sys);

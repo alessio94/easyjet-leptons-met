@@ -35,8 +35,6 @@ def photon_sequence(flags, configAcc):
                                 selectionName=id + '_' + iso)
         configSeq.setOptionValue('.qualityWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
-        if (iso == "NonIso"):
-            configSeq.setOptionValue('.noEffSF', True)
         configSeq.setOptionValue('.forceFullSimConfig',
                                  flags.Analysis.Photon.forceFullSimConfig)
 
