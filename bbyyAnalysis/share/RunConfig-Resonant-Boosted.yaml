@@ -36,3 +36,4 @@ ttree_output:
       small_R_jets: 'container_names.input.truth4Jet'
       large_R_jets: 'container_names.input.truth10SoftDropJet'
       higgs_particle: 'container_names.output.truthHHParticles'
+

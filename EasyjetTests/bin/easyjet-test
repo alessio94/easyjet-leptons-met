@@ -146,12 +146,12 @@ declare -A CONFIGS=(
     [bbtt-data22]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     [bbtt-data22-lite]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     [ttHH-data22-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
-    [bbyy-data22-lite]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
+    [bbyy-data22-lite]=bbyyAnalysis/RunConfig-bbyy-skimming-legacy-bypass.yaml
     [SHbbyy-data22-lite]=bbyyAnalysis/RunConfig-Resonant-Default.yaml
     # MC20
-    [bbyy-mc20]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
+    [bbyy-mc20]=bbyyAnalysis/RunConfig-bbyy-skimming-legacy-bypass.yaml
     [bbyy-mc20-syst]=bbyyAnalysis/RunConfig-bbyy-bypass-syst.yaml
-    [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-bbyy-bypass.yaml
+    [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-bbyy-skimming-legacy-bypass.yaml
     [SHbbyy-mc20]=bbyyAnalysis/RunConfig-Resonant-Default.yaml
     [ttHH-mc20]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
