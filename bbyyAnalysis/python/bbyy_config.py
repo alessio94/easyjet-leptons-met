@@ -190,7 +190,7 @@ def get_BaselineVarsbbyyAlg_variables(flags):
 
     # mva variables
     float_variable_names += ["HT", "topness", "sphericityT", "planarFlow",
-                             "pTBalance", "missEt", "metphi"]
+                             "pTBalance"]
 
     return float_variable_names, int_variable_names
 

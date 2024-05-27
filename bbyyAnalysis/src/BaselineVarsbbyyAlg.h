@@ -6,6 +6,8 @@
 #ifndef HHBBYYANALYSIS_FINALVARSYYBBALG
 #define HHBBYYANALYSIS_FINALVARSYYBBALG
 
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
+
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
@@ -13,17 +15,15 @@
 
 #include <AthContainers/ConstDataVector.h>
 
-#include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <FourMomUtils/xAODP4Helpers.h>
-
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
+
 #include "MVAUtils/BDT.h"
-#include "xAODEgamma/PhotonFwd.h"
+
 
 
 namespace HHBBYY

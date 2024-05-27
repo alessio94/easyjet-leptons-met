@@ -7,26 +7,29 @@
 #ifndef SELECTIONFLAGSYYBBALG_H
 #define SELECTIONFLAGSYYBBALG_H
 
-#include <SystematicsHandles/SysReadHandle.h>
-#include <SystematicsHandles/SysListHandle.h>
-#include <SystematicsHandles/SysWriteDecorHandle.h>
-#include <SystematicsHandles/SysReadDecorHandle.h>
-#include <AsgDataHandles/WriteDecorHandle.h>
-#include <AsgDataHandles/ReadDecorHandle.h>
-#include <AthContainers/ConstDataVector.h>
-
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
-#include <FourMomUtils/xAODP4Helpers.h>
+
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysFilterReporterParams.h>
+
+// For custom event weights
+#include <AsgDataHandles/ReadDecorHandle.h>
+#include <AsgDataHandles/WriteDecorHandle.h>
+
+#include <AthContainers/ConstDataVector.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
-#include "TriggerMatchingTool/IMatchingTool.h"
-#include <EasyjetHub/CutManager.h>
 
-#include <SystematicsHandles/SysFilterReporterParams.h>
+#include "TriggerMatchingTool/IMatchingTool.h"
+
+#include <EasyjetHub/CutManager.h>
 
 class CutManager;
 

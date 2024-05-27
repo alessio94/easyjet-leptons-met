@@ -2,8 +2,9 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "AthContainers/AuxElement.h"
 #include "BaselineVarsbbyyAlg.h"
+
+#include "AthContainers/AuxElement.h"
 #include <FourMomUtils/xAODP4Helpers.h>
 #include "PathResolver/PathResolver.h"
 
@@ -11,10 +12,8 @@
 #include "TMatrixDSymEigen.h"
 #include "TVectorD.h"
 #include "TFile.h"
-#include "xAODEgamma/PhotonFwd.h"
 
 #include <AthenaKernel/Units.h>
-#include <iostream>
 
 namespace HHBBYY
 {
@@ -338,9 +337,6 @@ namespace HHBBYY
 
       float topness = compute_Topness(jets);
       m_Fbranches.at("topness").set(*event, topness, sys);
-      
-      m_Fbranches.at("missEt").set(*event, met->met(), sys);
-      m_Fbranches.at("metphi").set(*event, met->phi(), sys);
       
       float* eventShapes = compute_EventShapes(bjets, photons);
       m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
