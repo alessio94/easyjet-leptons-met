@@ -6,6 +6,7 @@ dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUnc
 601523  PhPy8EG_PDF4LHC21_ZH125J_Zincl_MINLO_gammagamma             0.002142653 1.0  1.0   0.0  0.0
 601522  PhPy8EG_PDF4LHC21_ggZH125_Zincl_gammagamma                  0.00030872  1.0  1.0   0.0  0.0
 601481  PhPy8EG_PDF4LHC21_ttH125_tincl_gammagamma                   0.0012939   1.0  1.0   0.0  0.0
+602422  PhPy8EG_PDF4LHC21_ttH125_tincl_gammagamma_1file             0.0012939   1.0  1.0   0.0  0.0
 601710  PhPy8EG_PDF4LHC21_4FS_A14NNPDF_bbH_gammagamma               0.00119538  1.0  1.0   0.0  0.0
 800904  Py8EG_A14NNPDF23LO_XHS_X170_S030_HyySbb                     1.0E-03     1.0  1.0   0.0  0.0
 800913  Py8EG_A14NNPDF23LO_XHS_X245_S090_HyySbb                     1.0E-03     1.0  1.0   0.0  0.0
