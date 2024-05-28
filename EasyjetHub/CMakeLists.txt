@@ -54,7 +54,6 @@ atlas_install_python_modules(
   python/algs
   python/output
   python/steering
-  python/utils
   test
 )
 atlas_install_data(
