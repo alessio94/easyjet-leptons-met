@@ -1,5 +1,6 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
+from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
@@ -15,7 +16,8 @@ def electron_sequence(flags, configAcc):
     config = ConfigFactory()
     makeConfig = config.makeConfig
 
-    if flags.Analysis.Electron.forceFullSimConfig:
+    if flags.Analysis.Electron.forceFullSimConfig \
+       and flags.Analysis.DataType is DataType.FastSim:
         print("WARNING! If not already done, you should get in touch with the")
         print("EGamma group to contribute to the Electron AF3 recommendations as")
         print("you're relying on them")
@@ -26,7 +28,8 @@ def electron_sequence(flags, configAcc):
     configSeq += makeConfig('Electrons', containerName=output_name)
     configSeq.setOptionValue('.crackVeto', True)
     configSeq.setOptionValue('.forceFullSimConfig',
-                             flags.Analysis.Electron.forceFullSimConfig)
+                             flags.Analysis.Electron.forceFullSimConfig
+                             and flags.Analysis.DataType is DataType.FastSim)
 
     # PID configuration
     for id, iso in wps:
@@ -36,7 +39,8 @@ def electron_sequence(flags, configAcc):
         configSeq.setOptionValue('.isolationWP', iso)
         configSeq.setOptionValue('.recomputeLikelihood', False)
         configSeq.setOptionValue('.forceFullSimConfig',
-                                 flags.Analysis.Electron.forceFullSimConfig)
+                                 flags.Analysis.Electron.forceFullSimConfig
+                                 and flags.Analysis.DataType is DataType.FastSim)
         configSeq.setOptionValue('.trackSelection',
                                  flags.Analysis.Electron.trackSelection)
         configSeq.setOptionValue('.maxD0Significance',

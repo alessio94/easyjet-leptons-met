@@ -90,7 +90,7 @@ def cpalgs_cfg(flags):
             # EventInfo.PileWeight_%SYS$
             weightConfigSeq += pileup_sequence(flags)
 
-        if flags.Analysis.DataType != "data":
+        if flags.Input.isMC:
             log.info("Adding generator analysis sequence")
             # Adds variable to EventInfo if for generator weight, for example:
             # EventInfo.generatorWeight_%SYS%

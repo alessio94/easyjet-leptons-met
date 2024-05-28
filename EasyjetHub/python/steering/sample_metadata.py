@@ -3,6 +3,7 @@ import pickle
 from pathlib import Path
 from PathResolver import PathResolver
 from Campaigns.Utils import Campaign
+from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
 
 
 MCSampleYears = {
@@ -121,8 +122,8 @@ def get_prw_files(flags):
 
     if flags.Input.MCChannelNumber:
         dsid = str(flags.Input.MCChannelNumber)
-        data_type = get_data_type(flags, is_prw=True)
-        if data_type == "afii":
+        data_type = get_data_type(flags)
+        if data_type == DataType.FastSim:
             simulation_type = "AFII"
         else:
             simulation_type = "FS"
@@ -135,38 +136,21 @@ def get_prw_files(flags):
 
 def get_run_years(flags):
     years = []
-    if flags.Analysis.DataType != "data":
+    if flags.Input.isMC:
         years += MCSampleYears[flags.Input.MCCampaign]
     else:
         years.append(flags.Input.DataYear)
     return years
 
 
-def get_data_type(flags, is_prw=False):
-    data_type = ""
-    if flags.Input.SimulationFlavour in [
-        "",
-        "FullG4",
-        "FullG4_QS",
-        "FullG4_LongLived",
-    ]:
-        data_type = "mc"
-    if flags.Input.SimulationFlavour in ["ATLFAST3_QS"] and not is_prw:
-        # in R22 there are no calibrations for af3 yet,
-        # using FullSim calibrations for now
-        data_type = "mc"
-    if flags.Input.SimulationFlavour in ["ATLFAST3_QS"] and is_prw:
-        # there are no PRW files for af3 yet, except for the SH samples.
-        # however, they are hard-coded in the dev group as AFII.root,
-        # so for now setting af3 to afii to get correct PRW files from dev
-        data_type = "afii"
-    if not flags.Input.isMC:
-        data_type = "data"
-
-    if not data_type:
-        raise AssertionError("Data type cannot be determined from inputs!")
-
-    return data_type
+def get_data_type(flags):
+    if flags.Input.isMC:
+        if flags.Sim.ISF.Simulator.usesFastCaloSim():
+            return DataType.FastSim
+        else:
+            return DataType.FullSim
+    else:
+        return DataType.Data
 
 
 def get_grl_files(flags):

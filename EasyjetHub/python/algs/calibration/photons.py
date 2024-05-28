@@ -1,5 +1,6 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
+from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
@@ -15,7 +16,8 @@ def photon_sequence(flags, configAcc):
     config = ConfigFactory()
     makeConfig = config.makeConfig
 
-    if flags.Analysis.Photon.forceFullSimConfig:
+    if flags.Analysis.Photon.forceFullSimConfig \
+       and flags.Analysis.DataType is DataType.FastSim:
         print("WARNING! If not already done, you should get in touch with the")
         print("EGamma group to contribute to the Photon AF3 recommendations as")
         print("you're relying on them")
@@ -27,7 +29,8 @@ def photon_sequence(flags, configAcc):
     configSeq.setOptionValue('.recomputeIsEM', False)
     configSeq.setOptionValue('.crackVeto', True)
     configSeq.setOptionValue('.forceFullSimConfig',
-                             flags.Analysis.Photon.forceFullSimConfig)
+                             flags.Analysis.Photon.forceFullSimConfig
+                             and flags.Analysis.DataType is DataType.FastSim)
 
     # PID configuration
     for id, iso in wps:
@@ -36,7 +39,8 @@ def photon_sequence(flags, configAcc):
         configSeq.setOptionValue('.qualityWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
         configSeq.setOptionValue('.forceFullSimConfig',
-                                 flags.Analysis.Photon.forceFullSimConfig)
+                                 flags.Analysis.Photon.forceFullSimConfig
+                                 and flags.Analysis.DataType is DataType.FastSim)
 
     # Kinematic selection
     configSeq += makeConfig('Photons.PtEtaSelection', containerName=output_name,
