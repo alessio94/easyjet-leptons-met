@@ -22,6 +22,7 @@ def tau_sequence(flags, configAcc):
     # PID configuration
     configSeq += makeConfig('TauJets', containerName=output_name)
     configSeq.setOptionValue('.rerunTruthMatching', False)
+    configSeq.setOptionValue('.decorateTruth', True)
     for id in wps:
         configSeq += makeConfig('TauJets.WorkingPoint',
                                 containerName=output_name,

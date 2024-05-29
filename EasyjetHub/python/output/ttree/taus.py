@@ -37,6 +37,12 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
 
     if flags.Input.isMC and tree_flags.collection_options.taus.truth_branches:
         tau_branches.variables += [
+            "truth_pt_vis",
+            "truth_eta_vis",
+            "truth_phi_vis",
+            "truth_m_vis",
+            "truth_pdgId",
+            "truth_IsHadronicTau",
             "truthType"
         ]
 
