@@ -80,7 +80,6 @@ selection:
     - 'HLT_mu60_0eta105_msonly_L1MU14FCH'
     - 'HLT_mu60_L1MU14FCH'
     - 'HLT_mu80_msonly_3layersEC_L1MU14FCH'
-    - 'HLT_e24_lhvloose_2e12_lhvloose_L1eEM24L_3eEM12L'
     - 'HLT_2e17_lhvloose_L12eEM18M'
     - 'HLT_2e24_lhvloose_L12eEM24L'
     - 'HLT_e7_lhmedium_mu24_L1MU14FCH'
