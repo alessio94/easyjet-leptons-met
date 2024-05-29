@@ -1,7 +1,7 @@
 dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUncertUP/D:relUncertDOWN/D
 600021  PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0                          8.20992E-05  1.0  1.0  0.0  0.0
 600022  PhPy8EG_PDF4LHC15_HHbbyy_cHHH10d0                          1.77736E-03  1.0  1.0  0.0  0.0
-503004  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1cv1                        4.56371E-06  1.0  1.0  0.0  0.0
+503004  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1cv1                        4.46059E-06  1.0  1.0  0.0  0.0
 503007  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1p5cv1                      8.87359E-06  1.0  1.0  0.0  0.0
 503011  MGPy8EG_hh_bbyy_vbf_novhh_l2cvv1cv1                        4.12215E-06  1.0  1.0  0.0  0.0
 503012  MGPy8EG_hh_bbyy_vbf_novhh_l10cvv1cv1                       2.59277E-04  1.0  1.0  0.0  0.0
