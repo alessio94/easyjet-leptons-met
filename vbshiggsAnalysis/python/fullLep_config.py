@@ -9,6 +9,14 @@ def fullLep_cfg(flags, float_variables=[], int_variables=[]):
 
     cfg = ComponentAccumulator()
 
+    from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
+
+    # Selection
+    trigger_branches = [
+        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
+        for c in flags.Analysis.TriggerChains
+    ]
+
     # Selection
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.FullLepSelectorAlg(
@@ -19,6 +27,8 @@ def fullLep_cfg(flags, float_variables=[], int_variables=[]):
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="vbshiggs_pass_sr_%SYS%",
+            triggerLists=trigger_branches,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_vbshiggs_cutflow,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
@@ -49,15 +59,14 @@ def fullLep_cfg(flags, float_variables=[], int_variables=[]):
 def get_BaselineVarsFullLepAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
-
     for object in ["ll", "bb", "b1l1", "b2l2", "jj"]:
         for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
     float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET", "METSig"]
 
-    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons",
-                           "nLeptons", "nCentralJets", "nForwardJets"]
+    int_variable_names += ["nJets", "nBJets", "nCentralJets", "nForwardJets",
+                           "nLeptons", "nElectrons", "nMuons"]
 
     return float_variable_names, int_variable_names
 
@@ -100,4 +109,12 @@ def fullLep_branches(flags):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> FullLep_{cut}_%SYS%"]
+
+    # trigger variables do not need to be added to variable_names
+    # as it is written out in FullLepSelectorAlg
+    for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
+        branches += \
+            [f"EventInfo.pass_trigger_{cat}_%SYS% -> FullLep_pass_trigger_{cat}"
+             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
     return branches, float_variable_names, int_variable_names

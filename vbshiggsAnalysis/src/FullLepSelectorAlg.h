@@ -22,14 +22,40 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+#include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
 
 
 namespace VBSHIGGS{
+  enum TriggerChannel
+  {
+    SLT,
+    DLT,
+    ASLT1_em,
+    ASLT1_me,
+    ASLT2,
+  };
+
+  enum Var {
+    ele = 0,
+    mu = 1,
+    leadingele = 2,
+    leadingmu = 3,
+    subleadingele = 4,
+    subleadingmu = 5,
+  };
+
   enum Booleans{
     PASS_TRIGGER,
+    pass_trigger_SLT,
+    pass_trigger_DLT,
+    pass_trigger_ASLT1_em,
+    pass_trigger_ASLT1_me,
+    pass_trigger_ASLT2,
+
     EXACTLY_TWO_LEPTONS,
     TWO_SS_CHARGE_LEPTONS,
+    TWO_OS_CHARGE_LEPTONS,
     PASS_MET,
     EXACTLY_TWO_B_JETS,
     PASS_DELTA_R_BB,
@@ -57,6 +83,7 @@ namespace VBSHIGGS{
         "PASS_TRIGGER",
         "EXACTLY_TWO_LEPTONS",    
         "TWO_SS_CHARGE_LEPTONS",
+        "TWO_OS_CHARGE_LEPTONS",
         "PASS_MET",
         "EXACTLY_TWO_B_JETS",
         "PASS_DELTA_R_BB",
@@ -71,7 +98,19 @@ namespace VBSHIGGS{
         "IS_em",
       };
 
-      void leptonSelection(const xAOD::ElectronContainer& electrons,const xAOD::MuonContainer& muons, const xAOD::MissingET *met);
+      std::unordered_map<VBSHIGGS::TriggerChannel, std::unordered_map<VBSHIGGS::Var, float>> m_pt_threshold;
+
+      void evaluateTriggerCuts
+  (const xAOD::EventInfo *event,
+   const xAOD::ElectronContainer *electrons , const xAOD::MuonContainer *muons,
+   const CP::SystematicSet& sys);
+
+      void evaluateSingleLeptonTrigger(const xAOD::EventInfo* event, const xAOD::Electron* ele, const xAOD::Muon* mu, const CP::SystematicSet& sys);
+      void evaluateDiLeptonTrigger(const xAOD::EventInfo* event, const xAOD::Electron* ele0, const xAOD::Electron* ele1, const xAOD::Muon* mu0, const xAOD::Muon* mu1, const CP::SystematicSet& sys);
+      void evaluateAsymmetricLeptonTrigger(const xAOD::EventInfo* event, const xAOD::Electron* ele, const xAOD::Muon* mu, const CP::SystematicSet& sys);
+      void setThresholds(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
+
+      void leptonSelection(const xAOD::ElectronContainer* electrons,const xAOD::MuonContainer* muons, const xAOD::MissingET *met);
       void bjetSelection(std::vector<const xAOD::Jet*> bjets);
       void vbsjetsSelection(std::vector<const xAOD::Jet*> nonbjets);
       
@@ -107,8 +146,15 @@ namespace VBSHIGGS{
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
       std::unordered_map<VBSHIGGS::Booleans, std::string> m_boolnames{
         {VBSHIGGS::PASS_TRIGGER, "PASS_TRIGGER"},
+        {VBSHIGGS::pass_trigger_SLT, "pass_trigger_SLT"},
+        {VBSHIGGS::pass_trigger_DLT, "pass_trigger_DLT"},
+        {VBSHIGGS::pass_trigger_ASLT1_em, "pass_trigger_ASLT1_em"},
+        {VBSHIGGS::pass_trigger_ASLT1_me, "pass_trigger_ASLT1_me"},
+        {VBSHIGGS::pass_trigger_ASLT2, "pass_trigger_ASLT2"},
+
         {VBSHIGGS::EXACTLY_TWO_LEPTONS, "EXACTLY_TWO_LEPTONS"},
         {VBSHIGGS::TWO_SS_CHARGE_LEPTONS, "TWO_SS_CHARGE_LEPTONS"},
+        {VBSHIGGS::TWO_OS_CHARGE_LEPTONS, "TWO_OS_CHARGE_LEPTONS"},
         {VBSHIGGS::PASS_MET, "PASS_MET"},
         {VBSHIGGS::EXACTLY_TWO_B_JETS, "EXACTLY_TWO_B_JETS"},
         {VBSHIGGS::PASS_DELTA_R_BB, "PASS_DELTA_R_BB"},
@@ -119,6 +165,33 @@ namespace VBSHIGGS{
         {VBSHIGGS::IS_ee, "IS_ee"},
         {VBSHIGGS::IS_mm, "IS_mm"},
         {VBSHIGGS::IS_em, "IS_em"},
+      };
+
+      CP::SysReadDecorHandle<bool> m_is17_periodB5_B8
+      {this, "is2017_periodB5_B8", "is2017_periodB5_B8", ""};
+      CP::SysReadDecorHandle<bool> m_is22_75bunches
+      {this, "is2022_75bunches", "is2022_75bunches", ""};
+      CP::SysReadDecorHandle<bool> m_is23_75bunches
+      {this, "is2023_75bunches", "is2023_75bunches", ""};
+      CP::SysReadDecorHandle<bool> m_is23_400bunches
+      {this, "is2023_400bunches", "is2023_400bunches", ""};
+      CP::SysReadDecorHandle<unsigned int> m_year {this, "year", "dataTakingYear", ""};
+
+      Gaudi::Property<std::vector<std::string>> m_triggers 
+      { this, "triggerLists", {}, "Name list of trigger" };
+
+      std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
+
+      ToolHandle<Trig::IMatchingTool> m_matchingTool
+      { this, "trigMatchingTool", "", "Trigger matching tool"};
+
+      std::unordered_map<VBSHIGGS::TriggerChannel, std::string> m_triggerChannels = 
+      {
+        {VBSHIGGS::SLT, "SLT"},
+        {VBSHIGGS::DLT, "DLT"},
+        {VBSHIGGS::ASLT1_em, "ASLT1_em"},
+        {VBSHIGGS::ASLT1_me, "ASLT1_me"},
+        {VBSHIGGS::ASLT2, "ASLT2"},
       };
 
   };

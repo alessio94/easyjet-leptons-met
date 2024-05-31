@@ -59,6 +59,8 @@ namespace VBSHIGGS{
         ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
       }
 
+      ATH_CHECK (m_eleECIDS.initialize(m_systematicsList, m_electronHandle));
+      
       ATH_CHECK (m_METSig.initialize(m_systematicsList, m_metHandle));
       // Intialise syst list (must come after all syst-aware inputs and outputs)
       ATH_CHECK (m_systematicsList.initialize());
@@ -177,9 +179,16 @@ namespace VBSHIGGS{
           m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
           m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
           if(m_isMC){
-            float SF = std::abs(leptons[i].second)==11 ?
-              m_ele_SF.get(*leptons[i].first,sys) :
-              m_mu_SF.get(*leptons[i].first,sys);
+            float SF = -99;
+            if(std::abs(leptons[i].second)==11 ){
+              SF = m_ele_SF.get(*leptons[i].first,sys);
+
+              int ele_ECIDS = m_eleECIDS.get(*leptons[i].first, sys);
+              m_Ibranches.at(prefix+"_ele_ECIDS").set(*event, ele_ECIDS, sys);
+            }
+            else{
+              SF = m_mu_SF.get(*leptons[i].first,sys);
+            }
             m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
           }
           int charge = leptons[i].second>0 ? -1 : 1;

@@ -10,30 +10,44 @@ do_met : true
 
 
 Electron:
-  ID: "MediumLH"
+  ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"
   amount: 2
   extra_wps:
-    - ["LooseBLayerLH", "Loose_VarRad"]
+    - ["MediumLH", "Loose_VarRad"]
+    - ["MediumLH", "Tight_VarRad"]
+    - ["MediumLH", "TightTrackOnly_VarRad"]
+    - ["MediumLH", "TightTrackOnly_FixedRad"]
+
+    - ["TightLH", "Loose_VarRad"]
+    - ["TightLH", "Tight_VarRad"]
+    - ["TightLH", "TightTrackOnly_VarRad"]
+    - ["TightLH", "TightTrackOnly_FixedRad"]
 Muon:
-  ID: "Medium"
+  ID: "Loose"
   Iso: "PflowLoose_VarRad"
   amount: 2
   extra_wps:
-    - ["Loose", "PflowLoose_VarRad"]
+    - ["Medium", "PflowLoose_VarRad"]
+    - ["Medium", "PflowTight_VarRad"]
+
+    - ["Tight", "PflowLoose_VarRad"]
+    - ["Tight", "PflowTight_VarRad"]
 
 
 Lepton:
   amount: 2
-  variables_int: ["isPrompt","truthOrigin", "truthType"]
+  variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS"]
 
 # list of triggers per year to consider
 trigger:
   include: vbshiggsAnalysis/trigger-lep.yaml
 
 CutList :
+      - PASS_TRIGGER
       - EXACTLY_TWO_LEPTONS
       - TWO_SS_CHARGE_LEPTONS
+      - TWO_OS_CHARGE_LEPTONS
       - PASS_MET
       - EXACTLY_TWO_B_JETS
       - PASS_DELTA_R_BB
