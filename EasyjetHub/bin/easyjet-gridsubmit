@@ -61,6 +61,11 @@ def main():
         "--nFiles", default=None, help="How many files to run on"
     )
     parser.add_argument(
+        "--mergeOutput",
+        action="store_true",
+        help="Merge outputs (TEfficiency merging for CutFlow not supported)",
+    )
+    parser.add_argument(
         "--noSubmit",
         action="store_true",
         help="Don't submit the jobs, just create the tarball",
@@ -112,6 +117,8 @@ def main():
         submit_opts["nGBPerJob"] = args.nGBperJob
     if args.nFiles is not None:
         submit_opts["nFiles"] = args.nFiles
+    if args.mergeOutput:
+        submit_opts["mergeOutput"] = True
 
     if args.asetup is None:
         atlas_project = os.environ["AtlasProject"]
@@ -193,6 +200,7 @@ def main():
             "prun",
             "--inDS", io["inDS"],
             "--outDS", io["outDS"],
+            "--notExpandInDS",
             "--exec", exec_cmd,
         ]
 
