@@ -7,7 +7,7 @@
 #include <AthContainers/ConstDataVector.h>
 
 #include "TLorentzVector.h"
-#include "CalcGenericMT2/MT2_ROOT.h"
+#include "EasyjetHub/MT2_ROOT.h"
 
 namespace HHBBLL
 {

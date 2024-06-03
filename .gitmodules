@@ -4,6 +4,3 @@
 [submodule "KinematicFitTool"]
 	path = KinematicFitTool
 	url = https://gitlab.cern.ch/r3hh-public/KinematicFit.git
-[submodule "CalcGenericMT2"]
-	path = CalcGenericMT2
-	url = https://gitlab.cern.ch/atlas-phys-susy-wg/CalcGenericMT2.git
