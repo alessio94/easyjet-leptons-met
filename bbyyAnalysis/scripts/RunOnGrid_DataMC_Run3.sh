@@ -8,6 +8,13 @@ easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal
     --nGBperJob 2 \
     --campaign ${campaign}
 
+#ggF HH(bbyy) SM
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.ggFHH_bbyy_SM.${ptag}.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 2 \
+    --campaign ${campaign}
+
 #VBF HH(bbyy) SM
 easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.VBFHH_bbyy_SM.${ptag}.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
