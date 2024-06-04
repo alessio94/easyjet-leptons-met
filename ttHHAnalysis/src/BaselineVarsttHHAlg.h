@@ -57,6 +57,12 @@ private:
     CP::SysReadHandle<xAOD::JetContainer>
     m_jetHandle{ this, "jets", "",   "Jet container to read" };
 
+    CP::SysReadDecorHandle<char> 
+    m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
+
+    CP::SysReadDecorHandle<int> 
+    m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
+
     CP::SysReadHandle<xAOD::MuonContainer>
     m_muonHandle{ this, "muons", "",   "Muon container to read" };
 

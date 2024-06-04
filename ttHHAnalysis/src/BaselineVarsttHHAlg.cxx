@@ -35,6 +35,14 @@ namespace ttHH
 
     ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+    }
+    if (!m_PCBT.empty()) {
+      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
+    }
+
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
@@ -104,11 +112,12 @@ namespace ttHH
       TLorentzVector mu2(0.,0.,0.,0.);
       TLorentzVector mumu(0.,0.,0.,0.);
       TLorentzVector emu(0.,0.,0.,0.);
-      
       //auto btag_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       //auto btag_jets = *bjets;
       const xAOD::JetContainer btag_jets = *bjets;
 
+      int PCBTjet = -99;
+      int j_passWP=-99;
       double HT = 0; // scalar sum of jet pT
       int truthLabel = -99;
 
@@ -120,19 +129,29 @@ namespace ttHH
         m_Ibranches.at(string_var).set(*event, -99, sys);
       }
 
+      // inclusive jet sector
+      for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)6); i++){	 
+        TLorentzVector j = jets->at(i)->p4();
+        if (m_isMC) 
+          truthLabel = HadronConeExclTruthLabelID(*jets->at(i));
+        j_passWP = static_cast<int>(m_isBtag.get(*jets->at(i), sys));
+        PCBTjet= m_PCBT.get(*jets->at(i), sys);
+      
+        m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, j.Pt(), sys);
+        m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, j.Eta(), sys);
+        m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, j.Phi(), sys);
+        m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, j.E(), sys);
+
+        m_Ibranches.at("Jet"+std::to_string(i+1)+"_PassWP").set(*event,j_passWP,sys);
+
+        if(!m_PCBT.empty())
+          m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,PCBTjet,sys);
+
+        if (m_isMC)
+          m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel, sys);
+      }
+
       if (bjets->size()>=4) {
-        // fill all b-jet kinematics for at least 6 b-jets
-        for (std::size_t i=0; i<std::min(bjets->size(),(std::size_t)6); i++){	
-
-          if (m_isMC) truthLabel = HadronConeExclTruthLabelID(*bjets->at(i));
-
-          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_pt").set(*event, bjets->at(i)->p4().Pt(), sys);
-          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_eta").set(*event, bjets->at(i)->p4().Eta(), sys);
-          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_phi").set(*event, bjets->at(i)->p4().Phi(), sys);
-          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_E").set(*event, bjets->at(i)->p4().E(), sys);
-
-          m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel, sys);
-        }
 
         // Build the Higgs candidates
         H1 = bjets->at(0)->p4() + bjets->at(1)->p4();

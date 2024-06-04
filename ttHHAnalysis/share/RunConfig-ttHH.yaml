@@ -19,12 +19,15 @@ do_photons: false
 # Toggles for reconstructed objects decorations
 small_R_jet:
   btag_wp: GN2v00LegacyWP_FixedCutBEff_85
-  amount_bjet: 6
-  variables_bjets: ["truthLabel"]
+  btag_extra_wps:
+    - GN2v00LegacyWP_Continuous
+  amount: 6
+  variables_int_allJets: ["truthLabel", "PassWP", "pcbt"]
     
 Electron:
   ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"
+  forceFullSimConfig: true
   extra_wps:
     - ["MediumLH", "Loose_VarRad"]
 
@@ -75,9 +78,6 @@ ttree_output:
     include: EasyjetHub/AnalysisMiniTree-config.yaml
     # Our overrides. All defaults are off
     reco_outputs:
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      electrons: 'container_names.output.electrons'
-      muons: 'container_names.output.muons'
       met: 'container_names.output.met'
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
