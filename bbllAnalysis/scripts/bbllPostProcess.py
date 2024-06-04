@@ -39,7 +39,7 @@ def RunEasyjetPlus(args):
         pathsToPMGFiles=XSectionData['XSection_paths'])
 
     TotalWeightsTool_bbll = CompFactory.TotalWeightsTool(
-        analysis="bbll", nLeptons=2, bTagWP="DL1dv01_FixedCutBEff_77")
+        analysis="bbll", nLeptons=2, bTagWP=args.bTagWP)
 
     acc.addEventAlgo(CompFactory.PostProcessor(
         inFile=args.inFile,
@@ -69,6 +69,8 @@ parser.add_argument("--mergeMyFiles", action='store_true',
                     help="Merge branches. Default is merge output to input")
 parser.add_argument("--mergeToOutput", action='store_true',
                     help="Can apply with mergeMyFiles. Merge input to output")
+parser.add_argument("--bTagWP", default="DL1dv01_FixedCutBEff_77", type=str,
+                    help="b-tagging working point")
 
 args = parser.parse_args()
 
