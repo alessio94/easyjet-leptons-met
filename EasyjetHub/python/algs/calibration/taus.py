@@ -2,6 +2,7 @@ from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
+from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
 
 def tau_sequence(flags, configAcc):
@@ -28,6 +29,15 @@ def tau_sequence(flags, configAcc):
                                 containerName=output_name,
                                 selectionName=id)
         configSeq.setOptionValue('.quality', id)
+
+    # Tau trigger SF
+    trigSF_flags = flags.Analysis.trigger.scale_factor
+    if hasattr(trigSF_flags, 'Tau'):
+        configSeq += makeConfig('TauJets.TriggerSF')
+        configSeq.setOptionValue('.containerName', output_name)
+        configSeq.setOptionValue('.tauID', trigSF_flags.Tau.ID)
+        configSeq.setOptionValue('.triggerChainsPerYear',
+                                 get_trigger_chains_scale_factor(flags, 'Tau'))
 
     # Kinematic selection
     configSeq += makeConfig('TauJets.PtEtaSelection', containerName=output_name,

@@ -160,13 +160,18 @@ def get_trigger_chains(flags):
     return list(trigger_chains)
 
 
-def get_trigger_chains_scale_factor(flags):
+def get_trigger_chains_scale_factor(flags, obj=None):
     if not flags.Analysis.trigger.scale_factor.doSF:
         return {}
 
-    triggerChains = (flags.Analysis.trigger.scale_factor.chains
-                     if hasattr(flags.Analysis.trigger.scale_factor, "chains") else
-                     flags.Analysis.trigger.selection.chains)
+    if obj:
+        triggerChains = getattr(flags.Analysis.trigger.scale_factor, obj).chains
+    else:
+        triggerChains = (
+            flags.Analysis.trigger.scale_factor.chains
+            if hasattr(flags.Analysis.trigger.scale_factor, "chains") else
+            flags.Analysis.trigger.selection.chains)
+
     triggerChainsDict = {
         str(year): [trigger for trigger in triggerChains[str(year)]]
         for year in flags.Analysis.Years}

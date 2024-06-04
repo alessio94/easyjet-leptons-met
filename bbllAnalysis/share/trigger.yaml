@@ -96,7 +96,7 @@ scale_factor:
   chains:
     '2015':
     - 'HLT_e24_lhmedium_L1EM20VH || HLT_e60_lhmedium || HLT_e120_lhloose'
-    - 'HLT_mu20_iloose_L1MU15 || HLT_mu50'
+    - 'HLT_mu20_iloose_L1MU15 || HLT_mu40'
     - 'HLT_2e12_lhloose_L12EM10VH'
     # Muon legs don't have trigger scale factors yet
     #- 'HLT_e17_lhloose_mu14'
