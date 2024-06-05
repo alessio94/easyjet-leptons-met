@@ -5,7 +5,11 @@ from EasyjetHub.output.ttree.selected_objects import (
 )
 
 
-def fullLep_cfg(flags, float_variables=[], int_variables=[]):
+def fullLep_cfg(flags, float_variables=None, int_variables=None):
+    if not float_variables:
+        float_variables = []
+    if not int_variables:
+        int_variables = []
 
     cfg = ComponentAccumulator()
 
@@ -92,9 +96,8 @@ def fullLep_branches(flags):
 
     all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
-    for tree_flags in flags.Analysis.ttree_output:
-        for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> FullLep_{var}_%SYS%"]
+    for var in all_baseline_variable_names:
+        branches += [f"EventInfo.{var}_%SYS% -> FullLep_{var}_%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables

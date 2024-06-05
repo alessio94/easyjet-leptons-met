@@ -54,16 +54,17 @@ def update_metadata(path):
     all_cached = _load_metadata(path)
     if all_cached is None:
         return
-    for f, m in _fileMetaData.items():
+    for f, md in _fileMetaData.items():
         cached = all_cached.get(f)
         if cached:
-            md = _fileMetaData[f]
             md.metadata.update(cached["metadata"])
             md.filename = f
             md.metAccessLevel = cached["level"]
 
 
-def has_metadata(flags, path=Path("metadata.json")):
+def has_metadata(flags, path=None):
+    if not path:
+        path = Path("metadata.json")
     metadict = _load_metadata(path)
     if metadict is None:
         return False

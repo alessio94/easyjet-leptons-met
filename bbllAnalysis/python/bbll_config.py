@@ -8,7 +8,13 @@ from EasyjetHub.output.ttree.selected_objects import (
 
 
 def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
-             float_variables=[], int_variables=[], float_NW_variables=[]):
+             float_variables=None, int_variables=None, float_NW_variables=None):
+    if not float_variables:
+        float_variables = []
+    if not int_variables:
+        int_variables = []
+    if not float_NW_variables:
+        float_NW_variables = []
 
     cfg = ComponentAccumulator()
 
@@ -207,10 +213,9 @@ def bbll_branches(flags):
         *int_variable_names,
         *float_NW_variable_names]
 
-    for tree_flags in flags.Analysis.ttree_output:
-        for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+    for var in all_baseline_variable_names:
+        branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables

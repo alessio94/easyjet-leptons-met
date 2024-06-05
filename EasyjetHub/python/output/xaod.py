@@ -4,7 +4,9 @@ from OutputStreamAthenaPool.OutputStreamConfig import OutputStreamCfg
 from xAODMetaDataCnv.InfileMetaDataConfig import SetupMetaDataForStreamCfg
 
 
-def container(typename, key, items=[]):
+def container(typename, key, items=None):
+    if items is None:
+        items = []
     itemstring = '.'.join(items)
     return [
         f'xAOD::{typename}Container#{key}',

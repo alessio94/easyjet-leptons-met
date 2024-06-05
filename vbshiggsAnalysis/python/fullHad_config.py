@@ -6,7 +6,11 @@ from EasyjetHub.output.ttree.selected_objects import (
 )
 
 
-def fullHad_cfg(flags, float_variables=[], int_variables=[]):
+def fullHad_cfg(flags, float_variables=None, int_variables=None):
+    if not float_variables:
+        float_variables = []
+    if not int_variables:
+        int_variables = []
 
     cfg = ComponentAccumulator()
     # Selection
@@ -66,9 +70,8 @@ def fullHad_branches(flags):
     int_variable_names += baseline_int_variables
     all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
-    for tree_flags in flags.Analysis.ttree_output:
-        for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> FullHad_{var}_%SYS%"]
+    for var in all_baseline_variable_names:
+        branches += [f"EventInfo.{var}_%SYS% -> FullHad_{var}_%SYS%"]
 
     # Variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
