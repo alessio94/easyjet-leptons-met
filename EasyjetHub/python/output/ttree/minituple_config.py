@@ -1,4 +1,6 @@
 from operator import attrgetter
+from typing import List, Optional
+
 from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
@@ -64,7 +66,7 @@ def minituple_cfg(
     flags: AthConfigFlags,
     tree_flags: ConfigItem,
     outfile_name: str,
-    extra_output_branches: list[str] = [],
+    extra_output_branches: Optional[List[str]] = None,
 ) -> ComponentAccumulator:
     """
     This is the template output TTree configuration, steered via yaml config.
@@ -207,7 +209,7 @@ def minituple_cfg(
         log.info(
             f"Appending {len(tree_flags.extra_output_branches)} branches from yaml"
         )
-        tree_branches += list(extra_output_branches)
+        tree_branches += list(tree_flags.extra_output_branches)
 
     log.info("Add tree seq")
 
