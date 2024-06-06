@@ -207,9 +207,9 @@ namespace VBSHIGGS{
             m_Ibranches.at(prefix + "_truthOrigin").set(*event, lep_truthOrigin, sys);
             m_Ibranches.at(prefix + "_truthType").set(*event, lep_truthType, sys);
             int lep_isPrompt = 0;
-            if (lep_pdgid==13){ // simplistic
+            if (std::abs(lep_pdgid)==13){ // simplistic
               if (lep_truthType==6) lep_isPrompt=1; // isolated prompts
-            } else if (lep_pdgid==11){
+            } else if (std::abs(lep_pdgid)==11){
               if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
             }
             
