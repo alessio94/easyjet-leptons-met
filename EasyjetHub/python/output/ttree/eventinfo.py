@@ -28,6 +28,11 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "generatorWeight_%SYS%",
             "PileupWeight_%SYS%"
         ]
+        if flags.Analysis.save_HF_classification:
+            eventinfo_branches.variables += [
+                "HF_SimpleClassification",
+                "HF_Classification"
+            ]
         # Need syst_only_for not to be empty to avoid applying SYST on all
         # other branches
         # Any variable with %SYS% will anyway get systematics applied, so the list

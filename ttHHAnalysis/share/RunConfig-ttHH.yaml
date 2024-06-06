@@ -68,6 +68,9 @@ do_overlap_removal: true
 #Enable cutflow 
 save_ttHH_cutflow: false
 
+# save variables for HF classification
+save_HF_classification: false
+
 CutList:
   - PASS_TRIGGER
   - PASS_BASELINE

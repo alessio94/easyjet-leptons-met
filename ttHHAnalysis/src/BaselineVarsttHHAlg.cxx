@@ -49,12 +49,9 @@ namespace ttHH
 
     if(m_isMC){
       m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
-    }
-    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-
-    if(m_isMC){
       m_mu_SF = CP::SysReadDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
     }
+    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
     ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
@@ -112,6 +109,7 @@ namespace ttHH
       TLorentzVector mu2(0.,0.,0.,0.);
       TLorentzVector mumu(0.,0.,0.,0.);
       TLorentzVector emu(0.,0.,0.,0.);
+
       //auto btag_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       //auto btag_jets = *bjets;
       const xAOD::JetContainer btag_jets = *bjets;
