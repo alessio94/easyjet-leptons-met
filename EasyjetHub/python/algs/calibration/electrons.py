@@ -54,8 +54,8 @@ def electron_sequence(flags, configAcc):
     configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name,
                             selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
-    configSeq.setOptionValue('.minPt', 4.5e3)
-    configSeq.setOptionValue('.maxEta', 2.47)
+    configSeq.setOptionValue('.minPt', flags.Analysis.Electron.min_pT)
+    configSeq.setOptionValue('.maxEta', flags.Analysis.Electron.max_eta)
 
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)

@@ -1,0 +1,3 @@
+include: ssWWAnalysis/RunConfig-Signal-ssWW.yaml
+
+bypass: true #enabling Run through mode

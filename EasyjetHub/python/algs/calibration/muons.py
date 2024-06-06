@@ -38,7 +38,7 @@ def muon_sequence(flags, configAcc):
     configSeq += makeConfig('Muons.PtEtaSelection', containerName=output_name,
                             selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
-    configSeq.setOptionValue('.minPt', 3e3)
+    configSeq.setOptionValue('.minPt', flags.Analysis.Muon.min_pT)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
 
     # Add systematic object links

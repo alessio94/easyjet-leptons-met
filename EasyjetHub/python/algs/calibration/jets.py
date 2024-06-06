@@ -138,7 +138,7 @@ def jet_sequence(
     configSeq += makeConfig('Jets.PtEtaSelection', containerName=calib_name,
                             selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
-    configSeq.setOptionValue('.minPt', 20e3)
+    configSeq.setOptionValue('.minPt', jet_flags.min_pT)
     configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
 
     # Add systematic object links

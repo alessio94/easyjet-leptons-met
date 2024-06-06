@@ -1,0 +1,235 @@
+/*
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+*/
+
+// Always protect against multiple includes!
+
+#ifndef SSWWANALYSIS_SSWWSELECTORALG
+#define SSWWANALYSIS_SSWWSELECTORALG
+
+#include <memory>
+#include "AnaAlgorithm/AnaAlgorithm.h"
+#include <AsgDataHandles/ReadDecorHandleKey.h>
+#include <AsgDataHandles/ReadDecorHandle.h>
+
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
+#include <SystematicsHandles/SysFilterReporterParams.h>
+
+#include <xAODEventInfo/EventInfo.h>
+#include <xAODJet/JetContainer.h>
+#include <xAODMuon/MuonContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
+#include <xAODMissingET/MissingETContainer.h>
+
+#include "TriggerMatchingTool/IMatchingTool.h"
+#include <EasyjetHub/CutManager.h>
+
+namespace ssWWVBS
+{
+  enum TriggerChannel
+  {
+    SLT,
+    DLT,
+    ASLT1_em,
+    ASLT1_me,
+    ASLT2,
+  };
+
+  enum Var {
+    ele = 0,
+    mu = 1,
+    leadingele = 2,
+    leadingmu = 3,
+    subleadingele = 4,
+    subleadingmu = 5,
+  };
+
+  enum Booleans
+  {
+    IS_ee,
+    IS_mm,
+    IS_em,
+    
+    pass_trigger_SLT,
+    pass_trigger_DLT,
+    pass_trigger_ASLT1_em,
+    pass_trigger_ASLT1_me,
+    pass_trigger_ASLT2,
+
+    PASS_TRIGGER,
+    PASS_TWO_LEPTONS,
+    EXACTLY_TWO_LEPTONS,
+    TWO_SAME_CHARGE_LEPTONS,
+    DILEPTON_MASS_THRESHOLD,
+    DILEPTON_MASS_SIDEBAND_EE,
+    MET,
+    AT_LEAST_TWO_JETS,
+    DIJETS_MASS,
+    DIJETS_DELTA_RAPIDITY,
+    BJET_VETO,
+
+  };
+
+  /// \brief An algorithm for counting containers
+  class ssWWSelectorAlg final : public EL::AnaAlgorithm {
+
+    public:
+      ssWWSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
+
+      /// \brief Initialisation method, for setting up tools and other persistent
+      /// configs
+      StatusCode initialize() override;
+      /// \brief Execute method, for actions to be taken in the event loop
+      StatusCode execute() override;
+      /// \brief This is the mirror of initialize() and is called after all events are processed.
+      StatusCode finalize() override; ///I added this to write the cutflow histogram.
+
+      const std::vector<std::string> m_STANDARD_CUTS{
+        "PASS_TRIGGER",
+        "PASS_TWO_LEPTONS",
+        "EXACTLY_TWO_LEPTONS",
+        "TWO_SAME_CHARGE_LEPTONS",
+        "DILEPTON_MASS_THRESHOLD",
+        "DILEPTON_MASS_SIDEBAND_EE",
+        "MET",
+        "AT_LEAST_TWO_JETS",
+        "DIJETS_MASS",
+        "DIJETS_DELTA_RAPIDITY",
+        "BJET_VETO",
+      };
+
+
+    private :
+      // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
+      // "someInfo"};
+
+      Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
+      Gaudi::Property<bool> m_bypass
+      { this, "bypass", false, "Run selector algorithm in pass-through mode" };
+
+      /// \brief Setup syst-aware input container handles
+      CP::SysListHandle m_systematicsList {this};
+
+      CP::SysReadHandle<xAOD::JetContainer>
+      m_jetHandle{ this, "jets", "",   "Jet container to read" };
+
+      CP::SysReadDecorHandle<char> 
+      m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+
+      CP::SysReadHandle<xAOD::EventInfo>
+      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+
+      CP::SysReadHandle<xAOD::ElectronContainer>
+      m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+
+      CP::SysReadHandle<xAOD::MuonContainer>
+      m_muonHandle{ this, "muons", "",   "Muon container to read" };
+
+      CP::SysReadHandle<xAOD::MissingETContainer>
+      m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
+
+      CP::SysReadDecorHandle<unsigned int> m_year
+	{this, "year", "dataTakingYear", ""};
+
+      CP::SysReadDecorHandle<bool> m_is17_periodB5_B8
+	{this, "is2017_periodB5_B8", "is2017_periodB5_B8", ""};
+      CP::SysReadDecorHandle<bool> m_is22_75bunches
+	{this, "is2022_75bunches", "is2022_75bunches", ""};
+      CP::SysReadDecorHandle<bool> m_is23_75bunches
+	{this, "is2023_75bunches", "is2023_75bunches", ""};
+      CP::SysReadDecorHandle<bool> m_is23_400bunches
+	{this, "is2023_400bunches", "is2023_400bunches", ""};
+      
+      CP::SysFilterReporterParams m_filterParams {this, "ssWW selection"};
+
+      std::unordered_map<std::string,  SG::ReadDecorHandleKey<xAOD::EventInfo>> m_triggerDecorKeys;
+
+      std::unordered_map<ssWWVBS::TriggerChannel, std::string> m_triggerChannels = 
+      {
+        {ssWWVBS::SLT, "SLT"},
+        {ssWWVBS::DLT, "DLT"},
+        {ssWWVBS::ASLT1_em, "ASLT1_em"},
+        {ssWWVBS::ASLT1_me, "ASLT1_me"},
+        {ssWWVBS::ASLT2, "ASLT2"},
+      };
+
+      Gaudi::Property<std::vector<std::string>> m_triggers 
+      { this, "triggerLists", {}, "Name list of trigger" };
+
+      std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
+
+      ToolHandle<Trig::IMatchingTool> m_matchingTool
+      { this, "trigMatchingTool", "", "Trigger matching tool"};
+
+      long long int m_total_events{0};
+
+      std::unordered_map<ssWWVBS::Booleans, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+      std::unordered_map<ssWWVBS::Booleans, bool> m_bools;
+      std::unordered_map<ssWWVBS::Booleans, std::string> m_boolnames{
+        {ssWWVBS::IS_ee, "IS_ee"},
+        {ssWWVBS::IS_mm, "IS_mm"},
+        {ssWWVBS::IS_em, "IS_em"},
+        {ssWWVBS::pass_trigger_SLT, "pass_trigger_SLT"},
+        {ssWWVBS::pass_trigger_DLT, "pass_trigger_DLT"},
+        {ssWWVBS::pass_trigger_ASLT1_em, "pass_trigger_ASLT1_em"},
+        {ssWWVBS::pass_trigger_ASLT1_me, "pass_trigger_ASLT1_me"},
+        {ssWWVBS::pass_trigger_ASLT2, "pass_trigger_ASLT2"},
+        {ssWWVBS::PASS_TRIGGER, "PASS_TRIGGER"},
+        {ssWWVBS::PASS_TWO_LEPTONS, "PASS_TWO_LEPTONS"},
+        {ssWWVBS::EXACTLY_TWO_LEPTONS, "EXACTLY_TWO_LEPTONS"},
+        {ssWWVBS::TWO_SAME_CHARGE_LEPTONS, "TWO_SAME_CHARGE_LEPTONS"},
+        {ssWWVBS::DILEPTON_MASS_THRESHOLD, "DILEPTON_MASS_THRESHOLD"},
+        {ssWWVBS::DILEPTON_MASS_SIDEBAND_EE, "DILEPTON_MASS_SIDEBAND_EE"},
+        {ssWWVBS::MET, "MET"},
+        {ssWWVBS::AT_LEAST_TWO_JETS, "AT_LEAST_TWO_JETS"},
+        {ssWWVBS::DIJETS_MASS, "DIJETS_MASS"},
+        {ssWWVBS::DIJETS_DELTA_RAPIDITY, "DIJETS_DELTA_RAPIDITY"},
+        {ssWWVBS::BJET_VETO, "BJET_VETO"},
+      };
+
+      CutManager m_ssWWCuts;
+      Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
+      std::vector<ssWWVBS::Booleans> m_inputCutKeys;
+      Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
+      CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+
+      std::unordered_map<ssWWVBS::TriggerChannel, std::unordered_map<ssWWVBS::Var, float>> m_pt_threshold;
+
+      void evaluateTriggerCuts
+	(const xAOD::EventInfo* event,
+	 const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+	 const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+	 CutManager& ssWWCuts, const CP::SystematicSet& sys);
+      void evaluateSingleLeptonTrigger
+	(const xAOD::EventInfo* event, 
+	 const xAOD::Electron* ele, const xAOD::Muon* mu,
+	 const CP::SystematicSet& sys);
+      void evaluateDiLeptonTrigger
+	(const xAOD::EventInfo* event,
+	 const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+	 const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+	 const CP::SystematicSet& sys);
+      void evaluateAsymmetricLeptonTrigger
+	(const xAOD::EventInfo* event,
+	 const xAOD::Electron* ele, const xAOD::Muon* mu,
+	 const CP::SystematicSet& sys);
+
+      void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
+                          const xAOD::MuonContainer& muons, CutManager& ssWWCuts);
+      void evaluateMetCuts(const xAOD::MissingET* met, CutManager& ssWWCuts);
+      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& ssWWCuts);
+      void evaluateBJetLeptonCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
+                          const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons, CutManager& ssWWCuts);
+      void setThresholds(const xAOD::EventInfo* event,
+			 const CP::SystematicSet& sys);
+  };
+
+}
+
+#endif // SSWWANALYSIS_SSWWSELECTORALG
+
