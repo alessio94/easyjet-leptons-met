@@ -100,10 +100,9 @@ namespace VBSHIGGS{
 
       std::unordered_map<VBSHIGGS::TriggerChannel, std::unordered_map<VBSHIGGS::Var, float>> m_pt_threshold;
 
-      void evaluateTriggerCuts
-  (const xAOD::EventInfo *event,
-   const xAOD::ElectronContainer *electrons , const xAOD::MuonContainer *muons,
-   const CP::SystematicSet& sys);
+      void evaluateTriggerCuts(const xAOD::EventInfo *event,
+                              const xAOD::ElectronContainer *electrons , const xAOD::MuonContainer *muons,
+                              const CP::SystematicSet& sys);
 
       void evaluateSingleLeptonTrigger(const xAOD::EventInfo* event, const xAOD::Electron* ele, const xAOD::Muon* mu, const CP::SystematicSet& sys);
       void evaluateDiLeptonTrigger(const xAOD::EventInfo* event, const xAOD::Electron* ele0, const xAOD::Electron* ele1, const xAOD::Muon* mu0, const xAOD::Muon* mu1, const CP::SystematicSet& sys);
@@ -112,7 +111,7 @@ namespace VBSHIGGS{
 
       void leptonSelection(const xAOD::ElectronContainer* electrons,const xAOD::MuonContainer* muons, const xAOD::MissingET *met);
       void bjetSelection(std::vector<const xAOD::Jet*> bjets);
-      void vbsjetsSelection(std::vector<const xAOD::Jet*> nonbjets);
+      void vbsjetsSelection(const xAOD::JetContainer * vbsjets);
       
       Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
@@ -121,7 +120,9 @@ namespace VBSHIGGS{
 
       CP::SysListHandle m_systematicsList {this};
 
-      CP::SysReadHandle<xAOD::JetContainer> m_jetHandle{ this, "jets", "",   "Jet container to read" };
+      CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "",   "Signal Jet container to read" };
+
+      CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "",   "VBS Jet container to read" };
 
       CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 

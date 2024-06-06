@@ -19,9 +19,11 @@ namespace VBSHIGGS{
     // Initialise global event filter
     ATH_CHECK (m_filterParams.initialize(m_systematicsList));
     
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_signaljetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
+
     if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
     }
 
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
@@ -119,16 +121,17 @@ namespace VBSHIGGS{
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
   
-      const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      const xAOD::JetContainer *signalJets = nullptr;
+      ANA_CHECK (m_signaljetHandle.retrieve (signalJets, sys));
+
+      const xAOD::JetContainer *vbsjets = nullptr;
+      ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
 
       bool WPgiven = !m_isBtag.empty();
       std::vector<const xAOD::Jet*> bjets;
-      std::vector<const xAOD::Jet*> nonbjets;
-      for(const xAOD::Jet* jet : *jets) {
+      for(const xAOD::Jet* jet : *signalJets) {
         if (WPgiven) {
           if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets.push_back(jet);
-          else nonbjets.push_back(jet);
         }
       }
 
@@ -149,12 +152,10 @@ namespace VBSHIGGS{
       for (auto& [key, value] : m_boolnames) m_bools.at(key) = false;
 
       setThresholds(event, sys);
-
       evaluateTriggerCuts(event, electrons, muons, sys);
       leptonSelection(electrons, muons, met);
       bjetSelection(bjets);
-      vbsjetsSelection(nonbjets);
-      
+      vbsjetsSelection(vbsjets);
       m_passallcuts.set(*event, true, sys);
 
       
@@ -289,41 +290,25 @@ namespace VBSHIGGS{
       m_bools.at(VBSHIGGS::PASS_DELTA_R_BB) = true;
     
     float low_mbb = 100.;
-    float high_mbb = 160.; 
+    float high_mbb = 160.;
     float mbb = (lead_bjet->p4() + sublead_bjet->p4()).M();
     if (mbb > low_mbb * Athena::Units::GeV && mbb < high_mbb * Athena::Units::GeV ){
       m_bools.at(VBSHIGGS::PASS_mBB) = true;
     }
   }//bjet selections
   
-  void FullLepSelectorAlg :: vbsjetsSelection(std::vector<const xAOD::Jet*> nonbjets){
-    float max_mjj = 0.;
-    float delta_eta_jj = 0.;
+  void FullLepSelectorAlg :: vbsjetsSelection(const xAOD::JetContainer * vbsjets){
+    
+    if (vbsjets->size() >= 2){
+      //TODO, create an object holding the vbs jets passing the mjj + deta selections
+      const xAOD::Jet* vbsJet1 = vbsjets->at(0);
+      const xAOD::Jet* vbsJet2 = vbsjets->at(1);;
+      double mjj = vbsJet1->m() + vbsJet2->m();
+      double dEta_jj = std::abs(vbsJet1->eta() - vbsJet2->eta());
 
-    //TODO, create an object holding the vbs jets passing the mjj + deta selections
-    const xAOD::Jet* vbsJet1 = nullptr;
-    const xAOD::Jet* vbsJet2 = nullptr;
-
-    for(unsigned int i=0;i<nonbjets.size();i++){
-      for(unsigned int j=0;j<i;j++){
-
-        if (nonbjets[i]->eta() * nonbjets[j]->eta() > 0) continue; //back-to-back?
-        const xAOD::Jet* nonbjet1 = nonbjets.at(i);
-        const xAOD::Jet* nonbjet2 = nonbjets.at(j);
-
-        // TODO, perhaps we need a minimum pt requirement on vbs jets
-        //if (nonbjet1->pt() < 30. * Athena::Units::GeV || nonbjet2->pt() < 30. * Athena::Units::GeV) continue;
-        double mjj = (nonbjet1->p4() + nonbjet2->p4()).M();
-        if (mjj > max_mjj) {
-          max_mjj = mjj;
-          delta_eta_jj = std::abs(nonbjet1->eta() - nonbjet2->eta());;
-          vbsJet1 = nonbjet1;
-          vbsJet2 = nonbjet2;
-        } 
+      if ( mjj > 300 * Athena::Units::GeV  && dEta_jj > 3.0 ) {
+        m_bools.at(VBSHIGGS::PASS_VBS_BASELINE) = true;
       }
-    }
-    if ( vbsJet1 && vbsJet2 && max_mjj > 900 * Athena::Units::GeV  && delta_eta_jj > 3.0 ) {
-      m_bools.at(VBSHIGGS::PASS_VBS_BASELINE) = true;
     }
   }//vbsjetsSelection
 

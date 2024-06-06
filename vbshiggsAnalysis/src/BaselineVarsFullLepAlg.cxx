@@ -21,7 +21,8 @@ namespace VBSHIGGS{
       ATH_MSG_INFO("*********************************\n");
 
       // Read syst-aware input handles
-      ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+      ATH_CHECK (m_signaljetHandle.initialize(m_systematicsList));
+      ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
       ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       ATH_CHECK (m_metHandle.initialize(m_systematicsList));
@@ -38,7 +39,7 @@ namespace VBSHIGGS{
       ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
       if (!m_isBtag.empty()) {
-        ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+        ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
       }
 
       // Intialise syst-aware output decorators
@@ -56,7 +57,7 @@ namespace VBSHIGGS{
       };
 
       if (m_isMC) {
-        ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
+        ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_signaljetHandle));
       }
 
       ATH_CHECK (m_eleECIDS.initialize(m_systematicsList, m_electronHandle));
@@ -75,8 +76,11 @@ namespace VBSHIGGS{
         const xAOD::EventInfo *event = nullptr;
         ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-        const xAOD::JetContainer *jets = nullptr;
-        ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+        const xAOD::JetContainer *signalJets = nullptr;
+        ANA_CHECK (m_signaljetHandle.retrieve (signalJets, sys));
+
+        const xAOD::JetContainer *vbsjets = nullptr;
+        ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
 
         const xAOD::MuonContainer *muons = nullptr;
         ANA_CHECK (m_muonHandle.retrieve (muons, sys));
@@ -99,7 +103,7 @@ namespace VBSHIGGS{
           m_Ibranches.at(var).set(*event, -99, sys);
         }
         
-        int n_jets = jets->size();
+        int n_jets = signalJets->size() + vbsjets->size();
         int nCentralJets = 0;
         int nForwardJets = 0;
 
@@ -109,19 +113,21 @@ namespace VBSHIGGS{
         // b-jet sector
         bool WPgiven = !m_isBtag.empty();
         auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
-        
-        auto nonbjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);;
 
         // number of central jets
-        for(const xAOD::Jet* jet : *jets) {
+        for(const xAOD::Jet* jet : *signalJets) {
           // count central jets
           if (std::abs(jet->eta())<2.5) nCentralJets++;
           else nForwardJets++;
 
           if (WPgiven) {
             if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
-            else nonbjets->push_back(jet);
           }
+        }
+
+        for(const xAOD::Jet* vbsjet : *vbsjets) {
+          if (std::abs(vbsjet->eta())<2.5) nCentralJets++;
+          else nForwardJets++;
         }
 
         int n_bjets = bjets->size();
@@ -254,11 +260,11 @@ namespace VBSHIGGS{
         m_Fbranches.at("dPhil2MET").set(*event, Subleading_lep.Vect().DeltaPhi(metVec), sys);
 
         //jet sector
-        for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)2); i++){
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, jets->at(i)->pt(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, jets->at(i)->eta(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, jets->at(i)->phi(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, jets->at(i)->e(), sys); 
+        for (std::size_t i=0; i<std::min(signalJets->size(),(std::size_t)2); i++){
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, signalJets->at(i)->pt(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, signalJets->at(i)->eta(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, signalJets->at(i)->phi(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, signalJets->at(i)->e(), sys); 
         }
 
         //b-jet sector
@@ -307,28 +313,10 @@ namespace VBSHIGGS{
         }
 
         // kinematics of vbs jets
-        float max_mjj = 0.;
-        const xAOD::Jet* vbsJet1 = nullptr;
-        const xAOD::Jet* vbsJet2 = nullptr;
+        if (vbsjets->size() >=2){
+          const xAOD::Jet* vbsJet1 = vbsjets->at(0);
+          const xAOD::Jet* vbsJet2 = vbsjets->at(1);
 
-        for(unsigned int i=0;i<nonbjets->size();i++){
-          for(unsigned int j=0;j<i;j++){
-            const xAOD::Jet* nonbjet1 = nonbjets->at(i);
-            const xAOD::Jet* nonbjet2 = nonbjets->at(j);
-
-            if (nonbjet1->eta() * nonbjet2->eta() > 0) continue; //back-to-back?
-          
-            // TODO, perhaps we need a minimum pt requirement on vbs jets
-            //if (nonbjet1->pt() < 30. * Athena::Units::GeV || nonbjet2->pt() < 30. * Athena::Units::GeV) continue;
-            double mjj = (nonbjet1->p4() + nonbjet2->p4()).M();
-            if (mjj > max_mjj) {
-              max_mjj = mjj;
-              vbsJet1 = nonbjet1;
-              vbsJet2 = nonbjet2;
-            } 
-          }
-        }
-        if (vbsJet1 && vbsJet2){
           TLorentzVector vbs_jj = vbsJet1->p4() + vbsJet2->p4();
           
           m_Fbranches.at("mjj").set(*event, vbs_jj.M(), sys);

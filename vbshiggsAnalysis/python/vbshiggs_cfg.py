@@ -54,6 +54,16 @@ def vbshiggs_cfg(flags, smalljetkey, muonkey, electronkey):
         )
     )
 
+    cfg.addEventAlgo(
+        CompFactory.VBSHIGGS.VBSJetsSelectorAlg(
+            "VBSJetsSelectorAlg",
+            jets="vbshiggsAnalysisJets_%SYS%",
+            VBSjetContainerOutKey="vbshiggsAnalysisVBSJets_%SYS%",
+            SignaljetContainerOutKey="vbshiggsAnalysisSignalJets_%SYS%",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+        )
+    )
+
     if flags.Analysis.Channel == "FullLep":
         extra_vbshiggs_branches, float_variable_names, \
             int_variable_names = fullLep_branches(flags)

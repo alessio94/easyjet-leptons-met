@@ -1,3 +1,4 @@
+#include "../VBSJetsSelectorAlg.h"
 #include "../BaselineVarsFullLepAlg.h"
 #include "../BaselineVarsSemiLepAlg.h"
 #include "../BaselineVarsFullHadAlg.h"
@@ -6,6 +7,7 @@
 #include "../FullHadSelectorAlg.h"
 using namespace VBSHIGGS;
 
+DECLARE_COMPONENT(VBSJetsSelectorAlg)
 DECLARE_COMPONENT(BaselineVarsFullLepAlg)
 DECLARE_COMPONENT(BaselineVarsSemiLepAlg)
 DECLARE_COMPONENT(BaselineVarsFullHadAlg)

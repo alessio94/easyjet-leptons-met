@@ -21,7 +21,8 @@ def fullLep_cfg(flags, float_variables=[], int_variables=[]):
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.FullLepSelectorAlg(
             "FullLepSelectorAlg",
-            jets="vbshiggsAnalysisJets_%SYS%",
+            signaljets="vbshiggsAnalysisSignalJets_%SYS%",
+            vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
             muons="vbshiggsAnalysisMuons_%SYS%",
             electrons="vbshiggsAnalysisElectrons_%SYS%",
             met="AnalysisMET_%SYS%",
@@ -42,7 +43,8 @@ def fullLep_cfg(flags, float_variables=[], int_variables=[]):
         CompFactory.VBSHIGGS.BaselineVarsFullLepAlg(
             "FinalVarsFullLepAlg",
             isMC=flags.Input.isMC,
-            jets="vbshiggsAnalysisJets_%SYS%",
+            signaljets="vbshiggsAnalysisSignalJets_%SYS%",
+            vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
             muons="vbshiggsAnalysisMuons_%SYS%",
             electrons="vbshiggsAnalysisElectrons_%SYS%",
             muonWP=MuonWPLabel,
