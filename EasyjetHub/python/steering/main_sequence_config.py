@@ -1,12 +1,12 @@
 from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.MainServicesConfig import MainServicesCfg
-from PerfMonComps.PerfMonCompsConfig import PerfMonMTSvcCfg
 from EventBookkeeperTools.EventBookkeeperToolsConfig import (
     CutFlowSvcCfg,
     BookkeeperToolCfg,
 )
 from AthenaPoolCnvSvc.PoolReadConfig import PoolReadCfg
+from AthenaRootComps.xAODEventSelectorConfig import xAODReadCfg
 
 from AnalysisAlgorithmsConfig.ConfigAccumulator import ConfigAccumulator
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
@@ -45,24 +45,11 @@ def core_services_cfg(flags):
     # needed to run an Athena job.
     cfg = MainServicesCfg(flags)
 
-    if flags.PerfMon.doFullMonMT:
-        cfg.merge(PerfMonMTSvcCfg(flags))
-
     # Needed for filtering, Athena only for now
     # Create CutFlowSvc otherwise the default CutFlowSvc that has only
     # one CutflowBookkeeper object, and can't deal with multiple weights
     cfg.merge(CutFlowSvcCfg(flags))
     cfg.merge(BookkeeperToolCfg(flags))
-    # Adjust the loop manager to announce the event number less frequently.
-    # Makes a big difference if running over many events
-    if flags.Concurrency.NumThreads > 0:
-        cfg.addService(
-            CompFactory.AthenaHiveEventLoopMgr(EventPrintoutInterval=500)
-        )
-    else:
-        cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
-
-    from AthenaRootComps.xAODEventSelectorConfig import xAODReadCfg
 
     # We need to use a pool file reader if we write out an xAOD
     if flags.Output.AODFileName:

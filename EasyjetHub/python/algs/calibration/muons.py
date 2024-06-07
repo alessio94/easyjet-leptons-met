@@ -29,6 +29,7 @@ def muon_sequence(flags, configAcc):
         configSeq.setOptionValue('.isolation', iso)
         configSeq.setOptionValue('.trackSelection',
                                  flags.Analysis.Muon.trackSelection)
+        configSeq.setOptionValue('.writeTrackD0Z0', True)
         configSeq.setOptionValue('.maxD0Significance',
                                  flags.Analysis.Muon.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',

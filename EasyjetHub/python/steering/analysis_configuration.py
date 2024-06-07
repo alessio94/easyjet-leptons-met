@@ -36,6 +36,10 @@ def analysis_configuration(parser="default"):
     # These are used for steering the job, and include e.g. the input file (list).
     flags = initConfigFlags()
 
+    # Adjust the loop manager to announce the event number less frequently.
+    # Makes a big difference if running over many events
+    flags.Exec.EventPrintoutInterval = 500
+
     args = fill_from_args(flags, parser=parser)
     log.setLevel(flags.Exec.OutputLevel)
     if args.config_only and has_metadata(flags):

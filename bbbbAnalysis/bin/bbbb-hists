@@ -42,7 +42,6 @@ def core_services_cfg(flags):
     # the original bug.
     cfg.addService(CompFactory.ExceptionSvc(Catch="NONE"))
 
-    cfg.addService(CompFactory.AthenaEventLoopMgr(EventPrintoutInterval=500))
     cfg.merge(PoolReadCfg(flags))
 
     # we need this thing for sys-aware algorithms to work

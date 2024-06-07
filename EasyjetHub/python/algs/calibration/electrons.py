@@ -43,6 +43,7 @@ def electron_sequence(flags, configAcc):
                                  and flags.Analysis.DataType is DataType.FastSim)
         configSeq.setOptionValue('.trackSelection',
                                  flags.Analysis.Electron.trackSelection)
+        configSeq.setOptionValue('.writeTrackD0Z0', True)
         configSeq.setOptionValue('.maxD0Significance',
                                  flags.Analysis.Electron.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',
