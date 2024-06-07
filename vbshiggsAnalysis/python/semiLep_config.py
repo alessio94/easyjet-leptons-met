@@ -17,10 +17,17 @@ def semiLep_cfg(flags, float_variables=None, int_variables=None):
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.SemiLepSelectorAlg(
             "SemiLepSelectorAlg",
-            jets="SemiLepAnalysisJets_%SYS%",
+            signaljets="vbshiggsAnalysisSignalJets_%SYS%",
+            vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
             muons="vbshiggsAnalysisMuons_%SYS%",
             electrons="vbshiggsAnalysisElectrons_%SYS%",
             met="AnalysisMET_%SYS%",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            eventDecisionOutputDecoration="vbshiggs_pass_sr_%SYS%",
+            cutList=flags.Analysis.CutList,
+            saveCutFlow=flags.Analysis.save_vbshiggs_cutflow,
+            bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
+                    else False),
         )
     )
 
@@ -31,7 +38,8 @@ def semiLep_cfg(flags, float_variables=None, int_variables=None):
         CompFactory.VBSHIGGS.BaselineVarsSemiLepAlg(
             "FinalVarsSemiLepAlg",
             isMC=flags.Input.isMC,
-            jets="vbshiggsAnalysisJets_%SYS%",
+            signaljets="vbshiggsAnalysisSignalJets_%SYS%",
+            vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
             muons="vbshiggsAnalysisMuons_%SYS%",
             electrons="vbshiggsAnalysisElectrons_%SYS%",
             muonWP=MuonWPLabel,
@@ -51,14 +59,12 @@ def get_BaselineVarsSemiLepAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ee", "mumu", "emu", "bb", "bl"]:
-        for var in ["m", "pT", "dR", "Eta", "Phi"]:
+    for object in ["bb", "jj"]:
+        for var in ["m", "pT", "dR", "Eta", "Phi", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
-    float_variable_names += ["mll", "pTll"]
-
-    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons",
-                           "nCentralJets"]
+    int_variable_names += ["nJets", "nBJets", "nCentralJets", "nForwardJets",
+                           "nLeptons", "nElectrons", "nMuons"]
 
     return float_variable_names, int_variable_names
 
@@ -104,5 +110,10 @@ def semiLep_branches(flags):
     int_variable_names += object_level_int_variables
 
     branches += object_level_branches
+
+    if (flags.Analysis.save_vbshiggs_cutflow):
+        cutList = flags.Analysis.CutList
+        for cut in cutList:
+            branches += [f"EventInfo.{cut}_%SYS% -> SemiLep_{cut}_%SYS%"]
 
     return branches, float_variable_names, int_variable_names

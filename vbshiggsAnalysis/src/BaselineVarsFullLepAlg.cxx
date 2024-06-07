@@ -168,7 +168,7 @@ namespace VBSHIGGS{
         if(ele1) leptons.emplace_back(ele1, -11*ele1->charge());
         if(mu1) leptons.emplace_back(mu1, -13*mu1->charge());
 
-        int nLeptons = leptons.size();
+        int nLeptons = muons->size() + electrons->size();
         m_Ibranches.at("nLeptons").set(*event, nLeptons, sys);
 
         std::sort(leptons.begin(), leptons.end(),

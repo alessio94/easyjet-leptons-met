@@ -303,7 +303,7 @@ namespace VBSHIGGS{
       //TODO, create an object holding the vbs jets passing the mjj + deta selections
       const xAOD::Jet* vbsJet1 = vbsjets->at(0);
       const xAOD::Jet* vbsJet2 = vbsjets->at(1);;
-      double mjj = vbsJet1->m() + vbsJet2->m();
+      double mjj = (vbsJet1->p4() + vbsJet2->p4()).M();
       double dEta_jj = std::abs(vbsJet1->eta() - vbsJet2->eta());
 
       if ( mjj > 300 * Athena::Units::GeV  && dEta_jj > 3.0 ) {

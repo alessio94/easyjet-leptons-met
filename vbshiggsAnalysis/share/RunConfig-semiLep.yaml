@@ -26,3 +26,9 @@ Lepton:
 trigger:
   include: vbshiggsAnalysis/trigger-lep.yaml
 
+CutList :
+      - TwoVBSJets
+      - TwoBJets
+      - LepSelection
+      - JetSelection
+      - METSelection

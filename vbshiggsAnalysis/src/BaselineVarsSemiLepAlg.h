@@ -38,8 +38,10 @@ namespace VBSHIGGS{
 
         CP::SysReadHandle<xAOD::EventInfo> m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-        CP::SysReadHandle<xAOD::JetContainer> m_jetHandle{ this, "jets", "",   "Jet container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "",   "Signal Jet container to read" };
         
+        CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "",   "VBS Jet container to read" };
+
         CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "",   "Electron container to read" };
 
         CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{ this, "muons", "",   "Muon container to read" };
