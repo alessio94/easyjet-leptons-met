@@ -26,6 +26,7 @@ atlas_add_component(ttHHAnalysis
   FourMomUtils
   TruthUtils
   EasyjetHubLib
+  TriggerMatchingToolLib
 )
 
 # Install python modules, joboptions, and share content

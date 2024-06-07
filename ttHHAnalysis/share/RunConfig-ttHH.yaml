@@ -74,6 +74,7 @@ save_HF_classification: false
 CutList:
   - PASS_TRIGGER
   - PASS_BASELINE
+  - PASS_TRIGGER_MATCHING
 
 # Include the TTree configuration and update details
 ttree_output:

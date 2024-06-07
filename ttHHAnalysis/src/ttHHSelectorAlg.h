@@ -19,6 +19,8 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
+#include "TriggerMatchingTool/IMatchingTool.h"
+
 
 #include <EasyjetHub/CutManager.h>
 
@@ -26,6 +28,11 @@
 
 namespace ttHH
 {
+
+  enum Trigger_Matching_Tool{
+    pass_matching_trigger_single_lep, 
+    pass_matching_trigger_dilep,
+  };
 
   /// \brief An algorithm for counting containers
   class ttHHSelectorAlg final : public AthHistogramAlgorithm {
@@ -43,13 +50,18 @@ namespace ttHH
 
       const std::vector<std::string> m_STANDARD_CUTS{
           "PASS_TRIGGER",
-          "PASS_BASELINE"
+          "PASS_BASELINE", 
+          "PASS_TRIGGER_MATCHING"
       };
 
       void evaluateCuts(const xAOD::JetContainer& bjets,
 			const xAOD::MuonContainer& muons,
 			const xAOD::ElectronContainer& electrons,
 			CutManager& ttHHCuts);
+      
+      void evaluateTriggerMatchingCuts(const std::vector<std::string> &m_leptonTriggers, 
+                                      const xAOD::MuonContainer* muons,  const xAOD::ElectronContainer* electrons,
+                                      CutManager& ttHHCuts);
 
     private :
       // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
@@ -95,14 +107,25 @@ namespace ttHH
 
       std::vector<std::string> m_inputCutList{};
 
+      std::vector<std::string> m_leptonTriggers;
+
       bool m_saveCutFlow;
       long long int m_total_events{0};
 
       bool m_nLeptons;
 
       std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+      
+      std::unordered_map < ttHH::Trigger_Matching_Tool, bool > m_triggers_matchs;
+      std::unordered_map < ttHH::Trigger_Matching_Tool, std::string > m_triggermatchingnames{
+          {ttHH::pass_matching_trigger_single_lep, "pass_matching_trigger_single_lep"},
+          {ttHH::pass_matching_trigger_dilep, "pass_matching_trigger_dilep"},
+      };
 
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+      
+      ToolHandle<Trig::IMatchingTool> m_matchingTool{this, "trigMatchingTool", "",
+	    "Trigger matching tool"};
   };
 
 }

@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
@@ -102,6 +103,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             eleWP=TightEleWPLabel,
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_ttHH_cutflow,
+            triggerLists=flags.Analysis.TriggerChains,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             eventDecisionOutputDecoration="ttHH_pass_baseline_%SYS%",
             bypass=flags.Analysis.bypass,
         )
@@ -222,6 +225,9 @@ def ttHH_branches(flags):
     for trig in ["dilep", "singlep"]:
         branches += [f"EventInfo.ttHH_pass_trigger_{trig} \
                              -> ttHH_pass_trigger_{trig}"]
+    for trig in ["dilep", "single_lep"]:
+        branches += [f"EventInfo.pass_matching_trigger_{trig}_%SYS% \
+                             -> ttHH_pass_matching_trigger_{trig}_%SYS%"]
 
     if (flags.Analysis.save_ttHH_cutflow):
         cutList = flags.Analysis.CutList

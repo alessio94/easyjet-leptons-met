@@ -15,6 +15,7 @@ namespace ttHH
   {
     declareProperty("cutList", m_inputCutList);
     declareProperty("saveCutFlow", m_saveCutFlow);
+    declareProperty("triggerLists", m_leptonTriggers);
   }
 
 
@@ -45,6 +46,14 @@ namespace ttHH
       m_Bbranches.emplace(string_var, var);
       ATH_CHECK (m_Bbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
+
+    //Initialise booleans with a false value
+    for (auto& [key, value] : m_triggermatchingnames) {
+      m_triggers_matchs.emplace(key, false);
+      CP::SysWriteDecorHandle<bool> var {value+"_%SYS%", this};
+      m_Bbranches.emplace(value, var);
+      ATH_CHECK(m_Bbranches.at(value).initialize(m_systematicsList, m_eventHandle));
+    };
 
     m_eleWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
@@ -135,7 +144,12 @@ namespace ttHH
       }
 
       evaluateCuts(*bjets, *muons, *electrons, m_ttHHCuts);
-
+      if (!m_leptonTriggers.empty())
+        evaluateTriggerMatchingCuts(m_leptonTriggers, muons, electrons,m_ttHHCuts);
+      
+      m_Bbranches.at("pass_matching_trigger_single_lep").set(*event, m_triggers_matchs.at(ttHH::pass_matching_trigger_single_lep), sys);
+      m_Bbranches.at("pass_matching_trigger_dilep").set(*event, m_triggers_matchs.at(ttHH::pass_matching_trigger_dilep), sys);
+      
       bool passedall = true;
       for (CutEntry& cut : m_ttHHCuts) {
         passedall = passedall && cut.passed;
@@ -223,6 +237,41 @@ namespace ttHH
     if ((((nLeptons==1) && (nBJets>=4)) || ((nLeptons>=2) && (nBJets>=2))) && ttHHCuts.exists("PASS_BASELINE"))
         ttHHCuts("PASS_BASELINE").passed = true;
 
+  }
+
+  void ttHHSelectorAlg::evaluateTriggerMatchingCuts(const std::vector<std::string> &m_leptonTriggers, 
+                                                  const xAOD::MuonContainer* muons,  const xAOD::ElectronContainer* electrons, CutManager& ttHHCuts) {
+
+    if (!ttHHCuts.exists("PASS_TRIGGER_MATCHING"))
+      return;
+
+    int nLeptons = muons->size() + electrons->size();
+    bool pass_matching_trigger_single_lep = false;
+    bool pass_matching_trigger_dilep = false;
+    if (nLeptons>=1){
+      for (const std::string &trigger : m_leptonTriggers){
+        if (muons->size()==1 && electrons->size()==0){
+          if (trigger.find("_mu") != std::string::npos && trigger.find("_e") == std::string::npos)
+            pass_matching_trigger_single_lep |= m_matchingTool->match(*muons->at(0), trigger);
+        } else if (muons->size()==0 && electrons->size()==1){
+          if (trigger.find("_e") != std::string::npos && trigger.find("_mu") == std::string::npos)
+            pass_matching_trigger_single_lep |= m_matchingTool->match(*electrons->at(0), trigger);
+        } else if (muons->size()>=1 && electrons->size()>=1){
+          if (trigger.find("_e") != std::string::npos && trigger.find("_mu") != std::string::npos)
+            pass_matching_trigger_dilep |= m_matchingTool->match({muons->at(0), electrons->at(0)}, trigger);
+        } else if (muons->size()>=2 && electrons->size()==0){
+          if (trigger.find("_2mu") != std::string::npos)
+            pass_matching_trigger_dilep |= m_matchingTool->match({muons->at(0), muons->at(1)}, trigger);
+        } else if (muons->size()==0 && electrons->size()>=2){
+          if (trigger.find("_2e") != std::string::npos)
+            pass_matching_trigger_dilep |= m_matchingTool->match({electrons->at(0), electrons->at(1)}, trigger);
+        }
+      }
+    }
+
+    ttHHCuts("PASS_TRIGGER_MATCHING").passed = pass_matching_trigger_single_lep || pass_matching_trigger_dilep;
+    m_triggers_matchs.at(ttHH::pass_matching_trigger_single_lep) = pass_matching_trigger_single_lep;
+    m_triggers_matchs.at(ttHH::pass_matching_trigger_dilep) = pass_matching_trigger_dilep;
   }
 
 }
