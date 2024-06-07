@@ -32,7 +32,7 @@ def tau_sequence(flags, configAcc):
 
     # Tau trigger SF
     trigSF_flags = flags.Analysis.trigger.scale_factor
-    if hasattr(trigSF_flags, 'Tau'):
+    if trigSF_flags.doSF and hasattr(trigSF_flags, 'Tau'):
         configSeq += makeConfig('TauJets.TriggerSF')
         configSeq.setOptionValue('.containerName', output_name)
         configSeq.setOptionValue('.tauID', trigSF_flags.Tau.ID)
