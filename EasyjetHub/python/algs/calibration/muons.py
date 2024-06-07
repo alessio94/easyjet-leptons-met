@@ -2,6 +2,7 @@ from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
+from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
 
 def muon_sequence(flags, configAcc):
@@ -34,6 +35,15 @@ def muon_sequence(flags, configAcc):
                                  flags.Analysis.Muon.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',
                                  flags.Analysis.Muon.maxDeltaZ0SinTheta)
+
+    # Muon trigger SF
+    trigSF_flags = flags.Analysis.trigger.scale_factor
+    if trigSF_flags.doSF and hasattr(trigSF_flags, 'Muon'):
+        configSeq += makeConfig('Muons.TriggerSF')
+        configSeq.setOptionValue('.containerName', output_name)
+        configSeq.setOptionValue('.muonID', trigSF_flags.Muon.ID)
+        configSeq.setOptionValue('.triggerChainsPerYear',
+                                 get_trigger_chains_scale_factor(flags, 'Muon'))
 
     # Kinematic selection
     configSeq += makeConfig('Muons.PtEtaSelection', containerName=output_name,

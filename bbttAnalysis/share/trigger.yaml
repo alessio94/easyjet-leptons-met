@@ -142,6 +142,19 @@ scale_factor:
 
   Muon:
     ID: "Medium"
+    # No SF for mu-tau leg yet
+    chains:
+      '2015':
+      - 'HLT_mu20_iloose_L1MU15 || HLT_mu40'
+      '2016':
+      - 'HLT_mu26_ivarmedium || HLT_mu50'
+      '2017':
+      - 'HLT_mu26_ivarmedium || HLT_mu50'
+      '2018':
+      - 'HLT_mu26_ivarmedium || HLT_mu50'
+      '2022':
+      - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+      '2023': []
 
   Tau:
     ID: "Loose"
