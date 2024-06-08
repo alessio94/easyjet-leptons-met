@@ -3,6 +3,7 @@ from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
+from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
 
 def electron_sequence(flags, configAcc):
@@ -50,6 +51,16 @@ def electron_sequence(flags, configAcc):
                                  flags.Analysis.Electron.maxDeltaZ0SinTheta)
         configSeq.setOptionValue('.chargeIDSelection',
                                  flags.Analysis.Electron.chargeIDSelection)
+
+    # Electron trigger SF
+    trigSF_flags = flags.Analysis.trigger.scale_factor
+    if trigSF_flags.doSF and hasattr(trigSF_flags, 'Electron'):
+        configSeq += makeConfig('Electrons.TriggerSF')
+        configSeq.setOptionValue('.containerName', output_name)
+        configSeq.setOptionValue('.electronID', trigSF_flags.Electron.ID)
+        configSeq.setOptionValue('.electronIsol', trigSF_flags.Electron.Iso)
+        configSeq.setOptionValue('.triggerChainsPerYear',
+                                 get_trigger_chains_scale_factor(flags, 'Electron'))
 
     # Kinematic selection
     configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name,
