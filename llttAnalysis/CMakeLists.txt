@@ -30,6 +30,7 @@ atlas_add_component(llttAnalysis
   TruthUtils
   DiTauMassToolsLib
   EventBookkeeperToolsLib
+  TauAnalysisToolsLib
 )
 
 # Install python modules, joboptions, and share content

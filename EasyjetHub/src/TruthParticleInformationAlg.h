@@ -23,6 +23,7 @@
 namespace MC
 {
   static const int SBOSONBSM = 35;
+  static const int ABOSONBSM = 36;
 }
 
 namespace Easyjet

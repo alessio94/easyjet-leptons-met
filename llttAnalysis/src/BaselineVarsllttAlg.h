@@ -54,6 +54,9 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_tauHandle{ this, "taus", "",   "Tau container to read" };
 
+    CP::SysReadHandle<xAOD::TauJetContainer>
+    m_mrmtauHandle{ this, "mrmtaus", "TauJets_MuonRM",   "Tau container to read" };
+
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
 
@@ -94,7 +97,10 @@ private:
     m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input dectorator for selected mu"};
     CP::SysReadDecorHandle<bool> 
     m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input dectorator for selected tau"};
-    
+
+    CP::SysReadDecorHandle<bool>
+    m_selected_mrmtau { this, "selected_mrmtau", "selected_mrmtau_%SYS%", "Name of input dectorator for selected tau"};
+
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
@@ -104,7 +110,6 @@ private:
     Gaudi::Property<std::vector<std::string>> m_intVariables
           {this, "intVariableList", {}, "Name list of integer variables"};
 
-    /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
         m_Fbranches;
 

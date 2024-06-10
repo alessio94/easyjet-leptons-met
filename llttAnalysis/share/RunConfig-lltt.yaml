@@ -24,23 +24,31 @@ truthDecayModes: ["mmtt", "eett", "tttt"]
 small_R_jet:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
+  amount: 3
+  variables_int_allJets: ["truthLabel"]
 
 Electron:
+  forceFullSimConfig: true
   ID: "LooseBLayerLH"
-  Iso: "Loose_VarRad"
+  Iso: "NonIso"
+  #Iso: "Loose_VarRad"
   extra_wps:
-    - ["TightLH", "Loose_VarRad"]
+    - ["TightLH", "NonIso"]
+    #- ["TightLH", "Loose_VarRad"]
 
 Muon:
   ID: "Loose"
-  Iso: "PflowLoose_VarRad"
+  Iso: "NonIso"    
+  #Iso: "PflowLoose_VarRad"
   extra_wps:
-    - ["Medium", "PflowLoose_VarRad"]
+    - ["Medium", "NonIso"]
+    #- ["Medium", "PflowLoose_VarRad"]
 
 Tau:
   ID: "Loose"
   amount: 2
-  variables_int: ["pdgid"]
+  variables: ["RNN"]
+  variables_int: ["pdgid", "truthType", "EleRNN_WP"]
 
 Lepton:
   amount: 2

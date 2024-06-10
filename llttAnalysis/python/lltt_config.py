@@ -196,9 +196,6 @@ def lltt_branches(flags):
 
     branches += ["EventInfo.lltt_pass_sr_%SYS% -> lltt_pass_SR_%SYS%"]
 
-    # These are the variables always saved with the objects selected by the analysis
-    # This is tunable with the flags amount and variables
-    # in the object configs.
     object_level_branches, object_level_float_variables, object_level_int_variables \
         = get_selected_objects_branches_variables(flags, "lltt")
     float_variable_names += object_level_float_variables
@@ -208,9 +205,8 @@ def lltt_branches(flags):
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HllttSelectorAlg
-    for var in ["pass_trigger_SLT"]:
-        branches += [f"EventInfo.{var}_%SYS% -> lltt_{var}"
-                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+    for var in ["pass_trigger_SLT", "pass_Looseele", "pass_Loosemuo"]:
+        branches += [f"EventInfo.{var}_%SYS% -> lltt_{var}_%SYS%"]
 
     for var in ["_trigger_", "_baseline_", "_"]:
         for cat in ["DLT"]:

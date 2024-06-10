@@ -283,17 +283,20 @@ namespace Easyjet
       {
         verbosePrintParticleAndChildren(tp);
       }
-      if ((tp->pdgId() == MC::HIGGSBOSON || tp->pdgId() == MC::SBOSONBSM))
+      if ((tp->pdgId() == MC::HIGGSBOSON || tp->pdgId() == MC::SBOSONBSM || tp->pdgId() == MC::ABOSONBSM))
       {
         const xAOD::TruthParticle *final_h =
-	         getFinalParticleOfType(tp, {MC::HIGGSBOSON, MC::SBOSONBSM});
+	  getFinalParticleOfType(tp, {MC::HIGGSBOSON, MC::SBOSONBSM, MC::ABOSONBSM});
         if (!tmp || (final_h->barcode() != tmp->barcode()))
         {
           TruthScalar h = final_h;
           h.children(getFinalChildren(final_h));
           h.initial_children(getInitialChildren(final_h));
-          higgses.push_back(h);
-          tmp = final_h;
+	  tmp = final_h;
+	  // avoid SBOSONBSM if SBOSONBSM -> ABOSONBSM ABOSONBSM or ABOSONBSM HIGGSBOSON 
+	  if(final_h->pdgId() == MC::SBOSONBSM && final_h->nChildren() == 2 &&
+	     (h.initial_children_pdgId()[0] == MC::ABOSONBSM || h.initial_children_pdgId()[1] == MC::ABOSONBSM)) continue;
+	  higgses.push_back(h);
         }
       }
     }
