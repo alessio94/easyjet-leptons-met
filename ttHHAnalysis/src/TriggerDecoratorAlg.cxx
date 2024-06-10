@@ -146,7 +146,7 @@ namespace ttHH
             }},
             {ttHH::DILEP, {
                 "HLT_2e24_lhvloose_nod0",
-                "HLT_2e24_lhvloose_nod0_L12EM15VHI",
+                "HLT_2e17_lhvloose_nod0_L12EM15VHI",
                 "HLT_e17_lhloose_nod0_mu14",
                 "HLT_e7_lhmedium_nod0_mu24",
                 "HLT_2mu14",
