@@ -423,7 +423,7 @@ namespace HHBBLL
 	double m_b2l1 = b2l1.M();
 	double m_b1l2 = b1l2.M();
 	double m_b2l2 = b2l2.M();
-	double m_bl = std::min(std::max(m_b1l1, m_b2l1), std::max(m_b1l2, m_b2l2));
+	double m_bl = std::min(std::max(m_b1l1, m_b2l2), std::max(m_b2l1, m_b1l2));
         m_Fbranches.at("mbl").set(*event, m_bl, sys);
       }
 
