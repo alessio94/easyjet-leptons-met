@@ -56,6 +56,8 @@ private:
 
     CP::SysReadDecorHandle<float> m_relativeDeltaRToVRJet {"relativeDeltaRToVRJet", this};
 
+    CP::SysReadDecorHandle<char> m_jvtselection {"", this};
+
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
     m_outHandle{ this, "containerOutKey", "",   "Jet container to write" };
