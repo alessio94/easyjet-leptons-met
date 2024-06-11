@@ -66,8 +66,11 @@ def bbtt_cfg(
             containerInKey=smalljetkey,
             containerOutKey="bbttAnalysisJets_%SYS%",
             minPt=20 * Units.GeV,
-            bTagWPDecorName="",  # empty string: "" ignores btagging
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            # empty string: "" ignores btagging
+            selectBjet=False,
             minimumAmount=2,  # -1 means ignores this
+            bjetAmount=flags.Analysis.small_R_jet.amount_bjet,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )

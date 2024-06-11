@@ -71,6 +71,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             pTsort=False,
             PCBTsort=True,
             bTagWPDecorName="",
+            selectBjet=False,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )

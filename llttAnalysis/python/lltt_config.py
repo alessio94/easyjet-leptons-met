@@ -64,6 +64,7 @@ def lltt_cfg(
             minPt=25 * Units.GeV,
             maxEta=2.5,
             bTagWPDecorName="",  # empty string: "" ignores btagging
+            selectBjet=False,
             minimumAmount=-1,  # -1 means ignores this
             checkOR=flags.Analysis.do_overlap_removal,
         )

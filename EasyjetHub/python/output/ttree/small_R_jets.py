@@ -88,6 +88,11 @@ def get_small_R_jet_branches(
     ):
         small_R_jet_branches.variables += get_TopHiggs_jet_truth_labels(flags)
 
+    if tree_flags.collection_options.small_R_jets.run_selection:
+        small_R_jet_branches.variables += ["isAnalysisJet_%SYS%"]
+        for index in range(flags.Analysis.small_R_jet.amount_bjet):
+            small_R_jet_branches.variables += [f"isbjet{index+1}_%SYS%"]
+
     return small_R_jet_branches.get_output_list()
 
 

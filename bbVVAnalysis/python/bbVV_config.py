@@ -43,6 +43,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             containerInKey=smalljetkey,
             containerOutKey="bbVVAnalysisJets_%SYS%",
             bTagWPDecorName="",  # empty string: "" ignores btagging
+            selectBjet=False,
             maxEta=2.5,
             truncateAtAmount=2,  # -1 means keep all
             minimumAmount=2,  # -1 means ignores this
@@ -56,6 +57,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             containerInKey=largejetkey,
             containerOutKey="bbVVAnalysisLRJets_%SYS%",
             bTagWPDecorName="",  # empty string: "" ignores btagging
+            selectBjet=False,
             minPt=200e3,
             maxEta=2.0,
             truncateAtAmount=3,  # -1 means keep all
@@ -72,6 +74,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 containerInKey=largejetkey,
                 containerOutKey="boostedAnalysisJets_" + btag_wp,
                 bTagWPDecorName="ftag_select_" + btag_wp,
+                selectBjet=True,
                 minPt=250e3,
                 maxEta=2.0,
                 truncateAtAmount=2,  # -1 means keep all
@@ -96,6 +99,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 containerInKey="leadingLargeRVRJets_" + btag_wp,
                 containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
                 bTagWP=btag_wp,  # empty string: "" ignores btagging
+                selectBjet=True,
                 minPt=10e3,
                 maxEta=2.5,
                 truncateAtAmount=3,  # -1 means keep all
@@ -123,6 +127,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
                 containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
                 bTagWP=btag_wp,  # empty string: "" ignores btagging
+                selectBjet=True,
                 minPt=10e3,
                 maxEta=2.5,
                 truncateAtAmount=3,  # -1 means keep all

@@ -28,6 +28,17 @@ namespace Easyjet
       ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_inHandle));
     }
 
+    if(m_bjetAmount > 0){
+       for(int i=0; i<m_bjetAmount; i++){
+          std::string index = std::to_string(i+1);
+          CP::SysWriteDecorHandle<bool> whandle{"isbjet"+index+"_%SYS%", this};
+          m_leadBranches.emplace("isbjet"+index, whandle);
+          ATH_CHECK(m_leadBranches.at("isbjet"+index).initialize(m_systematicsList, m_inHandle));
+       };
+    }
+
+    ANA_CHECK (m_isSelectedJet.initialize (m_systematicsList, m_inHandle));
+
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
     ATH_CHECK (m_relativeDeltaRToVRJet.initialize(m_systematicsList, m_inHandle));
@@ -47,6 +58,18 @@ namespace Easyjet
     // check that pTsort and PCBTSort are not both set
     if(m_pTsort && m_PCBTsort){
       ATH_MSG_ERROR("pT sorting and PCBT sorting are configured simultaneously!");
+      return StatusCode::FAILURE;
+    }
+
+    // check if m_isBtag is empty and m_selectBjet is true 
+    if(m_isBtag.empty() && m_selectBjet){
+      ATH_MSG_ERROR("btag wp is empty but selectBjet is true");
+      return StatusCode::FAILURE;
+    }
+
+    // check if if m_bjetAmount is positive and there is no WPgiven
+    if(m_bjetAmount>0 && m_isBtag.empty()){
+      ATH_MSG_ERROR("required bjet amount is positive but btag wp is empty");
       return StatusCode::FAILURE;
     }
 
@@ -103,10 +126,16 @@ namespace Easyjet
         if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
           continue;
 
-        // select btagging wp if given. if not given always push back
-        if (!WPgiven || (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5))
-	    workContainer->push_back(jet);
+        bool isSelected = false;
+        // select btagging wp if given and select_bjet flag is on. if not given always push back
+	// check if want to apply btagging
+        if (!m_selectBjet || (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5)) 
+	{
+	  workContainer->push_back(jet);
+	  isSelected = true;
+	}
         if (PCBTaggiven) workContainer_pcbt[jet] = m_PCBT.get(*jet, sys);
+	m_isSelectedJet.set(*jet, isSelected, sys);
       }
       
       int nJets = workContainer->size();
@@ -144,6 +173,19 @@ namespace Easyjet
         // keep only the requested amount
         workContainer->erase(workContainer->begin() + nKeep, workContainer->end());
       }
+
+      //lead/sublead bjet
+      if(m_bjetAmount > 0){
+         int njet = 0;
+         for (const xAOD::Jet *jet : *workContainer) {
+            if (WPgiven &&  m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5){
+               njet++;
+               m_leadBranches.at("isbjet"+std::to_string(njet)).set(*jet, true, sys);
+            }
+            if ( njet == m_bjetAmount ) break;
+         }
+      }
+
       // Write to eventstore
       ATH_CHECK(m_outHandle.record(std::move(workContainer), sys));   
     }

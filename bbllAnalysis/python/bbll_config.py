@@ -50,6 +50,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             containerInKey=smalljetkey,
             containerOutKey="bbllAnalysisJets_%SYS%",
             bTagWPDecorName="",
+            selectBjet=False,
             minPt=20 * Units.GeV,
             minimumAmount=2,  # -1 means ignores this
             checkOR=flags.Analysis.do_overlap_removal,

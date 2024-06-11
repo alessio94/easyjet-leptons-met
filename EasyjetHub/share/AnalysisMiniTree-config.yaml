@@ -24,6 +24,7 @@ collection_options:
     JVT_details: false
     no_bjet_calib_p4: false
     btag_details: false
+    run_selection: false
 
   large_R_jets:
     substructure_info: false

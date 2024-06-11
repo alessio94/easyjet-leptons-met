@@ -16,6 +16,7 @@ ttree_output:
       small_R_jets:
         btag_info: true
         higgs_parent_info: true
+        run_selection: true
       taus:
         truth_branches: True
     truth_outputs:

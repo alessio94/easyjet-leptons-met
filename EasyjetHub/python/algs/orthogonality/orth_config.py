@@ -25,6 +25,7 @@ def orth_cfg(flags, smalljetkey, photonkey):
             containerInKey=smalljetkey,
             containerOutKey="OrthAnalysisBJets_%SYS%",
             bTagWPDecorName=BTagWPLabel,
+            selectBjet=True,
             checkOR=flags.Analysis.do_overlap_removal,
         )
     )

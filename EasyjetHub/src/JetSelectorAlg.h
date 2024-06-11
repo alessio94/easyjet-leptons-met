@@ -66,6 +66,8 @@ private:
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nJets_%SYS%", 
         "Name of output decorator for number of selected jets"};
 
+    CP::SysWriteDecorHandle<bool> m_isSelectedJet {this, "decoration", "isAnalysisJet_%SYS%", 
+        "decoration for per-object if jet is selected"};
 
     Gaudi::Property<float> m_minPt            {this, "minPt", 25e3, "Minimum pT of jets"};
     Gaudi::Property<float> m_maxEta           {this, "maxEta", 4.4, "Maximum eta of jets"}; // default is central jets
@@ -76,6 +78,9 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra jets after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_removeRelativeDeltaRToVRJet {this, "removeRelativeDeltaRToVRJet", false, "Remove events in which VR jets overlaps"};
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
+    Gaudi::Property<bool>  m_selectBjet       {this, "selectBjet", false, "Apply bjet selection"};
+    Gaudi::Property<int>   m_bjetAmount       {this, "bjetAmount", -1, "Maximum number of jets to consider"};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
 
   };
 }

@@ -20,6 +20,7 @@ def resolved_cfg(flags, smalljetkey):
                 containerInKey=smalljetkey,
                 containerOutKey="resolvedAnalysisJets_" + btag_wp,
                 bTagWPDecorName="ftag_select_" + btag_wp,
+                selectBjet=True,
                 minPt=20e3,
                 maxEta=2.5,
                 truncateAtAmount=4,  # -1 means keep all
