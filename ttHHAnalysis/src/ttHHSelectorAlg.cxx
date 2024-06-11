@@ -147,7 +147,7 @@ namespace ttHH
       if (!m_leptonTriggers.empty())
         evaluateTriggerMatchingCuts(m_leptonTriggers, muons, electrons,m_ttHHCuts);
       
-      m_Bbranches.at("pass_matching_trigger_single_lep").set(*event, m_triggers_matchs.at(ttHH::pass_matching_trigger_single_lep), sys);
+      m_Bbranches.at("pass_matching_trigger_singlep").set(*event, m_triggers_matchs.at(ttHH::pass_matching_trigger_singlep), sys);
       m_Bbranches.at("pass_matching_trigger_dilep").set(*event, m_triggers_matchs.at(ttHH::pass_matching_trigger_dilep), sys);
       
       bool passedall = true;
@@ -188,7 +188,7 @@ namespace ttHH
         m_ttHHCuts[i].relativeCounter+=1;
       }
 
-      if (!m_bypass and !m_ttHHCuts("PASS_BASELINE").passed) continue;
+      if (!m_bypass and (!m_ttHHCuts("PASS_BASELINE").passed or !m_ttHHCuts("PASS_TRIGGER").passed or !m_ttHHCuts("PASS_TRIGGER_MATCHING").passed)) continue;
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
@@ -246,16 +246,16 @@ namespace ttHH
       return;
 
     int nLeptons = muons->size() + electrons->size();
-    bool pass_matching_trigger_single_lep = false;
+    bool pass_matching_trigger_singlep = false;
     bool pass_matching_trigger_dilep = false;
     if (nLeptons>=1){
       for (const std::string &trigger : m_leptonTriggers){
         if (muons->size()==1 && electrons->size()==0){
           if (trigger.find("_mu") != std::string::npos && trigger.find("_e") == std::string::npos)
-            pass_matching_trigger_single_lep |= m_matchingTool->match(*muons->at(0), trigger);
+            pass_matching_trigger_singlep |= m_matchingTool->match(*muons->at(0), trigger);
         } else if (muons->size()==0 && electrons->size()==1){
           if (trigger.find("_e") != std::string::npos && trigger.find("_mu") == std::string::npos)
-            pass_matching_trigger_single_lep |= m_matchingTool->match(*electrons->at(0), trigger);
+            pass_matching_trigger_singlep |= m_matchingTool->match(*electrons->at(0), trigger);
         } else if (muons->size()>=1 && electrons->size()>=1){
           if (trigger.find("_e") != std::string::npos && trigger.find("_mu") != std::string::npos)
             pass_matching_trigger_dilep |= m_matchingTool->match({muons->at(0), electrons->at(0)}, trigger);
@@ -269,8 +269,8 @@ namespace ttHH
       }
     }
 
-    ttHHCuts("PASS_TRIGGER_MATCHING").passed = pass_matching_trigger_single_lep || pass_matching_trigger_dilep;
-    m_triggers_matchs.at(ttHH::pass_matching_trigger_single_lep) = pass_matching_trigger_single_lep;
+    ttHHCuts("PASS_TRIGGER_MATCHING").passed = pass_matching_trigger_singlep || pass_matching_trigger_dilep;
+    m_triggers_matchs.at(ttHH::pass_matching_trigger_singlep) = pass_matching_trigger_singlep;
     m_triggers_matchs.at(ttHH::pass_matching_trigger_dilep) = pass_matching_trigger_dilep;
   }
 

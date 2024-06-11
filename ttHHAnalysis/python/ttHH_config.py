@@ -230,7 +230,7 @@ def ttHH_branches(flags):
     for trig in ["dilep", "singlep"]:
         branches += [f"EventInfo.ttHH_pass_trigger_{trig} \
                              -> ttHH_pass_trigger_{trig}"]
-    for trig in ["dilep", "single_lep"]:
+    for trig in ["dilep", "singlep"]:
         branches += [f"EventInfo.pass_matching_trigger_{trig}_%SYS% \
                              -> ttHH_pass_matching_trigger_{trig}_%SYS%"]
 

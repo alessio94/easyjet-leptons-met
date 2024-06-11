@@ -30,7 +30,7 @@ namespace ttHH
 {
 
   enum Trigger_Matching_Tool{
-    pass_matching_trigger_single_lep, 
+    pass_matching_trigger_singlep, 
     pass_matching_trigger_dilep,
   };
 
@@ -118,7 +118,7 @@ namespace ttHH
       
       std::unordered_map < ttHH::Trigger_Matching_Tool, bool > m_triggers_matchs;
       std::unordered_map < ttHH::Trigger_Matching_Tool, std::string > m_triggermatchingnames{
-          {ttHH::pass_matching_trigger_single_lep, "pass_matching_trigger_single_lep"},
+          {ttHH::pass_matching_trigger_singlep, "pass_matching_trigger_singlep"},
           {ttHH::pass_matching_trigger_dilep, "pass_matching_trigger_dilep"},
       };
 
