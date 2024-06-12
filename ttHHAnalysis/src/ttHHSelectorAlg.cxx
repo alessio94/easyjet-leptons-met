@@ -251,7 +251,7 @@ namespace ttHH
     if (nLeptons>=1){
       for (const std::string &trigger : m_leptonTriggers){
         if (muons->size()==1 && electrons->size()==0){
-          if (trigger.find("_mu") != std::string::npos && trigger.find("_e") == std::string::npos)
+          if (trigger.find("_mu") != std::string::npos && trigger.find("_e") == std::string::npos && trigger.find("_mu8noL1") == std::string::npos)
             pass_matching_trigger_singlep |= m_matchingTool->match(*muons->at(0), trigger);
         } else if (muons->size()==0 && electrons->size()==1){
           if (trigger.find("_e") != std::string::npos && trigger.find("_mu") == std::string::npos)
@@ -260,7 +260,7 @@ namespace ttHH
           if (trigger.find("_e") != std::string::npos && trigger.find("_mu") != std::string::npos)
             pass_matching_trigger_dilep |= m_matchingTool->match({muons->at(0), electrons->at(0)}, trigger);
         } else if (muons->size()>=2 && electrons->size()==0){
-          if (trigger.find("_2mu") != std::string::npos)
+          if (trigger.find("_2mu") != std::string::npos || (trigger.find("_mu8noL1") != std::string::npos && trigger.find("_e") == std::string::npos))
             pass_matching_trigger_dilep |= m_matchingTool->match({muons->at(0), muons->at(1)}, trigger);
         } else if (muons->size()==0 && electrons->size()>=2){
           if (trigger.find("_2e") != std::string::npos)
