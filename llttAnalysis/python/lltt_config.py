@@ -25,7 +25,7 @@ def lltt_cfg(
             "MuonSelectorAlg",
             containerInKey=LooseMuonWPLabel + muonkey,
             containerOutKey="llttAnalysisMuons_%SYS%",
-            muon_WP=TightMuonWPLabel,
+            muon_WPs=[TightMuonWPLabel],
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )
@@ -39,7 +39,7 @@ def lltt_cfg(
             "ElectronSelectorAlg",
             containerInKey=LooseElectronWPLabel + electronkey,
             containerOutKey="llttAnalysisElectrons_%SYS%",
-            ele_WP=TightElectronWPLabel,
+            ele_WPs=[TightElectronWPLabel],
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
         )

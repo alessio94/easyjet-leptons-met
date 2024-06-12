@@ -22,7 +22,7 @@ def vbshiggs_cfg(flags, smalljetkey, muonkey, electronkey):
             "MuonSelectorAlg",
             containerInKey=MuonWPLabel + muonkey,
             containerOutKey="vbshiggsAnalysisMuons_%SYS%",
-            muon_WP=MuonWPLabel,
+            muon_WPs=[MuonWPLabel],
             isMC=flags.Input.isMC,
             checkOR=flags.Analysis.do_overlap_removal,
             minPt=9 * Units.GeV,
@@ -36,7 +36,7 @@ def vbshiggs_cfg(flags, smalljetkey, muonkey, electronkey):
             containerInKey=ElectronWPLabel + electronkey,
             containerOutKey="vbshiggsAnalysisElectrons_%SYS%",
             checkOR=flags.Analysis.do_overlap_removal,
-            ele_WP=ElectronWPLabel,
+            ele_WPs=[ElectronWPLabel],
             isMC=flags.Input.isMC,
             minPt=9 * Units.GeV,
         )

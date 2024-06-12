@@ -51,16 +51,16 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::string> m_eleWPName
-      { this, "ele_WP", "","Electron ID + Iso working point" };
-    bool m_isoIncluded = true;
-    CP::SysReadDecorHandle<float> m_ele_recoSF{"", this};
-    CP::SysReadDecorHandle<float> m_ele_idSF{"", this};
-    CP::SysReadDecorHandle<float> m_ele_isoSF{"", this};
-    CP::SysWriteDecorHandle<float> m_ele_SF{"", this};
+    Gaudi::Property<std::vector<std::string>> m_eleWPNames
+      { this, "ele_WPs", {},"Electron ID + Iso working points used on top of container" };
+        
+    std::vector<CP::SysReadDecorHandle<float>> m_ele_recoSF;
+    std::vector<CP::SysReadDecorHandle<float>> m_ele_idSF;
+    std::vector<CP::SysReadDecorHandle<float>> m_ele_isoSF;
+    std::vector<CP::SysWriteDecorHandle<float>> m_ele_SF;
 
-    CP::SysReadDecorHandle<char> m_select_in{"", this};
-    CP::SysWriteDecorHandle<char> m_select_out{"", this};
+    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
+    std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::ElectronContainer>>

@@ -25,21 +25,29 @@ namespace Easyjet
 
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    if(m_isMC){
-      m_mu_recoSF = CP::SysReadDecorHandle<float>("muon_reco_effSF_"+m_muWPName+"_%SYS%", this);
-      if(m_muWPName.value().find("NonIso")!=std::string::npos) m_isoIncluded = false;
-      else m_mu_isoSF = CP::SysReadDecorHandle<float>("muon_isol_effSF_"+m_muWPName+"_%SYS%", this);
-      m_mu_SF = CP::SysWriteDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
+    for(const auto& wp : m_muWPNames){
+      // Scale factors
+      m_mu_recoSF.emplace_back(m_isMC ? "muon_reco_effSF_"+wp+"_%SYS%" : "", this);
+      m_mu_isoSF.emplace_back((m_isMC && wp.find("NonIso")==std::string::npos) ?
+            "muon_isol_effSF_"+wp+"_%SYS%" : "", this);
+      m_mu_SF.emplace_back(m_isMC ? "muon_effSF_"+wp+"_%SYS%" : "", this);
+
+      // Select flags
+      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+      m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
-    ATH_CHECK (m_mu_recoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_mu_isoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+    for(auto& handle : m_mu_recoSF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_mu_isoSF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_mu_SF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+    for(auto& handle : m_select_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_select_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
-    m_select_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_muWPName+"_%SYS%", this);
-    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_muWPName+"_%SYS%", this);
-    ATH_CHECK (m_select_in.initialize(m_systematicsList, m_inHandle));
-    ATH_CHECK (m_select_out.initialize(m_systematicsList, m_outHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -77,12 +85,15 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        if(m_isMC){
-          float SF = m_mu_recoSF.get(*muon,sys);
-          if(m_isoIncluded) SF *= m_mu_isoSF.get(*muon,sys);
-          m_mu_SF.set(*muon, SF, sys);
+        for(unsigned int i=0; i<m_muWPNames.size(); i++){
+          std::string wp = m_muWPNames[i];
+          if(m_isMC){
+            float SF = m_mu_recoSF[i].get(*muon,sys);
+            if(wp.find("NonIso")==std::string::npos) SF *= m_mu_isoSF[i].get(*muon,sys);
+            m_mu_SF[i].set(*muon, SF, sys);
+          }
+          m_select_out[i].set(*muon, m_select_in[i].get(*muon,sys), sys);
         }
-        m_select_out.set(*muon, m_select_in.get(*muon,sys), sys);
 
         // If cuts are passed, save the object
         workContainer->push_back(muon);

@@ -24,23 +24,31 @@ namespace Easyjet
 
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    if(m_isMC){
-      m_ele_recoSF = CP::SysReadDecorHandle<float>("el_reco_effSF_"+m_eleWPName+"_%SYS%", this);
-      m_ele_idSF = CP::SysReadDecorHandle<float>("el_id_effSF_"+m_eleWPName+"_%SYS%", this);
-      if(m_eleWPName.value().find("NonIso")!=std::string::npos) m_isoIncluded = false;
-      else m_ele_isoSF = CP::SysReadDecorHandle<float>("el_isol_effSF_"+m_eleWPName+"_%SYS%", this);
-      m_ele_SF = CP::SysWriteDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
+    for(const auto& wp : m_eleWPNames){
+      // Scale factors
+      m_ele_recoSF.emplace_back(m_isMC ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
+      m_ele_idSF.emplace_back(m_isMC ? "el_id_effSF_"+wp+"_%SYS%" : "", this);
+      m_ele_isoSF.emplace_back((m_isMC && wp.find("NonIso")==std::string::npos) ?
+            "el_isol_effSF_"+wp+"_%SYS%" : "", this);
+      m_ele_SF.emplace_back(m_isMC ? "el_effSF_"+wp+"_%SYS%" : "", this);
+      
+      // Select flags
+      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+      m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
-    ATH_CHECK (m_ele_recoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ele_idSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ele_isoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-
-    m_select_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_eleWPName+"_%SYS%", this);
-    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_eleWPName+"_%SYS%", this);
-    ATH_CHECK (m_select_in.initialize(m_systematicsList, m_inHandle));
-    ATH_CHECK (m_select_out.initialize(m_systematicsList, m_outHandle));
+    for(auto& handle : m_ele_recoSF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_ele_idSF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_ele_isoSF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_ele_SF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+    for(auto& handle : m_select_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_select_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -85,13 +93,16 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        if(m_isMC){
-          float SF = m_ele_recoSF.get(*electron,sys) * m_ele_idSF.get(*electron,sys);
-          if(m_isoIncluded) SF *= m_ele_isoSF.get(*electron,sys);
-          m_ele_SF.set(*electron, SF, sys);
+        for(unsigned int i=0; i<m_eleWPNames.size(); i++){
+          std::string wp = m_eleWPNames[i];
+          if(m_isMC){
+            float SF = m_ele_recoSF[i].get(*electron,sys) * m_ele_idSF[i].get(*electron,sys);
+            if(wp.find("NonIso")==std::string::npos) SF *= m_ele_isoSF[i].get(*electron,sys);
+            m_ele_SF[i].set(*electron, SF, sys);
+          }
+          m_select_out[i].set(*electron, m_select_in[i].get(*electron,sys), sys);
         }
-        m_select_out.set(*electron, m_select_in.get(*electron,sys), sys);
-
+        
         // If cuts are passed, save the object
         workContainer->push_back(electron);
       }
