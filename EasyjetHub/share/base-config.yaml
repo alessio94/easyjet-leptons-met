@@ -149,7 +149,8 @@ systematics_suffix_separator: "_"
 do_overlap_removal: false
 # Enable specific TauAntiTauJet overlap removal, mostly for bbtt analysis
 doTauAntiTauJetOR: false
-# Enable overlap removal between large-R jets and all objects
+# Enable overlap removal between large-R jets and objects for which 
+# large-R jet OR removal is implemented in Athena
 do_large_R_jets_OR: true
 # Enable overlap removal between small-R jets and large-R jets
 # Athena default is true
