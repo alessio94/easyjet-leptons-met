@@ -164,7 +164,7 @@ def get_BaselineVarsttHHAlg_variables(flags):
 
     float_variable_names += angular_variables
 
-    float_variable_names += ["HT"]
+    float_variable_names += ["HT", "HTall"]
 
     int_variable_names += [
         "nJets", "nBJets", "nLeptons",

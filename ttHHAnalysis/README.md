@@ -33,7 +33,7 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
     * electron / muon  kinematics (implemented as a vector): `el_NOSYS_X` / `mu_NOSYS_X`;
     * jet kinematics (implemented as a vector): `recojet_antikt4PFlow_NOSYS_X`;
     * Higgses kinematics: `H1_X` /`H2_X`;
-    * global quantities `n_leptons`, `njets`, `nBjets`, `HT`.
+    * global quantities `n_leptons`, `njets`, `nBjets`, `HT`, `HTall`.
 * Standard set of `ttHH` variables, including:
     * selected jet kinematics (Y from 1 to 4): `Jet_X_BY`;
     * their delta R (M,N,O,P from 1 to 4): `Jets_DeltaRMN`, `Jets_DeltaRMNO` and `Jets_DeltaRMNOP`;

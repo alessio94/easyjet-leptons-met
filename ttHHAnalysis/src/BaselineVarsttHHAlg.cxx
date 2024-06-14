@@ -117,6 +117,7 @@ namespace ttHH
       int PCBTjet = -99;
       int j_passWP=-99;
       double HT = 0; // scalar sum of jet pT
+      double HTall = 0; // scalar sum of jet pT and lepton pT
       int truthLabel = -99;
 
       for (const std::string &string_var: m_floatVariables) {
@@ -280,19 +281,25 @@ namespace ttHH
           const xAOD::Muon* muon0 = muons->at(0);
           m_Ibranches.at("total_charge").set(*event, muon0->charge(), sys);
           updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
+	  HTall = muon0->pt();
         } else { // ele 
           const xAOD::Electron* electron0 = electrons->at(0);
           m_Ibranches.at("total_charge").set(*event, electron0->charge(), sys);
           updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+	  HTall = electron0->pt();
         }
 
       } else if (leptonCount == 2){
         //-- total charge
         int totalCharge = 0;
-        for (const auto& muon : *muons) 
+        for (const auto& muon : *muons) {
           totalCharge += muon->charge();
-        for (const auto& electron : *electrons) 
+	  HTall += muon->pt();
+	}
+        for (const auto& electron : *electrons) {
           totalCharge += electron->charge();
+          HTall += electron->pt();
+	}
 
 	m_Ibranches.at("total_charge").set(*event, totalCharge, sys);
         m_Ibranches.at("dilept_type").set(*event, muonSize == 2 ? 3 : (muonSize == 1 ? 2 : 1), sys);
@@ -337,7 +344,10 @@ namespace ttHH
         HT += jet->pt();
       }
 
+      HTall += HT;
+
       m_Fbranches.at("HT").set(*event, HT, sys);
+      m_Fbranches.at("HTall").set(*event, HTall, sys);
       m_Ibranches.at("nLeptons").set(*event, leptonCount, sys);
     }
     return StatusCode::SUCCESS;
