@@ -13,14 +13,8 @@ import re
 
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
-             float_variables=None, int_variables=None):
-    if not float_variables:
-        float_variables = []
-    if not int_variables:
-        int_variables = []
-
+             float_variables=[], int_variables=[]):
     cfg = ComponentAccumulator()
-
     PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
     TightPhotonWP = flags.Analysis.Photon.extra_wps[0]
     TightPhotonWPLabel = f'{TightPhotonWP[0]}_{TightPhotonWP[1]}'
@@ -99,6 +93,21 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
         )
     )
 
+    if flags.Analysis.do_KinematicFit:
+        cfg.addEventAlgo(
+            CompFactory.HHBBYY.MbbKinFitDecoratorAlg(
+                "MbbKinFitDecoratorAlg",
+                jets="bbyyAnalysisJets_%SYS%",
+                photons="bbyyAnalysisPhotons_%SYS%",
+                jetContainerOutKey="bbyyAnalysisKFJets_%SYS%",
+                JetCollection=flags.Analysis.small_R_jet.jet_type,
+                JetMinPt=25.,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                AnglesResolution=0.1,
+                FixAnglesFit=True,
+            )
+        )
+
     cfg.addEventAlgo(
         CompFactory.HHBBYY.BaselineVarsbbyyAlg(
             "BaselineVarsbbyyAlg",
@@ -107,11 +116,13 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             muons="bbyyAnalysisMuons_%SYS%",
             electrons="bbyyAnalysisElectrons_%SYS%",
             jets="bbyyAnalysisJets_%SYS%",
+            KFJets="bbyyAnalysisKFJets_%SYS%" if flags.Analysis.do_KinematicFit else "",
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
             BDT_path=flags.Analysis.BDT_path,
             isMC=flags.Input.isMC,
+            doKF=flags.Analysis.do_KinematicFit,
             floatVariableList=float_variables,
             intVariableList=int_variables
         )
@@ -185,6 +196,23 @@ def get_BaselineVarsbbyyAlg_variables(flags):
                              "Phibbyy", "dRbbyy", "bdtSel_score"]
 
     float_variable_names += ["DeltaPhi_bb_yy_cm_bbyy"]
+
+    # Kinematic Fit variables
+    if (flags.Analysis.do_KinematicFit):
+        float_variable_names += ["KF_mbb", "KF_pTbb", "KF_Etabb","KF_Phibb","KF_mbbyy",
+                                 "KF_dRbb", "KF_mbbyystar", "KF_pTbbyy", "KF_Etabbyy",
+                                 "KF_Phibbyy", "KF_dRHH"]
+        # KF mva variables
+        float_variable_names += ["KF_HT", "KF_topness", "KF_sphericityT",
+                                 "KF_planarFlow", "KF_pTBalance"]
+
+        for i in range(1,5):
+            for var in ["pt", "phi", "eta", "E"]:
+                float_variable_names += [f"KF_Jet{i}_" + var]
+
+        for i in range(1,3):
+            for var in ["pt", "phi", "eta", "E"]:
+                float_variable_names += [f"KF_HbbCandidate_Jet{i}_" + var]
 
     # VBFJets
     for i in range(1,3):
@@ -264,9 +292,9 @@ def bbyy_branches(flags):
 
     all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
-    for var in all_baseline_variable_names:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}"
-                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+    for tree_flags in flags.Analysis.ttree_output:
+        for var in all_baseline_variable_names:
+            branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables

@@ -10,6 +10,7 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(bbyyAnalysis
+  src/MbbKinFitDecoratorAlg.cxx
   src/BaselineVarsbbyyAlg.cxx
   src/bbyySelectorAlg.cxx
   src/bbyyFilterDalitzAlg.cxx
@@ -34,6 +35,7 @@ atlas_add_component(bbyyAnalysis
   EventBookkeeperToolsLib
   TriggerMatchingToolLib
   MVAUtils
+  KinematicFitToolLib
 )
 
 # Install python modules, joboptions, and share content

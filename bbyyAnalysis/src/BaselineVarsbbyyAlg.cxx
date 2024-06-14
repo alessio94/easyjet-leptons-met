@@ -41,6 +41,9 @@ namespace HHBBYY
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
+    if(m_doKF){
+      ATH_CHECK (m_KFJetHandle.initialize(m_systematicsList));
+    }
 
     ATH_CHECK (m_selected_ph.initialize(m_systematicsList, m_photonHandle));
 
@@ -102,11 +105,17 @@ namespace HHBBYY
         ATH_MSG_ERROR("Could not retrieve MET");
         return StatusCode::FAILURE;	
       }
+      const xAOD::JetContainer *KFJets = nullptr;
+      if(m_doKF){
+        ANA_CHECK (m_KFJetHandle.retrieve (KFJets, sys));
+      }
+      
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
       static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
       static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
       static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
+      static const SG::AuxElement::ConstAccessor<float> KF_MBB("KF1_Mbb");
 
       // initialize
       TLorentzVector H_bb(0.,0.,0.,0.);
@@ -145,10 +154,12 @@ namespace HHBBYY
 
       int nCentralJets = 0;
       double HT = 0.; // scalar sum of jet pT
+      double KF_HT = 0;
 
       bool WPgiven = !m_isBtag.empty();
       bool PCBTgiven = !m_PCBT.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      auto KF_bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
 
       for(const xAOD::Jet* jet : *jets) {
         // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.4
@@ -292,13 +303,11 @@ namespace HHBBYY
 
         H_bb = Hbb_candidate1 + Hbb_candidate2;
         dRbb = (Hbb_candidate1).DeltaR(Hbb_candidate2);
-
         m_Fbranches.at("mbb").set(*event, H_bb.M(), sys);
         m_Fbranches.at("pTbb").set(*event, H_bb.Pt(), sys);
         m_Fbranches.at("Etabb").set(*event, H_bb.Eta(), sys);
         m_Fbranches.at("Phibb").set(*event, H_bb.Phi(), sys);
         m_Fbranches.at("dRbb").set(*event, dRbb, sys);
-        
       }
 
       // Build the HH candidate
@@ -316,22 +325,21 @@ namespace HHBBYY
         m_Fbranches.at("Phibbyy").set(*event, HH.Phi(), sys);
         m_Fbranches.at("dRbbyy").set(*event, dRHH, sys);
         eventFloats.at(HHBBYY::Var::bbyy_mStar) = bbyy_mStar;
-
+      
 	//additional angular variables in referential of center of frame of HH and H
 
-	std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(y1,y2,Hbb_candidate1,Hbb_candidate2);
-	
-	m_Fbranches.at("cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);
-	m_Fbranches.at("phi_yy_cm_bbyy").set(*event,vec_angular_variables_CM[1], sys);
-	
-	m_Fbranches.at("Photon1_cos_theta_cm_gamgam").set(*event,vec_angular_variables_CM[2], sys);
-	m_Fbranches.at("Photon1_phi_cm_gamgam").set(*event,vec_angular_variables_CM[3], sys);
-	
-	m_Fbranches.at("HbbCandidate_Jet1_cos_theta_cm_bb").set(*event,vec_angular_variables_CM[4], sys);
-	m_Fbranches.at("HbbCandidate_Jet1_phi_cm_bb").set(*event,vec_angular_variables_CM[5], sys);
-	m_Fbranches.at("DeltaPhi_bb_yy_cm_bbyy").set(*event,vec_angular_variables_CM[6], sys);
+        std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(y1,y2,Hbb_candidate1,Hbb_candidate2);
+        
+        m_Fbranches.at("cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);
+        m_Fbranches.at("phi_yy_cm_bbyy").set(*event,vec_angular_variables_CM[1], sys);
+        
+        m_Fbranches.at("Photon1_cos_theta_cm_gamgam").set(*event,vec_angular_variables_CM[2], sys);
+        m_Fbranches.at("Photon1_phi_cm_gamgam").set(*event,vec_angular_variables_CM[3], sys);
+        
+        m_Fbranches.at("HbbCandidate_Jet1_cos_theta_cm_bb").set(*event,vec_angular_variables_CM[4], sys);
+        m_Fbranches.at("HbbCandidate_Jet1_phi_cm_bb").set(*event,vec_angular_variables_CM[5], sys);
+        m_Fbranches.at("DeltaPhi_bb_yy_cm_bbyy").set(*event,vec_angular_variables_CM[6], sys);
       }
-      
       // More global variables
       m_Fbranches.at("HT").set(*event, HT, sys);
 
@@ -346,7 +354,6 @@ namespace HHBBYY
       eventFloats.at(HHBBYY::Var::planarFlow) = eventShapes[1];
       eventFloats.at(HHBBYY::Var::topness) = topness;
 
-
       float pTBalance = compute_pTBalance(bjets, photons);
       m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
 
@@ -355,6 +362,82 @@ namespace HHBBYY
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
       m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
+
+      //KF jets sector
+      if (m_doKF){
+        for(const xAOD::Jet* KFjet : *KFJets) {
+          // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.4
+          KF_HT += KFjet->pt();
+            // check if jet is btagged
+            if (WPgiven && m_isBtag.get(*KFjet, sys)) KF_bjets->push_back(KFjet);
+          }
+          m_Fbranches.at("KF_HT").set(*event, KF_HT, sys);
+          //inclusive jets sector
+          for (std::size_t i=0; i<std::min(KFJets->size(),(std::size_t)4); i++){	 
+            j = KFJets->at(i)->p4();
+            m_Fbranches.at("KF_Jet"+std::to_string(i+1)+"_pt").set(*event, j.Pt(), sys);
+            m_Fbranches.at("KF_Jet"+std::to_string(i+1)+"_eta").set(*event, j.Eta(), sys);
+            m_Fbranches.at("KF_Jet"+std::to_string(i+1)+"_phi").set(*event, j.Phi(), sys);
+            m_Fbranches.at("KF_Jet"+std::to_string(i+1)+"_E").set(*event, j.E(), sys);
+          }
+
+          //KF candidate jets, Hbb variables
+          const xAOD::Jet* Hbb_KFJet1 = nullptr;
+          const xAOD::Jet* Hbb_KFJet2 = nullptr;
+          if (KFJets->size() >= 2) {
+            if (KF_bjets->size() == 0 ) {
+              Hbb_KFJet1 = KFJets->at(0);
+              Hbb_KFJet2 = KFJets->at(1);
+            } else if (KF_bjets->size() ==1 ) {
+              Hbb_KFJet1 = KF_bjets->at(0);
+              int index2 = (KFJets->at(0)==Hbb_KFJet1) ? 1 : 0;
+              Hbb_KFJet2 = KFJets->at(index2);
+
+            } else{
+              Hbb_KFJet1 = KF_bjets->at(0);
+              Hbb_KFJet2 = KF_bjets->at(1);
+            }
+
+            std::vector<TLorentzVector> Hbb_KFcandidates = {Hbb_KFJet1->p4(), Hbb_KFJet2->p4()};
+
+            for(unsigned int i=0; i<2; i++){
+              std::string prefix = "KF_HbbCandidate_Jet"+std::to_string(i+1);
+              m_Fbranches.at(prefix+"_pt").set(*event, Hbb_KFcandidates[i].Pt(), sys);
+              m_Fbranches.at(prefix+"_eta").set(*event, Hbb_KFcandidates[i].Eta(), sys);
+              m_Fbranches.at(prefix+"_phi").set(*event, Hbb_KFcandidates[i].Phi(), sys);
+              m_Fbranches.at(prefix+"_E").set(*event, Hbb_KFcandidates[i].E(), sys);
+            }
+
+            TLorentzVector H_bb_KF = Hbb_KFcandidates[0] + Hbb_KFcandidates[1];
+            float KF_dRbb = (Hbb_KFcandidates[0]).DeltaR(Hbb_KFcandidates[1]);
+
+            m_Fbranches.at("KF_mbb").set(*event, KF_MBB(*event), sys);
+            m_Fbranches.at("KF_pTbb").set(*event, H_bb_KF.Pt(), sys);
+            m_Fbranches.at("KF_Etabb").set(*event, H_bb_KF.Eta(), sys);
+            m_Fbranches.at("KF_Phibb").set(*event, H_bb_KF.Phi(), sys);
+            m_Fbranches.at("KF_dRbb").set(*event, KF_dRbb, sys);
+        
+            //build the KF HH candidate
+            double Higgs_mass = 125. * Athena::Units::GeV;
+            TLorentzVector HH_KF = H_yy + H_bb_KF;
+            float KF_bbyy_mStar = HH_KF.M() - (H_bb_KF.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
+            m_Fbranches.at("KF_mbbyy").set(*event, HH_KF.M(), sys);
+            m_Fbranches.at("KF_mbbyystar").set(*event, KF_bbyy_mStar, sys);
+            m_Fbranches.at("KF_pTbbyy").set(*event, HH_KF.M(), sys);
+            m_Fbranches.at("KF_Etabbyy").set(*event, HH_KF.M(), sys);
+            m_Fbranches.at("KF_Phibbyy").set(*event, HH_KF.M(), sys);
+            m_Fbranches.at("KF_dRHH").set(*event, H_yy.DeltaR(H_bb_KF), sys);
+
+          }
+          //mva variables
+          float KF_topness = compute_Topness(KFJets);
+          float* KF_eventShapes = compute_EventShapes(KF_bjets, photons);
+          float KF_pTBalance = compute_pTBalance(KF_bjets, photons);
+          m_Fbranches.at("KF_topness").set(*event, KF_topness, sys);
+          m_Fbranches.at("KF_sphericityT").set(*event, KF_eventShapes[0], sys);
+          m_Fbranches.at("KF_planarFlow").set(*event, KF_eventShapes[1], sys);
+          m_Fbranches.at("KF_pTBalance").set(*event, KF_pTBalance, sys);                   
+      }   
 
       // bdt (vbf jets selection)
       TLorentzVector vbf_j[2];
@@ -621,7 +704,7 @@ namespace HHBBYY
 
   //#######################################################################################################################################################################################################
 
-// Selects VBF jets based on VBF jet BDT score
+  // Selects VBF jets based on VBF jet BDT score
   float BaselineVarsbbyyAlg::getVBFjets_BDT(float ht, const xAOD::Photon *ph1, const xAOD::Photon *ph2,
                                          const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                                          const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]) {

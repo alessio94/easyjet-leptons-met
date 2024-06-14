@@ -163,6 +163,9 @@ namespace HHBBYY
     CP::SysReadHandle<xAOD::MuonContainer>
     m_muonHandle{ this, "muons", "",   "Muon container to read" };
 
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_KFJetHandle{this, "KFJets", "", "KF Jet container to read"};
+
     Gaudi::Property<std::string> m_photonWPName
       { this, "photonWP", "","Photon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ph_SF{"", this};
@@ -175,6 +178,9 @@ namespace HHBBYY
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
+
+    Gaudi::Property<bool> m_doKF
+      { this, "doKF", false, "Do Kinematic Fit?" };
     
     Gaudi::Property<std::vector<std::string>> m_floatVariables
       {this, "floatVariableList", {}, "Name list of float variables"};
