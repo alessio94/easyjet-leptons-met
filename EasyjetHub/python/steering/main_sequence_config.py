@@ -62,6 +62,20 @@ def core_services_cfg(flags):
 
 # Select events early with trigger and data quality requirements
 def preselection_cfg(flags, seqname):
+    # Create the output CA to set the sequence correctly
+    cfg = ComponentAccumulator()
+    cfg.addSequence(CompFactory.AthSequencer(seqname))
+
+    if flags.Analysis.do_bbyy_analysis and flags.Input.isMC:
+        from bbyyAnalysis.bbyy_config import contain_dalitz, get_weight_index
+        if contain_dalitz(flags):
+            from bbyyAnalysis.bbyy_config import bbyy_filter_dalitz_cfg
+            cfg.merge(bbyy_filter_dalitz_cfg(flags), seqname)
+
+        if contain_dalitz(flags) or get_weight_index(flags):
+            from EasyjetHub.algs.truth.truth_config import sumofweightsalg_cfg
+            cfg.merge(sumofweightsalg_cfg(flags), seqname)
+
     # Aggregate the configured CP algs in one ConfigSequence,
     # which will handle the container names, copying etc
     configSeq = ConfigSequence()
@@ -82,20 +96,6 @@ def preselection_cfg(flags, seqname):
     configSeq += event_selection_sequence(flags)
     if not flags.Analysis.suppress_metadata_json:
         makeEventCounterConfig(configSeq, "n_data_quality")
-
-    # Create the output CA to set the sequence correctly
-    cfg = ComponentAccumulator()
-    cfg.addSequence(CompFactory.AthSequencer(seqname))
-
-    if flags.Analysis.do_bbyy_analysis and flags.Input.isMC:
-        from bbyyAnalysis.bbyy_config import contain_dalitz, get_weight_index
-        if contain_dalitz(flags):
-            from bbyyAnalysis.bbyy_config import bbyy_filter_dalitz_cfg
-            cfg.merge(bbyy_filter_dalitz_cfg(flags), seqname)
-
-        if contain_dalitz(flags) or get_weight_index(flags):
-            from EasyjetHub.algs.truth.truth_config import sumofweightsalg_cfg
-            cfg.merge(sumofweightsalg_cfg(flags), seqname)
 
     # Define the sequence holding all the calibration
     preselSeq = CompFactory.AthSequencer('PreselectionSequence')
