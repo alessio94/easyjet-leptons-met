@@ -123,9 +123,6 @@ def jet_sequence(
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
 
-            if "GN2v01" in tagger:
-                continue
-
             # Note: this is going to run post overlap removal
             configSeq += config.makeConfig(
                 'Jets.FlavourTaggingEventSF',
