@@ -27,8 +27,8 @@ def HHbbttTriggerDecoratorCfg(flags, **kwargs):
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             # Not available in current Run2 PHYSLITE
-            diTauTrigMatch=not (flags.Input.isPHYSLITE and \
-                                flags.GeoModel.Run == LHCPeriod.Run2),
+            diTauTrigMatch=not (flags.Input.isPHYSLITE
+                                and flags.GeoModel.Run == LHCPeriod.Run2),
             **kwargs
         )
     )

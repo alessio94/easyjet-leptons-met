@@ -13,7 +13,12 @@ import re
 
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
-             float_variables=[], int_variables=[]):
+             float_variables=None, int_variables=None):
+    if not float_variables:
+        float_variables = []
+    if not int_variables:
+        int_variables = []
+
     cfg = ComponentAccumulator()
     PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
     TightPhotonWP = flags.Analysis.Photon.extra_wps[0]
@@ -292,9 +297,9 @@ def bbyy_branches(flags):
 
     all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
-    for tree_flags in flags.Analysis.ttree_output:
-        for var in all_baseline_variable_names:
-            branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}_%SYS%"]
+    for var in all_baseline_variable_names:
+        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
