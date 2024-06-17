@@ -56,6 +56,11 @@ def validate_do_obj_flags(flags):
             "Small-R / Large-R jets overlap removal requires for the Large-R jets "
             "overlap removal to be enabled"
         )
+    if flags.Analysis.do_large_R_UFO_jets \
+       and flags.Analysis.large_R_jet.runMuonJetPtCorr:
+        assert flags.Analysis.do_muons, (
+            "Large-R jets muon-in-jet correction requires muons to be run"
+        )
 
 
 def validate_do_write_obj_flags(flags, tree_flags):

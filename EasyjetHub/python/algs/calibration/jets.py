@@ -169,6 +169,19 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
                             jetCollection=input_name)
     configSeq.setOptionValue('.postfix', f'largeR_{lr_jet_type}jets')
 
+    # Optional muon-in-jet correction for large-R jets
+    if flags.Analysis.large_R_jet.runMuonJetPtCorr:
+        makeBJetPtCalibrationConfig(
+            configSeq,
+            output_name,
+        )
+        configSeq.setOptionValue(
+            '.muonName',
+            flags.Analysis.container_names.output.muons
+        )
+        # Disable small-R b-jet pT reco
+        configSeq.setOptionValue('.doPtCorr', False)
+
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
 

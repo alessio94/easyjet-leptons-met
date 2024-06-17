@@ -7,6 +7,9 @@ do_large_R_UFO_jets: true
 do_large_R_jets_OR: false
 do_small_R_jet_large_R_jet_OR: false
 
+large_R_jet:
+  runMuonJetPtCorr: true
+
 # Include the TTree configuration and update details
 ttree_output:
   - AnalysisMiniTree:

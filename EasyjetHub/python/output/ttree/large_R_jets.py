@@ -44,6 +44,9 @@ def get_large_R_jet_branches(
     if flags.Analysis.do_overlap_removal:
         large_R_jet_branches.variables += ["passesOR_%SYS%"]
 
+    if flags.Analysis.large_R_jet.runMuonJetPtCorr:
+        large_R_jet_branches.variables += ["uncorrPt", "n_muons"]
+
     if flags.Input.isMC and tree_flags.collection_options.large_R_jets.truth_labels:
         large_R_jet_branches.variables += [
             "GhostBHadronsFinalCount",

@@ -53,6 +53,7 @@ small_R_jet:
 large_R_jet:
   # btagging working points for Variable Radius Track jets
   vr_btag_wps: []
+  runMuonJetPtCorr: False
 
 Photon:
   ID: ""
