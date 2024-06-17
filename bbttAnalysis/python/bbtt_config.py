@@ -38,10 +38,15 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 
     cfg.merge(TauSelectorAlgCfg(flags,
                                 # Baseline always needed for anti-taus
-                                containerInKey='Baseline' + taukey,
+                                containerInKey=taukey,
                                 keepAntiTaus=True,
                                 containerOutKey="bbttAnalysisTaus_%SYS%",
-                                tau_WP=flags.Analysis.Tau.ID))
+                                # used to filter collection
+                                looseTauWP='Baseline',
+                                # used for subsequent event selections
+                                # only used to decorate flags + scale factors
+                                tightTauWP=flags.Analysis.Tau.ID,
+                                tauAmount=flags.Analysis.Tau.amount))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,

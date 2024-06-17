@@ -25,18 +25,35 @@ namespace Easyjet
     ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
 
+    if (m_tauAmount > 0)
+    {
+      for (int i = 0; i < m_tauAmount; i++)
+      {
+        std::string index = std::to_string(i + 1);
+        CP::SysWriteDecorHandle<bool> whandle{"isTau" + index + "_%SYS%", this};
+        m_leadBranches.emplace("isTau" + index, whandle);
+        ATH_CHECK(m_leadBranches.at("isTau" + index).initialize(m_systematicsList, m_inHandle));
+      };
+    }
+
+    ANA_CHECK (m_isSelectedTau.initialize(m_systematicsList, m_inHandle));
+
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
+    if(m_tightTauWP.empty()) m_tightTauWP = m_looseTauWP;
+
     if(m_isMC){
-      m_tau_SF_in = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
-      m_tau_SF_out = CP::SysWriteDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
+      m_tau_SF_in = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tightTauWP+"_%SYS%", this);
+      m_tau_SF_out = CP::SysWriteDecorHandle<float>("tau_effSF_"+m_tightTauWP+"_%SYS%", this);
     }
     ATH_CHECK (m_tau_SF_in.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_tau_SF_out.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
-    m_select_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_tauWPName+"_%SYS%", this);
-    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_tauWPName+"_%SYS%", this);
-    ATH_CHECK (m_select_in.initialize(m_systematicsList, m_inHandle));
+    m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_looseTauWP+"_%SYS%", this);
+    m_select_tight_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_tightTauWP+"_%SYS%", this);
+    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_tightTauWP+"_%SYS%", this);
+    ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
+    ATH_CHECK (m_select_tight_in.initialize(m_systematicsList, m_inHandle));
     ATH_CHECK (m_select_out.initialize(m_systematicsList, m_outHandle));
 
     // Initialise syst-aware input/output decorators 
@@ -69,6 +86,11 @@ namespace Easyjet
       // loop over taus 
       for (const xAOD::TauJet *tau : *inContainer) {
 
+        // selected taus for systematics
+        m_isSelectedTau.set(*tau, false, sys);
+
+        if(!m_select_loose_in.get(*tau,sys)) continue;
+
         // If not ID tau nor anti tau, skip
         if(m_keepAntiTaus){
           bool keep = m_IDTau.get(*tau, sys) || m_antiTau.get(*tau, sys);
@@ -92,10 +114,11 @@ namespace Easyjet
 
         // For some reason this decoration needs to be explicitly copied
         if(m_isMC) m_tau_SF_out.set(*tau, m_tau_SF_in.get(*tau,sys), sys);
-        m_select_out.set(*tau, m_select_in.get(*tau,sys), sys);
+        m_select_out.set(*tau, m_select_tight_in.get(*tau,sys), sys);
 
         // If cuts are passed, save the object
         workContainer->push_back(tau);
+        m_isSelectedTau.set(*tau, true, sys);
       }
 
       int nTaus = workContainer->size();      
@@ -129,6 +152,16 @@ namespace Easyjet
         // keep only the requested amount
         workContainer->erase(workContainer->begin() + nKeep,
      			                   workContainer->end());
+      }
+
+      //lead/sublead tau
+      if(m_tauAmount > 0){
+        int nTau = 0;
+        for (const xAOD::TauJet *tau : *workContainer) {
+          nTau++;
+          m_leadBranches.at("isTau"+std::to_string(nTau)).set(*tau, true, sys);
+          if ( nTau == m_tauAmount ) break;
+        }
       }
     
       // Write to eventstore

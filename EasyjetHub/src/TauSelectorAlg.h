@@ -57,12 +57,16 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::string> m_tauWPName
-      { this, "tau_WP", "","Tau ID working point" };
+    Gaudi::Property<std::string> m_looseTauWP
+      { this, "looseTauWP", "", "Loose tau ID working point, used to filter collection" };
+
+    Gaudi::Property<std::string> m_tightTauWP
+      { this, "tightTauWP", "", "Tight tau ID working point, not used to filter collection" };
     CP::SysReadDecorHandle<float> m_tau_SF_in{"", this};
     CP::SysWriteDecorHandle<float> m_tau_SF_out{"", this};
 
-    CP::SysReadDecorHandle<char> m_select_in{"", this};
+    CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
+    CP::SysReadDecorHandle<char> m_select_tight_in{"", this};
     CP::SysWriteDecorHandle<char> m_select_out{"", this};
 
     /// \brief Setup syst-aware output container handles
@@ -74,6 +78,10 @@ private:
       m_nSelPart{ this, "decorOutName", "nTaus_%SYS%",
 	  "Name out output decorator for number of selected taus" };
 
+    CP::SysWriteDecorHandle<bool > m_isSelectedTau {
+        this, "decoration", "isAnalysisTau_%SYS%", "decoration for per-object if tau is selected"
+    };
+
     Gaudi::Property<float> m_minPt            {this, "minPt", 20e3, "Minimum pT of taus"};
     Gaudi::Property<float> m_minEtaVeto       {this, "minEtaVeto", 1.37, "Minimum eta veto of EMCal"};
     Gaudi::Property<float> m_maxEtaVeto       {this, "maxEtaVeto", 1.52, "Maximum eta veto of EMCal"};
@@ -82,6 +90,11 @@ private:
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort taus by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra taus after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
+
+    Gaudi::Property<int>   m_tauAmount       {this, "tauAmount", -1, "Maximum number of tau to consider"};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
+
+
   };
 }
 

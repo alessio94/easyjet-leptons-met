@@ -82,4 +82,3 @@ do_overlap_removal: true
 doTauAntiTauJetOR: true
 
 store_high_level_variables: true
-

@@ -46,4 +46,9 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
             "truthType"
         ]
 
+    if tree_flags.collection_options.taus.run_selection:
+        tau_branches.variables += ["isAnalysisTau_%SYS%"]
+        for index in range(flags.Analysis.Tau.amount):
+            tau_branches.variables += [f"isTau{index+1}_%SYS%"]
+
     return tau_branches.get_output_list()

@@ -37,9 +37,10 @@ def lltt_cfg(
         ele_WPs=[TightElectronWPLabel]))
 
     cfg.merge(TauSelectorAlgCfg(flags,
-                                containerInKey=flags.Analysis.Tau.ID + taukey,
+                                containerInKey=taukey,
                                 containerOutKey="llttAnalysisTaus_%SYS%",
-                                tau_WP=flags.Analysis.Tau.ID))
+                                # used to filter collection
+                                looseTauWP=flags.Analysis.Tau.ID))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,

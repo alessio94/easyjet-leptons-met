@@ -34,6 +34,7 @@ collection_options:
   taus:
     RNN_branches: false
     truth_branches: false
+    run_selection: false
 
   photons:
     shower_shapes: false
