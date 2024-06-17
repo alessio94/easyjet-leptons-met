@@ -106,6 +106,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
             BDT_path=flags.Analysis.BDT_path,
+            VBFjetsMethod=flags.Analysis.VBFjetsMethod,
             isMC=flags.Input.isMC,
             doKF=flags.Analysis.do_KinematicFit,
             floatVariableList=float_variables,

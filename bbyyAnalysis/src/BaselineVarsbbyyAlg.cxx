@@ -71,6 +71,9 @@ namespace HHBBYY
       m_bdts.push_back(std::move(bdt));
     }
 
+    // convert string to enum (VBFjetsMethod)
+    m_vbfjets_method = stringToVBFjetsMethod(m_vbfjets_method_str);
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
@@ -446,7 +449,17 @@ namespace HHBBYY
       float vbf_jj_maxscore = 0;
     
       if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
-        vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+        if(m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) {
+          vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+        }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::mjj) {
+          getVBFjets_mjj(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+        }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::pTsorting) {
+          getVBFjets_pTsorting(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+        }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::invalid) {
+          ANA_MSG_ERROR("Invalid vbfjets method imported!!! The default BDT method is called!!!");
+          return StatusCode::FAILURE;
+        }
+
         vbf_jj = vbf_j[0] + vbf_j[1];
         yybbjj = vbf_jj + HH;
       }
@@ -703,6 +716,19 @@ namespace HHBBYY
   }
 
   //#######################################################################################################################################################################################################
+  // Convert string to enum (VBF Jets selection method)
+  VBFjetsMethod BaselineVarsbbyyAlg::stringToVBFjetsMethod(const std::string& vbfjets_method_str) {
+    if (vbfjets_method_str == "BDT") {
+      return HHBBYY::VBFjetsMethod::BDT;
+    } else if (vbfjets_method_str == "mjj") {
+      return HHBBYY::VBFjetsMethod::mjj;
+    } else if (vbfjets_method_str == "pTsorting") {
+      return HHBBYY::VBFjetsMethod::pTsorting;
+    } else {
+      ANA_MSG_ERROR("Invalid vbfjets method string");
+      return HHBBYY::VBFjetsMethod::invalid;
+    }
+  }
 
   // Selects VBF jets based on VBF jet BDT score
   float BaselineVarsbbyyAlg::getVBFjets_BDT(float ht, const xAOD::Photon *ph1, const xAOD::Photon *ph2,
@@ -742,7 +768,6 @@ namespace HHBBYY
       std::vector<float> scores;
 
       int curComb = 0;
-      //std::vector<float> vars;
   
       for (size_t i = 0; i < jets->size()-1; i++) {
         // ignore candidate bjets
@@ -809,7 +834,64 @@ namespace HHBBYY
 
     return max_jjscore;
   }
-  
+
+  // Selects VBF jets based on VBF jets: maximum mjj
+  void BaselineVarsbbyyAlg::getVBFjets_mjj(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
+                                           const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]) {
+    float m_jj = -999;
+
+    const int nCandidateVBFJets = jets->size() - 2;
+    if (nCandidateVBFJets >= 2) {
+      for (size_t i = 0; i < jets->size()-1; i++) {
+        // ignore candidate bjets
+        if (jets->at(i)==Hbb_Jet1 || jets->at(i)==Hbb_Jet2) {
+          continue;
+        }
+
+        for (size_t j = i + 1; j < jets->size(); j++) {
+          // ignore candidate bjets
+          if (jets->at(j)==Hbb_Jet1 || jets->at(j)==Hbb_Jet2) {
+            continue;
+          }
+
+          TLorentzVector iPair = jets->at(i)->p4() + jets->at(j)->p4();
+          if (iPair.M() > m_jj) {
+            m_jj = iPair.M();
+            Jets_vbf[0] = jets->at(i)->p4();
+            Jets_vbf[1] = jets->at(j)->p4();
+          }
+        } // end loop second jet
+      } // end loop first jet
+    }
+  }
+
+  // Selects VBF jets based on VBF jets: pT sorting
+  void BaselineVarsbbyyAlg::getVBFjets_pTsorting(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
+                                                 const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]) {
+
+    const int nCandidateVBFJets = jets->size() - 2;
+    if (nCandidateVBFJets >= 2) {
+      const xAOD::Jet* VBF_j1 = nullptr;
+      const xAOD::Jet* VBF_j2 = nullptr;
+      
+      // select the leading and sub-leading VBF jets
+      for (const xAOD::Jet *jet : *jets) {
+        // ignore candidate bjets
+        if (jet==Hbb_Jet1 || jet==Hbb_Jet2) continue;
+
+        if (!VBF_j1 || jet->pt() > VBF_j1->pt()){
+          VBF_j2 = VBF_j1;
+          VBF_j1 = jet;
+        }else if (!VBF_j2 || jet->pt() > VBF_j2->pt()){
+          VBF_j2 = jet;
+        }
+      }
+
+      Jets_vbf[0] = VBF_j1->p4();
+      Jets_vbf[1] = VBF_j2->p4();
+    }
+  }
+
   // Low and High mass regions (categorization)
   void BaselineVarsbbyyAlg::performCategorisationBDT(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
                                                      const xAOD::Jet *Hbb_Jet1, 

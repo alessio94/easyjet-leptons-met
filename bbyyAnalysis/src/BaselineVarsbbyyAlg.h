@@ -99,6 +99,13 @@ namespace HHBBYY
     nVars
   };
 
+  enum VBFjetsMethod {
+    BDT,
+    mjj,
+    pTsorting,
+    invalid
+  };
+
   /// \brief An algorithm for counting containers
   class BaselineVarsbbyyAlg final : public AthHistogramAlgorithm
   {
@@ -116,10 +123,15 @@ namespace HHBBYY
     float compute_Topness(const xAOD::JetContainer *jets);
     float* compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
     float compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
+    
+    VBFjetsMethod stringToVBFjetsMethod(const std::string& vbfjets_method_str);
     float getVBFjets_BDT(float ht, const xAOD::Photon *ph1, const xAOD::Photon *ph2,
                       const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                       const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
-
+    void getVBFjets_mjj(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
+                        const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
+    void getVBFjets_pTsorting(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
+                              const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
     std::vector<float> makeXGBoostDMatrixLegacyNonres(const xAOD::Photon *ph1, const xAOD::Photon *ph2, 
                                                       ConstDataVector<xAOD::JetContainer> &categorisation_jets,
                                                       const xAOD::MissingETContainer *met, const auto &sys,
@@ -191,6 +203,9 @@ namespace HHBBYY
     Gaudi::Property<std::vector<std::string>> m_bdts_path 
       {this, "BDT_path", {}, "Path to BDT model"};
 
+    Gaudi::Property<std::string> m_vbfjets_method_str
+      {this, "VBFjetsMethod", "", "VBF jets selection method"};
+
     CP::SysReadDecorHandle<bool> 
     m_selected_ph { this, "selected_ph", "selected_ph_%SYS%", "Name of input decorator for selected ph"};
 
@@ -202,6 +217,8 @@ namespace HHBBYY
     // Declare the BDTs
     std::vector<std::unique_ptr<MVAUtils::BDT>> m_bdts;
 
+    // Declare the enum of m_vbfjets_method
+    VBFjetsMethod m_vbfjets_method;
   };
 }
 #endif

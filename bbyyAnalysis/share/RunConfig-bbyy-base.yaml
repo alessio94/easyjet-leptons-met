@@ -88,3 +88,6 @@ BDT_path:
   - "bbyyAnalysis/bdt_legacy_lowMass.root"
   - "bbyyAnalysis/bdt_legacy_highMass.root"
   - "bbyyAnalysis/bdt_legacy_vbf_jets.root"
+
+#  choose VBF jets selection method
+VBFjetsMethod: "BDT" # "mjj" "pTsorting"
