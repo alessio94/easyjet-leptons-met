@@ -1,6 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import JetSelectorAlgCfg
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches,
 )
@@ -14,20 +15,15 @@ def resolved_cfg(flags, smalljetkey):
     btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
     for btag_wp in btag_wps:
         # get the 4 leading small R jets
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.JetSelectorAlg(
-                "SmallJetSelectorAlg_" + btag_wp,
-                containerInKey=smalljetkey,
-                containerOutKey="resolvedAnalysisJets_" + btag_wp,
-                bTagWPDecorName="ftag_select_" + btag_wp,
-                selectBjet=True,
-                minPt=20e3,
-                maxEta=2.5,
-                truncateAtAmount=4,  # -1 means keep all
-                minimumAmount=4,  # -1 means ignores this
-                checkOR=flags.Analysis.do_overlap_removal,
-            )
-        )
+        cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg_" + btag_wp,
+                                    containerInKey=smalljetkey,
+                                    containerOutKey="resolvedAnalysisJets_" + btag_wp,
+                                    bTagWPDecorName="ftag_select_" + btag_wp,
+                                    selectBjet=True,
+                                    minPt=20e3,
+                                    maxEta=2.5,
+                                    truncateAtAmount=4,  # -1 means keep all
+                                    minimumAmount=4))  # -1 means ignores this
 
         # pair them with some strategy and save them as leading (h1) and
         # subleading (h2) Higgs candidates in the order:

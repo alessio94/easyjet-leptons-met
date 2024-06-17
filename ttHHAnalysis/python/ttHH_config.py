@@ -2,6 +2,8 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -22,62 +24,41 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
     LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     TightMuonWP = flags.Analysis.Muon.extra_wps[0]
     TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.MuonSelectorAlg(
-            "MuonSelectorAlg",
-            containerInKey=LooseMuonWPLabel + muonkey,
-            containerOutKey="ttHHAnalysisMuons_%SYS%",
-            minPt=10e3,
-            muon_WPs=[TightMuonWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(MuonSelectorAlgCfg(flags,
+                                 containerInKey=LooseMuonWPLabel + muonkey,
+                                 containerOutKey="ttHHAnalysisMuons_%SYS%",
+                                 minPt=10e3,
+                                 muon_WPs=[TightMuonWPLabel]))
 
     LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     TightEleWP = flags.Analysis.Electron.extra_wps[0]
     TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.ElectronSelectorAlg(
-            "ElectronSelectorAlg",
-            containerInKey=LooseElectronWPLabel + electronkey,
-            containerOutKey="ttHHAnalysisElectrons_%SYS%",
-            minPt=10e3,
-            ele_WPs=[TightEleWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(ElectronSelectorAlgCfg(
+        flags,
+        containerInKey=LooseElectronWPLabel + electronkey,
+        containerOutKey="ttHHAnalysisElectrons_%SYS%",
+        minPt=10e3,
+        ele_WPs=[TightEleWPLabel]))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.JetSelectorAlg(
-            "SmallRJet_BTag_SelectorAlg",
-            containerInKey=smalljetkey,
-            containerOutKey="ttHHAnalysisJets_BTag_%SYS%",
-            bTagWPDecorName="ftag_select_"
-            + flags.Analysis.small_R_jet.btag_wp,
-            selectBjet=True,
-            maxEta=2.5,
-            minPt=20e3,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_BTag_SelectorAlg",
+                                containerInKey=smalljetkey,
+                                containerOutKey="ttHHAnalysisJets_BTag_%SYS%",
+                                bTagWPDecorName="ftag_select_"
+                                + flags.Analysis.small_R_jet.btag_wp,
+                                selectBjet=True,
+                                maxEta=2.5,
+                                minPt=20e3))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.JetSelectorAlg(
-            "SmallRJet_SelectorAlg",
-            containerInKey=smalljetkey,
-            containerOutKey="ttHHAnalysisJets_%SYS%",
-            PCBTDecorName="ftag_quantile_"
-            + flags.Analysis.small_R_jet.btag_extra_wps[0],
-            PCBTsort=True,
-            pTsort=False,
-            bTagWPDecorName="",
-            selectBjet=False,
-            minPt=20e3,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_SelectorAlg",
+                                containerInKey=smalljetkey,
+                                containerOutKey="ttHHAnalysisJets_%SYS%",
+                                PCBTDecorName="ftag_quantile_"
+                                + flags.Analysis.small_R_jet.btag_extra_wps[0],
+                                PCBTsort=True,
+                                pTsort=False,
+                                bTagWPDecorName="",
+                                selectBjet=False,
+                                minPt=20e3))
 
     cfg.addEventAlgo(
         CompFactory.ttHH.JetPairingAlgttHH(

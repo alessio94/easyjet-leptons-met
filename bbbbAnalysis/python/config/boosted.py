@@ -1,6 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import JetSelectorAlgCfg
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches,
 )
@@ -11,20 +12,16 @@ def boosted_cfg(flags, largejetkey):
 
     for btag_wp in flags.Analysis.large_R_jet.vr_btag_wps:
         # get the two leading large R's
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.JetSelectorAlg(
-                "LargeJetSelectorAlg_" + btag_wp,
-                containerInKey=largejetkey,
-                containerOutKey="boostedAnalysisJets_" + btag_wp,
-                bTagWPDecorName="ftag_select_" + btag_wp,
-                selectBjet=True,
-                minPt=250e3,
-                maxEta=2.0,
-                truncateAtAmount=2,  # -1 means keep all
-                minimumAmount=2,  # -1 means ignores this
-                checkOR=flags.Analysis.do_overlap_removal,
-            )
-        )
+        cfg.merge(JetSelectorAlgCfg(flags, name="LargeJetSelectorAlg_" + btag_wp,
+                                    containerInKey=largejetkey,
+                                    containerOutKey="boostedAnalysisJets_" + btag_wp,
+                                    bTagWPDecorName="ftag_select_" + btag_wp,
+                                    selectBjet=True,
+                                    minPt=250e3,
+                                    maxEta=2.0,
+                                    truncateAtAmount=2,  # -1 means keep all
+                                    minimumAmount=2))  # -1 means ignores this
+
         # get the ghost associated VR jets from the leading Large R jet
         cfg.addEventAlgo(
             CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
@@ -36,21 +33,17 @@ def boosted_cfg(flags, largejetkey):
         )
         # make sure we have at least 2 and maximally 3 ghost associated in
         # the leading large R jet
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.JetSelectorAlg(
-                "LeadingLargeRVRJetSelectorAlg_" + btag_wp,
-                containerInKey="leadingLargeRVRJets_" + btag_wp,
-                containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
-                bTagWP=btag_wp,  # empty string: "" ignores btagging
-                selectBjet=True,
-                minPt=10e3,
-                maxEta=2.5,
-                truncateAtAmount=3,  # -1 means keep all
-                minimumAmount=2,  # -1 means ignores this
-                removeRelativeDeltaRToVRJet=True,
-                checkOR=flags.Analysis.do_overlap_removal,
-            )
-        )
+        cfg.merge(JetSelectorAlgCfg(
+            flags, name="LeadingLargeRVRJetSelectorAlg_" + btag_wp,
+            containerInKey="leadingLargeRVRJets_" + btag_wp,
+            containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
+            bTagWP=btag_wp,
+            selectBjet=True,
+            minPt=10e3,
+            maxEta=2.5,
+            truncateAtAmount=3,
+            minimumAmount=2,
+            removeRelativeDeltaRToVRJet=True))
 
         # get the ghost associated VR jets from the subleading Large R jet
         cfg.addEventAlgo(
@@ -64,20 +57,17 @@ def boosted_cfg(flags, largejetkey):
 
         # make sure we have at least 2 and maximally 3 ghost associated in
         # the subleading large R jet
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.JetSelectorAlg(
-                "SubLeadingLargeRVRJetSelectorAlg_" + btag_wp,
-                containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
-                containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
-                bTagWP=btag_wp,  # empty string: "" ignores btagging
-                selectBjet=True,
-                minPt=10e3,
-                maxEta=2.5,
-                truncateAtAmount=3,  # -1 means keep all
-                minimumAmount=2,  # -1 means ignores this
-                removeRelativeDeltaRToVRJet=True,
-            )
-        )
+        cfg.merge(JetSelectorAlgCfg(
+            flags, name="SubLeadingLargeRVRJetSelectorAlg_" + btag_wp,
+            containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
+            containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
+            bTagWP=btag_wp,
+            selectBjet=True,
+            minPt=10e3,
+            maxEta=2.5,
+            truncateAtAmount=3,
+            minimumAmount=2,
+            removeRelativeDeltaRToVRJet=True))
 
         # calculate final boosted vars
         cfg.addEventAlgo(

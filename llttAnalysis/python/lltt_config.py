@@ -2,6 +2,8 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, TauSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -20,55 +22,34 @@ def lltt_cfg(
     LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     TightMuonWP = flags.Analysis.Muon.extra_wps[0]
     TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.MuonSelectorAlg(
-            "MuonSelectorAlg",
-            containerInKey=LooseMuonWPLabel + muonkey,
-            containerOutKey="llttAnalysisMuons_%SYS%",
-            muon_WPs=[TightMuonWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(MuonSelectorAlgCfg(flags,
+                                 containerInKey=LooseMuonWPLabel + muonkey,
+                                 containerOutKey="llttAnalysisMuons_%SYS%",
+                                 muon_WPs=[TightMuonWPLabel]))
 
     LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     TightElectronWP = flags.Analysis.Electron.extra_wps[0]
     TightElectronWPLabel = f'{TightElectronWP[0]}_{TightElectronWP[1]}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.ElectronSelectorAlg(
-            "ElectronSelectorAlg",
-            containerInKey=LooseElectronWPLabel + electronkey,
-            containerOutKey="llttAnalysisElectrons_%SYS%",
-            ele_WPs=[TightElectronWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(ElectronSelectorAlgCfg(
+        flags,
+        containerInKey=LooseElectronWPLabel + electronkey,
+        containerOutKey="llttAnalysisElectrons_%SYS%",
+        ele_WPs=[TightElectronWPLabel]))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.TauSelectorAlg(
-            "TauSelectorAlg",
-            containerInKey=flags.Analysis.Tau.ID + taukey,
-            containerOutKey="llttAnalysisTaus_%SYS%",
-            tau_WP=flags.Analysis.Tau.ID,
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(TauSelectorAlgCfg(flags,
+                                containerInKey=flags.Analysis.Tau.ID + taukey,
+                                containerOutKey="llttAnalysisTaus_%SYS%",
+                                tau_WP=flags.Analysis.Tau.ID))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.JetSelectorAlg(
-            "SmallJetSelectorAlg",
-            containerInKey=smalljetkey,
-            containerOutKey="llttAnalysisJets_%SYS%",
-            minPt=25 * Units.GeV,
-            maxEta=2.5,
-            bTagWPDecorName="",  # empty string: "" ignores btagging
-            selectBjet=False,
-            minimumAmount=-1,  # -1 means ignores this
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(JetSelectorAlgCfg(
+        flags,
+        containerInKey=smalljetkey,
+        containerOutKey="llttAnalysisJets_%SYS%",
+        minPt=25 * Units.GeV,
+        maxEta=2.5,
+        bTagWPDecorName="",  # empty string: "" ignores btagging
+        selectBjet=False,
+        minimumAmount=-1))  # -1 means ignores this
 
     # Selection
     trigger_branches = [

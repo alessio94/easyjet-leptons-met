@@ -4,14 +4,15 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, TauSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
 
-def bbtt_cfg(
-        flags, smalljetkey, muonkey, electronkey,
-        taukey, float_variables=None, int_variables=None):
+def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
+             taukey, float_variables=None, int_variables=None):
     if not float_variables:
         float_variables = []
     if not int_variables:
@@ -22,58 +23,35 @@ def bbtt_cfg(
     LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     TightMuonWP = flags.Analysis.Muon.extra_wps[0]
     TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.MuonSelectorAlg(
-            "MuonSelectorAlg",
-            containerInKey=LooseMuonWPLabel + muonkey,
-            containerOutKey="bbttAnalysisMuons_%SYS%",
-            muon_WPs=[TightMuonWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(MuonSelectorAlgCfg(flags,
+                                 containerInKey=LooseMuonWPLabel + muonkey,
+                                 containerOutKey="bbttAnalysisMuons_%SYS%",
+                                 muon_WPs=[TightMuonWPLabel]))
 
     LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     TightEleWP = flags.Analysis.Electron.extra_wps[0]
     TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.ElectronSelectorAlg(
-            "ElectronSelectorAlg",
-            containerInKey=LooseElectronWPLabel + electronkey,
-            containerOutKey="bbttAnalysisElectrons_%SYS%",
-            ele_WPs=[TightEleWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(ElectronSelectorAlgCfg(flags,
+                                     containerInKey=LooseElectronWPLabel + electronkey,
+                                     containerOutKey="bbttAnalysisElectrons_%SYS%",
+                                     ele_WPs=[TightEleWPLabel]))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.TauSelectorAlg(
-            "TauSelectorAlg",
-            # Baseline always needed for anti-taus
-            containerInKey='Baseline' + taukey,
-            keepAntiTaus=True,
-            containerOutKey="bbttAnalysisTaus_%SYS%",
-            tau_WP=flags.Analysis.Tau.ID,
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(TauSelectorAlgCfg(flags,
+                                # Baseline always needed for anti-taus
+                                containerInKey='Baseline' + taukey,
+                                keepAntiTaus=True,
+                                containerOutKey="bbttAnalysisTaus_%SYS%",
+                                tau_WP=flags.Analysis.Tau.ID))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.JetSelectorAlg(
-            "SmallJetSelectorAlg",
-            containerInKey=smalljetkey,
-            containerOutKey="bbttAnalysisJets_%SYS%",
-            minPt=20 * Units.GeV,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            # empty string: "" ignores btagging
-            selectBjet=False,
-            minimumAmount=2,  # -1 means ignores this
-            bjetAmount=flags.Analysis.small_R_jet.amount_bjet,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(JetSelectorAlgCfg(
+        flags,
+        containerInKey=smalljetkey,
+        containerOutKey="bbttAnalysisJets_%SYS%",
+        minPt=20 * Units.GeV,
+        bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+        selectBjet=False,
+        minimumAmount=2,  # -1 means ignores this
+        bjetAmount=flags.Analysis.small_R_jet.amount_bjet))
 
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(

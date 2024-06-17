@@ -1,6 +1,8 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -16,44 +18,28 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg = ComponentAccumulator()
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.MuonSelectorAlg(
-            "MuonSelectorAlg",
-            containerInKey=MuonWPLabel + muonkey,
-            containerOutKey="ssWWAnalysisMuons_%SYS%",
-            muon_WPs=[MuonWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-            minPt=flags.Analysis.Muon.min_pT_ssWW,
-            maxEta=flags.Analysis.Muon.max_eta_ssWW,
-        )
-    )
+    cfg.merge(MuonSelectorAlgCfg(flags,
+                                 containerInKey=MuonWPLabel + muonkey,
+                                 containerOutKey="ssWWAnalysisMuons_%SYS%",
+                                 muon_WPs=[MuonWPLabel],
+                                 minPt=flags.Analysis.Muon.min_pT_ssWW,
+                                 maxEta=flags.Analysis.Muon.max_eta_ssWW))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.ElectronSelectorAlg(
-            "ElectronSelectorAlg",
-            containerInKey=ElectronWPLabel + electronkey,
-            containerOutKey="ssWWAnalysisElectrons_%SYS%",
-            checkOR=flags.Analysis.do_overlap_removal,
-            ele_WPs=[ElectronWPLabel],
-            isMC=flags.Input.isMC,
-            minPt=flags.Analysis.Electron.min_pT_ssWW,
-            maxEta=flags.Analysis.Electron.max_eta_ssWW,
-        )
-    )
+    cfg.merge(ElectronSelectorAlgCfg(flags,
+                                     containerInKey=ElectronWPLabel + electronkey,
+                                     containerOutKey="ssWWAnalysisElectrons_%SYS%",
+                                     ele_WPs=[ElectronWPLabel],
+                                     isMC=flags.Input.isMC,
+                                     minPt=flags.Analysis.Electron.min_pT_ssWW,
+                                     maxEta=flags.Analysis.Electron.max_eta_ssWW))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.JetSelectorAlg(
-            "SmallJetSelectorAlg",
-            containerInKey=smalljetkey,
-            containerOutKey="ssWWAnalysisJets_%SYS%",
-            bTagWPDecorName="",
-            minPt=flags.Analysis.small_R_jet.min_pT_ssWW,
-            maxEta=flags.Analysis.small_R_jet.max_eta_ssWW,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(JetSelectorAlgCfg(flags,
+                                containerInKey=smalljetkey,
+                                containerOutKey="ssWWAnalysisJets_%SYS%",
+                                bTagWPDecorName="",
+                                minPt=flags.Analysis.small_R_jet.min_pT_ssWW,
+                                maxEta=flags.Analysis.small_R_jet.max_eta_ssWW))
 
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 

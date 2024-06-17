@@ -1,14 +1,13 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
-from vbshiggsAnalysis.fullLep_config import fullLep_cfg
-from vbshiggsAnalysis.fullLep_config import fullLep_branches
-
-from vbshiggsAnalysis.semiLep_config import semiLep_cfg
-from vbshiggsAnalysis.semiLep_config import semiLep_branches
-
-from vbshiggsAnalysis.fullHad_config import fullHad_cfg
-from vbshiggsAnalysis.fullHad_config import fullHad_branches
-
 from AthenaConfiguration.ComponentFactory import CompFactory
+
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
+
+from vbshiggsAnalysis.fullLep_config import fullLep_cfg, fullLep_branches
+from vbshiggsAnalysis.semiLep_config import semiLep_cfg, semiLep_branches
+from vbshiggsAnalysis.fullHad_config import fullHad_cfg, fullHad_branches
+
 import AthenaCommon.SystemOfUnits as Units
 
 
@@ -17,43 +16,26 @@ def vbshiggs_cfg(flags, smalljetkey, muonkey, electronkey):
     cfg = ComponentAccumulator()
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.MuonSelectorAlg(
-            "MuonSelectorAlg",
-            containerInKey=MuonWPLabel + muonkey,
-            containerOutKey="vbshiggsAnalysisMuons_%SYS%",
-            muon_WPs=[MuonWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-            minPt=9 * Units.GeV,
-        )
-    )
+    cfg.merge(MuonSelectorAlgCfg(flags,
+                                 containerInKey=MuonWPLabel + muonkey,
+                                 containerOutKey="vbshiggsAnalysisMuons_%SYS%",
+                                 muon_WPs=[MuonWPLabel],
+                                 minPt=9 * Units.GeV))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.ElectronSelectorAlg(
-            "ElectronSelectorAlg",
-            containerInKey=ElectronWPLabel + electronkey,
-            containerOutKey="vbshiggsAnalysisElectrons_%SYS%",
-            checkOR=flags.Analysis.do_overlap_removal,
-            ele_WPs=[ElectronWPLabel],
-            isMC=flags.Input.isMC,
-            minPt=9 * Units.GeV,
-        )
-    )
+    cfg.merge(ElectronSelectorAlgCfg(flags,
+                                     containerInKey=ElectronWPLabel + electronkey,
+                                     containerOutKey="vbshiggsAnalysisElectrons_%SYS%",
+                                     ele_WPs=[ElectronWPLabel],
+                                     minPt=9 * Units.GeV))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.JetSelectorAlg(
-            "SmallJetSelectorAlg",
-            containerInKey=smalljetkey,
-            containerOutKey="vbshiggsAnalysisJets_%SYS%",
-            bTagWPDecorName="",
-            selectBjet=False,
-            minPt=20 * Units.GeV,
-            minimumAmount=2,  # -1 means ignores this
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(JetSelectorAlgCfg(flags,
+                                containerInKey=smalljetkey,
+                                containerOutKey="vbshiggsAnalysisJets_%SYS%",
+                                bTagWPDecorName="",
+                                selectBjet=False,
+                                minPt=20 * Units.GeV,
+                                minimumAmount=2))  # -1 means ignores this
 
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.VBSJetsSelectorAlg(

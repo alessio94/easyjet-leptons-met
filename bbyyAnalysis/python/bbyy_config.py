@@ -2,7 +2,9 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
-
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
+    PhotonSelectorAlgCfg, MuonSelectorAlgCfg, ElectronSelectorAlgCfg,
+    JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -23,57 +25,35 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
     PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
     TightPhotonWP = flags.Analysis.Photon.extra_wps[0]
     TightPhotonWPLabel = f'{TightPhotonWP[0]}_{TightPhotonWP[1]}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.PhotonSelectorAlg(
-            "PhotonSelectorAlg",
-            containerInKey=PhotonWPLabel + photonkey,
-            containerOutKey="bbyyAnalysisPhotons_%SYS%",
-            photon_WPs=[f'{wp[0]}_{wp[1]}' for wp in
-                        flags.Analysis.Photon.extra_wps],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(PhotonSelectorAlgCfg(flags,
+                                   containerInKey=PhotonWPLabel + photonkey,
+                                   containerOutKey="bbyyAnalysisPhotons_%SYS%",
+                                   photon_WPs=[f'{wp[0]}_{wp[1]}' for wp in
+                                               flags.Analysis.Photon.extra_wps]))
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.MuonSelectorAlg(
-            "MuonSelectorAlg",
-            containerInKey=MuonWPLabel + muonkey,
-            containerOutKey="bbyyAnalysisMuons_%SYS%",
-            minPt=10e3,
-            muon_WPs=[MuonWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(MuonSelectorAlgCfg(flags,
+                                 containerInKey=MuonWPLabel + muonkey,
+                                 containerOutKey="bbyyAnalysisMuons_%SYS%",
+                                 minPt=10e3,
+                                 muon_WPs=[MuonWPLabel]))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.ElectronSelectorAlg(
-            "ElectronSelectorAlg",
-            containerInKey=ElectronWPLabel + electronkey,
-            containerOutKey="bbyyAnalysisElectrons_%SYS%",
-            minPt=10e3,
-            ele_WPs=[ElectronWPLabel],
-            isMC=flags.Input.isMC,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(ElectronSelectorAlgCfg(flags,
+                                     containerInKey=ElectronWPLabel + electronkey,
+                                     containerOutKey="bbyyAnalysisElectrons_%SYS%",
+                                     minPt=10e3,
+                                     ele_WPs=[ElectronWPLabel]))
 
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.JetSelectorAlg(
-            "JetSelectorAlg",
-            containerInKey=smalljetkey,
-            containerOutKey="bbyyAnalysisJets_%SYS%",
-            PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0], # noqa
-            pTsort=False,
-            PCBTsort=True,
-            bTagWPDecorName="",
-            selectBjet=False,
-            checkOR=flags.Analysis.do_overlap_removal,
-        )
-    )
+    cfg.merge(JetSelectorAlgCfg(
+        flags,
+        containerInKey=smalljetkey,
+        containerOutKey="bbyyAnalysisJets_%SYS%",
+        PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0], # noqa
+        pTsort=False,
+        PCBTsort=True,
+        bTagWPDecorName="",
+        selectBjet=False))
 
     selection_name = flags.Analysis.selection_name
 
