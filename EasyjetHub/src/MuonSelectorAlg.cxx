@@ -30,6 +30,8 @@ namespace Easyjet
       m_mu_recoSF.emplace_back(m_isMC ? "muon_reco_effSF_"+wp+"_%SYS%" : "", this);
       m_mu_isoSF.emplace_back((m_isMC && wp.find("NonIso")==std::string::npos) ?
             "muon_isol_effSF_"+wp+"_%SYS%" : "", this);
+      m_mu_TTVASF.emplace_back((m_isMC && m_doTTVA) ?
+            "muon_TTVA_effSF_"+wp+"_%SYS%" : "", this);
       m_mu_SF.emplace_back(m_isMC ? "muon_effSF_"+wp+"_%SYS%" : "", this);
 
       // Select flags
@@ -40,6 +42,8 @@ namespace Easyjet
     for(auto& handle : m_mu_recoSF)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_mu_isoSF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_mu_TTVASF)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_mu_SF)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
@@ -90,6 +94,7 @@ namespace Easyjet
           if(m_isMC){
             float SF = m_mu_recoSF[i].get(*muon,sys);
             if(wp.find("NonIso")==std::string::npos) SF *= m_mu_isoSF[i].get(*muon,sys);
+            if(m_doTTVA) SF *= m_mu_TTVASF[i].get(*muon,sys);
             m_mu_SF[i].set(*muon, SF, sys);
           }
           m_select_out[i].set(*muon, m_select_in[i].get(*muon,sys), sys);

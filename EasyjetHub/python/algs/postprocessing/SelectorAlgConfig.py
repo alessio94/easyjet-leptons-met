@@ -7,6 +7,7 @@ def MuonSelectorAlgCfg(flags, name="MuonSelectorAlg", **kwargs):
 
     kwargs.setdefault("isMC", flags.Input.isMC)
     kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
+    kwargs.setdefault("doTTVA", flags.Analysis.Muon.trackSelection)
 
     cfg.addEventAlgo(CompFactory.Easyjet.MuonSelectorAlg(name, **kwargs))
     return cfg

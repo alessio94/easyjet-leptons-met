@@ -54,8 +54,12 @@ private:
     Gaudi::Property<std::vector<std::string>> m_muWPNames
       { this, "muon_WPs", {},"Muon ID + Iso working point" };
 
+    Gaudi::Property<bool> m_doTTVA
+      { this, "doTTVA", false, "Is TTVA applied" };
+
     std::vector<CP::SysReadDecorHandle<float>> m_mu_recoSF;
     std::vector<CP::SysReadDecorHandle<float>> m_mu_isoSF;
+    std::vector<CP::SysReadDecorHandle<float>> m_mu_TTVASF;
     std::vector<CP::SysWriteDecorHandle<float>> m_mu_SF;
 
     std::vector<CP::SysReadDecorHandle<char>> m_select_in;
