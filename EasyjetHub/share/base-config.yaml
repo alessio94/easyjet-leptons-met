@@ -31,6 +31,7 @@ small_R_jet:
   # additional btagging working points, available for selections and per-jet SFs
   btag_extra_wps: []
   runBJetPtCalib: True
+  useFJvt: False
   # compute experimental btag variables
   doBtagExpVars: False
   # select jet type

@@ -46,6 +46,7 @@ def PhotonSelectorAlgCfg(flags, name="PhotonSelectorAlg", **kwargs):
 def JetSelectorAlgCfg(flags, name="JetSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 
+    kwargs.setdefault("useFJVT", flags.Analysis.small_R_jet.useFJvt)
     kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
 
     cfg.addEventAlgo(CompFactory.Easyjet.JetSelectorAlg(name, **kwargs))

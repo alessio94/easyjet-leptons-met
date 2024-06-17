@@ -36,6 +36,9 @@ def jet_sequence(
     # don't run JVT only for EMTopo jets
     configSeq.setOptionValue(".runNNJvtUpdate", jet_type != "reco4EMTopoJet")
     configSeq.setOptionValue(".runJvtSelection", jet_type != "reco4EMTopoJet")
+    # Forward JVT
+    configSeq.setOptionValue(".runFJvtSelection", jet_flags.useFJvt)
+    configSeq.setOptionValue(".runFJvtEfficiency", jet_flags.useFJvt)
 
     # Set options for calibration tool if given
     if jet_flags.calibToolConfigFile and jet_flags.calibToolCalibArea:
@@ -70,6 +73,7 @@ def jet_sequence(
 
     if jet_type != "reco4EMTopoJet":
         configSeq += makeConfig('Jets.JVT', containerName=calib_name)
+        configSeq.setOptionValue('.enableFJvt', jet_flags.useFJvt)
 
         btag_wps = [jet_flags.btag_wp]
         if 'btag_extra_wps' in jet_flags:
@@ -147,6 +151,8 @@ def jet_sequence(
     selection_string = "selectPtEta"
     if jet_type != "reco4EMTopoJet":
         selection_string += "&&baselineJvt"
+        if jet_flags.useFJvt:
+            selection_string += "&&baselineFJvt"
     configSeq.setOptionValue('.selectionName', selection_string)
     configSeq.setOptionValue('.outputName', output_name)
 

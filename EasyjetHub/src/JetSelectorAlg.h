@@ -56,7 +56,8 @@ private:
 
     CP::SysReadDecorHandle<float> m_relativeDeltaRToVRJet {"relativeDeltaRToVRJet", this};
 
-    CP::SysReadDecorHandle<char> m_jvtselection {"", this};
+    CP::SysReadDecorHandle<char> m_jvtselection {"jvt_selection", this};
+    CP::SysReadDecorHandle<char> m_fjvtselection {"fjvt_selection", this};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
@@ -78,6 +79,8 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra jets after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_removeRelativeDeltaRToVRJet {this, "removeRelativeDeltaRToVRJet", false, "Remove events in which VR jets overlaps"};
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
+    Gaudi::Property<bool>  m_useFJVT          {this, "useFJVT", false, "Apply forwardJVT"};
+
     Gaudi::Property<bool>  m_selectBjet       {this, "selectBjet", false, "Apply bjet selection"};
     Gaudi::Property<int>   m_bjetAmount       {this, "bjetAmount", -1, "Maximum number of jets to consider"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;

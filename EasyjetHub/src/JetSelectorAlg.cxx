@@ -39,12 +39,12 @@ namespace Easyjet
 
     ANA_CHECK (m_isSelectedJet.initialize (m_systematicsList, m_inHandle));
 
-    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
+    if(m_checkOR) ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
     ATH_CHECK (m_relativeDeltaRToVRJet.initialize(m_systematicsList, m_inHandle));
 
-    m_jvtselection = CP::SysReadDecorHandle<char>("jvt_selection", this);
     ATH_CHECK (m_jvtselection.initialize(m_systematicsList, m_inHandle));
+    if(m_useFJVT) ATH_CHECK (m_fjvtselection.initialize(m_systematicsList, m_inHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -104,7 +104,8 @@ namespace Easyjet
       for (const xAOD::Jet *jet : *inContainer)
       {
         // jvt selection
-	bool jvt = m_jvtselection.get(*jet, sys);
+        bool jvt = m_jvtselection.get(*jet, sys);
+        if(m_useFJVT) jvt &= m_fjvtselection.get(*jet, sys);
         if ( !jvt ) continue;
 
         // skip OR jets

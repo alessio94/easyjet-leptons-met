@@ -23,6 +23,8 @@ def get_small_R_jet_branches(
 
     if tree_flags.slim_variables_with_syst:
         small_R_jet_branches.syst_only_for = ["pt", "jvt_selection"]
+        if flags.Analysis.small_R_jet.useFJvt:
+            small_R_jet_branches.syst_only_for = ["fjvt_selection"]
 
     small_R_jet_branches.add_four_mom_branches(do_mass=True)
 
@@ -31,6 +33,8 @@ def get_small_R_jet_branches(
 
     if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
         small_R_jet_branches.variables += ["jvt_selection"]
+        if flags.Analysis.small_R_jet.useFJvt:
+            small_R_jet_branches.variables = ["fjvt_selection"]
         if flags.Input.isMC:
             # truth label used by Jet/Etmiss - always add it when running on MC
             small_R_jet_branches.variables += ["PartonTruthLabelID"]
@@ -81,6 +85,8 @@ def get_small_R_jet_branches(
 
             if flags.Input.isMC:
                 small_R_jet_branches.variables += ["jvt_effSF_%SYS%"]
+                if flags.Analysis.small_R_jet.useFJvt:
+                    small_R_jet_branches.variables = ["fjvt_effSF_%SYS%"]
 
     if (
         flags.Input.isMC

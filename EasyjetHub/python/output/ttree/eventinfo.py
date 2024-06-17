@@ -72,6 +72,8 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
 
         # jvt is effSF is now centrally calculated by CP tools
         eventinfo_branches.variables += ["jvt_effSF_%SYS%"]
+        if flags.Analysis.small_R_jet.useFJvt:
+            eventinfo_branches.variables += ["fjvt_effSF_%SYS%"]
 
     if tree_flags.truth_outputs.higgs_particle and flags.Input.isMC:
         eventinfo_branches.variables += ["truth_H1_pdgId", "truth_H2_pdgId",
