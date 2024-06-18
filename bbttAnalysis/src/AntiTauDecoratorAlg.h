@@ -53,6 +53,7 @@ namespace HHBBTT
     SG::ReadDecorHandleKey<xAOD::EventInfo> m_passLTTDecorKey;
     SG::ReadDecorHandleKey<xAOD::EventInfo> m_passSTTDecorKey;
     SG::ReadDecorHandleKey<xAOD::EventInfo> m_passDTTDecorKey;
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_passDBTDecorKey;
 
     // Taus
     SG::ReadHandleKey<xAOD::TauJetContainer> m_tausInKey

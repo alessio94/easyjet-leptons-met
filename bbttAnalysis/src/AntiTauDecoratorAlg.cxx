@@ -34,10 +34,12 @@ namespace HHBBTT
     m_passLTTDecorKey = "EventInfo.pass_trigger_LTT";
     m_passSTTDecorKey = "EventInfo.pass_trigger_STT";
     m_passDTTDecorKey = "EventInfo.pass_trigger_DTT";
+    m_passDBTDecorKey = "EventInfo.pass_trigger_DBT";
     ATH_CHECK(m_passSLTDecorKey.initialize());
     ATH_CHECK(m_passLTTDecorKey.initialize());
     ATH_CHECK(m_passSTTDecorKey.initialize());
     ATH_CHECK(m_passDTTDecorKey.initialize());
+    ATH_CHECK(m_passDBTDecorKey.initialize());
 
     ATH_CHECK (m_tausInKey.initialize());
 
@@ -86,6 +88,7 @@ namespace HHBBTT
     SG::ReadDecorHandle<xAOD::EventInfo, bool> isLTT(m_passLTTDecorKey);
     SG::ReadDecorHandle<xAOD::EventInfo, bool> isSTT(m_passSTTDecorKey);
     SG::ReadDecorHandle<xAOD::EventInfo, bool> isDTT(m_passDTTDecorKey);
+    SG::ReadDecorHandle<xAOD::EventInfo, bool> isDBT(m_passDBTDecorKey);
 
     SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> year(m_yearKey);
     SG::ReadDecorHandle<xAOD::EventInfo, bool> is2016_periodA(m_is2016_periodA_key);
@@ -155,8 +158,11 @@ namespace HHBBTT
       }
     }
 
+    // TODO DBT implementation not final. Like this we will have many events for which
+    // anti-taus are selected according to DTT criteria in the offline DBT category
     bool STT = isSTT(*eventInfo) && passTauPtSTTThreshold && nLeptons==0;
     bool DTT = isDTT(*eventInfo) && !passTauPtSTTThreshold && nLeptons==0;
+    bool DBT = isDBT(*eventInfo) && !passTauPtSTTThreshold && nLeptons==0; // not orthogonal to DTT for now
     bool SLT = isSLT(*eventInfo) && passLeptonPtSLTThreshold && nLeptons>0;
     bool LTT = isLTT(*eventInfo) && !passLeptonPtSLTThreshold && nLeptons>0;
 
@@ -168,7 +174,7 @@ namespace HHBBTT
       tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
       bool isAntiTau = !isTauID && RNNScore>m_antiTauRNNThreshold && decayMode!=xAOD::TauJetParameters::Mode_NotSet;
     
-      // for SLT no anti-tau trigger matching is required
+      // for SLT and DBT no anti-tau trigger matching is required
       if (LTT) isAntiTau &= isLTTMatched(*tau);
       else if (DTT) isAntiTau &= isDTTMatched(*tau);
       else if (STT && nIDMatchedTauSTT == 0) isAntiTau &= isSTTMatched(*tau); // in STT if ID tau not trig matched anti tau needs be matched to trigger
@@ -177,7 +183,7 @@ namespace HHBBTT
       int antiTauCategory = 0;
       if (isAntiTau) {
 	if(SLT || LTT) antiTauCategory = 1;
-	else if (STT || DTT) antiTauCategory = 2;
+	else if (STT || DTT || DBT) antiTauCategory = 2;
       }
       eventCategoryDecorHandle(*tau) = antiTauCategory;
     }
