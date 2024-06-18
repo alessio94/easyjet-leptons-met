@@ -40,8 +40,11 @@ Photon:
   Iso: "NonIso"
   amount: 2
   variables: ["ptOvermyy"]
+  # The first extra wp is used for the final photon selections
   extra_wps: 
     - ["Tight", "FixedCutLoose"]
+    - ["Tight", "NonIso"]
+    - ["Loose", "FixedCutLoose"]
 
 # orthogonality studies  
 orthogonality:

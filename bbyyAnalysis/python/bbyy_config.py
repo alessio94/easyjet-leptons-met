@@ -23,8 +23,6 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
 
     cfg = ComponentAccumulator()
     PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
-    TightPhotonWP = flags.Analysis.Photon.extra_wps[0]
-    TightPhotonWPLabel = f'{TightPhotonWP[0]}_{TightPhotonWP[1]}'
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=PhotonWPLabel + photonkey,
                                    containerOutKey="bbyyAnalysisPhotons_%SYS%",
@@ -57,11 +55,14 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
 
     selection_name = flags.Analysis.selection_name
 
+    # First extra wp is used to select photons
+    SelectedPhotonWP = flags.Analysis.Photon.extra_wps[0]
+    SelectedPhotonLabel = f'{SelectedPhotonWP[0]}_{SelectedPhotonWP[1]}'
     cfg.addEventAlgo(
         CompFactory.HHBBYY.bbyySelectorAlg(
             "bbyySelectorAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
-            photonWP=TightPhotonWPLabel,
+            photonWP=SelectedPhotonLabel,
             jets="bbyyAnalysisJets_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             muons="bbyyAnalysisMuons_%SYS%",
@@ -97,7 +98,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
         CompFactory.HHBBYY.BaselineVarsbbyyAlg(
             "BaselineVarsbbyyAlg",
             photons="bbyyAnalysisPhotons_%SYS%",
-            photonWP=TightPhotonWPLabel,
+            photonWP=SelectedPhotonLabel,
             muons="bbyyAnalysisMuons_%SYS%",
             electrons="bbyyAnalysisElectrons_%SYS%",
             jets="bbyyAnalysisJets_%SYS%",

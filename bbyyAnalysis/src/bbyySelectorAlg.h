@@ -63,7 +63,9 @@ namespace HHBBYY
           "PASS_TRIGGER",
           "TWO_LOOSE_PHOTONS",
           "PASS_TRIGGER_MATCHING",
-          "TWO_TIGHTID_ISO_PHOTONS",
+	  "TWO_TIGHTID_ISO_PHOTONS",
+          "TWO_TIGHTID_PHOTONS",
+          "TWO_ISO_PHOTONS",
           "PASS_RELPT",
           "DIPHOTON_MASS",
           "EXACTLY_ZERO_LEPTONS",
@@ -79,7 +81,7 @@ namespace HHBBYY
                           const std::vector<std::string> &photonTriggers, CutManager& bbyyCuts);
       void evaluateTriggerMatchingCuts(const std::vector<std::string> &photonTriggers, 
                                         const xAOD::PhotonContainer* photons, CutManager& bbyyCuts);
-      void evaluatePhotonCuts(const std::vector<const xAOD::Photon*>& photons, CutManager& bbyyCuts);
+      void evaluatePhotonCuts(const std::vector<const xAOD::Photon*>& photons, int n_TightID_NonIso_photons, int n_Loose_Iso_photons, int n_TightID_Iso_photons, CutManager& bbyyCuts);
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& bbyyCuts);
       void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
@@ -113,7 +115,18 @@ namespace HHBBYY
 
       Gaudi::Property<std::string> m_photonWPName
       { this, "photonWP", "","Photon ID + Iso cuts" };
+
+      Gaudi::Property<std::string> m_photon_TightID_NonIso_WPName
+      { this, "photon_TNI_WP", "Tight_NonIso","Photon tight ID + non Iso working point" };
+
+      Gaudi::Property<std::string> m_photon_LooseID_Iso_WPName
+      { this, "photon_LI_WP", "Loose_FixedCutLoose","Photon loose ID + Iso working point" };
+
       CP::SysReadDecorHandle<char> m_photonWPDecorHandle{"", this};
+
+      CP::SysReadDecorHandle<char> m_photonTNIWPDecorHandle{"", this};
+
+      CP::SysReadDecorHandle<char> m_photonLIWPDecorHandle{"", this};
 
       CP::SysWriteDecorHandle<bool> m_selected_ph {"selected_ph_%SYS%", this};
 

@@ -42,8 +42,14 @@ namespace HHBBYY
     
     m_photonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_photonWPName+"_%SYS%", this);
+    m_photonTNIWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_photon_TightID_NonIso_WPName+"_%SYS%", this);
+    m_photonLIWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_photon_LooseID_Iso_WPName+"_%SYS%", this);
 
     ATH_CHECK(m_photonWPDecorHandle.initialize(m_systematicsList, m_photonHandle));
+    ATH_CHECK(m_photonTNIWPDecorHandle.initialize(m_systematicsList, m_photonHandle));
+    ATH_CHECK(m_photonLIWPDecorHandle.initialize(m_systematicsList, m_photonHandle));
 
     ATH_CHECK(m_selected_ph.initialize(m_systematicsList, m_photonHandle));
     //Initialize trigger decorations
@@ -167,25 +173,32 @@ namespace HHBBYY
       if (m_bbyyCuts.exists("TWO_LOOSE_PHOTONS"))
       m_bbyyCuts("TWO_LOOSE_PHOTONS").passed = (photons->size() >= 2);
 
+      const xAOD::Photon* photon1 = photons->size()>0 ? photons->at(0) : nullptr;
+      const xAOD::Photon* photon2 = photons->size()>1 ? photons->at(1) : nullptr;
+      std::vector<const xAOD::Photon*> sel_photons = {photon1, photon2};
+
+      // count the number of TightID Iso photons
       int n_photons = 0;
+      int n_TightID_NonIso_photons = 0;
+      int n_LooseID_Iso_photons = 0;
 
-      const xAOD::Photon* photon1 = nullptr;
-      const xAOD::Photon* photon2 = nullptr;
-
-      for (const xAOD::Photon* photon : *photons){
+      for (const xAOD::Photon* photon : sel_photons){
+        if(!photon) break;
         bool passPhotonWP = m_photonWPDecorHandle.get(*photon, sys);
-        m_selected_ph.set(*photon, false, sys);
-        if (passPhotonWP){
-          m_selected_ph.set(*photon, true, sys);
-          n_photons +=1;
-          if (!photon1) photon1 = photon;
-          else if (!photon2) photon2 = photon;
-        }
+        bool passPhoton_TightID_NonIsoWP = m_photonTNIWPDecorHandle.get(*photon, sys);
+        bool passPhoton_LooseID_IsoWP = m_photonLIWPDecorHandle.get(*photon, sys);
+
+        m_selected_ph.set(*photon, passPhoton_TightID_NonIsoWP || passPhoton_LooseID_IsoWP, sys);
+
+        if (passPhotonWP) n_photons++;
+        if (passPhoton_TightID_NonIsoWP) n_TightID_NonIso_photons++;
+        if (passPhoton_LooseID_IsoWP) n_LooseID_Iso_photons++;
       }
 
-      if (n_photons >=2){
-        std::vector<const xAOD::Photon*> sel_photons = {photon1, photon2};
-        evaluatePhotonCuts(sel_photons, m_bbyyCuts);
+
+
+      if (n_TightID_NonIso_photons >=2 || n_LooseID_Iso_photons >=2 || n_photons >=2){
+        evaluatePhotonCuts(sel_photons, n_TightID_NonIso_photons, n_LooseID_Iso_photons, n_photons, m_bbyyCuts);
       }
       evaluateLeptonCuts(*electrons, *muons, m_bbyyCuts);
       evaluateJetCuts(*bjets, *jets, m_bbyyCuts);
@@ -376,12 +389,18 @@ namespace HHBBYY
   }
 
   void bbyySelectorAlg::evaluatePhotonCuts
-  (const std::vector<const xAOD::Photon*>& photons, CutManager& bbyyCuts)
+  (const std::vector<const xAOD::Photon*>& photons, int n_TightID_NonIso_photons, int n_Loose_Iso_photons, int n_TightID_Iso_photons, CutManager& bbyyCuts)
   {
     // photon isolation and selection pT/myy
    
+    if (bbyyCuts.exists("TWO_TIGHTID_PHOTONS"))
+    bbyyCuts("TWO_TIGHTID_PHOTONS").passed = (n_TightID_NonIso_photons >= 2);
+
+    if (bbyyCuts.exists("TWO_ISO_PHOTONS"))
+    bbyyCuts("TWO_ISO_PHOTONS").passed = (n_Loose_Iso_photons >= 2);
+
     if (bbyyCuts.exists("TWO_TIGHTID_ISO_PHOTONS"))
-    bbyyCuts("TWO_TIGHTID_ISO_PHOTONS").passed = (photons.size() >= 2);
+    bbyyCuts("TWO_TIGHTID_ISO_PHOTONS").passed = (n_TightID_Iso_photons >= 2);
 
     double myy = (photons.at(0)->p4() + photons.at(1)->p4()).M();
     std::vector<float> ptOverMasses;
