@@ -15,6 +15,7 @@ do_KinematicFit: true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
+  useFJvt: true
   # btagging nominal working point
   btag_wp: "GN2v01_FixedCutBEff_77"
   # to use multiple btagging WPs
