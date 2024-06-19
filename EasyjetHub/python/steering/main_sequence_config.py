@@ -26,6 +26,11 @@ from EasyjetHub.output.h5.h5_config import get_h5_cfg
 from EasyjetHub.output.xaod import get_xaod_cfg
 from EasyjetHub.steering.utils.log_helper import log
 
+from EasyjetHub.algs.calibration.event_weights import (
+    generator_sequence,
+    pileup_sequence,
+)
+
 
 def default_sequence_cfg(flags, seqname):
     cfg = core_services_cfg(flags)
@@ -65,6 +70,33 @@ def preselection_cfg(flags, seqname):
     # Create the output CA to set the sequence correctly
     cfg = ComponentAccumulator()
     cfg.addSequence(CompFactory.AthSequencer(seqname))
+
+    # adding weight seq (originally in cpalg)
+    # Some decoration algorithms require the RandomRunNumber from PRW
+    # Make sure this is available by adding first the relevant configs
+    weightConfigSeq = ConfigSequence()
+
+    weightSeq = CompFactory.AthSequencer('WeightSequence')
+    weightConfigAccumulator = ConfigAccumulator(
+        weightSeq,
+        autoconfigFromFlags=flags,
+    )
+
+    if not flags.Analysis.disable_calib:
+        if flags.Analysis.doPRW:
+            log.info("Adding PRW sequence")
+            # Adds variable to EventInfo if for pileup weight, for example:
+            # EventInfo.PileWeight_%SYS$
+            weightConfigSeq += pileup_sequence(flags)
+
+        if flags.Input.isMC:
+            log.info("Adding generator analysis sequence")
+            # Adds variable to EventInfo if for generator weight, for example:
+            # EventInfo.generatorWeight_%SYS%
+            weightConfigSeq += generator_sequence(flags)
+
+    weightConfigSeq.fullConfigure(weightConfigAccumulator)
+    cfg.merge(weightConfigAccumulator.CA,seqname)
 
     if flags.Analysis.do_bbyy_analysis and flags.Input.isMC:
         from bbyyAnalysis.bbyy_config import contain_dalitz, get_weight_index

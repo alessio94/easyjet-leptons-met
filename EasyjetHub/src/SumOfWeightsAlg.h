@@ -10,10 +10,13 @@
 #include <AsgDataHandles/ReadHandleKey.h>
 #include <AsgDataHandles/ReadDecorHandleKey.h>
 
+#include <SystematicsHandles/SysReadDecorHandle.h>
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
 #include <xAODEventInfo/EventInfo.h>
-
 
 namespace Easyjet
 {
@@ -45,6 +48,24 @@ namespace Easyjet
 
       SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
         this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};
+
+      // for systematics 
+      std::unordered_map<CP::SystematicSet,TH1*> m_hist;
+      
+      Gaudi::Property<std::string> m_histPattern 
+      {this, "histPattern", "SumOfWeights_%SYS%", "the pattern for histogram names"};
+      
+      Gaudi::Property<std::string> m_histTitle 
+      {this, "histTitle", "sum of weights for sys_%SYS%", "title for the created histograms"};
+      
+      CP::SysReadDecorHandle<float>
+      m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
+
+      CP::SysReadHandle<xAOD::EventInfo>
+      m_eventHandle{ this, "event_for_sys", "EventInfo",   "EventInfo container to read" };
+
+      CP::SysListHandle m_systematicsList {this};
+
 
     Gaudi::Property<int> m_weightIndex
       { this, "weightIndex", -1, "Special weight Index based on MCChannelNumber"};        

@@ -3,10 +3,6 @@ from AnalysisAlgorithmsConfig.ConfigAccumulator import ConfigAccumulator
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 
 from AthenaConfiguration.ComponentFactory import CompFactory
-from EasyjetHub.algs.calibration.event_weights import (
-    generator_sequence,
-    pileup_sequence,
-)
 from EasyjetHub.algs.calibration.jets import (
     jet_sequence,
     vr_jet_sequence,
@@ -72,32 +68,6 @@ def cpalgs_cfg(flags):
     # Create SelectionNameSvc explicitly
     selectionSvc = CompFactory.CP.SelectionNameSvc("SelectionNameSvc")
     cfg.addService(selectionSvc)
-
-    # Some decoration algorithms require the RandomRunNumber from PRW
-    # Make sure this is available by adding first the relevant configs
-    weightConfigSeq = ConfigSequence()
-
-    weightSeq = CompFactory.AthSequencer('WeightSequence')
-    weightConfigAccumulator = ConfigAccumulator(
-        weightSeq,
-        autoconfigFromFlags=flags,
-    )
-
-    if not flags.Analysis.disable_calib:
-        if flags.Analysis.doPRW:
-            log.info("Adding PRW sequence")
-            # Adds variable to EventInfo if for pileup weight, for example:
-            # EventInfo.PileWeight_%SYS$
-            weightConfigSeq += pileup_sequence(flags)
-
-        if flags.Input.isMC:
-            log.info("Adding generator analysis sequence")
-            # Adds variable to EventInfo if for generator weight, for example:
-            # EventInfo.generatorWeight_%SYS%
-            weightConfigSeq += generator_sequence(flags)
-
-    weightConfigSeq.fullConfigure(weightConfigAccumulator)
-    cfg.merge(weightConfigAccumulator.CA)
 
     # Extra decoration algorithms
 
