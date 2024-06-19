@@ -29,6 +29,8 @@ namespace HHBBTT
     DTT_2016,
     DTT_4J12,
     DTT_L1Topo,
+    DTT_4J12_delayed,
+    DTT_L1Topo_delayed,
   };
 
     enum Var

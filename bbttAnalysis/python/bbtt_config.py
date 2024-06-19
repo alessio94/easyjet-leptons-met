@@ -226,13 +226,18 @@ def bbtt_branches(flags):
     # as it is written out in HHbbttSelectorAlg
     for var in ["_trigger_", "_baseline_"]:
         for cat in ["SR", "SLT", "LTT", "STT", "DTT",
-                    "DTT_2016", "DTT_4J12", "DTT_L1Topo", "DBT"]:
+                    "DTT_2016", "DTT_4J12", "DTT_L1Topo",
+                    "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT"]:
+            if (var == "_baseline_"
+                    and cat in ["DTT_4J12_delayed", "DTT_L1Topo_delayed"]):
+                continue
             branches += [f"EventInfo.pass{var}{cat}_%SYS% -> "
                          f"bbtt_pass{var}{cat}"
                          + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for cat in ["SR", "SLT", "LTT", "STT", "DTT",
-                "DTT_2016", "DTT_4J12", "DTT_L1Topo", "DBT",
+                "DTT_2016", "DTT_4J12", "DTT_L1Topo",
+                "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT",
                 "LepHad", "HadHad"]:
         for nb in ["1B", "2B"]:
             branches += [f"EventInfo.pass_{cat}_{nb}_%SYS% ->"

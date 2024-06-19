@@ -509,6 +509,8 @@ namespace HHBBTT
     std::vector<std::string> ditau_paths_2016;
     std::vector<std::string> ditau_paths_L1Topo;
     std::vector<std::string> ditau_paths_4J12;
+    std::vector<std::string> ditau_paths_L1Topo_delayed;
+    std::vector<std::string> ditau_paths_4J12_delayed;
 
     if(year==2015){
       ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM"};
@@ -550,10 +552,10 @@ namespace HHBBTT
     else if(year>=2022){
       ditau_paths_L1Topo = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
-      //if (runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
-      //  ditau_paths_L1Topo = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
-      //  ditau_paths_4J12 = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
-      //}
+      if (runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
+        ditau_paths_L1Topo_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
+        ditau_paths_4J12_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
+      }
     }
     
 
@@ -561,11 +563,15 @@ namespace HHBBTT
     mapPaths.emplace(HHBBTT::DTT_2016, ditau_paths_2016);
     mapPaths.emplace(HHBBTT::DTT_4J12, ditau_paths_4J12);
     mapPaths.emplace(HHBBTT::DTT_L1Topo, ditau_paths_L1Topo);
+    mapPaths.emplace(HHBBTT::DTT_4J12_delayed, ditau_paths_4J12_delayed);
+    mapPaths.emplace(HHBBTT::DTT_L1Topo_delayed, ditau_paths_L1Topo_delayed);
 
     std::unordered_map<HHBBTT::TriggerChannel, bool> mapDecisions;
     mapDecisions.emplace(HHBBTT::DTT_2016, false);
     mapDecisions.emplace(HHBBTT::DTT_4J12, false);
     mapDecisions.emplace(HHBBTT::DTT_L1Topo, false);
+    mapDecisions.emplace(HHBBTT::DTT_4J12_delayed, false);
+    mapDecisions.emplace(HHBBTT::DTT_L1Topo_delayed, false);
 
 
     for(const auto& [channel, paths] : mapPaths){
@@ -579,7 +585,7 @@ namespace HHBBTT
 	  if(channel==HHBBTT::DTT_4J12)
 	    trig2 = std::regex_replace(trig, std::regex("4J12p0ETA23"),
 				      "4J12_0ETA23");
-	  else if(channel==HHBBTT::DTT_L1Topo)
+	  else if(channel==HHBBTT::DTT_L1Topo || channel==HHBBTT::DTT_L1Topo_delayed)
 	    trig2 = std::regex_replace(trig,
 				       std::regex("L1DR_TAU20ITAU12I_J25"),
 				       "L1DR-TAU20ITAU12I-J25");

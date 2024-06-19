@@ -329,14 +329,16 @@ namespace HHBBTT
 			      jet0, jet1);
       }
       else{
-	m_bools.at(HHBBTT::pass_trigger_SLT) = true;
-	m_bools.at(HHBBTT::pass_trigger_LTT) = true;
-	m_bools.at(HHBBTT::pass_trigger_STT) = true;
-	m_bools.at(HHBBTT::pass_trigger_DTT) = true;
-	m_bools.at(HHBBTT::pass_trigger_DTT_2016) = true;
-	m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = true;
-	m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = true;
-	m_bools.at(HHBBTT::pass_trigger_DBT) = true;
+        m_bools.at(HHBBTT::pass_trigger_SLT) = true;
+        m_bools.at(HHBBTT::pass_trigger_LTT) = true;
+        m_bools.at(HHBBTT::pass_trigger_STT) = true;
+        m_bools.at(HHBBTT::pass_trigger_DTT) = true;
+        m_bools.at(HHBBTT::pass_trigger_DTT_2016) = true;
+        m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = true;
+        m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = true;
+        m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed) = true;
+        m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed) = true;
+        m_bools.at(HHBBTT::pass_trigger_DBT) = true;
 
       }
 
@@ -466,6 +468,10 @@ namespace HHBBTT
                 if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_4J12_2B) = true;
                 else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_4J12_1B) = true;
               }
+              if (m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed)) {
+                if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_4J12_delayed_2B) = true;
+                else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_4J12_delayed_1B) = true;
+              }
           }
           else if(jet_ptcut_DTT_L1Topo && tau_DR_L1Topo){
             m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo) = true;
@@ -473,8 +479,13 @@ namespace HHBBTT
                 if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_L1Topo_2B) = true;
                 else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_L1Topo_1B) = true;
               }
+              if (m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed)) {
+                if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_2B) = true;
+                else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_1B) = true;
+              }
           }
         }
+
         //DBT
         int year = m_year.get(*event, sys);
         if(!m_bools.at(HHBBTT::pass_baseline_STT) && year>=2022){
@@ -489,15 +500,19 @@ namespace HHBBTT
       m_bools.at(HHBBTT::pass_baseline_DTT) =
 	      (m_bools.at(HHBBTT::pass_baseline_DTT_2016)  ||
 	       m_bools.at(HHBBTT::pass_baseline_DTT_4J12)  ||
-              m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo));
+               m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo));
       m_bools.at(HHBBTT::pass_DTT_2B) =
 	      (m_bools.at(HHBBTT::pass_DTT_2016_2B)  ||
 	       m_bools.at(HHBBTT::pass_DTT_4J12_2B)  ||
-              m_bools.at(HHBBTT::pass_DTT_L1Topo_2B));
+               m_bools.at(HHBBTT::pass_DTT_L1Topo_2B)  ||
+               m_bools.at(HHBBTT::pass_DTT_4J12_delayed_2B)  ||
+               m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_2B));
       m_bools.at(HHBBTT::pass_DTT_1B) = 
-        (m_bools.at(HHBBTT::pass_DTT_2016_1B)  ||
-         m_bools.at(HHBBTT::pass_DTT_4J12_1B)  ||
-         m_bools.at(HHBBTT::pass_DTT_L1Topo_1B));
+              (m_bools.at(HHBBTT::pass_DTT_2016_1B)  ||
+               m_bools.at(HHBBTT::pass_DTT_4J12_1B)  ||
+               m_bools.at(HHBBTT::pass_DTT_L1Topo_1B)  ||
+               m_bools.at(HHBBTT::pass_DTT_4J12_delayed_1B)  ||
+               m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_1B));
 
       m_bools.at(HHBBTT::pass_baseline_SR) =
 	(m_bools.at(HHBBTT::pass_baseline_SLT) ||
@@ -867,15 +882,45 @@ namespace HHBBTT
 	  tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
          tau0->p4().DeltaR(tau1->p4())<2.5 &&
 	  jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
-  }
+    }
     else trigPassed_DTT_L1Topo = false;
     m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = trigPassed_DTT_L1Topo;
+
+    bool trigPassed_DTT_4J12_delayed = triggerdecos.at(HHBBTT::DTT_4J12_delayed)(*event);
+    if(tau0 && tau1 && jet0 && jet1){
+      trigPassed_DTT_4J12_delayed &= tau_trigMatchDecos.at(HHBBTT::DTT_4J12_delayed)(*tau0);
+      trigPassed_DTT_4J12_delayed &= tau_trigMatchDecos.at(HHBBTT::DTT_4J12_delayed)(*tau1);
+      trigPassed_DTT_4J12_delayed &=
+        (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
+         tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
+         jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
+         jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet]);
+    }
+    else trigPassed_DTT_4J12_delayed = false;
+    m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed) = trigPassed_DTT_4J12_delayed;
+
+    bool trigPassed_DTT_L1Topo_delayed = triggerdecos.at(HHBBTT::DTT_L1Topo_delayed)(*event);
+    if(tau0 && tau1 && jet0){
+      trigPassed_DTT_L1Topo_delayed &= tau_trigMatchDecos.at(HHBBTT::DTT_L1Topo_delayed)(*tau0);
+      trigPassed_DTT_L1Topo_delayed &= tau_trigMatchDecos.at(HHBBTT::DTT_L1Topo_delayed)(*tau1);
+      trigPassed_DTT_L1Topo_delayed &=
+         (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
+          tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
+         tau0->p4().DeltaR(tau1->p4())<2.5 &&
+          jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
+    }
+    else trigPassed_DTT_L1Topo_delayed = false;
+    m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed) = trigPassed_DTT_L1Topo_delayed;
+
 
     m_bools.at(HHBBTT::pass_trigger_DTT) =
       (m_bools.at(HHBBTT::pass_trigger_DTT_2016) ||
        m_bools.at(HHBBTT::pass_trigger_DTT_4J12) ||
-       m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo));
+       m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) ||
+       m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed) ||
+       m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed));
   }
+
   
    void HHbbttSelectorAlg::applyDiBJetTriggerSelection
   (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
