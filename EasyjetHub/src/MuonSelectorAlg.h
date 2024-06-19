@@ -62,6 +62,11 @@ private:
     std::vector<CP::SysReadDecorHandle<float>> m_mu_TTVASF;
     std::vector<CP::SysWriteDecorHandle<float>> m_mu_SF;
 
+    Gaudi::Property<std::vector<std::string>> m_muTrigSF
+      {this, "muonTriggerSF", {}, "List of muon trigger SF"};
+    std::vector<CP::SysReadDecorHandle<float>> m_muTriggerSF_in;
+    std::vector<CP::SysWriteDecorHandle<float>> m_muTriggerSF_out;
+
     std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 

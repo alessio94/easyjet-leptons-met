@@ -4,6 +4,7 @@ import sys
 
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
+from TrigGlobalEfficiencyCorrection.TriggerLeg_DictHelpers import TriggerDict
 from AthenaCommon.Constants import INFO
 
 from EasyjetHub.steering.sample_metadata import (
@@ -169,6 +170,8 @@ def get_trigger_chains_scale_factor(flags, obj=None):
         return {}
 
     if obj:
+        if not hasattr(flags.Analysis.trigger.scale_factor, obj):
+            return {}
         triggerChains = getattr(flags.Analysis.trigger.scale_factor, obj).chains
     else:
         triggerChains = (
@@ -180,6 +183,37 @@ def get_trigger_chains_scale_factor(flags, obj=None):
         str(year): [trigger for trigger in triggerChains[str(year)]]
         for year in flags.Analysis.Years}
     return triggerChainsDict
+
+
+def get_trigger_legs_scale_factor_list(flags, obj=None):
+    triggerChainsPerYear = get_trigger_chains_scale_factor(flags, obj)
+    if not triggerChainsPerYear:
+        return []
+
+    trigger_legs = set()
+    triggerDict = TriggerDict()
+    for year in flags.Analysis.Years:
+        triggerChains = triggerChainsPerYear[str(year)]
+
+        if obj == "Electron" or obj == "Muon":
+            for chain in triggerChains:
+                chain = chain.replace("HLT_", "").replace(" || ", "_OR_")
+                legs = triggerDict[chain]
+                prefix = 'e' if obj == "Electron" else 'mu'
+                if len(legs) == 0:
+                    if chain.startswith(prefix) and chain[len(prefix)].isdigit:
+                        trigger_legs.add(chain)
+                else:
+                    for leg in legs:
+                        if leg.startswith(prefix) and leg[len(prefix)].isdigit:
+                            trigger_legs.add(leg)
+
+        else:
+            for chain in triggerChains:
+                chain = chain.replace("HLT_", "")
+                trigger_legs.add(chain)
+
+    return list(trigger_legs)
 
 
 def setHHOrthFlags(flags):

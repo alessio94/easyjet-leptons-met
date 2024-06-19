@@ -39,6 +39,13 @@ namespace Easyjet
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
+    if(m_isMC){
+      for(const auto& trig : m_muTrigSF){
+	m_muTriggerSF_in.emplace_back("muon_trigEffSF_"+trig+"_%SYS%", this);
+	m_muTriggerSF_out.emplace_back("muon_trigEffSF_"+trig+"_%SYS%", this);
+      }
+    }
+
     for(auto& handle : m_mu_recoSF)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_mu_isoSF)
@@ -46,6 +53,10 @@ namespace Easyjet
     for(auto& handle : m_mu_TTVASF)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_mu_SF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+    for(auto& handle : m_muTriggerSF_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_muTriggerSF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
     for(auto& handle : m_select_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
@@ -98,6 +109,13 @@ namespace Easyjet
             m_mu_SF[i].set(*muon, SF, sys);
           }
           m_select_out[i].set(*muon, m_select_in[i].get(*muon,sys), sys);
+        }
+
+        if(m_isMC){
+          for(unsigned int i=0; i<m_muTrigSF.size(); i++){
+            m_muTriggerSF_out[i].set
+              (*muon, m_muTriggerSF_in[i].get(*muon, sys), sys);
+          }
         }
 
         // If cuts are passed, save the object

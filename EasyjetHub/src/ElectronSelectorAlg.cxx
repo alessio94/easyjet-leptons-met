@@ -28,13 +28,21 @@ namespace Easyjet
       // Scale factors
       m_ele_recoSF.emplace_back(m_isMC ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
       m_ele_idSF.emplace_back(m_isMC ? "el_id_effSF_"+wp+"_%SYS%" : "", this);
-      m_ele_isoSF.emplace_back((m_isMC && wp.find("NonIso")==std::string::npos) ?
-            "el_isol_effSF_"+wp+"_%SYS%" : "", this);
+      m_ele_isoSF.emplace_back
+	((m_isMC && wp.find("NonIso")==std::string::npos) ?
+	 "el_isol_effSF_"+wp+"_%SYS%" : "", this);
       m_ele_SF.emplace_back(m_isMC ? "el_effSF_"+wp+"_%SYS%" : "", this);
       
       // Select flags
       m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    }
+
+    if(m_isMC){
+      for(const auto& trig : m_eleTrigSF){
+	m_eleTriggerSF_in.emplace_back("el_trigEffSF_"+trig+"_%SYS%", this);
+	m_eleTriggerSF_out.emplace_back("el_trigEffSF_"+trig+"_%SYS%", this);
+      }
     }
 
     for(auto& handle : m_ele_recoSF)
@@ -44,6 +52,10 @@ namespace Easyjet
     for(auto& handle : m_ele_isoSF)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_ele_SF)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+    for(auto& handle : m_eleTriggerSF_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_eleTriggerSF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
     for(auto& handle : m_select_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
@@ -101,6 +113,13 @@ namespace Easyjet
             m_ele_SF[i].set(*electron, SF, sys);
           }
           m_select_out[i].set(*electron, m_select_in[i].get(*electron,sys), sys);
+        }
+
+        if(m_isMC){
+          for(unsigned int i=0; i<m_eleTrigSF.size(); i++){
+            m_eleTriggerSF_out[i].set
+              (*electron, m_eleTriggerSF_in[i].get(*electron, sys), sys);
+          }
         }
         
         // If cuts are passed, save the object

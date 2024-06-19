@@ -59,6 +59,11 @@ private:
     std::vector<CP::SysReadDecorHandle<float>> m_ele_isoSF;
     std::vector<CP::SysWriteDecorHandle<float>> m_ele_SF;
 
+    Gaudi::Property<std::vector<std::string>> m_eleTrigSF
+      {this, "eleTriggerSF", {}, "List of electron trigger SF"};
+    std::vector<CP::SysReadDecorHandle<float>> m_eleTriggerSF_in;
+    std::vector<CP::SysWriteDecorHandle<float>> m_eleTriggerSF_out;
+
     std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 

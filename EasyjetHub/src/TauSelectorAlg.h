@@ -65,6 +65,11 @@ private:
     CP::SysReadDecorHandle<float> m_tau_SF_in{"", this};
     CP::SysWriteDecorHandle<float> m_tau_SF_out{"", this};
 
+    Gaudi::Property<std::vector<std::string>> m_tauTrigSF
+      {this, "tauTriggerSF", {}, "List of tau trigger SF"};
+    std::vector<CP::SysReadDecorHandle<float>> m_tauTriggerSF_in;
+    std::vector<CP::SysWriteDecorHandle<float>> m_tauTriggerSF_out;
+
     CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
     CP::SysReadDecorHandle<char> m_select_tight_in{"", this};
     CP::SysWriteDecorHandle<char> m_select_out{"", this};

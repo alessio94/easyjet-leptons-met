@@ -49,6 +49,16 @@ namespace Easyjet
     ATH_CHECK (m_tau_SF_in.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_tau_SF_out.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
+    for(const auto& trig : m_tauTrigSF){
+      m_tauTriggerSF_in.emplace_back("tau_trigEffSF_"+trig+"_%SYS%", this);
+      m_tauTriggerSF_out.emplace_back("tau_trigEffSF_"+trig+"_%SYS%", this);
+    }
+
+    for(auto& handle : m_tauTriggerSF_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle));
+    for(auto& handle : m_tauTriggerSF_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle));
+
     m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_looseTauWP+"_%SYS%", this);
     m_select_tight_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_tightTauWP+"_%SYS%", this);
     m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_tightTauWP+"_%SYS%", this);
@@ -113,7 +123,12 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        if(m_isMC) m_tau_SF_out.set(*tau, m_tau_SF_in.get(*tau,sys), sys);
+        if(m_isMC){
+	  m_tau_SF_out.set(*tau, m_tau_SF_in.get(*tau,sys), sys);
+	  for(unsigned int i=0; i<m_tauTrigSF.size(); i++){
+	    m_tauTriggerSF_out[i].set(*tau, m_tauTriggerSF_in[i].get(*tau, sys), sys);
+	  }
+	}
         m_select_out.set(*tau, m_select_tight_in.get(*tau,sys), sys);
 
         // If cuts are passed, save the object
