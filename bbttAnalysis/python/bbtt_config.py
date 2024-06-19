@@ -244,7 +244,8 @@ def bbtt_branches(flags):
                 "LepHad", "HadHad"]:
         for nb in ["1B", "2B"]:
             branches += [f"EventInfo.pass_{cat}_{nb}_%SYS% ->"
-                         f"bbtt_pass_{cat}_{nb}_%SYS%"]
+                         f"bbtt_pass_{cat}_{nb}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for cat in ["baseline_LepHad", "baseline_HadHad", "LepHad", "HadHad",
                 "ZCR", "TopEMuCR"]:

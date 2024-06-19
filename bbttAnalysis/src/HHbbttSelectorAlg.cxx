@@ -462,27 +462,29 @@ namespace HHBBTT
               }
             }
           }
-          else if(jet_ptcut_DTT_4J12){
-            m_bools.at(HHBBTT::pass_baseline_DTT_4J12) = true;
-              if (m_bools.at(HHBBTT::pass_trigger_DTT_4J12)) {
+	  else{
+            if(jet_ptcut_DTT_4J12){
+              m_bools.at(HHBBTT::pass_baseline_DTT_4J12) = true;
+	      if (m_bools.at(HHBBTT::pass_trigger_DTT_4J12)) {
                 if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_4J12_2B) = true;
-                else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_4J12_1B) = true;
+		else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_4J12_1B) = true;
               }
-              if (m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed)) {
+	      if (m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed)) {
                 if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_4J12_delayed_2B) = true;
-                else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_4J12_delayed_1B) = true;
+		else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_4J12_delayed_1B) = true;
               }
-          }
-          else if(jet_ptcut_DTT_L1Topo && tau_DR_L1Topo){
-            m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo) = true;
+            }
+	    if(jet_ptcut_DTT_L1Topo && tau_DR_L1Topo){
+              m_bools.at(HHBBTT::pass_baseline_DTT_L1Topo) = true;
               if (m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo)) {
                 if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_L1Topo_2B) = true;
-                else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_L1Topo_1B) = true;
+		else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_L1Topo_1B) = true;
               }
               if (m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed)) {
                 if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_2B) = true;
                 else if (m_bools.at(HHBBTT::ONE_BJET)) m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_1B) = true;
               }
+	    }
           }
         }
 
@@ -1029,22 +1031,37 @@ namespace HHBBTT
     m_pt_threshold[HHBBTT::MTT_high][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::MTT_high][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
 
+    // For data-taking period dependent thresholds 
+    int year = m_year.get(*event, sys);
+
     // Single-tau trigger
     m_pt_threshold[HHBBTT::STT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
+    float min_tau_STT = 180. * Athena::Units::GeV;
+    if(year==2015 || m_is2016_periodA.get(*event, sys))
+      min_tau_STT = 100. * Athena::Units::GeV;
+    else if(m_is2016_periodB_D3.get(*event, sys))
+      min_tau_STT = 140. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = min_tau_STT;
 
     // Di-tau triggers
-    m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 70. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 70. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30. * Athena::Units::GeV;
+    if(year >= 2022){
+      m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 20. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 20. * Athena::Units::GeV;
+    }
 
     // Di-b-jets triggers
     m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet] = 20. * Athena::Units::GeV;
     
-    // Run-dependent thresholds
-
-    int year = m_year.get(*event, sys);
-
     // Single-lepton triggers
     if(year==2015)
       m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 25. * Athena::Units::GeV;
@@ -1060,24 +1077,6 @@ namespace HHBBTT
     else
       m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 25. * Athena::Units::GeV;
 
-    // Single tau triggers
-    float min_tau_STT = 180. * Athena::Units::GeV;
-    if(year==2015 || m_is2016_periodA.get(*event, sys))
-      min_tau_STT = 100. * Athena::Units::GeV;
-    else if(m_is2016_periodB_D3.get(*event, sys))
-      min_tau_STT = 140. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = min_tau_STT;
-
-    m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 80. * Athena::Units::GeV;
-    if(year >= 2022){
-      m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 20. * Athena::Units::GeV;
-      m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
-      m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
-      m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
-      m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 20. * Athena::Units::GeV;
-    }
   }
 
 }
