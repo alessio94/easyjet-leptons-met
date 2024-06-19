@@ -43,7 +43,7 @@ namespace Easyjet
 
     ATH_CHECK (m_relativeDeltaRToVRJet.initialize(m_systematicsList, m_inHandle));
 
-    ATH_CHECK (m_jvtselection.initialize(m_systematicsList, m_inHandle));
+    if(m_useJVT) ATH_CHECK (m_jvtselection.initialize(m_systematicsList, m_inHandle));
     if(m_useFJVT) ATH_CHECK (m_fjvtselection.initialize(m_systematicsList, m_inHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
@@ -104,9 +104,11 @@ namespace Easyjet
       for (const xAOD::Jet *jet : *inContainer)
       {
         // jvt selection
-        bool jvt = m_jvtselection.get(*jet, sys);
-        if(m_useFJVT) jvt &= m_fjvtselection.get(*jet, sys);
-        if ( !jvt ) continue;
+        if(m_useJVT){
+          bool jvt = m_jvtselection.get(*jet, sys);
+          if(m_useFJVT) jvt &= m_fjvtselection.get(*jet, sys);
+          if ( !jvt ) continue;
+        }
 
         // skip OR jets
         if( m_checkOR ){

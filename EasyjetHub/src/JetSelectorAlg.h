@@ -79,6 +79,7 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra jets after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_removeRelativeDeltaRToVRJet {this, "removeRelativeDeltaRToVRJet", false, "Remove events in which VR jets overlaps"};
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
+    Gaudi::Property<bool>  m_useJVT           {this, "useJVT", false, "Apply JVT"};
     Gaudi::Property<bool>  m_useFJVT          {this, "useFJVT", false, "Apply forwardJVT"};
 
     Gaudi::Property<bool>  m_selectBjet       {this, "selectBjet", false, "Apply bjet selection"};
