@@ -76,7 +76,7 @@ if __name__ == "__main__":
     parser.add_argument("--containDalitzOrSpecialWeight", default=0, type=int,
                         help="Whether dalitz events or/and \
                         special weight are included in MC sample.")
-    parser.add_argument("--bTagWP", default="GN2v00LegacyWP_FixedCutBEff_77")
+    parser.add_argument("--bTagWP", default="GN2v01_FixedCutBEff_77")
 
     args = parser.parse_args()
 

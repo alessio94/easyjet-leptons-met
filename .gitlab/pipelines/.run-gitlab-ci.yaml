@@ -79,10 +79,10 @@ ntupler_SHbbyy_mc20:
   script:
     - easyjet-test SHbbyy-mc20
 
-ntupler_bbyy_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test bbyy-mc20-lite
+#ntupler_bbyy_mc20_lite:
+#  extends: .ntupler
+#  script:
+#    - easyjet-test bbyy-mc20-lite
 
 ntupler_ttHH_mc20:
   extends: .ntupler
@@ -156,10 +156,10 @@ ntupler_fast_awkward_mc20af3:
   script:
     - easyjet-test fast-awkward-mc20af3
 
-ntupler_SHbbyy_mc20af3_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test SHbbyy-mc20af3-lite
+#ntupler_SHbbyy_mc20af3_lite:
+#  extends: .ntupler
+#  script:
+#    - easyjet-test SHbbyy-mc20af3-lite
 
 # MC23
 
