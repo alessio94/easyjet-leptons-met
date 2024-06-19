@@ -3,6 +3,7 @@
 */
 
 #include "TriggerDecoratorAlg.h"
+#include "TriggerUtils.h"
 
 
 namespace HHBBTT
@@ -193,23 +194,7 @@ namespace HHBBTT
    muTrigMatchWriteDecoMap& mu_trigMatchDecos) const{
 
     std::vector<std::string> single_mu_paths;
-
-    if(year==2015){
-      single_mu_paths = {"HLT_mu20_iloose_L1MU15", "HLT_mu50"};
-    }
-    else if(2016<=year && year<=2018){
-      single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
-    }
-    else if(2022<=year && year<=2023 &&
-	    !runBoolDecos.at(HHBBTT::is22_75bunches)(*eventInfo) &&
-	    !runBoolDecos.at(HHBBTT::is23_75bunches)(*eventInfo) &&
-	    !runBoolDecos.at(HHBBTT::is23_400bunches)(*eventInfo)){
-      single_mu_paths = {
-	"HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
-	"HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
-	"HLT_mu80_msonly_3layersEC_L1MU14FCH"
-      };
-    }
+    getSingleMuTriggers(year, eventInfo, runBoolDecos, single_mu_paths);
 
     bool trigPassed_SMT = false;
 
@@ -236,45 +221,7 @@ namespace HHBBTT
    eleTrigMatchWriteDecoMap& ele_trigMatchDecos) const{
 
     std::vector<std::string> single_ele_paths;
-    
-    if(year==2015){
-      single_ele_paths = {
-	"HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium",
-	"HLT_e120_lhloose"
-      };
-    }
-    else if(2016<=year && year<=2018){
-      single_ele_paths = {
-	"HLT_e26_lhtight_nod0_ivarloose", "HLT_e60_lhmedium_nod0",
-	"HLT_e140_lhloose_nod0"
-      };
-    }
-    else if(runBoolDecos.at(HHBBTT::is22_75bunches)(*eventInfo)){
-      single_ele_paths = {
-	"HLT_e17_lhvloose_L1EM15VHI", "HLT_e20_lhvloose_L1EM15VH",
-	"HLT_e250_etcut_L1EM22VHI"
-      };
-    }
-    else if(year==2022){
-      single_ele_paths = {
-	"HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
-	"HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
-      };
-    }
-    else if(runBoolDecos.at(HHBBTT::is23_75bunches)(*eventInfo)){
-      single_ele_paths = {
-	"HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
-	"HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
-	"HLT_e300_etcut_L1EM22VHI"
-      };
-    }
-    else if(year==2023){
-      single_ele_paths = {
-	"HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M",
-	"HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
-	"HLT_e300_etcut_L1eEM26M"
-      };
-    }
+    getSingleEleTriggers(year, eventInfo, runBoolDecos, single_ele_paths);
 
     bool trigPassed_SET = false;
     
@@ -305,32 +252,8 @@ namespace HHBBTT
     std::vector<std::string> mu_tau_paths_2016;
     std::vector<std::string> mu_tau_paths_low;
     std::vector<std::string> mu_tau_paths_high;
-
-    if(year==2015 || runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo)){
-      mu_tau_paths_2016 = {"HLT_mu14_tau25_medium1_tracktwo"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo) ||
-	    runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo)){
-      mu_tau_paths_2016 = {"HLT_mu14_ivarloose_tau25_medium1_tracktwo"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo) ||
-	    runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
-	    runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo)){
-      mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_medium1_tracktwo_L1MU10_TAU12IM_3J12"};
-      mu_tau_paths_high = {"HLT_mu14_ivarloose_tau35_medium1_tracktwo"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is18PeriodB_end)(*eventInfo)){
-      mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_medium1_tracktwoEF_L1MU10_TAU12IM_3J12"};
-      mu_tau_paths_high = {"HLT_mu14_ivarloose_tau35_medium1_tracktwoEF"};
-      if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
-        mu_tau_paths_low.push_back("HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_L1MU10_TAU12IM_3J12");
-        mu_tau_paths_high.push_back("HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA");
-      }
-    }
-    else if(year<=2022 || year<=2023){
-      mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU12IM_3J12"};
-      mu_tau_paths_high = {"HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU20IM"};
-    }
+    getMuTauTriggers(year, eventInfo, runBoolDecos,
+		     mu_tau_paths_2016, mu_tau_paths_low, mu_tau_paths_high);
 
     std::unordered_map<HHBBTT::TriggerChannel, std::vector<std::string>> mapPaths;
     mapPaths.emplace(HHBBTT::MTT_2016, mu_tau_paths_2016);
@@ -377,36 +300,8 @@ namespace HHBBTT
 
     std::vector<std::string> ele_tau_paths;
     std::vector<std::string> ele_tau_paths_4J12;
- 
-    if(year==2015 || runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo)){
-      ele_tau_paths = {"HLT_e17_lhmedium_nod0_tau25_medium1_tracktwo"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo) ||
-	    runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo)){
-      ele_tau_paths = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo) ||
-	    runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
-	    runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo)){
-      ele_tau_paths = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo"};
-      ele_tau_paths_4J12 = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo_L1EM15VHI_2TAU12IM_4J12"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is18PeriodB_end)(*eventInfo)){
-      ele_tau_paths = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwoEF"};
-      ele_tau_paths_4J12 = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwoEF_L1EM15VHI_2TAU12IM_4J12"};
-      if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
-        ele_tau_paths.push_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA");
-        ele_tau_paths_4J12.push_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA_L1EM15VHI_2TAU12IM_4J12");
-      }
-    }
-    else if(year==2022){
-      ele_tau_paths = {"HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1EM22VHI"};
-      ele_tau_paths_4J12 = {"HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1EM15VHI_2TAU12IM_4J12"};
-    }
-    else if(year==2023){
-      ele_tau_paths = {"HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1eEM26M"};
-      ele_tau_paths_4J12 = {"HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1EM15VHI_2TAU12IM_4J12"};
-    }
+    getEleTauTriggers(year, eventInfo, runBoolDecos,
+		      ele_tau_paths, ele_tau_paths_4J12);
 
     std::unordered_map<HHBBTT::TriggerChannel, std::vector<std::string>> mapPaths;
     mapPaths.emplace(HHBBTT::ETT, ele_tau_paths);
@@ -449,36 +344,7 @@ namespace HHBBTT
    tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const {
 
     std::vector<std::string> single_tau_paths;
-
-    if(year==2015 || runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo)){
-      single_tau_paths = {"HLT_tau80_medium1_tracktwo_L1TAU60"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo)){
-      single_tau_paths = {"HLT_tau125_medium1_tracktwo"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo) ||
-	    runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo)){
-      single_tau_paths = {"HLT_tau160_medium1_tracktwo"};
-    }
-    else if(runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
-	    runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo)){
-      single_tau_paths = {"HLT_tau160_medium1_tracktwo_L1TAU100"};
-    }
-    else if(year==2018){
-      single_tau_paths = {"HLT_tau160_medium1_tracktwoEF_L1TAU100"};
-      if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
-        single_tau_paths.push_back("HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100");
-      }
-    }
-    else if(year==2022){
-      single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
-    }
-    else if(year==2023){
-      single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
-      if(runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
-        single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"};
-      }
-    }
+    getSingleTauTriggers(year, eventInfo, runBoolDecos, single_tau_paths);
 
     bool trigPassed_STT = false;
     
@@ -512,52 +378,9 @@ namespace HHBBTT
     std::vector<std::string> ditau_paths_L1Topo_delayed;
     std::vector<std::string> ditau_paths_4J12_delayed;
 
-    if(year==2015){
-      ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM"};
-    }
-    else if(2016<=year && year<=2017){
-      if(runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo) ||
-	 runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo) ||
-	 runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo)){
-	ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-      }
-      else if(runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo)){
-	ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-      }
-
-      if(year==2017){
-        ditau_paths_4J12 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM_4J12"};
-      }
-
-      if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo)){
-	// For Period B1 to B4 in 2017, should use this trigger but go to L1Topo selection
-        ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-      }
-      else if(!runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo) &&
-	      (runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
-	       runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo))){
-        ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1DR_TAU20ITAU12I_J25"};
-      }
-    }
-    
-    else if(year==2018){
-      ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1DR_TAU20ITAU12I_J25"};
-      ditau_paths_4J12 = {"HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1TAU20IM_2TAU12IM_4J12p0ETA23"};
-      if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
-        ditau_paths_L1Topo.push_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1DR_TAU20ITAU12I_J25");
-        ditau_paths_4J12.push_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1TAU20IM_2TAU12IM_4J12p0ETA23");
-      }
-    }
-    
-    else if(year>=2022){
-      ditau_paths_L1Topo = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
-      ditau_paths_4J12 = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
-      if (runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
-        ditau_paths_L1Topo_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
-        ditau_paths_4J12_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
-      }
-    }
-    
+    getDiTauTriggers(year, eventInfo, runBoolDecos,
+		     ditau_paths_2016, ditau_paths_L1Topo, ditau_paths_4J12,
+		     ditau_paths_L1Topo_delayed, ditau_paths_4J12_delayed);
 
     std::unordered_map<HHBBTT::TriggerChannel, std::vector<std::string>> mapPaths;
     mapPaths.emplace(HHBBTT::DTT_2016, ditau_paths_2016);
@@ -611,16 +434,8 @@ void TriggerDecoratorAlg::checkDiBJetTriggers
    passWriteDecoMap& pass_decos) const {
 
     std::vector<std::string> dib_paths;
-    
-    if(year==2022){
-      dib_paths = {"HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"};
-    }
-    else if(year==2023){
-      dib_paths = {"HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bgn177_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"};
-      if (runBoolDecos.at(HHBBTT::is23_from1200bunches)(*eventInfo)){
-        dib_paths = {"HLT_j75c_020jvt_j50c_020jvt_j25c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bgn177_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"};
-      }
-    }
+    getDiBJetTriggers(year, eventInfo, runBoolDecos, dib_paths);
+
     std::unordered_map<HHBBTT::TriggerChannel, std::vector<std::string>> mapPaths;
     mapPaths.emplace(HHBBTT::DBT, dib_paths);
 

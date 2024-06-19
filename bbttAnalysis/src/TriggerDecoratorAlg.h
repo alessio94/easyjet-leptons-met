@@ -30,25 +30,6 @@
 
 namespace HHBBTT
 {
-
-  enum RunBooleans
-  {
-    is16PeriodA,
-    is16PeriodB_D3,
-    is16PeriodD4_end,
-    is17PeriodB1_B4,
-    is17PeriodB5_B7,
-    is17PeriodB8_end,
-    is18PeriodB_end,
-    is18PeriodK_end,
-    is22_75bunches,
-    is23_75bunches,
-    is23_400bunches,
-    is23_from1200bunches,
-    is23_first_2400bunches,
-    l1topo_disabled
-  };
-
   
   class TriggerDecoratorAlg final : public AthReentrantAlgorithm
   {

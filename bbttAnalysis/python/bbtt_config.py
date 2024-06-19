@@ -9,6 +9,8 @@ from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
+from EasyjetHub.steering.analysis_configuration import (
+    get_trigger_legs_scale_factor_list)
 
 
 def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
@@ -116,14 +118,12 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.HHBBTT.BaselineVarsbbttAlg(
             "FinalVarsbbttAlg",
             isMC=flags.Input.isMC,
-            jets="bbttAnalysisJets_%SYS%",
-            muons="bbttAnalysisMuons_%SYS%",
-            electrons="bbttAnalysisElectrons_%SYS%",
-            taus="bbttAnalysisTaus_%SYS%",
-            met="AnalysisMET_%SYS%",
-            tauWP=flags.Analysis.Tau.ID,
-            muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
+            muonWP=TightMuonWPLabel,
+            tauWP=flags.Analysis.Tau.ID,
+            eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
+            muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
+            tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
             storeHighLevelVariables=flags.Analysis.store_high_level_variables,
@@ -138,6 +138,9 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 def get_BaselineVarsbbttAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
+
+    if flags.Input.isMC:
+        float_variable_names += ["eventTriggerSF"]
 
     if flags.Analysis.do_mmc:
         combined_particles = [
