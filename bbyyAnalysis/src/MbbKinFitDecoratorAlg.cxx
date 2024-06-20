@@ -26,13 +26,11 @@ namespace HHBBYY{
 
     // Initialise KF Tool
     m_KFTool.reset(new KinematicFitTool("KinematicFitTool"));
-    ATH_CHECK (m_KFTool->initialize());
     ATH_CHECK (m_KFTool->setProperty("JetMinPT", m_Jet_Min_pt));
-    ATH_CHECK (m_KFTool->setProperty("JetCollection", m_JetAlgo));
     ATH_CHECK (m_KFTool->setProperty("bTagWPDecorName", m_BtaggingWP));
     ATH_CHECK (m_KFTool->setProperty("AnglesResolution", m_angles_Res));
     ATH_CHECK (m_KFTool->setProperty("FixAnglesFit", m_isFixAngles));
-    
+    ATH_CHECK (m_KFTool->initialize());
 
     return StatusCode::SUCCESS;
   }

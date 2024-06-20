@@ -55,9 +55,7 @@ namespace HHBBYY {
       CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
       m_jetOutHandle{ this, "jetContainerOutKey", "jetContainerOutKey",   "Jet container to write" };
             
-          /// \brief Steerable properties
-      Gaudi::Property<std::string> m_JetAlgo { this, "JetCollection", "AntiKt4EMPFlow", 
-              "Jet Collection to use"};
+    /// \brief Steerable properties
       Gaudi::Property<std::string> m_BtaggingWP { this, "bTagWPDecorName", "ftag_select_GN2v01LegacyWP_FixedCutBEff_77", 
               "B-Tagging WP to use"};
       Gaudi::Property<float> m_Jet_Min_pt { this, "JetMinPt", 20., 
