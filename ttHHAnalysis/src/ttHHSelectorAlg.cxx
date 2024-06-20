@@ -143,7 +143,7 @@ namespace ttHH
         }
       }
 
-      evaluateCuts(*bjets, *muons, *electrons, m_ttHHCuts);
+      evaluateCuts(*jets, *bjets, *muons, *electrons, m_ttHHCuts);
       if (!m_leptonTriggers.empty())
         evaluateTriggerMatchingCuts(m_leptonTriggers, muons, electrons,m_ttHHCuts);
       
@@ -188,7 +188,7 @@ namespace ttHH
         m_ttHHCuts[i].relativeCounter+=1;
       }
 
-      if (!m_bypass and (!m_ttHHCuts("PASS_BASELINE").passed or !m_ttHHCuts("PASS_TRIGGER").passed or !m_ttHHCuts("PASS_TRIGGER_MATCHING").passed)) continue;
+      if (!m_bypass and (!m_ttHHCuts("PASS_BASELINE").passed or !m_ttHHCuts("PASS_TRIGGER").passed)) continue;
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
@@ -225,7 +225,7 @@ namespace ttHH
 
   }
 
-  void ttHHSelectorAlg::evaluateCuts(const xAOD::JetContainer& bjets,
+  void ttHHSelectorAlg::evaluateCuts(const xAOD::JetContainer& jets, const xAOD::JetContainer& bjets,
                             const xAOD::MuonContainer& muons, 
 			    const xAOD::ElectronContainer& electrons,
 			    CutManager& ttHHCuts)
@@ -233,8 +233,15 @@ namespace ttHH
 
     int nLeptons = muons.size() + electrons.size();
     int nBJets = bjets.size();
+    int nJets = jets.size(); 
 
-    if ((((nLeptons==1) && (nBJets>=4)) || ((nLeptons>=2) && (nBJets>=2))) && ttHHCuts.exists("PASS_BASELINE"))
+    double HT = 0;
+    for (const xAOD::Jet *jet : jets) // Jets here can be every type of jet (No Working point selected)
+    {
+        HT += jet->pt();
+    }
+
+    if ((((nLeptons==1) && (nBJets>=3)) || ((nLeptons>=2) && (nBJets>=3))) && HT > 0 && nJets >= 4 && ttHHCuts.exists("PASS_BASELINE"))
         ttHHCuts("PASS_BASELINE").passed = true;
 
   }
@@ -273,5 +280,4 @@ namespace ttHH
     m_triggers_matchs.at(ttHH::pass_matching_trigger_singlep) = pass_matching_trigger_singlep;
     m_triggers_matchs.at(ttHH::pass_matching_trigger_dilep) = pass_matching_trigger_dilep;
   }
-
 }

@@ -54,7 +54,8 @@ namespace ttHH
           "PASS_TRIGGER_MATCHING"
       };
 
-      void evaluateCuts(const xAOD::JetContainer& bjets,
+      void evaluateCuts(const xAOD::JetContainer& jets,
+		        const xAOD::JetContainer& bjets,
 			const xAOD::MuonContainer& muons,
 			const xAOD::ElectronContainer& electrons,
 			CutManager& ttHHCuts);

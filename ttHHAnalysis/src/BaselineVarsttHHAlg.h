@@ -52,7 +52,10 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_bjetHandle{ this, "bjets", "",   "BJet container to read" };
+    m_pairedJetHandle{ this, "pairedJets", "",   "BJet container to read" };
+
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_bjetHandle{ this, "bjets", "",   "Jet container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
     m_jetHandle{ this, "jets", "",   "Jet container to read" };

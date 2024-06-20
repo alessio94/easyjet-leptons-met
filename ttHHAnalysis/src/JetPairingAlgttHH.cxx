@@ -26,8 +26,13 @@ namespace ttHH
     ATH_MSG_INFO("*********************************\n");
 
     // Read syst-aware input/output handles
-    ATH_CHECK (m_inHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
+
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+    }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -49,13 +54,27 @@ namespace ttHH
     {
 
       // Retrive inputs
-      const xAOD::JetContainer *inContainer = nullptr;
-      ANA_CHECK (m_inHandle.retrieve (inContainer, sys));    
+      const xAOD::JetContainer *bjetContainer = nullptr;
+      const xAOD::JetContainer *jetContainer = nullptr;
+      ANA_CHECK (m_bjetHandle.retrieve (bjetContainer, sys));
+      ANA_CHECK (m_jetHandle.retrieve (jetContainer, sys));    
 
-      // fill workContainer with "views" of the inContainer
+      // fill workContainer with "views" of the jetContainer
       // see TJ's tutorial for this
       auto workContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
-          inContainer->begin(), inContainer->end(), SG::VIEW_ELEMENTS);
+          bjetContainer->begin(), bjetContainer->end(), SG::VIEW_ELEMENTS);
+
+      // if we do not have 4 bjets we add non b-tagged jets to the pairing
+      // which are sorted based on pcbt score
+      if (bjetContainer->size() == 3) {
+        for(const xAOD::Jet* jet : *jetContainer){
+          // fill with first non b-tagged jet
+          if (!m_isBtag.get(*jet, sys)) {
+            workContainer->push_back(jet);
+            break;
+          }
+        }
+      }
 
       // this assumes that container is pt sorted (use the JetSelectorAlg for
       // this) and checks if we have at least 4 jets otherwise exit this alg

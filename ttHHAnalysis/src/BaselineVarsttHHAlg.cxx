@@ -34,6 +34,7 @@ namespace ttHH
     ATH_MSG_INFO("*********************************\n");
 
     ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_pairedJetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
 
     if (!m_isBtag.empty()) {
@@ -92,6 +93,9 @@ namespace ttHH
       const xAOD::JetContainer *bjets = nullptr;
       ANA_CHECK (m_bjetHandle.retrieve (bjets, sys));
 
+      const xAOD::JetContainer *pairedJets = nullptr;
+      ANA_CHECK (m_pairedJetHandle.retrieve (pairedJets, sys));
+
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
 
@@ -110,9 +114,9 @@ namespace ttHH
       TLorentzVector mumu(0.,0.,0.,0.);
       TLorentzVector emu(0.,0.,0.,0.);
 
-      //auto btag_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
-      //auto btag_jets = *bjets;
-      const xAOD::JetContainer btag_jets = *bjets;
+      //auto paired_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      //auto paired_jets = *pairedJets;
+      const xAOD::JetContainer paired_jets = *pairedJets;
 
       int PCBTjet = -99;
       int j_passWP=-99;
@@ -150,13 +154,13 @@ namespace ttHH
           m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel, sys);
       }
 
-      if (bjets->size()>=4) {
+      if (pairedJets->size()>=4) {
 
         // Build the Higgs candidates
-        H1 = bjets->at(0)->p4() + bjets->at(1)->p4();
-        H2 = bjets->at(2)->p4() + bjets->at(3)->p4();
+        H1 = pairedJets->at(0)->p4() + pairedJets->at(1)->p4();
+        H2 = pairedJets->at(2)->p4() + pairedJets->at(3)->p4();
 
-        auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(btag_jets);
+        auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(paired_jets);
 
         m_Fbranches.at("Jets_DeltaR12").set(*event, DeltaR[0], sys);
         m_Fbranches.at("Jets_DeltaR34").set(*event, DeltaR[1], sys);
@@ -179,9 +183,9 @@ namespace ttHH
 
         // Create a new JetContainer
         xAOD::Jet jj12 = xAOD::Jet();
-        jj12 = *btag_jets[0]; // TODO: breaks if jj12 is empty, not sure what it the best approach...
+        jj12 = *paired_jets[0]; // TODO: breaks if jj12 is empty, not sure what it the best approach...
         xAOD::Jet jj34 = xAOD::Jet();
-        jj34 = *btag_jets[0];
+        jj34 = *paired_jets[0];
 
         jj12.setJetP4(xAOD::JetFourMom_t(H1.Pt(), H1.Eta(), H1.Phi(), H1.M()));
         jj34.setJetP4(xAOD::JetFourMom_t(H2.Pt(), H2.Eta(), H2.Phi(), H2.M()));
@@ -193,15 +197,15 @@ namespace ttHH
         float deltaEta_1234 = xAOD::P4Helpers::deltaEta(jj12, jj34);
         DeltaEta.push_back(deltaEta_1234);
 
-        if (btag_jets.size() > 5)
+        if (paired_jets.size() > 5)
         {
           m_Fbranches.at("Jets_DeltaR56").set(*event, DeltaR[2], sys);
           m_Fbranches.at("Jets_DeltaEta56").set(*event, DeltaEta[2], sys);
 
           // construct 56 jet combination
-          xAOD::JetFourMom_t jj56_p4 = btag_jets[4]->jetP4() + btag_jets[5]->jetP4();
+          xAOD::JetFourMom_t jj56_p4 = paired_jets[4]->jetP4() + paired_jets[5]->jetP4();
           xAOD::Jet jj56 = xAOD::Jet();
-          jj56 = *btag_jets[0];
+          jj56 = *paired_jets[0];
           jj56.setJetP4(jj56_p4);
 
           float deltaR_5612 = xAOD::P4Helpers::deltaR(jj56, jj12);

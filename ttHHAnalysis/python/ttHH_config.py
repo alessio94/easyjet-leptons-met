@@ -63,8 +63,11 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.ttHH.JetPairingAlgttHH(
             "JetPairingAlgHH",
-            containerInKey="ttHHAnalysisJets_BTag_%SYS%",
-            containerOutKey="pairedttHHAnalysisJets_"
+            bjets="ttHHAnalysisJets_BTag_%SYS%",
+            jets="ttHHAnalysisJets_%SYS%",
+            bTagWPDecorName="ftag_select_"
+            + flags.Analysis.small_R_jet.btag_wp,
+            pairedOutBJets="pairedttHHAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
             pairingStrategyName="chiSquare",
         )
@@ -100,8 +103,9 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.ttHH.BaselineVarsttHHAlg(
             "BaselineVarsttHHAlg",
-            bjets="pairedttHHAnalysisJets_"
+            pairedJets="pairedttHHAnalysisJets_"
             + flags.Analysis.small_R_jet.btag_wp + "_%SYS%",
+            bjets="ttHHAnalysisJets_BTag_%SYS%",
             jets="ttHHAnalysisJets_%SYS%",
             muons="ttHHAnalysisMuons_%SYS%",
             electrons="ttHHAnalysisElectrons_%SYS%",
