@@ -79,7 +79,6 @@ namespace HHBBTT
     TWO_JETS,
     TWO_BJETS,
     ONE_BJET,
-    MBB_MASS,
     N_LEPTONS_CUT_LEPHAD,
     ONE_TAU,
     OS_CHARGE_LEPHAD,

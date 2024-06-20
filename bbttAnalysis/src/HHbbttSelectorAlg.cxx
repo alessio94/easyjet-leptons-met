@@ -354,8 +354,6 @@ namespace HHBBTT
       // jet
       //************
       int n_jets = 0;
-      TLorentzVector bb(0, 0, 0, 0);
-      float mbb = 0;
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
           SG::VIEW_ELEMENTS);
@@ -392,8 +390,6 @@ namespace HHBBTT
         if (bjets->size() == 2)
         {
           m_bools.at(HHBBTT::TWO_BJETS) = (bjets->at(0)->pt() > 45. * Athena::Units::GeV && bjets->at(1)->pt() > 20. * Athena::Units::GeV);
-          bb = bjets->at(0)->p4() + bjets->at(1)->p4();
-          mbb = bb.M();
         } else if (bjets->size() == 1) {
           m_bools.at(HHBBTT::ONE_BJET) = (bjets->at(0)->pt() > 45. * Athena::Units::GeV);
         }
@@ -404,8 +400,6 @@ namespace HHBBTT
       //****************
       // event level info
       //****************
-      if (mbb < 150. * Athena::Units::GeV)
-        m_bools.at(HHBBTT::MBB_MASS) = true;
       if (n_taus==1 && n_leptons==1 && tau0->charge() != charge_lepton)
         m_bools.at(HHBBTT::OS_CHARGE_LEPHAD) = true;
       if (n_taus==2 && tau0->charge() == -tau1->charge())
