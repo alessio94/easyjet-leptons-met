@@ -11,7 +11,7 @@ do_muons: true
 do_electrons: true
 do_photons: true
 do_met: true
-do_KinematicFit: false
+do_KinematicFit: true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:

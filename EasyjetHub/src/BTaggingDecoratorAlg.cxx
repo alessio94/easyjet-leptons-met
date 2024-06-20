@@ -46,10 +46,10 @@ namespace Easyjet
 
       // loop  over the floatVars_exp and intVars_exp and decorate the jet
       if (m_doExp) {
-        SG::AuxElement::Decorator<float> DbExp("GN2v00_Db");
-        SG::AuxElement::Decorator<int> pcbtExp("GN2v00_pcbtExp");
+        SG::AuxElement::Decorator<float> DbExp("GN2v01_Db");
+        SG::AuxElement::Decorator<int> pcbtExp("GN2v01_pcbtExp");
 
-        // evaluate Db score of GN2v00
+        // evaluate Db score of GN2v01
         float Db = evaluate_Db(*jet);
 
         // assign an experimental pcbt score
@@ -65,24 +65,23 @@ namespace Easyjet
   }
 
   float BTaggingDecoratorAlg ::evaluate_Db(const xAOD::Jet& jet) const {
-    static const SG::AuxElement::ConstAccessor<float> pu("GN2v00_pu");
-    static const SG::AuxElement::ConstAccessor<float> pc("GN2v00_pc");
-    static const SG::AuxElement::ConstAccessor<float> pb("GN2v00_pb");
-    float fc = 0.1; // HARDCODED fc value for GN2
+    static const SG::AuxElement::ConstAccessor<float> pu("GN2v01_pu");
+    static const SG::AuxElement::ConstAccessor<float> pc("GN2v01_pc");
+    static const SG::AuxElement::ConstAccessor<float> pb("GN2v01_pb");
+    static const SG::AuxElement::ConstAccessor<float> ptau("GN2v01_ptau");
+    float fc = 0.2; // HARDCODED fc value for GN2v01
+    float ftau = 0.01; // HARDCODED ftau value for GN2v01
 
-    return log( (pb(jet) ) / ( fc * pc(jet) + (1-fc) * pu(jet) ) );
+    return log( (pb(jet) ) / ( fc * pc(jet) + ftau*ptau(jet) + (1-fc-ftau) * pu(jet) ) );
   }
 
   int BTaggingDecoratorAlg ::evaluate_pcbtExp(float Db) const {
     int PCBT = 0;         // 100-89% -> 0
-    if (Db > 0.783) PCBT++; // 89-85%  -> 1
-    if (Db > 1.638) PCBT++; // 85-82%  -> 2
-    if (Db > 2.145) PCBT++; // 82-77%  -> 3
-    if (Db > 2.893) PCBT++; // 77-75%  -> 4
-    if (Db > 3.034) PCBT++; // 75-70%  -> 5
-    if (Db > 3.875) PCBT++; // 70-68%  -> 6
-    if (Db > 4.157) PCBT++; // 68-60%  -> 7
-    if (Db > 5.394) PCBT++; // 60-0%   -> 8
+    if (Db > -1.351) PCBT++; // 90-85%  -> 1
+    if (Db > -0.396) PCBT++; // 85-77%  -> 2
+    if (Db > 0.828) PCBT++; // 77-70%  -> 3
+    if (Db > 1.877) PCBT++; // 70-65%  -> 4
+    if (Db > 2.658) PCBT++; // 65-0%   -> 5
 
     return PCBT;
   }

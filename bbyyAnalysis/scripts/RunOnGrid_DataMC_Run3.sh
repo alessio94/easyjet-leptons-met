@@ -2,11 +2,11 @@ ptag=p6266
 campaign=v4
 
 #data 
-easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13p6TeV.Run3.p6029.txt \
-    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
-    --exec bbyy-ntupler \
-    --nGBperJob 2 \
-    --campaign ${campaign}
+#easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13p6TeV.Run3.${ptag}.txt \
+#    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
+#    --exec bbyy-ntupler \
+#    --nGBperJob 2 \
+#    --campaign ${campaign}
 
 #ggF HH(bbyy) SM
 easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.ggFHH_bbyy_SM.${ptag}.txt \

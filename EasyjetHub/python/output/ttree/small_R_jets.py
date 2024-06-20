@@ -139,7 +139,8 @@ def get_small_R_bjet_branches(
             ]
 
         gn2v01_valid_ptag = (
-            get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
+            (get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
+            or get_valid_ami_tag(split_tags, "p", "p6266"))
         if gn2v01_valid_ptag:
             small_R_bjet_branches.variables += [
                 "GN2v01_pb",
@@ -150,8 +151,8 @@ def get_small_R_bjet_branches(
 
         if flags.Analysis.small_R_jet.doBtagExpVars:
             small_R_bjet_branches.variables += [
-                "GN2v00_Db",
-                "GN2v00_pcbtExp"
+                "GN2v01_Db",
+                "GN2v01_pcbtExp"
             ]
 
     return small_R_bjet_branches.get_output_list()

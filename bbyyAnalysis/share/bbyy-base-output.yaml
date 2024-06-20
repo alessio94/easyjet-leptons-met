@@ -7,6 +7,7 @@
     collection_options:
       small_R_jets:
         btag_details: true
+        btag_info: true
       photons:
         shower_shapes: false
         truth_labels: false
