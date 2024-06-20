@@ -11,6 +11,7 @@ input:
   electrons:           AnalysisElectrons
   photons:             AnalysisPhotons
   taus:                AnalysisTauJets
+  truthtaus:           TruthTaus
   truthBSMParticles:   TruthBSMWithDecayParticles
   truthSMParticles:    TruthBosonsWithDecayParticles
   met:                 AnalysisMET
