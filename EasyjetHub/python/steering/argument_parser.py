@@ -102,9 +102,15 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
         for ffile in value.split(","):
             if "*" in ffile:  # handle wildcard
                 import glob
-                input_file_list += glob.glob(ffile)
+                if glob.glob(ffile) != []:
+                    input_file_list += glob.glob(ffile)
+                else:
+                    raise ValueError("Unknown input files " + ffile)
             else:
-                input_file_list += [ffile]
+                if ffile.startswith("root://") or pathlib.Path(ffile).is_file():
+                    input_file_list += [ffile]
+                else:
+                    raise ValueError("Unknown input file " + ffile)
         flags[name] = input_file_list
 
     def set_log_level(flags, name, value):
