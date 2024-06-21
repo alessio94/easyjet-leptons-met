@@ -38,8 +38,7 @@ def btag_decor_cfg(flags):
         CompFactory.Easyjet.BTaggingDecoratorAlg(
             f"BTagDecor_{jetcoll}",
             jetsIn=jetcoll,
-            floatVars=btag_vars,
-            expVars=flags.Analysis.small_R_jet.doBtagExpVars
+            floatVars=btag_vars
         )
     )
 

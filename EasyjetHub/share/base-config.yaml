@@ -32,8 +32,6 @@ small_R_jet:
   btag_extra_wps: []
   runBJetPtCalib: True
   useFJvt: False
-  # compute experimental btag variables
-  doBtagExpVars: False
   # select jet type
   jet_type: 'reco4PFlowJet'
   # calib tool options

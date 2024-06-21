@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Teng Jian Khoo
@@ -43,46 +43,9 @@ namespace Easyjet
       for(const auto&[cacc,dec] : m_floatHandlers) {
           dec(*jet) = cacc(*btag);
       }
-
-      // loop  over the floatVars_exp and intVars_exp and decorate the jet
-      if (m_doExp) {
-        SG::AuxElement::Decorator<float> DbExp("GN2v01_Db");
-        SG::AuxElement::Decorator<int> pcbtExp("GN2v01_pcbtExp");
-
-        // evaluate Db score of GN2v01
-        float Db = evaluate_Db(*jet);
-
-        // assign an experimental pcbt score
-        int pcbt = evaluate_pcbtExp(Db);
-
-        // decorate the jet
-        DbExp(*jet) = Db;
-        pcbtExp(*jet) = pcbt;
-      }
     }
 
     return StatusCode::SUCCESS;
   }
 
-  float BTaggingDecoratorAlg ::evaluate_Db(const xAOD::Jet& jet) const {
-    static const SG::AuxElement::ConstAccessor<float> pu("GN2v01_pu");
-    static const SG::AuxElement::ConstAccessor<float> pc("GN2v01_pc");
-    static const SG::AuxElement::ConstAccessor<float> pb("GN2v01_pb");
-    static const SG::AuxElement::ConstAccessor<float> ptau("GN2v01_ptau");
-    float fc = 0.2; // HARDCODED fc value for GN2v01
-    float ftau = 0.01; // HARDCODED ftau value for GN2v01
-
-    return log( (pb(jet) ) / ( fc * pc(jet) + ftau*ptau(jet) + (1-fc-ftau) * pu(jet) ) );
-  }
-
-  int BTaggingDecoratorAlg ::evaluate_pcbtExp(float Db) const {
-    int PCBT = 0;         // 100-89% -> 0
-    if (Db > -1.351) PCBT++; // 90-85%  -> 1
-    if (Db > -0.396) PCBT++; // 85-77%  -> 2
-    if (Db > 0.828) PCBT++; // 77-70%  -> 3
-    if (Db > 1.877) PCBT++; // 70-65%  -> 4
-    if (Db > 2.658) PCBT++; // 65-0%   -> 5
-
-    return PCBT;
-  }
 }

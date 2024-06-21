@@ -149,10 +149,4 @@ def get_small_R_bjet_branches(
                 "GN2v01_ptau",
             ]
 
-        if flags.Analysis.small_R_jet.doBtagExpVars:
-            small_R_bjet_branches.variables += [
-                "GN2v01_Db",
-                "GN2v01_pcbtExp"
-            ]
-
     return small_R_bjet_branches.get_output_list()

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
   BTaggingDecoratorAlg:
   A convenience alg that copies b-tagging information from the BTagging
@@ -39,8 +39,6 @@ public:
     /// \brief Execute method, for actions to be taken in the event loop
     StatusCode execute(const EventContext& ctx) const override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
-    float evaluate_Db(const xAOD::Jet& jet) const;
-    int evaluate_pcbtExp(float Db) const;
 
 private:
 
@@ -55,10 +53,6 @@ private:
 
     Gaudi::Property<std::vector<std::string> > m_floatVars{
       this, "floatVars", {}, "Float variables to be decorated onto jets"
-    };
-
-    Gaudi::Property<bool > m_doExp{
-      this, "expVars", false, "Flag to add experimental decorations to jets"
     };
 
     // Internal members
