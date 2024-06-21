@@ -132,9 +132,7 @@ namespace HHBBTT
     else if(runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo) ||
 	    runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo)){
       ele_tau_paths = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo"};
-      // Need to wait for 25.2.16 to update leg
-      //ele_tau_SF_path = std::make_pair("e17_lhmedium_nod0_AND_e17_lhvloose_nod0_L1EM15VHI",
-      ele_tau_SF_path = std::make_pair("e17_lhmedium_nod0_L1EM15HI",
+      ele_tau_SF_path = std::make_pair("e17_lhmedium_nod0_AND_e17_lhvloose_nod0_L1EM15VHI",
 				       "tau25_medium1_tracktwo");
     }
     else if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo) ||

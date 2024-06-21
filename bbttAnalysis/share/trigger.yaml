@@ -147,8 +147,7 @@ scale_factor:
       '2016':
       - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
       - 'HLT_e17_lhmedium_nod0_tau25_medium1_tracktwo'
-      # To be added with 25.2.16
-      #- 'HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo'
+      - 'HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo'
       '2017':
       - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
       - 'HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo'
