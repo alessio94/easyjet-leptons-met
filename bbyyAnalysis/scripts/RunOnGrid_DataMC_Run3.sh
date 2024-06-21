@@ -205,21 +205,21 @@ easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/m
     --campaign ${campaign}
 
 #yy+jets MadGraph
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc21_13p6TeV.yyjets_MadGraph.${ptag}.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.yyjets_MadGraph.${ptag}.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 2 \
     --campaign ${campaign}
 
 #yy+jets Sherpa
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/mc23_13p6TeV.yyjets.${ptag}.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.yyjets.${ptag}.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 2 \
     --campaign ${campaign}
 
 #yy+jets Sherpa FS
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/mc23_13p6TeV.yyjets_FS.${ptag}.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc23_13p6TeV.yyjets_FS.${ptag}.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 2 \
