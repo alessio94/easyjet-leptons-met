@@ -36,7 +36,7 @@ Muon:
   Iso: "PflowLoose_VarRad"
 
 # list of triggers per year to consider
-trigger_chains:
+trigger:
   include: trigger.yaml
 
 # apply trigger lists to filter events
