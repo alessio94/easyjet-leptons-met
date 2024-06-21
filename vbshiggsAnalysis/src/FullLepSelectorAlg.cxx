@@ -239,10 +239,11 @@ namespace VBSHIGGS{
     }
 
     if (ele1) {
-      if (ele0->charge() != ele1->charge())
-        m_bools.at(VBSHIGGS::TWO_OS_CHARGE_LEPTONS) = true;
+      if (ele0->charge() * ele1->charge() == 1)
+        m_bools.at(VBSHIGGS::TWO_SS_CHARGE_LEPTONS) = true; 
       else
-        m_bools.at(VBSHIGGS::TWO_SS_CHARGE_LEPTONS) = true;
+        m_bools.at(VBSHIGGS::TWO_OS_CHARGE_LEPTONS) = true;
+        
     }
 
     const xAOD::Muon* mu0 = nullptr;
@@ -255,16 +256,17 @@ namespace VBSHIGGS{
     }
 
     if (mu1) {
-      if (mu0->charge() != mu1->charge())
-        m_bools.at(VBSHIGGS::TWO_OS_CHARGE_LEPTONS) = true;
-      else
+      if (mu0->charge() * mu1->charge() == 1)
         m_bools.at(VBSHIGGS::TWO_SS_CHARGE_LEPTONS) = true;
+      else
+        m_bools.at(VBSHIGGS::TWO_OS_CHARGE_LEPTONS) = true;
+        
     }
     else if (n_leptons == 2 && mu0) {
-      if (ele0->charge() != mu0->charge())
-        m_bools.at(VBSHIGGS::TWO_OS_CHARGE_LEPTONS) = true;
-      else  
+      if (ele0->charge() * mu0->charge() == 1 )
         m_bools.at(VBSHIGGS::TWO_SS_CHARGE_LEPTONS) = true;
+      else
+        m_bools.at(VBSHIGGS::TWO_OS_CHARGE_LEPTONS) = true;
     }
 
     if (n_leptons == 2)

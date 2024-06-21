@@ -47,6 +47,7 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
         CompFactory.VBSHIGGS.BaselineVarsFullLepAlg(
             "FinalVarsFullLepAlg",
             isMC=flags.Input.isMC,
+            largejets="vbshiggsAnalysisLargeJets_%SYS%",
             signaljets="vbshiggsAnalysisSignalJets_%SYS%",
             vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
             muons="vbshiggsAnalysisMuons_%SYS%",
@@ -66,13 +67,21 @@ def get_BaselineVarsFullLepAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
     for object in ["ll", "bb", "b1l1", "b2l2", "jj"]:
-        for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
+        for var in ["dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
-    float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET", "METSig"]
+    for object in ["VBSJ1", "VBSJ2", "LargeJet1", "ll", "bb", "b1l1", "b2l2", "jj"]:
+        for var in ["m", "pt", "eta", "phi"]:
+            float_variable_names.append(f"{object}_{var}")
 
-    int_variable_names += ["nJets", "nBJets", "nCentralJets", "nForwardJets",
-                           "nLeptons", "nElectrons", "nMuons"]
+    float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET", "METSig",
+                             "dRbl_min", "bbll_m", "bbllmet_m", "HT2", "HT2r",
+                             "Lepton1_MET_mT", "Lepton2_MET_mT", "LargeJet1_DXbb",
+                             "LargeJet1_phbb", "LargeJet1_phcc", "LargeJet1_pqcd",
+                             "LargeJet1_ptop"]
+
+    int_variable_names += ["nLargeJets", "nJets", "nBJets", "nCentralJets",
+                           "nForwardJets", "nLeptons", "nElectrons", "nMuons"]
 
     return float_variable_names, int_variable_names
 
@@ -97,7 +106,7 @@ def fullLep_branches(flags):
     all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
     for var in all_baseline_variable_names:
-        branches += [f"EventInfo.{var}_%SYS% -> FullLep_{var}_%SYS%"]
+        branches += [f"EventInfo.{var}_%SYS% -> {var}_%SYS%"]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
@@ -108,18 +117,18 @@ def fullLep_branches(flags):
     int_variable_names += object_level_int_variables
 
     branches += object_level_branches
-    branches += ["EventInfo.vbshiggs_pass_sr_%SYS% -> FullLep_pass_SR_%SYS%"]
+    branches += ["EventInfo.vbshiggs_pass_sr_%SYS% -> pass_SR_%SYS%"]
 
     if (flags.Analysis.save_vbshiggs_cutflow):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
-            branches += [f"EventInfo.{cut}_%SYS% -> FullLep_{cut}_%SYS%"]
+            branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in FullLepSelectorAlg
     for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
         branches += \
-            [f"EventInfo.pass_trigger_{cat}_%SYS% -> FullLep_pass_trigger_{cat}"
+            [f"EventInfo.pass_trigger_{cat}_%SYS% -> pass_trigger_{cat}"
              + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names

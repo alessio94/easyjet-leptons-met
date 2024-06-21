@@ -11,7 +11,7 @@ from vbshiggsAnalysis.fullHad_config import fullHad_cfg, fullHad_branches
 import AthenaCommon.SystemOfUnits as Units
 
 
-def vbshiggs_cfg(flags, smalljetkey, muonkey, electronkey):
+def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
 
     cfg = ComponentAccumulator()
 
@@ -29,13 +29,21 @@ def vbshiggs_cfg(flags, smalljetkey, muonkey, electronkey):
                                      ele_WPs=[ElectronWPLabel],
                                      minPt=9 * Units.GeV))
 
-    cfg.merge(JetSelectorAlgCfg(flags,
+    cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg",
                                 containerInKey=smalljetkey,
                                 containerOutKey="vbshiggsAnalysisJets_%SYS%",
                                 bTagWPDecorName="",
                                 selectBjet=False,
                                 minPt=20 * Units.GeV,
                                 minimumAmount=2))  # -1 means ignores this
+
+    cfg.merge(JetSelectorAlgCfg(flags,
+                                containerInKey=largejetkey,
+                                containerOutKey="vbshiggsAnalysisLargeJets_%SYS%",
+                                minPt=250 * Units.GeV,
+                                maxEta=2.0,
+                                minimumAmount=1,  # -1 means ignores this
+                                checkOR=flags.Analysis.do_overlap_removal))
 
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.VBSJetsSelectorAlg(

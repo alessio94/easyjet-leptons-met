@@ -40,7 +40,10 @@ namespace VBSHIGGS{
         /// \brief Setup syst-aware input container handles
         CP::SysListHandle m_systematicsList {this};
 
-        CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "",   "Signal Jet container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "",   "Small R jets Jet container to read" };
+
+        CP::SysReadHandle<xAOD::JetContainer> m_largejetHandle{ this, "largejets", "",   "Large R Jet container to read" };
+
 
         CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "",   "VBS Jet container to read" };
         
@@ -66,6 +69,11 @@ namespace VBSHIGGS{
         CP::SysReadDecorHandle<int> m_truthFlav { this, "truthFlav", "HadronConeExclTruthLabelID", "Jet truth flavor" };
 
         CP::SysReadDecorHandle<char> m_eleECIDS { this, "ElectronsECIDS", "DFCommonElectronsECIDS", "Charge ID Selector" };
+
+        CP::SysReadDecorHandle<float> m_GN2Xv01_phbb = {this, "phbb", "GN2Xv01_phbb", "GN2Xv01_phbb"};
+        CP::SysReadDecorHandle<float> m_GN2Xv01_phcc = {this, "phcc", "GN2Xv01_phcc", "GN2Xv01_phcc"};
+        CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd = {this, "pqcd", "GN2Xv01_pqcd", "GN2Xv01_pqcd"};
+        CP::SysReadDecorHandle<float> m_GN2Xv01_ptop = {this, "ptop", "GN2Xv01_ptop", "GN2Xv01_ptop"};
 
         CP::SysReadDecorHandle<float>
         m_METSig {this, "METSignificance", "significance", "Met Significance"};
