@@ -30,12 +30,10 @@ ntupler_bbtt_data22:
   script:
     - easyjet-test bbtt-data22
 
-# Cannot run with GN2v01
-# To be restored with next p-tag
-#ntupler_bbtt_data22_lite:
-#  extends: .ntupler
-#  script:
-#    - easyjet-test bbtt-data22-lite
+ntupler_bbtt_data22_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test bbtt-data22-lite
 
 ntupler_ttHH_data22_lite:
   extends: .ntupler
@@ -79,10 +77,10 @@ ntupler_SHbbyy_mc20:
   script:
     - easyjet-test SHbbyy-mc20
 
-#ntupler_bbyy_mc20_lite:
-#  extends: .ntupler
-#  script:
-#    - easyjet-test bbyy-mc20-lite
+ntupler_bbyy_mc20_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test bbyy-mc20-lite
 
 ntupler_ttHH_mc20:
   extends: .ntupler
@@ -156,10 +154,10 @@ ntupler_fast_awkward_mc20af3:
   script:
     - easyjet-test fast-awkward-mc20af3
 
-#ntupler_SHbbyy_mc20af3_lite:
-#  extends: .ntupler
-#  script:
-#    - easyjet-test SHbbyy-mc20af3-lite
+ntupler_SHbbyy_mc20af3_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test SHbbyy-mc20af3-lite
 
 # MC23
 
@@ -193,8 +191,7 @@ ntupler_SHbbyy_mc23af3:
   script:
     - easyjet-test SHbbyy-mc23af3
 
-# Cannot run with GN2v01
-# To be restored with next p-tag
+# Commented until ATLASG-2734 is solved
 #ntupler_bbtt_mc23_lite_syst:
 #  extends: .ntupler
 #  script:

@@ -18,9 +18,9 @@ do_photons: false
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
-  btag_wp: GN2v00LegacyWP_FixedCutBEff_85
+  btag_wp: GN2v01_FixedCutBEff_85
   btag_extra_wps:
-    - GN2v00LegacyWP_Continuous
+    - GN2v01_Continuous
   amount: 6
   variables_int_allJets: ["truthLabel", "PassWP", "pcbt"]
     
