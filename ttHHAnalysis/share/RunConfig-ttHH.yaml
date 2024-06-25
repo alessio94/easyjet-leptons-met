@@ -22,8 +22,10 @@ small_R_jet:
   btag_extra_wps:
     - GN2v01_Continuous
   amount: 6
-  variables_int_allJets: ["truthLabel", "PassWP", "pcbt"]
-    
+  variables_int_allJets: ["truthLabel", "PassWP", "pcbt", "n_muons"]
+  variables_allJets: ["uncorrPt", "muonCorrPt"]
+
+
 Electron:
   ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"

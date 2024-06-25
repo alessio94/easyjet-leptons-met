@@ -103,6 +103,10 @@ namespace ttHH
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
+      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
+      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
+      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
+
 
       TLorentzVector H1(0, 0, 0, 0);
       TLorentzVector H2(0, 0, 0, 0);
@@ -118,11 +122,8 @@ namespace ttHH
       //auto paired_jets = *pairedJets;
       const xAOD::JetContainer paired_jets = *pairedJets;
 
-      int PCBTjet = -99;
-      int j_passWP=-99;
       double HT = 0; // scalar sum of jet pT
       double HTall = 0; // scalar sum of jet pT and lepton pT
-      int truthLabel = -99;
 
       for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
@@ -132,26 +133,64 @@ namespace ttHH
         m_Ibranches.at(string_var).set(*event, -99, sys);
       }
 
-      // inclusive jet sector
-      for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)6); i++){	 
-        TLorentzVector j = jets->at(i)->p4();
-        if (m_isMC) 
-          truthLabel = HadronConeExclTruthLabelID(*jets->at(i));
-        j_passWP = static_cast<int>(m_isBtag.get(*jets->at(i), sys));
-        PCBTjet= m_PCBT.get(*jets->at(i), sys);
+      if (pairedJets->size()>=4 && jets->size()>=4 && bjets->size()>=3){
+        int jetsCandidateSize = (jets->size()<6) ? jets->size() : 6;
+        std::vector<const xAOD::Jet*> JetsCandidate(jetsCandidateSize, nullptr);
       
-        m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, j.Pt(), sys);
-        m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, j.Eta(), sys);
-        m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, j.Phi(), sys);
-        m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, j.E(), sys);
+        if (pairedJets->size()>=6){
+          for (std::size_t i=0; i<std::min(pairedJets->size(),(std::size_t)6); i++){
+            JetsCandidate[i] = pairedJets->at(i);
+          }
+        } else{
+          for (std::size_t i=0; i<pairedJets->size(); i++){
+            JetsCandidate[i] = pairedJets->at(i);
+          }
+          if (pairedJets->size()==5 && jets->size()>5){
+            for (const auto& jet : *jets){
+              for (std::size_t i=0; i<pairedJets->size(); i++){
+                if (jet==JetsCandidate[i]) {
+                  continue;
+                }
+                else{ 
+                  JetsCandidate[5] = jet;
+                  break;
+                }
+              }
+            }
+          } else if (pairedJets->size()==4 && jets->size()>4){
+            for (const auto& jet : *jets){
+              for (std::size_t i=0; i<pairedJets->size(); i++){
+                if (jet==JetsCandidate[i]) {
+                  continue;
+                }
+                else if (!JetsCandidate[4]){
+                  JetsCandidate[4] = jet;
+                  continue;
+                } else if (jets->size()>5){
+                  JetsCandidate[5] = jet;
+                }
+              }
+            }
+          }
+        }
+      
+        for (std::size_t i=0; i<JetsCandidate.size(); i++){
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, JetsCandidate[i]->p4().Pt(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, JetsCandidate[i]->p4().Eta(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, JetsCandidate[i]->p4().Phi(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, JetsCandidate[i]->p4().E(), sys);
 
-        m_Ibranches.at("Jet"+std::to_string(i+1)+"_PassWP").set(*event,j_passWP,sys);
+          m_Ibranches.at("Jet"+std::to_string(i+1)+"_PassWP").set(*event,static_cast<int>(m_isBtag.get(*JetsCandidate[i], sys)),sys);
 
-        if(!m_PCBT.empty())
-          m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,PCBTjet,sys);
+          if(!m_PCBT.empty())
+            m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,m_PCBT.get(*JetsCandidate[i], sys),sys);
+          if (m_isMC)
+            m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set(*event, HadronConeExclTruthLabelID(*JetsCandidate[i]), sys);
 
-        if (m_isMC)
-          m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel, sys);
+          m_Ibranches.at("Jet"+std::to_string(i+1)+"_n_muons").set(*event, cacc_NMu(*JetsCandidate[i]), sys);    
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_uncorrPt").set(*event, cacc_UncorrPt(*JetsCandidate[i]), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_muonCorrPt").set(*event, cacc_MuonCorrPt(*JetsCandidate[i]), sys);
+        }
       }
 
       if (pairedJets->size()>=4) {
