@@ -9,7 +9,6 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
     tau_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
         systematics_suffix_separator=flags.Analysis.systematics_suffix_separator
     )

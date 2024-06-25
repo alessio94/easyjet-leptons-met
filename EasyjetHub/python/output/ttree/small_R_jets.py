@@ -13,7 +13,6 @@ def get_small_R_jet_branches(
     small_R_jet_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
         systematics_suffix_separator=flags.Analysis.systematics_suffix_separator,
         required_flags=[
@@ -112,7 +111,6 @@ def get_small_R_bjet_branches(
     small_R_bjet_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
         systematics_suffix_separator=flags.Analysis.systematics_suffix_separator,
         required_flags=[

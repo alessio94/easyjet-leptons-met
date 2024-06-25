@@ -16,7 +16,6 @@ def get_small_R_truthjet_branches(flags, input_container, output_prefix):
     small_R_truthjet_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=False,
     )
 
     small_R_truthjet_branches.add_four_mom_branches(do_mass=True)
@@ -32,7 +31,6 @@ def get_large_R_truthjet_branches(flags, input_container, output_prefix):
     large_R_truthjet_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=False,
     )
 
     large_R_truthjet_branches.add_four_mom_branches(do_mass=True)

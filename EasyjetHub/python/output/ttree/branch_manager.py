@@ -13,7 +13,6 @@ class BranchManager(object):
     """Class for handling container to output ntuple branch mapping"""
     input_container:    str
     output_prefix:      str
-    do_overlap_removal: bool = False
     systematics_option: SystOption = SystOption.NONE
     systematics_suffix_separator: str = "_"
     required_flags:     list = field(default_factory=list)
@@ -26,12 +25,6 @@ class BranchManager(object):
     # In the ConfigBlock OR setup, we cannot actually make OR-ed
     # view containers for output without some more work.
     # So instead we have to add a 'passesOR_%SYS% branch
-    def or_str(self):
-        return ""
-        # if self.do_overlap_removal:
-        #     return "_OR"
-        # else:
-        #     return ""
 
     def syst_str(self):
         return {
@@ -52,7 +45,7 @@ class BranchManager(object):
                 or (not self.syst_only_for and var in self.syst_not_for))
 
     def full_output_var(self, var):
-        _output_prefix = f"{self.output_prefix}{self.or_str()}"
+        _output_prefix = f"{self.output_prefix}"
         if _output_prefix:
             _output_prefix += '_'
 
@@ -70,14 +63,11 @@ class BranchManager(object):
         return _output_var
 
     def full_input_container(self, var):
-        _input_container = f"{self.input_container}{self.or_str()}"
+        _input_container = f"{self.input_container}"
         if (
             "%SYS%" in _input_container
             and self.systematics_option == SystOption.NO_SYST
-        ):
-            _input_container = _input_container.replace("_%SYS%", self.syst_str())
-
-        if self.not_apply_syst_for_var(var):
+        ) or self.not_apply_syst_for_var(var):
             _input_container = _input_container.replace("_%SYS%", "_NOSYS")
 
         return _input_container

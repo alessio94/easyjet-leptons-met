@@ -16,23 +16,12 @@ def get_large_R_jet_branches(
     large_R_jet_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=flags.Analysis.do_overlap_removal,
         systematics_option=_syst_option,
         systematics_suffix_separator=flags.Analysis.systematics_suffix_separator
     )
 
     if tree_flags.slim_variables_with_syst:
         large_R_jet_branches.syst_only_for = ["pt", "m"]
-
-    # The LargeJetGhostVRJetAssociationAlg does not support systematics
-    # Implement systematics handles, then remove this extra BM
-    large_R_jet_NOSYS_branches = BranchManager(
-        input_container,
-        output_prefix,
-        do_overlap_removal=flags.Analysis.do_overlap_removal,
-        systematics_option=SystOption.NO_SYST,
-        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator
-    )
 
     if lr_jet_type == "Topo":
         large_R_jet_branches.required_flags.append(flags.Analysis.do_large_R_Topo_jets)
@@ -53,11 +42,11 @@ def get_large_R_jet_branches(
         ] + get_large_R_jet_truth_labels(flags)
 
         if lr_jet_type == "Topo":
-            large_R_jet_NOSYS_branches.variables += [
+            large_R_jet_branches.variables += [
                 "R10TruthLabel_R21Consolidated",
             ]
         if lr_jet_type == "UFO":
-            large_R_jet_NOSYS_branches.variables += [
+            large_R_jet_branches.variables += [
                 "GhostCHadronsFinalCount",
                 "R10TruthLabel_R21Precision_2022v1",
                 "R10TruthLabel_R22v1",
@@ -75,10 +64,7 @@ def get_large_R_jet_branches(
        tree_flags.collection_options.large_R_jets.btag_details:
         large_R_jet_branches.variables += get_large_R_gn2_branches()
 
-    return (
-        large_R_jet_branches.get_output_list()
-        + large_R_jet_NOSYS_branches.get_output_list()
-    )
+    return large_R_jet_branches.get_output_list()
 
 
 def get_ghost_vr_branches(flags):

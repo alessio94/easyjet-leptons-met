@@ -9,7 +9,6 @@ def get_met_branches(flags, input_container, output_prefix):
     met_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=False,
         systematics_option=_syst_option,
         systematics_suffix_separator=flags.Analysis.systematics_suffix_separator
     )

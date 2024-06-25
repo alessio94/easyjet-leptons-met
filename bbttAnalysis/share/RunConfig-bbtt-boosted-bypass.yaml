@@ -28,6 +28,7 @@ ttree_output:
         btag_info: true
       large_R_jets:
         substructure_info: true
+        truth_labels: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'

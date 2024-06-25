@@ -5,7 +5,6 @@ def get_truthtau_branches(flags, input_container, output_prefix):
     truthtau_branches = BranchManager(
         input_container,
         output_prefix,
-        do_overlap_removal=False,
     )
 
     truthtau_branches.variables = \
