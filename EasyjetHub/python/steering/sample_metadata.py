@@ -14,6 +14,7 @@ MCSampleYears = {
     Campaign.MC23a: (2022,),
     Campaign.MC23c: (2023,),
     Campaign.MC23d: (2023,),
+    Campaign.PhaseII: (2029,),
 }
 
 

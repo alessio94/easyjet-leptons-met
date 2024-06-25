@@ -4,6 +4,7 @@ import sys
 
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.AutoConfigFlags import GetFileMD
+from AthenaConfiguration.Enums import LHCPeriod
 from TrigGlobalEfficiencyCorrection.TriggerLeg_DictHelpers import TriggerDict
 from AthenaCommon.Constants import INFO
 
@@ -88,11 +89,16 @@ def analysis_configuration(parser="default"):
     log.info(f"Configuring to match dataset from {flags.Analysis.Years}")
     if max(flags.Analysis.Years) <= 2018:
         flags.addFlag("Analysis.Run", 2)
-    elif min(flags.Analysis.Years) >= 2022:
+    elif min(flags.Analysis.Years) >= 2022 and max(flags.Analysis.Years) <= 2025:
         flags.addFlag("Analysis.Run", 3)
+    elif min(flags.Analysis.Years) >= 2029:
+        flags.addFlag("Analysis.Run", 4)
     else:
         raise RuntimeError("Invalid list of years, cannot combine runs")
     log.info(f"Configured years match Run {flags.Analysis.Run}")
+
+    if flags.Analysis.Run == 4:
+        flags.GeoModel.Run = LHCPeriod.Run4
 
     flags.PerfMon.doFullMonMT = flags.Exec.OutputLevel <= INFO
 
