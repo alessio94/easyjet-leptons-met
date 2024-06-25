@@ -382,9 +382,18 @@ namespace ttHH
       m_Ibranches.at("trilept_type").set(*event, (leptonCount == 3) ? 1 : 0, sys);
       //--
 
+      int sumPCBT = 0; // sum of pcbt scores for one event
+
       for (const xAOD::Jet *jet : *jets) // Jets here can be every type of jet (No Working point selected)
       {
+	// calculate HT
         HT += jet->pt();
+
+	// calculate sumPCBT
+	int pcbt = m_PCBT.get(*jet, sys);
+	if (pcbt > 0) {
+	  sumPCBT += pcbt;
+	}
       }
 
       HTall += HT;
@@ -392,6 +401,7 @@ namespace ttHH
       m_Fbranches.at("HT").set(*event, HT, sys);
       m_Fbranches.at("HTall").set(*event, HTall, sys);
       m_Ibranches.at("nLeptons").set(*event, leptonCount, sys);
+      m_Ibranches.at("sumPCBT").set(*event, sumPCBT, sys);
     }
     return StatusCode::SUCCESS;
 
