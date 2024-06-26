@@ -63,7 +63,7 @@ namespace HHBBLL
     DILEPTON_MASS_SR1,
     VBFVETO_SR1,
     DILEPTON_MASS_SR2,
-    DIBJET_MASS_SR2,
+    DIBJET_MASS_SR2
   };
 
   /// \brief An algorithm for counting containers
@@ -88,7 +88,7 @@ namespace HHBBLL
         "DILEPTON_MASS_SR1",
         "VBFVETO_SR1",
         "DILEPTON_MASS_SR2",
-        "DIBJET_MASS_SR2"
+	"DIBJET_MASS_SR2",
       };
 
 

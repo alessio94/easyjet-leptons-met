@@ -41,3 +41,19 @@ easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_top_
     --nGBperJob 5 \
     --campaign ${campaignName} \
     --noTag
+
+#Diboson
+easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_diboson_background_p6026.txt \
+    --run-config ${runConfig} \
+    --exec ${executable} \
+    --nGBperJob 5 \
+    --campaign ${campaignName} \
+    --noTag
+
+#Single-Higgs
+easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_singleH_background_p6026.txt \
+    --run-config ${runConfig} \
+    --exec ${executable} \
+    --nGBperJob 5 \
+    --campaign ${campaignName} \
+    --noTag
