@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "SumOfWeightsAlg.h"
@@ -29,7 +29,7 @@ namespace Easyjet
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize()); 
 
-    ATH_CHECK (book (TH1D("SumOfWeights", "Sum of weights",2, 0.5, 2.5)));
+    ATH_CHECK (book (TH1F("SumOfWeights", "Sum of weights",2, 0.5, 2.5)));
 
 
     return StatusCode::SUCCESS;
@@ -66,7 +66,7 @@ namespace Easyjet
         std::string title = m_histTitle.value();
         if (!sys.empty())
           title += " (" + sys.name() + ")";
-        ATH_CHECK (book (TH1D (name.c_str(), title.c_str(), 2, 0.5, 2.5)));
+        ATH_CHECK (book (TH1F (name.c_str(), title.c_str(), 2, 0.5, 2.5)));
 
         m_hist.insert (std::make_pair (sys, hist (name)));
         histIter = m_hist.find (sys);
