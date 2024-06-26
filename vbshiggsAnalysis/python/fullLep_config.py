@@ -56,6 +56,8 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
             eleWP=ElectronWPLabel,
             met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            PCBTDecorName="ftag_quantile_"
+                          + flags.Analysis.small_R_jet.btag_extra_wps[0],
             floatVariableList=float_variables,
             intVariableList=int_variables
         )

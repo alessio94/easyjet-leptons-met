@@ -38,17 +38,15 @@ bypass: true
 # Toggles for reconstructed objects decorations
 small_R_jet:
   # btagging working points 
-  btag_wp: "GN2v01_FixedCutBEff_85"
+  btag_wp: "GN2v01_FixedCutBEff_90"
   amount: 2
   amount_bjet: 2
 
   # to use multiple btagging WPs
   btag_extra_wps:
-    - GN2v01_FixedCutBEff_65
-    - GN2v01_FixedCutBEff_70
-    - GN2v01_FixedCutBEff_77
-    - GN2v01_FixedCutBEff_90
-  variables_int_bjets: ["truthLabel"]
+    - GN2v01_Continuous
+
+  variables_int_bjets: ["truthLabel", "pcbt"]
 # Include the TTree configuration and update details
 ttree_output:
   - AnalysisMiniTree:

@@ -1,14 +1,15 @@
 runConfig="vbshiggsAnalysis/RunConfig-fullLep.yaml"
 executable="vbshiggs-ntupler"
-campaignName="VBSHiggs_25May2024_v01"
+campaignName="VBSHiggs_21June2024_v02"
 
 #signal
-easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/mc20_signal_DAOD_PHYS_p6026.txt \
+easyjet-gridsubmit --mc-list  ../easyjet/vbshiggsAnalysis/datasets/PHYS/mc20_signal_DAOD_PHYS_p6026.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --nGBperJob 5 \
     --campaign ${campaignName} \
-    --noTag
+    --noTag \
+    --mergeOutput
 
 
 #ttbar+single-top+ttH+tW
@@ -25,7 +26,8 @@ easyjet-gridsubmit --mc-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/mc20_WZjj
     --exec ${executable} \
     --nGBperJob 5 \
     --campaign ${campaignName} \
-    --noTag
+    --noTag \
+    --mergeOutput
 
 #VH (bb, WW)
 easyjet-gridsubmit --mc-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/mc20_VH_DAOD_PHYS_p6026.txt \
@@ -33,5 +35,15 @@ easyjet-gridsubmit --mc-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/mc20_VH_D
     --exec ${executable} \
     --nGBperJob 5 \
     --campaign ${campaignName} \
-    --noTag
+    --noTag \
+    --mergeOutput
+
+#data
+easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/data_Run2_p6026.txt \
+    --run-config ${runConfig} \
+    --exec ${executable} \
+    --nGBperJob 5 \
+    --campaign ${campaignName} \
+    --noTag \
+    --mergeOutput
 

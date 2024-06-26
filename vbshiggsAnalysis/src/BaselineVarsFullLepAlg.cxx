@@ -42,6 +42,9 @@ namespace VBSHIGGS{
       if (!m_isBtag.empty()) {
         ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
       }
+      if (!m_PCBT.empty()) {
+        ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_signaljetHandle));
+      }
 
       // Intialise syst-aware output decorators
       for (const std::string &var : m_floatVariables) {
@@ -123,6 +126,7 @@ namespace VBSHIGGS{
 
         // b-jet sector
         bool WPgiven = !m_isBtag.empty();
+        bool PCBTgiven = !m_PCBT.empty();
         auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
 
         // number of central jets
@@ -290,9 +294,14 @@ namespace VBSHIGGS{
           m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_eta").set(*event, bjets->at(i)->eta(), sys);
           m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_phi").set(*event, bjets->at(i)->phi(), sys);
           m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_E").set(*event, bjets->at(i)->e(), sys);
+
+          if(PCBTgiven)
+            m_Ibranches.at("Jet_b"+std::to_string(i+1)+"_pcbt").set(*event, m_PCBT.get(*bjets->at(i), sys),sys);
+
           if (m_isMC) {
             m_Ibranches.at("Jet_b"+std::to_string(i+1)+"_truthLabel").set(*event, m_truthFlav.get(*bjets->at(i), sys), sys);
           }
+
         }
         TLorentzVector bb;
         TLorentzVector Leading_bjet;
