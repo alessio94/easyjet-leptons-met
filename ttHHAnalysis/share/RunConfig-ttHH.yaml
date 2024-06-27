@@ -71,7 +71,7 @@ do_overlap_removal: true
 save_ttHH_cutflow: false
 
 # save variables for HF classification
-save_HF_classification: false
+save_HF_classification: true
 
 CutList:
   - PASS_TRIGGER

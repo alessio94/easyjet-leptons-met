@@ -178,6 +178,24 @@ DSID_nWLep_samples:
   - 602689 #pThard variation
   - 602690 #pThard variation
 
+# list of DSID of samples for which to store HF classification 
+# related information
+DSID_HF_class_samples:
+  - 410470 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_nonallhad
+  - 410472 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_dil
+  - 601229 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_SingleLep
+  - 601230 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_dil
+  - 411233 #mc20 PowhegHerwig7EvtGen_tt_hdamp258p75_713_SingleLep
+  - 411234 #mc20 PowhegHerwig7EvtGen_tt_hdamp258p75_713_dil
+  - 601491 #mc20 PhPy8EG_A14_ttbar_pThard1_dil
+  - 601497 #mc20 PhPy8EG_A14_ttbar_pThard1_singlelep
+  - 410472 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_dil
+  - 410470 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_nonallhad
+  - 410482 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_dil
+  - 410480 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_SingleLep
+  - 601491 #mc23 PhPy8EG_A14_ttbar_pThard1_dil
+  - 601497 #mc23 PhPy8EG_A14_ttbar_pThard1_singlelep
+
 # Definition of container names
 full_container_names:
   phys:

@@ -28,7 +28,9 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "generatorWeight_%SYS%",
             "PileupWeight_%SYS%"
         ]
-        if flags.Analysis.save_HF_classification:
+        if (flags.Analysis.save_HF_classification
+                and flags.Input.MCChannelNumber
+                in flags.Analysis.DSID_HF_class_samples):
             eventinfo_branches.variables += [
                 "HF_SimpleClassification",
                 "HF_Classification"
