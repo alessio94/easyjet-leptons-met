@@ -19,6 +19,7 @@ First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel fre
 ```
 setupATLAS
 lsetup git
+git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup once
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
 git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 ```
@@ -35,6 +36,7 @@ In case you want to make some developments to the software itself, we recommend 
 ``` 
 setupATLAS
 lsetup git
+git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup once
 git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 ```
 
