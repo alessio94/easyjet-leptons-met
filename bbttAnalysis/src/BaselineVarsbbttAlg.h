@@ -20,7 +20,6 @@
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODTau/TauJetContainer.h>
-#include <xAODMissingET/MissingETContainer.h>
 
 #include "HHbbttEnums.h"
 
@@ -65,9 +64,6 @@ private:
 
     CP::SysReadHandle<xAOD::TauJetContainer>
       m_tauHandle{ this, "taus", "bbttAnalysisTaus_%SYS%", "Tau container to read" };
-
-    CP::SysReadHandle<xAOD::MissingETContainer>
-      m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
