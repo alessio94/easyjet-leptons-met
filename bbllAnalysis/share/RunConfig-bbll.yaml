@@ -28,8 +28,7 @@ small_R_jet:
 
   # to use multiple btagging WPs
   btag_extra_wps:
-    - GN2v00LegacyWP_FixedCutBEff_77
-    - GN2v00NewAliasWP_FixedCutBEff_77
+    - GN2v01_FixedCutBEff_77
   
   variables_int_bjets: ["truthLabel"]
 

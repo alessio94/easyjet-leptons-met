@@ -10,7 +10,7 @@ HHPhoton:
   Iso: "FixedCutLoose"
 
 HHBjet:
-  btag_wp: "GN2v00LegacyWP_FixedCutBEff_77"
+  btag_wp: "GN2v01_FixedCutBEff_77"
 
 # Even if not used for checking number of objects, need to ensure other collections are processed and have baseline WPs for overlap removal
 HHElectron:

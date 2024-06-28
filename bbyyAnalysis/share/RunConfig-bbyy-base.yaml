@@ -21,7 +21,6 @@ small_R_jet:
   # to use multiple btagging WPs
   btag_extra_wps:
     - GN2v01_Continuous
-    #GN2v00NewAliasWP
     #DL1dv01
 
   amount: 4
