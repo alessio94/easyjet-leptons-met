@@ -101,15 +101,13 @@ namespace HHBBLL
       
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
-      TLorentzVector bb;
-      TLorentzVector ee;
-      TLorentzVector mumu;
-      TLorentzVector emu;
       TLorentzVector Leading_lep;
       TLorentzVector Subleading_lep;
       TLorentzVector Leading_bjet;
       TLorentzVector Subleading_bjet;
       TLorentzVector met_vector;
+      TLorentzVector bb;
+      TLorentzVector ll;
       TLorentzVector bbll;
       TLorentzVector bbllmet;
       TLorentzVector b1l1;
@@ -121,8 +119,6 @@ namespace HHBBLL
       int n_bjets=0;
       int n_electrons=0;
       int n_muons=0;
-      int truthLabel_b1 = -99;
-      int truthLabel_b2 = -99;
       int nCentralJets = 0;
 
       // Count electrons
@@ -153,272 +149,123 @@ namespace HHBBLL
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
 
       // Electron sector
-      if (electrons->size() > 0)
-      {
-        // Leading electron
-        const xAOD::Electron* ele0 = electrons->at(0);
-        m_Fbranches.at("Electron1_pt").set(*event, ele0->pt(), sys);
-        m_Fbranches.at("Electron1_eta").set(*event, ele0->eta(), sys);
-        m_Fbranches.at("Electron1_phi").set(*event, ele0->phi(), sys);
-        m_Fbranches.at("Electron1_E").set(*event, ele0->e(), sys);
+      const xAOD::Electron* ele0 = nullptr;
+      const xAOD::Electron* ele1 = nullptr;
+
+      for(unsigned int i=0; i<std::min(size_t(2),electrons->size()); i++){
+        std::string prefix = "Electron"+std::to_string(i+1);
+        const xAOD::Electron* ele = electrons->at(i);
+        if(i==0) ele0 = ele;
+        else if(i==1) ele1 = ele;
+        m_Fbranches.at(prefix+"_pt").set(*event, ele->pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, ele->eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, ele->phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, ele->e(), sys);
         if(m_isMC){
-          float ele_SF = m_ele_SF.get(*ele0, sys);
-          m_Fbranches.at("Electron1_effSF").set(*event, ele_SF, sys);
+          float ele_SF = m_ele_SF.get(*ele, sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, ele_SF, sys);
         }
       }
-      if (electrons->size() >= 2)
-      {
-        // Subleading electron
-        const xAOD::Electron* ele1 = electrons->at(1);
-        m_Fbranches.at("Electron2_pt").set(*event, ele1->pt(), sys);
-        m_Fbranches.at("Electron2_eta").set(*event, ele1->eta(), sys);
-        m_Fbranches.at("Electron2_phi").set(*event, ele1->phi(), sys);
-        m_Fbranches.at("Electron2_E").set(*event, ele1->e(), sys);
-        if(m_isMC){
-          float ele_SF = m_ele_SF.get(*ele1, sys);
-          m_Fbranches.at("Electron2_effSF").set(*event, ele_SF, sys);
-        }
-
-        // ee
-        ee = electrons->at(0)->p4() + electrons->at(1)->p4();
-        m_Fbranches.at("mee").set(*event, ee.M(), sys);
-        m_Fbranches.at("pTee").set(*event, ee.Pt(), sys);
-        m_Fbranches.at("Etaee").set(*event, ee.Eta(), sys);
-        m_Fbranches.at("Phiee").set(*event, ee.Phi(), sys);
-        m_Fbranches.at("dRee").set(*event, (electrons->at(0)->p4()).DeltaR(electrons->at(1)->p4()), sys);
-
-      } //end electron sector
 
       // Muon sector
-      if (muons->size() >= 1)
-      {
-        // Leading muon
-        const xAOD::Muon* mu0 = muons->at(0);
-        m_Fbranches.at("Muon1_pt").set(*event, mu0->pt(), sys);
-        m_Fbranches.at("Muon1_eta").set(*event, mu0->eta(), sys);
-        m_Fbranches.at("Muon1_phi").set(*event, mu0->phi(), sys);
-        m_Fbranches.at("Muon1_E").set(*event, mu0->e(), sys);
-        if(m_isMC){
-          float mu_SF = m_mu_SF.get(*mu0, sys);
-          m_Fbranches.at("Muon1_effSF").set(*event, mu_SF, sys);
-        }
-      }
-      if (muons->size() >= 2)
-      {
-        // Subleading muon
-        const xAOD::Muon* mu1 = muons->at(1);
-        m_Fbranches.at("Muon2_pt").set(*event, mu1->pt(), sys);
-        m_Fbranches.at("Muon2_eta").set(*event, mu1->eta(), sys);
-        m_Fbranches.at("Muon2_phi").set(*event, mu1->phi(), sys);
-        m_Fbranches.at("Muon2_E").set(*event, mu1->e(), sys);
-        if(m_isMC){
-          float mu_SF = m_mu_SF.get(*mu1, sys);
-          m_Fbranches.at("Muon2_effSF").set(*event, mu_SF, sys);
-        }
+      const xAOD::Muon* mu0 = nullptr;
+      const xAOD::Muon* mu1 = nullptr;
 
-        // mumu
-        mumu = muons->at(0)->p4() + muons->at(1)->p4();
-        m_Fbranches.at("mmumu").set(*event, mumu.M(), sys);
-        m_Fbranches.at("pTmumu").set(*event, mumu.Pt(), sys);
-        m_Fbranches.at("Etamumu").set(*event, mumu.Eta(), sys);
-        m_Fbranches.at("Phimumu").set(*event, mumu.Phi(), sys);
-        m_Fbranches.at("dRmumu").set(*event, (muons->at(0)->p4()).DeltaR(muons->at(1)->p4()), sys);
+      for(unsigned int i=0; i<std::min(size_t(2),muons->size()); i++){
+        std::string prefix = "Muon"+std::to_string(i+1);
+        const xAOD::Muon* mu = muons->at(i);
+        if(i==0) mu0 = mu;
+        else if(i==1) mu1 = mu;
+        m_Fbranches.at(prefix+"_pt").set(*event, mu->pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, mu->eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, mu->phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, mu->e(), sys);
+        if(m_isMC){
+          float mu_SF = m_mu_SF.get(*mu, sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, mu_SF, sys);
+        }
       }// end muon
 
-      //emu
-      if (electrons->size() == 1 && muons->size() == 1)
-      {
-        emu = electrons->at(0)->p4() + muons->at(0)->p4();
-        m_Fbranches.at("memu").set(*event, emu.M(), sys);
-        m_Fbranches.at("pTemu").set(*event, emu.Pt(), sys);
-        m_Fbranches.at("Etaemu").set(*event, emu.Eta(), sys);
-        m_Fbranches.at("Phiemu").set(*event, emu.Phi(), sys);
-        m_Fbranches.at("dRemu").set(*event, (electrons->at(0)->p4()).DeltaR(muons->at(0)->p4()), sys);
+      std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
+      if(ele0) leptons.emplace_back(ele0, -11*ele0->charge());
+      if(mu0) leptons.emplace_back(mu0, -13*mu0->charge());
+      if(ele1) leptons.emplace_back(ele1, -11*ele1->charge());
+      if(mu1) leptons.emplace_back(mu1, -13*mu1->charge());
+
+      std::sort(leptons.begin(), leptons.end(),
+		[](const std::pair<const xAOD::IParticle*, int>& a,
+		   const std::pair<const xAOD::IParticle*, int>& b) {
+		  return a.first->pt() > b.first->pt(); });
+
+      for(unsigned int i=0; i<std::min(size_t(2),leptons.size()); i++){
+        std::string prefix = "Lepton"+std::to_string(i+1);
+        TLorentzVector tlv = leptons[i].first->p4();
+        if(i==0) Leading_lep = tlv;
+        else if(i==1) Subleading_lep = tlv;
+        m_Fbranches.at(prefix+"_pt").set(*event, tlv.Pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, tlv.Eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
+        if(m_isMC){
+          float SF = std::abs(leptons[i].second)==11 ?
+            m_ele_SF.get(*leptons[i].first,sys) :
+            m_mu_SF.get(*leptons[i].first,sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
+        }
+        int charge = leptons[i].second>0 ? -1 : 1;
+        m_Ibranches.at(prefix+"_charge").set(*event, charge, sys);
+        m_Ibranches.at(prefix+"_pdgid").set(*event, leptons[i].second, sys);
       }
 
-      //Leading lepton
-      if (electrons->size() >= 1 || muons->size() >= 1)
-      {
-        const xAOD::Muon* mu0 = nullptr;
-        const xAOD::Electron* ele0 = nullptr;
-        float lep1_SF = -99;
-        int lep1_charge = -99;
-        int lep1_pdgid = -99;
-        if (electrons->size() >= 1)
-          ele0 = electrons->at(0);
-        if (muons->size() >= 1)
-          mu0 = muons->at(0);
-
-        if (ele0 && !mu0){
-          Leading_lep = ele0->p4();
-          if(m_isMC) lep1_SF = m_ele_SF.get(*ele0, sys);
-          lep1_charge = ele0->charge();
-          lep1_pdgid = ele0->charge() > 0 ? -11 : 11;
-        }
-
-	else if (!ele0 && mu0) {
-          Leading_lep = mu0->p4();
-	  if(m_isMC) lep1_SF = m_mu_SF.get(*mu0, sys);
-          lep1_charge = mu0->charge();
-          lep1_pdgid = mu0->charge() > 0 ? -13 : 13;
-        }
-
-	else if (ele0 && mu0) {
-          if (ele0->pt() > mu0->pt()){
-            Leading_lep =  ele0->p4();
-            if(m_isMC) lep1_SF = m_ele_SF.get(*ele0, sys);
-            lep1_charge = ele0->charge();
-            lep1_pdgid = ele0->charge() > 0 ? -11 : 11;
-          } else {
-            Leading_lep = mu0->p4();
-            if(m_isMC) lep1_SF = m_mu_SF.get(*mu0, sys);
-            lep1_charge = mu0->charge();
-            lep1_pdgid = mu0->charge() > 0 ? -13 : 13;
-          }
-        }
-
-        m_Fbranches.at("Lepton1_pt").set(*event, Leading_lep.Pt(), sys);
-        m_Fbranches.at("Lepton1_eta").set(*event, Leading_lep.Eta(), sys);
-        m_Fbranches.at("Lepton1_phi").set(*event, Leading_lep.Phi(), sys);
-        m_Fbranches.at("Lepton1_E").set(*event, Leading_lep.E(), sys);
-        if(m_isMC) m_Fbranches.at("Lepton1_effSF").set(*event, lep1_SF, sys);
-        m_Ibranches.at("Lepton1_charge").set(*event, lep1_charge, sys);
-        m_Ibranches.at("Lepton1_pdgid").set(*event, lep1_pdgid, sys);
+      if(leptons.size()>=2){
+	ll = Leading_lep + Subleading_lep;
+	m_Fbranches.at("mll").set(*event, ll.M(), sys);
+	m_Fbranches.at("pTll").set(*event, ll.Pt(), sys);
+	m_Fbranches.at("Etall").set(*event, ll.Eta(), sys);
+	m_Fbranches.at("Phill").set(*event, ll.Phi(), sys);
+	m_Fbranches.at("dRll").set(*event, Leading_lep.DeltaR(Subleading_lep), sys);
       }
-
-      //Subleading lepton
-      if (electrons->size() + muons->size() == 2)
-      {
-        const xAOD::Electron* ele0 = nullptr;
-        const xAOD::Muon* mu0 = nullptr;
-        const xAOD::Electron* ele1 = nullptr;
-        const xAOD::Muon* mu1 = nullptr;
-        float lep2_SF = -99;
-        int lep2_charge = -99;
-        int lep2_pdgid = -99;
-
-        if (electrons->size() == 2)
-          ele1 = electrons->at(1);
-        else if (muons->size() == 2)
-          mu1 = muons->at(1);
-        else {
-          ele0 = electrons->at(0);
-          mu0 = muons->at(0);
-        }
-
-        if (ele1){
-          Subleading_lep = ele1->p4();
-          if(m_isMC) lep2_SF = m_ele_SF.get(*ele1, sys);
-          lep2_charge = ele1->charge();
-          lep2_pdgid = ele1->charge() > 0 ? -11 : 11;
-        }
-
-	else if (mu1) {
-          Subleading_lep = mu1->p4();
-          if(m_isMC) lep2_SF = m_mu_SF.get(*mu1, sys);
-          lep2_charge = mu1->charge();
-          lep2_pdgid = mu1->charge() > 0 ? -13 : 13;
-        }
-
-	else if (ele0 && mu0) {
-          if (ele0->pt() > mu0->pt()){
-            Subleading_lep = mu0->p4();
-            if(m_isMC) lep2_SF = m_mu_SF.get(*mu0, sys);
-            lep2_charge = mu0->charge();
-            lep2_pdgid = mu0->charge() > 0 ? -13 : 13;
-          } else {
-            Subleading_lep = ele0->p4();
-            if(m_isMC) lep2_SF = m_ele_SF.get(*ele0, sys);
-            lep2_charge = ele0->charge();
-            lep2_pdgid = ele0->charge() > 0 ? -11 : 11;
-          }
-        }
-
-        m_Fbranches.at("Lepton2_pt").set(*event, Subleading_lep.Pt(), sys);
-        m_Fbranches.at("Lepton2_eta").set(*event, Subleading_lep.Eta(), sys);
-        m_Fbranches.at("Lepton2_phi").set(*event, Subleading_lep.Phi(), sys);
-        m_Fbranches.at("Lepton2_E").set(*event, Subleading_lep.E(), sys);
-        if(m_isMC) m_Fbranches.at("Lepton2_effSF").set(*event, lep2_SF, sys);
-        m_Ibranches.at("Lepton2_charge").set(*event, lep2_charge, sys);
-        m_Ibranches.at("Lepton2_pdgid").set(*event, lep2_pdgid, sys);
-      }
-
-      //ll_m
-      double ll_m = (electrons->size() == 2 && muons->size() == 0) ? ee.M() :
-        (electrons->size() == 0 && muons->size() == 2) ? mumu.M() :
-        (electrons->size() == 1 && muons->size() == 1 ) ? emu.M() : -99;
-      m_Fbranches.at("mll").set(*event, ll_m, sys);
-
-      //ll_pt
-      double ll_pt = (electrons->size() == 2 && muons->size() == 0) ? ee.Pt() :
-        (electrons->size() == 0 && muons->size() == 2) ? mumu.Pt() :
-        (electrons->size() == 1 && muons->size() == 1 ) ? emu.Pt() : -99;
-      m_Fbranches.at("pTll").set(*event, ll_pt, sys);
-
-      // ll_dR
-      double ll_dR = -99.;
-      if(electrons->size() == 2 && muons->size() == 0) ll_dR = electrons->at(0)->p4().DeltaR(electrons->at(1)->p4());
-      else if(electrons->size() == 0 && muons->size() == 2) ll_dR = muons->at(0)->p4().DeltaR(muons->at(1)->p4());
-      else if(electrons->size() == 1 && muons->size() == 1 ) ll_dR = electrons->at(0)->p4().DeltaR(muons->at(0)->p4());
-      m_Fbranches.at("dRll").set(*event, ll_dR, sys);
 
       //jet sector
-      if (jets->size()>=1)
-      {
-        m_Fbranches.at("Jet1_pt").set(*event, jets->at(0)->pt(), sys);
-        m_Fbranches.at("Jet1_eta").set(*event, jets->at(0)->eta(), sys);
-        m_Fbranches.at("Jet1_phi").set(*event, jets->at(0)->phi(), sys);
-        m_Fbranches.at("Jet1_E").set(*event, jets->at(0)->e(), sys);   
-      }
-
-      if (jets->size()>=2)
-      {
-        m_Fbranches.at("Jet2_pt").set(*event, jets->at(1)->pt(), sys);
-        m_Fbranches.at("Jet2_eta").set(*event, jets->at(1)->eta(), sys);
-        m_Fbranches.at("Jet2_phi").set(*event, jets->at(1)->phi(), sys);
-        m_Fbranches.at("Jet2_E").set(*event, jets->at(1)->e(), sys);
+      for(unsigned int i=0; i<std::min(size_t(2),jets->size()); i++){
+        std::string prefix = "Jet"+std::to_string(i+1);
+        m_Fbranches.at(prefix+"_pt").set(*event, jets->at(i)->pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, jets->at(i)->eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, jets->at(i)->phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, jets->at(i)->e(), sys);
       }
 
       //b-jet sector
-      if (bjets->size()>=1)
-      {
-        m_Fbranches.at("Jet_b1_pt").set(*event, bjets->at(0)->pt(), sys);
-        m_Fbranches.at("Jet_b1_eta").set(*event, bjets->at(0)->eta(), sys);
-        m_Fbranches.at("Jet_b1_phi").set(*event, bjets->at(0)->phi(), sys);
-        m_Fbranches.at("Jet_b1_E").set(*event, bjets->at(0)->e(), sys);
-
-	if (m_isMC) {
-          truthLabel_b1 = HadronConeExclTruthLabelID(*bjets->at(0));
-          m_Ibranches.at("Jet_b1_truthLabel").set(*event, truthLabel_b1, sys);
+      for(unsigned int i=0; i<std::min(size_t(2),bjets->size()); i++){
+        std::string prefix = "Jet_b"+std::to_string(i+1);
+        if(i==0) Leading_bjet = bjets->at(i)->p4();
+        else if(i==1) Subleading_bjet = bjets->at(i)->p4();
+        m_Fbranches.at(prefix+"_pt").set(*event, bjets->at(i)->pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, bjets->at(i)->eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, bjets->at(i)->phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, bjets->at(i)->e(), sys);
+        if (m_isMC) {
+          int truthLabel = HadronConeExclTruthLabelID(*bjets->at(i));
+          m_Ibranches.at(prefix+"_truthLabel").set(*event, truthLabel, sys);
         }
       }
-      if (bjets->size()>=2)
-      {
-        m_Fbranches.at("Jet_b2_pt").set(*event, bjets->at(1)->pt(), sys);
-        m_Fbranches.at("Jet_b2_eta").set(*event, bjets->at(1)->eta(), sys);
-        m_Fbranches.at("Jet_b2_phi").set(*event, bjets->at(1)->phi(), sys);
-        m_Fbranches.at("Jet_b2_E").set(*event, bjets->at(1)->e(), sys);
 
-	if (m_isMC) {
-          truthLabel_b2 = HadronConeExclTruthLabelID(*bjets->at(1));
-          m_Ibranches.at("Jet_b2_truthLabel").set(*event, truthLabel_b2, sys);
-        }
-
+      if (bjets->size()>=2) {
         // build the H(bb) candidate
-        bb = bjets->at(0)->p4()+bjets->at(1)->p4();
+        bb = Leading_bjet + Subleading_bjet;
         m_Fbranches.at("mbb").set(*event, bb.M(), sys);
         m_Fbranches.at("pTbb").set(*event, bb.Pt(), sys);
         m_Fbranches.at("Etabb").set(*event, bb.Eta(), sys);
         m_Fbranches.at("Phibb").set(*event, bb.Phi(), sys);
-        m_Fbranches.at("dRbb").set(*event, (bjets->at(0)->p4()).DeltaR(bjets->at(1)->p4()), sys);
+        m_Fbranches.at("dRbb").set(*event, Leading_bjet.DeltaR(Subleading_bjet), sys);
       }
 
       // b-jet + lepton sector
       if (bjets->size()>=2 && (n_electrons+n_muons)>=2) {
-	b1l1 = bjets->at(0)->p4()+Leading_lep;
-	b2l1 = bjets->at(1)->p4()+Leading_lep;
-	b1l2 = bjets->at(0)->p4()+Subleading_lep;
-	b2l2 = bjets->at(1)->p4()+Subleading_lep;
+	b1l1 = Leading_bjet+Leading_lep;
+	b2l1 = Subleading_bjet+Leading_lep;
+	b1l2 = Leading_bjet+Subleading_lep;
+	b2l2 = Subleading_bjet+Subleading_lep;
 	double m_b1l1 = b1l1.M();
 	double m_b2l1 = b2l1.M();
 	double m_b1l2 = b1l2.M();
@@ -453,6 +300,7 @@ namespace HHBBLL
         m_Fbranches.at("dRbl_min").set(*event, minDeltaR, sys);
       }
 
+
       // met
       met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
       float met_sig = m_met_sig.get(*met, sys);
@@ -460,16 +308,13 @@ namespace HHBBLL
 
       // combine bb + ll
       if (bjets->size()>=2 && (n_electrons+n_muons)>=2) {
-        bbll = Leading_lep + Subleading_lep + bb;
-	bbllmet = Leading_lep + Subleading_lep + bb + met_vector;
-	m_Fbranches.at("mbbll").set(*event, bbll.M(), sys);
-	m_Fbranches.at("mbbllmet").set(*event, bbllmet.M(), sys);
+        bbll = ll + bb;
+        bbllmet = bbll + met_vector;
+        m_Fbranches.at("mbbll").set(*event, bbll.M(), sys);
+        m_Fbranches.at("mbbllmet").set(*event, bbllmet.M(), sys);
 
         // Ht2r mesure for boostedness of the two Higgs bosons
-        Leading_bjet = bjets->at(0)->p4();
-        Subleading_bjet = bjets->at(1)->p4();
-
-        double ht2 = (met_vector + Leading_lep + Subleading_lep).Perp() + (Leading_bjet + Subleading_bjet).Perp();
+        double ht2 = (met_vector + ll).Perp() + bb.Perp();
         double ht2r = ht2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + Leading_bjet.Pt() + Subleading_bjet.Pt());
 
         m_Fbranches.at("HT2").set(*event, ht2, sys);
