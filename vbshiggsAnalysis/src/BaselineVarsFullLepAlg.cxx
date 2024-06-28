@@ -240,37 +240,26 @@ namespace VBSHIGGS{
           }
           
         }
-
-        // dilepton kinematics
-        TLorentzVector ll;
-        TLorentzVector Leading_lep;
-        TLorentzVector Subleading_lep;
         
         //MET Significance 
         float METSig = m_METSig.get(*met, sys);
         m_Fbranches.at("METSig").set(*event, METSig, sys);
 
-        // ee
-        if (ele0 && ele1){
-          ll = ele0->p4() + ele1->p4();
-        } 
-        //mumu
-        if (mu0 && mu1){
-          ll = mu0->p4() + mu1->p4();
+        // dilepton kinematics
+        TLorentzVector ll;
+        TLorentzVector Leading_lep;
+        TLorentzVector Subleading_lep;
+
+        if (leptons.size()>0) Leading_lep = leptons[0].first->p4();
+        if (leptons.size()>1){
+          Subleading_lep = leptons[1].first->p4();
+          ll = Leading_lep + Subleading_lep;
         }
-        //emu
-        if (ele0 && mu0){
-          ll = electrons->at(0)->p4() + muons->at(0)->p4(); 
-        }
+
         m_Fbranches.at("ll_m").set(*event, ll.M(), sys);
         m_Fbranches.at("ll_pt").set(*event, ll.Pt(), sys);
         m_Fbranches.at("ll_eta").set(*event, ll.Eta(), sys);
         m_Fbranches.at("ll_phi").set(*event, ll.Phi(), sys);
-        
-        if (leptons.size() > 2){
-          Leading_lep = leptons[0].first->p4();
-          Subleading_lep = leptons[1].first->p4();
-        }
 
         m_Fbranches.at("dRll").set(*event, Leading_lep.DeltaR(Subleading_lep), sys);
         m_Fbranches.at("dPhill").set(*event, Leading_lep.DeltaPhi(Subleading_lep), sys);
@@ -303,6 +292,7 @@ namespace VBSHIGGS{
           }
 
         }
+
         TLorentzVector bb;
         TLorentzVector Leading_bjet;
         TLorentzVector Subleading_bjet;
@@ -322,19 +312,19 @@ namespace VBSHIGGS{
         
         // leading b-jet + leadinglepton sector
         if (n_bjets>=1 && nLeptons>=1){
-          TLorentzVector bl = bjets->at(0)->p4()+Leading_lep;
+          TLorentzVector bl = Leading_bjet + Leading_lep;
           m_Fbranches.at("b1l1_m").set(*event, bl.M(), sys);
           m_Fbranches.at("b1l1_pt").set(*event, bl.Pt(), sys);
           m_Fbranches.at("b1l1_eta").set(*event, bl.Eta(), sys);
           m_Fbranches.at("b1l1_phi").set(*event, bl.Phi(), sys);
-          m_Fbranches.at("dRb1l1").set(*event, (bjets->at(0)->p4()).DeltaR(Leading_lep), sys);
-          m_Fbranches.at("dPhib1l1").set(*event, (bjets->at(0)->p4()).DeltaPhi(Leading_lep), sys);
-          m_Fbranches.at("dEtab1l1").set(*event, (bjets->at(0)->p4()).Eta() - Leading_lep.Eta(), sys);
+          m_Fbranches.at("dRb1l1").set(*event, Leading_bjet.DeltaR(Leading_lep), sys);
+          m_Fbranches.at("dPhib1l1").set(*event, Leading_bjet.DeltaPhi(Leading_lep), sys);
+          m_Fbranches.at("dEtab1l1").set(*event, Leading_bjet.Eta() - Leading_lep.Eta(), sys);
         }
 
         // subleading b-jet + subleading lepton sector
         if (n_bjets>=2 && nLeptons>=2){
-          TLorentzVector bl = bjets->at(1)->p4() + Subleading_lep;
+          TLorentzVector bl = Subleading_bjet + Subleading_lep;
           m_Fbranches.at("b2l2_m").set(*event, bl.M(), sys);
           m_Fbranches.at("b2l2_pt").set(*event, bl.Pt(), sys);
           m_Fbranches.at("b2l2_eta").set(*event, bl.Eta(), sys);
@@ -343,12 +333,12 @@ namespace VBSHIGGS{
           m_Fbranches.at("dPhib2l2").set(*event, Subleading_bjet.DeltaPhi(Subleading_lep), sys);
           m_Fbranches.at("dEtab2l2").set(*event, Subleading_bjet.Eta() - Subleading_lep.Eta(), sys);
 
-          TLorentzVector bbll = Leading_lep + Subleading_lep + bb;
-          TLorentzVector bbllmet = Leading_lep + Subleading_lep + bb + metVec;
+          TLorentzVector bbll = ll + bb;
+          TLorentzVector bbllmet = ll + bb + metVec;
           m_Fbranches.at("bbll_m").set(*event, bbll.M(), sys);
           m_Fbranches.at("bbllmet_m").set(*event, bbllmet.M(), sys);
 
-          double ht2 = (metVec + Leading_lep + Subleading_lep).Perp() + bb.Perp();
+          double ht2 = (metVec + ll).Perp() + bb.Perp();
           double ht2r = ht2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + Leading_bjet.Pt() + Subleading_bjet.Pt());
 
           m_Fbranches.at("HT2").set(*event, ht2, sys);
