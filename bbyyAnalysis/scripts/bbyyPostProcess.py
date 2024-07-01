@@ -8,6 +8,7 @@
 
 import sys
 import yaml
+import os
 
 from argparse import ArgumentParser
 from AthenaConfiguration.ComponentFactory import CompFactory
@@ -64,7 +65,7 @@ def RunEasyjetPlus(args):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--inFile", required=True)
-    parser.add_argument("--outFile", default="SumOfWeights_test.root")
+    parser.add_argument("--outFile", required=True)
     parser.add_argument("--maxEvents", default=-1, type=int)
     parser.add_argument("--xSectionsConfig", required=True)
     parser.add_argument("--copyInputs", action='store_true',
@@ -79,6 +80,10 @@ if __name__ == "__main__":
     parser.add_argument("--bTagWP", default="GN2v01_FixedCutBEff_77")
 
     args = parser.parse_args()
+
+    outputFile = args.outFile
+    if os.path.exists(outputFile):
+        raise RuntimeError("Output file already exists, provide anothe name")
 
     RunEasyjetPlus(args)
 
