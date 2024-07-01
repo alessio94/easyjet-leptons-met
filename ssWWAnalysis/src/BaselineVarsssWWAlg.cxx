@@ -105,13 +105,6 @@ namespace ssWWVBS
       }
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
-      
-      TLorentzVector Leading_jet;
-      TLorentzVector Subleading_jet;
-      TLorentzVector met_vector;
-
-      TLorentzVector lljj;
-      TLorentzVector lljjmet;
 
       // Count leptons
       int n_electrons = electrons->size();
@@ -215,8 +208,11 @@ namespace ssWWVBS
       }
 
       // MET
-      TVector3 metVec;
-      metVec.SetPtEtaPhi(met->met(), 0, met->phi());
+      TVector3 metVec3;
+      metVec3.SetPtEtaPhi(met->met(), 0, met->phi());
+      TLorentzVector met_tlv;
+      // Assumes m=0, wrong for final states with several neutrinos
+      met_tlv.SetVectM(metVec3, 0);
 
       //MET Significance 
       float METSig = m_METSig.get(*met, sys);
@@ -226,18 +222,11 @@ namespace ssWWVBS
       TLorentzVector ll;
       TLorentzVector Leading_lep;
       TLorentzVector Subleading_lep;
-
+      if (nLeptons >=1) Leading_lep = leptons[0].first->p4();
       if (nLeptons >= 2){
 
-        Leading_lep = leptons[0].first->p4();
         Subleading_lep = leptons[1].first->p4();
-
-        if (ele0 && ele1)
-          ll = ele0->p4() + ele1->p4(); // ee
-        else if (mu0 && mu1)
-          ll = mu0->p4() + mu1->p4(); //mumu
-        else if (ele0 && mu0)
-          ll = electrons->at(0)->p4() + muons->at(0)->p4();  //emu
+        ll = Leading_lep + Subleading_lep;
 
         m_Fbranches.at("mll").set(*event, ll.M(), sys);
         m_Fbranches.at("pTll").set(*event, ll.Pt(), sys);
@@ -248,22 +237,28 @@ namespace ssWWVBS
         m_Fbranches.at("dPhill").set(*event, Leading_lep.DeltaPhi(Subleading_lep), sys);
         m_Fbranches.at("dEtall").set(*event, Leading_lep.Eta() - Subleading_lep.Eta(), sys);
 
-        m_Fbranches.at("dPhillMET").set(*event, ll.Vect().DeltaPhi(metVec), sys);
-        m_Fbranches.at("dPhil1MET").set(*event, Leading_lep.Vect().DeltaPhi(metVec), sys);
-        m_Fbranches.at("dPhil2MET").set(*event, Subleading_lep.Vect().DeltaPhi(metVec), sys);
+        m_Fbranches.at("dPhillMET").set(*event, ll.Vect().DeltaPhi(metVec3), sys);
+        m_Fbranches.at("dPhil1MET").set(*event, Leading_lep.Vect().DeltaPhi(metVec3), sys);
+        m_Fbranches.at("dPhil2MET").set(*event, Subleading_lep.Vect().DeltaPhi(metVec3), sys);
       }
 
 
       //jet sector
-      TLorentzVector jj;
+      TLorentzVector Leading_jet;
+      TLorentzVector Subleading_jet;
+
       for (int i=0; i<std::min(n_jets,2); i++){
+        if(i==0) Leading_jet = jets->at(i)->p4();
+        else if(i==1) Subleading_jet = jets->at(i)->p4();
         m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, jets->at(i)->pt(), sys);
         m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, jets->at(i)->eta(), sys);
         m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, jets->at(i)->phi(), sys);
         m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, jets->at(i)->e(), sys); 
       }
+
+      TLorentzVector jj;
       if (n_jets >=2){
-        jj = jets->at(0)->p4()+jets->at(1)->p4();
+        jj = Leading_jet + Subleading_jet;
         m_Fbranches.at("mjj").set(*event, jj.M(), sys);
         m_Fbranches.at("pTjj").set(*event, jj.Pt(), sys);
         m_Fbranches.at("Etajj").set(*event, jj.Eta(), sys);
@@ -318,30 +313,19 @@ namespace ssWWVBS
           m_Ibranches.at("Jet_b"+std::to_string(i+1)+"_truthLabel").set(*event, m_truthFlav.get(*bjets->at(i), sys), sys);
         }
       }
-      if (n_bjets >=2){
-        TLorentzVector bb = bjets->at(0)->p4()+bjets->at(1)->p4();
-        m_Fbranches.at("mbb").set(*event, bb.M(), sys);
-        m_Fbranches.at("pTbb").set(*event, bb.Pt(), sys);
-        m_Fbranches.at("Etabb").set(*event, bb.Eta(), sys);
-        m_Fbranches.at("Phibb").set(*event, bb.Phi(), sys);
-        m_Fbranches.at("dRbb").set(*event, (bjets->at(0)->p4()).DeltaR(bjets->at(1)->p4()), sys);
-        m_Fbranches.at("dPhibb").set(*event, (bjets->at(0)->p4()).DeltaPhi(bjets->at(1)->p4()), sys);
-        m_Fbranches.at("dEtabb").set(*event, (bjets->at(0)->eta()) - bjets->at(1)->eta(), sys);
-      }
-
 
       // combine jj + ll
+
+      TLorentzVector lljj;
+      TLorentzVector lljjmet;
       if (n_jets>=2 && nLeptons>=2) {
-        lljj = Leading_lep + Subleading_lep + jj;
-        lljjmet = Leading_lep + Subleading_lep + jj + met_vector;
+        lljj = ll + jj;
+        lljjmet = ll + jj + met_tlv;
         m_Fbranches.at("mlljj").set(*event, lljj.M(), sys);
         m_Fbranches.at("mlljjmet").set(*event, lljjmet.M(), sys);
 
         // Ht2r 
-        Leading_jet = jets->at(0)->p4();
-        Subleading_jet = jets->at(1)->p4();
-
-        double ht2 = (met_vector + Leading_lep + Subleading_lep).Perp() + (Leading_jet + Subleading_jet).Perp();
+        double ht2 = (met_tlv + ll).Perp() + jj.Perp();
         double ht2r = ht2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + Leading_jet.Pt() + Subleading_jet.Pt());
 
         m_Fbranches.at("HT2").set(*event, ht2, sys);
@@ -351,12 +335,12 @@ namespace ssWWVBS
       // Transverse mass of the pT-leading lepton wrt met
       if (nLeptons >= 1)
       {
-        float mt_lept1_met = std::sqrt(2 * met->met() * Leading_lep.Pt() * (1 - std::cos(Leading_lep.DeltaPhi(met_vector))));
+        float mt_lept1_met = std::sqrt(2 * met->met() * Leading_lep.Pt() * (1 - std::cos(Leading_lep.DeltaPhi(met_tlv))));
         m_Fbranches.at("mT_Lepton1_Met").set(*event, mt_lept1_met, sys);
 
         if (nLeptons >= 2)
         {
-          float mt_lept2_met = std::sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - std::cos(Subleading_lep.DeltaPhi(met_vector))));
+          float mt_lept2_met = std::sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - std::cos(Subleading_lep.DeltaPhi(met_tlv))));
           float mt_l_min = std::min(mt_lept1_met, mt_lept2_met);
           m_Fbranches.at("mT_Lepton2_Met").set(*event, mt_lept2_met, sys);
           m_Fbranches.at("mT_L_min").set(*event, mt_l_min, sys);
@@ -366,7 +350,7 @@ namespace ssWWVBS
       // MT2_jj
       if (n_jets>=2){
         // stransverse mass of jet pair MT2_jj
-        ComputeMT2 mt2_calculator = ComputeMT2(Leading_jet, Subleading_jet, met_vector, 0, 0);
+        ComputeMT2 mt2_calculator = ComputeMT2(Leading_jet, Subleading_jet, met_tlv, 0, 0);
         double mT2_jj = mt2_calculator.Compute();
         m_Fbranches.at("mT2_jj").set(*event, mT2_jj, sys);
       }

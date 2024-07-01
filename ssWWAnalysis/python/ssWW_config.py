@@ -93,7 +93,7 @@ def get_BaselineVarsssWWAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ll", "jj", "jj_vbs", "bb"]:
+    for object in ["ll", "jj", "jj_vbs"]:
         for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
