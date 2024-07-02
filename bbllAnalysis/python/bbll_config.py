@@ -54,10 +54,6 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.HHBBLL.HHbbllSelectorAlg(
             "HHbbllSelectorAlg",
-            jets="bbllAnalysisJets_%SYS%",
-            muons="bbllAnalysisMuons_%SYS%",
-            electrons="bbllAnalysisElectrons_%SYS%",
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="bbll_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
@@ -72,15 +68,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
 
     # MMC decoration
     if flags.Analysis.do_mmc:
-        cfg.addEventAlgo(
-            CompFactory.HHBBLL.MMCDecoratorAlg(
-                "MMCDecoratorAlg",
-                jets="bbllAnalysisJets_%SYS%",
-                muons="bbllAnalysisMuons_%SYS%",
-                electrons="bbllAnalysisElectrons_%SYS%",
-                met="AnalysisMET_%SYS%",
-            )
-        )
+        cfg.addEventAlgo(CompFactory.HHBBLL.MMCDecoratorAlg())
 
     # NeutrinoWeighting
     if flags.Analysis.NeutrinoWeighting.doNW:
@@ -88,17 +76,11 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             "NeutrinoWeightingTool_1",
             resolution_settings=flags.Analysis.NeutrinoWeighting.resolution_settings,
             resolution_number=flags.Analysis.NeutrinoWeighting.resolution_number)
-        NeutrinoWeightingTool_2 = CompFactory.HHBBLL.NeutrinoWeightingTool(
-            "NeutrinoWeightingTool_2",
-            resolution_settings=flags.Analysis.NeutrinoWeighting.resolution_settings,
-            resolution_number=flags.Analysis.NeutrinoWeighting.resolution_number)
+        NeutrinoWeightingTool_2 = NeutrinoWeightingTool_1
+        NeutrinoWeightingTool_2.name = "NeutrinoWeightingTool_2"
         cfg.addEventAlgo(
             CompFactory.HHBBLL.NeutrinoWeightingAlg(
                 "NeutrinoWeightingAlg",
-                jets="bbllAnalysisJets_%SYS%",
-                muons="bbllAnalysisMuons_%SYS%",
-                electrons="bbllAnalysisElectrons_%SYS%",
-                met="AnalysisMET_%SYS%",
                 bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
                 floatNWVariables=float_NW_variables,
                 NW_cutList=flags.Analysis.NeutrinoWeighting.cutList,
@@ -113,12 +95,8 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.HHBBLL.BaselineVarsbbllAlg(
             "FinalVarsbbllAlg",
             isMC=flags.Input.isMC,
-            jets="bbllAnalysisJets_%SYS%",
-            muons="bbllAnalysisMuons_%SYS%",
-            electrons="bbllAnalysisElectrons_%SYS%",
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables
