@@ -127,6 +127,16 @@ ntupler_ssWW_mc20_lite:
   script:
     - easyjet-test ssWW-mc20-lite
 
+ntupler_ZCharm_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test ZCharm-mc20
+
+ntupler_ZCharm_mc20_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test ZCharm-mc20-lite
+
 # MC20 AF3
 
 ntupler_mc20af3_lite:

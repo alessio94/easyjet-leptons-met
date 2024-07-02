@@ -1,0 +1,101 @@
+include: EasyjetHub/base-config.yaml
+
+# Which analysis to consider
+do_ZCharm_analysis: true
+
+bypass: false
+
+
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_met : true 
+
+# Toggles for reconstructed objects decorations
+small_R_jet:
+  min_pT: 20000  # for the jets entering the MET computation and the overlap removal
+  max_eta: 2.5
+  min_pT_ZCharm: 20000 # for the jet selection
+  max_eta_ZCharm: 2.5
+  # btagging working points 
+  btag_wp: "GN2v01_FixedCutBEff_85"
+  amount: 2
+  amount_bjet: 2
+  # to use multiple btagging WPs
+  btag_extra_wps:
+    - GN2v01_FixedCutBEff_77
+    - GN2v01_FixedCutBEff_70
+    
+  variables_int_bjets: ["truthLabel", "pcbt_GN2v01"]
+
+Electron:
+  trackSelection: true
+  ID: "TightLH"
+  Iso: Tight_VarRad
+  min_pT: 2700
+  max_eta: 2.47
+  min_pT_ZCharm: 2700 
+  max_eta_ZCharm: 2.47
+  crackVeto: true
+
+Muon:
+  trackSelection: true
+  ID: "Medium"
+  Iso: PflowTight_VarRad
+  min_pT: 2700
+  max_eta: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
+  min_pT_ZCharm: 2700
+  max_eta_ZCharm: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
+
+Lepton:
+  amount: 2
+  variables_int: ["isPrompt","truthOrigin", "truthType"]
+
+### MET WP?
+
+# list of triggers per year to consider
+trigger:
+  include: ZCharmAnalysis/trigger.yaml
+
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+
+#Enable cutflow 
+save_ZCharm_cutflow: true
+
+CutList :
+      - PASS_TRIGGER
+      - EXACTLY_TWO_LEPTONS
+      - OPPOSITE_CHARGE_LEPTONS
+      - DILEPTON_MASS_WINDOW
+      - MET
+      - ONE_B_JETS
+      - TWO_B_JETS
+
+Categories :
+      - IS_ee
+      - IS_mm
+      - IS_em
+
+# Include the TTree configuration and update details
+ttree_output:
+  - AnalysisMiniTree:
+    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
+    slim_variables_with_syst: true
+    reco_outputs:
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
+      met : 'container_names.output.met'
+    collection_options:
+      small_R_jets:
+        btag_info: true
+        # JVT_details: true
+    truth_outputs:
+      small_R_jets: 'container_names.input.truth4Jet'

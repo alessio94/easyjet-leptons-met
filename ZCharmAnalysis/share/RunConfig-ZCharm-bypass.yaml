@@ -1,0 +1,3 @@
+include: ZCharmAnalysis/RunConfig-ZCharm.yaml
+
+bypass: true #enabling Run through mode
