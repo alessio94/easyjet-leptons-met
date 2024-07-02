@@ -110,11 +110,6 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     cfg.addEventAlgo(
         CompFactory.HHBBVV.HHbbVVSelectorAlg(
             "HHbbVVSelectorAlg",
-            jets="bbVVAnalysisJets_%SYS%",
-            lrjets="bbVVAnalysisLRJets_%SYS%",
-            muons="bbVVAnalysisMuons_%SYS%",
-            electrons="bbVVAnalysisElectrons_%SYS%",
-            met="AnalysisMET_%SYS%",
             eventDecisionOutputDecoration="bbVV_pass_sr_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             muonWP=TightMuonWPLabel,
@@ -130,13 +125,8 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         CompFactory.HHBBVV.BaselineVarsbbVVAlg(
             "FinalVarsbbVVAlg",
             isMC=flags.Input.isMC,
-            jets="bbVVAnalysisJets_%SYS%",
-            lrjets="bbVVAnalysisLRJets_%SYS%",
-            muons="bbVVAnalysisMuons_%SYS%",
-            electrons="bbVVAnalysisElectrons_%SYS%",
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
     )
