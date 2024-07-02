@@ -31,6 +31,30 @@ namespace Easyjet
 
     ATH_CHECK (book (TH1F("SumOfWeights", "Sum of weights",2, 0.5, 2.5)));
 
+    for (const auto& sys : m_systematicsList.systematicsVector())
+    {
+      auto histIter = m_hist_sys.find (sys);
+      if (histIter == m_hist_sys.end())
+      {
+        std::string name;
+        ATH_CHECK (m_systematicsList.service().makeSystematicsName (name, m_histPattern, sys));
+
+        std::string title = m_histTitle.value();
+        if (!sys.empty())
+          title += " (" + sys.name() + ")";
+        ATH_CHECK (book (TH1F (name.c_str(), title.c_str(), 2, 0.5, 2.5)));
+
+        m_hist_sys.insert (std::make_pair (sys, hist (name)));
+ 	m_total_mcEvent_sys.insert (std::make_pair (sys, 0));
+        m_total_mcEventWeight_sys.insert (std::make_pair (sys, 0.0));
+        m_total_mcEventWeight_squared_sys.insert (std::make_pair (sys, 0.0));
+        histIter = m_hist_sys.find (sys);
+        assert (histIter != m_hist_sys.end());
+
+        histIter->second->GetXaxis()->SetBinLabel(1, "event count");
+        histIter->second->GetXaxis()->SetBinLabel(2, "sum of weights");
+      } 
+    }
 
     return StatusCode::SUCCESS;
   }
@@ -56,28 +80,12 @@ namespace Easyjet
       ATH_CHECK (m_eventHandle.retrieve (evtInfo, sys));
       auto weight = m_generatorWeight.get(*evtInfo,sys); // float. see PMGTruthWeightTool.h
 
-
-      auto histIter = m_hist.find (sys);
-      if (histIter == m_hist.end())
-      {
-        std::string name;
-        ATH_CHECK (m_systematicsList.service().makeSystematicsName (name, m_histPattern, sys));
-
-        std::string title = m_histTitle.value();
-        if (!sys.empty())
-          title += " (" + sys.name() + ")";
-        ATH_CHECK (book (TH1F (name.c_str(), title.c_str(), 2, 0.5, 2.5)));
-
-        m_hist.insert (std::make_pair (sys, hist (name)));
-        histIter = m_hist.find (sys);
-        assert (histIter != m_hist.end());
-
-        histIter->second->GetXaxis()->SetBinLabel(1, "event count");
-        histIter->second->GetXaxis()->SetBinLabel(2, "sum of weights");
-      }
-
-      histIter->second->Fill (1);
-      histIter->second->Fill (2,weight);
+      auto cIter = m_total_mcEvent_sys.find (sys);
+      cIter->second += 1;
+      auto wIter = m_total_mcEventWeight_sys.find (sys);
+      wIter->second += weight;
+      auto w2Iter = m_total_mcEventWeight_squared_sys.find (sys);
+      w2Iter->second += weight*weight;
     }
 
     return StatusCode::SUCCESS;
@@ -88,6 +96,19 @@ namespace Easyjet
     hist("SumOfWeights")->SetBinContent(1,m_total_mcEvent);
     hist("SumOfWeights")->SetBinContent(2,m_total_mcEventWeight);
     hist("SumOfWeights")->SetBinError(2,std::sqrt(m_total_mcEventWeight_squared));
+
+    // fill sys to hist here
+    for (const auto& sys : m_systematicsList.systematicsVector())
+    {
+      auto histIter = m_hist_sys.find (sys);
+      auto cIter = m_total_mcEvent_sys.find (sys);
+      histIter->second->SetBinContent(1,cIter->second);
+      auto wIter = m_total_mcEventWeight_sys.find (sys);
+      histIter->second->SetBinContent(2,wIter->second);
+      auto w2Iter = m_total_mcEventWeight_squared_sys.find (sys);
+      histIter->second->SetBinError(2,std::sqrt(w2Iter->second));
+    }
+
 
     return StatusCode::SUCCESS;
 

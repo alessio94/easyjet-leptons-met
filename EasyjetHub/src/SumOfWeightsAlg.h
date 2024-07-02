@@ -50,8 +50,11 @@ namespace Easyjet
         this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};
 
       // for systematics 
-      std::unordered_map<CP::SystematicSet,TH1*> m_hist;
-      
+      std::unordered_map<CP::SystematicSet,TH1*> m_hist_sys;
+      std::unordered_map<CP::SystematicSet,long long int> m_total_mcEvent_sys;
+      std::unordered_map<CP::SystematicSet,double> m_total_mcEventWeight_sys;
+      std::unordered_map<CP::SystematicSet,double> m_total_mcEventWeight_squared_sys;
+     
       Gaudi::Property<std::string> m_histPattern 
       {this, "histPattern", "SumOfWeights_%SYS%", "the pattern for histogram names"};
       
