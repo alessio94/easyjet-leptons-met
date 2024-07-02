@@ -53,10 +53,6 @@ def ZCharm_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.ZCC.ZCharmSelectorAlg(
             "ZCharmSelectorAlg",
-            jets="ZCharmAnalysisJets_%SYS%",
-            muons="ZCharmAnalysisMuons_%SYS%",
-            electrons="ZCharmAnalysisElectrons_%SYS%",
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="ZCharm_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
@@ -74,12 +70,8 @@ def ZCharm_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.ZCC.BaselineVarsZCharmAlg(
             "FinalVarsZCharmAlg",
             isMC=flags.Input.isMC,
-            jets="ZCharmAnalysisJets_%SYS%",
-            muons="ZCharmAnalysisMuons_%SYS%",
-            electrons="ZCharmAnalysisElectrons_%SYS%",
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables
