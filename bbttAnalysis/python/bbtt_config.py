@@ -63,10 +63,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
-            jets="bbttAnalysisJets_%SYS%",
-            muons="bbttAnalysisMuons_%SYS%",
-            electrons="bbttAnalysisElectrons_%SYS%",
-            taus="bbttAnalysisTaus_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             tauWP=flags.Analysis.Tau.ID,
             muonWP=TightMuonWPLabel,
@@ -90,11 +86,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         cfg.addEventAlgo(
             CompFactory.HHBBTT.MMCDecoratorAlg(
                 "MMCDecoratorAlg",
-                jets="bbttAnalysisJets_%SYS%",
-                muons="bbttAnalysisMuons_%SYS%",
-                electrons="bbttAnalysisElectrons_%SYS%",
-                taus="bbttAnalysisTaus_%SYS%",
-                met="AnalysisMET_%SYS%",
                 channel=flags.Analysis.channel,
             )
         )

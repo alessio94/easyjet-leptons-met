@@ -69,19 +69,19 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "",   "Jet container to read" };
+      m_jetHandle{ this, "jets", "bbttAnalysisJets_%SYS%", "Jet container to read" };
     
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+    m_electronHandle{ this, "electrons", "bbttAnalysisElectrons_%SYS%", "Electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "",   "Muon container to read" };
+    m_muonHandle{ this, "muons", "bbttAnalysisMuons_%SYS%", "Muon container to read" };
 
     CP::SysReadHandle<xAOD::TauJetContainer>
-    m_tauHandle{ this, "taus", "",   "Tau container to read" };
+    m_tauHandle{ this, "taus", "bbttAnalysisTaus_%SYS%", "Tau container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+    m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
