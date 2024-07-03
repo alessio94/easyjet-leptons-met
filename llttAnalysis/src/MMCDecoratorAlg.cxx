@@ -59,13 +59,7 @@ namespace HLLTT
       }
     }
 
-    // Initialise MMC tool
-    m_mmcTool.reset(new DiTauMassTools::MissingMassToolV2("MissingMassToolV2"));
-    ATH_CHECK (m_mmcTool->setProperty("Decorate", false));
-    ATH_CHECK (m_mmcTool->setProperty("UseVerbose", m_verbose));
-    ATH_CHECK (m_mmcTool->setProperty("FloatStoppingCrit", m_float_stop));
-    ATH_CHECK (m_mmcTool->setProperty("CalibSet", m_calib_set));
-    ATH_CHECK (m_mmcTool->initialize());
+    ATH_CHECK (m_mmcTool.retrieve());
 
     if (m_method_str == "MLNU3P") 
       m_method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
@@ -120,7 +114,6 @@ namespace HLLTT
       const xAOD::IParticle* part2 = nullptr;
       int status = 0;      
       TLorentzVector res(0,0,0,0);
-      const auto method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
 
       int n_lep(0);
       TLorentzVector p4lep[4];
@@ -355,9 +348,9 @@ namespace HLLTT
 	    return StatusCode::FAILURE;	    
 	  }
 	
-	status = m_mmcTool->GetFitStatus(method);	
+	status = m_mmcTool->GetFitStatus(m_method);
 	if (status == 1) {
-	  res = m_mmcTool->GetResonanceVec(method)*1e3;	
+	  res = m_mmcTool->GetResonanceVec(m_method)*1e3;
 	}
       }
 

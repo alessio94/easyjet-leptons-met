@@ -89,23 +89,15 @@ private:
     /// \brief Steerable properties
     Gaudi::Property<std::string> m_method_str { this, "Method", "MLNU3P", 
 						 "MMC method to use"};
-    // Keep 2016MC15C as default, as 2019 has higher rate of non-converging fir for bbtt
-    Gaudi::Property<std::string> m_calib_set { this, "CalibSet", "2016MC15C", 
-						 "MMC calibration to use"};
-    Gaudi::Property<bool> m_float_stop { this, "FloatStoppingCrit", false, 
-					   "Activate MMC floating stopping criterion"};
-
-    Gaudi::Property<int> m_verbose { this, "UseVerbose", 0, 
-					"Activate MMC verbose output"};
+    DiTauMassTools::MMCFitMethodV2::e m_method;
+    ToolHandle<DiTauMassTools::MissingMassToolV2> m_mmcTool
+      { this, "mmcTool", "DiTauMassTools::MissingMassToolV2", "the Missing Mass Calculator tool"};
 
     Gaudi::Property<std::vector<std::string>> m_channel_names
       { this, "channel", {}, "Which channel to run" };
 
     std::vector<HHBBTT::Channel> m_channels;
 
-    /// \brief Internal variables
-    std::unique_ptr<DiTauMassTools::MissingMassToolV2> m_mmcTool;
-    DiTauMassTools::MMCFitMethodV2::e m_method;
   };
 }
 

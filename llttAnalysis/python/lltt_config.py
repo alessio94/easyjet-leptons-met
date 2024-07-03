@@ -81,6 +81,7 @@ def lltt_cfg(
     else:
         baseline = "_"
     if flags.Analysis.do_mmc:
+        from EasyjetHub.algs.mmc_tool_config import MissingMassToolV2Cfg
         cfg.addEventAlgo(
             CompFactory.HLLTT.MMCDecoratorAlg(
                 "MMCDecoratorAlg",
@@ -88,6 +89,7 @@ def lltt_cfg(
                 passLEPHAD="pass" + baseline + "LEPHAD_%SYS%",
                 passHADHAD="pass" + baseline + "HADHAD_%SYS%",
                 channel=flags.Analysis.channel,
+                mmcTool=cfg.popToolsAndMerge(MissingMassToolV2Cfg(flags))
             )
         )
 

@@ -37,13 +37,7 @@ namespace HHBBLL
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ANA_CHECK (m_systematicsList.initialize());    
 
-    // Initialise MMC tool
-    m_mmcTool.reset(new DiTauMassTools::MissingMassToolV2("MissingMassToolV2"));
-    ATH_CHECK (m_mmcTool->setProperty("Decorate", false));
-    ATH_CHECK (m_mmcTool->setProperty("UseVerbose", m_verbose));
-    ATH_CHECK (m_mmcTool->setProperty("FloatStoppingCrit", m_float_stop));
-    ATH_CHECK (m_mmcTool->setProperty("CalibSet", m_calib_set));
-    ATH_CHECK (m_mmcTool->initialize());
+    ATH_CHECK (m_mmcTool.retrieve());
 
     if (m_method_str == "MLNU3P") 
       m_method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
@@ -92,21 +86,20 @@ namespace HHBBLL
       const xAOD::IParticle* part2 = nullptr;
       int status = 0;      
       TLorentzVector res(0,0,0,0);
-      const auto method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
      
       if (electrons->size() == 2 && muons->size() == 0) {
-  part1 = electrons->at(0);
-  part2 = electrons->at(1);
+	part1 = electrons->at(0);
+	part2 = electrons->at(1);
       }
       else if (electrons->size() == 0 && muons->size() == 2)
       {
 	part1 = muons->at(0);
-  part2 = muons->at(1);
+	part2 = muons->at(1);
       }
       else if (electrons->size() == 1 && muons->size() == 1) 
       {
 	part1 = electrons->at(0);
-  part2 = muons->at(0);
+	part2 = muons->at(0);
       } 
 
       // Run MMC if find eligible particle content
@@ -119,9 +112,9 @@ namespace HHBBLL
 	    return StatusCode::FAILURE;	    
 	  }
 	
-	status = m_mmcTool->GetFitStatus(method);	
+	status = m_mmcTool->GetFitStatus(m_method);
 	if (status == 1) {
-	  res = m_mmcTool->GetResonanceVec(method);	
+	  res = m_mmcTool->GetResonanceVec(m_method);
 	}
       }
 

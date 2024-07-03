@@ -67,17 +67,10 @@ private:
     /// \brief Steerable properties
     Gaudi::Property<std::string> m_method_str { this, "Method", "MLNU3P", 
 						 "MMC method to use"};
-    Gaudi::Property<std::string> m_calib_set { this, "CalibSet", "2019", 
-						 "MMC calibration to use"};
-    Gaudi::Property<bool> m_float_stop { this, "FloatStoppingCrit", false, 
-					   "Activate MMC floating stopping criterion"};
-
-    Gaudi::Property<int> m_verbose { this, "UseVerbose", 0, 
-					"Activate MMC verbose output"};
-
-    /// \brief Internal variables
-    std::unique_ptr<DiTauMassTools::MissingMassToolV2> m_mmcTool;
     DiTauMassTools::MMCFitMethodV2::e m_method;
+    ToolHandle<DiTauMassTools::MissingMassToolV2> m_mmcTool
+      { this, "mmcTool", "DiTauMassTools::MissingMassToolV2", "the Missing Mass Calculator tool"};
+
   };
 }
 

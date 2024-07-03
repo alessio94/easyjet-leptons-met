@@ -35,7 +35,7 @@ namespace HHBBTT
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
 
-    // Intialise syst-aware output decorators
+    // Initialise syst-aware output decorators
     ATH_CHECK(m_mmc_status.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_mmc_pt.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_mmc_eta.initialize(m_systematicsList, m_eventHandle));
@@ -52,7 +52,7 @@ namespace HHBBTT
     ATH_CHECK(m_mmc_nu2_phi.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_mmc_nu2_m.initialize(m_systematicsList, m_eventHandle));
 
-    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    // Initialise syst list (must come after all syst-aware inputs and outputs)
     ANA_CHECK (m_systematicsList.initialize());    
 
     for ( auto name : m_channel_names){
@@ -62,13 +62,7 @@ namespace HHBBTT
       else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
     }
 
-    // Initialise MMC tool
-    m_mmcTool.reset(new DiTauMassTools::MissingMassToolV2("MissingMassToolV2"));
-    ATH_CHECK (m_mmcTool->setProperty("Decorate", false));
-    ATH_CHECK (m_mmcTool->setProperty("UseVerbose", m_verbose));
-    ATH_CHECK (m_mmcTool->setProperty("FloatStoppingCrit", m_float_stop));
-    ATH_CHECK (m_mmcTool->setProperty("CalibSet", m_calib_set));
-    ATH_CHECK (m_mmcTool->initialize());
+    ATH_CHECK (m_mmcTool.retrieve());
 
     if (m_method_str == "MLNU3P") 
       m_method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
@@ -154,7 +148,6 @@ namespace HHBBTT
       TLorentzVector res(0,0,0,0);
       TLorentzVector nu1(0,0,0,0);
       TLorentzVector nu2(0,0,0,0);
-      const auto method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
 
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
@@ -191,11 +184,11 @@ namespace HHBBTT
 	    return StatusCode::FAILURE;	    
 	  }
 	
-	status = m_mmcTool->GetFitStatus(method);	
+	status = m_mmcTool->GetFitStatus(m_method);
 	if (status == 1) {
-	  res = m_mmcTool->GetResonanceVec(method)*1e3;	
-	  nu1 = m_mmcTool->GetNeutrino4vec(method, 0)*1e3;	
-	  nu2 = m_mmcTool->GetNeutrino4vec(method, 1)*1e3;	
+	  res = m_mmcTool->GetResonanceVec(m_method)*1e3;
+	  nu1 = m_mmcTool->GetNeutrino4vec(m_method, 0)*1e3;
+	  nu2 = m_mmcTool->GetNeutrino4vec(m_method, 1)*1e3;
 	}
       }
 
