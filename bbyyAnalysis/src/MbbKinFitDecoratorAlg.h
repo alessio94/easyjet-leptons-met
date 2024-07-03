@@ -42,22 +42,21 @@ namespace HHBBYY {
       CP::SysListHandle m_systematicsList {this};
 
       CP::SysReadHandle<xAOD::PhotonContainer>
-      m_photonHandle{ this, "photons", "", "Photon container to read"};
+      m_photonHandle{ this, "photons", "bbyyAnalysisPhotons_%SYS%", "Photon container to read"};
 
       CP::SysReadHandle<xAOD::JetContainer>
-        m_jetHandle{ this, "jets", "",   "Jet container to read" };
+        m_jetHandle{ this, "jets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
       
       CP::SysReadHandle<xAOD::EventInfo>
-      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+      m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
       /// \brief Setup sys-aware output decorations
 
       CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
-      m_jetOutHandle{ this, "jetContainerOutKey", "jetContainerOutKey",   "Jet container to write" };
+      m_jetOutHandle{ this, "jetContainerOutKey", "bbyyAnalysisKFJets_%SYS%", "Jet container to write" };
             
     /// \brief Steerable properties
-      Gaudi::Property<std::string> m_BtaggingWP { this, "bTagWPDecorName", "ftag_select_GN2v01LegacyWP_FixedCutBEff_77", 
-              "B-Tagging WP to use"};
+      Gaudi::Property<std::string> m_BtaggingWP { this, "bTagWPDecorName", "", "B-Tagging WP to use"};
       Gaudi::Property<float> m_Jet_Min_pt { this, "JetMinPt", 20., 
               "Minimum Jet pT"};
       Gaudi::Property<float> m_angles_Res { this, "AnglesResolution", .01, 

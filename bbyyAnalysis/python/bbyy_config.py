@@ -61,12 +61,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.HHBBYY.bbyySelectorAlg(
             "bbyySelectorAlg",
-            photons="bbyyAnalysisPhotons_%SYS%",
             photonWP=SelectedPhotonLabel,
-            jets="bbyyAnalysisJets_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            muons="bbyyAnalysisMuons_%SYS%",
-            electrons="bbyyAnalysisElectrons_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_bbyy_cutflow,
             photonTriggers=flags.Analysis.TriggerChains,
@@ -83,26 +79,16 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
         cfg.addEventAlgo(
             CompFactory.HHBBYY.MbbKinFitDecoratorAlg(
                 "MbbKinFitDecoratorAlg",
-                jets="bbyyAnalysisJets_%SYS%",
-                photons="bbyyAnalysisPhotons_%SYS%",
-                jetContainerOutKey="bbyyAnalysisKFJets_%SYS%",
                 JetMinPt=25.,
                 bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-                AnglesResolution=0.1,
-                FixAnglesFit=True,
             )
         )
 
     cfg.addEventAlgo(
         CompFactory.HHBBYY.BaselineVarsbbyyAlg(
             "BaselineVarsbbyyAlg",
-            photons="bbyyAnalysisPhotons_%SYS%",
             photonWP=SelectedPhotonLabel,
-            muons="bbyyAnalysisMuons_%SYS%",
-            electrons="bbyyAnalysisElectrons_%SYS%",
-            jets="bbyyAnalysisJets_%SYS%",
             KFJets="bbyyAnalysisKFJets_%SYS%" if flags.Analysis.do_KinematicFit else "",
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
             BDT_path=flags.Analysis.BDT_path,
@@ -119,8 +105,6 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
         cfg.addEventAlgo(
             CompFactory.SHBBYY.ResonantPNNbbyyAlg(
                 "ResonantPNNbbyyAlg",
-                photons="bbyyAnalysisPhotons_%SYS%",
-                jets="bbyyAnalysisJets_%SYS%",
                 bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
                 mX_mS_pairs=flags.Analysis.mX_mS_pairs,
                 mS_values=flags.Analysis.mS_values,

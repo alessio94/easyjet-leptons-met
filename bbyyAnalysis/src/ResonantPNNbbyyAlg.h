@@ -42,13 +42,13 @@ namespace SHBBYY
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "",   "Jet container to read" };
+    m_jetHandle{ this, "jets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     CP::SysReadHandle<xAOD::PhotonContainer>
-    m_photonHandle{ this, "photons", "",   "Photons container to read" };
+    m_photonHandle{ this, "photons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };

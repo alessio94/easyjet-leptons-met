@@ -99,28 +99,28 @@ namespace HHBBYY
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
   
       CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "",   "Jet container to read" };
+      m_jetHandle{ this, "jets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
 
       CP::SysReadDecorHandle<char> 
       m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
 
       CP::SysReadHandle<xAOD::PhotonContainer>
-      m_photonHandle{ this, "photons", "",   "Photons container to read" };
+      m_photonHandle{ this, "photons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
 
       CP::SysReadHandle<xAOD::ElectronContainer>
-      m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+      m_electronHandle{ this, "electrons", "bbyyAnalysisElectrons_%SYS%", "Electron container to read" };
 
       CP::SysReadHandle<xAOD::MuonContainer>
-      m_muonHandle{ this, "muons", "",   "Muon container to read" };
+      m_muonHandle{ this, "muons", "bbyyAnalysisMuons_%SYS%", "Muon container to read" };
 
       Gaudi::Property<std::string> m_photonWPName
-      { this, "photonWP", "","Photon ID + Iso cuts" };
+      { this, "photonWP", "", "Photon ID + Iso cuts" };
 
       Gaudi::Property<std::string> m_photon_TightID_NonIso_WPName
-      { this, "photon_TNI_WP", "Tight_NonIso","Photon tight ID + non Iso working point" };
+      { this, "photon_TNI_WP", "Tight_NonIso", "Photon tight ID + non Iso working point" };
 
       Gaudi::Property<std::string> m_photon_LooseID_Iso_WPName
-      { this, "photon_LI_WP", "Loose_FixedCutLoose","Photon loose ID + Iso working point" };
+      { this, "photon_LI_WP", "Loose_FixedCutLoose", "Photon loose ID + Iso working point" };
 
       CP::SysReadDecorHandle<char> m_photonWPDecorHandle{"", this};
 

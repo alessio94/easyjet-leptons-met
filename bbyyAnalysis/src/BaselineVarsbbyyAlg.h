@@ -158,7 +158,7 @@ namespace HHBBYY
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "",   "Jet container to read" };
+    m_jetHandle{ this, "jets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
@@ -167,26 +167,26 @@ namespace HHBBYY
     m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
     CP::SysReadHandle<xAOD::PhotonContainer>
-    m_photonHandle{ this, "photons", "",   "Photons container to read" };
+    m_photonHandle{ this, "photons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
 
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+    m_electronHandle{ this, "electrons", "bbyyAnalysisElectrons_%SYS%", "Electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "",   "Muon container to read" };
+    m_muonHandle{ this, "muons", "bbyyAnalysisMuons_%SYS%", "Muon container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
     m_KFJetHandle{this, "KFJets", "", "KF Jet container to read"};
 
     Gaudi::Property<std::string> m_photonWPName
-      { this, "photonWP", "","Photon ID + Iso working point" };
+      { this, "photonWP", "", "Photon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ph_SF{"", this};
 
     CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "",   "MET container to read" };
+    m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+    m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
