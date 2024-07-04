@@ -63,10 +63,6 @@ def lltt_cfg(
     cfg.addEventAlgo(
         CompFactory.HLLTT.HllttSelectorAlg(
             "HllttSelectorAlg",
-            jets="llttAnalysisJets_%SYS%",
-            muons="llttAnalysisMuons_%SYS%",
-            electrons="llttAnalysisElectrons_%SYS%",
-            taus="llttAnalysisTaus_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             tauWP=flags.Analysis.Tau.ID,
             muonWP=TightMuonWPLabel,
@@ -88,11 +84,6 @@ def lltt_cfg(
         cfg.addEventAlgo(
             CompFactory.HLLTT.MMCDecoratorAlg(
                 "MMCDecoratorAlg",
-                jets="llttAnalysisJets_%SYS%",
-                muons="llttAnalysisMuons_%SYS%",
-                electrons="llttAnalysisElectrons_%SYS%",
-                taus="llttAnalysisTaus_%SYS%",
-                met="AnalysisMET_%SYS%",
                 passLEPLEP="pass" + baseline + "LEPLEP_%SYS%",
                 passLEPHAD="pass" + baseline + "LEPHAD_%SYS%",
                 passHADHAD="pass" + baseline + "HADHAD_%SYS%",
@@ -114,11 +105,6 @@ def lltt_cfg(
         CompFactory.HLLTT.BaselineVarsllttAlg(
             "FinalVarsllttAlg",
             isMC=flags.Input.isMC,
-            jets="llttAnalysisJets_%SYS%",
-            muons="llttAnalysisMuons_%SYS%",
-            electrons="llttAnalysisElectrons_%SYS%",
-            taus="llttAnalysisTaus_%SYS%",
-            met="AnalysisMET_%SYS%",
             tauWP=flags.Analysis.Tau.ID,
             muonWP=TightMuonWPLabel,
             eleWP=TightElectronWPLabel,

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -43,25 +43,25 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "",   "Jet container to read" };
+      m_jetHandle{ this, "jets", "llttAnalysisJets_%SYS%", "Jet container to read" };
     
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+    m_electronHandle{ this, "electrons", "llttAnalysisElectrons_%SYS%", "Electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "",   "Muon container to read" };
+    m_muonHandle{ this, "muons", "llttAnalysisMuons_%SYS%", "Muon container to read" };
 
     CP::SysReadHandle<xAOD::TauJetContainer>
-    m_tauHandle{ this, "taus", "",   "Tau container to read" };
+    m_tauHandle{ this, "taus", "llttAnalysisTaus_%SYS%", "Tau container to read" };
 
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_mrmtauHandle{ this, "mrmtaus", "TauJets_MuonRM",   "Tau container to read" };
 
     CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
+    m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+    m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     CP::SysReadDecorHandle<int>
       m_mmc_status { this, "mmc_status", "mmc_status_%SYS%", "MMC status key"};

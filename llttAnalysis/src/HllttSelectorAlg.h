@@ -75,22 +75,22 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "",   "Jet container to read" };
+      m_jetHandle{ this, "jets", "llttAnalysisJets_%SYS%", "Jet container to read" };
     
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+    m_electronHandle{ this, "electrons", "llttAnalysisElectrons_%SYS%", "Electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "",   "Muon container to read" };
+    m_muonHandle{ this, "muons", "llttAnalysisMuons_%SYS%", "Muon container to read" };
 
     CP::SysReadHandle<xAOD::TauJetContainer>
-    m_tauHandle{ this, "taus", "",   "Tau container to read" };
+    m_tauHandle{ this, "taus", "llttAnalysisTaus_%SYS%", "Tau container to read" };
 
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_mrmtauHandle{ this, "mrmtaus", "TauJets_MuonRM",   "Tau container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+    m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     CP::SysReadDecorHandle<unsigned int> m_year
       {this, "year", "dataTakingYear", ""};
