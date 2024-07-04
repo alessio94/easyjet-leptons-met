@@ -48,9 +48,6 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.VBSJetsSelectorAlg(
             "VBSJetsSelectorAlg",
-            jets="vbshiggsAnalysisJets_%SYS%",
-            VBSjetContainerOutKey="vbshiggsAnalysisVBSJets_%SYS%",
-            SignaljetContainerOutKey="vbshiggsAnalysisSignalJets_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
     )

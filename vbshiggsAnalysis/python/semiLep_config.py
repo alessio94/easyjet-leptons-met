@@ -17,11 +17,6 @@ def semiLep_cfg(flags, float_variables=None, int_variables=None):
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.SemiLepSelectorAlg(
             "SemiLepSelectorAlg",
-            signaljets="vbshiggsAnalysisSignalJets_%SYS%",
-            vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
-            muons="vbshiggsAnalysisMuons_%SYS%",
-            electrons="vbshiggsAnalysisElectrons_%SYS%",
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="vbshiggs_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
@@ -38,13 +33,8 @@ def semiLep_cfg(flags, float_variables=None, int_variables=None):
         CompFactory.VBSHIGGS.BaselineVarsSemiLepAlg(
             "FinalVarsSemiLepAlg",
             isMC=flags.Input.isMC,
-            signaljets="vbshiggsAnalysisSignalJets_%SYS%",
-            vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
-            muons="vbshiggsAnalysisMuons_%SYS%",
-            electrons="vbshiggsAnalysisElectrons_%SYS%",
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_"
                             + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,

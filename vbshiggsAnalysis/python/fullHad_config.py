@@ -14,20 +14,13 @@ def fullHad_cfg(flags, float_variables=None, int_variables=None):
 
     cfg = ComponentAccumulator()
     # Selection
-    cfg.addEventAlgo(
-        CompFactory.VBSHIGGS.FullHadSelectorAlg(
-            "FullHadSelectorAlg",
-            jets="vbshiggsAnalysisJets_%SYS%",
-            muons="vbshiggsAnalysisMuons_%SYS%",
-            electrons="vbshiggsAnalysisElectrons_%SYS%",
-        )
-    )
+    cfg.addEventAlgo(CompFactory.VBSHIGGS.FullHadSelectorAlg())
+
     # calculate final vbshiggs vars
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.BaselineVarsFullHadAlg(
             "FinalVarsFullHadAlg",
             isMC=flags.Input.isMC,
-            jets="vbshiggsAnalysisJets_%SYS%",
             bTagWPDecorName="ftag_select_"
                             + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,

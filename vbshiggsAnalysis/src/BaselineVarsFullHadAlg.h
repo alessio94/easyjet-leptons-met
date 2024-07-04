@@ -14,9 +14,6 @@
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
-#include <xAODMuon/MuonContainer.h>
-#include <xAODEgamma/ElectronContainer.h>
-#include <xAODMissingET/MissingETContainer.h>
 
 namespace VBSHIGGS{
     /// \brief An algorithm for counting containers
@@ -36,13 +33,9 @@ namespace VBSHIGGS{
         /// \brief Setup syst-aware input container handles
         CP::SysListHandle m_systematicsList {this};
 
-        CP::SysReadHandle<xAOD::EventInfo> m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+        CP::SysReadHandle<xAOD::EventInfo> m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
-        CP::SysReadHandle<xAOD::JetContainer> m_jetHandle{ this, "jets", "",   "Jet container to read" };
-        
-        CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "",   "Electron container to read" };
-
-        CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{ this, "muons", "",   "Muon container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_jetHandle{ this, "jets", "vbshiggsAnalysisJets_%SYS%", "Jet container to read" };
 
         CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 

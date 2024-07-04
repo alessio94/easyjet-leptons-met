@@ -25,11 +25,6 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.FullLepSelectorAlg(
             "FullLepSelectorAlg",
-            signaljets="vbshiggsAnalysisSignalJets_%SYS%",
-            vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
-            muons="vbshiggsAnalysisMuons_%SYS%",
-            electrons="vbshiggsAnalysisElectrons_%SYS%",
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="vbshiggs_pass_sr_%SYS%",
             triggerLists=trigger_branches,
@@ -47,14 +42,8 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
         CompFactory.VBSHIGGS.BaselineVarsFullLepAlg(
             "FinalVarsFullLepAlg",
             isMC=flags.Input.isMC,
-            largejets="vbshiggsAnalysisLargeJets_%SYS%",
-            signaljets="vbshiggsAnalysisSignalJets_%SYS%",
-            vbsjets="vbshiggsAnalysisVBSJets_%SYS%",
-            muons="vbshiggsAnalysisMuons_%SYS%",
-            electrons="vbshiggsAnalysisElectrons_%SYS%",
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_"
                           + flags.Analysis.small_R_jet.btag_extra_wps[0],

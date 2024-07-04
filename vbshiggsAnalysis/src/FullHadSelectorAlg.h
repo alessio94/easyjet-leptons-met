@@ -34,9 +34,9 @@ namespace VBSHIGGS{
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
 
       CP::SysListHandle m_systematicsList {this};
-      CP::SysReadHandle<xAOD::JetContainer> m_jetHandle{ this, "jets", "",   "Jet container to read" };
-      CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "",   "Electron container to read" }; 
-      CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{ this, "muons", "",   "Muon container to read" };
+      CP::SysReadHandle<xAOD::JetContainer> m_jetHandle{ this, "jets", "vbshiggsAnalysisJets_%SYS%", "Jet container to read" };
+      CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "vbshiggsAnalysisElectrons_%SYS%", "Electron container to read" };
+      CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{ this, "muons", "vbshiggsAnalysisMuons_%SYS%", "Muon container to read" };
 
       Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
       Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};

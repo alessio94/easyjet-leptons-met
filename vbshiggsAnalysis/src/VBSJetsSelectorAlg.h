@@ -38,13 +38,13 @@ namespace VBSHIGGS{
             /// \brief Setup syst-aware input container handles
             CP::SysListHandle m_systematicsList {this};
 
-            CP::SysReadHandle<xAOD::JetContainer> m_jetHandle{ this, "jets", "",   "Jet container to read" };
+            CP::SysReadHandle<xAOD::JetContainer> m_jetHandle{ this, "jets", "vbshiggsAnalysisJets_%SYS%", "Jet container to read" };
 
             //VBS jets to write
-            CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_VBSjetOutHandle{ this, "VBSjetContainerOutKey", "vbsjets",   "VBS Jet container to write" };
+            CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_VBSjetOutHandle{ this, "VBSjetContainerOutKey", "vbshiggsAnalysisVBSJets_%SYS%", "VBS Jet container to write" };
             
             //non VBS jets to write
-            CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_NonVBsjetOutHandle{ this, "SignaljetContainerOutKey", "signaljets",   "Non VBS Jet container to write" };
+            CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_NonVBsjetOutHandle{ this, "SignaljetContainerOutKey", "vbshiggsAnalysisSignalJets_%SYS%", "Non VBS Jet container to write" };
             
             CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
     };
