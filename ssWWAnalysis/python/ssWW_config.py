@@ -53,10 +53,6 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.ssWWVBS.ssWWSelectorAlg(
             "ssWWSelectorAlg",
-            jets="ssWWAnalysisJets_%SYS%",
-            muons="ssWWAnalysisMuons_%SYS%",
-            electrons="ssWWAnalysisElectrons_%SYS%",
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="ssWW_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
@@ -74,12 +70,8 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.ssWWVBS.BaselineVarsssWWAlg(
             "FinalVarsssWWAlg",
             isMC=flags.Input.isMC,
-            jets="ssWWAnalysisJets_%SYS%",
-            muons="ssWWAnalysisMuons_%SYS%",
-            electrons="ssWWAnalysisElectrons_%SYS%",
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            met="AnalysisMET_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables

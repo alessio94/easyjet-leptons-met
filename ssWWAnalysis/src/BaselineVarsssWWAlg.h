@@ -45,19 +45,19 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "",   "Jet container to read" };
+      m_jetHandle{ this, "jets", "ssWWAnalysisJets_%SYS%", "Jet container to read" };
     
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+    m_electronHandle{ this, "electrons", "ssWWAnalysisElectrons_%SYS%", "Electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "",   "Muon container to read" };
+    m_muonHandle{ this, "muons", "ssWWAnalysisMuons_%SYS%", "Muon container to read" };
 
     CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "AnalysisMET",   "MET container to read" };
+    m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+    m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
