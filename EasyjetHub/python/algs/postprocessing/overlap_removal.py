@@ -48,7 +48,7 @@ def overlap_sequence(flags):
 
     # For the benefit of the view container creation
     original_names = {
-        objtype: flags.Analysis.container_names.input[objtype]
+        objtype: container_names.input[objtype]
         for objtype in ['electrons', 'photons', 'muons', 'taus']
     }
 
@@ -57,21 +57,21 @@ def overlap_sequence(flags):
         preOR_collections['jets'] = drop_sys(
             container_names.allcalib[flags.Analysis.small_R_jet.jet_type]
         ) + ".selectPtEta"
-        original_names['jets'] = flags.Analysis.container_names.input[
+        original_names['jets'] = container_names.input[
             flags.Analysis.small_R_jet.jet_type
         ]
 
     # Large-R jets need more special handling
     if flags.Analysis.do_large_R_Topo_jets and flags.Analysis.do_large_R_jets_OR:
         preOR_collections['fatJets'] = (
-            drop_sys(flags.Analysis.container_names.output.reco10TopoJet)
+            drop_sys(container_names.output.reco10TopoJet)
         )
-        original_names['fatJets'] = flags.Analysis.container_names.input.reco10TopoJet
+        original_names['fatJets'] = container_names.input.reco10TopoJet
     if flags.Analysis.do_large_R_UFO_jets and flags.Analysis.do_large_R_jets_OR:
         preOR_collections['fatJets'] = (
-            drop_sys(flags.Analysis.container_names.output.reco10UFOJet)
+            drop_sys(container_names.output.reco10UFOJet)
         )
-        original_names['fatJets'] = flags.Analysis.container_names.input.reco10UFOJet
+        original_names['fatJets'] = container_names.input.reco10UFOJet
 
     # Include, and then set up the overlap analysis algorithm config:
     configSeq += makeConfig('OverlapRemoval')

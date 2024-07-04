@@ -18,7 +18,7 @@ def tau_decor_cfg(flags, **kwargs):
 
     if flags.Analysis.do_bbtt_analysis:
         from bbttAnalysis.AntiTauDecoratorConfig import (
-            HHbbttAntiTauDecoratorCfg)
-        cfg.merge(HHbbttAntiTauDecoratorCfg(flags))
+            HHbbttTriggerDecoratorCfg)
+        cfg.merge(HHbbttTriggerDecoratorCfg(flags))
 
     return cfg

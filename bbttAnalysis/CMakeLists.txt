@@ -22,6 +22,7 @@ atlas_add_component(bbttAnalysis
   xAODJet
   xAODTracking
   xAODTruth
+  SelectionHelpersLib
   SystematicsHandlesLib
   FourMomUtils
   TruthUtils

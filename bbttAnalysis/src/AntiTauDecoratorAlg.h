@@ -5,9 +5,14 @@
 #ifndef BBTTANALYSIS_ANTITAUDECORATORALG
 #define BBTTANALYSIS_ANTITAUDECORATORALG
 
-#include <AthenaBaseComps/AthReentrantAlgorithm.h>
-#include <AsgDataHandles/ReadDecorHandleKey.h>
-#include <AsgDataHandles/WriteDecorHandleKey.h>
+#include "AnaAlgorithm/AnaAlgorithm.h"
+
+#include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+#include <SelectionHelpers/SysReadSelectionHandle.h>
+#include <SelectionHelpers/SysWriteSelectionHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODTau/TauJetContainer.h>
@@ -20,7 +25,7 @@ namespace HHBBTT
 {
 
   /// \brief An algorithm for counting containers
-  class AntiTauDecoratorAlg final : public AthReentrantAlgorithm
+  class AntiTauDecoratorAlg final : public EL::AnaAlgorithm
   {
     /// \brief The standard constructor
   public:
@@ -30,34 +35,36 @@ namespace HHBBTT
     /// configs
     StatusCode initialize() override;
     /// \brief Execute method, for actions to be taken in the event loop
-    StatusCode execute(const EventContext& ctx) const override;
+    StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
-    
- 
 
   private:
+
+    CP::SysListHandle m_systematicsList {this};
     
     // Members for configurable properties
-    SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
+    CP::SysReadHandle<xAOD::EventInfo> m_eventHandle
       { this, "event", "EventInfo", "EventInfo to read" };
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
 
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_yearKey;
+    CP::SysReadDecorHandle<unsigned int> m_year{"dataTakingYear", this};
 
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_is2016_periodA_key;
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_is2016_periodB_D3_key;
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_is2022_75bunches_key;
+    CP::SysReadDecorHandle<bool> m_is2016_periodA{"is2016_periodA", this};
+    CP::SysReadDecorHandle<bool> m_is2016_periodB_D3{"is2016_periodB_D3", this};
+    CP::SysReadDecorHandle<bool> m_is2022_75bunches{"is2022_75bunches", this};
 
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_passSLTDecorKey;
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_passLTTDecorKey;
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_passSTTDecorKey;
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_passDTTDecorKey;
-    SG::ReadDecorHandleKey<xAOD::EventInfo> m_passDBTDecorKey;
+    CP::SysReadDecorHandle<bool> m_passSLT{"pass_trigger_SLT", this};
+    CP::SysReadDecorHandle<bool> m_passLTT{"pass_trigger_LTT", this};
+    CP::SysReadDecorHandle<bool> m_passSTT{"pass_trigger_STT", this};
+    CP::SysReadDecorHandle<bool> m_passDTT{"pass_trigger_DTT", this};
+    CP::SysReadDecorHandle<bool> m_passDBT{"pass_trigger_DBT", this};
 
     // Taus
-    SG::ReadHandleKey<xAOD::TauJetContainer> m_tausInKey
-      { this, "tausIn", "", "containerName to read" };
+    CP::SysReadHandle<xAOD::TauJetContainer>
+      m_tauHandle{ this, "taus", "", "Tau container to read" };
+
+    CP::SysReadSelectionHandle m_tauBaselineSelection {
+      this, "tauBaselineSelection", "", "the preselection to be applied for all taus"
+    };
 
     Gaudi::Property<std::string> m_tauIDWP_name
       { this, "tauIDWP", "", "Name of the Tau ID WP" };
@@ -66,36 +73,31 @@ namespace HHBBTT
     Gaudi::Property<double> m_antiTauRNNThreshold
       { this, "antiTauRNNThreshold", 0.01,
 	"Lower threshold of RNN score for Anti-Id taus" };
-    
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_triggerMatchSTTKey;
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_triggerMatchLTTKey;
-    SG::ReadDecorHandleKey<xAOD::TauJetContainer> m_triggerMatchDTTKey;
-    
-    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_IDTauDecorKey;
-    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_antiTauDecorKey;
-    SG::WriteDecorHandleKey<xAOD::TauJetContainer> m_eventCategoryDecorKey;
+
+    CP::SysReadDecorHandle<bool> m_triggerMatchSTT{"trigMatch_STT", this};
+    CP::SysReadDecorHandle<bool> m_triggerMatchLTT{"trigMatch_LTT", this};
+    CP::SysReadDecorHandle<bool> m_triggerMatchDTT{"trigMatch_DTT", this};
+
+    CP::SysWriteSelectionHandle m_IDTau{
+      this, "IDTauSelection", "", "decoration name for the ID taus"};
+    CP::SysWriteSelectionHandle m_antiTau{
+      this, "AntiTauSelection", "", "decoration name for the anti taus"};
 
     // Muons
-    SG::ReadHandleKey<xAOD::MuonContainer> m_muonsInKey
-      { this, "muonsIn", "", "containerName to read" };
-    Gaudi::Property<std::string> m_muonIdDecorName
-      { this, "muonIdDecorKey", "DFCommonMuonPassIDCuts",
-	"Decoration for muon ID cuts" };
-    Gaudi::Property<std::string> m_muonPreselDecorName
-      { this, "muonPreselDecorKey", "DFCommonMuonPassPreselection",
-	"Decoration for muon preselection" };
-    
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonIdDecorKey;
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> m_muonPreselDecorKey;
+    CP::SysReadHandle<xAOD::MuonContainer>
+      m_muonHandle{ this, "muons", "", "Muon container to read" };
+
+    CP::SysReadSelectionHandle m_muonSelection {
+      this, "muonSelection", "", "the selection to be applied for muons"
+    };
 
     // Electrons
-    SG::ReadHandleKey<xAOD::ElectronContainer> m_elesInKey
-      { this, "elesIn", "", "containerName to read" };
-    Gaudi::Property<std::string> m_eleIdDecorName
-      { this, "eleIdDecorKey", "DFCommonElectronsLHTight",
-	  "Decoration for electron ID working point" };
+    CP::SysReadHandle<xAOD::ElectronContainer>
+      m_electronHandle{ this, "electrons", "",   "Electron container to read" };
 
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> m_eleIdDecorKey;
+    CP::SysReadSelectionHandle m_electronSelection {
+      this, "electronSelection", "", "the selection to be applied for muons"
+    };
 
     void setThresholds
     (unsigned int year,

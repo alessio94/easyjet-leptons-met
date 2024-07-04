@@ -2,11 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-
 #include "AntiTauDecoratorAlg.h"
-#include <AsgDataHandles/ReadDecorHandle.h>
-#include <AsgDataHandles/WriteDecorHandle.h>
-#include "TauAnalysisTools/HelperFunctions.h"
 
 #include <AthenaKernel/Units.h>
 
@@ -15,33 +11,26 @@ namespace HHBBTT
 {
   AntiTauDecoratorAlg::AntiTauDecoratorAlg(const std::string &name,
                                   ISvcLocator *pSvcLocator)
-      : AthReentrantAlgorithm(name, pSvcLocator) { }
+      : EL::AnaAlgorithm(name, pSvcLocator) { }
 
   StatusCode AntiTauDecoratorAlg::initialize()
   {
-    ATH_CHECK (m_eventInfoKey.initialize());
+    ATH_CHECK(m_eventHandle.initialize(m_systematicsList));
 
-    m_yearKey = "EventInfo.dataTakingYear";
-    m_is2016_periodA_key = "EventInfo.is2016_periodA";
-    m_is2016_periodB_D3_key = "EventInfo.is2016_periodB_D3";
-    m_is2022_75bunches_key = "EventInfo.is2022_75bunches";
-    ATH_CHECK(m_yearKey.initialize());
-    ATH_CHECK(m_is2016_periodA_key.initialize());
-    ATH_CHECK(m_is2016_periodB_D3_key.initialize());
-    ATH_CHECK(m_is2022_75bunches_key.initialize());
+    ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
-    m_passSLTDecorKey = "EventInfo.pass_trigger_SLT";
-    m_passLTTDecorKey = "EventInfo.pass_trigger_LTT";
-    m_passSTTDecorKey = "EventInfo.pass_trigger_STT";
-    m_passDTTDecorKey = "EventInfo.pass_trigger_DTT";
-    m_passDBTDecorKey = "EventInfo.pass_trigger_DBT";
-    ATH_CHECK(m_passSLTDecorKey.initialize());
-    ATH_CHECK(m_passLTTDecorKey.initialize());
-    ATH_CHECK(m_passSTTDecorKey.initialize());
-    ATH_CHECK(m_passDTTDecorKey.initialize());
-    ATH_CHECK(m_passDBTDecorKey.initialize());
+    ATH_CHECK(m_is2016_periodA.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is2016_periodB_D3.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is2022_75bunches.initialize(m_systematicsList, m_eventHandle));
 
-    ATH_CHECK (m_tausInKey.initialize());
+    ATH_CHECK(m_passSLT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_passLTT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_passSTT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_passDTT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_passDBT.initialize(m_systematicsList, m_eventHandle));
+
+    ATH_CHECK(m_tauHandle.initialize(m_systematicsList));
+    ATH_CHECK(m_tauBaselineSelection.initialize(m_systematicsList, m_tauHandle));
 
     if(m_tauIDWP_name=="Loose") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
     else if(m_tauIDWP_name=="Medium") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
@@ -51,141 +40,127 @@ namespace HHBBTT
       return StatusCode::FAILURE;
     }
 
-    m_triggerMatchSTTKey = m_tausInKey.key() + ".trigMatch_STT";
-    m_triggerMatchLTTKey = m_tausInKey.key() + ".trigMatch_LTT";
-    m_triggerMatchDTTKey = m_tausInKey.key() + ".trigMatch_DTT";
-    ATH_CHECK (m_triggerMatchSTTKey.initialize());
-    ATH_CHECK (m_triggerMatchLTTKey.initialize());
-    ATH_CHECK (m_triggerMatchDTTKey.initialize());
+    ATH_CHECK(m_triggerMatchSTT.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK(m_triggerMatchLTT.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK(m_triggerMatchDTT.initialize(m_systematicsList, m_tauHandle));
 
-    m_IDTauDecorKey = m_tausInKey.key() + ".isIDTau";
-    m_antiTauDecorKey = m_tausInKey.key() + ".isAntiTau";
-    m_eventCategoryDecorKey = m_tausInKey.key() + ".antiTauEventCategory";
-    ATH_CHECK (m_IDTauDecorKey.initialize());
-    ATH_CHECK (m_antiTauDecorKey.initialize());
-    ATH_CHECK (m_eventCategoryDecorKey.initialize());
+    ATH_CHECK(m_IDTau.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK(m_antiTau.initialize(m_systematicsList, m_tauHandle));
 
-    ATH_CHECK (m_muonsInKey.initialize());
-    ATH_CHECK (m_elesInKey.initialize());
+    ATH_CHECK(m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK(m_muonSelection.initialize(m_systematicsList, m_muonHandle));
 
-    m_muonIdDecorKey = m_muonsInKey.key() + "." + m_muonIdDecorName;
-    m_muonPreselDecorKey = m_muonsInKey.key() + "." + m_muonPreselDecorName;
-    m_eleIdDecorKey = m_elesInKey.key() + "." + m_eleIdDecorName;
-    ATH_CHECK (m_muonIdDecorKey.initialize());
-    ATH_CHECK (m_muonPreselDecorKey.initialize());
-    ATH_CHECK (m_eleIdDecorKey.initialize());
+    ATH_CHECK(m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK(m_electronSelection.initialize(m_systematicsList, m_electronHandle));
+
+    ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
   }
 
-  StatusCode AntiTauDecoratorAlg ::execute(const EventContext& ctx) const
+  StatusCode AntiTauDecoratorAlg ::execute()
   {
-    // Event info handles
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_eventInfoKey,ctx);
-    ATH_CHECK (eventInfo.isValid());
 
-    SG::ReadDecorHandle<xAOD::EventInfo, bool> isSLT(m_passSLTDecorKey);
-    SG::ReadDecorHandle<xAOD::EventInfo, bool> isLTT(m_passLTTDecorKey);
-    SG::ReadDecorHandle<xAOD::EventInfo, bool> isSTT(m_passSTTDecorKey);
-    SG::ReadDecorHandle<xAOD::EventInfo, bool> isDTT(m_passDTTDecorKey);
-    SG::ReadDecorHandle<xAOD::EventInfo, bool> isDBT(m_passDBTDecorKey);
-
-    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> year(m_yearKey);
-    SG::ReadDecorHandle<xAOD::EventInfo, bool> is2016_periodA(m_is2016_periodA_key);
-    SG::ReadDecorHandle<xAOD::EventInfo, bool> is2016_periodB_D3(m_is2016_periodB_D3_key);
-    SG::ReadDecorHandle<xAOD::EventInfo, bool> is2022_75bunches(m_is2022_75bunches_key);
-
-    // Tau handles
-    SG::ReadHandle<xAOD::TauJetContainer> tausIn(m_tausInKey,ctx);
-    ATH_CHECK (tausIn.isValid());
-
-    SG::ReadDecorHandle<xAOD::TauJetContainer, bool> isSTTMatched(m_triggerMatchSTTKey);
-    SG::ReadDecorHandle<xAOD::TauJetContainer, bool> isLTTMatched(m_triggerMatchLTTKey);
-    SG::ReadDecorHandle<xAOD::TauJetContainer, bool> isDTTMatched(m_triggerMatchDTTKey);
-
-    SG::WriteDecorHandle<xAOD::TauJetContainer, char> idTauDecorHandle(m_IDTauDecorKey);
-    SG::WriteDecorHandle<xAOD::TauJetContainer, char> antiTauDecorHandle(m_antiTauDecorKey);
-    SG::WriteDecorHandle<xAOD::TauJetContainer, int> eventCategoryDecorHandle(m_eventCategoryDecorKey);
-
-    // lepton handles
-    SG::ReadHandle<xAOD::MuonContainer> muonsIn(m_muonsInKey,ctx);
-    ATH_CHECK (muonsIn.isValid());
-    SG::ReadHandle<xAOD::ElectronContainer> elesIn(m_elesInKey,ctx);
-    ATH_CHECK (elesIn.isValid());
-
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonIdDecorHandle(m_muonIdDecorKey);
-    SG::ReadDecorHandle<xAOD::MuonContainer, char> muonPreselDecorHandle(m_muonPreselDecorKey);
-    SG::ReadDecorHandle<xAOD::ElectronContainer, char> eleIdDecorHandle(m_eleIdDecorKey);
-
-
-    std::unordered_map<HHBBTT::TriggerChannel,
-		       std::unordered_map<HHBBTT::Var, float>> ptThresholds;
-    setThresholds(year(*eventInfo),
-		  is2016_periodA(*eventInfo),
-		  is2016_periodB_D3(*eventInfo),
-		  is2022_75bunches(*eventInfo),
-		  ptThresholds);
-
-    int nIDMatchedTauSTT = 0;
-    bool passTauPtSTTThreshold = false;
-
-    for(const xAOD::TauJet* tau : *tausIn) {
-      bool isTauID = tau->isTau(m_tauIDWP);
-      if(isSTTMatched(*tau)){
-	if(isTauID) nIDMatchedTauSTT++;
-	passTauPtSTTThreshold |=
-	  tau->pt() > ptThresholds[HHBBTT::TriggerChannel::STT][HHBBTT::Var::leadingtau];
-      }
-    }
-
-    int nLeptons = 0;
-    bool passLeptonPtSLTThreshold = false;
-      
-    for(const xAOD::Muon* muon : *muonsIn) {
-      if(muonIdDecorHandle(*muon) && muonPreselDecorHandle(*muon) &&
-	 muon->pt() > 7 * Athena::Units::GeV) {
-	nLeptons++;
-	passLeptonPtSLTThreshold |=
-	  muon->pt() > ptThresholds[HHBBTT::TriggerChannel::SLT][HHBBTT::Var::mu];
-      }
-    }
-
-    for(const xAOD::Electron* ele : *elesIn) {
-      if(eleIdDecorHandle(*ele) && ele->pt() > 7 * Athena::Units::GeV){
-	nLeptons++;
-	passLeptonPtSLTThreshold |=
-	  ele->pt() > ptThresholds[HHBBTT::TriggerChannel::SLT][HHBBTT::Var::ele];
-      }
-    }
-
-    // TODO DBT implementation not final. Like this we will have many events for which
-    // anti-taus are selected according to DTT criteria in the offline DBT category
-    bool STT = isSTT(*eventInfo) && passTauPtSTTThreshold && nLeptons==0;
-    bool DTT = isDTT(*eventInfo) && !passTauPtSTTThreshold && nLeptons==0;
-    bool DBT = isDBT(*eventInfo) && !passTauPtSTTThreshold && nLeptons==0; // not orthogonal to DTT for now
-    bool SLT = isSLT(*eventInfo) && passLeptonPtSLTThreshold && nLeptons>0;
-    bool LTT = isLTT(*eventInfo) && !passLeptonPtSLTThreshold && nLeptons>0;
-
-    for(const xAOD::TauJet* tau : *tausIn) {
-      bool isTauID = tau->isTau(m_tauIDWP);
-      idTauDecorHandle(*tau) = isTauID;
-      float RNNScore = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
-      int decayMode = -1;
-      tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
-      bool isAntiTau = !isTauID && RNNScore>m_antiTauRNNThreshold && decayMode!=xAOD::TauJetParameters::Mode_NotSet;
+    const static SG::AuxElement::Decorator<int> categoryDecorator("antiTauEventCategory");
     
-      // for SLT and DBT no anti-tau trigger matching is required
-      if (LTT) isAntiTau &= isLTTMatched(*tau);
-      else if (DTT) isAntiTau &= isDTTMatched(*tau);
-      else if (STT && nIDMatchedTauSTT == 0) isAntiTau &= isSTTMatched(*tau); // in STT if ID tau not trig matched anti tau needs be matched to trigger
-      antiTauDecorHandle(*tau) = isAntiTau;
-        
-      int antiTauCategory = 0;
-      if (isAntiTau) {
-	if(SLT || LTT) antiTauCategory = 1;
-	else if (STT || DTT || DBT) antiTauCategory = 2;
+    for (const auto& sys : m_systematicsList.systematicsVector()){
+
+      // Retrieve inputs
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK(m_eventHandle.retrieve (event, sys));
+
+      const xAOD::TauJetContainer *taus = nullptr;
+      ANA_CHECK(m_tauHandle.retrieve (taus, sys));
+
+      const xAOD::MuonContainer *muons = nullptr;
+      ANA_CHECK(m_muonHandle.retrieve (muons, sys));
+
+      const xAOD::ElectronContainer *electrons = nullptr;
+      ANA_CHECK(m_electronHandle.retrieve (electrons, sys));
+
+      std::unordered_map<HHBBTT::TriggerChannel,
+			 std::unordered_map<HHBBTT::Var, float>> ptThresholds;
+      setThresholds(m_year.get(*event, sys),
+		    m_is2016_periodA.get(*event, sys),
+		    m_is2016_periodB_D3.get(*event, sys),
+		    m_is2022_75bunches.get(*event, sys),
+		    ptThresholds);
+
+      int nIDMatchedTauSTT = 0;
+      bool passTauPtSTTThreshold = false;
+
+      for(const xAOD::TauJet* tau : *taus) {
+        if(!m_tauBaselineSelection.getBool(*tau, sys)) continue;
+        bool isTauID = tau->isTau(m_tauIDWP);
+        if(m_triggerMatchSTT.get(*tau, sys)){
+          if(isTauID) nIDMatchedTauSTT++;
+          passTauPtSTTThreshold |=
+            tau->pt() > ptThresholds[HHBBTT::TriggerChannel::STT][HHBBTT::Var::leadingtau];
+        }
       }
-      eventCategoryDecorHandle(*tau) = antiTauCategory;
+
+      int nLeptons = 0;
+      bool passLeptonPtSLTThreshold = false;
+
+      for(const xAOD::Muon* muon : *muons) {
+        if(m_muonSelection.getBool(*muon, sys) &&
+           muon->pt() > 7 * Athena::Units::GeV) {
+          nLeptons++;
+          passLeptonPtSLTThreshold |=
+	    muon->pt() > ptThresholds[HHBBTT::TriggerChannel::SLT][HHBBTT::Var::mu];
+        }
+      }
+
+      for(const xAOD::Electron* ele : *electrons) {
+        if(m_electronSelection.getBool(*ele, sys) && ele->pt() > 7 * Athena::Units::GeV){
+          nLeptons++;
+          passLeptonPtSLTThreshold |=
+            ele->pt() > ptThresholds[HHBBTT::TriggerChannel::SLT][HHBBTT::Var::ele];
+        }
+      }
+
+      // TODO DBT implementation not final. Like this we will have many events for which
+      // anti-taus are selected according to DTT criteria in the offline DBT category
+      bool STT = m_passSTT.get(*event, sys) && passTauPtSTTThreshold && nLeptons==0;
+      bool DTT = m_passDTT.get(*event, sys) && !passTauPtSTTThreshold && nLeptons==0;
+      bool DBT = m_passDBT.get(*event, sys) && !passTauPtSTTThreshold && nLeptons==0; // not orthogonal to DTT for now
+      bool SLT = m_passSLT.get(*event, sys) && passLeptonPtSLTThreshold && nLeptons>0;
+      bool LTT = m_passLTT.get(*event, sys) && !passLeptonPtSLTThreshold && nLeptons>0;
+
+      for(const xAOD::TauJet* tau : *taus) {
+        bool isTauID = false;
+        bool isAntiTau = false;
+        int antiTauCategory = 0;
+
+        if(m_tauBaselineSelection.getBool(*tau, sys)){
+	  isTauID = tau->isTau(m_tauIDWP);
+          float RNNScore = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
+          int decayMode = -1;
+          tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
+          isAntiTau = (!isTauID && RNNScore>m_antiTauRNNThreshold &&
+		       decayMode!=xAOD::TauJetParameters::Mode_NotSet);
+    
+          // for SLT and DBT no anti-tau trigger matching is required
+          if (LTT) isAntiTau &= m_triggerMatchLTT.get(*tau, sys);
+          else if (DTT) isAntiTau &= m_triggerMatchDTT.get(*tau, sys);
+          // in STT if ID tau not trig matched anti tau needs be matched to trigger
+          else if (STT && nIDMatchedTauSTT == 0) isAntiTau &= m_triggerMatchSTT.get(*tau, sys);
+
+          if (isAntiTau) {
+            if(SLT || LTT) antiTauCategory = 1;
+            else if (STT || DTT || DBT) antiTauCategory = 2;
+          }
+        }
+
+        m_IDTau.setBool(*tau, isTauID, sys);
+        m_antiTau.setBool(*tau, isAntiTau, sys);
+
+        // Using a decorator might be ill-defined with systematics
+        // but anti-tau usage is mostly for data-driven background
+        // so let's neglect the subtlety involved
+        categoryDecorator(*tau) = antiTauCategory;
+
+      }
     }
   
     return StatusCode::SUCCESS;

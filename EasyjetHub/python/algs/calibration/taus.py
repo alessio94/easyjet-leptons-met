@@ -4,6 +4,8 @@ from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from EasyjetHub.steering.utils.name_helper import drop_sys
 from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
+from bbttAnalysis.AntiTauDecoratorConfig import HHbbttAntiTauDecoratorBlock
+
 
 def tau_sequence(flags, configAcc):
 
@@ -29,6 +31,18 @@ def tau_sequence(flags, configAcc):
                                 containerName=output_name,
                                 selectionName=id)
         configSeq.setOptionValue('.quality', id)
+
+    # Anti-tau selections
+    if flags.Analysis.do_bbtt_analysis:
+        configSeq.append(HHbbttAntiTauDecoratorBlock())
+        configSeq.setOptionValue('.taus', output_name)
+        configSeq.setOptionValue('.tauIDSelection', flags.Analysis.Tau.ID)
+        muons = drop_sys(flags.Analysis.container_names.output.muons)
+        muons += f'.{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+        configSeq.setOptionValue('.muons', muons)
+        electrons = drop_sys(flags.Analysis.container_names.output.electrons)
+        electrons += f'.{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+        configSeq.setOptionValue('.electrons', electrons)
 
     # Tau trigger SF
     trigSF_flags = flags.Analysis.trigger.scale_factor
