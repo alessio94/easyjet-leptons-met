@@ -46,17 +46,17 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_bjetHandle{ this, "bjets", "",   "Jet container to read" };
+    m_bjetHandle{ this, "bjets", "ttHHAnalysisJets_BTag_%SYS%", "Jet container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "",   "Jet container to read" };
+    m_jetHandle{ this, "jets", "ttHHAnalysisJets_%SYS%", "Jet container to read" };
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
-    m_outHandle{ this, "pairedOutBJets", "",   "Jet container to write" };
+    m_outHandle{ this, "pairedOutBJets", "pairedttHHAnalysisJets_%SYS%", "Jet container to write" };
 
     std::vector<const xAOD::Jet*> bJetChiSquarePairing(const ConstDataVector<xAOD::JetContainer>& Jets, float target_mass_1, float target_mass_2);
 

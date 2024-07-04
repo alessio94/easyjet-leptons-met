@@ -52,13 +52,13 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_pairedJetHandle{ this, "pairedJets", "",   "BJet container to read" };
+    m_pairedJetHandle{ this, "pairedJets", "pairedttHHAnalysisJets_%SYS%", "Paired jet container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_bjetHandle{ this, "bjets", "",   "Jet container to read" };
+    m_bjetHandle{ this, "bjets", "ttHHAnalysisJets_BTag_%SYS%", "BJet container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "",   "Jet container to read" };
+    m_jetHandle{ this, "jets", "ttHHAnalysisJets_%SYS%", "Jet container to read" };
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
@@ -67,13 +67,13 @@ private:
     m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "",   "Muon container to read" };
+    m_muonHandle{ this, "muons", "ttHHAnalysisMuons_%SYS%", "Muon container to read" };
 
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "",   "Electron container to read" };
+    m_electronHandle{ this, "electrons", "ttHHAnalysisElectrons_%SYS%", "Electron container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+    m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
