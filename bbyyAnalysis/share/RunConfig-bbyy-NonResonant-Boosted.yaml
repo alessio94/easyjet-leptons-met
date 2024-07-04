@@ -1,0 +1,54 @@
+include: bbyyAnalysis/RunConfig-bbyy-base.yaml
+
+do_large_R_UFO_jets: true
+do_Boosted: true
+
+# temporarily disable OR for large R jets
+do_large_R_jets_OR: false
+do_small_R_jet_large_R_jet_OR: false
+
+# flag that toggles run-through mode in the SelectorAlg
+bypass: true
+
+# name that will go in the tree bbyy_pass_<selection_name>_%SYS%
+selection_name: "loose"
+
+CutList :
+    - PASS_TRIGGER
+    - TWO_LOOSE_PHOTONS
+    - PASS_TRIGGER_MATCHING
+    - TWO_TIGHTID_ISO_PHOTONS
+    - DIPHOTON_MASS
+    - AT_LEAST_TWO_JETS
+    - EXACTLY_ZERO_LEPTONS
+
+# Toggles for reconstructed objects decorations
+large_R_jet:
+  amount: 2
+  variables_LargeJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_phbb", "GN2Xv01_pqcd", "GN2Xv01_phcc", "GN2Xv01_ptop"]
+  variables_int_LargeJets: ["truthLabel"]
+
+
+ttree_output:
+  - AnalysisMiniTree:
+    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
+    reco_outputs:
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+      photons: 'container_names.output.photons'
+    collection_options:
+      small_R_jets:
+        btag_details: true
+        btag_info: true
+      photons:
+        shower_shapes: false
+        truth_labels: false
+        iso_variables: false
+      large_R_jets:
+        substructure_info: true
+        truth_labels: true
+    truth_outputs:
+      small_R_jets: 'container_names.input.truth4Jet'
+      large_R_jets: 'container_names.input.truth10SoftDropJet'
+      higgs_particle: 'container_names.output.truthHHParticles'

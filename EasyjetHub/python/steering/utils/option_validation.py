@@ -91,7 +91,6 @@ def validate_do_write_obj_flags(flags, tree_flags):
             )
 
         small_R_flags = tree_flags.collection_options.small_R_jets
-        large_R_flags = tree_flags.collection_options.large_R_jets
         try:
             if any([
                 small_R_flags.btag_info,
@@ -115,7 +114,6 @@ def validate_do_write_obj_flags(flags, tree_flags):
         if flags.Input.isPHYSLITE:
             assert not any([
                 small_R_flags.JVT_details,
-                large_R_flags.truth_labels,
             ]), "Jet variables requested are incompatible with PHYSLITE"
 
         if small_R_flags.no_bjet_calib_p4:

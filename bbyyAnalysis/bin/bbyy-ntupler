@@ -68,6 +68,7 @@ def bbyy_job_cfg():
                 photonkey=flags.Analysis.container_names.output.photons,
                 muonkey=flags.Analysis.container_names.output.muons,
                 electronkey=flags.Analysis.container_names.output.electrons,
+                largeRjetkey=flags.Analysis.container_names.output.reco10UFOJet,
                 float_variables=float_variable_names,
                 int_variables=int_variable_names,
             ),

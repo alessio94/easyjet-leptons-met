@@ -16,6 +16,7 @@ atlas_add_component(bbyyAnalysis
   src/bbyyFilterDalitzAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
   src/ResonantPNNbbyyAlg.cxx
+  src/BoostedVarsbbyyAlg.cxx
   LINK_LIBRARIES ${ROOT_LIBRARIES}
   AthenaBaseComps
   AsgTools

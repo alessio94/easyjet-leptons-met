@@ -12,6 +12,7 @@ do_electrons: true
 do_photons: true
 do_met: true
 do_KinematicFit: true
+do_Boosted: false
 
 # Toggles for reconstructed objects decorations
 small_R_jet:

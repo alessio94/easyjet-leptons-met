@@ -14,7 +14,7 @@ import os
 import re
 
 
-def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
+def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
              float_variables=None, int_variables=None):
     if not float_variables:
         float_variables = []
@@ -52,6 +52,20 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
         PCBTsort=True,
         bTagWPDecorName="",
         selectBjet=False))
+
+    if flags.Analysis.do_Boosted:
+        cfg.merge(JetSelectorAlgCfg(
+            flags,
+            name="LargeRJetSelectorAlg",
+            containerInKey=largeRjetkey,
+            containerOutKey="bbyyAnalysisLargeRJets_%SYS%",
+            minPt=250e3,
+            maxEta=2.0,
+            pTsort=True,
+            PCBTsort=False,
+            bTagWPDecorName="",
+            checkOR=False,
+            selectBjet=False))
 
     selection_name = flags.Analysis.selection_name
 
@@ -99,6 +113,16 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey,
             intVariableList=int_variables
         )
     )
+
+    if flags.Analysis.do_Boosted:
+        cfg.addEventAlgo(
+            CompFactory.HHBBYY.BoostedVarsbbyyAlg(
+                "BoostedVarsbbyyAlg",
+                isMC=flags.Input.isMC,
+                floatVariableList=float_variables,
+                intVariableList=int_variables
+            )
+        )
 
     if flags.Analysis.do_resonant_PNN:
         float_SH_var = [var for var in float_variables if "SH_" in var]
@@ -229,6 +253,15 @@ def get_BaselineVarsbbyyAlg_SH(flags):
     return SH_float_variable_names, SH_int_variable_names
 
 
+def get_BoostedVarsbbyyAlg(flags):
+    boosted_float_variables = []
+    boosted_int_variables = []
+
+    boosted_int_variables += ["nLargeRJets"]
+
+    return boosted_float_variables, boosted_int_variables
+
+
 def bbyy_branches(flags):
     branches = []
 
@@ -259,6 +292,13 @@ def bbyy_branches(flags):
             = get_BaselineVarsbbyyAlg_SH(flags)
         float_variable_names += SH_float_variables
         int_variable_names += SH_int_variables
+
+    # Here are some variables which can be stored for the boosted case
+    if flags.Analysis.do_Boosted:
+        boosted_float_variables, boosted_int_variables \
+            = get_BoostedVarsbbyyAlg(flags)
+        float_variable_names += boosted_float_variables
+        int_variable_names += boosted_int_variables
 
     all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
