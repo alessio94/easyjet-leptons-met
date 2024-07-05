@@ -349,7 +349,7 @@ namespace HHBBYY
       float topness = compute_Topness(jets);
       m_Fbranches.at("topness").set(*event, topness, sys);
       
-      float* eventShapes = compute_EventShapes(bjets, photons);
+      std::vector<float> eventShapes = compute_EventShapes(bjets, photons);
       m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
       m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
 
@@ -434,7 +434,7 @@ namespace HHBBYY
           }
           //mva variables
           float KF_topness = compute_Topness(KFJets);
-          float* KF_eventShapes = compute_EventShapes(KF_bjets, photons);
+          std::vector<float> KF_eventShapes = compute_EventShapes(KF_bjets, photons);
           float KF_pTBalance = compute_pTBalance(KF_bjets, photons);
           m_Fbranches.at("KF_topness").set(*event, KF_topness, sys);
           m_Fbranches.at("KF_sphericityT").set(*event, KF_eventShapes[0], sys);
@@ -535,9 +535,9 @@ namespace HHBBYY
   eventShapes[0] = sphericityT;
   eventShapes[1] = planarFlow;
   */
-  float* BaselineVarsbbyyAlg::compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets,
+  std::vector<float> BaselineVarsbbyyAlg::compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets,
                                                  const xAOD::PhotonContainer *photons){
-    static float eventShapes[2] = {0};
+    std::vector<float> eventShapes(2);
     if (bjets->size() >= 2 && photons->size() >= 2) {
       TLorentzVector photon1 = photons->at(0)->p4();
       TLorentzVector photon2 = photons->at(1)->p4();

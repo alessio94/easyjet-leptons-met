@@ -121,7 +121,7 @@ namespace HHBBYY
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
     float compute_Topness(const xAOD::JetContainer *jets);
-    float* compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
+    std::vector<float> compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
     float compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
     
     VBFjetsMethod stringToVBFjetsMethod(const std::string& vbfjets_method_str);
