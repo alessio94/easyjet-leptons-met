@@ -25,20 +25,22 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
     TightMuonWP = flags.Analysis.Muon.extra_wps[0]
     TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=LooseMuonWPLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="ttHHAnalysisMuons_%SYS%",
                                  minPt=10e3,
-                                 muon_WPs=[TightMuonWPLabel]))
+                                 looseMuonWP=LooseMuonWPLabel,
+                                 tightMuonWPs=[TightMuonWPLabel]))
 
     LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     TightEleWP = flags.Analysis.Electron.extra_wps[0]
     TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
-        containerInKey=LooseElectronWPLabel + electronkey,
+        containerInKey=electronkey,
         containerOutKey="ttHHAnalysisElectrons_%SYS%",
         minPt=10e3,
-        ele_WPs=[TightEleWPLabel]))
+        looseEleWP=LooseElectronWPLabel,
+        tightEleWPs=[TightEleWPLabel]))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_BTag_SelectorAlg",
                                 containerInKey=smalljetkey,

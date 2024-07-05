@@ -51,8 +51,11 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::vector<std::string>> m_muWPNames
-      { this, "muon_WPs", {},"Muon ID + Iso working point" };
+    Gaudi::Property<std::string> m_looseMuonWP
+        { this, "looseMuonWP", "", "Loose muon ID + ISO working point, used to filter collection" };
+
+    Gaudi::Property<std::vector<std::string>> m_tightMuonWPs
+        { this, "tightMuonWPs", {}, "Tight muon ID + ISO working points, not used to filter collection" };
 
     Gaudi::Property<bool> m_doTTVA
       { this, "doTTVA", false, "Is TTVA applied" };
@@ -67,7 +70,8 @@ private:
     std::vector<CP::SysReadDecorHandle<float>> m_muTriggerSF_in;
     std::vector<CP::SysWriteDecorHandle<float>> m_muTriggerSF_out;
 
-    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
+    CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
+    std::vector<CP::SysReadDecorHandle<char>> m_select_tight_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
@@ -78,6 +82,10 @@ private:
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nMuons_%SYS%", 
         "Name out output decorator for number of selected muons"};
 
+    CP::SysWriteDecorHandle<bool > m_isSelectedMuon {
+        this, "decoration", "isAnalysisMuon_%SYS%", "decoration for per-object if muon is selected"
+    };
+
 
     Gaudi::Property<float> m_minPt            {this, "minPt", 7e3, "Minimum pT of muons"};
     Gaudi::Property<float> m_maxEta           {this, "maxEta", 2.7, "Maximum eta of muons"};
@@ -85,6 +93,9 @@ private:
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort muons by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra muons after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
+
+    Gaudi::Property<int>   m_muonAmount       {this, "muonAmount", -1, "Maximum number of muon to consider"};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
   };
 }
 

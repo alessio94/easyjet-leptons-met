@@ -17,16 +17,16 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=MuonWPLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="vbshiggsAnalysisMuons_%SYS%",
-                                 muon_WPs=[MuonWPLabel],
+                                 looseMuonWP=MuonWPLabel,
                                  minPt=9 * Units.GeV))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
-                                     containerInKey=ElectronWPLabel + electronkey,
+                                     containerInKey=electronkey,
                                      containerOutKey="vbshiggsAnalysisElectrons_%SYS%",
-                                     ele_WPs=[ElectronWPLabel],
+                                     looseEleWP=ElectronWPLabel,
                                      minPt=9 * Units.GeV))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg",

@@ -19,17 +19,17 @@ def ZCharm_cfg(flags, smalljetkey, muonkey, electronkey,
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=MuonWPLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="ZCharmAnalysisMuons_%SYS%",
-                                 muon_WPs=[MuonWPLabel],
+                                 looseMuonWP=MuonWPLabel,
                                  minPt=flags.Analysis.Muon.min_pT_ZCharm,
                                  maxEta=flags.Analysis.Muon.max_eta_ZCharm))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
-                                     containerInKey=ElectronWPLabel + electronkey,
+                                     containerInKey=electronkey,
                                      containerOutKey="ZCharmAnalysisElectrons_%SYS%",
-                                     ele_WPs=[ElectronWPLabel],
+                                     looseEleWP=ElectronWPLabel,
                                      isMC=flags.Input.isMC,
                                      minPt=flags.Analysis.Electron.min_pT_ZCharm,
                                      maxEta=flags.Analysis.Electron.max_eta_ZCharm))

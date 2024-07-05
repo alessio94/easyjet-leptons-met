@@ -33,4 +33,9 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
             for id_wp in id_wps
         ]
 
+    if tree_flags.collection_options.electrons.run_selection:
+        electron_branches.variables += ["isAnalysisElectron_%SYS%"]
+        for index in range(flags.Analysis.Lepton.amount):
+            electron_branches.variables += [f"isElectron{index+1}_%SYS%"]
+
     return electron_branches.get_output_list()

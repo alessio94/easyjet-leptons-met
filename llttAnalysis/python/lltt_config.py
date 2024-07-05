@@ -23,18 +23,20 @@ def lltt_cfg(
     TightMuonWP = flags.Analysis.Muon.extra_wps[0]
     TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=LooseMuonWPLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="llttAnalysisMuons_%SYS%",
-                                 muon_WPs=[TightMuonWPLabel]))
+                                 looseMuonWP=LooseMuonWPLabel,
+                                 tightMuonWPs=[TightMuonWPLabel]))
 
     LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     TightElectronWP = flags.Analysis.Electron.extra_wps[0]
     TightElectronWPLabel = f'{TightElectronWP[0]}_{TightElectronWP[1]}'
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
-        containerInKey=LooseElectronWPLabel + electronkey,
+        containerInKey=electronkey,
         containerOutKey="llttAnalysisElectrons_%SYS%",
-        ele_WPs=[TightElectronWPLabel]))
+        looseEleWP=LooseElectronWPLabel,
+        tightEleWPs=[TightElectronWPLabel]))
 
     cfg.merge(TauSelectorAlgCfg(flags,
                                 containerInKey=taukey,

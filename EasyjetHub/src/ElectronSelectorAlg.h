@@ -51,8 +51,11 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::vector<std::string>> m_eleWPNames
-      { this, "ele_WPs", {},"Electron ID + Iso working points used on top of container" };
+    Gaudi::Property<std::string> m_looseEleWP
+        { this, "looseEleWP", "", "Loose electron ID + ISO working point, used to filter collection" };
+
+    Gaudi::Property<std::vector<std::string>> m_tightEleWPs
+        { this, "tightEleWPs", {}, "Tight electron ID + ISO working points, not used to filter collection" };
         
     std::vector<CP::SysReadDecorHandle<float>> m_ele_recoSF;
     std::vector<CP::SysReadDecorHandle<float>> m_ele_idSF;
@@ -64,7 +67,8 @@ private:
     std::vector<CP::SysReadDecorHandle<float>> m_eleTriggerSF_in;
     std::vector<CP::SysWriteDecorHandle<float>> m_eleTriggerSF_out;
 
-    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
+    CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
+    std::vector<CP::SysReadDecorHandle<char>> m_select_tight_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
@@ -75,6 +79,10 @@ private:
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nElectrons_%SYS%", 
         "Name out output decorator for number of selected electrons"};
 
+    CP::SysWriteDecorHandle<bool > m_isSelectedElectron {
+        this, "decoration", "isAnalysisElectron_%SYS%", "decoration for per-object if electron is selected"
+    };
+
     Gaudi::Property<float> m_minPt            {this, "minPt", 7e3, "Minimum pT of electrons"};
     Gaudi::Property<float> m_minEtaVeto       {this, "minEtaVeto", 1.37, "Minimum eta veto of EMCal"};
     Gaudi::Property<float> m_maxEtaVeto       {this, "maxEtaVeto", 1.52, "Maximum eta veto of EMCal"};
@@ -83,6 +91,9 @@ private:
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort electrons by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra electrons after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
+
+    Gaudi::Property<int>   m_electronAmount       {this, "electronAmount", -1, "Maximum number of electron to consider"};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
   };
 }
 

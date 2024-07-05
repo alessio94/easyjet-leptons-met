@@ -31,17 +31,17 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=MuonWPLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="bbyyAnalysisMuons_%SYS%",
                                  minPt=10e3,
-                                 muon_WPs=[MuonWPLabel]))
+                                 looseMuonWP=MuonWPLabel))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
-                                     containerInKey=ElectronWPLabel + electronkey,
+                                     containerInKey=electronkey,
                                      containerOutKey="bbyyAnalysisElectrons_%SYS%",
                                      minPt=10e3,
-                                     ele_WPs=[ElectronWPLabel]))
+                                     looseEleWP=ElectronWPLabel))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,

@@ -33,4 +33,9 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
             for id_wp in id_wps
         ]
 
+    if tree_flags.collection_options.muons.run_selection:
+        muon_branches.variables += ["isAnalysisMuon_%SYS%"]
+        for index in range(flags.Analysis.Lepton.amount):
+            muon_branches.variables += [f"isMuon{index+1}_%SYS%"]
+
     return muon_branches.get_output_list()

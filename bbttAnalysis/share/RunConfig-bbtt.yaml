@@ -8,8 +8,8 @@ ttree_output:
     slim_variables_with_syst: true
     reco_outputs:
       small_R_jets: 'container_names.output.reco4PFlowJet'
-      # muons: 'container_names.output.muons'
-      # electrons: 'container_names.output.electrons'
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
       taus: 'container_names.output.taus'
       met : 'container_names.output.met'
     collection_options:
@@ -19,7 +19,11 @@ ttree_output:
         run_selection: true
       taus:
         truth_branches: True
-        run_selection: true 
+        run_selection: true
+      electrons:
+        run_selection: true
+      muons:
+        run_selection: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'

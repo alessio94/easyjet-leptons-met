@@ -22,9 +22,26 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
+    if (m_electronAmount > 0)
+    {
+      for (int i = 0; i < m_electronAmount; i++)
+      {
+        std::string index = std::to_string(i + 1);
+        CP::SysWriteDecorHandle<bool> whandle{"isElectron" + index + "_%SYS%", this};
+        m_leadBranches.emplace("isElectron" + index, whandle);
+        ATH_CHECK(m_leadBranches.at("isElectron" + index).initialize(m_systematicsList, m_inHandle));
+      };
+    }
+    ANA_CHECK (m_isSelectedElectron.initialize(m_systematicsList, m_inHandle));
+
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    for(const auto& wp : m_eleWPNames){
+    if(m_tightEleWPs.empty()) m_tightEleWPs.setValue({m_looseEleWP});
+
+    m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+ m_looseEleWP +"_%SYS%", this);
+    ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
+
+    for(const auto& wp : m_tightEleWPs){
       // Scale factors
       m_ele_recoSF.emplace_back(m_isMC ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
       m_ele_idSF.emplace_back(m_isMC ? "el_id_effSF_"+wp+"_%SYS%" : "", this);
@@ -34,7 +51,7 @@ namespace Easyjet
       m_ele_SF.emplace_back(m_isMC ? "el_effSF_"+wp+"_%SYS%" : "", this);
       
       // Select flags
-      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+      m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
@@ -57,7 +74,7 @@ namespace Easyjet
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_eleTriggerSF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-    for(auto& handle : m_select_in)
+    for(auto& handle : m_select_tight_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_select_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
@@ -88,6 +105,10 @@ namespace Easyjet
       // loop over electrons 
       for (const xAOD::Electron *electron : *inContainer)
       {
+        m_isSelectedElectron.set(*electron, false, sys);
+
+        if(!m_select_loose_in.get(*electron, sys)) continue;
+
         // skip OR electrons
         if ( m_checkOR ){
           bool passesOR = m_passesOR.get(*electron, sys);
@@ -105,14 +126,14 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_eleWPNames.size(); i++){
-          std::string wp = m_eleWPNames[i];
+        for(unsigned int i=0; i<m_tightEleWPs.size(); i++){
+          std::string wp = m_tightEleWPs[i];
           if(m_isMC){
             float SF = m_ele_recoSF[i].get(*electron,sys) * m_ele_idSF[i].get(*electron,sys);
             if(wp.find("NonIso")==std::string::npos) SF *= m_ele_isoSF[i].get(*electron,sys);
             m_ele_SF[i].set(*electron, SF, sys);
           }
-          m_select_out[i].set(*electron, m_select_in[i].get(*electron,sys), sys);
+          m_select_out[i].set(*electron, m_select_tight_in[i].get(*electron,sys), sys);
         }
 
         if(m_isMC){
@@ -124,6 +145,7 @@ namespace Easyjet
         
         // If cuts are passed, save the object
         workContainer->push_back(electron);
+        m_isSelectedElectron.set(*electron, true, sys);
       }
       
       int nElectrons = workContainer->size();
@@ -161,6 +183,15 @@ namespace Easyjet
         // keep only the requested amount
         workContainer->erase(workContainer->begin() + nKeep,
                 workContainer->end());
+      }
+
+      if(m_electronAmount > 0){
+        int nElectron = 0;
+        for (const xAOD::Electron *electron : *workContainer) {
+          nElectron++;
+          m_leadBranches.at("isElectron"+std::to_string(nElectron)).set(*electron, true, sys);
+          if ( nElectron == m_electronAmount ) break;
+        }
       }
       
       // Write to eventstore

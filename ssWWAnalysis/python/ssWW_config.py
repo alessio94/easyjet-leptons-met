@@ -19,17 +19,17 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=MuonWPLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="ssWWAnalysisMuons_%SYS%",
-                                 muon_WPs=[MuonWPLabel],
+                                 looseMuonWP=MuonWPLabel,
                                  minPt=flags.Analysis.Muon.min_pT_ssWW,
                                  maxEta=flags.Analysis.Muon.max_eta_ssWW))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
-                                     containerInKey=ElectronWPLabel + electronkey,
+                                     containerInKey=electronkey,
                                      containerOutKey="ssWWAnalysisElectrons_%SYS%",
-                                     ele_WPs=[ElectronWPLabel],
+                                     looseEleWP=ElectronWPLabel,
                                      isMC=flags.Input.isMC,
                                      minPt=flags.Analysis.Electron.min_pT_ssWW,
                                      maxEta=flags.Analysis.Electron.max_eta_ssWW))

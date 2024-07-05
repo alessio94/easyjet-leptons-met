@@ -23,9 +23,26 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
+    if (m_muonAmount > 0)
+    {
+      for (int i = 0; i < m_muonAmount; i++)
+      {
+        std::string index = std::to_string(i + 1);
+        CP::SysWriteDecorHandle<bool> whandle{"isMuon" + index + "_%SYS%", this};
+        m_leadBranches.emplace("isMuon" + index, whandle);
+        ATH_CHECK(m_leadBranches.at("isMuon" + index).initialize(m_systematicsList, m_inHandle));
+      };
+    }
+    ANA_CHECK (m_isSelectedMuon.initialize(m_systematicsList, m_inHandle));
+
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    for(const auto& wp : m_muWPNames){
+    if(m_tightMuonWPs.empty()) m_tightMuonWPs.setValue({m_looseMuonWP});
+
+    m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+ m_looseMuonWP +"_%SYS%", this);
+    ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
+
+    for(const auto& wp : m_tightMuonWPs){
       // Scale factors
       m_mu_recoSF.emplace_back(m_isMC ? "muon_reco_effSF_"+wp+"_%SYS%" : "", this);
       m_mu_isoSF.emplace_back((m_isMC && wp.find("NonIso")==std::string::npos) ?
@@ -35,7 +52,7 @@ namespace Easyjet
       m_mu_SF.emplace_back(m_isMC ? "muon_effSF_"+wp+"_%SYS%" : "", this);
 
       // Select flags
-      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+      m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
@@ -58,7 +75,7 @@ namespace Easyjet
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_muTriggerSF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-    for(auto& handle : m_select_in)
+    for(auto& handle : m_select_tight_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_select_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
@@ -89,6 +106,10 @@ namespace Easyjet
       // loop over muons 
       for (const xAOD::Muon *muon : *inContainer)
       {
+        m_isSelectedMuon.set(*muon, false, sys);
+
+        if(!m_select_loose_in.get(*muon, sys)) continue;
+
         // skip OR muons
         if ( m_checkOR ){
           bool passesOR = m_passesOR.get(*muon, sys);
@@ -100,15 +121,15 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_muWPNames.size(); i++){
-          std::string wp = m_muWPNames[i];
+        for(unsigned int i=0; i<m_tightMuonWPs.size(); i++){
+          std::string wp = m_tightMuonWPs[i];
           if(m_isMC){
             float SF = m_mu_recoSF[i].get(*muon,sys);
             if(wp.find("NonIso")==std::string::npos) SF *= m_mu_isoSF[i].get(*muon,sys);
             if(m_doTTVA) SF *= m_mu_TTVASF[i].get(*muon,sys);
             m_mu_SF[i].set(*muon, SF, sys);
           }
-          m_select_out[i].set(*muon, m_select_in[i].get(*muon,sys), sys);
+          m_select_out[i].set(*muon, m_select_tight_in[i].get(*muon,sys), sys);
         }
 
         if(m_isMC){
@@ -120,6 +141,7 @@ namespace Easyjet
 
         // If cuts are passed, save the object
         workContainer->push_back(muon);
+        m_isSelectedMuon.set(*muon, true, sys);
       }
       
       int nMuons = workContainer->size();      
@@ -153,6 +175,15 @@ namespace Easyjet
           // keep only the requested amount
           workContainer->erase(workContainer->begin() + nKeep,
                               workContainer->end());
+      }
+
+      if(m_muonAmount > 0){
+        int nMuon = 0;
+        for (const xAOD::Muon *muon : *workContainer) {
+          nMuon++;
+          m_leadBranches.at("isMuon"+std::to_string(nMuon)).set(*muon, true, sys);
+          if ( nMuon == m_muonAmount ) break;
+        }
       }
     
       // Write to eventstore

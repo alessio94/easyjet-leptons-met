@@ -13,6 +13,7 @@ def MuonSelectorAlgCfg(flags, name="MuonSelectorAlg", **kwargs):
     kwargs.setdefault("doTTVA", flags.Analysis.Muon.trackSelection)
     kwargs.setdefault("muonTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Muon'))
+    kwargs.setdefault("muonAmount", flags.Analysis.Lepton.amount)
 
     cfg.addEventAlgo(CompFactory.Easyjet.MuonSelectorAlg(name, **kwargs))
     return cfg
@@ -25,6 +26,7 @@ def ElectronSelectorAlgCfg(flags, name="ElectronSelectorAlg", **kwargs):
     kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
     kwargs.setdefault("eleTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Electron'))
+    kwargs.setdefault("electronAmount", flags.Analysis.Lepton.amount)
 
     cfg.addEventAlgo(CompFactory.Easyjet.ElectronSelectorAlg(name, **kwargs))
     return cfg

@@ -15,17 +15,19 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     TightMuonWP = flags.Analysis.Muon.extra_wps[0]
     TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=MuonWPLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="bbVVAnalysisMuons_%SYS%",
-                                 muon_WPs=[TightMuonWPLabel]))
+                                 looseMuonWP=MuonWPLabel,
+                                 tightMuonWPs=[TightMuonWPLabel]))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     TightEleWP = flags.Analysis.Electron.extra_wps[0]
     TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
-                                     containerInKey=ElectronWPLabel + electronkey,
+                                     containerInKey=electronkey,
                                      containerOutKey="bbVVAnalysisElectrons_%SYS%",
-                                     ele_WPs=[TightEleWPLabel]))
+                                     looseEleWP=ElectronWPLabel,
+                                     tightEleWPs=[TightEleWPLabel]))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg",
                                 containerInKey=smalljetkey,
