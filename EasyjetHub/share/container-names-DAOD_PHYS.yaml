@@ -9,6 +9,7 @@ input:
   electrons:           Electrons
   photons:             Photons
   taus:                TauJets
+  taus_muonRM:         TauJets_MuonRM
   truthtaus:           TruthTaus
   truthBSMParticles:   TruthBSMWithDecayParticles
   truthSMParticles:    TruthBosonsWithDecayParticles

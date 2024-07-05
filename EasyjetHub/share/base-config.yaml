@@ -95,6 +95,7 @@ Muon:
 
 Tau:
   ID: ""
+  addMuonRM: false
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: ["charge", "nProng", "decayMode"]

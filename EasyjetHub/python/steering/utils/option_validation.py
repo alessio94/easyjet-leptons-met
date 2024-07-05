@@ -39,6 +39,14 @@ def validate_do_obj_flags(flags):
         assert flags.Analysis.Muon.Iso, (
             "Muons require isolation working point e.g. Muon.Iso: 'Loose_VarRad'"
         )
+    if flags.Analysis.do_taus:
+        assert flags.Analysis.Tau.ID, (
+            "Taus require ID working point e.g. Tau.ID: 'Loose'"
+        )
+        if flags.Input.isPHYSLITE:
+            assert not flags.Analysis.Tau.addMuonRM, (
+                "TauJets_MuonRM are not saved in PHYSLITE yet"
+            )
     if flags.Analysis.do_small_R_jets and flags.Analysis.small_R_jet.runBJetPtCalib:
         assert flags.Analysis.do_muons, (
             "B-jet pT calibration requires muons to be run"

@@ -1,6 +1,9 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
+from TauAnalysisAlgorithms.TauAnalysisConfig import (
+    EXPERIMENTAL_TauCombineMuonRemovalConfig)
+
 from EasyjetHub.steering.utils.name_helper import drop_sys
 from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
@@ -22,8 +25,14 @@ def tau_sequence(flags, configAcc):
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.taus)
 
+    if flags.Analysis.Tau.addMuonRM:
+        configSeq.append(EXPERIMENTAL_TauCombineMuonRemovalConfig())
+        configSeq.setOptionValue('.outputTaus', 'TauJets_MuonRmCombined')
+
     # PID configuration
     configSeq += makeConfig('TauJets', containerName=output_name)
+    if flags.Analysis.Tau.addMuonRM:
+        configSeq.setOptionValue('.inputContainer', 'TauJets_MuonRmCombined')
     configSeq.setOptionValue('.rerunTruthMatching', False)
     configSeq.setOptionValue('.decorateTruth', True)
     for id in wps:
