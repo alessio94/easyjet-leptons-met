@@ -171,15 +171,15 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     float_variable_names += ["myy", "pTyy", "Etayy", "Phiyy", "dRyy"]
     float_variable_names += ["mbb", "pTbb", "Etabb", "Phibb", "dRbb"]
 
-    float_variable_names += ["cos_theta_yy_cm_bbyy","phi_yy_cm_bbyy"]
+    float_variable_names += ["cos_theta_yy_cm_bbyy", "phi_yy_cm_bbyy"]
 
-    float_variable_names += ["Photon1_cos_theta_cm_gamgam","Photon1_phi_cm_gamgam"]
+    float_variable_names += ["Photon1_cos_theta_cm_gamgam", "Photon1_phi_cm_gamgam"]
 
     # HbbCandidate jets
-    for i in range(1,3):
-        for var in ["pt", "phi", "eta", "E","uncorrPt","muonCorrPt"]:
+    for i in range(1, 3):
+        for var in ["pt", "phi", "eta", "E", "uncorrPt", "muonCorrPt"]:
             float_variable_names += [f"HbbCandidate_Jet{i}_" + var]
-        for var in ["truthLabel", "pcbt","n_muons"]:
+        for var in ["truthLabel", "pcbt", "n_muons"]:
             int_variable_names += [f"HbbCandidate_Jet{i}_" + var]
 
     float_variable_names += ["HbbCandidate_Jet1_cos_theta_cm_bb",
@@ -193,23 +193,23 @@ def get_BaselineVarsbbyyAlg_variables(flags):
 
     # Kinematic Fit variables
     if (flags.Analysis.do_KinematicFit):
-        float_variable_names += ["KF_mbb", "KF_pTbb", "KF_Etabb","KF_Phibb","KF_mbbyy",
-                                 "KF_dRbb", "KF_mbbyystar", "KF_pTbbyy", "KF_Etabbyy",
-                                 "KF_Phibbyy", "KF_dRHH"]
+        float_variable_names += ["KF_mbb", "KF_pTbb", "KF_Etabb", "KF_Phibb",
+                                 "KF_mbbyy", "KF_dRbb", "KF_mbbyystar", "KF_pTbbyy",
+                                 "KF_Etabbyy", "KF_Phibbyy", "KF_dRHH"]
         # KF mva variables
         float_variable_names += ["KF_HT", "KF_topness", "KF_sphericityT",
                                  "KF_planarFlow", "KF_pTBalance"]
 
-        for i in range(1,5):
+        for i in range(1, 5):
             for var in ["pt", "phi", "eta", "E"]:
                 float_variable_names += [f"KF_Jet{i}_" + var]
 
-        for i in range(1,3):
+        for i in range(1, 3):
             for var in ["pt", "phi", "eta", "E"]:
                 float_variable_names += [f"KF_HbbCandidate_Jet{i}_" + var]
 
     # VBFJets
-    for i in range(1,3):
+    for i in range(1, 3):
         for var in ["pt", "eta", "phi", "E", "yybb_dR", "yybb_deta"]:
             float_variable_names += [f"Jet_vbf_j{i}_" + var]
     for var in ["maxscore", "m", "deta", "yybb_dR", "yybb_deta", "yybb_pt",

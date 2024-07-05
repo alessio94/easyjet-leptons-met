@@ -96,7 +96,7 @@ def preselection_cfg(flags, seqname):
             weightConfigSeq += generator_sequence(flags)
 
     weightConfigSeq.fullConfigure(weightConfigAccumulator)
-    cfg.merge(weightConfigAccumulator.CA,seqname)
+    cfg.merge(weightConfigAccumulator.CA, seqname)
 
     if flags.Analysis.do_bbyy_analysis and flags.Input.isMC:
         from bbyyAnalysis.bbyy_config import contain_dalitz, get_weight_index

@@ -30,12 +30,12 @@ from EasyjetHub.algs.event_info_global_alg_config import event_info_global_alg_c
 
 # Map object types to sequence configurators
 analysis_seqs = {
-    "muons":        muon_sequence,
-    "electrons":    electron_sequence,
-    "photons":      photon_sequence,
-    "taus":         tau_sequence,
+    "muons": muon_sequence,
+    "electrons": electron_sequence,
+    "photons": photon_sequence,
+    "taus": tau_sequence,
     "small_R_jets": jet_sequence,
-    "VR_jets":      vr_jet_sequence,
+    "VR_jets": vr_jet_sequence,
 }
 
 

@@ -5,11 +5,9 @@
     - pip install flake8
   script:
     # Ignore some more annoying flake8 problems:
-    #  E231: missing whitespace after comma, semicolon, colon
-    #  E241: multiple spaces after comma (and at least colon)
     #  W503: line break before binary operator
     #  E741: ambiguous variable name
-    - flake8 --ignore=E231,E241,W503,E741 . --per-file-ignores="hub.py:F401"
+    - flake8 --ignore=W503,E741 . --per-file-ignores="hub.py:F401"
   needs: []
 
 .black_check_template: &black_check_template

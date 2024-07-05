@@ -11,16 +11,16 @@ class SystOption(IntEnum):
 @dataclass
 class BranchManager(object):
     """Class for handling container to output ntuple branch mapping"""
-    input_container:    str
-    output_prefix:      str
+    input_container: str
+    output_prefix: str
     systematics_option: SystOption = SystOption.NONE
     systematics_suffix_separator: str = "_"
-    required_flags:     list = field(default_factory=list)
-    variables:          list = field(default_factory=list)
+    required_flags: list = field(default_factory=list)
+    variables: list = field(default_factory=list)
 
     # Apply systs only for given vars (takes priority) or not for some vars
-    syst_only_for:      list = field(default_factory=list)
-    syst_not_for:       list = field(default_factory=list)
+    syst_only_for: list = field(default_factory=list)
+    syst_not_for: list = field(default_factory=list)
 
     # In the ConfigBlock OR setup, we cannot actually make OR-ed
     # view containers for output without some more work.
@@ -28,8 +28,8 @@ class BranchManager(object):
 
     def syst_str(self):
         return {
-            SystOption.NONE:     "",
-            SystOption.NO_SYST:  self.systematics_suffix_separator + "NOSYS",
+            SystOption.NONE: "",
+            SystOption.NO_SYST: self.systematics_suffix_separator + "NOSYS",
             SystOption.ALL_SYST: self.systematics_suffix_separator + "%SYS%",
         }[self.systematics_option]
 

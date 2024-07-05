@@ -133,8 +133,8 @@ def get_BaselineVarsllttAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for var in ["mll","ptll","drll","dphimetll","matt","ptatt","dratt",
-                "maa","ptaa","draa","dphimetatt"]:
+    for var in ["mll", "ptll", "drll", "dphimetll", "matt", "ptatt", "dratt",
+                "maa", "ptaa", "draa", "dphimetatt"]:
         float_variable_names.append(var)
 
     for var in ["isr", "recid", "nlep", "osatt", "nmuo", "nele", "ntaus",
@@ -203,4 +203,4 @@ def lltt_branches(flags):
                          f"lltt_pass{var}{cat}"
                          + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    return branches,float_variable_names,int_variable_names
+    return branches, float_variable_names, int_variable_names
