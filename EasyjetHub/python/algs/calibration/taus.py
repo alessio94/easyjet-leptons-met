@@ -39,7 +39,10 @@ def tau_sequence(flags, configAcc):
         configSeq += makeConfig('TauJets.WorkingPoint',
                                 containerName=output_name,
                                 selectionName=id)
-        configSeq.setOptionValue('.quality', id)
+        if "noeleid" in id:
+            configSeq.setOptionValue('.use_eVeto', False)
+        quality = id.replace("_noeleid", "")
+        configSeq.setOptionValue('.quality', quality)
 
     # Anti-tau selections
     if flags.Analysis.do_bbtt_analysis:

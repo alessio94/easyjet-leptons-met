@@ -32,9 +32,12 @@ namespace HHBBTT
     ATH_CHECK(m_tauHandle.initialize(m_systematicsList));
     ATH_CHECK(m_tauBaselineSelection.initialize(m_systematicsList, m_tauHandle));
 
-    if(m_tauIDWP_name=="Loose") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
-    else if(m_tauIDWP_name=="Medium") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
-    else if(m_tauIDWP_name=="Tight") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigTight;
+    if(m_tauIDWP_name.value().find("Loose")!=std::string::npos)
+      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
+    else if(m_tauIDWP_name.value().find("Medium")!=std::string::npos)
+      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
+    else if(m_tauIDWP_name.value().find("Tight")!=std::string::npos)
+      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigTight;
     else{
       ATH_MSG_ERROR("Unknown Tau ID WP ");
       return StatusCode::FAILURE;

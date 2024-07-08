@@ -54,10 +54,12 @@ namespace HLLTT
     m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
 
-    if(m_tauWPName=="Loose") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
-    else if(m_tauWPName=="Medium") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
-    else if(m_tauWPName=="Tight") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigTight;
-    else if(m_tauWPName=="VeryLoose") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigVeryLoose;
+    if(m_tauWPName.value().find("Loose")!=std::string::npos)
+      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
+    else if(m_tauWPName.value().find("Medium")!=std::string::npos)
+      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
+    else if(m_tauWPName.value().find("Tight")!=std::string::npos)
+      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigTight;
     else{
       ATH_MSG_ERROR("Unknown Tau ID WP ");
       return StatusCode::FAILURE;
