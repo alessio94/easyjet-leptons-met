@@ -1,0 +1,41 @@
+include: EasyjetHub/base-config.yaml
+
+# Which analysis to consider
+do_XbbCalib: true
+
+# Toggles to bypass event selection
+bypass: false
+
+# Toggles for object types
+do_large_R_UFO_jets: true
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_met: true
+
+# Toggles for reconstructed objects decorations
+small_R_jet:
+  btag_wp: "GN2v01_FixedCutBEff_77"
+  Amount: 1
+
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "Loose_VarRad"
+  Amount: 1
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+  Amount: 1
+
+# Include the TTree configuration and update details
+ttree_output:
+  - AnalysisMiniTree:
+    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    # Our overrides. All defaults are off
+    reco_outputs:
+      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+      small_R_jets: 'container_names.output.reco4PFlowJet'
+      muons: 'container_names.output.muons'
+      electrons: 'container_names.output.electrons'
+      met : 'container_names.output.met'
