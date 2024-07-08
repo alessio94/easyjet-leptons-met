@@ -124,6 +124,7 @@ namespace ttHH
 
       double HT = 0; // scalar sum of jet pT
       double HTall = 0; // scalar sum of jet pT and lepton pT
+      int nBJets77 = 0; 
 
       for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
@@ -146,28 +147,36 @@ namespace ttHH
             JetsCandidate[i] = pairedJets->at(i);
           }
           if (pairedJets->size()==5 && jets->size()>5){
-            for (const auto& jet : *jets){
-              for (std::size_t i=0; i<pairedJets->size(); i++){
-                if (jet==JetsCandidate[i]) {
-                  continue;
-                }
-                else{ 
-                  JetsCandidate[5] = jet;
+            for (const auto& jet : *jets) {
+              bool alreadyInCandidate = false;
+              // Check if jet is already in JetsCandidate
+              for (const auto& candidate : JetsCandidate) {
+                if (jet == candidate) {
+                  alreadyInCandidate = true;
                   break;
                 }
               }
-            }
+              if (!alreadyInCandidate) {
+                JetsCandidate[5] = jet;
+		break;
+	      }
+	    }
           } else if (pairedJets->size()==4 && jets->size()>4){
-            for (const auto& jet : *jets){
-              for (std::size_t i=0; i<pairedJets->size(); i++){
-                if (jet==JetsCandidate[i]) {
-                  continue;
+	    for (const auto& jet : *jets) {
+              bool alreadyInCandidate = false;
+              // Check if jet is already in JetsCandidate
+              for (const auto& candidate : JetsCandidate) {
+                if (jet == candidate) {
+                  alreadyInCandidate = true;
+                  break;
                 }
-                else if (!JetsCandidate[4]){
+              }
+              if (!alreadyInCandidate) {
+		if (!JetsCandidate[4]){
                   JetsCandidate[4] = jet;
-                  continue;
-                } else if (jets->size()>5){
+		} else if (jets->size()>5){
                   JetsCandidate[5] = jet;
+		  break;
                 }
               }
             }
@@ -186,6 +195,10 @@ namespace ttHH
             m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,m_PCBT.get(*JetsCandidate[i], sys),sys);
           if (m_isMC)
             m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set(*event, HadronConeExclTruthLabelID(*JetsCandidate[i]), sys);
+
+	  if (m_PCBT.get(*JetsCandidate[i], sys) >= 3) {
+	    nBJets77++;
+	  }
 
           m_Ibranches.at("Jet"+std::to_string(i+1)+"_n_muons").set(*event, cacc_NMu(*JetsCandidate[i]), sys);    
           m_Fbranches.at("Jet"+std::to_string(i+1)+"_uncorrPt").set(*event, cacc_UncorrPt(*JetsCandidate[i]), sys);
@@ -309,7 +322,8 @@ namespace ttHH
       }
 
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
-      m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
+      m_Ibranches.at("nBJets85").set(*event, bjets->size(), sys);
+      m_Ibranches.at("nBJets77").set(*event, nBJets77, sys);
 
       //----------------------------------------------------------
       //-- Multileptons

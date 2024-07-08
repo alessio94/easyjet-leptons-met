@@ -5,6 +5,7 @@
 #include "ttHHSelectorAlg.h"
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
+#include <AthenaKernel/Units.h>
 
 namespace ttHH
 {
@@ -241,7 +242,7 @@ namespace ttHH
         HT += jet->pt();
     }
 
-    if ((((nLeptons==1) && (nBJets>=3)) || ((nLeptons>=2) && (nBJets>=3))) && HT > 0 && nJets >= 4 && ttHHCuts.exists("PASS_BASELINE"))
+    if (((nLeptons==1 && nBJets>=3) || (nLeptons>=2 && nBJets>=3)) && HT > 400.*Athena::Units::GeV && nJets >= 4 && ttHHCuts.exists("PASS_BASELINE"))
         ttHHCuts("PASS_BASELINE").passed = true;
 
   }

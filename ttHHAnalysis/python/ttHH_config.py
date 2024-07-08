@@ -139,7 +139,7 @@ def get_BaselineVarsttHHAlg_variables(flags):
     float_variable_names += ["HT", "HTall"]
 
     int_variable_names += [
-        "nJets", "nBJets", "nLeptons", "sumPCBT",
+        "nJets", "nBJets85", "nBJets77", "nLeptons", "sumPCBT",
         "dilept_type", "trilept_type", "total_charge",
     ]
 
