@@ -1,10 +1,10 @@
 dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUncertUP/D:relUncertDOWN/D
-603558  PhPy8EG_PDF4LHC21_HHbbyy_chhh0p0                            2.0208826E-04   1.0  1.0   0.0  0.0
-603559  PhPy8EG_PDF4LHC21_HHbbyy_chhh1p0                            9.1036225E-05   1.0  1.0   0.0  0.0
-603560  PhPy8EG_PDF4LHC21_HHbbyy_chhh5p0                            2.6573165E-04   1.0  1.0   0.0  0.0
-603695	PhPy8EG_PDF4LHC21_HHbbyy_chhh2p5                            4.0353135E-05   1.0  1.0   0.0  0.0
-603696	PhPy8EG_PDF4LHC21_HHbbyy_chhh10p0                           1.8783658E-03   1.0  1.0   0.0  0.0
-603697  PhPy8EG_PDF4LHC21_HHbbyy_chhhm1p0                           3.7519722E-04   1.0  1.0   0.0  0.0
+603558  PhPy8EG_PDF4LHC21_HHbbyy_chhh0p0                            2.00290E-04   1.0  1.0   0.0  0.0
+603559  PhPy8EG_PDF4LHC21_HHbbyy_chhh1p0                            9.02430E-05   1.0  1.0   0.0  0.0
+603560  PhPy8EG_PDF4LHC21_HHbbyy_chhh5p0                            2.63484E-04   1.0  1.0   0.0  0.0
+603695	PhPy8EG_PDF4LHC21_HHbbyy_chhh2p5                            3.99964E-05   1.0  1.0   0.0  0.0
+603696	PhPy8EG_PDF4LHC21_HHbbyy_chhh10p0                           1.86197E-03   1.0  1.0   0.0  0.0
+603697  PhPy8EG_PDF4LHC21_HHbbyy_chhhm1p0                           3.72024E-04   1.0  1.0   0.0  0.0
 525376  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1cv1_5fns                    4.9550359E-06   1.0  1.0   0.0  0.0
 525377  MGPy8EG_hh_bbyy_vbf_novhh_l0cvv1cv1_5fns                    1.29032E-05     1.0  1.0   0.0  0.0
 525378  MGPy8EG_hh_bbyy_vbf_novhh_l2cvv1cv1_5fns                    4.45530E-06     1.0  1.0   0.0  0.0

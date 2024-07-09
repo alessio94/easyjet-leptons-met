@@ -1,13 +1,12 @@
 dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUncertUP/D:relUncertDOWN/D
-600021  PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0                          8.20992E-05  1.0  1.0  0.0  0.0
-600022  PhPy8EG_PDF4LHC15_HHbbyy_cHHH10d0                          1.71073E-03  1.0  1.0  0.0  0.0
-603559  PhPy8EG_PDF4LHC21_HHbbyy_chhh1p0                           8.20992E-05  1.0  1.0  0.0  0.0
-603558  PhPy8EG_PDF4LHC21_HHbbyy_chhh0p0                           1.82892E-04  1.0  1.0  0.0  0.0
-603559  PhPy8EG_PDF4LHC21_HHbbyy_chhh1p0                           8.20992E-05  1.0  1.0  0.0  0.0
-603560  PhPy8EG_PDF4LHC21_HHbbyy_chhh5p0                           2.42279E-04  1.0  1.0  0.0  0.0
-603695  PhPy8EG_PDF4LHC21_HHbbyy_chhh2p5                           3.64588E-05  1.0  1.0  0.0  0.0
-603696  PhPy8EG_PDF4LHC21_HHbbyy_chhh10p0                          1.71073E-03  1.0  1.0  0.0  0.0
-603697  PhPy8EG_PDF4LHC21_HHbbyy_chhhm1p0                          3.40031E-04  1.0  1.0  0.0  0.0
+600021  PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0                          8.13588E-05  1.0  1.0  0.0  0.0
+600022  PhPy8EG_PDF4LHC15_HHbbyy_cHHH10d0                          1.69539E-03  1.0  1.0  0.0  0.0
+603558  PhPy8EG_PDF4LHC21_HHbbyy_chhh0p0                           1.81279E-04  1.0  1.0  0.0  0.0
+603559  PhPy8EG_PDF4LHC21_HHbbyy_chhh1p0                           8.13588E-05  1.0  1.0  0.0  0.0
+603560  PhPy8EG_PDF4LHC21_HHbbyy_chhh5p0                           2.40137E-04  1.0  1.0  0.0  0.0
+603695  PhPy8EG_PDF4LHC21_HHbbyy_chhh2p5                           3.61343E-05  1.0  1.0  0.0  0.0
+603696  PhPy8EG_PDF4LHC21_HHbbyy_chhh10p0                          1.69539E-03  1.0  1.0  0.0  0.0
+603697  PhPy8EG_PDF4LHC21_HHbbyy_chhhm1p0                          3.37122E-04  1.0  1.0  0.0  0.0
 503004  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1cv1                        4.46059E-06  1.0  1.0  0.0  0.0
 503007  MGPy8EG_hh_bbyy_vbf_novhh_l1cvv1p5cv1                      8.38707E-06  1.0  1.0  0.0  0.0
 503011  MGPy8EG_hh_bbyy_vbf_novhh_l2cvv1cv1                        4.03225E-06  1.0  1.0  0.0  0.0
