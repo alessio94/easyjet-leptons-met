@@ -1,11 +1,11 @@
 ptag=p6266
-campaign=v4
+campaign=v5
 
 #data 
-##easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13TeV.Run2.${ptag}.txt \
-##    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
-##    --exec bbyy-ntupler \
-####    --campaign ${campaign}
+easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13TeV.Run2.${ptag}.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
+    --exec bbyy-ntupler \
+    --campaign ${campaign}
 
 #ggF HH(bbyy) SM
 easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.ggFHH_bbyy_SM.${ptag}.txt \

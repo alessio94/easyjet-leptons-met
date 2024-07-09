@@ -29,7 +29,7 @@ namespace Easyjet
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize()); 
 
-    ATH_CHECK (book (TH1F("SumOfWeights", "Sum of weights",2, 0.5, 2.5)));
+    ATH_CHECK (book (TH1F("SumOfWeights_special", "Sum of weights",2, 0.5, 2.5)));
 
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
@@ -93,9 +93,9 @@ namespace Easyjet
 
   StatusCode SumOfWeightsAlg::finalize()
   {
-    hist("SumOfWeights")->SetBinContent(1,m_total_mcEvent);
-    hist("SumOfWeights")->SetBinContent(2,m_total_mcEventWeight);
-    hist("SumOfWeights")->SetBinError(2,std::sqrt(m_total_mcEventWeight_squared));
+    hist("SumOfWeights_special")->SetBinContent(1,m_total_mcEvent);
+    hist("SumOfWeights_special")->SetBinContent(2,m_total_mcEventWeight);
+    hist("SumOfWeights_special")->SetBinError(2,std::sqrt(m_total_mcEventWeight_squared));
 
     // fill sys to hist here
     for (const auto& sys : m_systematicsList.systematicsVector())
