@@ -3,7 +3,7 @@ executable="bbll-ntupler"
 campaignName="XHHbbll_v00"
 
 #data 
-easyjet-gridsubmit --data-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/data_Run2_p6026.txt \
+easyjet-gridsubmit --data-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/data_Run2_p6266.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --nGBperJob 5 \
@@ -11,7 +11,7 @@ easyjet-gridsubmit --data-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/data_Ru
     --noTag
 
 #XHH signal
-easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYS/mc20_resonantXHH_samples_p6026.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_resonantXHH_samples_p6266.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --nGBperJob 5 \
@@ -19,7 +19,7 @@ easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYS/mc20_resonant
     --noTag
 
 #Z+jet
-easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_Zjet_background_p6026.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_Zjet_background_p6266.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --nGBperJob 5 \
@@ -27,7 +27,7 @@ easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_Zjet
     --noTag
 
 #W+jet
-easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_Wjet_background_p6026.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_Wjet_background_p6266.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --nGBperJob 5 \
@@ -35,7 +35,7 @@ easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_Wjet
     --noTag
 
 #ttbar+single-top
-easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_top_background_p6026.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_top_background_p6266.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --nGBperJob 5 \
@@ -43,7 +43,7 @@ easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_top_
     --noTag
 
 #Diboson
-easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_diboson_background_p6026.txt \
+easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc20_diboson_background_p6266.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --nGBperJob 5 \
