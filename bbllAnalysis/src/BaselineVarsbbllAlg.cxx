@@ -54,6 +54,12 @@ namespace HHBBLL
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
+    for (const std::string &var : m_PCBTnames) {
+      ATH_MSG_DEBUG("initializing PCBT: " << var);
+      CP::SysReadDecorHandle<int> rhandle{var, this};
+      m_PCBTs.emplace(var, rhandle);
+      ATH_CHECK (m_PCBTs.at(var).initialize(m_systematicsList, m_jetHandle));
+    };
 
     ATH_CHECK (m_met_sig.initialize(m_systematicsList, m_metHandle));
 
@@ -247,6 +253,12 @@ namespace HHBBLL
         if (m_isMC) {
           int truthLabel = HadronConeExclTruthLabelID(*bjets->at(i));
           m_Ibranches.at(prefix+"_truthLabel").set(*event, truthLabel, sys);
+        }
+        for (const auto& var: m_PCBTnames) {
+          std::string new_var = var;
+          new_var.erase(0, 14);
+          new_var.erase(new_var.length() - 11, new_var.length());
+          m_Ibranches.at(prefix+"_pcbt_"+new_var).set(*event, m_PCBTs.at(var).get(*bjets->at(i), sys), sys);
         }
       }
 

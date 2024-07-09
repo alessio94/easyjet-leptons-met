@@ -92,6 +92,9 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             )
         )
 
+    btag_pcbt_wps \
+        = [wp for wp in flags.Analysis.small_R_jet.btag_extra_wps if "Continuous" in wp]
+
     # calculate final bbll vars
     cfg.addEventAlgo(
         CompFactory.HHBBLL.BaselineVarsbbllAlg(
@@ -100,6 +103,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
             floatVariableList=float_variables,
             intVariableList=int_variables
         )
