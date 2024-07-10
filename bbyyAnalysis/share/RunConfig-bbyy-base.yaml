@@ -41,6 +41,7 @@ Photon:
   Iso: "NonIso"
   amount: 2
   variables: ["ptOvermyy"]
+  variables_int: ["isEMTight"]
   # The first extra wp is used for the final photon selections
   extra_wps: 
     - ["Tight", "FixedCutLoose"]

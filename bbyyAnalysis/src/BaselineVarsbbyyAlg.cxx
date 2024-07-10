@@ -115,6 +115,7 @@ namespace HHBBYY
       
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
+      static const SG::AuxElement::ConstAccessor<unsigned int> DFCommonPhotonsIsEMTightIsEMValue("DFCommonPhotonsIsEMTightIsEMValue");
       static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
       static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
       static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
@@ -197,6 +198,7 @@ namespace HHBBYY
         m_Fbranches.at("Photon1_eta").set(*event, y1.Eta(), sys);
         m_Fbranches.at("Photon1_phi").set(*event, y1.Phi(), sys);
         m_Fbranches.at("Photon1_E").set(*event, y1.E(), sys);
+        m_Ibranches.at("Photon1_isEMTight").set(*event, DFCommonPhotonsIsEMTightIsEMValue(*ph1), sys);
         if(m_isMC){
           float ph_SF = m_ph_SF.get(*ph1, sys);
           m_Fbranches.at("Photon1_effSF").set(*event, ph_SF, sys);
@@ -214,6 +216,7 @@ namespace HHBBYY
         m_Fbranches.at("Photon2_eta").set(*event, y2.Eta(), sys);
         m_Fbranches.at("Photon2_phi").set(*event, y2.Phi(), sys);
         m_Fbranches.at("Photon2_E").set(*event, y2.E(), sys);
+        m_Ibranches.at("Photon2_isEMTight").set(*event, DFCommonPhotonsIsEMTightIsEMValue(*ph2), sys);
         if(m_isMC){
           float ph_SF = m_ph_SF.get(*ph2, sys);
           m_Fbranches.at("Photon2_effSF").set(*event, ph_SF, sys);
