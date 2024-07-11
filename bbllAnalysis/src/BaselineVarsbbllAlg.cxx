@@ -106,6 +106,9 @@ namespace HHBBLL
       }
       
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
+      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
+      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
+      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
 
       TLorentzVector Leading_lep;
       TLorentzVector Subleading_lep;
@@ -250,6 +253,7 @@ namespace HHBBLL
         m_Fbranches.at(prefix+"_eta").set(*event, bjets->at(i)->eta(), sys);
         m_Fbranches.at(prefix+"_phi").set(*event, bjets->at(i)->phi(), sys);
         m_Fbranches.at(prefix+"_E").set(*event, bjets->at(i)->e(), sys);
+
         if (m_isMC) {
           int truthLabel = HadronConeExclTruthLabelID(*bjets->at(i));
           m_Ibranches.at(prefix+"_truthLabel").set(*event, truthLabel, sys);
@@ -260,6 +264,9 @@ namespace HHBBLL
           new_var.erase(new_var.length() - 11, new_var.length());
           m_Ibranches.at(prefix+"_pcbt_"+new_var).set(*event, m_PCBTs.at(var).get(*bjets->at(i), sys), sys);
         }
+	m_Ibranches.at(prefix+"_nmuons").set(*event, cacc_NMu(*bjets->at(i)), sys);
+	m_Fbranches.at(prefix+"_uncorrPt").set(*event, cacc_UncorrPt(*bjets->at(i)), sys);
+	m_Fbranches.at(prefix+"_muonCorrPt").set(*event, cacc_MuonCorrPt(*bjets->at(i)), sys);
       }
 
       if (bjets->size()>=2) {

@@ -30,7 +30,8 @@ small_R_jet:
   btag_extra_wps:
     - GN2v01_FixedCutBEff_77
   
-  variables_int_bjets: ["truthLabel"]
+  variables_int_bjets: ["truthLabel", "nmuons"]
+  variables_bjets: ["uncorrPt", "muonCorrPt"]
 
 Electron:
   ID: "MediumLH"
@@ -80,6 +81,8 @@ Categories :
       - IS_mm
       - IS_em
       - Pass_ll
+      - pass_ZHF_CR1
+      - pass_ZHF_CR2
 
 # Include the TTree configuration and update details
 ttree_output:
