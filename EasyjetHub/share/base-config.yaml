@@ -24,7 +24,6 @@ do_bbyy_analysis: false
 # Toggles for reconstructed objects decorations
 small_R_jet:
   min_pT: 20000
-  max_eta: 4.5
   max_eta: 100
   # nominal btagging working point, used for b-jet pT calibration in particular
   btag_wp: ""
