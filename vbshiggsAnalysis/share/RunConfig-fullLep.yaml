@@ -10,8 +10,8 @@ do_met : true
 
 
 Electron:
-  ID: "LooseBLayerLH"
-  Iso: "Loose_VarRad"
+  ID: "TightLH"
+  Iso: "NonIso"
   amount: 2
   extra_wps:
     - ["MediumLH", "Loose_VarRad"]
@@ -24,8 +24,8 @@ Electron:
     - ["TightLH", "TightTrackOnly_VarRad"]
     - ["TightLH", "TightTrackOnly_FixedRad"]
 Muon:
-  ID: "Loose"
-  Iso: "PflowLoose_VarRad"
+  ID: "Tight"
+  Iso: "NonIso"
   amount: 2
   extra_wps:
     - ["Medium", "PflowLoose_VarRad"]
@@ -44,11 +44,13 @@ trigger:
   include: vbshiggsAnalysis/trigger-lep.yaml
 
 CutList :
-      - PASS_TRIGGER
+      - AT_LEAST_TWO_LEPTONS
       - EXACTLY_TWO_LEPTONS
+      - PASS_TRIGGER 
       - TWO_SS_CHARGE_LEPTONS
       - TWO_OS_CHARGE_LEPTONS
       - PASS_MET
+      - AT_LEAST_ONE_B_JET
       - EXACTLY_TWO_B_JETS
       - PASS_DELTA_R_BB
       - PASS_mBB

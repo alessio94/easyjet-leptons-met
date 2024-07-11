@@ -158,7 +158,8 @@ namespace VBSHIGGS{
       vbsjetsSelection(vbsjets);
       m_passallcuts.set(*event, true, sys);
 
-      
+      bool pass_baseline = m_bools.at(VBSHIGGS::PASS_TRIGGER) && m_bools.at(VBSHIGGS::AT_LEAST_TWO_LEPTONS) && m_bools.at(VBSHIGGS::AT_LEAST_ONE_B_JET );
+
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()==""){
       
@@ -197,6 +198,7 @@ namespace VBSHIGGS{
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
+      if (!m_bypass && !pass_baseline) continue;
       filter.setPassed(true);
     }
     return StatusCode::SUCCESS;
@@ -268,6 +270,8 @@ namespace VBSHIGGS{
       else
         m_bools.at(VBSHIGGS::TWO_OS_CHARGE_LEPTONS) = true;
     }
+    if (n_leptons >= 2)
+      m_bools.at(VBSHIGGS::AT_LEAST_TWO_LEPTONS) = true;
 
     if (n_leptons == 2)
       m_bools.at(VBSHIGGS::EXACTLY_TWO_LEPTONS) = true;
@@ -280,8 +284,8 @@ namespace VBSHIGGS{
     if (bjets.size()<2) return;
 
     // require exactly 2 bjets in the event
-    if (bjets.size()==2) m_bools.at(VBSHIGGS::EXACTLY_TWO_B_JETS)= true;
-
+    if (bjets.size()==2) m_bools.at(VBSHIGGS::EXACTLY_TWO_B_JETS ) = true;
+    if (bjets.size()>=1) m_bools.at(VBSHIGGS::AT_LEAST_ONE_B_JET ) = true;
     const xAOD::Jet * lead_bjet = bjets.at(0);
     const xAOD::Jet * sublead_bjet = bjets.at(1);
     
