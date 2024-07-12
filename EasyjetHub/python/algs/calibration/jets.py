@@ -108,6 +108,8 @@ def jet_sequence(
                     'xAODBTaggingEfficiency/13TeV/'
                     '2023-02_MC20_CDI_GN2v01-noSF_bugFix.root'
                 ) # noqa
+                # Until AFT-748 is solved
+                configSeq.setOptionValue('.noEffSF', True)
 
         if jet_flags.runBJetPtCalib:
             # Pick a reasonable b-tag selection?
@@ -126,6 +128,10 @@ def jet_sequence(
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
+
+            # Until AFT-748 is solved
+            if "GN2v01" in tagger:
+                continue
 
             # Note: this is going to run post overlap removal
             configSeq += config.makeConfig(

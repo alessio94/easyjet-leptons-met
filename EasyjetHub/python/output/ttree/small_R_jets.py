@@ -55,6 +55,9 @@ def get_small_R_jet_branches(
                 # always add btag truth label if btag is used, when running on MC
                 small_R_jet_branches.variables += ["HadronConeExclTruthLabelID"]
                 for btag_wp in btag_wps:
+                    # Until AFT-748 is solved
+                    if "GN2v01" in btag_wp:
+                        continue
                     small_R_jet_branches.variables += [
                         f"ftag_effSF_{btag_wp}_%SYS%"
                     ]

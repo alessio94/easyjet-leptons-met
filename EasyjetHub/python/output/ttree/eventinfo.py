@@ -70,6 +70,9 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
 
         for wp in btag_wps:
+            # Until AFT-748 is solved
+            if "GN2v01" in wp:
+                continue
             eventinfo_branches.variables += [f"ftag_effSF_{wp}_%SYS%"]
 
         # jvt is effSF is now centrally calculated by CP tools
