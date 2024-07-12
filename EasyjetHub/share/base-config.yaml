@@ -70,7 +70,7 @@ Electron:
   trackSelection: true
   maxD0Significance: 5.
   maxDeltaZ0SinTheta: 0.5
-  chargeIDSelection: false
+  chargeIDSelectionRun2: false
   ID: ""
   Iso: ""
   amount: 0

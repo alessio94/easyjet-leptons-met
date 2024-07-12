@@ -8,13 +8,12 @@ Electron:
   trackSelection: true
   maxD0Significance: 5
   maxDeltaZ0SinTheta: 0.5
-  chargeIDSelection: true
   ID: "TightLH"
   Iso: "Loose_VarRad" # previously Gradient
   min_pT_ssWW: 27000
   max_eta_ssWW: 2.47
   crackVeto: true
-  chargeIDSelection: false
+  chargeIDSelectionRun2: false
 
 Muon:
   trackSelection: true

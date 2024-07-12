@@ -1,6 +1,7 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
+from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
@@ -36,7 +37,7 @@ def electron_sequence(flags, configAcc):
     for id, iso in wps:
         configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
                                 selectionName=id + '_' + iso)
-        configSeq.setOptionValue('.likelihoodWP', id)
+        configSeq.setOptionValue('.identificationWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
         configSeq.setOptionValue('.recomputeLikelihood', False)
         configSeq.setOptionValue('.forceFullSimConfig',
@@ -49,8 +50,9 @@ def electron_sequence(flags, configAcc):
                                  flags.Analysis.Electron.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',
                                  flags.Analysis.Electron.maxDeltaZ0SinTheta)
-        configSeq.setOptionValue('.chargeIDSelection',
-                                 flags.Analysis.Electron.chargeIDSelection)
+        configSeq.setOptionValue('.chargeIDSelectionRun2',
+                                 flags.Analysis.Electron.chargeIDSelectionRun2
+                                 and flags.GeoModel.Run == LHCPeriod.Run2)
 
     # Electron trigger SF
     trigSF_flags = flags.Analysis.trigger.scale_factor
