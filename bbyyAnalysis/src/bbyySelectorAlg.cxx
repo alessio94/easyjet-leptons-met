@@ -182,6 +182,13 @@ namespace HHBBYY
       int n_TightID_NonIso_photons = 0;
       int n_LooseID_Iso_photons = 0;
 
+      // Ensure a decoration is added for each photon in the collection
+      // This is to ensure all photons are accessible during baseline variables 
+      // definitions, not just the first two.
+      for (const xAOD::Photon* photon : *photons){
+        m_selected_ph.set(*photon, false, sys);
+      }
+
       for (const xAOD::Photon* photon : sel_photons){
         if(!photon) break;
         bool passPhotonWP = m_photonWPDecorHandle.get(*photon, sys);
