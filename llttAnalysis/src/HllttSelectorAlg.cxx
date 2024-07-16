@@ -29,7 +29,6 @@ namespace HLLTT
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_mrmtauHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
@@ -54,17 +53,6 @@ namespace HLLTT
     m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
 
-    if(m_tauWPName.value().find("Loose")!=std::string::npos)
-      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
-    else if(m_tauWPName.value().find("Medium")!=std::string::npos)
-      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
-    else if(m_tauWPName.value().find("Tight")!=std::string::npos)
-      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigTight;
-    else{
-      ATH_MSG_ERROR("Unknown Tau ID WP ");
-      return StatusCode::FAILURE;
-    }
-
     ATH_CHECK(m_tauWPDecorHandle.initialize(m_systematicsList, m_tauHandle));
     ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
@@ -72,7 +60,6 @@ namespace HLLTT
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK(m_selected_tau.initialize(m_systematicsList, m_tauHandle));
-    ATH_CHECK(m_selected_mrmtau.initialize(m_systematicsList, m_mrmtauHandle));
 
     // make trigger decorators
     for (auto trig : m_triggers){
@@ -121,9 +108,6 @@ namespace HLLTT
 
       const xAOD::TauJetContainer *taus = nullptr;
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
-
-      const xAOD::TauJetContainer *mrmtaus = nullptr;
-      ANA_CHECK (m_mrmtauHandle.retrieve (mrmtaus, sys));
 
       applyTriggerSelection(event, sys);
       m_Bbranches.at("pass_trigger_SLT").set(*event, trigPassed_SLT, sys);
@@ -197,37 +181,9 @@ namespace HLLTT
 	N_LEPTONS_CUT_HADHAD = true;
 
       //************
-      // taujet (default)
-      //************
-      // mrmtaus
-      static const SG::AuxElement::ConstAccessor<ElementLink<xAOD::TauJetContainer>> originalTauJet("originalTauJet");
-      int n_mrmtaus(0);
-      long unsigned int  mrmlink[4];
-      for(const xAOD::TauJet* mrmtau : *mrmtaus) {
-	m_selected_mrmtau.set(*mrmtau, false, sys); 
-        bool passTauWP=mrmtau->isTau(m_tauIDWP);
-	if(passTauWP && mrmtau->pt() > 20. * Athena::Units::GeV){
-	  if (std::abs(mrmtau->eta()) < 2.5) {
-	    m_selected_mrmtau.set(*mrmtau, true, sys);
-	    auto link_to_ori_tau = originalTauJet(*mrmtau);
-	    if (link_to_ori_tau.isValid()) {
-	      for(const xAOD::TauJet* tau : *taus) {
-		if((*link_to_ori_tau)==tau){
-		  if(n_mrmtaus<4){
-		    mrmlink[n_mrmtaus] = tau->index();
-		    ++n_mrmtaus;
-		  }
-		  break;
-		}
-	      }
-	    }
-	  }
-	}
-      }      
-      //************
       // taujet
       //************
-      int n_taus = n_mrmtaus;
+      int n_taus = 0;
       for (const xAOD::TauJet *tau : *taus)
       {
         bool passTauWP = m_tauWPDecorHandle.get(*tau, sys);
@@ -235,17 +191,8 @@ namespace HLLTT
         if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)
         {
           if (std::abs(tau->eta()) < 2.5) {
-	    bool lkeep = true;
-	    for(int i = 0; i<n_mrmtaus; ++i){
-	      if(mrmlink[i]==(tau->index())){
-		lkeep=false;
-		break;
-	      }
-	    }
-	    if(lkeep){
-	      m_selected_tau.set(*tau, true, sys);
-	      n_taus += 1;
-	    }
+	    m_selected_tau.set(*tau, true, sys);
+	    n_taus += 1;
           }
         }
       }

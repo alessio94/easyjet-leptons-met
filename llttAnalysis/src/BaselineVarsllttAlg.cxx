@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -24,7 +24,6 @@ namespace HLLTT
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_mrmtauHandle.initialize(m_systematicsList));
     
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
@@ -56,7 +55,6 @@ namespace HLLTT
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
-    ATH_CHECK (m_selected_mrmtau.initialize(m_systematicsList, m_mrmtauHandle));
 
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
@@ -103,9 +101,6 @@ namespace HLLTT
 
       const xAOD::TauJetContainer *taus = nullptr;
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
-
-      const xAOD::TauJetContainer *mrmtaus = nullptr;
-      ANA_CHECK (m_mrmtauHandle.retrieve (mrmtaus, sys));
 
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
@@ -161,21 +156,11 @@ namespace HLLTT
       }
 
       // selecting taus
-      int n_mrmtaus = 0;
       int n_taus = 0;
       float lead_tau_sf(1.);
       float sublead_tau_sf(1.);
       const xAOD::TauJet* tau0 = nullptr;
       const xAOD::TauJet* tau1 = nullptr;
-
-      for(const xAOD::TauJet* mrmtau : *mrmtaus) {
-        if (m_selected_mrmtau.get(*mrmtau, sys)){
-          ++n_mrmtaus;
-	  if(!tau0) tau0 = mrmtau;
-	  else if(!tau1) tau1 = mrmtau;
-	}
-      }
-      n_taus = n_mrmtaus;
       
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){

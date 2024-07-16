@@ -46,6 +46,7 @@ Muon:
 
 Tau:
   ID: "Loose"
+  addMuonRM: true
   amount: 2
   variables: ["RNN"]
   variables_int: ["pdgid", "truthType", "EleRNN_WP"]

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Carl Gwilliam
@@ -23,7 +23,6 @@ namespace HLLTT
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_mrmtauHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
@@ -36,7 +35,6 @@ namespace HLLTT
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
-    ATH_CHECK (m_selected_mrmtau.initialize(m_systematicsList, m_mrmtauHandle));
 
     // Intialise syst-aware output decorators
     ATH_CHECK(m_mmc_status.initialize(m_systematicsList, m_eventHandle));
@@ -98,9 +96,6 @@ namespace HLLTT
       const xAOD::TauJetContainer *taus = nullptr;
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
 
-      const xAOD::TauJetContainer *mrmtaus = nullptr;
-      ANA_CHECK (m_mrmtauHandle.retrieve (mrmtaus, sys));
-
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
       const xAOD::MissingET* met = (*metCont)["Final"];
@@ -132,7 +127,6 @@ namespace HLLTT
       float drminx(99.);
       int types(0); //iatau1+10*iatau2 +100*isr
       int n_taus(0);
-      int n_mrmtaus(0);
       //
       int nlep(0);
 
@@ -155,13 +149,6 @@ namespace HLLTT
 	  }
 	}
       }
-
-      for(const xAOD::TauJet* mrmtau : *mrmtaus) {
-        if (m_selected_mrmtau.get(*mrmtau, sys)){
-          ++n_mrmtaus;
-        }
-      }
-      n_taus = n_mrmtaus;
       
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
@@ -300,14 +287,6 @@ namespace HLLTT
 	    }
 	  }
 	}
-	for(const xAOD::TauJet* mrmtau : *mrmtaus) {
-          if (m_selected_mrmtau.get(*mrmtau, sys)){
-            if(!part2) {
-              part2 = mrmtau;
-              break;
-            }
-          }
-        }
 	for(const xAOD::TauJet* tau : *taus) {
 	  if (m_selected_tau.get(*tau, sys)){
 	    if(!part2) {
@@ -318,15 +297,6 @@ namespace HLLTT
 	}
       }
       else if(isr==3){
-	for(const xAOD::TauJet* mrmtau : *mrmtaus) {
-          if (m_selected_mrmtau.get(*mrmtau, sys)){
-            if(!part1) part1 = mrmtau;
-            else{
-              part2 = mrmtau;
-              break;
-            }
-          }
-        }
 	for(const xAOD::TauJet* tau : *taus) {
 	  if (m_selected_tau.get(*tau, sys)){
 	    if(!part1) part1 = tau;

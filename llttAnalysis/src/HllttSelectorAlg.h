@@ -86,9 +86,6 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_tauHandle{ this, "taus", "llttAnalysisTaus_%SYS%", "Tau container to read" };
 
-    CP::SysReadHandle<xAOD::TauJetContainer>
-    m_mrmtauHandle{ this, "mrmtaus", "TauJets_MuonRM",   "Tau container to read" };
-
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
@@ -98,7 +95,6 @@ private:
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
     CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
-    xAOD::TauJetParameters::IsTauFlag m_tauIDWP;
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
@@ -127,7 +123,6 @@ private:
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
-    CP::SysWriteDecorHandle<bool> m_selected_mrmtau {"selected_mrmtau_%SYS%", this};
 
     /// \brief Setup sys-aware output decorations
     CP::SysFilterReporterParams m_filterParams {this, "Hlltt selection"};

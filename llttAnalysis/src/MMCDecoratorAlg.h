@@ -60,10 +60,6 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_tauHandle{ this, "taus", "llttAnalysisTaus_%SYS%", "Tau container to read" };
 
-    CP::SysReadHandle<xAOD::TauJetContainer>
-    m_mrmtauHandle{ this, "mrmtaus", "TauJets_MuonRM",   "Tau container to read" };
-
-
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
@@ -77,8 +73,6 @@ private:
     CP::SysReadDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
-    CP::SysReadDecorHandle<bool> m_selected_mrmtau {"selected_mrmtau_%SYS%", this};
-
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int> m_mmc_status {"mmc_status_%SYS%", this};
