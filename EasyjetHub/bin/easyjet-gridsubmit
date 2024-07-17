@@ -75,7 +75,11 @@ def main():
         action="store_true",
         help="Skip git tag creation",
     )
-
+    parser.add_argument(
+        "--noEmail",
+        action="store_true",
+        help="Don't send panda emails",
+    )
     args = parser.parse_args()
 
     # check ntupler command is available before submitting
@@ -119,6 +123,8 @@ def main():
         submit_opts["nFiles"] = args.nFiles
     if args.mergeOutput:
         submit_opts["mergeOutput"] = True
+    if args.noEmail:
+        submit_opts["noEmail"] = True
 
     if args.asetup is None:
         atlas_project = os.environ["AtlasProject"]
@@ -166,7 +172,7 @@ def main():
         ds_list = fp.readlines()
     for ds in ds_list:
         ds = ds.strip()
-        if ds.startswith("*"):
+        if ds.startswith("*") or ds.startswith("#"):
             continue
         if not ds:
             continue
