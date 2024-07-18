@@ -63,6 +63,8 @@ declare -A DATAFILES=(
     [ssWW-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [ZCharm-mc20]=${PHYS_TTBAR_MC20}
     [ZCharm-mc20-lite]=${PHYSLITE_TTBAR_MC20}
+    [hhml-mc20]=${PHYS_TTBAR_MC20}
+    [hhml-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     # MC20 AF3
     [mc20af3-lite]=${PHYSLITE_SH4B_BOOSTED_MC20_AF3}
     [fast-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
@@ -119,6 +121,8 @@ declare -A TESTS=(
     [ssWW-mc20-lite]="simple ssWW-ntupler"
     [ZCharm-mc20]="simple ZCharm-ntupler"
     [ZCharm-mc20-lite]="simple ZCharm-ntupler"
+    [hhml-mc20]="simple hhml-ntupler"
+    [hhml-mc20-lite]="simple hhml-ntupler"
     # MC20 AF3
     [mc20af3-lite]="simple easyjet-ntupler"
     [fast-mc20af3]="fast easyjet-ntupler"
@@ -173,6 +177,8 @@ declare -A CONFIGS=(
     [ssWW-mc20-lite]=ssWWAnalysis/RunConfig-Signal-ssWW.yaml
     [ZCharm-mc20]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
     [ZCharm-mc20-lite]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
+    [hhml-mc20]=multileptonAnalysis/RunConfig-multilepton-bypass.yaml
+    [hhml-mc20-lite]=multileptonAnalysis/RunConfig-multilepton-bypass.yaml
     # MC20 AF3
     [fast-mc20af3]=EasyjetHub/RunConfig-noEle.yaml
     [fast-mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE-noEle.yaml

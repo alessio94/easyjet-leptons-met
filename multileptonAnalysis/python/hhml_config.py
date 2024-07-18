@@ -1,0 +1,132 @@
+from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
+from AthenaConfiguration.ComponentFactory import CompFactory
+import AthenaCommon.SystemOfUnits as Units
+
+from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
+from EasyjetHub.output.ttree.selected_objects import (
+    get_selected_objects_branches_variables,
+)
+
+
+def hhml_cfg(
+        flags, smalljetkey, muonkey, electronkey,
+        float_variables=None, int_variables=None
+):
+    if not float_variables:
+        float_variables = []
+    if not int_variables:
+        int_variables = []
+
+    cfg = ComponentAccumulator()
+
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    cfg.merge(MuonSelectorAlgCfg(
+        flags,
+        containerInKey=muonkey,
+        containerOutKey="hhmlAnalysisMuons_%SYS%",
+        looseMuonWP=MuonWPLabel,
+        minPt=9 * Units.GeV
+    ))
+
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    cfg.merge(ElectronSelectorAlgCfg(
+        flags,
+        containerInKey=electronkey,
+        containerOutKey="hhmlAnalysisElectrons_%SYS%",
+        looseEleWP=ElectronWPLabel,
+        minPt=9 * Units.GeV
+    ))
+
+    cfg.merge(JetSelectorAlgCfg(
+        flags,
+        containerInKey=smalljetkey,
+        containerOutKey="hhmlAnalysisJets_%SYS%",
+        bTagWPDecorName="",
+        selectBjet=False,
+        minPt=20 * Units.GeV,
+        minimumAmount=2
+    ))  # -1 means ignores this
+
+    # Selection
+    cfg.addEventAlgo(
+        CompFactory.MULTILEPTON.MultileptonSelectorAlg(
+            "HHMLSelectorAlg",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            eventDecisionOutputDecoration="hhml_pass_sr_%SYS%",
+            isMC=flags.Input.isMC,
+            bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
+                    else False),
+        )
+    )
+
+    # calculate final hhml vars
+    cfg.addEventAlgo(
+        CompFactory.MULTILEPTON.BaselineVarsMultileptonAlg(
+            "FinalVarshhmlAlg",
+            isMC=flags.Input.isMC,
+            muonWP=MuonWPLabel,
+            eleWP=ElectronWPLabel,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            floatVariableList=float_variables,
+            intVariableList=int_variables
+        )
+    )
+
+    return cfg
+
+
+def get_BaselineVarshhmlAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets"]
+
+    return float_variable_names, int_variable_names
+
+
+def hhml_branches(flags):
+    branches = []
+
+    # this will be all the variables that are calculated by the
+    # BaselineVarshhmlAlg algorithm
+    all_baseline_variable_names = []
+    float_variable_names = []
+    int_variable_names = []
+
+    # these are the variables that will always be stored by easyjet specific to HHbbtt
+    # further below there are more high level variables which can be
+    # stored using the flag
+    # flags.Analysis.store_high_level_variables
+    baseline_float_variables, baseline_int_variables \
+        = get_BaselineVarshhmlAlg_variables(flags)
+    float_variable_names += baseline_float_variables
+    int_variable_names += baseline_int_variables
+
+    all_baseline_variable_names += [
+        *float_variable_names,
+        *int_variable_names,
+    ]
+
+    for var in all_baseline_variable_names:
+        branches += [
+            f"EventInfo.{var}_%SYS% -> hhml_{var}"
+            + flags.Analysis.systematics_suffix_separator + "%SYS%"
+        ]
+
+    # These are the variables always saved with the objects selected by the analysis
+    # This is tunable with the flags amount and variables
+    # in the object configs.
+    object_level_branches, object_level_float_variables, object_level_int_variables \
+        = get_selected_objects_branches_variables(flags, "hhml")
+    float_variable_names += object_level_float_variables
+    int_variable_names += object_level_int_variables
+
+    branches += object_level_branches
+
+    branches += [
+        "EventInfo.hhml_pass_sr_%SYS% -> hhml_pass_SR"
+        + flags.Analysis.systematics_suffix_separator + "%SYS%"
+    ]
+
+    return branches, float_variable_names, int_variable_names
