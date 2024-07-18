@@ -12,10 +12,12 @@ StatusCode TotalWeightsTool::initialize(){
   std::unordered_map<std::string, VarType> inVars;
 
   m_SF_names = {
-    "ftag_effSF_"+m_bTagWP+"_NOSYS",
     "jvt_effSF_NOSYS",
     "PileupWeight_NOSYS"
   };
+// Temporary fix for the disabling of GN2V01 SF
+  if (m_bTagWP.value().find("GN2v01") == std::string::npos)
+    m_SF_names.insert(m_SF_names.begin(),"ftag_effSF_"+m_bTagWP+"_NOSYS");
 
   const std::vector<std::pair<std::string, int>> objects = {
     {"Lepton", m_nLepton},
