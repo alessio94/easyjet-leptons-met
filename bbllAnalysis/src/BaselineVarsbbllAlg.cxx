@@ -17,7 +17,7 @@ namespace HHBBLL
   {
 
   }
-
+    
   StatusCode BaselineVarsbbllAlg::initialize()
   {
     // Read syst-aware input handles
@@ -224,6 +224,21 @@ namespace HHBBLL
         int charge = leptons[i].second>0 ? -1 : 1;
         m_Ibranches.at(prefix+"_charge").set(*event, charge, sys);
         m_Ibranches.at(prefix+"_pdgid").set(*event, leptons[i].second, sys);
+          
+        // leptons truth information
+          if (m_isMC){
+            auto [lep_truthOrigin, lep_truthType] = truthOrigin(leptons[i].first);
+            m_Ibranches.at(prefix + "_truthOrigin").set(*event, lep_truthOrigin, sys);
+            m_Ibranches.at(prefix + "_truthType").set(*event, lep_truthType, sys);
+            int lep_isPrompt = 0;
+            if (std::abs(leptons[i].second)==13){ // simplistic
+              if (lep_truthType==6) lep_isPrompt=1; // isolated prompts
+            } else if (std::abs(leptons[i].second)==11){
+              if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
+            }
+            m_Ibranches.at(prefix + "_isPrompt").set(*event, lep_isPrompt, sys);
+          }
+        
       }
 
       if(leptons.size()>=2){
@@ -363,6 +378,15 @@ namespace HHBBLL
 
     return StatusCode::SUCCESS;
   }
+    
+  template<typename ParticleType>
+    std::pair<int, int> BaselineVarsbbllAlg::truthOrigin(const ParticleType* particle) {
+      static const SG::AuxElement::ConstAccessor<int> lepttruthOrigin("truthOrigin");
+      static const SG::AuxElement::ConstAccessor<int> lepttruthType("truthType");
+    
+      return {lepttruthOrigin(*particle), lepttruthType(*particle)};
+  }
+
 
 }
 

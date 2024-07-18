@@ -40,6 +40,8 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
     
+    template<typename ParticleType>
+            std::pair<int, int> truthOrigin(const ParticleType* particle);
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 

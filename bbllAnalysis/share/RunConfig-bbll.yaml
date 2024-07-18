@@ -45,6 +45,7 @@ Muon:
 
 Lepton:
   amount: 2
+  variables_int: ["isPrompt","truthOrigin", "truthType"]
 
 # orthogonality studies  
 orthogonality:
