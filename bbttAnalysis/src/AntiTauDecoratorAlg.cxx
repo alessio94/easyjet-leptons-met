@@ -32,15 +32,35 @@ namespace HHBBTT
     ATH_CHECK(m_tauHandle.initialize(m_systematicsList));
     ATH_CHECK(m_tauBaselineSelection.initialize(m_systematicsList, m_tauHandle));
 
-    if(m_tauIDWP_name.value().find("Loose")!=std::string::npos)
-      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
-    else if(m_tauIDWP_name.value().find("Medium")!=std::string::npos)
-      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
-    else if(m_tauIDWP_name.value().find("Tight")!=std::string::npos)
-      m_tauIDWP = xAOD::TauJetParameters::JetRNNSigTight;
-    else{
-      ATH_MSG_ERROR("Unknown Tau ID WP ");
-      return StatusCode::FAILURE;
+    if(m_tauIDWP_name.value().find("GNTau")!=std::string::npos){
+
+      m_useGNTau = true;
+      ATH_CHECK(m_GNTau_score.initialize(m_systematicsList, m_tauHandle));
+
+      if(m_tauIDWP_name.value().find("GNTauLoose")!=std::string::npos)
+	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauL_v0", this};
+      else if(m_tauIDWP_name.value().find("GNTauMedium")!=std::string::npos)
+	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauM_v0", this};
+      else if(m_tauIDWP_name.value().find("GNTauTight")!=std::string::npos)
+	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauT_v0", this};
+      else{
+	ATH_MSG_ERROR("Unknown Tau ID WP ");
+	return StatusCode::FAILURE;
+      }
+      ATH_CHECK(m_GNTau_sel.initialize(m_systematicsList, m_tauHandle));
+
+    } else {
+
+      if(m_tauIDWP_name.value().find("RNNLoose")!=std::string::npos)
+	m_tauRNNWP = xAOD::TauJetParameters::JetRNNSigLoose;
+      else if(m_tauIDWP_name.value().find("RNNMedium")!=std::string::npos)
+	m_tauRNNWP = xAOD::TauJetParameters::JetRNNSigMedium;
+      else if(m_tauIDWP_name.value().find("RNNTight")!=std::string::npos)
+	m_tauRNNWP = xAOD::TauJetParameters::JetRNNSigTight;
+      else{
+	ATH_MSG_ERROR("Unknown Tau ID WP ");
+	return StatusCode::FAILURE;
+      }
     }
 
     ATH_CHECK(m_triggerMatchSTT.initialize(m_systematicsList, m_tauHandle));
@@ -94,7 +114,8 @@ namespace HHBBTT
 
       for(const xAOD::TauJet* tau : *taus) {
         if(!m_tauBaselineSelection.getBool(*tau, sys)) continue;
-        bool isTauID = tau->isTau(m_tauIDWP);
+        bool isTauID = m_useGNTau ? bool(m_GNTau_sel.get(*tau, sys)) :
+	  tau->isTau(m_tauRNNWP);
         if(m_triggerMatchSTT.get(*tau, sys)){
           if(isTauID) nIDMatchedTauSTT++;
           passTauPtSTTThreshold |=
@@ -136,11 +157,13 @@ namespace HHBBTT
         int antiTauCategory = 0;
 
         if(m_tauBaselineSelection.getBool(*tau, sys)){
-	  isTauID = tau->isTau(m_tauIDWP);
-          float RNNScore = tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
+          isTauID = m_useGNTau ? bool(m_GNTau_sel.get(*tau, sys)) :
+            tau->isTau(m_tauRNNWP);
+          float score = m_useGNTau ? m_GNTau_score.get(*tau, sys) :
+            tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
           int decayMode = -1;
           tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
-          isAntiTau = (!isTauID && RNNScore>m_antiTauRNNThreshold &&
+          isAntiTau = (!isTauID && score>m_antiTauScoreThreshold &&
 		       decayMode!=xAOD::TauJetParameters::Mode_NotSet);
     
           // for SLT and DBT no anti-tau trigger matching is required

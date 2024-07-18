@@ -68,11 +68,14 @@ namespace HHBBTT
 
     Gaudi::Property<std::string> m_tauIDWP_name
       { this, "tauIDWP", "", "Name of the Tau ID WP" };
-    xAOD::TauJetParameters::IsTauFlag m_tauIDWP;
+    xAOD::TauJetParameters::IsTauFlag m_tauRNNWP;
+    bool m_useGNTau = false;
+    CP::SysReadDecorHandle<char> m_GNTau_sel{"", this};
+    CP::SysReadDecorHandle<float> m_GNTau_score{"GNTauScoreSigTrans_v0", this};
 
-    Gaudi::Property<double> m_antiTauRNNThreshold
-      { this, "antiTauRNNThreshold", 0.01,
-	"Lower threshold of RNN score for Anti-Id taus" };
+    Gaudi::Property<double> m_antiTauScoreThreshold
+      { this, "antiTauScoreThreshold", 0.01,
+	"Lower threshold of RNN/GNTau score for Anti-Id taus" };
 
     CP::SysReadDecorHandle<bool> m_triggerMatchSTT{"trigMatch_STT", this};
     CP::SysReadDecorHandle<bool> m_triggerMatchLTT{"trigMatch_LTT", this};

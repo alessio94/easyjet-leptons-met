@@ -41,7 +41,9 @@ def tau_sequence(flags, configAcc):
                                 selectionName=id)
         if "noeleid" in id:
             configSeq.setOptionValue('.use_eVeto', False)
-        quality = id.replace("_noeleid", "")
+        if "GNTau" in id:
+            configSeq.setOptionValue('.useGNTau', True)
+        quality = id.replace("_noeleid", "").replace("GNTau", "").replace("RNN", "")
         configSeq.setOptionValue('.quality', quality)
 
     # Anti-tau selections

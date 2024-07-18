@@ -32,7 +32,7 @@ collection_options:
     btag_details: true
 
   taus:
-    RNN_branches: false
+    score_branches: false
     truth_branches: false
     run_selection: false
 

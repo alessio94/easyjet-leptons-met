@@ -48,7 +48,7 @@ Muon:
     - ["Medium", "PflowLoose_VarRad"]
 
 Tau:
-  ID: "Loose"
+  ID: "RNNLoose"
   amount: 2
   variables: ["RNN"]
   variables_int: ["isTauID", "isAntiTau", "truthType", "EleRNN_WP", "tauTruthJetLabel"]

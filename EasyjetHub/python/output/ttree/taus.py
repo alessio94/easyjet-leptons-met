@@ -1,4 +1,5 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
+from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 
 def get_tau_branches(flags, tree_flags, input_container, output_prefix):
@@ -28,11 +29,19 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
         for tau_id in [flags.Analysis.Tau.ID]:
             tau_branches.variables += [f"tau_effSF_{tau_id}_%SYS%"]
 
-    if tree_flags.collection_options.taus.RNN_branches:
+    if tree_flags.collection_options.taus.score_branches:
         tau_branches.variables += [
             "RNNJetScoreSigTrans",
             "RNNEleScoreSigTrans"
         ]
+
+        split_tags = flags.Input.AMITag.split("_")
+        gntau_valid_ptag = (
+            get_valid_ami_tag(split_tags, "p", "p6266") and not flags.Input.isPHYSLITE)
+        if gntau_valid_ptag:
+            tau_branches.variables += [
+                "GNTauScoreSigTrans_v0"
+            ]
 
     if flags.Input.isMC and tree_flags.collection_options.taus.truth_branches:
         tau_branches.variables += [
