@@ -178,8 +178,8 @@ namespace HHBBLL
         double mWpos = random.Gaus(80.379, 2.085);
         double mWneg = random.Gaus(80.379, 2.085);
 
-        double met_ex = met->mpx()/1000.;
-        double met_ey = met->mpy()/1000.;
+        double met_ex = met->mpx() / Athena::Units::GeV;
+        double met_ey = met->mpy() / Athena::Units::GeV;
         
         ATH_CHECK(m_reco_pairings[0]->Reconstruct(lepton_pos, lepton_neg, b, bbar, met_ex, met_ey, mtop, mtbar, mWpos, mWneg));
         ATH_CHECK(m_reco_pairings[1]->Reconstruct(lepton_pos, lepton_neg, bbar, b, met_ex, met_ey, mtop, mtbar, mWpos, mWneg));

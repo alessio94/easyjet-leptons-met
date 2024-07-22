@@ -3,6 +3,8 @@
 */
 
 #include "bbyySelectorAlg.h"
+#include <AthenaKernel/Units.h>
+
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
 
@@ -419,7 +421,7 @@ namespace HHBBYY
 
     if (ptOverMasses[0] > 0.35 && ptOverMasses[1] > 0.25 && bbyyCuts.exists("PASS_RELPT"))
       bbyyCuts("PASS_RELPT").passed = true;
-    if (myy >= 105000. && myy < 160000. && bbyyCuts.exists("DIPHOTON_MASS"))
+    if (myy >= 105. * Athena::Units::GeV && myy < 160. * Athena::Units::GeV && bbyyCuts.exists("DIPHOTON_MASS"))
       bbyyCuts("DIPHOTON_MASS").passed = true;
   }
 

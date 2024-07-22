@@ -5,6 +5,7 @@
 /// @author Kira Abeling
 
 #include "HHbbVVSelectorAlg.h"
+#include <AthenaKernel/Units.h>
 
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
@@ -121,7 +122,7 @@ namespace HHBBVV
       {
         bool passElectronWP = m_eleWPDecorHandle.get(*electron, sys);
         m_selected_el.set(*electron, false, sys);
-        if (passElectronWP && electron->pt() > 18000)
+        if (passElectronWP && electron->pt() > 18. * Athena::Units::GeV)
         {
           m_selected_el.set(*electron, true, sys);
           n_leptons += 1;
@@ -134,7 +135,7 @@ namespace HHBBVV
       {
         bool passMuonWP = m_muonWPDecorHandle.get(*muon, sys);
         m_selected_mu.set(*muon, false, sys);
-        if (passMuonWP && std::abs(muon->eta()) < 2.5 && muon->pt() > 15000)
+        if (passMuonWP && std::abs(muon->eta()) < 2.5 && muon->pt() > 15. * Athena::Units::GeV)
         {
           m_selected_mu.set(*muon, true, sys);
           n_leptons += 1;

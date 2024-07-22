@@ -14,9 +14,9 @@ do_met : true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
-  min_pT: 20000  # for the jets entering the MET computation and the overlap removal
+  min_pT: 20.e+3  # for the jets entering the MET computation and the overlap removal
   max_eta: 4.5
-  min_pT_ssWW: 20000 # for the jet selection
+  min_pT_ssWW: 20.e+3 # for the jet selection
   max_eta_ssWW: 4.5
   # btagging working points 
   btag_wp: "GN2v01_FixedCutBEff_85"
@@ -35,9 +35,9 @@ Electron:
   maxDeltaZ0SinTheta: 0.5
   ID: "LooseLH"
   Iso: None
-  min_pT: 4500
+  min_pT: 4.5e+3
   max_eta: 2.47
-  min_pT_ssWW: 4500 
+  min_pT_ssWW: 4.5e+3
   max_eta_ssWW: 2.47
 
 Muon:
@@ -46,9 +46,9 @@ Muon:
   maxDeltaZ0SinTheta: 1.5
   ID: "Loose"
   Iso: None
-  min_pT: 3000
+  min_pT: 3.e+3
   max_eta: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
-  min_pT_ssWW: 3000
+  min_pT_ssWW: 3.e+3
   max_eta_ssWW: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
 
 Lepton:

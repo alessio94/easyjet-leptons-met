@@ -23,7 +23,7 @@ do_bbyy_analysis: false
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
-  min_pT: 20000
+  min_pT: 20.e+3
   max_eta: 100
   # nominal btagging working point, used for b-jet pT calibration in particular
   btag_wp: ""
@@ -65,7 +65,7 @@ Photon:
   extra_wps: []
 
 Electron:
-  min_pT: 4500
+  min_pT: 4.5e+3
   max_eta: 2.47
   trackSelection: true
   maxD0Significance: 5.
@@ -80,7 +80,7 @@ Electron:
   extra_wps: []
 
 Muon:
-  min_pT: 3000
+  min_pT: 3.e+3
   max_eta: 2.5
   trackSelection: true
   maxD0Significance: 3

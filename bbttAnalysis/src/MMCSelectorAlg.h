@@ -6,6 +6,7 @@
 #define BBTTANALYSIS_MMCSELECTORALG
 
 #include "AnaAlgorithm/AnaAlgorithm.h"
+#include <AthenaKernel/Units.h>
 
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
@@ -38,7 +39,7 @@ namespace HHBBTT
   private:
 
    Gaudi::Property<float> m_mmc_min
-      { this, "MMC_min", 60000, "Minimal MMC value" };
+      { this, "MMC_min", 60. * Athena::Units::GeV, "Minimal MMC value" };
 
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };

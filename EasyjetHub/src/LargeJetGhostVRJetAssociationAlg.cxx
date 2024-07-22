@@ -3,6 +3,7 @@
 */
 
 #include "LargeJetGhostVRJetAssociationAlg.h"
+#include <AthenaKernel/Units.h>
 
 namespace Easyjet
 {
@@ -72,7 +73,7 @@ namespace Easyjet
               ilargeRjet_ghostVRjets.begin(), ilargeRjet_ghostVRjets.end(),
               [&](ELPC &vrjet)
               {
-                return !(vrjet.isValid() && (*vrjet)->pt() > 10000. &&
+                return !(vrjet.isValid() && (*vrjet)->pt() > 10. * Athena::Units::GeV &&
                          std::abs((*vrjet)->eta()) < 2.5);
               }),
           ilargeRjet_ghostVRjets.end());
