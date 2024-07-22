@@ -1,93 +1,36 @@
 runConfig="bbyyAnalysis/RunConfig-Resonant-Default.yaml"
 executable="bbyy-ntupler"
 campaignName="SHbbyy_vXXX"
-
+dir_PHYS="../easyjet/bbyyAnalysis/datasets/PHYS/nominal"
+dir_PHYSLITE="../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal"
+mc_compaign="mc20_13TeV"
+ptag=p5855
+mc_list=(
+    "$dir_PHYS/$mc_compaign.XHS.p6026.txt"
+    "$dir_PHYSLITE/$mc_compaign.ggFHH_bbyy_SM.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.VBFHH_bbyy_kl1kvv1kv1.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.ggFH_yy.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.VBFH_yy.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.WpH_yy.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.WmH_yy.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.qqZH_yy.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.ggZH_yy.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.ttH_yy.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.tHjb.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.tWHyy.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.yyjets.$ptag.txt"
+    "$dir_PHYSLITE/$mc_compaign.ttyy_nonallhad.$ptag.txt"
+)
 #data 
 easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13TeV.Run2.p5855.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --campaign ${campaignName}
 
-#SH signal
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/mc20_13TeV.XHS.p6026.txt \
+#mc
+easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
     --run-config ${runConfig} \
     --exec ${executable} \
+    --nGBperJob 2 \
     --campaign ${campaignName}
 
-#ggF HH(bbyy) SM
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.ggFHH_bbyy_SM.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#VBF HH(bbyy) SM
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.VBFHH_bbyy_kl1kvv1kv1.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#ggF H(yy)
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.ggFH_yy.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#VBF H(yy)
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.VBFH_yy.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#W+H(yy)
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.WpH_yy.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#W-H(yy)
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.WmH_yy.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#qqZH(yy)
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.qqZH_yy.p5855.txt\
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#ggZH(yy)
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.ggZH_yy.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#ttH(yy)
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.ttH_yy.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#yy+jets
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.yyjets.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#tHjb
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.tHjb.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#tWHyy
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.tWHyy.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}
-
-#ttyy non all had 
-easyjet-gridsubmit --mc-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/mc20_13TeV.ttyy_nonallhad.p5855.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName}

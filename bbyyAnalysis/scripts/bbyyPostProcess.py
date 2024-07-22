@@ -31,7 +31,7 @@ def RunEasyjetPlus(args):
 
     SOWTool = CompFactory.SumOfWeightsTool(inFile=args.inFile)
     if bool(args.containDalitzOrSpecialWeight):
-        SOWTool.inHisto = "SumOfWeights"
+        SOWTool.inHisto = "SumOfWeights_special"
 
     # Get XSection Path
     with open(FullPath(args.xSectionsConfig), 'r') as file:
