@@ -2,6 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
+from AthenaConfiguration.Enums import LHCPeriod
 
 from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetPtCalibrationConfig
 
@@ -53,6 +54,17 @@ def jet_sequence(
         configSeq.setOptionValue(
             ".calibToolCalibSeq",
             jet_flags.calibToolCalibSeq
+        )
+
+    # Do not recalibrate PHYSLITE samples yet due to missing variables.
+    if flags.Input.isPHYSLITE and flags.GeoModel.Run == LHCPeriod.Run3:
+        print("WARNING! Event shape variables not present in mc23 PHYSLITE.")
+        print("Jets won't be recalibrated.")
+        print("Please check the JET/Etmiss twiki for more info:")
+        print("https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/ApplyJetCalibrationR22#R_0_4_particle_flow_jet_cali_AN1")  # noqa: E501
+        configSeq.setOptionValue(
+            ".recalibratePhyslite",
+            False
         )
 
     # Set options for uncertainties tool if given

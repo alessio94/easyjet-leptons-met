@@ -32,6 +32,12 @@ def electron_sequence(flags, configAcc):
     configSeq.setOptionValue('.forceFullSimConfig',
                              flags.Analysis.Electron.forceFullSimConfig
                              and flags.Analysis.DataType is DataType.FastSim)
+    # Setting the ES Model by hand to avoid warnings.
+    if flags.GeoModel.Run is LHCPeriod.Run2:
+        ESModel = 'es2023_R22_Run2_v0'
+    elif flags.GeoModel.Run is LHCPeriod.Run3:
+        ESModel = 'es2022_R22_PRE'
+    configSeq.setOptionValue('.ESModel', ESModel)
 
     # PID configuration
     for id, iso in wps:
