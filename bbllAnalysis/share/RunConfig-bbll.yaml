@@ -22,15 +22,16 @@ NeutrinoWeighting:
 # Toggles for reconstructed objects decorations
 small_R_jet:
   # btagging working points 
-  btag_wp: "DL1dv01_FixedCutBEff_77"
+  btag_wp: "GN2v01_FixedCutBEff_85"
   amount: 2
   amount_bjet: 2
 
   # to use multiple btagging WPs
   btag_extra_wps:
-    - GN2v01_FixedCutBEff_77
+    - DL1dv01_FixedCutBEff_77
+    - GN2v01_Continuous
   
-  variables_int_bjets: ["truthLabel", "nmuons"]
+  variables_int_bjets: ["truthLabel", "nmuons", "pcbt_GN2v01"]
   variables_bjets: ["uncorrPt", "muonCorrPt"]
 
 Electron:
