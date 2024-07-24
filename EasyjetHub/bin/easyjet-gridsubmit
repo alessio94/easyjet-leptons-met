@@ -80,6 +80,11 @@ def main():
         action="store_true",
         help="Don't send panda emails",
     )
+    parser.add_argument(
+        "--HDBSProductionRole",
+        action="store_true",
+        help="Run with HDBS production role",
+    )
     args = parser.parse_args()
 
     # check ntupler command is available before submitting
@@ -183,12 +188,15 @@ def main():
             dsid = ds_name_split[1]
         else:
             dsid = f"{ds_name_split[0]}.{ds_name_split[1]}"
+        output_ds_name = ""
+        if args.HDBSProductionRole:
+            output_ds_name = "group.phys-hdbs.{0}.{1}.{2}".format(campaign, dsid, ds_tags)
+        else:
+            output_ds_name = "user.{0}.{1}.{2}.{3}".format(grid_nickname, campaign, dsid, ds_tags)
         io_list.append(
             {
                 "inDS": ds_name,
-                "outDS": "user.{0}.{1}.{2}.{3}".format(
-                    grid_nickname, campaign, dsid, ds_tags
-                ),
+                "outDS": output_ds_name,
             }
         )
 
@@ -209,6 +217,11 @@ def main():
             "--notExpandInDS",
             "--exec", exec_cmd,
         ]
+        if args.HDBSProductionRole:
+            cmd += [
+                "--voms", "atlas:/atlas/phys-hdbs/Role=production",
+                "--official",
+            ]
 
         for k, v in submit_opts.items():
             if isinstance(v, bool):
