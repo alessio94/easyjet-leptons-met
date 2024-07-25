@@ -7,7 +7,6 @@
 #include "AthContainers/AuxElement.h"
 #include "TLorentzVector.h"
 
-
 namespace VBSHIGGS{
     BaselineVarsFullLepAlg::BaselineVarsFullLepAlg(const std::string &name,
                                                 ISvcLocator *pSvcLocator)
@@ -43,6 +42,7 @@ namespace VBSHIGGS{
       if (!m_isBtag.empty()) {
         ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
       }
+      
       if (!m_PCBT.empty()) {
         ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_signaljetHandle));
       }
@@ -82,7 +82,6 @@ namespace VBSHIGGS{
     StatusCode BaselineVarsFullLepAlg::execute(){
       // Loop over all systs
       for (const auto& sys : m_systematicsList.systematicsVector()){
-
         // Retrieve inputs
         const xAOD::EventInfo *event = nullptr;
         ANA_CHECK (m_eventHandle.retrieve (event, sys));
@@ -158,7 +157,7 @@ namespace VBSHIGGS{
         m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
         m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
         m_Ibranches.at("nForwardJets").set(*event, nForwardJets, sys);
-        
+
         // selected leptons ;
         const xAOD::Electron* ele0 = nullptr;
         const xAOD::Electron* ele1 = nullptr;
@@ -244,7 +243,7 @@ namespace VBSHIGGS{
           }
           
         }
-        
+
         //MET Significance 
         float METSig = m_METSig.get(*met, sys);
         m_Fbranches.at("METSig").set(*event, METSig, sys);
@@ -252,7 +251,7 @@ namespace VBSHIGGS{
         // dilepton kinematics
         TLorentzVector ll;
         TLorentzVector Leading_lep;
-        TLorentzVector Subleading_lep;
+        TLorentzVector Subleading_lep;     
 
         if (leptons.size()>0) Leading_lep = leptons[0].first->p4();
         if (leptons.size()>1){
@@ -295,7 +294,6 @@ namespace VBSHIGGS{
           if (m_isMC) {
             m_Ibranches.at(prefix+"_truthLabel").set(*event, m_truthFlav.get(*HJets->at(i), sys), sys);
           }
-
         }
 
         TLorentzVector HDijet;

@@ -13,14 +13,6 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
 
     cfg = ComponentAccumulator()
 
-    from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
-
-    # Selection
-    trigger_branches = [
-        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
-        for c in flags.Analysis.TriggerChains
-    ]
-
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.HiggsSelectorAlg(
             "HiggsSelectorAlg",
@@ -33,8 +25,6 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
             "FullLepSelectorAlg",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="vbshiggs_pass_sr_%SYS%",
-            triggerLists=trigger_branches,
-            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_vbshiggs_cutflow,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
@@ -92,6 +82,7 @@ def get_BaselineVarsFullLepAlg_variables(flags):
 
 def fullLep_branches(flags):
     branches = []
+
     # this will be all the variables that are calculated by the
     # BaselineVarsFullLepAlg algorithm
     all_baseline_variable_names = []
@@ -128,8 +119,6 @@ def fullLep_branches(flags):
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]
 
-    # trigger variables do not need to be added to variable_names
-    # as it is written out in FullLepSelectorAlg
     for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> pass_trigger_{cat}"

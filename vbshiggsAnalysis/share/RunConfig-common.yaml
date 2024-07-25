@@ -10,7 +10,6 @@ do_small_R_jets: true
 do_large_R_UFO_jets: true
 do_VR_jets: false
 
-
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
@@ -23,6 +22,7 @@ Muon:
 
 Lepton:
   amount: 0
+
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
@@ -33,8 +33,6 @@ do_overlap_removal: true
 #Enable cutflow 
 save_vbshiggs_cutflow: true
 
-bypass: false
-
 # Toggles for reconstructed objects decorations
 small_R_jet:
   # btagging working points 
@@ -44,7 +42,7 @@ small_R_jet:
   # to use multiple btagging WPs
   btag_extra_wps:
     - GN2v01_Continuous
-
+    
 # Include the TTree configuration and update details
 ttree_output:
   - AnalysisMiniTree:

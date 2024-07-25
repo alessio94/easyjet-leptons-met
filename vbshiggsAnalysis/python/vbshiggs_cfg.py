@@ -51,6 +51,22 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
     )
+    from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
+
+    trigger_branches = [
+        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
+        for c in flags.Analysis.TriggerChains
+    ]
+
+    cfg.addEventAlgo(
+        CompFactory.VBSHIGGS.TriggerDecoratorAlg(
+            "VBSHIGGSTriggerDecoratorAlg",
+            muons="vbshiggsAnalysisMuons_%SYS%",
+            electrons="vbshiggsAnalysisElectrons_%SYS%",
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
+            triggerLists=trigger_branches,
+        )
+    )
 
     if flags.Analysis.Channel == "FullLep":
         extra_vbshiggs_branches, float_variable_names, \
