@@ -503,7 +503,7 @@ namespace ZCC
     if(ZCharmCuts.exists("OPPOSITE_CHARGE_LEPTONS")) m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS) = OPPOSITE_CHARGE_LEPTONS;
     if(ZCharmCuts.exists("DILEPTON_MASS_WINDOW")) m_bools.at(ZCC::DILEPTON_MASS_WINDOW) = ( mll >= 76.*Athena::Units::GeV && mll <= 106.*Athena::Units::GeV );
 
-    if(met->met() < 60 * Athena::Units::GeV && pTll < 150 * Athena::Units::GeV && pTll != -99){
+    if( (pTll < 150 * Athena::Units::GeV && pTll != -99 && met->met() < 60 * Athena::Units::GeV) || pTll >= 150 * Athena::Units::GeV ){
       if(ZCharmCuts.exists("MET")) m_bools.at(ZCC::MET) = true;
     }
 

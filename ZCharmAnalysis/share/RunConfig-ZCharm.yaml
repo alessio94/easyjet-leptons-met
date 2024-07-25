@@ -33,9 +33,9 @@ Electron:
   trackSelection: true
   ID: "TightLH"
   Iso: Tight_VarRad
-  min_pT: 2700
+  min_pT: 27.e+3
   max_eta: 2.47
-  min_pT_ZCharm: 2700 
+  min_pT_ZCharm: 27.e+3
   max_eta_ZCharm: 2.47
   crackVeto: true
 
@@ -43,9 +43,9 @@ Muon:
   trackSelection: true
   ID: "Medium"
   Iso: PflowTight_VarRad
-  min_pT: 2700
+  min_pT: 27.e+3
   max_eta: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
-  min_pT_ZCharm: 2700
+  min_pT_ZCharm: 27.e+3
   max_eta_ZCharm: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
 
 Lepton:
