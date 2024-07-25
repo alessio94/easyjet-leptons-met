@@ -52,16 +52,22 @@ namespace VBSHIGGS{
     pass_trigger_ASLT1_em,
     pass_trigger_ASLT1_me,
     pass_trigger_ASLT2,
-    AT_LEAST_TWO_LEPTONS,
-    EXACTLY_TWO_LEPTONS,
-    TWO_SS_CHARGE_LEPTONS,
-    TWO_OS_CHARGE_LEPTONS,
+    PASS_AT_LEAST_TWO_LEPTONS,
+    PASS_EXACTLY_TWO_LEPTONS,
+    PASS_TWO_SS_CHARGE_LEPTONS,
+    PASS_TWO_OS_CHARGE_LEPTONS,
     PASS_MET,
-    AT_LEAST_ONE_B_JET,
-    EXACTLY_TWO_B_JETS,
+    PASS_RES_AT_LEAST_ONE_B_JET,
+    PASS_RES_EXACTLY_ONE_B_JET,
+    PASS_RES_EXACTLY_TWO_B_JETS,
+    PASS_RES_NOADD_B_JET,
+    PASS_ONE_LARGE_JET,
+    PASS_TWO_SIGNAL_JETS,
     PASS_DELTA_R_BB,
-    PASS_mBB,
+    PASS_RES_H_WINDOW,
     PASS_VBS_BASELINE,
+    PASS_RES_BASELINE,
+    PASS_MERG_BASELINE,
     IS_SF,
     IS_ee,
     IS_mm,
@@ -82,16 +88,22 @@ namespace VBSHIGGS{
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
       const std::vector<std::string> m_STANDARD_CUTS{
         "PASS_TRIGGER",
-        "AT_LEAST_TWO_LEPTONS",
-        "EXACTLY_TWO_LEPTONS",    
-        "TWO_SS_CHARGE_LEPTONS",
-        "TWO_OS_CHARGE_LEPTONS",
+        "PASS_AT_LEAST_TWO_LEPTONS",
+        "PASS_EXACTLY_TWO_LEPTONS",    
+        "PASS_TWO_SS_CHARGE_LEPTONS",
+        "PASS_TWO_OS_CHARGE_LEPTONS",
         "PASS_MET",
-        "AT_LEAST_ONE_B_JET",
-        "EXACTLY_TWO_B_JETS",
+        "PASS_RES_AT_LEAST_ONE_B_JET",
+        "PASS_RES_EXACTLY_ONE_B_JET",
+        "PASS_RES_EXACTLY_TWO_B_JETS",
+        "PASS_RES_NOADD_B_JET",
+        "PASS_ONE_LARGE_JET",
+        "PASS_TWO_SIGNAL_JETS",
         "PASS_DELTA_R_BB",
-        "PASS_mBB",
-        "PASS_VBS_BASELINE"
+        "PASS_RES_H_WINDOW",
+        "PASS_VBS_BASELINE",
+        "PASS_RES_BASELINE",
+        "PASS_MERG_BASELINE"
       };
       std::vector<std::string> m_Bvarnames{
         "Pass_ll", 
@@ -113,8 +125,10 @@ namespace VBSHIGGS{
       void setThresholds(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
 
       void leptonSelection(const xAOD::ElectronContainer* electrons,const xAOD::MuonContainer* muons, const xAOD::MissingET *met);
-      void bjetSelection(std::vector<const xAOD::Jet*> bjets);
       void vbsjetsSelection(const xAOD::JetContainer * vbsjets);
+      void resolvedSelection(const xAOD::JetContainer *HJets, std::vector<const xAOD::Jet*> bjets, const CP::SystematicSet& sys);
+      void boostedSelection(const xAOD::JetContainer *largeJets, const CP::SystematicSet& sys);
+      void eventCategorisation();
       
       Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
@@ -123,7 +137,15 @@ namespace VBSHIGGS{
 
       CP::SysListHandle m_systematicsList {this};
 
+      CP::SysReadHandle<xAOD::JetContainer> m_largejetHandle{ this, "largejets", "vbshiggsAnalysisLargeJets_%SYS%", "Large R Jet container to read"};
+      CP::SysReadDecorHandle<float> m_GN2Xv01_phbb = {this, "phbb", "GN2Xv01_phbb", "GN2Xv01_phbb"};
+      CP::SysReadDecorHandle<float> m_GN2Xv01_phcc = {this, "phcc", "GN2Xv01_phcc", "GN2Xv01_phcc"};
+      CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd = {this, "pqcd", "GN2Xv01_pqcd", "GN2Xv01_pqcd"};
+      CP::SysReadDecorHandle<float> m_GN2Xv01_ptop = {this, "ptop", "GN2Xv01_ptop", "GN2Xv01_ptop"};
+
       CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "vbshiggsAnalysisSignalJets_%SYS%", "Signal Jet container to read" };
+
+      CP::SysReadHandle<xAOD::JetContainer> m_HCandHandle{ this, "higgsCandidates", "vbshiggsAnalysisHJets_%SYS%", "Higgs Candidates container to read"};
 
       CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "vbshiggsAnalysisVBSJets_%SYS%", "VBS Jet container to read" };
 
@@ -155,16 +177,22 @@ namespace VBSHIGGS{
         {VBSHIGGS::pass_trigger_ASLT1_em, "pass_trigger_ASLT1_em"},
         {VBSHIGGS::pass_trigger_ASLT1_me, "pass_trigger_ASLT1_me"},
         {VBSHIGGS::pass_trigger_ASLT2, "pass_trigger_ASLT2"},
-        {VBSHIGGS::AT_LEAST_TWO_LEPTONS, "AT_LEAST_TWO_LEPTONS"},
-        {VBSHIGGS::EXACTLY_TWO_LEPTONS, "EXACTLY_TWO_LEPTONS"},
-        {VBSHIGGS::TWO_SS_CHARGE_LEPTONS, "TWO_SS_CHARGE_LEPTONS"},
-        {VBSHIGGS::TWO_OS_CHARGE_LEPTONS, "TWO_OS_CHARGE_LEPTONS"},
+        {VBSHIGGS::PASS_AT_LEAST_TWO_LEPTONS, "PASS_AT_LEAST_TWO_LEPTONS"},
+        {VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS, "PASS_EXACTLY_TWO_LEPTONS"},
+        {VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS, "PASS_TWO_SS_CHARGE_LEPTONS"},
+        {VBSHIGGS::PASS_TWO_OS_CHARGE_LEPTONS, "PASS_TWO_OS_CHARGE_LEPTONS"},
         {VBSHIGGS::PASS_MET, "PASS_MET"},
-        {VBSHIGGS::AT_LEAST_ONE_B_JET, "AT_LEAST_ONE_B_JET"},
-        {VBSHIGGS::EXACTLY_TWO_B_JETS, "EXACTLY_TWO_B_JETS"},
+        {VBSHIGGS::PASS_RES_AT_LEAST_ONE_B_JET, "PASS_RES_AT_LEAST_ONE_B_JET"},
+        {VBSHIGGS::PASS_RES_EXACTLY_ONE_B_JET, "PASS_RES_EXACTLY_ONE_B_JET"},
+        {VBSHIGGS::PASS_RES_NOADD_B_JET, "PASS_RES_NOADD_B_JET"},
+        {VBSHIGGS::PASS_RES_EXACTLY_TWO_B_JETS, "PASS_RES_EXACTLY_TWO_B_JETS"},
+        {VBSHIGGS::PASS_ONE_LARGE_JET, "PASS_ONE_LARGE_JET"},
+        {VBSHIGGS::PASS_TWO_SIGNAL_JETS, "PASS_TWO_SIGNAL_JETS"},
         {VBSHIGGS::PASS_DELTA_R_BB, "PASS_DELTA_R_BB"},
-        {VBSHIGGS::PASS_mBB, "PASS_mBB"},
+        {VBSHIGGS::PASS_RES_H_WINDOW, "PASS_RES_H_WINDOW"},
         {VBSHIGGS::PASS_VBS_BASELINE, "PASS_VBS_BASELINE"},
+        {VBSHIGGS::PASS_RES_BASELINE, "PASS_RES_BASELINE"},
+        {VBSHIGGS::PASS_MERG_BASELINE, "PASS_MERG_BASELINE"},
         {VBSHIGGS::Pass_ll, "Pass_ll"},
         {VBSHIGGS::IS_SF, "IS_SF"},
         {VBSHIGGS::IS_ee, "IS_ee"},
@@ -198,6 +226,8 @@ namespace VBSHIGGS{
         {VBSHIGGS::ASLT1_me, "ASLT1_me"},
         {VBSHIGGS::ASLT2, "ASLT2"},
       };
+
+
 
   };
 }

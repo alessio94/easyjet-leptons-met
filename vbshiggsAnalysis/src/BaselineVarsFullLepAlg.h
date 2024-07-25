@@ -40,9 +40,11 @@ namespace VBSHIGGS{
         /// \brief Setup syst-aware input container handles
         CP::SysListHandle m_systematicsList {this};
 
-        CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "vbshiggsAnalysisSignalJets_%SYS%", "Small R jets Jet container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "vbshiggsAnalysisSignalJets_%SYS%", "Small R jets Jet container to read"};
+              
+        CP::SysReadHandle<xAOD::JetContainer> m_HCandHandle{ this, "higgsCandidates", "vbshiggsAnalysisHJets_%SYS%", "Higgs Candidates container to read"};
 
-        CP::SysReadHandle<xAOD::JetContainer> m_largejetHandle{ this, "largejets", "vbshiggsAnalysisLargeJets_%SYS%", "Large R Jet container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_largejetHandle{ this, "largejets", "vbshiggsAnalysisLargeJets_%SYS%", "Large R Jet container to read"};
 
         CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "vbshiggsAnalysisVBSJets_%SYS%", "VBS Jet container to read" };
         

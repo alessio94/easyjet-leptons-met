@@ -21,6 +21,12 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
         for c in flags.Analysis.TriggerChains
     ]
 
+    cfg.addEventAlgo(
+        CompFactory.VBSHIGGS.HiggsSelectorAlg(
+            "HiggsSelectorAlg",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+        )
+    )
     # Selection
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.FullLepSelectorAlg(
@@ -57,16 +63,23 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
 def get_BaselineVarsFullLepAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
-    for object in ["ll", "bb", "b1l1", "b2l2", "jj"]:
+    for object in ["ll", "Hjj", "Hj1l1", "Hj2l2", "VBSjj"]:
         for var in ["dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
-    for object in ["VBSJ1", "VBSJ2", "LargeJet1", "ll", "bb", "b1l1", "b2l2", "jj"]:
+    for object in ["VBSJ1", "VBSJ2", "LargeJet1", "ll", "Hdijet",
+                   "Hj1l1", "Hj2l2", "VBSdijet"]:
         for var in ["m", "pt", "eta", "phi"]:
             float_variable_names.append(f"{object}_{var}")
 
+    for object in ["Jet_Higgs_candidate1", "Jet_Higgs_candidate2"]:
+        for var in ["pt", "eta", "phi", "E"]:
+            float_variable_names.append(f"{object}_{var}")
+        for var in ["pcbt", "truthLabel"]:
+            int_variable_names.append(f"{object}_{var}")
+
     float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET", "METSig",
-                             "dRbl_min", "bbll_m", "bbllmet_m", "HT2", "HT2r",
+                             "dRbl_min", "Hdijetll_m", "Hdijetllmet_m", "HT2", "HT2r",
                              "Lepton1_MET_mT", "Lepton2_MET_mT", "LargeJet1_DXbb",
                              "LargeJet1_phbb", "LargeJet1_phcc", "LargeJet1_pqcd",
                              "LargeJet1_ptop"]
