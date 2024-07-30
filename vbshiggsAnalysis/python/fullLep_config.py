@@ -75,11 +75,7 @@ def get_BaselineVarsFullLepAlg_variables(flags):
                              "LargeJet1_ptop"]
 
     int_variable_names += ["nLargeJets", "nJets", "nBJets", "nCentralJets",
-                           "nForwardJets", "nLeptons", "nElectrons", "nMuons",
-                           "Jet_Higgs_candidate1_pcbt",
-                           "Jet_Higgs_candidate1_truthLabel",
-                           "Jet_Higgs_candidate2_pcbt",
-                           "Jet_Higgs_candidate2_truthLabel"]
+                           "nForwardJets", "nLeptons", "nElectrons", "nMuons"]
 
     return float_variable_names, int_variable_names
 

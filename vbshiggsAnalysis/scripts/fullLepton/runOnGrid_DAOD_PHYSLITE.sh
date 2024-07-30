@@ -1,34 +1,22 @@
 runConfig="vbshiggsAnalysis/RunConfig-fullLep.yaml"
 executable="vbshiggs-ntupler"
-campaignName="VBSHiggs_12July2024_v03"
+campaignName="VBSHiggs_vXXX"
 
-#signal
-easyjet-gridsubmit --mc-list  ../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20_signal_DAOD_PHYSLITE_p6026.txt \
+mc_list=(
+    "../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20_signal_DAOD_PHYSLITE_p6026.txt"
+    "../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20a_DAOD_PHYSLITE_p6266_bkg.txt"
+    "../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20d_DAOD_PHYSLITE_p6266_bkg.txt"
+    "../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20e_DAOD_PHYSLITE_p6266_bkg.txt"
+)
+#mc
+easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
     --run-config ${runConfig} \
-    --exec ${executable} \
+    --exec ${executable}  \
     --campaign ${campaignName} \
     --noTag \
-    --mergeOutput
-
-
-#mc20a bkg
-easyjet-gridsubmit --mc-list ../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20a_DAOD_PHYSLITE_p6266_bkg.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName} \
-    --noTag
-
-easyjet-gridsubmit --mc-list ../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20d_DAOD_PHYSLITE_p6266_bkg.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName} \
-    --noTag
-
-easyjet-gridsubmit --mc-list ../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20e_DAOD_PHYSLITE_p6266_bkg.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName} \
-    --noTag
+    --mergeOutput \
+    --noEmail \
+    --HDBSProductionRole
 
 #data
 easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/data_Run2_p6266.txt \
@@ -36,5 +24,7 @@ easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/dat
     --exec ${executable} \
     --campaign ${campaignName} \
     --noTag \
-    --mergeOutput
+    --mergeOutput \
+    --noEmail \
+    --HDBSProductionRole
 
