@@ -34,6 +34,7 @@ collection_options:
   taus:
     score_branches: false
     truth_branches: false
+    higgs_parent_info: false
     run_selection: false
 
   photons:

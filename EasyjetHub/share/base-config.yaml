@@ -12,6 +12,7 @@ do_muons: false
 do_electrons: false
 do_photons: false
 do_taus: false
+do_tau_parent_decoration: false
 do_met: false
 do_mmc: false
 save_HF_classification: false

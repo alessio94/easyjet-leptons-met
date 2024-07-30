@@ -2,6 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.algs.truth.jet_parent_decorator_config import jet_parent_decorator_cfg
+from EasyjetHub.algs.truth.tau_parent_decorator_config import tau_parent_decorator_cfg
 from EasyjetHub.algs.truth_particle_info_config import truth_particle_info_cfg
 
 
@@ -37,6 +38,14 @@ def truth_info_cfg(
                 name_prefix="largeRTopo",
                 match_dr=1.0,
             ))
+
+    if flags.Analysis.do_tau_parent_decoration and not flags.Input.isPHYSLITE:
+        cfg.merge(tau_parent_decorator_cfg(
+            flags,
+            tau_collection=flags.Analysis.container_names.input.taus,
+            name_prefix="Tau",
+            match_dr=0.2,
+        ))
 
     log.info("Adding truth particle info seq")
     cfg.merge(

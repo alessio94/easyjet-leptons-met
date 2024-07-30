@@ -19,6 +19,7 @@ ttree_output:
         run_selection: true
       taus:
         truth_branches: True
+        higgs_parent_info: true
         run_selection: true
       electrons:
         run_selection: true

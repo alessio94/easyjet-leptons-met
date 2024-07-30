@@ -20,6 +20,7 @@ do_small_R_jets: true
 do_muons: true
 do_electrons: true
 do_taus: true
+do_tau_parent_decoration: true
 do_met : true
 do_mmc : true
 

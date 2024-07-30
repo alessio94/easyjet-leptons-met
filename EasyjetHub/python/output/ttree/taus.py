@@ -1,5 +1,6 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
+from EasyjetHub.output.ttree.truth_taus import get_TopHiggs_tau_truth_labels
 
 
 def get_tau_branches(flags, tree_flags, input_container, output_prefix):
@@ -53,6 +54,9 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
             "truth_IsHadronicTau",
             "truthType"
         ]
+
+    if flags.Input.isMC and tree_flags.collection_options.taus.higgs_parent_info:
+        tau_branches.variables += get_TopHiggs_tau_truth_labels(flags)
 
     if tree_flags.collection_options.taus.run_selection:
         tau_branches.variables += ["isAnalysisTau_%SYS%"]
