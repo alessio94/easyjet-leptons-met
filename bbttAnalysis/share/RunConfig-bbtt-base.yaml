@@ -18,7 +18,9 @@ truthDecayModes: ["bbtt"]
 # Toggles for object types
 do_small_R_jets: true
 do_muons: true
+do_muon_parent_decoration: true
 do_electrons: true
+do_electron_parent_decoration: true
 do_taus: true
 do_tau_parent_decoration: true
 do_met : true

@@ -92,7 +92,7 @@ def get_small_R_jet_branches(
 
     if (
         flags.Input.isMC
-        and (tree_flags.collection_options.small_R_jets.higgs_parent_info)
+        and (tree_flags.collection_options.small_R_jets.truth_parent_info)
     ):
         small_R_jet_branches.variables += get_TopHiggs_jet_truth_labels(flags)
 

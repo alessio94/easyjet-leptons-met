@@ -89,7 +89,7 @@ def _get_truth_types(flags):
     all_boson_suffix = bhalves + bints + bchar + bull
 
     physlite = flags.Input.isPHYSLITE
-    all_parents = [] if physlite else ["Higgs", "Scalar", "Top"]
+    all_parents = [] if physlite else ["Higgs", "Z", "Scalar", "Top"]
     for parent in all_parents:
         boson_label += [f"parent{parent}{x}" for x in all_boson_suffix]
         types |= {f"parent{parent}{x}": "HALF" for x in bhalves}

@@ -2,62 +2,61 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def jet_parent_decorator_cfg(
+def muon_parent_decorator_cfg(
         flags,
-        jet_collection,
+        muon_collection,
         name_prefix="",
         match_dr=0.3,
 ):
     sm_particles = flags.Analysis.container_names.input.truthSMParticles
-    bsm_particles = flags.Analysis.container_names.input.truthBSMParticles
-    b_hadron_common = dict(
-        addBsToCascade=True,
-        addCsToCascade=True,
+
+    # add in leptonic tau decay via a W to neutrino and other lepton+nu
+    muon_decay_pdgIds = [24, 11, 12, 13, 14, 15, 16]
+    muon_decay_pdgIds_all = [-x for x in muon_decay_pdgIds] + muon_decay_pdgIds
+
+    muon_common = dict(
+        targetContainer=muon_collection,
+        cascades=[
+            "TruthBoson",
+            "TruthBosonsWithDecayParticles",
+            "TruthTaus",
+            "TruthMuons",
+            "TruthElectrons",
+            "TruthNeutrinos"
+        ],
+        cascadePdgIds=muon_decay_pdgIds_all,
+        addBsToCascade=False,
+        addCsToCascade=False,
         vetoSoftLeptonCascade=True,
         vetoSoftCharmCascade=True,
         matchDeltaR=match_dr,
     )
-    scalar_boson_common = dict(
-        targetContainer=jet_collection,
-        cascades=["TruthBottom", "TruthCharm", "TruthHFWithDecayParticles"],
-        cascadePdgIds=[-5, 5],
-        **b_hadron_common,
-    )
+
     cfg = ComponentAccumulator()
     cfg.addEventAlgo(
         CompFactory.TruthParentDecoratorAlg(
-            name=f"{name_prefix}JetParentHiggsDecorator",
+            name=f"{name_prefix}ParentHiggsDecorator",
             parents=sm_particles,
             decoratorPrefix="parentHiggs",
             parentPdgIds=[25],
-            **scalar_boson_common,
+            **muon_common,
         )
     )
     cfg.addEventAlgo(
         CompFactory.TruthParentDecoratorAlg(
-            name=f"{name_prefix}JetParentZDecorator",
+            name=f"{name_prefix}ParentZDecorator",
             parents=sm_particles,
             decoratorPrefix="parentZ",
             parentPdgIds=[23],
-            **scalar_boson_common,
+            **muon_common
         )
     )
-    cfg.addEventAlgo(
-        CompFactory.TruthParentDecoratorAlg(
-            name=f"{name_prefix}JetParentScalarDecorator",
-            parents=bsm_particles,
-            decoratorPrefix="parentScalar",
-            parentPdgIds=[35],
-            **scalar_boson_common,
-        )
-    )
-    # we want to label any jet coming via a W to a quark, tau, or
-    # electron
-    top_decay_pdgids = [24, 5, 4, 3, 2, 1, 11, 15]
+    # we want to label any lepton or neutrino coming via a W
+    top_decay_pdgids = [24, 11, 12, 13, 14, 15, 16]
     top_decay_pdgids_all = [-x for x in top_decay_pdgids] + top_decay_pdgids
     cfg.addEventAlgo(
         CompFactory.TruthParentDecoratorAlg(
-            name=f"{name_prefix}JetParentTopDecorator",
+            name=f"{name_prefix}ParentTopDecorator",
             parents="TruthTop",
             decoratorPrefix="parentTop",
             parentPdgIds=[-6, 6],
@@ -74,10 +73,9 @@ def jet_parent_decorator_cfg(
             ],
             countChildrenInCascadeWithPdgIds={
                 "nTopToWChildren": [-24, 24],
-                "nTopToBChildren": [-5, 5]
             },
-            targetContainer=jet_collection,
-            **b_hadron_common
+            targetContainer=muon_collection,
+            matchDeltaR=match_dr
         )
     )
     return cfg

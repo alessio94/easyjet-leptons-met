@@ -19,7 +19,7 @@ reco_outputs:
 collection_options:
 
   small_R_jets:
-    higgs_parent_info: false
+    truth_parent_info: false
     btag_info: false
     JVT_details: false
     no_bjet_calib_p4: false
@@ -34,7 +34,7 @@ collection_options:
   taus:
     score_branches: false
     truth_branches: false
-    higgs_parent_info: false
+    truth_parent_info: false
     run_selection: false
 
   photons:
@@ -45,10 +45,12 @@ collection_options:
   electrons:
     id_iso_variables: false
     run_selection: false
+    truth_parent_info: false
 
   muons:
     id_iso_variables: false
     run_selection: false
+    truth_parent_info: false
 
 # turned off automatically if MC
 truth_outputs:

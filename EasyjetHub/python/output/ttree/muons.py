@@ -33,6 +33,14 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
             for id_wp in id_wps
         ]
 
+    if flags.Input.isMC and tree_flags.collection_options.muons.truth_parent_info:
+        truth_labels = []
+        if not flags.Input.isPHYSLITE:
+            truth_labels += [
+                *[f"parent{p}ParentsMask" for p in ["Higgs", "Z", "Top"]],
+            ]
+        muon_branches.variables += truth_labels
+
     if tree_flags.collection_options.muons.run_selection:
         muon_branches.variables += ["isAnalysisMuon_%SYS%"]
         for index in range(flags.Analysis.Lepton.amount):

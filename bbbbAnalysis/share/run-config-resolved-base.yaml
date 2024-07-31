@@ -36,7 +36,7 @@ ttree_output:
       small_R_jets: 'container_names.output.reco4PFlowJet'
     collection_options:
       small_R_jets:
-        higgs_parent_info: true
+        truth_parent_info: true
         btag_info: true
         JVT_details: true
         no_bjet_calib_p4: true

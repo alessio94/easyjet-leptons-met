@@ -33,6 +33,14 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
             for id_wp in id_wps
         ]
 
+    if flags.Input.isMC and tree_flags.collection_options.electrons.truth_parent_info:
+        truth_labels = []
+        if not flags.Input.isPHYSLITE:
+            truth_labels += [
+                *[f"parent{p}ParentsMask" for p in ["Higgs", "Z", "Top"]],
+            ]
+        electron_branches.variables += truth_labels
+
     if tree_flags.collection_options.electrons.run_selection:
         electron_branches.variables += ["isAnalysisElectron_%SYS%"]
         for index in range(flags.Analysis.Lepton.amount):

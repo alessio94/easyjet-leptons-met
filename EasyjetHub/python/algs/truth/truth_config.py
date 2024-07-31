@@ -3,6 +3,10 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.algs.truth.jet_parent_decorator_config import jet_parent_decorator_cfg
 from EasyjetHub.algs.truth.tau_parent_decorator_config import tau_parent_decorator_cfg
+from EasyjetHub.algs.truth.muon_parent_decorator_config import muon_parent_decorator_cfg
+from EasyjetHub.algs.truth.electron_parent_decorator_config import (
+    electron_parent_decorator_cfg
+)
 from EasyjetHub.algs.truth_particle_info_config import truth_particle_info_cfg
 
 
@@ -44,7 +48,23 @@ def truth_info_cfg(
             flags,
             tau_collection=flags.Analysis.container_names.input.taus,
             name_prefix="Tau",
-            match_dr=0.2,
+            match_dr=0.3,
+        ))
+
+    if flags.Analysis.do_muon_parent_decoration and not flags.Input.isPHYSLITE:
+        cfg.merge(muon_parent_decorator_cfg(
+            flags,
+            muon_collection=flags.Analysis.container_names.input.muons,
+            name_prefix="Muon",
+            match_dr=0.3,
+        ))
+
+    if flags.Analysis.do_electron_parent_decoration and not flags.Input.isPHYSLITE:
+        cfg.merge(electron_parent_decorator_cfg(
+            flags,
+            electron_collection=flags.Analysis.container_names.input.electrons,
+            name_prefix="Electron",
+            match_dr=0.3,
         ))
 
     log.info("Adding truth particle info seq")

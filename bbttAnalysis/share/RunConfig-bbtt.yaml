@@ -15,15 +15,17 @@ ttree_output:
     collection_options:
       small_R_jets:
         btag_info: true
-        higgs_parent_info: true
+        truth_parent_info: true
         run_selection: true
       taus:
         truth_branches: True
-        higgs_parent_info: true
+        truth_parent_info: true
         run_selection: true
       electrons:
+        truth_parent_info: true
         run_selection: true
       muons:
+        truth_parent_info: true
         run_selection: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'

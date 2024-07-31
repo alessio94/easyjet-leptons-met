@@ -6,7 +6,7 @@ def get_TopHiggs_jet_truth_labels(flags):
     if not flags.Input.isPHYSLITE:
         truth_labels += [
             *[f"nTopTo{p}Children" for p in "BW"],
-            *[f"parent{p}ParentsMask" for p in ["Higgs", "Scalar", "Top"]],
+            *[f"parent{p}ParentsMask" for p in ["Higgs", "Z", "Scalar", "Top"]],
         ]
 
     return truth_labels

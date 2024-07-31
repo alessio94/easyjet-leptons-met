@@ -6,7 +6,7 @@ def tau_parent_decorator_cfg(
         flags,
         tau_collection,
         name_prefix="",
-        match_dr=0.2,
+        match_dr=0.3,
 ):
     sm_particles = flags.Analysis.container_names.input.truthSMParticles
 

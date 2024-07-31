@@ -9,7 +9,9 @@ do_large_R_UFO_jets: false
 do_jet_parent_decoration: true
 do_VR_jets: false
 do_muons: false
+do_muon_parent_decoration: false
 do_electrons: false
+do_electron_parent_decoration: false
 do_photons: false
 do_taus: false
 do_tau_parent_decoration: false

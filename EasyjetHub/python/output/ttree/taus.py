@@ -55,7 +55,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
             "truthType"
         ]
 
-    if flags.Input.isMC and tree_flags.collection_options.taus.higgs_parent_info:
+    if flags.Input.isMC and tree_flags.collection_options.taus.truth_parent_info:
         tau_branches.variables += get_TopHiggs_tau_truth_labels(flags)
 
     if tree_flags.collection_options.taus.run_selection:

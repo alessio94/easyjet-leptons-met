@@ -54,7 +54,7 @@ ttree_output:
       #electrons: 'container_names.output.electrons'
     collection_options:
       small_R_jets:
-        higgs_parent_info: true
+        truth_parent_info: true
         btag_details: true
       large_R_jets:
         substructure_info: true

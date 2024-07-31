@@ -50,7 +50,7 @@ ttree_output:
       VR_jets: 'container_names.output.vrJet'
     collection_options:
       small_R_jets:
-        higgs_parent_info: true
+        truth_parent_info: true
         btag_info: true
         JVT_details: true
         no_bjet_calib_p4: true

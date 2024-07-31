@@ -102,7 +102,7 @@ def validate_do_write_obj_flags(flags, tree_flags):
         try:
             if any([
                 small_R_flags.btag_info,
-                small_R_flags.higgs_parent_info,
+                small_R_flags.truth_parent_info,
                 small_R_flags.JVT_details,
                 small_R_flags.no_bjet_calib_p4,
                 small_R_flags.btag_details,
