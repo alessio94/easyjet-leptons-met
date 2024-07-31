@@ -12,6 +12,7 @@ namespace HHBBTT
     HadHad1B = 3,
     ZCR = 4,
     TopEMuCR = 5,
+    AntiIsoLepHad = 6,
   };
 
     enum TriggerChannel
@@ -82,6 +83,7 @@ namespace HHBBTT
     MBB_MASS,
     MTAUTAU_VIS_MASS,
     N_LEPTONS_CUT_LEPHAD,
+    N_LEPTONS_CUT_ANTIISOLEPHAD,
     ONE_TAU,
     OS_CHARGE_LEPHAD,
     pass_baseline_SLT,
@@ -134,6 +136,7 @@ namespace HHBBTT
 
     pass_ZCR,
     pass_TopEMuCR,
+    pass_AntiIsoLepHad,
   };
 }
 

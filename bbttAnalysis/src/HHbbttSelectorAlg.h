@@ -101,16 +101,20 @@ private:
     CP::SysReadDecorHandle<bool> m_is2022_75bunches
       {this, "is2022_75bunches", "is2022_75bunches", ""};
 
-    Gaudi::Property<std::string> m_eleWPName
-      { this, "eleWP", "","Electron ID + Iso working point" };
-    CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
-		      
-    Gaudi::Property<std::string> m_muonWPName
-      { this, "muonWP", "","Muon ID + Iso cuts" };
-    CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
+    Gaudi::Property<std::vector<std::string>> m_eleWPNames
+      { this, "eleWPs", {},"Electron working point names" };
+    std::vector<CP::SysReadDecorHandle<char>> m_eleWPDecorHandles;
+
+    Gaudi::Property<std::vector<std::string>> m_muonWPNames
+      { this, "muonWPs", {},"Muon working point names" };
+    std::vector<CP::SysReadDecorHandle<char>> m_muonWPDecorHandles;
 
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_selected_el_isIso {"selected_el_isIso_%SYS%", this};
+   
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_selected_mu_isIso {"selected_mu_isIso_%SYS%", this};
+   
     CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
 
     std::unordered_map<HHBBTT::TriggerChannel, std::string> m_triggerChannels =
@@ -173,6 +177,7 @@ private:
     {HHBBTT::MBB_MASS, "MBB_MASS"},
     {HHBBTT::MTAUTAU_VIS_MASS, "MTAUTAU_VIS_MASS"},
     {HHBBTT::N_LEPTONS_CUT_LEPHAD, "N_LEPTONS_CUT_LEPHAD"},
+    {HHBBTT::N_LEPTONS_CUT_ANTIISOLEPHAD, "N_LEPTONS_CUT_ANTIISOLEPHAD"},
     {HHBBTT::ONE_TAU, "ONE_TAU"},
     {HHBBTT::OS_CHARGE_LEPHAD, "OS_CHARGE_LEPHAD"},
     {HHBBTT::OS_CHARGE_LEPTONS, "OS_CHARGE_LEPTONS"},
@@ -220,6 +225,7 @@ private:
     {HHBBTT::pass_HadHad, "pass_HadHad"},
     {HHBBTT::pass_ZCR, "pass_ZCR"},
     {HHBBTT::pass_TopEMuCR, "pass_TopEMuCR"},
+    {HHBBTT::pass_AntiIsoLepHad, "pass_AntiIsoLepHad"},
     };
 
     /// \brief Cutflow Variables

@@ -7,7 +7,6 @@ systematics_suffix_separator: "___"
 do_bbtt_analysis: true
 do_antiID_regions: true
 enable_MMC_cut: false
-channel: ["hadhad2b","hadhad1b","lephad2b","lephad1b","ZCR","TopEMuCR"]
 
 # Toggles to bypass event selection
 bypass: false
@@ -58,6 +57,7 @@ Tau:
 
 Lepton:
   amount: 2
+  variables_int: ["isIso"]
 
 # orthogonality studies  
 orthogonality:

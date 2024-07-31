@@ -60,6 +60,7 @@ namespace HHBBTT
       else if ( name == "hadhad2b") m_channels.push_back(HHBBTT::HadHad2B);
       else if ( name == "lephad1b") m_channels.push_back(HHBBTT::LepHad1B);
       else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
+      else if ( name == "antiiso-lephad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
     }
 
     ATH_CHECK (m_mmcTool.retrieve());
@@ -93,8 +94,8 @@ namespace HHBBTT
       bool is_hadhad = false;
 
       for(const auto& channel : m_channels){
-        if(channel == HHBBTT::LepHad2B || channel == HHBBTT::LepHad1B)
-	  is_lephad |= m_pass_LepHad.get(*event, sys);
+        if(channel == HHBBTT::LepHad2B || channel == HHBBTT::LepHad1B || channel == HHBBTT::AntiIsoLepHad)
+	  is_lephad |= m_pass_LepHad.get(*event, sys); // TODO: check anti-iso condition
         else if(channel == HHBBTT::HadHad2B || channel == HHBBTT::HadHad1B)
 	  is_hadhad |= m_pass_HadHad.get(*event, sys);
       }

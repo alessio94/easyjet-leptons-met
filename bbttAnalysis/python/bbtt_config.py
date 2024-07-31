@@ -22,23 +22,31 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 
     cfg = ComponentAccumulator()
 
-    LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
-    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
-    cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=muonkey,
-                                 containerOutKey="bbttAnalysisMuons_%SYS%",
-                                 looseMuonWP=LooseMuonWPLabel,
-                                 tightMuonWPs=[TightMuonWPLabel]))
+    # anti-iso lepton control region is not compatible with the other
+    # regions at the moment:
+    if ("antiiso-lephad" in flags.Analysis.channel
+            and len(flags.Analysis.channel) > 1):
+        raise ValueError("Cannot run 'antiiso-lephad' with any other channels")
 
-    LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    TightEleWP = flags.Analysis.Electron.extra_wps[0]
-    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
+    # muons:
+    muonInWpLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
+
+    cfg.merge(MuonSelectorAlgCfg(flags,
+                                 containerInKey=muonInWpLabel + muonkey,
+                                 containerOutKey="bbttAnalysisMuons_%SYS%",
+                                 looseMuonWP=muonInWpLabel,
+                                 tightMuonWPs=muon_WPs))
+
+    # electrons:
+    electronInWpLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
+
     cfg.merge(ElectronSelectorAlgCfg(flags,
-                                     containerInKey=electronkey,
+                                     containerInKey=electronInWpLabel + electronkey,
                                      containerOutKey="bbttAnalysisElectrons_%SYS%",
-                                     looseEleWP=LooseElectronWPLabel,
-                                     tightEleWPs=[TightEleWPLabel]))
+                                     looseEleWP=electronInWpLabel,
+                                     tightEleWPs=ele_WPs))
 
     cfg.merge(TauSelectorAlgCfg(flags,
                                 # Baseline always needed for anti-taus
@@ -67,8 +75,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             "HHbbttSelectorAlg",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             tauWP=flags.Analysis.Tau.ID,
-            muonWP=TightMuonWPLabel,
-            eleWP=TightEleWPLabel,
+            muonWPs=muon_WPs,
+            eleWPs=ele_WPs,
             eventDecisionOutputDecoration=(
                 "bbtt_pass_presel_noMMC_%SYS%" if flags.Analysis.enable_MMC_cut
                 else "bbtt_pass_presel_%SYS%"),
@@ -118,8 +126,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.HHBBTT.BaselineVarsbbttAlg(
             "FinalVarsbbttAlg",
             isMC=flags.Input.isMC,
-            eleWP=TightEleWPLabel,
-            muonWP=TightMuonWPLabel,
+            eleWPs=ele_WPs,
+            muonWPs=muon_WPs,
             tauWP=flags.Analysis.Tau.ID,
             eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
             muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
@@ -248,7 +256,7 @@ def bbtt_branches(flags):
                          + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for cat in ["baseline_LepHad", "baseline_HadHad", "LepHad", "HadHad",
-                "ZCR", "TopEMuCR"]:
+                "ZCR", "TopEMuCR", "AntiIsoLepHad"]:
         branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 

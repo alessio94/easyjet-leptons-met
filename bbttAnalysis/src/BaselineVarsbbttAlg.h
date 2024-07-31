@@ -80,17 +80,17 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::string> m_eleWPName
-      { this, "eleWP", "","Electron ID + Iso working point" };
-    CP::SysReadDecorHandle<float> m_ele_SF{"", this};
+    Gaudi::Property<std::vector<std::string>> m_eleWPNames
+      { this, "eleWPs", {},"Electron ID + Iso working points" };
+    std::vector<CP::SysReadDecorHandle<float>> m_ele_SF;
 
     Gaudi::Property<std::vector<std::string>> m_eleTrigSF
       {this, "eleTriggerSF", {}, "List of electron trigger SF"};
     std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_eleTriggerSF;
 
-    Gaudi::Property<std::string> m_muWPName
-      { this, "muonWP", "","Muon ID + Iso working point" };
-    CP::SysReadDecorHandle<float> m_mu_SF{"", this};
+    Gaudi::Property<std::vector<std::string>> m_muonWPNames
+      { this, "muonWPs", {},"Muon ID + Iso working points" };
+    std::vector<CP::SysReadDecorHandle<float>> m_mu_SF;
 
     Gaudi::Property<std::vector<std::string>> m_muonTrigSF
       {this, "muonTriggerSF", {}, "List of muon trigger SF"};
@@ -117,7 +117,13 @@ private:
     CP::SysReadDecorHandle<bool> 
       m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};
     CP::SysReadDecorHandle<bool> 
+      m_selected_el_isIso { this, "selected_el_isIso", "selected_el_isIso_%SYS%", "Input deco for selected el+iso"};
+    
+    CP::SysReadDecorHandle<bool> 
       m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input decorator for selected mu"};
+    CP::SysReadDecorHandle<bool> 
+      m_selected_mu_isIso { this, "selected_mu_isIso", "selected_mu_isIso_%SYS%", "Input deco for selected mu+iso"};
+    
     CP::SysReadDecorHandle<bool> 
       m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input decorator for selected tau"};
     
@@ -158,7 +164,8 @@ private:
       {HHBBTT::pass_baseline_STT, "pass_baseline_STT"},
       {HHBBTT::pass_baseline_DTT, "pass_baseline_DTT"},
       {HHBBTT::pass_ZCR, "pass_ZCR"},
-      {HHBBTT::pass_TopEMuCR, "pass_TopEMuCR"}
+      {HHBBTT::pass_TopEMuCR, "pass_TopEMuCR"},
+      {HHBBTT::pass_AntiIsoLepHad, "pass_AntiIsoLepHad"}
     };
 
     Gaudi::Property<bool> m_storeHighLevelVariables

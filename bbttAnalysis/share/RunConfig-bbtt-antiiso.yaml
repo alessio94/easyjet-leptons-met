@@ -1,0 +1,18 @@
+include: bbttAnalysis/AnalysisMiniTree-bbtt-tree.yaml
+include: bbttAnalysis/RunConfig-bbtt-base.yaml
+
+channel: ["antiiso-lephad"]
+
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "NonIso"
+  extra_wps:
+    - ["LooseBLayerLH", "Loose_VarRad"]
+    - ["TightLH", "NonIso"] 
+
+Muon:
+  ID: "Loose"
+  Iso: "NonIso"
+  extra_wps:
+    - ["Loose", "PflowLoose_VarRad"]
+    - ["Medium", "NonIso"] 

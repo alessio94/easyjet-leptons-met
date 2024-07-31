@@ -54,19 +54,28 @@ namespace HHBBTT
 
     m_tauWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_" + m_tauWPName+"_%SYS%", this);
-    m_eleWPDecorHandle = CP::SysReadDecorHandle<char>
-      ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
-    m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
-      ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
-
+       
+    for(auto& wp : m_eleWPNames){
+      m_eleWPDecorHandles.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    }
+    for(auto& wp : m_muonWPNames){
+      m_muonWPDecorHandles.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    }
+    
     ATH_CHECK(m_tauWPDecorHandle.initialize(m_systematicsList, m_tauHandle));
     ATH_CHECK(m_antiTauDecorHandle.initialize(m_systematicsList, m_tauHandle));
-    ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
 
-    ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+    for(auto& handle : m_eleWPDecorHandles)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    for(auto& handle : m_muonWPDecorHandles)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
+
     ATH_CHECK(m_selected_tau.initialize(m_systematicsList, m_tauHandle));
+    
+    ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_selected_el_isIso.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK(m_selected_mu_isIso.initialize(m_systematicsList, m_muonHandle));
     
     for (const auto& [channel, name] : m_triggerChannels){
       SG::ReadDecorHandleKey<xAOD::EventInfo> deco;
@@ -129,6 +138,7 @@ namespace HHBBTT
       else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
       else if ( name == "ZCR") m_channels.push_back(HHBBTT::ZCR);
       else if ( name == "TopEMuCR") m_channels.push_back(HHBBTT::TopEMuCR);
+      else if ( name == "antiiso-lephad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -189,31 +199,56 @@ namespace HHBBTT
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
 
       // Apply selection
-
       for (auto& [key, value] : m_boolnames) m_bools.at(key) = false;
 
       //************
       // lepton
       //************
-      int n_leptons = 0;
-      int n_looseleptons = 0;
+      int n_leptons_looseId_iso = 0;
+      int n_leptons_tightId_iso = 0;
+      int n_leptons_tightId_antiiso = 0;
+      int n_veto_leptons = 0;
 
       const xAOD::Electron* ele0 = nullptr;
       const xAOD::Electron* ele1 = nullptr;
       for (const xAOD::Electron *electron : *electrons)
       {
-        bool passElectronWP = m_eleWPDecorHandle.get(*electron, sys);
+        // check if we need to complicate isolation logic:
+        bool do_antiiso_test = m_eleWPDecorHandles.size() > 1;
+
+        // TODO: cleanup, this makes a lof of assumptions about the wp vector 
+        bool pass_tightId_looseIso = m_eleWPDecorHandles[do_antiiso_test ? 2 : 0].get(*electron, sys); 
+        bool pass_looseId_looseIso = do_antiiso_test
+                                     ? m_eleWPDecorHandles[0].get(*electron, sys) 
+                                     : true;
+        bool pass_tightId_noIso = do_antiiso_test
+                                  ? m_eleWPDecorHandles[1].get(*electron, sys) 
+                                  : pass_tightId_looseIso;
+        bool pass_tightId_antiIso = do_antiiso_test
+                                    ? pass_tightId_noIso && !pass_tightId_looseIso 
+                                    : false;
+
+        if (pass_looseId_looseIso) n_leptons_looseId_iso++;
+
         m_selected_el.set(*electron, false, sys);
-        if (passElectronWP &&
-	    electron->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::ele])
-	{
+        m_selected_el_isIso.set(*electron, false, sys); // slightly misleading default
+        if (electron->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::ele] &&
+            (pass_tightId_looseIso || pass_tightId_antiIso))
+        {
           m_selected_el.set(*electron, true, sys);
+
+          // check isolation:
+          m_selected_el_isIso.set(*electron, pass_tightId_looseIso, sys);
+          if (pass_tightId_looseIso) n_leptons_tightId_iso++;
+          else if (pass_tightId_antiIso) n_leptons_tightId_antiiso++;
+
           if(!ele0) ele0 = electron;
           else if(!ele1) ele1 = electron;
-          n_leptons += 1;
         }
         else
-          n_looseleptons += 1;
+        {
+          continue;
+        }
       }
       if (ele1) {
         if (ele0->charge() != ele1->charge())
@@ -224,27 +259,51 @@ namespace HHBBTT
       const xAOD::Muon* mu1 = nullptr;
       for (const xAOD::Muon *muon : *muons)
       {
-        bool passMuonWP = m_muonWPDecorHandle.get(*muon, sys);
+        // check if we need to complicate isolation logic:
+        bool do_antiiso_test = m_muonWPDecorHandles.size() > 1;
+        
+        // TODO: cleanup, this makes a lof of assumptions about the wp vector
+        bool pass_tightId_looseIso = m_muonWPDecorHandles[do_antiiso_test ? 2 : 0].get(*muon, sys); 
+        bool pass_looseId_looseIso = do_antiiso_test 
+                                     ? m_muonWPDecorHandles[0].get(*muon, sys) 
+                                     : true;
+        bool pass_tightId_noIso = do_antiiso_test
+                                  ? m_muonWPDecorHandles[1].get(*muon, sys) 
+                                  : pass_tightId_looseIso;
+        bool pass_tightId_antiIso = do_antiiso_test
+                                    ? pass_tightId_noIso && !pass_tightId_looseIso 
+                                    : false;
+        
+        if (pass_looseId_looseIso) n_leptons_looseId_iso++;
+
         m_selected_mu.set(*muon, false, sys);
-        if (passMuonWP && std::abs(muon->eta()) < 2.5 &&
-	    muon->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::mu])
-        {
+        m_selected_mu_isIso.set(*muon, false, sys); // slightly misleading default
+        if (std::abs(muon->eta()) < 2.5 &&
+	    muon->pt() > m_pt_threshold[HHBBTT::LTT][HHBBTT::mu]
+            && (pass_tightId_looseIso || pass_tightId_antiIso) )
+        { 
           m_selected_mu.set(*muon, true, sys);
+          
+          // check isolation:
+          m_selected_mu_isIso.set(*muon, pass_tightId_looseIso, sys);
+          if (pass_tightId_looseIso) n_leptons_tightId_iso++;
+          else if (pass_tightId_antiIso) n_leptons_tightId_antiiso++;
+
           if(!mu0) mu0 = muon;
           else if(!mu1) mu1 = muon;
-          n_leptons += 1;
         }
         else
-          n_looseleptons += 1;
+        {
+          continue;
+        }
       }
       if (mu1) {
         if (mu0->charge() != mu1->charge())
           m_bools.at(HHBBTT::OS_CHARGE_LEPTONS) = true;
-      } else if (n_leptons == 2 && mu0) {
+      } else if (n_leptons_tightId_iso == 2 && mu0) {
         if (ele0->charge() != mu0->charge())
           m_bools.at(HHBBTT::OS_CHARGE_LEPTONS) = true;
       }
-
 
       int charge_lepton = 0;
       bool lep_ptcut_SLT = false;
@@ -264,10 +323,14 @@ namespace HHBBTT
 	  lep_ptcut_LTT = true;
       }
 
-      if (n_leptons == 1 && n_looseleptons == 0)
-        m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) = true;
+      n_veto_leptons = n_leptons_looseId_iso - n_leptons_tightId_iso;
 
-      if (n_leptons == 0 && n_looseleptons == 0)
+      if (n_leptons_tightId_iso == 1 && n_veto_leptons == 0 && n_leptons_tightId_antiiso == 0)
+        m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) = true;
+      else if(n_leptons_tightId_iso == 0 && n_veto_leptons == 0 && n_leptons_tightId_antiiso == 1)
+        m_bools.at(HHBBTT::N_LEPTONS_CUT_ANTIISOLEPHAD) = true;
+
+      if (n_leptons_tightId_iso == 0 && n_veto_leptons == 0)
         m_bools.at(HHBBTT::N_LEPTONS_CUT_HADHAD) = true;
 
       //************
@@ -319,7 +382,7 @@ namespace HHBBTT
       }
 
       TLorentzVector tautau_vis;
-      if (n_leptons == 1 && n_taus == 1) {
+      if (n_leptons_tightId_iso+n_leptons_tightId_antiiso == 1 && n_taus == 1) {
         tautau_vis = tau0->p4();
         if(ele0) tautau_vis += ele0->p4();
         else if(mu0) tautau_vis += mu0->p4();
@@ -411,12 +474,13 @@ namespace HHBBTT
       //****************
       // event level info
       //****************
-      if (n_taus==1 && n_leptons==1 && tau0->charge() != charge_lepton)
+      if (n_taus==1 && n_leptons_tightId_iso+n_leptons_tightId_antiiso==1 && tau0->charge() != charge_lepton)
         m_bools.at(HHBBTT::OS_CHARGE_LEPHAD) = true;
       if (n_taus==2 && tau0->charge() == -tau1->charge())
         m_bools.at(HHBBTT::OS_CHARGE_HADHAD) = true;
 
-      if (m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) &&
+      if ((m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) || 
+           m_bools.at(HHBBTT::N_LEPTONS_CUT_ANTIISOLEPHAD)) &&
 	  m_bools.at(HHBBTT::ONE_TAU) &&
 	  m_bools.at(HHBBTT::MTAUTAU_VIS_MASS) &&
 	  m_bools.at(HHBBTT::TWO_JETS)){
@@ -574,7 +638,7 @@ namespace HHBBTT
 
       // Z+HF and top (e+mu) control regions
       if (m_bools.at(HHBBTT::pass_trigger_SLT) && m_bools.at(HHBBTT::TWO_BJETS)){
-        if(jets->at(0)->pt() > 45. * Athena::Units::GeV && n_leptons == 2) {
+        if(jets->at(0)->pt() > 45. * Athena::Units::GeV && n_leptons_tightId_iso == 2) {
           float mll = -999.;
           float lep1_pt = -999.;
           if (ele1) {
@@ -593,6 +657,11 @@ namespace HHBBTT
         }
       }
 
+      // fake enriched antiiso-lephad region check:
+      m_bools.at(HHBBTT::pass_AntiIsoLepHad) = m_bools.at(HHBBTT::pass_SLT_1B) || m_bools.at(pass_SLT_2B) 
+                                               || m_bools.at(HHBBTT::pass_LTT_1B) || m_bools.at(pass_LTT_2B);
+      m_bools.at(HHBBTT::pass_AntiIsoLepHad) &= m_bools.at(HHBBTT::N_LEPTONS_CUT_ANTIISOLEPHAD);
+
       bool pass = false;
       for(const auto& channel : m_channels){
        if(channel == HHBBTT::LepHad2B) pass |= m_bools.at(HHBBTT::pass_LepHad_2B);
@@ -601,6 +670,7 @@ namespace HHBBTT
        else if(channel == HHBBTT::HadHad1B) pass |= m_bools.at(HHBBTT::pass_HadHad_1B);
        else if(channel == HHBBTT::ZCR) pass |= m_bools.at(HHBBTT::pass_ZCR);
        else if(channel == HHBBTT::TopEMuCR) pass |= m_bools.at(HHBBTT::pass_TopEMuCR);
+       else if(channel == HHBBTT::AntiIsoLepHad) pass |= m_bools.at(HHBBTT::pass_AntiIsoLepHad);
       }
 
       //****************
@@ -703,7 +773,7 @@ namespace HHBBTT
     bool use_DTT = false;
     bool use_DBT = false;
     for (const auto &channel : m_channels){
-      if (channel == HHBBTT::LepHad2B || channel == HHBBTT::LepHad1B){
+      if (channel == HHBBTT::LepHad2B || channel == HHBBTT::LepHad1B || channel == HHBBTT::AntiIsoLepHad){
 	use_SLT = true;
 	use_LTT = true;
       }

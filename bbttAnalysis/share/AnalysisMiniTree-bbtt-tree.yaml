@@ -1,17 +1,3 @@
-include: bbttAnalysis/RunConfig-bbtt-base.yaml
-
-channel: ["hadhad2b","hadhad1b","lephad2b","lephad1b","ZCR","TopEMuCR"]
-
-bypass: true
-do_trigger_filtering: false
-
-do_large_R_UFO_jets: true
-do_large_R_jets_OR: false
-do_small_R_jet_large_R_jet_OR: false
-
-large_R_jet:
-  runMuonJetPtCorr: true
-
 # Include the TTree configuration and update details
 ttree_output:
   - AnalysisMiniTree:
@@ -24,13 +10,22 @@ ttree_output:
       electrons: 'container_names.output.electrons'
       taus: 'container_names.output.taus'
       met : 'container_names.output.met'
-      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
     collection_options:
       small_R_jets:
         btag_info: true
-      large_R_jets:
-        substructure_info: true
-        truth_labels: true
+        truth_parent_info: true
+        run_selection: true
+      taus:
+        truth_branches: True
+        truth_parent_info: true
+        run_selection: true
+      electrons:
+        run_selection: true
+        truth_parent_info: true
+      muons:
+        run_selection: true
+        truth_parent_info: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'
+      taus: 'container_names.input.truthtaus'

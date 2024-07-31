@@ -36,9 +36,12 @@ namespace HHBBTT
     ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
 
     if(m_isMC){
-      m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
+      for(const auto& wp : m_eleWPNames){
+        m_ele_SF.emplace_back(CP::SysReadDecorHandle<float>("el_effSF_"+wp+"_%SYS%", this));
+      }
     }
-    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+    for(auto& handle : m_ele_SF)
+      ATH_CHECK (handle.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
     if(m_isMC){
       for(const auto& trig : m_eleTrigSF){
@@ -49,9 +52,12 @@ namespace HHBBTT
     }
 
     if(m_isMC){
-      m_mu_SF = CP::SysReadDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
+      for(const auto& wp : m_muonWPNames){
+        m_mu_SF.emplace_back(CP::SysReadDecorHandle<float>("muon_effSF_"+wp+"_%SYS%", this));
+      }
     }
-    ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
+    for(auto& handle : m_mu_SF)
+      ATH_CHECK (handle.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     if(m_isMC){
       for(const auto& trig : m_muonTrigSF){
@@ -75,7 +81,9 @@ namespace HHBBTT
     }
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_selected_el_isIso.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK (m_selected_mu_isIso.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
 
     if (!m_isBtag.empty()) {
@@ -217,15 +225,20 @@ namespace HHBBTT
         m_Fbranches.at(prefix+"_eta").set(*event, tlv.Eta(), sys);
         m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
         m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
-        if(m_isMC){
-          float SF = std::abs(leptons[i].second)==11 ?
-            m_ele_SF.get(*leptons[i].first,sys) :
-            m_mu_SF.get(*leptons[i].first,sys);
-          m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
-        }
         int charge = leptons[i].second>0 ? -1 : 1;
         m_Ibranches.at(prefix+"_charge").set(*event, charge, sys);
         m_Ibranches.at(prefix+"_pdgid").set(*event, leptons[i].second, sys);
+        bool lep_is_isolated = (std::abs(leptons[i].second) == 13) 
+                               ? m_selected_mu_isIso.get(*leptons[i].first, sys) 
+                               : m_selected_el_isIso.get(*leptons[i].first, sys);
+        m_Ibranches.at(prefix+"_isIso").set(*event, (int)lep_is_isolated, sys);
+        if(m_isMC){
+          int sfWpIndex = (m_muonWPNames.size() > 1 && !lep_is_isolated) ? 2 : 0; // TODO: fixme
+          float SF = std::abs(leptons[i].second)==11 ?
+            m_ele_SF[sfWpIndex].get(*leptons[i].first,sys) :
+            m_mu_SF[sfWpIndex].get(*leptons[i].first,sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
+        }
       }
 
       //selected tau
