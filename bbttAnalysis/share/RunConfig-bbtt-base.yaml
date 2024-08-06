@@ -42,6 +42,7 @@ Electron:
   Iso: "Loose_VarRad"
   extra_wps:
     - ["TightLH", "Loose_VarRad"]
+  forceFullSimConfig: true
 
 Muon:
   ID: "Loose"
