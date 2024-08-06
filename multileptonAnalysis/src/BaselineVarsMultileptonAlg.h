@@ -76,17 +76,26 @@ private:
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};
 
+    Gaudi::Property<std::vector<std::string>> m_floatVectorVariables
+          {this, "floatVectorVariableList", {}, "Name list of vectors of floating variables"};
+
     Gaudi::Property<std::vector<std::string>> m_intVariables
           {this, "intVariableList", {}, "Name list of integer variables"};
+
+    Gaudi::Property<std::vector<std::string>> m_charVectorVariables
+          {this, "charVectorVariableList", {}, "Name list of vectors of character variables"};
 
     CP::SysReadDecorHandle<float> m_met_sig
           {this, "METSignificance", "significance", "Met Significance"};
 
     /// \brief Setup sys-aware output decorations
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
-        m_Fbranches;
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
+
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<std::vector<float>>> m_FVbranches;
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
+
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<std::vector<char>>> m_CVbranches;
     
  };
 }

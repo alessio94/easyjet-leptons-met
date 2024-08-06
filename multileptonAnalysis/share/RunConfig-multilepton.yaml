@@ -25,15 +25,50 @@ small_R_jet:
   variables_int_bjets: ["truthLabel"]
 
 Electron:
-  ID: "MediumLH"
-  Iso: "Loose_VarRad"
+  ID: "LooseBLayer"
+  Iso: "NonIso"
+  extra_wps: 
+    - ["Tight", "Tight_VarRad"]
+    - ["Tight", "TightTrackOnly_VarRad"]
+    - ["Tight", "TightTrackOnly_FixedRad"]
+    - ["Tight", "Loose_VarRad"]
+    - ["Tight", "HighPtCaloOnly"]
+    - ["Medium", "Tight_VarRad"]
+    - ["Medium", "TightTrackOnly_VarRad"]
+    - ["Medium", "TightTrackOnly_FixedRad"]
+    - ["Medium", "Loose_VarRad"]
+    - ["Medium", "HighPtCaloOnly"]
+    - ["LooseBLayer", "Tight_VarRad"]
+    - ["LooseBLayer", "TightTrackOnly_VarRad"]
+    - ["LooseBLayer", "TightTrackOnly_FixedRad"]
+    - ["LooseBLayer", "HighPtCaloOnly"]
 
 Muon:
-  ID: "Medium"
-  Iso: "PflowLoose_VarRad"
+  ID: "Loose"
+  Iso: "NonIso"
+  extra_wps:
+    - ["Tight", "PflowLoose_VarRad"]
+    - ["Tight", "PflowTight_VarRad"]
+    - ["Tight", "Loose_VarRad"]
+    - ["Tight", "Tight_VarRad"]
+    - ["Medium", "PflowLoose_VarRad"]
+    - ["Medium", "PflowTight_VarRad"]
+    - ["Medium", "Loose_VarRad"]
+    - ["Medium", "Tight_VarRad"]
+    - ["HighPt", "PflowLoose_VarRad"]
+    - ["HighPt", "PflowTight_VarRad"]
+    - ["HighPt", "Loose_VarRad"]
+    - ["HighPt", "Tight_VarRad"]
+    - ["Loose", "PflowLoose_VarRad"]
+    - ["Loose", "PflowTight_VarRad"]
+    - ["Loose", "Tight_VarRad"]
+    # - ["LowPt", "PflowLoose_VarRad"]
+    # - ["LowPt", "PflowTight_VarRad"]
+    # - ["LowPt", "Loose_VarRad"]
+    # - ["LowPt", "Tight_VarRad"]
 
 Lepton:
-  amount: 2
+  amount: 4
 
 # orthogonality studies  
 orthogonality:
@@ -68,6 +103,14 @@ ttree_output:
     collection_options:
       small_R_jets:
         btag_info: true
+      electrons:
+        run_selection: true
+        truth_parent_info: true
+        id_iso_variables: true
+      muons:
+        run_selection: true
+        truth_parent_info: true
+        id_iso_variables: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'

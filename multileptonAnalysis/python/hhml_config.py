@@ -11,7 +11,8 @@ from EasyjetHub.output.ttree.selected_objects import (
 
 def hhml_cfg(
         flags, smalljetkey, muonkey, electronkey,
-        float_variables=None, int_variables=None
+        float_variables=None, float_vector_variables=None,
+        int_variables=None, char_vector_variables=None
 ):
     if not float_variables:
         float_variables = []
@@ -21,20 +22,24 @@ def hhml_cfg(
     cfg = ComponentAccumulator()
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    tightMuonWPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
     cfg.merge(MuonSelectorAlgCfg(
         flags,
         containerInKey=muonkey,
         containerOutKey="hhmlAnalysisMuons_%SYS%",
         looseMuonWP=MuonWPLabel,
+        tightMuonWPs=tightMuonWPs,
         minPt=9 * Units.GeV
     ))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    tightElectronWP = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
         containerInKey=electronkey,
         containerOutKey="hhmlAnalysisElectrons_%SYS%",
         looseEleWP=ElectronWPLabel,
+        tightEleWPs=tightElectronWP,
         minPt=9 * Units.GeV
     ))
 
@@ -69,7 +74,9 @@ def hhml_cfg(
             eleWP=ElectronWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,
-            intVariableList=int_variables
+            floatVectorVariableList=float_vector_variables,
+            intVariableList=int_variables,
+            charVectorVariableList=char_vector_variables
         )
     )
 
@@ -92,7 +99,9 @@ def hhml_branches(flags):
     # BaselineVarshhmlAlg algorithm
     all_baseline_variable_names = []
     float_variable_names = []
+    float_vector_variable_names = []
     int_variable_names = []
+    char_vector_variable_names = []
 
     # these are the variables that will always be stored by easyjet specific to HHbbtt
     # further below there are more high level variables which can be
@@ -105,7 +114,9 @@ def hhml_branches(flags):
 
     all_baseline_variable_names += [
         *float_variable_names,
+        *float_vector_variable_names,
         *int_variable_names,
+        *char_vector_variable_names
     ]
 
     for var in all_baseline_variable_names:
@@ -129,4 +140,5 @@ def hhml_branches(flags):
         + flags.Analysis.systematics_suffix_separator + "%SYS%"
     ]
 
-    return branches, float_variable_names, int_variable_names
+    return (branches, float_variable_names, float_vector_variable_names,
+            int_variable_names, char_vector_variable_names)
