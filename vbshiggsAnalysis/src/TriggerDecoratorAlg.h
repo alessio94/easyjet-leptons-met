@@ -102,11 +102,26 @@ namespace VBSHIGGS
       std::map<VBSHIGGS::RunBooleans, SG::ReadDecorHandleKey<xAOD::EventInfo>> m_runBooleans_key;
       typedef std::unordered_map<VBSHIGGS::RunBooleans, SG::ReadDecorHandle<xAOD::EventInfo, bool> > runBoolReadDecoMap;
 
-      void evaluateTriggerCuts(const xAOD::EventInfo *event, const runBoolReadDecoMap& runBoolDecos, const xAOD::ElectronContainer *electrons , const xAOD::MuonContainer *muons, const CP::SystematicSet& sys);
-      void evaluateSingleLeptonTrigger(const xAOD::EventInfo* event, const runBoolReadDecoMap& runBoolDecos, const xAOD::Electron* ele, const xAOD::Muon* mu, const CP::SystematicSet& sys);
-      void evaluateDiLeptonTrigger(const xAOD::EventInfo* event, const runBoolReadDecoMap& runBoolDecos, const xAOD::Electron* ele0, const xAOD::Electron* ele1, const xAOD::Muon* mu0, const xAOD::Muon* mu1, const CP::SystematicSet& sys);
-      void evaluateAsymmetricLeptonTrigger(const xAOD::EventInfo* event, const runBoolReadDecoMap& runBoolDecos, const xAOD::Electron* ele, const xAOD::Muon* mu, const CP::SystematicSet& sys);
-      void setThresholds(const xAOD::EventInfo* event, const runBoolReadDecoMap& runBoolDecos, const CP::SystematicSet& sys);
+      void evaluateTriggerCuts(const xAOD::EventInfo *event,
+			       const runBoolReadDecoMap& runBoolDecos,
+			       const xAOD::ElectronContainer *electrons ,
+			       const xAOD::MuonContainer *muons,
+			       const CP::SystematicSet& sys);
+      void evaluateSingleLeptonTrigger(const xAOD::EventInfo* event,
+				       const runBoolReadDecoMap& runBoolDecos,
+				       const xAOD::Electron* ele, const xAOD::Muon* mu,
+				       const CP::SystematicSet& sys);
+      void evaluateDiLeptonTrigger(const xAOD::EventInfo* event,
+				   const runBoolReadDecoMap& runBoolDecos,
+				   const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+				   const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+				   const CP::SystematicSet& sys);
+      void evaluateAsymmetricLeptonTrigger(const xAOD::EventInfo* event,
+					   const xAOD::Electron* ele, const xAOD::Muon* mu,
+					   const CP::SystematicSet& sys);
+      void setThresholds(const xAOD::EventInfo* event,
+			 const runBoolReadDecoMap& runBoolDecos,
+			 const CP::SystematicSet& sys);
   };
 }
 

@@ -7,8 +7,8 @@
 namespace VBSHIGGS
 {
   void getSingleEleTriggers(int year, const xAOD::EventInfo* event,
-			                const runBoolReadDecoMap& runBoolDecos,
-			                std::vector<std::string>& single_ele_paths){
+			    const runBoolReadDecoMap& runBoolDecos,
+			    std::vector<std::string>& single_ele_paths){
     if(year==2015){
       single_ele_paths = {
         "HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium",
@@ -50,8 +50,8 @@ namespace VBSHIGGS
   }
 
   void getSingleMuTriggers(int year, const xAOD::EventInfo* event,
-			               const runBoolReadDecoMap& runBoolDecos,
-			               std::vector<std::string>& single_mu_paths){
+			   const runBoolReadDecoMap& runBoolDecos,
+			   std::vector<std::string>& single_mu_paths){
     if(year==2015){
       single_mu_paths = {"HLT_mu20_iloose_L1MU15", "HLT_mu50"};
     }
@@ -59,9 +59,9 @@ namespace VBSHIGGS
       single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
     }
     else if(2022<=year && year<=2023 &&
-	        !runBoolDecos.at(VBSHIGGS::is22_75bunches)(*event) &&
-	        !runBoolDecos.at(VBSHIGGS::is23_75bunches)(*event) &&
-	        !runBoolDecos.at(VBSHIGGS::is23_400bunches)(*event)){
+	    !runBoolDecos.at(VBSHIGGS::is22_75bunches)(*event) &&
+	    !runBoolDecos.at(VBSHIGGS::is23_75bunches)(*event) &&
+	    !runBoolDecos.at(VBSHIGGS::is23_400bunches)(*event)){
       single_mu_paths = {
         "HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
         "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
@@ -71,8 +71,8 @@ namespace VBSHIGGS
   }
 
   void getDiEleTriggers(int year, const xAOD::EventInfo* event,
-			               const runBoolReadDecoMap& runBoolDecos,
-			               std::vector<std::string>& di_ele_paths){
+			const runBoolReadDecoMap& runBoolDecos,
+			std::vector<std::string>& di_ele_paths){
     if(year==2015){
       di_ele_paths = {"HLT_2e12_lhloose_L12EM10VH"};
     }
@@ -103,9 +103,7 @@ namespace VBSHIGGS
     }
   }
 
-  void getDiMuTriggers(int year, const xAOD::EventInfo* event,
-			               const runBoolReadDecoMap& runBoolDecos,
-			               std::vector<std::string>& di_mu_paths){
+  void getDiMuTriggers(int year, std::vector<std::string>& di_mu_paths){
     if(year==2015){
       di_mu_paths = {"HLT_mu18_mu8noL1"};
     }
@@ -117,9 +115,7 @@ namespace VBSHIGGS
     }
   }
 
-  void getAsymLep2Triggers(int year, const xAOD::EventInfo* event,
-			               const runBoolReadDecoMap& runBoolDecos,
-			               std::vector<std::string>& asym_lepton_paths){
+  void getAsymLep2Triggers(int year, std::vector<std::string>& asym_lepton_paths){
     if(year==2015){
       asym_lepton_paths = {"HLT_e17_lhloose_mu14"};
     }
@@ -131,9 +127,7 @@ namespace VBSHIGGS
     }
   }
 
-  void getAsymLep1emTriggers(int year, const xAOD::EventInfo* event,
-			               const runBoolReadDecoMap& runBoolDecos,
-			               std::vector<std::string>& asym_lepton_paths){
+  void getAsymLep1emTriggers(int year, std::vector<std::string>& asym_lepton_paths){
     if(year==2016){
       asym_lepton_paths = {"HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1"};
     }
@@ -145,9 +139,7 @@ namespace VBSHIGGS
     }
   }
 
-  void getAsymLep1meTriggers(int year, const xAOD::EventInfo* event,
-			               const runBoolReadDecoMap& runBoolDecos,
-			               std::vector<std::string>& asym_lepton_paths){
+  void getAsymLep1meTriggers(int year, std::vector<std::string>& asym_lepton_paths){
     if(year==2015){
       asym_lepton_paths = {"HLT_e7_lhmedium_mu24"};
     }

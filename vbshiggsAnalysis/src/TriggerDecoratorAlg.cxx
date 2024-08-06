@@ -111,8 +111,9 @@ namespace VBSHIGGS
 
     if (ele0 || mu0) evaluateSingleLeptonTrigger(event, runBoolDecos, ele0, mu0, sys);
     if (ele1 || mu1) evaluateSingleLeptonTrigger(event, runBoolDecos, ele1, mu1, sys);
-    if ((ele0 && ele1) || (mu0 && mu1)) evaluateDiLeptonTrigger(event, runBoolDecos, ele0, ele1, mu0, mu1, sys);
-    if (ele0 && mu0) evaluateAsymmetricLeptonTrigger(event, runBoolDecos, ele0, mu0, sys);
+    if ((ele0 && ele1) || (mu0 && mu1))
+      evaluateDiLeptonTrigger(event, runBoolDecos, ele0, ele1, mu0, mu1, sys);
+    if (ele0 && mu0) evaluateAsymmetricLeptonTrigger(event, ele0, mu0, sys);
   }
 
   void TriggerDecoratorAlg::evaluateSingleLeptonTrigger
@@ -185,7 +186,7 @@ namespace VBSHIGGS
 
     // Check di-muon triggers
     std::vector<std::string> di_mu_paths;
-    getDiMuTriggers(year, event, runBoolDecos, di_ele_paths);
+    getDiMuTriggers(year, di_mu_paths);
 
     bool trigPassed_DMT = false;
     if (mu0 && mu1) {
@@ -206,7 +207,7 @@ namespace VBSHIGGS
   }
 
   void TriggerDecoratorAlg::evaluateAsymmetricLeptonTrigger
-  (const xAOD::EventInfo *event, const runBoolReadDecoMap& runBoolDecos,
+  (const xAOD::EventInfo *event,
    const xAOD::Electron *ele, const xAOD::Muon *mu,
    const CP::SystematicSet& sys)
   {
@@ -218,7 +219,7 @@ namespace VBSHIGGS
     if (ele && mu) {
 
       std::vector<std::string> asym_lepton_paths;
-      getAsymLep2Triggers(year, event, runBoolDecos, asym_lepton_paths);
+      getAsymLep2Triggers(year, asym_lepton_paths);
 
       for(const auto& trig : asym_lepton_paths){
         bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
@@ -231,7 +232,7 @@ namespace VBSHIGGS
       trigPassed_ASLT2 &= mu->pt() > m_pt_threshold[VBSHIGGS::ASLT2][VBSHIGGS::leadingmu];
       if (ele->pt() > mu->pt()) {
         asym_lepton_paths = {};
-        getAsymLep1emTriggers(year, event, runBoolDecos, asym_lepton_paths);
+        getAsymLep1emTriggers(year, asym_lepton_paths);
         
         for(const auto& trig : asym_lepton_paths){
           bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
@@ -245,7 +246,7 @@ namespace VBSHIGGS
       } 
       else {
         asym_lepton_paths = {};
-        getAsymLep1meTriggers(year, event, runBoolDecos, asym_lepton_paths);
+        getAsymLep1meTriggers(year, asym_lepton_paths);
 
         for(const auto& trig : asym_lepton_paths){
           bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);

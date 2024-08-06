@@ -1,6 +1,9 @@
 # Declare the package
 atlas_subdir(vbshiggsAnalysis)
 
+# We don't want any warnings in compilation
+add_compile_options(-Werror)
+
 # Build the Athena component library
 atlas_add_component(vbshiggsAnalysis
   src/*.cxx
