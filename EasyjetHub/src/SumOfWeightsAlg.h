@@ -42,13 +42,6 @@ namespace Easyjet
       SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
       { this, "event", "EventInfo", "EventInfo to read" };
 
-      long long int m_total_mcEvent{0};
-      double m_total_mcEventWeight{0.0};
-      double m_total_mcEventWeight_squared{0.0};
-
-      SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
-        this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};
-
       // for systematics 
       std::unordered_map<CP::SystematicSet,TH1*> m_hist_sys;
       std::unordered_map<CP::SystematicSet,long long int> m_total_mcEvent_sys;
@@ -68,10 +61,6 @@ namespace Easyjet
       m_eventHandle{ this, "event_for_sys", "EventInfo",   "EventInfo container to read" };
 
       CP::SysListHandle m_systematicsList {this};
-
-
-    Gaudi::Property<int> m_weightIndex
-      { this, "weightIndex", -1, "Special weight Index based on MCChannelNumber"};        
 
   };
 

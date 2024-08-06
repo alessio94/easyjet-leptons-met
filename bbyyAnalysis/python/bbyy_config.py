@@ -11,7 +11,7 @@ from EasyjetHub.output.ttree.selected_objects import (
 
 import pathlib
 import os
-import re
+import yaml
 
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
@@ -86,7 +86,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             isMC=flags.Input.isMC,
             bypass=flags.Analysis.bypass,
             enableSinglePhotonTrigger=flags.Analysis.enable_single_photon_trigger,
-            weightIndex=get_weight_index(flags),
+            specialSysWeight=get_sys_weight_name(flags),
         )
     )
 
@@ -96,6 +96,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
                 "MbbKinFitDecoratorAlg",
                 JetMinPt=25.,
                 bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                doSystematics=flags.Analysis.do_CP_systematics,
             )
         )
 
@@ -111,7 +112,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             isMC=flags.Input.isMC,
             doKF=flags.Analysis.do_KinematicFit,
             floatVariableList=float_variables,
-            intVariableList=int_variables
+            intVariableList=int_variables,
+            doSystematics=flags.Analysis.do_CP_systematics,
         )
     )
 
@@ -121,7 +123,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
                 "BoostedVarsbbyyAlg",
                 isMC=flags.Input.isMC,
                 floatVariableList=float_variables,
-                intVariableList=int_variables
+                intVariableList=int_variables,
+                doSystematics=flags.Analysis.do_CP_systematics,
             )
         )
 
@@ -135,7 +138,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
                 mS_values=flags.Analysis.mS_values,
                 mX_values=flags.Analysis.mX_values,
                 mX_1bjet=flags.Analysis.mX_1bjet,
-                floatVariableList=float_SH_var
+                floatVariableList=float_SH_var,
             )
         )
 
@@ -303,9 +306,14 @@ def bbyy_branches(flags):
 
     all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
+
     for var in all_baseline_variable_names:
-        branches += [f"EventInfo.{var}_%SYS% -> bbyy_{var}"
-                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+        branches += [f"EventInfo.{var}_{sys_suffix} -> bbyy_{var}"
+                     + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
@@ -320,21 +328,17 @@ def bbyy_branches(flags):
     # More event info variables:
     s_name = flags.Analysis.selection_name
     branches += \
-        [f"EventInfo.bbyy_pass_{s_name}_%SYS% -> bbyy_pass_{s_name}"
-         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+        [f"EventInfo.bbyy_pass_{s_name}_{sys_suffix} -> bbyy_pass_{s_name}"
+         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     if (flags.Analysis.save_bbyy_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
+            extra = ""
             if cut == "PASS_TRIGGER" or cut == "PASS_TRIGGER_MATCHING":
                 extra = "SINGLE_OR_DIPHOTON"
-                branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}_{extra}"
-                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
-            else:
-                branches += [f"EventInfo.{cut}_%SYS% -> bbyy_{cut}"
-                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
-
-    branches += ["EventInfo.eventWeight -> eventWeight"]
+            branches += [f"EventInfo.{cut}_{sys_suffix} -> bbyy_{cut}{extra}"
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     photon_triggers = [
         "pass_trigger_single_photon",
@@ -343,8 +347,8 @@ def bbyy_branches(flags):
         "pass_matching_trigger_diphoton"]
 
     for trigger in photon_triggers:
-        branches += [f"EventInfo.{trigger}_%SYS% -> {trigger}"
-                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+        branches += [f"EventInfo.{trigger}_{sys_suffix} -> {trigger}"
+                     + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     return branches, float_variable_names, int_variable_names
 
@@ -357,8 +361,12 @@ def FullPath(rawpath):
             return fullpath
 
 
-def contain_dalitz(flags):
-    dsid = str(flags.Input.MCChannelNumber)
+def contain_dalitz(input):
+    # Determine if input is flags or an integer DSID
+    if isinstance(input, int):
+        dsid = str(input)
+    else:
+        dsid = str(input.Input.MCChannelNumber)
     # file name hard-coded
     with open(FullPath("bbyyAnalysis/DalitzDataset.txt"), 'r') as file_in:
         dataset_list = file_in.readlines()
@@ -368,16 +376,31 @@ def contain_dalitz(flags):
     return False
 
 
-def get_weight_index(flags):
-    dsid = str(flags.Input.MCChannelNumber)
+def get_sys_weight_name(input):
+    # Determine if input is flags or an integer DSID
+    if isinstance(input, int):
+        dsid = input
+    else:
+        dsid = int(input.Input.MCChannelNumber)
+
     # file name hard-coded
     with open(FullPath("bbyyAnalysis/SpecialWeightIndices.yaml"), 'r') as file_in:
-        pattern = r"DSID:\s*(\d+)\s*\n\s*weightIndex:\s*(\d+)"
-        content = file_in.read()
-        matches = re.findall(pattern, content)
+        try:
+            content = yaml.safe_load(file_in)
+        except yaml.YAMLError as exc:
+            raise ValueError(f"Error in configuration file: {exc}")
 
-        for match_dsid, weight_index in matches:
-            if match_dsid == dsid:
-                return int(weight_index)
+        for entry in content:
+            if entry['DSID'] == dsid:
+                sys_weight_name = entry.get("sysWeightName", "")
 
-    return 0  # in case no matching DSID is found, set the nominal weight index to 0.
+                # Exception in case I forgot to map the DSID with
+                # the sys weight name for a MC sample.
+                if sys_weight_name is None:
+                    raise ValueError(
+                        f"DSID {dsid} must have sysWeightName"
+                    )
+
+                return sys_weight_name if sys_weight_name else ""
+
+    return ""  # in case no matching DSID is found

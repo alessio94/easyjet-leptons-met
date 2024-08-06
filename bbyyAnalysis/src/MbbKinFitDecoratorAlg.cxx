@@ -40,7 +40,8 @@ namespace HHBBYY{
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
-
+      // In case of special Higgs sample, run only on NOSYS
+      if (!m_doSystematics && sys.name()!="") continue;
         // Retrieve inputs
         const xAOD::EventInfo *event = nullptr;
         ANA_CHECK (m_eventHandle.retrieve (event, sys));

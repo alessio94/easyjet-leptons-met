@@ -42,6 +42,8 @@ namespace HHBBYY
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     
+    ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
+
     m_photonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_photonWPName+"_%SYS%", this);
     m_photonTNIWPDecorHandle = CP::SysReadDecorHandle<char>
@@ -78,12 +80,10 @@ namespace HHBBYY
   
     // special flag for all cuts
     ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_mcEventWeightsKey.initialize()); 
-    ATH_CHECK(m_eventWeightDecorKey.initialize());
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize()); 
-
+    
     m_bbyyCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
 
     for (const std::string &cut : m_inputCutList)  { 
@@ -127,8 +127,6 @@ namespace HHBBYY
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
-
-      SG::WriteDecorHandle<xAOD::EventInfo, float> m_eventWeightDecorHandle(m_eventWeightDecorKey);
      
       // Set run number dependent quantities for nominal systematics
       if(sys.name()==""){
@@ -224,16 +222,11 @@ namespace HHBBYY
       m_passallcuts.set(*event, passedall, sys);
 
       // do the CUTFLOW only with sys="" -> NOSYS
-      if (sys.name()!="") continue;
-
-      if (m_isMC) {
-          SG::ReadDecorHandle<xAOD::EventInfo, std::vector<float>> mcEventWeightsHandle(m_mcEventWeightsKey);
-          eventWeights = mcEventWeightsHandle(*event);
-        }
+      if (sys.name()!=m_specialSysWeight) continue;
 
       // Compute total_events
       m_total_events+=1; 
-      if (m_isMC) m_total_mcEventWeight+= eventWeights.at(m_weightIndex);
+      if (m_isMC) m_total_mcEventWeight+=  m_generatorWeight.get(*event, sys);
 
       // Count how many cuts the event passed and increase the relative counter
       for (const auto &cut : m_inputCutList) {
@@ -245,7 +238,7 @@ namespace HHBBYY
             else if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER_MATCHING")
               pass = m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
             m_bbyyCuts(cut).counter += pass;
-            if (m_isMC) m_bbyyCuts(cut).w_counter += eventWeights.at(m_weightIndex) * pass;
+            if (m_isMC) m_bbyyCuts(cut).w_counter += m_generatorWeight.get(*event, sys) * pass;
           }
         }
       }
@@ -276,10 +269,8 @@ namespace HHBBYY
         else if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER_MATCHING")
           pass = m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
         m_bbyyCuts[i].relativeCounter += pass;
-        if (m_isMC) m_bbyyCuts(cut).w_relativeCounter += eventWeights.at(m_weightIndex) * pass;
+        if (m_isMC) m_bbyyCuts(cut).w_relativeCounter += m_generatorWeight.get(*event, sys) * pass;
       }
-
-      if (m_isMC) m_eventWeightDecorHandle(*event) = eventWeights.at(m_weightIndex);
 
       if (not (m_bypass or passedall) ) continue;
 

@@ -15,6 +15,7 @@ StatusCode SumOfWeightsTool::initialize(){
   const std::unordered_map<std::string, VarType> inVars = {};
   const std::vector<std::string> inVecVars = {};
   const std::unordered_map<std::string, VarType> outVars = {
+    {"totalEvents", VarType::Long},
     {"sumOfWeights", VarType::Float}
   };
 
@@ -33,6 +34,7 @@ StatusCode SumOfWeightsTool::initialize(){
   if (key==nullptr){return StatusCode::FAILURE;} 
   m_inHisto = dynamic_cast<TH1F*>(m_inFile->Get(key->GetName())); 
   m_sumOfEventWeight = m_inHisto->GetBinContent(2);
+  m_sumOfEvents = m_inHisto->GetBinContent(1);
 
   delete m_inHisto;
   m_inFile->Close();
@@ -50,5 +52,6 @@ void SumOfWeightsTool::computeVariables
  std::unordered_map<std::string, varTypePointer>& outVars) const{
 
   setContent<float>(outVars, "sumOfWeights", m_sumOfEventWeight);
+  setContent<unsigned long long>(outVars, "totalEvents", m_sumOfEvents);
   
 }

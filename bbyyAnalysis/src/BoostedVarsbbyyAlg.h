@@ -54,7 +54,9 @@ namespace HHBBYY
     Gaudi::Property<std::vector<std::string>> m_Ivarnames
       {this, "intVariableList", {}, "Name list of integer variables"};
 
-
+    Gaudi::Property<bool> m_doSystematics
+      { this, "doSystematics", false, "Run on all systematics" };
+      
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float> > m_Fbranches;
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int> > m_Ibranches;

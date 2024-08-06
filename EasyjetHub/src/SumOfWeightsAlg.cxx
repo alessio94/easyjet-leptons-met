@@ -22,17 +22,16 @@ namespace Easyjet
     ATH_MSG_INFO("*********************************\n");
 
     ATH_CHECK (m_eventInfoKey.initialize());
-    ATH_CHECK (m_mcEventWeightsKey.initialize());
 
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize()); 
 
-    ATH_CHECK (book (TH1F("SumOfWeights_special", "Sum of weights",2, 0.5, 2.5)));
 
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
+
       auto histIter = m_hist_sys.find (sys);
       if (histIter == m_hist_sys.end())
       {
@@ -67,13 +66,6 @@ namespace Easyjet
     SG::ReadHandle<xAOD::EventInfo> event(m_eventInfoKey);
     ATH_CHECK (event.isValid());
 
-    SG::ReadDecorHandle<xAOD::EventInfo, std::vector<float>> mcEventWeightsHandle(m_mcEventWeightsKey);
-    std::vector<float> eventWeights = mcEventWeightsHandle(*event);
-
-    m_total_mcEvent += 1;
-    m_total_mcEventWeight += eventWeights.at(m_weightIndex);
-    m_total_mcEventWeight_squared += eventWeights.at(m_weightIndex)*eventWeights.at(m_weightIndex);
-
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
       const xAOD::EventInfo *evtInfo = nullptr;
@@ -93,9 +85,6 @@ namespace Easyjet
 
   StatusCode SumOfWeightsAlg::finalize()
   {
-    hist("SumOfWeights_special")->SetBinContent(1,m_total_mcEvent);
-    hist("SumOfWeights_special")->SetBinContent(2,m_total_mcEventWeight);
-    hist("SumOfWeights_special")->SetBinError(2,std::sqrt(m_total_mcEventWeight_squared));
 
     // fill sys to hist here
     for (const auto& sys : m_systematicsList.systematicsVector())

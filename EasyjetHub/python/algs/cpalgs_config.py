@@ -28,6 +28,8 @@ from EasyjetHub.steering.utils.systematics_helper import consolidate_systematics
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from EasyjetHub.algs.event_info_global_alg_config import event_info_global_alg_cfg
 
+from bbyyAnalysis.bbyy_config import get_sys_weight_name
+
 # Map object types to sequence configurators
 analysis_seqs = {
     "muons": muon_sequence,
@@ -50,9 +52,18 @@ def cpalgs_cfg(flags):
     # Create SystematicsSvc explicitly:
     sysSvc = CompFactory.CP.SystematicsSvc("SystematicsSvc")
     cfg.addService(sysSvc)
-    if flags.Analysis.do_CP_systematics:
+
+    sys_weight_name = get_sys_weight_name(flags)
+
+    if flags.Analysis.do_CP_systematics or (bool)(sys_weight_name):
         sysSvc.sigmaRecommended = 1
-        systs = consolidate_systematics_regex(flags.Analysis.systematics_regex)
+
+        if not flags.Analysis.do_CP_systematics and (bool)(sys_weight_name):
+            # Convert sys weight name to be consolidated
+            sys_weight_name = [f".*{sys_weight_name}"]
+            systs = consolidate_systematics_regex(sys_weight_name)
+        else:
+            systs = consolidate_systematics_regex(flags.Analysis.systematics_regex)
 
         log.info("Systematics regex:")
         log.info(systs)

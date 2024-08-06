@@ -8,6 +8,11 @@ def get_selected_objects_branches_variables(flags, analysis):
     float_variable_names = []
     int_variable_names = []
 
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
+
     # All jets
     for var in [*flags.Analysis.small_R_jet.variables_int_allJets,
                 *flags.Analysis.small_R_jet.variables_allJets]:
@@ -20,9 +25,9 @@ def get_selected_objects_branches_variables(flags, analysis):
             if var in flags.Analysis.small_R_jet.variables_int_allJets:
                 int_variable_names += [f"Jet{index+1}_{var}"]
             # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.Jet{index+1}_{var}_%SYS% \
+            branches += [f"EventInfo.Jet{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Jet{index+1}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # B tagged jets
     for var in [*flags.Analysis.small_R_jet.variables_int_bjets,
@@ -36,9 +41,9 @@ def get_selected_objects_branches_variables(flags, analysis):
             if var in flags.Analysis.small_R_jet.variables_int_bjets:
                 int_variable_names += [f"Jet_b{index+1}_{var}"]
             # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.Jet_b{index+1}_{var}_%SYS% \
+            branches += [f"EventInfo.Jet_b{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Jet_b{index+1}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # Large R jets
     for var in [*flags.Analysis.large_R_jet.variables_int_LargeRJets,
@@ -52,9 +57,9 @@ def get_selected_objects_branches_variables(flags, analysis):
             if var in flags.Analysis.large_R_jet.variables_int_LargeRJets:
                 int_variable_names += [f"LargeRJet{index+1}_{var}"]
             # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.LargeRJet{index+1}_{var}_%SYS% \
+            branches += [f"EventInfo.LargeRJet{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_LargeRJet{index+1}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # Photons
     for var in [*flags.Analysis.Photon.variables,
@@ -68,9 +73,9 @@ def get_selected_objects_branches_variables(flags, analysis):
             if var in flags.Analysis.Photon.variables_int:
                 int_variable_names += [f"Photon{index+1}_{var}"]
             # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.Photon{index+1}_{var}_%SYS% \
+            branches += [f"EventInfo.Photon{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Photon{index+1}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # Electrons
     for var in [*flags.Analysis.Electron.variables,
@@ -84,9 +89,9 @@ def get_selected_objects_branches_variables(flags, analysis):
             if var in flags.Analysis.Electron.variables_int:
                 int_variable_names += [f"Electron{index+1}_{var}"]
             # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.Electron{index+1}_{var}_%SYS% \
+            branches += [f"EventInfo.Electron{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Electron{index+1}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # Muons
     for var in [*flags.Analysis.Muon.variables,
@@ -100,9 +105,9 @@ def get_selected_objects_branches_variables(flags, analysis):
             if var in flags.Analysis.Muon.variables_int:
                 int_variable_names += [f"Muon{index+1}_{var}"]
             # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.Muon{index+1}_{var}_%SYS% \
+            branches += [f"EventInfo.Muon{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Muon{index+1}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # Taus
     for var in [*flags.Analysis.Tau.variables,
@@ -116,9 +121,9 @@ def get_selected_objects_branches_variables(flags, analysis):
             if var in flags.Analysis.Tau.variables_int:
                 int_variable_names += [f"Tau{index+1}_{var}"]
             # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.Tau{index+1}_{var}_%SYS% \
+            branches += [f"EventInfo.Tau{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Tau{index+1}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # Selected Lepton
     for var in [*flags.Analysis.Lepton.variables,
@@ -132,8 +137,8 @@ def get_selected_objects_branches_variables(flags, analysis):
             if var in flags.Analysis.Lepton.variables_int:
                 int_variable_names += [f"Lepton{index_str}_{var}"]
             # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.Lepton{index_str}_{var}_%SYS% \
+            branches += [f"EventInfo.Lepton{index_str}_{var}_{sys_suffix} \
                         -> {analysis}_Lepton{index_str}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     return branches, float_variable_names, int_variable_names

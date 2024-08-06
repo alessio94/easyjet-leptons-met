@@ -181,14 +181,11 @@ namespace HHBBYY
 
       std::vector<float> eventWeights{};
 
-      SG::WriteDecorHandleKey<xAOD::EventInfo> m_eventWeightDecorKey{
-          this, "mcEventWeightsOut", "EventInfo.eventWeight", "Event Weight of correct weight index"};
+      Gaudi::Property<std::string> m_specialSysWeight
+        { this, "specialSysWeight", "", "Special sys weight Name based on MCChannelNumber"}; 
 
-      SG::ReadDecorHandleKey<xAOD::EventInfo> m_mcEventWeightsKey{
-        this, "mcEventWeights", "EventInfo.mcEventWeights", "mc event weights"};
-
-      Gaudi::Property<int> m_weightIndex
-        { this, "weightIndex", -1, "Special weight Index based on MCChannelNumber"}; 
+      CP::SysReadDecorHandle<float>
+        m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
 
   };
 

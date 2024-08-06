@@ -63,6 +63,8 @@ namespace HHBBYY {
               "Angles Resolution"};
       Gaudi::Property<bool> m_isFixAngles { this, "FixAnglesFit", true, 
               "Fix Angles in Fit"};       
+      Gaudi::Property<bool> m_doSystematics
+        { this, "doSystematics", false, "Run on all systematics" };
 
       std::unique_ptr<KinematicFitTool> m_KFTool;
 

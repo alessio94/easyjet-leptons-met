@@ -9,14 +9,59 @@
 import sys
 import yaml
 import os
+import re
 
 from argparse import ArgumentParser
 from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 
-from bbyyAnalysis.bbyy_config import FullPath
+from bbyyAnalysis.bbyy_config import FullPath, get_sys_weight_name, contain_dalitz
 from EasyjetPlus.PostProcessTools import mergeFiles
+
+import ROOT
+
+
+def get_DSID(file_path):
+    file = ROOT.TFile.Open(file_path)
+    if not file or file.IsZombie():
+        raise IOError(f"Could not open file: {file_path}")
+
+    metadata = file.Get("metadata")
+    if not metadata:
+        raise KeyError("The 'metadata' histo is not found in the file.")
+
+    bin_label = metadata.GetXaxis().GetBinLabel(3)
+
+    DSID = int(bin_label)
+    file.Close()
+    return DSID
+
+
+def get_sys_histogram_name(file_path, sys_suffix):
+    file = ROOT.TFile.Open(file_path)
+    if not file or file.IsZombie():
+        raise IOError(f"Could not open file: {file_path}")
+
+    histogram_name = f"SumOfWeights_{sys_suffix}"
+    if file.GetListOfKeys().Contains(histogram_name):
+        file.Close()
+        return histogram_name
+    else:
+        pattern = re.compile(f"^CutBookkeeper_.*_{sys_suffix}$")
+        matching_histograms = [
+            key.GetName() for key in file.GetListOfKeys()
+            if pattern.match(key.GetName().split(';')[0])
+        ]
+        if matching_histograms:
+            file.Close()
+            return matching_histograms[0].split(';')[0]
+        else:
+            file.Close()
+            raise RuntimeError(
+                f"Neither SumOfWeights_{sys_suffix} nor"
+                f"CutBookkeeper_*_{sys_suffix} found in the file."
+            )
 
 
 def RunEasyjetPlus(args):
@@ -29,9 +74,14 @@ def RunEasyjetPlus(args):
 
     acc = MainServicesCfg(flags)
 
+    dsid = int(get_DSID(args.inFile))
+    sys_weight_prefix = get_sys_weight_name(dsid)
+    if sys_weight_prefix == "":
+        sys_weight_prefix = "NOSYS"
+
     SOWTool = CompFactory.SumOfWeightsTool(inFile=args.inFile)
-    if bool(args.containDalitzOrSpecialWeight):
-        SOWTool.inHisto = "SumOfWeights_special"
+    if bool(sys_weight_prefix) or contain_dalitz(dsid):
+        SOWTool.inHisto = get_sys_histogram_name(args.inFile, sys_weight_prefix)
 
     # Get XSection Path
     with open(FullPath(args.xSectionsConfig), 'r') as file:
@@ -43,7 +93,7 @@ def RunEasyjetPlus(args):
 
     TotalWeightsTool_bbyy = CompFactory.TotalWeightsTool(
         analysis="bbyy", nPhotons=2, bTagWP=args.bTagWP,
-        MCWeightName="eventWeight")
+        MCWeightName=f"generatorWeight_{sys_weight_prefix}")
 
     acc.addEventAlgo(CompFactory.PostProcessor(
         inFile=args.inFile,
@@ -58,7 +108,7 @@ def RunEasyjetPlus(args):
 
     # Success should be 0
     if not sc.isSuccess():
-        print("Athena job failed.")
+        print("Post-Processing job failed.")
         sys.exit(1)
 
 
@@ -74,18 +124,15 @@ if __name__ == "__main__":
                         help="Merge branches. Default is merge output to input")
     parser.add_argument("--mergeToOutput", action='store_true',
                         help="Can apply with mergeMyFiles. Merge input to output")
-    parser.add_argument("--containDalitzOrSpecialWeight", default=0, type=int,
-                        help="Whether dalitz events or/and \
-                        special weight are included in MC sample.")
     parser.add_argument("--bTagWP", default="GN2v01_FixedCutBEff_77")
 
     args = parser.parse_args()
 
     outputFile = args.outFile
     if os.path.exists(outputFile):
-        raise RuntimeError("Output file already exists, provide anothe name")
+        raise RuntimeError("Output file already exists, provide another name")
 
     RunEasyjetPlus(args)
 
-    if (args.mergeMyFiles):
+    if args.mergeMyFiles:
         mergeFiles(args.inFile, args.outFile, args.mergeToOutput)

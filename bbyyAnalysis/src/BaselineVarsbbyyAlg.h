@@ -206,6 +206,9 @@ namespace HHBBYY
     Gaudi::Property<std::string> m_vbfjets_method_str
       {this, "VBFjetsMethod", "", "VBF jets selection method"};
 
+    Gaudi::Property<bool> m_doSystematics
+      { this, "doSystematics", false, "Run on all systematics" };
+
     CP::SysReadDecorHandle<bool> 
     m_selected_ph { this, "selected_ph", "selected_ph_%SYS%", "Name of input decorator for selected ph"};
 
