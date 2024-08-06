@@ -28,7 +28,8 @@ namespace HHBBTT
 	"HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
 	"HLT_mu80_msonly_3layersEC_L1MU14FCH"
       };
-      single_mu_SF_path = "mu24_ivarmedium_L1MU14FCH_OR_mu50_L1MU14FCH";
+      // No 2023 SF available yet
+      if(year==2022) single_mu_SF_path = "mu24_ivarmedium_L1MU14FCH_OR_mu50_L1MU14FCH";
     }
   }
 
@@ -190,7 +191,7 @@ namespace HHBBTT
       single_tau_SF_path = "tau160L1TAU100_medium1_tracktwoEF";
       if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
         single_tau_paths.push_back("HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100");
-	single_tau_SF_path = "tau160L1TAU100_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA";
+        single_tau_SF_path = "tau160L1TAU100_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA";
       }
     }
     else if(year==2022){
