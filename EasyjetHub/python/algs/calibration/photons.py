@@ -1,7 +1,6 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
-from AthenaConfiguration.Enums import LHCPeriod
 
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
@@ -33,12 +32,6 @@ def photon_sequence(flags, configAcc):
     configSeq.setOptionValue('.forceFullSimConfig',
                              flags.Analysis.Photon.forceFullSimConfig
                              and flags.Analysis.DataType is DataType.FastSim)
-    # Setting the ES Model by hand to avoid warnings.
-    if flags.GeoModel.Run is LHCPeriod.Run2:
-        ESModel = 'es2023_R22_Run2_v0'
-    elif flags.GeoModel.Run is LHCPeriod.Run3:
-        ESModel = 'es2022_R22_PRE'
-    configSeq.setOptionValue('.ESModel', ESModel)
 
     # PID configuration
     for id, iso in wps:

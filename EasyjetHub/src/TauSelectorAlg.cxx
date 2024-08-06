@@ -43,10 +43,18 @@ namespace Easyjet
     if(m_tightTauWP.empty()) m_tightTauWP = m_looseTauWP;
 
     if(m_isMC){
-      m_tau_SF_in = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tightTauWP+"_%SYS%", this);
+      m_tau_recoSF = CP::SysReadDecorHandle<float>("tau_Reco_effSF_"+m_tightTauWP+"_%SYS%", this);
+      m_tau_IDSF = CP::SysReadDecorHandle<float>("tau_ID_effSF_"+m_tightTauWP+"_%SYS%", this);
+      if(m_tightTauWP.value().find("noeleid")==std::string::npos){
+        m_tau_eVetoFakeTauSF = CP::SysReadDecorHandle<float>("tau_EvetoFakeTau_effSF_"+m_tightTauWP+"_%SYS%", this);
+        m_tau_eVetoTrueTauSF = CP::SysReadDecorHandle<float>("tau_EvetoTrueTau_effSF_"+m_tightTauWP+"_%SYS%", this);
+      }
       m_tau_SF_out = CP::SysWriteDecorHandle<float>("tau_effSF_"+m_tightTauWP+"_%SYS%", this);
     }
-    ATH_CHECK (m_tau_SF_in.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_tau_recoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_tau_IDSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_tau_eVetoFakeTauSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_tau_eVetoTrueTauSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_tau_SF_out.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     for(const auto& trig : m_tauTrigSF){
@@ -124,11 +132,17 @@ namespace Easyjet
 
         // For some reason this decoration needs to be explicitly copied
         if(m_isMC){
-	  m_tau_SF_out.set(*tau, m_tau_SF_in.get(*tau,sys), sys);
-	  for(unsigned int i=0; i<m_tauTrigSF.size(); i++){
-	    m_tauTriggerSF_out[i].set(*tau, m_tauTriggerSF_in[i].get(*tau, sys), sys);
-	  }
-	}
+          float SF = m_tau_recoSF.get(*tau,sys);
+          SF *=  m_tau_IDSF.get(*tau,sys);
+          if(m_tightTauWP.value().find("noeleid")==std::string::npos){
+            SF *= m_tau_eVetoFakeTauSF.get(*tau,sys);
+            SF *= m_tau_eVetoTrueTauSF.get(*tau,sys);
+          }
+          m_tau_SF_out.set(*tau, SF, sys);
+          for(unsigned int i=0; i<m_tauTrigSF.size(); i++){
+            m_tauTriggerSF_out[i].set(*tau, m_tauTriggerSF_in[i].get(*tau, sys), sys);
+          }
+        }
         m_select_out.set(*tau, m_select_tight_in.get(*tau,sys), sys);
 
         // If cuts are passed, save the object

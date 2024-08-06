@@ -6,7 +6,9 @@
 
 #include "MMCDecoratorAlg.h"
 
-#include "TLorentzVector.h"
+using ROOT::Math::PtEtaPhiMVector;
+using ROOT::Math::PxPyPzEVector;
+using ROOT::Math::VectorUtil::DeltaR;
 
 namespace HLLTT
 {
@@ -108,10 +110,10 @@ namespace HLLTT
       const xAOD::IParticle* part1 = nullptr;
       const xAOD::IParticle* part2 = nullptr;
       int status = 0;      
-      TLorentzVector res(0,0,0,0);
+      PtEtaPhiMVector res(0,0,0,0);
 
       int n_lep(0);
-      TLorentzVector p4lep[4];
+      PxPyPzEVector p4lep[4];
       int lepid[4];
       int iamu1(-1);
       int iamu2(-1);
@@ -133,7 +135,7 @@ namespace HLLTT
       for(const xAOD::Muon* muon : *muons) {
 	if (m_selected_mu.get(*muon, sys)){
 	  if(n_lep<4){
-            p4lep[n_lep] = muon->p4();
+            p4lep[n_lep] = muon->genvecP4();
 	    lepid[n_lep] = muon->charge()>0?-13: 13;
             ++n_lep;
           }
@@ -143,7 +145,7 @@ namespace HLLTT
       for(const xAOD::Electron* electron : *electrons) {
 	if (m_selected_el.get(*electron, sys)){
 	  if(n_lep<4){
-	    p4lep[n_lep] = electron->p4();
+	    p4lep[n_lep] = electron->genvecP4();
 	    lepid[n_lep] = electron->charge()>0? -11:11;
 	    ++n_lep;
 	  }
@@ -166,7 +168,7 @@ namespace HLLTT
         }
         for(int i = 0; i<n_lep; ++i){
           if(iamu1 != i){
-            float dr = p4lep[iamu1].DeltaR(p4lep[i]);
+            float dr = DeltaR(p4lep[iamu1], p4lep[i]);
             if( dr<drmin){
               iamu2 = i;
               drmin = dr;
@@ -183,7 +185,7 @@ namespace HLLTT
           }
           for(int i = 0; i<n_lep; ++i){
             if(iamu1x != i){
-              float dr = p4lep[iamu1x].DeltaR(p4lep[i]);
+              float dr = DeltaR(p4lep[iamu1x], p4lep[i]);
               if( dr<drminx){
                 iamu2x = i;
                 drminx = dr;

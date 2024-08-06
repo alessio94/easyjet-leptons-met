@@ -1,12 +1,12 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Carl Gwilliam
 
 #include "MMCDecoratorAlg.h"
 
-#include "TLorentzVector.h"
+using ROOT::Math::PtEtaPhiMVector;
 
 namespace HHBBLL
 {
@@ -85,7 +85,7 @@ namespace HHBBLL
       const xAOD::IParticle* part1 = nullptr;
       const xAOD::IParticle* part2 = nullptr;
       int status = 0;      
-      TLorentzVector res(0,0,0,0);
+      PtEtaPhiMVector res(0,0,0,0);
      
       if (electrons->size() == 2 && muons->size() == 0) {
 	part1 = electrons->at(0);

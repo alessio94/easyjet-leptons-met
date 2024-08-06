@@ -28,7 +28,11 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
 
     if flags.Input.isMC:
         for tau_id in [flags.Analysis.Tau.ID]:
-            tau_branches.variables += [f"tau_effSF_{tau_id}_%SYS%"]
+            tau_branches.variables += [f"tau_Reco_effSF_{tau_id}_%SYS%",
+                                       f"tau_ID_effSF_{tau_id}_%SYS%"]
+            if "noeleid" not in tau_id:
+                tau_branches.variables += [f"tau_EvetoFakeTau_effSF_{tau_id}_%SYS%",
+                                           f"tau_EvetoTrueTau_effSF_{tau_id}_%SYS%"]
 
     if tree_flags.collection_options.taus.score_branches:
         tau_branches.variables += [

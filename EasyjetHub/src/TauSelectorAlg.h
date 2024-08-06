@@ -62,7 +62,10 @@ private:
 
     Gaudi::Property<std::string> m_tightTauWP
       { this, "tightTauWP", "", "Tight tau ID working point, not used to filter collection" };
-    CP::SysReadDecorHandle<float> m_tau_SF_in{"", this};
+    CP::SysReadDecorHandle<float> m_tau_recoSF{"", this};
+    CP::SysReadDecorHandle<float> m_tau_IDSF{"", this};
+    CP::SysReadDecorHandle<float> m_tau_eVetoFakeTauSF{"", this};
+    CP::SysReadDecorHandle<float> m_tau_eVetoTrueTauSF{"", this};
     CP::SysWriteDecorHandle<float> m_tau_SF_out{"", this};
 
     Gaudi::Property<std::vector<std::string>> m_tauTrigSF

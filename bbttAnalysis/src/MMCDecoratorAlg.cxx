@@ -1,12 +1,12 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Carl Gwilliam
 
 #include "MMCDecoratorAlg.h"
 
-#include "TLorentzVector.h"
+using ROOT::Math::PtEtaPhiMVector;
 
 namespace HHBBTT
 {
@@ -146,9 +146,9 @@ namespace HHBBTT
       const xAOD::IParticle* part1 = nullptr;
       const xAOD::IParticle* part2 = nullptr;
       int status = 0;      
-      TLorentzVector res(0,0,0,0);
-      TLorentzVector nu1(0,0,0,0);
-      TLorentzVector nu2(0,0,0,0);
+      PtEtaPhiMVector res(0,0,0,0);
+      PtEtaPhiMVector nu1(0,0,0,0);
+      PtEtaPhiMVector nu2(0,0,0,0);
 
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
