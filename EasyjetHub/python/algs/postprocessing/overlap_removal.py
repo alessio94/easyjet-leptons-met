@@ -77,6 +77,7 @@ def overlap_sequence(flags):
     configSeq += makeConfig('OverlapRemoval')
     configSeq.setOptionValue('.inputLabel', 'preselectOR')
     configSeq.setOptionValue('.outputLabel', 'passesOR')
+    configSeq.setOptionValue('.addToAllSelections', True)
     configSeq.setOptionValue('.doJetFatJetOR',
                              flags.Analysis.do_small_R_jet_large_R_jet_OR)
     for objtype, coll in preOR_collections.items():
