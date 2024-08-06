@@ -1,31 +1,30 @@
 # Include the TTree configuration and update details
-ttree_output:
-  - AnalysisMiniTree:
-    include: EasyjetHub/AnalysisMiniTree-config.yaml
-    # Our overrides. All defaults are off
-    slim_variables_with_syst: true
-    reco_outputs:
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      muons: 'container_names.output.muons'
-      electrons: 'container_names.output.electrons'
-      taus: 'container_names.output.taus'
-      met : 'container_names.output.met'
-    collection_options:
-      small_R_jets:
-        btag_info: true
-        truth_parent_info: true
-        run_selection: true
-      taus:
-        truth_branches: True
-        truth_parent_info: true
-        run_selection: true
-      electrons:
-        run_selection: true
-        truth_parent_info: true
-      muons:
-        run_selection: true
-        truth_parent_info: true
-    truth_outputs:
-      small_R_jets: 'container_names.input.truth4Jet'
-      higgs_particle: 'container_names.output.truthHHParticles'
-      taus: 'container_names.input.truthtaus'
+
+include: EasyjetHub/AnalysisMiniTree-config.yaml
+# Our overrides. All defaults are off
+slim_variables_with_syst: true
+reco_outputs:
+  small_R_jets: 'container_names.output.reco4PFlowJet'
+  muons: 'container_names.output.muons'
+  electrons: 'container_names.output.electrons'
+  taus: 'container_names.output.taus'
+  met : 'container_names.output.met'
+collection_options:
+  small_R_jets:
+    btag_info: true
+    truth_parent_info: true
+    run_selection: true
+  taus:
+    truth_branches: True
+    truth_parent_info: true
+    run_selection: true
+  electrons:
+    run_selection: true
+    truth_parent_info: true
+  muons:
+    run_selection: true
+    truth_parent_info: true
+truth_outputs:
+  small_R_jets: 'container_names.input.truth4Jet'
+  higgs_particle: 'container_names.output.truthHHParticles'
+  taus: 'container_names.input.truthtaus'
