@@ -78,8 +78,10 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             "NeutrinoWeightingTool_1",
             resolution_settings=flags.Analysis.NeutrinoWeighting.resolution_settings,
             resolution_number=flags.Analysis.NeutrinoWeighting.resolution_number)
-        NeutrinoWeightingTool_2 = NeutrinoWeightingTool_1
-        NeutrinoWeightingTool_2.name = "NeutrinoWeightingTool_2"
+        NeutrinoWeightingTool_2 = CompFactory.HHBBLL.NeutrinoWeightingTool(
+            "NeutrinoWeightingTool_2",
+            resolution_settings=flags.Analysis.NeutrinoWeighting.resolution_settings,
+            resolution_number=flags.Analysis.NeutrinoWeighting.resolution_number)
         cfg.addEventAlgo(
             CompFactory.HHBBLL.NeutrinoWeightingAlg(
                 "NeutrinoWeightingAlg",
