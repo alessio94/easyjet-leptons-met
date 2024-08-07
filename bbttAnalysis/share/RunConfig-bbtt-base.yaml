@@ -17,11 +17,8 @@ truthDecayModes: ["bbtt"]
 # Toggles for object types
 do_small_R_jets: true
 do_muons: true
-do_muon_parent_decoration: true
 do_electrons: true
-do_electron_parent_decoration: true
 do_taus: true
-do_tau_parent_decoration: true
 do_met : true
 do_mmc : true
 
@@ -42,6 +39,7 @@ Electron:
   Iso: "Loose_VarRad"
   extra_wps:
     - ["TightLH", "Loose_VarRad"]
+  do_parent_decoration: true
   forceFullSimConfig: true
 
 Muon:
@@ -49,9 +47,12 @@ Muon:
   Iso: "PflowLoose_VarRad"
   extra_wps:
     - ["Medium", "PflowLoose_VarRad"]
+  do_parent_decoration: true
+
 
 Tau:
   ID: "RNNLoose"
+  do_parent_decoration: true
   amount: 2
   variables: ["RNN"]
   variables_int: ["isTauID", "isAntiTau", "truthType", "EleRNN_WP", "tauTruthJetLabel"]

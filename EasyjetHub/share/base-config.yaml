@@ -6,15 +6,11 @@ do_event_cleaning: true
 do_small_R_jets: false
 do_large_R_Topo_jets: false
 do_large_R_UFO_jets: false
-do_jet_parent_decoration: true
 do_VR_jets: false
 do_muons: false
-do_muon_parent_decoration: false
 do_electrons: false
-do_electron_parent_decoration: false
 do_photons: false
 do_taus: false
-do_tau_parent_decoration: false
 do_met: false
 do_mmc: false
 save_HF_classification: false
@@ -32,7 +28,7 @@ small_R_jet:
   btag_wp: ""
   # additional btagging working points, available for selections and per-jet SFs
   btag_extra_wps: []
-  runBJetPtCalib: True
+  runBJetPtCalib: true
   useFJvt: False
   # select jet type
   jet_type: 'reco4PFlowJet'
@@ -44,6 +40,7 @@ small_R_jet:
   uncertToolCalibArea: ""
   uncertToolConfigPath: ""
   uncertToolMCType: ""
+  do_parent_decoration: true
   amount: 0
   amount_bjet: 0
   variables_bjets: ["pt", "eta", "phi", "E"]
@@ -54,7 +51,8 @@ small_R_jet:
 large_R_jet:
   # btagging working points for Variable Radius Track jets
   vr_btag_wps: []
-  runMuonJetPtCorr: False
+  runMuonJetPtCorr: false
+  do_parent_decoration: true
   variables_LargeRJets: []
   variables_int_LargeRJets: []
 
@@ -76,6 +74,7 @@ Electron:
   chargeIDSelectionRun2: false
   ID: ""
   Iso: ""
+  do_parent_decoration: false
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
@@ -90,6 +89,7 @@ Muon:
   maxDeltaZ0SinTheta: 0.5
   ID: ""
   Iso: ""
+  do_parent_decoration: false
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
@@ -98,6 +98,7 @@ Muon:
 Tau:
   ID: ""
   addMuonRM: false
+  do_parent_decoration: false
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: ["charge", "nProng", "decayMode"]
