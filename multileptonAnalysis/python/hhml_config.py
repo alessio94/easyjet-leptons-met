@@ -3,14 +3,14 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, TauSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
 
 def hhml_cfg(
-        flags, smalljetkey, muonkey, electronkey,
+        flags, smalljetkey, muonkey, electronkey, taukey,
         float_variables=None, float_vector_variables=None,
         int_variables=None, char_vector_variables=None
 ):
@@ -43,15 +43,27 @@ def hhml_cfg(
         minPt=9 * Units.GeV
     ))
 
+    cfg.merge(TauSelectorAlgCfg(
+        flags,
+        # Baseline always needed for anti-taus
+        containerInKey=taukey,
+        containerOutKey="hhmlAnalysisTaus_%SYS%",
+        # used to filter collection
+        looseTauWP='Baseline',
+        # used for subsequent event selections
+        # only used to decorate flags + scale factors
+        tightTauWP=flags.Analysis.Tau.ID,
+    ))
+
     cfg.merge(JetSelectorAlgCfg(
         flags,
         containerInKey=smalljetkey,
         containerOutKey="hhmlAnalysisJets_%SYS%",
-        bTagWPDecorName="",
+        bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         selectBjet=False,
         minPt=20 * Units.GeV,
-        minimumAmount=2
-    ))  # -1 means ignores this
+        minimumAmount=flags.Analysis.small_R_jet.amount,  # -1 means ignores this
+    ))
 
     # Selection
     cfg.addEventAlgo(

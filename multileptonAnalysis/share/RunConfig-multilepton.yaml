@@ -14,15 +14,29 @@ truthDecayModes: ["bbZZ", "WWWW", "WWZZ","WWtt", "ZZtt", "tttt"]
 do_small_R_jets: true
 do_muons: true
 do_electrons: true
+do_taus: true
 do_met : true
+
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
-  # btagging working points 
-  btag_wp: "GN2v01_FixedCutBEff_77"
-  amount: 2
+  useFJvt: true
+  # btagging nominal working point
+  btag_wp: "GN2v01_FixedCutBEff_85"
+  btag_extra_wps:
+    - GN2v01_Continuous
+    - DL1dv01_Continuous
+  variables_bjets: ["uncorrPt", "muonCorrPt"]
+  variables_int_bjets: ["truthLabel", "pcbt_GN2v01", "pcbt_DL1dv01", "nmuons"]
   amount_bjet: 2
-  variables_int_bjets: ["truthLabel"]
+  amount: 2
+
+Tau:
+  ID: "RNNLoose"
+  amount: 2
+  variables: ["RNN"]
+  variables_int: ["isTauID", "truthType", "EleRNN_WP", "tauTruthJetLabel"]
+  do_parent_decoration: true
 
 Electron:
   ID: "LooseBLayer"
@@ -42,6 +56,7 @@ Electron:
     - ["LooseBLayer", "TightTrackOnly_VarRad"]
     - ["LooseBLayer", "TightTrackOnly_FixedRad"]
     - ["LooseBLayer", "HighPtCaloOnly"]
+  do_parent_decoration: true
 
 Muon:
   ID: "Loose"
@@ -66,6 +81,7 @@ Muon:
     # - ["LowPt", "PflowTight_VarRad"]
     # - ["LowPt", "Loose_VarRad"]
     # - ["LowPt", "Tight_VarRad"]
+  do_parent_decoration: true
 
 Lepton:
   amount: 4
@@ -99,10 +115,17 @@ ttree_output:
       small_R_jets: 'container_names.output.reco4PFlowJet'
       muons: 'container_names.output.muons'
       electrons: 'container_names.output.electrons'
+      taus: 'container_names.output.taus'
       met : 'container_names.output.met'
     collection_options:
       small_R_jets:
         btag_info: true
+        truth_parent_info: true
+        run_selection: true
+      taus:
+        truth_branches: True
+        truth_parent_info: true
+        run_selection: true
       electrons:
         run_selection: true
         truth_parent_info: true

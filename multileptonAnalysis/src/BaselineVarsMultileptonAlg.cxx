@@ -83,15 +83,58 @@ namespace MULTILEPTON
   {
     // Loop over all systematics
     for (const auto& sys : m_systematicsList.systematicsVector()){
-      //Retrieve inputs
+      // Retrieve inputs
       const xAOD::EventInfo *event = nullptr;
-      ANA_CHECK(m_eventHandle.retrieve(event, sys));
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-      const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK(m_electronHandle.retrieve(electrons, sys));
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
       const xAOD::MuonContainer *muons = nullptr;
-      ANA_CHECK(m_muonHandle.retrieve(muons, sys));
+      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+
+      const xAOD::ElectronContainer *electrons = nullptr;
+      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+
+      for (const std::string &string_var: m_floatVariables) {
+        m_Fbranches.at(string_var).set(*event, -99., sys);
+      }
+
+      for (const auto& var: m_intVariables) {
+        m_Ibranches.at(var).set(*event, -99, sys);
+      }
+
+      for (const auto& var: m_floatVectorVariables) {
+        m_FVbranches.at(var).set(*event, {}, sys);
+      }
+
+      for (const auto& var: m_charVectorVariables) {
+        m_CVbranches.at(var).set(*event, {}, sys);
+      }
+
+      int n_electrons = electrons->size();
+      int n_muons = muons->size();
+      int n_jets = jets->size();
+      int nCentralJets = 0;
+
+      // b-jet sector
+      bool WPgiven = !m_isBtag.empty();
+      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      for(const xAOD::Jet* jet : *jets) {
+        // count central jets
+        if (std::abs(jet->eta())<2.5) {
+          nCentralJets++;
+          if (WPgiven && m_isBtag.get(*jet, sys)) bjets->push_back(jet);
+        }
+      }
+      int n_bjets = bjets->size();
+
+      m_Ibranches.at("nJets").set(*event, n_jets, sys);
+      m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
+      m_Ibranches.at("nMuons").set(*event, n_muons, sys);
+      m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
+      m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
+
 
     }
     return StatusCode::SUCCESS;
