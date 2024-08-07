@@ -57,8 +57,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                                 looseTauWP='Baseline',
                                 # used for subsequent event selections
                                 # only used to decorate flags + scale factors
-                                tightTauWP=flags.Analysis.Tau.ID,
-                                tauAmount=flags.Analysis.Tau.amount))
+                                tightTauWP=flags.Analysis.Tau.ID))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,
@@ -67,8 +66,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         minPt=20 * Units.GeV,
         bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         selectBjet=False,
-        minimumAmount=2,  # -1 means ignores this
-        bjetAmount=flags.Analysis.small_R_jet.amount_bjet))
+        minimumAmount=2))
 
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(

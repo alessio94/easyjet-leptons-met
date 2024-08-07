@@ -39,6 +39,7 @@ def TauSelectorAlgCfg(flags, name="TauSelectorAlg", **kwargs):
     kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
     kwargs.setdefault("tauTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Tau'))
+    kwargs.setdefault("tauAmount", flags.Analysis.Tau.amount)
 
     cfg.addEventAlgo(CompFactory.Easyjet.TauSelectorAlg(name, **kwargs))
     return cfg
@@ -60,8 +61,9 @@ def JetSelectorAlgCfg(flags, name="JetSelectorAlg", **kwargs):
     isSmallRJet = "AntiKt4" in kwargs["containerInKey"]
     kwargs.setdefault("useJVT", isSmallRJet)
     kwargs.setdefault("useFJVT", isSmallRJet and flags.Analysis.small_R_jet.useFJvt)
-
     kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
+    if kwargs.get("bTagWPDecorName", ""):
+        kwargs.setdefault("bjetAmount", flags.Analysis.small_R_jet.amount_bjet)
 
     cfg.addEventAlgo(CompFactory.Easyjet.JetSelectorAlg(name, **kwargs))
     return cfg
