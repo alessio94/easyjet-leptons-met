@@ -52,7 +52,15 @@ def electron_sequence(flags, configAcc):
                                  flags.Analysis.Electron.maxDeltaZ0SinTheta)
         configSeq.setOptionValue('.chargeIDSelectionRun2',
                                  flags.Analysis.Electron.chargeIDSelectionRun2
-                                 and flags.GeoModel.Run == LHCPeriod.Run2)
+                                 and flags.GeoModel.Run is LHCPeriod.Run2)
+        # No DNN SF yet
+        if "DNN" in id:
+            print("WARNING! Electron DNN ID does not have SF available yet")
+            configSeq.setOptionValue('.noEffSF', True)
+        # No Run 2 SF yet
+        if flags.GeoModel.Run is LHCPeriod.Run2:
+            print("WARNING! Run 2 electron SF are not available yet")
+            configSeq.setOptionValue('.noEffSF', True)
 
     # Electron trigger SF
     trigSF_flags = flags.Analysis.trigger.scale_factor

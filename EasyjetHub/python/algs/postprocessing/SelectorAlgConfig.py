@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.steering.analysis_configuration import (
     get_trigger_legs_scale_factor_list)
@@ -27,6 +28,7 @@ def ElectronSelectorAlgCfg(flags, name="ElectronSelectorAlg", **kwargs):
     kwargs.setdefault("eleTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Electron'))
     kwargs.setdefault("electronAmount", flags.Analysis.Lepton.amount)
+    kwargs.setdefault("saveDummySF", flags.GeoModel.Run is LHCPeriod.Run2)
 
     cfg.addEventAlgo(CompFactory.Easyjet.ElectronSelectorAlg(name, **kwargs))
     return cfg

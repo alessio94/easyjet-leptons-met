@@ -42,11 +42,12 @@ namespace Easyjet
     ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
 
     for(const auto& wp : m_tightEleWPs){
-      // Scale factors
-      m_ele_recoSF.emplace_back(m_isMC ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
-      m_ele_idSF.emplace_back(m_isMC ? "el_id_effSF_"+wp+"_%SYS%" : "", this);
+      // Scale factors not available for DNN yet
+      bool sfAvailable = m_isMC && !m_saveDummySF && wp.find("DNN")==std::string::npos;
+      m_ele_recoSF.emplace_back(sfAvailable ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
+      m_ele_idSF.emplace_back(sfAvailable ? "el_id_effSF_"+wp+"_%SYS%" : "", this);
       m_ele_isoSF.emplace_back
-	((m_isMC && wp.find("NonIso")==std::string::npos) ?
+	((sfAvailable && wp.find("NonIso")==std::string::npos) ?
 	 "el_isol_effSF_"+wp+"_%SYS%" : "", this);
       m_ele_SF.emplace_back(m_isMC ? "el_effSF_"+wp+"_%SYS%" : "", this);
       
@@ -129,8 +130,11 @@ namespace Easyjet
         for(unsigned int i=0; i<m_tightEleWPs.size(); i++){
           std::string wp = m_tightEleWPs[i];
           if(m_isMC){
-            float SF = m_ele_recoSF[i].get(*electron,sys) * m_ele_idSF[i].get(*electron,sys);
-            if(wp.find("NonIso")==std::string::npos) SF *= m_ele_isoSF[i].get(*electron,sys);
+	    float SF = 1.;
+	    if(!m_saveDummySF && wp.find("DNN")==std::string::npos){
+	      SF = m_ele_recoSF[i].get(*electron,sys) * m_ele_idSF[i].get(*electron,sys);
+	      if(wp.find("NonIso")==std::string::npos) SF *= m_ele_isoSF[i].get(*electron,sys);
+	    }
             m_ele_SF[i].set(*electron, SF, sys);
           }
           m_select_out[i].set(*electron, m_select_tight_in[i].get(*electron,sys), sys);

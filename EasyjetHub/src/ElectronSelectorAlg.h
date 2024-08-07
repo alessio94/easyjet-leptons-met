@@ -52,10 +52,14 @@ private:
       { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<std::string> m_looseEleWP
-        { this, "looseEleWP", "", "Loose electron ID + ISO working point, used to filter collection" };
-
+      { this, "looseEleWP", "",
+	  "Loose electron ID + ISO working point, used to filter collection" };
     Gaudi::Property<std::vector<std::string>> m_tightEleWPs
-        { this, "tightEleWPs", {}, "Tight electron ID + ISO working points, not used to filter collection" };
+      { this, "tightEleWPs", {},
+	  "Tight electron ID + ISO working points, not used to filter collection" };
+    Gaudi::Property<bool> m_saveDummySF
+      { this, "saveDummySF", false, "Store dummy SF=1 in case they are not available"};
+
         
     std::vector<CP::SysReadDecorHandle<float>> m_ele_recoSF;
     std::vector<CP::SysReadDecorHandle<float>> m_ele_idSF;
