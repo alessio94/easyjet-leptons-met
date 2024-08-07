@@ -150,6 +150,8 @@ disable_calib: false
 do_CP_systematics: false
 systematics_regex: []
 systematics_suffix_separator: "_"
+# CutBookKeeper histPattern
+cbkHistPattern: "CutBookkeeper_%DSID%_%RUN%_%SYS%"
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false

@@ -59,5 +59,6 @@ def generator_sequence(flags):
     configSeq.setOptionValue('.saveCutBookkeepers', doCBK)
     configSeq.setOptionValue('.runNumber', flags.Input.RunNumbers[0])
     configSeq.setOptionValue('.cutBookkeepersSystematics', doCBK)
+    configSeq.setOptionValue('.histPattern', flags.Analysis.cbkHistPattern)
 
     return configSeq
