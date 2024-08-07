@@ -1,31 +1,23 @@
-runConfig="bbllAnalysis/RunConfig-bbll.yaml"
-executable="bbll-ntupler"
-campaignName="XHHbbll_v00"
+runConfig="multileptonAnalysis/RunConfig-multilepton.yaml"
+executable="hhml-ntupler"
+campaignName="HHML_v00"
 
+dir_samples="../easyjet/multileptonAnalysis/datasets/PHYSLITE/"
+mc_list=(
+    "$dir_samples/mc23_Zjet_background_p6026.txt"
+    "$dir_samples/mc23_Wjet_background_p6026."
+    "$dir_samples/mc23_top_background_p6026.txt"
+)
 #No Run3 ggH samples yet
+
 #data 
-easyjet-gridsubmit --data-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/data_Run3_p6026.txt \
+easyjet-gridsubmit --data-list $dir_samples/data_Run3_p6026.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --campaign ${campaignName} \
     --noTag
-
-#Z+jet
-easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc23_Zjet_background_p6026.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName} \
-    --noTag
-
-#W+jet
-easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc23_Wjet_background_p6026.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName} \
-    --noTag
-
-#ttbar+single-top
-easyjet-gridsubmit --mc-list ../easyjet/bbllAnalysis/datasets/PHYSLITE/mc23_top_background_p6026.txt \
+#mc
+easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
     --run-config ${runConfig} \
     --exec ${executable} \
     --campaign ${campaignName} \
