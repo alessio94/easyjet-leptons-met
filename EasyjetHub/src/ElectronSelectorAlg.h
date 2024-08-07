@@ -92,7 +92,7 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra electrons after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
 
-    Gaudi::Property<int>   m_electronAmount       {this, "electronAmount", -1, "Maximum number of electron to consider"};
+    Gaudi::Property<int>   m_electronAmount       {this, "electronAmount", -1, "Number of electrons to consider for isElectronXX decoration"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
   };
 }

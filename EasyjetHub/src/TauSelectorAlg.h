@@ -99,7 +99,7 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra taus after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
 
-    Gaudi::Property<int>   m_tauAmount       {this, "tauAmount", -1, "Maximum number of tau to consider"};
+    Gaudi::Property<int>   m_tauAmount       {this, "tauAmount", -1, "Number of taus to consider for isTauXX decoration"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
 
 

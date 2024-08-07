@@ -94,7 +94,7 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra muons after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
 
-    Gaudi::Property<int>   m_muonAmount       {this, "muonAmount", -1, "Maximum number of muon to consider"};
+    Gaudi::Property<int>   m_muonAmount       {this, "muonAmount", -1, "Number of muons to consider for isMuonXX decoration"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
   };
 }
