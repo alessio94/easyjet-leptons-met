@@ -45,8 +45,8 @@ class GetXSectionTool final: public extends<AthAlgTool, IPostProcessTool>
         {2016, 3.24454+33.4022},
         {2017, 44.6306},
         {2018, 58.7916},
-        {2022, 31.3985},
-        {2023, 27.7667},
+        {2022, 26.0714},
+        {2023, 25.7675},
     };
 
 };
