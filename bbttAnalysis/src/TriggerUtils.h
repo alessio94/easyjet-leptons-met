@@ -126,6 +126,8 @@ namespace HHBBTT
 			std::vector<std::string>& ditau_paths_4J12,
 			std::vector<std::string>& ditau_paths_L1Topo_delayed,
 			std::vector<std::string>& ditau_paths_4J12_delayed,
+			std::vector<std::string>& tau35_match_paths,
+			std::vector<std::string>& tau25_match_paths,
 			std::pair<std::string, std::string>& di_tau_SF_path);
   inline void getDiTauTriggers(int year, const xAOD::EventInfo* eventInfo,
 			       const runBoolReadDecoMap& runBoolDecos,
@@ -133,22 +135,25 @@ namespace HHBBTT
 			       std::vector<std::string>& ditau_paths_L1Topo,
 			       std::vector<std::string>& ditau_paths_4J12,
 			       std::vector<std::string>& ditau_paths_L1Topo_delayed,
-			       std::vector<std::string>& ditau_paths_4J12_delayed){
+			       std::vector<std::string>& ditau_paths_4J12_delayed,
+			       std::vector<std::string>& tau35_match_paths,
+			       std::vector<std::string>& tau25_match_paths){
     std::pair<std::string, std::string> di_tau_SF_path;
     getDiTauTriggers(year, eventInfo, runBoolDecos,
 		     ditau_paths_2016, ditau_paths_L1Topo, ditau_paths_4J12,
 		     ditau_paths_L1Topo_delayed, ditau_paths_4J12_delayed,
-		     di_tau_SF_path);
+		     tau35_match_paths, tau25_match_paths, di_tau_SF_path);
   }
   inline void getDiTauTriggers(int year, const xAOD::EventInfo* eventInfo,
 			       const runBoolReadDecoMap& runBoolDecos,
 			       std::pair<std::string, std::string>& di_tau_SF_path){
     std::vector<std::string> ditau_paths_2016, ditau_paths_L1Topo, ditau_paths_4J12,
-      ditau_paths_L1Topo_delayed, ditau_paths_4J12_delayed;
+      ditau_paths_L1Topo_delayed, ditau_paths_4J12_delayed,
+      tau35_match_paths, tau25_match_paths;
     getDiTauTriggers(year, eventInfo, runBoolDecos,
 		     ditau_paths_2016, ditau_paths_L1Topo, ditau_paths_4J12,
 		     ditau_paths_L1Topo_delayed, ditau_paths_4J12_delayed,
-		     di_tau_SF_path);
+		     tau35_match_paths, tau25_match_paths, di_tau_SF_path);
   }
 
   void getDiBJetTriggers(int year, const xAOD::EventInfo* eventInfo,

@@ -13,7 +13,6 @@ def HHbbttTriggerDecoratorCfg(flags, **kwargs):
     cfg = ComponentAccumulator()
 
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
-    from AthenaConfiguration.Enums import LHCPeriod
 
     # Selection
     trigger_branches = [
@@ -30,9 +29,6 @@ def HHbbttTriggerDecoratorCfg(flags, **kwargs):
             taus=flags.Analysis.container_names.input.taus,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
-            # Not available in current Run2 PHYSLITE
-            diTauTrigMatch=not (flags.Input.isPHYSLITE
-                                and flags.GeoModel.Run == LHCPeriod.Run2),
             **kwargs
         )
     )

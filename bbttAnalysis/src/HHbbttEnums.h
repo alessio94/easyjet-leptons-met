@@ -32,6 +32,8 @@ namespace HHBBTT
     DTT_L1Topo,
     DTT_4J12_delayed,
     DTT_L1Topo_delayed,
+    trigMatch_Tau35,
+    trigMatch_Tau25
   };
 
     enum Var

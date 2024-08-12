@@ -59,6 +59,8 @@ namespace HHBBTT
 	{HHBBTT::DTT_4J12_delayed, "DTT_4J12_delayed"},
 	{HHBBTT::DTT_L1Topo_delayed, "DTT_L1Topo_delayed"},
 	{HHBBTT::DBT, "DBT"},
+	{HHBBTT::trigMatch_Tau35, "Tau35"},
+	{HHBBTT::trigMatch_Tau25, "Tau25"}
       };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey

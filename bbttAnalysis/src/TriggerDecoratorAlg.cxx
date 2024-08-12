@@ -41,6 +41,7 @@ namespace HHBBTT
     }
 
     for (const auto& [channel, name] : m_triggerChannels){
+      if(channel==HHBBTT::trigMatch_Tau35 || channel==HHBBTT::trigMatch_Tau25) continue;
       SG::WriteDecorHandleKey<xAOD::EventInfo> deco;
       deco = "EventInfo.pass_trigger_"+name;
       m_pass_DecorKey.emplace(channel, deco);
@@ -377,10 +378,13 @@ namespace HHBBTT
     std::vector<std::string> ditau_paths_4J12;
     std::vector<std::string> ditau_paths_L1Topo_delayed;
     std::vector<std::string> ditau_paths_4J12_delayed;
+    std::vector<std::string> tau35_match_paths;
+    std::vector<std::string> tau25_match_paths;
 
     getDiTauTriggers(year, eventInfo, runBoolDecos,
 		     ditau_paths_2016, ditau_paths_L1Topo, ditau_paths_4J12,
-		     ditau_paths_L1Topo_delayed, ditau_paths_4J12_delayed);
+		     ditau_paths_L1Topo_delayed, ditau_paths_4J12_delayed,
+		     tau35_match_paths, tau25_match_paths);
 
     std::unordered_map<HHBBTT::TriggerChannel, std::vector<std::string>> mapPaths;
     mapPaths.emplace(HHBBTT::DTT_2016, ditau_paths_2016);
@@ -395,7 +399,6 @@ namespace HHBBTT
     mapDecisions.emplace(HHBBTT::DTT_L1Topo, false);
     mapDecisions.emplace(HHBBTT::DTT_4J12_delayed, false);
     mapDecisions.emplace(HHBBTT::DTT_L1Topo_delayed, false);
-
 
     for(const auto& [channel, paths] : mapPaths){
       for(const auto& trig : paths){
@@ -414,7 +417,6 @@ namespace HHBBTT
 				       "L1DR-TAU20ITAU12I-J25");
 	  for(const xAOD::TauJet* tau : *taus){
 	    bool match = m_matchingTool->match(*tau, trig2, 0.2);
-	    if(!m_useDiTauTrigMatch) match = true;
 	    tau_trigMatchDecos.at(channel)(*tau) |= match;
 	    tau_trigMatchDecos.at(HHBBTT::DTT)(*tau) |= match;
 	  }
@@ -423,6 +425,20 @@ namespace HHBBTT
 
       pass_decos.at(channel)(*eventInfo) |= mapDecisions.at(channel);
       pass_decos.at(HHBBTT::DTT)(*eventInfo) |= mapDecisions.at(channel);
+    }
+
+    // Save specifically tau35 + tau25 independent trigger matching
+    std::unordered_map<HHBBTT::TriggerChannel, std::vector<std::string>> mapMatchPaths;
+    mapMatchPaths.emplace(HHBBTT::trigMatch_Tau35, tau35_match_paths);
+    mapMatchPaths.emplace(HHBBTT::trigMatch_Tau25, tau25_match_paths);
+
+    for(const auto& [channel, paths] : mapMatchPaths){
+      for(const auto& trig : paths){
+	for(const xAOD::TauJet* tau : *taus){
+	  bool match = m_matchingTool->match(*tau, trig, 0.2);
+	  tau_trigMatchDecos.at(channel)(*tau) |= match;
+	}
+      }
     }
 
   }

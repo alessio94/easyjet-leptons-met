@@ -212,61 +212,94 @@ namespace HHBBTT
 			std::vector<std::string>& ditau_paths_4J12,
 			std::vector<std::string>& ditau_paths_L1Topo_delayed,
 			std::vector<std::string>& ditau_paths_4J12_delayed,
+			std::vector<std::string>& tau35_match_paths,
+			std::vector<std::string>& tau25_match_paths,
 			std::pair<std::string, std::string>& di_tau_SF_path){
     if(year==2015){
       ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM"};
+      tau35_match_paths = {"HLT_tau35_medium1_tracktwo_L1TAU20"};
+      tau25_match_paths = {"HLT_tau25_medium1_tracktwo_L1TAU12"};
       di_tau_SF_path = std::make_pair("tau35_medium1_tracktwo",
 				      "tau25_medium1_tracktwo");
     }
-    else if(2016<=year && year<=2017){
-      if(runBoolDecos.at(HHBBTT::is16PeriodA)(*eventInfo) ||
-	 runBoolDecos.at(HHBBTT::is16PeriodB_D3)(*eventInfo) ||
-	 runBoolDecos.at(HHBBTT::is16PeriodD4_end)(*eventInfo)){
-	ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-	di_tau_SF_path = std::make_pair("tau35_medium1_tracktwo",
-					"tau25_medium1_tracktwo");
-      }
-      else if(runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo)){
-	ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-	di_tau_SF_path = std::make_pair("tau35_medium1_tracktwo",
-					"tau25_medium1_tracktwo");
-      }
 
-      if(year==2017){
-        ditau_paths_4J12 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM_4J12"};
-	di_tau_SF_path = std::make_pair("tau35_medium1_tracktwo",
-					"tau25_medium1_tracktwo");
+    else if(year==2016){
+      ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
+      tau35_match_paths = {"HLT_tau35_medium1_tracktwo"};
+      tau25_match_paths = {"HLT_tau25_medium1_tracktwo"};
+      di_tau_SF_path = std::make_pair("tau35_medium1_tracktwo",
+				      "tau25_medium1_tracktwo");
+    }
+
+    else if(year==2017){
+      ditau_paths_4J12 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM_4J12"};
+      tau35_match_paths = {"HLT_tau35_medium1_tracktwo"};
+      tau25_match_paths = {"HLT_tau25_medium1_tracktwo_L1TAU12"};
+
+      if(runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo)){
+        ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
+        tau25_match_paths.push_back("HLT_tau25_medium1_tracktwo");
       }
 
       if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo)){
-	// For Period B1 to B4 in 2017, should use this trigger but go to L1Topo selection
+        // For Period B1 to B4 in 2017, should use this trigger but go to L1Topo selection
         ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-	di_tau_SF_path = std::make_pair("tau35_medium1_tracktwo",
-					"tau25_medium1_tracktwo");
+        tau25_match_paths.push_back("HLT_tau25_medium1_tracktwo");
       }
       else if(!runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo) &&
 	      (runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
 	       runBoolDecos.at(HHBBTT::is17PeriodB8_end)(*eventInfo))){
         ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1DR_TAU20ITAU12I_J25"};
-	di_tau_SF_path = std::make_pair("tau35_medium1_tracktwo",
-					"tau25_medium1_tracktwo");
       }
+
+      di_tau_SF_path = std::make_pair("tau35_medium1_tracktwo",
+				      "tau25_medium1_tracktwo");
     }
     
     else if(year==2018){
       ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1TAU20IM_2TAU12IM_4J12p0ETA23"};
+      tau35_match_paths = {"HLT_tau35_medium1_tracktwoEF"};
+      tau25_match_paths = {"HLT_tau25_medium1_tracktwoEF"};
+
       if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
         ditau_paths_L1Topo.push_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1DR_TAU20ITAU12I_J25");
         ditau_paths_4J12.push_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1TAU20IM_2TAU12IM_4J12p0ETA23");
+        tau35_match_paths.push_back("HLT_tau35_mediumRNN_tracktwoMVA");
+        tau25_match_paths.push_back("HLT_tau25_mediumRNN_tracktwoMVA");
       }
+
       di_tau_SF_path = std::make_pair("tau35_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA",
 				      "tau25_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA");
     }
-    
+
     else if(year>=2022){
       ditau_paths_L1Topo = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
+      // Single leg paths not available for matching for Run 3
+      // LTT T&P triggers to be used instead
+      tau35_match_paths = {
+	"HLT_mu24_ivarmedium_tau35_mediumRNN_tracktwoMVA_probe_03dRAB_L1MU14FCH",
+	"HLT_e26_lhtight_ivarloose_tau35_mediumRNN_tracktwoMVA_probe_03dRAB_L1EM22VHI"
+      };
+      tau25_match_paths = {
+	"HLT_mu24_ivarmedium_tau25_mediumRNN_tracktwoMVA_probe_03dRAB_L1MU14FCH",
+	"HLT_e26_lhtight_ivarloose_tau25_mediumRNN_tracktwoMVA_probe_03dRAB_L1EM22VHI"
+      };
+    }
+
+    else if(year>=2023){
+      ditau_paths_L1Topo = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
+      ditau_paths_4J12 = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
+      tau35_match_paths = {
+	"HLT_mu24_ivarmedium_tau35_mediumRNN_tracktwoMVA_probe_03dRAB_L1MU14FCH",
+	"HLT_e26_lhtight_ivarloose_tau35_mediumRNN_tracktwoMVA_probe_03dRAB_L1EM22VHI"
+      };
+      tau25_match_paths = {
+	"HLT_mu24_ivarmedium_tau25_mediumRNN_tracktwoMVA_probe_03dRAB_L1MU14FCH",
+	"HLT_e26_lhtight_ivarloose_tau25_mediumRNN_tracktwoMVA_probe_L1TAU12IM_03dRAB_L1eEM26M"
+      };
+
       if (runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
         ditau_paths_L1Topo_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
         ditau_paths_4J12_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};

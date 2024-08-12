@@ -21,7 +21,8 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
     tau_branches.add_four_mom_branches(do_mass=False)
     tau_branches.variables += ["charge", "nProng", "decayMode"]
     if flags.Analysis.do_bbtt_analysis:
-        tau_branches.variables += ["isIDTau", "isAntiTau"]
+        tau_branches.variables += ["isIDTau", "isAntiTau",
+                                   "trigMatch_Tau35", "trigMatch_Tau25"]
 
     if flags.Analysis.do_overlap_removal:
         tau_branches.variables += ["passesOR_%SYS%"]
