@@ -248,11 +248,13 @@ namespace HHBBYY
       for (size_t i = 0; i < m_bbyyCuts.size(); ++i) {
         if (m_bbyyCuts[i].passed)
         {
-          if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER")
+          if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER"){
+            if (not m_bools.at(HHBBYY::pass_trigger_diphoton)) break;
             consecutive_cuts += m_bools.at(HHBBYY::pass_trigger_diphoton);
-          else if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER_MATCHING")
+          }else if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER_MATCHING"){
+            if (not m_bools.at(HHBBYY::pass_matching_trigger_diphoton)) break;
             consecutive_cuts += m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
-          else
+          }else
             consecutive_cuts++;
         }
         else
