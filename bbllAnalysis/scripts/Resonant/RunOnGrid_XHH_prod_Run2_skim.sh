@@ -1,15 +1,16 @@
-runConfig="bbllAnalysis/RunConfig-bbll-Resonant.yaml"
+runConfig="bbllAnalysis/RunConfig-bbll-Resonant-NW.yaml"
 executable="bbll-ntupler"
 campaignName="XHHbbll_v00"
 
 dir_samples="../easyjet/bbllAnalysis/datasets/PHYSLITE/"
 mc_list=(
     "$dir_samples/mc20_resonantXHH_samples_p6266.txt"
+    "$dir_samples/mc20_ggFXHH_samples_p6266.txt"
     "$dir_samples/mc20_Zjet_background_p6266.txt"
     "$dir_samples/mc20_Wjet_background_p6266."
     "$dir_samples/mc20_top_background_p6266.txt"
     "$dir_samples/mc20_diboson_background_p6266.txt"
-    "$dir_samples/mc20_singleH_background_p6026.txt"
+    "$dir_samples/mc20_singleH_background_p6226.txt"
 )
 
 #data 
