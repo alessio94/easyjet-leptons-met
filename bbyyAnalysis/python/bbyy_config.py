@@ -26,6 +26,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=PhotonWPLabel + photonkey,
                                    containerOutKey="bbyyAnalysisPhotons_%SYS%",
+                                   minPt=22e3,
                                    photon_WPs=[f'{wp[0]}_{wp[1]}' for wp in
                                                flags.Analysis.Photon.extra_wps]))
 
