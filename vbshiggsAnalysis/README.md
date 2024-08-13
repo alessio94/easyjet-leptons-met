@@ -38,4 +38,10 @@ vbshiggs-ntupler /eos/atlas/atlascerngroupdisk/phys-hdbs/dbl/VBS_Higgs/MC/DAOD_P
 ```
 
 # How to Run (Grid)
-To be added
+This is taken care of by ```easyjet-gridsubmit``` script. First you need to put the list of containers (DAOD_PHYS or DAOD_PHYSLITE) in .txt file (let's call it mc_list.txt) and then you need to choose the config yml, depending
+if one wants to run with or with events skimming, you can use either ```RunConfig-fullLep.yaml``` or ```RunConfig-fullLep-bypass.yaml```. you can run with this command line 
+``` 
+easyjet-gridsubmit --mc-list mc_list.txt --exec vbshiggs-ntupler --run-config vbshiggsAnalysis
+/RunConfig-fullLep.yaml  --campaign VBSHiggs_vXXX  --noTag --mergeOutput --noEmail 
+``` 
+Some bash scripts have been made for this they can be found under vbshiggsAnalysis/scripts/

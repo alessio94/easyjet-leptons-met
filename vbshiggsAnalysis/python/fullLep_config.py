@@ -63,7 +63,7 @@ def get_BaselineVarsFullLepAlg_variables(flags):
             float_variable_names.append(f"{object}_{var}")
 
     for object in ["Jet_Higgs_candidate1", "Jet_Higgs_candidate2"]:
-        for var in ["pt", "eta", "phi", "E"]:
+        for var in ["m", "pt", "eta", "phi", "E"]:
             float_variable_names.append(f"{object}_{var}")
         for var in ["pcbt", "truthLabel"]:
             int_variable_names.append(f"{object}_{var}")

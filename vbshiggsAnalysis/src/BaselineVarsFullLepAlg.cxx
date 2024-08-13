@@ -283,6 +283,7 @@ namespace VBSHIGGS{
         //b-jet sector
         for (std::size_t i=0; i<std::min(HJets->size(),(std::size_t)2); i++){
           std::string prefix = "Jet_Higgs_candidate"+std::to_string(i+1);
+          m_Fbranches.at(prefix+"_m").set(*event, HJets->at(i)->m(), sys);
           m_Fbranches.at(prefix+"_pt").set(*event, HJets->at(i)->pt(), sys);
           m_Fbranches.at(prefix+"_eta").set(*event, HJets->at(i)->eta(), sys);
           m_Fbranches.at(prefix+"_phi").set(*event, HJets->at(i)->phi(), sys);
