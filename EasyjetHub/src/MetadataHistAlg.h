@@ -28,8 +28,8 @@ namespace Easyjet {
       Gaudi::Property<std::string> m_dataType {
         this, "dataType", "", "sample dataType"
       };
-      Gaudi::Property<std::string> m_mcCampaign {
-        this, "mcCampaign", "", "mc campaign"
+      Gaudi::Property<std::string> m_campaign {
+        this, "campaign", "", "mc/data campaign"
       };
       Gaudi::Property<std::string> m_mcChannelNumber {
         this, "mcChannelNumber", "", "mc channel number"

@@ -204,18 +204,20 @@ def metadata_cfg(flags):
     cfg = ComponentAccumulator()
 
     if flags.Input.isMC:
+        campaign = str(flags.Input.MCCampaign).replace("Campaign.MC", "mc")
         if flags.Sim.ISF.Simulator.usesFastCaloSim():
             dataType = "fastsim"
         else:
             dataType = "fullsim"
     else:
+        campaign = str(flags.Input.DataYear).replace("20", "data")
         dataType = "data"
 
     cfg.addEventAlgo(
         CompFactory.Easyjet.MetadataHistAlg(
             "MetadataHistAlg",
             dataType=dataType,
-            mcCampaign=str(flags.Input.MCCampaign),
+            campaign=campaign,
             mcChannelNumber=str(flags.Input.MCChannelNumber),
         )
     )

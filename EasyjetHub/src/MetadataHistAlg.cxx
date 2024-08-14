@@ -22,8 +22,8 @@ namespace Easyjet {
       ATH_MSG_ERROR("Missing data type information");
       return StatusCode::FAILURE;
     }
-    if (m_mcCampaign.value().empty()) {
-      ATH_MSG_ERROR("Missing mc campaign");
+    if (m_campaign.value().empty()) {
+      ATH_MSG_ERROR("Missing campaign");
       return StatusCode::FAILURE;
     }
     if (m_mcChannelNumber.value().empty()) {
@@ -43,19 +43,9 @@ namespace Easyjet {
 
   StatusCode MetadataHistAlg::finalize()
   {
-
-    // Extracting the desired part of the string
-    std::string mcCampaignValue = m_mcCampaign.value();
-    size_t dotPos = mcCampaignValue.find('.');
-    if (dotPos != std::string::npos) {
-        mcCampaignValue = mcCampaignValue.substr(dotPos + 1);
-    }
-    // Replace MC by mc
-    mcCampaignValue.replace(0, 2, "mc");
-
     // Please keep the bin order unchanged
     hist("metadata")->GetXaxis()->SetBinLabel(1, m_dataType.value().c_str());
-    hist("metadata")->GetXaxis()->SetBinLabel(2, mcCampaignValue.c_str());
+    hist("metadata")->GetXaxis()->SetBinLabel(2, m_campaign.value().c_str());
     hist("metadata")->GetXaxis()->SetBinLabel(3, m_mcChannelNumber.value().c_str());
 
     return StatusCode::SUCCESS;
