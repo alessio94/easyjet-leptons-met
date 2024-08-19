@@ -31,6 +31,7 @@ namespace ZCC
     ATH_CHECK (m_filterParams.initialize(m_systematicsList));
     
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_largejetHandle.initialize(m_systematicsList));
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
@@ -136,6 +137,9 @@ namespace ZCC
         }
       }
 
+      const xAOD::JetContainer *largeJets = nullptr;
+      ANA_CHECK (m_largejetHandle.retrieve (largeJets, sys));
+
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
       
@@ -165,6 +169,7 @@ namespace ZCC
       m_bools.at(ZCC::MET) = false;
       m_bools.at(ZCC::ONE_B_JETS) = false;
       m_bools.at(ZCC::TWO_B_JETS) = false;
+      m_bools.at(ZCC::ONE_LARGE_JET) = false;
 
       setThresholds(event, sys);
 
@@ -193,6 +198,7 @@ namespace ZCC
       evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_ZCharmCuts, sys);
       evaluateLeptonCuts(*electrons, *muons, met, m_ZCharmCuts);
       evaluateBJetCuts(*bjets, m_ZCharmCuts);
+      evaluateLargeJetCuts(largeJets);
       
       bool passedall = true;
       for (const auto& [key, value] : m_boolnames) {
@@ -523,6 +529,12 @@ namespace ZCC
     }
 
   }  
+
+  void ZCharmSelectorAlg::evaluateLargeJetCuts
+  (const xAOD::JetContainer *largeJets)
+  {
+    m_bools.at(ZCC::ONE_LARGE_JET) = largeJets->size();
+  }
 
   void ZCharmSelectorAlg::setThresholds(const xAOD::EventInfo* event,
 					const CP::SystematicSet& sys) {

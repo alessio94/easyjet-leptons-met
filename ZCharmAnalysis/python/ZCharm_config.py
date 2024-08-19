@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
@@ -8,7 +9,7 @@ from EasyjetHub.output.ttree.selected_objects import (
 )
 
 
-def ZCharm_cfg(flags, smalljetkey, muonkey, electronkey,
+def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                float_variables=None, int_variables=None):
     if not float_variables:
         float_variables = []
@@ -34,12 +35,19 @@ def ZCharm_cfg(flags, smalljetkey, muonkey, electronkey,
                                      minPt=flags.Analysis.Electron.min_pT_ZCharm,
                                      maxEta=flags.Analysis.Electron.max_eta_ZCharm))
 
-    cfg.merge(JetSelectorAlgCfg(flags,
+    cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_SelectorAlg",
                                 containerInKey=smalljetkey,
                                 containerOutKey="ZCharmAnalysisJets_%SYS%",
                                 bTagWPDecorName="",
                                 minPt=flags.Analysis.small_R_jet.min_pT_ZCharm,
                                 maxEta=flags.Analysis.small_R_jet.max_eta_ZCharm))
+
+    cfg.merge(JetSelectorAlgCfg(flags, name="LargeRJet_SelectorAlg",
+                                containerInKey=largejetkey,
+                                containerOutKey="ZCharmAnalysisLargeJets_%SYS%",
+                                minPt=250 * Units.GeV,
+                                maxEta=2.5,
+                                selectBjet=False))
 
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
@@ -90,7 +98,7 @@ def get_BaselineVarsZCharmAlg_variables(flags):
             float_variable_names.append(f"{var}{object}")
 
     float_variable_names += ["METSig"]
-    int_variable_names += ["nJets", "nBJets"]
+    int_variable_names += ["nJets", "nBJets", "nLargeRJets"]
     int_variable_names += ["nElectrons", "nMuons", "nLeptons"]
 
     return float_variable_names, int_variable_names

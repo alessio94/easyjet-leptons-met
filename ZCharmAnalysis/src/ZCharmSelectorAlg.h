@@ -60,6 +60,7 @@ namespace ZCC
     MET,
     ONE_B_JETS,
     TWO_B_JETS,
+    ONE_LARGE_JET,
   };
 
   /// \brief An algorithm for counting containers
@@ -84,6 +85,7 @@ namespace ZCC
         "MET",
         "ONE_B_JETS",
         "TWO_B_JETS",
+        "ONE_LARGE_JET",
       };
 
 
@@ -102,6 +104,9 @@ namespace ZCC
 
       CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "ZCharmAnalysisJets_%SYS%", "Jet container to read" };
+
+      CP::SysReadHandle<xAOD::JetContainer> 
+      m_largejetHandle{ this, "largejets", "ZCharmAnalysisLargeJets_%SYS%", "Large R Jet container to read"};
 
       CP::SysReadDecorHandle<char> 
       m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
@@ -168,6 +173,7 @@ namespace ZCC
         {ZCC::MET, "MET"},
         {ZCC::ONE_B_JETS, "ONE_B_JETS"},
         {ZCC::TWO_B_JETS, "TWO_B_JETS"},
+        {ZCC::ONE_LARGE_JET, "ONE_LARGE_JET"},
       };
 
       CutManager m_ZCharmCuts;
@@ -183,15 +189,18 @@ namespace ZCC
 	 const xAOD::Electron* ele0, const xAOD::Electron* ele1,
 	 const xAOD::Muon* mu0, const xAOD::Muon* mu1,
 	 CutManager& ZCharmCuts, const CP::SystematicSet& sys);
+
       void evaluateSingleLeptonTrigger
 	(const xAOD::EventInfo* event, 
 	 const xAOD::Electron* ele, const xAOD::Muon* mu,
 	 const CP::SystematicSet& sys);
+
       void evaluateDiLeptonTrigger
 	(const xAOD::EventInfo* event,
 	 const xAOD::Electron* ele0, const xAOD::Electron* ele1,
 	 const xAOD::Muon* mu0, const xAOD::Muon* mu1,
 	 const CP::SystematicSet& sys);
+   
       void evaluateAsymmetricLeptonTrigger
 	(const xAOD::EventInfo* event,
 	 const xAOD::Electron* ele, const xAOD::Muon* mu,
@@ -200,8 +209,8 @@ namespace ZCC
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, const xAOD::MissingET* met, CutManager& ZCharmCuts);
       void evaluateBJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, CutManager& ZCharmCuts);
-      void setThresholds(const xAOD::EventInfo* event,
-			 const CP::SystematicSet& sys);
+      void evaluateLargeJetCuts(const xAOD::JetContainer *largeJets);
+      void setThresholds(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
   };
 
 }

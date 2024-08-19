@@ -22,6 +22,7 @@ namespace ZCC
   {
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_largejetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
@@ -60,6 +61,11 @@ namespace ZCC
       m_Ibranches.emplace(var, whandle);
       ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
     };
+    
+    ATH_CHECK (m_GN2Xv01_phbb.initialize(m_systematicsList, m_largejetHandle));
+    ATH_CHECK (m_GN2Xv01_phcc.initialize(m_systematicsList, m_largejetHandle));
+    ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_largejetHandle));
+    ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_largejetHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -80,6 +86,9 @@ namespace ZCC
 
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+
+      const xAOD::JetContainer *largeJets  = nullptr;
+      ANA_CHECK (m_largejetHandle.retrieve (largeJets , sys));
 
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
@@ -266,6 +275,36 @@ namespace ZCC
         m_Fbranches.at("dPhibb").set(*event, (bjets->at(0)->p4()).DeltaPhi(bjets->at(1)->p4()), sys);
         m_Fbranches.at("dEtabb").set(*event, (bjets->at(0)->eta()) - bjets->at(1)->eta(), sys);
       }
+
+      // large jet sector
+      for (std::size_t i=0; i<std::min(largeJets ->size(),(std::size_t)1); i++){
+
+        const xAOD::Jet* largeJet = largeJets->at(i);
+        std::string prefix = "LargeRJet"+std::to_string(i+1);
+
+        // calculate Xbb/cc score
+        float phbb = m_GN2Xv01_phbb.get(*largeJet, sys);
+        float phcc = m_GN2Xv01_phcc.get(*largeJet, sys);
+        float pqcd = m_GN2Xv01_pqcd.get(*largeJet, sys);
+        float ptop = m_GN2Xv01_ptop.get(*largeJet, sys);
+        float fbb = 0.25;
+        float ftop = 0.25;
+        float XccScore= log (phcc / (fbb*phbb + ftop*ptop + pqcd*(1-fbb-ftop)));
+
+        m_Fbranches.at(prefix+"_pt").set(*event, largeJet->pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, largeJet->eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, largeJet->phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, largeJet->e(), sys);
+        m_Fbranches.at(prefix+"_m").set(*event, largeJet->m(), sys);
+        
+        m_Fbranches.at(prefix+"_GN2Xv01_phbb").set(*event, phbb, sys);
+        m_Fbranches.at(prefix+"_GN2Xv01_phcc").set(*event, phcc, sys);
+        m_Fbranches.at(prefix+"_GN2Xv01_pqcd").set(*event, pqcd, sys);
+        m_Fbranches.at(prefix+"_GN2Xv01_ptop").set(*event, ptop, sys);
+        m_Fbranches.at(prefix+"_GN2Xv01_DXcc").set(*event, XccScore, sys);
+
+      }
+      m_Ibranches.at("nLargeRJets").set(*event, largeJets ->size(), sys);
 
     }
     return StatusCode::SUCCESS;

@@ -5,12 +5,13 @@ do_ZCharm_analysis: true
 
 bypass: false
 
-
 # Toggles for object types
 do_small_R_jets: true
 do_muons: true
 do_electrons: true
 do_met : true 
+do_large_R_UFO_jets: true
+save_HF_classification: true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
@@ -28,6 +29,10 @@ small_R_jet:
     - GN2v01_FixedCutBEff_70
     
   variables_int_bjets: ["truthLabel", "pcbt_GN2v01"]
+
+large_R_jet:
+  amount: 1
+  variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_DXcc", "GN2Xv01_phbb", "GN2Xv01_phcc", "GN2Xv01_pqcd", "GN2Xv01_ptop"]
 
 Electron:
   trackSelection: true
@@ -93,9 +98,16 @@ ttree_output:
       muons: 'container_names.output.muons'
       electrons: 'container_names.output.electrons'
       met : 'container_names.output.met'
+      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
     collection_options:
       small_R_jets:
         btag_info: true
+        btag_details: true
         # JVT_details: true
+      large_R_jets:
+        substructure_info: true
+        truth_labels: true
+        btag_details: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
+      large_R_jets: ['container_names.input.truth10SoftDropJet']
