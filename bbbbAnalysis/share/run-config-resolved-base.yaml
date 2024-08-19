@@ -13,6 +13,8 @@ small_R_jet:
     - GN2v01_FixedCutBEff_65
     - GN2v01_FixedCutBEff_70
     - GN2v01_FixedCutBEff_77
+  doHLTMatching: false
+  saveTriggerInfo: false
 
 Muon:
   ID: "Loose"

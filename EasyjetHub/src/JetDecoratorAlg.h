@@ -13,6 +13,7 @@
 #include <AthenaBaseComps/AthReentrantAlgorithm.h>
 
 #include <xAODJet/JetContainer.h>
+#include <TrigDecisionTool/TrigDecisionTool.h>
 
 #include <AthenaKernel/Units.h>
 
@@ -49,6 +50,23 @@ namespace Easyjet
 
     SG::WriteDecorHandleKey<xAOD::JetContainer> m_bJetTruthPtDecorKey;
     SG::WriteDecorHandleKey<xAOD::JetContainer> m_bJetTruthDRDecorKey;
+
+    PublicToolHandle<Trig::TrigDecisionTool> m_trigDecTool{
+      this, "TrigDecisionTool", "", "Trigger decision tool"
+    };
+
+    Gaudi::Property<std::vector<std::string>> m_triggers{
+      this, "triggerList", {}, "List of triggers to match"
+    };
+
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTPtDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTEtaDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTPhiDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTDRDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTThresholdsDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTBtagDecorKeys;
+
+    bool isSameJet(const xAOD::IParticle *jet1, const xAOD::IParticle *jet2) const;
 
   };
 

@@ -101,6 +101,19 @@ def get_small_R_jet_branches(
         for index in range(flags.Analysis.small_R_jet.amount_bjet):
             small_R_jet_branches.variables += [f"isbjet{index+1}_%SYS%"]
 
+    if (flags.Analysis.small_R_jet.saveTriggerInfo
+            and flags.Analysis.small_R_jet.doHLTMatching):
+        for trig in flags.Analysis.TriggerChains:
+            trig = trig.replace("-", "_").replace(".", "p")
+            small_R_jet_branches.variables += [
+                f'match{trig}_pt',
+                f'match{trig}_eta',
+                f'match{trig}_phi',
+                f'match{trig}_dr',
+                f'match{trig}_thresholds',
+                f'match{trig}_btag'
+            ]
+
     return small_R_jet_branches.get_output_list()
 
 

@@ -30,6 +30,8 @@ small_R_jet:
   btag_extra_wps: []
   runBJetPtCalib: true
   useFJvt: False
+  doHLTMatching: False
+  saveTriggerInfo: False
   # select jet type
   jet_type: 'reco4PFlowJet'
   # calib tool options

@@ -32,6 +32,8 @@ atlas_add_library( EasyjetHubLib
                    TruthUtils
                    FlavorTagDiscriminants
                    TauAnalysisToolsLib
+                   TrigDecisionToolLib
+                   TrigCompositeUtilsLib
 )
 
 
