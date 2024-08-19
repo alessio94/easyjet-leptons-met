@@ -21,6 +21,16 @@ def get_photon_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.do_overlap_removal:
         photon_branches.variables += ["passesOR_%SYS%"]
 
+    id_wps = [f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}']
+    if 'extra_wps' in flags.Analysis.Photon:
+        for wp in flags.Analysis.Photon.extra_wps:
+            id_wps.append(wp[0] + "_" + wp[1])
+
+    photon_branches.variables += [
+        f"baselineSelection_{id_wp}_%SYS%"
+        for id_wp in id_wps
+    ]
+
     if tree_flags.collection_options.photons.shower_shapes:
         photon_branches.variables += [
             "Rhad",
@@ -49,5 +59,17 @@ def get_photon_branches(flags, tree_flags, input_container, output_prefix):
             "truthType",
             "truthOrigin",
         ]
+
+    # Requires PhotonSelectorAlg to be run
+    if tree_flags.collection_options.photons.run_selection:
+        if flags.Input.isMC:
+            photon_branches.variables += [
+                f"ph_effSF_{id_wp}_%SYS%"
+                for id_wp in id_wps
+            ]
+
+        photon_branches.variables += ["isAnalysisPhoton_%SYS%"]
+        for index in range(flags.Analysis.Photon.amount):
+            photon_branches.variables += [f"isPhoton{index+1}_%SYS%"]
 
     return photon_branches.get_output_list()

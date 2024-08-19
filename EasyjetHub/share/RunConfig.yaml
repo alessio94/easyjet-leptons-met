@@ -61,6 +61,10 @@ ttree_output:
       large_R_jets:
         substructure_info: true
         truth_labels: true
+      muons:
+        run_selection: false
+      electrons:
+        run_selection: false
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       large_R_jets: 'container_names.input.truth10SoftDropJet'

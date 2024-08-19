@@ -129,11 +129,9 @@ ttree_output:
       electrons:
         run_selection: true
         truth_parent_info: true
-        id_iso_variables: true
       muons:
         run_selection: true
         truth_parent_info: true
-        id_iso_variables: true
     truth_outputs:
       small_R_jets: 'container_names.input.truth4Jet'
       higgs_particle: 'container_names.output.truthHHParticles'

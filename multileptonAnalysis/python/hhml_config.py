@@ -52,7 +52,7 @@ def hhml_cfg(
         looseTauWP='Baseline',
         # used for subsequent event selections
         # only used to decorate flags + scale factors
-        tightTauWP=flags.Analysis.Tau.ID,
+        tightTauWPs=[flags.Analysis.Tau.ID],
     ))
 
     cfg.merge(JetSelectorAlgCfg(

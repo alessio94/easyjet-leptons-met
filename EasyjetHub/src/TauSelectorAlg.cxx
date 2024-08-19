@@ -25,54 +25,64 @@ namespace Easyjet
     ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
 
-    if (m_tauAmount > 0)
-    {
-      for (int i = 0; i < m_tauAmount; i++)
-      {
-        std::string index = std::to_string(i + 1);
-        CP::SysWriteDecorHandle<bool> whandle{"isTau" + index + "_%SYS%", this};
-        m_leadBranches.emplace("isTau" + index, whandle);
-        ATH_CHECK(m_leadBranches.at("isTau" + index).initialize(m_systematicsList, m_inHandle));
-      };
+    for (int i = 0; i < m_tauAmount; i++){
+      std::string index = std::to_string(i + 1);
+      CP::SysWriteDecorHandle<bool> whandle{"isTau" + index + "_%SYS%", this};
+      m_leadBranches.emplace("isTau" + index, whandle);
+      ATH_CHECK(m_leadBranches.at("isTau" + index).initialize(m_systematicsList, m_inHandle));
     }
 
     ANA_CHECK (m_isSelectedTau.initialize(m_systematicsList, m_inHandle));
 
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    if(m_tightTauWP.empty()) m_tightTauWP = m_looseTauWP;
-
-    if(m_isMC){
-      m_tau_recoSF = CP::SysReadDecorHandle<float>("tau_Reco_effSF_"+m_tightTauWP+"_%SYS%", this);
-      m_tau_IDSF = CP::SysReadDecorHandle<float>("tau_ID_effSF_"+m_tightTauWP+"_%SYS%", this);
-      if(m_tightTauWP.value().find("noeleid")==std::string::npos){
-        m_tau_eVetoFakeTauSF = CP::SysReadDecorHandle<float>("tau_EvetoFakeTau_effSF_"+m_tightTauWP+"_%SYS%", this);
-        m_tau_eVetoTrueTauSF = CP::SysReadDecorHandle<float>("tau_EvetoTrueTau_effSF_"+m_tightTauWP+"_%SYS%", this);
-      }
-      m_tau_SF_out = CP::SysWriteDecorHandle<float>("tau_effSF_"+m_tightTauWP+"_%SYS%", this);
-    }
-    ATH_CHECK (m_tau_recoSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_tau_IDSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_tau_eVetoFakeTauSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_tau_eVetoTrueTauSF.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    ATH_CHECK (m_tau_SF_out.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-
-    for(const auto& trig : m_tauTrigSF){
-      m_tauTriggerSF_in.emplace_back("tau_trigEffSF_"+trig+"_%SYS%", this);
-      m_tauTriggerSF_out.emplace_back("tau_trigEffSF_"+trig+"_%SYS%", this);
-    }
-
-    for(auto& handle : m_tauTriggerSF_in)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle));
-    for(auto& handle : m_tauTriggerSF_out)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle));
-
     m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_looseTauWP+"_%SYS%", this);
-    m_select_tight_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_tightTauWP+"_%SYS%", this);
-    m_select_out = CP::SysWriteDecorHandle<char>("baselineSelection_"+m_tightTauWP+"_%SYS%", this);
     ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
-    ATH_CHECK (m_select_tight_in.initialize(m_systematicsList, m_inHandle));
-    ATH_CHECK (m_select_out.initialize(m_systematicsList, m_outHandle));
+
+    // Select flags
+    for(const auto& wp : m_tightTauWPs){
+      m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+      m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    }
+
+    for(auto& handle : m_select_tight_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_select_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+
+    // Scale factors
+    if(m_isMC){
+      std::vector<std::string> wps = m_tightTauWPs;
+      if(m_looseTauWP!="Baseline") wps.emplace_back(m_looseTauWP);
+      for(const auto& wp : wps){
+        m_tau_recoSF.emplace_back("tau_Reco_effSF_"+wp+"_%SYS%", this);
+        m_tau_IDSF.emplace_back("tau_ID_effSF_"+wp+"_%SYS%", this);
+        bool eVetoAvailable = wp.find("noeleid")==std::string::npos;
+        m_tau_eVetoFakeTauSF.emplace_back(eVetoAvailable ? "tau_EvetoFakeTau_effSF_"+wp+"_%SYS%" : "", this);
+        m_tau_eVetoTrueTauSF.emplace_back(eVetoAvailable ? "tau_EvetoTrueTau_effSF_"+wp+"_%SYS%" : "", this);
+        m_tau_SF_out.emplace_back("tau_effSF_"+wp+"_%SYS%", this);
+      }
+
+      for(const auto& trig : m_tauTrigSF){
+        m_tauTriggerSF_in.emplace_back("tau_trigEffSF_"+trig+"_%SYS%", this);
+        m_tauTriggerSF_out.emplace_back("tau_trigEffSF_"+trig+"_%SYS%", this);
+      }
+    }
+
+    for(auto& handle : m_tau_recoSF)
+      ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_tau_IDSF)
+      ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_tau_eVetoFakeTauSF)
+      ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_tau_eVetoTrueTauSF)
+      ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_tau_SF_out)
+      ATH_CHECK (handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+    for(auto& handle : m_tauTriggerSF_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_tauTriggerSF_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Initialise syst-aware input/output decorators 
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
@@ -131,19 +141,28 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
+        for(unsigned int i=0; i<m_tightTauWPs.size(); i++)
+          m_select_out[i].set(*tau, m_select_tight_in[i].get(*tau,sys), sys);
+
         if(m_isMC){
-          float SF = m_tau_recoSF.get(*tau,sys);
-          SF *=  m_tau_IDSF.get(*tau,sys);
-          if(m_tightTauWP.value().find("noeleid")==std::string::npos){
-            SF *= m_tau_eVetoFakeTauSF.get(*tau,sys);
-            SF *= m_tau_eVetoTrueTauSF.get(*tau,sys);
+          std::vector<std::string> wps = m_tightTauWPs;
+          if(m_looseTauWP!="Baseline") wps.emplace_back(m_looseTauWP);
+          for(unsigned int i=0; i<wps.size(); i++){
+            std::string wp = wps[i];
+            float SF = m_tau_recoSF[i].get(*tau,sys);
+            SF *=  m_tau_IDSF[i].get(*tau,sys);
+            if(wp.find("noeleid")==std::string::npos){
+              SF *= m_tau_eVetoFakeTauSF[i].get(*tau,sys);
+              SF *= m_tau_eVetoTrueTauSF[i].get(*tau,sys);
+            }
+            m_tau_SF_out[i].set(*tau, SF, sys);
           }
-          m_tau_SF_out.set(*tau, SF, sys);
+
           for(unsigned int i=0; i<m_tauTrigSF.size(); i++){
-            m_tauTriggerSF_out[i].set(*tau, m_tauTriggerSF_in[i].get(*tau, sys), sys);
+            m_tauTriggerSF_out[i].set
+	      (*tau, m_tauTriggerSF_in[i].get(*tau, sys), sys);
           }
         }
-        m_select_out.set(*tau, m_select_tight_in.get(*tau,sys), sys);
 
         // If cuts are passed, save the object
         workContainer->push_back(tau);

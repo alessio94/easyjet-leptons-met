@@ -23,43 +23,41 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    if (m_muonAmount > 0)
-    {
-      for (int i = 0; i < m_muonAmount; i++)
-      {
-        std::string index = std::to_string(i + 1);
-        CP::SysWriteDecorHandle<bool> whandle{"isMuon" + index + "_%SYS%", this};
-        m_leadBranches.emplace("isMuon" + index, whandle);
-        ATH_CHECK(m_leadBranches.at("isMuon" + index).initialize(m_systematicsList, m_inHandle));
-      };
+    for (int i = 0; i < m_muonAmount; i++){
+      std::string index = std::to_string(i + 1);
+      CP::SysWriteDecorHandle<bool> whandle{"isMuon" + index + "_%SYS%", this};
+      m_leadBranches.emplace("isMuon" + index, whandle);
+      ATH_CHECK(m_leadBranches.at("isMuon" + index).initialize(m_systematicsList, m_inHandle));
     }
     ANA_CHECK (m_isSelectedMuon.initialize(m_systematicsList, m_inHandle));
 
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    if(m_tightMuonWPs.empty()) m_tightMuonWPs.setValue({m_looseMuonWP});
-
     m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+ m_looseMuonWP +"_%SYS%", this);
     ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
 
+    // Select flags
     for(const auto& wp : m_tightMuonWPs){
-      // Scale factors
-      m_mu_recoSF.emplace_back(m_isMC ? "muon_reco_effSF_"+wp+"_%SYS%" : "", this);
-      m_mu_isoSF.emplace_back((m_isMC && wp.find("NonIso")==std::string::npos) ?
-            "muon_isol_effSF_"+wp+"_%SYS%" : "", this);
-      m_mu_TTVASF.emplace_back((m_isMC && m_doTTVA) ?
-            "muon_TTVA_effSF_"+wp+"_%SYS%" : "", this);
-      m_mu_SF.emplace_back(m_isMC ? "muon_effSF_"+wp+"_%SYS%" : "", this);
-
-      // Select flags
       m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
+    // Scale factors
     if(m_isMC){
+      std::vector<std::string> wps = m_tightMuonWPs;
+      wps.emplace_back(m_looseMuonWP);
+      for(const auto& wp : wps){
+        m_mu_recoSF.emplace_back("muon_reco_effSF_"+wp+"_%SYS%", this);
+        m_mu_isoSF.emplace_back(wp.find("NonIso")==std::string::npos ?
+				"muon_isol_effSF_"+wp+"_%SYS%" : "", this);
+        m_mu_TTVASF.emplace_back(m_doTTVA ?
+				 "muon_TTVA_effSF_"+wp+"_%SYS%" : "", this);
+        m_mu_SF.emplace_back("muon_effSF_"+wp+"_%SYS%", this);
+      }
+
       for(const auto& trig : m_muTrigSF){
-	m_muTriggerSF_in.emplace_back("muon_trigEffSF_"+trig+"_%SYS%", this);
-	m_muTriggerSF_out.emplace_back("muon_trigEffSF_"+trig+"_%SYS%", this);
+        m_muTriggerSF_in.emplace_back("muon_trigEffSF_"+trig+"_%SYS%", this);
+        m_muTriggerSF_out.emplace_back("muon_trigEffSF_"+trig+"_%SYS%", this);
       }
     }
 
@@ -121,18 +119,20 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_tightMuonWPs.size(); i++){
-          std::string wp = m_tightMuonWPs[i];
-          if(m_isMC){
+        for(unsigned int i=0; i<m_tightMuonWPs.size(); i++)
+          m_select_out[i].set(*muon, m_select_tight_in[i].get(*muon,sys), sys);
+
+        if(m_isMC){
+          std::vector<std::string> wps = m_tightMuonWPs;
+          wps.emplace_back(m_looseMuonWP);
+          for(unsigned int i=0; i<wps.size(); i++){
+            std::string wp = wps[i];
             float SF = m_mu_recoSF[i].get(*muon,sys);
             if(wp.find("NonIso")==std::string::npos) SF *= m_mu_isoSF[i].get(*muon,sys);
             if(m_doTTVA) SF *= m_mu_TTVASF[i].get(*muon,sys);
             m_mu_SF[i].set(*muon, SF, sys);
           }
-          m_select_out[i].set(*muon, m_select_tight_in[i].get(*muon,sys), sys);
-        }
 
-        if(m_isMC){
           for(unsigned int i=0; i<m_muTrigSF.size(); i++){
             m_muTriggerSF_out[i].set
               (*muon, m_muTriggerSF_in[i].get(*muon, sys), sys);

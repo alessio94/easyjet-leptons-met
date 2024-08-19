@@ -27,13 +27,15 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.do_overlap_removal:
         tau_branches.variables += ["passesOR_%SYS%"]
 
-    if flags.Input.isMC:
-        for tau_id in [flags.Analysis.Tau.ID]:
-            tau_branches.variables += [f"tau_Reco_effSF_{tau_id}_%SYS%",
-                                       f"tau_ID_effSF_{tau_id}_%SYS%"]
-            if "noeleid" not in tau_id:
-                tau_branches.variables += [f"tau_EvetoFakeTau_effSF_{tau_id}_%SYS%",
-                                           f"tau_EvetoTrueTau_effSF_{tau_id}_%SYS%"]
+    id_wps = [flags.Analysis.Tau.ID]
+    if 'extra_wps' in flags.Analysis.Tau:
+        for wp in flags.Analysis.Tau.extra_wps:
+            id_wps.append(wp[0] + "_" + wp[1])
+
+    tau_branches.variables += [
+        f"baselineSelection_{id_wp}_%SYS%"
+        for id_wp in id_wps
+    ]
 
     if tree_flags.collection_options.taus.score_branches:
         tau_branches.variables += [
@@ -63,7 +65,15 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Input.isMC and tree_flags.collection_options.taus.truth_parent_info:
         tau_branches.variables += get_TopHiggs_tau_truth_labels(flags)
 
+    # Requires TauSelectorAlg to be run
     if tree_flags.collection_options.taus.run_selection:
+        if flags.Input.isMC:
+            tau_branches.variables += [
+                f"tau_effSF_{id_wp}_%SYS%"
+                for id_wp in id_wps
+                if id_wp != "Baseline"
+            ]
+
         tau_branches.variables += ["isAnalysisTau_%SYS%"]
         for index in range(flags.Analysis.Tau.amount):
             tau_branches.variables += [f"isTau{index+1}_%SYS%"]

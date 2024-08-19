@@ -52,14 +52,18 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::vector<std::string>> m_photonWPNames
-      { this, "photon_WPs", {},"Photon ID + Iso working points used on top of container" };
+    Gaudi::Property<std::string> m_loosePhotonWP
+      { this, "loosePhotonWP", "", "Loose photon ID + Iso working point, used to filter collection" };
+
+    Gaudi::Property<std::vector<std::string>> m_tightPhotonWPs
+      { this, "tightPhotonWPs", {},"Tight photon ID + Iso working points, not used to filter collection" };
 
     std::vector<CP::SysReadDecorHandle<float>> m_ph_idSF;
     std::vector<CP::SysReadDecorHandle<float>> m_ph_isoSF;
     std::vector<CP::SysWriteDecorHandle<float>> m_ph_SF;
 
-    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
+    CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
+    std::vector<CP::SysReadDecorHandle<char>> m_select_tight_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
@@ -69,6 +73,10 @@ private:
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "Photons_%SYS%", 
         "Name out output decorator for number of selected photons"};
+
+    CP::SysWriteDecorHandle<bool > m_isSelectedPhoton {
+        this, "decoration", "isAnalysisPhoton_%SYS%", "decoration for per-object if photon is selected"
+    };
 
     /// \brief Setup vertex container for photon pointing
     SG::ReadHandleKey<xAOD::VertexContainer> m_vertexContainerInKey {this, "VertexContainer", "PrimaryVertices", "Vertex container name"};
@@ -82,6 +90,9 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra photons after pT sorting"}; // -1 means keep them all
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
     Gaudi::Property<bool>  m_recomputePhotons {this, "recomputePhotons", true, "Recompute photon eta (and subsequently pT) w.r.t. hardest vertex"}; 
+
+    Gaudi::Property<int>   m_photonAmount     {this, "photonAmount", -1, "Number of photons to consider for isPhotonXX decoration"};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
 
   };
 }

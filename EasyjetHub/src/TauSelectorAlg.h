@@ -60,13 +60,14 @@ private:
     Gaudi::Property<std::string> m_looseTauWP
       { this, "looseTauWP", "", "Loose tau ID working point, used to filter collection" };
 
-    Gaudi::Property<std::string> m_tightTauWP
-      { this, "tightTauWP", "", "Tight tau ID working point, not used to filter collection" };
-    CP::SysReadDecorHandle<float> m_tau_recoSF{"", this};
-    CP::SysReadDecorHandle<float> m_tau_IDSF{"", this};
-    CP::SysReadDecorHandle<float> m_tau_eVetoFakeTauSF{"", this};
-    CP::SysReadDecorHandle<float> m_tau_eVetoTrueTauSF{"", this};
-    CP::SysWriteDecorHandle<float> m_tau_SF_out{"", this};
+    Gaudi::Property<std::vector<std::string>> m_tightTauWPs
+      { this, "tightTauWPs", {}, "Tight tau ID working points, not used to filter collection" };
+
+    std::vector<CP::SysReadDecorHandle<float>> m_tau_recoSF;
+    std::vector<CP::SysReadDecorHandle<float>> m_tau_IDSF;
+    std::vector<CP::SysReadDecorHandle<float>> m_tau_eVetoFakeTauSF;
+    std::vector<CP::SysReadDecorHandle<float>> m_tau_eVetoTrueTauSF;
+    std::vector<CP::SysWriteDecorHandle<float>> m_tau_SF_out;
 
     Gaudi::Property<std::vector<std::string>> m_tauTrigSF
       {this, "tauTriggerSF", {}, "List of tau trigger SF"};
@@ -74,8 +75,8 @@ private:
     std::vector<CP::SysWriteDecorHandle<float>> m_tauTriggerSF_out;
 
     CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
-    CP::SysReadDecorHandle<char> m_select_tight_in{"", this};
-    CP::SysWriteDecorHandle<char> m_select_out{"", this};
+    std::vector<CP::SysReadDecorHandle<char>> m_select_tight_in;
+    std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::TauJetContainer>>

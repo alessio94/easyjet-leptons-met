@@ -22,21 +22,41 @@ namespace Easyjet
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
 
+    for (int i = 0; i < m_photonAmount; i++){
+      std::string index = std::to_string(i + 1);
+      CP::SysWriteDecorHandle<bool> whandle{"isPhoton" + index + "_%SYS%", this};
+      m_leadBranches.emplace("isPhoton" + index, whandle);
+      ATH_CHECK(m_leadBranches.at("isPhoton" + index).initialize(m_systematicsList, m_inHandle));
+    }
+
+    ATH_CHECK (m_isSelectedPhoton.initialize(m_systematicsList, m_inHandle));
+
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    // Intialise syst-aware input/output decorators    
-    ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
+    m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_loosePhotonWP+"_%SYS%", this);
+    ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
 
-    for(const auto& wp : m_photonWPNames){
-      // Scale factors
-      m_ph_idSF.emplace_back(m_isMC ? "ph_id_effSF_"+wp+"_%SYS%" : "", this);
-      m_ph_isoSF.emplace_back((m_isMC && wp.find("NonIso")==std::string::npos) ?
-			      "ph_isol_effSF_"+wp+"_%SYS%" : "", this);
-      m_ph_SF.emplace_back(m_isMC ? "ph_effSF_"+wp+"_%SYS%" : "", this);
-
-      // Select flags
-      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    // Select flags
+    for(const auto& wp : m_tightPhotonWPs){
+      m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    }
+
+    for(auto& handle : m_select_tight_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_select_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+
+    // Scale factors
+    if(m_isMC){
+      std::vector<std::string> wps = m_tightPhotonWPs;
+      wps.emplace_back(m_loosePhotonWP);
+      for(const auto& wp : wps){
+        m_ph_idSF.emplace_back("ph_id_effSF_"+wp+"_%SYS%", this);
+        m_ph_isoSF.emplace_back(wp.find("NonIso")==std::string::npos ?
+        			"ph_isol_effSF_"+wp+"_%SYS%" : "", this);
+        m_ph_SF.emplace_back("ph_effSF_"+wp+"_%SYS%", this);
+      }
     }
 
     for(auto& handle : m_ph_idSF)
@@ -45,10 +65,9 @@ namespace Easyjet
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_ph_SF)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-    for(auto& handle : m_select_in)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_select_out)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+
+    // Intialise syst-aware input/output decorators
+    ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -90,6 +109,12 @@ namespace Easyjet
 
       for (const xAOD::Photon *photon : *inContainer)
       {
+
+	// selected photons for systematics
+        m_isSelectedPhoton.set(*photon, false, sys);
+
+        if(!m_select_loose_in.get(*photon,sys)) continue;
+
         // skip OR photons
         if ( m_checkOR ){
           bool passesOR = m_passesOR.get(*photon, sys);
@@ -113,14 +138,18 @@ namespace Easyjet
           continue ;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_photonWPNames.size(); i++){
-          std::string wp = m_photonWPNames[i];
-          if(m_isMC){
+        for(unsigned int i=0; i<m_tightPhotonWPs.size(); i++)
+          m_select_out[i].set(*thisPhoton, m_select_tight_in[i].get(*thisPhoton,sys), sys);
+
+        if(m_isMC){
+          std::vector<std::string> wps = m_tightPhotonWPs;
+          wps.emplace_back(m_loosePhotonWP);
+          for(unsigned int i=0; i<wps.size(); i++){
+            std::string wp = wps[i];
             float SF = m_ph_idSF[i].get(*thisPhoton, sys);
             if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*thisPhoton, sys);
             m_ph_SF[i].set(*thisPhoton, SF, sys);
           }
-          m_select_out[i].set(*thisPhoton, m_select_in[i].get(*thisPhoton,sys), sys);
         }
 
         workContainer->push_back(thisPhoton.release());
@@ -158,6 +187,16 @@ namespace Easyjet
         // keep only the requested amount
         workContainer->erase(workContainer->begin() + nKeep,
                              workContainer->end());
+      }
+
+      //lead/sublead photon
+      if(m_photonAmount > 0){
+        int nPhoton = 0;
+        for (const xAOD::Photon *photon : *workContainer) {
+          nPhoton++;
+          m_leadBranches.at("isPhoton"+std::to_string(nPhoton)).set(*photon, true, sys);
+          if ( nPhoton == m_photonAmount ) break;
+        }
       }
 
       // Write to eventstore

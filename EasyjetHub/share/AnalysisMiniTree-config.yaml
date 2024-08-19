@@ -35,21 +35,20 @@ collection_options:
     score_branches: false
     truth_branches: false
     truth_parent_info: false
-    run_selection: false
+    run_selection: true
 
   photons:
     shower_shapes: false
     truth_labels: false
     iso_variables: false
+    run_selection: true
   
   electrons:
-    id_iso_variables: false
-    run_selection: false
+    run_selection: true
     truth_parent_info: false
 
   muons:
-    id_iso_variables: false
-    run_selection: false
+    run_selection: true
     truth_parent_info: false
 
 # turned off automatically if MC

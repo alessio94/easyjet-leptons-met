@@ -20,15 +20,17 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
 
     LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=LooseMuonWPLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="XbbCalibMuons_%SYS%",
+                                 looseMuonWP=LooseMuonWPLabel,
                                  minPt=10 * Units.GeV))
 
     LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
-        containerInKey=LooseElectronWPLabel + electronkey,
+        containerInKey=electronkey,
         containerOutKey="XbbCalibElectrons_%SYS%",
+        looseElectronWP=LooseElectronWPLabel,
         minPt=10 * Units.GeV))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_SelectorAlg",

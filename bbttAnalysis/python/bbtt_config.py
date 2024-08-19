@@ -33,7 +33,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
     muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
 
     cfg.merge(MuonSelectorAlgCfg(flags,
-                                 containerInKey=muonInWpLabel + muonkey,
+                                 containerInKey=muonkey,
                                  containerOutKey="bbttAnalysisMuons_%SYS%",
                                  looseMuonWP=muonInWpLabel,
                                  tightMuonWPs=muon_WPs))
@@ -43,7 +43,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
     ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
 
     cfg.merge(ElectronSelectorAlgCfg(flags,
-                                     containerInKey=electronInWpLabel + electronkey,
+                                     containerInKey=electronkey,
                                      containerOutKey="bbttAnalysisElectrons_%SYS%",
                                      looseEleWP=electronInWpLabel,
                                      tightEleWPs=ele_WPs))
@@ -57,7 +57,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                                 looseTauWP='Baseline',
                                 # used for subsequent event selections
                                 # only used to decorate flags + scale factors
-                                tightTauWP=flags.Analysis.Tau.ID))
+                                tightTauWPs=[flags.Analysis.Tau.ID]))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,

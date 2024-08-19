@@ -22,16 +22,15 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.do_overlap_removal:
         muon_branches.variables += ["passesOR_%SYS%"]
 
-    if tree_flags.collection_options.muons.id_iso_variables:
-        id_wps = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
-        if 'extra_wps' in flags.Analysis.Muon:
-            for wp in flags.Analysis.Muon.extra_wps:
-                id_wps.append(wp[0] + "_" + wp[1])
+    id_wps = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
+    if 'extra_wps' in flags.Analysis.Muon:
+        for wp in flags.Analysis.Muon.extra_wps:
+            id_wps.append(wp[0] + "_" + wp[1])
 
-        muon_branches.variables += [
-            f"baselineSelection_{id_wp}_%SYS%"
-            for id_wp in id_wps
-        ]
+    muon_branches.variables += [
+        f"baselineSelection_{id_wp}_%SYS%"
+        for id_wp in id_wps
+    ]
 
     if flags.Input.isMC and tree_flags.collection_options.muons.truth_parent_info:
         truth_labels = []
@@ -41,7 +40,14 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
             ]
         muon_branches.variables += truth_labels
 
+    # Requires MuonSelectorAlg to be run
     if tree_flags.collection_options.muons.run_selection:
+        if flags.Input.isMC:
+            muon_branches.variables += [
+                f"muon_effSF_{id_wp}_%SYS%"
+                for id_wp in id_wps
+            ]
+
         muon_branches.variables += ["isAnalysisMuon_%SYS%"]
         for index in range(flags.Analysis.Lepton.amount):
             muon_branches.variables += [f"isMuon{index+1}_%SYS%"]

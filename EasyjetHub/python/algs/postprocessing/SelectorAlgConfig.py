@@ -52,6 +52,7 @@ def PhotonSelectorAlgCfg(flags, name="PhotonSelectorAlg", **kwargs):
 
     kwargs.setdefault("isMC", flags.Input.isMC)
     kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
+    kwargs.setdefault("photonAmount", flags.Analysis.Photon.amount)
 
     cfg.addEventAlgo(CompFactory.Easyjet.PhotonSelectorAlg(name, **kwargs))
     return cfg

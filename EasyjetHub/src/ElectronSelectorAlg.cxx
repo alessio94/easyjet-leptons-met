@@ -22,44 +22,43 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    if (m_electronAmount > 0)
-    {
-      for (int i = 0; i < m_electronAmount; i++)
-      {
-        std::string index = std::to_string(i + 1);
-        CP::SysWriteDecorHandle<bool> whandle{"isElectron" + index + "_%SYS%", this};
-        m_leadBranches.emplace("isElectron" + index, whandle);
-        ATH_CHECK(m_leadBranches.at("isElectron" + index).initialize(m_systematicsList, m_inHandle));
-      };
+    for (int i = 0; i < m_electronAmount; i++){
+      std::string index = std::to_string(i + 1);
+      CP::SysWriteDecorHandle<bool> whandle{"isElectron" + index + "_%SYS%", this};
+      m_leadBranches.emplace("isElectron" + index, whandle);
+      ATH_CHECK(m_leadBranches.at("isElectron" + index).initialize(m_systematicsList, m_inHandle));
     }
     ANA_CHECK (m_isSelectedElectron.initialize(m_systematicsList, m_inHandle));
 
     ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    if(m_tightEleWPs.empty()) m_tightEleWPs.setValue({m_looseEleWP});
-
     m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+ m_looseEleWP +"_%SYS%", this);
     ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
 
+    // Select flags
     for(const auto& wp : m_tightEleWPs){
-      // Scale factors not available for DNN yet
-      bool sfAvailable = m_isMC && !m_saveDummySF && wp.find("DNN")==std::string::npos;
-      m_ele_recoSF.emplace_back(sfAvailable ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
-      m_ele_idSF.emplace_back(sfAvailable ? "el_id_effSF_"+wp+"_%SYS%" : "", this);
-      m_ele_isoSF.emplace_back
-	((sfAvailable && wp.find("NonIso")==std::string::npos) ?
-	 "el_isol_effSF_"+wp+"_%SYS%" : "", this);
-      m_ele_SF.emplace_back(m_isMC ? "el_effSF_"+wp+"_%SYS%" : "", this);
-      
-      // Select flags
       m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
+    // Scale factors
     if(m_isMC){
+      std::vector<std::string> wps = m_tightEleWPs;
+      wps.emplace_back(m_looseEleWP);
+      for(const auto& wp : wps){
+        // Scale factors not available for DNN yet
+        bool sfAvailable = !m_saveDummySF && wp.find("DNN")==std::string::npos;
+        m_ele_recoSF.emplace_back(sfAvailable ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
+        m_ele_idSF.emplace_back(sfAvailable ? "el_id_effSF_"+wp+"_%SYS%" : "", this);
+        m_ele_isoSF.emplace_back
+          ((sfAvailable && wp.find("NonIso")==std::string::npos) ?
+           "el_isol_effSF_"+wp+"_%SYS%" : "", this);
+        m_ele_SF.emplace_back("el_effSF_"+wp+"_%SYS%", this);
+      }
+
       for(const auto& trig : m_eleTrigSF){
-	m_eleTriggerSF_in.emplace_back("el_trigEffSF_"+trig+"_%SYS%", this);
-	m_eleTriggerSF_out.emplace_back("el_trigEffSF_"+trig+"_%SYS%", this);
+        m_eleTriggerSF_in.emplace_back("el_trigEffSF_"+trig+"_%SYS%", this);
+        m_eleTriggerSF_out.emplace_back("el_trigEffSF_"+trig+"_%SYS%", this);
       }
     }
 
@@ -127,20 +126,22 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_tightEleWPs.size(); i++){
-          std::string wp = m_tightEleWPs[i];
-          if(m_isMC){
-	    float SF = 1.;
-	    if(!m_saveDummySF && wp.find("DNN")==std::string::npos){
-	      SF = m_ele_recoSF[i].get(*electron,sys) * m_ele_idSF[i].get(*electron,sys);
-	      if(wp.find("NonIso")==std::string::npos) SF *= m_ele_isoSF[i].get(*electron,sys);
-	    }
-            m_ele_SF[i].set(*electron, SF, sys);
-          }
+        for(unsigned int i=0; i<m_tightEleWPs.size(); i++)
           m_select_out[i].set(*electron, m_select_tight_in[i].get(*electron,sys), sys);
-        }
 
         if(m_isMC){
+          std::vector<std::string> wps = m_tightEleWPs;
+          wps.emplace_back(m_looseEleWP);
+          for(unsigned int i=0; i<wps.size(); i++){
+            std::string wp = wps[i];
+            float SF = 1.;
+            if(!m_saveDummySF && wp.find("DNN")==std::string::npos){
+              SF = m_ele_recoSF[i].get(*electron,sys) * m_ele_idSF[i].get(*electron,sys);
+              if(wp.find("NonIso")==std::string::npos) SF *= m_ele_isoSF[i].get(*electron,sys);
+            }
+            m_ele_SF[i].set(*electron, SF, sys);
+          }
+
           for(unsigned int i=0; i<m_eleTrigSF.size(); i++){
             m_eleTriggerSF_out[i].set
               (*electron, m_eleTriggerSF_in[i].get(*electron, sys), sys);

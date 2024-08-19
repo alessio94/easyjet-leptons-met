@@ -28,13 +28,11 @@ namespace Easyjet
       ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_inHandle));
     }
 
-    if(m_bjetAmount > 0){
-       for(int i=0; i<m_bjetAmount; i++){
-          std::string index = std::to_string(i+1);
-          CP::SysWriteDecorHandle<bool> whandle{"isbjet"+index+"_%SYS%", this};
-          m_leadBranches.emplace("isbjet"+index, whandle);
-          ATH_CHECK(m_leadBranches.at("isbjet"+index).initialize(m_systematicsList, m_inHandle));
-       };
+    for(int i=0; i<m_bjetAmount; i++){
+      std::string index = std::to_string(i+1);
+      CP::SysWriteDecorHandle<bool> whandle{"isbjet"+index+"_%SYS%", this};
+      m_leadBranches.emplace("isbjet"+index, whandle);
+      ATH_CHECK(m_leadBranches.at("isbjet"+index).initialize(m_systematicsList, m_inHandle));
     }
 
     ANA_CHECK (m_isSelectedJet.initialize (m_systematicsList, m_inHandle));
