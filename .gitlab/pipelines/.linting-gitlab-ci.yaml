@@ -21,7 +21,7 @@
 
 .cppcheck: &cpp_check_template
   stage: linting
-  image: gitlab-registry.cern.ch/atlas/athena/athanalysis:24.2.2
+  image: gitlab-registry.cern.ch/atlas/athena/athanalysis:25.2.23
   tags:
     - cvmfs
   before_script:
