@@ -109,6 +109,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
             BDT_path=flags.Analysis.BDT_path,
+            doGNN_tagging=flags.Analysis.do_GNN2bjetSelection,
+            GNN_path=flags.Analysis.GNN_path,
             VBFjetsMethod=flags.Analysis.VBFjetsMethod,
             isMC=flags.Input.isMC,
             doKF=flags.Analysis.do_KinematicFit,
@@ -220,6 +222,43 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     for var in ["maxscore", "m", "deta", "yybb_dR", "yybb_deta", "yybb_pt",
                 "yybb_eta", "yybb_phi", "yybb_m"]:
         float_variable_names += ["Jet_vbf_jj_" + var]
+
+    # GNN HbbCandidate jets
+    if (flags.Analysis.do_GNN2bjetSelection):
+        for c in ["ggFTarget", "VBFTarget"]:
+            GNN_float_list = list(flags.Analysis.small_R_jet.variables_allJets)
+            GNN_float_list.extend(["uncorrPt", "muonCorrPt"])
+            GNN_int_list = list(flags.Analysis.small_R_jet.variables_int_allJets)
+            GNN_int_list.extend(["n_muons"])
+
+            for i in range(1, 3):
+                for v in GNN_float_list:
+                    float_variable_names += ["GNN_" + c + f"_HbbCandidate_Jet{i}_" + v]
+                for v in GNN_int_list:
+                    int_variable_names += ["GNN_" + c + f"_HbbCandidate_Jet{i}_" + v]
+
+            float_variable_names += ["GNN_" + c + "_mbb", "GNN_" + c + "_pTbb",
+                                     "GNN_" + c + "_Etabb", "GNN_" + c + "_Phibb",
+                                     "GNN_" + c + "_dRbb"]
+            float_variable_names += ["GNN_" + c + "_cos_theta_yy_cm_bbyy",
+                                     "GNN_" + c + "_phi_yy_cm_bbyy"]
+            float_variable_names += ["GNN_" + c + "_HbbCandidate_Jet1_cos_theta_cm_bb",
+                                     "GNN_" + c + "_HbbCandidate_Jet1_phi_cm_bb"]
+            float_variable_names += ["GNN_" + c + "_DeltaPhi_bb_yy_cm_bbyy"]
+            float_variable_names += ["GNN_" + c + "_Photon1_cos_theta_cm_gamgam",
+                                     "GNN_" + c + "_Photon1_phi_cm_gamgam"]
+            float_variable_names += ["GNN_" + c + "_mbbyy", "GNN_" + c + "_mbbyy_star",
+                                     "GNN_" + c + "_pTbbyy", "GNN_" + c + "_Etabbyy",
+                                     "GNN_" + c + "_Phibbyy", "GNN_" + c + "_dRbbyy",
+                                     "GNN_" + c + "_bdtSel_score",
+                                     "GNN_" + c + "_maxscore",
+                                     "GNN_" + c + "_Jet_vbf_jj_maxscore"]
+            float_variable_names += ["GNN_" + c + "_sphericityT",
+                                     "GNN_" + c + "_planarFlow",
+                                     "GNN_" + c + "_pTBalance"]
+            float_variable_names += ["GNN_" + c + "_Jet_vbf_jj_m",
+                                     "GNN_" + c + "_Jet_vbf_jj_deta"]
+            int_variable_names += ["GNN_" + c + "_bdtSel_category"]
 
     # mva variables
     float_variable_names += ["HT", "topness", "sphericityT", "planarFlow",

@@ -24,7 +24,7 @@
 
 #include "MVAUtils/BDT.h"
 
-
+#include <onnxruntime_cxx_api.h>
 
 namespace HHBBYY
 {
@@ -32,6 +32,11 @@ namespace HHBBYY
     low_mass  = 0,
     high_mass = 1,
     VBFjets   = 2
+  };
+
+  enum GNN {
+    ggFTarget = 0,
+    VBFTarget = 1
   };
   
   enum Var {
@@ -121,8 +126,8 @@ namespace HHBBYY
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
     float compute_Topness(const xAOD::JetContainer *jets);
-    std::vector<float> compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
-    float compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets, const xAOD::PhotonContainer *photons);
+    std::vector<float> compute_EventShapes(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::PhotonContainer *photons);
+    float compute_pTBalance(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::PhotonContainer *photons);
     
     VBFjetsMethod stringToVBFjetsMethod(const std::string& vbfjets_method_str);
     float getVBFjets_BDT(float ht, const xAOD::Photon *ph1, const xAOD::Photon *ph2,
@@ -149,6 +154,14 @@ namespace HHBBYY
     ConstDataVector<xAOD::JetContainer> categorisation_jets(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::JetContainer *jets);
 
     std::vector<double> compute_angular_variables_CM(const TLorentzVector& lz_photon1,const TLorentzVector& lz_photon2,const TLorentzVector& lz_b_jet1,const TLorentzVector& lz_b_jet2);
+
+    void fill_bb_branches(std::vector<const xAOD::Jet*> Hbb_jets, std::string prefix, const xAOD::EventInfo *event, const auto& sys);
+    void fill_bbyy_branches(std::vector<const xAOD::Jet*> Hbb_jets, std::vector<const xAOD::Photon*> Hyy_photons, std::string prefix, const xAOD::EventInfo *event, const auto& sys);
+    void loadGNN(const std::string &filePath);
+
+    std::vector<const xAOD::Jet*> getHbb_GNN_ggFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys);
+    std::vector<const xAOD::Jet*> getHbb_GNN_VBFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys);
+
 
   private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
@@ -203,6 +216,12 @@ namespace HHBBYY
     Gaudi::Property<std::vector<std::string>> m_bdts_path 
       {this, "BDT_path", {}, "Path to BDT model"};
 
+    Gaudi::Property<bool> m_doGNN_tagging
+      { this, "doGNN_tagging", false, "Do GNN 2bjet Selection?" };
+ 
+    Gaudi::Property<std::vector<std::string>> m_GNNs_path 
+      {this, "GNN_path", {}, "Path to GNN model"};
+
     Gaudi::Property<std::string> m_vbfjets_method_str
       {this, "VBFjetsMethod", "", "VBF jets selection method"};
 
@@ -220,8 +239,21 @@ namespace HHBBYY
     // Declare the BDTs
     std::vector<std::unique_ptr<MVAUtils::BDT>> m_bdts;
 
+    // Declare the GNNs
+    std::vector<std::unique_ptr<Ort::Session>> m_sessions;
+    std::vector<std::unique_ptr<Ort::Env>> m_envs; 
+
+    std::vector<std::vector<std::string>> m_input_node_names;
+    std::vector<std::vector<std::string>> m_output_node_names;
+    std::vector<std::vector<std::vector<int64_t>>> m_input_node_dims_vector;
+    std::vector<std::vector<std::vector<int64_t>>> m_output_node_dims_vector;
+    std::vector<std::vector<int64_t>> m_input_node_dims_sum;
+    std::vector<std::vector<int64_t>> m_output_node_dims_sum;
+
     // Declare the enum of m_vbfjets_method
     VBFjetsMethod m_vbfjets_method;
   };
 }
 #endif
+
+

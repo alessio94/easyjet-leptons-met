@@ -71,6 +71,15 @@ namespace HHBBYY
       m_bdts.push_back(std::move(bdt));
     }
 
+    // Load GNN models
+    if(m_doGNN_tagging)
+    {
+      for (const std::string &path: m_GNNs_path)
+      {
+        loadGNN(path);
+      }
+    }
+
     // convert string to enum (VBFjetsMethod)
     m_vbfjets_method = stringToVBFjetsMethod(m_vbfjets_method_str);
 
@@ -119,9 +128,6 @@ namespace HHBBYY
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
       static const SG::AuxElement::ConstAccessor<unsigned int> DFCommonPhotonsIsEMTightIsEMValue("DFCommonPhotonsIsEMTightIsEMValue");
-      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
-      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
-      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
       static const SG::AuxElement::ConstAccessor<float> KF_MBB("KF1_Mbb");
 
       // initialize
@@ -137,10 +143,7 @@ namespace HHBBYY
       int j_passWP=-99;
       int truthLabel_j = -99;
       int PCBTjet = -99;
-      int truthLabel_b1 = -99, truthLabel_b2 = -99;
-      int PCBT_candidate1 = -99, PCBT_candidate2 = -99;
-      double dRHH = -99., dRyy = -99., dRbb = -99.;
-      float bbyy_mStar = -99.;
+      double dRyy = -99.;
       
       // Maps for per-event outputs
       std::map<HHBBYY::Var, float> eventFloats;
@@ -275,87 +278,29 @@ namespace HHBBYY
           Hbb_Jet1 = bjets->at(0);
           Hbb_Jet2 = bjets->at(1);
         }
-        Hbb_candidate1= Hbb_Jet1->p4();
-        Hbb_candidate2= Hbb_Jet2->p4();
-        PCBT_candidate1 = m_PCBT.get(*Hbb_Jet1, sys);
-        PCBT_candidate2 = m_PCBT.get(*Hbb_Jet2, sys);
-
-        if (m_isMC) {      
-          truthLabel_b1 = HadronConeExclTruthLabelID(*Hbb_Jet1);
-          truthLabel_b2 = HadronConeExclTruthLabelID(*Hbb_Jet2);
-        }
-        m_Ibranches.at("HbbCandidate_Jet1_n_muons").set(*event, cacc_NMu(*Hbb_Jet1), sys);
-        m_Fbranches.at("HbbCandidate_Jet1_uncorrPt").set(*event, cacc_UncorrPt(*Hbb_Jet1), sys);
-        m_Fbranches.at("HbbCandidate_Jet1_muonCorrPt").set(*event, cacc_MuonCorrPt(*Hbb_Jet1), sys);
-        m_Fbranches.at("HbbCandidate_Jet1_pt").set(*event, Hbb_candidate1.Pt(), sys);
-        m_Fbranches.at("HbbCandidate_Jet1_eta").set(*event, Hbb_candidate1.Eta(), sys);
-        m_Fbranches.at("HbbCandidate_Jet1_phi").set(*event, Hbb_candidate1.Phi(), sys);
-        m_Fbranches.at("HbbCandidate_Jet1_E").set(*event, Hbb_candidate1.E(), sys);
-
-        m_Ibranches.at("HbbCandidate_Jet2_n_muons").set(*event, cacc_NMu(*Hbb_Jet2), sys);
-        m_Fbranches.at("HbbCandidate_Jet2_uncorrPt").set(*event, cacc_UncorrPt(*Hbb_Jet2), sys);
-        m_Fbranches.at("HbbCandidate_Jet2_muonCorrPt").set(*event, cacc_MuonCorrPt(*Hbb_Jet2), sys);
-        m_Fbranches.at("HbbCandidate_Jet2_pt").set(*event, Hbb_candidate2.Pt(), sys);
-        m_Fbranches.at("HbbCandidate_Jet2_eta").set(*event, Hbb_candidate2.Eta(), sys);
-        m_Fbranches.at("HbbCandidate_Jet2_phi").set(*event, Hbb_candidate2.Phi(), sys);
-        m_Fbranches.at("HbbCandidate_Jet2_E").set(*event, Hbb_candidate2.E(), sys);
-
-        if(PCBTgiven){
-          m_Ibranches.at("HbbCandidate_Jet1_pcbt").set(*event,PCBT_candidate1,sys);
-          m_Ibranches.at("HbbCandidate_Jet2_pcbt").set(*event,PCBT_candidate2,sys);
-        }
-
-        if (m_isMC) {
-          m_Ibranches.at("HbbCandidate_Jet1_truthLabel").set(*event, truthLabel_b1, sys);
-          m_Ibranches.at("HbbCandidate_Jet2_truthLabel").set(*event, truthLabel_b2, sys);
-        }
-
-        H_bb = Hbb_candidate1 + Hbb_candidate2;
-        dRbb = (Hbb_candidate1).DeltaR(Hbb_candidate2);
-        m_Fbranches.at("mbb").set(*event, H_bb.M(), sys);
-        m_Fbranches.at("pTbb").set(*event, H_bb.Pt(), sys);
-        m_Fbranches.at("Etabb").set(*event, H_bb.Eta(), sys);
-        m_Fbranches.at("Phibb").set(*event, H_bb.Phi(), sys);
-        m_Fbranches.at("dRbb").set(*event, dRbb, sys);
+        H_bb = Hbb_Jet1->p4() + Hbb_Jet2->p4();
       }
 
-      // Build the HH candidate
-      if (ph1 && ph2 && bjets->size() >= 2) {
-        HH = H_yy + H_bb;
-        dRHH = H_yy.DeltaR(H_bb);
+      std::vector<const xAOD::Jet*> Hbb_jets = {Hbb_Jet1, Hbb_Jet2};
+      std::vector<const xAOD::Photon*> Hyy_photons = {ph1, ph2};
 
-        double Higgs_mass = 125. * Athena::Units::GeV;
-        bbyy_mStar = HH.M() - (H_bb.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
+      // Fill the bb and bbyy branches
+      if (bjets->size() >= 2) {
+        fill_bb_branches(Hbb_jets, "", event, sys);
 
-        m_Fbranches.at("mbbyy").set(*event, HH.M(), sys);
-        m_Fbranches.at("mbbyy_star").set(*event, bbyy_mStar, sys);
-        m_Fbranches.at("pTbbyy").set(*event, HH.Pt(), sys);
-        m_Fbranches.at("Etabbyy").set(*event, HH.Eta(), sys);
-        m_Fbranches.at("Phibbyy").set(*event, HH.Phi(), sys);
-        m_Fbranches.at("dRbbyy").set(*event, dRHH, sys);
-        eventFloats.at(HHBBYY::Var::bbyy_mStar) = bbyy_mStar;
-      
-	//additional angular variables in referential of center of frame of HH and H
-
-        std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(y1,y2,Hbb_candidate1,Hbb_candidate2);
-        
-        m_Fbranches.at("cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);
-        m_Fbranches.at("phi_yy_cm_bbyy").set(*event,vec_angular_variables_CM[1], sys);
-        
-        m_Fbranches.at("Photon1_cos_theta_cm_gamgam").set(*event,vec_angular_variables_CM[2], sys);
-        m_Fbranches.at("Photon1_phi_cm_gamgam").set(*event,vec_angular_variables_CM[3], sys);
-        
-        m_Fbranches.at("HbbCandidate_Jet1_cos_theta_cm_bb").set(*event,vec_angular_variables_CM[4], sys);
-        m_Fbranches.at("HbbCandidate_Jet1_phi_cm_bb").set(*event,vec_angular_variables_CM[5], sys);
-        m_Fbranches.at("DeltaPhi_bb_yy_cm_bbyy").set(*event,vec_angular_variables_CM[6], sys);
+        if(ph1 && ph2) {
+          HH = H_yy + H_bb;
+          fill_bbyy_branches(Hbb_jets, Hyy_photons, "", event, sys);
+        }
       }
+
       // More global variables
       m_Fbranches.at("HT").set(*event, HT, sys);
 
       float topness = compute_Topness(jets);
       m_Fbranches.at("topness").set(*event, topness, sys);
       
-      std::vector<float> eventShapes = compute_EventShapes(bjets, photons);
+      std::vector<float> eventShapes = compute_EventShapes(Hbb_Jet1, Hbb_Jet2, photons);
       m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
       m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
 
@@ -363,7 +308,7 @@ namespace HHBBYY
       eventFloats.at(HHBBYY::Var::planarFlow) = eventShapes[1];
       eventFloats.at(HHBBYY::Var::topness) = topness;
 
-      float pTBalance = compute_pTBalance(bjets, photons);
+      float pTBalance = compute_pTBalance(Hbb_Jet1, Hbb_Jet2, photons);
       m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
 
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
@@ -440,8 +385,8 @@ namespace HHBBYY
           }
           //mva variables
           float KF_topness = compute_Topness(KFJets);
-          std::vector<float> KF_eventShapes = compute_EventShapes(KF_bjets, photons);
-          float KF_pTBalance = compute_pTBalance(KF_bjets, photons);
+          std::vector<float> KF_eventShapes = compute_EventShapes(Hbb_KFJet1, Hbb_KFJet2, photons);
+          float KF_pTBalance = compute_pTBalance(Hbb_KFJet1, Hbb_KFJet2, photons);
           m_Fbranches.at("KF_topness").set(*event, KF_topness, sys);
           m_Fbranches.at("KF_sphericityT").set(*event, KF_eventShapes[0], sys);
           m_Fbranches.at("KF_planarFlow").set(*event, KF_eventShapes[1], sys);
@@ -500,11 +445,425 @@ namespace HHBBYY
       }
       m_Fbranches.at("bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
       m_Ibranches.at("bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category), sys);
+
+      //GNN Implementation
+      if(m_doGNN_tagging)
+      {
+        float pile_up = event->averageInteractionsPerCrossing();
+        for(int i=0; i<2; i++)
+        {
+          if(nCentralJets>=2 && ph1 && ph2) 
+          {
+            float GNN_maxscore = -99.;
+            float GNN_vbf_jj_maxscore=0.;
+            std::string prefix;
+            std::vector<const xAOD::Jet*> GNN_jets;
+            TLorentzVector GNN_vbf_j[2];
+
+            if(i == HHBBYY::GNN::ggFTarget) {
+              prefix = "ggFTarget";
+              GNN_jets = getHbb_GNN_ggFTarget(jets, ph1, ph2, GNN_maxscore, pile_up, sys);
+              
+              if(m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) {
+                GNN_vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, GNN_jets[0], GNN_jets[1], jets, GNN_vbf_j);
+              }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::mjj) {
+                getVBFjets_mjj(GNN_jets[0], GNN_jets[1], jets, GNN_vbf_j);
+              }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::pTsorting) {
+                getVBFjets_pTsorting(GNN_jets[0], GNN_jets[1], jets, GNN_vbf_j);
+              }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::invalid) {
+                ANA_MSG_ERROR("Invalid vbfjets method imported!!! The default BDT method is called!!!");
+                return StatusCode::FAILURE;
+              }
+            }
+            else if(i == HHBBYY::GNN::VBFTarget) {
+              if(jets->size()<4) continue;
+              prefix = "VBFTarget";
+              GNN_jets = getHbb_GNN_VBFTarget(jets, ph1, ph2, GNN_maxscore, pile_up, sys);
+              GNN_vbf_j[0] = GNN_jets[2]->p4();
+              GNN_vbf_j[1] = GNN_jets[3]->p4();
+              GNN_vbf_jj_maxscore = GNN_maxscore;
+            }
+  
+            fill_bb_branches(GNN_jets, "GNN_" + prefix + "_", event, sys);
+            fill_bbyy_branches(GNN_jets, Hyy_photons, "GNN_" + prefix + "_", event, sys);
+            m_Fbranches.at("GNN_" + prefix + "_maxscore").set(*event, GNN_maxscore, sys);
+  
+            double Higgs_mass = 125. * Athena::Units::GeV;
+            TLorentzVector GNN_H_bb = GNN_jets[0]->p4() + GNN_jets[1]->p4();
+            TLorentzVector GNN_HH = H_yy + GNN_H_bb;
+            float GNN_bbyy_mStar = GNN_HH.M() - (GNN_H_bb.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
+            eventFloats.at(HHBBYY::Var::bbyy_mStar) = GNN_bbyy_mStar;
+  
+            TLorentzVector GNN_vbf_jj = GNN_vbf_j[0] + GNN_vbf_j[1];
+            m_Fbranches.at("GNN_" + prefix + "_Jet_vbf_jj_maxscore").set(*event, GNN_vbf_jj_maxscore, sys);
+            m_Fbranches.at("GNN_" + prefix + "_Jet_vbf_jj_m").set(*event, GNN_vbf_jj.M(), sys);
+            m_Fbranches.at("GNN_" + prefix + "_Jet_vbf_jj_deta").set(*event, std::fabs(GNN_vbf_j[0].Eta() - GNN_vbf_j[1].Eta()), sys);
+            eventFloats.at(HHBBYY::Var::vbfjj_m) = GNN_vbf_jj.M();
+            eventFloats.at(HHBBYY::Var::vbfjj_dEta) = std::fabs(GNN_vbf_j[0].Eta() - GNN_vbf_j[1].Eta());
+  
+            std::vector<float> GNN_eventShapes = compute_EventShapes(GNN_jets[0], GNN_jets[1], photons);
+            m_Fbranches.at("GNN_" + prefix + "_sphericityT").set(*event, GNN_eventShapes[0], sys);
+            m_Fbranches.at("GNN_" + prefix + "_planarFlow").set(*event, GNN_eventShapes[1], sys);
+            eventFloats.at(HHBBYY::Var::sphericityT) = GNN_eventShapes[0];
+            eventFloats.at(HHBBYY::Var::planarFlow) = GNN_eventShapes[1];
+  
+            float GNN_pTBalance = compute_pTBalance(GNN_jets[0], GNN_jets[1], photons);
+            m_Fbranches.at("GNN_" + prefix + "_pTBalance").set(*event, GNN_pTBalance, sys);
+  
+            performCategorisationBDT(ph1, ph2, GNN_jets[0], GNN_jets[1], jets, metCont, sys, eventFloats, eventInts);
+            m_Fbranches.at("GNN_" + prefix + "_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
+            m_Ibranches.at("GNN_" + prefix + "_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category), sys);
+          }
+        }
+      }
     }
 
     return StatusCode::SUCCESS;
   }
+
+  void BaselineVarsbbyyAlg::fill_bb_branches(std::vector<const xAOD::Jet*> Hbb_jets, std::string prefix, const xAOD::EventInfo *event, const auto& sys) {
+    for(unsigned int i =0; i<2; i++){
+      const xAOD::Jet* jet = Hbb_jets[i];
+
+      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
+      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
+      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
+      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
+
+      bool PCBTgiven = !m_PCBT.empty();
+
+      std::string prefix_bjet = prefix + "HbbCandidate_Jet"+std::to_string(i+1);
+      m_Ibranches.at(prefix_bjet+"_n_muons").set(*event, cacc_NMu(*jet), sys);
+      m_Fbranches.at(prefix_bjet+"_uncorrPt").set(*event, cacc_UncorrPt(*jet), sys);
+      m_Fbranches.at(prefix_bjet+"_muonCorrPt").set(*event, cacc_MuonCorrPt(*jet), sys);
+
+      TLorentzVector jet_tlv = jet->p4();
+      m_Fbranches.at(prefix_bjet+"_pt").set(*event, jet_tlv.Pt(), sys);
+      m_Fbranches.at(prefix_bjet+"_eta").set(*event, jet_tlv.Eta(), sys);
+      m_Fbranches.at(prefix_bjet+"_phi").set(*event, jet_tlv.Phi(), sys);
+      m_Fbranches.at(prefix_bjet+"_E").set(*event, jet_tlv.E(), sys);
+
+      if(prefix.find("GNN") != std::string::npos)
+        m_Ibranches.at(prefix_bjet+"_PassWP").set(*event, static_cast<int>(m_isBtag.get(*jet,sys)), sys);
+      if(PCBTgiven)
+        m_Ibranches.at(prefix_bjet+"_pcbt").set(*event, m_PCBT.get(*jet, sys), sys);
+      if(m_isMC)
+        m_Ibranches.at(prefix_bjet+"_truthLabel").set(*event, HadronConeExclTruthLabelID(*jet), sys);
+    }
+
+    TLorentzVector H_bb = Hbb_jets[0]->p4() + Hbb_jets[1]->p4();
+
+    m_Fbranches.at(prefix+"mbb").set(*event, H_bb.M(), sys);
+    m_Fbranches.at(prefix+"pTbb").set(*event, H_bb.Pt(), sys);
+    m_Fbranches.at(prefix+"Etabb").set(*event, H_bb.Eta(), sys);
+    m_Fbranches.at(prefix+"Phibb").set(*event, H_bb.Phi(), sys);
+    m_Fbranches.at(prefix+"dRbb").set(*event, Hbb_jets[0]->p4().DeltaR(Hbb_jets[1]->p4()), sys);
+  }
+
+  void BaselineVarsbbyyAlg::fill_bbyy_branches(std::vector<const xAOD::Jet*> Hbb_jets, std::vector<const xAOD::Photon*> Hyy_photons, std::string prefix, const xAOD::EventInfo *event, const auto& sys) {
+    TLorentzVector H_bb = Hbb_jets[0]->p4() + Hbb_jets[1]->p4();
+    TLorentzVector H_yy = Hyy_photons[0]->p4() + Hyy_photons[1]->p4();
+
+    TLorentzVector HH = H_yy + H_bb;
+
+    double Higgs_mass = 125. * Athena::Units::GeV;
+    float bbyy_mStar = HH.M() - (H_bb.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
+
+    m_Fbranches.at(prefix+"mbbyy").set(*event, HH.M(), sys);
+    m_Fbranches.at(prefix+"mbbyy_star").set(*event, bbyy_mStar, sys);
+    m_Fbranches.at(prefix+"pTbbyy").set(*event, HH.Pt(), sys);
+    m_Fbranches.at(prefix+"Etabbyy").set(*event, HH.Eta(), sys);
+    m_Fbranches.at(prefix+"Phibbyy").set(*event, HH.Phi(), sys);
+    m_Fbranches.at(prefix+"dRbbyy").set(*event, H_yy.DeltaR(H_bb), sys);
+
+    std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(Hyy_photons[0]->p4(),Hyy_photons[1]->p4(),Hbb_jets[0]->p4(),Hbb_jets[1]->p4());
+
+    m_Fbranches.at(prefix+"cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);
+    m_Fbranches.at(prefix+"phi_yy_cm_bbyy").set(*event,vec_angular_variables_CM[1], sys);
   
+    m_Fbranches.at(prefix+"Photon1_cos_theta_cm_gamgam").set(*event,vec_angular_variables_CM[2], sys);
+    m_Fbranches.at(prefix+"Photon1_phi_cm_gamgam").set(*event,vec_angular_variables_CM[3], sys);
+  
+    m_Fbranches.at(prefix+"HbbCandidate_Jet1_cos_theta_cm_bb").set(*event,vec_angular_variables_CM[4], sys);
+    m_Fbranches.at(prefix+"HbbCandidate_Jet1_phi_cm_bb").set(*event,vec_angular_variables_CM[5], sys);
+    m_Fbranches.at(prefix+"DeltaPhi_bb_yy_cm_bbyy").set(*event,vec_angular_variables_CM[6], sys);
+  }
+
+  void BaselineVarsbbyyAlg::loadGNN(const std::string &filePath) {
+    std::string resolvedPath = PathResolverFindCalibFile(filePath);
+    std::unique_ptr<Ort::Env> env = std::make_unique<Ort::Env>(ORT_LOGGING_LEVEL_FATAL, "");
+
+    Ort::SessionOptions session_options;
+    session_options.SetIntraOpNumThreads(1);
+    session_options.SetLogSeverityLevel(4);
+    session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
+   
+    std::unique_ptr<Ort::Session> session = std::make_unique<Ort::Session>(*env, resolvedPath.c_str(), session_options);
+
+    size_t num_input_nodes = session->GetInputCount();
+    size_t num_output_nodes = session->GetOutputCount();
+
+    std::vector<std::string> input_node_names;
+    std::vector<std::string> output_node_names;
+    std::vector<std::vector<int64_t>> input_node_dims_vector;
+    std::vector<std::vector<int64_t>> output_node_dims_vector;
+    std::vector<int64_t> input_node_dims_sum;
+    std::vector<int64_t> output_node_dims_sum;
+
+    Ort::AllocatorWithDefaultOptions allocator;
+
+    for (size_t i = 0; i < num_input_nodes; i++) {
+      std::string input_name = session->GetInputNameAllocated(i, allocator).get();
+      input_node_names.push_back(input_name);
+      
+      Ort::TypeInfo type_info = session->GetInputTypeInfo(i);
+      auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
+      auto input_node_dims = tensor_info.GetShape();
+      input_node_dims_vector.emplace_back(input_node_dims);
+
+      int64_t sums = 1;
+      for (size_t j = 0; j < input_node_dims.size(); j++) {
+          sums *= input_node_dims[j];
+      }
+      input_node_dims_sum.emplace_back(sums);
+  
+    }
+
+    for (size_t i = 0; i < num_output_nodes; i++) {
+      std::string output_name = session->GetOutputNameAllocated(i, allocator).get();
+      output_node_names.push_back(output_name);
+
+      Ort::TypeInfo type_info = session->GetOutputTypeInfo(i);
+      auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
+      auto output_node_dims = tensor_info.GetShape();
+      output_node_dims_vector.emplace_back(output_node_dims);
+
+      int64_t sums = 1;
+      for (size_t j = 0; j < output_node_dims.size(); j++) {
+          sums *= output_node_dims[j];
+      }
+      output_node_dims_sum.emplace_back(sums);
+    }
+    
+    m_sessions.push_back(std::move(session));
+    m_envs.push_back(std::move(env));
+    m_input_node_names.push_back(input_node_names);
+    m_output_node_names.push_back(output_node_names);
+    m_input_node_dims_vector.push_back(input_node_dims_vector);
+    m_output_node_dims_vector.push_back(output_node_dims_vector);
+    m_input_node_dims_sum.push_back(input_node_dims_sum);
+    m_output_node_dims_sum.push_back(output_node_dims_sum);
+  }
+
+  std::vector<const xAOD::Jet*> BaselineVarsbbyyAlg::getHbb_GNN_ggFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys){
+    TLorentzVector y1 = ph1->p4();
+    TLorentzVector y2 = ph2->p4();
+    TLorentzVector H_yy = y1 + y2;
+
+    std::vector<float> node3 = {static_cast<float>(H_yy.Pt()/H_yy.M()), static_cast<float>(H_yy.Eta()), static_cast<float>(H_yy.Phi()), static_cast<float>(H_yy.E()/H_yy.M()), -2., 1.};
+
+    std::vector<const char*> input_node_names;
+    std::vector<const char*> output_node_names;
+    input_node_names.reserve(m_input_node_names.at(HHBBYY::GNN::ggFTarget).size());
+    output_node_names.reserve(m_output_node_names.at(HHBBYY::GNN::ggFTarget).size());
+    for(const auto& name : m_input_node_names.at(HHBBYY::GNN::ggFTarget)) {
+      input_node_names.push_back(name.c_str());
+    }
+    for(const auto& name : m_output_node_names.at(HHBBYY::GNN::ggFTarget)) {
+      output_node_names.push_back(name.c_str());
+    }
+
+    Ort::Session &session = *(m_sessions.at(HHBBYY::GNN::ggFTarget));
+
+    std::vector<const xAOD::Jet*> GNN_jets;
+    for(size_t i = 0; i < jets->size(); i++) {
+      const xAOD::Jet *jet1 = jets->at(i);
+      if(std::fabs(jet1->eta()) > 2.5) continue;
+
+      for(size_t j = i+1; j < jets->size(); j++) {
+        const xAOD::Jet *jet2 = jets->at(j);
+        if(std::fabs(jet2->eta()) > 2.5) continue;
+
+        if(jet2->pt()>jet1->pt()) std::swap(jet1, jet2);
+        TLorentzVector j1 = jet1->p4();
+        TLorentzVector j2 = jet2->p4();
+
+        std::vector<Ort::Value> input_tensors;
+        auto memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
+        
+        TLorentzVector jj = j1 + j2;
+        int PCBT_j1 = m_PCBT.get(*jet1, sys);
+        int PCBT_j2 = m_PCBT.get(*jet2, sys);
+    
+        std::vector<float> nodes;
+        std::vector<float> edges;
+        std::vector<float> globals;
+        std::vector<long int> senders;
+        std::vector<long int> receivers;
+        std::vector<long int> n_node = {3};
+        std::vector<long int> n_edge = {6};
+    
+        std::vector<float> node1 = {static_cast<float>(j1.Pt()/jj.M()), static_cast<float>(j1.Eta()), static_cast<float>(j1.Phi()), static_cast<float>(j1.E()/jj.M()), static_cast<float>(PCBT_j1), 0.};
+        std::vector<float> node2 = {static_cast<float>(j2.Pt()/jj.M()), static_cast<float>(j2.Eta()), static_cast<float>(j2.Phi()), static_cast<float>(j2.E()/jj.M()), static_cast<float>(PCBT_j2), 0.};
+        nodes.insert(nodes.end(), node1.begin(), node1.end());
+        nodes.insert(nodes.end(), node2.begin(), node2.end());
+        nodes.insert(nodes.end(), node3.begin(), node3.end());
+        for(int k = 0; k < 3; k++)
+        {
+          for(int l = 0; l < 3; l++)
+          {
+            if(k == l) continue;
+            senders.push_back(k);
+            receivers.push_back(l);
+            float dEta = nodes[k*node1.size()+1] - nodes[l*node1.size()+1];
+            float dPhi = nodes[k*node1.size()+2] - nodes[l*node1.size()+2];
+            if(dPhi > M_PI) dPhi -= 2* M_PI;
+            if(dPhi < -M_PI) dPhi += 2* M_PI;
+            float dR = std::sqrt(dEta*dEta + dPhi*dPhi);
+            std::vector<float> edge = {dEta, dPhi, dR};
+            edges.insert(edges.end(), edge.begin(), edge.end());
+          }
+        }
+
+        globals.push_back(pile_up);
+  
+        input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, nodes.data(), m_input_node_dims_sum.at(HHBBYY::GNN::ggFTarget)[0], m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[0].data(), m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[0].size()));
+        input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, edges.data(), m_input_node_dims_sum.at(HHBBYY::GNN::ggFTarget)[1], m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[1].data(), m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[1].size()));
+        input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, globals.data(), m_input_node_dims_sum.at(HHBBYY::GNN::ggFTarget)[2], m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[2].data(), m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[2].size()));
+        input_tensors.push_back(Ort::Value::CreateTensor<long int>(memory_info, receivers.data(), m_input_node_dims_sum.at(HHBBYY::GNN::ggFTarget)[3], m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[3].data(), m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[3].size()));
+        input_tensors.push_back(Ort::Value::CreateTensor<long int>(memory_info, senders.data(), m_input_node_dims_sum.at(HHBBYY::GNN::ggFTarget)[4], m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[4].data(), m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[4].size()));
+        input_tensors.push_back(Ort::Value::CreateTensor<long int>(memory_info, n_node.data(), m_input_node_dims_sum.at(HHBBYY::GNN::ggFTarget)[5], m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[5].data(), m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[5].size()));
+        input_tensors.push_back(Ort::Value::CreateTensor<long int>(memory_info, n_edge.data(), m_input_node_dims_sum.at(HHBBYY::GNN::ggFTarget)[6], m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[6].data(), m_input_node_dims_vector.at(HHBBYY::GNN::ggFTarget)[6].size()));
+
+        std::vector<Ort::Value> output_tensors = session.Run(Ort::RunOptions{nullptr}, input_node_names.data(), input_tensors.data(), input_node_names.size(), output_node_names.data(), output_node_names.size());
+        float score = *(output_tensors[0].GetTensorMutableData<float>());
+
+        if(score > max_score) {
+          max_score = score;
+          GNN_jets = {jet1, jet2};
+        }
+      }
+    }
+
+    return GNN_jets;
+  }
+
+  std::vector<const xAOD::Jet*> BaselineVarsbbyyAlg::getHbb_GNN_VBFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys){
+    TLorentzVector y1 = ph1->p4();
+    TLorentzVector y2 = ph2->p4();
+    TLorentzVector H_yy = y1 + y2;
+
+    std::vector<float> node3 = {static_cast<float>(H_yy.Pt()/H_yy.M()), static_cast<float>(H_yy.Eta()), static_cast<float>(H_yy.Phi()), static_cast<float>(H_yy.E()/H_yy.M()), -2., 1.};
+
+    std::vector<const char*> input_node_names;
+    std::vector<const char*> output_node_names;
+    input_node_names.reserve(m_input_node_names.at(HHBBYY::GNN::VBFTarget).size());
+    output_node_names.reserve(m_output_node_names.at(HHBBYY::GNN::VBFTarget).size());
+    for(const auto& name : m_input_node_names.at(HHBBYY::GNN::VBFTarget)) {
+      input_node_names.push_back(name.c_str());
+    }
+    for(const auto& name : m_output_node_names.at(HHBBYY::GNN::VBFTarget)) {
+      output_node_names.push_back(name.c_str());
+    }
+
+    Ort::Session &session = *(m_sessions.at(HHBBYY::GNN::VBFTarget));
+
+    std::vector<const xAOD::Jet*> GNN_jets;
+    for(size_t i = 0; i < jets->size(); i++) {
+      const xAOD::Jet *jet1 = jets->at(i);
+      if(std::abs(jet1->eta()) > 2.5) continue;
+
+      for(size_t j = i+1; j < jets->size(); j++) {
+        const xAOD::Jet *jet2 = jets->at(j);
+        if(std::abs(jet2->eta()) > 2.5) continue;
+        if(jet2->pt()>jet1->pt()) std::swap(jet1, jet2);
+
+        TLorentzVector j1 = jet1->p4();
+        TLorentzVector j2 = jet2->p4();
+        TLorentzVector jj = j1 + j2;
+        int PCBT_j1 = m_PCBT.get(*jet1, sys);
+        int PCBT_j2 = m_PCBT.get(*jet2, sys);
+ 
+        std::vector<float> node1 = {static_cast<float>(j1.Pt()/jj.M()), static_cast<float>(j1.Eta()), static_cast<float>(j1.Phi()), static_cast<float>(j1.E()/jj.M()), static_cast<float>(PCBT_j1), 0.};
+        std::vector<float> node2 = {static_cast<float>(j2.Pt()/jj.M()), static_cast<float>(j2.Eta()), static_cast<float>(j2.Phi()), static_cast<float>(j2.E()/jj.M()), static_cast<float>(PCBT_j2), 0.};
+ 
+         for(size_t k = 0; k < std::min(jets->size(), (std::size_t)6); k++) {
+          if(k==i || k==j) continue;
+          const xAOD::Jet *jet3 = jets->at(k);
+  
+          for(size_t p = k+1; p < std::min(jets->size(), (std::size_t)6); p++) {
+            if(p==i || p==j) continue;
+            const xAOD::Jet *jet4 = jets->at(p);
+
+            TLorentzVector j3 = jet3->p4();
+            TLorentzVector j4 = jet4->p4();
+
+            std::vector<Ort::Value> input_tensors;
+            auto memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
+            
+            TLorentzVector vbf_jj = j3 + j4;
+           int PCBT_j3 = m_PCBT.get(*jet3, sys);
+            int PCBT_j4 = m_PCBT.get(*jet4, sys);
+        
+            std::vector<float> nodes;
+            std::vector<float> edges;
+            std::vector<float> globals;
+            std::vector<long int> senders;
+            std::vector<long int> receivers;
+            std::vector<long int> n_node = {5};
+            std::vector<long int> n_edge = {20};
+        
+            std::vector<float> node4 = {static_cast<float>(j3.Pt()/vbf_jj.M()), static_cast<float>(j3.Eta()), static_cast<float>(j3.Phi()), static_cast<float>(j3.E()/vbf_jj.M()), static_cast<float>(PCBT_j3), 2.};
+            std::vector<float> node5 = {static_cast<float>(j4.Pt()/vbf_jj.M()), static_cast<float>(j4.Eta()), static_cast<float>(j4.Phi()), static_cast<float>(j4.E()/vbf_jj.M()), static_cast<float>(PCBT_j4), 2.};
+            nodes.insert(nodes.end(), node1.begin(), node1.end());
+            nodes.insert(nodes.end(), node2.begin(), node2.end());
+            nodes.insert(nodes.end(), node3.begin(), node3.end());
+            nodes.insert(nodes.end(), node4.begin(), node4.end());
+            nodes.insert(nodes.end(), node5.begin(), node5.end());
+            for(int m = 0; m < 5; m++)
+            {
+              for(int n = 0; n < 5; n++)
+              {
+                if(m == n) continue;
+                senders.push_back(m);
+                receivers.push_back(n);
+                float dEta = nodes[m*node1.size()+1] - nodes[n*node1.size()+1];
+                float dPhi = nodes[m*node1.size()+2] - nodes[n*node1.size()+2];
+                if(dPhi > M_PI) dPhi -= 2* M_PI;
+                if(dPhi < -M_PI) dPhi += 2* M_PI;
+                float dR = std::sqrt(dEta*dEta + dPhi*dPhi);
+                std::vector<float> edge = {dEta, dPhi, dR};
+                edges.insert(edges.end(), edge.begin(), edge.end());
+              }
+            }
+
+            globals.push_back(pile_up);
+            globals.push_back(float(vbf_jj.M()));
+      
+            input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, nodes.data(), m_input_node_dims_sum.at(HHBBYY::GNN::VBFTarget)[0], m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[0].data(), m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[0].size()));
+            input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, edges.data(), m_input_node_dims_sum.at(HHBBYY::GNN::VBFTarget)[1], m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[1].data(), m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[1].size()));
+            input_tensors.push_back(Ort::Value::CreateTensor<float>(memory_info, globals.data(), m_input_node_dims_sum.at(HHBBYY::GNN::VBFTarget)[2], m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[2].data(), m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[2].size()));
+            input_tensors.push_back(Ort::Value::CreateTensor<long int>(memory_info, receivers.data(), m_input_node_dims_sum.at(HHBBYY::GNN::VBFTarget)[3], m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[3].data(), m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[3].size()));
+            input_tensors.push_back(Ort::Value::CreateTensor<long int>(memory_info, senders.data(), m_input_node_dims_sum.at(HHBBYY::GNN::VBFTarget)[4], m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[4].data(), m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[4].size()));
+            input_tensors.push_back(Ort::Value::CreateTensor<long int>(memory_info, n_node.data(), m_input_node_dims_sum.at(HHBBYY::GNN::VBFTarget)[5], m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[5].data(), m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[5].size()));
+            input_tensors.push_back(Ort::Value::CreateTensor<long int>(memory_info, n_edge.data(), m_input_node_dims_sum.at(HHBBYY::GNN::VBFTarget)[6], m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[6].data(), m_input_node_dims_vector.at(HHBBYY::GNN::VBFTarget)[6].size()));
+    
+            std::vector<Ort::Value> output_tensors = session.Run(Ort::RunOptions{nullptr}, input_node_names.data(), input_tensors.data(), input_node_names.size(), output_node_names.data(), output_node_names.size());
+            float score = *(output_tensors[0].GetTensorMutableData<float>());
+    
+            if(score > max_score) {
+              max_score = score;
+              GNN_jets = {jet1, jet2, jet3, jet4};
+            }
+          }
+        }
+      }
+    }
+
+    return GNN_jets;
+  }
+
+
   float BaselineVarsbbyyAlg::compute_Topness(const xAOD::JetContainer *jets){
     float minTopness=std::numeric_limits<float>::max();
     const float wmass=80 * Athena::Units::GeV;
@@ -541,14 +900,14 @@ namespace HHBBYY
   eventShapes[0] = sphericityT;
   eventShapes[1] = planarFlow;
   */
-  std::vector<float> BaselineVarsbbyyAlg::compute_EventShapes(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets,
+  std::vector<float> BaselineVarsbbyyAlg::compute_EventShapes(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                                                  const xAOD::PhotonContainer *photons){
     std::vector<float> eventShapes(2);
-    if (bjets->size() >= 2 && photons->size() >= 2) {
+    if (Hbb_Jet1 && Hbb_Jet2 && photons->size() >= 2) {
       TLorentzVector photon1 = photons->at(0)->p4();
       TLorentzVector photon2 = photons->at(1)->p4();
-      TLorentzVector bjet1 = bjets->at(0)->p4();
-      TLorentzVector bjet2 = bjets->at(1)->p4();
+      TLorentzVector bjet1 = Hbb_Jet1->p4();
+      TLorentzVector bjet2 = Hbb_Jet2->p4();
       std::vector<TLorentzVector> p4_vec = {photon1, photon2, bjet1, bjet2};
 
       TMatrixDSym MomentumTensor = TMatrixDSym(3);
@@ -600,14 +959,14 @@ namespace HHBBYY
     return eventShapes;
   }
 
-  float BaselineVarsbbyyAlg::compute_pTBalance(std::unique_ptr<ConstDataVector<xAOD::JetContainer>> &bjets,
+  float BaselineVarsbbyyAlg::compute_pTBalance(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                                             const xAOD::PhotonContainer *photons){
     float pTBalance = -99;
-    if (bjets->size() >= 2 && photons->size() >= 2) {
+    if (Hbb_Jet1 && Hbb_Jet2 && photons->size() >= 2) {
       TLorentzVector photon1 = photons->at(0)->p4();
       TLorentzVector photon2 = photons->at(1)->p4();
-      TLorentzVector bjet1 = bjets->at(0)->p4();
-      TLorentzVector bjet2 = bjets->at(1)->p4();
+      TLorentzVector bjet1 = Hbb_Jet1->p4();
+      TLorentzVector bjet2 = Hbb_Jet2->p4();
       float numerator, denominator;
       std::vector<TLorentzVector> p4_vec = {photon1, photon2, bjet1, bjet2};
       TLorentzVector numerator_p4(0.,0.,0.,0.);

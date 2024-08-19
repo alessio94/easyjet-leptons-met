@@ -13,6 +13,7 @@ do_photons: true
 do_met: true
 do_KinematicFit: true
 do_Boosted: false
+do_GNN2bjetSelection: true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
@@ -93,6 +94,10 @@ BDT_path:
   - "bbyyAnalysis/bdt_legacy_lowMass.root"
   - "bbyyAnalysis/bdt_legacy_highMass.root"
   - "bbyyAnalysis/bdt_legacy_vbf_jets.root"
+
+GNN_path:
+  - "bbyyAnalysis/GNN_ggFTarget.onnx"
+  - "bbyyAnalysis/GNN_VBFTarget.onnx"
 
 #  choose VBF jets selection method
 VBFjetsMethod: "BDT" # "mjj" "pTsorting"
