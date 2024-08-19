@@ -191,18 +191,18 @@ DSID_nWLep_samples:
 DSID_HF_class_samples:
   - 410470 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_nonallhad
   - 410472 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_dil
-  - 601229 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_SingleLep
-  - 601230 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_dil
+  - 410480 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_SingleLep
+  - 410482 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_dil
   - 411233 #mc20 PowhegHerwig7EvtGen_tt_hdamp258p75_713_SingleLep
   - 411234 #mc20 PowhegHerwig7EvtGen_tt_hdamp258p75_713_dil
+  - 601229 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_SingleLep
+  - 601230 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_dil
   - 601491 #mc20 PhPy8EG_A14_ttbar_pThard1_dil
   - 601497 #mc20 PhPy8EG_A14_ttbar_pThard1_singlelep
-  - 410472 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_dil
-  - 410470 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_nonallhad
-  - 410482 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_dil
-  - 410480 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_SingleLep
-  - 601491 #mc23 PhPy8EG_A14_ttbar_pThard1_dil
-  - 601497 #mc23 PhPy8EG_A14_ttbar_pThard1_singlelep
+  - 603190 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_bzd5_dilep_shower
+  - 603191 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_pTdef1_pThard1_dilep
+  - 603192 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_bzd5_ljets_shower
+  - 603193 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_pTdef1_pThard1_ljets
 
 # Definition of container names
 full_container_names:
