@@ -292,10 +292,6 @@ namespace ttHH
         e2 = electrons->at(1)->p4();
         ee = e1 + e2;
         m_Fbranches.at("ll_m").set(*event, ee.M(), sys);
-        m_Fbranches.at("ll_pt").set(*event, ee.Pt(), sys);
-        m_Fbranches.at("ll_eta").set(*event, ee.Eta(), sys);
-        m_Fbranches.at("ll_phi").set(*event, ee.Phi(), sys);
-        m_Fbranches.at("ll_dR").set(*event, (e1).DeltaR(e2), sys);
       }
 
       if (muons->size() >= 2) {
@@ -304,10 +300,6 @@ namespace ttHH
         mu2 = muons->at(1)->p4();
         mumu = mu1 + mu2;
         m_Fbranches.at("ll_m").set(*event, mumu.M(), sys);
-        m_Fbranches.at("ll_pt").set(*event, mumu.Pt(), sys);
-        m_Fbranches.at("ll_eta").set(*event, mumu.Eta(), sys);
-        m_Fbranches.at("ll_phi").set(*event, mumu.Phi(), sys);
-        m_Fbranches.at("ll_dR").set(*event, (mu1).DeltaR(mu2), sys);
       }
 
       if (muons->size() >= 1 and electrons->size() >= 1) {
@@ -315,10 +307,6 @@ namespace ttHH
         e1 = electrons->at(0)->p4();
         emu = e1 + mu1;
         m_Fbranches.at("ll_m").set(*event, emu.M(), sys);
-        m_Fbranches.at("ll_pt").set(*event, emu.Pt(), sys);
-        m_Fbranches.at("ll_eta").set(*event, emu.Eta(), sys);
-        m_Fbranches.at("ll_phi").set(*event, emu.Phi(), sys);
-        m_Fbranches.at("ll_dR").set(*event, (mu1).DeltaR(e1), sys);
       }
 
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);

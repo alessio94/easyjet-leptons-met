@@ -47,6 +47,9 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
                                 containerOutKey="ttHHAnalysisJets_BTag_%SYS%",
                                 bTagWPDecorName="ftag_select_"
                                 + flags.Analysis.small_R_jet.btag_wp,
+                                PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0], # noqa
+                                PCBTsort=True,
+                                pTsort=False,
                                 selectBjet=True,
                                 maxEta=2.5,
                                 minPt=20e3))
@@ -116,7 +119,7 @@ def get_BaselineVarsttHHAlg_variables(flags):
     int_variable_names = []
 
     for object in ["ll"]:
-        for var in ["m", "pt", "dR", "eta", "phi"]:
+        for var in ["m"]:
             float_variable_names.append(f"{object}_{var}")
 
     H_candidate_variables = [
