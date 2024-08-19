@@ -31,13 +31,13 @@ Electron:
   Iso: "Loose_VarRad"
   forceFullSimConfig: true
   extra_wps:
-    - ["MediumLH", "Loose_VarRad"]
+    - ["TightLH", "Tight_VarRad"]
 
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
   extra_wps:
-    - ["Medium", "PflowLoose_VarRad"]
+    - ["Tight", "PflowTight_VarRad"]
 
 Lepton:
   amount: 2
