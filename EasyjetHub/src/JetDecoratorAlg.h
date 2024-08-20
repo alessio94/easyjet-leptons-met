@@ -51,6 +51,10 @@ namespace Easyjet
     SG::WriteDecorHandleKey<xAOD::JetContainer> m_bJetTruthPtDecorKey;
     SG::WriteDecorHandleKey<xAOD::JetContainer> m_bJetTruthDRDecorKey;
 
+    Gaudi::Property<bool> m_isMC{
+      this, "isMC", false, "is this simulation?"
+    };
+
     PublicToolHandle<Trig::TrigDecisionTool> m_trigDecTool{
       this, "TrigDecisionTool", "", "Trigger decision tool"
     };

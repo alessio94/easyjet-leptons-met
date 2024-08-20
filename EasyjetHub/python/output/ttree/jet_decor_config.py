@@ -9,6 +9,8 @@ def jet_decor_cfg(flags, **kwargs):
         flags.Analysis.small_R_jet.jet_type
     ]
 
+    kwargs.setdefault("isMC", flags.Input.isMC)
+
     if flags.Analysis.small_R_jet.doHLTMatching:
         kwargs.setdefault("triggerList", flags.Analysis.TriggerChains)
         from TrigDecisionTool.TrigDecisionToolConfig import TrigDecisionToolCfg

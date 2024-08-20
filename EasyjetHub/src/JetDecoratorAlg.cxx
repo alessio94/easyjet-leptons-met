@@ -19,17 +19,18 @@ namespace Easyjet
   StatusCode JetDecoratorAlg::initialize()
   {
     ATH_CHECK(m_jetsInKey.initialize());
-    ATH_CHECK(m_truthJetsInKey.initialize());
 
+    // truth matching
+    ATH_CHECK(m_truthJetsInKey.initialize(m_isMC));
     m_truthLabelDecorKey = m_truthJetsInKey.key() + ".HadronConeExclTruthLabelID";
-    ATH_CHECK(m_truthLabelDecorKey.initialize());
-    
+    ATH_CHECK(m_truthLabelDecorKey.initialize(m_isMC));
+
     m_bJetTruthPtDecorKey = m_jetsInKey.key() + ".bJetTruthPt";
     m_bJetTruthDRDecorKey = m_jetsInKey.key() + ".bJetTruthDR";
-    ATH_CHECK(m_bJetTruthPtDecorKey.initialize());
-    ATH_CHECK(m_bJetTruthDRDecorKey.initialize());
+    ATH_CHECK(m_bJetTruthPtDecorKey.initialize(m_isMC));
+    ATH_CHECK(m_bJetTruthDRDecorKey.initialize(m_isMC));
 
-    // for trigger matching
+    // trigger matching
     if (!m_triggers.empty())
     {
       ATH_CHECK(m_trigDecTool.retrieve());
@@ -42,18 +43,12 @@ namespace Easyjet
         std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '.',
                      'p');
 
-        m_jetHLTPtDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                              modifiedTrigName + "_pt");
-        m_jetHLTEtaDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                               modifiedTrigName + "_eta");
-        m_jetHLTPhiDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                               modifiedTrigName + "_phi");
-        m_jetHLTDRDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                              modifiedTrigName + "_dr");
-        m_jetHLTBtagDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                                modifiedTrigName + "_btag");
-        m_jetHLTThresholdsDecorKeys.emplace(
-            trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_thresholds");
+        m_jetHLTPtDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_pt");
+        m_jetHLTEtaDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_eta");
+        m_jetHLTPhiDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_phi");
+        m_jetHLTDRDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_dr");
+        m_jetHLTBtagDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_btag");
+        m_jetHLTThresholdsDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_thresholds");
         ATH_CHECK(m_jetHLTPtDecorKeys.at(trig).initialize());
         ATH_CHECK(m_jetHLTEtaDecorKeys.at(trig).initialize());
         ATH_CHECK(m_jetHLTPhiDecorKeys.at(trig).initialize());
@@ -72,12 +67,38 @@ namespace Easyjet
     SG::ReadHandle<xAOD::JetContainer> jets(m_jetsInKey,ctx);
     ATH_CHECK(jets.isValid());
 
-    SG::ReadHandle<xAOD::JetContainer> truthJets(m_truthJetsInKey,ctx);
-    ATH_CHECK(truthJets.isValid());
+    if (m_isMC) {
+      SG::ReadHandle<xAOD::JetContainer> truthJets(m_truthJetsInKey, ctx);
+      ATH_CHECK(truthJets.isValid());
 
-    SG::ReadDecorHandle<xAOD::JetContainer, int> truthLabel(m_truthLabelDecorKey);
-    SG::WriteDecorHandle<xAOD::JetContainer, float> bJetTruthPt(m_bJetTruthPtDecorKey);
-    SG::WriteDecorHandle<xAOD::JetContainer, float> bJetTruthDR(m_bJetTruthDRDecorKey);
+      SG::ReadDecorHandle<xAOD::JetContainer, int> truthLabel(m_truthLabelDecorKey);
+      SG::WriteDecorHandle<xAOD::JetContainer, float> bJetTruthPt(m_bJetTruthPtDecorKey);
+      SG::WriteDecorHandle<xAOD::JetContainer, float> bJetTruthDR(m_bJetTruthDRDecorKey);
+
+      for(const xAOD::Jet* jet: *jets) {
+        float minDR = m_minDR;
+        const xAOD::Jet *bestTruth = nullptr;
+
+        for (const xAOD::Jet *truthJet : *truthJets)
+        {
+          if (truthJet->pt() < m_minTruthPt)
+            continue;
+          if (truthLabel(*truthJet) != 5)
+            continue;
+
+          float dR = jet->p4().DeltaR(truthJet->p4());
+          if (dR < minDR)
+          {
+            bestTruth = truthJet;
+            minDR = dR;
+          }
+        }
+
+        bJetTruthPt(*jet) = bestTruth ? bestTruth->pt() : -99.;
+        bJetTruthDR(*jet) = bestTruth ? minDR : -99.;
+      }
+    }
+
 
     std::unordered_map<std::string,
                        SG::WriteDecorHandle<xAOD::JetContainer, float>>
@@ -102,22 +123,6 @@ namespace Easyjet
     Trig::FeatureRequestDescriptor frd;
     
     for(const xAOD::Jet* jet: *jets) {
-      float minDR = m_minDR;
-      const xAOD::Jet* bestTruth = nullptr;
-
-      for(const xAOD::Jet* truthJet: *truthJets){
-	if(truthJet->pt()<m_minTruthPt) continue;
-	if(truthLabel(*truthJet)!=5) continue;
-
-	float dR = jet->p4().DeltaR(truthJet->p4());
-	if(dR < minDR){
-	  bestTruth = truthJet;
-	  minDR = dR;
-	}
-      }
-
-      bJetTruthPt(*jet) = bestTruth ? bestTruth->pt() : -99.;
-      bJetTruthDR(*jet) = bestTruth ? minDR : -99.;
 
       // trigger matching
       for (auto &trig : m_triggers)
@@ -171,8 +176,7 @@ namespace Easyjet
             }
             ATH_MSG_VERBOSE(" =dRHLT: " << minDRHLT << " bestHLT pT: "
                                     << (bestHLT ? bestHLT->pt() : -99.)
-                                    << " btag: "
-                                    << btag
+                                    << " btag: " << btag
                                     << " thresholds: " << std::vector<int>(threshold.begin(), threshold.end()));
             ileg++;
           }
@@ -186,8 +190,7 @@ namespace Easyjet
         jetHLTBtag.at(trig)(*jet) = bestHLT ? btag : -1; // Only works for trigger chain with a single b-tagging WP. Not sure how to handle multiple WPs.
         ATH_MSG_VERBOSE("Summary " << " Trigger: " << trig << " bestHLT pT: "
                                   << (bestHLT ? bestHLT->pt() : -99.)
-                                  << " btag: "
-                                  << btag
+                                  << " btag: " << btag
                                   << " thresholds: " << std::vector<int>(threshold.begin(), threshold.end()));
       }
     }

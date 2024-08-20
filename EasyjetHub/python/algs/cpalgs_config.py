@@ -93,10 +93,7 @@ def cpalgs_cfg(flags):
         # so as to avoid any systematics-dependence or filtering
         if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
             cfg.merge(btag_decor_cfg(flags))
-
-        # For now, only MC decoration added
-        if flags.Input.isMC:
-            cfg.merge(jet_decor_cfg(flags))
+        cfg.merge(jet_decor_cfg(flags))
 
     if flags.Analysis.do_taus:
         # Schedule the alg to decorate taus with extra info
