@@ -72,31 +72,48 @@ namespace XBBCALIB
       	return StatusCode::FAILURE;
       }
 
-      // Apply selection
+      //************
+      // Apply Selection
+      //************
 
       // flags
-      PROBE_JET = false;
+      bool PROBE_JET = false;
+      bool TAG_JET = false;
+      bool TAG_LEPTON = false;
+      bool TAG_MET = false;
 
       //************
       // Large-R Jet
       //************
-      for (const xAOD::Jet *jet : *lrjets){
-        if (jet->pt() > 300 * Athena::Units::GeV){
-          PROBE_JET=true;
-        }
-      }
+      if (lrjets->size() != 0) PROBE_JET=true;
+
+      //************
+      // Small-R Jet
+      //************
+      if (jets->size() != 0) TAG_JET=true;
+
+      //************
+      // Leptons
+      //************
+      int n_lepton = electrons->size() + muons->size();
+      if (n_lepton == 1) TAG_LEPTON=true;
+
+      //************
+      // MET
+      //************
+      if (met->met() > 70 * Athena::Units::GeV) TAG_MET=true;
 
       //****************
       // event level info
       //****************
       //for example masses of the system, met, fired triggers etc
+      bool pass_baseline = PROBE_JET && TAG_JET && TAG_LEPTON && TAG_MET;
 
-      if (!m_bypass && !PROBE_JET) continue;
+      if (!m_bypass && !pass_baseline) continue;
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
       filter.setPassed(true);
-
     }
 
     return StatusCode::SUCCESS;

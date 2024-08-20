@@ -51,7 +51,7 @@ namespace XBBCALIB
       m_jetHandle{ this, "jets", "XbbCalibJets_%SYS%",   "Jet container to read" };
 
       CP::SysReadHandle<xAOD::JetContainer>
-      m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Lerge-R jet container to read" };
+      m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Large-R jet container to read" };
 
       CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
@@ -67,8 +67,6 @@ namespace XBBCALIB
 
       CP::SysFilterReporterParams m_filterParams {this, "XbbCalib selection"};
 
-      // \brief Internal variables
-      bool PROBE_JET;
   };
 
 }

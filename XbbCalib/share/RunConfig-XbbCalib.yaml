@@ -15,18 +15,21 @@ do_met: true
 
 # Toggles for reconstructed objects decorations
 small_R_jet:
+  min_pT: 28
   btag_wp: "GN2v01_FixedCutBEff_77"
-  Amount: 1
+
+large_R_jet:
+  min_pT: 200
 
 Electron:
-  ID: "LooseBLayerLH"
-  Iso: "Loose_VarRad"
-  Amount: 1
+  min_pT: 28
+  ID: "TightLH"
+  Iso: "Tight_VarRad"
 
 Muon:
-  ID: "Loose"
-  Iso: "PflowLoose_VarRad"
-  Amount: 1
+  min_pT: 28
+  ID: "Medium"
+  Iso: "PflowTight_VarRad"
 
 # Include the TTree configuration and update details
 ttree_output:
@@ -39,3 +42,13 @@ ttree_output:
       muons: 'container_names.output.muons'
       electrons: 'container_names.output.electrons'
       met : 'container_names.output.met'
+    collection_options:
+      #large_R_jets:
+      #  run_selection: true
+      small_R_jets:
+        btag_info: true
+        run_selection: true
+      electrons:
+        run_selection: true
+      muons:
+        run_selection: true

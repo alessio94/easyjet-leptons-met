@@ -89,6 +89,13 @@ namespace XBBCALIB
         m_Fbranches.at("probe_jet_phi").set(*event, lrjets->at(0)->phi(), sys);  
       }
 
+      if (jets->size() >= 1)
+      {
+        m_Fbranches.at("tag_jet_pt").set(*event, jets->at(0)->pt(), sys);  
+        m_Fbranches.at("tag_jet_eta").set(*event, jets->at(0)->eta(), sys);  
+        m_Fbranches.at("tag_jet_phi").set(*event, jets->at(0)->phi(), sys);  
+      }
+
     }
     return StatusCode::SUCCESS;
   }
