@@ -109,6 +109,18 @@ namespace VBSHIGGS
       mu0 = muons->at(0);
     }
 
+    // NOTE: This change would allow non-di-lepton events to pass to the lepton triggers
+    // This means that events that have less than two leptons can pass the trigger algorithm
+    // However, for the FullLep version, if we require PASS_EXACTLY_TWO_LEPTONS in addition to PASS_TRIGGER then this issue goes away
+    // And this allows us to use the trigger algorithm for one lepton signal events for the SemiLep version
+    if (electrons->size() == 1 && muons->size() == 0) {
+      ele0 = electrons->at(0);
+    }
+
+    if (electrons->size() == 0 && muons->size() == 1) {
+      mu0 = muons->at(0);
+    }
+
     if (ele0 || mu0) evaluateSingleLeptonTrigger(event, runBoolDecos, ele0, mu0, sys);
     if (ele1 || mu1) evaluateSingleLeptonTrigger(event, runBoolDecos, ele1, mu1, sys);
     if ((ele0 && ele1) || (mu0 && mu1))

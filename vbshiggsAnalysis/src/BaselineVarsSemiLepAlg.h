@@ -10,8 +10,6 @@
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
 
-#include <AthContainers/ConstDataVector.h>
-
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
@@ -33,22 +31,29 @@ namespace VBSHIGGS{
             /// We use default finalize() -- this is for cleanup, and we don't do any
 
         private:
+
+        template<typename ParticleType>
+            std::pair<int, int> truthOrigin(const ParticleType* particle);
+            
         /// \brief Setup syst-aware input container handles
         CP::SysListHandle m_systematicsList {this};
 
-        CP::SysReadHandle<xAOD::EventInfo> m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "vbshiggsAnalysisSignalJets_%SYS%", "Small R jets Jet container to read"};
+              
+        CP::SysReadHandle<xAOD::JetContainer> m_HCandHandle{ this, "higgsCandidates", "vbshiggsAnalysisHJets_%SYS%", "Higgs Candidates container to read"};
 
-        CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "vbshiggsAnalysisSignalJets_%SYS%", "Signal Jet container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_largejetHandle{ this, "largejets", "vbshiggsAnalysisLargeJets_%SYS%", "Large R Jet container to read"};
+
+        CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "vbshiggsAnalysisVBSJets_%SYS%",   "VBS Jet container to read" };
         
-        CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "vbshiggsAnalysisVBSJets_%SYS%", "VBS Jet container to read" };
+        CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "vbshiggsAnalysisElectrons_%SYS%",   "Electron container to read" };
 
-        CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "vbshiggsAnalysisElectrons_%SYS%", "Electron container to read" };
+        CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{ this, "muons", "vbshiggsAnalysisMuons_%SYS%",   "Muon container to read" };
 
-        CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{ this, "muons", "vbshiggsAnalysisMuons_%SYS%", "Muon container to read" };
+        CP::SysReadHandle<xAOD::MissingETContainer> m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read" };
 
-        CP::SysReadHandle<xAOD::MissingETContainer> m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
-
-        CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+        CP::SysReadHandle<xAOD::EventInfo>
+        m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
         Gaudi::Property<bool> m_isMC { this, "isMC", false, "Is this simulation?" };
 
@@ -57,6 +62,22 @@ namespace VBSHIGGS{
 
         Gaudi::Property<std::string> m_muWPName { this, "muonWP", "","Muon ID + Iso working point" };
         CP::SysReadDecorHandle<float> m_mu_SF{"", this};
+
+        CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+
+        CP::SysReadDecorHandle<int> m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
+
+        CP::SysReadDecorHandle<int> m_truthFlav { this, "truthFlav", "HadronConeExclTruthLabelID", "Jet truth flavor" };
+
+        CP::SysReadDecorHandle<char> m_eleECIDS { this, "ElectronsECIDS", "DFCommonElectronsECIDS", "Charge ID Selector" };
+
+        CP::SysReadDecorHandle<float> m_GN2Xv01_phbb = {this, "phbb", "GN2Xv01_phbb", "GN2Xv01_phbb"};
+        CP::SysReadDecorHandle<float> m_GN2Xv01_phcc = {this, "phcc", "GN2Xv01_phcc", "GN2Xv01_phcc"};
+        CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd = {this, "pqcd", "GN2Xv01_pqcd", "GN2Xv01_pqcd"};
+        CP::SysReadDecorHandle<float> m_GN2Xv01_ptop = {this, "ptop", "GN2Xv01_ptop", "GN2Xv01_ptop"};
+
+        CP::SysReadDecorHandle<float>
+        m_METSig {this, "METSignificance", "significance", "Met Significance"};
         
 
         Gaudi::Property<std::vector<std::string>> m_floatVariables {this, "floatVariableList", {}, "Name list of floating variables"};
@@ -67,6 +88,7 @@ namespace VBSHIGGS{
         std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 
         std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
+
     };
 }
 #endif

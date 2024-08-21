@@ -8,8 +8,6 @@
 #include <memory>
 
 #include "AnaAlgorithm/AnaAlgorithm.h"
-#include <AsgDataHandles/ReadDecorHandleKey.h>
-#include <AsgDataHandles/ReadDecorHandle.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
@@ -24,17 +22,10 @@
 #include <xAODMissingET/MissingETContainer.h>
 
 #include <EasyjetHub/CutManager.h>
+#include "vbshiggsEnums.h"
 
 
 namespace VBSHIGGS{
-
-  enum Booleans_semiLep{
-    TwoVBSJets,
-    TwoBJets,
-    LepSelection,
-    JetSelection,
-    METSelection
-  };
 
   /// \brief An algorithm for counting containers
   class SemiLepSelectorAlg final : public EL::AnaAlgorithm{
@@ -48,51 +39,85 @@ namespace VBSHIGGS{
       StatusCode execute() override;
       /// \brief This is the mirror of initialize() and is called after all events are processed.
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
-
       const std::vector<std::string> m_STANDARD_CUTS{
-        "TwoVBSJets",
-        "TwoBJets",
-        "LepSelection",
-        "JetSelection",
-        "METSelection",
+        "PASS_TRIGGER",
+        "PASS_ONE_LEPTON",
+        "PASS_MET",
+        "PASS_RES_AT_LEAST_ONE_B_JET",
+        "PASS_RES_EXACTLY_ONE_B_JET",
+        "PASS_RES_EXACTLY_TWO_B_JETS",
+        "PASS_RES_NOADD_B_JET",
+        "PASS_ONE_LARGE_JET",
+        "PASS_TWO_SIGNAL_JETS",
+        "PASS_DELTA_R_BB",
+        "PASS_RES_H_WINDOW",
+        "PASS_VBS_BASELINE",
+        "PASS_RES_BASELINE",
+        "PASS_MERG_BASELINE"
       };
 
       void leptonSelection(const xAOD::ElectronContainer& electrons,const xAOD::MuonContainer& muons, const xAOD::MissingET *met);
       void vbsjetsSelection(const xAOD::JetContainer * vbsjets);
-      void bjetSelection(std::vector<const xAOD::Jet*> bjets);
-      void jetSelection(const xAOD::JetContainer * signaljets, const xAOD::JetContainer * vbsjets);
+      void resolvedSelection(const xAOD::JetContainer *HJets, std::vector<const xAOD::Jet*> bjets, const CP::SystematicSet& sys);
+      void boostedSelection(const xAOD::JetContainer *largeJets, const CP::SystematicSet& sys);
+      
+      Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
       // \brief Setup syst-aware input container handles
       CutManager m_vbshiggsCuts;
 
       CP::SysListHandle m_systematicsList {this};
 
-      CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "vbshiggsAnalysisSignalJets_%SYS%", "Signal Jet container to read" };
-      CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "vbshiggsAnalysisVBSJets_%SYS%", "VBS Jet container to read" };
-      CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
-      CP::SysReadHandle<xAOD::EventInfo> m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
-      CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "vbshiggsAnalysisElectrons_%SYS%", "Electron container to read" };
-      CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{ this, "muons", "vbshiggsAnalysisMuons_%SYS%", "Muon container to read" };
-      CP::SysReadHandle<xAOD::MissingETContainer> m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
+      CP::SysReadHandle<xAOD::JetContainer> m_largejetHandle{ this, "largejets", "vbshiggsAnalysisLargeJets_%SYS%", "Large R Jet container to read"};
+      CP::SysReadDecorHandle<float> m_GN2Xv01_phbb = {this, "phbb", "GN2Xv01_phbb", "GN2Xv01_phbb"};
+      CP::SysReadDecorHandle<float> m_GN2Xv01_phcc = {this, "phcc", "GN2Xv01_phcc", "GN2Xv01_phcc"};
+      CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd = {this, "pqcd", "GN2Xv01_pqcd", "GN2Xv01_pqcd"};
+      CP::SysReadDecorHandle<float> m_GN2Xv01_ptop = {this, "ptop", "GN2Xv01_ptop", "GN2Xv01_ptop"};
 
+      CP::SysReadHandle<xAOD::JetContainer> m_signaljetHandle{ this, "signaljets", "vbshiggsAnalysisSignalJets_%SYS%", "Signal Jet container to read" };
+
+      CP::SysReadHandle<xAOD::JetContainer> m_HCandHandle{ this, "higgsCandidates", "vbshiggsAnalysisHJets_%SYS%", "Higgs Candidates container to read"};
+
+      CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "vbshiggsAnalysisVBSJets_%SYS%", "VBS Jet container to read" };
+
+      CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+
+      CP::SysReadHandle<xAOD::EventInfo> m_eventHandle{ this, "event", "EventInfo",  "EventInfo container to read" };
+
+      CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "vbshiggsAnalysisElectrons_%SYS%",  "Electron container to read" };
+
+      CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{ this, "muons", "vbshiggsAnalysisMuons_%SYS%",   "Muon container to read" };
+
+      CP::SysReadHandle<xAOD::MissingETContainer> m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read" };
+
+      CP::SysReadDecorHandle<bool> m_passTriggerSLT {this, "passTriggerSLT", "pass_trigger_SLT_%SYS%", "events pass any singlep triggers"};
+      
       CP::SysFilterReporterParams m_filterParams {this, "vbshiggs selection"};
 
       Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
-      std::vector<VBSHIGGS::Booleans_semiLep> m_inputCutKeys;
+      std::vector<VBSHIGGS::Booleans> m_inputCutKeys;
       Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
-      Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };
+      
+      long long int m_total_events{0};
 
-       long long int m_total_events{0};
-
-      std::unordered_map<VBSHIGGS::Booleans_semiLep, CP::SysWriteDecorHandle<bool> > m_Bbranches;
-      std::unordered_map<VBSHIGGS::Booleans_semiLep, bool> m_bools;
-       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
-      std::unordered_map<VBSHIGGS::Booleans_semiLep, std::string> m_boolnames{
-        {VBSHIGGS::TwoVBSJets, "TwoVBSJets"},
-        {VBSHIGGS::TwoBJets, "TwoBJets"},
-        {VBSHIGGS::LepSelection, "LepSelection"},
-        {VBSHIGGS::JetSelection, "JetSelection"},
-        {VBSHIGGS::METSelection, "METSelection"},
+      std::unordered_map<VBSHIGGS::Booleans, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+      std::unordered_map<VBSHIGGS::Booleans, bool> m_bools;
+      CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+      std::unordered_map<VBSHIGGS::Booleans, std::string> m_boolnames{
+        {VBSHIGGS::PASS_TRIGGER, "PASS_TRIGGER"},
+        {VBSHIGGS::PASS_ONE_LEPTON, "PASS_ONE_LEPTON"},
+        {VBSHIGGS::PASS_MET, "PASS_MET"},
+        {VBSHIGGS::PASS_RES_AT_LEAST_ONE_B_JET, "PASS_RES_AT_LEAST_ONE_B_JET"},
+        {VBSHIGGS::PASS_RES_EXACTLY_ONE_B_JET, "PASS_RES_EXACTLY_ONE_B_JET"},
+        {VBSHIGGS::PASS_RES_NOADD_B_JET, "PASS_RES_NOADD_B_JET"},
+        {VBSHIGGS::PASS_RES_EXACTLY_TWO_B_JETS, "PASS_RES_EXACTLY_TWO_B_JETS"},
+        {VBSHIGGS::PASS_ONE_LARGE_JET, "PASS_ONE_LARGE_JET"},
+        {VBSHIGGS::PASS_TWO_SIGNAL_JETS, "PASS_TWO_SIGNAL_JETS"},
+        {VBSHIGGS::PASS_DELTA_R_BB, "PASS_DELTA_R_BB"},
+        {VBSHIGGS::PASS_RES_H_WINDOW, "PASS_RES_H_WINDOW"},
+        {VBSHIGGS::PASS_VBS_BASELINE, "PASS_VBS_BASELINE"},
+        {VBSHIGGS::PASS_RES_BASELINE, "PASS_RES_BASELINE"},
+        {VBSHIGGS::PASS_MERG_BASELINE, "PASS_MERG_BASELINE"},
       };
   };
 }

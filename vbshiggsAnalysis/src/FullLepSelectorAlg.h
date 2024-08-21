@@ -24,34 +24,11 @@
 
 #include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
+#include "vbshiggsEnums.h"
 
 
 namespace VBSHIGGS{
 
-  enum Booleans{
-    PASS_TRIGGER,
-    PASS_AT_LEAST_TWO_LEPTONS,
-    PASS_EXACTLY_TWO_LEPTONS,
-    PASS_TWO_SS_CHARGE_LEPTONS,
-    PASS_TWO_OS_CHARGE_LEPTONS,
-    PASS_MET,
-    PASS_RES_AT_LEAST_ONE_B_JET,
-    PASS_RES_EXACTLY_ONE_B_JET,
-    PASS_RES_EXACTLY_TWO_B_JETS,
-    PASS_RES_NOADD_B_JET,
-    PASS_ONE_LARGE_JET,
-    PASS_TWO_SIGNAL_JETS,
-    PASS_DELTA_R_BB,
-    PASS_RES_H_WINDOW,
-    PASS_VBS_BASELINE,
-    PASS_RES_BASELINE,
-    PASS_MERG_BASELINE,
-    IS_SF,
-    IS_ee,
-    IS_mm,
-    IS_em,
-    Pass_ll,
-  };
   /// \brief An algorithm for counting containers
   class FullLepSelectorAlg final : public EL::AnaAlgorithm{
     public:
@@ -90,7 +67,6 @@ namespace VBSHIGGS{
         "IS_mm",
         "IS_em",
       };
-
      
       void setThresholds(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
       void leptonSelection(const xAOD::ElectronContainer* electrons,const xAOD::MuonContainer* muons, const xAOD::MissingET *met);

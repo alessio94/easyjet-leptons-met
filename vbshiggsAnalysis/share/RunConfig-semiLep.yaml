@@ -8,29 +8,53 @@ do_muons: true
 do_electrons: true
 do_met : true
 
+
 Electron:
-  ID: "MediumLH"
+  ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"
   amount: 1
+  extra_wps:
+    - ["MediumLH", "Loose_VarRad"]
+    - ["MediumLH", "Tight_VarRad"]
+    - ["MediumLH", "TightTrackOnly_VarRad"]
+    - ["MediumLH", "TightTrackOnly_FixedRad"]
 
+    - ["TightLH", "Loose_VarRad"]
+    - ["TightLH", "Tight_VarRad"]
+    - ["TightLH", "TightTrackOnly_VarRad"]
+    - ["TightLH", "TightTrackOnly_FixedRad"]
 Muon:
-  ID: "Medium"
+  ID: "Loose"
   Iso: "PflowLoose_VarRad"
   amount: 1
+  extra_wps:
+    - ["Medium", "PflowLoose_VarRad"]
+    - ["Medium", "PflowTight_VarRad"]
+
+    - ["Tight", "PflowLoose_VarRad"]
+    - ["Tight", "PflowTight_VarRad"]
+
 
 Lepton:
   amount: 1
-
-small_R_jet:
-  amount_bjet: 2
+  variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS"]
 
 # list of triggers per year to consider
 trigger:
   include: vbshiggsAnalysis/trigger-lep.yaml
 
 CutList :
-      - TwoVBSJets
-      - TwoBJets
-      - LepSelection
-      - JetSelection
-      - METSelection
+      - PASS_TRIGGER 
+      - PASS_ONE_LEPTON
+      - PASS_MET
+      - PASS_RES_AT_LEAST_ONE_B_JET
+      - PASS_RES_EXACTLY_ONE_B_JET
+      - PASS_RES_EXACTLY_TWO_B_JETS
+      - PASS_RES_NOADD_B_JET
+      - PASS_ONE_LARGE_JET
+      - PASS_TWO_SIGNAL_JETS
+      - PASS_DELTA_R_BB
+      - PASS_RES_H_WINDOW
+      - PASS_VBS_BASELINE
+      - PASS_RES_BASELINE
+      - PASS_MERG_BASELINE

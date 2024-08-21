@@ -24,36 +24,10 @@
 
 #include <EasyjetHub/CutManager.h>
 #include <algorithm>
+#include "vbshiggsEnums.h"
 
 namespace VBSHIGGS
 {
-
-  enum TriggerChannel
-  {
-    SLT,
-    DLT,
-    ASLT1_em,
-    ASLT1_me,
-    ASLT2,
-  };
-
-  enum Var_Trigger {
-    ele = 0,
-    mu = 1,
-    leadingele = 2,
-    leadingmu = 3,
-    subleadingele = 4,
-    subleadingmu = 5,
-  };
-
-  enum RunBooleans
-  {
-    is17_periodB5_B8,
-    is22_75bunches,
-    is23_75bunches,
-    is23_400bunches,
-  };
-
   class TriggerDecoratorAlg final : public EL::AnaAlgorithm
   {
     public:

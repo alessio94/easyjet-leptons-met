@@ -55,6 +55,13 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
     )
+
+    cfg.addEventAlgo(
+        CompFactory.VBSHIGGS.HiggsSelectorAlg(
+            "HiggsSelectorAlg",
+            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+        )
+    )
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
     trigger_branches = [

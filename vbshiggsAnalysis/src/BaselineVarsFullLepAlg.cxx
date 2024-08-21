@@ -44,7 +44,7 @@ namespace VBSHIGGS{
       }
       
       if (!m_PCBT.empty()) {
-        ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_signaljetHandle));
+        ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_HCandHandle));
       }
 
       // Intialise syst-aware output decorators
@@ -62,7 +62,7 @@ namespace VBSHIGGS{
       };
 
       if (m_isMC) {
-        ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_signaljetHandle));
+        ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_HCandHandle));
       }
 
       ATH_CHECK (m_eleECIDS.initialize(m_systematicsList, m_electronHandle));

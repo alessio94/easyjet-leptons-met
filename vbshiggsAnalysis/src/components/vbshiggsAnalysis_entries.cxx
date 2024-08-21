@@ -7,7 +7,9 @@
 #include "../SemiLepSelectorAlg.h"
 #include "../FullHadSelectorAlg.h"
 #include "../TriggerDecoratorAlg.h"
+
 using namespace VBSHIGGS;
+
 DECLARE_COMPONENT(VBSJetsSelectorAlg)
 DECLARE_COMPONENT(HiggsSelectorAlg)
 DECLARE_COMPONENT(TriggerDecoratorAlg)

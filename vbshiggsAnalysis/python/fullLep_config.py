@@ -13,12 +13,6 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
 
     cfg = ComponentAccumulator()
 
-    cfg.addEventAlgo(
-        CompFactory.VBSHIGGS.HiggsSelectorAlg(
-            "HiggsSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-        )
-    )
     # Selection
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.FullLepSelectorAlg(
@@ -31,6 +25,7 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
                     else False),
         )
     )
+
     # calculate final vbshiggs vars
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
