@@ -57,7 +57,7 @@ def jet_sequence(
         )
 
     # Do not recalibrate PHYSLITE samples yet due to missing variables.
-    if flags.Input.isPHYSLITE and flags.GeoModel.Run == LHCPeriod.Run3:
+    if flags.Input.isPHYSLITE and flags.GeoModel.Run is LHCPeriod.Run3:
         print("WARNING! Event shape variables not present in mc23 PHYSLITE.")
         print("Jets won't be recalibrated.")
         print("Please check the JET/Etmiss twiki for more info:")
@@ -102,26 +102,29 @@ def jet_sequence(
             configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
 
+            bTagCalibFile = None
             if 'btagCDI' in jet_flags:
-                configSeq.setOptionValue(
-                    '.bTagCalibFile',
-                    jet_flags.btagCDI
-                )
+                bTagCalibFile = jet_flags.btagCDI
             # if GN2 in tagger name overwrite the CDI
-            if "GN2v00" in tagger:
-                configSeq.setOptionValue(
-                    '.bTagCalibFile',
-                    'xAODBTaggingEfficiency/13p6TeV/'
+            elif "GN2v00" in tagger:
+                bTagCalibFile = 'xAODBTaggingEfficiency/13p6TeV/' \
                     '2023-22-13p6TeV-MC21-CDI_Test_2023-08-1_v1.root'
-                ) # noqa
             elif "GN2v01" in tagger:
-                configSeq.setOptionValue(
-                    '.bTagCalibFile',
-                    'xAODBTaggingEfficiency/13TeV/'
-                    '2023-02_MC20_CDI_GN2v01-noSF_bugFix.root'
-                ) # noqa
                 # Until AFT-748 is solved
                 configSeq.setOptionValue('.noEffSF', True)
+
+                if btag_wp == "Continuous2D":
+                    bTagCalibFile = 'xAODBTaggingEfficiency/13p6TeV/' \
+                        '2023-22-13p6TeV-MC21-CDI_GN2v01_Test_2024-07-ctag_noSF_NewCutValues.root'  # noqa
+                elif flags.GeoModel.Run is LHCPeriod.Run2:
+                    bTagCalibFile = 'xAODBTaggingEfficiency/13TeV/' \
+                        '2023-02_MC20_CDI_GN2v01-noSF_bugFix.root'
+                elif flags.GeoModel.Run is LHCPeriod.Run3:
+                    bTagCalibFile = 'xAODBTaggingEfficiency/13p6TeV/' \
+                        '2023-02_MC23_CDI_GN2v01-noSF.root'
+
+            if bTagCalibFile:
+                configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
 
         if jet_flags.runBJetPtCalib:
             # Pick a reasonable b-tag selection?
