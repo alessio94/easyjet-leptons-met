@@ -23,7 +23,7 @@ def get_small_R_jet_branches(
     if tree_flags.slim_variables_with_syst:
         small_R_jet_branches.syst_only_for = ["pt", "jvt_selection"]
         if flags.Analysis.small_R_jet.useFJvt:
-            small_R_jet_branches.syst_only_for = ["fjvt_selection"]
+            small_R_jet_branches.syst_only_for += ["fjvt_selection"]
 
     small_R_jet_branches.add_four_mom_branches(do_mass=True)
 
