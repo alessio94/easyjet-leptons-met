@@ -1,4 +1,5 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
+from AthenaConfiguration.Enums import LHCPeriod
 
 
 def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
@@ -27,6 +28,10 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "generatorWeight_%SYS%",
             "PileupWeight_%SYS%"
         ]
+
+        if flags.GeoModel.Run is LHCPeriod.Run2:
+            eventinfo_branches.variables += ["beamSpotWeight"]
+
         if (flags.Analysis.save_HF_classification
                 and flags.Input.MCChannelNumber
                 in flags.Analysis.DSID_HF_class_samples):
