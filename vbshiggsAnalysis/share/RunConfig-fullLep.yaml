@@ -8,6 +8,18 @@ do_muons: true
 do_electrons: true
 do_met : true
 
+# expand list to store nWLep truth information
+DSID_nWLep_samples:
+  - 525362 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp1
+  - 525363 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp2
+  - 525364 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp5
+  - 525365 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp10
+  - 525366 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klm5
+  - 525367 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp1
+  - 525368 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp2
+  - 525369 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp5
+  - 525370 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp10
+  - 525371 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klm5
 
 Electron:
   ID: "LooseBLayerLH"

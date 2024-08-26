@@ -79,6 +79,15 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         )
     )
 
+    # truth info
+    if flags.Input.isMC:
+        cfg.addEventAlgo(
+            CompFactory.VBSHIGGS.TruthVBSQuarksInfoAlg(
+                "TruthVBSQuarksInfoAlg",
+                TruthParticleInKey="HardScatterParticles",
+            )
+        )
+
     if flags.Analysis.Channel == "FullLep":
         extra_vbshiggs_branches, float_variable_names, \
             int_variable_names = fullLep_branches(flags)

@@ -119,4 +119,11 @@ def fullLep_branches(flags):
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> pass_trigger_{cat}"
              + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
+    # truth info
+    if flags.Input.isMC:
+        branches += ['EventInfo.nVBSQuarks -> nVBSQuarks', 'EventInfo.nWLep -> nWLep']
+        for var in ['pT', 'eta', 'phi', 'E']:
+            branches += [f'EventInfo.VBSQuark1_{var} -> VBSQuark1_{var}']
+            branches += [f'EventInfo.VBSQuark2_{var} -> VBSQuark2_{var}']
+
     return branches, float_variable_names, int_variable_names

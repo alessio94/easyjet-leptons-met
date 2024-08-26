@@ -7,6 +7,7 @@
 #include "../SemiLepSelectorAlg.h"
 #include "../FullHadSelectorAlg.h"
 #include "../TriggerDecoratorAlg.h"
+#include "../TruthVBSQuarksInfoAlg.h"
 
 using namespace VBSHIGGS;
 
@@ -19,3 +20,4 @@ DECLARE_COMPONENT(BaselineVarsFullHadAlg)
 DECLARE_COMPONENT(FullLepSelectorAlg)
 DECLARE_COMPONENT(SemiLepSelectorAlg)
 DECLARE_COMPONENT(FullHadSelectorAlg)
+DECLARE_COMPONENT(TruthVBSQuarksInfoAlg)
