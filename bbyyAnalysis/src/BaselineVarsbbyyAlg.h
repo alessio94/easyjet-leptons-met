@@ -38,7 +38,7 @@ namespace HHBBYY
     ggFTarget = 0,
     VBFTarget = 1
   };
-  
+
   enum Var {
     y1_ptOverMyy = 0,
     y1_eta,
@@ -201,6 +201,9 @@ namespace HHBBYY
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
+    CP::SysReadDecorHandle<unsigned int> m_year
+      {this, "year", "dataTakingYear", ""};
+ 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 

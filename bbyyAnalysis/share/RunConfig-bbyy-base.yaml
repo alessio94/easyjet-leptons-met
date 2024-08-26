@@ -95,9 +95,13 @@ BDT_path:
   - "bbyyAnalysis/bdt_legacy_highMass.root"
   - "bbyyAnalysis/bdt_legacy_vbf_jets.root"
 
-GNN_path:
-  - "bbyyAnalysis/GNN_ggFTarget.onnx"
-  - "bbyyAnalysis/GNN_VBFTarget.onnx"
+GNN_path_run2:
+  - "bbyyAnalysis/GNN_ggFTarget_run2.onnx"
+  - "bbyyAnalysis/GNN_VBFTarget_run2.onnx"
+
+GNN_path_run3:
+  - "bbyyAnalysis/GNN_ggFTarget_run3.onnx"
+  - "bbyyAnalysis/GNN_VBFTarget_run3.onnx"
 
 #  choose VBF jets selection method
 VBFjetsMethod: "BDT" # "mjj" "pTsorting"

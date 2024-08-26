@@ -41,6 +41,7 @@ namespace HHBBYY
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
+    ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
     if(m_doKF){
       ATH_CHECK (m_KFJetHandle.initialize(m_systematicsList));
     }
@@ -124,7 +125,6 @@ namespace HHBBYY
       if(m_doKF){
         ANA_CHECK (m_KFJetHandle.retrieve (KFJets, sys));
       }
-      
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
       static const SG::AuxElement::ConstAccessor<unsigned int> DFCommonPhotonsIsEMTightIsEMValue("DFCommonPhotonsIsEMTightIsEMValue");
@@ -449,7 +449,14 @@ namespace HHBBYY
       //GNN Implementation
       if(m_doGNN_tagging)
       {
-        float pile_up = event->averageInteractionsPerCrossing();
+        int year = m_year.get(*event, sys);
+        float pile_up;
+        if(2015<=year && year<=2016) {
+          pile_up = event->averageInteractionsPerCrossing();
+        }
+        else {
+          pile_up = event->actualInteractionsPerCrossing();
+        }
         for(int i=0; i<2; i++)
         {
           if(nCentralJets>=2 && ph1 && ph2) 

@@ -111,7 +111,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
             BDT_path=flags.Analysis.BDT_path,
             doGNN_tagging=flags.Analysis.do_GNN2bjetSelection,
-            GNN_path=flags.Analysis.GNN_path,
+            GNN_path=(flags.Analysis.GNN_path_run2 if flags.Analysis.Run == 2 else
+                      flags.Analysis.GNN_path_run3),
             VBFjetsMethod=flags.Analysis.VBFjetsMethod,
             isMC=flags.Input.isMC,
             doKF=flags.Analysis.do_KinematicFit,
