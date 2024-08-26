@@ -22,7 +22,6 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
     )
     if flags.Input.isMC:
         eventinfo_branches.variables += [
-            "mcEventWeights",
             "mcChannelNumber",
             "RandomRunNumber",
             "generatorWeight_%SYS%",
