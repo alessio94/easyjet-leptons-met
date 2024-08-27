@@ -69,7 +69,7 @@ parser.add_argument("--mergeMyFiles", action='store_true',
                     help="Merge branches. Default is merge output to input")
 parser.add_argument("--mergeToOutput", action='store_true',
                     help="Can apply with mergeMyFiles. Merge input to output")
-parser.add_argument("--bTagWP", default="DL1dv01_FixedCutBEff_77", type=str,
+parser.add_argument("--bTagWP", default="GN2v01_FixedCutBEff_85", type=str,
                     help="b-tagging working point")
 
 args = parser.parse_args()
