@@ -123,18 +123,13 @@ def get_BaselineVarsttHHAlg_variables(flags):
             float_variable_names.append(f"{object}_{var}")
 
     H_candidate_variables = [
-        "H1_m", "H1_pt", "H1_eta", "H1_phi",
-        "H2_m", "H2_pt", "H2_eta", "H2_phi",
         "HH_m", "HH_CHI",
     ]
 
     float_variable_names += H_candidate_variables
 
     angular_variables = [
-        "Jets_DeltaR12", "Jets_DeltaR34", "Jets_DeltaR56",
-        "Jets_DeltaEta12", "Jets_DeltaEta34", "Jets_DeltaEta56",
         "Jets_DeltaRMax", "Jets_DeltaRMin", "Jets_DeltaRMean",
-        "Jets_DeltaEtaMax", "Jets_DeltaEtaMin", "Jets_DeltaEtaMean"
     ]
 
     float_variable_names += angular_variables

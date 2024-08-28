@@ -184,25 +184,9 @@ namespace ttHH
         }
       
         for (std::size_t i=0; i<JetsCandidate.size(); i++){
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, JetsCandidate[i]->p4().Pt(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, JetsCandidate[i]->p4().Eta(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, JetsCandidate[i]->p4().Phi(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, JetsCandidate[i]->p4().E(), sys);
-
-          m_Ibranches.at("Jet"+std::to_string(i+1)+"_PassWP").set(*event,static_cast<int>(m_isBtag.get(*JetsCandidate[i], sys)),sys);
-
-          if(!m_PCBT.empty())
-            m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,m_PCBT.get(*JetsCandidate[i], sys),sys);
-          if (m_isMC)
-            m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set(*event, HadronConeExclTruthLabelID(*JetsCandidate[i]), sys);
-
 	  if (m_PCBT.get(*JetsCandidate[i], sys) >= 3) {
 	    nBJets77++;
 	  }
-
-          m_Ibranches.at("Jet"+std::to_string(i+1)+"_n_muons").set(*event, cacc_NMu(*JetsCandidate[i]), sys);    
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_uncorrPt").set(*event, cacc_UncorrPt(*JetsCandidate[i]), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_muonCorrPt").set(*event, cacc_MuonCorrPt(*JetsCandidate[i]), sys);
         }
       }
 
@@ -214,22 +198,7 @@ namespace ttHH
 
         auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(paired_jets);
 
-        m_Fbranches.at("Jets_DeltaR12").set(*event, DeltaR[0], sys);
-        m_Fbranches.at("Jets_DeltaR34").set(*event, DeltaR[1], sys);
-        m_Fbranches.at("Jets_DeltaEta12").set(*event, DeltaEta[0], sys);
-        m_Fbranches.at("Jets_DeltaEta34").set(*event, DeltaEta[1], sys);
-
         // Jet pairing variables
-        m_Fbranches.at("H1_m").set(*event, H1.M(), sys);
-        m_Fbranches.at("H1_pt").set(*event, H1.Pt(), sys);
-        m_Fbranches.at("H1_eta").set(*event, H1.Eta(), sys);
-        m_Fbranches.at("H1_phi").set(*event, H1.Phi(), sys);
-
-        m_Fbranches.at("H2_m").set(*event, H2.M(), sys);
-        m_Fbranches.at("H2_pt").set(*event, H2.Pt(), sys);
-        m_Fbranches.at("H2_eta").set(*event, H2.Eta(), sys);
-        m_Fbranches.at("H2_phi").set(*event, H2.Phi(), sys);
-
         m_Fbranches.at("HH_m").set(*event, (H1+H2).M(), sys);
         m_Fbranches.at("HH_CHI").set(*event, computeChiSquare(H1.M(), H2.M(), m_targetMassH, m_targetMassH, m_massResolution), sys);
 
@@ -251,9 +220,6 @@ namespace ttHH
 
         if (paired_jets.size() > 5)
         {
-          m_Fbranches.at("Jets_DeltaR56").set(*event, DeltaR[2], sys);
-          m_Fbranches.at("Jets_DeltaEta56").set(*event, DeltaEta[2], sys);
-
           // construct 56 jet combination
           xAOD::JetFourMom_t jj56_p4 = paired_jets[4]->jetP4() + paired_jets[5]->jetP4();
           xAOD::Jet jj56 = xAOD::Jet();
@@ -275,15 +241,10 @@ namespace ttHH
 
         // calculate max, min and mean of mass, deltaEta and deltaR
         auto [DeltaRMax, DeltaRMin, DeltaRMean] = calculateVectorStats(DeltaR);
-        auto [DeltaEtaMax, DeltaEtaMin, DeltaEtaMean] = calculateVectorStats(DeltaEta);
 
         m_Fbranches.at("Jets_DeltaRMax").set(*event, DeltaRMax, sys);
         m_Fbranches.at("Jets_DeltaRMin").set(*event, DeltaRMin, sys);
         m_Fbranches.at("Jets_DeltaRMean").set(*event, DeltaRMean, sys);
-
-        m_Fbranches.at("Jets_DeltaEtaMax").set(*event, DeltaEtaMax, sys);
-        m_Fbranches.at("Jets_DeltaEtaMin").set(*event, DeltaEtaMin, sys);
-        m_Fbranches.at("Jets_DeltaEtaMean").set(*event, DeltaEtaMean, sys);
       }
 
       if (electrons->size() >= 2) {
