@@ -34,13 +34,34 @@ namespace MULTILEPTON
 
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
+
+    ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK (m_matchingTool.retrieve());
+
+    // Intialise booleans with value false. Also initialise syst-aware output decorators
+    for (auto& [key, value] : m_boolnames) {
+      m_bools.emplace(key, false);
+      CP::SysWriteDecorHandle<bool> whandle{value+"_%SYS%", this};
+      m_Bbranches.emplace(key, whandle);
+      ATH_CHECK(m_Bbranches.at(key).initialize(m_systematicsList, m_eventHandle));
+    };
+
+    // make trigger decorators
+    for (auto trig : m_triggers){
+      CP::SysReadDecorHandle<bool> deco {this, "trig"+trig, trig, "Name of trigger"};
+      m_triggerdecos.emplace(trig, deco);
+      ATH_CHECK(m_triggerdecos.at(trig).initialize(m_systematicsList, m_eventHandle));
+    }
+
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
+
+    ATH_CHECK (initialiseCutflow());
 
     return StatusCode::SUCCESS;
   }
@@ -52,8 +73,7 @@ namespace MULTILEPTON
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
     // Loop over all systs
-    for (const auto& sys : m_systematicsList.systematicsVector())
-    {
+    for (const auto& sys : m_systematicsList.systematicsVector()) {
 
       CP::SysFilterReporter filter (filterCombiner, sys);
 
@@ -80,21 +100,100 @@ namespace MULTILEPTON
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
-      const xAOD::MissingETContainer *metCont = nullptr;
-      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
-      const xAOD::MissingET* met = (*metCont)["Final"];
-      if (!met) {
-        ATH_MSG_ERROR("Could not retrieve MET");
-        return StatusCode::FAILURE;
+      const xAOD::TauJetContainer *taus = nullptr;
+      ANA_CHECK (m_tauHandle.retrieve (taus, sys));
+
+
+      for (const auto& [key, value] : m_bools) {
+        m_bools.at(key) = false;
       }
 
+      setThresholds(event, sys);
 
-      bool pass_baseline=true;
+      // Leptons
+      const xAOD::Electron* ele0 = nullptr;
+      const xAOD::Electron* ele1 = nullptr;
+      
+      const xAOD::Muon* mu0 = nullptr;
+      const xAOD::Muon* mu1 = nullptr;
+      
+      if (electrons->size() >= 2) {
+        ele0 = electrons->at(0);
+        ele1 = electrons->at(1);
+      }
+      
+      if (muons->size() >= 2) {
+        mu0 = muons->at(0);
+        mu1 = muons->at(1);
+      }
+      
+      if (electrons->size() == 1 && muons->size() == 1) {
+        ele0 = electrons->at(0);
+        mu0 = muons->at(0);
+      }
 
-      // Compute total_events
-      m_total_events+=1;
+      // TODO: apply baseline selection for objects
+      
+      evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_hhmlCuts, sys);
+      applyChannelSelection(*electrons, *muons, *taus, *bjets, m_hhmlCuts);
+
+      bool pass_baseline=false;
+      if(m_bools.at(MULTILEPTON::PASS_TRIGGER)) pass_baseline=true;
+
+      bool pass_selection = false;
+      for (const auto& [key, value] : m_bools) {
+        if (key == MULTILEPTON::PASS_TRIGGER) continue;
+        pass_selection |= value;
+      }
+      
+      pass_baseline &= pass_selection;
+            
+      //****************
+      // Cutflow
+      //****************
+
+      // do the CUTFLOW only with sys="" -> NOSYS
+      if (sys.name()=="") {
+        // Compute total_events
+        m_total_events+=1;
+        if(m_isMC) m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);
+
+        for (const auto &cut : m_inputCutKeys) {
+          auto cutname = m_boolnames.at(cut);
+          if (m_hhmlCuts.exists(cutname)) {
+            m_hhmlCuts(cutname).passed = m_bools.at(cut);
+            if (m_hhmlCuts(cutname).passed) {
+              m_hhmlCuts(cutname).counter += 1;
+              if(m_isMC) m_hhmlCuts(cutname).w_counter += m_generatorWeight.get(*event, sys);
+            }
+          }
+        }
+
+        // Check how many consecutive cuts are passed by the event.
+        unsigned int consecutive_cuts = 0;
+        for (size_t i = 0; i < m_hhmlCuts.size(); ++i) {
+          if (m_hhmlCuts[i].passed)
+            consecutive_cuts++;
+          else
+            break;
+        }
+
+        // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
+        for (unsigned int i=0; i<consecutive_cuts; i++) {
+          m_hhmlCuts[i].relativeCounter += 1;
+          if(m_isMC) m_hhmlCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
+        }
+      }
+
+      // Fill syst-aware output decorators
+      for (auto& [key, var] : m_bools) {
+        m_Bbranches.at(key).set(*event, var, sys);
+      };
 
       if (!m_bypass && !pass_baseline) continue;
+
+      // Global event filter true if any syst passes and controls
+      // if event is passed to output writing or not
       filter.setPassed(true);
     }
     return StatusCode::SUCCESS;
@@ -106,8 +205,613 @@ namespace MULTILEPTON
     ATH_MSG_INFO("Total events = " << m_total_events <<std::endl);
     ANA_CHECK (m_filterParams.finalize ());
 
+    m_hhmlCuts.CheckCutResults(); // Print CheckCutResults
+
+    if(m_saveCutFlow) {
+      m_hhmlCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
+      m_hhmlCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
+      m_hhmlCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
+      if(m_isMC) {
+        m_hhmlCuts.DoWeightedAbsoluteEfficiency(m_total_mcEventWeight, efficiency("WeightedAbsoluteEfficiency"));
+        m_hhmlCuts.DoWeightedRelativeEfficiency(m_total_mcEventWeight, efficiency("WeightedRelativeEfficiency"));
+        m_hhmlCuts.DoWeightedStandardCutFlow(m_total_mcEventWeight, efficiency("WeightedStandardCutFlow"));
+      }
+      m_hhmlCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
+    }
+    else {
+      delete efficiency("AbsoluteEfficiency");
+      delete efficiency("RelativeEfficiency");
+      delete efficiency("StandardCutFlow");
+      if(m_isMC) {
+        delete efficiency("WeightedAbsoluteEfficiency");
+        delete efficiency("WeightedRelativeEfficiency");
+        delete efficiency("WeightedStandardCutFlow");
+      }
+      delete hist("EventsPassed_BinLabeling");
+    }
 
     return StatusCode::SUCCESS;
   }
+
+
+  StatusCode MultileptonSelectorAlg::initialiseCutflow()
+  {
+    // CutFlow
+    std::vector<std::string> boolnamelist;
+    for (const auto& [key, value]: m_boolnames) {
+      boolnamelist.push_back(value);
+    }
+    m_hhmlCuts.CheckInputCutList(m_inputCutList,boolnamelist);
+
+    // Initialize an array containing the enum values needed for the cutlist
+    m_inputCutKeys.resize(m_inputCutList.size());
+    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
+    for (const auto& [key, value]: m_boolnames) {
+      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
+      if(it != m_inputCutList.end()) {
+        auto index = it - m_inputCutList.begin();
+        m_inputCutKeys.at(index) = key;
+        inputWasFound.at(index) = true;
+      }
+    }
+    // Check that every element of m_inputCutList has a corresponding enum in m_inputCutEnum
+    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
+      if(inputWasFound.at(index)) continue;
+      ATH_MSG_ERROR("Doubled or falsely spelled cuts in CutList (see config file)." + m_inputCutList[index]);
+    }
+    // Initialize a vector of CutEntry structs based on the input Cut List
+    for (const auto &cut : m_inputCutKeys) {
+      m_hhmlCuts.add(m_boolnames[cut]);
+    }
+
+    //After filling the CutManager, book your histograms.
+    const unsigned int nbins = m_hhmlCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->multilepton cuts;Cuts;#epsilon",
+			nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->multilepton cuts;Cuts;#epsilon",
+			nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->multilepton cuts;Cuts;#epsilon",
+      nbins, 0.5, nbins + 0.5)));
+    if(m_isMC) {
+      ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->multilepton cuts;Cuts;#epsilon",
+				nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->multilepton cuts;Cuts;#epsilon",
+				nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->multilepton cuts;Cuts;#epsilon",
+        nbins, 0.5, nbins + 0.5)));
+    }
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+
+    return StatusCode::SUCCESS;
+  }
+
+  void MultileptonSelectorAlg::evaluateTriggerCuts(
+    const xAOD::EventInfo *event,
+    const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+    const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+    CutManager& hhmlCuts, const CP::SystematicSet& sys) {
+
+    if (!hhmlCuts.exists("PASS_TRIGGER"))
+        return;
+
+    if (ele0 || mu0) evaluateSingleLeptonTrigger(event, ele0, mu0, sys);
+    if (ele1 || mu1) evaluateSingleLeptonTrigger(event, ele1, mu1, sys);
+    if ((ele0 && ele1) || (mu0 && mu1) || (ele0 && mu0)) evaluateDiLeptonTrigger(event, ele0, ele1, mu0, mu1, sys);
+
+    if (m_bools.at(MULTILEPTON::pass_trigger_SLT) || m_bools.at(MULTILEPTON::pass_trigger_DLT)) m_bools.at(MULTILEPTON::PASS_TRIGGER) = true;
+  }
+
+  void MultileptonSelectorAlg::evaluateSingleLeptonTrigger(
+    const xAOD::EventInfo *event,
+    const xAOD::Electron *ele, const xAOD::Muon *mu,
+    const CP::SystematicSet& sys) {
+
+    // Check single electron triggers
+    std::vector<std::string> single_ele_paths;
+
+    int year = m_year.get(*event, sys);
+    if(year==2015){
+      single_ele_paths = {
+        "HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium",
+        "HLT_e120_lhloose"
+      };
+    } 
+    else if(2016<=year && year<=2018){
+      single_ele_paths = {
+        "HLT_e26_lhtight_nod0_ivarloose", "HLT_e60_lhmedium_nod0",
+        "HLT_e140_lhloose_nod0"
+      };
+    }
+    // TODO: Add 2022 and 2023 triggers
+    // else if(m_is22_75bunches.get(*event, sys)){
+    //   single_ele_paths = {
+    //     "HLT_e17_lhvloose_L1EM15VHI", "HLT_e20_lhvloose_L1EM15VH",
+    //     "HLT_e250_etcut_L1EM22VHI"
+    //   };
+    // }
+    // else if(year==2022){
+    //   single_ele_paths = {
+    //     "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
+    //     "HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
+    //   };
+    // }
+    // else if(m_is23_75bunches.get(*event, sys)){
+    //   single_ele_paths = {
+    //     "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
+    //     "HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
+    //     "HLT_e300_etcut_L1EM22VHI"
+    //   };
+    // }
+    // else if(year==2023){
+    //   single_ele_paths = {
+    //     "HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M",
+    //     "HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
+    //     "HLT_e300_etcut_L1eEM26M"
+    //   };
+    // }
+
+    bool trigPassed_SET = false;
+    if(ele){
+      for(const auto& trig : single_ele_paths){
+        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        if (pass){
+          bool match = m_matchingTool->match(*ele, trig);
+          trigPassed_SET |= match;
+        }
+      }
+      trigPassed_SET &= ele->pt() > m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele];
+    }
+
+    // Check single muon triggers
+    std::vector<std::string> single_mu_paths;
+
+    if(year==2015){
+      single_mu_paths = {"HLT_mu20_iloose_L1MU15", "HLT_mu50"};
+    }
+    else if(2016<=year && year<=2018){
+      single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
+    }
+    // TODO: Add 2022 and 2023 triggers
+    // else if(2022<=year && year<=2023 &&
+	  //   !m_is22_75bunches.get(*event, sys) &&
+	  //   !m_is23_75bunches.get(*event, sys) &&
+	  //   !m_is23_400bunches.get(*event, sys)){
+    //   single_mu_paths = {
+    //     "HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
+    //     "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
+    //     "HLT_mu80_msonly_3layersEC_L1MU14FCH"
+    //   };
+    // }
+
+    bool trigPassed_SMT = false;
+    if (mu){
+      for(const auto& trig : single_mu_paths){
+        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        if (pass){
+          bool match = m_matchingTool->match(*mu, trig);
+          trigPassed_SMT |= match;
+        }
+      }
+      trigPassed_SMT &= mu->pt() > m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu];
+    }
+
+    m_bools.at(MULTILEPTON::pass_trigger_SLT) |= (trigPassed_SET || trigPassed_SMT);
+  }
+
+  void MultileptonSelectorAlg::evaluateDiLeptonTrigger(
+    const xAOD::EventInfo *event,
+    const xAOD::Electron *ele0, const xAOD::Electron *ele1,
+    const xAOD::Muon *mu0, const xAOD::Muon *mu1,
+    const CP::SystematicSet& sys) {
+
+    std::vector<std::string> di_ele_paths;
+
+    int year = m_year.get(*event, sys);
+    if(year==2015){
+      di_ele_paths = {"HLT_2e12_lhloose_L12EM10VH"};
+    }
+    else if(year==2016){
+      di_ele_paths = {"HLT_2e17_lhvloose_nod0"};
+    }
+    else if(2017<=year && year<=2018){
+      di_ele_paths = {
+        "HLT_2e24_lhvloose_nod0"
+      };
+    }
+    // TODO: Add 2022 and 2023 triggers
+    // else if(year==2022){
+    //   di_ele_paths = {
+    //     "HLT_2e17_lhvloose_L12EM15VHI", "HLT_2e24_lhvloose_L12EM20VH"
+    //   };
+    // }
+    // else if(year==2023){
+    //   di_ele_paths = {
+    //     "HLT_2e17_lhvloose_L12eEM18M", "HLT_2e24_lhvloose_L12eEM24L"
+    //   };
+    // }
+
+    bool trigPassed_DET = false;
+    if (ele0 && ele1) {
+      for (const auto &trig : di_ele_paths){
+        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        if (pass) {
+          bool match = m_matchingTool->match({ele0, ele1}, trig);
+          trigPassed_DET |= match;
+        }
+      }
+      trigPassed_DET &= ele0->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele];
+      trigPassed_DET &= ele1->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele];
+    }
+
+    // Check di-muon triggers
+    std::vector<std::string> di_mu_paths;
+
+    if(year==2015){
+      di_mu_paths = {"HLT_mu18_mu8noL1"};
+    }
+    else if(2016<=year && year<=2018){
+      di_mu_paths = {"HLT_mu22_mu8noL1"};
+    }
+    // TODO: Add 2022 and 2023 triggers
+    // else if(2022<=year && year<=2023){
+    //   di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
+    // }
+
+    bool trigPassed_DMT = false;
+    if (mu0 && mu1) {
+      for (const auto &trig : di_mu_paths){
+        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        if (pass) {
+          bool match = m_matchingTool->match({mu0, mu1}, trig);
+          trigPassed_DMT |= match;
+        }
+      }
+      trigPassed_DMT &= mu0->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu];
+      trigPassed_DMT &= mu1->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu];
+    }
+
+    // Check electron-muon triggers
+    std::vector<std::string> emu_paths;
+    if(year==2015){
+      emu_paths = {"HLT_e17_lhloose_mu14"};
+    }
+    else if(2016<=year && year<=2018){
+      emu_paths = {"HLT_e17_lhloose_nod0_mu14"};
+    }
+    // TODO: Add 2022 and 2023 triggers
+    // else if(2022<=year && year<=2023){
+    //   emu_paths = {"HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
+    // }
+
+    auto ele = ele0;
+    auto mu = mu0;
+    bool trigPassed_EMT = false;
+    if (ele && mu) {
+      for(const auto& trig : emu_paths){
+        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        if (pass){
+          bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
+          trigPassed_EMT |= match;
+        }
+      }
+      trigPassed_EMT &= ele->pt() > m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingele];
+      trigPassed_EMT &= mu->pt() > m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingmu];
+    }
+
+    m_bools.at(MULTILEPTON::pass_trigger_DLT) = (trigPassed_DET || trigPassed_DMT || trigPassed_EMT);
+  }
+
+  bool MultileptonSelectorAlg::evaluate2lssSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        CutManager& hhmlCuts){
+    if (!hhmlCuts.exists("pass_2lss") || leptons.size()!=2 ) return false;
+    bool pass_selection = true;
+
+    // SS cut
+    pass_selection &= (leptons.at(0).second * leptons.at(1).second > 0);
+    // Pt cuts
+    pass_selection &= (leptons.at(0).first->pt() > 10 * Athena::Units::GeV && leptons.at(1).first->pt() > 10 * Athena::Units::GeV);
+    // TODO: ID & prompt lepton isolation WP cut
+    //
+    // Low mass veto
+    pass_selection &= ( (leptons.at(0).first->p4() + leptons.at(1).first->p4()).M() > 12. * Athena::Units::GeV);
+
+    pass_selection &= (taus.size() == 0);
+
+    return pass_selection;
+  }
+
+  bool MultileptonSelectorAlg::evaluate3lSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        CutManager& hhmlCuts){
+    if (!hhmlCuts.exists("pass_3l") || leptons.size()!=3) return false;
+    bool pass_selection = true;
+
+    std::vector<int> charges;
+    for (const auto& lep : leptons){
+      charges.push_back(lep.second > 0 ? -1 : 1);
+    }
+    pass_selection &= ((charges.at(0) + charges.at(1) + charges.at(2)) == 1);
+
+    std::pair<const xAOD::IParticle*, int> lepton0 = leptons.at(0);
+    std::pair<const xAOD::IParticle*, int> lepton1 = leptons.at(1);
+    std::pair<const xAOD::IParticle*, int> lepton2 = leptons.at(2);
+
+    if ( pass_selection ){
+      if (charges.at(0)*charges.at(1)<0 && charges.at(0)*charges.at(2)<0){
+
+      } else if (charges.at(0)*charges.at(1)<0 && charges.at(1)*charges.at(2)<0){
+        std::swap(lepton0, lepton1);
+      } else if (charges.at(0)*charges.at(2)<0 && charges.at(1)*charges.at(2)<0){
+        lepton0 = leptons.at(1);
+        lepton1 = leptons.at(2);
+        lepton2 = leptons.at(0);
+      } else {
+        ATH_MSG_ERROR("Unknown 3l charge combination");
+      }
+    }
+
+    if (lepton0.first->p4().DeltaR(lepton2.first->p4()) < lepton0.first->p4().DeltaR(lepton1.first->p4())){
+      std::swap(lepton1, lepton2);
+    }
+    pass_selection &= (lepton0.first->pt() > 10 * Athena::Units::GeV && lepton1.first->pt() > 10 * Athena::Units::GeV && lepton2.first->pt() > 10 * Athena::Units::GeV);
+
+    // Low mass veto and Z mass for SFOS pairs
+    if (lepton0.second == -lepton1.second){
+      pass_selection &= ( (lepton0.first->p4() + lepton1.first->p4()).M() > 12. * Athena::Units::GeV);
+    }
+    if (lepton0.second == -lepton2.second){
+      pass_selection &= ( (lepton0.first->p4() + lepton2.first->p4()).M() > 12. * Athena::Units::GeV);
+    }
+
+
+    pass_selection &= (taus.size() == 0);
+
+    return pass_selection;
+  }
+        
+
+  bool MultileptonSelectorAlg::evaluatebb4lSelection(
+      const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+      [[maybe_unused]] const xAOD::TauJetContainer& taus,
+      const ConstDataVector<xAOD::JetContainer>& bjets,
+      CutManager& hhmlCuts){
+    if (!hhmlCuts.exists("pass_bb4l") || leptons.size()!=4 || !(bjets.size() >= 1 && bjets.size() <= 3) ) return false;
+
+    bool pass_selection = true;
+
+    // // TODO: PLV cut
+    // //
+    // // pt cuts
+    // pass_selection &= (leptons.at(0).first->pt() > 20 * Athena::Units::GeV && leptons.at(1).first->pt() > 15 * Athena::Units::GeV && leptons.at(2).first->pt() > 10 * Athena::Units::GeV);
+    // // DeltaR cuts
+    // for(int i=0; i<4; i++){
+    //   for(int j=i+1; j<4; j++){
+    //     pass_selection &= (leptons.at(i).first->p4().DeltaR(leptons.at(j).first->p4()) > 0.02);
+    //   }
+    // }
+    // // Find 2 Opposite Sign Same Flavor pairs
+    // // TODO: If there are multiple combinations of OSSF pairs, choose the one with the mass closest to Z mass
+    // std::vector<int> not_pair_with_0th_lepton;
+    // int pair_with_0th_lepton = -1;
+    // for (int i=1; i<4; i++){
+    //   if (leptons.at(0).second == leptons.at(i).second*-1 && pair_with_0th_lepton == -1){
+    //     pair_with_0th_lepton = i;
+    //   } else {
+    //     not_pair_with_0th_lepton.push_back(i);
+    //   }
+    // }
+    // std::vector<std::pair<int, int>> OSSF_pairs;
+    // std::vector<float> mass_OSSF_pairs;
+    // if (not_pair_with_0th_lepton.size() == 2 && leptons.at(not_pair_with_0th_lepton.at(0)).second == leptons.at(not_pair_with_0th_lepton.at(1)).second*-1){
+    //   float mass_pair_a = (leptons.at(0).first->p4() + leptons.at(pair_with_0th_lepton).first->p4()).M();
+    //   float mass_pair_b = (leptons.at(not_pair_with_0th_lepton.at(0)).first->p4() + leptons.at(not_pair_with_0th_lepton.at(1)).first->p4()).M();
+    //   if (abs(mass_pair_a - 91.2 * Athena::Units::GeV) < abs(mass_pair_b - 91.2 * Athena::Units::GeV)){
+    //     OSSF_pairs.push_back({0, pair_with_0th_lepton});
+    //     OSSF_pairs.push_back({not_pair_with_0th_lepton.at(0), not_pair_with_0th_lepton.at(1)});
+    //     mass_OSSF_pairs.push_back(mass_pair_a);
+    //     mass_OSSF_pairs.push_back(mass_pair_b);
+    //   } else {
+    //     OSSF_pairs.push_back({0, pair_with_0th_lepton});
+    //     OSSF_pairs.push_back({not_pair_with_0th_lepton.at(1), not_pair_with_0th_lepton.at(0)});
+    //     mass_OSSF_pairs.push_back(mass_pair_b);
+    //     mass_OSSF_pairs.push_back(mass_pair_a);
+    //   }
+    // } else {
+    //   pass_selection = false;
+    // }
+
+    // // low mass veto
+    // pass_selection = pass_selection && (mass_OSSF_pairs.at(0) > 5. * Athena::Units::GeV && mass_OSSF_pairs.at(1) > 5. * Athena::Units::GeV);
+    // // Di-lepton mass
+    // pass_selection = pass_selection && (mass_OSSF_pairs.at(0) > 50. * Athena::Units::GeV && mass_OSSF_pairs.at(0) < 106. * Athena::Units::GeV && mass_OSSF_pairs.at(1) < 115. * Athena::Units::GeV);
+    // // Higgs mass window
+    // auto mass_4l = (leptons.at(0).first->p4() + leptons.at(1).first->p4() + leptons.at(2).first->p4() + leptons.at(3).first->p4()).M();
+    // pass_selection &= (mass_4l > 115. * Athena::Units::GeV && mass_4l < 135. * Athena::Units::GeV);
+
+    // pass_selection &= (jets->size() >= 2);
+    return pass_selection;
+  }
+
+  bool MultileptonSelectorAlg::evaluate1l2tauhadSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        CutManager& hhmlCuts){
+    if (!hhmlCuts.exists("pass_1l2tauhad") || leptons.size()!=1 || taus.size()!=2) return false;
+    bool pass_selection = true;
+
+    // TODO: ID and PLV cut
+    //
+    // Pt cut
+    pass_selection &= leptons.at(0).first->pt() > 10 * Athena::Units::GeV;
+    // OS tau cut
+    pass_selection &= (taus.at(0)->charge() * taus.at(1)->charge() == -1);
+    // DeltaR cut
+    pass_selection &= (taus.at(0)->p4().DeltaR(taus.at(1)->p4()) < 2);
+    // TODO: tau object selection
+
+    return pass_selection;
+  }
+
+    
+  bool MultileptonSelectorAlg::evaluate2l2tauhadSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        CutManager& hhmlCuts){
+    if (!hhmlCuts.exists("pass_2l2tauhad") || leptons.size()!=2 || taus.size()!=2 ) return false;
+    bool pass_selection = true;
+    // TODO: ID and PLV cut
+
+    // Pt cut
+    pass_selection &= (leptons.at(0).first->pt() > 10 * Athena::Units::GeV && leptons.at(1).first->pt() > 10 * Athena::Units::GeV);
+    // Low mass veto
+    pass_selection &= ( (leptons.at(0).first->p4() + leptons.at(1).first->p4()).M() > 12. * Athena::Units::GeV);
+
+    // OS tau selection
+    pass_selection &= (taus.at(0)->charge() * taus.at(1)->charge() == -1);
+    // DeltaR cut
+    pass_selection &= (taus.at(0)->p4().DeltaR(taus.at(1)->p4()) < 2);
+    // TODO: tau object selection
+
+    return pass_selection;
+  }
+
+  // NOTE: Ignore 2LSC for the moment
+  // bool MultileptonSelectorAlg::evaluate2lss1tauhadSelection(
+  //       std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+  //       const xAOD::TauJetContainer *taus,
+  //       const xAOD::JetContainer *jets,
+  //       const ConstDataVector<xAOD::JetContainer>& bjets,
+  //       CutManager& hhmlCuts){
+  //   if (!hhmlCuts.exists("pass_2lss1tauhad") || leptons.size()!=2 || taus->size()!=1) return false;
+  //   bool pass_selection = true;
+  //   // SS
+  //   pass_selection &= (leptons.at(0).second * leptons.at(1).second > 0);
+  //   int lepton_charge = leptons.at(0).second > 0 ? -1 : 1;
+  //   // low mass veto
+    // pass_selection &= ( (leptons.at(0).first->p4() + leptons.at(1).first->p4()).M() > 12. * Athena::Units::GeV);
+  //   // pT cuts
+  //   pass_selection &= (leptons.at(0).first->pt() > 10 * Athena::Units::GeV && leptons.at(1).first->pt() > 10 * Athena::Units::GeV);
+  //   // TODO: ID and PLV cut
+
+  //   // tau selection
+  //   // OS with lepton
+  //   pass_selection &= (taus->at(0)->charge() * lepton_charge == -1);
+  //   // pT cut
+  //   pass_selection &= (taus->at(0)->pt() > 25 * Athena::Units::GeV);
+  //   // TODO: tau object selection
+
+  //   // pass_selection &= (bjets.size() == 0);
+  //   // pass_selection &= (jets->size() >= 2);
+
+  //   return pass_selection;
+  // }
+
+  void MultileptonSelectorAlg::applyChannelSelection(
+        const xAOD::ElectronContainer& electrons,
+        const xAOD::MuonContainer& muons,
+        const xAOD::TauJetContainer& taus,
+        const ConstDataVector<xAOD::JetContainer>& bjets,
+        CutManager& hhmlCuts){
+    
+    // collect all leptons and sort by pt
+    std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
+    for (const auto& ele : electrons) {
+      leptons.push_back({ele, -11*ele->charge()});
+    }
+    for (const auto& mu : muons) {
+      leptons.push_back({mu, -13*mu->charge()});
+    }
+    std::sort(leptons.begin(), leptons.end(),
+      [](const std::pair<const xAOD::IParticle*, int>& a,
+      const std::pair<const xAOD::IParticle*, int>& b) {
+      return a.first->pt() > b.first->pt(); });
+
+    if (hhmlCuts.exists("pass_2lss")){
+      m_bools.at(MULTILEPTON::pass_2lss) = evaluate2lssSelection(leptons, taus, hhmlCuts);
+    }
+    if (hhmlCuts.exists("pass_3l")){
+      m_bools.at(MULTILEPTON::pass_3l) = evaluate3lSelection(leptons, taus, hhmlCuts);
+    }
+    if (hhmlCuts.exists("pass_bb4l")){
+      m_bools.at(MULTILEPTON::pass_bb4l) = evaluatebb4lSelection(leptons, taus, bjets, hhmlCuts);
+    }
+    if (hhmlCuts.exists("pass_1l2tauhad")){
+      m_bools.at(MULTILEPTON::pass_1l2tauhad) = evaluate1l2tauhadSelection(leptons, taus, hhmlCuts);
+    }
+    if (hhmlCuts.exists("pass_2l2tauhad")){
+      m_bools.at(MULTILEPTON::pass_2l2tauhad) = evaluate2l2tauhadSelection(leptons, taus, hhmlCuts);
+    }
+    // NOTE: Ignore 2LSC for the moment
+    // if (hhmlCuts.exists("pass_2lss1tauhad")){
+    //   m_bools.at(MULTILEPTON::pass_2lss1tauhad) = evaluate2lss1tauhadSelection(leptons, taus, jets, bjets, hhmlCuts);
+    // }
+  }
+
+
+  void MultileptonSelectorAlg::setThresholds(const xAOD::EventInfo* event,
+					const CP::SystematicSet& sys) {
+    
+    int year = m_year.get(*event, sys);
+
+    // Single-lepton triggers
+    // electron
+    if(year==2015)
+      m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele] = 25. * Athena::Units::GeV;
+    // TODO: Add 2022 and 2023 triggers
+    // 2022 75 bunches
+    // else if(m_is22_75bunches.get(*event, sys))
+    //   m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele] = 18. * Athena::Units::GeV;
+    else
+      m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele] = 27. * Athena::Units::GeV;
+
+    // muon
+    if(year==2015)
+      m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 21. * Athena::Units::GeV;
+    else if(year<=2016 && year<=2018)
+      m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 27. * Athena::Units::GeV;
+    // TODO: Add 2022 and 2023 triggers
+    // else
+    //   m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 25. * Athena::Units::GeV;
+
+
+    //Di-lepton triggers
+    //ee
+    if(year==2015) {
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] = 13. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele] = 13. * Athena::Units::GeV;
+    }
+    else if(year==2016) {
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] = 18. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele] = 18. * Athena::Units::GeV;
+    } else {
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] = 25. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele] = 25. * Athena::Units::GeV;
+    }
+
+    //mm
+    if(year==2015) {
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 19. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 10. * Athena::Units::GeV;
+    }
+    else if(year<=2016 && year<=2018) {
+      // TODO: why bbll set cut on 24 & 10 GeV?
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 23. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 9. * Athena::Units::GeV;
+    } 
+    // TODO: Add 2022 and 2023 triggers
+    // else {
+    //   m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 15. * Athena::Units::GeV;
+    //   m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 15. * Athena::Units::GeV;
+    // }
+
+    //Asymmetric Lepton triggers
+    m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingele] = 18. * Athena::Units::GeV;
+    m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingmu] = 15. * Athena::Units::GeV;
+
+  }
+
 }
 

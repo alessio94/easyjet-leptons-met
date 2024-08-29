@@ -29,7 +29,8 @@ def hhml_cfg(
         containerOutKey="hhmlAnalysisMuons_%SYS%",
         looseMuonWP=MuonWPLabel,
         tightMuonWPs=tightMuonWPs,
-        minPt=9 * Units.GeV
+        minPt=9 * Units.GeV,
+        maxEta=flags.Analysis.Muon.max_eta
     ))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
@@ -66,12 +67,22 @@ def hhml_cfg(
     ))
 
     # Selection
+    from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
+    trigger_branches = [
+        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
+        for c in flags.Analysis.TriggerChains
+    ]
+
     cfg.addEventAlgo(
         CompFactory.MULTILEPTON.MultileptonSelectorAlg(
             "HHMLSelectorAlg",
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="hhml_pass_sr_%SYS%",
+            cutList=flags.Analysis.CutList,
+            saveCutFlow=flags.Analysis.save_hhml_cutflow,
             isMC=flags.Input.isMC,
+            triggerLists=trigger_branches,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
         )
@@ -84,6 +95,7 @@ def hhml_cfg(
             isMC=flags.Input.isMC,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
+            leptonAmount=flags.Analysis.Lepton.amount,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             floatVariableList=float_variables,
             floatVectorVariableList=float_vector_variables,
@@ -99,7 +111,9 @@ def get_BaselineVarshhmlAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets"]
+    int_variable_names += [
+        "nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets", "nLeptons"
+    ]
 
     return float_variable_names, int_variable_names
 

@@ -19,6 +19,9 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+#include <MCTruthClassifier/MCTruthClassifier.h>
+#include <MCTruthClassifier/MCTruthClassifierDefs.h>
+
 namespace MULTILEPTON
 {
 
@@ -39,6 +42,8 @@ public:
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
+    template<typename ParticleType>
+    std::pair<int, int> truthOrigin(const ParticleType* particle);
     
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
@@ -70,8 +75,13 @@ private:
 
     CP::SysReadDecorHandle<float> m_mu_SF{"", this};
 
+    Gaudi::Property<unsigned int> m_leptonAmount
+        { this, "leptonAmount", 4,"Number of leptons required" };
+
     CP::SysReadDecorHandle<char> m_isBtag
           {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+
+    ToolHandle<IMCTruthClassifier> m_truthClassifier{this, "MCTruthClassifier", "MCTruthClassifier/MCTruthClassifier"}; 
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};
@@ -96,6 +106,8 @@ private:
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<std::vector<char>>> m_CVbranches;
+
+    int getTruthQMisID(const xAOD::IParticle* lep, const xAOD::TruthParticle* truthMatch);
     
  };
 }

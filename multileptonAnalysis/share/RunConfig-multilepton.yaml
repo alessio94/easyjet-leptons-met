@@ -5,6 +5,9 @@ include: EasyjetHub/base-config.yaml
 # Which analysis to consider
 do_hhml_analysis: true
 
+# CutBookKeeper histPattern
+cbkHistPattern: "CutBookkeeper_%RUN%_%SYS%"
+
 bypass: false
 
 # Decay mode considered for truth decoration
@@ -57,6 +60,7 @@ Electron:
     - ["LooseBLayer", "TightTrackOnly_FixedRad"]
     - ["LooseBLayer", "HighPtCaloOnly"]
   do_parent_decoration: true
+  # chargeIDSelectionRun2: true
 
 Muon:
   ID: "Loose"
@@ -82,9 +86,12 @@ Muon:
     # - ["LowPt", "Loose_VarRad"]
     # - ["LowPt", "Tight_VarRad"]
   do_parent_decoration: true
+  max_eta: 2.5
 
 Lepton:
   amount: 4
+  variables: ["EtaBE2", "Z0SinTheta", "sigd0PV"]
+  variables_int: ["isPrompt","truthOrigin", "truthType", "isQMisID"]
 
 # orthogonality studies  
 orthogonality:
@@ -104,6 +111,16 @@ do_overlap_removal: true
 
 #Enable cutflow 
 save_hhml_cutflow: true
+
+CutList :
+  - PASS_TRIGGER
+  - pass_2lss
+  - pass_3l
+  - pass_bb4l
+  - pass_1l2tauhad
+  - pass_2l2tauhad
+  # - pass_2lss1tauhad
+  # - pass_1l3tauhad
 
 # Include the TTree configuration and update details
 ttree_output:

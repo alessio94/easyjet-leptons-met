@@ -18,32 +18,50 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
-#include <xAODMissingET/MissingETContainer.h>
 #include <xAODMuon/MuonContainer.h>
+#include <xAODTau/TauJetContainer.h>
 
 #include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
 
 namespace MULTILEPTON
 {
-  enum TriggerChannel
-  {
+    enum TriggerChannel
+    {
+        SLT,
+        DLT,
+        ASLT,
+    };
 
-  };
+    enum Var
+    {
+        ele = 0,
+        mu = 1,
+        leadingele = 2,
+        leadingmu = 3,
+        subleadingele = 4,
+        subleadingmu = 5,
+    };
 
-  enum Var
-  {
+    enum Booleans
+    {
+        pass_trigger_SLT,
+        pass_trigger_DLT,
+        pass_trigger_ASLT,
+        PASS_TRIGGER,
 
-  };
+        pass_2lss,
+        pass_3l,
+        pass_bb4l,
+        pass_1l2tauhad,
+        pass_2l2tauhad,
+        pass_2lss1tauhad,
+        pass_1l3tauhad,
+    };
 
-  enum Booleans
-  {
-
-  };
-
-  /// \brief An algorithm for counting containers
-  class MultileptonSelectorAlg final : public EL::AnaAlgorithm
-  {
+    /// \brief An algorithm for counting containers
+    class MultileptonSelectorAlg final : public EL::AnaAlgorithm
+    {
 
 public:
     MultileptonSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
@@ -86,8 +104,9 @@ private:
     CP::SysReadHandle<xAOD::MuonContainer> m_muonHandle{
         this, "muons", "hhmlAnalysisMuons_%SYS%", "Muon container to read"};
 
-    CP::SysReadHandle<xAOD::MissingETContainer> m_metHandle{
-        this, "met", "AnalysisMET_%SYS%", "MET container to read"};
+    CP::SysReadHandle<xAOD::TauJetContainer> m_tauHandle{ 
+        this, "taus", "hhmlAnalysisTaus_%SYS%", "Tau container to read" };
+
 
     CP::SysReadDecorHandle<unsigned int> m_year{
         this, "year", "dataTakingYear",""};
@@ -95,8 +114,114 @@ private:
     CP::SysFilterReporterParams m_filterParams{
         this, "Multilepton selection"};
 
+
+    Gaudi::Property<std::vector<std::string>> m_triggers 
+		{ this, "triggerLists", {}, "Name list of trigger" };
+		
+    ToolHandle<Trig::IMatchingTool> m_matchingTool
+		{ this, "trigMatchingTool", "", "Trigger matching tool"};
+
+    std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
+
     long long int m_total_events{0};
-  };
+    
+    std::unordered_map<MULTILEPTON::Booleans, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+    std::unordered_map<MULTILEPTON::Booleans, bool> m_bools;
+    std::unordered_map<MULTILEPTON::Booleans, std::string> m_boolnames{
+        {MULTILEPTON::pass_trigger_SLT, "pass_trigger_SLT"},
+        {MULTILEPTON::pass_trigger_DLT, "pass_trigger_DLT"},
+        {MULTILEPTON::pass_trigger_ASLT, "pass_trigger_ASLT"},
+        {MULTILEPTON::PASS_TRIGGER, "PASS_TRIGGER"},
+
+        {MULTILEPTON::pass_2lss, "pass_2lss"},
+        {MULTILEPTON::pass_3l, "pass_3l"},
+        {MULTILEPTON::pass_bb4l, "pass_bb4l"},
+        {MULTILEPTON::pass_1l2tauhad, "pass_1l2tauhad"},
+        {MULTILEPTON::pass_2l2tauhad, "pass_2l2tauhad"},
+        {MULTILEPTON::pass_2lss1tauhad, "pass_2lss1tauhad"},
+        {MULTILEPTON::pass_1l3tauhad, "pass_1l3tauhad"},
+    };
+
+    /// \brief Cutflow Variables
+    CutManager m_hhmlCuts;
+    Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
+    std::vector<MULTILEPTON::Booleans> m_inputCutKeys;
+    Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
+    double m_total_mcEventWeight{0.0};
+    CP::SysReadDecorHandle<float>
+		m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
+
+    std::unordered_map<MULTILEPTON::TriggerChannel, std::unordered_map<MULTILEPTON::Var, float>> m_pt_threshold;
+
+    StatusCode initialiseCutflow();
+
+    void evaluateTriggerCuts(
+        const xAOD::EventInfo* event,
+        const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+        const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+        CutManager& hhmlCuts, const CP::SystematicSet& sys);
+    
+    void evaluateSingleLeptonTrigger(
+        const xAOD::EventInfo* event, 
+        const xAOD::Electron* ele, const xAOD::Muon* mu,
+        const CP::SystematicSet& sys);
+    void evaluateDiLeptonTrigger(
+        const xAOD::EventInfo* event,
+        const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+        const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+        const CP::SystematicSet& sys);
+    void evaluateAsymmetricLeptonTrigger(
+        const xAOD::EventInfo* event,
+        const xAOD::Electron* ele, const xAOD::Muon* mu,
+        const CP::SystematicSet& sys);
+
+    bool evaluate2lssSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        CutManager& hhmlCuts);
+
+    bool evaluate3lSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        CutManager& hhmlCuts);
+
+    bool evaluatebb4lSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        const ConstDataVector<xAOD::JetContainer>& bjets,
+        CutManager& hhmlCuts);
+    
+    bool evaluate1l2tauhadSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        CutManager& hhmlCuts);
+    
+    bool evaluate2l2tauhadSelection(
+        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+        const xAOD::TauJetContainer& taus,
+        CutManager& hhmlCuts);
+    
+    // NOTE: Ignore 2LSC for the moment
+    // bool evaluate2lss1tauhadSelection(
+    //     std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
+    //     const xAOD::TauJetContainer *taus,
+    //     const xAOD::JetContainer *jets,
+    //     const ConstDataVector<xAOD::JetContainer>& bjets,
+    //     CutManager& hhmlCuts);
+
+    // TODO: Add 1l3tauhad selection
+
+    void applyChannelSelection(
+        const xAOD::ElectronContainer& electrons,
+        const xAOD::MuonContainer& muons,
+        const xAOD::TauJetContainer& taus,
+        const ConstDataVector<xAOD::JetContainer>& bjets,
+        CutManager& hhmlCuts);
+
+    void setThresholds(
+        const xAOD::EventInfo* event,
+        const CP::SystematicSet& sys);
+};
 
 } // namespace MULTILEPTON
 
