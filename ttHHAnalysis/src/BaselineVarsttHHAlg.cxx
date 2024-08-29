@@ -9,6 +9,10 @@
 #include "AthContainers/AuxElement.h"
 #include <FourMomUtils/xAODP4Helpers.h>
 #include <AthContainers/ConstDataVector.h>
+#include <xAODJet/JetContainer.h>
+#include <vector>
+#include <tuple>
+#include <AthenaKernel/Units.h>
 
 namespace ttHH
 {
@@ -16,7 +20,6 @@ namespace ttHH
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   { }
-
 
   template<typename ParticleType>
   std::pair<int, int> BaselineVarsttHHAlg::truthOrigin(const ParticleType* particle) {
@@ -46,6 +49,7 @@ namespace ttHH
 
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
@@ -93,11 +97,25 @@ namespace ttHH
       const xAOD::JetContainer *bjets = nullptr;
       ANA_CHECK (m_bjetHandle.retrieve (bjets, sys));
 
+      auto top1_jet_candidates = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
+      auto top2_jet_candidates = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
+
       const xAOD::JetContainer *pairedJets = nullptr;
       ANA_CHECK (m_pairedJetHandle.retrieve (pairedJets, sys));
 
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+
+      const xAOD::MissingETContainer *metCont = nullptr;
+      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
+      const xAOD::MissingET* met = (*metCont)["Final"];
+      if (!met){
+        ATH_MSG_ERROR("Count not retrieve MET");
+	return StatusCode::FAILURE;
+      }
+
+      TLorentzVector met_vector;
+      met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
 
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
@@ -184,9 +202,9 @@ namespace ttHH
         }
       
         for (std::size_t i=0; i<JetsCandidate.size(); i++){
-	  if (m_PCBT.get(*JetsCandidate[i], sys) >= 3) {
-	    nBJets77++;
-	  }
+          if (m_PCBT.get(*JetsCandidate[i], sys) >= 3) {
+            nBJets77++;
+          }
         }
       }
 
@@ -196,6 +214,23 @@ namespace ttHH
         H1 = pairedJets->at(0)->p4() + pairedJets->at(1)->p4();
         H2 = pairedJets->at(2)->p4() + pairedJets->at(3)->p4();
 
+        // Build top1 jet candidates
+        for (size_t i = 4; i<pairedJets->size(); i++){
+          const xAOD::Jet* paired_jet = pairedJets->at(i);
+          top1_jet_candidates->push_back(paired_jet);
+        }
+        for (const auto& jet : *jets) {
+          bool isJetInVec = false;
+          for (size_t i = 4; i<pairedJets->size(); i++){
+            const xAOD::Jet* paired_jet = pairedJets->at(i);
+            if (jet == paired_jet){
+              isJetInVec = true;
+            }
+          }
+          if (!isJetInVec){
+            top1_jet_candidates->push_back(jet);
+          }
+        }
         auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(paired_jets);
 
         // Jet pairing variables
@@ -220,6 +255,7 @@ namespace ttHH
 
         if (paired_jets.size() > 5)
         {
+
           // construct 56 jet combination
           xAOD::JetFourMom_t jj56_p4 = paired_jets[4]->jetP4() + paired_jets[5]->jetP4();
           xAOD::Jet jj56 = xAOD::Jet();
@@ -247,6 +283,14 @@ namespace ttHH
         m_Fbranches.at("Jets_DeltaRMean").set(*event, DeltaRMean, sys);
       }
 
+      std::vector<std::tuple<int, double>> leptonmasses;
+
+      for (unsigned int i = 0; i<muons->size(); i++){
+        leptonmasses.push_back(std::make_tuple(i, mu_mass));
+      }
+      for (unsigned int j = 0; j<electrons->size(); j++){
+        leptonmasses.push_back(std::make_tuple(j, e_mass));
+      }
       if (electrons->size() >= 2) {
         // ee
         e1 = electrons->at(0)->p4();
@@ -270,18 +314,85 @@ namespace ttHH
         m_Fbranches.at("ll_m").set(*event, emu.M(), sys);
       }
 
-      m_Ibranches.at("nJets").set(*event, jets->size(), sys);
+      int nJets = jets->size();
+      int nLeptons = muons->size() + electrons->size();
+      int nJets_ttbar = top1_jet_candidates->size();
+      m_Ibranches.at("nJets").set(*event, nJets, sys);
+      m_Ibranches.at("nLeptons").set(*event, nLeptons, sys);
       m_Ibranches.at("nBJets85").set(*event, bjets->size(), sys);
       m_Ibranches.at("nBJets77").set(*event, nBJets77, sys);
+
+      bool top1_had = false;
+      bool top2_had = false;
+      bool all_had = false;
+      bool semi_lep = false;
+      bool di_lep = false;
+      if (nLeptons == 0 and nJets_ttbar >= 6){ // all hadronic
+        top1_had = true;
+        top2_had = true;
+        all_had = true;
+      }
+      if (nLeptons == 1 and nJets_ttbar >= 4){ // semi-leptonic
+        top2_had = true;
+        semi_lep = true;
+      }
+      if (nLeptons == 2 and nJets_ttbar >= 2){ // di-lepton
+        di_lep = true;
+      }
+
+      std::vector<unsigned int> top1_jet_locations;
+      std::vector<unsigned int> top2_jet_locations;
+      std::vector<std::tuple<unsigned int, double>> top1_lepton_locations;
+      std::vector<std::tuple<unsigned int, double>> top2_lepton_locations;
+
+      // Build top1 lepton candidates
+      std::vector<std::tuple<int, double>> top1_lepton_candidates = leptonmasses;
+      double topness1 = -99.;
+      if (all_had or semi_lep or di_lep){
+        topness1 = computeChiSquaretops(*top1_jet_candidates, top1_lepton_candidates, met_vector, top1_had, top1_jet_locations, top1_lepton_locations, electrons, muons);
+      }
+      m_Fbranches.at("topness1").set(*event, topness1, sys);
+
+      for (size_t i = 0; i<top1_jet_candidates->size(); i++) {
+        const xAOD::Jet* jet = top1_jet_candidates->at(i);
+        bool is_jet_from_top1 = false;
+        for (const unsigned int& id : top1_jet_locations) {
+          const xAOD::Jet* top1_jet = top1_jet_candidates->at(id);
+          if (top1_jet == jet) {
+            is_jet_from_top1 = true;
+            break;
+          } 
+        }
+        if (!is_jet_from_top1){
+          top2_jet_candidates->push_back(jet);
+        }
+      }
+
+      // Build top2 lepton candidates
+      std::vector<std::tuple<int, double>> top2_lepton_candidates;
+      if (semi_lep){
+        top2_lepton_candidates = top1_lepton_candidates;
+      }
+      if (di_lep){
+        for (const auto& leptonmass : leptonmasses){
+          if (leptonmass != top1_lepton_locations[0]){
+            top2_lepton_candidates.push_back(leptonmass);
+          }        
+        }
+      }
+
+      double topness2 = -99.;
+      if (all_had or semi_lep or di_lep){
+        topness2 = computeChiSquaretops(*top2_jet_candidates, top2_lepton_candidates, met_vector, top2_had, top2_jet_locations, top2_lepton_locations, electrons, muons);
+      }
+      m_Fbranches.at("topness2").set(*event, topness2, sys);
 
       //----------------------------------------------------------
       //-- Multileptons
 
       size_t muonSize = muons->size();
-      size_t electronSize = electrons->size();
-      int leptonCount = muonSize + electronSize;
 
-      if (leptonCount == 1){
+      if (nLeptons == 1){
         //-- Filling Lepton branches
         if (muonSize==1){ // mu
           const xAOD::Muon* muon0 = muons->at(0);
@@ -295,7 +406,8 @@ namespace ttHH
 	  HTall = electron0->pt();
         }
 
-      } else if (leptonCount == 2){
+      }
+      else if (nLeptons == 2){
         //-- total charge
         int totalCharge = 0;
         for (const auto& muon : *muons) {
@@ -317,7 +429,7 @@ namespace ttHH
           const xAOD::Muon* muon1 = muons->at(1);
           updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
           updateLeptonBranch(event, 2, muon1, 13, m_isMC ? m_mu_SF.get(*muon1, sys) : 1.0 , sys);
-          
+
         } else if (muonSize==1){ // emu
           
           const xAOD::Muon* muon0 = muons->at(0);
@@ -329,20 +441,19 @@ namespace ttHH
             updateLeptonBranch(event, 2, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
             updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
           }
-          
+
         } else { //ee
           
           const xAOD::Electron* electron0 = electrons->at(0);
           const xAOD::Electron* electron1 = electrons->at(1);          
           updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
           updateLeptonBranch(event, 2, electron1, 11, m_isMC ? m_ele_SF.get(*electron1, sys) : 1.0 , sys);
-          
         }
       } else { //not 2l
         m_Ibranches.at("dilept_type").set(*event, 0, sys);
       }
       //-- 3l
-      m_Ibranches.at("trilept_type").set(*event, (leptonCount == 3) ? 1 : 0, sys);
+      m_Ibranches.at("trilept_type").set(*event, (nLeptons == 3) ? 1 : 0, sys);
       //--
 
       int sumPCBT = 0; // sum of pcbt scores for one event
@@ -363,7 +474,6 @@ namespace ttHH
 
       m_Fbranches.at("HT").set(*event, HT, sys);
       m_Fbranches.at("HTall").set(*event, HTall, sys);
-      m_Ibranches.at("nLeptons").set(*event, leptonCount, sys);
       m_Ibranches.at("sumPCBT").set(*event, sumPCBT, sys);
     }
     return StatusCode::SUCCESS;
@@ -423,6 +533,72 @@ namespace ttHH
     float chi_squared = ( r_12 * r_12 + r_34 * r_34 ) / (massResolution * massResolution);
 
     return chi_squared;
+  }
+
+  double BaselineVarsttHHAlg::computeChiSquaretops
+  (const ConstDataVector<xAOD::JetContainer>& jets,
+   std::vector<std::tuple<int, double>> leptonmasses,
+   TLorentzVector met,
+   bool top_had,
+   std::vector<unsigned int> &jet_locations,
+   std::vector<std::tuple<unsigned int, double>> &lepton_locations,
+   const xAOD::ElectronContainer *electrons,
+   const xAOD::MuonContainer *muons){
+    float minTopness = std::numeric_limits<float>::max();
+
+    if (top_had){ //top decays hadronically
+      unsigned int jet1 = 0;
+      unsigned int jet2 = 0;
+      unsigned int jet3 = 0;
+      for (unsigned int j1 = 0; j1<jets.size()-2; j1++){
+        for (unsigned int j2 = j1+1; j2<jets.size()-1; j2++){
+          for (unsigned int j3 = j2+1; j3<jets.size(); j3++){
+            double m_j1j2 = (jets[j1]->p4() + jets[j2]->p4()).M();
+            double m_j1j2j3 = (jets[j1]->p4() + jets[j2]->p4() + jets[j3]->p4()).M();
+            double topness = std::hypot((m_j1j2-wmass)/wmass, (m_j1j2j3-topmass)/topmass);
+            if (topness<minTopness) {
+              minTopness = topness;
+              jet1 = j1;
+              jet2 = j2;
+              jet3 = j3;
+            }
+          }
+        }
+      }
+      jet_locations.push_back(jet1);
+      jet_locations.push_back(jet2);
+      jet_locations.push_back(jet3);
+    }
+    else { //top decays leptonically
+      unsigned int jet1 = 0;
+      unsigned int lep1_id = 0;
+      double lep1_mass = 0.;
+
+      for (unsigned int j = 0; j<jets.size(); j++){
+        for (const auto& leptonmass : leptonmasses){
+          double m_j_lep_met;
+          double m_lep_met;
+          if (get<1>(leptonmass) == e_mass) {
+            m_j_lep_met = ((jets)[j]->p4() + electrons->at(get<0>(leptonmass))->p4() + met).M();
+            m_lep_met = (electrons->at(get<0>(leptonmass))->p4() + met).M();
+          }
+          else {
+            m_j_lep_met = ((jets)[j]->p4() + muons->at(get<0>(leptonmass))->p4() + met).M();
+            m_lep_met = (muons->at(get<0>(leptonmass))->p4() + met).M();
+          }
+          double topness = std::hypot((m_lep_met-wmass)/wmass, (m_j_lep_met-topmass)/topmass);
+          if (topness<minTopness) {
+            minTopness = topness;
+            jet1 = j;
+            lep1_id = get<0>(leptonmass);
+            lep1_mass = get<1>(leptonmass);
+          }
+        }
+      }
+      jet_locations.push_back(jet1);
+      lepton_locations.push_back(std::make_tuple(lep1_id, lep1_mass));
+    }
+    return minTopness;
   }
 
   //-------------------------------------------------------------------------------------------

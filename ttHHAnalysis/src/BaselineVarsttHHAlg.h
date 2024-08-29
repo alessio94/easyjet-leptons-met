@@ -17,6 +17,8 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
+#include <xAODMissingET/MissingETContainer.h>
+#include <AthenaKernel/Units.h>
 
 namespace ttHH
 {
@@ -27,7 +29,6 @@ namespace ttHH
     /// \brief The standard constructor
 public:
     BaselineVarsttHHAlg(const std::string &name, ISvcLocator *pSvcLocator);
-
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
     StatusCode initialize() override;
@@ -35,11 +36,9 @@ public:
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
-    
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
-
     
     template<typename ParticleType>
       std::pair<int, int> truthOrigin(const ParticleType* particle);
@@ -71,6 +70,9 @@ private:
 
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "ttHHAnalysisElectrons_%SYS%", "Electron container to read" };
+
+    CP::SysReadHandle<xAOD::MissingETContainer>
+    m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read "};
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
@@ -105,9 +107,21 @@ private:
 
     const float m_targetMassH = 125e3; // Higgs target mass to be used in chi square calculation
     const float m_massResolution = 20.0e3; // Mass resolution used in chi square calculation
+    const double e_mass = .511 * Athena::Units::MeV;
+    const double mu_mass = 105.6 * Athena::Units::MeV;
+    const float topmass = 173 * Athena::Units::GeV;
+    const float wmass = 80 * Athena::Units::GeV;
 
     std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> getPairKinematics(const xAOD::JetContainer& jetPairs);
     std::tuple<double, double, double> calculateVectorStats(const std::vector<double>& inputVector);
+    double computeChiSquaretops(const ConstDataVector<xAOD::JetContainer>& jets,
+				std::vector<std::tuple<int, double>> leptonmasses,
+				TLorentzVector met,
+				bool top_had,
+				std::vector<unsigned int> &jet_locations,
+				std::vector<std::tuple<unsigned int, double>> &lepton_locations,
+				const xAOD::ElectronContainer *electrons,
+				const xAOD::MuonContainer *muons);
     float computeChiSquare(float observedMass1, float observedMass2, float targetMass1, float targetMass2, float massResolution);
   };
 }
