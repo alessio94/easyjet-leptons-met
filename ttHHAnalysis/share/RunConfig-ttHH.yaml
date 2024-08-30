@@ -21,6 +21,8 @@ small_R_jet:
   btag_wp: GN2v01_FixedCutBEff_85
   btag_extra_wps:
     - GN2v01_Continuous
+  #amount: 6
+  #variables_int_allJets: ["pcbt"]
 
 Electron:
   ID: "LooseBLayerLH"

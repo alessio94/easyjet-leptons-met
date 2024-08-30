@@ -202,6 +202,17 @@ namespace ttHH
         }
       
         for (std::size_t i=0; i<JetsCandidate.size(); i++){
+
+	  if (m_storeJetBranches) {
+	    m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, JetsCandidate[i]->p4().Pt(), sys);
+            m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, JetsCandidate[i]->p4().Eta(), sys);
+            m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, JetsCandidate[i]->p4().Phi(), sys);
+            m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, JetsCandidate[i]->p4().E(), sys);
+
+            if(!m_PCBT.empty())
+              m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,m_PCBT.get(*JetsCandidate[i], sys),sys);
+	  }
+
           if (m_PCBT.get(*JetsCandidate[i], sys) >= 3) {
             nBJets77++;
           }
@@ -214,23 +225,6 @@ namespace ttHH
         H1 = pairedJets->at(0)->p4() + pairedJets->at(1)->p4();
         H2 = pairedJets->at(2)->p4() + pairedJets->at(3)->p4();
 
-        // Build top1 jet candidates
-        for (size_t i = 4; i<pairedJets->size(); i++){
-          const xAOD::Jet* paired_jet = pairedJets->at(i);
-          top1_jet_candidates->push_back(paired_jet);
-        }
-        for (const auto& jet : *jets) {
-          bool isJetInVec = false;
-          for (size_t i = 4; i<pairedJets->size(); i++){
-            const xAOD::Jet* paired_jet = pairedJets->at(i);
-            if (jet == paired_jet){
-              isJetInVec = true;
-            }
-          }
-          if (!isJetInVec){
-            top1_jet_candidates->push_back(jet);
-          }
-        }
         auto [DeltaR, DeltaPhi, DeltaEta] = getPairKinematics(paired_jets);
 
         // Jet pairing variables
@@ -283,14 +277,6 @@ namespace ttHH
         m_Fbranches.at("Jets_DeltaRMean").set(*event, DeltaRMean, sys);
       }
 
-      std::vector<std::tuple<int, double>> leptonmasses;
-
-      for (unsigned int i = 0; i<muons->size(); i++){
-        leptonmasses.push_back(std::make_tuple(i, mu_mass));
-      }
-      for (unsigned int j = 0; j<electrons->size(); j++){
-        leptonmasses.push_back(std::make_tuple(j, e_mass));
-      }
       if (electrons->size() >= 2) {
         // ee
         e1 = electrons->at(0)->p4();
@@ -322,70 +308,102 @@ namespace ttHH
       m_Ibranches.at("nBJets85").set(*event, bjets->size(), sys);
       m_Ibranches.at("nBJets77").set(*event, nBJets77, sys);
 
-      bool top1_had = false;
-      bool top2_had = false;
-      bool all_had = false;
-      bool semi_lep = false;
-      bool di_lep = false;
-      if (nLeptons == 0 and nJets_ttbar >= 6){ // all hadronic
-        top1_had = true;
-        top2_had = true;
-        all_had = true;
-      }
-      if (nLeptons == 1 and nJets_ttbar >= 4){ // semi-leptonic
-        top2_had = true;
-        semi_lep = true;
-      }
-      if (nLeptons == 2 and nJets_ttbar >= 2){ // di-lepton
-        di_lep = true;
-      }
+      // Run top pairing based on chi2
+      if (m_runTopness) {
 
-      std::vector<unsigned int> top1_jet_locations;
-      std::vector<unsigned int> top2_jet_locations;
-      std::vector<std::tuple<unsigned int, double>> top1_lepton_locations;
-      std::vector<std::tuple<unsigned int, double>> top2_lepton_locations;
-
-      // Build top1 lepton candidates
-      std::vector<std::tuple<int, double>> top1_lepton_candidates = leptonmasses;
-      double topness1 = -99.;
-      if (all_had or semi_lep or di_lep){
-        topness1 = computeChiSquaretops(*top1_jet_candidates, top1_lepton_candidates, met_vector, top1_had, top1_jet_locations, top1_lepton_locations, electrons, muons);
-      }
-      m_Fbranches.at("topness1").set(*event, topness1, sys);
-
-      for (size_t i = 0; i<top1_jet_candidates->size(); i++) {
-        const xAOD::Jet* jet = top1_jet_candidates->at(i);
-        bool is_jet_from_top1 = false;
-        for (const unsigned int& id : top1_jet_locations) {
-          const xAOD::Jet* top1_jet = top1_jet_candidates->at(id);
-          if (top1_jet == jet) {
-            is_jet_from_top1 = true;
-            break;
-          } 
+	if (pairedJets->size()>=4) {
+          // Build top1 jet candidates
+          for (size_t i = 4; i<pairedJets->size(); i++){
+            const xAOD::Jet* paired_jet = pairedJets->at(i);
+            top1_jet_candidates->push_back(paired_jet);
+          }
+          for (const auto& jet : *jets) {
+            bool isJetInVec = false;
+            for (size_t i = 4; i<pairedJets->size(); i++){
+              const xAOD::Jet* paired_jet = pairedJets->at(i);
+              if (jet == paired_jet){
+                isJetInVec = true;
+              }
+            }
+            if (!isJetInVec){
+              top1_jet_candidates->push_back(jet);
+            }
+          }
         }
-        if (!is_jet_from_top1){
-          top2_jet_candidates->push_back(jet);
-        }
-      }
 
-      // Build top2 lepton candidates
-      std::vector<std::tuple<int, double>> top2_lepton_candidates;
-      if (semi_lep){
-        top2_lepton_candidates = top1_lepton_candidates;
-      }
-      if (di_lep){
-        for (const auto& leptonmass : leptonmasses){
-          if (leptonmass != top1_lepton_locations[0]){
-            top2_lepton_candidates.push_back(leptonmass);
-          }        
+	std::vector<std::tuple<int, double>> leptonmasses;
+        for (unsigned int i = 0; i<muons->size(); i++){
+          leptonmasses.push_back(std::make_tuple(i, mu_mass));
         }
-      }
+        for (unsigned int j = 0; j<electrons->size(); j++){
+          leptonmasses.push_back(std::make_tuple(j, e_mass));
+        }
 
-      double topness2 = -99.;
-      if (all_had or semi_lep or di_lep){
-        topness2 = computeChiSquaretops(*top2_jet_candidates, top2_lepton_candidates, met_vector, top2_had, top2_jet_locations, top2_lepton_locations, electrons, muons);
+	bool top1_had = false;
+	bool top2_had = false;
+	bool all_had = false;
+	bool semi_lep = false;
+	bool di_lep = false;
+	if (nLeptons == 0 and nJets_ttbar >= 6){ // all hadronic
+	  top1_had = true;
+	  top2_had = true;
+	  all_had = true;
+	}
+	if (nLeptons == 1 and nJets_ttbar >= 4){ // semi-leptonic
+	  top2_had = true;
+	  semi_lep = true;
+	}
+	if (nLeptons == 2 and nJets_ttbar >= 2){ // di-lepton
+	  di_lep = true;
+	}
+
+	std::vector<unsigned int> top1_jet_locations;
+	std::vector<unsigned int> top2_jet_locations;
+	std::vector<std::tuple<unsigned int, double>> top1_lepton_locations;
+	std::vector<std::tuple<unsigned int, double>> top2_lepton_locations;
+
+	// Build top1 lepton candidates
+	std::vector<std::tuple<int, double>> top1_lepton_candidates = leptonmasses;
+	double topness1 = -99.;
+	if (all_had or semi_lep or di_lep){
+	  topness1 = computeChiSquaretops(*top1_jet_candidates, top1_lepton_candidates, met_vector, top1_had, top1_jet_locations, top1_lepton_locations, electrons, muons);
+	}
+	m_Fbranches.at("topness1").set(*event, topness1, sys);
+
+	for (size_t i = 0; i<top1_jet_candidates->size(); i++) {
+	  const xAOD::Jet* jet = top1_jet_candidates->at(i);
+	  bool is_jet_from_top1 = false;
+	  for (const unsigned int& id : top1_jet_locations) {
+	    const xAOD::Jet* top1_jet = top1_jet_candidates->at(id);
+	    if (top1_jet == jet) {
+	      is_jet_from_top1 = true;
+	      break;
+	    } 
+	  }
+	  if (!is_jet_from_top1){
+	    top2_jet_candidates->push_back(jet);
+	  }
+	}
+
+	// Build top2 lepton candidates
+	std::vector<std::tuple<int, double>> top2_lepton_candidates;
+	if (semi_lep){
+	  top2_lepton_candidates = top1_lepton_candidates;
+	}
+	if (di_lep){
+	  for (const auto& leptonmass : leptonmasses){
+	    if (leptonmass != top1_lepton_locations[0]){
+	      top2_lepton_candidates.push_back(leptonmass);
+	    }        
+	  }
+	}
+
+	double topness2 = -99.;
+	if (all_had or semi_lep or di_lep){
+	  topness2 = computeChiSquaretops(*top2_jet_candidates, top2_lepton_candidates, met_vector, top2_had, top2_jet_locations, top2_lepton_locations, electrons, muons);
+	}
+	m_Fbranches.at("topness2").set(*event, topness2, sys);
       }
-      m_Fbranches.at("topness2").set(*event, topness2, sys);
 
       //----------------------------------------------------------
       //-- Multileptons

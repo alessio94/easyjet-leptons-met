@@ -93,6 +93,12 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
+    Gaudi::Property<bool> m_storeJetBranches
+      { this, "storeJetBranches", false, "Store flat jet branches" };
+
+    Gaudi::Property<bool> m_runTopness
+      { this, "runTopness", false, "Store topness variables" };
+
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};
 
