@@ -39,7 +39,6 @@ def electron_sequence(flags, configAcc):
                                 selectionName=id + '_' + iso)
         configSeq.setOptionValue('.identificationWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
-        configSeq.setOptionValue('.recomputeLikelihood', False)
         configSeq.setOptionValue('.forceFullSimConfig',
                                  flags.Analysis.Electron.forceFullSimConfig
                                  and flags.Analysis.DataType is DataType.FastSim)
