@@ -11,8 +11,7 @@ from EasyjetHub.output.ttree.photons import get_photon_branches
 from EasyjetHub.output.ttree.muons import get_muon_branches
 from EasyjetHub.output.ttree.taus import get_tau_branches
 from EasyjetHub.output.ttree.small_R_jets import (
-    get_small_R_jet_branches,
-    get_small_R_bjet_branches,
+    get_small_R_jet_branches
 )
 from EasyjetHub.output.ttree.large_R_jets import (
     get_large_R_jet_branches,
@@ -113,15 +112,6 @@ def minituple_cfg(
             + flags.Analysis.small_R_jet.jet_type.replace("reco4", "").replace("Jet", "")  # noqa: E501
         )
         tree_branches += get_small_R_jet_branches(
-            flags, tree_flags,
-            input_container=small_R_name,
-            output_prefix=small_R_prefix,
-        )
-
-        # Use this to directly read b-tagging information
-        # Needs to be decorated onto the jet container
-        # to handle jet selection (thinning)
-        tree_branches += get_small_R_bjet_branches(
             flags, tree_flags,
             input_container=small_R_name,
             output_prefix=small_R_prefix,

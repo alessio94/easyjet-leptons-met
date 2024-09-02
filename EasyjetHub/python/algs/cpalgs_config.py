@@ -9,7 +9,6 @@ from EasyjetHub.algs.calibration.jets import (
     lr_jet_sequence,
     lr_jet_ghost_vr_jet_association_cfg,
 )
-from EasyjetHub.output.ttree.btag_decor_config import btag_decor_cfg
 from EasyjetHub.output.ttree.tau_decor_config import tau_decor_cfg
 from EasyjetHub.output.ttree.jet_decor_config import jet_decor_cfg
 
@@ -87,17 +86,11 @@ def cpalgs_cfg(flags):
     cfg.merge(event_info_global_alg_cfg(flags))
 
     if flags.Analysis.do_small_R_jets:
-        # Schedule the alg to decorate btag info onto jets
-        # rather than accessing from xAOD::BTagging
-        # We perform the decoration on the uncalibrated jets
-        # so as to avoid any systematics-dependence or filtering
-        if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
-            cfg.merge(btag_decor_cfg(flags))
+        # Schedule the alg to decorate jets with extra info
         cfg.merge(jet_decor_cfg(flags))
 
     if flags.Analysis.do_taus:
         # Schedule the alg to decorate taus with extra info
-        # in particular anti-tau label
         cfg.merge(tau_decor_cfg(flags))
 
     # Aggregate the configured CP algs in one ConfigSequence,

@@ -114,29 +114,9 @@ def get_small_R_jet_branches(
                 f'match{trig}_btag'
             ]
 
-    return small_R_jet_branches.get_output_list()
-
-
-def get_small_R_bjet_branches(
-    flags, tree_flags, input_container, output_prefix
-):
-    _syst_option = SystOption.ALL_SYST
-    if flags.Analysis.disable_calib:
-        _syst_option = SystOption.NONE
-
-    small_R_bjet_branches = BranchManager(
-        input_container,
-        output_prefix,
-        systematics_option=_syst_option,
-        systematics_suffix_separator=flags.Analysis.systematics_suffix_separator,
-        required_flags=[
-            flags.Analysis.do_small_R_jets
-        ],
-    )
-
     # ftag scores pb, pc, pl
     if tree_flags.collection_options.small_R_jets.btag_details:
-        small_R_bjet_branches.variables += [
+        small_R_jet_branches.variables += [
             "DL1dv01_pb",
             "DL1dv01_pc",
             "DL1dv01_pu"
@@ -146,7 +126,7 @@ def get_small_R_bjet_branches(
         gn2v00_valid_ptag = (get_valid_ami_tag(split_tags, "p", "p5855")
                              and not get_valid_ami_tag(split_tags, "p", "p6187"))
         if gn2v00_valid_ptag:
-            small_R_bjet_branches.variables += [
+            small_R_jet_branches.variables += [
                 "GN2v00_pb",
                 "GN2v00_pc",
                 "GN2v00_pu",
@@ -156,11 +136,11 @@ def get_small_R_bjet_branches(
             (get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
             or get_valid_ami_tag(split_tags, "p", "p6266"))
         if gn2v01_valid_ptag:
-            small_R_bjet_branches.variables += [
+            small_R_jet_branches.variables += [
                 "GN2v01_pb",
                 "GN2v01_pc",
                 "GN2v01_pu",
                 "GN2v01_ptau",
             ]
 
-    return small_R_bjet_branches.get_output_list()
+    return small_R_jet_branches.get_output_list()

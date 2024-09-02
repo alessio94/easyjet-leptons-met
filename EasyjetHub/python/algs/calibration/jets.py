@@ -91,6 +91,8 @@ def jet_sequence(
         if 'btag_extra_wps' in jet_flags:
             btag_wps += jet_flags.btag_extra_wps
 
+        tagger_set = set()
+
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
             configSeq += makeConfig('Jets.FlavourTagging',
@@ -101,6 +103,10 @@ def jet_sequence(
             # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
             configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
+            # save pb / pc / pu / ptau
+            if tagger not in tagger_set:
+                configSeq.setOptionValue('.saveScores', 'All')
+                tagger_set.add(tagger)
 
             bTagCalibFile = None
             if 'btagCDI' in jet_flags:
