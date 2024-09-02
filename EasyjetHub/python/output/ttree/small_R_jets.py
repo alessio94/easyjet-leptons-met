@@ -21,19 +21,28 @@ def get_small_R_jet_branches(
     )
 
     if tree_flags.slim_variables_with_syst:
-        small_R_jet_branches.syst_only_for = ["pt", "jvt_selection"]
+        small_R_jet_branches.syst_only_for = ["pt", "m", "jvt_selection"]
         if flags.Analysis.small_R_jet.useFJvt:
             small_R_jet_branches.syst_only_for += ["fjvt_selection"]
 
     small_R_jet_branches.add_four_mom_branches(do_mass=True)
 
-    if flags.Analysis.do_overlap_removal:
-        small_R_jet_branches.variables += ["passesOR_%SYS%"]
+    # If object selector are run OR + JVT selection flags are combined into
+    # isAnalysisJet
+    if tree_flags.collection_options.small_R_jets.run_selection:
+        small_R_jet_branches.variables += ["isAnalysisJet_%SYS%"]
+        for index in range(flags.Analysis.small_R_jet.amount_bjet):
+            small_R_jet_branches.variables += [f"isbjet{index+1}_%SYS%"]
+    else:
+        if flags.Analysis.do_overlap_removal:
+            small_R_jet_branches.variables += ["passesOR_%SYS%"]
+
+        if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
+            small_R_jet_branches.variables += ["jvt_selection"]
+            if flags.Analysis.small_R_jet.useFJvt:
+                small_R_jet_branches.variables += ["fjvt_selection"]
 
     if flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet":
-        small_R_jet_branches.variables += ["jvt_selection"]
-        if flags.Analysis.small_R_jet.useFJvt:
-            small_R_jet_branches.variables += ["fjvt_selection"]
         if flags.Input.isMC:
             # truth label used by Jet/Etmiss - always add it when running on MC
             small_R_jet_branches.variables += ["PartonTruthLabelID"]
@@ -62,15 +71,12 @@ def get_small_R_jet_branches(
                         f"ftag_effSF_{btag_wp}_%SYS%"
                     ]
 
-        if flags.Analysis.small_R_jet.runBJetPtCalib:
-            small_R_jet_branches.variables += ["uncorrPt", "muonCorrPt", "n_muons"]
+        if flags.Analysis.small_R_jet.runBJetPtCalib \
+           and tree_flags.collection_options.small_R_jets.no_bjet_calib_p4:
+            small_R_jet_branches.variables += ["muonCorrPt", "n_muons"]
             if flags.Input.isMC:
                 small_R_jet_branches.variables += ["bJetTruthPt", "bJetTruthDR"]
 
-        if (
-            tree_flags.collection_options.small_R_jets.no_bjet_calib_p4
-            and flags.Analysis.do_muons
-        ):
             small_R_jet_branches.variables += [
                 f"NoBJetCalibMomentum_{var}"
                 for var in ["pt", "eta", "phi", "m"]
@@ -95,11 +101,6 @@ def get_small_R_jet_branches(
         and (tree_flags.collection_options.small_R_jets.truth_parent_info)
     ):
         small_R_jet_branches.variables += get_TopHiggs_jet_truth_labels(flags)
-
-    if tree_flags.collection_options.small_R_jets.run_selection:
-        small_R_jet_branches.variables += ["isAnalysisJet_%SYS%"]
-        for index in range(flags.Analysis.small_R_jet.amount_bjet):
-            small_R_jet_branches.variables += [f"isbjet{index+1}_%SYS%"]
 
     if (flags.Analysis.small_R_jet.saveTriggerInfo
             and flags.Analysis.small_R_jet.doHLTMatching):
