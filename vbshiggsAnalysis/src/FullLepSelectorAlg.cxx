@@ -113,7 +113,8 @@ namespace VBSHIGGS{
       ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
 
       const xAOD::JetContainer *vbsjets = nullptr;
-      ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
+      if( !m_UseVBFRNN )
+        ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
 
       const xAOD::JetContainer *largeJets = nullptr;
       ANA_CHECK (m_largejetHandle.retrieve (largeJets, sys));
@@ -162,7 +163,8 @@ namespace VBSHIGGS{
       }
       
       leptonSelection(electrons, muons, met);
-      vbsjetsSelection(vbsjets);
+      if( !m_UseVBFRNN )
+        vbsjetsSelection(vbsjets);
       if (m_bools.at(VBSHIGGS::PASS_TWO_SIGNAL_JETS)) resolvedSelection(HJets, bjets, sys);
       if (m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET)) boostedSelection(largeJets, sys);
 

@@ -3,6 +3,11 @@ include: vbshiggsAnalysis/RunConfig-common.yaml
 # Which analysis to consider
 Channel: "FullLep"
 
+### tagging jets vs RNN strategy
+### false: select tagging jets ---> higgs candidate jets
+### true : select higgs candidate jets ---> load VBF-RNN
+UseVBFRNN : true 
+
 # Toggles for object types
 do_muons: true
 do_electrons: true

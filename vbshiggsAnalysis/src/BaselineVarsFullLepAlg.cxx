@@ -23,11 +23,14 @@ namespace VBSHIGGS{
       ATH_CHECK (m_largejetHandle.initialize(m_systematicsList));
       ATH_CHECK (m_signaljetHandle.initialize(m_systematicsList));
       ATH_CHECK (m_HCandHandle.initialize(m_systematicsList));
-      ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
       ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       ATH_CHECK (m_metHandle.initialize(m_systematicsList));
       ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+
+      if( !m_UseVBFRNN ){
+        ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
+      }
 
       if(m_isMC){
         m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
@@ -96,7 +99,8 @@ namespace VBSHIGGS{
         ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
 
         const xAOD::JetContainer *vbsjets = nullptr;
-        ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
+        if(!m_UseVBFRNN)
+          ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
 
         const xAOD::MuonContainer *muons = nullptr;
         ANA_CHECK (m_muonHandle.retrieve (muons, sys));
@@ -119,7 +123,9 @@ namespace VBSHIGGS{
           m_Ibranches.at(var).set(*event, -99, sys);
         }
         
-        int n_jets = signalJets->size() + vbsjets->size();
+        int n_jets = signalJets->size();
+        if(!m_UseVBFRNN) n_jets += vbsjets->size();
+        
         int n_largeJets = largeJets->size();
         int nCentralJets = 0;
         int nForwardJets = 0;
@@ -143,9 +149,11 @@ namespace VBSHIGGS{
           }
         }
 
-        for(const xAOD::Jet* vbsjet : *vbsjets) {
-          if (std::abs(vbsjet->eta())<2.5) nCentralJets++;
-          else nForwardJets++;
+        if(!m_UseVBFRNN){
+          for(const xAOD::Jet* vbsjet : *vbsjets) {
+            if (std::abs(vbsjet->eta())<2.5) nCentralJets++;
+            else nForwardJets++;
+          }
         }
 
         int n_bjets = bjets->size();
@@ -382,30 +390,32 @@ namespace VBSHIGGS{
         }
 
         // kinematics of vbs jets
-        if ( vbsjets->size() >= 2 ){
-          const xAOD::Jet* vbsJet1 = vbsjets->at(0);
-          const xAOD::Jet* vbsJet2 = vbsjets->at(1);
+        if(!m_UseVBFRNN){
+          if ( vbsjets->size() >= 2 ){
+            const xAOD::Jet* vbsJet1 = vbsjets->at(0);
+            const xAOD::Jet* vbsJet2 = vbsjets->at(1);
 
-          TLorentzVector vbs_jj = vbsJet1->p4() + vbsJet2->p4();
-          
-          m_Fbranches.at("VBSJ1_m").set(*event, vbsJet1->m(), sys);
-          m_Fbranches.at("VBSJ1_pt").set(*event, vbsJet1->pt(), sys);
-          m_Fbranches.at("VBSJ1_eta").set(*event, vbsJet1->eta(), sys);
-          m_Fbranches.at("VBSJ1_phi").set(*event, vbsJet1->phi(), sys);
+            TLorentzVector vbs_jj = vbsJet1->p4() + vbsJet2->p4();
+            
+            m_Fbranches.at("VBSJ1_m").set(*event, vbsJet1->m(), sys);
+            m_Fbranches.at("VBSJ1_pt").set(*event, vbsJet1->pt(), sys);
+            m_Fbranches.at("VBSJ1_eta").set(*event, vbsJet1->eta(), sys);
+            m_Fbranches.at("VBSJ1_phi").set(*event, vbsJet1->phi(), sys);
 
-          m_Fbranches.at("VBSJ2_m").set(*event, vbsJet2->m(), sys);
-          m_Fbranches.at("VBSJ2_pt").set(*event, vbsJet2->pt(), sys);
-          m_Fbranches.at("VBSJ2_eta").set(*event, vbsJet2->eta(), sys);
-          m_Fbranches.at("VBSJ2_phi").set(*event, vbsJet2->phi(), sys);
+            m_Fbranches.at("VBSJ2_m").set(*event, vbsJet2->m(), sys);
+            m_Fbranches.at("VBSJ2_pt").set(*event, vbsJet2->pt(), sys);
+            m_Fbranches.at("VBSJ2_eta").set(*event, vbsJet2->eta(), sys);
+            m_Fbranches.at("VBSJ2_phi").set(*event, vbsJet2->phi(), sys);
 
-          m_Fbranches.at("VBSdijet_m").set(*event, vbs_jj.M(), sys);
-          m_Fbranches.at("VBSdijet_pt").set(*event, vbs_jj.Pt(), sys);
-          m_Fbranches.at("VBSdijet_eta").set(*event, vbs_jj.Eta(), sys);
-          m_Fbranches.at("VBSdijet_phi").set(*event, vbs_jj.Phi(), sys);
-          m_Fbranches.at("dRVBSjj").set(*event, (vbsJet1->p4()).DeltaR(vbsJet2->p4()), sys);
-          m_Fbranches.at("dEtaVBSjj").set(*event, (vbsJet1->eta())-vbsJet2->eta(), sys);
-          m_Fbranches.at("dPhiVBSjj").set(*event, (vbsJet1->p4()).DeltaPhi(vbsJet2->p4()), sys);
-          
+            m_Fbranches.at("VBSdijet_m").set(*event, vbs_jj.M(), sys);
+            m_Fbranches.at("VBSdijet_pt").set(*event, vbs_jj.Pt(), sys);
+            m_Fbranches.at("VBSdijet_eta").set(*event, vbs_jj.Eta(), sys);
+            m_Fbranches.at("VBSdijet_phi").set(*event, vbs_jj.Phi(), sys);
+            m_Fbranches.at("dRVBSjj").set(*event, (vbsJet1->p4()).DeltaR(vbsJet2->p4()), sys);
+            m_Fbranches.at("dEtaVBSjj").set(*event, (vbsJet1->eta())-vbsJet2->eta(), sys);
+            m_Fbranches.at("dPhiVBSjj").set(*event, (vbsJet1->p4()).DeltaPhi(vbsJet2->p4()), sys);
+            
+          }
         }
       }
 

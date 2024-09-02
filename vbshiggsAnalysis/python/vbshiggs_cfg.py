@@ -49,19 +49,85 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                                 minimumAmount=1,  # -1 means ignores this
                                 checkOR=flags.Analysis.do_overlap_removal))
 
+    if not flags.Analysis.UseVBFRNN:
+        cfg.addEventAlgo(
+            CompFactory.VBSHIGGS.VBSJetsSelectorAlg(
+                "VBSJetsSelectorAlg",
+                bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            )
+        )
+
+    # set jets container labels
+    if flags.Analysis.UseVBFRNN:
+        # use full small-R jets pool to select signal jets
+        SignalJetsLabel = "vbshiggsAnalysisJets_%SYS%"
+    else:
+        # use the small-R jets after selecting tagging jets
+        SignalJetsLabel = "vbshiggsAnalysisSignalJets_%SYS%"
+
+    # signal jets selection
     cfg.addEventAlgo(
-        CompFactory.VBSHIGGS.VBSJetsSelectorAlg(
-            "VBSJetsSelectorAlg",
+        CompFactory.VBSHIGGS.HiggsSelectorAlg(
+            "HiggsSelectorAlg",
+            jets=SignalJetsLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
         )
     )
 
-    cfg.addEventAlgo(
-        CompFactory.VBSHIGGS.HiggsSelectorAlg(
-            "HiggsSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+    if flags.Analysis.UseVBFRNN:
+        # VBF-RNN tagger: resolved
+        vbftagger = CompFactory.VBFTagger("VBFTaggerTool", modelTag="VBFRNNv0")
+        cfg.addEventAlgo(
+            CompFactory.VBFTaggerAlgSys(
+                "VBFTaggerAlg_resolved",
+                VBFTagger=vbftagger,
+                containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
+                containerSigJetsKey="vbshiggsAnalysisHJets_%SYS%",
+                pTCut=30.e3,
+                nMaxJets=2,
+                DecTag="_resolved"
+            )
         )
-    )
+
+        cfg.addEventAlgo(
+            CompFactory.VBFTaggerAlgSys(
+                "VBFTaggerAlg_resolved_20gev",
+                VBFTagger=vbftagger,
+                containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
+                containerSigJetsKey="vbshiggsAnalysisHJets_%SYS%",
+                pTCut=20.e3,
+                nMaxJets=2,
+                DecTag="_resolved_20gev"
+            )
+        )
+
+        # VBF-RNN tagger: boosted
+        cfg.addEventAlgo(
+            CompFactory.VBFTaggerAlgSys(
+                "VBFTaggerAlg_boosted",
+                VBFTagger=vbftagger,
+                containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
+                containerSigLargeRJetsKey="vbshiggsAnalysisLargeJets_%SYS%",
+                OnlyFirstLargeRJet=True,
+                pTCut=30.e3,
+                nMaxJets=2,
+                DecTag="_boosted"
+            )
+        )
+
+        cfg.addEventAlgo(
+            CompFactory.VBFTaggerAlgSys(
+                "VBFTaggerAlg_boosted_20gev",
+                VBFTagger=vbftagger,
+                containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
+                containerSigLargeRJetsKey="vbshiggsAnalysisLargeJets_%SYS%",
+                OnlyFirstLargeRJet=True,
+                pTCut=20.e3,
+                nMaxJets=2,
+                DecTag="_boosted_20gev"
+            )
+        )
+
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
     trigger_branches = [

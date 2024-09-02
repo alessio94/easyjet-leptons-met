@@ -26,6 +26,7 @@ atlas_add_component(vbshiggsAnalysis
   TriggerMatchingToolLib
   EventBookkeeperToolsLib
   EasyjetHubLib
+  VBFTaggerLib
 )
 
 # Install python modules, joboptions, and share content

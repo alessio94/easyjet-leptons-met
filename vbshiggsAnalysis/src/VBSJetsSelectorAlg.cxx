@@ -89,7 +89,7 @@ namespace VBSHIGGS{
                     const xAOD::Jet* b) {
                     return a->pt() > b->pt(); });
 
-            //not erase VBS jets from the signal jet collection
+            // now erase VBS jets from the signal jet collection
             if (vbsJet1 && vbsJet2) {
                 nonVBSJetContainer->erase( std::remove_if( nonVBSJetContainer->begin(), nonVBSJetContainer->end(),
                     [&](const xAOD::Jet* jet) -> bool { return jet == vbsJet1 || jet == vbsJet2 ;} ),

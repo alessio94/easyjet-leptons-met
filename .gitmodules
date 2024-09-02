@@ -4,3 +4,6 @@
 [submodule "KinematicFitTool"]
 	path = KinematicFitTool
 	url = https://gitlab.cern.ch/r3hh-public/KinematicFit.git
+[submodule "VBFTagger"]
+	path = VBFTagger
+	url = https://gitlab.cern.ch/vbftagger/vbftagger.git

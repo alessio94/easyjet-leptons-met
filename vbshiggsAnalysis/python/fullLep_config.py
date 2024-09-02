@@ -13,10 +13,24 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
 
     cfg = ComponentAccumulator()
 
+    # set jets container labels
+    if flags.Analysis.UseVBFRNN:
+        # vbs tagging jets no more
+        VBSJetsLabel = ""
+        # use full small-R jets pool to select signal jets
+        SignalJetsLabel = "vbshiggsAnalysisJets_%SYS%"
+    else:
+        # use vbs tagging jets
+        VBSJetsLabel = "vbshiggsAnalysisVBSJets_%SYS%",
+        # use the small-R jets after selecting tagging jets
+        SignalJetsLabel = "vbshiggsAnalysisSignalJets_%SYS%"
+
     # Selection
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.FullLepSelectorAlg(
             "FullLepSelectorAlg",
+            signaljets=SignalJetsLabel,
+            UseVBFRNN=flags.Analysis.UseVBFRNN,
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             eventDecisionOutputDecoration="vbshiggs_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
@@ -32,6 +46,9 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.BaselineVarsFullLepAlg(
             "FinalVarsFullLepAlg",
+            signaljets=SignalJetsLabel,
+            UseVBFRNN=flags.Analysis.UseVBFRNN,
+            vbsjets=VBSJetsLabel,
             isMC=flags.Input.isMC,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
@@ -48,14 +65,21 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
 def get_BaselineVarsFullLepAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
-    for object in ["ll", "Hjj", "Hj1l1", "Hj2l2", "VBSjj"]:
-        for var in ["dR", "dEta", "dPhi"]:
-            float_variable_names.append(f"{var}{object}")
 
-    for object in ["VBSJ1", "VBSJ2", "LargeJet1", "ll", "Hdijet",
-                   "Hj1l1", "Hj2l2", "VBSdijet"]:
+    objects = ["LargeJet1", "ll", "Hdijet", "Hj1l1", "Hj2l2"]
+    if not flags.Analysis.UseVBFRNN:
+        objects += ["VBSJ1", "VBSJ2", "VBSdijet"]
+
+    for object in objects:
         for var in ["m", "pt", "eta", "phi"]:
             float_variable_names.append(f"{object}_{var}")
+
+    objects = ["ll", "Hjj", "Hj1l1", "Hj2l2"]
+    if not flags.Analysis.UseVBFRNN:
+        objects += ["VBSjj"]
+    for object in objects:
+        for var in ["dR", "dEta", "dPhi"]:
+            float_variable_names.append(f"{var}{object}")
 
     for object in ["Jet_Higgs_candidate1", "Jet_Higgs_candidate2"]:
         for var in ["m", "pt", "eta", "phi", "E"]:
@@ -125,5 +149,13 @@ def fullLep_branches(flags):
         for var in ['pT', 'eta', 'phi', 'E']:
             branches += [f'EventInfo.VBSQuark1_{var} -> VBSQuark1_{var}']
             branches += [f'EventInfo.VBSQuark2_{var} -> VBSQuark2_{var}']
+
+    # VBF tagger
+    if flags.Analysis.UseVBFRNN:
+        vars = ['RNNScore', 'nRNNJets']
+        regs = ['resolved', 'resolved_20gev', 'boosted', 'boosted_20gev']
+        for var in vars:
+            for reg in regs:
+                branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}_%SYS%']
 
     return branches, float_variable_names, int_variable_names

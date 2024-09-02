@@ -46,7 +46,7 @@ namespace VBSHIGGS{
 
         CP::SysReadHandle<xAOD::JetContainer> m_largejetHandle{ this, "largejets", "vbshiggsAnalysisLargeJets_%SYS%", "Large R Jet container to read"};
 
-        CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "vbshiggsAnalysisVBSJets_%SYS%",   "VBS Jet container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "",   "VBS Jet container to read" };
         
         CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "vbshiggsAnalysisElectrons_%SYS%",   "Electron container to read" };
 
@@ -90,6 +90,8 @@ namespace VBSHIGGS{
         std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 
         std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
+
+        Gaudi::Property<bool> m_UseVBFRNN { this, "UseVBFRNN", false, "Not use VBS tagging jets or yes (i.e. use VBF-RNN jets or not)" };
 
     };
 }
