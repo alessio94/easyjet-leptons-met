@@ -136,9 +136,6 @@ namespace HHBBYY
       TLorentzVector HH(0.,0.,0.,0.);
       TLorentzVector y1(0.,0.,0.,0.);
       TLorentzVector y2(0.,0.,0.,0.);
-      TLorentzVector j(0.,0.,0.,0.);
-      TLorentzVector Hbb_candidate1(0.,0.,0.,0.);
-      TLorentzVector Hbb_candidate2(0.,0.,0.,0.);
 
       int j_passWP=-99;
       int truthLabel_j = -99;
@@ -243,7 +240,7 @@ namespace HHBBYY
 
       // inclusive jet sector
       for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)4); i++){	 
-        j = jets->at(i)->p4();
+        TLorentzVector j = jets->at(i)->p4();
         if (m_isMC) 
           truthLabel_j = HadronConeExclTruthLabelID(*jets->at(i));
         j_passWP = static_cast<int>(m_isBtag.get(*jets->at(i), sys));
@@ -328,7 +325,7 @@ namespace HHBBYY
           m_Fbranches.at("KF_HT").set(*event, KF_HT, sys);
           //inclusive jets sector
           for (std::size_t i=0; i<std::min(KFJets->size(),(std::size_t)4); i++){	 
-            j = KFJets->at(i)->p4();
+            TLorentzVector j = KFJets->at(i)->p4();
             m_Fbranches.at("KF_Jet"+std::to_string(i+1)+"_pt").set(*event, j.Pt(), sys);
             m_Fbranches.at("KF_Jet"+std::to_string(i+1)+"_eta").set(*event, j.Eta(), sys);
             m_Fbranches.at("KF_Jet"+std::to_string(i+1)+"_phi").set(*event, j.Phi(), sys);
