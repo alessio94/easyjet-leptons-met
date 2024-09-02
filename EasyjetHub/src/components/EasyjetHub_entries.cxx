@@ -5,6 +5,7 @@
 #include "../MuonSelectorAlg.h"
 #include "../ElectronSelectorAlg.h"
 #include "../TauSelectorAlg.h"
+#include "../EventSelectorAlg.h"
 #include "../LargeJetGhostVRJetAssociationAlg.h"
 #include "../TruthParentDecoratorAlg.h"
 #include "../JetDeepCopyAlg.h"
@@ -26,6 +27,7 @@ DECLARE_COMPONENT(PhotonSelectorAlg)
 DECLARE_COMPONENT(MuonSelectorAlg)
 DECLARE_COMPONENT(ElectronSelectorAlg)
 DECLARE_COMPONENT(TauSelectorAlg)
+DECLARE_COMPONENT(EventSelectorAlg)
 DECLARE_COMPONENT(LargeJetGhostVRJetAssociationAlg)
 DECLARE_COMPONENT(TruthParentDecoratorAlg)
 DECLARE_COMPONENT(JetDeepCopyAlg)

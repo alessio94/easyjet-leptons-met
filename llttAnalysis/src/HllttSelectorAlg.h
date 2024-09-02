@@ -115,8 +115,8 @@ private:
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
     std::vector<std::string> m_Bvarnames{      
       "pass_trigger_SLT", "pass_trigger_DLT", "pass_baseline_DLT", "pass_DLT",
-	"pass_baseline_LEPLEP", "pass_LEPLEP", "pass_baseline_LEPHAD", "pass_LEPHAD",
-	"pass_baseline_HADHAD", "pass_HADHAD", "pass_Looseele", "pass_Loosemuo" 
+	"pass_baseline_LepLep", "pass_LepLep", "pass_baseline_LepHad", "pass_LepHad",
+	"pass_baseline_HadHad", "pass_HadHad", "pass_Looseele", "pass_Loosemuo"
     };
 
 
@@ -134,12 +134,12 @@ private:
     bool N_LEPTONS_CUT_LEPLEP;
     bool N_LEPTONS_CUT_LEPHAD;
     bool N_LEPTONS_CUT_HADHAD;
-    bool pass_baseline_LEPLEP;
-    bool pass_LEPLEP;
-    bool pass_baseline_LEPHAD;
-    bool pass_LEPHAD;
-    bool pass_baseline_HADHAD;
-    bool pass_HADHAD;
+    bool pass_baseline_LepLep;
+    bool pass_LepLep;
+    bool pass_baseline_LepHad;
+    bool pass_LepHad;
+    bool pass_baseline_HadHad;
+    bool pass_HadHad;
     bool pass_baseline_DLT;
     bool pass_DLT;
 

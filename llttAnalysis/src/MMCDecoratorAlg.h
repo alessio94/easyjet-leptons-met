@@ -66,9 +66,9 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
-    CP::SysReadDecorHandle<bool> m_pass_baseline_LEPLEP {this, "passLEPLEP", "", "events pass (baseline) LEPLEP"};
-    CP::SysReadDecorHandle<bool> m_pass_baseline_LEPHAD {this, "passLEPHAD", "", "events pass (baseline) LEPHAD"};
-    CP::SysReadDecorHandle<bool> m_pass_baseline_HADHAD {this, "passHADHAD", "", "events pass (baseline) HADHAD"};
+    CP::SysReadDecorHandle<bool> m_pass_baseline_LepLep {this, "passLepLep", "", "events pass (baseline) LepLep"};
+    CP::SysReadDecorHandle<bool> m_pass_baseline_LepHad {this, "passLepHad", "", "events pass (baseline) LepHad"};
+    CP::SysReadDecorHandle<bool> m_pass_baseline_HadHad {this, "passHadHad", "", "events pass (baseline) HadHad"};
 
     CP::SysReadDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};

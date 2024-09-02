@@ -56,11 +56,11 @@ namespace HHBBTT
     ANA_CHECK (m_systematicsList.initialize());    
 
     for ( auto name : m_channel_names){
-      if( name == "lephad2b") m_channels.push_back(HHBBTT::LepHad2B);
-      else if ( name == "hadhad2b") m_channels.push_back(HHBBTT::HadHad2B);
-      else if ( name == "lephad1b") m_channels.push_back(HHBBTT::LepHad1B);
-      else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
-      else if ( name == "antiiso-lephad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
+      if( name == "LepHad_2B") m_channels.push_back(HHBBTT::LepHad2B);
+      else if ( name == "HadHad_2B") m_channels.push_back(HHBBTT::HadHad2B);
+      else if ( name == "LepHad_1B") m_channels.push_back(HHBBTT::LepHad1B);
+      else if ( name == "HadHad_1B") m_channels.push_back(HHBBTT::HadHad1B);
+      else if ( name == "AntiIsoLepHad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
     }
 
     ATH_CHECK (m_mmcTool.retrieve());

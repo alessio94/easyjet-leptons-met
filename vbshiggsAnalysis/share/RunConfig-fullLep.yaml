@@ -1,7 +1,7 @@
 include: vbshiggsAnalysis/RunConfig-common.yaml 
 
 # Which analysis to consider
-Channel: "FullLep"
+channels: ["FullLep"]
 
 ### tagging jets vs RNN strategy
 ### false: select tagging jets ---> higgs candidate jets

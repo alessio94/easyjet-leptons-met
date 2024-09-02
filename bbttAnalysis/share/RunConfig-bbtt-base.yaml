@@ -10,6 +10,7 @@ enable_MMC_cut: false
 
 # Toggles to bypass event selection
 bypass: false
+splitOutputTree: false
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbtt"]

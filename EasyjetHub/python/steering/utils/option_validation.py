@@ -12,6 +12,8 @@ def validate_flags(flags):
 
     validate_systematics_flags(flags)
 
+    validate_output(flags)
+
 
 def validate_do_obj_flags(flags):
     if flags.Analysis.do_met:
@@ -149,4 +151,16 @@ def validate_systematics_flags(flags):
         assert flags.Analysis.systematics_regex, (
             "Systematics requested but no regex provided "
             "e.g. for all systematics_regex: ['.*']"
+        )
+
+
+def validate_output(flags):
+    if flags.Analysis.splitOutputTree:
+        assert len(flags.Analysis.channels) > 1, (
+            "Should configure at least two channels to "
+            "split output trees"
+        )
+        assert not flags.Analysis.bypass, (
+            "Should not be in bypass mode to split output trees by channel. "
+            "Where would the events in no channel go?"
         )

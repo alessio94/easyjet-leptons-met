@@ -4,6 +4,8 @@ from typing import List, Optional
 from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaCommon.CFElements import seqAND, parOR
+
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.output.ttree.eventinfo import get_event_info_branches
 from EasyjetHub.output.ttree.electrons import get_electron_branches
@@ -57,14 +59,16 @@ def output_analysis_sequence(
     configSeq.setOptionValue('.vars', branches)
     configSeq.setOptionValue('.metVars', met_branches)
     configSeq.setOptionValue('.treeName', treename)
+    configSeq.setOptionValue('.postfix', treename)
 
     return configSeq
 
 
-def minituple_cfg(
+def minituple_output_cfg(
     flags: AthConfigFlags,
     tree_flags: ConfigItem,
     outfile_name: str,
+    tree_name: str = "AnalysisMiniTree",
     extra_output_branches: Optional[List[str]] = None,
 ) -> ComponentAccumulator:
     """
@@ -222,13 +226,14 @@ def minituple_cfg(
         f" to '{outfile_name}' via stream '{tree_flags.stream_name}'"
     )
 
-    outputSeq = CompFactory.AthSequencer('OutputSequence')
+    outputSeq = CompFactory.AthSequencer('OutputSequence' + tree_name)
     outputConfigAccumulator = ConfigAccumulator(
         outputSeq,
         autoconfigFromFlags=flags,
     )
     outputConfigSeq = output_analysis_sequence(flags, branches=tree_branches,
-                                               met_branches=met_branches)
+                                               met_branches=met_branches,
+                                               treename=tree_name)
     outputConfigSeq.fullConfigure(outputConfigAccumulator)
     cfg.merge(outputConfigAccumulator.CA)
 
@@ -243,5 +248,52 @@ def minituple_cfg(
         with open(branches_fname, "w") as branches_f:
             for b in tree_branches:
                 branches_f.write(f"{b}\n")
+
+    return cfg
+
+
+def minituple_cfg(
+    flags: AthConfigFlags,
+    tree_flags: ConfigItem,
+    outfile_name: str,
+    tree_name: str = "AnalysisMiniTree",
+    extra_output_branches: Optional[List[str]] = None,
+) -> ComponentAccumulator:
+    """
+    Extra config layer on top of minituple_output_cfg to allow splitting between
+    different output trees per channel
+    """
+    cfg = ComponentAccumulator()
+
+    seqname = "OutputSeq"
+    cfg.addSequence(parOR(seqname))
+
+    channelList = [""]
+    if flags.Analysis.splitOutputTree:
+        channelList = flags.Analysis.channels
+
+    for channel in channelList:
+        channelSeqName = seqname
+
+        if flags.Analysis.splitOutputTree:
+            channelSeqName = seqname + channel
+            cfg.addSequence(seqAND(channelSeqName), parentName=seqname)
+            cfg.addEventAlgo(
+                CompFactory.Easyjet.EventSelectorAlg(
+                    "EventSelectorAlg_" + channel,
+                    filterDecoration="pass_" + channel + "_%SYS%",
+                    # Dummy output decoration, required for all selector alg
+                    eventDecisionOutputDecoration="out_" + channel + "_%SYS%"),
+                sequenceName=channelSeqName)
+
+        cfg.merge(
+            minituple_output_cfg(
+                flags, tree_flags,
+                flags.Analysis.out_file,
+                tree_name=tree_flags.tree_name + channel,
+                extra_output_branches=extra_output_branches
+            ),
+            channelSeqName,
+        )
 
     return cfg

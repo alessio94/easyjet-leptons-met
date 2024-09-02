@@ -116,7 +116,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
-            channel=flags.Analysis.channel,
+            channel=flags.Analysis.channels,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
         )

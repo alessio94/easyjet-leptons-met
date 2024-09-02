@@ -30,9 +30,9 @@ namespace HLLTT
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    ATH_CHECK (m_pass_baseline_LEPLEP.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_pass_baseline_LEPHAD.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_pass_baseline_HADHAD.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_baseline_LepLep.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_baseline_LepHad.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_baseline_HadHad.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -50,9 +50,9 @@ namespace HLLTT
     ANA_CHECK (m_systematicsList.initialize());    
 
     for ( auto name : m_channel_names){
-      if( name == "leplep") m_channels.push_back(HLLTT::LepLep);
-      else if( name == "lephad") m_channels.push_back(HLLTT::LepHad);
-      else if ( name == "hadhad") m_channels.push_back(HLLTT::HadHad);
+      if( name == "LepLep") m_channels.push_back(HLLTT::LepLep);
+      else if( name == "LepHad") m_channels.push_back(HLLTT::LepHad);
+      else if ( name == "HadHad") m_channels.push_back(HLLTT::HadHad);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;

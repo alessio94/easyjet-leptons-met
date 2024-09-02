@@ -2,7 +2,7 @@ include: EasyjetHub/base-config.yaml
 
 # Which analysis and channels to consider
 do_lltt_analysis: true
-channel: ["leplep", "lephad", "hadhad"]
+channels: ["LepLep", "LepHad", "HadHad"]
 
 # Toggles to bypass event selection
 bypass: true

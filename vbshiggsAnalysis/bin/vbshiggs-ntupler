@@ -34,10 +34,10 @@ def vbshiggs_job_cfg():
     # Returned flags are locked
     flags, args = analysis_configuration(parser)
 
-    if not any(flags.Analysis.Channel in ch for ch in ["FullLep", "SemiLep",  
-                                                       "FullHad"]):
-        raise RuntimeError("Invalid channel {}, 'FullLep', 'SemiLep' or \
-                           'FullHad'".format(flags.Analysis.Channel))
+    for channel in flags.Analysis.channels:
+        if channel not in ["FullLep", "SemiLep", "FullHad"]:
+            raise RuntimeError("Invalid channel {}, 'FullLep', 'SemiLep' " \
+                               "or 'FullHad'".format(channel))
     # Get a standard ComponentAccumulator with the following infrastructure:
     # - basic services for event loop, messaging etc
     # - apply preselection on triggers and data quality
@@ -63,15 +63,17 @@ def vbshiggs_job_cfg():
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
     # rather than statically in the yaml
-    extra_vbshiggs_branches = []
-    if flags.Analysis.Channel == "FullLep":
+    extra_branches = []
+    if "FullLep" in flags.Analysis.channels:
         extra_vbshiggs_branches, float_variable_names, int_variable_names = fullLep_branches(flags)
-    if flags.Analysis.Channel == "SemiLep":
+        extra_branches += extra_vbshiggs_branches
+    if "SemiLep" in flags.Analysis.channels:
         extra_vbshiggs_branches, float_variable_names, int_variable_names = semiLep_branches(flags)
-    if flags.Analysis.Channel == "FullHad":
+        extra_branches += extra_vbshiggs_branches
+    if "FullHad" in flags.Analysis.channels:
         extra_vbshiggs_branches, float_variable_names, int_variable_names = fullHad_branches(flags)
+        extra_branches += extra_vbshiggs_branches
 
-    extra_branches = extra_vbshiggs_branches
     if flags.Analysis.out_file:
         for tree_flags in flags.Analysis.ttree_output:
             cfg.merge(

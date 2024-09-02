@@ -5,7 +5,7 @@ ttree_output:
 
 include: bbttAnalysis/RunConfig-bbtt-base.yaml
 
-channel: ["antiiso-lephad"]
+channels: ["AntiIsoLepHad"]
 
 Electron:
   ID: "LooseBLayerLH"

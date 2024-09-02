@@ -1,7 +1,7 @@
 include: vbshiggsAnalysis/RunConfig-common.yaml 
 
 # Which analysis to consider
-Channel: "SemiLep"
+channels: ["SemiLep"]
 
 # Toggles for object types
 do_muons: true

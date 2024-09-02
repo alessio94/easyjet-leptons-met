@@ -15,9 +15,9 @@ do_met: false
 do_mmc: false
 save_HF_classification: false
 
+# Other global event configs
+bypass: false
 do_bbtt_analysis: false
-
-# tempo fix for adding this flag in main_sequence_config.py
 do_bbyy_analysis: false
 
 # Toggles for reconstructed objects decorations
@@ -155,6 +155,7 @@ systematics_regex: []
 systematics_suffix_separator: "_"
 # CutBookKeeper histPattern
 cbkHistPattern: "CutBookkeeper_%DSID%_%RUN%_%SYS%"
+
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: false
@@ -212,6 +213,10 @@ full_container_names:
     include: container-names-DAOD_PHYS.yaml
   physlite:
     include: container-names-DAOD_PHYSLITE.yaml
+
+channels: []
+splitOutputTree: false
+
 
 histograms: false
 h5:

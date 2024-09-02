@@ -154,7 +154,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             )
         )
 
-    if flags.Analysis.Channel == "FullLep":
+    if "FullLep" in flags.Analysis.channels:
         extra_vbshiggs_branches, float_variable_names, \
             int_variable_names = fullLep_branches(flags)
         cfg.merge(
@@ -164,7 +164,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 int_variables=int_variable_names)
         )
 
-    if flags.Analysis.Channel == "SemiLep":
+    if "SemiLep" in flags.Analysis.channels:
         extra_vbshiggs_branches, float_variable_names, \
             int_variable_names = semiLep_branches(flags)
         cfg.merge(
@@ -174,7 +174,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 int_variables=int_variable_names)
         )
 
-    if flags.Analysis.Channel == "FullHad":
+    if "FullHad" in flags.Analysis.channels:
         extra_vbshiggs_branches, float_variable_names, int_variable_names \
             = fullHad_branches(flags)
         cfg.merge(

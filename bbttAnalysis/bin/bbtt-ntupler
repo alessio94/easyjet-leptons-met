@@ -25,6 +25,7 @@ from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from EasyjetHub.algs.orthogonality.orth_config import orth_branches
 from EasyjetHub.algs.orthogonality.orth_config import orth_cfg
 
+
 def bbtt_job_cfg():
     parser = AnalysisArgumentParser()
 
@@ -82,7 +83,7 @@ def bbtt_job_cfg():
         for tree_flags in flags.Analysis.ttree_output:
             cfg.merge(
                 minituple_cfg(
-                    flags,tree_flags,
+                    flags, tree_flags,
                     flags.Analysis.out_file,
                     extra_output_branches = extra_branches
                 ),

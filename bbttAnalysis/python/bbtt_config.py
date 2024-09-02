@@ -24,8 +24,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 
     # anti-iso lepton control region is not compatible with the other
     # regions at the moment:
-    if ("antiiso-lephad" in flags.Analysis.channel
-            and len(flags.Analysis.channel) > 1):
+    if ("AntiIsoLepHad" in flags.Analysis.channels
+            and len(flags.Analysis.channels) > 1):
         raise ValueError("Cannot run 'antiiso-lephad' with any other channels")
 
     # muons:
@@ -78,7 +78,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             eventDecisionOutputDecoration=(
                 "bbtt_pass_presel_noMMC_%SYS%" if flags.Analysis.enable_MMC_cut
                 else "bbtt_pass_presel_%SYS%"),
-            channel=flags.Analysis.channel,
+            channel=flags.Analysis.channels,
             isMC=flags.Input.isMC,
             doAntiIDRegions=flags.Analysis.do_antiID_regions,
             useTriggerSelections=flags.Analysis.do_trigger_offline_filtering,
@@ -100,7 +100,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         cfg.addEventAlgo(
             CompFactory.HHBBTT.MMCDecoratorAlg(
                 "MMCDecoratorAlg",
-                channel=flags.Analysis.channel,
+                channel=flags.Analysis.channels,
                 mmcTool=mmcTool
             )
         )
@@ -109,7 +109,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             cfg.addEventAlgo(
                 CompFactory.HHBBTT.MMCSelectorAlg(
                     "MMCSelectorAlg",
-                    channel=flags.Analysis.channel,
+                    channel=flags.Analysis.channels,
                     MMC_min=60 * Units.GeV,
                     eventDecisionOutputDecoration="bbtt_pass_presel_%SYS%",
                     bypass=flags.Analysis.bypass,

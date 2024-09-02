@@ -2,7 +2,7 @@ include: EasyjetHub/base-config.yaml
 
 # Which analysis and channels to consider
 do_bbVV_analysis: true
-channel: ["1leptonBoosted","1leptonSplitboosted","0leptonBoosted","0leptonSplitboosted"]
+channels: ["1leptonBoosted","1leptonSplitboosted","0leptonBoosted","0leptonSplitboosted"]
 
 # Decay mode considered for truth decoration
 truthDecayModes: ["bbWW","bbZZ"]

@@ -71,9 +71,9 @@ namespace HLLTT
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
     for ( auto name : m_channel_names){
-      if( name == "leplep") m_channels.push_back(HLLTT::LepLep);
-      else if( name == "lephad") m_channels.push_back(HLLTT::LepHad);
-      else if ( name == "hadhad") m_channels.push_back(HLLTT::HadHad);
+      if( name == "LepLep") m_channels.push_back(HLLTT::LepLep);
+      else if( name == "LepHad") m_channels.push_back(HLLTT::LepHad);
+      else if ( name == "HadHad") m_channels.push_back(HLLTT::HadHad);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -115,16 +115,16 @@ namespace HLLTT
 
       // flags for leplep
       N_LEPTONS_CUT_LEPLEP = false;
-      pass_baseline_LEPLEP = false;
-      pass_LEPLEP = false;
+      pass_baseline_LepLep = false;
+      pass_LepLep = false;
       // flags for lephad
       N_LEPTONS_CUT_LEPHAD = false;
-      pass_baseline_LEPHAD = false;
-      pass_LEPHAD = false;
+      pass_baseline_LepHad = false;
+      pass_LepHad = false;
       // flags for hadhad
       N_LEPTONS_CUT_HADHAD = false;
-      pass_baseline_HADHAD = false;
-      pass_HADHAD = false;
+      pass_baseline_HadHad = false;
+      pass_HadHad = false;
 
       //************
       // lepton
@@ -217,27 +217,27 @@ namespace HLLTT
       if (N_LEPTONS_CUT_LEPLEP){
         // DLT
         if (lep_ptcut_DLT){
-	  pass_baseline_LEPLEP = true;
+	  pass_baseline_LepLep = true;
 	  if (trigPassed_DLT && n_bjets==0)
-	    pass_LEPLEP = true;
+	    pass_LepLep = true;
         }
       }
 
       if (N_LEPTONS_CUT_LEPHAD && n_taus==1){
         // DLT
         if (lep_ptcut_DLT){
-           pass_baseline_LEPHAD = true;
+           pass_baseline_LepHad = true;
            if (trigPassed_DLT && n_bjets==0)
-              pass_LEPHAD = true;
+              pass_LepHad = true;
         }
       }
 
       if (N_LEPTONS_CUT_HADHAD && n_taus ==2 ){
         // DLT
 	if (lep_ptcut_DLT){
-	  pass_baseline_HADHAD = true;
+	  pass_baseline_HadHad = true;
 	  if (trigPassed_DLT && n_bjets==0)
-	    pass_HADHAD = true;
+	    pass_HadHad = true;
         }
       } 
 
@@ -246,26 +246,26 @@ namespace HLLTT
  
       for(const auto& channel : m_channels){
 	if(channel == HLLTT::LepLep) {
-	  pass_baseline_DLT |= (pass_baseline_LEPLEP);
-	  pass_DLT |= (pass_LEPLEP);
+	  pass_baseline_DLT |= (pass_baseline_LepLep);
+	  pass_DLT |= (pass_LepLep);
 	}
 	else if(channel == HLLTT::LepHad){
-	  pass_baseline_DLT |= (pass_baseline_LEPHAD);
-          pass_DLT |= (pass_LEPHAD);
+	  pass_baseline_DLT |= (pass_baseline_LepHad);
+	  pass_DLT |= (pass_LepHad);
 	} 
 	else if(channel == HLLTT::HadHad){
-	  pass_baseline_DLT |= (pass_baseline_HADHAD);
-	  pass_DLT |= (pass_HADHAD);
+	  pass_baseline_DLT |= (pass_baseline_HadHad);
+	  pass_DLT |= (pass_HadHad);
 	}
       }
       m_Bbranches.at("pass_baseline_DLT").set(*event, pass_baseline_DLT, sys);
       m_Bbranches.at("pass_DLT").set(*event, pass_DLT, sys);
-      m_Bbranches.at("pass_baseline_LEPLEP").set(*event, pass_baseline_LEPLEP, sys);
-      m_Bbranches.at("pass_LEPLEP").set(*event, pass_LEPLEP, sys);
-      m_Bbranches.at("pass_baseline_LEPHAD").set(*event, pass_baseline_LEPHAD, sys);
-      m_Bbranches.at("pass_LEPHAD").set(*event, pass_LEPHAD, sys);
-      m_Bbranches.at("pass_baseline_HADHAD").set(*event, pass_baseline_HADHAD, sys);
-      m_Bbranches.at("pass_HADHAD").set(*event, pass_HADHAD, sys);
+      m_Bbranches.at("pass_baseline_LepLep").set(*event, pass_baseline_LepLep, sys);
+      m_Bbranches.at("pass_LepLep").set(*event, pass_LepLep, sys);
+      m_Bbranches.at("pass_baseline_LepHad").set(*event, pass_baseline_LepHad, sys);
+      m_Bbranches.at("pass_LepHad").set(*event, pass_LepHad, sys);
+      m_Bbranches.at("pass_baseline_HadHad").set(*event, pass_baseline_HadHad, sys);
+      m_Bbranches.at("pass_HadHad").set(*event, pass_HadHad, sys);
       m_Bbranches.at("pass_Looseele").set(*event, n_looseele==0, sys);
       m_Bbranches.at("pass_Loosemuo").set(*event, n_loosemuo==0, sys);
 

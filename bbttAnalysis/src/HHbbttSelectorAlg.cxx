@@ -132,13 +132,13 @@ namespace HHBBTT
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
     for ( auto name : m_channel_names){
-      if( name == "lephad2b") m_channels.push_back(HHBBTT::LepHad2B);
-      else if ( name == "hadhad2b") m_channels.push_back(HHBBTT::HadHad2B);
-      else if ( name == "lephad1b") m_channels.push_back(HHBBTT::LepHad1B);
-      else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
+      if( name == "LepHad_2B") m_channels.push_back(HHBBTT::LepHad2B);
+      else if ( name == "HadHad_2B") m_channels.push_back(HHBBTT::HadHad2B);
+      else if ( name == "LepHad_1B") m_channels.push_back(HHBBTT::LepHad1B);
+      else if ( name == "HadHad_1B") m_channels.push_back(HHBBTT::HadHad1B);
       else if ( name == "ZCR") m_channels.push_back(HHBBTT::ZCR);
       else if ( name == "TopEMuCR") m_channels.push_back(HHBBTT::TopEMuCR);
-      else if ( name == "antiiso-lephad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
+      else if ( name == "AntiIsoLepHad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;

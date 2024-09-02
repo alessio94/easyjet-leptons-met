@@ -5,4 +5,4 @@ ttree_output:
       
 include: bbttAnalysis/RunConfig-bbtt-base.yaml
 
-channel: ["hadhad2b","hadhad1b","lephad2b","lephad1b","ZCR","TopEMuCR"]
+channels: ["HadHad_2B","HadHad_1B","LepHad_2B","LepHad_1B","ZCR","TopEMuCR"]

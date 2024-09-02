@@ -69,7 +69,7 @@ def lltt_cfg(
             eleWP=TightElectronWPLabel,
             eventDecisionOutputDecoration="lltt_pass_sr_noMMC_%SYS%",
             triggerLists=trigger_branches,
-            channel=flags.Analysis.channel,
+            channel=flags.Analysis.channels,
             isMC=flags.Input.isMC,
             bypass=flags.Analysis.bypass,
         )
@@ -85,10 +85,10 @@ def lltt_cfg(
         cfg.addEventAlgo(
             CompFactory.HLLTT.MMCDecoratorAlg(
                 "MMCDecoratorAlg",
-                passLEPLEP="pass" + baseline + "LEPLEP_%SYS%",
-                passLEPHAD="pass" + baseline + "LEPHAD_%SYS%",
-                passHADHAD="pass" + baseline + "HADHAD_%SYS%",
-                channel=flags.Analysis.channel,
+                passLepLep="pass" + baseline + "LepLep_%SYS%",
+                passLepHad="pass" + baseline + "LepHad_%SYS%",
+                passHadHad="pass" + baseline + "HadHad_%SYS%",
+                channel=flags.Analysis.channels,
                 mmcTool=cfg.popToolsAndMerge(MissingMassToolV2Cfg(flags))
             )
         )
@@ -188,7 +188,7 @@ def lltt_branches(flags):
                          + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for var in ["_baseline_", "_"]:
-        for cat in ["LEPLEP", "LEPHAD", "HADHAD"]:
+        for cat in ["LepLep", "LepHad", "HadHad"]:
             branches += [f"EventInfo.pass{var}{cat}_%SYS% -> "
                          f"lltt_pass{var}{cat}"
                          + flags.Analysis.systematics_suffix_separator + "%SYS%"]
