@@ -30,6 +30,15 @@ def event_selection_sequence(flags):
             ],
         )
 
+    # Run GRL decoration optionally, already available in PHYSLITE
+    if flags.Analysis.GRL.store_decoration and not flags.Input.isMC \
+       and not flags.Input.isPHYSLITE:
+        from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
+        configSeq += makeConfig('EventCleaning')
+        configSeq.setOptionValue('.noFilter', True)
+        configSeq.setOptionValue('.runPrimaryVertexSelection', False)
+        configSeq.setOptionValue('.GRLDict', getGoodRunsLists())
+
     return configSeq
 
 

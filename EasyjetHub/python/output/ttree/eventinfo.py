@@ -125,4 +125,11 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "passRelativeDeltaRToVRJetCutUFO"
         ]
 
+    if flags.Analysis.GRL.store_decoration and not flags.Input.isMC:
+        from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
+        for key in getGoodRunsLists().keys():
+            for year in flags.Analysis.Years:
+                if str(year) in key:
+                    eventinfo_branches.variables += [key]
+
     return eventinfo_branches.get_output_list()

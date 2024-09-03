@@ -154,6 +154,8 @@ GRL:
   # good runs lists to filter events
   files:
     include: general_grl.yaml
+  store_decoration: false
+
 # In general we should not need custom Pileup Reweighting
 # Uses grl_years to find files
 prw_files: {}
