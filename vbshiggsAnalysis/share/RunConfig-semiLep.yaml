@@ -10,23 +10,23 @@ do_met : true
 
 
 Electron:
-  ID: "LooseBLayerLH"
+  ID: "LooseDNNElectron"
   Iso: "Loose_VarRad"
-  amount: 1
+  amount: 2
   extra_wps:
-    - ["MediumLH", "Loose_VarRad"]
-    - ["MediumLH", "Tight_VarRad"]
-    - ["MediumLH", "TightTrackOnly_VarRad"]
-    - ["MediumLH", "TightTrackOnly_FixedRad"]
+    - ["MediumDNNElectron", "Loose_VarRad"]
+    - ["MediumDNNElectron", "Tight_VarRad"]
+    - ["MediumDNNElectron", "TightTrackOnly_VarRad"]
+    - ["MediumDNNElectron", "TightTrackOnly_FixedRad"]
 
-    - ["TightLH", "Loose_VarRad"]
-    - ["TightLH", "Tight_VarRad"]
-    - ["TightLH", "TightTrackOnly_VarRad"]
-    - ["TightLH", "TightTrackOnly_FixedRad"]
+    - ["TightDNNElectron", "Loose_VarRad"]
+    - ["TightDNNElectron", "Tight_VarRad"]
+    - ["TightDNNElectron", "TightTrackOnly_VarRad"]
+    - ["TightDNNElectron", "TightTrackOnly_FixedRad"]
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
-  amount: 1
+  amount: 2
   extra_wps:
     - ["Medium", "PflowLoose_VarRad"]
     - ["Medium", "PflowTight_VarRad"]
