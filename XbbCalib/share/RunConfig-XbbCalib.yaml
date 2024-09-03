@@ -15,19 +15,19 @@ do_met: true
 
 # Toggles for reconstructed objects decorations
 Small_R_jet:
-  min_pT: 28
+  min_pT: 28.e+3
   btag_wp: "GN2v01_FixedCutBEff_77"
 
 Large_R_jet:
-  min_pT: 200
+  min_pT: 200.e+3
 
 Electron:
-  min_pT: 28
+  min_pT: 28.e+3
   ID: "TightLH"
   Iso: "Tight_VarRad"
 
 Muon:
-  min_pT: 28
+  min_pT: 28.e+3
   ID: "Medium"
   Iso: "PflowTight_VarRad"
 
