@@ -1,17 +1,14 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
+from EasyjetHub.algs.cpalgs_config import get_sys_weight_name
+from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     PhotonSelectorAlgCfg, MuonSelectorAlgCfg, ElectronSelectorAlgCfg,
     JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
-
-import pathlib
-import os
-import yaml
 
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
@@ -146,24 +143,6 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
                 floatVariableList=float_SH_var,
             )
         )
-
-    return cfg
-
-
-def bbyy_filter_dalitz_cfg(flags):
-    cfg = ComponentAccumulator()
-
-    cfg.addEventAlgo(
-        CompFactory.HHBBYY.bbyyFilterDalitzAlg(
-            "bbyyFilterDalitzAlg",
-            TruthParticleSMInKey=(
-                flags.Analysis.container_names.input.truthSMParticles
-            ),
-            TruthParticleBSMInKey=(
-                flags.Analysis.container_names.input.truthBSMParticles
-            ),
-        ),
-    )
 
     return cfg
 
@@ -393,56 +372,3 @@ def bbyy_branches(flags):
                      + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     return branches, float_variable_names, int_variable_names
-
-
-def FullPath(rawpath):
-    fpath = pathlib.Path(rawpath)
-    for dirpath in [""] + os.environ["DATAPATH"].split(":"):
-        fullpath = dirpath / fpath
-        if fullpath.exists():
-            return fullpath
-
-
-def contain_dalitz(input):
-    # Determine if input is flags or an integer DSID
-    if isinstance(input, int):
-        dsid = str(input)
-    else:
-        dsid = str(input.Input.MCChannelNumber)
-    # file name hard-coded
-    with open(FullPath("bbyyAnalysis/DalitzDataset.txt"), 'r') as file_in:
-        dataset_list = file_in.readlines()
-        for dataset in dataset_list:
-            if dsid in dataset:
-                return True
-    return False
-
-
-def get_sys_weight_name(input):
-    # Determine if input is flags or an integer DSID
-    if isinstance(input, int):
-        dsid = input
-    else:
-        dsid = int(input.Input.MCChannelNumber)
-
-    # file name hard-coded
-    with open(FullPath("bbyyAnalysis/SpecialWeightIndices.yaml"), 'r') as file_in:
-        try:
-            content = yaml.safe_load(file_in)
-        except yaml.YAMLError as exc:
-            raise ValueError(f"Error in configuration file: {exc}")
-
-        for entry in content:
-            if entry['DSID'] == dsid:
-                sys_weight_name = entry.get("sysWeightName", "")
-
-                # Exception in case I forgot to map the DSID with
-                # the sys weight name for a MC sample.
-                if sys_weight_name is None:
-                    raise ValueError(
-                        f"DSID {dsid} must have sysWeightName"
-                    )
-
-                return sys_weight_name if sys_weight_name else ""
-
-    return ""  # in case no matching DSID is found

@@ -59,7 +59,7 @@ atlas_install_python_modules(
   test
 )
 atlas_install_data(
-  share/*.yaml
+  share/*
 )
 
 # atlas_install_data( data/* )

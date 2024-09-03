@@ -1,42 +1,11 @@
 # Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
-from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
-from AthenaConfiguration.ComponentFactory import CompFactory
-
 from AnalysisAlgorithmsConfig.ConfigBlock import ConfigBlock
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
-
-def HHbbttTriggerDecoratorCfg(flags, **kwargs):
-
-    cfg = ComponentAccumulator()
-
-    from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
-
-    # Selection
-    trigger_branches = [
-        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
-        for c in flags.Analysis.TriggerChains
-    ]
-
-    cfg.addEventAlgo(
-        CompFactory.HHBBTT.TriggerDecoratorAlg(
-            "HHbbttTriggerDecoratorAlg",
-            isMC=flags.Input.isMC,
-            muons=flags.Analysis.container_names.input.muons,
-            electrons=flags.Analysis.container_names.input.electrons,
-            taus=flags.Analysis.container_names.input.taus,
-            triggerLists=trigger_branches,
-            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
-            **kwargs
-        )
-    )
-
-    return cfg
-
-
 # Define ConfigBlock for AntiTauDecoratorAlg
+
 
 class HHbbttAntiTauDecoratorBlock(ConfigBlock):
 

@@ -99,11 +99,10 @@ def preselection_cfg(flags, seqname):
     cfg.merge(weightConfigAccumulator.CA, seqname)
 
     if flags.Analysis.do_bbyy_analysis and flags.Input.isMC:
-        from bbyyAnalysis.bbyy_config import contain_dalitz
+        from EasyjetHub.algs.truth.truth_config import (
+            contain_dalitz, bbyy_filter_dalitz_cfg, sumofweightsalg_cfg)
         if contain_dalitz(flags):
-            from bbyyAnalysis.bbyy_config import bbyy_filter_dalitz_cfg
             cfg.merge(bbyy_filter_dalitz_cfg(flags), seqname)
-            from EasyjetHub.algs.truth.truth_config import sumofweightsalg_cfg
             cfg.merge(sumofweightsalg_cfg(flags), seqname)
 
     # Aggregate the configured CP algs in one ConfigSequence,

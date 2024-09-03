@@ -4,6 +4,9 @@ from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.algs.truth.parent_decorator_config import parent_decorator_cfg
 from EasyjetHub.algs.truth_particle_info_config import truth_particle_info_cfg
 
+import pathlib
+import os
+
 
 def truth_info_cfg(
     flags,
@@ -72,6 +75,47 @@ def sumofweightsalg_cfg(flags):
     cfg.addEventAlgo(
         CompFactory.Easyjet.SumOfWeightsAlg(
             "SumOfWeightsAlg",
+        ),
+    )
+
+    return cfg
+
+
+def contain_dalitz(input):
+    # Determine if input is flags or an integer DSID
+    if isinstance(input, int):
+        dsid = str(input)
+    else:
+        dsid = str(input.Input.MCChannelNumber)
+
+    def FullPath(rawpath):
+        fpath = pathlib.Path(rawpath)
+        for dirpath in [""] + os.environ["DATAPATH"].split(":"):
+            fullpath = dirpath / fpath
+            if fullpath.exists():
+                return fullpath
+
+    # file name hard-coded
+    with open(FullPath("EasyjetHub/DalitzDataset.txt"), 'r') as file_in:
+        dataset_list = file_in.readlines()
+        for dataset in dataset_list:
+            if dsid in dataset:
+                return True
+    return False
+
+
+def bbyy_filter_dalitz_cfg(flags):
+    cfg = ComponentAccumulator()
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBYY.bbyyFilterDalitzAlg(
+            "bbyyFilterDalitzAlg",
+            TruthParticleSMInKey=(
+                flags.Analysis.container_names.input.truthSMParticles
+            ),
+            TruthParticleBSMInKey=(
+                flags.Analysis.container_names.input.truthBSMParticles
+            ),
         ),
     )
 

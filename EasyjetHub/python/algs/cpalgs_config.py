@@ -27,7 +27,9 @@ from EasyjetHub.steering.utils.systematics_helper import consolidate_systematics
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from EasyjetHub.algs.event_info_global_alg_config import event_info_global_alg_cfg
 
-from bbyyAnalysis.bbyy_config import get_sys_weight_name
+import pathlib
+import os
+import yaml
 
 # Map object types to sequence configurators
 analysis_seqs = {
@@ -185,3 +187,40 @@ def cpalgs_cfg(flags):
                 )
 
     return cfg
+
+
+def get_sys_weight_name(input):
+    # Determine if input is flags or an integer DSID
+    if isinstance(input, int):
+        dsid = input
+    else:
+        dsid = int(input.Input.MCChannelNumber)
+
+    def FullPath(rawpath):
+        fpath = pathlib.Path(rawpath)
+        for dirpath in [""] + os.environ["DATAPATH"].split(":"):
+            fullpath = dirpath / fpath
+            if fullpath.exists():
+                return fullpath
+
+    # file name hard-coded
+    with open(FullPath("EasyjetHub/SpecialWeightIndices.yaml"), 'r') as file_in:
+        try:
+            content = yaml.safe_load(file_in)
+        except yaml.YAMLError as exc:
+            raise ValueError(f"Error in configuration file: {exc}")
+
+        for entry in content:
+            if entry['DSID'] == dsid:
+                sys_weight_name = entry.get("sysWeightName", "")
+
+                # Exception in case I forgot to map the DSID with
+                # the sys weight name for a MC sample.
+                if sys_weight_name is None:
+                    raise ValueError(
+                        f"DSID {dsid} must have sysWeightName"
+                    )
+
+                return sys_weight_name if sys_weight_name else ""
+
+    return ""  # in case no matching DSID is found

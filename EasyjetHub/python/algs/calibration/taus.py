@@ -7,7 +7,7 @@ from TauAnalysisAlgorithms.TauAnalysisConfig import (
 from EasyjetHub.steering.utils.name_helper import drop_sys
 from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
-from bbttAnalysis.AntiTauDecoratorConfig import HHbbttAntiTauDecoratorBlock
+from EasyjetHub.algs.calibration.antitaus import HHbbttAntiTauDecoratorBlock
 
 
 def tau_sequence(flags, configAcc):
