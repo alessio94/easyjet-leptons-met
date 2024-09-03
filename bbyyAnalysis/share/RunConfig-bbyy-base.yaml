@@ -104,4 +104,4 @@ GNN_path_run3:
   - "bbyyAnalysis/GNN_VBFTarget_run3.onnx"
 
 #  choose VBF jets selection method
-VBFjetsMethod: "BDT" # "mjj" "pTsorting"
+VBFjetsMethod: "mjj" # "mjj" "pTsorting"

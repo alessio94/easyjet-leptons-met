@@ -6,20 +6,6 @@ bypass: false
 # name that will go in the tree bbyy_pass_<selection_name>_%SYS%
 selection_name: "loose"
 
-##temporary lines for the resonant analysis
-do_resonant_PNN: true
-
-#Low Mass Grid
-mX_mS_pairs: [[170, 30], [205, 30], [245, 90]]
-
-#High Mass Grid
-mS_values: [30, 170, 400]
-mX_values: [750]
-
-#1 bjet Mass Grid
-mX_1bjet: [750]
-###########
-
 CutList :
       - PASS_TRIGGER
       - TWO_LOOSE_PHOTONS

@@ -282,7 +282,7 @@ namespace HHBBYY
       std::vector<const xAOD::Photon*> Hyy_photons = {ph1, ph2};
 
       // Fill the bb and bbyy branches
-      if (bjets->size() >= 2) {
+      if (jets->size() >= 2) {
         fill_bb_branches(Hbb_jets, "", event, sys);
 
         if(ph1 && ph2) {
