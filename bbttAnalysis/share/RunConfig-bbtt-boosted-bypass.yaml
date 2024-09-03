@@ -6,10 +6,11 @@ bypass: true
 do_trigger_filtering: false
 
 do_large_R_UFO_jets: true
-do_large_R_jets_OR: false
-do_small_R_jet_large_R_jet_OR: false
+OverlapRemoval:
+  do_large_R_jets: false
+  do_small_R_jet_large_R_jet: false
 
-large_R_jet:
+Large_R_jet:
   runMuonJetPtCorr: true
 
 # Include the TTree configuration and update details

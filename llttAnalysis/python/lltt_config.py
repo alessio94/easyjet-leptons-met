@@ -63,7 +63,7 @@ def lltt_cfg(
     cfg.addEventAlgo(
         CompFactory.HLLTT.HllttSelectorAlg(
             "HllttSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             tauWP=flags.Analysis.Tau.ID,
             muonWP=TightMuonWPLabel,
             eleWP=TightElectronWPLabel,
@@ -110,7 +110,7 @@ def lltt_cfg(
             tauWP=flags.Analysis.Tau.ID,
             muonWP=TightMuonWPLabel,
             eleWP=TightElectronWPLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables,
         )

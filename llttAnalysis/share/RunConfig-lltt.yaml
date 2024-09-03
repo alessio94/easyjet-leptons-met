@@ -18,10 +18,11 @@ do_mmc : true
 do_baseline : true
 
 # Decay mode considered for truth decoration
-truthDecayModes: ["mmtt", "eett", "tttt"]
+Truth:
+  decayModes: ["mmtt", "eett", "tttt"]
 
 # small R config
-small_R_jet:
+Small_R_jet:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
   amount: 3
@@ -55,9 +56,8 @@ Lepton:
   amount: 2
 
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: llttAnalysis/trigger.yaml
-
 # apply trigger lists to filter events
 do_trigger_filtering: true
 

@@ -66,7 +66,7 @@ def analysis_configuration(parser="default"):
     if flags.Analysis.fast_test:
         flags.Analysis.do_overlap_removal = False
         flags.Analysis.do_muons = False
-        flags.Analysis.small_R_jet.runBJetPtCalib = False
+        flags.Analysis.Small_R_jet.runBJetPtCalib = False
 
         def disable_reco_muons(tree_flags):
             _tree_flags = {k: v for k, v in tree_flags.items()}
@@ -159,11 +159,11 @@ def get_trigger_chains(flags):
         )
 
     trigger_chains = set()
-    if flags.hasCategory("Analysis.trigger"):
+    if flags.hasCategory("Analysis.Trigger"):
         try:
             for year in trigger_year_list:
                 trigger_chains |= set(
-                    flags.Analysis.trigger.selection.chains[str(year)])
+                    flags.Analysis.Trigger.selection.chains[str(year)])
         except KeyError as err:
             log.error(f"Trigger chains for {year} not defined.")
             raise err
@@ -172,18 +172,18 @@ def get_trigger_chains(flags):
 
 
 def get_trigger_chains_scale_factor(flags, obj=None):
-    if not flags.Analysis.trigger.scale_factor.doSF:
+    if not flags.Analysis.Trigger.scale_factor.doSF:
         return {}
 
     if obj:
-        if not hasattr(flags.Analysis.trigger.scale_factor, obj):
+        if not hasattr(flags.Analysis.Trigger.scale_factor, obj):
             return {}
-        triggerChains = getattr(flags.Analysis.trigger.scale_factor, obj).chains
+        triggerChains = getattr(flags.Analysis.Trigger.scale_factor, obj).chains
     else:
         triggerChains = (
-            flags.Analysis.trigger.scale_factor.chains
-            if hasattr(flags.Analysis.trigger.scale_factor, "chains") else
-            flags.Analysis.trigger.selection.chains)
+            flags.Analysis.Trigger.scale_factor.chains
+            if hasattr(flags.Analysis.Trigger.scale_factor, "chains") else
+            flags.Analysis.Trigger.selection.chains)
 
     triggerChainsDict = {
         str(year): [trigger for trigger in triggerChains[str(year)]]
@@ -250,11 +250,12 @@ def setHHOrthFlags(flags):
         HHBjet_WP = flags.Analysis.orthogonality.HHBjet.btag_wp
         # Take WP from orthogonality configuration if
         # the collection was not already going to be run
-        if flags.Analysis.small_R_jet.btag_wp == "":
-            flags.Analysis.small_R_jet.btag_wp = HHBjet_WP
+        if flags.Analysis.Small_R_jet.btag_wp == "":
+            flags.Analysis.Small_R_jet.btag_wp = HHBjet_WP
         # WP is there but it differs from the orthogonality WP
-        elif flags.Analysis.small_R_jet.btag_wp != "" and flags.Analysis.small_R_jet.btag_wp != HHBjet_WP: # noqa
-            flags.Analysis.small_R_jet.btag_extra_wps += [HHBjet_WP]
+        elif (flags.Analysis.Small_R_jet.btag_wp != ""
+              and flags.Analysis.Small_R_jet.btag_wp != HHBjet_WP):
+            flags.Analysis.Small_R_jet.btag_extra_wps += [HHBjet_WP]
 
         # Photons (ID and Iso)
         HHPhoton_ID = flags.Analysis.orthogonality.HHPhoton.ID

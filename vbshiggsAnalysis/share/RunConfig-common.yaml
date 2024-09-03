@@ -34,7 +34,7 @@ do_overlap_removal: true
 save_vbshiggs_cutflow: true
 
 # Toggles for reconstructed objects decorations
-small_R_jet:
+Small_R_jet:
   # btagging working points 
   btag_wp: "GN2v01_FixedCutBEff_90"
   amount: 2

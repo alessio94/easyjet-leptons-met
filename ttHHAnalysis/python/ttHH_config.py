@@ -46,8 +46,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
                                 containerInKey=smalljetkey,
                                 containerOutKey="ttHHAnalysisJets_BTag_%SYS%",
                                 bTagWPDecorName="ftag_select_"
-                                + flags.Analysis.small_R_jet.btag_wp,
-                                PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0], # noqa
+                                + flags.Analysis.Small_R_jet.btag_wp,
+                                PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0], # noqa
                                 PCBTsort=True,
                                 pTsort=False,
                                 selectBjet=True,
@@ -58,7 +58,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
                                 containerInKey=smalljetkey,
                                 containerOutKey="ttHHAnalysisJets_%SYS%",
                                 PCBTDecorName="ftag_quantile_"
-                                + flags.Analysis.small_R_jet.btag_extra_wps[0],
+                                + flags.Analysis.Small_R_jet.btag_extra_wps[0],
                                 PCBTsort=True,
                                 pTsort=False,
                                 bTagWPDecorName="",
@@ -69,7 +69,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.ttHH.JetPairingAlgttHH(
             "JetPairingAlgHH",
             bTagWPDecorName="ftag_select_"
-            + flags.Analysis.small_R_jet.btag_wp,
+            + flags.Analysis.Small_R_jet.btag_wp,
             pairingStrategyName="chiSquare",
         )
     )
@@ -100,9 +100,9 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.ttHH.BaselineVarsttHHAlg(
             "BaselineVarsttHHAlg",
             bTagWPDecorName="ftag_select_"
-            + flags.Analysis.small_R_jet.btag_wp,
+            + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_"
-            + flags.Analysis.small_R_jet.btag_extra_wps[0],
+            + flags.Analysis.Small_R_jet.btag_extra_wps[0],
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             isMC=flags.Input.isMC,

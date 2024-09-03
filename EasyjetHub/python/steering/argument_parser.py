@@ -162,7 +162,7 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
 
 
 def validate_args(runconfig: dict, overwrites: dict) -> None:
-    # check that values belonging in runcofig exist, and vice-versa
+    # check that values belonging in runconfig exist, and vice-versa
     for key, value in overwrites.items():
         if value and key not in runconfig:
             raise ValueError(f"{key} must be set in the config file")

@@ -14,15 +14,15 @@ def get_selected_objects_branches_variables(flags, analysis):
         sys_suffix = "%SYS%"
 
     # All jets
-    for var in [*flags.Analysis.small_R_jet.variables_int_allJets,
-                *flags.Analysis.small_R_jet.variables_allJets]:
+    for var in [*flags.Analysis.Small_R_jet.variables_int_allJets,
+                *flags.Analysis.Small_R_jet.variables_allJets]:
         if not flags.Input.isMC and "SF" in var:
             continue
-        for index in range(flags.Analysis.small_R_jet.amount):
+        for index in range(flags.Analysis.Small_R_jet.amount):
             # Store the float and int variables
-            if var in flags.Analysis.small_R_jet.variables_allJets:
+            if var in flags.Analysis.Small_R_jet.variables_allJets:
                 float_variable_names += [f"Jet{index+1}_{var}"]
-            if var in flags.Analysis.small_R_jet.variables_int_allJets:
+            if var in flags.Analysis.Small_R_jet.variables_int_allJets:
                 int_variable_names += [f"Jet{index+1}_{var}"]
             # Translate the name to an analysis specific convention
             branches += [f"EventInfo.Jet{index+1}_{var}_{sys_suffix} \
@@ -30,15 +30,15 @@ def get_selected_objects_branches_variables(flags, analysis):
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # B tagged jets
-    for var in [*flags.Analysis.small_R_jet.variables_int_bjets,
-                *flags.Analysis.small_R_jet.variables_bjets]:
+    for var in [*flags.Analysis.Small_R_jet.variables_int_bjets,
+                *flags.Analysis.Small_R_jet.variables_bjets]:
         if not flags.Input.isMC and "SF" in var:
             continue
-        for index in range(flags.Analysis.small_R_jet.amount_bjet):
+        for index in range(flags.Analysis.Small_R_jet.amount_bjet):
             # Store the float and int variables
-            if var in flags.Analysis.small_R_jet.variables_bjets:
+            if var in flags.Analysis.Small_R_jet.variables_bjets:
                 float_variable_names += [f"Jet_b{index+1}_{var}"]
-            if var in flags.Analysis.small_R_jet.variables_int_bjets:
+            if var in flags.Analysis.Small_R_jet.variables_int_bjets:
                 int_variable_names += [f"Jet_b{index+1}_{var}"]
             # Translate the name to an analysis specific convention
             branches += [f"EventInfo.Jet_b{index+1}_{var}_{sys_suffix} \
@@ -46,15 +46,15 @@ def get_selected_objects_branches_variables(flags, analysis):
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     # Large R jets
-    for var in [*flags.Analysis.large_R_jet.variables_int_LargeRJets,
-                *flags.Analysis.large_R_jet.variables_LargeRJets]:
+    for var in [*flags.Analysis.Large_R_jet.variables_int_LargeRJets,
+                *flags.Analysis.Large_R_jet.variables_LargeRJets]:
         if not flags.Input.isMC and "SF" in var:
             continue
-        for index in range(flags.Analysis.large_R_jet.amount):
+        for index in range(flags.Analysis.Large_R_jet.amount):
             # Store the float and int variables
-            if var in flags.Analysis.large_R_jet.variables_LargeRJets:
+            if var in flags.Analysis.Large_R_jet.variables_LargeRJets:
                 float_variable_names += [f"LargeRJet{index+1}_{var}"]
-            if var in flags.Analysis.large_R_jet.variables_int_LargeRJets:
+            if var in flags.Analysis.Large_R_jet.variables_int_LargeRJets:
                 int_variable_names += [f"LargeRJet{index+1}_{var}"]
             # Translate the name to an analysis specific convention
             branches += [f"EventInfo.LargeRJet{index+1}_{var}_{sys_suffix} \

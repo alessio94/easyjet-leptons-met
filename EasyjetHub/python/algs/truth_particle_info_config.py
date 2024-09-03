@@ -6,7 +6,7 @@ def truth_particle_info_cfg(
     flags,
 ):
     cfg = ComponentAccumulator()
-    if flags.Input.MCChannelNumber in flags.Analysis.DSID_nWLep_samples:
+    if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_nWLep_samples:
         cfg.addEventAlgo(
             CompFactory.Easyjet.TruthWBosonInformationAlg(
                 "TruthWBosonInformationAlg",
@@ -28,7 +28,7 @@ def truth_particle_info_cfg(
             TruthParticleInformationOutKey=(
                 flags.Analysis.container_names.output.truthHHParticles
             ),
-            decayModes=flags.Analysis.truthDecayModes,
+            decayModes=flags.Analysis.Truth.decayModes,
         )
     )
 

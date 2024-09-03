@@ -62,7 +62,7 @@ def electron_sequence(flags, configAcc):
             configSeq.setOptionValue('.noEffSF', True)
 
     # Electron trigger SF
-    trigSF_flags = flags.Analysis.trigger.scale_factor
+    trigSF_flags = flags.Analysis.Trigger.scale_factor
     if trigSF_flags.doSF and hasattr(trigSF_flags, 'Electron'):
         configSeq += makeConfig('Electrons.TriggerSF')
         configSeq.setOptionValue('.containerName', output_name)

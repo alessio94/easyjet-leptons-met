@@ -54,7 +54,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.HHBBLL.HHbbllSelectorAlg(
             "HHbbllSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             eventDecisionOutputDecoration="bbll_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_bbll_cutflow,
@@ -85,7 +85,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
         cfg.addEventAlgo(
             CompFactory.HHBBLL.NeutrinoWeightingAlg(
                 "NeutrinoWeightingAlg",
-                bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 floatNWVariables=float_NW_variables,
                 NW_cutList=flags.Analysis.NeutrinoWeighting.cutList,
                 NeutrinoWeightingTools=[
@@ -95,7 +95,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
         )
 
     btag_pcbt_wps \
-        = [wp for wp in flags.Analysis.small_R_jet.btag_extra_wps if "Continuous" in wp]
+        = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp]
 
     # calculate final bbll vars
     cfg.addEventAlgo(
@@ -104,7 +104,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             isMC=flags.Input.isMC,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
             floatVariableList=float_variables,
             intVariableList=int_variables

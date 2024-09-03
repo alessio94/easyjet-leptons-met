@@ -11,8 +11,8 @@ def resolved_cfg(flags, smalljetkey):
     cfg = ComponentAccumulator()
 
     # this is a resolved dihiggs analysis chain
-    btag_wps = [flags.Analysis.small_R_jet.btag_wp]
-    btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
+    btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
+    btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
     for btag_wp in btag_wps:
         # get the 4 leading small R jets
         cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg_" + btag_wp,
@@ -60,8 +60,8 @@ def resolved_branches(flags):
     # in the object configs.
     branches += get_selected_objects_branches(flags, "bbbb_resolved")
 
-    btag_wps = [flags.Analysis.small_R_jet.btag_wp]
-    btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
+    btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
+    btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
     for btag_wp in btag_wps:
         resolved_vars = [
             "DeltaR12",

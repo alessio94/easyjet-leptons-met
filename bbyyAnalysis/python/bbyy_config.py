@@ -46,7 +46,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         flags,
         containerInKey=smalljetkey,
         containerOutKey="bbyyAnalysisJets_%SYS%",
-        PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0], # noqa
+        PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0], # noqa
         minPt=20e3,
         pTsort=False,
         PCBTsort=True,
@@ -76,7 +76,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         CompFactory.HHBBYY.bbyySelectorAlg(
             "bbyySelectorAlg",
             photonWP=SelectedPhotonLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_bbyy_cutflow,
             photonTriggers=flags.Analysis.TriggerChains,
@@ -94,7 +94,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             CompFactory.HHBBYY.MbbKinFitDecoratorAlg(
                 "MbbKinFitDecoratorAlg",
                 JetMinPt=25.,
-                bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 doSystematics=flags.Analysis.do_CP_systematics,
             )
         )
@@ -104,8 +104,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             "BaselineVarsbbyyAlg",
             photonWP=SelectedPhotonLabel,
             KFJets="bbyyAnalysisKFJets_%SYS%" if flags.Analysis.do_KinematicFit else "",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
-            PCBTDecorName="ftag_quantile_" + flags.Analysis.small_R_jet.btag_extra_wps[0],  # noqa
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+            PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0],  # noqa
             BDT_path=flags.Analysis.BDT_path,
             doGNN_tagging=flags.Analysis.do_GNN2bjetSelection,
             GNN_path=(flags.Analysis.GNN_path_run2 if flags.Analysis.Run == 2 else
@@ -135,7 +135,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         cfg.addEventAlgo(
             CompFactory.SHBBYY.ResonantPNNbbyyAlg(
                 "ResonantPNNbbyyAlg",
-                bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 mX_mS_pairs=flags.Analysis.mX_mS_pairs,
                 mS_values=flags.Analysis.mS_values,
                 mX_values=flags.Analysis.mX_values,
@@ -207,9 +207,9 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     # GNN HbbCandidate jets
     if (flags.Analysis.do_GNN2bjetSelection):
         for c in ["ggFTarget", "VBFTarget"]:
-            GNN_float_list = list(flags.Analysis.small_R_jet.variables_allJets)
+            GNN_float_list = list(flags.Analysis.Small_R_jet.variables_allJets)
             GNN_float_list.extend(["uncorrPt", "muonCorrPt"])
-            GNN_int_list = list(flags.Analysis.small_R_jet.variables_int_allJets)
+            GNN_int_list = list(flags.Analysis.Small_R_jet.variables_int_allJets)
             GNN_int_list.extend(["n_muons"])
 
             for i in range(1, 3):

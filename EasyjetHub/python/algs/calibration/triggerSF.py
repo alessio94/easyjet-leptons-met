@@ -9,7 +9,7 @@ from EasyjetHub.steering.utils.log_helper import log
 
 def triggerSF_sequence(flags):
 
-    trigSF_flags = flags.Analysis.trigger.scale_factor
+    trigSF_flags = flags.Analysis.Trigger.scale_factor
 
     configSeq = ConfigSequence()
 

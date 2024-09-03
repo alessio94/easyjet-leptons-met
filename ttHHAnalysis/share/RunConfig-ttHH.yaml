@@ -7,7 +7,8 @@ do_ttHH_analysis: true
 bypass: false
 
 # Decay mode considered for truth decoration
-truthDecayModes: ["bbbb"]
+Truth:
+  decayModes: ["bbbb"]
 
 # Toggles for object types
 do_small_R_jets: true
@@ -17,7 +18,7 @@ do_met: true
 do_photons: false
 
 # Toggles for reconstructed objects decorations
-small_R_jet:
+Small_R_jet:
   btag_wp: GN2v01_FixedCutBEff_85
   btag_extra_wps:
     - GN2v01_Continuous
@@ -47,9 +48,8 @@ orthogonality:
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: ttHHAnalysis/trigger.yaml
-
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
@@ -67,9 +67,6 @@ do_overlap_removal: true
 
 #Enable cutflow 
 save_ttHH_cutflow: false
-
-# save variables for HF classification
-save_HF_classification: true
 
 CutList:
   - PASS_TRIGGER

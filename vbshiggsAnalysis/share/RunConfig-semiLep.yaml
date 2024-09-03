@@ -40,7 +40,7 @@ Lepton:
   variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS"]
 
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: vbshiggsAnalysis/trigger-lep.yaml
 
 CutList :

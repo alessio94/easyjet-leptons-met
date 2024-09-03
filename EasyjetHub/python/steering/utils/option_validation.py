@@ -49,25 +49,25 @@ def validate_do_obj_flags(flags):
             assert not flags.Analysis.Tau.addMuonRM, (
                 "TauJets_MuonRM are not saved in PHYSLITE yet"
             )
-    if flags.Analysis.do_small_R_jets and flags.Analysis.small_R_jet.runBJetPtCalib:
+    if flags.Analysis.do_small_R_jets and flags.Analysis.Small_R_jet.runBJetPtCalib:
         assert flags.Analysis.do_muons, (
             "B-jet pT calibration requires muons to be run"
         )
-        assert len(flags.Analysis.small_R_jet.btag_wp) > 0, (
+        assert len(flags.Analysis.Small_R_jet.btag_wp) > 0, (
             "B-jet pT calibration requires some btag WP to be set"
         )
-        assert "Continuous" not in flags.Analysis.small_R_jet.btag_wp, (
+        assert "Continuous" not in flags.Analysis.Small_R_jet.btag_wp, (
             "Pseudo-continuous b-tagging cannot be used as nominal btag_wp with B-jet "
             "pT calibration. A fixed cut should be used for nominal and PCBT can be "
             "used as btag_extra_wp"
         )
-    if flags.Analysis.do_small_R_jet_large_R_jet_OR:
-        assert flags.Analysis.do_large_R_jets_OR, (
+    if flags.Analysis.OverlapRemoval.do_small_R_jet_large_R_jet:
+        assert flags.Analysis.OverlapRemoval.do_large_R_jets, (
             "Small-R / Large-R jets overlap removal requires for the Large-R jets "
             "overlap removal to be enabled"
         )
     if flags.Analysis.do_large_R_UFO_jets \
-       and flags.Analysis.large_R_jet.runMuonJetPtCorr:
+       and flags.Analysis.Large_R_jet.runMuonJetPtCorr:
         assert flags.Analysis.do_muons, (
             "Large-R jets muon-in-jet correction requires muons to be run"
         )

@@ -6,12 +6,12 @@ def jet_decor_cfg(flags, **kwargs):
     cfg = ComponentAccumulator()
 
     jetcoll = flags.Analysis.container_names.input[
-        flags.Analysis.small_R_jet.jet_type
+        flags.Analysis.Small_R_jet.jet_type
     ]
 
     kwargs.setdefault("isMC", flags.Input.isMC)
 
-    if flags.Analysis.small_R_jet.doHLTMatching:
+    if flags.Analysis.Small_R_jet.doHLTMatching:
         kwargs.setdefault("triggerList", flags.Analysis.TriggerChains)
         from TrigDecisionTool.TrigDecisionToolConfig import TrigDecisionToolCfg
         kwargs.setdefault("TrigDecisionTool", cfg.getPrimaryAndMerge(

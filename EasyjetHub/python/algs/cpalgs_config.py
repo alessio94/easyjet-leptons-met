@@ -156,7 +156,7 @@ def cpalgs_cfg(flags):
 
         configSeq += overlap_sequence(flags)
 
-    if flags.Input.isMC and flags.Analysis.trigger.scale_factor.doSF:
+    if flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF:
         configSeq += triggerSF_sequence(flags)
 
     configSeq += selection_decoration_sequence(flags)

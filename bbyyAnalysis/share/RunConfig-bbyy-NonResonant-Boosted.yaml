@@ -4,8 +4,9 @@ do_large_R_UFO_jets: true
 do_Boosted: true
 
 # temporarily disable OR for large R jets
-do_large_R_jets_OR: false
-do_small_R_jet_large_R_jet_OR: false
+OverlapRemoval:
+  do_large_R_jets: false
+  do_small_R_jet_large_R_jet: false
 
 # flag that toggles run-through mode in the SelectorAlg
 bypass: true
@@ -23,7 +24,7 @@ CutList :
     - EXACTLY_ZERO_LEPTONS
 
 # Toggles for reconstructed objects decorations
-large_R_jet:
+Large_R_jet:
   amount: 2
   variables_LargeJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_phbb", "GN2Xv01_pqcd", "GN2Xv01_phcc", "GN2Xv01_ptop"]
   variables_int_LargeJets: ["truthLabel"]

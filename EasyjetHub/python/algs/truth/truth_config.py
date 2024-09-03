@@ -16,17 +16,17 @@ def truth_info_cfg(
     if not flags.Input.isPHYSLITE:
         # truth record seems to be broken in physlite
         if flags.Analysis.do_small_R_jets \
-           and flags.Analysis.small_R_jet.do_parent_decoration:
+           and flags.Analysis.Small_R_jet.do_parent_decoration:
             cfg.merge(parent_decorator_cfg(
                 flags,
                 targetContainer=flags.Analysis.container_names.input[
-                    flags.Analysis.small_R_jet.jet_type
+                    flags.Analysis.Small_R_jet.jet_type
                 ],
                 prefix="smallR"
             ))
 
         if flags.Analysis.do_large_R_UFO_jets and \
-           flags.Analysis.large_R_jet.do_parent_decoration:
+           flags.Analysis.Large_R_jet.do_parent_decoration:
             cfg.merge(parent_decorator_cfg(
                 flags,
                 targetContainer=flags.Analysis.container_names.input.reco10UFOJet,
@@ -35,7 +35,7 @@ def truth_info_cfg(
             ))
 
         if flags.Analysis.do_large_R_Topo_jets and \
-           flags.Analysis.large_R_jet.do_parent_decoration:
+           flags.Analysis.Large_R_jet.do_parent_decoration:
             cfg.merge(parent_decorator_cfg(
                 flags,
                 targetContainer=flags.Analysis.container_names.input.reco10TopoJet,

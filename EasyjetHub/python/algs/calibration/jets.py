@@ -17,7 +17,7 @@ def jet_sequence(
     configSeq = ConfigSequence()
     config = ConfigFactory()
     makeConfig = config.makeConfig
-    jet_flags = flags.Analysis.small_R_jet
+    jet_flags = flags.Analysis.Small_R_jet
 
     # We define the basic sequence to produce all calibrated jets
     jet_type = jet_flags.jet_type
@@ -202,7 +202,7 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
                             jetCollection=input_name)
 
     # Optional muon-in-jet correction for large-R jets
-    if flags.Analysis.large_R_jet.runMuonJetPtCorr:
+    if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
         makeBJetPtCalibrationConfig(
             configSeq,
             output_name,
@@ -230,7 +230,7 @@ def vr_jet_sequence(flags, configAcc):
 
     # There is no output container, we just operate on the input one
     input_name = flags.Analysis.container_names.input.vrJet
-    for tagger_wp in flags.Analysis.large_R_jet.vr_btag_wps:
+    for tagger_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
         tagger, btag_wp = tagger_wp.split("_", 1)
         # Default CDI in FTag config which is:
         #   "xAODBTaggingEfficiency/13TeV/2022-22-13TeV-MC20-CDI-2022-07-28_v1.root"
@@ -269,7 +269,7 @@ def lr_jet_ghost_vr_jet_association_cfg(
             isMC=flags.Input.isMC,
             LargeJetInKey=flags.Analysis.container_names.input[
                 f"reco10{lr_jet_type}Jet"].replace("%SYS%", "NOSYS"),
-            workingPoints=flags.Analysis.large_R_jet.vr_btag_wps,
+            workingPoints=flags.Analysis.Large_R_jet.vr_btag_wps,
             EventInfoDecorSuffix=lr_jet_type,
         )
     )

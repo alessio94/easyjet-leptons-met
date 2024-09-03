@@ -5,7 +5,8 @@ do_bbVV_analysis: true
 channels: ["1leptonBoosted","1leptonSplitboosted","0leptonBoosted","0leptonSplitboosted"]
 
 # Decay mode considered for truth decoration
-truthDecayModes: ["bbWW","bbZZ"]
+Truth:
+  decayModes: ["bbWW","bbZZ"]
 
 # Toggles for object types
 do_small_R_jets: true
@@ -15,7 +16,7 @@ do_electrons: true
 do_met : true
 
 # Toggles for reconstructed objects decorations
-small_R_jet:
+Small_R_jet:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
 
@@ -40,7 +41,7 @@ orthogonality:
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: bbVVAnalysis/trigger.yaml
 
 # write objects with overlap removal applied

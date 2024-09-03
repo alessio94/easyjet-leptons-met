@@ -36,7 +36,9 @@ container_names:
 
 In addition to the associative definitions above, where all values are accessed by keys (parsed initially to a python `dict`), sequential definitions (parsed initially to a python `list`) are also permitted. Both simple and complex lists are possible:
 ```yaml
-truthDecayModes: ["bbbb"]
+Truth:
+  decayModes: ["bbbb"]
+
 btag_wp: "GN120220509_FixedCutBEff_70"
 btag_extra_wps:
     - GN120220509_FixedCutBEff_77
@@ -62,11 +64,12 @@ lumicalc_files:
   include: lumicalc.yaml
 ```
 
-To ensure that GRL, PRW and luminosity calculation files are consistent, the `prw_files` and `lumicalc_files` should only specify the file name, and the directory they are contained should be set in the `grl_years`, for example:
+To ensure that GRL, PRW and luminosity calculation files are consistent, the `prw_files` and `lumicalc_files` should only specify the file name, and the directory they are contained should be set in the `GRL.years`, for example:
 
 ```yaml
-grl_years:
-  include: grl_years.yaml
+GRL:
+  years:
+    include: grl_years.yaml
 prw_files:
   include: prw.yaml
 lumicalc_files:
@@ -96,8 +99,9 @@ and `prw.yaml` could contain files by year or by MC campaign if using common PRW
 Additionally, GRL files can be specified in the analysis config like:
 
 ```yaml
-grl_files:
-  include: general_grl.yaml
+GRL:
+  files:
+    include: general_grl.yaml
 ```
 
 where `general_grl.yaml` contains only the file names by year:
@@ -110,11 +114,11 @@ where `general_grl.yaml` contains only the file names by year:
 or for analysis relying on b-jet triggers,
 
 ```yaml
-grl_years:
-  include: bjet_grl_years.yaml
-
-grl_files:
-  include: bjet_grl.yaml
+GRL:
+  years:
+    include: bjet_grl_years.yaml
+  files:
+    include: bjet_grl.yaml
 ```
 
 ### Illegal yaml values

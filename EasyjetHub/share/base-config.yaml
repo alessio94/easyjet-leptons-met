@@ -1,8 +1,4 @@
-# Decay mode considered for truth decoration
-truthDecayModes: []
-
 # Toggles for object types
-do_event_cleaning: true
 do_small_R_jets: false
 do_large_R_Topo_jets: false
 do_large_R_UFO_jets: false
@@ -13,15 +9,23 @@ do_photons: false
 do_taus: false
 do_met: false
 do_mmc: false
-save_HF_classification: false
+do_overlap_removal: false
 
 # Other global event configs
 bypass: false
+do_event_cleaning: true
+# apply loose jet cleaning only
+loose_jet_cleaning: false
 do_bbtt_analysis: false
 do_bbyy_analysis: false
 
-# Toggles for reconstructed objects decorations
-small_R_jet:
+# Truth-related properties
+Truth:
+  decayModes: []
+  include: DSID_samples.yaml
+
+# Toggles for reconstructed objects properties
+Small_R_jet:
   min_pT: 20.e+3
   max_eta: 100
   # nominal btagging working point, used for b-jet pT calibration in particular
@@ -50,7 +54,7 @@ small_R_jet:
   variables_int_bjets: []
   variables_int_allJets: []
 
-large_R_jet:
+Large_R_jet:
   # btagging working points for Variable Radius Track jets
   vr_btag_wps: []
   runMuonJetPtCorr: false
@@ -111,11 +115,23 @@ Lepton:
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: ["charge", "pdgid"]
 
+OverlapRemoval:
+  # Enable specific TauAntiTauJet overlap removal, mostly for bbtt analysis
+  doTauAntiTauJet: false
+  # Enable overlap removal between large-R jets and objects for which 
+  # large-R jet OR removal is implemented in Athena
+  do_large_R_jets: true
+  # Enable overlap removal between small-R jets and large-R jets
+  # Athena default is true
+  do_small_R_jet_large_R_jet: true
+
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
 trigger_year: Auto
+# apply trigger lists to filter event
+do_trigger_filtering: false
 # list of triggers per year to consider
-trigger:
+Trigger:
   selection:
     chains:
       "2015": []
@@ -129,24 +145,20 @@ trigger:
   scale_factor:
     doSF: False
 
-# apply trigger lists to filter events
-do_trigger_filtering: false
-# use trigger selections in offline algorithms
-do_trigger_offline_filtering: true
-# list of directories to search for files
-grl_years:
-  include: grl_years.yaml
-# good runs lists to filter events
-grl_files:
-  include: general_grl.yaml
+GRL:
+  # list of directories to search for files
+  years:
+    include: grl_years.yaml
+  # good runs lists to filter events
+  files:
+    include: general_grl.yaml
 # In general we should not need custom Pileup Reweighting
 # Uses grl_years to find files
 prw_files: {}
 # We may need special LumiCalc files depending on triggers
 # Uses grl_years to find files
 lumicalc_files: {}
-# apply loose jet cleaning only
-loose_jet_cleaning: false
+
 # disable CP Algs for calibration
 disable_calib: false
 # Whether to activate CP alg systematic variations
@@ -156,56 +168,9 @@ systematics_suffix_separator: "_"
 # CutBookKeeper histPattern
 cbkHistPattern: "CutBookkeeper_%DSID%_%RUN%_%SYS%"
 
-# write objects with overlap removal applied
-# turning this on you have to decide on one large R jet collection
-do_overlap_removal: false
-# Enable specific TauAntiTauJet overlap removal, mostly for bbtt analysis
-doTauAntiTauJetOR: false
-# Enable overlap removal between large-R jets and objects for which 
-# large-R jet OR removal is implemented in Athena
-do_large_R_jets_OR: true
-# Enable overlap removal between small-R jets and large-R jets
-# Athena default is true
-do_small_R_jet_large_R_jet_OR: true
-
 # Store high level variables by default 
 # when the config file set the high level variables
 store_high_level_variables: false
-
-# list of DSID of samples for which to store WLep related information
-# for overlap removal between samples
-DSID_nWLep_samples:
-  - 410470 #nonallhad ttbar
-  - 601352 #dyn scale Wt DR
-  - 601355 #dyn scale Wt DR
-  - 601627 #dyn scale Wt DS
-  - 601631 #dyn scale Wt DS
-  - 601626 #hdamp variations DS
-  - 601630 #hdamp variations DS
-  - 601460 #hdamp variations DR
-  - 601462 #hdamp variations DR
-  - 602235 #PS variation
-  - 602236 #PS variation
-  - 602689 #pThard variation
-  - 602690 #pThard variation
-
-# list of DSID of samples for which to store HF classification 
-# related information
-DSID_HF_class_samples:
-  - 410470 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_nonallhad
-  - 410472 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_dil
-  - 410480 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_SingleLep
-  - 410482 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_dil
-  - 411233 #mc20 PowhegHerwig7EvtGen_tt_hdamp258p75_713_SingleLep
-  - 411234 #mc20 PowhegHerwig7EvtGen_tt_hdamp258p75_713_dil
-  - 601229 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_SingleLep
-  - 601230 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_dil
-  - 601491 #mc20 PhPy8EG_A14_ttbar_pThard1_dil
-  - 601497 #mc20 PhPy8EG_A14_ttbar_pThard1_singlelep
-  - 603190 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_bzd5_dilep_shower
-  - 603191 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_pTdef1_pThard1_dilep
-  - 603192 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_bzd5_ljets_shower
-  - 603193 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_pTdef1_pThard1_ljets
 
 # Definition of container names
 full_container_names:

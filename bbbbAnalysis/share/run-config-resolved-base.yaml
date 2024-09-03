@@ -4,7 +4,7 @@ include: bbbbAnalysis/RunConfig-bbbb-base.yaml
 do_small_R_jets: true
 do_muons: true
 
-small_R_jet:
+Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_85"
   btag_extra_wps:
     - DL1dv01_FixedCutBEff_70
@@ -23,7 +23,7 @@ Muon:
 do_overlap_removal: true
 
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: bbbbAnalysis/resolved-triggers.yaml
 
 do_CP_systematics: true

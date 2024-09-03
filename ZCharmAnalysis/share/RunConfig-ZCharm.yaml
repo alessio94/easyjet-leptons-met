@@ -11,10 +11,9 @@ do_muons: true
 do_electrons: true
 do_met : true 
 do_large_R_UFO_jets: true
-save_HF_classification: true
 
 # Toggles for reconstructed objects decorations
-small_R_jet:
+Small_R_jet:
   min_pT: 20000  # for the jets entering the MET computation and the overlap removal
   max_eta: 2.5
   min_pT_ZCharm: 20000 # for the jet selection
@@ -30,7 +29,7 @@ small_R_jet:
     
   variables_int_bjets: ["truthLabel", "pcbt_GN2v01"]
 
-large_R_jet:
+Large_R_jet:
   amount: 1
   variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_DXcc", "GN2Xv01_phbb", "GN2Xv01_phcc", "GN2Xv01_pqcd", "GN2Xv01_ptop"]
 
@@ -60,9 +59,8 @@ Lepton:
 ### MET WP?
 
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: ZCharmAnalysis/trigger.yaml
-
 # apply trigger lists to filter events
 do_trigger_filtering: true
 

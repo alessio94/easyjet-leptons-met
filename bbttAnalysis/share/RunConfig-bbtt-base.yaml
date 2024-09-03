@@ -13,7 +13,8 @@ bypass: false
 splitOutputTree: false
 
 # Decay mode considered for truth decoration
-truthDecayModes: ["bbtt"]
+Truth:
+  decayModes: ["bbtt"]
 
 # Toggles for object types
 do_small_R_jets: true
@@ -24,7 +25,7 @@ do_met : true
 do_mmc : true
 
 # Toggles for reconstructed objects decorations
-small_R_jet:
+Small_R_jet:
   useFJvt: true
   # btagging nominal working point
   btag_wp: "GN2v01_FixedCutBEff_85"
@@ -68,11 +69,12 @@ orthogonality:
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
   
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: bbttAnalysis/trigger.yaml
-
 # apply trigger lists to filter events
 do_trigger_filtering: true
+# use trigger selections in offline algorithms
+do_trigger_offline_filtering: true
 
 #Enable cutflow 
 save_bbtt_cutflow: true
@@ -86,6 +88,7 @@ CutList :
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: true
-doTauAntiTauJetOR: true
+OverlapRemoval:
+  doTauAntiTauJet: true
 
 store_high_level_variables: true

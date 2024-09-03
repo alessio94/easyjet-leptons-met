@@ -53,7 +53,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         cfg.addEventAlgo(
             CompFactory.VBSHIGGS.VBSJetsSelectorAlg(
                 "VBSJetsSelectorAlg",
-                bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             )
         )
 
@@ -70,7 +70,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         CompFactory.VBSHIGGS.HiggsSelectorAlg(
             "HiggsSelectorAlg",
             jets=SignalJetsLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
         )
     )
 

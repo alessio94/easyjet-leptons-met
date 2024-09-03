@@ -113,7 +113,7 @@ def minituple_output_cfg(
         )
         small_R_prefix = (
             "recojet_antikt4"
-            + flags.Analysis.small_R_jet.jet_type.replace("reco4", "").replace("Jet", "")  # noqa: E501
+            + flags.Analysis.Small_R_jet.jet_type.replace("reco4", "").replace("Jet", "")  # noqa: E501
         )
         tree_branches += get_small_R_jet_branches(
             flags, tree_flags,

@@ -64,14 +64,14 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         containerInKey=smalljetkey,
         containerOutKey="bbttAnalysisJets_%SYS%",
         minPt=20 * Units.GeV,
-        bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+        bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
         selectBjet=False,
         minimumAmount=2))
 
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             tauWP=flags.Analysis.Tau.ID,
             muonWPs=muon_WPs,
             eleWPs=ele_WPs,
@@ -117,7 +117,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             )
 
     btag_pcbt_wps \
-        = [wp for wp in flags.Analysis.small_R_jet.btag_extra_wps if "Continuous" in wp] # noqa
+        = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp] # noqa
 
     # calculate final bbtt vars
     cfg.addEventAlgo(
@@ -130,7 +130,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
             muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
             tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
             storeHighLevelVariables=flags.Analysis.store_high_level_variables,
             floatVariableList=float_variables,

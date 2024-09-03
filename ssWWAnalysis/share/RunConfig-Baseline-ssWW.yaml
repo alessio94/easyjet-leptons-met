@@ -13,7 +13,7 @@ do_electrons: true
 do_met : true
 
 # Toggles for reconstructed objects decorations
-small_R_jet:
+Small_R_jet:
   min_pT: 20.e+3  # for the jets entering the MET computation and the overlap removal
   max_eta: 4.5
   min_pT_ssWW: 20.e+3 # for the jet selection
@@ -57,9 +57,8 @@ Lepton:
 
 
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: ssWWAnalysis/trigger.yaml
-
 # apply trigger lists to filter events
 do_trigger_filtering: true
 

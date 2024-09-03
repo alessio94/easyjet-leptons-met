@@ -10,7 +10,7 @@ from EasyjetHub.output.ttree.selected_objects import (
 def boosted_cfg(flags, largejetkey):
     cfg = ComponentAccumulator()
 
-    for btag_wp in flags.Analysis.large_R_jet.vr_btag_wps:
+    for btag_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
         # get the two leading large R's
         cfg.merge(JetSelectorAlgCfg(flags, name="LargeJetSelectorAlg_" + btag_wp,
                                     containerInKey=largejetkey,
@@ -91,7 +91,7 @@ def boosted_branches(flags):
     # in the object configs.
     branches += get_selected_objects_branches(flags, "bbbb_boosted")
 
-    for btag_wp in flags.Analysis.large_R_jet.vr_btag_wps:
+    for btag_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
         boosted_vars = [
             "h1_m",
             "h1_jet1_pt",

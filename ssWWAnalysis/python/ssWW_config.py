@@ -38,8 +38,8 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
                                 containerInKey=smalljetkey,
                                 containerOutKey="ssWWAnalysisJets_%SYS%",
                                 bTagWPDecorName="",
-                                minPt=flags.Analysis.small_R_jet.min_pT_ssWW,
-                                maxEta=flags.Analysis.small_R_jet.max_eta_ssWW))
+                                minPt=flags.Analysis.Small_R_jet.min_pT_ssWW,
+                                maxEta=flags.Analysis.Small_R_jet.max_eta_ssWW))
 
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
@@ -53,7 +53,7 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.ssWWVBS.ssWWSelectorAlg(
             "ssWWSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             eventDecisionOutputDecoration="ssWW_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_ssWW_cutflow,
@@ -72,7 +72,7 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
             isMC=flags.Input.isMC,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables
         )

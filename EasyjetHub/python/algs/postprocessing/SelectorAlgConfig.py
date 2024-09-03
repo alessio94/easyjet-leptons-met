@@ -63,10 +63,10 @@ def JetSelectorAlgCfg(flags, name="JetSelectorAlg", **kwargs):
 
     isSmallRJet = "AntiKt4" in kwargs["containerInKey"]
     kwargs.setdefault("useJVT", isSmallRJet)
-    kwargs.setdefault("useFJVT", isSmallRJet and flags.Analysis.small_R_jet.useFJvt)
+    kwargs.setdefault("useFJVT", isSmallRJet and flags.Analysis.Small_R_jet.useFJvt)
     kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
     if kwargs.get("bTagWPDecorName", ""):
-        kwargs.setdefault("bjetAmount", flags.Analysis.small_R_jet.amount_bjet)
+        kwargs.setdefault("bjetAmount", flags.Analysis.Small_R_jet.amount_bjet)
 
     cfg.addEventAlgo(CompFactory.Easyjet.JetSelectorAlg(name, **kwargs))
     return cfg

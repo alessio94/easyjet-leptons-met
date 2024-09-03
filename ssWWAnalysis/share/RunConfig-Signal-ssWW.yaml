@@ -1,6 +1,6 @@
 include: ssWWAnalysis/RunConfig-Baseline-ssWW.yaml
 
-small_R_jet:
+Small_R_jet:
   min_pT_ssWW: 25000
   max_eta_ssWW: 4.5 ## To be sure
 

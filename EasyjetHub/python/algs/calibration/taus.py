@@ -59,7 +59,7 @@ def tau_sequence(flags, configAcc):
         configSeq.setOptionValue('.electrons', electrons)
 
     # Tau trigger SF
-    trigSF_flags = flags.Analysis.trigger.scale_factor
+    trigSF_flags = flags.Analysis.Trigger.scale_factor
     if trigSF_flags.doSF and hasattr(trigSF_flags, 'Tau'):
         configSeq += makeConfig('TauJets.TriggerSF')
         configSeq.setOptionValue('.containerName', output_name)

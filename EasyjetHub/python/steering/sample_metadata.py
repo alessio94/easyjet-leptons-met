@@ -89,7 +89,7 @@ def get_lumicalc_files(flags):
     lumicalc_files = set()
     for year in flags.Analysis.Years:
         year = str(year)
-        lumicalc_dir = flags.Analysis.grl_years[year]
+        lumicalc_dir = flags.Analysis.GRL.years[year]
         lumicalc_file = flags.Analysis.lumicalc_files[year]
         if lumicalc_dir and lumicalc_file:
             lumicalc_files.add(str(Path(lumicalc_dir) / lumicalc_file))
@@ -108,7 +108,7 @@ def get_prw_files(flags):
     prw_files = set()
     for year in flags.Analysis.Years:
         year = str(year)
-        prw_dir = flags.Analysis.grl_years[year]
+        prw_dir = flags.Analysis.GRL.years[year]
         # because we don't get PRW from GRL folders from all years
         if year in flags.Analysis.prw_files:
             prw_file = flags.Analysis.prw_files[year]
@@ -160,8 +160,8 @@ def get_grl_files(flags):
     if not flags.Input.isMC:
         for year in flags.Analysis.Years:
             year = str(year)
-            grl_dir = flags.Analysis.grl_years[year]
-            grl_file = flags.Analysis.grl_files[year]
+            grl_dir = flags.Analysis.GRL.years[year]
+            grl_file = flags.Analysis.GRL.files[year]
             if grl_dir and grl_file:
                 grl_files.add(str(Path(grl_dir) / grl_file))
             else:

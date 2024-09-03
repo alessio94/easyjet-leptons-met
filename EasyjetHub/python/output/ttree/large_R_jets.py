@@ -33,7 +33,7 @@ def get_large_R_jet_branches(
     if flags.Analysis.do_overlap_removal:
         large_R_jet_branches.variables += ["passesOR_%SYS%"]
 
-    if flags.Analysis.large_R_jet.runMuonJetPtCorr:
+    if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
         large_R_jet_branches.variables += ["uncorrPt", "n_muons"]
 
     if flags.Input.isMC and tree_flags.collection_options.large_R_jets.truth_labels:
@@ -80,7 +80,7 @@ def get_ghost_vr_branches(flags):
         "leadingVRTrackJetsDeltaR32",
     ] + [
         f"leadingVRTrackJetsBtag_{wp}"
-        for wp in flags.Analysis.large_R_jet.vr_btag_wps
+        for wp in flags.Analysis.Large_R_jet.vr_btag_wps
     ]
     if flags.Input.isMC:
         vr_vars += [

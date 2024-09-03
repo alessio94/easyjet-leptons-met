@@ -60,10 +60,10 @@ def hhml_cfg(
         flags,
         containerInKey=smalljetkey,
         containerOutKey="hhmlAnalysisJets_%SYS%",
-        bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+        bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
         selectBjet=False,
         minPt=20 * Units.GeV,
-        minimumAmount=flags.Analysis.small_R_jet.amount,  # -1 means ignores this
+        minimumAmount=flags.Analysis.Small_R_jet.amount,  # -1 means ignores this
     ))
 
     # Selection
@@ -76,7 +76,7 @@ def hhml_cfg(
     cfg.addEventAlgo(
         CompFactory.MULTILEPTON.MultileptonSelectorAlg(
             "HHMLSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             eventDecisionOutputDecoration="hhml_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_hhml_cutflow,
@@ -96,7 +96,7 @@ def hhml_cfg(
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
             leptonAmount=flags.Analysis.Lepton.amount,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
             floatVectorVariableList=float_vector_variables,
             intVariableList=int_variables,

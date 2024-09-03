@@ -6,7 +6,8 @@ do_bbll_analysis: true
 bypass: false
 
 # Decay mode considered for truth decoration
-truthDecayModes: ["bbtt", "bbWW", "bbZZ"]
+Truth:
+  decayModes: ["bbtt", "bbWW", "bbZZ"]
 
 # Toggles for object types
 do_small_R_jets: true
@@ -20,7 +21,7 @@ NeutrinoWeighting:
   doNW: false
 
 # Toggles for reconstructed objects decorations
-small_R_jet:
+Small_R_jet:
   # btagging working points 
   btag_wp: "GN2v01_FixedCutBEff_85"
   amount: 2
@@ -54,9 +55,8 @@ orthogonality:
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
 # list of triggers per year to consider
-trigger:
+Trigger:
   include: bbllAnalysis/trigger.yaml
-
 # apply trigger lists to filter events
 do_trigger_filtering: true
 

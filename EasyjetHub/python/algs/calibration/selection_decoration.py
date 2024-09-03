@@ -18,7 +18,7 @@ def selection_decoration_sequence(flags):
             containers += [drop_sys(flags.Analysis.container_names.output[objtype])]
     if flags.Analysis.do_small_R_jets:
         containers += [drop_sys(flags.Analysis.container_names.output[
-            flags.Analysis.small_R_jet.jet_type])]
+            flags.Analysis.Small_R_jet.jet_type])]
     if flags.Analysis.do_large_R_Topo_jets:
         containers += [drop_sys(flags.Analysis.container_names.output.reco10TopoJet)]
     if flags.Analysis.do_large_R_UFO_jets:

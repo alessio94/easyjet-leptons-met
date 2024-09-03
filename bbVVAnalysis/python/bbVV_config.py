@@ -48,7 +48,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                                 truncateAtAmount=3,
                                 minimumAmount=2))
 
-    for btag_wp in flags.Analysis.large_R_jet.vr_btag_wps:
+    for btag_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
         # get the two leading large R's
         cfg.merge(JetSelectorAlgCfg(flags, name="LargeJetSelectorAlg_" + btag_wp,
                                     containerInKey=largejetkey,
@@ -113,7 +113,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         CompFactory.HHBBVV.HHbbVVSelectorAlg(
             "HHbbVVSelectorAlg",
             eventDecisionOutputDecoration="bbVV_pass_sr_%SYS%",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             channel=flags.Analysis.channels,
@@ -129,7 +129,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             isMC=flags.Input.isMC,
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
         )
     )
 

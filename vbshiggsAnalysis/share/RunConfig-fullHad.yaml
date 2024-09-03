@@ -3,6 +3,6 @@ include: vbshiggsAnalysis/RunConfig-common.yaml
 # Which analysis to consider
 channels: ["FullHad"]
 
-small_R_jet:
+Small_R_jet:
   amount: 4
 

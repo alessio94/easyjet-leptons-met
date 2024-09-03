@@ -22,7 +22,7 @@ def fullHad_cfg(flags, float_variables=None, int_variables=None):
             "FinalVarsFullHadAlg",
             isMC=flags.Input.isMC,
             bTagWPDecorName="ftag_select_"
-                            + flags.Analysis.small_R_jet.btag_wp,
+                            + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables
         )

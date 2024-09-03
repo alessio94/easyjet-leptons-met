@@ -39,8 +39,8 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                 containerInKey=smalljetkey,
                                 containerOutKey="ZCharmAnalysisJets_%SYS%",
                                 bTagWPDecorName="",
-                                minPt=flags.Analysis.small_R_jet.min_pT_ZCharm,
-                                maxEta=flags.Analysis.small_R_jet.max_eta_ZCharm))
+                                minPt=flags.Analysis.Small_R_jet.min_pT_ZCharm,
+                                maxEta=flags.Analysis.Small_R_jet.max_eta_ZCharm))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="LargeRJet_SelectorAlg",
                                 containerInKey=largejetkey,
@@ -61,7 +61,7 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     cfg.addEventAlgo(
         CompFactory.ZCC.ZCharmSelectorAlg(
             "ZCharmSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             eventDecisionOutputDecoration="ZCharm_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_ZCharm_cutflow,
@@ -80,7 +80,7 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             isMC=flags.Input.isMC,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.small_R_jet.btag_wp,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables
         )

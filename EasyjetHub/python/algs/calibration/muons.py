@@ -37,7 +37,7 @@ def muon_sequence(flags, configAcc):
                                  flags.Analysis.Muon.maxDeltaZ0SinTheta)
 
     # Muon trigger SF
-    trigSF_flags = flags.Analysis.trigger.scale_factor
+    trigSF_flags = flags.Analysis.Trigger.scale_factor
     if trigSF_flags.doSF and hasattr(trigSF_flags, 'Muon'):
         configSeq += makeConfig('Muons.TriggerSF')
         configSeq.setOptionValue('.containerName', output_name)

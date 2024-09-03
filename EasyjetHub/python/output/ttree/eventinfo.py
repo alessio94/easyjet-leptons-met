@@ -32,13 +32,14 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
         if flags.GeoModel.Run is LHCPeriod.Run2:
             eventinfo_branches.variables += ["beamSpotWeight"]
 
-        if (flags.Analysis.save_HF_classification
-                and flags.Input.MCChannelNumber
-                in flags.Analysis.DSID_HF_class_samples):
+        if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_HF_class_samples:
             eventinfo_branches.variables += [
                 "HF_SimpleClassification",
                 "HF_Classification"
             ]
+        if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_nWLep_samples:
+            eventinfo_branches.variables += ["nWLep"]
+
         # Need syst_only_for not to be empty to avoid applying SYST on all
         # other branches
         # Any variable with %SYS% will anyway get systematics applied, so the list
@@ -55,7 +56,7 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
     eventinfo_branches.variables += trigger_branches
 
     # Event-level scale factors
-    if flags.Input.isMC and flags.Analysis.trigger.scale_factor.doSF:
+    if flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF:
 
         var = ["globalTriggerEffSF_%SYS%"]
         # Only dump trigger SF if computed before
@@ -67,11 +68,11 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
 
     if (
         flags.Input.isMC
-        and flags.Analysis.small_R_jet.jet_type != "reco4EMTopoJet"
+        and flags.Analysis.Small_R_jet.jet_type != "reco4EMTopoJet"
     ):
-        btag_wps = [flags.Analysis.small_R_jet.btag_wp]
-        if 'btag_extra_wps' in flags.Analysis.small_R_jet:
-            btag_wps += flags.Analysis.small_R_jet.btag_extra_wps
+        btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
+        if 'btag_extra_wps' in flags.Analysis.Small_R_jet:
+            btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
         for wp in btag_wps:
             # Until AFT-748 is solved
@@ -81,7 +82,7 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
 
         # jvt is effSF is now centrally calculated by CP tools
         eventinfo_branches.variables += ["jvt_effSF_%SYS%"]
-        if flags.Analysis.small_R_jet.useFJvt:
+        if flags.Analysis.Small_R_jet.useFJvt:
             eventinfo_branches.variables += ["fjvt_effSF_%SYS%"]
 
     if tree_flags.truth_outputs.higgs_particle and flags.Input.isMC:
@@ -116,8 +117,5 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
         eventinfo_branches.variables += [
             "passRelativeDeltaRToVRJetCutUFO"
         ]
-
-    if flags.Input.MCChannelNumber in flags.Analysis.DSID_nWLep_samples:
-        eventinfo_branches.variables += ["nWLep"]
 
     return eventinfo_branches.get_output_list()
