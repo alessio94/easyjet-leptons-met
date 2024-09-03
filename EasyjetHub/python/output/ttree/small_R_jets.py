@@ -135,7 +135,7 @@ def get_small_R_jet_branches(
 
         gn2v01_valid_ptag = (
             (get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
-            or get_valid_ami_tag(split_tags, "p", "p6266"))
+            or get_valid_ami_tag(split_tags, "p", "p6255"))
         if gn2v01_valid_ptag:
             small_R_jet_branches.variables += [
                 "GN2v01_pb",
