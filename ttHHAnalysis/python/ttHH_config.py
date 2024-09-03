@@ -63,6 +63,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
                                 pTsort=False,
                                 bTagWPDecorName="",
                                 selectBjet=False,
+                                maxEta=2.5,
                                 minPt=20e3))
 
     cfg.addEventAlgo(
