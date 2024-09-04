@@ -12,6 +12,7 @@
 
 #include <AthenaBaseComps/AthReentrantAlgorithm.h>
 
+#include <xAODTrigger/JetRoIContainer.h>
 #include <xAODJet/JetContainer.h>
 #include <TrigDecisionTool/TrigDecisionTool.h>
 
@@ -55,6 +56,9 @@ namespace Easyjet
       this, "isMC", false, "is this simulation?"
     };
 
+    Gaudi::Property<bool> m_doL1Matching{this, "doL1Matching", false, "do trigger HLT matching?" };
+    Gaudi::Property<bool> m_doHLTMatching{this, "doHLTMatching", false, "do trigger L1 matching?" };
+
     PublicToolHandle<Trig::TrigDecisionTool> m_trigDecTool{
       this, "TrigDecisionTool", "", "Trigger decision tool"
     };
@@ -62,6 +66,16 @@ namespace Easyjet
     Gaudi::Property<std::vector<std::string>> m_triggers{
       this, "triggerList", {}, "List of triggers to match"
     };
+
+    SG::ReadHandleKey<xAOD::JetRoIContainer> m_L1JetsInKey{
+      this, "L1Jets", "LVL1JetRoIs", "L1 jet container"
+    };
+
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1EtDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1EtaDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1PhiDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1DRDecorKeys;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1ThresholdsDecorKeys;
 
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTPtDecorKeys;
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTEtaDecorKeys;

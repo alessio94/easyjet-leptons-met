@@ -32,7 +32,9 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
         if flags.GeoModel.Run is LHCPeriod.Run2:
             eventinfo_branches.variables += ["beamSpotWeight"]
 
-        if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_HF_class_samples:
+        if (flags.Input.isAnalysisFormat
+                and flags.Input.MCChannelNumber
+                in flags.Analysis.Truth.DSID_HF_class_samples):
             eventinfo_branches.variables += [
                 "HF_SimpleClassification",
                 "HF_Classification"

@@ -102,18 +102,26 @@ def get_small_R_jet_branches(
     ):
         small_R_jet_branches.variables += get_TopHiggs_jet_truth_labels(flags)
 
-    if (flags.Analysis.Small_R_jet.saveTriggerInfo
-            and flags.Analysis.Small_R_jet.doHLTMatching):
+    if flags.Analysis.Small_R_jet.saveTriggerInfo:
         for trig in flags.Analysis.TriggerChains:
             trig = trig.replace("-", "_").replace(".", "p")
-            small_R_jet_branches.variables += [
-                f'match{trig}_pt',
-                f'match{trig}_eta',
-                f'match{trig}_phi',
-                f'match{trig}_dr',
-                f'match{trig}_thresholds',
-                f'match{trig}_btag'
-            ]
+            if flags.Analysis.Small_R_jet.doL1Matching:
+                small_R_jet_branches.variables += [
+                    f'match{trig}_L1et',
+                    f'match{trig}_L1eta',
+                    f'match{trig}_L1phi',
+                    f'match{trig}_L1dr',
+                    f'match{trig}_L1thresholds'
+                ]
+            if flags.Analysis.Small_R_jet.doHLTMatching:
+                small_R_jet_branches.variables += [
+                    f'match{trig}_HLTpt',
+                    f'match{trig}_HLTeta',
+                    f'match{trig}_HLTphi',
+                    f'match{trig}_HLTdr',
+                    f'match{trig}_HLTthresholds',
+                    f'match{trig}_HLTbtag'
+                ]
 
     # ftag scores pb, pc, pl
     if tree_flags.collection_options.small_R_jets.btag_details:

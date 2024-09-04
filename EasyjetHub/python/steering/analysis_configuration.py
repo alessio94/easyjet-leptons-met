@@ -52,6 +52,13 @@ def analysis_configuration(parser="default"):
     fill_flags_from_runconfig(args, flags, parser.overwrites)
     flags.loadAllDynamicFlags()
 
+    def is_analysisFormat(flags):
+        for stream in ["StreamDAOD_PHYS", "StreamDAOD_PHYSLITE"]:
+            if stream in flags.Input.ProcessingTags:
+                return True
+
+    flags.addFlag("Input.isAnalysisFormat", is_analysisFormat)
+
     # Determined from input file without explicitly reading metadata
     def is_physlite(flags):
         return flags.Input.ProcessingTags == ["StreamDAOD_PHYSLITE"]

@@ -20,6 +20,7 @@ atlas_add_component(bbbbAnalysis
   src/JetBoostHistogramsAlg.cxx
   src/MassPlaneBoostHistograms.cxx
   src/MassPlaneBoostHistogramsAlg.cxx
+  src/SmallRJetTriggerSFAlg.cxx
   src/components/bbbbAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -35,6 +36,8 @@ atlas_add_component(bbbbAnalysis
   TruthUtils
   IH5GroupSvc
   ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES}
+  TrigCompositeUtilsLib
+  PathResolver
 )
 
 # Install python modules, joboptions, and share content
@@ -51,6 +54,6 @@ atlas_install_data(
   share/*.yaml
 )
 
-# atlas_install_data( data/* )
+atlas_install_data( data/* )
 # You can access your data from code using path resolver, e.g.
 # PathResolverFindCalibFile("JetMETCommon/file.txt")

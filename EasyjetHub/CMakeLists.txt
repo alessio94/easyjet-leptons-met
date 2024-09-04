@@ -25,6 +25,7 @@ atlas_add_library( EasyjetHubLib
                    xAODJet
                    xAODTau
                    xAODTruth
+                   xAODTrigger
                    egammaUtils
                    StoreGateLib
                    SystematicsHandlesLib

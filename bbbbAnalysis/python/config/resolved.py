@@ -10,6 +10,43 @@ from EasyjetHub.output.ttree.selected_objects import (
 def resolved_cfg(flags, smalljetkey):
     cfg = ComponentAccumulator()
 
+    # This is a jet trigger scale factor block
+    if (flags.Input.isMC
+            and (flags.Analysis.Small_R_jet.doHLTMatching
+                 or flags.Analysis.Small_R_jet.doL1Matching)):
+        cfg.merge(
+            JetSelectorAlgCfg(flags, name="SmallJetPreSelectorAlg",
+                              containerInKey=smalljetkey.replace("%SYS%", "NOSYS"),
+                              containerOutKey="smallRJetsForTriggerMatching",
+                              minPt=20e3,
+                              maxEta=2.5))
+        if flags.Analysis.Small_R_jet.doL1Matching:
+            cfg.addEventAlgo(
+                CompFactory.HH4B.SmallRJetTriggerSFAlg(
+                    "SmallRJetL1SFAlg",
+                    containerInKey="smallRJetsForTriggerMatching",
+                    containerOutKey="trigL1MatchedSmallRJets",
+                    triggers=flags.Analysis.TriggerChains,
+                    years=flags.Analysis.Years,
+                    matchingLevel="L1",
+                    doL1SF=flags.Analysis.Small_R_jet.doL1Matching,
+                    doHLTSF=flags.Analysis.Small_R_jet.doHLTMatching
+                )
+            )
+        if flags.Analysis.Small_R_jet.doHLTMatching:
+            cfg.addEventAlgo(
+                CompFactory.HH4B.SmallRJetTriggerSFAlg(
+                    "SmallRJetHLTSFAlg",
+                    containerInKey="smallRJetsForTriggerMatching",
+                    containerOutKey="trigHLTMatchedSmallRJets",
+                    triggers=flags.Analysis.TriggerChains,
+                    years=flags.Analysis.Years,
+                    matchingLevel="HLT",
+                    doL1SF=flags.Analysis.Small_R_jet.doL1Matching,
+                    doHLTSF=flags.Analysis.Small_R_jet.doHLTMatching
+                )
+            )
+
     # this is a resolved dihiggs analysis chain
     btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
     btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
@@ -79,5 +116,37 @@ def resolved_branches(flags):
             branches += [
                 f"EventInfo.resolved_{var}_{btag_wp} -> bbbb_resolved_{btag_wp}_{var}"
             ]
+
+    if flags.Input.isMC:
+        # add trigger scale factor output
+        for trig in flags.Analysis.TriggerChains:
+            trig = trig.replace("-", "_").replace(".", "p")
+            matchLevels = []
+            if flags.Analysis.Small_R_jet.doL1Matching:
+                matchLevels.append("L1")
+            if flags.Analysis.Small_R_jet.doHLTMatching:
+                matchLevels.append("HLT")
+            for matchLevel in matchLevels:
+                branches += [
+                    f'EventInfo.trigSF_{trig}_{matchLevel}SF'
+                    f'->trigSF_{trig}_{matchLevel}SF',
+                    f'EventInfo.trigSF_{trig}_{matchLevel}SF__1up'
+                    f'->trigSF_{trig}_{matchLevel}SF__1up',
+                    f'EventInfo.trigSF_{trig}_{matchLevel}SF__1down'
+                    f'->trigSF_{trig}_{matchLevel}SF__1down',
+                ]
+                if flags.Analysis.Small_R_jet.saveTriggerInfo:
+                    jet_coll = f'trig{matchLevel}MatchedSmallRJets'
+                    branches += [
+                        f'{jet_coll}.uncorrPt->{jet_coll}_uncorrPt',
+                        f'{jet_coll}.{trig}_{matchLevel}threshold_NOSYS'
+                        f'->{jet_coll}_{trig}_{matchLevel}threshold',
+                        f'{jet_coll}.{trig}_{matchLevel}SF_NOSYS'
+                        f'->{jet_coll}_{trig}_{matchLevel}SF',
+                        f'{jet_coll}.{trig}_{matchLevel}SF__1up'
+                        f'->{jet_coll}_{trig}_{matchLevel}SF__1up',
+                        f'{jet_coll}.{trig}_{matchLevel}SF__1down'
+                        f'->{jet_coll}_{trig}_{matchLevel}SF__1down',
+                    ]
 
     return branches
