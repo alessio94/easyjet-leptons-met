@@ -15,6 +15,7 @@ do_muons: true
 do_electrons: true
 do_met : true
 do_mmc : true
+do_photons : true
 
 #NeutrinoWeighting Config
 NeutrinoWeighting:
@@ -48,6 +49,10 @@ Muon:
 Lepton:
   amount: 2
   variables_int: ["isPrompt","truthOrigin", "truthType"]
+
+Photon:
+  ID: "Tight"
+  Iso: "Tight"
 
 # orthogonality studies  
 orthogonality:
@@ -97,6 +102,7 @@ ttree_output:
       muons: 'container_names.output.muons'
       electrons: 'container_names.output.electrons'
       met : 'container_names.output.met'
+      photons: 'container_names.output.photons'
     collection_options:
       small_R_jets:
         btag_info: true

@@ -3,13 +3,13 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg, PhotonSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
 
-def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
+def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
              float_variables=None, int_variables=None, float_NW_variables=None):
     if not float_variables:
         float_variables = []
@@ -19,6 +19,13 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
         float_NW_variables = []
 
     cfg = ComponentAccumulator()
+
+    PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
+    cfg.merge(PhotonSelectorAlgCfg(flags,
+                                   containerInKey=photonkey,
+                                   containerOutKey="bbllAnalysisPhotons_%SYS%",
+                                   minPt=20e3,
+                                   loosePhotonWP=PhotonWPLabel))
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
