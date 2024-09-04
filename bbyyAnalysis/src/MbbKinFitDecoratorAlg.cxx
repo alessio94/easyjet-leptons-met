@@ -4,6 +4,7 @@
 
 #include "MbbKinFitDecoratorAlg.h"
 
+#include <xAODJet/JetAuxContainer.h>
 #include "TLorentzVector.h"
 
 namespace HHBBYY{
@@ -24,13 +25,7 @@ namespace HHBBYY{
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ANA_CHECK (m_systematicsList.initialize());    
 
-    // Initialise KF Tool
-    m_KFTool.reset(new KinematicFitTool("KinematicFitTool"));
-    ATH_CHECK (m_KFTool->setProperty("JetMinPT", m_Jet_Min_pt));
-    ATH_CHECK (m_KFTool->setProperty("bTagWPDecorName", m_BtaggingWP));
-    ATH_CHECK (m_KFTool->setProperty("AnglesResolution", m_angles_Res));
-    ATH_CHECK (m_KFTool->setProperty("FixAnglesFit", m_isFixAngles));
-    ATH_CHECK (m_KFTool->initialize());
+    ATH_CHECK (m_KFTool.retrieve());
 
     return StatusCode::SUCCESS;
   }
@@ -60,29 +55,36 @@ namespace HHBBYY{
           TLorentzVector jj = j1 + j2;
           KF1_Mbb = jj.M();
         }
-        //run KF tool
-        ATH_CHECK(m_KFTool->applyKF(*photons, *jets, KF1_Mbb));
-        //retrieve decorations
-        static const SG::AuxElement::ConstAccessor<float> pTDecor("KF_PT");
-        static const SG::AuxElement::ConstAccessor<float> etaDecor("KF_ETA");
-        static const SG::AuxElement::ConstAccessor<float> phiDecor("KF_PHI");
-        static const SG::AuxElement::ConstAccessor<float> mDecor("KF_M");
-        static const SG::AuxElement::ConstAccessor<char> isBDecor("KF_isB");
 
-        static SG::AuxElement::Decorator<float> KF_MBB("KF1_Mbb");
+        auto workJetContainer = std::make_unique<xAOD::JetContainer>();
+        auto workJetAuxContainer = std::make_unique<xAOD::JetAuxContainer>();
+        workJetContainer->setStore(workJetAuxContainer.get());
 
-        auto workJetContainer =
-        std::make_unique<ConstDataVector<xAOD::JetContainer> >(); 
-        for (auto jet : *jets) {
-          auto thisJet = std::make_unique<xAOD::Jet>(*jet);
-          xAOD::JetFourMom_t newp4 (pTDecor(*jet), etaDecor(*jet), phiDecor(*jet), mDecor(*jet));
-          thisJet->setJetP4(newp4);
-          workJetContainer->push_back(thisJet.release());
+        for (const auto jet : *jets) {
+          // Create a new jet in the workJetContainer by copying the existing jet
+          xAOD::Jet* thisJet = new xAOD::Jet();
+          workJetContainer->push_back(thisJet);
+          *thisJet = *jet; // Copy the jet
         }
 
+        //run KF tool
+        ATH_CHECK(m_KFTool->applyKF(*photons, *workJetContainer, KF1_Mbb));
+
+        // Create a ConstDataVector to store the jets and set ownership
+        auto constDataWorkJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>();
+        constDataWorkJetContainer->reserve(workJetContainer->size());
+
+        // Move the jets from workJetContainer to constDataWorkJetContainer
+        for (xAOD::Jet* jet : *workJetContainer) {
+          auto thisJet = std::make_unique<xAOD::Jet>(*jet);
+          constDataWorkJetContainer->push_back(thisJet.release());
+        }
+
+        static SG::AuxElement::Decorator<float> KF_MBB("KF1_Mbb");
         KF_MBB(*event) = KF1_Mbb;
+
         //write to eventstore
-        ATH_CHECK(m_jetOutHandle.record(std::move(workJetContainer), sys));
+        ATH_CHECK(m_jetOutHandle.record(std::move(constDataWorkJetContainer), sys));
 
       }
       return StatusCode::SUCCESS;

@@ -9,6 +9,7 @@ from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
+import AthenaCommon.SystemOfUnits as Units
 
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
@@ -23,7 +24,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=photonkey,
                                    containerOutKey="bbyyAnalysisPhotons_%SYS%",
-                                   minPt=22e3,
+                                   minPt=22. * Units.GeV,
                                    loosePhotonWP=PhotonWPLabel,
                                    tightPhotonWPs=[f'{wp[0]}_{wp[1]}' for wp in
                                                    flags.Analysis.Photon.extra_wps]))
@@ -32,14 +33,14 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="bbyyAnalysisMuons_%SYS%",
-                                 minPt=10e3,
+                                 minPt=10 * Units.GeV,
                                  looseMuonWP=MuonWPLabel))
 
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="bbyyAnalysisElectrons_%SYS%",
-                                     minPt=10e3,
+                                     minPt=10. * Units.GeV,
                                      looseEleWP=ElectronWPLabel))
 
     cfg.merge(JetSelectorAlgCfg(
@@ -47,7 +48,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         containerInKey=smalljetkey,
         containerOutKey="bbyyAnalysisJets_%SYS%",
         PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0], # noqa
-        minPt=25e3,
+        minPt=25. * Units.GeV,
         pTsort=False,
         PCBTsort=True,
         bTagWPDecorName="",
@@ -59,7 +60,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             name="LargeRJetSelectorAlg",
             containerInKey=largeRjetkey,
             containerOutKey="bbyyAnalysisLargeRJets_%SYS%",
-            minPt=250e3,
+            minPt=250. * Units.GeV,
             maxEta=2.0,
             pTsort=True,
             PCBTsort=False,
@@ -93,8 +94,10 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         cfg.addEventAlgo(
             CompFactory.HHBBYY.MbbKinFitDecoratorAlg(
                 "MbbKinFitDecoratorAlg",
-                JetMinPt=25.,
-                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+                KinFitTool=CompFactory.KinematicFitTool(
+                    JetMinPt=25. * Units.GeV,
+                    bTagWPDecorName=(
+                        "ftag_select_" + flags.Analysis.Small_R_jet.btag_wp)),
                 doSystematics=flags.Analysis.do_CP_systematics,
             )
         )
