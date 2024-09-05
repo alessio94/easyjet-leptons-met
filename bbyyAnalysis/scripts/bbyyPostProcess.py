@@ -16,7 +16,9 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.AllConfigFlags import initConfigFlags
 from AthenaConfiguration.MainServicesConfig import MainServicesCfg
 
-from bbyyAnalysis.bbyy_config import FullPath, get_sys_weight_name, contain_dalitz
+from EasyjetHub.algs.truth.truth_config import contain_dalitz
+
+from EasyjetHub.algs.cpalgs_config import get_sys_weight_name
 from EasyjetPlus.PostProcessTools import mergeFiles
 
 import ROOT
@@ -82,9 +84,9 @@ def RunEasyjetPlus(args):
     SOWTool = CompFactory.SumOfWeightsTool(inFile=args.inFile)
     if bool(sys_weight_prefix) or contain_dalitz(dsid):
         SOWTool.inHisto = get_sys_histogram_name(args.inFile, sys_weight_prefix)
-
     # Get XSection Path
-    with open(FullPath(args.xSectionsConfig), 'r') as file:
+    from AthenaCommon.Utils.unixtools import find_datafile
+    with open(find_datafile(args.xSectionsConfig), 'r') as file:
         XSectionData = yaml.safe_load(file)
     # Get XSection from either custom file (which is in PMG format)
     # or from an official PMG file
