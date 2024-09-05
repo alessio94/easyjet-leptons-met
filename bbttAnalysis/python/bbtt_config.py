@@ -120,21 +120,32 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp] # noqa
 
     # calculate final bbtt vars
+    if flags.Analysis.store_high_level_variables:
+        cfg.addEventAlgo(
+            CompFactory.HHBBTT.BaselineVarsbbttAlg(
+                "FinalVarsbbttAlg",
+                isMC=flags.Input.isMC,
+                eleWPs=ele_WPs,
+                muonWPs=muon_WPs,
+                tauWP=flags.Analysis.Tau.ID,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+                PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
+                floatVariableList=float_variables,
+                intVariableList=int_variables
+            )
+        )
+
+    # calculate event trigger SF
     cfg.addEventAlgo(
-        CompFactory.HHBBTT.BaselineVarsbbttAlg(
-            "FinalVarsbbttAlg",
+        CompFactory.HHBBTT.TriggerSFAlg(
+            "TriggerSFAlg",
             isMC=flags.Input.isMC,
             eleWPs=ele_WPs,
             muonWPs=muon_WPs,
             tauWP=flags.Analysis.Tau.ID,
             eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
             muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
-            tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),
-            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-            PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
-            storeHighLevelVariables=flags.Analysis.store_high_level_variables,
-            floatVariableList=float_variables,
-            intVariableList=int_variables
+            tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau')
         )
     )
 
@@ -144,9 +155,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 def get_BaselineVarsbbttAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
-
-    if flags.Input.isMC:
-        float_variable_names += ["eventTriggerSF"]
 
     if flags.Analysis.do_mmc:
         combined_particles = [
@@ -190,11 +198,14 @@ def bbtt_branches(flags):
     # these are the variables that will always be stored by easyjet specific to HHbbtt
     # further below there are more high level variables which can be
     # stored using the flag
-    # flags.Analysis.store_high_level_variables
-    baseline_float_variables, baseline_int_variables \
-        = get_BaselineVarsbbttAlg_variables(flags)
-    float_variable_names += baseline_float_variables
-    int_variable_names += baseline_int_variables
+    if flags.Analysis.store_high_level_variables:
+        baseline_float_variables, baseline_int_variables \
+            = get_BaselineVarsbbttAlg_variables(flags)
+        float_variable_names += baseline_float_variables
+        int_variable_names += baseline_int_variables
+
+    if flags.Input.isMC:
+        all_baseline_variable_names.append("eventTriggerSF")
 
     if flags.Analysis.do_mmc:
         # do not append mmc variables to float_variable_names
@@ -226,7 +237,8 @@ def bbtt_branches(flags):
     float_variable_names += object_level_float_variables
     int_variable_names += object_level_int_variables
 
-    branches += object_level_branches
+    if flags.Analysis.store_high_level_variables:
+        branches += object_level_branches
 
     branches += ["EventInfo.bbtt_pass_presel_%SYS% -> bbtt_pass_presel"
                  + flags.Analysis.systematics_suffix_separator + "%SYS%"]
