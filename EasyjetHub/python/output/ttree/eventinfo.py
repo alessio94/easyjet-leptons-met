@@ -1,5 +1,6 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from AthenaConfiguration.Enums import LHCPeriod
+from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 
 def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
@@ -32,7 +33,11 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
         if flags.GeoModel.Run is LHCPeriod.Run2:
             eventinfo_branches.variables += ["beamSpotWeight"]
 
+        split_tags = flags.Input.AMITag.split("_")
+        HF_valid_ptag = (
+            get_valid_ami_tag(split_tags, "p", "p6255"))
         if (flags.Input.isAnalysisFormat
+                and HF_valid_ptag
                 and flags.Input.MCChannelNumber
                 in flags.Analysis.Truth.DSID_HF_class_samples):
             eventinfo_branches.variables += [
