@@ -145,7 +145,7 @@ def fullLep_branches(flags):
 
     # truth info
     if flags.Input.isMC:
-        branches += ['EventInfo.nVBSQuarks -> nVBSQuarks', 'EventInfo.nWLep -> nWLep']
+        branches += ['EventInfo.nVBSQuarks -> nVBSQuarks']
         for var in ['pT', 'eta', 'phi', 'E']:
             branches += [f'EventInfo.VBSQuark1_{var} -> VBSQuark1_{var}']
             branches += [f'EventInfo.VBSQuark2_{var} -> VBSQuark2_{var}']
