@@ -17,6 +17,7 @@
 #include "../SumOfWeightsAlg.h"
 #include "../TruthWBosonInformationAlg.h"
 #include "../MetadataHistAlg.h"
+#include "../ElectronDecoratorAlg.h"
 
 using namespace Easyjet;
 
@@ -39,3 +40,4 @@ DECLARE_COMPONENT(OrthogonalityAlg)
 DECLARE_COMPONENT(SumOfWeightsAlg)
 DECLARE_COMPONENT(TruthWBosonInformationAlg)
 DECLARE_COMPONENT(MetadataHistAlg)
+DECLARE_COMPONENT(ElectronDecoratorAlg)

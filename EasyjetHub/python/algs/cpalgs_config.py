@@ -11,6 +11,7 @@ from EasyjetHub.algs.calibration.jets import (
 )
 from EasyjetHub.output.ttree.tau_decor_config import tau_decor_cfg
 from EasyjetHub.output.ttree.jet_decor_config import jet_decor_cfg
+from EasyjetHub.output.ttree.electron_decor_config import electron_decor_config
 
 from EasyjetHub.algs.calibration.muons import muon_sequence
 from EasyjetHub.algs.calibration.electrons import electron_sequence
@@ -94,6 +95,10 @@ def cpalgs_cfg(flags):
     if flags.Analysis.do_taus:
         # Schedule the alg to decorate taus with extra info
         cfg.merge(tau_decor_cfg(flags))
+
+    if flags.Analysis.do_electrons:
+        # Schedule the alg to decorate electrons with extra info
+        cfg.merge(electron_decor_config(flags))
 
     # Aggregate the configured CP algs in one ConfigSequence,
     # which will handle the container names, copying etc
