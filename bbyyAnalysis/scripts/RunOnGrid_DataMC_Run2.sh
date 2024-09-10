@@ -1,41 +1,41 @@
 ptag=p6266
-campaign=v5
+campaign=v6
 dir_samples="../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal"
-mc_compaign="mc20_13TeV"
+mc_campaign="mc20_13TeV"
 mc_list=(
-    "$dir_samples/$mc_compaign.ggFHH_bbyy_SM.$ptag.txt"
-    "$dir_samples/$mc_compaign.ggFHH_bbyy_SM_FS.$ptag.txt"
-    "$dir_samples/$mc_compaign.ggFHH_bbyy_kl0.$ptag.txt"
-    "$dir_samples/$mc_compaign.ggFHH_bbyy_kl5.$ptag.txt"
-    "$dir_samples/$mc_compaign.ggFHH_bbyy_klm1.$ptag.txt"
-    "$dir_samples/$mc_compaign.ggFHH_bbyy_kl2p5.$ptag.txt"
-    "$dir_samples/$mc_compaign.ggFHH_bbyy_kl10.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_SM.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_SM_FS.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl0kvv1kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl2kvv1kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl10kvv1kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl1kvv0kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl1kvv0p5kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl1kvv1p5kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl1kvv2kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl1kvv3kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl1kvv1kv0p5.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl1kvv1kv1p5.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_kl0kvv0kv1.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFHH_bbyy_klm5kvv1kv0p5.$ptag.txt"
-    "$dir_samples/$mc_compaign.ggFH_yy.$ptag.txt"
-    "$dir_samples/$mc_compaign.VBFH_yy.$ptag.txt"
-    "$dir_samples/$mc_compaign.WpH_yy.$ptag.txt"
-    "$dir_samples/$mc_compaign.WmH_yy.$ptag.txt"
-    "$dir_samples/$mc_compaign.qqZH_yy.$ptag.txt"
-    "$dir_samples/$mc_compaign.ggZH_yy.$ptag.txt"
-    "$dir_samples/$mc_compaign.ttH_yy.$ptag.txt"
-    "$dir_samples/$mc_compaign.tHjb.$ptag.txt"
-    "$dir_samples/$mc_compaign.tWHyy.$ptag.txt"
-    "$dir_samples/$mc_compaign.bbH_yy.$ptag.txt"
-    "$dir_samples/$mc_compaign.yyjets.$ptag.txt"
-    "$dir_samples/$mc_compaign.ttyy_nonallhad.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggFHH_bbyy_SM.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggFHH_bbyy_SM_FS.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggFHH_bbyy_kl0.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggFHH_bbyy_kl5.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggFHH_bbyy_klm1.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggFHH_bbyy_kl2p5.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggFHH_bbyy_kl10.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_SM.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_SM_FS.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl0kvv1kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl2kvv1kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl10kvv1kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl1kvv0kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl1kvv0p5kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl1kvv1p5kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl1kvv2kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl1kvv3kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl1kvv1kv0p5.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl1kvv1kv1p5.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_kl0kvv0kv1.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFHH_bbyy_klm5kvv1kv0p5.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggFH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.VBFH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.WpH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.WmH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.qqZH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.ggZH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.ttH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.tHjb.$ptag.txt"
+    "$dir_samples/$mc_campaign.tWHyy.$ptag.txt"
+    "$dir_samples/$mc_campaign.bbH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.yyjets.$ptag.txt"
+    "$dir_samples/$mc_campaign.ttyy_nonallhad.$ptag.txt"
 )
 
 #data 
@@ -45,7 +45,7 @@ easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal
     --campaign ${campaign}
 
 #mc
-easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
+easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 2 \
