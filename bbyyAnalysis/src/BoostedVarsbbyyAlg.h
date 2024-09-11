@@ -40,7 +40,7 @@ namespace HHBBYY
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "bbyyAnalysisLargeJets_%SYS%", "Jet container to read" };
+    m_jetHandle{ this, "jets", "bbyyAnalysisLargeRJets_%SYS%", "Jet container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };

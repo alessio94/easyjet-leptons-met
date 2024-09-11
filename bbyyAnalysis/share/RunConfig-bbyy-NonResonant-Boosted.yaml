@@ -26,8 +26,8 @@ CutList :
 # Toggles for reconstructed objects decorations
 Large_R_jet:
   amount: 2
-  variables_LargeJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_phbb", "GN2Xv01_pqcd", "GN2Xv01_phcc", "GN2Xv01_ptop"]
-  variables_int_LargeJets: ["truthLabel"]
+  variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_phbb", "GN2Xv01_pqcd", "GN2Xv01_phcc", "GN2Xv01_ptop"]
+  variables_int_LargeRJets: ["truthLabel"]
 
 
 ttree_output:
