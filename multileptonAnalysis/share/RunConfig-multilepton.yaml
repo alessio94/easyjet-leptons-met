@@ -61,6 +61,7 @@ Electron:
     - ["LooseBLayer", "TightTrackOnly_FixedRad"]
     - ["LooseBLayer", "HighPtCaloOnly"]
   do_parent_decoration: true
+  doRetrieveTrack: true
   # chargeIDSelectionRun2: true
 
 Muon:

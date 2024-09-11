@@ -12,6 +12,7 @@
 
 #include <AsgDataHandles/WriteDecorHandleKey.h>
 #include <AsgDataHandles/ReadDecorHandleKey.h>
+#include <AsgAnalysisInterfaces/ITruthClassificationTool.h>
 #include <AthenaBaseComps/AthReentrantAlgorithm.h>
 
 #include <xAODEgamma/ElectronContainer.h>
@@ -43,6 +44,9 @@ namespace Easyjet
     std::pair<float, float> position(const double* helix) const;
 
     // Members for configurable properties
+    Gaudi::Property<bool> m_isMC
+      { this, "isMC", false, "Is this simulation?" };
+
     Gaudi::Property<bool> m_doRetrieveTracks
       {this, "doRetrieveTrack", false, "retrive track information for electrons?" };
 
@@ -60,14 +64,19 @@ namespace Easyjet
     SG::ReadHandleKey<xAOD::VertexContainer> m_VertexContainerKey
       {this, "vertexIn", "PrimaryVertices", "input primary vertex container"};
 
+    ToolHandle<ITruthClassificationTool> m_truthTool
+      {this, "truthClassificationTool", ""};
+
+
     SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_closestSiTrackDecorKey;
     SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_bestmatchedElTrackDecorKey;
     SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_primaryVertexDecorKey;
 
-    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_mllConvKey;
-    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_mllConvAtConvVKey;
-    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_radiusConvKey;
-    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_separationMinDCTKey;
+    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_mllConvDecorKey;
+    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_mllConvAtConvVDecorKey;
+    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_radiusConvDecorKey;
+    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_separationMinDCTDecorKey;
+    SG::WriteDecorHandleKey<xAOD::ElectronContainer> m_IFFtypeDecorKey;
 
     const float PTTOCURVATURE = -0.301; // ATLAS B=2T in MeV/mm
     const float m_e = 0.511;

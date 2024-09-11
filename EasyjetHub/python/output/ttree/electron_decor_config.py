@@ -1,5 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from EasyjetHub.output.ttree.TruthClassificationToolConfig import (
+    TruthClassificationToolConfig)
 
 
 def electron_decor_config(flags, **kwargs):
@@ -11,7 +13,10 @@ def electron_decor_config(flags, **kwargs):
         CompFactory.Easyjet.ElectronDecoratorAlg(
             f"ElectronDecor_{electroncoll}",
             electronsIn=electroncoll,
+            isMC=flags.Input.isMC,
             doRetrieveTrack=doRetrieveTrack,
+            truthClassificationTool=cfg.popToolsAndMerge(
+                TruthClassificationToolConfig(flags)),
             **kwargs
         )
     )
