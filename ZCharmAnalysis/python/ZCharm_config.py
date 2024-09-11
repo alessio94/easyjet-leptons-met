@@ -97,6 +97,7 @@ def get_BaselineVarsZCharmAlg_variables(flags):
         for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
+    float_variable_names += ["pT_over_mbb"]
     float_variable_names += ["METSig"]
     int_variable_names += ["nJets", "nBJets", "nLargeRJets"]
     int_variable_names += ["nElectrons", "nMuons", "nLeptons"]

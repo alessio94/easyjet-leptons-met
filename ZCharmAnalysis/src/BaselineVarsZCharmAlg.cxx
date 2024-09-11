@@ -268,6 +268,7 @@ namespace ZCC
       if (n_bjets >=2){
         TLorentzVector bb = bjets->at(0)->p4()+bjets->at(1)->p4();
         m_Fbranches.at("mbb").set(*event, bb.M(), sys);
+        m_Fbranches.at("pT_over_mbb").set(*event, (bb.Pt())/(bb.M()), sys);
         m_Fbranches.at("pTbb").set(*event, bb.Pt(), sys);
         m_Fbranches.at("Etabb").set(*event, bb.Eta(), sys);
         m_Fbranches.at("Phibb").set(*event, bb.Phi(), sys);
