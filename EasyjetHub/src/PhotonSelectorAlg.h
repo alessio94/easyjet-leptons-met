@@ -57,6 +57,8 @@ private:
 
     Gaudi::Property<std::vector<std::string>> m_tightPhotonWPs
       { this, "tightPhotonWPs", {},"Tight photon ID + Iso working points, not used to filter collection" };
+    Gaudi::Property<bool> m_saveDummySF
+      { this, "saveDummySF", false, "Store dummy SF=1 in case they are not available"};
 
     std::vector<CP::SysReadDecorHandle<float>> m_ph_idSF;
     std::vector<CP::SysReadDecorHandle<float>> m_ph_isoSF;

@@ -1,7 +1,7 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
-
+from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
@@ -42,6 +42,11 @@ def photon_sequence(flags, configAcc):
         configSeq.setOptionValue('.forceFullSimConfig',
                                  flags.Analysis.Photon.forceFullSimConfig
                                  and flags.Analysis.DataType is DataType.FastSim)
+
+        # No Run 2 SF yet
+        if flags.GeoModel.Run is LHCPeriod.Run2 and flags.Input.isMC:
+            print("WARNING! Run 2 photon SF are not available yet")
+            configSeq.setOptionValue('.noEffSF', True)
 
     # Kinematic selection
     configSeq += makeConfig('Photons.PtEtaSelection', containerName=output_name,

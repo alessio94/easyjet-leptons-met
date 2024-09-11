@@ -52,9 +52,11 @@ namespace Easyjet
       std::vector<std::string> wps = m_tightPhotonWPs;
       wps.emplace_back(m_loosePhotonWP);
       for(const auto& wp : wps){
-        m_ph_idSF.emplace_back("ph_id_effSF_"+wp+"_%SYS%", this);
-        m_ph_isoSF.emplace_back(wp.find("NonIso")==std::string::npos ?
-        			"ph_isol_effSF_"+wp+"_%SYS%" : "", this);
+        m_ph_idSF.emplace_back
+	  (!m_saveDummySF ? "ph_id_effSF_"+wp+"_%SYS%" : "", this);
+        m_ph_isoSF.emplace_back
+	  ((!m_saveDummySF && wp.find("NonIso")==std::string::npos) ?
+	   "ph_isol_effSF_"+wp+"_%SYS%" : "", this);
         m_ph_SF.emplace_back("ph_effSF_"+wp+"_%SYS%", this);
       }
     }
@@ -145,9 +147,12 @@ namespace Easyjet
           std::vector<std::string> wps = m_tightPhotonWPs;
           wps.emplace_back(m_loosePhotonWP);
           for(unsigned int i=0; i<wps.size(); i++){
-            std::string wp = wps[i];
-            float SF = m_ph_idSF[i].get(*thisPhoton, sys);
-            if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*thisPhoton, sys);
+	    float SF = 1.;
+	    if(!m_saveDummySF){
+	      std::string wp = wps[i];
+	      SF = m_ph_idSF[i].get(*thisPhoton, sys);
+	      if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*thisPhoton, sys);
+	    }
             m_ph_SF[i].set(*thisPhoton, SF, sys);
           }
         }
