@@ -45,6 +45,11 @@ def muon_sequence(flags, configAcc):
         configSeq.setOptionValue('.triggerChainsPerYear',
                                  get_trigger_chains_scale_factor(flags, 'Muon'))
 
+    # IFF truth decoration
+    if flags.Analysis.Muon.do_IFF_decoration:
+        configSeq += makeConfig('Muons.IFFClassification',
+                                containerName=output_name)
+
     # Kinematic selection
     configSeq += makeConfig('Muons.PtEtaSelection', containerName=output_name,
                             selectionName='selectPtEta')

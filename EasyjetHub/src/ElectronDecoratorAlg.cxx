@@ -31,26 +31,17 @@ namespace Easyjet
 
     m_closestSiTrackDecorKey = m_electronsInKey.key() + ".closestSiTrack";
     m_bestmatchedElTrackDecorKey = m_electronsInKey.key() + ".bestmatchedElTrack";
-    m_primaryVertexDecorKey = m_electronsInKey.key() + ".primaryVertex";
     ATH_CHECK (m_closestSiTrackDecorKey.initialize(m_doRetrieveTracks));
     ATH_CHECK (m_bestmatchedElTrackDecorKey.initialize(m_doRetrieveTracks));
-    ATH_CHECK (m_primaryVertexDecorKey.initialize(m_doRetrieveTracks));
-
 
     m_mllConvDecorKey = m_electronsInKey.key() + ".mllConv";
     m_mllConvAtConvVDecorKey = m_electronsInKey.key() + ".mllConvAtConvV";
     m_radiusConvDecorKey = m_electronsInKey.key() + ".radiusConv";
     m_separationMinDCTDecorKey = m_electronsInKey.key() + ".separationMinDCT";
-    m_IFFtypeDecorKey = m_electronsInKey.key() + ".IFFtype";
     ATH_CHECK (m_mllConvDecorKey.initialize(m_doRetrieveTracks));
     ATH_CHECK (m_mllConvAtConvVDecorKey.initialize(m_doRetrieveTracks));
     ATH_CHECK (m_radiusConvDecorKey.initialize(m_doRetrieveTracks));
     ATH_CHECK (m_separationMinDCTDecorKey.initialize(m_doRetrieveTracks));
-    ATH_CHECK (m_IFFtypeDecorKey.initialize(m_isMC));
-
-    if(m_isMC) {
-      ATH_CHECK(m_truthTool.retrieve());
-    }
 
     return StatusCode::SUCCESS;
   }
@@ -60,15 +51,6 @@ namespace Easyjet
     // input handles
     SG::ReadHandle<xAOD::ElectronContainer> electronsIn(m_electronsInKey,ctx);
     ATH_CHECK (electronsIn.isValid());
-    if (m_isMC){
-      SG::WriteDecorHandle<xAOD::ElectronContainer, int> IFFtypeDecorHandle(m_IFFtypeDecorKey);
-
-      for(const xAOD::Electron* electron : *electronsIn) {
-        unsigned int IFFtype(-99);
-        ATH_CHECK(m_truthTool->classify(*electron, IFFtype));
-        IFFtypeDecorHandle(*electron) = IFFtype;
-      }
-    }
 
     if (m_doRetrieveTracks){
 

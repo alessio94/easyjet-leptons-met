@@ -74,7 +74,7 @@ class BranchManager(object):
 
     def output_string(self, var):
         incont = self.full_input_container(var)
-        outvar = self.full_output_var(var)
+        outvar = self.full_output_var(var).replace("_NOSYS", "")
         outstr = f"{incont}.{var} -> {outvar}"
         return outstr
 

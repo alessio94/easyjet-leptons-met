@@ -57,7 +57,8 @@ Electron:
     - ["LooseBLayer", "TightTrackOnly_FixedRad"]
     - ["LooseBLayer", "HighPtCaloOnly"]
   do_parent_decoration: true
-  doRetrieveTrack: true
+  do_track_decoration: true
+  do_IFF_decoration: true
   chargeIDSelectionRun2: true
 
 Muon:
@@ -84,6 +85,7 @@ Muon:
     # - ["LowPt", "Loose_VarRad"]
     # - ["LowPt", "Tight_VarRad"]
   do_parent_decoration: true
+  do_IFF_decoration: true
   max_eta: 2.5
 
 Lepton:

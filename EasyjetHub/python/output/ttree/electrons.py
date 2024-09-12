@@ -32,7 +32,19 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
         for id_wp in id_wps
     ]
 
-    if flags.Input.isMC and tree_flags.collection_options.electrons.truth_parent_info:
+    if flags.Analysis.Electron.do_track_decoration:
+        electron_branches.variables += [
+            "mllConv",
+            "mllConvAtConvV",
+            "radiusConv",
+            "separationMinDCT",
+        ]
+
+    if flags.Analysis.Electron.do_IFF_decoration:
+        electron_branches.variables += ["IFFClass_NOSYS"]
+
+    if flags.Input.isMC and \
+       tree_flags.collection_options.electrons.truth_parent_info:
         truth_labels = []
         if not flags.Input.isPHYSLITE:
             truth_labels += [
@@ -51,13 +63,5 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
         electron_branches.variables += ["isAnalysisElectron_%SYS%"]
         for index in range(flags.Analysis.Lepton.amount):
             electron_branches.variables += [f"isElectron{index+1}_%SYS%"]
-
-        if flags.Analysis.Electron.doRetrieveTrack:
-            electron_branches.variables += [
-                "mllConv",
-                "mllConvAtConvV",
-                "radiusConv",
-                "separationMinDCT",
-            ]
 
     return electron_branches.get_output_list()

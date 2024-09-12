@@ -82,12 +82,13 @@ Electron:
   ID: ""
   Iso: ""
   do_parent_decoration: false
+  do_track_decoration: false
+  do_IFF_decoration: false
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
   forceFullSimConfig: false
   extra_wps: []
-  doRetrieveTrack: false
 
 Muon:
   min_pT: 3.e+3
@@ -98,6 +99,7 @@ Muon:
   ID: ""
   Iso: ""
   do_parent_decoration: false
+  do_IFF_decoration: false
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []

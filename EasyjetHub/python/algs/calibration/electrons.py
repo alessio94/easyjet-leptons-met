@@ -71,6 +71,11 @@ def electron_sequence(flags, configAcc):
         configSeq.setOptionValue('.triggerChainsPerYear',
                                  get_trigger_chains_scale_factor(flags, 'Electron'))
 
+    # IFF truth decoration
+    if flags.Analysis.Electron.do_IFF_decoration:
+        configSeq += makeConfig('Electrons.IFFClassification',
+                                containerName=output_name)
+
     # Kinematic selection
     configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name,
                             selectionName='selectPtEta')
