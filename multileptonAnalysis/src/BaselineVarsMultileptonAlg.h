@@ -17,14 +17,11 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
+#include <xAODTau/TauJetContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
-
-#include <MCTruthClassifier/MCTruthClassifier.h>
-#include <MCTruthClassifier/MCTruthClassifierDefs.h>
 
 namespace MULTILEPTON
 {
-
   /// \brief An algorithm for counting containers
   class BaselineVarsMultileptonAlg final : public AthHistogramAlgorithm
   {
@@ -40,10 +37,6 @@ public:
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
 private:
-    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-    // "someInfo"};
-    template<typename ParticleType>
-    std::pair<int, int> truthOrigin(const ParticleType* particle);
     
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
@@ -57,31 +50,44 @@ private:
     CP::SysReadHandle<xAOD::MuonContainer>
         m_muonHandle{ this, "muons", "hhmlAnalysisMuons_%SYS%", "Muon container to read" };
 
+    CP::SysReadHandle<xAOD::TauJetContainer>
+        m_tauHandle{ this, "taus", "hhmlAnalysisTaus_%SYS%", "Tau container to read" };
+
     CP::SysReadHandle<xAOD::MissingETContainer>
         m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
-        m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+        m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     Gaudi::Property<bool> m_isMC
         { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<std::string> m_eleWPName
         { this, "eleWP", "","Electron ID + Iso working point" };
-    CP::SysReadDecorHandle<float> m_ele_SF{"", this};
 
     Gaudi::Property<std::string> m_muWPName
         { this, "muonWP", "","Muon ID + Iso working point" };
 
-    CP::SysReadDecorHandle<float> m_mu_SF{"", this};
+    Gaudi::Property<std::string> m_tauWPName
+        { this, "tauWP", "","Tau ID working point" };
+
+    CP::SysReadDecorHandle<char> m_isBtag 
+        {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     Gaudi::Property<unsigned int> m_leptonAmount
-        { this, "leptonAmount", 4,"Number of leptons required" };
+        { this, "leptonAmount", 4, "Number of leptons required" };
 
-    CP::SysReadDecorHandle<char> m_isBtag
-          {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+    Gaudi::Property<unsigned int> m_tauAmount
+        { this, "tauAmount", 3, "Number of taus required" };
 
-    ToolHandle<IMCTruthClassifier> m_truthClassifier{this, "MCTruthClassifier", "MCTruthClassifier/MCTruthClassifier"}; 
+    Gaudi::Property<unsigned int> m_jetAmount
+        { this, "jetAmount", 4, "Number of jets required" };
+
+    Gaudi::Property<unsigned int> m_lightJetAmount
+        { this, "lightJetAmount", 2, "Number of light jets required" };
+
+    Gaudi::Property<unsigned int> m_bJetAmount
+        { this, "bJetAmount", 2, "Number of b-jets required" };
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};
@@ -106,9 +112,6 @@ private:
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<std::vector<char>>> m_CVbranches;
-
-    int getTruthQMisID(const xAOD::IParticle* lep, const xAOD::TruthParticle* truthMatch);
-    
  };
 }
 #endif

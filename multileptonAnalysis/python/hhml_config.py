@@ -96,6 +96,11 @@ def hhml_cfg(
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
             leptonAmount=flags.Analysis.Lepton.amount,
+            tauAmount=flags.Analysis.Tau.amount,
+            jetAmount=flags.Analysis.Small_R_jet.amount,
+            lightJetAmount=(flags.Analysis.Small_R_jet.amount
+                            - flags.Analysis.Small_R_jet.amount_bjet),
+            bJetAmount=flags.Analysis.Small_R_jet.amount_bjet,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
             floatVectorVariableList=float_vector_variables,
@@ -112,10 +117,19 @@ def get_BaselineVarshhmlAlg_variables(flags):
     int_variable_names = []
 
     int_variable_names += [
-        "nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets", "nLeptons"
+        "nTotalJets", "nElectrons", "nMuons", "nTaus", "nLightJets", "nBJets",
+        "nCentralJets", "nLeptons"
     ]
 
     return float_variable_names, int_variable_names
+
+
+def get_hhml_extra_object_branches_variables(flags):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    return branches, float_variable_names, int_variable_names
 
 
 def hhml_branches(flags):
@@ -129,7 +143,7 @@ def hhml_branches(flags):
     int_variable_names = []
     char_vector_variable_names = []
 
-    # these are the variables that will always be stored by easyjet specific to HHbbtt
+    # these are the variables that will always be stored by easyjet specific to HHML
     # further below there are more high level variables which can be
     # stored using the flag
     # flags.Analysis.store_high_level_variables
@@ -160,6 +174,13 @@ def hhml_branches(flags):
     int_variable_names += object_level_int_variables
 
     branches += object_level_branches
+
+    extra_object_level_branches, extra_object_level_float_variables, \
+        extra_object_level_int_variables \
+        = get_hhml_extra_object_branches_variables(flags)
+    float_variable_names += extra_object_level_float_variables
+    int_variable_names += extra_object_level_int_variables
+    branches += extra_object_level_branches
 
     branches += [
         "EventInfo.hhml_pass_sr_%SYS% -> hhml_pass_SR"

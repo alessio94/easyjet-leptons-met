@@ -30,16 +30,12 @@ Small_R_jet:
   btag_extra_wps:
     - GN2v01_Continuous
     - DL1dv01_Continuous
-  variables_bjets: ["uncorrPt", "muonCorrPt"]
-  variables_int_bjets: ["truthLabel", "pcbt_GN2v01", "pcbt_DL1dv01", "nmuons"]
   amount_bjet: 2
-  amount: 2
+  amount: 6 # maximum number of jets to consider (WWWW->2LSC + 4j + 2 VBF jets)
 
 Tau:
   ID: "RNNLoose"
-  amount: 2
-  variables: ["RNN"]
-  variables_int: ["isTauID", "truthType", "EleRNN_WP", "tauTruthJetLabel"]
+  amount: 3
   do_parent_decoration: true
 
 Electron:
@@ -92,8 +88,6 @@ Muon:
 
 Lepton:
   amount: 4
-  variables: ["EtaBE2", "Z0SinTheta", "sigd0PV"]
-  variables_int: ["isPrompt","truthOrigin", "truthType", "isQMisID"]
 
 # orthogonality studies  
 orthogonality:
