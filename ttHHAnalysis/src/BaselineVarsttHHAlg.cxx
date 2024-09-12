@@ -120,12 +120,6 @@ namespace ttHH
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
-      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
-      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
-      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
-      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
-
-
       TLorentzVector H1(0, 0, 0, 0);
       TLorentzVector H2(0, 0, 0, 0);
       TLorentzVector e1(0.,0.,0.,0.);
@@ -136,8 +130,6 @@ namespace ttHH
       TLorentzVector mumu(0.,0.,0.,0.);
       TLorentzVector emu(0.,0.,0.,0.);
 
-      //auto paired_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
-      //auto paired_jets = *pairedJets;
       const xAOD::JetContainer paired_jets = *pairedJets;
 
       double HT = 0; // scalar sum of jet pT
