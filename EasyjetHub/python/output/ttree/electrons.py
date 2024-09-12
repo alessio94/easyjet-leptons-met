@@ -52,4 +52,12 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
         for index in range(flags.Analysis.Lepton.amount):
             electron_branches.variables += [f"isElectron{index+1}_%SYS%"]
 
+        if flags.Analysis.Electron.doRetrieveTrack:
+            electron_branches.variables += [
+                "mllConv",
+                "mllConvAtConvV",
+                "radiusConv",
+                "separationMinDCT",
+            ]
+
     return electron_branches.get_output_list()
