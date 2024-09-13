@@ -172,14 +172,14 @@ def output_cfg(flags, seqname):
     # If additional branches need to be configured dynamically,
     # i.e. via python, then minituple_cfg should be called explicitly
     if flags.Analysis.out_file:
-        for tree_flags in flags.Analysis.ttree_output:
-            cfg.merge(
-                minituple_cfg(
-                    flags, tree_flags,
-                    flags.Analysis.out_file,
-                ),
-                seqname,
-            )
+        tree_flags = flags.Analysis.ttree_output
+        cfg.merge(
+            minituple_cfg(
+                flags, tree_flags,
+                flags.Analysis.out_file,
+            ),
+            seqname,
+        )
 
     if flags.Analysis.h5_output:
         cfg.merge(

@@ -22,7 +22,3 @@ Electron:
 
 Photon:
   forceFullSimConfig: true
-
-ttree_output:
-  - AnalysisMiniTree:
-    include: bbyy-base-output.yaml

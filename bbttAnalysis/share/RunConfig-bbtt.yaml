@@ -1,8 +1,3 @@
-# Include the TTree configuration and update details
-ttree_output:
-  - AnalysisMiniTree:
-    include: bbttAnalysis/AnalysisMiniTree-bbtt-tree.yaml
-      
 include: bbttAnalysis/RunConfig-bbtt-base.yaml
 
 channels: ["HadHad_2B","HadHad_1B","LepHad_2B","LepHad_1B","ZCR","TopEMuCR"]

@@ -5,7 +5,8 @@ def validate_flags(flags):
 
     validate_do_obj_flags(flags)
 
-    for tree_flags in flags.Analysis.ttree_output:
+    if hasattr(flags.Analysis, "ttree_output"):
+        tree_flags = flags.Analysis.ttree_output
         validate_do_write_obj_flags(flags, tree_flags)
 
     validate_file_format(flags)

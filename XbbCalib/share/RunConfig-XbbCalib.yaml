@@ -45,22 +45,21 @@ OverlapRemoval:
 
 # Include the TTree configuration and update details
 ttree_output:
-  - AnalysisMiniTree:
-    include: EasyjetHub/AnalysisMiniTree-config.yaml
-    # Our overrides. All defaults are off
-    reco_outputs:
-      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      muons: 'container_names.output.muons'
-      electrons: 'container_names.output.electrons'
-      met : 'container_names.output.met'
-    collection_options:
-      #large_R_jets:
-      #  run_selection: true
-      small_R_jets:
-        btag_info: true
-        run_selection: true
-      electrons:
-        run_selection: true
-      muons:
-        run_selection: true
+  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  # Our overrides. All defaults are off
+  reco_outputs:
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    met : 'container_names.output.met'
+  collection_options:
+    #large_R_jets:
+    #  run_selection: true
+    small_R_jets:
+      btag_info: true
+      run_selection: true
+    electrons:
+      run_selection: true
+    muons:
+      run_selection: true

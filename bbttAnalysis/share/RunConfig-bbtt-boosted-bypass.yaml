@@ -13,25 +13,13 @@ OverlapRemoval:
 Large_R_jet:
   runMuonJetPtCorr: true
 
-# Include the TTree configuration and update details
+# Update output configs for large-R jets
 ttree_output:
-  - AnalysisMiniTree:
-    include: EasyjetHub/AnalysisMiniTree-config.yaml
-    # Our overrides. All defaults are off
-    slim_variables_with_syst: true
-    reco_outputs:
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      muons: 'container_names.output.muons'
-      electrons: 'container_names.output.electrons'
-      taus: 'container_names.output.taus'
-      met : 'container_names.output.met'
-      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-    collection_options:
-      small_R_jets:
-        btag_info: true
-      large_R_jets:
-        substructure_info: true
-        truth_labels: true
-    truth_outputs:
-      small_R_jets: 'container_names.input.truth4Jet'
-      higgs_particle: 'container_names.output.truthHHParticles'
+  reco_outputs:
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+  collection_options:
+    large_R_jets:
+      substructure_info: true
+      truth_labels: true
+  truth_outputs:
+    higgs_particle: 'container_names.output.truthHHParticles'

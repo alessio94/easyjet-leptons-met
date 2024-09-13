@@ -60,15 +60,15 @@ def ssWW_job_cfg():
     # additional branches, the list of which is generated dynamically
     # rather than statically in the yaml
     if flags.Analysis.out_file:
-        for tree_flags in flags.Analysis.ttree_output:
-            cfg.merge(
-                minituple_cfg(
-                    flags,tree_flags,
-                    flags.Analysis.out_file,
-                    extra_output_branches = extra_ssWW_branches
-                ),
-                seqname,
-            )
+        tree_flags = flags.Analysis.ttree_output
+        cfg.merge(
+            minituple_cfg(
+                flags, tree_flags,
+                flags.Analysis.out_file,
+                extra_output_branches=extra_ssWW_branches
+            ),
+            seqname,
+        )
 
     # Record the number of events for logging and tests
     if not flags.Analysis.suppress_metadata_json:

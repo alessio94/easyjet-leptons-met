@@ -74,14 +74,8 @@ def analysis_configuration(parser="default"):
         flags.Analysis.do_overlap_removal = False
         flags.Analysis.do_muons = False
         flags.Analysis.Small_R_jet.runBJetPtCalib = False
-
-        def disable_reco_muons(tree_flags):
-            _tree_flags = {k: v for k, v in tree_flags.items()}
-            _tree_flags['reco_outputs']['muons'] = ''
-            return _tree_flags
-        flags.Analysis.ttree_output = [
-            disable_reco_muons(f) for f in flags.Analysis.ttree_output
-        ]
+        if hasattr(flags.Analysis, 'ttree_output'):
+            flags.Analysis.ttree_output.reco_outputs.muons = ''
 
     log.info(f"Operating on input files {flags.Input.Files}")
 

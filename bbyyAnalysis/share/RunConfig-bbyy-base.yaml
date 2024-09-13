@@ -105,3 +105,6 @@ GNN_path_run3:
 
 #  choose VBF jets selection method
 VBFjetsMethod: "mjj" # "mjj" "pTsorting"
+
+ttree_output:
+  include: bbyy-base-output.yaml

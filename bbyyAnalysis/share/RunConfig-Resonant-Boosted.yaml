@@ -16,24 +16,23 @@ CutList :
       #- EXACTLY_TWO_B_JETS
 
 ttree_output:
-  - AnalysisMiniTree:
-    include: EasyjetHub/AnalysisMiniTree-config.yaml
-    # Our overrides. All defaults are off
-    reco_outputs:
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-      photons: 'container_names.output.photons'
-    collection_options:
-      small_R_jets:
-        btag_details: true
-      photons:
-        shower_shapes: false
-        truth_labels: false
-        iso_variables: false
-      large_R_jets:
-        truth_labels: true
-    truth_outputs:
-      small_R_jets: 'container_names.input.truth4Jet'
-      large_R_jets: 'container_names.input.truth10SoftDropJet'
-      higgs_particle: 'container_names.output.truthHHParticles'
+  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  # Our overrides. All defaults are off
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    photons: 'container_names.output.photons'
+  collection_options:
+    small_R_jets:
+      btag_details: true
+    photons:
+      shower_shapes: false
+      truth_labels: false
+      iso_variables: false
+    large_R_jets:
+      truth_labels: true
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
+    large_R_jets: 'container_names.input.truth10SoftDropJet'
+    higgs_particle: 'container_names.output.truthHHParticles'
 

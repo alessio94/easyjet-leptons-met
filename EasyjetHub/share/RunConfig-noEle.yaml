@@ -42,28 +42,27 @@ do_overlap_removal: true
 
 # Include the TTree configuration and update details
 ttree_output:
-  - 
-    include: AnalysisMiniTree-config.yaml
-    # Our overrides. All defaults are off
-    reco_outputs:
-      muons: 'container_names.output.muons'
-      #electrons: 'container_names.output.electrons'
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-      #VR_jets: 'container_names.output.vrJets'
-    collection_options:
-      small_R_jets:
-        truth_parent_info: true
-        btag_info: true
-        JVT_details: true
-        no_bjet_calib_p4: true
-        btag_details: true
-      large_R_jets:
-        substructure_info: true
-        truth_labels: true
-      muons:
-        run_selection: false
-    truth_outputs:
-      small_R_jets: 'container_names.input.truth4Jet'
-      large_R_jets: 'container_names.input.truth10SoftDropJet'
-      higgs_particle: 'container_names.output.truthHHParticles'
+  include: AnalysisMiniTree-config.yaml
+  # Our overrides. All defaults are off
+  reco_outputs:
+    muons: 'container_names.output.muons'
+    #electrons: 'container_names.output.electrons'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    #VR_jets: 'container_names.output.vrJets'
+  collection_options:
+    small_R_jets:
+      truth_parent_info: true
+      btag_info: true
+      JVT_details: true
+      no_bjet_calib_p4: true
+      btag_details: true
+    large_R_jets:
+      substructure_info: true
+      truth_labels: true
+    muons:
+      run_selection: false
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
+    large_R_jets: 'container_names.input.truth10SoftDropJet'
+    higgs_particle: 'container_names.output.truthHHParticles'

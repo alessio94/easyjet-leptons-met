@@ -32,18 +32,17 @@ systematics_regex: ["PRW_DATASF"]
 
 # Include the TTree configuration and update details
 ttree_output:
-  -
-    include: EasyjetHub/AnalysisMiniTree-config.yaml
-    # Our overrides. All defaults are off
-    reco_outputs:
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-    collection_options:
-      small_R_jets:
-        truth_parent_info: true
-        btag_info: true
-        JVT_details: true
-        no_bjet_calib_p4: true
-        btag_details: true
-    truth_outputs:
-      small_R_jets: 'container_names.input.truth4Jet'
-      higgs_particle: 'container_names.output.truthHHParticles'
+  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  # Our overrides. All defaults are off
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+  collection_options:
+    small_R_jets:
+      truth_parent_info: true
+      btag_info: true
+      JVT_details: true
+      no_bjet_calib_p4: true
+      btag_details: true
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
+    higgs_particle: 'container_names.output.truthHHParticles'

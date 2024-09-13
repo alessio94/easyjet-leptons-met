@@ -13,6 +13,3 @@ CutList :
       #- EXACTLY_ONE_B_JET
       - EXACTLY_TWO_B_JETS
 
-ttree_output:
-  - AnalysisMiniTree:
-    include: bbyy-base-output.yaml

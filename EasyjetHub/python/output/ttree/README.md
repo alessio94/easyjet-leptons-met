@@ -25,7 +25,7 @@ For even more control over the branch content, the `tree_cfg()` function that is
 ### Tree configuration in yaml
 
 A single TTree configuration object contains these flags, among others:
-- `tree_name`, `directory_name`, `stream_name`: specification to `THistSvc` how to place the TTree in the output file
+- `tree_name`, `stream_name`: specification to `THistSvc` how to place the TTree in the output file
 - `reco_outputs`, `truth_outputs`: mappings, specifying the set of containers in StoreGate to be written out. Each can either be specified explicitly, or with reference to a flag under `flags.Analysis`. The flags will be searched first. E.g. consider the following fragment:
 ```yaml
 reco_outputs:

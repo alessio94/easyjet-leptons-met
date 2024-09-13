@@ -191,4 +191,4 @@ histograms: false
 h5:
   n_jets: 10
 
-ttree_output: []
+ttree_output: {}

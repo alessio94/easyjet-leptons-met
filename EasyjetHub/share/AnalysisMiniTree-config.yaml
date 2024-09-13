@@ -1,6 +1,5 @@
 # Name the TTree
 tree_name: AnalysisMiniTree
-directory_name: ''
 stream_name: ANALYSIS
 # Do we apply object systs only for pt/et
 slim_variables_with_syst: false

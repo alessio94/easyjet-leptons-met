@@ -87,25 +87,24 @@ Categories :
 
 # Include the TTree configuration and update details
 ttree_output:
-  - AnalysisMiniTree:
-    include: EasyjetHub/AnalysisMiniTree-config.yaml
-    # Our overrides. All defaults are off
-    slim_variables_with_syst: true
-    reco_outputs:
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      muons: 'container_names.output.muons'
-      electrons: 'container_names.output.electrons'
-      met : 'container_names.output.met'
-      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-    collection_options:
-      small_R_jets:
-        btag_info: true
-        btag_details: true
-        # JVT_details: true
-      large_R_jets:
-        substructure_info: true
-        truth_labels: true
-        btag_details: true
-    truth_outputs:
-      small_R_jets: 'container_names.input.truth4Jet'
-      large_R_jets: ['container_names.input.truth10SoftDropJet']
+  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  # Our overrides. All defaults are off
+  slim_variables_with_syst: true
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    met : 'container_names.output.met'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+  collection_options:
+    small_R_jets:
+      btag_info: true
+      btag_details: true
+      # JVT_details: true
+    large_R_jets:
+      substructure_info: true
+      truth_labels: true
+      btag_details: true
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
+    large_R_jets: ['container_names.input.truth10SoftDropJet']

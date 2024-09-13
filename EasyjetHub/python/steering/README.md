@@ -43,16 +43,10 @@ btag_wp: "GN120220509_FixedCutBEff_70"
 btag_extra_wps:
     - GN120220509_FixedCutBEff_77
 ttree_output:
-  - # List item 1
-    tree_name: 'PFlowJetTree'
-    reco_outputs:
-      small_R_jets: 'container_names.input.reco4PFlowJet'
-      large_R_UFO_jets: 'container_names.input.reco10UFOJet'
-  - # List item 2
-    tree_name: 'TopoJetTree'
-    reco_outputs:
-      small_R_jets: 'container_names.input.reco4TopoJet'
-      large_R_UFO_jets: 'container_names.input.reco10TopoJet'
+  tree_name: 'PFlowJetTree'
+  reco_outputs:
+    small_R_jets: 'container_names.input.reco4PFlowJet'
+    large_R_UFO_jets: 'container_names.input.reco10UFOJet'
 ```
 
 In general one should not need custom pileup reweighting, as they are set automatically upstream by the CP tools. However, if necessary, the `prw_files` flag can be used to specify a custom PRW file, and the `lumicalc_files` flag can be used to specify a custom luminosity calculation file. These flags are dictionaries of year or MC campaign, and can be defined in the analysis configuration as:

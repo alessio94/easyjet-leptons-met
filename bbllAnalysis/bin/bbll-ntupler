@@ -81,15 +81,15 @@ def bbll_job_cfg():
     # rather than statically in the yaml
     extra_branches = extra_bbll_branches + extra_orth_branches
     if flags.Analysis.out_file:
-        for tree_flags in flags.Analysis.ttree_output:
-            cfg.merge(
-                minituple_cfg(
-                    flags,tree_flags,
-                    flags.Analysis.out_file,
-                    extra_output_branches = extra_branches
-                ),
-                seqname,
-            )
+        tree_flags = flags.Analysis.ttree_output
+        cfg.merge(
+            minituple_cfg(
+                flags,tree_flags,
+                flags.Analysis.out_file,
+                extra_output_branches = extra_branches
+            ),
+            seqname,
+        )
 
     # Record the number of events for logging and tests
     if not flags.Analysis.suppress_metadata_json:

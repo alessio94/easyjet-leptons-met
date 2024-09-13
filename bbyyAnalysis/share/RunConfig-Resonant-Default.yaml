@@ -14,5 +14,4 @@ CutList :
       - EXACTLY_TWO_B_JETS
 
 ttree_output:
-  - AnalysisMiniTree:
-    include: bbyy-base-output.yaml
+  include: bbyy-base-output.yaml

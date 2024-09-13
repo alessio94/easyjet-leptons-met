@@ -45,16 +45,15 @@ Small_R_jet:
     
 # Include the TTree configuration and update details
 ttree_output:
-  - AnalysisMiniTree:
-    include: EasyjetHub/AnalysisMiniTree-config.yaml
-    # Our overrides. All defaults are off
-    slim_variables_with_syst: true
-    reco_outputs:
-      small_R_jets: 'container_names.output.reco4PFlowJet'
-      large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-      muons: 'container_names.output.muons'
-      electrons: 'container_names.output.electrons'
-      met : 'container_names.output.met'
-    collection_options:
-      small_R_jets:
-        btag_info: true
+  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  # Our overrides. All defaults are off
+  slim_variables_with_syst: true
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    met : 'container_names.output.met'
+  collection_options:
+    small_R_jets:
+      btag_info: true

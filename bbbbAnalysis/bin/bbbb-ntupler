@@ -83,27 +83,26 @@ def hh4b_job_cfg():
     # For more sophistication this could be done using
     # custom BranchManagers
     bbbb_branches = []
-    for tree_flags in flags.Analysis.ttree_output:
-        if flags.Analysis.do_boosted_dihiggs:
-            bbbb_branches += boosted_branches(flags)
-        if flags.Analysis.do_resolved_dihiggs:
-            bbbb_branches += resolved_branches(flags)
-        if(flags.Analysis.orthogonality.do_orth_check):
-            bbbb_branches += extra_orth_branches
+    if flags.Analysis.do_boosted_dihiggs:
+        bbbb_branches += boosted_branches(flags)
+    if flags.Analysis.do_resolved_dihiggs:
+        bbbb_branches += resolved_branches(flags)
+    if flags.Analysis.orthogonality.do_orth_check:
+        bbbb_branches += extra_orth_branches
 
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
     # rather than statically in the yaml
     if flags.Analysis.out_file:
-        for tree_flags in flags.Analysis.ttree_output:
-            cfg.merge(
-                minituple_cfg(
-                    flags,tree_flags,
-                    flags.Analysis.out_file,
-                    extra_output_branches = bbbb_branches
-                ),
-                seqname,
-            )
+        tree_flags = flags.Analysis.ttree_output
+        cfg.merge(
+            minituple_cfg(
+                flags, tree_flags,
+                flags.Analysis.out_file,
+                extra_output_branches=bbbb_branches
+            ),
+            seqname,
+        )
 
     if flags.Analysis.h5_output:
         cfg.merge(
