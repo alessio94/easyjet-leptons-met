@@ -8,6 +8,7 @@
 
 #include "TLorentzVector.h"
 #include "EasyjetHub/MT2_ROOT.h"
+#include "SubChannelClassify.h"
 
 namespace MULTILEPTON
 {
@@ -120,7 +121,7 @@ namespace MULTILEPTON
         // count central jets
         if (std::abs(jet->eta())<2.5) {
           n_centralJets++;
-          if (WPgiven && m_isBtag.get(*jet, sys)){ 
+          if (WPgiven && m_isBtag.get(*jet, sys)){
             bjets->push_back(jet);
           }
           else {
@@ -142,55 +143,20 @@ namespace MULTILEPTON
       m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
       m_Ibranches.at("nCentralJets").set(*event, n_centralJets, sys);
 
-      // selected leptons
-      const xAOD::Electron* ele0 = nullptr;
-      const xAOD::Electron* ele1 = nullptr;
-      const xAOD::Electron* ele2 = nullptr;
-      const xAOD::Electron* ele3 = nullptr;
+      auto classifier = SubChannelClassify(
+          muons, electrons, taus, bjets.get()
+          );
 
-      for(const xAOD::Electron* electron : *electrons) {
-        if(!ele0) ele0 = electron;
-        else if(!ele1) ele1 = electron;
-        else if(!ele2) ele2 = electron;
-        else {
-          ele3 = electron;
-          break;
-        }
-      }
-
-      const xAOD::Muon* mu0 = nullptr;
-      const xAOD::Muon* mu1 = nullptr;
-      const xAOD::Muon* mu2 = nullptr;
-      const xAOD::Muon* mu3 = nullptr;
-
-      for(const xAOD::Muon* muon : *muons) {
-        if(!mu0) mu0 = muon;
-        else if(!mu1) mu1 = muon;
-        else if(!mu2) mu2 = muon;
-        else {
-          mu3 = muon;
-          break;
-        }
-      }
-
-      std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
-      if(ele0) leptons.emplace_back(ele0, -11*ele0->charge());
-      if(mu0) leptons.emplace_back(mu0, -13*mu0->charge());
-      if(ele1) leptons.emplace_back(ele1, -11*ele1->charge());
-      if(mu1) leptons.emplace_back(mu1, -13*mu1->charge());
-      if(ele2) leptons.emplace_back(ele2, -11*ele2->charge());
-      if(mu2) leptons.emplace_back(mu2, -13*mu2->charge());
-      if(ele3) leptons.emplace_back(ele3, -11*ele3->charge());
-      if(mu3) leptons.emplace_back(mu3, -13*mu3->charge());
-
-      int nLeptons = muons->size() + electrons->size();
-      m_Ibranches.at("nLeptons").set(*event, nLeptons, sys);
-      
-      // Sort by pT; FIXME: for 3l, os lepton should be the 1st then the ss leptons sorted by pT
-      std::sort(leptons.begin(), leptons.end(),
-          [](const std::pair<const xAOD::IParticle*, int>& a,
-              const std::pair<const xAOD::IParticle*, int>& b) {
-            return a.first->pt() > b.first->pt(); });
+      m_Ibranches.at("nLeptons").set(
+          *event, classifier.getNLeptons(), sys);
+      m_Ibranches.at("totalLepCharge").set(
+          *event, classifier.getTotalChargeLep(), sys);
+      m_Ibranches.at("totalTauCharge").set(
+          *event, classifier.getTotalChargeTau(), sys);
+      m_Ibranches.at("subChannelID").set(
+          *event, static_cast<int>(classifier.getSubChannelId()), sys);
+      m_Ibranches.at("subChannelFlavor").set(
+          *event, classifier.getSubChannelFlavor(), sys);
 
       // TODO: compute trigger SF
     }

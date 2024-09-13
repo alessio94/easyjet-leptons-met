@@ -10,6 +10,7 @@
 
 namespace MULTILEPTON
 {
+  using std::get;
 
   MultileptonSelectorAlg::MultileptonSelectorAlg(const std::string &name,
                                 ISvcLocator *pSvcLocator)
@@ -502,154 +503,64 @@ namespace MULTILEPTON
   }
 
   bool MultileptonSelectorAlg::evaluate2lssSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
+      const SubChannelClassify &classify,
         CutManager& hhmlCuts){
-    if (!hhmlCuts.exists("pass_2lss") || leptons.size()!=2 ) return false;
+    auto sub_channel_id = classify.getSubChannelId();
+    if (!hhmlCuts.exists("pass_2lss") || sub_channel_id != CH_ID::hh2lsc) return false;
     bool pass_selection = true;
 
-    // SS cut
-    pass_selection &= (leptons.at(0).second * leptons.at(1).second > 0);
     // Pt cuts
-    pass_selection &= (leptons.at(0).first->pt() > 10 * Athena::Units::GeV && leptons.at(1).first->pt() > 10 * Athena::Units::GeV);
+    pass_selection &= classify.check_lep_pT(10 * Athena::Units::GeV);
     // TODO: ID & prompt lepton isolation WP cut
     //
     // Low mass veto
-    pass_selection &= ( (leptons.at(0).first->p4() + leptons.at(1).first->p4()).M() > 12. * Athena::Units::GeV);
-
-    pass_selection &= (taus.size() == 0);
+    pass_selection &= classify.check_low_mass(12. * Athena::Units::GeV);
 
     return pass_selection;
   }
 
   bool MultileptonSelectorAlg::evaluate3lSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
+      const SubChannelClassify &classify,
         CutManager& hhmlCuts){
-    if (!hhmlCuts.exists("pass_3l") || leptons.size()!=3) return false;
+
+    auto sub_channel_id = classify.getSubChannelId();
+    if (!hhmlCuts.exists("pass_3l") || sub_channel_id != CH_ID::hh3l) return false;
     bool pass_selection = true;
 
-    std::vector<int> charges;
-    for (const auto& lep : leptons){
-      charges.push_back(lep.second > 0 ? -1 : 1);
-    }
-    pass_selection &= ((charges.at(0) + charges.at(1) + charges.at(2)) == 1);
+    pass_selection &= classify.check_lep_pT(10 * Athena::Units::GeV);
 
-    std::pair<const xAOD::IParticle*, int> lepton0 = leptons.at(0);
-    std::pair<const xAOD::IParticle*, int> lepton1 = leptons.at(1);
-    std::pair<const xAOD::IParticle*, int> lepton2 = leptons.at(2);
-
-    if ( pass_selection ){
-      if (charges.at(0)*charges.at(1)<0 && charges.at(0)*charges.at(2)<0){
-
-      } else if (charges.at(0)*charges.at(1)<0 && charges.at(1)*charges.at(2)<0){
-        std::swap(lepton0, lepton1);
-      } else if (charges.at(0)*charges.at(2)<0 && charges.at(1)*charges.at(2)<0){
-        lepton0 = leptons.at(1);
-        lepton1 = leptons.at(2);
-        lepton2 = leptons.at(0);
-      } else {
-        ATH_MSG_ERROR("Unknown 3l charge combination");
-      }
-    }
-
-    if (lepton0.first->p4().DeltaR(lepton2.first->p4()) < lepton0.first->p4().DeltaR(lepton1.first->p4())){
-      std::swap(lepton1, lepton2);
-    }
-    pass_selection &= (lepton0.first->pt() > 10 * Athena::Units::GeV && lepton1.first->pt() > 10 * Athena::Units::GeV && lepton2.first->pt() > 10 * Athena::Units::GeV);
-
-    // Low mass veto and Z mass for SFOS pairs
-    if (lepton0.second == -lepton1.second){
-      pass_selection &= ( (lepton0.first->p4() + lepton1.first->p4()).M() > 12. * Athena::Units::GeV);
-    }
-    if (lepton0.second == -lepton2.second){
-      pass_selection &= ( (lepton0.first->p4() + lepton2.first->p4()).M() > 12. * Athena::Units::GeV);
-    }
-
-
-    pass_selection &= (taus.size() == 0);
+    // Low mass veto for all pairs
+    pass_selection &= classify.check_low_mass(12. * Athena::Units::GeV);
 
     return pass_selection;
   }
         
 
   bool MultileptonSelectorAlg::evaluatebb4lSelection(
-      const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-      [[maybe_unused]] const xAOD::TauJetContainer& taus,
-      const ConstDataVector<xAOD::JetContainer>& bjets,
+      const SubChannelClassify &classify,
       CutManager& hhmlCuts){
-    if (!hhmlCuts.exists("pass_bb4l") || leptons.size()!=4 || !(bjets.size() >= 1 && bjets.size() <= 3) ) return false;
+
+    auto sub_channel_id = classify.getSubChannelId();
+    if (!hhmlCuts.exists("pass_bb4l") || sub_channel_id != CH_ID::hhbb4l) return false;
 
     bool pass_selection = true;
 
-    // // TODO: PLV cut
-    // //
-    // // pt cuts
-    // pass_selection &= (leptons.at(0).first->pt() > 20 * Athena::Units::GeV && leptons.at(1).first->pt() > 15 * Athena::Units::GeV && leptons.at(2).first->pt() > 10 * Athena::Units::GeV);
-    // // DeltaR cuts
-    // for(int i=0; i<4; i++){
-    //   for(int j=i+1; j<4; j++){
-    //     pass_selection &= (leptons.at(i).first->p4().DeltaR(leptons.at(j).first->p4()) > 0.02);
-    //   }
-    // }
-    // // Find 2 Opposite Sign Same Flavor pairs
-    // // TODO: If there are multiple combinations of OSSF pairs, choose the one with the mass closest to Z mass
-    // std::vector<int> not_pair_with_0th_lepton;
-    // int pair_with_0th_lepton = -1;
-    // for (int i=1; i<4; i++){
-    //   if (leptons.at(0).second == leptons.at(i).second*-1 && pair_with_0th_lepton == -1){
-    //     pair_with_0th_lepton = i;
-    //   } else {
-    //     not_pair_with_0th_lepton.push_back(i);
-    //   }
-    // }
-    // std::vector<std::pair<int, int>> OSSF_pairs;
-    // std::vector<float> mass_OSSF_pairs;
-    // if (not_pair_with_0th_lepton.size() == 2 && leptons.at(not_pair_with_0th_lepton.at(0)).second == leptons.at(not_pair_with_0th_lepton.at(1)).second*-1){
-    //   float mass_pair_a = (leptons.at(0).first->p4() + leptons.at(pair_with_0th_lepton).first->p4()).M();
-    //   float mass_pair_b = (leptons.at(not_pair_with_0th_lepton.at(0)).first->p4() + leptons.at(not_pair_with_0th_lepton.at(1)).first->p4()).M();
-    //   if (abs(mass_pair_a - 91.2 * Athena::Units::GeV) < abs(mass_pair_b - 91.2 * Athena::Units::GeV)){
-    //     OSSF_pairs.push_back({0, pair_with_0th_lepton});
-    //     OSSF_pairs.push_back({not_pair_with_0th_lepton.at(0), not_pair_with_0th_lepton.at(1)});
-    //     mass_OSSF_pairs.push_back(mass_pair_a);
-    //     mass_OSSF_pairs.push_back(mass_pair_b);
-    //   } else {
-    //     OSSF_pairs.push_back({0, pair_with_0th_lepton});
-    //     OSSF_pairs.push_back({not_pair_with_0th_lepton.at(1), not_pair_with_0th_lepton.at(0)});
-    //     mass_OSSF_pairs.push_back(mass_pair_b);
-    //     mass_OSSF_pairs.push_back(mass_pair_a);
-    //   }
-    // } else {
-    //   pass_selection = false;
-    // }
-
-    // // low mass veto
-    // pass_selection = pass_selection && (mass_OSSF_pairs.at(0) > 5. * Athena::Units::GeV && mass_OSSF_pairs.at(1) > 5. * Athena::Units::GeV);
-    // // Di-lepton mass
-    // pass_selection = pass_selection && (mass_OSSF_pairs.at(0) > 50. * Athena::Units::GeV && mass_OSSF_pairs.at(0) < 106. * Athena::Units::GeV && mass_OSSF_pairs.at(1) < 115. * Athena::Units::GeV);
-    // // Higgs mass window
-    // auto mass_4l = (leptons.at(0).first->p4() + leptons.at(1).first->p4() + leptons.at(2).first->p4() + leptons.at(3).first->p4()).M();
-    // pass_selection &= (mass_4l > 115. * Athena::Units::GeV && mass_4l < 135. * Athena::Units::GeV);
-
-    // pass_selection &= (jets->size() >= 2);
     return pass_selection;
   }
 
   bool MultileptonSelectorAlg::evaluate1l2tauhadSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
-        CutManager& hhmlCuts){
-    if (!hhmlCuts.exists("pass_1l2tauhad") || leptons.size()!=1 || taus.size()!=2) return false;
+      const SubChannelClassify &classify,
+      CutManager& hhmlCuts){
+
+    auto sub_channel_id = classify.getSubChannelId();
+    if (!hhmlCuts.exists("pass_1l2tauhad") || sub_channel_id != CH_ID::hh1l2tau) return false;
     bool pass_selection = true;
 
     // TODO: ID and PLV cut
     //
     // Pt cut
-    pass_selection &= leptons.at(0).first->pt() > 10 * Athena::Units::GeV;
-    // OS tau cut
-    pass_selection &= (taus.at(0)->charge() * taus.at(1)->charge() == -1);
-    // DeltaR cut
-    pass_selection &= (taus.at(0)->p4().DeltaR(taus.at(1)->p4()) < 2);
+    pass_selection &= classify.check_lep_pT(10 * Athena::Units::GeV);
+
     // TODO: tau object selection
 
     return pass_selection;
@@ -657,57 +568,26 @@ namespace MULTILEPTON
 
     
   bool MultileptonSelectorAlg::evaluate2l2tauhadSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
-        CutManager& hhmlCuts){
-    if (!hhmlCuts.exists("pass_2l2tauhad") || leptons.size()!=2 || taus.size()!=2 ) return false;
+      const SubChannelClassify &classify,
+      CutManager& hhmlCuts){
+
+    auto sub_channel_id = classify.getSubChannelId();
+    if (!hhmlCuts.exists("pass_2l2tauhad") || sub_channel_id != CH_ID::hh2l2tau)
+      return false;
+
     bool pass_selection = true;
+
     // TODO: ID and PLV cut
 
     // Pt cut
-    pass_selection &= (leptons.at(0).first->pt() > 10 * Athena::Units::GeV && leptons.at(1).first->pt() > 10 * Athena::Units::GeV);
+    pass_selection &= classify.check_lep_pT(10 * Athena::Units::GeV);
     // Low mass veto
-    pass_selection &= ( (leptons.at(0).first->p4() + leptons.at(1).first->p4()).M() > 12. * Athena::Units::GeV);
+    pass_selection &= classify.check_low_mass(12. * Athena::Units::GeV);
 
-    // OS tau selection
-    pass_selection &= (taus.at(0)->charge() * taus.at(1)->charge() == -1);
-    // DeltaR cut
-    pass_selection &= (taus.at(0)->p4().DeltaR(taus.at(1)->p4()) < 2);
     // TODO: tau object selection
 
     return pass_selection;
   }
-
-  // NOTE: Ignore 2LSC for the moment
-  // bool MultileptonSelectorAlg::evaluate2lss1tauhadSelection(
-  //       std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-  //       const xAOD::TauJetContainer *taus,
-  //       const xAOD::JetContainer *jets,
-  //       const ConstDataVector<xAOD::JetContainer>& bjets,
-  //       CutManager& hhmlCuts){
-  //   if (!hhmlCuts.exists("pass_2lss1tauhad") || leptons.size()!=2 || taus->size()!=1) return false;
-  //   bool pass_selection = true;
-  //   // SS
-  //   pass_selection &= (leptons.at(0).second * leptons.at(1).second > 0);
-  //   int lepton_charge = leptons.at(0).second > 0 ? -1 : 1;
-  //   // low mass veto
-    // pass_selection &= ( (leptons.at(0).first->p4() + leptons.at(1).first->p4()).M() > 12. * Athena::Units::GeV);
-  //   // pT cuts
-  //   pass_selection &= (leptons.at(0).first->pt() > 10 * Athena::Units::GeV && leptons.at(1).first->pt() > 10 * Athena::Units::GeV);
-  //   // TODO: ID and PLV cut
-
-  //   // tau selection
-  //   // OS with lepton
-  //   pass_selection &= (taus->at(0)->charge() * lepton_charge == -1);
-  //   // pT cut
-  //   pass_selection &= (taus->at(0)->pt() > 25 * Athena::Units::GeV);
-  //   // TODO: tau object selection
-
-  //   // pass_selection &= (bjets.size() == 0);
-  //   // pass_selection &= (jets->size() >= 2);
-
-  //   return pass_selection;
-  // }
 
   void MultileptonSelectorAlg::applyChannelSelection(
         const xAOD::ElectronContainer& electrons,
@@ -715,39 +595,25 @@ namespace MULTILEPTON
         const xAOD::TauJetContainer& taus,
         const ConstDataVector<xAOD::JetContainer>& bjets,
         CutManager& hhmlCuts){
-    
-    // collect all leptons and sort by pt
-    std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
-    for (const auto& ele : electrons) {
-      leptons.push_back({ele, -11*ele->charge()});
-    }
-    for (const auto& mu : muons) {
-      leptons.push_back({mu, -13*mu->charge()});
-    }
-    std::sort(leptons.begin(), leptons.end(),
-      [](const std::pair<const xAOD::IParticle*, int>& a,
-      const std::pair<const xAOD::IParticle*, int>& b) {
-      return a.first->pt() > b.first->pt(); });
+
+    auto classifier = SubChannelClassify(&muons, &electrons, &taus, &bjets);
 
     if (hhmlCuts.exists("pass_2lss")){
-      m_bools.at(MULTILEPTON::pass_2lss) = evaluate2lssSelection(leptons, taus, hhmlCuts);
+      m_bools.at(MULTILEPTON::pass_2lss) = evaluate2lssSelection(classifier, hhmlCuts);
     }
     if (hhmlCuts.exists("pass_3l")){
-      m_bools.at(MULTILEPTON::pass_3l) = evaluate3lSelection(leptons, taus, hhmlCuts);
+      m_bools.at(MULTILEPTON::pass_3l) = evaluate3lSelection(classifier, hhmlCuts);
     }
     if (hhmlCuts.exists("pass_bb4l")){
-      m_bools.at(MULTILEPTON::pass_bb4l) = evaluatebb4lSelection(leptons, taus, bjets, hhmlCuts);
+      m_bools.at(MULTILEPTON::pass_bb4l) = evaluatebb4lSelection(classifier, hhmlCuts);
     }
     if (hhmlCuts.exists("pass_1l2tauhad")){
-      m_bools.at(MULTILEPTON::pass_1l2tauhad) = evaluate1l2tauhadSelection(leptons, taus, hhmlCuts);
+      m_bools.at(MULTILEPTON::pass_1l2tauhad) = evaluate1l2tauhadSelection(classifier, hhmlCuts);
     }
     if (hhmlCuts.exists("pass_2l2tauhad")){
-      m_bools.at(MULTILEPTON::pass_2l2tauhad) = evaluate2l2tauhadSelection(leptons, taus, hhmlCuts);
+      m_bools.at(MULTILEPTON::pass_2l2tauhad) = evaluate2l2tauhadSelection(classifier, hhmlCuts);
     }
-    // NOTE: Ignore 2LSC for the moment
-    // if (hhmlCuts.exists("pass_2lss1tauhad")){
-    //   m_bools.at(MULTILEPTON::pass_2lss1tauhad) = evaluate2lss1tauhadSelection(leptons, taus, jets, bjets, hhmlCuts);
-    // }
+
   }
 
 

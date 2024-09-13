@@ -117,8 +117,10 @@ def get_BaselineVarshhmlAlg_variables(flags):
     int_variable_names = []
 
     int_variable_names += [
-        "nTotalJets", "nElectrons", "nMuons", "nTaus", "nLightJets", "nBJets",
-        "nCentralJets", "nLeptons"
+        "nTotalJets", "nElectrons", "nMuons", "nTaus",
+        "nLightJets", "nBJets", "nCentralJets", "nLeptons",
+        "totalLepCharge", "totalTauCharge",
+        "subChannelID", "subChannelFlavor",
     ]
 
     return float_variable_names, int_variable_names

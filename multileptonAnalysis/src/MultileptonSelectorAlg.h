@@ -24,6 +24,8 @@
 #include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
 
+#include "SubChannelClassify.h"
+
 namespace MULTILEPTON
 {
     enum TriggerChannel
@@ -175,30 +177,19 @@ private:
         const xAOD::Electron* ele, const xAOD::Muon* mu,
         const CP::SystematicSet& sys);
 
-    bool evaluate2lssSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
+    bool evaluate2lssSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
 
-    bool evaluate3lSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
+    bool evaluate3lSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
 
-    bool evaluatebb4lSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
-        const ConstDataVector<xAOD::JetContainer>& bjets,
+    bool evaluatebb4lSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
     
-    bool evaluate1l2tauhadSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
+    bool evaluate1l2tauhadSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
     
-    bool evaluate2l2tauhadSelection(
-        const std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-        const xAOD::TauJetContainer& taus,
+    bool evaluate2l2tauhadSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
     
     // NOTE: Ignore 2LSC for the moment

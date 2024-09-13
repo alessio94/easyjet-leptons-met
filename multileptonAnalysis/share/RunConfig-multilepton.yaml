@@ -58,7 +58,7 @@ Electron:
     - ["LooseBLayer", "HighPtCaloOnly"]
   do_parent_decoration: true
   doRetrieveTrack: true
-  # chargeIDSelectionRun2: true
+  chargeIDSelectionRun2: true
 
 Muon:
   ID: "Loose"
@@ -114,8 +114,8 @@ CutList :
   - pass_bb4l
   - pass_1l2tauhad
   - pass_2l2tauhad
-  # - pass_2lss1tauhad
-  # - pass_1l3tauhad
+#  - pass_2lss1tauhad
+#  - pass_1l3tauhad
 
 # Include the TTree configuration and update details
 ttree_output:
