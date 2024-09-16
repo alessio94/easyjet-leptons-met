@@ -221,6 +221,10 @@ namespace HHBBYY
       }
       m_passallcuts.set(*event, passedall, sys);
 
+      // Global event filter true if any syst passes and controls
+      // if event is passed to output writing or not
+      if (m_bypass or passedall) filter.setPassed(true);
+
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()!=m_specialSysWeight) continue;
 
@@ -273,12 +277,6 @@ namespace HHBBYY
         m_bbyyCuts[i].relativeCounter += pass;
         if (m_isMC) m_bbyyCuts(cut).w_relativeCounter += m_generatorWeight.get(*event, sys) * pass;
       }
-
-      if (not (m_bypass or passedall) ) continue;
-
-      // Global event filter true if any syst passes and controls
-      // if event is passed to output writing or not
-      filter.setPassed(true);
 
     }
 
