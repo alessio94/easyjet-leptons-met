@@ -90,6 +90,10 @@ selection_name: "allcuts"
 
 # bdt models used for categorisation and VBF jets selection
 # They should appear in this order lowMass / highMass / VBF jets
+
+do_nonresonant_BDTs: true
+save_VBF_vars: true
+
 BDT_path:
   - "bbyyAnalysis/bdt_legacy_lowMass.root"
   - "bbyyAnalysis/bdt_legacy_highMass.root"

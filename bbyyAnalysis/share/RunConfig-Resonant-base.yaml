@@ -26,3 +26,10 @@ bypass: false
 
 Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_77"
+
+do_GNN2bjetSelection: false
+do_KinematicFit: false
+do_trigger_filtering: true
+do_nonresonant_BDTs: false
+save_VBF_vars: false
+

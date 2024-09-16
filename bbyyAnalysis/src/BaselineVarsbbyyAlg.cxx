@@ -66,10 +66,12 @@ namespace HHBBYY
     }
   
     // Load BDT models
-    for (const std::string &path: m_bdts_path){
-      std::unique_ptr<MVAUtils::BDT> bdt;
-      loadBDT(path, bdt);
-      m_bdts.push_back(std::move(bdt));
+    if(m_do_nonresonant_BDTs){
+      for (const std::string &path: m_bdts_path){
+        std::unique_ptr<MVAUtils::BDT> bdt;
+        loadBDT(path, bdt);
+        m_bdts.push_back(std::move(bdt));
+      }
     }
 
     // Load GNN models
@@ -83,6 +85,14 @@ namespace HHBBYY
 
     // convert string to enum (VBFjetsMethod)
     m_vbfjets_method = stringToVBFjetsMethod(m_vbfjets_method_str);
+
+    // Check compatibility of flags
+    if(!m_do_nonresonant_BDTs && (m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT)){
+      ANA_MSG_ERROR("do_nonresonant_BDTs set to false, but VBF jets method set to BDT. getVBFjets_BDT only works if BDTs are loaded.");
+      return StatusCode::FAILURE;
+    }
+
+
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -395,53 +405,61 @@ namespace HHBBYY
       TLorentzVector vbf_jj(0.,0.,0.,0.);
       TLorentzVector yybbjj(0.,0.,0.,0.);
       float vbf_jj_maxscore = 0;
-    
-      if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
-        if(m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) {
-          vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
-        }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::mjj) {
-          getVBFjets_mjj(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
-        }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::pTsorting) {
-          getVBFjets_pTsorting(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
-        }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::invalid) {
-          ANA_MSG_ERROR("Invalid vbfjets method imported!!! The default BDT method is called!!!");
-          return StatusCode::FAILURE;
+
+      if(m_do_nonresonant_BDTs || m_save_VBF_vars){
+        if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
+          if(m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) {
+            vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+          }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::mjj) {
+            getVBFjets_mjj(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+          }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::pTsorting) {
+            getVBFjets_pTsorting(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+          }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::invalid) {
+            ANA_MSG_ERROR("Invalid vbfjets method imported!!! The default BDT method is called!!!");
+            return StatusCode::FAILURE;
+          }
+
+          vbf_jj = vbf_j[0] + vbf_j[1];
+          yybbjj = vbf_jj + HH;
+          eventFloats.at(HHBBYY::Var::vbfjj_m) = vbf_jj.M();
+          eventFloats.at(HHBBYY::Var::vbfjj_dEta) = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
         }
 
-        vbf_jj = vbf_j[0] + vbf_j[1];
-        yybbjj = vbf_jj + HH;
       }
 
-      for(unsigned int i=0; i<2; i++){
-        std::string prefix = "Jet_vbf_j"+std::to_string(i+1);
-        m_Fbranches.at(prefix+"_pt").set(*event, vbf_j[i].Pt(), sys);
-        m_Fbranches.at(prefix+"_eta").set(*event, vbf_j[i].Eta(), sys);
-        m_Fbranches.at(prefix+"_phi").set(*event, vbf_j[i].Phi(), sys);
-        m_Fbranches.at(prefix+"_E").set(*event, vbf_j[i].E(), sys);
-        m_Fbranches.at(prefix+"_yybb_dR").set(*event, vbf_j[i].DeltaR(HH), sys);
-        m_Fbranches.at(prefix+"_yybb_deta").set(*event, std::fabs(vbf_j[i].Eta() - HH.Eta()), sys);
-      }
+      if(m_save_VBF_vars){
 
-      std::string prefix_vbf = "Jet_vbf_jj";
-      m_Fbranches.at(prefix_vbf+"_maxscore").set(*event, vbf_jj_maxscore, sys);
-      m_Fbranches.at(prefix_vbf+"_m").set(*event, vbf_jj.M(), sys);
-      m_Fbranches.at(prefix_vbf+"_deta").set(*event, std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta()), sys);
-      m_Fbranches.at(prefix_vbf+"_yybb_dR").set(*event, vbf_jj.DeltaR(HH), sys);
-      m_Fbranches.at(prefix_vbf+"_yybb_deta").set(*event, std::fabs(vbf_jj.Eta()-HH.Eta()), sys);
-      m_Fbranches.at(prefix_vbf+"_yybb_pt").set(*event, yybbjj.Pt(), sys);
-      m_Fbranches.at(prefix_vbf+"_yybb_eta").set(*event, yybbjj.Eta(), sys);
-      m_Fbranches.at(prefix_vbf+"_yybb_phi").set(*event, yybbjj.Phi(), sys);
-      m_Fbranches.at(prefix_vbf+"_yybb_m").set(*event, yybbjj.M(), sys);
-   
-      eventFloats.at(HHBBYY::Var::vbfjj_m) = vbf_jj.M();
-      eventFloats.at(HHBBYY::Var::vbfjj_dEta) = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
+        for(unsigned int i=0; i<2; i++){
+          std::string prefix = "Jet_vbf_j"+std::to_string(i+1);
+          m_Fbranches.at(prefix+"_pt").set(*event, vbf_j[i].Pt(), sys);
+          m_Fbranches.at(prefix+"_eta").set(*event, vbf_j[i].Eta(), sys);
+          m_Fbranches.at(prefix+"_phi").set(*event, vbf_j[i].Phi(), sys);
+          m_Fbranches.at(prefix+"_E").set(*event, vbf_j[i].E(), sys);
+          m_Fbranches.at(prefix+"_yybb_dR").set(*event, vbf_j[i].DeltaR(HH), sys);
+          m_Fbranches.at(prefix+"_yybb_deta").set(*event, std::fabs(vbf_j[i].Eta() - HH.Eta()), sys);
+        }
+
+        std::string prefix_vbf = "Jet_vbf_jj";
+        m_Fbranches.at(prefix_vbf+"_maxscore").set(*event, vbf_jj_maxscore, sys);
+        m_Fbranches.at(prefix_vbf+"_m").set(*event, vbf_jj.M(), sys);
+        m_Fbranches.at(prefix_vbf+"_deta").set(*event, std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta()), sys);
+        m_Fbranches.at(prefix_vbf+"_yybb_dR").set(*event, vbf_jj.DeltaR(HH), sys);
+        m_Fbranches.at(prefix_vbf+"_yybb_deta").set(*event, std::fabs(vbf_jj.Eta()-HH.Eta()), sys);
+        m_Fbranches.at(prefix_vbf+"_yybb_pt").set(*event, yybbjj.Pt(), sys);
+        m_Fbranches.at(prefix_vbf+"_yybb_eta").set(*event, yybbjj.Eta(), sys);
+        m_Fbranches.at(prefix_vbf+"_yybb_phi").set(*event, yybbjj.Phi(), sys);
+        m_Fbranches.at(prefix_vbf+"_yybb_m").set(*event, yybbjj.M(), sys);
+
+      }
 
       // bdt (low and high mHH categorations)
-      if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
-        performCategorisationBDT(ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, metCont, sys, eventFloats, eventInts);
+      if(m_do_nonresonant_BDTs){
+        if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
+          performCategorisationBDT(ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, metCont, sys, eventFloats, eventInts);
+        }
+        m_Fbranches.at("bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
+        m_Ibranches.at("bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category), sys);
       }
-      m_Fbranches.at("bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
-      m_Ibranches.at("bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category), sys);
 
       //GNN Implementation
       if(m_doGNN_tagging)

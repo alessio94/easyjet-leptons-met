@@ -216,6 +216,9 @@ namespace HHBBYY
     Gaudi::Property<std::vector<std::string>> m_intVariables
       {this, "intVariableList", {}, "Name list of integer variables"};
 
+    Gaudi::Property<bool> m_do_nonresonant_BDTs
+      { this, "do_nonresonant_BDTs", false, "Do nonresonant BDT computations?" };
+
     Gaudi::Property<std::vector<std::string>> m_bdts_path 
       {this, "BDT_path", {}, "Path to BDT model"};
 
@@ -227,6 +230,9 @@ namespace HHBBYY
 
     Gaudi::Property<std::string> m_vbfjets_method_str
       {this, "VBFjetsMethod", "", "VBF jets selection method"};
+
+    Gaudi::Property<bool> m_save_VBF_vars
+      { this, "save_VBF_vars", false, "Save VBF variables?" };
 
     Gaudi::Property<bool> m_doSystematics
       { this, "doSystematics", false, "Run on all systematics" };

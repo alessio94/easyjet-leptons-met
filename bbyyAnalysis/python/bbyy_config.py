@@ -109,11 +109,13 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             KFJets="bbyyAnalysisKFJets_%SYS%" if flags.Analysis.do_KinematicFit else "",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0],  # noqa
+            do_nonresonant_BDTs=flags.Analysis.do_nonresonant_BDTs,
             BDT_path=flags.Analysis.BDT_path,
             doGNN_tagging=flags.Analysis.do_GNN2bjetSelection,
             GNN_path=(flags.Analysis.GNN_path_run2 if flags.Analysis.Run == 2 else
                       flags.Analysis.GNN_path_run3),
             VBFjetsMethod=flags.Analysis.VBFjetsMethod,
+            save_VBF_vars=flags.Analysis.save_VBF_vars,
             isMC=flags.Input.isMC,
             doKF=flags.Analysis.do_KinematicFit,
             floatVariableList=float_variables,
@@ -156,7 +158,9 @@ def get_BaselineVarsbbyyAlg_variables(flags):
 
     # Number of objects
     int_variable_names += ["nPhotons", "nJets", "nCentralJets", "nBJets", "nLeptons",
-                           "bdtSel_category"]
+                           ]
+    if flags.Analysis.do_nonresonant_BDTs:
+        int_variable_names += ["bdtSel_category"]
 
     # Reconstructed Higgses
     float_variable_names += ["myy", "pTyy", "Etayy", "Phiyy", "dRyy"]
@@ -178,7 +182,9 @@ def get_BaselineVarsbbyyAlg_variables(flags):
 
     # di-higgs variables
     float_variable_names += ["mbbyy", "mbbyy_star", "pTbbyy", "Etabbyy",
-                             "Phibbyy", "dRbbyy", "bdtSel_score"]
+                             "Phibbyy", "dRbbyy"]
+    if flags.Analysis.do_nonresonant_BDTs:
+        float_variable_names += ["bdtSel_score"]
 
     float_variable_names += ["DeltaPhi_bb_yy_cm_bbyy"]
 
@@ -200,12 +206,13 @@ def get_BaselineVarsbbyyAlg_variables(flags):
                 float_variable_names += [f"KF_HbbCandidate_Jet{i}_" + var]
 
     # VBFJets
-    for i in range(1, 3):
-        for var in ["pt", "eta", "phi", "E", "yybb_dR", "yybb_deta"]:
-            float_variable_names += [f"Jet_vbf_j{i}_" + var]
-    for var in ["maxscore", "m", "deta", "yybb_dR", "yybb_deta", "yybb_pt",
-                "yybb_eta", "yybb_phi", "yybb_m"]:
-        float_variable_names += ["Jet_vbf_jj_" + var]
+    if flags.Analysis.save_VBF_vars:
+        for i in range(1, 3):
+            for var in ["pt", "eta", "phi", "E", "yybb_dR", "yybb_deta"]:
+                float_variable_names += [f"Jet_vbf_j{i}_" + var]
+        for var in ["maxscore", "m", "deta", "yybb_dR", "yybb_deta", "yybb_pt",
+                    "yybb_eta", "yybb_phi", "yybb_m"]:
+            float_variable_names += ["Jet_vbf_jj_" + var]
 
     # GNN HbbCandidate jets
     if (flags.Analysis.do_GNN2bjetSelection):
