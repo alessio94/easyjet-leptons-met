@@ -24,6 +24,7 @@ Small_R_jet:
   amount_bjet: 2
   # to use multiple btagging WPs
   btag_extra_wps:
+    - GN2v01_Continuous2D
     - GN2v01_FixedCutBEff_77
     - GN2v01_FixedCutBEff_70
     
