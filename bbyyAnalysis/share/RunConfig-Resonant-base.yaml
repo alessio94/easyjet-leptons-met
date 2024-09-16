@@ -22,7 +22,7 @@ Electron:
 Photon:
   forceFullSimConfig: true
 
-bypass: true
+bypass: false
 
 Small_R_jet:
-  btag_wp: "DL1dv01_FixedCutBEff_77"
+  btag_wp: "GN2v01_FixedCutBEff_77"

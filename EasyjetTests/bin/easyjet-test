@@ -157,12 +157,12 @@ declare -A CONFIGS=(
     [bbtt-data22-lite]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     [ttHH-data22-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [bbyy-data22-lite]=bbyyAnalysis/RunConfig-bbyy-skimming-legacy-bypass.yaml
-    [SHbbyy-data22-lite]=bbyyAnalysis/RunConfig-Resonant-Default.yaml
+    [SHbbyy-data22-lite]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     # MC20
     [bbyy-mc20]=bbyyAnalysis/RunConfig-bbyy-skimming-legacy-bypass.yaml
     [bbyy-mc20-syst]=bbyyAnalysis/RunConfig-bbyy-bypass-syst.yaml
     [bbyy-mc20-lite]=bbyyAnalysis/RunConfig-bbyy-skimming-legacy-bypass.yaml
-    [SHbbyy-mc20]=bbyyAnalysis/RunConfig-Resonant-Default.yaml
+    [SHbbyy-mc20]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     [ttHH-mc20]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [bbll-mc20]=bbllAnalysis/RunConfig-bbll.yaml
@@ -183,7 +183,7 @@ declare -A CONFIGS=(
     [mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE-noEle.yaml
     [sh4b-mc20af3]=bbbbAnalysis/RunConfig-SH4b.yaml
     [fast-awkward-mc20af3]=EasyjetHub/awkward-config-noEle.yaml
-    [SHbbyy-mc20af3-lite]=bbyyAnalysis/RunConfig-Resonant-Default.yaml
+    [SHbbyy-mc20af3-lite]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     # MC23
     [bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
     [bbtt-mc23]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
@@ -193,7 +193,7 @@ declare -A CONFIGS=(
     [emtopo-mc23]=EasyjetHub/RunConfig-EMTopo.yaml
     # MC23 AF3
     [mc23af3]=EasyjetHub/RunConfig-noEle.yaml
-    [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-Default.yaml
+    [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     # non-ntupler
     [aod-fast-bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
     [hist-syst-bbbb-mc23]=bbbbAnalysis/histonly-config.yaml
