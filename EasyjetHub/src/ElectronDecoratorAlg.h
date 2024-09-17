@@ -2,7 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 
   ElectronDecoratorAlg:
-  An alg that copies tau information to aux decorations so can be
+  An alg that copies electron information to aux decorations so can be
   output branch.
 */
 

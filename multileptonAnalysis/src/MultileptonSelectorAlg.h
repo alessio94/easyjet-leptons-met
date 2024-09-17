@@ -59,6 +59,7 @@ namespace MULTILEPTON
         pass_2l2tauhad,
         pass_2lss1tauhad,
         pass_1l3tauhad,
+        pass_baseline_tau_trigger,
     };
 
     /// \brief An algorithm for counting containers
@@ -132,7 +133,7 @@ private:
     std::unordered_map<MULTILEPTON::Booleans, std::string> m_boolnames{
         {MULTILEPTON::pass_trigger_SLT, "pass_trigger_SLT"},
         {MULTILEPTON::pass_trigger_DLT, "pass_trigger_DLT"},
-        {MULTILEPTON::pass_trigger_ASLT, "pass_trigger_ASLT"},
+        {MULTILEPTON::pass_baseline_tau_trigger, "pass_baseline_tau_trigger"},
         {MULTILEPTON::PASS_TRIGGER, "PASS_TRIGGER"},
 
         {MULTILEPTON::pass_2lss, "pass_2lss"},
@@ -159,22 +160,22 @@ private:
 
     void evaluateTriggerCuts(
         const xAOD::EventInfo* event,
-        const xAOD::Electron* ele0, const xAOD::Electron* ele1,
-        const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+        const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
+        const xAOD::TauJetContainer* taus,
         CutManager& hhmlCuts, const CP::SystematicSet& sys);
     
     void evaluateSingleLeptonTrigger(
-        const xAOD::EventInfo* event, 
-        const xAOD::Electron* ele, const xAOD::Muon* mu,
+        const xAOD::EventInfo* event,
+        const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
         const CP::SystematicSet& sys);
     void evaluateDiLeptonTrigger(
         const xAOD::EventInfo* event,
-        const xAOD::Electron* ele0, const xAOD::Electron* ele1,
-        const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+        const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
         const CP::SystematicSet& sys);
-    void evaluateAsymmetricLeptonTrigger(
+    void evaluateBaselineTauTrigger(
         const xAOD::EventInfo* event,
-        const xAOD::Electron* ele, const xAOD::Muon* mu,
+        const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
+        const xAOD::TauJetContainer* taus,
         const CP::SystematicSet& sys);
 
     bool evaluate2lssSelection(const SubChannelClassify &classify,

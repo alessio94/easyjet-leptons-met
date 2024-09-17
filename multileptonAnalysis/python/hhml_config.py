@@ -4,9 +4,6 @@ import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, TauSelectorAlgCfg, JetSelectorAlgCfg)
-from EasyjetHub.output.ttree.selected_objects import (
-    get_selected_objects_branches_variables,
-)
 
 
 def hhml_cfg(
@@ -126,14 +123,6 @@ def get_BaselineVarshhmlAlg_variables(flags):
     return float_variable_names, int_variable_names
 
 
-def get_hhml_extra_object_branches_variables(flags):
-    branches = []
-    float_variable_names = []
-    int_variable_names = []
-
-    return branches, float_variable_names, int_variable_names
-
-
 def hhml_branches(flags):
     branches = []
 
@@ -167,27 +156,28 @@ def hhml_branches(flags):
             + flags.Analysis.systematics_suffix_separator + "%SYS%"
         ]
 
-    # These are the variables always saved with the objects selected by the analysis
-    # This is tunable with the flags amount and variables
-    # in the object configs.
-    object_level_branches, object_level_float_variables, object_level_int_variables \
-        = get_selected_objects_branches_variables(flags, "hhml")
-    float_variable_names += object_level_float_variables
-    int_variable_names += object_level_int_variables
-
-    branches += object_level_branches
-
-    extra_object_level_branches, extra_object_level_float_variables, \
-        extra_object_level_int_variables \
-        = get_hhml_extra_object_branches_variables(flags)
-    float_variable_names += extra_object_level_float_variables
-    int_variable_names += extra_object_level_int_variables
-    branches += extra_object_level_branches
-
     branches += [
         "EventInfo.hhml_pass_sr_%SYS% -> hhml_pass_SR"
         + flags.Analysis.systematics_suffix_separator + "%SYS%"
     ]
+
+    for trigger in ["pass_trigger_SLT",
+                    "pass_trigger_DLT",
+                    "PASS_TRIGGER",]:
+        branches += [f"EventInfo.{trigger}_%SYS% ->"
+                     f"hhml_{trigger}"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    for ch_cut in ["pass_2lss",
+                   "pass_3l",
+                   "pass_bb4l",
+                   "pass_1l2tauhad",
+                   "pass_2l2tauhad",
+                   "pass_1l3tauhad",
+                   "pass_baseline_tau_trigger"]:
+        branches += [f"EventInfo.{ch_cut}_%SYS% ->"
+                     f"hhml_{ch_cut}"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return (branches, float_variable_names, float_vector_variable_names,
             int_variable_names, char_vector_variable_names)

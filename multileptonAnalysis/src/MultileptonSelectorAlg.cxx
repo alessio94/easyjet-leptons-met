@@ -111,31 +111,9 @@ namespace MULTILEPTON
 
       setThresholds(event, sys);
 
-      // Leptons
-      const xAOD::Electron* ele0 = nullptr;
-      const xAOD::Electron* ele1 = nullptr;
-      
-      const xAOD::Muon* mu0 = nullptr;
-      const xAOD::Muon* mu1 = nullptr;
-      
-      if (electrons->size() >= 2) {
-        ele0 = electrons->at(0);
-        ele1 = electrons->at(1);
-      }
-      
-      if (muons->size() >= 2) {
-        mu0 = muons->at(0);
-        mu1 = muons->at(1);
-      }
-      
-      if (electrons->size() == 1 && muons->size() == 1) {
-        ele0 = electrons->at(0);
-        mu0 = muons->at(0);
-      }
-
       // TODO: apply baseline selection for objects
-      
-      evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_hhmlCuts, sys);
+
+      evaluateTriggerCuts(event, electrons, muons, taus, m_hhmlCuts, sys);
       applyChannelSelection(*electrons, *muons, *taus, *bjets, m_hhmlCuts);
 
       bool pass_baseline=false;
@@ -143,7 +121,11 @@ namespace MULTILEPTON
 
       bool pass_selection = false;
       for (const auto& [key, value] : m_bools) {
-        if (key == MULTILEPTON::PASS_TRIGGER) continue;
+        if (key == MULTILEPTON::PASS_TRIGGER ||
+            key == pass_trigger_SLT ||
+            key == pass_trigger_DLT ||
+            key == pass_baseline_tau_trigger)
+          continue;
         pass_selection |= value;
       }
       
@@ -287,25 +269,27 @@ namespace MULTILEPTON
   }
 
   void MultileptonSelectorAlg::evaluateTriggerCuts(
-    const xAOD::EventInfo *event,
-    const xAOD::Electron* ele0, const xAOD::Electron* ele1,
-    const xAOD::Muon* mu0, const xAOD::Muon* mu1,
-    CutManager& hhmlCuts, const CP::SystematicSet& sys) {
+    const xAOD::EventInfo* event,
+    const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
+    const xAOD::TauJetContainer* taus,
+    CutManager& hhmlCuts, const CP::SystematicSet& sys){
 
     if (!hhmlCuts.exists("PASS_TRIGGER"))
         return;
 
-    if (ele0 || mu0) evaluateSingleLeptonTrigger(event, ele0, mu0, sys);
-    if (ele1 || mu1) evaluateSingleLeptonTrigger(event, ele1, mu1, sys);
-    if ((ele0 && ele1) || (mu0 && mu1) || (ele0 && mu0)) evaluateDiLeptonTrigger(event, ele0, ele1, mu0, mu1, sys);
+    if (electrons || muons){ 
+      evaluateSingleLeptonTrigger(event, electrons, muons, sys);
+      evaluateDiLeptonTrigger(event, electrons, muons, sys);
+    }
+    if (taus) evaluateBaselineTauTrigger(event, electrons, muons, taus, sys);
 
     if (m_bools.at(MULTILEPTON::pass_trigger_SLT) || m_bools.at(MULTILEPTON::pass_trigger_DLT)) m_bools.at(MULTILEPTON::PASS_TRIGGER) = true;
   }
 
   void MultileptonSelectorAlg::evaluateSingleLeptonTrigger(
-    const xAOD::EventInfo *event,
-    const xAOD::Electron *ele, const xAOD::Muon *mu,
-    const CP::SystematicSet& sys) {
+    const xAOD::EventInfo* event,
+    const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
+    const CP::SystematicSet& sys){
 
     // Check single electron triggers
     std::vector<std::string> single_ele_paths;
@@ -352,15 +336,16 @@ namespace MULTILEPTON
     // }
 
     bool trigPassed_SET = false;
-    if(ele){
-      for(const auto& trig : single_ele_paths){
+    if (electrons){
+      for (const auto& trig : single_ele_paths){
         bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
         if (pass){
-          bool match = m_matchingTool->match(*ele, trig);
-          trigPassed_SET |= match;
+          for (const auto& ele : *electrons){
+            bool match = m_matchingTool->match(*ele, trig);
+            trigPassed_SET |= match && ele->pt() > m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele];
+          }
         }
       }
-      trigPassed_SET &= ele->pt() > m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele];
     }
 
     // Check single muon triggers
@@ -385,25 +370,25 @@ namespace MULTILEPTON
     // }
 
     bool trigPassed_SMT = false;
-    if (mu){
+    if (muons){
       for(const auto& trig : single_mu_paths){
         bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
         if (pass){
-          bool match = m_matchingTool->match(*mu, trig);
-          trigPassed_SMT |= match;
+          for (const auto& mu : *muons){
+            bool match = m_matchingTool->match(*mu, trig);
+            trigPassed_SMT |= match && mu->pt() > m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu];
+          }
         }
       }
-      trigPassed_SMT &= mu->pt() > m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu];
     }
 
     m_bools.at(MULTILEPTON::pass_trigger_SLT) |= (trigPassed_SET || trigPassed_SMT);
   }
 
   void MultileptonSelectorAlg::evaluateDiLeptonTrigger(
-    const xAOD::EventInfo *event,
-    const xAOD::Electron *ele0, const xAOD::Electron *ele1,
-    const xAOD::Muon *mu0, const xAOD::Muon *mu1,
-    const CP::SystematicSet& sys) {
+    const xAOD::EventInfo* event,
+    const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
+    const CP::SystematicSet& sys){
 
     std::vector<std::string> di_ele_paths;
 
@@ -432,16 +417,25 @@ namespace MULTILEPTON
     // }
 
     bool trigPassed_DET = false;
-    if (ele0 && ele1) {
+    if (electrons && electrons->size() >= 2){
       for (const auto &trig : di_ele_paths){
         bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-        if (pass) {
-          bool match = m_matchingTool->match({ele0, ele1}, trig);
-          trigPassed_DET |= match;
-        }
-      }
-      trigPassed_DET &= ele0->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele];
-      trigPassed_DET &= ele1->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele];
+        if (pass){
+          for (const auto &ele0: *electrons){
+            for (const auto &ele1: *electrons){
+              if (ele0 == ele1) continue;
+              bool match = m_matchingTool->match({ele0, ele1}, trig);
+              bool pass_cut = (
+                (ele0->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] &&
+                 ele1->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele]) || 
+                (ele1->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] && 
+                 ele0->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele])
+              );
+              trigPassed_DET |= match && pass_cut;
+            } // ele1 loop end
+          } // ele0 loop end
+        } // pass check end
+      } // trigger loop end
     }
 
     // Check di-muon triggers
@@ -459,16 +453,25 @@ namespace MULTILEPTON
     // }
 
     bool trigPassed_DMT = false;
-    if (mu0 && mu1) {
+    if (muons && muons->size() >= 2){
       for (const auto &trig : di_mu_paths){
         bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-        if (pass) {
-          bool match = m_matchingTool->match({mu0, mu1}, trig);
-          trigPassed_DMT |= match;
-        }
-      }
-      trigPassed_DMT &= mu0->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu];
-      trigPassed_DMT &= mu1->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu];
+        if (pass){
+          for (const auto &mu0: *muons){
+            for (const auto &mu1: *muons){
+              if (mu0 == mu1) continue;
+              bool match = m_matchingTool->match({mu0, mu1}, trig);
+              bool pass_cut = (
+                (mu0->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] &&
+                 mu1->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu]) || 
+                (mu1->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] && 
+                 mu0->pt() > m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu])
+              );
+              trigPassed_DMT |= match && pass_cut;
+            } // mu1 loop end
+          } // mu0 loop end
+        } // pass check end
+      } // trigger loop end
     }
 
     // Check electron-muon triggers
@@ -483,24 +486,204 @@ namespace MULTILEPTON
     // else if(2022<=year && year<=2023){
     //   emu_paths = {"HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
     // }
-
-    auto ele = ele0;
-    auto mu = mu0;
     bool trigPassed_EMT = false;
-    if (ele && mu) {
+    if (electrons && muons){
       for(const auto& trig : emu_paths){
         bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
         if (pass){
-          bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
-          trigPassed_EMT |= match;
+          for(const auto& ele : *electrons){
+            for(const auto& mu : *muons){
+              bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
+              bool pass_cut = (
+                  ele->pt() > m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingele] &&
+                  mu->pt() > m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingmu]);
+              trigPassed_EMT |= match && pass_cut;
+            }
+          }
         }
       }
-      trigPassed_EMT &= ele->pt() > m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingele];
-      trigPassed_EMT &= mu->pt() > m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingmu];
     }
 
     m_bools.at(MULTILEPTON::pass_trigger_DLT) = (trigPassed_DET || trigPassed_DMT || trigPassed_EMT);
   }
+
+  void MultileptonSelectorAlg::evaluateBaselineTauTrigger(
+    const xAOD::EventInfo* event,
+    const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
+    const xAOD::TauJetContainer* taus,
+    const CP::SystematicSet& sys){
+
+    int year = m_year.get(*event, sys);
+
+    if (!taus) return;
+
+    // Single tau trigger
+    std::vector<std::string> single_tau_paths;
+    if (year==2015){
+      single_tau_paths = {
+        "HLT_tau80_medium1_tracktwo_L1TAU60",
+      };
+    }
+    else if(year==2016){
+      single_tau_paths = {
+        "HLT_tau80_medium1_tracktwo_L1TAU60",
+        "HLT_tau125_medium1_tracktwo",
+        "HLT_tau160_medium1_tracktwo",
+      };
+    }
+    else if(year==2017){
+      single_tau_paths = {
+        "HLT_tau160_medium1_tracktwo",
+        "HLT_tau160_medium1_tracktwo_L1TAU100",
+      };
+    }
+    else if(year==2018){
+      single_tau_paths = {
+        "HLT_tau160_medium1_tracktwoEF_L1TAU100",
+        "HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100",
+      };
+    }
+
+    bool trigPassed_STT = false;
+    for(const auto& trig : single_tau_paths){
+      bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+      if (pass){
+        for(const auto& tau : *taus){
+          bool match = m_matchingTool->match(*tau, trig, 0.2);
+          trigPassed_STT |= match;
+        }
+      }
+    }
+
+    // Di-tau trigger
+    std::vector<std::string> di_tau_paths;
+    if (year==2015){
+      di_tau_paths = {
+        "HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo_L1TAU20IM_2TAU12IM",
+      };
+    }
+    else if(year==2016){
+      di_tau_paths = {
+        "HLT_tau35_loose1_tracktwo_tau25_loose1_tracktwo",
+        "HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo",
+        "HLT_tau80_medium1_TAU60_tau50_medium1_L1TAU12",
+      };
+    }
+    else if(year==2017){
+      di_tau_paths = {
+        // can we use "HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"? 
+        // Cause it is described as "di-tau+L1 jets" in https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled?sortcol=2;table=77;up=0#sorted_table
+        "HLT_tau80_medium1_tracktwo_L1TAU60_tau50_medium1_tracktwo_L1TAU12",
+        "HLT_tau80_medium1_tracktwo_L1TAU60_tau60_medium1_tracktwo_L1TAU40",
+      };
+    }
+    else if(year==2018){
+      di_tau_paths = {
+        "HLT_tau80_medium1_tracktwoEF_L1TAU60_tau60_medium1_tracktwoEF_L1TAU40 ",
+        "HLT_tau80_mediumRNN_tracktwoMVA_L1TAU60_tau60_mediumRNN_tracktwoMVA_L1TAU40",
+        "HLT_tau80_medium1_tracktwoEF_L1TAU60_tau35_medium1_tracktwoEF_L1TAU12IM_L1TAU60_DR-TAU20ITAU12I",
+        "HLT_tau80_mediumRNN_tracktwoMVA_L1TAU60_tau35_mediumRNN_tracktwoMVA_L1TAU12IM_L1TAU60_DR-TAU20ITAU12I",
+      };
+    }
+    bool trigPassed_DTT = false;
+    if (taus->size() >= 2){
+      for(const auto& trig : di_tau_paths){
+        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        if (pass){
+          for (const auto& tau0 : *taus){
+            for (const auto& tau1 : *taus){
+              if (tau0 == tau1) continue;
+              bool match = m_matchingTool->match({tau0,tau1}, trig, 0.2);
+              trigPassed_DTT |= match;
+            }
+          }
+        }
+      }
+    }
+
+    // electron-tau trigger
+    std::vector<std::string> ele_tau_paths;
+    if (year==2015){
+      ele_tau_paths = {
+        "HLT_e17_lhmedium_nod0_tau25_medium1_tracktwo",
+      };
+    }
+    else if(year==2016){
+      ele_tau_paths = {
+        "HLT_e17_lhmedium_nod0_tau25_medium1_tracktwo",
+        "HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo",
+      };
+    }
+    else if(year==2017){
+      ele_tau_paths = {
+        "HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwo",
+        "HLT_e24_lhmedium_nod0_ivarloose_tau35_medium1_tracktwo",
+      };
+    }
+    else if(year==2018){
+      ele_tau_paths = {
+        "HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwoEF",
+        "HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA",
+      };
+    }
+
+    bool trigPassed_ETT = false;
+    if (electrons){
+      for(const auto& trig : ele_tau_paths){
+        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        if (pass){
+          for (const auto& ele : *electrons){
+            for (const auto& tau : *taus){
+              bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*tau, trig, 0.2);
+              trigPassed_ETT |= match;
+            }
+          }
+        }
+      }
+    }
+
+    // muon-tau trigger
+    std::vector<std::string> mu_tau_paths;
+    if (year==2015){
+      mu_tau_paths = {
+        "HLT_mu14_tau25_medium1_tracktwo",
+      };
+    }
+    else if(year==2016){
+      mu_tau_paths = {
+        "HLT_mu14_tau25_medium1_tracktwo",
+        "HLT_mu14_ivarloose_tau25_medium1_tracktwo",
+      };
+    }
+    else if(year==2017){
+      mu_tau_paths = {
+        "HLT_mu14_ivarloose_tau25_medium1_tracktwo",
+        "HLT_mu14_ivarloose_tau35_medium1_tracktwo",
+      };
+    }
+    else if(year==2018){
+      mu_tau_paths = {
+        "HLT_mu14_ivarloose_tau35_medium1_tracktwoEF",
+        "HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA",
+      };
+    }
+    bool trigPassed_MTT = false;
+    if (muons){
+      for(const auto& trig : mu_tau_paths){
+        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        if (pass){
+          for (const auto& mu : *muons){
+            for (const auto& tau : *taus){
+              bool match = m_matchingTool->match(*mu, trig) && m_matchingTool->match(*tau, trig, 0.2);
+              trigPassed_MTT |= match;
+            }
+          }
+        }
+      }
+    }
+    m_bools.at(MULTILEPTON::pass_baseline_tau_trigger) = (trigPassed_STT || trigPassed_DTT || trigPassed_ETT || trigPassed_MTT);
+  }
+
 
   bool MultileptonSelectorAlg::evaluate2lssSelection(
       const SubChannelClassify &classify,
