@@ -10,6 +10,7 @@
 
 import sys
 import time
+from Gaudi.Main import BootstrapHelper
 
 from EasyjetHub.hub import (
     AnalysisArgumentParser,
@@ -105,7 +106,7 @@ def main():
     cfg, flags, args = bbyy_job_cfg()
 
     if args.dry_run:
-        return_code = 1
+        return_code =  BootstrapHelper.StatusCode(False)
     else:
         return_code = run_job(flags, args, cfg)
 
