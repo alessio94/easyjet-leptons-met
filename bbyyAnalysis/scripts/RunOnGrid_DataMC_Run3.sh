@@ -44,6 +44,8 @@ mc_list=(
     "$dir_samples/$mc_campaign.ggZH_yy.$ptag.txt"
     "$dir_samples/$mc_campaign.ttH_yy.$ptag.txt"
     "$dir_samples/$mc_campaign.bbH_yy.$ptag.txt"
+    "$dir_samples/$mc_campaign.tHjb.$ptag.txt"
+    "$dir_samples/$mc_campaign.tWHyy.$ptag.txt"
     "$dir_samples/$mc_campaign.yyjets.$ptag.txt"
 )
 #data 
