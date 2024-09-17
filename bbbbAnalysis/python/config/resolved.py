@@ -51,10 +51,11 @@ def resolved_cfg(flags, smalljetkey):
     btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
     btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
     for btag_wp in btag_wps:
+        btag_sys = btag_wp + "_%SYS%"
         # get the 4 leading small R jets
         cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg_" + btag_wp,
                                     containerInKey=smalljetkey,
-                                    containerOutKey="resolvedAnalysisJets_" + btag_wp,
+                                    containerOutKey="resolvedAnalysisJets_" + btag_sys,
                                     bTagWPDecorName="ftag_select_" + btag_wp,
                                     selectBjet=True,
                                     minPt=20e3,
@@ -71,8 +72,8 @@ def resolved_cfg(flags, smalljetkey):
         cfg.addEventAlgo(
             CompFactory.HH4B.JetPairingAlg(
                 "JetPairingAlg_" + btag_wp,
-                containerInKey="resolvedAnalysisJets_" + btag_wp,
-                containerOutKey="pairedResolvedAnalysisJets_" + btag_wp,
+                containerInKey="resolvedAnalysisJets_" + btag_sys,
+                containerOutKey="pairedResolvedAnalysisJets_" + btag_sys,
                 pairingStrategy="minDeltaR",  # so far only minDeltaR
             )
         )
@@ -81,7 +82,7 @@ def resolved_cfg(flags, smalljetkey):
         cfg.addEventAlgo(
             CompFactory.HH4B.BaselineVarsResolvedAlg(
                 "FinalVarsResolvedAlg_" + btag_wp,
-                smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_wp,
+                smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_sys,
                 bTagWP=btag_wp,
             )
         )
@@ -114,7 +115,8 @@ def resolved_branches(flags):
 
         for var in resolved_vars:
             branches += [
-                f"EventInfo.resolved_{var}_{btag_wp} -> bbbb_resolved_{btag_wp}_{var}"
+                f"EventInfo.resolved_{var}_{btag_wp}_%SYS%"
+                + f" -> bbbb_resolved_{var}_{btag_wp}_%SYS%"
             ]
 
     if flags.Input.isMC:

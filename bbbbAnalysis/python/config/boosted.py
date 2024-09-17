@@ -11,10 +11,11 @@ def boosted_cfg(flags, largejetkey):
     cfg = ComponentAccumulator()
 
     for btag_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
+        btag_sys = btag_wp + "_%SYS%"
         # get the two leading large R's
         cfg.merge(JetSelectorAlgCfg(flags, name="LargeJetSelectorAlg_" + btag_wp,
                                     containerInKey=largejetkey,
-                                    containerOutKey="boostedAnalysisJets_" + btag_wp,
+                                    containerOutKey="boostedAnalysisJets_" + btag_sys,
                                     bTagWPDecorName="ftag_select_" + btag_wp,
                                     selectBjet=True,
                                     minPt=250e3,
@@ -26,8 +27,8 @@ def boosted_cfg(flags, largejetkey):
         cfg.addEventAlgo(
             CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
                 "LeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
-                containerInKey="boostedAnalysisJets_" + btag_wp,
-                containerOutKey="leadingLargeRVRJets_" + btag_wp,
+                containerInKey="boostedAnalysisJets_" + btag_sys,
+                containerOutKey="leadingLargeRVRJets_" + btag_sys,
                 whichJet=0,
             )
         )
@@ -35,8 +36,8 @@ def boosted_cfg(flags, largejetkey):
         # the leading large R jet
         cfg.merge(JetSelectorAlgCfg(
             flags, name="LeadingLargeRVRJetSelectorAlg_" + btag_wp,
-            containerInKey="leadingLargeRVRJets_" + btag_wp,
-            containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
+            containerInKey="leadingLargeRVRJets_" + btag_sys,
+            containerOutKey="SelectedLeadingLargeRVRJets_" + btag_sys,
             bTagWP=btag_wp,
             selectBjet=True,
             minPt=10e3,
@@ -49,8 +50,8 @@ def boosted_cfg(flags, largejetkey):
         cfg.addEventAlgo(
             CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
                 "SubLeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
-                containerInKey="boostedAnalysisJets_" + btag_wp,
-                containerOutKey="SubLeadingLargeRVRJets_" + btag_wp,
+                containerInKey="boostedAnalysisJets_" + btag_sys,
+                containerOutKey="SubLeadingLargeRVRJets_" + btag_sys,
                 whichJet=1,
             )
         )
@@ -59,8 +60,8 @@ def boosted_cfg(flags, largejetkey):
         # the subleading large R jet
         cfg.merge(JetSelectorAlgCfg(
             flags, name="SubLeadingLargeRVRJetSelectorAlg_" + btag_wp,
-            containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
-            containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
+            containerInKey="SubLeadingLargeRVRJets_" + btag_sys,
+            containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_sys,
             bTagWP=btag_wp,
             selectBjet=True,
             minPt=10e3,
@@ -73,9 +74,9 @@ def boosted_cfg(flags, largejetkey):
         cfg.addEventAlgo(
             CompFactory.HH4B.BaselineVarsBoostedAlg(
                 "FinalVarsBoostedAlg_" + btag_wp,
-                largeRContainerInKey="boostedAnalysisJets_" + btag_wp,
-                leadingLargeR_GA_VRJets="SelectedLeadingLargeRVRJets_" + btag_wp,
-                subLeadingLargeR_GA_VRJets="SelectedSubLeadingLargeRVRJets_" + btag_wp,
+                largeRContainerInKey="boostedAnalysisJets_" + btag_sys,
+                leadingLargeR_GA_VRJets="SelectedLeadingLargeRVRJets_" + btag_sys,
+                subLeadingLargeR_GA_VRJets="SelectedSubLeadingLargeRVRJets_" + btag_sys,
                 bTagWP=btag_wp,
             )
         )
@@ -106,7 +107,9 @@ def boosted_branches(flags):
 
         for var in boosted_vars:
             branches += [
-                f"EventInfo.boosted_{var}_{btag_wp} -> bbbb_boosted_{btag_wp}_{var}"
+                f"EventInfo.boosted_{var}_{btag_wp}_%SYS%"
+                + f" -> bbbb_boosted_{btag_wp}_{var}"
+                + flags.Analysis.systematics_suffix_separator + "_%SYS%"
             ]
 
     return branches

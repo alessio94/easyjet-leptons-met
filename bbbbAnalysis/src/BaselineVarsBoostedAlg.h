@@ -8,11 +8,12 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
-
-// not sure we ever _need_ to use this below, but we use it below
-#include "AthContainers/ConstDataVector.h"
 
 namespace HH4B
 {
@@ -35,20 +36,19 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
-        m_largeRContainerInKey{this, "largeRContainerInKey", "",
-                               "containerName to read"};
-    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
-        m_leadingLargeR_GA_VRJets{this, "leadingLargeR_GA_VRJets", "",
-                                  "containerName to read"};
-    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
-        m_subLeadingLargeR_GA_VRJets{this, "subLeadingLargeR_GA_VRJets", "",
-                                     "containerName to read"};
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-        this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
+    CP::SysListHandle m_systematicsList {this};
 
-    std::string m_bTagWP;
-    std::unordered_map<std::string, SG::AuxElement::Decorator<float>> m_decos;
+    CP::SysReadHandle<xAOD::JetContainer>
+      m_LargeJetHandle{ this, "largeRContainerInKey", "", "Large-R jet container to read" };
+    CP::SysReadHandle<xAOD::JetContainer>
+      m_leadingLargeR_GA_VRJetsHandle{ this, "leadingLargeR_GA_VRJets", "", "Large-R jet container to read" };
+    CP::SysReadHandle<xAOD::JetContainer>
+      m_subleadingLargeR_GA_VRJetsHandle{ this, "subLeadingLargeR_GA_VRJets", "", "Large-R jet container to read" };
+    CP::SysReadHandle<xAOD::EventInfo>
+      m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
+
+    Gaudi::Property<std::string> m_bTagWP {this, "bTagWP", "", "B-tagging working point."};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_decos;
     // clang-format off
     std::vector<std::string> m_vars{
       "boosted_h1_m_",

@@ -8,6 +8,10 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysWriteHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+
 #include <xAODJet/JetContainer.h>
 
 namespace HH4B
@@ -31,12 +35,13 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerInKey{
-        this, "containerInKey", "", "containerName to read"};
-    SG::WriteHandleKey<ConstDataVector<xAOD::JetContainer>> m_containerOutKey{
-        this, "containerOutKey", "", "containerName to write"};
+    CP::SysListHandle m_systematicsList {this};
+    CP::SysReadHandle<xAOD::JetContainer>
+      m_inJetHandle{this, "containerInKey", "", "Input jet container to read"};
+    CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
+      m_outJetHandle{this, "containerOutKey", "", "Output jet container to write"};
 
-    std::string m_pairingStrategy;
+    Gaudi::Property<std::string> m_pairingStrategy {this, "pairingStrategy", "", "Pairing strategy."};
   };
 }
 

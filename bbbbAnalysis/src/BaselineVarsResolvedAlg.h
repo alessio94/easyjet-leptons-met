@@ -8,6 +8,10 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 
@@ -32,14 +36,15 @@ private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
-    SG::ReadHandleKey<ConstDataVector<xAOD::JetContainer>>
-        m_smallRContainerInKey{this, "smallRContainerInKey", "",
-                               "containerName to read"};
-    SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
-        this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
+    CP::SysListHandle m_systematicsList {this};
+    CP::SysReadHandle<xAOD::JetContainer>
+      m_jetHandle{ this, "smallRContainerInKey", "", "Jet container to read" };
+    CP::SysReadHandle<xAOD::EventInfo>
+      m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
-    std::string m_bTagWP;
-    std::unordered_map<std::string, SG::AuxElement::Decorator<float>> m_decos;
+    Gaudi::Property<std::string> m_bTagWP {this, "bTagWP", "", "B-tagging working point."};
+
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_decos;
     // clang-format off
     std::vector<std::string> m_vars{
       "resolved_DeltaR12_",

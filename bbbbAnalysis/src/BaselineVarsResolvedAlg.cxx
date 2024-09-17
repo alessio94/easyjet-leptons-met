@@ -7,7 +7,6 @@
 #include "BaselineVarsResolvedAlg.h"
 #include "AthContainers/AuxElement.h"
 #include "FourMomUtils/xAODP4Helpers.h"
-#include <AthContainers/ConstDataVector.h>
 
 namespace HH4B
 {
@@ -15,63 +14,69 @@ namespace HH4B
                                                     ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
-    declareProperty("bTagWP", m_bTagWP);
   }
 
   StatusCode BaselineVarsResolvedAlg ::initialize()
   {
-    ATH_CHECK(m_smallRContainerInKey.initialize());
-    ATH_CHECK(m_EventInfoKey.initialize());
+    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     // make decorators
     for (const std::string& var : m_vars)
     {
       std::string deco_var = var + m_bTagWP;
-      SG::AuxElement::Decorator<float> deco(deco_var);
+      CP::SysWriteDecorHandle<float> deco{deco_var + "_%SYS%", this};
       m_decos.emplace(deco_var, deco);
-    };
+      ATH_CHECK (m_decos.at(deco_var).initialize(m_systematicsList, m_eventHandle));
+    }
+
+    // Initialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize());
+
     return StatusCode::SUCCESS;
   }
 
   StatusCode BaselineVarsResolvedAlg ::execute()
   {
-    // container we read in
-    SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
-    ATH_CHECK(eventInfo.isValid());
+    for (const auto& sys : m_systematicsList.systematicsVector()) {
+      const xAOD::EventInfo *eventInfo = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (eventInfo, sys));
 
-    // set defaults
-    for (const std::string& var : m_vars)
-    {
-      std::string deco_var = var + m_bTagWP;
-      m_decos.at(deco_var)(*eventInfo) = -1.;
-    };
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-    SG::ReadHandle<ConstDataVector<xAOD::JetContainer>> smallRjets(
-        m_smallRContainerInKey);
-    ATH_CHECK(smallRjets.isValid());
+      // set defaults
+      for (const std::string& var : m_vars)
+      {
+        std::string deco_var = var + m_bTagWP;
+        m_decos.at(deco_var).set(*eventInfo, -1, sys);
+      }
 
-    ConstDataVector<xAOD::JetContainer> jets = *smallRjets;
-    // check if we have 4 small R jets
-    if (jets.size() >= 4)
-    {
-      // construct Higgs Candidates
-      xAOD::JetFourMom_t h1 = jets[0]->jetP4() + jets[1]->jetP4();
-      xAOD::JetFourMom_t h2 = jets[2]->jetP4() + jets[3]->jetP4();
+      // check if we have 4 small R jets
+      if (jets->size() >= 4)
+      {
+        // construct Higgs Candidates
+        xAOD::JetFourMom_t h1 = jets->at(0)->jetP4() + jets->at(1)->jetP4();
+        xAOD::JetFourMom_t h2 = jets->at(2)->jetP4() + jets->at(3)->jetP4();
 
-      // decorate eventinfo
-      // clang-format off
-      m_decos.at("resolved_DeltaR12_" + m_bTagWP)(*eventInfo) = xAOD::P4Helpers::deltaR(jets[0],jets[1]);
-      m_decos.at("resolved_DeltaR13_" + m_bTagWP)(*eventInfo) = xAOD::P4Helpers::deltaR(jets[0],jets[2]);
-      m_decos.at("resolved_DeltaR14_" + m_bTagWP)(*eventInfo) = xAOD::P4Helpers::deltaR(jets[0],jets[3]);
-      m_decos.at("resolved_DeltaR23_" + m_bTagWP)(*eventInfo) = xAOD::P4Helpers::deltaR(jets[1],jets[2]);
-      m_decos.at("resolved_DeltaR24_" + m_bTagWP)(*eventInfo) = xAOD::P4Helpers::deltaR(jets[1],jets[3]);
-      m_decos.at("resolved_DeltaR34_" + m_bTagWP)(*eventInfo) = xAOD::P4Helpers::deltaR(jets[2],jets[3]);
-      m_decos.at("resolved_h1_m_" + m_bTagWP)(*eventInfo) = h1.M();
-      m_decos.at("resolved_h2_m_" + m_bTagWP)(*eventInfo) = h2.M();
-      m_decos.at("resolved_hh_m_" + m_bTagWP)(*eventInfo) = (h1 + h2).M();
-      // clang-format on
+        // decorate eventinfo
+        float deltaR12 = xAOD::P4Helpers::deltaR(jets->at(0),jets->at(1));
+        float deltaR13 = xAOD::P4Helpers::deltaR(jets->at(0),jets->at(2));
+        float deltaR14 = xAOD::P4Helpers::deltaR(jets->at(0),jets->at(3));
+        float deltaR23 = xAOD::P4Helpers::deltaR(jets->at(1),jets->at(2));
+        float deltaR24 = xAOD::P4Helpers::deltaR(jets->at(1),jets->at(3));
+        float deltaR34 = xAOD::P4Helpers::deltaR(jets->at(2),jets->at(3));
+        m_decos.at("resolved_DeltaR12_" + m_bTagWP).set(*eventInfo, deltaR12, sys);
+        m_decos.at("resolved_DeltaR13_" + m_bTagWP).set(*eventInfo, deltaR13, sys);
+        m_decos.at("resolved_DeltaR14_" + m_bTagWP).set(*eventInfo, deltaR14, sys);
+        m_decos.at("resolved_DeltaR23_" + m_bTagWP).set(*eventInfo, deltaR23, sys);
+        m_decos.at("resolved_DeltaR24_" + m_bTagWP).set(*eventInfo, deltaR24, sys);
+        m_decos.at("resolved_DeltaR34_" + m_bTagWP).set(*eventInfo, deltaR34, sys);
+        m_decos.at("resolved_h1_m_" + m_bTagWP).set(*eventInfo, h1.M(), sys);
+        m_decos.at("resolved_h2_m_" + m_bTagWP).set(*eventInfo, h2.M(), sys);
+        m_decos.at("resolved_hh_m_" + m_bTagWP).set(*eventInfo, (h1 + h2).M(), sys);
+      }
     }
-
     return StatusCode::SUCCESS;
   }
 }
