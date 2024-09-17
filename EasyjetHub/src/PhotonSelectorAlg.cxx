@@ -157,6 +157,7 @@ namespace Easyjet
           }
         }
 
+        m_isSelectedPhoton.set(*thisPhoton, true, sys);
         workContainer->push_back(thisPhoton.release());
       }
 
