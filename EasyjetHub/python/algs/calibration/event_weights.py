@@ -22,16 +22,23 @@ def pileup_sequence(flags):
         cfg.addEventAlgo(alg, pileup_sequence.getName())
     """
 
-    configSeq += makeConfig('PileupReweighting')
-    configSeq.setOptionValue('.campaign', flags.Input.MCCampaign)
-    configSeq.setOptionValue('.files', flags.Input.Files)
-    if 'prw_files' in flags.Analysis:
-        configSeq.setOptionValue('.userPileupConfigs', get_prw_files(flags))
-    else:
-        # only use default config if we're not using custom PRW
-        configSeq.setOptionValue('.useDefaultConfig', True)
-    if 'lumicalc_files' in flags.Analysis:
-        configSeq.setOptionValue('.userLumicalcFiles', get_lumicalc_files(flags))
+    altConfig = False
+    for prw in flags.Analysis.PileupReweighting:
+        postfix = ("_" + prw.postfix) if prw.postfix else ""
+        configSeq += makeConfig('PileupReweighting')
+        configSeq.setOptionValue('.postfix', postfix)
+        configSeq.setOptionValue('.campaign', flags.Input.MCCampaign)
+        configSeq.setOptionValue('.files', flags.Input.Files)
+        configSeq.setOptionValue('.alternativeConfig', altConfig)
+        if 'prw_files' in prw:
+            configSeq.setOptionValue('.userPileupConfigs', get_prw_files(flags, prw))
+        else:
+            # only use default config if we're not using custom PRW
+            configSeq.setOptionValue('.useDefaultConfig', True)
+        if 'lumicalc_files' in prw:
+            configSeq.setOptionValue('.userLumicalcFiles',
+                                     get_lumicalc_files(flags, prw))
+        altConfig = True
 
     return configSeq
 

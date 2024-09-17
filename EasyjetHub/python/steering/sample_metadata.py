@@ -83,14 +83,14 @@ def get_valid_ami_tag(tags, check_tag="p", min_valid_tag="p5657"):
     return is_valid_tag
 
 
-def get_lumicalc_files(flags):
+def get_lumicalc_files(flags, prw_flags):
     """Return the lumicalc files"""
 
     lumicalc_files = set()
     for year in flags.Analysis.Years:
         year = str(year)
         lumicalc_dir = flags.Analysis.GRL.years[year]
-        lumicalc_file = flags.Analysis.lumicalc_files[year]
+        lumicalc_file = prw_flags.lumicalc_files[year]
         if lumicalc_dir and lumicalc_file:
             lumicalc_files.add(str(Path(lumicalc_dir) / lumicalc_file))
         else:
@@ -101,20 +101,21 @@ def get_lumicalc_files(flags):
     return list(lumicalc_files)
 
 
-def get_prw_files(flags):
+def get_prw_files(flags, prw_flags):
     """Return the PRW (Pileup ReWeighting) config files."""
-    campaign = flags.Input.MCCampaign
+    campaign = str(flags.Input.MCCampaign)
+    campaign = campaign.replace("MC", "mc").replace("Campaign.", "")
 
     prw_files = set()
     for year in flags.Analysis.Years:
         year = str(year)
         prw_dir = flags.Analysis.GRL.years[year]
         # because we don't get PRW from GRL folders from all years
-        if year in flags.Analysis.prw_files:
-            prw_file = flags.Analysis.prw_files[year]
+        if year in prw_flags.prw_files:
+            prw_file = prw_flags.prw_files[year]
             prw_files.add(str(Path(prw_dir) / prw_file))
-        elif campaign in flags.Analysis.prw_files:
-            prw_file = flags.Analysis.prw_files[campaign]
+        if campaign in prw_flags.prw_files:
+            prw_file = prw_flags.prw_files[campaign]
             prw_files.add(prw_file)
         else:
             raise RuntimeError(

@@ -3,7 +3,7 @@ from AthenaConfiguration.Enums import LHCPeriod
 from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 
-def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
+def get_event_info_branches(flags, tree_flags, trigger_chains):
     _syst_option = SystOption.ALL_SYST
     if flags.Analysis.disable_calib or not flags.Input.isMC:
         _syst_option = SystOption.NONE
@@ -27,8 +27,14 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
             "mcChannelNumber",
             "RandomRunNumber",
             "generatorWeight_%SYS%",
-            "PileupWeight_%SYS%"
         ]
+
+        if flags.Analysis.doPRW:
+            for prw in flags.Analysis.PileupReweighting:
+                postfix = ("_" + prw.postfix) if prw.postfix else ""
+                eventinfo_branches.variables += [
+                    "PileupWeight" + postfix + "_%SYS%"
+                ]
 
         if flags.GeoModel.Run is LHCPeriod.Run2:
             eventinfo_branches.variables += ["beamSpotWeight"]
@@ -51,8 +57,13 @@ def get_event_info_branches(flags, tree_flags, do_PRW, trigger_chains):
         # other branches
         # Any variable with %SYS% will anyway get systematics applied, so the list
         # doesn't need to be exhaustive with the extra variables added in the config
-        eventinfo_branches.syst_only_for = ["generatorWeight_%SYS%",
-                                            "PileupWeight_%SYS%"]
+        eventinfo_branches.syst_only_for = ["generatorWeight_%SYS%"]
+        if flags.Analysis.doPRW:
+            for prw in flags.Analysis.PileupReweighting:
+                postfix = ("_" + prw.postfix) if prw.postfix else ""
+                eventinfo_branches.syst_only_for += [
+                    "PileupWeight" + postfix + "_%SYS%"
+                ]
 
     # Replace L1Topo characters, formatting as done by the
     # trigger selection CP alg

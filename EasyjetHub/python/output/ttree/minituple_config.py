@@ -86,7 +86,7 @@ def minituple_output_cfg(
     tree_branches = []
 
     tree_branches += get_event_info_branches(
-        flags, tree_flags, flags.Analysis.doPRW, flags.Analysis.TriggerChains
+        flags, tree_flags, flags.Analysis.TriggerChains
     )
 
     objects_out = {
