@@ -50,6 +50,9 @@ Small_R_jet:
   do_parent_decoration: true
   amount: 0
   amount_bjet: 0
+  btag_egReductionB: "Loose"
+  btag_egReductionC: "Loose"
+  btag_egReductionLight: "Loose"
   variables_bjets: ["pt", "eta", "phi", "E"]
   variables_allJets: ["pt", "eta", "phi", "E"]
   variables_int_bjets: []

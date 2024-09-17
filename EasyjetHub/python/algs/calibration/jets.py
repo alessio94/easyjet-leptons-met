@@ -103,6 +103,12 @@ def jet_sequence(
             # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
             configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
+            configSeq.setOptionValue('.eigenvectorReductionB',
+                                     jet_flags.btag_egReductionB)
+            configSeq.setOptionValue('.eigenvectorReductionC',
+                                     jet_flags.btag_egReductionC)
+            configSeq.setOptionValue('.eigenvectorReductionLight',
+                                     jet_flags.btag_egReductionLight)
             # save pb / pc / pu / ptau
             if tagger not in tagger_set:
                 configSeq.setOptionValue('.saveScores', 'All')
