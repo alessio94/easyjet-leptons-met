@@ -21,7 +21,7 @@ def fullLep_cfg(flags, float_variables=None, int_variables=None):
         SignalJetsLabel = "vbshiggsAnalysisJets_%SYS%"
     else:
         # use vbs tagging jets
-        VBSJetsLabel = "vbshiggsAnalysisVBSJets_%SYS%",
+        VBSJetsLabel = "vbshiggsAnalysisVBSJets_%SYS%"
         # use the small-R jets after selecting tagging jets
         SignalJetsLabel = "vbshiggsAnalysisSignalJets_%SYS%"
 
