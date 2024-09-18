@@ -10,10 +10,6 @@ cbkHistPattern: "CutBookkeeper_%RUN%_%SYS%"
 
 bypass: false
 
-# Decay mode considered for truth decoration
-Truth:
-  decayModes: ["bbZZ", "WWWW", "WWZZ","WWtt", "ZZtt", "tttt"]
-
 # Toggles for object types
 do_small_R_jets: true
 do_muons: true
@@ -39,6 +35,7 @@ Tau:
   do_parent_decoration: true
 
 Electron:
+  min_pT: 10.0e+3
   ID: "LooseBLayer"
   Iso: "NonIso"
   extra_wps: 
@@ -62,6 +59,7 @@ Electron:
   chargeIDSelectionRun2: true
 
 Muon:
+  min_pT: 10.0e+3
   ID: "Loose"
   Iso: "NonIso"
   extra_wps:
@@ -111,13 +109,6 @@ save_hhml_cutflow: true
 
 CutList :
   - PASS_TRIGGER
-  - pass_2lss
-  - pass_3l
-  - pass_bb4l
-  - pass_1l2tauhad
-  - pass_2l2tauhad
-#  - pass_2lss1tauhad
-#  - pass_1l3tauhad
 
 # Include the TTree configuration and update details
 ttree_output:

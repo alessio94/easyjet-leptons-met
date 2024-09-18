@@ -1,0 +1,21 @@
+include: multileptonAnalysis/RunConfig-multilepton.yaml
+
+Truth:
+  decayModes: ["bbZZ"]
+
+Small_R_jet:
+  amount_bjet: 2
+  amount: 4
+
+Tau:
+  amount: 0
+
+Electron:
+  min_pT: 4.5e+3
+
+Muon:
+  min_pT: 3.e+3
+
+
+CutList :
+  - pass_bb4l

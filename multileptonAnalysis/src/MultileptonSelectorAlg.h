@@ -49,17 +49,17 @@ namespace MULTILEPTON
     {
         pass_trigger_SLT,
         pass_trigger_DLT,
-        pass_trigger_ASLT,
+        pass_baseline_tau_trigger,
         PASS_TRIGGER,
 
-        pass_2lss,
+        pass_2lsc,
         pass_3l,
         pass_bb4l,
-        pass_1l2tauhad,
-        pass_2l2tauhad,
-        pass_2lss1tauhad,
-        pass_1l3tauhad,
-        pass_baseline_tau_trigger,
+        pass_1l2tau,
+        pass_2l2tau,
+        pass_2lsc1tau,
+        pass_1l3tau,
+        pass_3l1tau,
     };
 
     /// \brief An algorithm for counting containers
@@ -136,13 +136,14 @@ private:
         {MULTILEPTON::pass_baseline_tau_trigger, "pass_baseline_tau_trigger"},
         {MULTILEPTON::PASS_TRIGGER, "PASS_TRIGGER"},
 
-        {MULTILEPTON::pass_2lss, "pass_2lss"},
+        {MULTILEPTON::pass_2lsc, "pass_2lsc"},
         {MULTILEPTON::pass_3l, "pass_3l"},
         {MULTILEPTON::pass_bb4l, "pass_bb4l"},
-        {MULTILEPTON::pass_1l2tauhad, "pass_1l2tauhad"},
-        {MULTILEPTON::pass_2l2tauhad, "pass_2l2tauhad"},
-        {MULTILEPTON::pass_2lss1tauhad, "pass_2lss1tauhad"},
-        {MULTILEPTON::pass_1l3tauhad, "pass_1l3tauhad"},
+        {MULTILEPTON::pass_1l2tau, "pass_1l2tau"},
+        {MULTILEPTON::pass_2l2tau, "pass_2l2tau"},
+        {MULTILEPTON::pass_2lsc1tau, "pass_2lsc1tau"},
+        {MULTILEPTON::pass_1l3tau, "pass_1l3tau"},
+        {MULTILEPTON::pass_3l1tau, "pass_3l1tau"},
     };
 
     /// \brief Cutflow Variables
@@ -178,7 +179,7 @@ private:
         const xAOD::TauJetContainer* taus,
         const CP::SystematicSet& sys);
 
-    bool evaluate2lssSelection(const SubChannelClassify &classify,
+    bool evaluate2lscSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
 
     bool evaluate3lSelection(const SubChannelClassify &classify,
@@ -187,21 +188,21 @@ private:
     bool evaluatebb4lSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
     
-    bool evaluate1l2tauhadSelection(const SubChannelClassify &classify,
+    bool evaluate1l2tauSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
     
-    bool evaluate2l2tauhadSelection(const SubChannelClassify &classify,
+    bool evaluate2l2tauSelection(const SubChannelClassify &classify,
         CutManager& hhmlCuts);
-    
-    // NOTE: Ignore 2LSC for the moment
-    // bool evaluate2lss1tauhadSelection(
-    //     std::vector<std::pair<const xAOD::IParticle*, int>>& leptons,
-    //     const xAOD::TauJetContainer *taus,
-    //     const xAOD::JetContainer *jets,
-    //     const ConstDataVector<xAOD::JetContainer>& bjets,
-    //     CutManager& hhmlCuts);
 
-    // TODO: Add 1l3tauhad selection
+    bool evaluate2lsc1tauSelection(const SubChannelClassify &classify,
+        CutManager& hhmlCuts);
+
+    bool evaluate1l3tauSelection(const SubChannelClassify &classify,
+        CutManager& hhmlCuts);
+
+    bool evaluate3l1tauSelection(const SubChannelClassify &classify,
+        CutManager& hhmlCuts);
+
 
     void applyChannelSelection(
         const xAOD::ElectronContainer& electrons,

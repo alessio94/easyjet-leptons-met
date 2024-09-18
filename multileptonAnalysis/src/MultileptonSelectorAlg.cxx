@@ -579,16 +579,20 @@ namespace MULTILEPTON
     }
     else if(year==2018){
       di_tau_paths = {
-        "HLT_tau80_medium1_tracktwoEF_L1TAU60_tau60_medium1_tracktwoEF_L1TAU40 ",
+        "HLT_tau80_medium1_tracktwoEF_L1TAU60_tau60_medium1_tracktwoEF_L1TAU40",
         "HLT_tau80_mediumRNN_tracktwoMVA_L1TAU60_tau60_mediumRNN_tracktwoMVA_L1TAU40",
-        "HLT_tau80_medium1_tracktwoEF_L1TAU60_tau35_medium1_tracktwoEF_L1TAU12IM_L1TAU60_DR-TAU20ITAU12I",
-        "HLT_tau80_mediumRNN_tracktwoMVA_L1TAU60_tau35_mediumRNN_tracktwoMVA_L1TAU12IM_L1TAU60_DR-TAU20ITAU12I",
       };
     }
     bool trigPassed_DTT = false;
     if (taus->size() >= 2){
       for(const auto& trig : di_tau_paths){
-        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        bool pass = false;
+        if (m_triggerdecos.count("trigPassed_"+trig) > 0){
+          pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
+        } else {
+          ATH_MSG_WARNING("Trigger " << trig << " not found. Skipping.");
+        }
+
         if (pass){
           for (const auto& tau0 : *taus){
             for (const auto& tau1 : *taus){
@@ -685,17 +689,15 @@ namespace MULTILEPTON
   }
 
 
-  bool MultileptonSelectorAlg::evaluate2lssSelection(
+  bool MultileptonSelectorAlg::evaluate2lscSelection(
       const SubChannelClassify &classify,
         CutManager& hhmlCuts){
     auto sub_channel_id = classify.getSubChannelId();
-    if (!hhmlCuts.exists("pass_2lss") || sub_channel_id != CH_ID::hh2lsc) return false;
+    if (!hhmlCuts.exists("pass_2lsc") || sub_channel_id != CH_ID::hh2lsc) return false;
     bool pass_selection = true;
 
-    // Pt cuts
-    pass_selection &= classify.check_lep_pT(10 * Athena::Units::GeV);
     // TODO: ID & prompt lepton isolation WP cut
-    //
+
     // Low mass veto
     pass_selection &= classify.check_low_mass(12. * Athena::Units::GeV);
 
@@ -709,8 +711,6 @@ namespace MULTILEPTON
     auto sub_channel_id = classify.getSubChannelId();
     if (!hhmlCuts.exists("pass_3l") || sub_channel_id != CH_ID::hh3l) return false;
     bool pass_selection = true;
-
-    pass_selection &= classify.check_lep_pT(10 * Athena::Units::GeV);
 
     // Low mass veto for all pairs
     pass_selection &= classify.check_low_mass(12. * Athena::Units::GeV);
@@ -731,18 +731,15 @@ namespace MULTILEPTON
     return pass_selection;
   }
 
-  bool MultileptonSelectorAlg::evaluate1l2tauhadSelection(
+  bool MultileptonSelectorAlg::evaluate1l2tauSelection(
       const SubChannelClassify &classify,
       CutManager& hhmlCuts){
 
     auto sub_channel_id = classify.getSubChannelId();
-    if (!hhmlCuts.exists("pass_1l2tauhad") || sub_channel_id != CH_ID::hh1l2tau) return false;
+    if (!hhmlCuts.exists("pass_1l2tau") || sub_channel_id != CH_ID::hh1l2tau) return false;
     bool pass_selection = true;
 
     // TODO: ID and PLV cut
-    //
-    // Pt cut
-    pass_selection &= classify.check_lep_pT(10 * Athena::Units::GeV);
 
     // TODO: tau object selection
 
@@ -750,22 +747,62 @@ namespace MULTILEPTON
   }
 
     
-  bool MultileptonSelectorAlg::evaluate2l2tauhadSelection(
+  bool MultileptonSelectorAlg::evaluate2l2tauSelection(
       const SubChannelClassify &classify,
       CutManager& hhmlCuts){
 
     auto sub_channel_id = classify.getSubChannelId();
-    if (!hhmlCuts.exists("pass_2l2tauhad") || sub_channel_id != CH_ID::hh2l2tau)
+    if (!hhmlCuts.exists("pass_2l2tau") || sub_channel_id != CH_ID::hh2l2tau)
       return false;
 
     bool pass_selection = true;
 
     // TODO: ID and PLV cut
 
-    // Pt cut
-    pass_selection &= classify.check_lep_pT(10 * Athena::Units::GeV);
     // Low mass veto
     pass_selection &= classify.check_low_mass(12. * Athena::Units::GeV);
+
+    // TODO: tau object selection
+
+    return pass_selection;
+  }
+
+  bool MultileptonSelectorAlg::evaluate2lsc1tauSelection(
+      const SubChannelClassify &classify, CutManager &hhmlCuts)
+  {
+    auto sub_channel_id = classify.getSubChannelId();
+    if (!hhmlCuts.exists("pass_2lsc1tau") || sub_channel_id != CH_ID::hh2lsc1tau) return false;
+    bool pass_selection = true;
+
+    // TODO: ID and PLV cut
+
+    // TODO: tau object selection
+
+    return pass_selection;
+  }
+
+  bool MultileptonSelectorAlg::evaluate1l3tauSelection(
+      const SubChannelClassify &classify, CutManager &hhmlCuts)
+  {
+    auto sub_channel_id = classify.getSubChannelId();
+    if (!hhmlCuts.exists("pass_1l3tau") || sub_channel_id != CH_ID::hh1l3tau) return false;
+    bool pass_selection = true;
+
+    // TODO: ID and PLV cut
+
+    // TODO: tau object selection
+
+    return pass_selection;
+  }
+
+  bool MultileptonSelectorAlg::evaluate3l1tauSelection(
+      const SubChannelClassify &classify, CutManager &hhmlCuts)
+  {
+    auto sub_channel_id = classify.getSubChannelId();
+    if (!hhmlCuts.exists("pass_3l1tau") || sub_channel_id != CH_ID::hh3l1tau) return false;
+    bool pass_selection = true;
+
+    // TODO: ID and PLV cut
 
     // TODO: tau object selection
 
@@ -781,8 +818,9 @@ namespace MULTILEPTON
 
     auto classifier = SubChannelClassify(&muons, &electrons, &taus, &bjets);
 
-    if (hhmlCuts.exists("pass_2lss")){
-      m_bools.at(MULTILEPTON::pass_2lss) = evaluate2lssSelection(classifier, hhmlCuts);
+    if (hhmlCuts.exists("pass_2lsc")){
+      m_bools.at(MULTILEPTON::pass_2lsc) =
+          evaluate2lscSelection(classifier, hhmlCuts);
     }
     if (hhmlCuts.exists("pass_3l")){
       m_bools.at(MULTILEPTON::pass_3l) = evaluate3lSelection(classifier, hhmlCuts);
@@ -790,13 +828,25 @@ namespace MULTILEPTON
     if (hhmlCuts.exists("pass_bb4l")){
       m_bools.at(MULTILEPTON::pass_bb4l) = evaluatebb4lSelection(classifier, hhmlCuts);
     }
-    if (hhmlCuts.exists("pass_1l2tauhad")){
-      m_bools.at(MULTILEPTON::pass_1l2tauhad) = evaluate1l2tauhadSelection(classifier, hhmlCuts);
+    if (hhmlCuts.exists("pass_1l2tau")){
+      m_bools.at(MULTILEPTON::pass_1l2tau) =
+          evaluate1l2tauSelection(classifier, hhmlCuts);
     }
-    if (hhmlCuts.exists("pass_2l2tauhad")){
-      m_bools.at(MULTILEPTON::pass_2l2tauhad) = evaluate2l2tauhadSelection(classifier, hhmlCuts);
+    if (hhmlCuts.exists("pass_2l2tau")){
+      m_bools.at(MULTILEPTON::pass_2l2tau) =
+          evaluate2l2tauSelection(classifier, hhmlCuts);
     }
-
+    if (hhmlCuts.exists("pass_2lsc1tau")){
+      m_bools.at(MULTILEPTON::pass_2lsc1tau) = evaluate2lsc1tauSelection(classifier, hhmlCuts);
+    }
+    if (hhmlCuts.exists("pass_1l3tau")){
+      m_bools.at(MULTILEPTON::pass_1l3tau) =
+          evaluate1l3tauSelection(classifier, hhmlCuts);
+    }
+    if (hhmlCuts.exists("pass_3l1tau")){
+      m_bools.at(MULTILEPTON::pass_3l1tau) =
+          evaluate3l1tauSelection(classifier, hhmlCuts);
+    }
   }
 
 
@@ -861,6 +911,7 @@ namespace MULTILEPTON
     m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingmu] = 15. * Athena::Units::GeV;
 
   }
+
 
 }
 
