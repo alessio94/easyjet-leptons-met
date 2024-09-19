@@ -250,6 +250,7 @@ namespace ZCC
       if (!m_bypass && !pass_baseline) continue;
       filter.setPassed(true);
     }
+
     return StatusCode::SUCCESS;
   }
 
@@ -285,7 +286,6 @@ namespace ZCC
 
     if (!ZCharmCuts.exists("PASS_TRIGGER"))
         return;
-
     if (ele0 || mu0) evaluateSingleLeptonTrigger(event, ele0, mu0, sys);
     if (ele1 || mu1) evaluateSingleLeptonTrigger(event, ele1, mu1, sys);
     if ((ele0 && ele1) || (mu0 && mu1)) evaluateDiLeptonTrigger(event, ele0, ele1, mu0, mu1, sys);
@@ -415,13 +415,13 @@ namespace ZCC
     }
     else if(year==2022){
       di_ele_paths = {
-        "HLT_e24_lhvloose_2e12_lhvloose_L1EM20VH_3EM10VH", "HLT_2e17_lhvloose_L12EM15VHI",
+        "HLT_2e17_lhvloose_L12EM15VHI",
         "HLT_2e24_lhvloose_L12EM20VH"
       };
     }
     else if(year==2023){
       di_ele_paths = {
-        "HLT_e24_lhvloose_2e12_lhvloose_L1eEM24L_3eEM12L", "HLT_2e17_lhvloose_L12eEM18M",
+        "HLT_2e17_lhvloose_L12eEM18M",
         "HLT_2e24_lhvloose_L12eEM24L"
       };
     }
