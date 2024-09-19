@@ -65,6 +65,8 @@ Large_R_jet:
   do_parent_decoration: true
   variables_LargeRJets: []
   variables_int_LargeRJets: []
+  wtag_type: ""
+  wtag_wp: ""
 
 Photon:
   ID: ""

@@ -13,6 +13,7 @@ add_compile_options(-Werror)
 atlas_add_library( EasyjetHubLib
 		   Easyjet/CutManager.h
 		   src/CutManager.cxx
+                   INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
                    PUBLIC_HEADERS EasyjetHub
                    LINK_LIBRARIES
                    AthenaBaseComps
@@ -35,6 +36,10 @@ atlas_add_library( EasyjetHubLib
                    TauAnalysisToolsLib
                    TrigDecisionToolLib
                    TrigCompositeUtilsLib
+                   ${ROOT_LIBRARIES}
+                   BoostedJetTaggersLib 
+                   JetAnalysisInterfacesLib
+
 )
 
 

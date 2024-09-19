@@ -58,6 +58,11 @@ def get_large_R_jet_branches(
     if tree_flags.collection_options.large_R_jets.substructure_info:
         large_R_jet_branches.variables += get_substructure_branches(flags, lr_jet_type)
 
+    if lr_jet_type == "UFO" and \
+        flags.Analysis.Large_R_jet.wtag_type and \
+            flags.Analysis.Large_R_jet.wtag_wp:
+        large_R_jet_branches.variables += get_wtag_branches(flags)
+
     split_tags = flags.Input.AMITag.split("_")
     is_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5834")
     if lr_jet_type == "UFO" and is_valid_ptag and \
@@ -136,3 +141,22 @@ def get_large_R_jet_truth_labels(flags):
     truth_labels += get_TopHiggs_jet_truth_labels(flags)
 
     return truth_labels
+
+
+def get_wtag_branches(flags):
+    wtag_type = flags.Analysis.Large_R_jet.wtag_type
+    wtag_wp = flags.Analysis.Large_R_jet.wtag_wp
+
+    if wtag_type == "DNN":
+        wtag_branches = [
+            f"{wtag_type}TaggerTopQuarkContained{wtag_wp}_Tagged",
+            f"{wtag_type}TaggerTopQuarkContained{wtag_wp}_Score",
+        ]
+
+    else:
+        wtag_branches = [
+            f"{wtag_type}{wtag_wp}Tagger_Tagged",
+            f"{wtag_type}{wtag_wp}Tagger_Score",
+        ]
+
+    return wtag_branches
