@@ -9,7 +9,7 @@ mc_list=(
     "../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/mc20e_DAOD_PHYSLITE_p6266_bkg.txt"
 )
 #mc
-easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
+easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --run-config ${runConfig} \
     --exec ${executable}  \
     --campaign ${campaignName} \

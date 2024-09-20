@@ -15,7 +15,7 @@ mc_list=(
 
 
 #mc
-easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
+easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --run-config ${runConfig} \
     --exec ${executable}  \
     --campaign ${campaignName} \
