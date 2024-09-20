@@ -1,4 +1,4 @@
-runConfig="ssWWAnalysis/RunConfig-ssWW-VBS.yaml"
+runConfig="ssWWAnalysis/RunConfig-Signal-ssWW.yaml"
 executable="ssWW-ntupler"
 campaignName="ssWWVBS_v00"
 

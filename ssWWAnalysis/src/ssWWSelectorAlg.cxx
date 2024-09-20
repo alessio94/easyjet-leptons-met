@@ -434,13 +434,13 @@ namespace ssWWVBS
     }
     else if(year==2022){
       di_ele_paths = {
-        "HLT_e24_lhvloose_2e12_lhvloose_L1EM20VH_3EM10VH", "HLT_2e17_lhvloose_L12EM15VHI",
+        "HLT_2e17_lhvloose_L12EM15VHI",
         "HLT_2e24_lhvloose_L12EM20VH"
       };
     }
     else if(year==2023){
       di_ele_paths = {
-        "HLT_e24_lhvloose_2e12_lhvloose_L1eEM24L_3eEM12L", "HLT_2e17_lhvloose_L12eEM18M",
+        "HLT_2e17_lhvloose_L12eEM18M",
         "HLT_2e24_lhvloose_L12eEM24L"
       };
     }

@@ -1,4 +1,4 @@
-runConfig="ssWWAnalysis/RunConfig-ssWW-VBS-bypass.yaml"
+runConfig="ssWWAnalysis/RunConfig-Signal-ssWW-bypass.yaml"
 executable="ssWW-ntupler"
 campaignName="ssWWVBS_v00"
 
