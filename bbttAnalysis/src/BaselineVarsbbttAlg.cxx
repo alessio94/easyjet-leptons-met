@@ -138,6 +138,10 @@ namespace HHBBTT
       static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
       static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
 
+      static const SG::AuxElement::ConstAccessor<char> cacc_EleRNNLoose("EleRNNLoose_v1");
+      static const SG::AuxElement::ConstAccessor<char> cacc_EleRNNMedium("EleRNNMedium_v1");
+      static const SG::AuxElement::ConstAccessor<char> cacc_EleRNNTight("EleRNNTight_v1");
+
       // selected leptons ;
       const xAOD::Electron* ele0 = nullptr;
       const xAOD::Electron* ele1 = nullptr;
@@ -233,9 +237,9 @@ namespace HHBBTT
 	m_Ibranches.at(prefix+"_isTauID").set(*event, m_IDTau.get(*tau, sys), sys);
 	m_Ibranches.at(prefix+"_isAntiTau").set(*event, m_antiTau.get(*tau, sys), sys);
 	int tau_EleRNN_WP = 0;
-	if(tau->isTau(xAOD::TauJetParameters::EleRNNTight)) tau_EleRNN_WP = 3;
-	else if(tau->isTau(xAOD::TauJetParameters::EleRNNMedium)) tau_EleRNN_WP = 2;
-	else if(tau->isTau(xAOD::TauJetParameters::EleRNNLoose)) tau_EleRNN_WP = 1;
+	if(cacc_EleRNNTight(*tau)) tau_EleRNN_WP = 3;
+	else if(cacc_EleRNNMedium(*tau)) tau_EleRNN_WP = 2;
+	else if(cacc_EleRNNLoose(*tau)) tau_EleRNN_WP = 1;
 	m_Ibranches.at(prefix+"_EleRNN_WP").set(*event, tau_EleRNN_WP, sys);
 
 	if(m_isMC){
