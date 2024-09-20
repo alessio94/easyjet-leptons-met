@@ -16,9 +16,7 @@
 
 #include <AthenaBaseComps/AthAlgorithm.h>
 #include <xAODJet/JetContainer.h>
-#include "BoostedJetTaggers/JSSWTopTaggerANN.h"
-#include "BoostedJetTaggers/JSSWTopTaggerDNN.h"
-#include "AsgTools/StandaloneToolHandle.h"
+#include "BoostedJetTaggers/JSSTaggerBase.h"
 
 namespace Easyjet
 {
@@ -44,13 +42,8 @@ private:
       this, "jetsIn", "", "containerName to read"
     };
 
-    Gaudi::Property<std::string> m_taggerType {this, "TaggerType", "", "W tagger type"};
-    Gaudi::Property<std::string> m_configFile {this, "ConfigFile", "", "Name of config file"};
-    Gaudi::Property<std::string> m_calibArea {this, "CalibArea", "", "Path to config file"};
-    Gaudi::Property<bool> m_isMC {this, "IsMC", false, "MC or data"};
-    
-    asg::StandaloneToolHandle<JSSWTopTaggerANN> m_ANNWtagger;
-    asg::StandaloneToolHandle<JSSWTopTaggerDNN> m_DNNWtagger;
+    ToolHandle<JSSTaggerBase> m_Wtagger{this, "Wtagger", "", "W-tagging tool"};
+
   };
 }
 
