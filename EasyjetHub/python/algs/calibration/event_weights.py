@@ -64,6 +64,9 @@ def generator_sequence(flags):
     # Include, and then set up the generator analysis sequence:
     configSeq += makeConfig('GeneratorLevelAnalysis')
     configSeq.setOptionValue('.saveCutBookkeepers', doCBK)
+    if hasattr(flags.Analysis, "ttree_output"):
+        configSeq.setOptionValue('.streamName', 'CBK' if flags.Analysis.splitCBK else
+                                 flags.Analysis.ttree_output.stream_name)
     configSeq.setOptionValue('.runNumber', flags.Input.RunNumbers[0])
     configSeq.setOptionValue('.cutBookkeepersSystematics', doCBK)
     configSeq.setOptionValue('.histPattern', flags.Analysis.cbkHistPattern)

@@ -165,3 +165,6 @@ def validate_output(flags):
             "Should not be in bypass mode to split output trees by channel. "
             "Where would the events in no channel go?"
         )
+        assert flags.Analysis.splitCBK, (
+            "SplitCBK should be set to true, to store CutBookKeeper in separate file"
+        )

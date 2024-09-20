@@ -43,6 +43,19 @@ def main():
         ),
     )
     parser.add_argument(
+        "--channels",
+        nargs='+',
+        default=[],
+        help="The list of channels to process. Only relevant if splitOutputTree is used in "
+        "the config"
+    )
+    parser.add_argument(
+        "--splitCBK",
+        action="store_true",
+        help="Store CutBookKeeper in separate file. Only relevant if splitCBK is used in ",
+        "the config"
+    )    
+    parser.add_argument(
         "--asetup",
         help="The asetup command, in case it cannot be read from the environment",
     )
@@ -116,6 +129,15 @@ def main():
         "useAthenaPackages": True,
     }
 
+    if len(args.channels)>0:
+        outputs = ""
+        for channel in args.channels:
+            outputs += "output-tree_"+channel+".root,"
+        outputs += "output-tree_cbk.root"
+        submit_opts["outputs"] = outputs
+    elif args.splitCBK:
+        outputs = ["output-tree.root", "output-tree_cbk.root"]
+        submit_opts["outputs"] = outputs
     if args.noSubmit:
         submit_opts["noSubmit"] = True
     if args.dest_se is not None:
@@ -207,6 +229,7 @@ def main():
         exec_cmd = "{0} %IN -l --run-config {1} --out-file {2}".format(
             args.exec,
             "config.yaml",
+            "output-tree.root" if (len(args.channels)>0 or args.splitCBK) else
             submit_opts["outputs"].removeprefix("TREE:"),
         )
 

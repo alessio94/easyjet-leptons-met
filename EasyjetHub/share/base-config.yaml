@@ -194,7 +194,7 @@ full_container_names:
 
 channels: []
 splitOutputTree: false
-
+splitCBK: false
 
 histograms: false
 h5:

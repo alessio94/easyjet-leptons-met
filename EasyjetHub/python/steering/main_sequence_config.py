@@ -218,6 +218,7 @@ def metadata_cfg(flags):
             dataType=dataType,
             campaign=campaign,
             mcChannelNumber=str(flags.Input.MCChannelNumber),
+            RootStreamName='CBK'
         )
     )
     return cfg

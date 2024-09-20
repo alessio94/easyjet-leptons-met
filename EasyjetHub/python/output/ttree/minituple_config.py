@@ -50,6 +50,7 @@ def output_analysis_sequence(
         branches: list[str],
         met_branches: list[str],
         treename: str = "AnalysisMiniTree",
+        streamname: str = "ANALYSIS"
 ) -> ConfigSequence:
     configSeq = ConfigSequence()
     config = ConfigFactory()
@@ -59,6 +60,7 @@ def output_analysis_sequence(
     configSeq.setOptionValue('.vars', branches)
     configSeq.setOptionValue('.metVars', met_branches)
     configSeq.setOptionValue('.treeName', treename)
+    configSeq.setOptionValue('.streamName', streamname)
     configSeq.setOptionValue('.postfix', treename)
 
     return configSeq
@@ -68,6 +70,7 @@ def minituple_output_cfg(
     flags: AthConfigFlags,
     tree_flags: ConfigItem,
     outfile_name: str,
+    stream_name: str,
     tree_name: str = "AnalysisMiniTree",
     extra_output_branches: Optional[List[str]] = None,
 ) -> ComponentAccumulator:
@@ -216,14 +219,14 @@ def minituple_output_cfg(
     #      "RECREATE" will (over)write the specified file name with a new file
     cfg.addService(
         CompFactory.THistSvc(
-            Output=[f"{tree_flags.stream_name} DATAFILE='{outfile_name}',"
+            Output=[f"{stream_name} DATAFILE='{outfile_name}',"
                     " OPT='RECREATE'"]
         )
     )
 
     log.info(
         f"Writing tree AnalysisMiniTree"
-        f" to '{outfile_name}' via stream '{tree_flags.stream_name}'"
+        f" to '{outfile_name}' via stream '{stream_name}'"
     )
 
     outputSeq = CompFactory.AthSequencer('OutputSequence' + tree_name)
@@ -233,7 +236,8 @@ def minituple_output_cfg(
     )
     outputConfigSeq = output_analysis_sequence(flags, branches=tree_branches,
                                                met_branches=met_branches,
-                                               treename=tree_name)
+                                               treename=tree_name,
+                                               streamname=stream_name)
     outputConfigSeq.fullConfigure(outputConfigAccumulator)
     cfg.merge(outputConfigAccumulator.CA)
 
@@ -268,15 +272,27 @@ def minituple_cfg(
     seqname = "OutputSeq"
     cfg.addSequence(parOR(seqname))
 
+    if flags.Analysis.splitCBK:
+        # Define output stream for cut bookkeeper
+        cbk_outfile = flags.Analysis.out_file.replace(".root", "_cbk.root")
+        cfg.addService(
+            CompFactory.THistSvc(
+                Output=[f"CBK DATAFILE='{cbk_outfile}',"
+                        " OPT='RECREATE'"]
+            )
+        )
+
     channelList = [""]
     if flags.Analysis.splitOutputTree:
         channelList = flags.Analysis.channels
 
     for channel in channelList:
         channelSeqName = seqname
+        outfile = flags.Analysis.out_file
 
         if flags.Analysis.splitOutputTree:
             channelSeqName = seqname + channel
+            outfile = outfile.replace(".root", "_" + channel + ".root")
             cfg.addSequence(seqAND(channelSeqName), parentName=seqname)
             cfg.addEventAlgo(
                 CompFactory.Easyjet.EventSelectorAlg(
@@ -289,7 +305,8 @@ def minituple_cfg(
         cfg.merge(
             minituple_output_cfg(
                 flags, tree_flags,
-                flags.Analysis.out_file,
+                outfile_name=outfile,
+                stream_name=tree_flags.stream_name + channel,
                 tree_name=tree_flags.tree_name + channel,
                 extra_output_branches=extra_output_branches
             ),
