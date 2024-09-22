@@ -8,6 +8,7 @@ from AthenaCommon.CFElements import seqAND, parOR
 
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.output.ttree.eventinfo import get_event_info_branches
+from EasyjetHub.output.ttree.truth_eventinfo import get_truth_event_info_branches
 from EasyjetHub.output.ttree.electrons import get_electron_branches
 from EasyjetHub.output.ttree.photons import get_photon_branches
 from EasyjetHub.output.ttree.muons import get_muon_branches
@@ -91,6 +92,9 @@ def minituple_output_cfg(
     tree_branches += get_event_info_branches(
         flags, tree_flags, flags.Analysis.TriggerChains
     )
+
+    if flags.Input.isMC:
+        tree_branches += get_truth_event_info_branches(flags)
 
     objects_out = {
         "electrons": ("el", get_electron_branches),
