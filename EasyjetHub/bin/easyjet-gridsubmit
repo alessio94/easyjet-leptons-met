@@ -52,7 +52,7 @@ def main():
     parser.add_argument(
         "--splitCBK",
         action="store_true",
-        help="Store CutBookKeeper in separate file. Only relevant if splitCBK is used in ",
+        help="Store CutBookKeeper in separate file. Only relevant if splitCBK is used in "
         "the config"
     )    
     parser.add_argument(
