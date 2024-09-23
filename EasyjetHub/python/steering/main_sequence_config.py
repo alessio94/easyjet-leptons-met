@@ -199,7 +199,7 @@ def output_cfg(flags, seqname):
     return cfg
 
 
-def metadata_cfg(flags):
+def metadata_cfg(flags, **kwargs):
     cfg = ComponentAccumulator()
 
     if flags.Input.isMC:
@@ -212,13 +212,16 @@ def metadata_cfg(flags):
         campaign = str(flags.Input.DataYear).replace("20", "data")
         dataType = "data"
 
+    kwargs.setdefault("dataType", dataType)
+    kwargs.setdefault("campaign", campaign)
+    kwargs.setdefault("mcChannelNumber", str(flags.Input.MCChannelNumber))
+    if hasattr(flags.Analysis, "ttree_output"):
+        kwargs.setdefault("RootStreamName", 'CBK' if flags.Analysis.splitCBK else
+                          flags.Analysis.ttree_output.stream_name)
+
     cfg.addEventAlgo(
         CompFactory.Easyjet.MetadataHistAlg(
-            "MetadataHistAlg",
-            dataType=dataType,
-            campaign=campaign,
-            mcChannelNumber=str(flags.Input.MCChannelNumber),
-            RootStreamName='CBK'
+            "MetadataHistAlg", **kwargs
         )
     )
     return cfg
