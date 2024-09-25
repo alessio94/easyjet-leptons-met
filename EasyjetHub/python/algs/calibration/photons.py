@@ -32,6 +32,8 @@ def photon_sequence(flags, configAcc):
     configSeq.setOptionValue('.forceFullSimConfig',
                              flags.Analysis.Photon.forceFullSimConfig
                              and flags.Analysis.DataType is DataType.FastSim)
+    configSeq.setOptionValue('.decorrelationModel',
+                             flags.Analysis.Photon.correlationModelScale)
 
     # PID configuration
     for id, iso in wps:

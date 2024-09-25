@@ -32,6 +32,8 @@ def electron_sequence(flags, configAcc):
     configSeq.setOptionValue('.forceFullSimConfig',
                              flags.Analysis.Electron.forceFullSimConfig
                              and flags.Analysis.DataType is DataType.FastSim)
+    configSeq.setOptionValue('.decorrelationModel',
+                             flags.Analysis.Electron.correlationModelScale)
 
     # PID configuration
     for id, iso in wps:
@@ -52,6 +54,14 @@ def electron_sequence(flags, configAcc):
         configSeq.setOptionValue('.chargeIDSelectionRun2',
                                  flags.Analysis.Electron.chargeIDSelectionRun2
                                  and flags.GeoModel.Run is LHCPeriod.Run2)
+        configSeq.setOptionValue('.correlationModelId',
+                                 flags.Analysis.Electron.correlationModelId)
+        configSeq.setOptionValue('.correlationModelIso',
+                                 flags.Analysis.Electron.correlationModelIso)
+        # Only TOTAL correlation model is currently supported
+        # for reconstruction efficiency correction in Run 3
+        configSeq.setOptionValue('.correlationModelReco',
+                                 flags.Analysis.Electron.correlationModelReco)
         # No DNN SF yet
         if "DNN" in id and flags.Input.isMC:
             print("WARNING! Electron DNN ID does not have SF available yet")
