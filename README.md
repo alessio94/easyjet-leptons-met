@@ -13,17 +13,24 @@ Meetings will be biweekly at 5 pm on Tuesday, Central European Time, see [the in
 
 # Installation
 
-*The instructions below with `setupATLAS` and `asetup` assume you are working on a CERN CentOS terminal, e.g. lxplus or a Singularity container on an institute cluster. Alternative instructions for using Docker images are given below.*
+*The instructions below with `setupATLAS` and `asetup` assume you are working on a CERN Alma9 terminal, e.g. lxplus or a Singularity container on an institute cluster. Alternative instructions for using Docker images are given below.*
 
-First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel free to make an alias with `export WORKDIR=.`) clone the repository :
+First, in a new working directory (we'll refer to this as `$WORKDIR` -- feel free to make an alias with `export WORKDIR=.`) clone the repository with a sparse checkout:
 ```
 setupATLAS
 lsetup git
 git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup once
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
-git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+git clone --recursive --no-checkout --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+git sparse-checkout init --cone
+git sparse-checkout set EasyjetHub EasyjetTests YourFavouriteAnalysis
+git checkout upstream/main
+git submodule update --init --recursive
 ```
 Note the `--recursive` argument, which is needed to get the submodules in the package.
+The `--no-checkout` argument allows to subsequently define the list of packages you want to check out and avoids to download all of the analysis packages.
+Just replace `YourFavouriteAnalysis` with the name of the analysis package you want to use. You can specify several of them.
+You can omit the `--no-checkout` option and the subsequent lines if you want to checkout the full repository.
 
 ### Installation as developer
 
@@ -31,7 +38,20 @@ If not familiar with git already, pleas have a look at the [ATLAS git tutorial](
 
 In case you want to make some developments to the software itself, we recommend you to:
 1. Fork the branch using [this link](https://gitlab.cern.ch/easyjet/easyjet/-/forks/new). Please remember to put your username in the Project URL.
-2. Clone the repository and set it as upstream:
+2. Clone the repository with a sparse checkout and set it as upstream:
+
+``` 
+setupATLAS
+lsetup git
+git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup once
+git clone --recursive --no-checkout --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+git sparse-checkout init --cone
+git sparse-checkout set EasyjetHub EasyjetTests YourFavouriteAnalysis
+git checkout upstream/main
+git submodule update --init --recursive
+```
+
+If you need to update a large amount of packages, a full checkout is also possible
 
 ``` 
 setupATLAS
