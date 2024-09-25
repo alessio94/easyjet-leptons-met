@@ -40,6 +40,9 @@ def jet_sequence(
     # Forward JVT
     configSeq.setOptionValue(".runFJvtSelection", jet_flags.useFJvt)
     configSeq.setOptionValue(".runFJvtEfficiency", jet_flags.useFJvt)
+    # JES/JER scheme
+    configSeq.setOptionValue(".systematicsModelJES", jet_flags.systModelJES)
+    configSeq.setOptionValue(".systematicsModelJER", jet_flags.systModelJER)
 
     # Set options for calibration tool if given
     if jet_flags.calibToolConfigFile and jet_flags.calibToolCalibArea:
