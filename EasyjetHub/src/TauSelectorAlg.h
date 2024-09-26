@@ -49,7 +49,6 @@ private:
     Gaudi::Property<bool> m_keepAntiTaus
       {this, "keepAntiTaus", false, "Keep anti-taus in addition to ID taus"};
 
-    CP::SysReadDecorHandle<char> m_IDTau{"", this};
     CP::SysReadDecorHandle<char> m_antiTau{"", this};
 
     CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};

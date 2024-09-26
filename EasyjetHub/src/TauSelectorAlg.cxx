@@ -19,10 +19,8 @@ namespace Easyjet
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
 
     if(m_keepAntiTaus){
-      m_IDTau = CP::SysReadDecorHandle<char>("isIDTau", this);
       m_antiTau = CP::SysReadDecorHandle<char>("isAntiTau", this);
     }
-    ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
 
     for (int i = 0; i < m_tauAmount; i++){
@@ -121,7 +119,7 @@ namespace Easyjet
 
         // If not ID tau nor anti tau, skip
         if(m_keepAntiTaus){
-          bool keep = m_IDTau.get(*tau, sys) || m_antiTau.get(*tau, sys);
+          bool keep = m_select_tight_in[0].get(*tau,sys) || m_antiTau.get(*tau, sys);
           if( !keep ) continue;
         }
 
