@@ -74,7 +74,8 @@ def resolved_cfg(flags, smalljetkey):
                 "JetPairingAlg_" + btag_wp,
                 containerInKey="resolvedAnalysisJets_" + btag_sys,
                 containerOutKey="pairedResolvedAnalysisJets_" + btag_sys,
-                pairingStrategy="minDeltaR",  # so far only minDeltaR
+                pairingStrategy=flags.Analysis.pairingStrategy,  # minDeltaR, BDT
+                kinematicGroup=flags.Analysis.kinematicGroup,
             )
         )
 
@@ -101,22 +102,35 @@ def resolved_branches(flags):
     btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
     btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
     for btag_wp in btag_wps:
-        resolved_vars = [
-            "DeltaR12",
-            "DeltaR13",
-            "DeltaR14",
-            "DeltaR23",
-            "DeltaR24",
-            "DeltaR34",
-            "h1_m",
-            "h2_m",
-            "hh_m",
-        ]
+        resolved_vars = ["hh_m", "hh_pt", "DeltaEtaHH"]
+        for part in ["h1", "h2"]:
+            for var in ["m", "pt", "eta", "phi"]:
+                resolved_vars += [part + "_" + var]
+
+        if flags.Analysis.pairingStrategy == "minDeltaR":
+            resolved_vars += [
+                "DeltaR12",
+                "DeltaR13",
+                "DeltaR14",
+                "DeltaR23",
+                "DeltaR24",
+                "DeltaR34",
+            ]
 
         for var in resolved_vars:
+            deco_suffix = ""
+            pairing_strategy = flags.Analysis.pairingStrategy
+            if pairing_strategy == "minDeltaR":
+                deco_suffix = "mindrPaired_"
+            elif pairing_strategy == "BDT":
+                deco_suffix = "bdtPaired_"
+            else:
+                print("Pairing method not specified or incorrect")
+
             branches += [
                 f"EventInfo.resolved_{var}_{btag_wp}_%SYS%"
-                + f" -> bbbb_resolved_{var}_{btag_wp}_%SYS%"
+                + f" -> bbbb_resolved_{deco_suffix}{btag_wp}_{var}"
+                + flags.Analysis.systematics_suffix_separator + "%SYS%"
             ]
 
     if flags.Input.isMC:

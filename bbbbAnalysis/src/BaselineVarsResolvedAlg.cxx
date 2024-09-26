@@ -73,8 +73,16 @@ namespace HH4B
         m_decos.at("resolved_DeltaR24_" + m_bTagWP).set(*eventInfo, deltaR24, sys);
         m_decos.at("resolved_DeltaR34_" + m_bTagWP).set(*eventInfo, deltaR34, sys);
         m_decos.at("resolved_h1_m_" + m_bTagWP).set(*eventInfo, h1.M(), sys);
+        m_decos.at("resolved_h1_pt_" + m_bTagWP).set(*eventInfo, h1.Pt(), sys);
+        m_decos.at("resolved_h1_eta_" + m_bTagWP).set(*eventInfo, h1.Eta(), sys);
+        m_decos.at("resolved_h1_phi_" + m_bTagWP).set(*eventInfo, h1.Phi(), sys);
         m_decos.at("resolved_h2_m_" + m_bTagWP).set(*eventInfo, h2.M(), sys);
+        m_decos.at("resolved_h2_pt_" + m_bTagWP).set(*eventInfo, h2.Pt(), sys);
+        m_decos.at("resolved_h2_eta_" + m_bTagWP).set(*eventInfo, h2.Eta(), sys);
+        m_decos.at("resolved_h2_phi_" + m_bTagWP).set(*eventInfo, h2.Phi(), sys);
         m_decos.at("resolved_hh_m_" + m_bTagWP).set(*eventInfo, (h1 + h2).M(), sys);
+        m_decos.at("resolved_hh_pt_" + m_bTagWP).set(*eventInfo, (h1 + h2).Pt(), sys);
+      m_decos.at("resolved_DeltaEtaHH_" + m_bTagWP).set(*eventInfo, std::abs(h1.Eta() - h2.Eta()), sys);
       }
     }
     return StatusCode::SUCCESS;

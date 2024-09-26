@@ -7,6 +7,8 @@
 #define HH4BANALYSIS_JETPAIRINGRALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
+#include <xAODEventInfo/EventInfo.h>
+#include "MVAUtils/BDT.h"
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysWriteHandle.h>
@@ -16,6 +18,48 @@
 
 namespace HH4B
 {
+  class JetSet {
+  public:
+    float dr1;
+    float dr2;
+    float deta1;
+    float deta2;
+    float dphi1;
+    float dphi2;
+    float jet_system_pt_1;
+    float jet_system_pt_2;
+    float jet_system_mass_1;
+    float jet_system_mass_2;
+    float systems_mass_difference;
+    float m4j;
+    float BDT_score;
+
+    JetSet() = default;
+  };
+
+  enum PairingStrategy {
+    minDeltaR = 0,
+    BDT,
+    invalid
+  };
+
+  enum pairingBDT {
+    oddEvents  = 0,
+    evenEvents = 1
+  };
+
+  enum pairingBDTinputs {
+    dEta1 = 0,
+    dPhi1 = 1,
+    dR1 = 2,
+    dEta2 = 3,
+    dPhi2 = 4,
+    dR2 = 5,
+    recoM4j = 6,
+    recoPtbb1 = 7,
+    recoPtbb2 = 8,
+    recoSHmassdiff = 9
+  };
 
   /// \brief An algorithm for counting containers
   class JetPairingAlg final : public AthHistogramAlgorithm
@@ -31,6 +75,9 @@ public:
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
+    PairingStrategy stringtoPairingStrategy(const std::string& pairing_strategy_str);
+    void loadJetPairingBDT(const std::string &trainingGroup, std::string &trainingFile, std::unique_ptr<MVAUtils::BDT> &bdt);
+
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
@@ -40,8 +87,16 @@ private:
       m_inJetHandle{this, "containerInKey", "", "Input jet container to read"};
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
       m_outJetHandle{this, "containerOutKey", "", "Output jet container to write"};
+    SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey{
+        this, "eventInfoKey", "EventInfo", "eventInfo container"};
 
-    Gaudi::Property<std::string> m_pairingStrategy {this, "pairingStrategy", "", "Pairing strategy."};
+    Gaudi::Property<std::string> m_pairingStrategy {
+        this, "pairingStrategy", "", "Pairing strategy."};
+    std::string m_bdt_kinematicGroup;
+    // Declare the BDTs
+    std::vector<std::unique_ptr<MVAUtils::BDT>> m_pairing_bdts;
+    // Declare the enum for jet pairing strategy
+    PairingStrategy m_pairing_strategy;
   };
 }
 

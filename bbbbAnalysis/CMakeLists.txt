@@ -34,6 +34,7 @@ atlas_add_component(bbbbAnalysis
   SystematicsHandlesLib
   FourMomUtils
   TruthUtils
+  MVAUtils
   IH5GroupSvc
   ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES}
   TrigCompositeUtilsLib

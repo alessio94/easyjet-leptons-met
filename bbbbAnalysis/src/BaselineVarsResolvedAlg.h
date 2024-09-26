@@ -54,8 +54,16 @@ private:
       "resolved_DeltaR24_",
       "resolved_DeltaR34_",
       "resolved_h1_m_",
+      "resolved_h1_pt_",
+      "resolved_h1_eta_",
+      "resolved_h1_phi_",
       "resolved_h2_m_",
+      "resolved_h2_pt_",
+      "resolved_h2_eta_",
+      "resolved_h2_phi_",
       "resolved_hh_m_",
+      "resolved_hh_pt_",
+      "resolved_DeltaEtaHH_",
     };
     // clang-format on
   };
