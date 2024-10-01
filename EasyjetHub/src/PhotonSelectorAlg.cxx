@@ -107,7 +107,7 @@ namespace Easyjet
 
       // Setup output 
       auto workContainer =
-        std::make_unique<ConstDataVector<xAOD::PhotonContainer> >();
+        std::make_unique<ConstDataVector<xAOD::PhotonContainer> >(SG::VIEW_ELEMENTS);
 
       for (const xAOD::Photon *photon : *inContainer)
       {
@@ -123,17 +123,11 @@ namespace Easyjet
           if ( !passesOR ) continue;
         }
 
-	// Recompute photon pt and eta with respect to the hardest vertex z position
-        auto thisPhoton = std::make_unique<xAOD::Photon>(*photon);
-
-        if(m_recomputePhotons){
-          photonWrtPoint::correctForZ(*thisPhoton, primary->z());
-        };
         
-        if (thisPhoton->pt() < m_minPt)
+        if (photon->pt() < m_minPt)
           continue;
         
-        float this_photon_eta_abs = std::abs(thisPhoton->eta());
+        float this_photon_eta_abs = std::abs(photon->eta());
         if((this_photon_eta_abs > m_minEtaVeto &&
             this_photon_eta_abs < m_maxEtaVeto) ||
             (this_photon_eta_abs > m_maxEta ))
@@ -141,7 +135,7 @@ namespace Easyjet
 
         // For some reason this decoration needs to be explicitly copied
         for(unsigned int i=0; i<m_tightPhotonWPs.size(); i++)
-          m_select_out[i].set(*thisPhoton, m_select_tight_in[i].get(*thisPhoton,sys), sys);
+          m_select_out[i].set(*photon, m_select_tight_in[i].get(*photon,sys), sys);
 
         if(m_isMC){
           std::vector<std::string> wps = m_tightPhotonWPs;
@@ -150,15 +144,15 @@ namespace Easyjet
 	    float SF = 1.;
 	    if(!m_saveDummySF){
 	      std::string wp = wps[i];
-	      SF = m_ph_idSF[i].get(*thisPhoton, sys);
-	      if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*thisPhoton, sys);
+	      SF = m_ph_idSF[i].get(*photon, sys);
+	      if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*photon, sys);
 	    }
-            m_ph_SF[i].set(*thisPhoton, SF, sys);
+            m_ph_SF[i].set(*photon, SF, sys);
           }
         }
 
-        m_isSelectedPhoton.set(*thisPhoton, true, sys);
-        workContainer->push_back(thisPhoton.release());
+        m_isSelectedPhoton.set(*photon, true, sys);
+        workContainer->push_back(photon);
       }
 
       int nPhotons = workContainer->size();
