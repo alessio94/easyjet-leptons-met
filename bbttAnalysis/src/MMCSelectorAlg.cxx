@@ -31,10 +31,9 @@ namespace HHBBTT
     ATH_CHECK (m_systematicsList.initialize());
 
     for ( auto name : m_channel_names){
-      if( name == "lephad2b") m_channels.push_back(HHBBTT::LepHad2B);
-      else if( name == "lephad1b") m_channels.push_back(HHBBTT::LepHad1B);
-      else if ( name == "hadhad2b") m_channels.push_back(HHBBTT::HadHad2B);
-      else if ( name == "hadhad1b") m_channels.push_back(HHBBTT::HadHad1B);
+      if(name == "LepHad") m_channels.push_back(HHBBTT::LepHad);
+      else if (name == "HadHad") m_channels.push_back(HHBBTT::HadHad);
+      else if (name == "AntiIsoLepHad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
     }
 
     return StatusCode::SUCCESS;
@@ -59,9 +58,9 @@ namespace HHBBTT
       bool is_hadhad = false;
 
       for(const auto& channel : m_channels){
-        if(channel == HHBBTT::LepHad2B || channel == HHBBTT::LepHad1B)
+        if(channel == HHBBTT::LepHad || channel == HHBBTT::AntiIsoLepHad)
           is_lephad |= m_pass_LepHad.get(*event, sys);
-        else if(channel == HHBBTT::HadHad2B || channel == HHBBTT::HadHad1B)
+        else if(channel == HHBBTT::HadHad)
           is_hadhad |= m_pass_HadHad.get(*event, sys);
       }
 

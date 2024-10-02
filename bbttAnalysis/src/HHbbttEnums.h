@@ -6,16 +6,14 @@ namespace HHBBTT
 
   enum Channel
   {
-    LepHad2B = 0,
-    HadHad2B = 1,
-    LepHad1B = 2,
-    HadHad1B = 3,
-    ZCR = 4,
-    TopEMuCR = 5,
-    AntiIsoLepHad = 6,
+    LepHad,
+    HadHad,
+    ZCR,
+    TopEMuCR,
+    AntiIsoLepHad,
   };
 
-    enum TriggerChannel
+  enum TriggerChannel
   {
     SLT,
     LTT,
@@ -36,7 +34,7 @@ namespace HHBBTT
     trigMatch_Tau25
   };
 
-    enum Var
+  enum Var
   {
     ele = 0,
     mu = 1,

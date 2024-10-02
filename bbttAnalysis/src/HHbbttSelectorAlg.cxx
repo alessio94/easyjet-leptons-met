@@ -132,10 +132,8 @@ namespace HHBBTT
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
     for ( auto name : m_channel_names){
-      if( name == "LepHad_2B") m_channels.push_back(HHBBTT::LepHad2B);
-      else if ( name == "HadHad_2B") m_channels.push_back(HHBBTT::HadHad2B);
-      else if ( name == "LepHad_1B") m_channels.push_back(HHBBTT::LepHad1B);
-      else if ( name == "HadHad_1B") m_channels.push_back(HHBBTT::HadHad1B);
+      if( name == "LepHad") m_channels.push_back(HHBBTT::LepHad);
+      else if ( name == "HadHad") m_channels.push_back(HHBBTT::HadHad);
       else if ( name == "ZCR") m_channels.push_back(HHBBTT::ZCR);
       else if ( name == "TopEMuCR") m_channels.push_back(HHBBTT::TopEMuCR);
       else if ( name == "AntiIsoLepHad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
@@ -664,13 +662,17 @@ namespace HHBBTT
 
       bool pass = false;
       for(const auto& channel : m_channels){
-       if(channel == HHBBTT::LepHad2B) pass |= m_bools.at(HHBBTT::pass_LepHad_2B);
-       else if(channel == HHBBTT::HadHad2B) pass |= m_bools.at(HHBBTT::pass_HadHad_2B);
-       else if(channel == HHBBTT::LepHad1B) pass |= m_bools.at(HHBBTT::pass_LepHad_1B);
-       else if(channel == HHBBTT::HadHad1B) pass |= m_bools.at(HHBBTT::pass_HadHad_1B);
-       else if(channel == HHBBTT::ZCR) pass |= m_bools.at(HHBBTT::pass_ZCR);
-       else if(channel == HHBBTT::TopEMuCR) pass |= m_bools.at(HHBBTT::pass_TopEMuCR);
-       else if(channel == HHBBTT::AntiIsoLepHad) pass |= m_bools.at(HHBBTT::pass_AntiIsoLepHad);
+        if(channel == HHBBTT::LepHad){
+          pass |= m_bools.at(HHBBTT::pass_LepHad_2B);
+          if(m_do1BRegions) pass |= m_bools.at(HHBBTT::pass_LepHad_1B);
+        }
+        else if(channel == HHBBTT::HadHad){
+          pass |= m_bools.at(HHBBTT::pass_HadHad_2B);
+          if(m_do1BRegions) pass |= m_bools.at(HHBBTT::pass_HadHad_1B);
+        }
+        else if(channel == HHBBTT::ZCR) pass |= m_bools.at(HHBBTT::pass_ZCR);
+        else if(channel == HHBBTT::TopEMuCR) pass |= m_bools.at(HHBBTT::pass_TopEMuCR);
+        else if(channel == HHBBTT::AntiIsoLepHad) pass |= m_bools.at(HHBBTT::pass_AntiIsoLepHad);
       }
 
       //****************
@@ -773,11 +775,11 @@ namespace HHBBTT
     bool use_DTT = false;
     bool use_DBT = false;
     for (const auto &channel : m_channels){
-      if (channel == HHBBTT::LepHad2B || channel == HHBBTT::LepHad1B || channel == HHBBTT::AntiIsoLepHad){
+      if (channel == HHBBTT::LepHad || channel == HHBBTT::AntiIsoLepHad){
 	use_SLT = true;
 	use_LTT = true;
       }
-      else if (channel == HHBBTT::HadHad2B || channel == HHBBTT::HadHad1B){
+      else if (channel == HHBBTT::HadHad){
 	use_STT = true;
 	use_DTT = true;
 	use_DBT = true;

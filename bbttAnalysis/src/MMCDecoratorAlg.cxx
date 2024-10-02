@@ -56,11 +56,9 @@ namespace HHBBTT
     ANA_CHECK (m_systematicsList.initialize());    
 
     for ( auto name : m_channel_names){
-      if( name == "LepHad_2B") m_channels.push_back(HHBBTT::LepHad2B);
-      else if ( name == "HadHad_2B") m_channels.push_back(HHBBTT::HadHad2B);
-      else if ( name == "LepHad_1B") m_channels.push_back(HHBBTT::LepHad1B);
-      else if ( name == "HadHad_1B") m_channels.push_back(HHBBTT::HadHad1B);
-      else if ( name == "AntiIsoLepHad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
+      if(name == "LepHad") m_channels.push_back(HHBBTT::LepHad);
+      else if (name == "HadHad") m_channels.push_back(HHBBTT::HadHad);
+      else if (name == "AntiIsoLepHad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
     }
 
     ATH_CHECK (m_mmcTool.retrieve());
@@ -94,9 +92,9 @@ namespace HHBBTT
       bool is_hadhad = false;
 
       for(const auto& channel : m_channels){
-        if(channel == HHBBTT::LepHad2B || channel == HHBBTT::LepHad1B || channel == HHBBTT::AntiIsoLepHad)
+        if(channel == HHBBTT::LepHad || channel == HHBBTT::AntiIsoLepHad)
 	  is_lephad |= m_pass_LepHad.get(*event, sys); // TODO: check anti-iso condition
-        else if(channel == HHBBTT::HadHad2B || channel == HHBBTT::HadHad1B)
+        else if(channel == HHBBTT::HadHad)
 	  is_hadhad |= m_pass_HadHad.get(*event, sys);
       }
 

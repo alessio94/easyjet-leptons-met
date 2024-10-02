@@ -6,6 +6,7 @@ systematics_suffix_separator: "___"
 # Which analysis and channels to consider
 do_bbtt_analysis: true
 do_antiID_regions: true
+do_1B_regions: true
 enable_MMC_cut: false
 
 # Toggles to bypass event selection

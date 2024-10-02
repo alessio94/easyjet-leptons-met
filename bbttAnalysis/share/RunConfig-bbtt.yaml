@@ -1,3 +1,3 @@
 include: bbttAnalysis/RunConfig-bbtt-base.yaml
 
-channels: ["HadHad_2B","HadHad_1B","LepHad_2B","LepHad_1B","ZCR","TopEMuCR"]
+channels: ["HadHad","LepHad","ZCR","TopEMuCR"]

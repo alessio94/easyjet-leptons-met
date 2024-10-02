@@ -61,6 +61,8 @@ private:
       { this, "useTriggerSelections", true, "Apply trigger-related selections" };
     Gaudi::Property<bool> m_doAntiIDRegions
       { this, "doAntiIDRegions", false, "Select anti-ID taus for fake estimates" };
+    Gaudi::Property<bool> m_do1BRegions
+      { this, "do1BRegions", false, "Add 1B signal regions" };
     
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
