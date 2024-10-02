@@ -11,6 +11,8 @@ input:
   taus:                TauJets
   taus_muonRM:         TauJets_MuonRM
   truthtaus:           TruthTaus
+  truthelectrons:      TruthElectrons
+  truthmuons:          TruthMuons
   truthBSMParticles:   TruthBSMWithDecayParticles
   truthSMParticles:    TruthBosonsWithDecayParticles
   met:                 AntiKt4EMPFlow

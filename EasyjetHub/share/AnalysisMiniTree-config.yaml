@@ -56,5 +56,7 @@ truth_outputs:
   large_R_jets: ''
   higgs_particle: ''
   taus: ''
+  electrons: ''
+  muons: ''
 # custom extra output branches
 extra_output_branches: []

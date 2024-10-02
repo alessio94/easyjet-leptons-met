@@ -122,7 +122,7 @@ namespace MULTILEPTON
     // lepton 2 is the remaining lepton.
 
     // find the opposite sign lepton and move it to index 0
-    for (auto lep : m_leptons)
+    for (auto& lep : m_leptons)
     {
       if (get<1>(lep) * m_total_charge_lep < 0)
       {

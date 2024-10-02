@@ -137,15 +137,6 @@ ntupler_ZCharm_mc20_lite:
   script:
     - easyjet-test ZCharm-mc20-lite
 
-ntupler_hhml_mc20:
-  extends: .ntupler
-  script:
-    - easyjet-test hhml-mc20
-
-ntupler_hhml_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test hhml-mc20-lite
 # MC20 AF3
 
 ntupler_mc20af3_lite:
@@ -230,6 +221,16 @@ ntupler_EMTopo_mc23:
   extends: .ntupler
   script:
     - easyjet-test emtopo-mc23
+  
+ntupler_hhml_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test hhml-mc23
+
+ntupler_hhml_mc23_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test hhml-mc23-lite
 
 # systematics enabled
 
