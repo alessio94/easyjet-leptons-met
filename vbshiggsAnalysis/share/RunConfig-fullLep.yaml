@@ -6,7 +6,7 @@ channels: ["FullLep"]
 ### tagging jets vs RNN strategy
 ### false: select tagging jets ---> higgs candidate jets
 ### true : select higgs candidate jets ---> load VBF-RNN
-UseVBFRNN : true 
+UseVBFRNN : true
 
 # Toggles for object types
 do_muons: true
@@ -26,6 +26,14 @@ Truth:
     - 525369 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp5
     - 525370 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp10
     - 525371 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klm5
+    - 545778 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vm7
+    - 545779 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vm4
+    - 545780 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vm2
+    - 545781 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2v0
+    - 545782 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp2
+    - 545783 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp4
+    - 545784 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp6
+    - 545785 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp
 
 Electron:
   ID: "LooseDNNElectron"
@@ -41,6 +49,7 @@ Electron:
     - ["TightDNNElectron", "Tight_VarRad"]
     - ["TightDNNElectron", "TightTrackOnly_VarRad"]
     - ["TightDNNElectron", "TightTrackOnly_FixedRad"]
+  do_IFF_decoration: true
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
@@ -51,7 +60,7 @@ Muon:
 
     - ["Tight", "PflowLoose_VarRad"]
     - ["Tight", "PflowTight_VarRad"]
-
+  do_IFF_decoration: true
 
 Lepton:
   amount: 2
