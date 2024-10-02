@@ -1,12 +1,8 @@
-include: EasyjetHub/base-config.yaml
+include: bbbbAnalysis/RunConfig-bbbb-base.yaml
 
 # Which analysis to consider
 do_resolved_dihiggs: false
 do_boosted_dihiggs: false
-
-# Decay mode considered for truth decoration
-Truth:
-  decayModes: ["bbbb"]
 
 # Toggles for object types
 do_small_R_jets: true
@@ -27,11 +23,6 @@ Small_R_jet:
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
-
-# orthogonality studies  
-orthogonality:
-  include: EasyjetHub/orth-config.yaml 
-  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
 # list of triggers per year to consider
 Trigger:

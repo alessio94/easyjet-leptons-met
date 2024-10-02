@@ -16,6 +16,7 @@ atlas_add_component(bbbbAnalysis
   src/JetPairingAlg.cxx
   src/BaselineVarsResolvedAlg.cxx
   src/BaselineVarsBoostedAlg.cxx
+  src/bbbbSelectorAlg.cxx
   src/JetBoostHistograms.cxx
   src/JetBoostHistogramsAlg.cxx
   src/MassPlaneBoostHistograms.cxx
@@ -39,6 +40,7 @@ atlas_add_component(bbbbAnalysis
   ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES}
   TrigCompositeUtilsLib
   PathResolver
+  EasyjetHubLib
 )
 
 # Install python modules, joboptions, and share content

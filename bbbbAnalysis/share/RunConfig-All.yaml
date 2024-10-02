@@ -1,15 +1,17 @@
 include: bbbbAnalysis/RunConfig-bbbb-base.yaml
 
-# Which analysis to consider
 # Current strategy could lead to super large output
 # with all syst on
-do_resolved_dihiggs: true
+do_resolved_dihiggs: false
+do_boosted_dihiggs: false
 
 pairingStrategy: "minDeltaR"
 
 # Toggles for object types
 do_small_R_jets: true
+do_large_R_UFO_jets: true
 do_muons: true
+do_met: true
 
 Small_R_jet:
   min_pT: 20.e+3
@@ -22,13 +24,20 @@ Small_R_jet:
   doHLTMatching: false
   saveTriggerInfo: false
 
+Large_R_jet:
+  min_pT: 200.e+3
+  max_pT: 3000.e+3
+  max_eta: 2.0
+  runMuonJetPtCorr: false
+  amount_leadingjet: 2
+
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
 
 # list of triggers per year to consider
 Trigger:
-  include: bbbbAnalysis/triggers-resolved.yaml
+  include: bbbbAnalysis/triggers-recommended.yaml
 
 # can alternatively use the CutList to filter events to get trigger eff
 do_trigger_filtering: true
@@ -36,15 +45,13 @@ save_bbbb_cutflow: true
 bypass: false
 selection_name: "preselection"
 CutList:
-  - AT_LEAST_FOUR_JETS
-  - AT_LEAST_TWO_BJETS
+  - AT_LEAST_FOUR_JETS_TWO_BJETS_OR_TWO_LRJETS
 
 do_overlap_removal: true
 
-do_CP_systematics: false
+do_CP_systematics: true
 systematics_regex: [".*"]
 
-# Alternative PRW configuration
 PileupReweighting:
   - postfix: "bjet"
     lumicalc_files:
@@ -58,6 +65,8 @@ ttree_output:
   # Our overrides. All defaults are off
   reco_outputs:
     small_R_jets: 'container_names.output.reco4PFlowJet'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    met: 'container_names.output.met'
   collection_options:
     small_R_jets:
       truth_parent_info: true
@@ -65,6 +74,11 @@ ttree_output:
       JVT_details: true
       no_bjet_calib_p4: true
       btag_details: true
+    large_R_jets:
+      truth_labels: true
+      substructure_info: true
+      run_selection: true
   truth_outputs:
     small_R_jets: 'container_names.input.truth4Jet'
+    large_R_jets: 'container_names.input.truth10SoftDropJet'
     higgs_particle: 'container_names.output.truthHHParticles'
