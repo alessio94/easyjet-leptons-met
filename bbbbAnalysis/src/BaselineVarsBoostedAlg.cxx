@@ -6,7 +6,6 @@
 
 #include "BaselineVarsBoostedAlg.h"
 #include "AthContainers/AuxElement.h"
-#include "FourMomUtils/xAODP4Helpers.h"
 
 namespace HH4B
 {
@@ -18,19 +17,20 @@ namespace HH4B
 
   StatusCode BaselineVarsBoostedAlg ::initialize()
   {
-    ATH_CHECK (m_LargeJetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_leadingLargeR_GA_VRJetsHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_subleadingLargeR_GA_VRJetsHandle.initialize(m_systematicsList));
+    ATH_MSG_INFO("*********************************\n");
+    ATH_MSG_INFO("      BaselineVarsBoostedAlg     \n");
+    ATH_MSG_INFO("*********************************\n");
+
+    ATH_CHECK (m_LargeRJetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     // make decorators
-    for (const std::string& var : m_vars)
-    {
-      std::string deco_var = var + m_bTagWP;
-      CP::SysWriteDecorHandle<float> deco{deco_var + "_%SYS%", this};
-      m_decos.emplace(deco_var, deco);
-      ATH_CHECK (m_decos.at(deco_var).initialize(m_systematicsList, m_eventHandle));
-    };
+    for (const std::string &string_var: m_Fvars) {
+      CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
+      m_Fdecos.emplace(string_var, var);
+      ATH_CHECK (m_Fdecos.at(string_var).initialize(m_systematicsList, m_eventHandle));
+    }
+
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
@@ -39,48 +39,79 @@ namespace HH4B
 
   StatusCode BaselineVarsBoostedAlg ::execute()
   {
+    static const SG::AuxElement::ConstAccessor<int>    R10TruthLabel_R22v1("R10TruthLabel_R22v1");
+    static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phbb("GN2Xv01_phbb");
+    static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_pqcd("GN2Xv01_pqcd");
+    static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phcc("GN2Xv01_phcc");
+    static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_ptop("GN2Xv01_ptop");
+
+    static const SG::AuxElement::ConstAccessor<float>  Tau2_wta("Tau2_wta");
+    static const SG::AuxElement::ConstAccessor<float>  Tau3_wta("Tau3_wta");
+
     for (const auto& sys : m_systematicsList.systematicsVector()) {
       // container we read in
       const xAOD::EventInfo *eventInfo = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (eventInfo, sys));
 
       const xAOD::JetContainer *largeRjets = nullptr;
-      ANA_CHECK (m_LargeJetHandle.retrieve (largeRjets, sys));
-
-      const xAOD::JetContainer *leadingVRjets = nullptr;
-      ANA_CHECK (m_leadingLargeR_GA_VRJetsHandle.retrieve (leadingVRjets, sys));
-
-      const xAOD::JetContainer *subleadingVRjets = nullptr;
-      ANA_CHECK (m_subleadingLargeR_GA_VRJetsHandle.retrieve (subleadingVRjets, sys));
+      ANA_CHECK (m_LargeRJetHandle.retrieve (largeRjets, sys));
+      std::size_t n_largeRjets = largeRjets->size();
 
       // set defaults
-      for (const std::string& var : m_vars)
-      {
-        std::string deco_var = var + m_bTagWP;
-        m_decos.at(deco_var).set(*eventInfo, -1, sys);
-      };
+      for (const std::string& var : m_Fvars) {
+        m_Fdecos.at(var).set(*eventInfo, -1, sys);
+      }
 
-      // check if we have 2 large R's and two btagged VR jets in each
-      if (largeRjets->size() >= 2 && leadingVRjets->size() >= 2 &&
-          subleadingVRjets->size() >= 2)
+      // large jet sector
+      if (n_largeRjets >= 2)
       {
-        // construct Higgs Candidates
-        xAOD::JetFourMom_t h1 = (*largeRjets)[0]->jetP4();
-        xAOD::JetFourMom_t h2 = (*largeRjets)[1]->jetP4();
-        float h1_dR_jets = xAOD::P4Helpers::deltaR((*leadingVRjets)[0],(*leadingVRjets)[1]);
-        float h2_dR_jets = xAOD::P4Helpers::deltaR((*subleadingVRjets)[0],(*subleadingVRjets)[1]);
-        // decorate eventinfo
-        // clang-format off
-        m_decos.at("boosted_h1_m_" + m_bTagWP).set(*eventInfo, h1.M(), sys);
-        m_decos.at("boosted_h1_jet1_pt_" + m_bTagWP).set(*eventInfo, (*leadingVRjets)[0]->pt(), sys);
-        m_decos.at("boosted_h1_jet2_pt_" + m_bTagWP).set(*eventInfo, (*leadingVRjets)[1]->pt(), sys);
-        m_decos.at("boosted_h1_dR_jets_" + m_bTagWP).set(*eventInfo, h1_dR_jets, sys);
-        m_decos.at("boosted_h2_m_" + m_bTagWP).set(*eventInfo, h2.M(), sys);
-        m_decos.at("boosted_h2_jet1_pt_" + m_bTagWP).set(*eventInfo, (*subleadingVRjets)[0]->pt(), sys);
-        m_decos.at("boosted_h2_jet2_pt_" + m_bTagWP).set(*eventInfo, (*subleadingVRjets)[1]->pt(), sys);
-        m_decos.at("boosted_h2_dR_jets_" + m_bTagWP).set(*eventInfo, h2_dR_jets, sys);
-        m_decos.at("boosted_hh_m_" + m_bTagWP).set(*eventInfo, (h1 + h2).M(), sys);
-        // clang-format on
+        TLorentzVector h1_v4 = largeRjets->at(0)->p4();
+        TLorentzVector h2_v4 = largeRjets->at(1)->p4();
+
+        m_Fdecos.at("boosted_h1_m").set(*eventInfo, h1_v4.M(), sys);
+        m_Fdecos.at("boosted_h1_pt").set(*eventInfo, h1_v4.Pt(), sys);
+        m_Fdecos.at("boosted_h1_eta").set(*eventInfo, h1_v4.Eta(), sys);
+        m_Fdecos.at("boosted_h1_phi").set(*eventInfo, h1_v4.Phi(), sys);
+        m_Fdecos.at("boosted_h1_E").set(*eventInfo, h1_v4.E(), sys);
+
+        m_Fdecos.at("boosted_h2_m").set(*eventInfo, h2_v4.M(), sys);
+        m_Fdecos.at("boosted_h2_pt").set(*eventInfo, h2_v4.Pt(), sys);
+        m_Fdecos.at("boosted_h2_eta").set(*eventInfo, h2_v4.Eta(), sys);
+        m_Fdecos.at("boosted_h2_phi").set(*eventInfo, h2_v4.Phi(), sys);
+        m_Fdecos.at("boosted_h2_E").set(*eventInfo, h2_v4.E(), sys);
+
+        TLorentzVector hh_v4 = h1_v4 + h2_v4;
+        m_Fdecos.at("boosted_hh_m").set(*eventInfo, hh_v4.M(), sys);
+        m_Fdecos.at("boosted_hh_pt").set(*eventInfo, hh_v4.Pt(), sys);
+        m_Fdecos.at("boosted_hh_delta_eta").set(*eventInfo, h1_v4.Eta() - h2_v4.Eta(), sys);
+        m_Fdecos.at("boosted_hh_delta_phi").set(*eventInfo, h1_v4.DeltaPhi(h2_v4), sys);
+
+        float tau32, phbb_score, pqcd_score, phcc_score, ptop_score, hbb_disc;
+
+        for (std::size_t i=0; i<2; i++){
+          std::string prefix = "boosted_h"+std::to_string(i+1);
+
+          tau32 = Tau3_wta(*largeRjets->at(i))/Tau2_wta(*largeRjets->at(i));
+          m_Fdecos.at(prefix+"_Tau32_wta").set(*eventInfo, tau32, sys);
+
+          phbb_score = GN2Xv01_phbb(*largeRjets->at(i));
+          pqcd_score = GN2Xv01_pqcd(*largeRjets->at(i));
+          phcc_score = GN2Xv01_phcc(*largeRjets->at(i));
+          ptop_score = GN2Xv01_ptop(*largeRjets->at(i));
+
+          m_Fdecos.at(prefix+"_GN2Xv01_phbb").set(*eventInfo, phbb_score, sys);
+          m_Fdecos.at(prefix+"_GN2Xv01_pqcd").set(*eventInfo, pqcd_score, sys);
+          m_Fdecos.at(prefix+"_GN2Xv01_phcc").set(*eventInfo, phcc_score, sys);
+          m_Fdecos.at(prefix+"_GN2Xv01_ptop").set(*eventInfo, ptop_score, sys);
+
+          hbb_disc = calculateGN2Xv01_disc(phbb_score, pqcd_score, phcc_score, ptop_score);
+          m_Fdecos.at(prefix+"_GN2Xv01_disc").set(*eventInfo, hbb_disc, sys);
+
+          if (m_isMC){
+            int truthLabel_i = R10TruthLabel_R22v1(*largeRjets->at(i));
+            m_Fdecos.at(prefix+"_truthLabel").set(*eventInfo, truthLabel_i, sys);
+          }
+        }
       }
     }
     return StatusCode::SUCCESS;

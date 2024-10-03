@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import JetSelectorAlgCfg
 from EasyjetHub.output.ttree.selected_objects import (
@@ -18,7 +19,7 @@ def resolved_cfg(flags, smalljetkey):
             JetSelectorAlgCfg(flags, name="SmallJetPreSelectorAlg",
                               containerInKey=smalljetkey.replace("%SYS%", "NOSYS"),
                               containerOutKey="smallRJetsForTriggerMatching",
-                              minPt=20e3,
+                              minPt=20 * Units.GeV,
                               maxEta=2.5))
         if flags.Analysis.Small_R_jet.doL1Matching:
             cfg.addEventAlgo(
@@ -58,7 +59,7 @@ def resolved_cfg(flags, smalljetkey):
                                     containerOutKey="resolvedAnalysisJets_" + btag_sys,
                                     bTagWPDecorName="ftag_select_" + btag_wp,
                                     selectBjet=True,
-                                    minPt=20e3,
+                                    minPt=20 * Units.GeV,
                                     maxEta=2.5,
                                     truncateAtAmount=4,  # -1 means keep all
                                     minimumAmount=4))  # -1 means ignores this

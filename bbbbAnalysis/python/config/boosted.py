@@ -1,85 +1,35 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
-from EasyjetHub.algs.postprocessing.SelectorAlgConfig import JetSelectorAlgCfg
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches,
 )
+
+# Define the variables that will be saved in the output TTree
+boosted_vars = ["hh_m", "hh_pt", "hh_delta_eta", "hh_delta_phi"]
+variables = [
+    "m", "pt", "eta", "phi", "E",
+    "Tau32_wta", "GN2Xv01_disc",
+    "GN2Xv01_phbb", "GN2Xv01_pqcd",
+    "GN2Xv01_phcc", "GN2Xv01_ptop"
+]
+for var in variables:
+    for hc in ["h1", "h2"]:
+        boosted_vars.append(f"{hc}_{var}")
+boosted_vars += ["h1_truthLabel", "h2_truthLabel"]
+boosted_vars = [f"boosted_{var}" for var in boosted_vars]
 
 
 def boosted_cfg(flags, largejetkey):
     cfg = ComponentAccumulator()
 
-    for btag_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
-        btag_sys = btag_wp + "_%SYS%"
-        # get the two leading large R's
-        cfg.merge(JetSelectorAlgCfg(flags, name="LargeJetSelectorAlg_" + btag_wp,
-                                    containerInKey=largejetkey,
-                                    containerOutKey="boostedAnalysisJets_" + btag_sys,
-                                    bTagWPDecorName="ftag_select_" + btag_wp,
-                                    selectBjet=True,
-                                    minPt=250e3,
-                                    maxEta=2.0,
-                                    truncateAtAmount=2,  # -1 means keep all
-                                    minimumAmount=2))  # -1 means ignores this
-
-        # get the ghost associated VR jets from the leading Large R jet
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
-                "LeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
-                containerInKey="boostedAnalysisJets_" + btag_sys,
-                containerOutKey="leadingLargeRVRJets_" + btag_sys,
-                whichJet=0,
-            )
+    cfg.addEventAlgo(
+        CompFactory.HH4B.BaselineVarsBoostedAlg(
+            "BaselineVarsBoostedAlg",
+            isMC=flags.Input.isMC,
+            floatVariableList=boosted_vars,
         )
-        # make sure we have at least 2 and maximally 3 ghost associated in
-        # the leading large R jet
-        cfg.merge(JetSelectorAlgCfg(
-            flags, name="LeadingLargeRVRJetSelectorAlg_" + btag_wp,
-            containerInKey="leadingLargeRVRJets_" + btag_sys,
-            containerOutKey="SelectedLeadingLargeRVRJets_" + btag_sys,
-            bTagWP=btag_wp,
-            selectBjet=True,
-            minPt=10e3,
-            maxEta=2.5,
-            truncateAtAmount=3,
-            minimumAmount=2,
-            removeRelativeDeltaRToVRJet=True))
-
-        # get the ghost associated VR jets from the subleading Large R jet
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
-                "SubLeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
-                containerInKey="boostedAnalysisJets_" + btag_sys,
-                containerOutKey="SubLeadingLargeRVRJets_" + btag_sys,
-                whichJet=1,
-            )
-        )
-
-        # make sure we have at least 2 and maximally 3 ghost associated in
-        # the subleading large R jet
-        cfg.merge(JetSelectorAlgCfg(
-            flags, name="SubLeadingLargeRVRJetSelectorAlg_" + btag_wp,
-            containerInKey="SubLeadingLargeRVRJets_" + btag_sys,
-            containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_sys,
-            bTagWP=btag_wp,
-            selectBjet=True,
-            minPt=10e3,
-            maxEta=2.5,
-            truncateAtAmount=3,
-            minimumAmount=2,
-            removeRelativeDeltaRToVRJet=True))
-
-        # calculate final boosted vars
-        cfg.addEventAlgo(
-            CompFactory.HH4B.BaselineVarsBoostedAlg(
-                "FinalVarsBoostedAlg_" + btag_wp,
-                largeRContainerInKey="boostedAnalysisJets_" + btag_sys,
-                leadingLargeR_GA_VRJets="SelectedLeadingLargeRVRJets_" + btag_sys,
-                subLeadingLargeR_GA_VRJets="SelectedSubLeadingLargeRVRJets_" + btag_sys,
-                bTagWP=btag_wp,
-            )
-        )
+    )
 
     return cfg
 
@@ -92,24 +42,13 @@ def boosted_branches(flags):
     # in the object configs.
     branches += get_selected_objects_branches(flags, "bbbb_boosted")
 
-    for btag_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
-        boosted_vars = [
-            "h1_m",
-            "h1_jet1_pt",
-            "h1_jet2_pt",
-            "h1_dR_jets",
-            "h2_m",
-            "h2_jet1_pt",
-            "h2_jet2_pt",
-            "h2_dR_jets",
-            "hh_m",
+    for var in boosted_vars:
+        if flags.Input.isMC and "truthLabel" in var:
+            continue
+        branches += [
+            f"EventInfo.{var}_%SYS%"
+            + f" -> bbbb_{var}"
+            + flags.Analysis.systematics_suffix_separator + "%SYS%"
         ]
-
-        for var in boosted_vars:
-            branches += [
-                f"EventInfo.boosted_{var}_{btag_wp}_%SYS%"
-                + f" -> bbbb_boosted_{btag_wp}_{var}"
-                + flags.Analysis.systematics_suffix_separator + "_%SYS%"
-            ]
 
     return branches
