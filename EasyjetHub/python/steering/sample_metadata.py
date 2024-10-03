@@ -4,6 +4,7 @@ from pathlib import Path
 from PathResolver import PathResolver
 from Campaigns.Utils import Campaign
 from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
+from AthenaCommon.Utils.unixtools import find_datafile
 
 
 MCSampleYears = {
@@ -91,6 +92,9 @@ def get_lumicalc_files(flags, prw_flags):
         year = str(year)
         lumicalc_dir = flags.Analysis.GRL.years[year]
         lumicalc_file = prw_flags.lumicalc_files[year]
+        # check if it is specified locally
+        if find_datafile(lumicalc_file) is not None:
+            lumicalc_file = find_datafile(lumicalc_file)
         if lumicalc_dir and lumicalc_file:
             lumicalc_files.add(str(Path(lumicalc_dir) / lumicalc_file))
         else:
