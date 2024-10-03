@@ -71,7 +71,9 @@ private:
         "decoration for per-object if jet is selected"};
 
     Gaudi::Property<float> m_minPt            {this, "minPt", 25e3, "Minimum pT of jets"};
+    Gaudi::Property<float> m_maxPt            {this, "maxPt", -1, "Maximum pT of jets"};
     Gaudi::Property<float> m_maxEta           {this, "maxEta", 4.4, "Maximum eta of jets"}; // default is central jets
+    Gaudi::Property<float> m_maxMass          {this, "maxMass", -1, "Maximum mass of jets"};
     Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of jets to consider"}; // -1 means ignores this
     Gaudi::Property<int>   m_maximumAmount    {this, "maximumAmount", -1, "Maximum number of jets to consider"};
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort jets by pT"};
@@ -84,6 +86,9 @@ private:
 
     Gaudi::Property<bool>  m_selectBjet       {this, "selectBjet", false, "Apply bjet selection"};
     Gaudi::Property<int>   m_bjetAmount       {this, "bjetAmount", -1, "Number of jets to consider for isbjetXX decoration"};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_bleadBranches;
+
+    Gaudi::Property<int>   m_jetAmount        {this, "jetAmount", -1, "Number of jets to consider for isjetXX decoration"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
 
   };

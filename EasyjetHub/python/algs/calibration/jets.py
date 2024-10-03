@@ -202,13 +202,15 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
     configSeq = ConfigSequence()
     config = ConfigFactory()
     makeConfig = config.makeConfig
+    jet_flags = flags.Analysis.Large_R_jet
 
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
     input_name = flags.Analysis.container_names.input[
         f"reco10{lr_jet_type}Jet"]
-    output_name = flags.Analysis.container_names.output[
-        f"reco10{lr_jet_type}Jet"].replace('_%SYS%', '')
+    output_name = drop_sys(
+        flags.Analysis.container_names.output[f"reco10{lr_jet_type}Jet"]
+    )
     configSeq += makeConfig('Jets', containerName=output_name,
                             jetCollection=input_name)
 
@@ -225,10 +227,18 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
         # Disable small-R b-jet pT reco
         configSeq.setOptionValue('.doPtCorr', False)
 
+    configSeq += makeConfig('Jets.PtEtaSelection', containerName=output_name,
+                            selectionName='selectPtEta')
+    configSeq.setOptionValue('.minPt', jet_flags.min_pT)
+    if jet_flags.max_pT > 0:
+        configSeq.setOptionValue('.maxPt', jet_flags.max_pT)
+    configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
+
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
     configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq.setOptionValue('.selectionName', "selectPtEta")
 
     return configSeq
 

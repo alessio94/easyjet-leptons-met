@@ -50,6 +50,7 @@ Small_R_jet:
   do_parent_decoration: true
   amount: 0
   amount_bjet: 0
+  amount_leadingjet: 0
   systModelJES: "Category"
   systModelJER: "Full"
   btag_egReductionB: "Loose"
@@ -63,8 +64,13 @@ Small_R_jet:
 Large_R_jet:
   # btagging working points for Variable Radius Track jets
   vr_btag_wps: []
+  min_pT: 200.e+3
+  max_pT: -1
+  max_eta: 100
   runMuonJetPtCorr: false
   do_parent_decoration: true
+  amount: 0
+  amount_leadingjet: 0
   variables_LargeRJets: []
   variables_int_LargeRJets: []
   wtag_type: ""

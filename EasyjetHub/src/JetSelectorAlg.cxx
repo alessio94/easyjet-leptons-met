@@ -30,9 +30,16 @@ namespace Easyjet
 
     for(int i=0; i<m_bjetAmount; i++){
       std::string index = std::to_string(i+1);
-      CP::SysWriteDecorHandle<bool> whandle{"isbjet"+index+"_%SYS%", this};
-      m_leadBranches.emplace("isbjet"+index, whandle);
-      ATH_CHECK(m_leadBranches.at("isbjet"+index).initialize(m_systematicsList, m_inHandle));
+      CP::SysWriteDecorHandle<bool> wbhandle{"isbjet"+index+"_%SYS%", this};
+      m_bleadBranches.emplace("isbjet"+index, wbhandle);
+      ATH_CHECK(m_bleadBranches.at("isbjet"+index).initialize(m_systematicsList, m_inHandle));
+    }
+
+    for(int i=0; i<m_jetAmount; i++){
+      std::string index = std::to_string(i+1);
+      CP::SysWriteDecorHandle<bool> whandle{"isjet"+index+"_%SYS%", this};
+      m_leadBranches.emplace("isjet"+index, whandle);
+      ATH_CHECK(m_leadBranches.at("isjet"+index).initialize(m_systematicsList, m_inHandle));
     }
 
     ANA_CHECK (m_isSelectedJet.initialize (m_systematicsList, m_inHandle));
@@ -117,7 +124,7 @@ namespace Easyjet
         // jump out if VR jets overlap
         // recommended by ftag : Remove the event if any of your signal jets have
         // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.
-        // checks if any of the vr jets overlap	  
+        // checks if any of the vr jets overlap
         if (m_removeRelativeDeltaRToVRJet && m_relativeDeltaRToVRJet.get(*jet, sys) < 1.0)
         {
           workContainer->clear();
@@ -126,17 +133,22 @@ namespace Easyjet
         // cuts
         if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
           continue;
+        // cuts for calibrated large-R jet
+        if (m_maxPt > 0 && jet->pt() > m_maxPt)
+          continue;
+        if (m_maxMass > 0 && jet->m() > m_maxMass)
+          continue;
 
         bool isSelected = false;
         // select btagging wp if given and select_bjet flag is on. if not given always push back
-	// check if want to apply btagging
+        // check if want to apply btagging
         if (!m_selectBjet || (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5)) 
-	{
-	  workContainer->push_back(jet);
-	  isSelected = true;
-	}
+        {
+          workContainer->push_back(jet);
+          isSelected = true;
+        }
         if (PCBTaggiven) workContainer_pcbt[jet] = m_PCBT.get(*jet, sys);
-	m_isSelectedJet.set(*jet, isSelected, sys);
+        m_isSelectedJet.set(*jet, isSelected, sys);
       }
       
       int nJets = workContainer->size();
@@ -181,9 +193,19 @@ namespace Easyjet
          for (const xAOD::Jet *jet : *workContainer) {
             if (WPgiven &&  m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5){
                njet++;
-               m_leadBranches.at("isbjet"+std::to_string(njet)).set(*jet, true, sys);
+               m_bleadBranches.at("isbjet"+std::to_string(njet)).set(*jet, true, sys);
             }
             if ( njet == m_bjetAmount ) break;
+         }
+      }
+
+      //lead/sublead jet
+      if(m_jetAmount > 0){
+         int njet = 0;
+         for (const xAOD::Jet *jet : *workContainer) {
+            njet++;
+            m_leadBranches.at("isjet"+std::to_string(njet)).set(*jet, true, sys);
+            if ( njet == m_jetAmount ) break;
          }
       }
 

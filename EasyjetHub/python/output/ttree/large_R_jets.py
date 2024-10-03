@@ -30,8 +30,14 @@ def get_large_R_jet_branches(
 
     large_R_jet_branches.add_four_mom_branches(do_mass=True)
 
-    if flags.Analysis.do_overlap_removal:
-        large_R_jet_branches.variables += ["passesOR_%SYS%"]
+    # Similar run_selection as small_R_jets to avoid ordering issues
+    if tree_flags.collection_options.large_R_jets.run_selection:
+        large_R_jet_branches.variables += ["isAnalysisJet_%SYS%"]
+        for index in range(flags.Analysis.Large_R_jet.amount_leadingjet):
+            large_R_jet_branches.variables += [f"isjet{index+1}_%SYS%"]
+    else:
+        if flags.Analysis.do_overlap_removal:
+            large_R_jet_branches.variables += ["passesOR_%SYS%"]
 
     if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
         large_R_jet_branches.variables += ["uncorrPt", "n_muons"]
