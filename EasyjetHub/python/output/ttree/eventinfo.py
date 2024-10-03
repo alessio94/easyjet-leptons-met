@@ -87,8 +87,11 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
     if (
         flags.Input.isMC
         and flags.Analysis.Small_R_jet.jet_type != "reco4EMTopoJet"
+        and flags.Analysis.do_small_R_jets
     ):
-        btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
+        btag_wps = []
+        if flags.Analysis.Small_R_jet.btag_wp != "":
+            btag_wps += [flags.Analysis.Small_R_jet.btag_wp]
         if 'btag_extra_wps' in flags.Analysis.Small_R_jet:
             btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 

@@ -90,7 +90,9 @@ def jet_sequence(
         configSeq += makeConfig('Jets.JVT', containerName=calib_name)
         configSeq.setOptionValue('.enableFJvt', jet_flags.useFJvt)
 
-        btag_wps = [jet_flags.btag_wp]
+        btag_wps = []
+        if jet_flags.btag_wp != "":
+            btag_wps += [jet_flags.btag_wp]
         if 'btag_extra_wps' in jet_flags:
             btag_wps += jet_flags.btag_extra_wps
 

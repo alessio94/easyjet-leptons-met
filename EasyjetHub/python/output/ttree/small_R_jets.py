@@ -48,7 +48,9 @@ def get_small_R_jet_branches(
             small_R_jet_branches.variables += ["PartonTruthLabelID"]
 
         if tree_flags.collection_options.small_R_jets.btag_info:
-            btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
+            btag_wps = []
+            if flags.Analysis.Small_R_jet.btag_wp != "":
+                btag_wps += [flags.Analysis.Small_R_jet.btag_wp]
             if 'btag_extra_wps' in flags.Analysis.Small_R_jet:
                 btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
