@@ -1,5 +1,3 @@
-from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
-from AthenaConfiguration.ComponentFactory import CompFactory
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AthenaConfiguration.Enums import LHCPeriod
@@ -241,58 +239,3 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
     configSeq.setOptionValue('.selectionName', "selectPtEta")
 
     return configSeq
-
-
-# vr = variable R
-def vr_jet_sequence(flags, configAcc):
-    configSeq = ConfigSequence()
-    config = ConfigFactory()
-    makeConfig = config.makeConfig
-
-    # There is no output container, we just operate on the input one
-    input_name = flags.Analysis.container_names.input.vrJet
-    for tagger_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
-        tagger, btag_wp = tagger_wp.split("_", 1)
-        # Default CDI in FTag config which is:
-        #   "xAODBTaggingEfficiency/13TeV/2022-22-13TeV-MC20-CDI-2022-07-28_v1.root"
-        # supports only DL1dv00 and GN2 in PFlow jets, for testing
-        # minPt defaults to 10 GeV for VR
-        # kinematic selection is on by default
-        configSeq += makeConfig('FlavourTagging', containerName=input_name,
-                                selectionName=tagger_wp)
-        configSeq.setOptionValue('.btagger', tagger)
-        configSeq.setOptionValue('.btagWP', btag_wp)
-        # Set up CDI compatible with DL1r for VR
-        configSeq.setOptionValue('.legacyRecommendations', True)
-
-    # If we don't have a (functionally useless) jet sequence
-    # preceding the FTag one, the latter just won't configure
-    # unless we force the names like this
-    # which we need to do because the ghost VR jets need us to
-    # decorate the original VR collection
-    configAcc.setSourceName(
-        containerName=input_name,
-        sourceName=input_name,
-        originalName=input_name,
-    )
-
-    return configSeq
-
-
-def lr_jet_ghost_vr_jet_association_cfg(
-    flags,
-    lr_jet_type,
-):
-    cfg = ComponentAccumulator()
-    cfg.addEventAlgo(
-        CompFactory.Easyjet.LargeJetGhostVRJetAssociationAlg(
-            f"Large{lr_jet_type}JetGhostVRJetAssociationAlg",
-            isMC=flags.Input.isMC,
-            LargeJetInKey=flags.Analysis.container_names.input[
-                f"reco10{lr_jet_type}Jet"].replace("%SYS%", "NOSYS"),
-            workingPoints=flags.Analysis.Large_R_jet.vr_btag_wps,
-            EventInfoDecorSuffix=lr_jet_type,
-        )
-    )
-
-    return cfg

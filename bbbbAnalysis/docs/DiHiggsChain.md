@@ -35,32 +35,22 @@ subgraph JetSelectorAlg
 end
 
 JetSelectorAlg --> B[xAOD::JetContainer]
-B[xAOD::JetContainer]-->GhostAssocVRJetGetterAlg1
-subgraph GhostAssocVRJetGetterAlg1
-   whichJet:0
-end
 
-GhostAssocVRJetGetterAlg1 --> C1[xAOD::JetContainer]
 C1 --> JetSelectorAlg1
 subgraph JetSelectorAlg1
-   bTagWP:btag_wp\nminPt:10000\nmaxEta:2.5\ntruncateAtAmount:3\nminimumAmount:2\npTsort:True\nremoveRelativeDeltaRToVRJet:True 
+   bTagWP:btag_wp\nminPt:10000\nmaxEta:2.5\ntruncateAtAmount:3\nminimumAmount:2\npTsort:True
 end
 JetSelectorAlg1 --> D1[xAOD::JetContainer]
 D1-->BaselineVarsBoostedAlg
 
-B[xAOD::JetContainer]-->GhostAssocVRJetGetterAlg2
-subgraph GhostAssocVRJetGetterAlg2
-   whichJet:1
-end
-GhostAssocVRJetGetterAlg2 --> C2[xAOD::JetContainer]
 C2 --> JetSelectorAlg2
 subgraph JetSelectorAlg2
-   BTagWP:btag_wp\nminPt:10000\nmaxEta:2.5\ntruncateAtAmount:3\nminimumAmount:2\npTsort:True\nremoveRelativeDeltaRToVRJet:True 
+   BTagWP:btag_wp\nminPt:10000\nmaxEta:2.5\ntruncateAtAmount:3\nminimumAmount:2\npTsort:True
 end
 JetSelectorAlg2 --> D2[xAOD::JetContainer]
 D2-->BaselineVarsBoostedAlg
 B-->BaselineVarsBoostedAlg
 subgraph BaselineVarsBoostedAlg
-   largeRContainerInKey\nleadingLargeR_GA_VRJets\nsubLeadingLargeR_GA_VRJets\nbTagWP
+   largeRContainerInKey\nbTagWP
 end
 ```

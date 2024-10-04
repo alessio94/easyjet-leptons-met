@@ -8,7 +8,6 @@ do_electrons: true
 do_met : true
 do_small_R_jets: true
 do_large_R_UFO_jets: true
-do_VR_jets: false
 
 Electron:
   ID: "MediumLH"

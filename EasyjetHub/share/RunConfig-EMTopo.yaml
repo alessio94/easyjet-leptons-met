@@ -57,7 +57,6 @@ ttree_output:
     electrons: 'container_names.output.electrons'
     small_R_jets: 'container_names.output.reco4EMTopoJet'
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-    #VR_jets: 'container_names.output.vrJets'
   collection_options:
     small_R_jets:
       truth_parent_info: true

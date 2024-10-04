@@ -82,7 +82,6 @@ def validate_do_write_obj_flags(flags, tree_flags):
         'small_R_jets',
         'large_R_Topo_jets',
         'large_R_UFO_jets',
-        'VR_jets',
         'muons',
         'electrons',
         'photons',
@@ -137,7 +136,6 @@ def validate_file_format(flags):
     if flags.Input.isPHYSLITE:
 
         assert not any([
-            flags.Analysis.do_VR_jets,
             flags.Analysis.do_large_R_Topo_jets,
         ]), "Collections requested are incompatible with PHYSLITE"
 

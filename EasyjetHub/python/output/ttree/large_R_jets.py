@@ -58,9 +58,6 @@ def get_large_R_jet_branches(
                 "R10TruthLabel_R22v1",
             ]
 
-    if tree_flags.reco_outputs.VR_jets:
-        large_R_jet_branches.variables += get_ghost_vr_branches(flags)
-
     if tree_flags.collection_options.large_R_jets.substructure_info:
         large_R_jet_branches.variables += get_substructure_branches(flags, lr_jet_type)
 
@@ -76,29 +73,6 @@ def get_large_R_jet_branches(
         large_R_jet_branches.variables += get_large_R_gn2_branches()
 
     return large_R_jet_branches.get_output_list()
-
-
-def get_ghost_vr_branches(flags):
-    vr_vars = [
-        "goodVRTrackJets",
-        "minRelativeDeltaRToVRJet",
-        "leadingVRTrackJetsPt",
-        "leadingVRTrackJetsEta",
-        "leadingVRTrackJetsPhi",
-        "leadingVRTrackJetsM",
-        "leadingVRTrackJetsDeltaR12",
-        "leadingVRTrackJetsDeltaR13",
-        "leadingVRTrackJetsDeltaR32",
-    ] + [
-        f"leadingVRTrackJetsBtag_{wp}"
-        for wp in flags.Analysis.Large_R_jet.vr_btag_wps
-    ]
-    if flags.Input.isMC:
-        vr_vars += [
-            "VRTrackJetsTruthLabel"
-            # previously leadingVRTrackJets_HadronConeExclTruthLabelID
-        ]
-    return vr_vars
 
 
 def get_substructure_branches(flags, lr_jet_type):

@@ -123,22 +123,6 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
                 for var in ["pt", "eta", "phi", "m"]
             ]
 
-    if tree_flags.reco_outputs.large_R_Topo_jets and tree_flags.reco_outputs.VR_jets:
-        eventinfo_branches.required_flags.append(
-            flags.Analysis.do_large_R_Topo_jets
-        )
-        eventinfo_branches.variables += [
-            "passRelativeDeltaRToVRJetCutTopo"
-        ]
-
-    if tree_flags.reco_outputs.large_R_UFO_jets and tree_flags.reco_outputs.VR_jets:
-        eventinfo_branches.required_flags.append(
-            flags.Analysis.do_large_R_UFO_jets
-        )
-        eventinfo_branches.variables += [
-            "passRelativeDeltaRToVRJetCutUFO"
-        ]
-
     if flags.Analysis.GRL.store_decoration and not flags.Input.isMC:
         from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
         for key in getGoodRunsLists().keys():

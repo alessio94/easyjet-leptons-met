@@ -46,8 +46,6 @@ namespace Easyjet
 
     if(m_checkOR) ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
 
-    ATH_CHECK (m_relativeDeltaRToVRJet.initialize(m_systematicsList, m_inHandle));
-
     if(m_useJVT) ATH_CHECK (m_jvtselection.initialize(m_systematicsList, m_inHandle));
     if(m_useFJVT) ATH_CHECK (m_fjvtselection.initialize(m_systematicsList, m_inHandle));
 
@@ -121,15 +119,6 @@ namespace Easyjet
           if ( !passesOR ) continue;
         }
 
-        // jump out if VR jets overlap
-        // recommended by ftag : Remove the event if any of your signal jets have
-        // relativeDeltaRToVRJet = radius(jet_i)/min(dR(jet_i,jet_j)) < 1.0.
-        // checks if any of the vr jets overlap
-        if (m_removeRelativeDeltaRToVRJet && m_relativeDeltaRToVRJet.get(*jet, sys) < 1.0)
-        {
-          workContainer->clear();
-          break;
-        }
         // cuts
         if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
           continue;

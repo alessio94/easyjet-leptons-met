@@ -5,9 +5,7 @@ from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.calibration.jets import (
     jet_sequence,
-    vr_jet_sequence,
     lr_jet_sequence,
-    lr_jet_ghost_vr_jet_association_cfg,
 )
 from EasyjetHub.output.ttree.wtag_decor_config import wtag_decor_cfg
 from EasyjetHub.output.ttree.tau_decor_config import tau_decor_cfg
@@ -40,7 +38,6 @@ analysis_seqs = {
     "photons": photon_sequence,
     "taus": tau_sequence,
     "small_R_jets": jet_sequence,
-    "VR_jets": vr_jet_sequence,
 }
 
 
@@ -124,8 +121,7 @@ def cpalgs_cfg(flags):
             "photons",
             "muons",
             "taus",
-            "small_R_jets",
-            "VR_jets"
+            "small_R_jets"
         ]:
             if flags.Analysis[f"do_{objtype}"]:
                 log.info(f"Adding {objtype} seq")
@@ -133,7 +129,7 @@ def cpalgs_cfg(flags):
                 # Append the configured CP calibration sequence for
                 # the given object type
                 # Pass the configAccumulator because we may need to
-                # provide some container name info (e.g. for VR jets)
+                # provide some container name info
                 configSeq += analysis_seqs[objtype](flags, configAccumulator)
 
         if flags.Analysis.do_large_R_Topo_jets:
@@ -173,27 +169,6 @@ def cpalgs_cfg(flags):
     configSeq.fullConfigure(configAccumulator)
 
     cfg.merge(configAccumulator.CA)
-
-    # Need to run the jet association after the VR jet calibration
-    # Could conceivably set this up as a ConfigSequence instead
-    if not flags.Analysis.disable_calib:
-
-        if flags.Analysis.do_VR_jets:
-            if flags.Analysis.do_large_R_Topo_jets:
-                cfg.merge(
-                    lr_jet_ghost_vr_jet_association_cfg(
-                        flags,
-                        lr_jet_type="Topo",
-                    )
-                )
-
-            if flags.Analysis.do_large_R_UFO_jets:
-                cfg.merge(
-                    lr_jet_ghost_vr_jet_association_cfg(
-                        flags,
-                        lr_jet_type="UFO",
-                    )
-                )
 
     return cfg
 

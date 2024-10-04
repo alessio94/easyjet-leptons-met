@@ -2,7 +2,6 @@
 do_small_R_jets: false
 do_large_R_Topo_jets: false
 do_large_R_UFO_jets: false
-do_VR_jets: false
 do_muons: false
 do_electrons: false
 do_photons: false
@@ -62,8 +61,6 @@ Small_R_jet:
   variables_int_allJets: []
 
 Large_R_jet:
-  # btagging working points for Variable Radius Track jets
-  vr_btag_wps: []
   min_pT: 200.e+3
   max_pT: -1
   max_eta: 100

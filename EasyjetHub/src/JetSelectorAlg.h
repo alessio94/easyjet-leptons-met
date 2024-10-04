@@ -54,8 +54,6 @@ private:
 
     CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
 
-    CP::SysReadDecorHandle<float> m_relativeDeltaRToVRJet {"relativeDeltaRToVRJet", this};
-
     CP::SysReadDecorHandle<char> m_jvtselection {"jvt_selection", this};
     CP::SysReadDecorHandle<char> m_fjvtselection {"fjvt_selection", this};
 
@@ -79,7 +77,6 @@ private:
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort jets by pT"};
     Gaudi::Property<bool>  m_PCBTsort         {this, "PCBTsort", false, "Sort jets by PCBT scores"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra jets after pT sorting"}; // -1 means keep them all
-    Gaudi::Property<bool>  m_removeRelativeDeltaRToVRJet {this, "removeRelativeDeltaRToVRJet", false, "Remove events in which VR jets overlaps"};
     Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
     Gaudi::Property<bool>  m_useJVT           {this, "useJVT", false, "Apply JVT"};
     Gaudi::Property<bool>  m_useFJVT          {this, "useFJVT", false, "Apply forwardJVT"};

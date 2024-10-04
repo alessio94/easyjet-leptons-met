@@ -48,66 +48,6 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                                 truncateAtAmount=3,
                                 minimumAmount=2))
 
-    for btag_wp in flags.Analysis.Large_R_jet.vr_btag_wps:
-        # get the two leading large R's
-        cfg.merge(JetSelectorAlgCfg(flags, name="LargeJetSelectorAlg_" + btag_wp,
-                                    containerInKey=largejetkey,
-                                    containerOutKey="boostedAnalysisJets_" + btag_wp,
-                                    bTagWPDecorName="ftag_select_" + btag_wp,
-                                    selectBjet=True,
-                                    minPt=250e3,
-                                    maxEta=2.0,
-                                    truncateAtAmount=2,
-                                    minimumAmount=2))
-
-        # get the ghost associated VR jets from the leading Large R jet
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
-                "LeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
-                containerInKey="boostedAnalysisJets_" + btag_wp,
-                containerOutKey="leadingLargeRVRJets_" + btag_wp,
-                whichJet=0,
-            )
-        )
-
-        # make sure we have at least 2 and maximally 3 ghost associated in
-        # the leading large R jet
-        cfg.merge(JetSelectorAlgCfg(
-            flags, name="LeadingLargeRVRJetSelectorAlg_" + btag_wp,
-            containerInKey="leadingLargeRVRJets_" + btag_wp,
-            containerOutKey="SelectedLeadingLargeRVRJets_" + btag_wp,
-            bTagWP=btag_wp,
-            selectBjet=True,
-            minPt=10e3,
-            maxEta=2.5,
-            truncateAtAmount=3,
-            minimumAmount=2,
-            removeRelativeDeltaRToVRJet=True))
-
-        # get the ghost associated VR jets from the subleading Large R jet
-        cfg.addEventAlgo(
-            CompFactory.Easyjet.GhostAssocVRJetGetterAlg(
-                "SubLeadingLargeRGhostAssocVRJetGetterAlg_" + btag_wp,
-                containerInKey="boostedAnalysisJets_" + btag_wp,
-                containerOutKey="SubLeadingLargeRVRJets_" + btag_wp,
-                whichJet=1,
-            )
-        )
-
-        # make sure we have at least 2 and maximally 3 ghost associated in
-        # the subleading large R jet
-        cfg.merge(JetSelectorAlgCfg(
-            flags, name="SubLeadingLargeRVRJetSelectorAlg_" + btag_wp,
-            containerInKey="SubLeadingLargeRVRJets_" + btag_wp,
-            containerOutKey="SelectedSubLeadingLargeRVRJets_" + btag_wp,
-            bTagWP=btag_wp,  # empty string: "" ignores btagging
-            selectBjet=True,
-            minPt=10e3,
-            maxEta=2.5,
-            truncateAtAmount=3,
-            minimumAmount=2,
-            removeRelativeDeltaRToVRJet=True))
-
     # Selection
     cfg.addEventAlgo(
         CompFactory.HHBBVV.HHbbVVSelectorAlg(

@@ -27,7 +27,7 @@ The first entry needs to be unique, so athena knows which algorithm to run. Algo
 flowchart LR
 A[xAOD::JetContainer] --> JetSelectorAlg
 subgraph JetSelectorAlg
-containerInKey\ncontainerOutKey\nbTagWP\nminPt\nmaxEta\ntruncateAtAmount\nminimumAmount\npTsort\nremoveRelativeDeltaRToVRJet
+containerInKey\ncontainerOutKey\nbTagWP\nminPt\nmaxEta\ntruncateAtAmount\nminimumAmount\npTsort
  end
 JetSelectorAlg --> B[xAOD::JetContainer\n selection]
 JetSelectorAlg --> C[decorate EventInfo\n n,pt,eta,phi,m]
@@ -55,7 +55,6 @@ TreeBranches += [
 | minimumAmount               | int    | 4                         | minimum amount of the output jets you require. It can be ignored with `-1`. It will return an empty container if the condition is not fulfilled                                |
 | truncateAtAmount            | int    | 4                         | truncates the nr of jets to the given value. This also optimizes the sorting. It can be ignored with `-1`. It will return an empty container if the condition is not fulfilled |
 | pTsort                      | bool   | true                      | Wether to sort the jets by pt                                                                                                                                                  |
-| removeRelativeDeltaRToVRJet | bool   | false   (per default)     | This is to remove VR jets that overlap within a large R jet. If this is the case it will return an empty jet container                                                         |
 
 
 &nbsp;
@@ -84,28 +83,7 @@ This is currently intended for a Dihiggs analysis. It assumes to get a pt sorted
 
 &nbsp;
 &nbsp;
-#### GhostAssocVRJetGetterAlg
-```mermaid
-flowchart LR
-A[xAOD::JetContainer] --> GhostAssocVRJetGetterAlg
-subgraph GhostAssocVRJetGetterAlg
-containerInKey\ncontainerOutKey\nwhichJet
- end
-GhostAssocVRJetGetterAlg --> B[xAOD::JetContainer]
-```
 
-Variable radius (VR) jets are written onto the parent (untrimmed) large R jets as 
-`std::vector<ElementLink<xAOD::IParticleContainer>>`. This serves as a Getter and Converter for them to a `xAOD::JetContainer` for further processing with other algorithms, e.g. select on btagging, sorting, decorating etc. 
-
-
-| option          | type   | example      | meaning                                                                                                                                                                                             |
-| --------------- | ------ | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| containerInKey  | string | "LargeRJets" | xAOD::JetContainer name                                                                                                                                                                             |
-| containerOutKey | string | "MyVRJets"   | xAOD::JetContainer name                                                                                                                                                                             |
-| whichJet        | int    | 0            | Index of the inContainer starting at `0`. If you e.g. want the VR jets from the leading Large R, you would use the `JetSelectorAlg` to return you a pt sorted JetContainer and use whichJet to `0`. |
-
-&nbsp;
-&nbsp;
 #### BaselineVarsResolvedAlg
 
 ```mermaid
@@ -144,17 +122,15 @@ Decorations per working point in the format `EventInfo.resolved_{variable}_{bTag
 flowchart LR
 A[xAOD::JetContainer] --> BaselineVarsBoostedAlg
 subgraph BaselineVarsBoostedAlg
-largeRContainerInKey\nleadingLargeR_GA_VRJets\nsubLeadingLargeR_GA_VRJets\nbTagWP
+largeRContainerInKey\nbTagWP
 end
 BaselineVarsBoostedAlg --> B[decorate Eventinfo: \nboosted_btagWP_h1_m\nboosted_btagWP_h1_jet1_pt\nboosted_btagWP_h1_jet2_pt\nboosted_btagWP_h1_dR_jets\nboosted_btagWP_h2_m\nboosted_btagWP_h2_jet1_pt\nboosted_btagWP_h2_jet2_pt\nboosted_btagWP_h2_dR_jets\nboosted_btagWP_hh_m]
 ```
-Calculate variables for the boosted regime and decorate eventInfo per btagging working point. Assumes to get a pt sorted Large R container. The btagging will be select with the `JetSelectorAlg` that you handed the VR Jets you got from `GhostAssocVRJetGetterAlg`. The algorithm decorates defaults `-1` if none of the handed jetContainers contain >=2 jets.
+Calculate variables for the boosted regime and decorate eventInfo per btagging working point. Assumes to get a pt sorted Large R container. The algorithm decorates defaults `-1` if none of the handed jetContainers contain >=2 jets.
 
 | option                     | type   | example                        | meaning                                                                          |
 | -------------------------- | ------ | ------------------------------ | -------------------------------------------------------------------------------- |
 | largeRContainerInKey       | string | "MyPtSortedLargeRJets"         | xAOD::JetContainer name                                                          |
-| leadingLargeR_GA_VRJets    | string | "MyVRJetsFromLeadingLargeR"    | xAOD::JetContainer name, you retrieved these with the `GhostAssocVRJetGetterAlg` |
-| subLeadingLargeR_GA_VRJets | string | "MyVRJetsFromSubLeadingLargeR" | xAOD::JetContainer name, you retrieved these with the `GhostAssocVRJetGetterAlg` |
 | bTagWP                     | string | "DL1r_FixedCutBEff_77"         | btagging working point (needed for unique decoration)                            |
 
 
@@ -162,13 +138,13 @@ Decorations per working point in the format `EventInfo.boosted_{variable}_{bTagW
 | variable   | meaning                                      |
 | ---------- | -------------------------------------------- |
 | h1_m       | invariant mass of leading higgs candidate    |
-| h1_jet1_pt | pt of leading VR track jet in h1             |
-| h1_jet2_pt | pt of subleading VR track jet in h1          |
-| h1_dR_jets | delta R of the two leading btagging VR jets  |
+| h1_jet1_pt | pt of leading jet in h1             |
+| h1_jet2_pt | pt of subleading in h1          |
+| h1_dR_jets | delta R of the two leading jets  |
 | h2_m       | invariant mass of subleading higgs candidate |
-| h2_jet1_pt | pt of leading VR track jet in h2             |
-| h2_jet2_pt | pt of subleading VR track jet in h2          |
-| h2_dR_jets | delta R of the two leading btagging VR jets  |
+| h2_jet1_pt | pt of leading jet in h2             |
+| h2_jet2_pt | pt of subleading jet in h2          |
+| h2_dR_jets | delta R of the two leading jets  |
 | hh_m       | invariant mass of Dihiggs                    |
 
 
