@@ -3,7 +3,8 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
+    JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -34,6 +35,10 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                      isMC=flags.Input.isMC,
                                      minPt=flags.Analysis.Electron.min_pT_ZCharm,
                                      maxEta=flags.Analysis.Electron.max_eta_ZCharm))
+
+    cfg.merge(LeptonOrderingAlgCfg(flags,
+                                   containerInEleKey=electronkey,
+                                   containerInMuKey=muonkey))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_SelectorAlg",
                                 containerInKey=smalljetkey,

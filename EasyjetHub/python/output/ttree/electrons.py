@@ -63,5 +63,6 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
         electron_branches.variables += ["isAnalysisElectron_%SYS%"]
         for index in range(flags.Analysis.Lepton.amount):
             electron_branches.variables += [f"isElectron{index+1}_%SYS%"]
+            electron_branches.variables += [f"isLepton{index+1}_%SYS%"]
 
     return electron_branches.get_output_list()

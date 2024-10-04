@@ -3,7 +3,8 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, TauSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
+    TauSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -37,6 +38,10 @@ def lltt_cfg(
         containerOutKey="llttAnalysisElectrons_%SYS%",
         looseEleWP=LooseElectronWPLabel,
         tightEleWPs=[TightElectronWPLabel]))
+
+    cfg.merge(LeptonOrderingAlgCfg(flags,
+                                   containerInEleKey=electronkey,
+                                   containerInMuKey=muonkey))
 
     cfg.merge(TauSelectorAlgCfg(flags,
                                 containerInKey=taukey,

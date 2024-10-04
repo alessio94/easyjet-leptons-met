@@ -3,7 +3,8 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, TauSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
+    TauSelectorAlgCfg, JetSelectorAlgCfg)
 
 
 def hhml_cfg(
@@ -40,6 +41,10 @@ def hhml_cfg(
         tightEleWPs=tightElectronWP,
         minPt=9 * Units.GeV
     ))
+
+    cfg.merge(LeptonOrderingAlgCfg(flags,
+                                   containerInEleKey=electronkey,
+                                   containerInMuKey=muonkey))
 
     cfg.merge(TauSelectorAlgCfg(
         flags,

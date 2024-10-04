@@ -5,7 +5,8 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, TauSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
+    TauSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -47,6 +48,10 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                                      containerOutKey="bbttAnalysisElectrons_%SYS%",
                                      looseEleWP=electronInWpLabel,
                                      tightEleWPs=ele_WPs))
+    # leptons:
+    cfg.merge(LeptonOrderingAlgCfg(flags,
+                                   containerInEleKey=electronkey,
+                                   containerInMuKey=muonkey))
 
     cfg.merge(TauSelectorAlgCfg(flags,
                                 # Baseline always needed for anti-taus

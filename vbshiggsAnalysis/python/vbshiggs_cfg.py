@@ -2,7 +2,8 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
+    JetSelectorAlgCfg)
 
 from vbshiggsAnalysis.fullLep_config import fullLep_cfg, fullLep_branches
 from vbshiggsAnalysis.semiLep_config import semiLep_cfg, semiLep_branches
@@ -32,6 +33,10 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                                      looseEleWP=ElectronWPLabel,
                                      tightEleWPs=ele_WPs,
                                      minPt=9 * Units.GeV))
+
+    cfg.merge(LeptonOrderingAlgCfg(flags,
+                                   containerInEleKey=electronkey,
+                                   containerInMuKey=muonkey))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg",
                                 containerInKey=smalljetkey,

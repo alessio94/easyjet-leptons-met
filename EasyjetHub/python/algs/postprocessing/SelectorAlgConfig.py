@@ -34,6 +34,15 @@ def ElectronSelectorAlgCfg(flags, name="ElectronSelectorAlg", **kwargs):
     return cfg
 
 
+def LeptonOrderingAlgCfg(flags, name="LeptonOrderingAlg", **kwargs):
+    cfg = ComponentAccumulator()
+
+    kwargs.setdefault("leptonAmount", flags.Analysis.Lepton.amount)
+
+    cfg.addEventAlgo(CompFactory.Easyjet.LeptonOrderingAlg(name, **kwargs))
+    return cfg
+
+
 def TauSelectorAlgCfg(flags, name="TauSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 

@@ -3,7 +3,8 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg, PhotonSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
+    JetSelectorAlgCfg, PhotonSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -40,6 +41,10 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
                                      containerOutKey="bbllAnalysisElectrons_%SYS%",
                                      looseEleWP=ElectronWPLabel,
                                      minPt=9 * Units.GeV))
+
+    cfg.merge(LeptonOrderingAlgCfg(flags,
+                                   containerInEleKey=electronkey,
+                                   containerInMuKey=muonkey))
 
     cfg.merge(JetSelectorAlgCfg(flags,
                                 containerInKey=smalljetkey,

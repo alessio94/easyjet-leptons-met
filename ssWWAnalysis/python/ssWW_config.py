@@ -2,7 +2,8 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
+    JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
@@ -33,6 +34,10 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
                                      isMC=flags.Input.isMC,
                                      minPt=flags.Analysis.Electron.min_pT_ssWW,
                                      maxEta=flags.Analysis.Electron.max_eta_ssWW))
+
+    cfg.merge(LeptonOrderingAlgCfg(flags,
+                                   containerInEleKey=electronkey,
+                                   containerInMuKey=muonkey))
 
     cfg.merge(JetSelectorAlgCfg(flags,
                                 containerInKey=smalljetkey,
