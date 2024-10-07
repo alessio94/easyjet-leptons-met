@@ -68,9 +68,11 @@ def get_large_R_jet_branches(
 
     split_tags = flags.Input.AMITag.split("_")
     is_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5834")
-    if lr_jet_type == "UFO" and is_valid_ptag and \
-       tree_flags.collection_options.large_R_jets.btag_details:
-        large_R_jet_branches.variables += get_large_R_gn2_branches()
+    if lr_jet_type == "UFO" and is_valid_ptag:
+        if tree_flags.collection_options.large_R_jets.btag_details:
+            large_R_jet_branches.variables += get_large_R_gn2_branches()
+        if flags.Analysis.Large_R_jet.GN2X_hbb_wps:
+            large_R_jet_branches.variables += get_large_R_gn2_tag_branches(flags)
 
     return large_R_jet_branches.get_output_list()
 
@@ -107,6 +109,16 @@ def get_large_R_gn2_branches():
         "GN2Xv01_pqcd",
     ]
     return gn2_branches
+
+
+def get_large_R_gn2_tag_branches(flags):
+    gn2_tag_branches = []
+    for wp in flags.Analysis.Large_R_jet.GN2X_hbb_wps:
+        gn2_tag_branches += ["GN2X_select_" + wp]
+        # Disable SF for now to avoid warnings with preliminary json
+        # if flags.Input.isMC:
+        #    gn2_tag_branches += ["GN2X_effSF_" + wp + "_NOSYS"]
+    return gn2_tag_branches
 
 
 def get_large_R_jet_truth_labels(flags):

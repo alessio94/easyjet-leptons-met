@@ -12,6 +12,7 @@ OverlapRemoval:
 
 Large_R_jet:
   runMuonJetPtCorr: true
+  GN2X_hbb_wps: ["FixedCutBEff_70", "FixedCutBEff_60", "FixedCutBEff_50"]
 
 # Update output configs for large-R jets
 ttree_output:

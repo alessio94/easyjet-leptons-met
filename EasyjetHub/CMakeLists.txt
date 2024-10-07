@@ -33,6 +33,7 @@ atlas_add_library( EasyjetHubLib
                    FourMomUtils
                    TruthUtils
                    FlavorTagDiscriminants
+                   FTagAnalysisInterfacesLib
                    TauAnalysisToolsLib
                    TrigDecisionToolLib
                    TrigCompositeUtilsLib
@@ -66,6 +67,7 @@ atlas_install_python_modules(
 )
 atlas_install_data(
   share/*
+  data/*
 )
 
 # atlas_install_data( data/* )

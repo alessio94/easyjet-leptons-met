@@ -1,3 +1,4 @@
+#include "../GN2XTaggingDecoratorAlg.h"
 #include "../WTaggingDecoratorAlg.h"
 #include "../EventCounterAlg.h"
 #include "../JetSelectorAlg.h"
@@ -21,6 +22,7 @@
 
 using namespace Easyjet;
 
+DECLARE_COMPONENT(GN2XTaggingDecoratorAlg)
 DECLARE_COMPONENT(WTaggingDecoratorAlg)
 DECLARE_COMPONENT(EventCounterAlg)
 DECLARE_COMPONENT(JetSelectorAlg)

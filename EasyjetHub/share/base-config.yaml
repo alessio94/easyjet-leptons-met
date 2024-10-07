@@ -61,6 +61,7 @@ Small_R_jet:
   variables_int_allJets: []
 
 Large_R_jet:
+  GN2X_hbb_wps: []
   min_pT: 200.e+3
   max_pT: -1
   max_eta: 100
