@@ -30,7 +30,7 @@ Small_R_jet:
   amount: 6 # maximum number of jets to consider (WWWW->2LSC + 4j + 2 VBF jets)
 
 Tau:
-  ID: "RNNLoose"
+  ID: "RNNMedium"
   amount: 3
   do_parent_decoration: true
 
