@@ -60,15 +60,10 @@ namespace VBSHIGGS
       std::unordered_map<VBSHIGGS::TriggerChannel, std::string> m_triggerChannels = 
       {
         {VBSHIGGS::SLT, "SLT"},
-        {VBSHIGGS::DLT, "DLT"},
-        {VBSHIGGS::ASLT1_em, "ASLT1_em"},
-        {VBSHIGGS::ASLT1_me, "ASLT1_me"},
-        {VBSHIGGS::ASLT2, "ASLT2"},
       };
 
       std::unordered_map<VBSHIGGS::RunBooleans, std::string> m_runBooleans =
       {
-        {VBSHIGGS::is17_periodB5_B8, "is2017_periodB5_B8"},
         {VBSHIGGS::is22_75bunches, "is2022_75bunches"},
         {VBSHIGGS::is23_75bunches, "is2023_75bunches"},
         {VBSHIGGS::is23_400bunches, "is2023_400bunches"},
@@ -85,14 +80,6 @@ namespace VBSHIGGS
 				       const runBoolReadDecoMap& runBoolDecos,
 				       const xAOD::Electron* ele, const xAOD::Muon* mu,
 				       const CP::SystematicSet& sys);
-      void evaluateDiLeptonTrigger(const xAOD::EventInfo* event,
-				   const runBoolReadDecoMap& runBoolDecos,
-				   const xAOD::Electron* ele0, const xAOD::Electron* ele1,
-				   const xAOD::Muon* mu0, const xAOD::Muon* mu1,
-				   const CP::SystematicSet& sys);
-      void evaluateAsymmetricLeptonTrigger(const xAOD::EventInfo* event,
-					   const xAOD::Electron* ele, const xAOD::Muon* mu,
-					   const CP::SystematicSet& sys);
       void setThresholds(const xAOD::EventInfo* event,
 			 const runBoolReadDecoMap& runBoolDecos,
 			 const CP::SystematicSet& sys);

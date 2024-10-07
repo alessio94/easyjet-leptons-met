@@ -105,11 +105,7 @@ namespace VBSHIGGS{
       CP::SysReadHandle<xAOD::MissingETContainer> m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read" };
 
       CP::SysReadDecorHandle<bool> m_passTriggerSLT {this, "passTriggerSLT", "pass_trigger_SLT_%SYS%", "events pass any singlep triggers"};
-      CP::SysReadDecorHandle<bool> m_passTriggerDLT {this, "passTriggerDLT", "pass_trigger_DLT_%SYS%", "events pass any dilepton triggers"};
-      CP::SysReadDecorHandle<bool> m_passTriggerASLT1_em {this, "passTriggerASLT1_em", "pass_trigger_ASLT1_em_%SYS%", "events pass ASLT1_em triggers"};
-      CP::SysReadDecorHandle<bool> m_passTriggerASLT1_me {this, "passTriggerASLT1_me", "pass_trigger_ASLT1_me_%SYS%", "events pass ASLT1_me triggers"};
-      CP::SysReadDecorHandle<bool> m_passTriggerASLT2 {this, "passTriggerASLT2", "pass_trigger_ASLT2_%SYS%", "events pass ASLT2 triggers"};
-
+      
       CP::SysFilterReporterParams m_filterParams {this, "vbshiggs selection"};
 
       Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};

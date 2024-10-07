@@ -138,7 +138,7 @@ def fullLep_branches(flags):
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]
 
-    for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
+    for cat in ["SLT"]:
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> pass_trigger_{cat}"
              + flags.Analysis.systematics_suffix_separator + "%SYS%"]

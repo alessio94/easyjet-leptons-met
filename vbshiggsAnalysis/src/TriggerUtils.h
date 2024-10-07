@@ -20,21 +20,6 @@ namespace VBSHIGGS
     void getSingleMuTriggers(int year, const xAOD::EventInfo* event,
 			     const runBoolReadDecoMap& runBoolDecos,
 			     std::vector<std::string>& single_mu_paths);
-
-    void getDiEleTriggers(int year, const xAOD::EventInfo* event,
-			  const runBoolReadDecoMap& runBoolDecos,
-			  std::vector<std::string>& di_ele_paths);
-
-    void getDiMuTriggers(int year, std::vector<std::string>& di_mu_paths);
-
-    void getAsymLep2Triggers(int year,
-			     std::vector<std::string>& asym_lepton_paths);
-
-    void getAsymLep1emTriggers(int year,
-			       std::vector<std::string>& asym_lepton_paths);
-
-    void getAsymLep1meTriggers(int year,
-			       std::vector<std::string>& asym_lepton_paths);
 }
 
 #endif
