@@ -52,7 +52,7 @@ Lepton:
 
 Photon:
   ID: "Tight"
-  Iso: "Tight"
+  Iso: "FixedCutTight"
 
 # orthogonality studies  
 orthogonality:
