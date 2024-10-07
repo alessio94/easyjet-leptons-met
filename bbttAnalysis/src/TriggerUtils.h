@@ -158,7 +158,7 @@ namespace HHBBTT
 
   void getDiBJetTriggers(int year, const xAOD::EventInfo* eventInfo,
 			 const runBoolReadDecoMap& runBoolDecos,
-			 std::vector<std::string> dib_paths);
+			 std::vector<std::string>& dib_paths);
 
 }
 

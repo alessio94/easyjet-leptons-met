@@ -309,7 +309,7 @@ namespace HHBBTT
 
   void getDiBJetTriggers(int year, const xAOD::EventInfo* eventInfo,
 			 const runBoolReadDecoMap& runBoolDecos,
-			 std::vector<std::string> dib_paths){
+			 std::vector<std::string>& dib_paths){
     if(year==2022){
       dib_paths = {"HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"};
     }
