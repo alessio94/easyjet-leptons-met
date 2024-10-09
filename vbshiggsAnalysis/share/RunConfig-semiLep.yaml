@@ -10,10 +10,25 @@ do_met : true
 
 
 Electron:
-  ID: "LooseDNNElectron"
+  ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"
   amount: 2
   extra_wps:
+    - ["MediumLH", "Loose_VarRad"]
+    - ["MediumLH", "Tight_VarRad"]
+    - ["MediumLH", "TightTrackOnly_VarRad"]
+    - ["MediumLH", "TightTrackOnly_FixedRad"]
+
+    - ["TightLH", "Loose_VarRad"]
+    - ["TightLH", "Tight_VarRad"]
+    - ["TightLH", "TightTrackOnly_VarRad"]
+    - ["TightLH", "TightTrackOnly_FixedRad"]
+
+    - ["LooseDNNElectron", "Loose_VarRad"]
+    - ["LooseDNNElectron", "Tight_VarRad"]
+    - ["LooseDNNElectron", "TightTrackOnly_VarRad"]
+    - ["LooseDNNElectron", "TightTrackOnly_FixedRad"]
+
     - ["MediumDNNElectron", "Loose_VarRad"]
     - ["MediumDNNElectron", "Tight_VarRad"]
     - ["MediumDNNElectron", "TightTrackOnly_VarRad"]
