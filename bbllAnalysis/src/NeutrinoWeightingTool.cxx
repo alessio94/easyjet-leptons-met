@@ -8,42 +8,12 @@
 
 namespace HHBBLL {
   NeutrinoWeightingTool::NeutrinoWeightingTool(const std::string &type, const std::string &name, const IInterface *parent)
-  : AthAlgTool(type, name, parent){
+  : AthAlgTool(type, name, parent)
+  , m_res_fixed_value(m_resolution_number)
+  , m_res_dynamic_const_x_met_value(m_resolution_number){
   };
 
   StatusCode NeutrinoWeightingTool::initialize(){
-
-    m_tops.clear();
-    m_tbars.clear();
-    m_nus.clear();
-    m_nubars.clear();
-    m_Wposs.clear();
-    m_Wnegs.clear();
-
-    m_weights.clear();
-    m_highestWeight = 0;
-    m_weight_threshold = 0; // lower limit allowed for weights
-
-
-    m_highestWeightTop   = TLorentzVector();
-    m_highestWeightTbar  = TLorentzVector();
-    m_highestWeightNu    = TLorentzVector();
-    m_highestWeightNubar = TLorentzVector();
-    m_highestWeightWpos  = TLorentzVector();
-    m_highestWeightWneg  = TLorentzVector();
-
-    m_flag_eta_sampling_linear    = false; // sampling in equal step sizes
-    m_flag_eta_sampling_SM_lep    = true;  // sampling using lep-nu eta SM relationship
-    m_flag_eta_sampling_gauss     = false; // sampling using a user-defined gaussian
-    m_flag_eta_sampling_do_random = true;  // sample using random numbers, not for linear
-
-    m_eta_sampling_linear_step_low  = -5.;
-    m_eta_sampling_linear_step_high =  5.;
-    m_eta_sampling_gauss_mean       =  0.;
-    m_eta_sampling_gauss_sigma      =  1.;
-
-    m_eta_sampling_nsamples = 20; // how many sample points to do 
-
     if (m_resolution_settings == "fixed"){
       m_flag_res_fixed = true;
       m_flag_res_dynamic_const_x_met = false;
@@ -54,16 +24,8 @@ namespace HHBBLL {
       ATH_MSG_ERROR("NW: You've asked for a resolution setting that doesn't exist. Please choose 'fixed' or 'dynamic'");
       return StatusCode::FAILURE;
     }
-    
-    m_res_fixed_value               = m_resolution_number; // The fixed MET resolution value in (careful with units!)
-    m_res_dynamic_const_x_met_value = m_resolution_number; // The constant factor to multiply the MET in dynamic resoluton
-
-    m_eta_points_nu.clear();
-    m_eta_points_nubar.clear(); 
 
     m_random = TRandom3(12345);
-
-    m_stop_after_first_solution = false;
 
     return StatusCode::SUCCESS;
   }

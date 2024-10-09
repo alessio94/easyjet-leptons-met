@@ -52,10 +52,6 @@ namespace HLLTT
 
     CP::SysFilterReporterParams m_filterParams {this, "Hlltt selection"};
 
-    /// \brief Internal variables
-
-    bool MMC_MASS;
-
   };
 }
 

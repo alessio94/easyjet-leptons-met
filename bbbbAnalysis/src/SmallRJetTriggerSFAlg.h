@@ -66,7 +66,7 @@ private:
     // calibration map
     std::unordered_map<int, TH2D*> m_jetTriggerSFMap;
 
-    TrigMatchingLevel m_matchingLevelEnum;
+    std::optional<TrigMatchingLevel> m_matchingLevelEnum;
   };
 }
 

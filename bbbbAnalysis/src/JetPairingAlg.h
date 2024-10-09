@@ -20,19 +20,19 @@ namespace HH4B
 {
   class JetSet {
   public:
-    float dr1;
-    float dr2;
-    float deta1;
-    float deta2;
-    float dphi1;
-    float dphi2;
-    float jet_system_pt_1;
-    float jet_system_pt_2;
-    float jet_system_mass_1;
-    float jet_system_mass_2;
-    float systems_mass_difference;
-    float m4j;
-    float BDT_score;
+    float dr1 {0.};
+    float dr2 {0.};
+    float deta1 {0.};
+    float deta2 {0.};
+    float dphi1 {0.};
+    float dphi2 {0.};
+    float jet_system_pt_1 {0.};
+    float jet_system_pt_2 {0.};
+    float jet_system_mass_1 {0.};
+    float jet_system_mass_2 {0.};
+    float systems_mass_difference {0.};
+    float m4j {0.};
+    float BDT_score {0.};
 
     JetSet() = default;
   };
@@ -96,7 +96,7 @@ private:
     // Declare the BDTs
     std::vector<std::unique_ptr<MVAUtils::BDT>> m_pairing_bdts;
     // Declare the enum for jet pairing strategy
-    PairingStrategy m_pairing_strategy;
+    PairingStrategy m_pairing_strategy {invalid};
   };
 }
 

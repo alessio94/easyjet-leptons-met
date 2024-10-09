@@ -41,29 +41,29 @@ namespace HHBBLL {
 
     TRandom3 m_random;
 
-    bool m_flag_eta_sampling_linear; // sampling in equal step sizes
-    bool m_flag_eta_sampling_SM_lep; // sampling using lep-nu eta SM relationship
-    bool m_flag_eta_sampling_gauss;  // sampling using a user-defined gaussian
-    bool m_flag_eta_sampling_do_random;  // sample using random numbers, not for linear
+    bool m_flag_eta_sampling_linear {false}; // sampling in equal step sizes
+    bool m_flag_eta_sampling_SM_lep {true}; // sampling using lep-nu eta SM relationship
+    bool m_flag_eta_sampling_gauss {false};  // sampling using a user-defined gaussian
+    bool m_flag_eta_sampling_do_random {true};  // sample using random numbers, not for linear
 
-    float m_eta_sampling_linear_step_low;
-    float m_eta_sampling_linear_step_high;
-    float m_eta_sampling_gauss_mean;
-    float m_eta_sampling_gauss_sigma;
+    float m_eta_sampling_linear_step_low {-5.};
+    float m_eta_sampling_linear_step_high {5.};
+    float m_eta_sampling_gauss_mean {0.};
+    float m_eta_sampling_gauss_sigma {1.};
 
-    bool m_flag_res_fixed;
-    bool m_flag_res_dynamic_const_x_met;
-    float m_res_fixed_value;
-    float m_res_dynamic_const_x_met_value;
+    bool m_flag_res_fixed {false};
+    bool m_flag_res_dynamic_const_x_met {false};
+    float m_res_fixed_value; // The fixed MET resolution value in (careful with units!)
+    float m_res_dynamic_const_x_met_value; // The constant factor to multiply the MET in dynamic resoluton
 
-    uint m_eta_sampling_nsamples; // how many sample points to do 
+    uint m_eta_sampling_nsamples {20}; // how many sample points to do
 
     std::vector<float> m_eta_points_nu;
     std::vector<float> m_eta_points_nubar;  
 
-    float m_highestWeight;
-    float m_weight_threshold;
-    bool m_stop_after_first_solution;
+    float m_highestWeight {0.};
+    float m_weight_threshold {0.}; // lower limit allowed for weights
+    bool m_stop_after_first_solution {false};
 
   public:
 

@@ -32,7 +32,7 @@ class SumOfWeightsTool final: public extends<AthAlgTool, IPostProcessTool>
      Gaudi::Property<std::string> m_inFileName {this, "inFile", "", "EasyJet input file"};
      Gaudi::Property<std::string> m_inHistoName {this, "inHisto", "CutBookkeeper_*_NOSYS", "CutBookkeeper histo"};
      std::unique_ptr<TFile> m_inFile;
-     TH1F* m_inHisto; 
+     TH1F* m_inHisto {nullptr};
      float m_sumOfEventWeight = -1.;
      long int m_sumOfEvents = 0;
      

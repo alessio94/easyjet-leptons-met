@@ -100,7 +100,7 @@ private:
     
     /// \brief Internal variables
     // TODO: implement internal and relevant bbVV variables here
-    bool TWO_JETS;
+    bool TWO_JETS {false};
 
 
   };

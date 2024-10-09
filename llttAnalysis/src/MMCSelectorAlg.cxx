@@ -45,7 +45,7 @@ namespace HLLTT
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
-      MMC_MASS = false;
+      bool MMC_MASS = false;
 
       if (m_mmc_m.get(*event, sys) > m_mmc_min){
         MMC_MASS = true;

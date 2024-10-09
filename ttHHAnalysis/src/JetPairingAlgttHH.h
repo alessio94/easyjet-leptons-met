@@ -64,7 +64,7 @@ private:
 
     std::string m_pairingStrategyName;
 
-    PairingStrategy m_pairingStrategy;
+    std::optional<PairingStrategy> m_pairingStrategy;
 
     Gaudi::Property<float> m_targetMass1 {this, "targetMass1", 125e3, "First target mass of boson to be used in chi square pairing"};
     Gaudi::Property<float> m_targetMass2 {this, "targetMass2", 125e3, "Second target mass of boson to be used in chi square pairing"};

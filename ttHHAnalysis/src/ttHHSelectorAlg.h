@@ -113,8 +113,6 @@ namespace ttHH
       bool m_saveCutFlow;
       long long int m_total_events{0};
 
-      bool m_nLeptons;
-
       std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
       
       std::unordered_map < ttHH::Trigger_Matching_Tool, bool > m_triggers_matchs;

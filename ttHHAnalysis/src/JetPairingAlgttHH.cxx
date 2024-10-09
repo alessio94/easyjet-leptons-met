@@ -78,7 +78,7 @@ namespace ttHH
 
       // this assumes that container is pt sorted (use the JetSelectorAlg for
       // this) and checks if we have at least 4 jets otherwise exit this alg
-      switch (m_pairingStrategy) {
+      switch (m_pairingStrategy.value()) {
 	case ttHH::MinDeltaR:
 	  if (workContainer->size() >= 4)
 	  {

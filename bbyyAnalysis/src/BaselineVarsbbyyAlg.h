@@ -260,7 +260,7 @@ namespace HHBBYY
     std::vector<std::vector<int64_t>> m_output_node_dims_sum;
 
     // Declare the enum of m_vbfjets_method
-    VBFjetsMethod m_vbfjets_method;
+    VBFjetsMethod m_vbfjets_method {VBFjetsMethod::invalid};
   };
 }
 #endif

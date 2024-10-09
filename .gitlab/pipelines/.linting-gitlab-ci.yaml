@@ -27,7 +27,15 @@
   before_script:
     - source /release_setup.sh
   script:
-    - /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck*/bin/cppcheck --enable=warning,portability --xml-version=2 .
+    - |
+      /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck*/bin/cppcheck \
+      --check-level=exhaustive --xml-version=2 --error-exitcode=1 \
+      --enable=warning,portability \
+      -D "DECLARE_COMPONENT(type)=void()" \
+      -D "ANA_MSG_HEADER(name)=void()" \
+      -D "ANA_MSG_SOURCE(name,title)=void()" \
+      --suppress="iterateByValue:VBFTagger/Root/VBFTagger.cxx" \
+      .
   needs: []
 
 .mypy_check_template: &mypy_check_template

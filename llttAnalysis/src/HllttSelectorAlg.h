@@ -129,19 +129,8 @@ private:
     
     /// \brief Internal variables
 
-    bool trigPassed_SLT;
-    bool trigPassed_DLT;
-    bool N_LEPTONS_CUT_LEPLEP;
-    bool N_LEPTONS_CUT_LEPHAD;
-    bool N_LEPTONS_CUT_HADHAD;
-    bool pass_baseline_LepLep;
-    bool pass_LepLep;
-    bool pass_baseline_LepHad;
-    bool pass_LepHad;
-    bool pass_baseline_HadHad;
-    bool pass_HadHad;
-    bool pass_baseline_DLT;
-    bool pass_DLT;
+    bool trigPassed_SLT {false};
+    bool trigPassed_DLT {false};
 
     std::unordered_map<HLLTT::TriggerChannel, std::unordered_map<HLLTT::Var, float>> m_pt_threshold;
 

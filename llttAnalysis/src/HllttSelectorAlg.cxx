@@ -114,17 +114,20 @@ namespace HLLTT
       m_Bbranches.at("pass_trigger_DLT").set(*event, trigPassed_DLT, sys);
 
       // flags for leplep
-      N_LEPTONS_CUT_LEPLEP = false;
-      pass_baseline_LepLep = false;
-      pass_LepLep = false;
+      bool N_LEPTONS_CUT_LEPLEP = false;
+      bool pass_baseline_LepLep = false;
+      bool pass_LepLep = false;
       // flags for lephad
-      N_LEPTONS_CUT_LEPHAD = false;
-      pass_baseline_LepHad = false;
-      pass_LepHad = false;
+      bool N_LEPTONS_CUT_LEPHAD = false;
+      bool pass_baseline_LepHad = false;
+      bool pass_LepHad = false;
       // flags for hadhad
-      N_LEPTONS_CUT_HADHAD = false;
-      pass_baseline_HadHad = false;
-      pass_HadHad = false;
+      bool N_LEPTONS_CUT_HADHAD = false;
+      bool pass_baseline_HadHad = false;
+      bool pass_HadHad = false;
+
+      bool pass_baseline_DLT = false;
+      bool pass_DLT = false;
 
       //************
       // lepton
