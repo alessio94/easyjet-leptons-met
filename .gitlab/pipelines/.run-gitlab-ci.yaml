@@ -117,6 +117,16 @@ ntupler_vbshiggs_mc20_lite:
   script:
     - easyjet-test vbshiggs-mc20-lite
 
+ntupler_VBSVV4q_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test VBSVV4q-mc20
+
+ntupler_VBSVV4q_mc20_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test VBSVV4q-mc20-lite
+
 ntupler_ssWW_mc20:
   extends: .ntupler
   script:

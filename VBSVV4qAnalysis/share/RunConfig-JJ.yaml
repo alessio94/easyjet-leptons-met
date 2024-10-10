@@ -1,0 +1,16 @@
+include: VBSVV4qAnalysis/RunConfig-common.yaml 
+
+# Which analysis to consider
+channels: ["JJ"]
+
+# Toggles for object types
+
+# list of triggers per year to consider
+Trigger:
+  include: VBSVV4qAnalysis/trigger-jet.yaml
+
+CutList :
+  - PASS_TRIGGER 
+  - PASS_ONE_LARGE_JET
+
+#Categories :
