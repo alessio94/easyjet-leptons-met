@@ -461,9 +461,9 @@ namespace HHBBTT
 
         if (bjets->size() == 2)
         {
-          m_bools.at(HHBBTT::TWO_BJETS) = (bjets->at(0)->pt() > 45. * Athena::Units::GeV && bjets->at(1)->pt() > 20. * Athena::Units::GeV);
+          m_bools.at(HHBBTT::TWO_BJETS) = true; //(bjets->at(0)->pt() > 45. * Athena::Units::GeV && bjets->at(1)->pt() > 20. * Athena::Units::GeV);
         } else if (bjets->size() == 1) {
-          m_bools.at(HHBBTT::ONE_BJET) = (bjets->at(0)->pt() > 45. * Athena::Units::GeV);
+          m_bools.at(HHBBTT::ONE_BJET) = true; //(bjets->at(0)->pt() > 45. * Athena::Units::GeV);
         }
       }
 

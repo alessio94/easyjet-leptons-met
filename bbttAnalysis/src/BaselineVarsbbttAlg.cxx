@@ -264,10 +264,13 @@ namespace HHBBTT
 
       // Expand b-jets with extra jet for 1-btag events
       if(bjets->size()==1){
-	if(bjets->at(0)==jets->at(0) && jets->size()>1)
-	  bjets->push_back(jets->at(1));
-	else
-	  bjets->push_back(jets->at(0));
+        for(const xAOD::Jet* jet : *jets){
+          if(jet!=bjets->at(0) && std::abs(jet->eta())<2.5){
+            if(jet->pt() > bjets->at(0)->pt()) bjets->insert(bjets->begin(),jet);
+            else bjets->push_back(jet);
+            break;
+          }
+        }
       }
      
       if (bjets->size() > 1){
