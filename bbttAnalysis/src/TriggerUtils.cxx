@@ -28,8 +28,7 @@ namespace HHBBTT
 	"HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
 	"HLT_mu80_msonly_3layersEC_L1MU14FCH"
       };
-      // No 2023 SF available yet
-      if(year==2022) single_mu_SF_path = "mu24_ivarmedium_L1MU14FCH_OR_mu50_L1MU14FCH";
+      single_mu_SF_path = "mu24_ivarmedium_L1MU14FCH_OR_mu50_L1MU14FCH";
     }
   }
 
