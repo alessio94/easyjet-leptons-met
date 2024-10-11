@@ -2,7 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-#ifndef EASYJET_LEPTONORDERINGRALG
+#ifndef EASYJET_LEPTONORDERINGALG
 #define EASYJET_LEPTONORDERINGALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>

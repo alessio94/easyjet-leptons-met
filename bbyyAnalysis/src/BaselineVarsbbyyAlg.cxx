@@ -1256,24 +1256,26 @@ namespace HHBBYY
   void BaselineVarsbbyyAlg::getVBFjets_pTsorting(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                                                  const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]) {
 
-    const int nCandidateVBFJets = jets->size() - 2;
-    if (nCandidateVBFJets >= 2) {
-      const xAOD::Jet* VBF_j1 = nullptr;
-      const xAOD::Jet* VBF_j2 = nullptr;
-      
-      // select the leading and sub-leading VBF jets
-      for (const xAOD::Jet *jet : *jets) {
-        // ignore candidate bjets
-        if (jet==Hbb_Jet1 || jet==Hbb_Jet2) continue;
+    int nCandidateVBFJets = 0;
+    const xAOD::Jet* VBF_j1 = nullptr;
+    const xAOD::Jet* VBF_j2 = nullptr;
 
-        if (!VBF_j1 || jet->pt() > VBF_j1->pt()){
-          VBF_j2 = VBF_j1;
-          VBF_j1 = jet;
-        }else if (!VBF_j2 || jet->pt() > VBF_j2->pt()){
-          VBF_j2 = jet;
-        }
+    // select the leading and sub-leading VBF jets
+    for (const xAOD::Jet *jet : *jets) {
+      // ignore candidate bjets
+      if (jet==Hbb_Jet1 || jet==Hbb_Jet2) continue;
+
+      if (!VBF_j1 || jet->pt() > VBF_j1->pt()){
+        VBF_j2 = VBF_j1;
+        VBF_j1 = jet;
+        ++nCandidateVBFJets;
+      }else if (!VBF_j2 || jet->pt() > VBF_j2->pt()){
+        VBF_j2 = jet;
+        ++nCandidateVBFJets;
       }
+    }
 
+    if (nCandidateVBFJets >= 2) {
       Jets_vbf[0] = VBF_j1->p4();
       Jets_vbf[1] = VBF_j2->p4();
     }

@@ -236,7 +236,7 @@ namespace VBSHIGGS{
       n_leptons += 1;
     }
 
-    if (ele1) {
+    if (ele0 && ele1) {
       if (ele0->charge() * ele1->charge() == 1)
         m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) = true; 
       else
@@ -253,14 +253,14 @@ namespace VBSHIGGS{
       n_leptons += 1;
     }
 
-    if (mu1) {
+    if (mu0 && mu1) {
       if (mu0->charge() * mu1->charge() == 1)
         m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) = true;
       else
         m_bools.at(VBSHIGGS::PASS_TWO_OS_CHARGE_LEPTONS) = true;
         
     }
-    else if (n_leptons == 2 && mu0) {
+    else if (n_leptons == 2 && ele0 && mu0) {
       if (ele0->charge() * mu0->charge() == 1 )
         m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) = true;
       else

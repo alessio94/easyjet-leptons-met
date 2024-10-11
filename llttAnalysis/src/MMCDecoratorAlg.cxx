@@ -202,7 +202,6 @@ namespace HLLTT
 	      iamu1 = iamu1x;
 	      iamu2 = iamu2x;
 	    }
-            drmin = drminx;
           }
         }
 	if(iamu2>-1){

@@ -298,7 +298,6 @@ namespace HLLTT
 	      iamu1 = iamu1x;
 	      iamu2 = iamu2x;
 	    }
-            drmin = drminx;
 	    recid=1;
           }
         }

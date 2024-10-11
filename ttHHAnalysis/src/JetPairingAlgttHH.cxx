@@ -108,7 +108,7 @@ namespace ttHH
 		workContainer->begin(),     // Iterator from which to start sorting
 		workContainer->begin() + 4, // Use begin + N to sort first N
 		workContainer->end(),       // Iterator marking the end of the range
-		[dRtoLeadingJet_dec, dRtoLeadingJet_acc](
+		[dRtoLeadingJet_acc](
 		    const xAOD::IParticle *left, const xAOD::IParticle *right)
 		{ return dRtoLeadingJet_acc(*left) < dRtoLeadingJet_acc(*right); });
 

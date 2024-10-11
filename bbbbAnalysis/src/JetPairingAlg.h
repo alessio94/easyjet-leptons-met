@@ -4,7 +4,7 @@
 
 // Always protect against multiple includes!
 #ifndef HH4BANALYSIS_JETPAIRINGALG
-#define HH4BANALYSIS_JETPAIRINGRALG
+#define HH4BANALYSIS_JETPAIRINGALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <xAODEventInfo/EventInfo.h>

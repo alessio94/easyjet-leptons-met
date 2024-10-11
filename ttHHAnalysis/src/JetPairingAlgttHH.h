@@ -4,7 +4,7 @@
 
 // Always protect against multiple includes!
 #ifndef TTHHANALYSIS_JETPAIRINGALG
-#define TTHHANALYSIS_JETPAIRINGRALG
+#define TTHHANALYSIS_JETPAIRINGALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 

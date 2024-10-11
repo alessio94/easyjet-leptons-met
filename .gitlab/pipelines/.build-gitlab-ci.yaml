@@ -1,16 +1,37 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-compile:
+cmake:
   stage: build
   script:
     - mkdir -p build # -p checks if it already exists
     - cd build
     - cmake .. | tee cmake.log
+  artifacts:
+    paths:
+      - build
+    expire_in: 1 week
+  needs: []
+
+compile:
+  stage: build
+  script:
+    - cd build
     - make clean # make sure we don't have residual compilation results
     - make -j $(nproc) 2>&1 | tee -a cmake.log # dump the log files
   artifacts:
     paths:
       - build
     expire_in: 1 week
-  needs: []
+  needs: [cmake]
+
+clang_tidy:
+  stage: build
+  tags:
+    - cvmfs
+  before_script:
+    - source $(find /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/Clang/current/ -mindepth 3 -maxdepth 3 -type f -name setup.sh)
+    - cd build
+  script:
+    - run-clang-tidy -use-color -checks 'clang-*' -warnings-as-errors '*'
+  needs: [cmake]

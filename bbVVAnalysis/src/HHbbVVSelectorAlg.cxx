@@ -115,8 +115,6 @@ namespace HHBBVV
       //************
       // lepton
       //************
-      int n_leptons = 0;
-      int n_looseleptons = 0;
       //example - needs to match bbVV definition
       for (const xAOD::Electron *electron : *electrons)
       {
@@ -125,10 +123,7 @@ namespace HHBBVV
         if (passElectronWP && electron->pt() > 18. * Athena::Units::GeV)
         {
           m_selected_el.set(*electron, true, sys);
-          n_leptons += 1;
         }
-        else
-          n_looseleptons += 1;
       }
 
       for (const xAOD::Muon *muon : *muons)
@@ -138,10 +133,7 @@ namespace HHBBVV
         if (passMuonWP && std::abs(muon->eta()) < 2.5 && muon->pt() > 15. * Athena::Units::GeV)
         {
           m_selected_mu.set(*muon, true, sys);
-          n_leptons += 1;
         }
-        else
-          n_looseleptons += 1;
       }
 
 

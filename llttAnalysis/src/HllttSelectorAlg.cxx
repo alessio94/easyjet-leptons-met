@@ -202,14 +202,12 @@ namespace HLLTT
       //************
       // jet
       //************
-      int n_jets = 0;
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
           SG::VIEW_ELEMENTS);
 
       for (const xAOD::Jet *jet : *jets)
       {
-	n_jets += 1;
 	if (WPgiven){
 	  if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5)
 	    bjets->push_back(jet);	      

@@ -7,7 +7,7 @@
 #include "boost/histogram.hpp"
 
 namespace {
-  constexpr double pi = std::atan2(0, -1);
+  constexpr const double & pi = std::numbers::pi;
 
   namespace bh = boost::histogram;
 
