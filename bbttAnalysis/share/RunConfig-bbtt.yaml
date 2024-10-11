@@ -1,3 +1,7 @@
 include: bbttAnalysis/RunConfig-bbtt-base.yaml
 
 channels: ["HadHad","LepHad","ZCR","TopEMuCR"]
+
+# Produce separate files per channel + CutBookKeeper
+splitOutputTree: true
+splitCBK: true

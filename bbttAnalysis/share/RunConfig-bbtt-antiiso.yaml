@@ -14,4 +14,9 @@ Muon:
   Iso: "NonIso"
   extra_wps:
     - ["Loose", "PflowLoose_VarRad"]
-    - ["Medium", "NonIso"] 
+    - ["Medium", "NonIso"]
+
+# Produce separate files per channel + CutBookKeeper
+# Overkill with a single channel but used for consistency with other multi-channel config
+splitOutputTree: true
+splitCBK: true

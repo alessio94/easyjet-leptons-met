@@ -64,7 +64,7 @@ def output_analysis_sequence(
     configSeq.setOptionValue('.metVars', met_branches)
     configSeq.setOptionValue('.treeName', treename)
     configSeq.setOptionValue('.streamName', streamname)
-    configSeq.setOptionValue('.postfix', treename)
+    configSeq.setOptionValue('.postfix', streamname)
 
     return configSeq
 
@@ -253,7 +253,7 @@ def minituple_output_cfg(
         f" to '{outfile_name}' via stream '{stream_name}'"
     )
 
-    outputSeq = CompFactory.AthSequencer('OutputSequence' + tree_name)
+    outputSeq = CompFactory.AthSequencer('OutputSequence' + stream_name)
     outputConfigAccumulator = ConfigAccumulator(
         outputSeq,
         autoconfigFromFlags=flags,
@@ -331,7 +331,7 @@ def minituple_cfg(
                 flags, tree_flags,
                 outfile_name=outfile,
                 stream_name=tree_flags.stream_name + channel,
-                tree_name=tree_flags.tree_name + channel,
+                tree_name=tree_flags.tree_name,
                 extra_output_branches=extra_output_branches
             ),
             channelSeqName,

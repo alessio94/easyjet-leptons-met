@@ -4,6 +4,7 @@ channels: ["HadHad","LepHad","ZCR","TopEMuCR"]
 
 bypass: true
 do_trigger_filtering: false
+splitOutputTree: false
 
 do_large_R_UFO_jets: true
 OverlapRemoval:
