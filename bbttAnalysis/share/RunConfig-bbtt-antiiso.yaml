@@ -16,7 +16,7 @@ Muon:
     - ["Loose", "PflowLoose_VarRad"]
     - ["Medium", "NonIso"]
 
-# Produce separate files per channel + CutBookKeeper
+# Produce separate files for CutBookKeeper
 # Overkill with a single channel but used for consistency with other multi-channel config
-splitOutputTree: true
+splitOutputTree: False
 splitCBK: true
