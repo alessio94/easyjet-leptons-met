@@ -27,6 +27,8 @@ dataset_number/I:physics_short/C:crossSection_pb/D:kFactor/D:genFiltEff/D:relUnc
 601481  PhPy8EG_PDF4LHC21_ttH125_tincl_gammagamma                   1.2939E-03      1.0  1.0   0.0  0.0
 602422  PhPy8EG_PDF4LHC21_ttH125_tincl_gammagamma_1file             1.2939E-03      1.0  1.0   0.0  0.0
 601710  PhPy8EG_PDF4LHC21_4FS_A14NNPDF_bbH_gammagamma               1.19538E-03     1.0  1.0   0.0  0.0
+545636  aMCPy8EG_tHjb125_4fl_gammagamma                            1.9E-04      1.0  1.0  0.0  0.0
+545639  aMCPy8EG_tWH125_gammagamma                                 3.9E-05      1.0  1.0  0.0  0.0
 800898  Py8EG_A14NNPDF23LO_XHS_X180_S050_HyySbb                    1.0E-03      1.0  1.0  0.0  0.0
 800899  Py8EG_A14NNPDF23LO_XHS_X200_S070_HyySbb                    1.0E-03      1.0  1.0  0.0  0.0
 800900  Py8EG_A14NNPDF23LO_XHS_X220_S090_HyySbb                    1.0E-03      1.0  1.0  0.0  0.0
