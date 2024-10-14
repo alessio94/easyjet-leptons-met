@@ -53,8 +53,8 @@ namespace HHBBLL {
 
     bool m_flag_res_fixed {false};
     bool m_flag_res_dynamic_const_x_met {false};
-    float m_res_fixed_value; // The fixed MET resolution value in (careful with units!)
-    float m_res_dynamic_const_x_met_value; // The constant factor to multiply the MET in dynamic resoluton
+    float m_res_fixed_value {0.}; // The fixed MET resolution value in (careful with units!)
+    float m_res_dynamic_const_x_met_value {0.}; // The constant factor to multiply the MET in dynamic resoluton
 
     uint m_eta_sampling_nsamples {20}; // how many sample points to do
 

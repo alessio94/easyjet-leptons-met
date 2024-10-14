@@ -8,9 +8,7 @@
 
 namespace HHBBLL {
   NeutrinoWeightingTool::NeutrinoWeightingTool(const std::string &type, const std::string &name, const IInterface *parent)
-  : AthAlgTool(type, name, parent)
-  , m_res_fixed_value(m_resolution_number)
-  , m_res_dynamic_const_x_met_value(m_resolution_number){
+    : AthAlgTool(type, name, parent){
   };
 
   StatusCode NeutrinoWeightingTool::initialize(){
@@ -24,6 +22,9 @@ namespace HHBBLL {
       ATH_MSG_ERROR("NW: You've asked for a resolution setting that doesn't exist. Please choose 'fixed' or 'dynamic'");
       return StatusCode::FAILURE;
     }
+
+    m_res_fixed_value = m_resolution_number;
+    m_res_dynamic_const_x_met_value = m_resolution_number;
 
     m_random = TRandom3(12345);
 
