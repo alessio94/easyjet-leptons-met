@@ -5,7 +5,6 @@ Truth:
 
 Small_R_jet:
   amount_bjet: 2
-  amount: 4
 
 Tau:
   amount: 0

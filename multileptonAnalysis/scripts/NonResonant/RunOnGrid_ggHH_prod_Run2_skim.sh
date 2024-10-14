@@ -1,4 +1,4 @@
-runConfig="multileptonAnalysis/RunConfig-multilepton.yaml"
+runConfig="multileptonAnalysis/RunConfig-multilepton-pure_lep.yaml"
 executable="hhml-ntupler"
 campaignName="HHML_v01"
 
@@ -32,9 +32,12 @@ easyjet-gridsubmit --data-list $dir_samples/data_Run2.txt \
     --HDBSProductionRole
 
 #mc
-easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
+for mc_file in "${mc_list[@]}"; do
+    cat "$mc_file"
+    echo # This adds a newline after each file's content
+done | easyjet-gridsubmit --mc-list /dev/stdin \
     --run-config ${runConfig} \
     --exec ${executable} \
     --campaign ${campaignName} \
     --noTag \
-    --HDBSProductionRole
+    --HDBSProductionRole # --noSubmit

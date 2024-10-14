@@ -27,7 +27,7 @@ Small_R_jet:
     - GN2v01_Continuous
     - DL1dv01_Continuous
   amount_bjet: 2
-  amount: 6 # maximum number of jets to consider (WWWW->2LSC + 4j + 2 VBF jets)
+  amount: 6
 
 Tau:
   ID: "RNNMedium"

@@ -84,19 +84,19 @@ namespace MULTILEPTON
 
   CH_ID SubChannelClassify::classify_id()
   {
-    if (m_n_bjets == 2 && m_n_leptons == 4 && m_n_taus == 0 &&
+    if (m_n_bjets >= 1 && m_n_bjets <= 3 && m_n_leptons == 4 && m_n_taus == 0 &&
         m_total_charge_lep == 0)
     {
       return CH_ID::hhbb4l;
     }
-    else if (m_n_bjets == 0 && m_n_taus == 0)
+    else if (m_n_taus == 0)
     {
       if (m_n_leptons == 3 && std::abs(m_total_charge_lep) == 1)
         return CH_ID::hh3l;
       else if (m_n_leptons == 2 && std::abs(m_total_charge_lep) == 2)
         return CH_ID::hh2lsc;
     }
-    else if (m_n_bjets == 0 && m_n_taus > 0)
+    else if (m_n_taus > 0)
     {
       if (m_n_leptons == 3 && std::abs(m_total_charge_lep) == 1 && m_n_taus == 1)
         return CH_ID::hh3l1tau;
