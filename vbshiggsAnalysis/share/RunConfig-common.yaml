@@ -2,6 +2,11 @@ include: EasyjetHub/base-config.yaml
 
 do_CP_systematics: false
 
+### tagging jets vs RNN strategy
+### false: select tagging jets ---> higgs candidate jets
+### true : select higgs candidate jets ---> load VBF-RNN
+UseVBFRNN : false
+
 # Toggles for object types
 do_muons: true
 do_electrons: true
