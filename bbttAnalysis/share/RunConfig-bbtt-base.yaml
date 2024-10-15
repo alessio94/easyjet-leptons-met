@@ -57,7 +57,7 @@ Muon:
 
 
 Tau:
-  ID: "RNNLoose"
+  ID: "RNNLoose_eleid"
   do_parent_decoration: true
   amount: 2
   variables: ["RNN"]

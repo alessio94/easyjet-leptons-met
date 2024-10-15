@@ -12,7 +12,8 @@ from EasyjetHub.algs.calibration.antitaus import HHbbttAntiTauDecoratorBlock
 
 def tau_sequence(flags, configAcc):
 
-    wps = ['Baseline', flags.Analysis.Tau.ID]
+    baseline_wp = 'Baseline' + ('_eleid' if "eleid" in flags.Analysis.Tau.ID else '')
+    wps = [baseline_wp, flags.Analysis.Tau.ID]
     if 'extra_wps' in flags.Analysis.Tau:
         for wp in flags.Analysis.Tau.extra_wps:
             wps.append(wp)
@@ -39,17 +40,18 @@ def tau_sequence(flags, configAcc):
         configSeq += makeConfig('TauJets.WorkingPoint',
                                 containerName=output_name,
                                 selectionName=id)
-        if "noeleid" in id:
-            configSeq.setOptionValue('.use_eVeto', False)
+        if "eleid" in id:
+            configSeq.setOptionValue('.use_eVeto', True)
         if "GNTau" in id:
             configSeq.setOptionValue('.useGNTau', True)
-        quality = id.replace("_noeleid", "").replace("GNTau", "").replace("RNN", "")
+        quality = id.replace("_eleid", "").replace("GNTau", "").replace("RNN", "")
         configSeq.setOptionValue('.quality', quality)
 
     # Anti-tau selections
     if flags.Analysis.do_bbtt_analysis:
         configSeq.append(HHbbttAntiTauDecoratorBlock())
         configSeq.setOptionValue('.taus', output_name)
+        configSeq.setOptionValue('.tauBaselineSelection', baseline_wp)
         configSeq.setOptionValue('.tauIDSelection', flags.Analysis.Tau.ID)
         muons = drop_sys(flags.Analysis.container_names.output.muons)
         muons += f'.{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'

@@ -30,14 +30,19 @@ def overlap_sequence(flags):
     # mapping of type to name
     preOR_collections = {}
     objflags = {x: f'do_{x}' for x in ['electrons', 'photons', 'muons', 'taus']}
+
+    tau_wp = flags.Analysis.Tau.ID
+    # Baseline always needed for TauAntiTauJet OR
+    if flags.Analysis.OverlapRemoval.doTauAntiTauJet:
+        tau_wp = 'Baseline' + ('_eleid' if "eleid" in flags.Analysis.Tau.ID else '')
+
     ORselections = dict(
         electrons=f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}',
         photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
         muons=f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}',
-        # Baseline always needed for TauAntiTauJet OR
-        taus=('Baseline' if flags.Analysis.OverlapRemoval.doTauAntiTauJet
-              else flags.Analysis.Tau.ID),
+        taus=tau_wp,
     )
+
     # Construct the names of the view containers with working point selection
     # We need to use the '.' style so that the algs operate on the full
     # container, and avoid incomplete decorations

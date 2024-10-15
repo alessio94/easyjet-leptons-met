@@ -53,13 +53,15 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                                    containerInEleKey=electronkey,
                                    containerInMuKey=muonkey))
 
+    baseline_wp = 'Baseline' + (
+        '_eleid' if "eleid" in flags.Analysis.Tau.ID else '')
     cfg.merge(TauSelectorAlgCfg(flags,
                                 # Baseline always needed for anti-taus
                                 containerInKey=taukey,
                                 keepAntiTaus=True,
                                 containerOutKey="bbttAnalysisTaus_%SYS%",
                                 # used to filter collection
-                                looseTauWP='Baseline',
+                                looseTauWP=baseline_wp,
                                 # used for subsequent event selections
                                 # only used to decorate flags + scale factors
                                 tightTauWPs=[flags.Analysis.Tau.ID]))

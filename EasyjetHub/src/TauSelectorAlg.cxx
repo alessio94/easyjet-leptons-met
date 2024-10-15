@@ -51,11 +51,12 @@ namespace Easyjet
     // Scale factors
     if(m_isMC){
       std::vector<std::string> wps = m_tightTauWPs;
-      if(m_looseTauWP!="Baseline") wps.emplace_back(m_looseTauWP);
+      wps.emplace_back(m_looseTauWP);
       for(const auto& wp : wps){
         m_tau_recoSF.emplace_back("tau_Reco_effSF_"+wp+"_%SYS%", this);
-        m_tau_IDSF.emplace_back("tau_ID_effSF_"+wp+"_%SYS%", this);
-        bool eVetoAvailable = wp.find("noeleid")==std::string::npos;
+        bool tauIDAvailable = wp.find("Baseline")==std::string::npos;
+        m_tau_IDSF.emplace_back(tauIDAvailable ? "tau_ID_effSF_"+wp+"_%SYS%" : "", this);
+        bool eVetoAvailable = wp.find("eleid")!=std::string::npos;
         m_tau_eVetoFakeTauSF.emplace_back(eVetoAvailable ? "tau_EvetoFakeTau_effSF_"+wp+"_%SYS%" : "", this);
         m_tau_eVetoTrueTauSF.emplace_back(eVetoAvailable ? "tau_EvetoTrueTau_effSF_"+wp+"_%SYS%" : "", this);
         m_tau_SF_out.emplace_back("tau_effSF_"+wp+"_%SYS%", this);
@@ -148,8 +149,9 @@ namespace Easyjet
           for(unsigned int i=0; i<wps.size(); i++){
             std::string wp = wps[i];
             float SF = m_tau_recoSF[i].get(*tau,sys);
-            SF *=  m_tau_IDSF[i].get(*tau,sys);
-            if(wp.find("noeleid")==std::string::npos){
+            if(wp.find("Baseline")==std::string::npos)
+              SF *=  m_tau_IDSF[i].get(*tau,sys);
+            if(wp.find("eleid")!=std::string::npos){
               SF *= m_tau_eVetoFakeTauSF[i].get(*tau,sys);
               SF *= m_tau_eVetoTrueTauSF[i].get(*tau,sys);
             }
