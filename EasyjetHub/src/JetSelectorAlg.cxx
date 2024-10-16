@@ -48,6 +48,10 @@ namespace Easyjet
 
     if(m_useJVT) ATH_CHECK (m_jvtselection.initialize(m_systematicsList, m_inHandle));
     if(m_useFJVT) ATH_CHECK (m_fjvtselection.initialize(m_systematicsList, m_inHandle));
+    if(!m_nmuons_in.empty()){
+      ATH_CHECK (m_nmuons_in.initialize(m_systematicsList, m_inHandle));
+      ATH_CHECK (m_nmuons_out.initialize(m_systematicsList, m_outHandle));
+    }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -137,6 +141,7 @@ namespace Easyjet
           isSelected = true;
         }
         if (PCBTaggiven) workContainer_pcbt[jet] = m_PCBT.get(*jet, sys);
+        if(!m_nmuons_in.empty()) m_nmuons_out.set(*jet, m_nmuons_in.get(*jet, sys), sys);
         m_isSelectedJet.set(*jet, isSelected, sys);
       }
       

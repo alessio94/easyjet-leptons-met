@@ -40,7 +40,7 @@ def get_large_R_jet_branches(
             large_R_jet_branches.variables += ["passesOR_%SYS%"]
 
     if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
-        large_R_jet_branches.variables += ["uncorrPt", "n_muons"]
+        large_R_jet_branches.variables += ["n_muons_%SYS%"]
 
     if flags.Input.isMC and tree_flags.collection_options.large_R_jets.truth_labels:
         large_R_jet_branches.variables += [

@@ -73,16 +73,20 @@ def get_small_R_jet_branches(
                         f"ftag_effSF_{btag_wp}_%SYS%"
                     ]
 
-        if flags.Analysis.Small_R_jet.runBJetPtCalib \
-           and tree_flags.collection_options.small_R_jets.no_bjet_calib_p4:
-            small_R_jet_branches.variables += ["muonCorrPt", "n_muons"]
+        if flags.Analysis.Small_R_jet.runBJetPtCalib:
+            small_R_jet_branches.variables += ["n_muons_%SYS%"]
             if flags.Input.isMC:
                 small_R_jet_branches.variables += ["bJetTruthPt", "bJetTruthDR"]
 
-            small_R_jet_branches.variables += [
-                f"NoBJetCalibMomentum_{var}"
-                for var in ["pt", "eta", "phi", "m"]
-            ]
+            if tree_flags.collection_options.small_R_jets.no_bjet_calib_p4:
+                small_R_jet_branches.variables += [
+                    f"NoBJetCalibMomentum_{var}"
+                    for var in ["pt", "eta", "phi", "m"]
+                ]
+                small_R_jet_branches.variables += [
+                    f"MuonCorrMomentum_{var}"
+                    for var in ["pt", "eta", "phi", "m"]
+                ]
 
         if tree_flags.collection_options.small_R_jets.JVT_details:
             small_R_jet_branches.variables += [

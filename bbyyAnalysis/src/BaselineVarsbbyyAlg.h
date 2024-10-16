@@ -179,6 +179,9 @@ namespace HHBBYY
     CP::SysReadDecorHandle<int> 
     m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
+    CP::SysReadDecorHandle<int>
+    m_nmuons{ this, "nmuons", "n_muons_%SYS%", "Number of muons from muon-in-jet correction"};
+
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_photonHandle{ this, "photons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
 

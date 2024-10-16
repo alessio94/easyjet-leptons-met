@@ -57,6 +57,10 @@ private:
     CP::SysReadDecorHandle<char> m_jvtselection {"jvt_selection", this};
     CP::SysReadDecorHandle<char> m_fjvtselection {"fjvt_selection", this};
 
+    CP::SysReadDecorHandle<int> m_nmuons_in{this, "nmuons", "",
+	"Number of muons from muon-in-jet correction"};
+    CP::SysWriteDecorHandle<int> m_nmuons_out{"n_muons_%SYS%", this};
+
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
     m_outHandle{ this, "containerOutKey", "",   "Jet container to write" };

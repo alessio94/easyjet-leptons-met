@@ -1,6 +1,3 @@
-[submodule "BJetCalibrationTool"]
-	path = BJetCalibrationTool
-	url = https://gitlab.cern.ch/r3hh-public/b-jet-energy-corrections.git
 [submodule "KinematicFitTool"]
 	path = KinematicFitTool
 	url = https://gitlab.cern.ch/r3hh-public/KinematicFit.git

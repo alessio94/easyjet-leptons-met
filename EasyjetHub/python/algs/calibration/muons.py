@@ -20,6 +20,7 @@ def muon_sequence(flags, configAcc):
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.muons)
     configSeq += makeConfig('Muons', containerName=output_name)
+    configSeq.setOptionValue('.minPt', flags.Analysis.Muon.min_pT)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
 
     # PID configuration
@@ -35,6 +36,14 @@ def muon_sequence(flags, configAcc):
                                  flags.Analysis.Muon.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',
                                  flags.Analysis.Muon.maxDeltaZ0SinTheta)
+
+    if flags.Analysis.Small_R_jet.runBJetPtCalib or \
+       flags.Analysis.Large_R_jet.runMuonJetPtCorr:
+        configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
+                                selectionName='forBJetCalib')
+        configSeq.setOptionValue('.quality', 'Medium')
+        configSeq.setOptionValue('.isolation', 'NonIso')
+        configSeq.setOptionValue('.trackSelection', False)
 
     # Muon trigger SF
     trigSF_flags = flags.Analysis.Trigger.scale_factor

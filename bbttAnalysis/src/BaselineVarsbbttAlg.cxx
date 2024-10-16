@@ -74,6 +74,7 @@ namespace HHBBTT
     if (m_isMC) {
       ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
     }
+    ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_jetHandle));
 
     ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_tauHandle));
     ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_tauHandle));
@@ -133,10 +134,6 @@ namespace HHBBTT
       for (const auto& var: m_intVariables) {
         m_Ibranches.at(var).set(*event, -99, sys);
       }
-
-      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
-      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
-      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
 
       static const SG::AuxElement::ConstAccessor<char> cacc_EleRNNLoose("EleRNNLoose_v1");
       static const SG::AuxElement::ConstAccessor<char> cacc_EleRNNMedium("EleRNNMedium_v1");
@@ -290,9 +287,12 @@ namespace HHBBTT
             new_var.erase(new_var.length() - 11, new_var.length()); // remove '_Continuous' from var name
             m_Ibranches.at(prefix+"_pcbt_"+new_var).set(*event, m_PCBTs.at(var).get(*bjets->at(i), sys), sys);
           }
-          m_Ibranches.at(prefix+"_nmuons").set(*event, cacc_NMu(*bjets->at(i)), sys);
-	  m_Fbranches.at(prefix+"_uncorrPt").set(*event, cacc_UncorrPt(*bjets->at(i)), sys);
-	  m_Fbranches.at(prefix+"_muonCorrPt").set(*event, cacc_MuonCorrPt(*bjets->at(i)), sys);
+          m_Ibranches.at(prefix+"_nmuons").set
+	    (*event, m_nmuons.get(*bjets->at(i), sys), sys);
+          float uncorrPt = bjets->at(i)->jetP4("NoBJetCalibMomentum").Pt();
+          m_Fbranches.at(prefix+"_uncorrPt").set(*event, uncorrPt, sys);
+          float muonCorrPt = bjets->at(i)->jetP4("MuonCorrMomentum").Pt();
+          m_Fbranches.at(prefix+"_muonCorrPt").set(*event, muonCorrPt, sys);
         }
 
         TLorentzVector b1 = bjets->at(0)->p4();

@@ -35,6 +35,7 @@ namespace HHBBYY
     if (!m_PCBT.empty()) {
       ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
     }
+    ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_jetHandle));
 
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
@@ -548,16 +549,16 @@ namespace HHBBYY
       const xAOD::Jet* jet = Hbb_jets[i];
 
       static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
-      static const SG::AuxElement::ConstAccessor<int> cacc_NMu("n_muons");
-      static const SG::AuxElement::ConstAccessor<float> cacc_UncorrPt("uncorrPt");
-      static const SG::AuxElement::ConstAccessor<float> cacc_MuonCorrPt("muonCorrPt");
 
       bool PCBTgiven = !m_PCBT.empty();
 
       std::string prefix_bjet = prefix + "HbbCandidate_Jet"+std::to_string(i+1);
-      m_Ibranches.at(prefix_bjet+"_n_muons").set(*event, cacc_NMu(*jet), sys);
-      m_Fbranches.at(prefix_bjet+"_uncorrPt").set(*event, cacc_UncorrPt(*jet), sys);
-      m_Fbranches.at(prefix_bjet+"_muonCorrPt").set(*event, cacc_MuonCorrPt(*jet), sys);
+      m_Ibranches.at(prefix_bjet+"_n_muons").set
+	(*event, m_nmuons.get(*jet, sys), sys);
+      float uncorrPt = jet->jetP4("NoBJetCalibMomentum").Pt();
+      m_Fbranches.at(prefix_bjet+"_uncorrPt").set(*event, uncorrPt, sys);
+      float muonCorrPt = jet->jetP4("MuonCorrMomentum").Pt();
+      m_Fbranches.at(prefix_bjet+"_muonCorrPt").set(*event, muonCorrPt, sys);
 
       TLorentzVector jet_tlv = jet->p4();
       m_Fbranches.at(prefix_bjet+"_pt").set(*event, jet_tlv.Pt(), sys);

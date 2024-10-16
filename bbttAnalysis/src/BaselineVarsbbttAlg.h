@@ -118,6 +118,7 @@ private:
 
     CP::SysReadDecorHandle<int>
       m_truthFlav{ this, "truthFlav", "HadronConeExclTruthLabelID", "Jet truth flavor" };
+    CP::SysReadDecorHandle<int> m_nmuons{"n_muons_%SYS%", this};
 
     CP::SysReadDecorHandle<unsigned int> m_year{this, "year", "dataTakingYear", ""};
 

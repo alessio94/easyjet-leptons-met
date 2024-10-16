@@ -2,8 +2,6 @@ from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AthenaConfiguration.Enums import LHCPeriod
 
-from BJetCalibrationTool.BJetPtCorrectionConfig import makeBJetPtCalibrationConfig
-
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
 
@@ -142,19 +140,12 @@ def jet_sequence(
                 configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
 
         if jet_flags.runBJetPtCalib:
-            # Pick a reasonable b-tag selection?
-            makeBJetPtCalibrationConfig(
-                configSeq,
-                calib_name,
-            )
-            configSeq.setOptionValue(
-                '.muonName',
-                flags.Analysis.container_names.output.muons
-            )
-            configSeq.setOptionValue(
-                '.btagSelDecor',
-                "ftag_select_" + jet_flags.btag_wp,
-            )
+            configSeq += makeConfig(
+                'Jets.BJetCalib',
+                jetContainerName=calib_name,
+                muonContainerName=drop_sys(flags.Analysis.container_names.output.muons))
+            configSeq.setOptionValue('.jetPreselection', jet_flags.btag_wp)
+            configSeq.setOptionValue('.muonPreselection', "forBJetCalib")
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
@@ -214,14 +205,11 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 
     # Optional muon-in-jet correction for large-R jets
     if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
-        makeBJetPtCalibrationConfig(
-            configSeq,
-            output_name,
-        )
-        configSeq.setOptionValue(
-            '.muonName',
-            flags.Analysis.container_names.output.muons
-        )
+        configSeq += makeConfig(
+            'Jets.BJetCalib',
+            jetContainerName=output_name,
+            muonContainerName=drop_sys(flags.Analysis.container_names.output.muons))
+        configSeq.setOptionValue('.muonPreselection', "forBJetCalib")
         # Disable small-R b-jet pT reco
         configSeq.setOptionValue('.doPtCorr', False)
 
