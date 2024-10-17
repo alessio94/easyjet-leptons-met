@@ -385,9 +385,9 @@ namespace HHBBYY
             float KF_bbyy_mStar = HH_KF.M() - (H_bb_KF.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
             m_Fbranches.at("KF_mbbyy").set(*event, HH_KF.M(), sys);
             m_Fbranches.at("KF_mbbyystar").set(*event, KF_bbyy_mStar, sys);
-            m_Fbranches.at("KF_pTbbyy").set(*event, HH_KF.M(), sys);
-            m_Fbranches.at("KF_Etabbyy").set(*event, HH_KF.M(), sys);
-            m_Fbranches.at("KF_Phibbyy").set(*event, HH_KF.M(), sys);
+            m_Fbranches.at("KF_pTbbyy").set(*event, HH_KF.Pt(), sys);
+            m_Fbranches.at("KF_Etabbyy").set(*event, HH_KF.Eta(), sys);
+            m_Fbranches.at("KF_Phibbyy").set(*event, HH_KF.Phi(), sys);
             m_Fbranches.at("KF_dRHH").set(*event, H_yy.DeltaR(H_bb_KF), sys);
 
           }
