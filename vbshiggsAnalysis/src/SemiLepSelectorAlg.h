@@ -58,7 +58,7 @@ namespace VBSHIGGS{
 
       void leptonSelection(const xAOD::ElectronContainer& electrons,const xAOD::MuonContainer& muons, const xAOD::MissingET *met);
       void vbsjetsSelection(const xAOD::JetContainer * vbsjets);
-      void resolvedSelection(const xAOD::JetContainer *HJets, std::vector<const xAOD::Jet*> bjets, const CP::SystematicSet& sys);
+      void resolvedSelection(const xAOD::JetContainer *HJets, const std::vector<const xAOD::Jet*>& bjets, const CP::SystematicSet& sys);
       void boostedSelection(const xAOD::JetContainer *largeJets, const CP::SystematicSet& sys);
       
       Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };

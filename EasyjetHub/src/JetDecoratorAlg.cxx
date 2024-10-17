@@ -202,7 +202,7 @@ namespace Easyjet
                   { // regex match
                     std::string legName_noMultiplicity = match[2].str() + match[3].str() + match[4].str();
                     int threshold = match[3].str()=="" ? 1 : std::stoi(match[3].str());
-                    for (auto thr : thrNames)
+                    for (const auto &thr : thrNames)
                     { // compare with passed thresholds
                       if (thr == legName_noMultiplicity)
                       {

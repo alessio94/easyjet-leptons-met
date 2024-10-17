@@ -98,23 +98,23 @@ namespace HHBBLL {
                                                     double mW);
 
     ///-- Getters for objects --///
-    std::vector<TLorentzVector> GetTops(){  return m_tops;};
-    std::vector<TLorentzVector> GetTbars(){ return m_tbars;};
-    std::vector<TLorentzVector> GetNus(){   return m_nus;};
-    std::vector<TLorentzVector> GetNubars(){return m_nubars;};
-    std::vector<TLorentzVector> GetWposs(){ return m_Wposs;};
-    std::vector<TLorentzVector> GetWnegs(){ return m_Wnegs;};
-    TLorentzVector              GetTop(){   return m_highestWeightTop;};
-    TLorentzVector              GetTbar(){  return m_highestWeightTbar;};
-    TLorentzVector              GetNu(){    return m_highestWeightNu;};
-    TLorentzVector              GetNubar(){ return m_highestWeightNubar;};
-    TLorentzVector              GetWpos(){  return m_highestWeightWpos;};
-    TLorentzVector              GetWneg(){  return m_highestWeightWneg;};
+    const std::vector<TLorentzVector>& GetTops(){  return m_tops;};
+    const std::vector<TLorentzVector>& GetTbars(){ return m_tbars;};
+    const std::vector<TLorentzVector>& GetNus(){   return m_nus;};
+    const std::vector<TLorentzVector>& GetNubars(){return m_nubars;};
+    const std::vector<TLorentzVector>& GetWposs(){ return m_Wposs;};
+    const std::vector<TLorentzVector>& GetWnegs(){ return m_Wnegs;};
+    TLorentzVector                      GetTop(){   return m_highestWeightTop;};
+    TLorentzVector                      GetTbar(){  return m_highestWeightTbar;};
+    TLorentzVector                      GetNu(){    return m_highestWeightNu;};
+    TLorentzVector                      GetNubar(){ return m_highestWeightNubar;};
+    TLorentzVector                      GetWpos(){  return m_highestWeightWpos;};
+    TLorentzVector                      GetWneg(){  return m_highestWeightWneg;};
 
 
     ///-- Functions Related to weights --///
-    std::vector<float> GetWeights(){return m_weights;};
-    float              GetWeight(){ return m_highestWeight;};
+    const std::vector<float>& GetWeights(){return m_weights;};
+    float                     GetWeight(){ return m_highestWeight;};
     void SetWeightThreshold(double choice=0.0){m_weight_threshold=choice;};
 
 
@@ -137,7 +137,7 @@ namespace HHBBLL {
 
 
     ///-- Other helper functions --///
-    TLorentzVector Average(std::vector<TLorentzVector> vecs);
+    TLorentzVector Average(const std::vector<TLorentzVector>& vecs);
     void SetRandomSeed(int seed){m_random.SetSeed(seed);};
     void StopAfterFirstSolution(bool choice=false){m_stop_after_first_solution = choice;};
 

@@ -155,8 +155,8 @@ namespace HHBBYY
 
     std::vector<double> compute_angular_variables_CM(const TLorentzVector& lz_photon1,const TLorentzVector& lz_photon2,const TLorentzVector& lz_b_jet1,const TLorentzVector& lz_b_jet2);
 
-    void fill_bb_branches(std::vector<const xAOD::Jet*> Hbb_jets, std::string prefix, const xAOD::EventInfo *event, const auto& sys);
-    void fill_bbyy_branches(std::vector<const xAOD::Jet*> Hbb_jets, std::vector<const xAOD::Photon*> Hyy_photons, std::string prefix, const xAOD::EventInfo *event, const auto& sys);
+    void fill_bb_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys);
+    void fill_bbyy_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::vector<const xAOD::Photon*> &Hyy_photons, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys);
     void loadGNN(const std::string &filePath);
 
     std::vector<const xAOD::Jet*> getHbb_GNN_ggFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys);

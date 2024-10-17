@@ -121,7 +121,7 @@ private:
     std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> getPairKinematics(const xAOD::JetContainer& jetPairs);
     std::tuple<double, double, double> calculateVectorStats(const std::vector<double>& inputVector);
     double computeChiSquaretops(const ConstDataVector<xAOD::JetContainer>& jets,
-				std::vector<std::tuple<int, double>> leptonmasses,
+				const std::vector<std::tuple<int, double>> &leptonmasses,
 				TLorentzVector met,
 				bool top_had,
 				std::vector<unsigned int> &jet_locations,

@@ -544,7 +544,7 @@ namespace HHBBYY
     return StatusCode::SUCCESS;
   }
 
-  void BaselineVarsbbyyAlg::fill_bb_branches(std::vector<const xAOD::Jet*> Hbb_jets, std::string prefix, const xAOD::EventInfo *event, const auto& sys) {
+  void BaselineVarsbbyyAlg::fill_bb_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys) {
     for(unsigned int i =0; i<2; i++){
       const xAOD::Jet* jet = Hbb_jets[i];
 
@@ -583,7 +583,7 @@ namespace HHBBYY
     m_Fbranches.at(prefix+"dRbb").set(*event, Hbb_jets[0]->p4().DeltaR(Hbb_jets[1]->p4()), sys);
   }
 
-  void BaselineVarsbbyyAlg::fill_bbyy_branches(std::vector<const xAOD::Jet*> Hbb_jets, std::vector<const xAOD::Photon*> Hyy_photons, std::string prefix, const xAOD::EventInfo *event, const auto& sys) {
+  void BaselineVarsbbyyAlg::fill_bbyy_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::vector<const xAOD::Photon*> &Hyy_photons, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys) {
     TLorentzVector H_bb = Hbb_jets[0]->p4() + Hbb_jets[1]->p4();
     TLorentzVector H_yy = Hyy_photons[0]->p4() + Hyy_photons[1]->p4();
 

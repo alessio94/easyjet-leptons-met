@@ -144,7 +144,7 @@ namespace bhist {
       const std::string name,
       PairingFunction,
       TruthMatchFunction = true_func);
-    void fill(const Jets, float weight);
+    void fill(const Jets& jets, float weight);
     void write(H5::Group& output_group);
   private:
     decltype(make_mass_hist()) m_hist;
@@ -169,7 +169,7 @@ namespace bhist {
   }
 
 
-  void MassHist::fill(const Jets jets, float weight) {
+  void MassHist::fill(const Jets& jets, float weight) {
     auto pairs = m_pair(jets);
     assert(pairs.size() == 2);
     if (!m_truth_match(pairs)) return;

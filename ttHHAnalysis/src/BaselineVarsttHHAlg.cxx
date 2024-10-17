@@ -547,7 +547,7 @@ namespace ttHH
 
   double BaselineVarsttHHAlg::computeChiSquaretops
   (const ConstDataVector<xAOD::JetContainer>& jets,
-   std::vector<std::tuple<int, double>> leptonmasses,
+   const std::vector<std::tuple<int, double>> &leptonmasses,
    TLorentzVector met,
    bool top_had,
    std::vector<unsigned int> &jet_locations,

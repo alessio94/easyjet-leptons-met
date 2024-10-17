@@ -346,7 +346,7 @@ namespace HHBBLL {
   }
 
 
-  TLorentzVector NeutrinoWeightingTool::Average(std::vector<TLorentzVector> vecs){
+  TLorentzVector NeutrinoWeightingTool::Average(const std::vector<TLorentzVector>& vecs){
 
     double average_m = 0;
     TVector3 three_vecs = TVector3();

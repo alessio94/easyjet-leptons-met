@@ -243,7 +243,7 @@ namespace VBSHIGGS{
   }//vbsjetsSelection
 
   //Resolved Analysis
-  void SemiLepSelectorAlg :: resolvedSelection(const xAOD::JetContainer *HJets, std::vector<const xAOD::Jet*> bjets, const CP::SystematicSet& sys){
+  void SemiLepSelectorAlg :: resolvedSelection(const xAOD::JetContainer *HJets, const std::vector<const xAOD::Jet*>& bjets, const CP::SystematicSet& sys){
     int mNBJets = bjets.size();
 
     // require exactly 2 bjets in the event

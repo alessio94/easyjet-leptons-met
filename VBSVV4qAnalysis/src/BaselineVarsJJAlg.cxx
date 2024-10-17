@@ -139,7 +139,7 @@ namespace VBSVV4q{
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_ptop").set(*event, ptop, sys);
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_DXbb").set(*event, XbbScore, sys);
 
-          for(auto jss : m_JSS_list){
+          for(const auto & jss : m_JSS_list){
             float jss_var = m_JSS.at(jss).get(*jet, sys);
             m_Fbranches.at("SigJet" + std::to_string(iii) + "_" + jss).set(*event, jss_var, sys);
           }
