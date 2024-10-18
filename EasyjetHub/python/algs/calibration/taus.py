@@ -12,8 +12,7 @@ from EasyjetHub.algs.calibration.antitaus import HHbbttAntiTauDecoratorBlock
 
 def tau_sequence(flags, configAcc):
 
-    baseline_wp = 'Baseline' + ('_eleid' if "eleid" in flags.Analysis.Tau.ID else '')
-    wps = [baseline_wp, flags.Analysis.Tau.ID]
+    wps = [flags.Analysis.Tau.ID]
     if 'extra_wps' in flags.Analysis.Tau:
         for wp in flags.Analysis.Tau.extra_wps:
             wps.append(wp)
@@ -51,8 +50,8 @@ def tau_sequence(flags, configAcc):
     if flags.Analysis.do_bbtt_analysis:
         configSeq.append(HHbbttAntiTauDecoratorBlock())
         configSeq.setOptionValue('.taus', output_name)
-        configSeq.setOptionValue('.tauBaselineSelection', baseline_wp)
-        configSeq.setOptionValue('.tauIDSelection', flags.Analysis.Tau.ID)
+        configSeq.setOptionValue('.tauBaselineSelection', flags.Analysis.Tau.ID)
+        configSeq.setOptionValue('.tauIDSelection', flags.Analysis.Tau.extra_wps[0])
         muons = drop_sys(flags.Analysis.container_names.output.muons)
         muons += f'.{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
         configSeq.setOptionValue('.muons', muons)

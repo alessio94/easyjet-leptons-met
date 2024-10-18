@@ -48,14 +48,9 @@ def hhml_cfg(
 
     cfg.merge(TauSelectorAlgCfg(
         flags,
-        # Baseline always needed for anti-taus
         containerInKey=taukey,
         containerOutKey="hhmlAnalysisTaus_%SYS%",
-        # used to filter collection
-        looseTauWP='Baseline',
-        # used for subsequent event selections
-        # only used to decorate flags + scale factors
-        tightTauWPs=[flags.Analysis.Tau.ID],
+        looseTauWP=flags.Analysis.Tau.ID
     ))
 
     cfg.merge(JetSelectorAlgCfg(

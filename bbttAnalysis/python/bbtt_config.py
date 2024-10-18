@@ -53,18 +53,16 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                                    containerInEleKey=electronkey,
                                    containerInMuKey=muonkey))
 
-    baseline_wp = 'Baseline' + (
-        '_eleid' if "eleid" in flags.Analysis.Tau.ID else '')
     cfg.merge(TauSelectorAlgCfg(flags,
                                 # Baseline always needed for anti-taus
                                 containerInKey=taukey,
                                 keepAntiTaus=True,
                                 containerOutKey="bbttAnalysisTaus_%SYS%",
                                 # used to filter collection
-                                looseTauWP=baseline_wp,
+                                looseTauWP=flags.Analysis.Tau.ID,
                                 # used for subsequent event selections
                                 # only used to decorate flags + scale factors
-                                tightTauWPs=[flags.Analysis.Tau.ID]))
+                                tightTauWPs=flags.Analysis.Tau.extra_wps))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,
@@ -79,7 +77,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-            tauWP=flags.Analysis.Tau.ID,
+            tauWP=flags.Analysis.Tau.extra_wps[0],
             muonWPs=muon_WPs,
             eleWPs=ele_WPs,
             eventDecisionOutputDecoration=(
@@ -135,7 +133,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                 isMC=flags.Input.isMC,
                 eleWPs=ele_WPs,
                 muonWPs=muon_WPs,
-                tauWP=flags.Analysis.Tau.ID,
+                tauWP=flags.Analysis.Tau.extra_wps[0],
                 bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
                 floatVariableList=float_variables,
@@ -150,7 +148,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             isMC=flags.Input.isMC,
             eleWPs=ele_WPs,
             muonWPs=muon_WPs,
-            tauWP=flags.Analysis.Tau.ID,
+            tauWP=flags.Analysis.Tau.extra_wps[0],
             eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
             muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
             tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau')

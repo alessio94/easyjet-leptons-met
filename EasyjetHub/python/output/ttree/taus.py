@@ -29,8 +29,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
 
     id_wps = [flags.Analysis.Tau.ID]
     if 'extra_wps' in flags.Analysis.Tau:
-        for wp in flags.Analysis.Tau.extra_wps:
-            id_wps.append(wp[0] + "_" + wp[1])
+        id_wps += flags.Analysis.Tau.extra_wps
 
     tau_branches.variables += [
         f"baselineSelection_{id_wp}_%SYS%"
