@@ -64,6 +64,9 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Input.isMC and tree_flags.collection_options.taus.truth_parent_info:
         tau_branches.variables += get_TopHiggs_tau_truth_labels(flags)
 
+    if flags.Input.isMC:
+        tau_branches.variables += ["tauTruthJetLabel"]
+
     # Requires TauSelectorAlg to be run
     if tree_flags.collection_options.taus.run_selection:
         if flags.Input.isMC:
