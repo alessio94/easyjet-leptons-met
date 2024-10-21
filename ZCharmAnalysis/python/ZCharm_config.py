@@ -62,11 +62,15 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
         for c in flags.Analysis.TriggerChains
     ]
 
+    btag_pcbt_wps \
+        = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp]
+
     # Selection
     cfg.addEventAlgo(
         CompFactory.ZCC.ZCharmSelectorAlg(
             "ZCharmSelectorAlg",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+            PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
             eventDecisionOutputDecoration="ZCharm_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_ZCharm_cutflow,
@@ -78,6 +82,9 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
         )
     )
 
+    btag_pcbt_wps \
+        = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp]
+
     # calculate final ZCharm vars
     cfg.addEventAlgo(
         CompFactory.ZCC.BaselineVarsZCharmAlg(
@@ -86,6 +93,7 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+            PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
             floatVariableList=float_variables,
             intVariableList=int_variables
         )
@@ -98,13 +106,17 @@ def get_BaselineVarsZCharmAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ll", "jj", "bb"]:
+    for object in ["ll", "jj", "bb", "cc"]:
         for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
-    float_variable_names += ["pT_over_mbb"]
+    for object in ["Zj", "Zb", "Zc"]:
+        for var in ["dR", "dPhi"]:
+            float_variable_names.append(f"{var}{object}")
+
+    float_variable_names += ["pT_over_mbb", "pT_over_mcc"]
     float_variable_names += ["METSig"]
-    int_variable_names += ["nJets", "nBJets", "nLargeRJets"]
+    int_variable_names += ["nJets", "nBJets", "nCJets", "nLargeRJets"]
     int_variable_names += ["nElectrons", "nMuons", "nLeptons"]
 
     return float_variable_names, int_variable_names

@@ -22,13 +22,16 @@ Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_85"
   amount: 2
   amount_bjet: 2
+  amount_cjet: 2
   # to use multiple btagging WPs
   btag_extra_wps:
     - GN2v01_Continuous2D
+    - GN2v01_Continuous
     - GN2v01_FixedCutBEff_77
     - GN2v01_FixedCutBEff_70
-    
-  variables_int_bjets: ["truthLabel", "pcbt_GN2v01"]
+  
+  variables_int_bjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]    
+  variables_int_cjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]
 
 Large_R_jet:
   amount: 1
@@ -80,6 +83,8 @@ CutList :
       - MET
       - ONE_B_JETS
       - TWO_B_JETS
+      - ONE_C_JETS
+      - TWO_C_JETS
 
 Categories :
       - IS_ee

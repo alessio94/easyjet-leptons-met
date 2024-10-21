@@ -60,6 +60,8 @@ namespace ZCC
     MET,
     ONE_B_JETS,
     TWO_B_JETS,
+    ONE_C_JETS,
+    TWO_C_JETS,
     ONE_LARGE_JET,
   };
 
@@ -85,6 +87,8 @@ namespace ZCC
         "MET",
         "ONE_B_JETS",
         "TWO_B_JETS",
+        "ONE_C_JETS",
+        "TWO_C_JETS",
         "ONE_LARGE_JET",
       };
 
@@ -110,6 +114,10 @@ namespace ZCC
 
       CP::SysReadDecorHandle<char> 
       m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+ 
+      Gaudi::Property<std::vector<std::string>> m_PCBTnames
+        {this, "PCBTDecorList", {}, "Name list of pseudo-continuous b-tagging decorator"};
+      std::unordered_map<std::string, CP::SysReadDecorHandle<int>> m_PCBTs;
 
       CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
@@ -173,6 +181,8 @@ namespace ZCC
         {ZCC::MET, "MET"},
         {ZCC::ONE_B_JETS, "ONE_B_JETS"},
         {ZCC::TWO_B_JETS, "TWO_B_JETS"},
+        {ZCC::ONE_C_JETS, "ONE_C_JETS"},
+        {ZCC::TWO_C_JETS, "TWO_C_JETS"},
         {ZCC::ONE_LARGE_JET, "ONE_LARGE_JET"},
       };
 
@@ -209,6 +219,7 @@ namespace ZCC
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, const xAOD::MissingET* met, CutManager& ZCharmCuts);
       void evaluateBJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, CutManager& ZCharmCuts);
+      void evaluateCJetCuts(const ConstDataVector<xAOD::JetContainer>& cjets, CutManager& ZCharmCuts);
       void evaluateLargeJetCuts(const xAOD::JetContainer *largeJets);
       void setThresholds(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
   };

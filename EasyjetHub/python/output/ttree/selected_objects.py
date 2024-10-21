@@ -45,6 +45,22 @@ def get_selected_objects_branches_variables(flags, analysis):
                         -> {analysis}_Jet_b{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
+    # C tagged jets
+    for var in [*flags.Analysis.Small_R_jet.variables_int_cjets,
+                *flags.Analysis.Small_R_jet.variables_cjets]:
+        if not flags.Input.isMC and "SF" in var:
+            continue
+        for index in range(flags.Analysis.Small_R_jet.amount_cjet):
+            # Store the float and int variables
+            if var in flags.Analysis.Small_R_jet.variables_cjets:
+                float_variable_names += [f"Jet_c{index+1}_{var}"]
+            if var in flags.Analysis.Small_R_jet.variables_int_cjets:
+                int_variable_names += [f"Jet_c{index+1}_{var}"]
+            # Translate the name to an analysis specific convention
+            branches += [f"EventInfo.Jet_c{index+1}_{var}_{sys_suffix} \
+                        -> {analysis}_Jet_c{index+1}_{var}"
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
+
     # Large R jets
     for var in [*flags.Analysis.Large_R_jet.variables_int_LargeRJets,
                 *flags.Analysis.Large_R_jet.variables_LargeRJets]:

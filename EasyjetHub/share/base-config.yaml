@@ -49,6 +49,7 @@ Small_R_jet:
   do_parent_decoration: true
   amount: 0
   amount_bjet: 0
+  amount_cjet: 0
   amount_leadingjet: 0
   systModelJES: "Category"
   systModelJER: "Full"
@@ -56,8 +57,10 @@ Small_R_jet:
   btag_egReductionC: "Loose"
   btag_egReductionLight: "Loose"
   variables_bjets: ["pt", "eta", "phi", "E"]
+  variables_cjets: ["pt", "eta", "phi", "E"]
   variables_allJets: ["pt", "eta", "phi", "E"]
   variables_int_bjets: []
+  variables_int_cjets: []
   variables_int_allJets: []
 
 Large_R_jet:

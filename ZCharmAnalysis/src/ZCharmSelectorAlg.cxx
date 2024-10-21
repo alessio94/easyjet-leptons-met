@@ -36,6 +36,13 @@ namespace ZCC
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
 
+    for (const std::string &var : m_PCBTnames){
+      ATH_MSG_DEBUG("initializing PCBT: " << var);
+      CP::SysReadDecorHandle<int> rhandle{var, this};
+      m_PCBTs.emplace(var, rhandle);
+      ATH_CHECK(m_PCBTs.at(var).initialize(m_systematicsList, m_jetHandle));
+    };
+
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
@@ -137,6 +144,17 @@ namespace ZCC
         }
       }
 
+      std::string ftag2D_WP = "GN2v01_Continuous2D";
+      std::vector<int> ctag_values = {1,2,3};
+      auto cjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      if(std::find(m_PCBTnames.begin(), m_PCBTnames.end(), ftag2D_WP)!=m_PCBTnames.end())
+      {
+        for(const xAOD::Jet* jet : *jets) {
+          int pcbt = m_PCBTs.at(ftag2D_WP).get(*jet, sys);
+          if (std::find(ctag_values.begin(), ctag_values.end(), pcbt)!=ctag_values.end() && std::abs(jet->eta())<2.5) cjets->push_back(jet);
+        }
+      }
+
       const xAOD::JetContainer *largeJets = nullptr;
       ANA_CHECK (m_largejetHandle.retrieve (largeJets, sys));
 
@@ -169,6 +187,8 @@ namespace ZCC
       m_bools.at(ZCC::MET) = false;
       m_bools.at(ZCC::ONE_B_JETS) = false;
       m_bools.at(ZCC::TWO_B_JETS) = false;
+      m_bools.at(ZCC::ONE_C_JETS) = false;
+      m_bools.at(ZCC::TWO_C_JETS) = false;
       m_bools.at(ZCC::ONE_LARGE_JET) = false;
 
       setThresholds(event, sys);
@@ -198,6 +218,7 @@ namespace ZCC
       evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_ZCharmCuts, sys);
       evaluateLeptonCuts(*electrons, *muons, met, m_ZCharmCuts);
       evaluateBJetCuts(*bjets, m_ZCharmCuts);
+      evaluateCJetCuts(*cjets, m_ZCharmCuts);
       evaluateLargeJetCuts(largeJets);
       
       bool passedall = true;
@@ -210,7 +231,7 @@ namespace ZCC
       m_passallcuts.set(*event, passedall, sys);
 
       bool pass_baseline=false;
-      if(m_bools.at(ZCC::PASS_TRIGGER) && m_bools.at(ZCC::EXACTLY_TWO_LEPTONS) && m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS) && m_bools.at(ZCC::DILEPTON_MASS_WINDOW) && m_bools.at(ZCC::MET) && m_bools.at(ZCC::ONE_B_JETS)) pass_baseline=true;
+      if(m_bools.at(ZCC::PASS_TRIGGER) && m_bools.at(ZCC::EXACTLY_TWO_LEPTONS) && m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS) && m_bools.at(ZCC::DILEPTON_MASS_WINDOW) && m_bools.at(ZCC::MET)) pass_baseline=true;
       
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()=="") {
@@ -526,6 +547,21 @@ namespace ZCC
 
     if (bjets.size() >= 2 && ZCharmCuts.exists("TWO_B_JETS")){
       m_bools.at(ZCC::TWO_B_JETS) = true;
+    }
+
+  }  
+  
+  void ZCharmSelectorAlg::evaluateCJetCuts
+  (const ConstDataVector<xAOD::JetContainer>& cjets, CutManager& ZCharmCuts)
+  { 
+
+    ///All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the ZCharm_config file.
+    if (cjets.size() >= 1 && ZCharmCuts.exists("ONE_C_JETS")){
+      m_bools.at(ZCC::ONE_C_JETS) = true;
+    }
+
+    if (cjets.size() >= 2 && ZCharmCuts.exists("TWO_C_JETS")){
+      m_bools.at(ZCC::TWO_C_JETS) = true;
     }
 
   }  
