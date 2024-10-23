@@ -22,6 +22,7 @@ lsetup git
 git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup once
 # Copy-paste this repo's URL, choosing your preferred authentication scheme, e.g. for lxplus or institute cluster
 git clone --recursive --no-checkout --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+cd easyjet
 git sparse-checkout init --cone
 git sparse-checkout set EasyjetHub EasyjetTests YourFavouriteAnalysis
 git checkout upstream/main
@@ -45,6 +46,7 @@ setupATLAS
 lsetup git
 git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup once
 git clone --recursive --no-checkout --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+cd easyjet
 git sparse-checkout init --cone
 git sparse-checkout set EasyjetHub EasyjetTests YourFavouriteAnalysis
 git checkout upstream/main
