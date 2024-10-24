@@ -33,8 +33,7 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                      containerOutKey="ZCharmAnalysisElectrons_%SYS%",
                                      looseEleWP=ElectronWPLabel,
                                      isMC=flags.Input.isMC,
-                                     minPt=flags.Analysis.Electron.min_pT_ZCharm,
-                                     maxEta=flags.Analysis.Electron.max_eta_ZCharm))
+                                     minPt=flags.Analysis.Electron.min_pT_ZCharm))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
                                    containerInEleKey=electronkey,

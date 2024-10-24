@@ -78,6 +78,8 @@ Large_R_jet:
   wtag_wp: ""
 
 Photon:
+  min_pT: 10.e+3
+  max_eta: 100
   ID: ""
   Iso: ""
   amount: 0
@@ -89,7 +91,7 @@ Photon:
 
 Electron:
   min_pT: 4.5e+3
-  max_eta: 2.47
+  max_eta: 100
   trackSelection: true
   maxD0Significance: 5.
   maxDeltaZ0SinTheta: 0.5

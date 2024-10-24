@@ -36,9 +36,7 @@ Electron:
   ID: "LooseLH"
   Iso: None
   min_pT: 4.5e+3
-  max_eta: 2.47
   min_pT_ssWW: 4.5e+3
-  max_eta_ssWW: 2.47
 
 Muon:
   trackSelection: true

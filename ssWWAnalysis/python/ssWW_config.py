@@ -32,8 +32,7 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
                                      containerOutKey="ssWWAnalysisElectrons_%SYS%",
                                      looseEleWP=ElectronWPLabel,
                                      isMC=flags.Input.isMC,
-                                     minPt=flags.Analysis.Electron.min_pT_ssWW,
-                                     maxEta=flags.Analysis.Electron.max_eta_ssWW))
+                                     minPt=flags.Analysis.Electron.min_pT_ssWW))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
                                    containerInEleKey=electronkey,

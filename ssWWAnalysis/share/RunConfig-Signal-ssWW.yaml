@@ -11,7 +11,6 @@ Electron:
   ID: "TightLH"
   Iso: "Loose_VarRad" # previously Gradient
   min_pT_ssWW: 27000
-  max_eta_ssWW: 2.47
   crackVeto: true
   chargeIDSelectionRun2: false
 

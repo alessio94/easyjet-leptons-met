@@ -42,9 +42,7 @@ Electron:
   ID: "TightLH"
   Iso: Tight_VarRad
   min_pT: 27.e+3
-  max_eta: 2.47
   min_pT_ZCharm: 27.e+3
-  max_eta_ZCharm: 2.47
   crackVeto: true
 
 Muon:

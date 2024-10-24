@@ -41,7 +41,6 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                      containerOutKey="XbbCalibElectrons_%SYS%",
                                      looseEleWP=LooseElectronWPLabel,
                                      minPt=70 * Units.GeV,
-                                     maxEta=2.47,
                                      ))
 
     LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'

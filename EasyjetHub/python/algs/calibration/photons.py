@@ -54,8 +54,8 @@ def photon_sequence(flags, configAcc):
     configSeq += makeConfig('Photons.PtEtaSelection', containerName=output_name,
                             selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
-    configSeq.setOptionValue('.minPt', 10e3)
-    configSeq.setOptionValue('.maxEta', 2.37)
+    configSeq.setOptionValue('.minPt', flags.Analysis.Photon.min_pT)
+    configSeq.setOptionValue('.maxEta', flags.Analysis.Photon.max_eta)
 
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)

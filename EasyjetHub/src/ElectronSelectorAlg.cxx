@@ -118,11 +118,8 @@ namespace Easyjet
         // cuts
         if (electron->pt() < m_minPt)
           continue;
-        
-        float this_electron_eta_abs = std::abs(electron->eta());
-        if ((this_electron_eta_abs > m_minEtaVeto &&
-            this_electron_eta_abs < m_maxEtaVeto) ||
-            (this_electron_eta_abs > m_maxEta ))
+
+        if (std::abs(electron->eta()) > m_maxEta)
           continue;
 
         // For some reason this decoration needs to be explicitly copied

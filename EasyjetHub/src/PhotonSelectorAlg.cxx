@@ -126,11 +126,8 @@ namespace Easyjet
         
         if (photon->pt() < m_minPt)
           continue;
-        
-        float this_photon_eta_abs = std::abs(photon->eta());
-        if((this_photon_eta_abs > m_minEtaVeto &&
-            this_photon_eta_abs < m_maxEtaVeto) ||
-            (this_photon_eta_abs > m_maxEta ))
+
+        if(std::abs(photon->eta()) > m_maxEta)
           continue ;
 
         // For some reason this decoration needs to be explicitly copied
