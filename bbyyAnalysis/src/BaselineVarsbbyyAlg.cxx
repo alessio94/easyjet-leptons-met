@@ -180,7 +180,7 @@ namespace HHBBYY
       auto KF_bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
 
       for(const xAOD::Jet* jet : *jets) {
-        // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.4
+        // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.5
         HT += jet->pt();
 
         // count central jets
@@ -328,7 +328,7 @@ namespace HHBBYY
       //KF jets sector
       if (m_doKF){
         for(const xAOD::Jet* KFjet : *KFJets) {
-          // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.4
+          // Compute scalar pt sum (Ht) for all the jets in the event |eta|<4.5
           KF_HT += KFjet->pt();
             // check if jet is btagged
             if (WPgiven && m_isBtag.get(*KFjet, sys)) KF_bjets->push_back(KFjet);
