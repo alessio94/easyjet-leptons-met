@@ -1,6 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
+import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
@@ -27,7 +28,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="ttHHAnalysisMuons_%SYS%",
-                                 minPt=10e3,
+                                 minPt=15 * Units.GeV,
                                  looseMuonWP=LooseMuonWPLabel,
                                  tightMuonWPs=[TightMuonWPLabel]))
 
@@ -38,7 +39,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
         flags,
         containerInKey=electronkey,
         containerOutKey="ttHHAnalysisElectrons_%SYS%",
-        minPt=10e3,
+        minPt=15 * Units.GeV,
         looseEleWP=LooseElectronWPLabel,
         tightEleWPs=[TightEleWPLabel]))
 
@@ -52,7 +53,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
                                 pTsort=False,
                                 selectBjet=True,
                                 maxEta=2.5,
-                                minPt=20e3))
+                                minPt=20 * Units.GeV))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_SelectorAlg",
                                 containerInKey=smalljetkey,
@@ -63,7 +64,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
                                 pTsort=False,
                                 bTagWPDecorName="",
                                 selectBjet=False,
-                                minPt=20e3))
+                                minPt=20 * Units.GeV))
 
     cfg.addEventAlgo(
         CompFactory.ttHH.JetPairingAlgttHH(
