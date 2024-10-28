@@ -12,6 +12,7 @@ namespace HHBBLL {
   };
 
   StatusCode NeutrinoWeightingTool::initialize(){
+
     if (m_resolution_settings == "fixed"){
       m_flag_res_fixed = true;
       m_flag_res_dynamic_const_x_met = false;

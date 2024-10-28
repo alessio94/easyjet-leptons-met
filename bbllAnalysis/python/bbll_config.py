@@ -181,10 +181,7 @@ def bbll_branches(flags):
         # or int_variable_names as they are stored by the
         # TopReco algortithm not BaselineVarsbbllAlg
         all_baseline_variable_names.append("NW_solutions")
-        for var in ["neutrinoweight", "top_pt", "top_eta", "top_phi",
-                    "top_e", "tbar_pt", "tbar_eta", "tbar_phi", "tbar_e", "ttbar_pt",
-                    "ttbar_eta", "ttbar_phi", "ttbar_e", "nu_pt", "nu_eta", "nu_phi",
-                    "nu_e", "nubar_pt", "nubar_eta", "nubar_phi", "nubar_e"]:
+        for var in ["neutrinoweight"]:
             float_NW_variable_names.append(f"NW_{var}")
     if flags.Analysis.store_high_level_variables:
         high_level_float_variables, high_level_int_variables \

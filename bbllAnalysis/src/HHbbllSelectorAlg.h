@@ -60,12 +60,7 @@ namespace HHBBLL
     PASS_TRIGGER,
     TWO_OPPOSITE_CHARGE_LEPTONS,
     EXACTLY_TWO_B_JETS,
-    DILEPTON_MASS_SR1,
     VBFVETO_SR1,
-    DILEPTON_MASS_SR2,
-    DIBJET_MASS_SR2,
-    pass_ZHF_CR1,
-    pass_ZHF_CR2,
   };
 
   /// \brief An algorithm for counting containers
@@ -87,10 +82,7 @@ namespace HHBBLL
         "PASS_TRIGGER",
         "TWO_OPPOSITE_CHARGE_LEPTONS",
         "EXACTLY_TWO_B_JETS",
-        "DILEPTON_MASS_SR1",
-        "VBFVETO_SR1",
-        "DILEPTON_MASS_SR2",
-	"DIBJET_MASS_SR2"
+	"VBFVETO_SR1",
       };
 
 
@@ -175,12 +167,7 @@ namespace HHBBLL
         {HHBBLL::PASS_TRIGGER, "PASS_TRIGGER"},
         {HHBBLL::TWO_OPPOSITE_CHARGE_LEPTONS, "TWO_OPPOSITE_CHARGE_LEPTONS"},
         {HHBBLL::EXACTLY_TWO_B_JETS, "EXACTLY_TWO_B_JETS"},
-        {HHBBLL::DILEPTON_MASS_SR1, "DILEPTON_MASS_SR1"},
-        {HHBBLL::VBFVETO_SR1, "VBFVETO_SR1"},
-        {HHBBLL::DILEPTON_MASS_SR2, "DILEPTON_MASS_SR2"},
-        {HHBBLL::DIBJET_MASS_SR2, "DIBJET_MASS_SR2"},
-	{HHBBLL::pass_ZHF_CR1, "pass_ZHF_CR1"},
-	{HHBBLL::pass_ZHF_CR2, "pass_ZHF_CR2"},
+	{HHBBLL::VBFVETO_SR1, "VBFVETO_SR1"},
       };
 
       CutManager m_bbllCuts;
@@ -211,10 +198,9 @@ namespace HHBBLL
 	 const CP::SystematicSet& sys);
 
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
-                          const xAOD::MuonContainer& muons, CutManager& bbllCuts);
-      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
-                          const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts);
-      void evaluateBJetLeptonCuts(const ConstDataVector<xAOD::JetContainer>& bjets, const xAOD::JetContainer& jets,
+			      const xAOD::MuonContainer& muons, CutManager& bbllCuts);
+      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts);
+      void evaluateBJetLeptonCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                           const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons);
       void setThresholds(const xAOD::EventInfo* event,
 			 const CP::SystematicSet& sys);

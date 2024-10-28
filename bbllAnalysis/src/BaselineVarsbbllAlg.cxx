@@ -160,18 +160,9 @@ namespace HHBBLL
       const xAOD::Electron* ele1 = nullptr;
 
       for(unsigned int i=0; i<std::min(size_t(2),electrons->size()); i++){
-        std::string prefix = "Electron"+std::to_string(i+1);
         const xAOD::Electron* ele = electrons->at(i);
         if(i==0) ele0 = ele;
         else if(i==1) ele1 = ele;
-        m_Fbranches.at(prefix+"_pt").set(*event, ele->pt(), sys);
-        m_Fbranches.at(prefix+"_eta").set(*event, ele->eta(), sys);
-        m_Fbranches.at(prefix+"_phi").set(*event, ele->phi(), sys);
-        m_Fbranches.at(prefix+"_E").set(*event, ele->e(), sys);
-        if(m_isMC){
-          float ele_SF = m_ele_SF.get(*ele, sys);
-          m_Fbranches.at(prefix+"_effSF").set(*event, ele_SF, sys);
-        }
       }
 
       // Muon sector
@@ -179,18 +170,9 @@ namespace HHBBLL
       const xAOD::Muon* mu1 = nullptr;
 
       for(unsigned int i=0; i<std::min(size_t(2),muons->size()); i++){
-        std::string prefix = "Muon"+std::to_string(i+1);
         const xAOD::Muon* mu = muons->at(i);
         if(i==0) mu0 = mu;
         else if(i==1) mu1 = mu;
-        m_Fbranches.at(prefix+"_pt").set(*event, mu->pt(), sys);
-        m_Fbranches.at(prefix+"_eta").set(*event, mu->eta(), sys);
-        m_Fbranches.at(prefix+"_phi").set(*event, mu->phi(), sys);
-        m_Fbranches.at(prefix+"_E").set(*event, mu->e(), sys);
-        if(m_isMC){
-          float mu_SF = m_mu_SF.get(*mu, sys);
-          m_Fbranches.at(prefix+"_effSF").set(*event, mu_SF, sys);
-        }
       }// end muon
 
       std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
@@ -247,16 +229,6 @@ namespace HHBBLL
 	m_Fbranches.at("Phill").set(*event, ll.Phi(), sys);
 	m_Fbranches.at("dRll").set(*event, Leading_lep.DeltaR(Subleading_lep), sys);
       }
-
-      //jet sector
-      for(unsigned int i=0; i<std::min(size_t(2),jets->size()); i++){
-        std::string prefix = "Jet"+std::to_string(i+1);
-        m_Fbranches.at(prefix+"_pt").set(*event, jets->at(i)->pt(), sys);
-        m_Fbranches.at(prefix+"_eta").set(*event, jets->at(i)->eta(), sys);
-        m_Fbranches.at(prefix+"_phi").set(*event, jets->at(i)->phi(), sys);
-        m_Fbranches.at(prefix+"_E").set(*event, jets->at(i)->e(), sys);
-      }
-
       //b-jet sector
       for(unsigned int i=0; i<std::min(size_t(2),bjets->size()); i++){
         std::string prefix = "Jet_b"+std::to_string(i+1);

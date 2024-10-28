@@ -14,7 +14,7 @@ do_small_R_jets: true
 do_muons: true
 do_electrons: true
 do_met : true
-do_mmc : true
+do_mmc : false
 do_photons : true
 
 #NeutrinoWeighting Config
@@ -25,26 +25,27 @@ NeutrinoWeighting:
 Small_R_jet:
   # btagging working points 
   btag_wp: "GN2v01_FixedCutBEff_85"
-  amount: 2
   amount_bjet: 2
 
   # to use multiple btagging WPs
   btag_extra_wps:
-    - DL1dv01_FixedCutBEff_77
     - GN2v01_Continuous
   
   variables_int_bjets: ["truthLabel", "nmuons", "pcbt_GN2v01"]
   variables_bjets: ["uncorrPt", "muonCorrPt"]
+  systModelJES: "Category"
+  systModelJER: "Full"
+  btag_egReductionB: "Medium"
+  btag_egReductionC: "Medium"
+  btag_egReductionLight: "Medium"
 
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
-  amount: 2
 
 Muon:
   ID: "Medium"
   Iso: "PflowLoose_VarRad"
-  amount: 2
 
 Lepton:
   amount: 2
@@ -77,10 +78,7 @@ CutList :
       - PASS_TRIGGER
       - TWO_OPPOSITE_CHARGE_LEPTONS
       - EXACTLY_TWO_B_JETS
-      - DILEPTON_MASS_SR1
       - VBFVETO_SR1
-      - DILEPTON_MASS_SR2
-      - DIBJET_MASS_SR2
 
 Categories :
       - IS_SF
@@ -88,8 +86,6 @@ Categories :
       - IS_mm
       - IS_em
       - Pass_ll
-      - pass_ZHF_CR1
-      - pass_ZHF_CR2
 
 # Include the TTree configuration and update details
 ttree_output:

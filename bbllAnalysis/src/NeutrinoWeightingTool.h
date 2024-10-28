@@ -53,6 +53,7 @@ namespace HHBBLL {
 
     bool m_flag_res_fixed {false};
     bool m_flag_res_dynamic_const_x_met {false};
+
     float m_res_fixed_value {0.}; // The fixed MET resolution value in (careful with units!)
     float m_res_dynamic_const_x_met_value {0.}; // The constant factor to multiply the MET in dynamic resoluton
 
@@ -62,6 +63,7 @@ namespace HHBBLL {
     std::vector<float> m_eta_points_nubar;  
 
     float m_highestWeight {0.};
+
     float m_weight_threshold {0.}; // lower limit allowed for weights
     bool m_stop_after_first_solution {false};
 

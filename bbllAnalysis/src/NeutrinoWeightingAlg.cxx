@@ -200,34 +200,37 @@ namespace HHBBLL
       m_solutions.set(*event, solutions, sys);
   
       m_fBranches.at("NW_neutrinoweight").set(*event, neutrinoweight, sys);
+      /*
+      if (sys.name()=="") {
+	m_fBranches.at("NW_top_pt").set(*event, top.Pt(), sys);
+	m_fBranches.at("NW_top_eta").set(*event, top.Eta(), sys);
+	m_fBranches.at("NW_top_phi").set(*event, top.Phi(), sys);
+	m_fBranches.at("NW_top_e").set(*event, top.E(), sys);
+	
+	m_fBranches.at("NW_tbar_pt").set(*event, tbar.Pt(), sys);
+	m_fBranches.at("NW_tbar_eta").set(*event, tbar.Eta(), sys);
+	m_fBranches.at("NW_tbar_phi").set(*event, tbar.Phi(), sys);
+	m_fBranches.at("NW_tbar_e").set(*event, tbar.E(), sys);
 
-      m_fBranches.at("NW_top_pt").set(*event, top.Pt(), sys);
-      m_fBranches.at("NW_top_eta").set(*event, top.Eta(), sys);
-      m_fBranches.at("NW_top_phi").set(*event, top.Phi(), sys);
-      m_fBranches.at("NW_top_e").set(*event, top.E(), sys);
-
-      m_fBranches.at("NW_tbar_pt").set(*event, tbar.Pt(), sys);
-      m_fBranches.at("NW_tbar_eta").set(*event, tbar.Eta(), sys);
-      m_fBranches.at("NW_tbar_phi").set(*event, tbar.Phi(), sys);
-      m_fBranches.at("NW_tbar_e").set(*event, tbar.E(), sys);
-
-      TLorentzVector ttbar = top + tbar;
-
-      m_fBranches.at("NW_ttbar_pt").set(*event, ttbar.Pt(), sys);
-      m_fBranches.at("NW_ttbar_eta").set(*event, ttbar.Eta(), sys);
-      m_fBranches.at("NW_ttbar_phi").set(*event, ttbar.Phi(), sys);
-      m_fBranches.at("NW_ttbar_e").set(*event, ttbar.E(), sys);
-
-      m_fBranches.at("NW_nu_pt").set(*event, nu.Pt(), sys);
-      m_fBranches.at("NW_nu_eta").set(*event, nu.Eta(), sys);
-      m_fBranches.at("NW_nu_phi").set(*event, nu.Phi(), sys);
-      m_fBranches.at("NW_nu_e").set(*event, nu.E(), sys);
-
-      m_fBranches.at("NW_nubar_pt").set(*event, nubar.Pt(), sys);
-      m_fBranches.at("NW_nubar_eta").set(*event, nubar.Eta(), sys);
-      m_fBranches.at("NW_nubar_phi").set(*event, nubar.Phi(), sys);
-      m_fBranches.at("NW_nubar_e").set(*event, nubar.E(), sys);
-
+	TLorentzVector ttbar = top + tbar;
+	
+	m_fBranches.at("NW_ttbar_pt").set(*event, ttbar.Pt(), sys);
+	m_fBranches.at("NW_ttbar_eta").set(*event, ttbar.Eta(), sys);
+	m_fBranches.at("NW_ttbar_phi").set(*event, ttbar.Phi(), sys);
+	m_fBranches.at("NW_ttbar_e").set(*event, ttbar.E(), sys);
+	
+	m_fBranches.at("NW_nu_pt").set(*event, nu.Pt(), sys);
+	m_fBranches.at("NW_nu_eta").set(*event, nu.Eta(), sys);
+	m_fBranches.at("NW_nu_phi").set(*event, nu.Phi(), sys);
+	m_fBranches.at("NW_nu_e").set(*event, nu.E(), sys);
+	
+	m_fBranches.at("NW_nubar_pt").set(*event, nubar.Pt(), sys);
+	m_fBranches.at("NW_nubar_eta").set(*event, nubar.Eta(), sys);
+	m_fBranches.at("NW_nubar_phi").set(*event, nubar.Phi(), sys);
+	m_fBranches.at("NW_nubar_e").set(*event, nubar.E(), sys);
+	
+      }
+      */
     }
     return StatusCode::SUCCESS;
   }

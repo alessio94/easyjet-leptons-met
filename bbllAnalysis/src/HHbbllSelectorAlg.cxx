@@ -174,13 +174,7 @@ namespace HHBBLL
       m_bools.at(HHBBLL::PASS_TRIGGER) = false;
       m_bools.at(HHBBLL::TWO_OPPOSITE_CHARGE_LEPTONS) = false;
       m_bools.at(HHBBLL::EXACTLY_TWO_B_JETS) = false;
-      m_bools.at(HHBBLL::DILEPTON_MASS_SR1) = false;
       m_bools.at(HHBBLL::VBFVETO_SR1) = false;
-      m_bools.at(HHBBLL::DILEPTON_MASS_SR2) = false;
-      m_bools.at(HHBBLL::DIBJET_MASS_SR2) = false;
-      m_bools.at(HHBBLL::pass_ZHF_CR1) = false;
-      m_bools.at(HHBBLL::pass_ZHF_CR2) = false;
-
       setThresholds(event, sys);
 
       // Leptons
@@ -208,7 +202,7 @@ namespace HHBBLL
       evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_bbllCuts, sys);
       evaluateLeptonCuts(*electrons, *muons, m_bbllCuts);
       evaluateJetCuts(*bjets, *nonbjets, m_bbllCuts);
-      evaluateBJetLeptonCuts(*bjets, *jets,  *electrons, *muons);
+      evaluateBJetLeptonCuts(*bjets,  *electrons, *muons);
 
       bool passedall = true;
       for (const auto& [key, value] : m_boolnames) {
@@ -221,7 +215,9 @@ namespace HHBBLL
 
       bool pass_baseline=false;
       if(m_bools.at(HHBBLL::PASS_TRIGGER) && m_bools.at(HHBBLL::EXACTLY_TWO_LEPTONS) && m_bools.at(HHBBLL::EXACTLY_TWO_B_JETS)) pass_baseline=true;
-            
+
+      if ((m_bypass or pass_baseline)) filter.setPassed(true);
+      
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()=="") {
 
@@ -256,9 +252,7 @@ namespace HHBBLL
       for (auto& [key, var] : m_bools) {
         m_Bbranches.at(key).set(*event, var, sys);
       }
-
-      if (!m_bypass && !pass_baseline) continue;
-      filter.setPassed(true);
+      
     }
     return StatusCode::SUCCESS;
   }
@@ -574,10 +568,6 @@ namespace HHBBLL
   (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
    CutManager& bbllCuts)
   {
-    double mee = -99;
-    double mmumu = -99;
-    double memu = -99;
-    bool Dilepton_Pass_DF = false;
     bool Two_Opposite_Sign_Electrons = false;
     bool Two_Opposite_Sign_Muons = false;
     bool Opposite_Sign_ElecMu = false;
@@ -587,45 +577,32 @@ namespace HHBBLL
 
     if (electrons.size() >= 2)
     {
-      mee = (electrons.at(0)->p4() + electrons.at(1)->p4()).M();
       Two_Opposite_Sign_Electrons = electrons.at(0)->charge()*electrons.at(1)->charge() == -1;
 
     }
     if (muons.size() >= 2)
     {
-      mmumu = (muons.at(0)->p4() + muons.at(1)->p4()).M();
       Two_Opposite_Sign_Muons = muons.at(0)->charge()*muons.at(1)->charge() == -1;
     }
     if (electrons.size() == 1 && muons.size() == 1)
     {
-      memu = (electrons.at(0)->p4() + muons.at(0)->p4()).M();
-      Dilepton_Pass_DF = (memu > 15. * Athena::Units::GeV && memu < 110. * Athena::Units::GeV);
       Opposite_Sign_ElecMu = electrons.at(0)->charge()*muons.at(0)->charge() == -1;
     }
-    bool Dilepton_Pass_SF_SR1 = ((electrons.size() >= 2  && mee > 15. * Athena::Units::GeV && mee < 75. * Athena::Units::GeV) ||
-      (muons.size() >= 2 && mmumu > 15. * Athena::Units::GeV && mmumu < 75. * Athena::Units::GeV));
-    bool Dilepton_Pass_SF_SR2 = ((electrons.size() >= 2  && mee > 75. * Athena::Units::GeV && mee < 110. * Athena::Units::GeV) ||
-      (muons.size() >= 2 && mmumu > 75. * Athena::Units::GeV && mmumu < 110. * Athena::Units::GeV));
-
     if ((Two_Opposite_Sign_Electrons || Two_Opposite_Sign_Muons || Opposite_Sign_ElecMu)
       && bbllCuts.exists("TWO_OPPOSITE_CHARGE_LEPTONS"))
     {
       m_bools.at(HHBBLL::TWO_OPPOSITE_CHARGE_LEPTONS) = true;
     }
-
-    if(bbllCuts.exists("DILEPTON_MASS_SR1")) m_bools.at(HHBBLL::DILEPTON_MASS_SR1) = (Dilepton_Pass_SF_SR1 || Dilepton_Pass_DF);
-    if(bbllCuts.exists("DILEPTON_MASS_SR2")) m_bools.at(HHBBLL::DILEPTON_MASS_SR2) = Dilepton_Pass_SF_SR2;
-
   }
 
-  void HHbbllSelectorAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
-                            const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts)
+  void HHbbllSelectorAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts)					  
   {
 
     ///All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the bbll_config file.
+    if (bjets.size()==2)
+      m_bools.at(HHBBLL::EXACTLY_TWO_B_JETS) = true;
 
     bool VBFVeto = false;
-    double mbb = -99;
     float max_mjj = 0;
     float max_delta_eta_jj = 0;
 
@@ -655,21 +632,10 @@ namespace HHBBLL
       }
     }
     if(bbllCuts.exists("VBFVETO_SR1")) m_bools.at(HHBBLL::VBFVETO_SR1) = VBFVeto;
-
-    if (bjets.size()==2)
-      m_bools.at(HHBBLL::EXACTLY_TWO_B_JETS) = true;
-
-    if (bjets.size() >= 2){
-      mbb = (bjets.at(0)->p4() + bjets.at(1)->p4()).M();
-    }
-
-    if(bbllCuts.exists("DIBJET_MASS_SR2")) m_bools.at(HHBBLL::DIBJET_MASS_SR2) = (mbb > 40. * Athena::Units::GeV && mbb < 210. * Athena::Units::GeV);
-
   }
 
   void HHbbllSelectorAlg::evaluateBJetLeptonCuts
   (const ConstDataVector<xAOD::JetContainer>& bjets,
-   const xAOD::JetContainer& jets,
    const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons)
   {
     bool TWO_ISO_ELECTRONS = (electrons.size() >= 2);
@@ -687,35 +653,7 @@ namespace HHBBLL
     m_bools.at(HHBBLL::IS_SF) = (IS_ee || IS_mm);
     m_bools.at(HHBBLL::Pass_ll) = ((TWO_ISO_ELECTRONS || TWO_ISO_MUONS || TWO_ISO_ELECMUs) && EXACTLY_TWO_B_JETS);
 
-    // Z+HF control region
-    double mbb = -99.;
-    float mll = -99;
-    float lep1_pt = -99.;
-    if(IS_ee){
-       mll = (electrons.at(0)->p4() + electrons.at(1)->p4()).M();
-       lep1_pt = electrons.at(1)->pt();
-    }
-    else if(IS_mm){
-       mll = (muons.at(0)->p4() + muons.at(1)->p4()).M();
-       lep1_pt = muons.at(1)->pt();
-    }
-
-    if (bjets.size() >= 2){
-      mbb = (bjets.at(0)->p4() + bjets.at(1)->p4()).M();
-      if (m_bools.at(HHBBLL::IS_SF) && m_bools.at(HHBBLL::TWO_OPPOSITE_CHARGE_LEPTONS) &&
-	  mll > 75. * Athena::Units::GeV && mll < 110. * Athena::Units::GeV) {
-
-        if (mbb < 40. * Athena::Units::GeV || mbb > 210. * Athena::Units::GeV)
-          m_bools.at(HHBBLL::pass_ZHF_CR1) = true;
-
-	if (jets.at(0)->pt() > 45. * Athena::Units::GeV &&
-            lep1_pt > 40. * Athena::Units::GeV)
-	  m_bools.at(HHBBLL::pass_ZHF_CR2) = true;
-
-      }
-    }
-
-  }  
+  }
 
   void HHbbllSelectorAlg::setThresholds(const xAOD::EventInfo* event,
 					const CP::SystematicSet& sys) {
