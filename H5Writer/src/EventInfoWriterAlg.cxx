@@ -24,13 +24,13 @@ StatusCode EventInfoWriterAlg::initialize() {
   }
 
   for (const std::string& prim: m_primitives) {
-    if (!m_primToType.value().count(prim)) {
+    if (!m_primToType.value().contains(prim)) {
       ATH_MSG_ERROR(prim << " not specified in type mapping");
     }
     std::string type = m_primToType.value().at(prim);
     cfg.inputs.push_back(Primitive{getPrimitiveType(type), prim, prim});
   }
-  m_writer.reset(new EventInfoWriter(*m_output_svc->group(), cfg));
+  m_writer = std::make_unique<EventInfoWriter>(*m_output_svc->group(), cfg);
 
   return StatusCode::SUCCESS;
 }

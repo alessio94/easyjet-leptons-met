@@ -101,7 +101,7 @@ namespace {
   class LinkGetter
   {
   public:
-    LinkGetter(std::string name);
+    explicit LinkGetter(std::string name);
     const R* operator()(In_t in) const;
   private:
     using LinkAccessor = SG::AuxElement::ConstAccessor<ElementLink<T>>;
@@ -164,7 +164,7 @@ namespace {
   public:
     IParticle2dWriter(H5::Group& group,
                       const std::string& n,
-                      Consumer_t c,
+                      const Consumer_t & c,
                       long long unsigned size):
       m_writer(group, n, c, {{size}}) {}
     ~IParticle2dWriter() = default;
@@ -187,7 +187,7 @@ namespace {
   public:
     IParticleAwkwardWriter(H5::Group& parent,
                            const std::string& n,
-                           Consumer_t c):
+                           const Consumer_t & c):
       m_group(parent.createGroup(n)),
       m_writer(m_group, "raw", c),
       m_counts(m_group, "counts", getOffsetConsumer())

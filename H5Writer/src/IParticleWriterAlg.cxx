@@ -24,12 +24,12 @@ StatusCode IParticleWriterAlg::initialize() {
     return StatusCode::FAILURE;
   }
   for (const std::string& prim: m_primitives) {
-    if (!m_primToType.value().count(prim)) {
+    if (!m_primToType.value().contains(prim)) {
       ATH_MSG_ERROR(prim << " not specified in type mapping");
       return StatusCode::FAILURE;
     }
     auto type = getPrimitiveType(m_primToType.value().at(prim));
-    if (m_primToAssociation.value().count(prim)) {
+    if (m_primToAssociation.value().contains(prim)) {
       std::string path = m_primToAssociation.value().at(prim);
       size_t pos = path.find('/');
       if (pos == std::string::npos) {
@@ -53,7 +53,7 @@ StatusCode IParticleWriterAlg::initialize() {
       cfg.inputs.push_back(AssociatedPrimitive{"",newprim});
     }
   }
-  m_writer.reset(new IParticleWriter(*m_output_svc->group(), cfg));
+  m_writer = std::make_unique<IParticleWriter>(*m_output_svc->group(), cfg);
 
   return StatusCode::SUCCESS;
 }

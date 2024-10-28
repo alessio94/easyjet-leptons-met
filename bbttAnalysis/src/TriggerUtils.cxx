@@ -107,13 +107,13 @@ namespace HHBBTT
       mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_medium1_tracktwoEF_L1MU10_TAU12IM_3J12"};
       mu_tau_paths_high = {"HLT_mu14_ivarloose_tau35_medium1_tracktwoEF"};
       if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
-        mu_tau_paths_low.push_back("HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_L1MU10_TAU12IM_3J12");
-        mu_tau_paths_high.push_back("HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA");
+        mu_tau_paths_low.emplace_back("HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_L1MU10_TAU12IM_3J12");
+        mu_tau_paths_high.emplace_back("HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA");
       }
       // No muon SF leg yet
       mu_tau_SF_path = std::make_pair("", "tau25_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA");
     }
-    else if(year<=2022 || year<=2023){
+    else if(year>=2022 && year<=2023){
       mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU12IM_3J12"};
       mu_tau_paths_high = {"HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU20IM"};
     }
@@ -147,8 +147,8 @@ namespace HHBBTT
       ele_tau_paths = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwoEF"};
       ele_tau_paths_4J12 = {"HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwoEF_L1EM15VHI_2TAU12IM_4J12"};
       if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
-        ele_tau_paths.push_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA");
-        ele_tau_paths_4J12.push_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA_L1EM15VHI_2TAU12IM_4J12");
+        ele_tau_paths.emplace_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA");
+        ele_tau_paths_4J12.emplace_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA_L1EM15VHI_2TAU12IM_4J12");
       }
       ele_tau_SF_path = std::make_pair("e17_lhmedium_nod0_AND_e17_lhvloose_nod0_L1EM15VHI",
 				       "tau25_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA");
@@ -189,7 +189,7 @@ namespace HHBBTT
       single_tau_paths = {"HLT_tau160_medium1_tracktwoEF_L1TAU100"};
       single_tau_SF_path = "tau160L1TAU100_medium1_tracktwoEF";
       if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
-        single_tau_paths.push_back("HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100");
+        single_tau_paths.emplace_back("HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100");
         single_tau_SF_path = "tau160L1TAU100_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA";
       }
     }
@@ -237,13 +237,13 @@ namespace HHBBTT
 
       if(runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo)){
         ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-        tau25_match_paths.push_back("HLT_tau25_medium1_tracktwo");
+        tau25_match_paths.emplace_back("HLT_tau25_medium1_tracktwo");
       }
 
       if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo)){
         // For Period B1 to B4 in 2017, should use this trigger but go to L1Topo selection
         ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
-        tau25_match_paths.push_back("HLT_tau25_medium1_tracktwo");
+        tau25_match_paths.emplace_back("HLT_tau25_medium1_tracktwo");
       }
       else if(!runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo) &&
 	      (runBoolDecos.at(HHBBTT::is17PeriodB5_B7)(*eventInfo) ||
@@ -262,10 +262,10 @@ namespace HHBBTT
       tau25_match_paths = {"HLT_tau25_medium1_tracktwoEF"};
 
       if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
-        ditau_paths_L1Topo.push_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1DR_TAU20ITAU12I_J25");
-        ditau_paths_4J12.push_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1TAU20IM_2TAU12IM_4J12p0ETA23");
-        tau35_match_paths.push_back("HLT_tau35_mediumRNN_tracktwoMVA");
-        tau25_match_paths.push_back("HLT_tau25_mediumRNN_tracktwoMVA");
+        ditau_paths_L1Topo.emplace_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1DR_TAU20ITAU12I_J25");
+        ditau_paths_4J12.emplace_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1TAU20IM_2TAU12IM_4J12p0ETA23");
+        tau35_match_paths.emplace_back("HLT_tau35_mediumRNN_tracktwoMVA");
+        tau25_match_paths.emplace_back("HLT_tau25_mediumRNN_tracktwoMVA");
       }
 
       di_tau_SF_path = std::make_pair("tau35_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA",

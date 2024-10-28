@@ -212,7 +212,7 @@ void CutManager::DoCutflowLabeling(long long int nEvents, TH1* histo)
 }
 
 
-void CutManager::CheckInputCutList(std::vector<std::string> inputCutList, std::vector<std::string> standard_cuts )
+void CutManager::CheckInputCutList(const std::vector<std::string> & inputCutList, const std::vector<std::string> & standard_cuts )
 {
 
     // In case of empty CutList list, then AssertionError or ValueErrors occur from python scripts

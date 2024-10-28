@@ -52,7 +52,7 @@ namespace bhist {
   {
   public:
     WeightHist();
-    void fill(const xAOD::Jet&, double weight) override;
+    void fill(const xAOD::Jet& jets, double weight) override;
     void write(H5::Group& group) override;
   private:
     decltype(make_weight_hist()) m_histogram;
@@ -153,7 +153,7 @@ namespace bhist {
     m_histogram(make_weight_hist())
   {
   }
-  void WeightHist::fill(const xAOD::Jet&, double weight) {
+  void WeightHist::fill([[maybe_unused]] const xAOD::Jet& jets, double weight) {
     m_histogram(weight);
   }
   void WeightHist::write(H5::Group& group) {

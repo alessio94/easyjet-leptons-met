@@ -455,6 +455,8 @@ namespace HLLTT
 	  Tau1 = tau0;
 	  Tau2 = tau1;
 	  break;
+        default:
+          throw std::runtime_error("Invalid ISR value: " + std::to_string(isr));
 	}
 	
 	m_Fbranches.at("Tau1_pt").set(*event, p4LeadTau.Pt(), sys);

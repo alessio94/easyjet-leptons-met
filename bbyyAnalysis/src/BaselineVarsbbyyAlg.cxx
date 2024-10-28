@@ -898,7 +898,7 @@ namespace HHBBYY
     // If there are < 3 jets (min. # required to define ChiWt) fill out the rest with 0, 0, 0, 0 dummy jets
     if (jets->size() < 3) {
         for (unsigned int i = 0; i < 3 - jets->size(); i++) {
-            temp_jets.push_back(TLorentzVector(0, 0, 0, 0));
+            temp_jets.emplace_back(0, 0, 0, 0);
         }
     }
 

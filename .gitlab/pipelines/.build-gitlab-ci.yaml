@@ -33,5 +33,5 @@ clang_tidy:
     - source $(find /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/Clang/current/ -mindepth 3 -maxdepth 3 -type f -name setup.sh)
     - cd build
   script:
-    - run-clang-tidy -use-color -checks 'clang-*' -warnings-as-errors '*'
+    - run-clang-tidy -j8 -use-color -config-file ../.clang-tidy -warnings-as-errors '*'
   needs: [cmake]

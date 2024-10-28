@@ -15,19 +15,17 @@ namespace MULTILEPTON
       const xAOD::TauJetContainer *taus,
       const ConstDataVector<xAOD::JetContainer> *bjets,
       const xAOD::EventInfo *event)
+    : m_event(event)
+    , m_muons(muons)
+    , m_electrons(electrons)
+    , m_taus(taus)
+    , m_bjets(bjets)
+    , m_n_bjets(m_bjets->size())
+    , m_n_electrons(m_electrons->size())
+    , m_n_muons(m_muons->size())
+    , m_n_leptons(m_n_electrons + m_n_muons)
+    , m_n_taus(m_taus->size())
   {
-    m_event = event;
-    m_muons = muons;
-    m_electrons = electrons;
-    m_taus = taus;
-    m_bjets = bjets;
-
-    m_n_bjets = m_bjets->size();
-    m_n_electrons = m_electrons->size();
-    m_n_muons = m_muons->size();
-    m_n_leptons = m_n_electrons + m_n_muons;
-    m_n_taus = m_taus->size();
-
     for (int i = 0; i < m_n_electrons; i++)
     {
       const xAOD::Electron *ele = electrons->at(i);
@@ -82,7 +80,7 @@ namespace MULTILEPTON
 
   }
 
-  CH_ID SubChannelClassify::classify_id()
+  CH_ID SubChannelClassify::classify_id() const
   {
     if (m_n_bjets >= 1 && m_n_bjets <= 3 && m_n_leptons == 4 && m_n_taus == 0 &&
         m_total_charge_lep == 0)
@@ -198,7 +196,7 @@ namespace MULTILEPTON
     return SFOC && SFSC && DF;
   }
 
-  FLAVOR_1L SubChannelClassify::classify_flavor_1L() {
+  FLAVOR_1L SubChannelClassify::classify_flavor_1L() const {
     if (m_n_electrons == 1)
       return FLAVOR_1L::e;
     else if (m_n_muons == 1)
@@ -207,7 +205,7 @@ namespace MULTILEPTON
       return FLAVOR_1L::unknown;
   }
 
-  FlAVOR_2L SubChannelClassify::classify_flavor_2L() {
+  FlAVOR_2L SubChannelClassify::classify_flavor_2L() const {
     if (m_n_electrons == 2)
       return FlAVOR_2L::ee;
     else if (m_n_muons == 2)
@@ -218,7 +216,7 @@ namespace MULTILEPTON
       return FlAVOR_2L::unknown;
   }
 
-  FLAVOR_3L SubChannelClassify::classify_flavor_3L() {
+  FLAVOR_3L SubChannelClassify::classify_flavor_3L() const {
 
     auto flavor_l0 = std::abs(get<1>(m_leptons[0]));
     auto flavor_l1 = std::abs(get<1>(m_leptons[1]));
@@ -243,7 +241,7 @@ namespace MULTILEPTON
       return FLAVOR_3L::unknown;
   }
 
-  FLAVOR_4L SubChannelClassify::classify_flavor_4L() {
+  FLAVOR_4L SubChannelClassify::classify_flavor_4L() const {
     if (m_n_electrons == 4)
       return FLAVOR_4L::eeee;
     else if (m_n_muons == 4)

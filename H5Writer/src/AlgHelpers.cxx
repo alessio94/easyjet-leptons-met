@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 #define CHECK_TYPE(string, target)                      \
-  if (string == #target) return Primitive::Type::target
+  if ((string) == (#target)) return Primitive::Type::target
 Primitive::Type getPrimitiveType(const std::string& name) {
   CHECK_TYPE(name, PRECISION_CUSTOM);
   CHECK_TYPE(name, CUSTOM);

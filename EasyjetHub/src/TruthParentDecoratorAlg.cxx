@@ -30,7 +30,7 @@ namespace {
           "[index: "  + std::to_string(match.parent_index) +
           " , max_mask: " + std::to_string(max_idx) + "]");
       }
-      mask |= (0x1 << match.parent_index);
+      mask |= (0x1u << match.parent_index);
     }
     return mask;
   }
@@ -212,7 +212,7 @@ void CascadeCountDecorator::decorate(
   unsigned char n_match = 0;
   for (const auto& parent: parents) {
     for (const auto& pid: m_pids) {
-      if (parent.cascade_pids.count(pid)) n_match++;
+      if (parent.cascade_pids.contains(pid)) n_match++;
     }
   }
   m_dec(target) = n_match;
@@ -296,7 +296,7 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   std::set<int> parentids(m_parent_pdgids.begin(), m_parent_pdgids.end());
   std::vector<const xAOD::TruthParticle*> psort;
   for (const xAOD::TruthParticle* p: *phandle) {
-    if (!parentids.count(p->pdgId())) continue;
+    if (!parentids.contains(p->pdgId())) continue;
     if (!isOriginal(p)) continue;
     psort.push_back(p);
   }
@@ -388,7 +388,7 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   }
 
   for (const J* j: *targets) {
-    if (labeled_targets.count(j)) {
+    if (labeled_targets.contains(j)) {
       const std::vector<MatchedParent>& matches = labeled_targets.at(j);
       auto min_dr = [](auto& p1, auto& p2) {
         return p1.deltaR < p2.deltaR;
@@ -398,7 +398,7 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
       const xAOD::TruthParticle* p = nearest.parent;
       pdgid(*j) = p->pdgId();
       deltaR(*j) = nearest.deltaR;
-      auto* container = static_cast<const TPC*>(p->container());
+      auto* container = dynamic_cast<const TPC*>(p->container());
       link(*j) = JL(*container, p->index());
       index(*j) = nearest.parent_index;
       nMatched(*j) = matches.size();
@@ -406,7 +406,7 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
       const xAOD::TruthParticle* child = nearest.child;
       matchPdgId(*j) = child->pdgId();
       matchChildCount(*j) = child->nChildren();
-      auto* matchedContainer = static_cast<const TPC*>(child->container());
+      auto* matchedContainer = dynamic_cast<const TPC*>(child->container());
       matchLink(*j) = JL(*matchedContainer, child->index());
       for (const auto& cascadeCount: m_cascade_count_decorators) {
         cascadeCount.decorate(*j, matches);
@@ -454,7 +454,7 @@ void TruthParentDecoratorAlg::addTruthContainer(
       if (vsl && isSoftLepton(p)) return false;
       if (vsc && isSoftCharm(p)) return false;
     }
-    if (targid.count(p->pdgId())) return true;
+    if (targid.contains(p->pdgId())) return true;
     if (b && p->hasBottom()) return true;
     if (c && p->hasCharm()) return true;
     return false;

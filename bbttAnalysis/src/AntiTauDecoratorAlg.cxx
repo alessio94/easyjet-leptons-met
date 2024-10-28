@@ -196,7 +196,7 @@ namespace HHBBTT
   (unsigned int year,
    bool is2016_periodA, bool is2016_periodB_D3,
    bool is2022_75bunches,
-   std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>>& ptThresholds) const{
+   std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>>& ptThresholdMap) const{
 
     // References:
     // https://twiki.cern.ch/twiki/bin/view/Atlas/LowestUnprescaled
@@ -205,18 +205,18 @@ namespace HHBBTT
     float min_ele = 27. * Athena::Units::GeV;
     if(year==2015) min_ele = 25. * Athena::Units::GeV;
     else if(is2022_75bunches) min_ele = 18. * Athena::Units::GeV;
-    ptThresholds[HHBBTT::TriggerChannel::SLT][HHBBTT::Var::ele] = min_ele;
+    ptThresholdMap[HHBBTT::TriggerChannel::SLT][HHBBTT::Var::ele] = min_ele;
 
     float min_mu = 25. * Athena::Units::GeV;
     if(year==2015) min_mu = 21. * Athena::Units::GeV;
     else if(year>=2016 && year<=2018) min_mu = 27. * Athena::Units::GeV;
-    ptThresholds[HHBBTT::TriggerChannel::SLT][HHBBTT::Var::mu] = min_mu;
+    ptThresholdMap[HHBBTT::TriggerChannel::SLT][HHBBTT::Var::mu] = min_mu;
 
     // Single tau triggers
     float min_tau_STT = 180. * Athena::Units::GeV;
     if(year==2015 || is2016_periodA) min_tau_STT = 100. * Athena::Units::GeV;
     else if(is2016_periodB_D3) min_tau_STT = 140. * Athena::Units::GeV;
-    ptThresholds[HHBBTT::TriggerChannel::STT][HHBBTT::Var::leadingtau] = min_tau_STT;
+    ptThresholdMap[HHBBTT::TriggerChannel::STT][HHBBTT::Var::leadingtau] = min_tau_STT;
   }
 
 }

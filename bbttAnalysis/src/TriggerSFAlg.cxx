@@ -32,7 +32,7 @@ namespace HHBBTT
 
     if(m_isMC){
       for(const auto& wp : m_eleWPNames){
-        m_ele_SF.emplace_back(CP::SysReadDecorHandle<float>("el_effSF_"+wp+"_%SYS%", this));
+        m_ele_SF.emplace_back("el_effSF_"+wp+"_%SYS%", this);
       }
     }
     for(auto& handle : m_ele_SF)
@@ -48,7 +48,7 @@ namespace HHBBTT
 
     if(m_isMC){
       for(const auto& wp : m_muonWPNames){
-        m_mu_SF.emplace_back(CP::SysReadDecorHandle<float>("muon_effSF_"+wp+"_%SYS%", this));
+        m_mu_SF.emplace_back("muon_effSF_"+wp+"_%SYS%", this);
       }
     }
     for(auto& handle : m_mu_SF)

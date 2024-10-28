@@ -44,7 +44,7 @@ namespace SHBBYY
     for (const auto& mX : m_mX_values) {
       for (const auto& mS : m_mS_values) {
         if ((mX > 500 && mS < 70) || ((mX - mS) <= 125)) continue;
-        m_mX_mS_all_pairs.push_back(std::make_pair(mX, mS));
+        m_mX_mS_all_pairs.emplace_back(mX, mS);
       }
     }
 
@@ -54,16 +54,16 @@ namespace SHBBYY
     std::ifstream input_stream_pnn_cv1(PathResolverFindCalibFile("bbyyAnalysis/PNN_Tight_SH_bbyy_cv1.json"));
     std::ifstream input_stream_pnn_cv2(PathResolverFindCalibFile("bbyyAnalysis/PNN_Tight_SH_bbyy_cv2.json"));
     std::ifstream input_stream_pnn_cv3(PathResolverFindCalibFile("bbyyAnalysis/PNN_Tight_SH_bbyy_cv3.json"));
-    m_model_PNN_cv1 = std::unique_ptr<lwt::LightweightGraph> (new lwt::LightweightGraph(lwt::parse_json_graph(input_stream_pnn_cv1)));
-    m_model_PNN_cv2 = std::unique_ptr<lwt::LightweightGraph> (new lwt::LightweightGraph(lwt::parse_json_graph(input_stream_pnn_cv2)));
-    m_model_PNN_cv3 = std::unique_ptr<lwt::LightweightGraph> (new lwt::LightweightGraph(lwt::parse_json_graph(input_stream_pnn_cv3)));
+    m_model_PNN_cv1 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_cv1));
+    m_model_PNN_cv2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_cv2));
+    m_model_PNN_cv3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_cv3));
 
     std::ifstream input_stream_pnn_1bjet_cv1(PathResolverFindCalibFile("bbyyAnalysis/PNN_1bjet_SH_bbyy_cv1_pt.json"));
     std::ifstream input_stream_pnn_1bjet_cv2(PathResolverFindCalibFile("bbyyAnalysis/PNN_1bjet_SH_bbyy_cv2_pt.json"));
     std::ifstream input_stream_pnn_1bjet_cv3(PathResolverFindCalibFile("bbyyAnalysis/PNN_1bjet_SH_bbyy_cv3_pt.json"));
-    m_model_PNN_1bjet_cv1 = std::unique_ptr<lwt::LightweightGraph> (new lwt::LightweightGraph(lwt::parse_json_graph(input_stream_pnn_1bjet_cv1)));
-    m_model_PNN_1bjet_cv2 = std::unique_ptr<lwt::LightweightGraph> (new lwt::LightweightGraph(lwt::parse_json_graph(input_stream_pnn_1bjet_cv2)));
-    m_model_PNN_1bjet_cv3 = std::unique_ptr<lwt::LightweightGraph> (new lwt::LightweightGraph(lwt::parse_json_graph(input_stream_pnn_1bjet_cv3)));
+    m_model_PNN_1bjet_cv1 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_1bjet_cv1));
+    m_model_PNN_1bjet_cv2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_1bjet_cv2));
+    m_model_PNN_1bjet_cv3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_1bjet_cv3));
   
 
     return StatusCode::SUCCESS;

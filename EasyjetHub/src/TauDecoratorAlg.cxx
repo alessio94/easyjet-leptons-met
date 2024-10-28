@@ -72,7 +72,7 @@ namespace Easyjet
       for(const xAOD::TauJet* tau : *tausIn) {
         truthTypeDecorHandle(*tau) = int(TauAnalysisTools::getTruthParticleType(*tau));
 
-        const Link_t tauTruthJetLink = tauLinkedJetLink(*tau);
+        const Link_t& tauTruthJetLink = tauLinkedJetLink(*tau);
         const xAOD::Jet* tauTruthJet = tauTruthJetLink.isValid() ? tauTruthJetLink.cachedElement() : nullptr;
         
         tauTruthJetLabelDecorHandle(*tau) = tauTruthJet ? truthLabelLinkedJet(*tauTruthJet) : -99;

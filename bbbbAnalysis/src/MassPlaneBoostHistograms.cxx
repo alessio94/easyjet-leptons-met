@@ -68,7 +68,7 @@ namespace {
     std::vector<JetPair> unique_pairs;
     std::set<const xAOD::Jet*> used;
     for (const auto& pair: pairs) {
-      if (!used.count(pair.j1) && !used.count(pair.j2)) {
+      if (!used.contains(pair.j1) && !used.contains(pair.j2)) {
         unique_pairs.push_back(pair);
         used.insert(pair.j1);
         used.insert(pair.j2);
@@ -141,9 +141,9 @@ namespace bhist {
   {
   public:
     MassHist(
-      const std::string name,
-      PairingFunction,
-      TruthMatchFunction = true_func);
+      const std::string& name,
+      const PairingFunction& func,
+      const TruthMatchFunction& truth_func = true_func);
     void fill(const Jets& jets, float weight);
     void write(H5::Group& output_group);
   private:
@@ -156,9 +156,9 @@ namespace bhist {
 
 
   MassHist::MassHist(
-    std::string name,
-    PairingFunction func,
-    TruthMatchFunction truth_func
+    const std::string& name,
+    const PairingFunction& func,
+    const TruthMatchFunction& truth_func
     ):
     m_hist(make_mass_hist()),
     m_dihiggs(make_dihiggs_mass_hist()),

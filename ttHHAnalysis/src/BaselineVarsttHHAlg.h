@@ -122,12 +122,12 @@ private:
     std::tuple<double, double, double> calculateVectorStats(const std::vector<double>& inputVector);
     double computeChiSquaretops(const ConstDataVector<xAOD::JetContainer>& jets,
 				const std::vector<std::tuple<int, double>> &leptonmasses,
-				TLorentzVector met,
+				const TLorentzVector& met,
 				bool top_had,
 				std::vector<unsigned int> &jet_locations,
 				std::vector<std::tuple<unsigned int, double>> &lepton_locations,
 				const xAOD::ElectronContainer *electrons,
-				const xAOD::MuonContainer *muons);
+				const xAOD::MuonContainer *muons) const;
     float computeChiSquare(float observedMass1, float observedMass2, float targetMass1, float targetMass2, float massResolution);
   };
 }

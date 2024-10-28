@@ -1,0 +1,224 @@
+# Tried the following checks but disabled them (with reasons in parenthesis):
+#
+# -abseil-* (require Abseil library)
+# -altera-* (relevant to C++ code that's synthesized for FPGAs)
+# -android-* (relevant to Android development)
+# -boost-* (require Boost libraries)
+# -concurrency-* (relevant to POSIX multithreading)
+# -darwin-* (relevant to Darwin OS)
+# -fuchsia-* (relevant to Fuchsia OS development)
+# -linuxkernel-* (relevant to Linux kernel development)
+# -llvm* (relevant to LLVM development)
+# -mpi-* (relevant to MPI code)
+# -objc-* (relevant to Obj-C development)
+# -openmp-* (relevant to OpenMP code)
+# -portability-* (depends on language features)
+# -zircon-* (relevant to Zircon kernel development)
+#
+#
+# The following checks produced errors but are now disabled (with reasons in parenthesis):
+#
+# -bugprone-branch-clone (results in long if-conditions, which are difficult to understand)
+# -bugprone-easily-swappable-parameters (complains about function arguments with similar names)
+# -bugprone-exception-escape (affects only backtrace)
+# -bugprone-narrowing-conversions (covered by cppcoreguidelines-narrowing-conversions)
+# -bugprone-signed-char-misuse (converting from signed char to signed int shouldn't be a problem)
+# -cert-err58-cpp (requires construct-on-first-use idiom just to instantiate simple maps)
+# -cppcoreguidelines-avoid-c-arrays (enforceable by cppcoreguidelines-pro-bounds-pointer-arithmetic)
+# -cppcoreguidelines-avoid-const-or-ref-data-members (would get a compilation error anyways if an object is not copy-assignable or movable)
+# -cppcoreguidelines-avoid-do-while (complains about Athena macros)
+# -cppcoreguidelines-avoid-magic-numbers (too restrictive, many offending lines)
+# -cppcoreguidelines-explicit-virtual-functions (covered by modernize-use-override)
+# -cppcoreguidelines-macro-usage (inaccurate)
+# -cppcoreguidelines-owning-memory (requires MS Guidelines Support Library to resolve)
+# -cppcoreguidelines-pro-bounds-array-to-pointer-decay (while useful, in almost all cases it concerns Athena macros)
+# -cppcoreguidelines-pro-bounds-constant-array-index (forbids induction variables in for-loops)
+# -cppcoreguidelines-pro-bounds-pointer-arithmetic (effectively disallows C style arrays)
+# -cppcoreguidelines-pro-type-cstyle-cast (enforces C++-style casting, which may confuse people)
+# -cppcoreguidelines-special-member-functions (complains if some ctors and dtors are defined)
+# -google-build-using-namespace (unavoidable when declaring Gaudi components)
+# -google-readability-* (style issue)
+# -google-runtime-int (no practical value)
+# -misc-confusable-identifiers (complains about variables with similar names, e.g., "ll" and "I1")
+# -misc-const-correctness (while useful, too many offending lines already)
+# -misc-include-cleaner (complains about implicit header inclusions)
+# -misc-no-recursion (while recursive algorithms can always be turned into iterative ones, it can be a bit impractical in some cases)
+# -misc-non-private-member-variables-in-classes (unnecessary restriction)
+# -modernize-avoid-c-arrays (same as cppcoreguidelines-avoid-c-arrays)
+# -modernize-loop-convert (too restrictive)
+# -modernize-pass-by-value (requires knowledge about std::move() to maximize performance)
+# -modernize-raw-string-literal (can do more harm by confusing people)
+# -modernize-use-auto (unnecessary restriction)
+# -modernize-use-bool-literals (unnecessary restriction)
+# -modernize-use-nodiscard (relevant functions need to satisfy very specific set of conditions)
+# -modernize-use-trailing-return-type (style issue, no improvement)
+# -performance-inefficient-string-concatenation (performance gain negigible, but alternatives like append and format more difficult to read)
+# -performance-inefficient-vector-operation (can be a nuisance to remember)
+# -performance-type-promotion-in-math-fn (non-issue)
+# -readability-braces-around-statements (too restrictive)
+# -readability-container-size-empty (no gain in performance because -O2 optimizes it away)
+# -readability-else-after-return (non-issue)
+# -readability-function-cognitive-complexity (while useful, requires a lot of code refactoring)
+# -readability-identifier-length (impractical)
+# -readability-implicit-bool-conversion (can't use pointers as if-conditions)
+# -readability-isolate-declaration (inconvenient)
+# -readability-magic-numbers (same as cppcoreguidelines-avoid-magic-numbers)
+# -readability-misleading-indentation (doesn't really work that well)
+# -readability-qualified-auto (style issue)
+# -readability-redundant-control-flow (non-issue)
+# -readability-simplify-boolean-expr (will make long expressions difficult to understand)
+# -readability-redundant-string-init (optimized away by the compiler)
+# -readability-uppercase-literal-suffix (style issue)
+# -readability-use-anyofallof (expects knowledge about functions in std::ranges namespace)
+#
+#
+# The remaining checks not explicitly mentioned in the above list haven't really raised any
+# errors, but they're disabled regardless because either they've already been covered by other
+# checks (which may or may not be enabled), they're irrelevant for the current application
+# (such as checks for specific code or libraries like Google Test and POSIX C), or unnecessary
+# (since it boils down to style or convention).
+# It's better to keep the number of checks and thus the time spent on analyzing the source
+# files to a minimum. Unlike clangd, clang-tidy inspects every header file recursively but
+# suppresses the resulting output (unless instructed otherwise).
+#
+#
+# Finally, there are these checks which had to be disabled for now since they're violated in
+# git submodules (indicated between brackets):
+#
+# -cppcoreguidelines-avoid-non-const-global-variables [KinematicFitTool]
+# -cppcoreguidelines-init-variables [KinematicFitTool,VBFTagger]
+# -cppcoreguidelines-narrowing-conversions [KinematicFitTool]
+# -cppcoreguidelines-pro-type-member-init [BJetCalibrationTool,KinematicFitTool,VBFTagger]
+# -modernize-use-equals-default [VBFTagger]
+# -modernize-use-nullptr [BJetCalibrationTool,VBFTagger]
+# -performance-avoid-endl [VBFTagger]
+# -performance-for-range-copy [VBFTagger]
+# -readability-convert-member-functions-to-static [BJetCalibrationTool,KinematicFitTool,VBFTagger]
+# -readability-string-compare [VBFTagger]
+
+Checks: >
+  clang-*,
+  bugprone-*,
+  -bugprone-bad-signal-to-kill-thread,
+  -bugprone-branch-clone,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-exception-escape,
+  -bugprone-narrowing-conversions,
+  -bugprone-no-escape,
+  -bugprone-posix-return,
+  -bugprone-signed-char-misuse,
+  -bugprone-undefined-memory-manipulation,
+  -bugprone-unsafe-functions,
+  readability-*,
+  -readability-braces-around-statements,
+  -readability-container-size-empty,
+  -readability-else-after-return,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-length,
+  -readability-identifier-naming,
+  -readability-implicit-bool-conversion,
+  -readability-isolate-declaration,
+  -readability-magic-numbers,
+  -readability-misleading-indentation,
+  -readability-operators-representation,
+  -readability-qualified-auto,
+  -readability-redundant-control-flow,
+  -readability-redundant-string-cstr,
+  -readability-redundant-string-init,
+  -readability-simplify-boolean-expr,
+  -readability-suspicious-call-argument,
+  -readability-uppercase-literal-suffix,
+  -readability-use-anyofallof,
+  cert-*-cpp,
+  -cert-con54-cpp,
+  -cert-dcl51-cpp,
+  -cert-dcl54-cpp,
+  -cert-dcl59-cpp,
+  -cert-err09-cpp,
+  -cert-err58-cpp,
+  -cert-err61-cpp,
+  -cert-msc54-cpp,
+  -cert-oop11-cpp,
+  -cert-oop54-cpp,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-capturing-lambda-coroutines,
+  -cppcoreguidelines-avoid-c-arrays,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -cppcoreguidelines-avoid-do-while,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-avoid-reference-coroutine-parameters,
+  -cppcoreguidelines-c-copy-assignment-signature,
+  -cppcoreguidelines-explicit-virtual-functions,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-noexcept-destructor,
+  -cppcoreguidelines-noexcept-move-operations,
+  -cppcoreguidelines-noexcept-swap,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-cstyle-cast,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-special-member-functions,
+  -cppcoreguidelines-use-default-member-init,
+  modernize-*,
+  -modernize-avoid-c-arrays,
+  -modernize-deprecated-ios-base-aliases,
+  -modernize-loop-convert,
+  -modernize-pass-by-value,
+  -modernize-raw-string-literal,
+  -modernize-redundant-void-arg,
+  -modernize-replace-auto-ptr,
+  -modernize-replace-random-shuffle,
+  -modernize-use-auto,
+  -modernize-use-bool-literals,
+  -modernize-use-nodiscard,
+  -modernize-use-noexcept,
+  -modernize-use-std-print,
+  -modernize-use-trailing-return-type,
+  -modernize-use-uncaught-exceptions,
+  misc-*,
+  -misc-confusable-identifiers,
+  -misc-const-correctness,
+  -misc-include-cleaner,
+  -misc-misleading-bidirectional,
+  -misc-misleading-identifier,
+  -misc-no-recursion,
+  -misc-non-copyable-objects,
+  -misc-non-private-member-variables-in-classes,
+  -misc-unused-parameters,
+  performance-*,
+  -performance-inefficient-string-concatenation,
+  -performance-inefficient-vector-operation,
+  -performance-type-promotion-in-math-fn,
+  google-*,
+  -google-build-using-namespace,
+  -google-objc-*,
+  -google-readability-*,
+  -google-runtime-int,
+  -google-upgrade-googletest-case,
+  hicpp-avoid-goto,
+  hicpp-exception-baseclass,
+  hicpp-signed-bitwise,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-init-variables,
+  -cppcoreguidelines-narrowing-conversions,
+  -cppcoreguidelines-pro-type-member-init,
+  -modernize-use-equals-default,
+  -modernize-use-nullptr,
+  -performance-avoid-endl,
+  -performance-for-range-copy,
+  -readability-convert-member-functions-to-static,
+  -readability-string-compare,
+
+CheckOptions:
+  - key:   cppcoreguidelines-narrowing-conversions.WarnOnIntegerToFloatingPointNarrowingConversion
+    value: false
+  - key:   cppcoreguidelines-narrowing-conversions.WarnOnFloatingPointNarrowingConversion
+    value: false
+  - key:   cppcoreguidelines-narrowing-conversions.IgnoreConversionFromTypes
+    value: 'size_type;size_t'
+  - key:   modernize-type-traits.IgnoreMacros
+    value: true
+  - key:   modernize-use-override.IgnoreDestructors
+    value: true

@@ -9,7 +9,7 @@ namespace Easyjet
   {
     for (size_t i = 0; i < p->nChildren(); i++)
     {
-      if (std::find(ids.begin(), ids.end(), p->child(i)->pdgId()) != ids.end())
+      if (ids.find(p->child(i)->pdgId()) != ids.end())
       {
         return getFinalParticleOfType(p->child(i), ids);
       }

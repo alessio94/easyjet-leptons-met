@@ -325,10 +325,10 @@ namespace ttHH
 
 	std::vector<std::tuple<int, double>> leptonmasses;
         for (unsigned int i = 0; i<muons->size(); i++){
-          leptonmasses.push_back(std::make_tuple(i, mu_mass));
+          leptonmasses.emplace_back(i, mu_mass);
         }
         for (unsigned int j = 0; j<electrons->size(); j++){
-          leptonmasses.push_back(std::make_tuple(j, e_mass));
+          leptonmasses.emplace_back(j, e_mass);
         }
 
 	bool top1_had = false;
@@ -548,12 +548,12 @@ namespace ttHH
   double BaselineVarsttHHAlg::computeChiSquaretops
   (const ConstDataVector<xAOD::JetContainer>& jets,
    const std::vector<std::tuple<int, double>> &leptonmasses,
-   TLorentzVector met,
+   const TLorentzVector &met,
    bool top_had,
    std::vector<unsigned int> &jet_locations,
    std::vector<std::tuple<unsigned int, double>> &lepton_locations,
    const xAOD::ElectronContainer *electrons,
-   const xAOD::MuonContainer *muons){
+   const xAOD::MuonContainer *muons) const{
     float minTopness = std::numeric_limits<float>::max();
 
     if (top_had){ //top decays hadronically
@@ -606,7 +606,7 @@ namespace ttHH
         }
       }
       jet_locations.push_back(jet1);
-      lepton_locations.push_back(std::make_tuple(lep1_id, lep1_mass));
+      lepton_locations.emplace_back(lep1_id, lep1_mass);
     }
     return minTopness;
   }

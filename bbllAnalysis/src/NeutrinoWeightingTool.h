@@ -70,7 +70,7 @@ namespace HHBBLL {
     virtual ~NeutrinoWeightingTool() = default;
     NeutrinoWeightingTool(const std::string& type, const std::string& name, const IInterface* parent);
 
-    virtual StatusCode initialize() override;
+    StatusCode initialize() override;
 
     StatusCode Reconstruct(TLorentzVector lepton_pos, 
                     TLorentzVector lepton_neg, 
@@ -83,10 +83,10 @@ namespace HHBBLL {
                     double mWpos,
                     double mWneg);
 
-    float get_weight(TLorentzVector nu1, 
-                      TLorentzVector nu2, 
-                      double met_ex, 
-                      double met_ey);
+    float get_weight(const TLorentzVector& nu1,
+                     const TLorentzVector& nu2,
+                     double met_ex,
+                     double met_ey);
 
     void Reset();
     StatusCode SetupEtaSampling(); // sets up sampling points based on settings
@@ -128,7 +128,7 @@ namespace HHBBLL {
     void SetEtaSamplingGaussMean(      float choice= 0.0){ m_eta_sampling_gauss_mean      = choice;};
     void SetEtaSamplingGaussSigma(     float choice= 1.0){ m_eta_sampling_gauss_sigma     = choice;};  
     void SetEtaSamplingNsamples( int number=2){m_eta_sampling_nsamples = number;};
-    StatusCode SetupEtaSampling(TLorentzVector, TLorentzVector);
+    StatusCode SetupEtaSampling(const TLorentzVector&, const TLorentzVector&);
 
     void SetFlagResFixed(            bool choice=false){ m_flag_res_fixed                = choice;};
     void SetFlagResDynamicConstXMet( bool choice=false){ m_flag_res_dynamic_const_x_met  = choice;};

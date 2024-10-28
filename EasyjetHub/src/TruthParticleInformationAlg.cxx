@@ -53,6 +53,9 @@ namespace Easyjet
 
     ATH_CHECK(m_EventInfoKey.initialize());
 
+    m_truthHiggsesKinDecorators.resize(m_nHiggses);
+    m_truthChildrenKinFromHiggsesDecorators.resize(m_nHiggses);
+    m_truthInitialChildrenKinFromHiggsesDecorators.resize(m_nHiggses);
     for (unsigned int h = 0; h < m_nHiggses; h++)
     {
       // decorator will show up as "truth_Hx_pdgId", where x is the x higgs
@@ -63,12 +66,6 @@ namespace Easyjet
       m_truthInitialChildrenPdgIdFromHiggsesDecorators.emplace_back(
           "truth_initial_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
 
-      m_truthHiggsesKinDecorators.emplace_back(
-          std::vector<SG::AuxElement::Decorator<float>>());
-      m_truthChildrenKinFromHiggsesDecorators.emplace_back(
-          std::vector<SG::AuxElement::Decorator<std::vector<float>>>());
-      m_truthInitialChildrenKinFromHiggsesDecorators.emplace_back(
-          std::vector<SG::AuxElement::Decorator<std::vector<float>>>());
       for (const std::string &var : m_kinVars)
       {
         m_truthHiggsesKinDecorators[h].emplace_back(
@@ -228,15 +225,15 @@ namespace Easyjet
   }
 
   std::vector<const xAOD::TruthParticle *>
-  TruthParticleInformationAlg ::getFinalChildren(const xAOD::TruthParticle *h) const
+  TruthParticleInformationAlg ::getFinalChildren(const xAOD::TruthParticle *p) const
   {
     std::vector<const xAOD::TruthParticle *> children;
     const xAOD::TruthParticle *tmp(nullptr);
-    for (size_t i = 0; i < h->nChildren(); i++)
+    for (size_t i = 0; i < p->nChildren(); i++)
     {
       if (msgLvl(MSG::VERBOSE))
       {
-        verbosePrintParticleAndChildren(h->child(i));
+        verbosePrintParticleAndChildren(p->child(i));
       }
 
       std::unordered_set<int> childrenPdgIds;
@@ -249,7 +246,7 @@ namespace Easyjet
       }
 
       const xAOD::TruthParticle *final_child =
-          getFinalParticleOfType(h->child(i), childrenPdgIds);
+          getFinalParticleOfType(p->child(i), childrenPdgIds);
       if (!tmp || (final_child->barcode() != tmp->barcode()))
       {
         tmp = final_child;
@@ -260,17 +257,17 @@ namespace Easyjet
   }
 
   std::vector<const xAOD::TruthParticle *>
-  TruthParticleInformationAlg ::getInitialChildren(const xAOD::TruthParticle *h) const
+  TruthParticleInformationAlg ::getInitialChildren(const xAOD::TruthParticle *p) const
   {
     std::vector<const xAOD::TruthParticle *> initial_children;
-    for (size_t i = 0; i < h->nChildren(); i++)
+    for (size_t i = 0; i < p->nChildren(); i++)
     {
       if (msgLvl(MSG::VERBOSE))
       {
-        verbosePrintParticleAndChildren(h->child(i));
+        verbosePrintParticleAndChildren(p->child(i));
       }
 
-      initial_children.push_back(h->child(i));
+      initial_children.push_back(p->child(i));
     }
     return initial_children;
 

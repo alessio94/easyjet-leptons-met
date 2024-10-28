@@ -10,8 +10,6 @@
 
 namespace MULTILEPTON
 {
-  using std::get;
-
   MultileptonSelectorAlg::MultileptonSelectorAlg(const std::string &name,
                                 ISvcLocator *pSvcLocator)
       : EL::AnaAlgorithm(name, pSvcLocator)
@@ -587,7 +585,7 @@ namespace MULTILEPTON
     if (taus->size() >= 2){
       for(const auto& trig : di_tau_paths){
         bool pass = false;
-        if (m_triggerdecos.count("trigPassed_"+trig) > 0){
+        if (m_triggerdecos.contains("trigPassed_"+trig)){
           pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
         } else {
           ATH_MSG_WARNING("Trigger " << trig << " not found. Skipping.");
@@ -869,7 +867,7 @@ namespace MULTILEPTON
     // muon
     if(year==2015)
       m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 21. * Athena::Units::GeV;
-    else if(year<=2016 && year<=2018)
+    else if(year>=2016 && year<=2018)
       m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 27. * Athena::Units::GeV;
     // TODO: Add 2022 and 2023 triggers
     // else
@@ -895,7 +893,7 @@ namespace MULTILEPTON
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 19. * Athena::Units::GeV;
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 10. * Athena::Units::GeV;
     }
-    else if(year<=2016 && year<=2018) {
+    else if(year>=2016 && year<=2018) {
       // TODO: why bbll set cut on 24 & 10 GeV?
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 23. * Athena::Units::GeV;
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 9. * Athena::Units::GeV;

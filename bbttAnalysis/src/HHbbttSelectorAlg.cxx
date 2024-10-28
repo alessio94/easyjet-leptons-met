@@ -342,7 +342,7 @@ namespace HHBBTT
       {
         bool passTauWP = m_tauWPDecorHandle.get(*tau, sys);
         if (m_doAntiIDRegions) {
-          passTauWP |= m_antiTauDecorHandle.get(*tau, sys);
+          passTauWP |= m_antiTauDecorHandle.get(*tau, sys) > 0;
         }
         m_selected_tau.set(*tau, false, sys);
         if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)

@@ -184,7 +184,7 @@ namespace VBSHIGGS
 
     if(year==2015)
       m_pt_threshold[VBSHIGGS::SLT][VBSHIGGS::mu] = 21. * Athena::Units::GeV;
-    else if(year<=2016 && year<=2018)
+    else if(year>=2016 && year<=2018)
       m_pt_threshold[VBSHIGGS::SLT][VBSHIGGS::mu] = 27. * Athena::Units::GeV;
     else
       m_pt_threshold[VBSHIGGS::SLT][VBSHIGGS::mu] = 25. * Athena::Units::GeV;

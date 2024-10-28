@@ -27,12 +27,12 @@ public:
                        const ConstDataVector<xAOD::JetContainer> *,
                        const xAOD::EventInfo * event=nullptr);
 
-    CH_ID classify_id();
+    CH_ID classify_id() const;
 
-    FLAVOR_1L classify_flavor_1L();
-    FlAVOR_2L classify_flavor_2L();
-    FLAVOR_3L classify_flavor_3L();
-    FLAVOR_4L classify_flavor_4L();
+    FLAVOR_1L classify_flavor_1L() const;
+    FlAVOR_2L classify_flavor_2L() const;
+    FLAVOR_3L classify_flavor_3L() const;
+    FLAVOR_4L classify_flavor_4L() const;
 
     void reorder_3l();
     void fill_lepton_pairs();

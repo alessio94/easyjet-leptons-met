@@ -12,3 +12,6 @@ __pycache__/
 *eventLoopHeartBeat.txt
 
 *.h5
+
+.cache/
+compile_commands.json

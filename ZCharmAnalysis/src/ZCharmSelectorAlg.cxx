@@ -588,7 +588,7 @@ namespace ZCC
 
     if(year==2015)
       m_pt_threshold[ZCC::SLT][ZCC::mu] = 21. * Athena::Units::GeV;
-    else if(year<=2016 && year<=2018)
+    else if(year>=2016 && year<=2018)
       m_pt_threshold[ZCC::SLT][ZCC::mu] = 27. * Athena::Units::GeV;
     else
       m_pt_threshold[ZCC::SLT][ZCC::mu] = 25. * Athena::Units::GeV;
@@ -614,7 +614,7 @@ namespace ZCC
       m_pt_threshold[ZCC::DLT][ZCC::leadingmu] = 19. * Athena::Units::GeV;
       m_pt_threshold[ZCC::DLT][ZCC::subleadingmu] = 10. * Athena::Units::GeV;
     }
-    else if(year<=2016 && year<=2018) {
+    else if(year>=2016 && year<=2018) {
       m_pt_threshold[ZCC::DLT][ZCC::leadingmu] = 24. * Athena::Units::GeV;
       m_pt_threshold[ZCC::DLT][ZCC::subleadingmu] = 10. * Athena::Units::GeV;
     } else {

@@ -92,7 +92,7 @@ class CutManager : public AthMessaging, public std::vector<CutEntry>
         void DoWeightedAbsoluteEfficiency(float totalWeight, TEfficiency* eff);
         void DoWeightedRelativeEfficiency(float totalWeight, TEfficiency* eff);
         void DoWeightedStandardCutFlow(float totalWeight, TEfficiency* eff);
-        void CheckInputCutList(std::vector<std::string> inputCutList, std::vector<std::string> standard_cuts );
+        void CheckInputCutList(const std::vector<std::string> & inputCutList, const std::vector<std::string> & standard_cuts );
 
         int PassAllCuts{0};
 

@@ -56,7 +56,7 @@ namespace HHBBLL {
   }
 
 
-  StatusCode NeutrinoWeightingTool::SetupEtaSampling(TLorentzVector lepton_pos, TLorentzVector lepton_neg){
+  StatusCode NeutrinoWeightingTool::SetupEtaSampling(const TLorentzVector& lepton_pos, const TLorentzVector& lepton_neg){
 
 
     ///-- This function setups up the sampling of eta steps. --///
@@ -312,7 +312,7 @@ namespace HHBBLL {
   }
 
 
-  float NeutrinoWeightingTool::get_weight(TLorentzVector nu1, TLorentzVector nu2, double met_ex, double met_ey){
+  float NeutrinoWeightingTool::get_weight(const TLorentzVector& nu1, const TLorentzVector& nu2, double met_ex, double met_ey){
 
       double dx = met_ex - (nu1 + nu2).Px();
       double dy = met_ey - (nu1 + nu2).Py();

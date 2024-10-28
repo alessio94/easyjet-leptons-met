@@ -113,7 +113,7 @@ namespace Easyjet
         // jvt selection
         if(m_useJVT){
           bool jvt = m_jvtselection.get(*jet, sys);
-          if(m_useFJVT) jvt &= m_fjvtselection.get(*jet, sys);
+          if(m_useFJVT) jvt &= m_fjvtselection.get(*jet, sys) > 0;
           if ( !jvt ) continue;
         }
 

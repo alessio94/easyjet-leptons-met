@@ -11,6 +11,6 @@ namespace detail {
     using Tp = Primitive::Type;
     return std::unordered_set {
       Tp::CUSTOM, Tp::PRECISION_CUSTOM
-    }.count(t);
+    }.contains(t);
   }
 }

@@ -58,9 +58,9 @@ private:
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
     m_outHandle{ this, "pairedOutBJets", "pairedttHHAnalysisJets_%SYS%", "Jet container to write" };
 
-    std::vector<const xAOD::Jet*> bJetChiSquarePairing(const ConstDataVector<xAOD::JetContainer>& Jets, float target_mass_1, float target_mass_2);
+    std::vector<const xAOD::Jet*> bJetChiSquarePairing(const ConstDataVector<xAOD::JetContainer>& Jets, float targetMass1, float targetMass2);
 
-    std::tuple<const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, float> minChiSquared(const ConstDataVector<xAOD::JetContainer>& Jets, const std::vector<size_t>& indexes, float target_mass_1, float target_mass_2);
+    std::tuple<const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, const xAOD::Jet*, float> minChiSquared(const ConstDataVector<xAOD::JetContainer>& Jets, const std::vector<size_t>& indexes, float targetMass1, float targetMass2);
 
     std::string m_pairingStrategyName;
 

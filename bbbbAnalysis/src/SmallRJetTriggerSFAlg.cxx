@@ -60,7 +60,7 @@ namespace HH4B
             unsigned int multiplicity = match[1].str()=="" ? 1 : std::stoi(match[1].str());
             TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get(
                 ("L1_"+threshold+"_jet_sf").c_str())));
-            if (h) {m_jetTriggerSFMap.emplace(std::stoi(threshold), std::move(h)); }
+            if (h) {m_jetTriggerSFMap.emplace(std::stoi(threshold), h); }
             else { ATH_MSG_WARNING("No trigger jet scale factor for L1 threshold J" << threshold); }
             for (unsigned int i=0; i< multiplicity; i++) // flattern the multiplicity
             {
@@ -80,7 +80,7 @@ namespace HH4B
             {
               TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get(
                   (m_matchingLevel+"_"+std::to_string(legInfo.threshold)+"_jet_sf").c_str())));
-              if (h) { m_jetTriggerSFMap.emplace(legInfo.threshold, std::move(h)); }
+              if (h) { m_jetTriggerSFMap.emplace(legInfo.threshold, h); }
               else { ATH_MSG_WARNING("No trigger jet scale factor for HLT threshold j" << legInfo.threshold); }
             }
             for (unsigned int i = 0; i < legInfo.multiplicity; i++) // flattern the multiplicity
