@@ -2,7 +2,7 @@ include: EasyjetHub/base-config.yaml
 
 # Which analysis and channels to consider
 do_bbVV_analysis: true
-channels: ["1leptonBoosted","1leptonSplitboosted","0leptonBoosted","0leptonSplitboosted"]
+channel: []
 
 # Decay mode considered for truth decoration
 Truth:
@@ -20,20 +20,32 @@ Small_R_jet:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
 
+  btag_extra_wps:
+    - DL1dv01_FixedCutBEff_60
+    - DL1dv01_FixedCutBEff_70
+    - DL1dv01_FixedCutBEff_85
+    - DL1dv01_Continuous
+    # - GN2v01_FixedCutBEff_85
+
+Large_R_jet:
+  amount: 2
+  GN2X_hbb_wps: ["FixedCutBEff_70", "FixedCutBEff_60", "FixedCutBEff_50"]
+  wtag_type: "ANN" # ANN, DNN
+  wtag_wp: 70 # [50, 60, 70, 80, 90] ANN, [50, 80] DNN
+  max_eta: 2.0
+  
+
 Electron:
   ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"
   extra_wps:
-    - ["TightLH", "Loose_VarRad"]
+    - ["MediumLH", "TightTrackOnly_VarRad"]
 
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
   extra_wps:
-    - ["Medium", "PflowLoose_VarRad"]
-
-Lepton:
-  amount: 1
+    - ["Medium", "PflowTight_VarRad"] # "TightTrackOnly_VarRad" not yet supported
 
 # orthogonality studies  
 orthogonality:
@@ -47,6 +59,15 @@ Trigger:
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
 do_overlap_removal: true
+
+CutList : # Only include general cuts
+      - AT_LEAST_TWO_LRJETS
+      - LEAD_LRJ_PT
+      - HBB_PT
+      - HBB_BTAG
+
+# Enable cutflow
+save_bbVV_cutflow: true
 
 # Include the TTree configuration and update details
 ttree_output:

@@ -18,7 +18,6 @@ namespace HHBBVV
 
   StatusCode BaselineVarsbbVVAlg::initialize()
   {
-
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
@@ -39,36 +38,45 @@ namespace HHBBVV
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK(m_Hbb.initialize(m_systematicsList, m_lrjetHandle)); // Hbb jet
+    ATH_CHECK(m_Whad.initialize(m_systematicsList, m_lrjetHandle)); // Whad jet
+    ATH_CHECK(m_Whad2.initialize(m_systematicsList, m_lrjetHandle)); // Whad2 jet
 
-    // Intialise syst-aware output decorators
-    // ATH_CHECK(m_HH_pt.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_eta.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_phi.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_m.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_vis_pt.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_vis_eta.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_vis_phi.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_vis_m.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_visMet_pt.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_visMet_eta.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_visMet_phi.initialize(m_systematicsList, m_eventHandle));
-    // ATH_CHECK(m_HH_visMet_m.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_ANN_70_Score.initialize(m_systematicsList, m_lrjetHandle));
 
-    ATH_CHECK(m_selected_lepton_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_eta.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_phi.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_E.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_charge.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_selected_lepton_pdgid.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_Pass_GN2X_70.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_Pass_GN2X_60.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_Pass_GN2X_50.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_Pass_ANN_70.initialize(m_systematicsList, m_lrjetHandle));
 
-    if(m_isMC){
-      m_selected_lepton_SF = CP::SysWriteDecorHandle<float>("Selected_Lepton_SF_%SYS%", this);
+    // Initialise syst-aware output decorators
+    for(const std::string &var : m_floatVariables){
+      CP::SysWriteDecorHandle<float> whandle{var+"_%SYS%", this};
+      m_Fbranches.emplace(var, whandle);
+      ATH_CHECK(m_Fbranches.at(var).initialize(m_systematicsList, m_eventHandle));
     }
-    ATH_CHECK(m_selected_lepton_SF.initialize(m_systematicsList, m_eventHandle, SG::AllowEmpty));
 
-    if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
-    }
+    for(const std::string &var : m_intVariables){
+      CP::SysWriteDecorHandle<int> whandle{var+"_%SYS%", this};
+      m_Ibranches.emplace(var, whandle);
+      ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
+    };
+
+    for(const std::string &channel : m_channel_names){
+      if (channel.std::string::find("1Lep") != std::string::npos)m_run_lep = true;
+
+      if( channel == "Boosted1Lep") m_channels.push_back(HHBBVV::Boosted1Lep);
+      else if ( channel == "SplitBoosted1Lep") m_channels.push_back(HHBBVV::SplitBoosted1Lep);
+      else if( channel == "Boosted0Lep") m_channels.push_back(HHBBVV::Boosted0Lep);
+      else if ( channel == "SplitBoosted0Lep") m_channels.push_back(HHBBVV::SplitBoosted0Lep);
+      else{
+        ATH_MSG_ERROR("Unknown channel: "
+          << channel << std::endl
+          << "Available are: [\"Boosted1Lep\", \"SplitBoosted1Lep\", \"Boosted0Lep\", \"SplitBoosted0lep\"]");
+        return StatusCode::FAILURE;
+      }
+      ATH_MSG_DEBUG("Running Channel: " << channel);
+    };
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -78,11 +86,9 @@ namespace HHBBVV
 
   StatusCode BaselineVarsbbVVAlg::execute()
   {
-
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
-
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
@@ -107,48 +113,136 @@ namespace HHBBVV
       	return StatusCode::FAILURE;
       }
 
+      for (const std::string &string_var: m_floatVariables) { // Initialize
+        m_Fbranches.at(string_var).set(*event, -99., sys);
+      }
+      
+      for (const std::string &string_var: m_intVariables) {
+        m_Ibranches.at(string_var).set(*event, -99, sys);
+      }
+
+
       // Calculate vars
 
-      // selected leptons ; 
-      float lepton_pt = -99;
-      float lepton_eta = -99;
-      float lepton_phi = -99;
-      float lepton_E = -99;
-      int lepton_charge = -99;
-      int lepton_pdgid = -99;
-      float lepton_SF = -99;
+      TLorentzVector signal_lepton;
+      float signal_lepton_SF = -99.;
+      int signal_lepton_charge = -99;
+      int signal_lepton_id = -99;
 
       for(const xAOD::Electron* electron : *electrons) {
         if (m_selected_el.get(*electron, sys)){
-          lepton_pt = electron->pt();
-          lepton_eta = electron->eta();
-          lepton_phi = electron->phi();
-          lepton_E = electron->e();
-          lepton_charge = electron->charge();
-          lepton_pdgid = electron->charge() > 0 ? -11 : 11;
-          if(m_isMC) lepton_SF = m_ele_SF.get(*electron,sys);
+          signal_lepton = electron->p4();
+          signal_lepton_SF = m_ele_SF.get(*electron, sys);
+          signal_lepton_charge = electron->charge();
+          signal_lepton_id = signal_lepton_charge > 0 ? -11 : 11;
           break; // At most one lepton selected
       	}
       }
       for(const xAOD::Muon* muon : *muons) {
         if (m_selected_mu.get(*muon, sys)){
-          lepton_pt = muon->pt();
-          lepton_eta = muon->eta();
-          lepton_phi = muon->phi();
-          lepton_E = muon->e();
-          lepton_charge = muon->charge();
-          lepton_pdgid = muon->charge() > 0 ? -13 : 13;
-          if(m_isMC) lepton_SF = m_mu_SF.get(*muon,sys);
-          break;
-	}
+          signal_lepton = muon->p4();
+          signal_lepton_SF = m_mu_SF.get(*muon, sys);
+          signal_lepton_charge = muon->charge();
+          signal_lepton_id = signal_lepton_charge > 0 ? -13 : 13;
+          break; 
+        }
       }
-      m_selected_lepton_pt.set(*event, lepton_pt, sys);
-      m_selected_lepton_eta.set(*event, lepton_eta, sys);
-      m_selected_lepton_phi.set(*event, lepton_phi, sys);
-      m_selected_lepton_E.set(*event, lepton_E, sys);
-      m_selected_lepton_charge.set(*event, lepton_charge, sys);
-      m_selected_lepton_pdgid.set(*event, lepton_pdgid, sys);
-      if(m_isMC) m_selected_lepton_SF.set(*event, lepton_SF, sys);
+
+      if(m_run_lep){ // Fill in the selected lepton branches
+        m_Fbranches.at("Lepton_pt").set(*event, signal_lepton.Pt(), sys);
+        m_Fbranches.at("Lepton_eta").set(*event, signal_lepton.Eta(), sys);
+        m_Fbranches.at("Lepton_phi").set(*event, signal_lepton.Phi(), sys);
+        m_Fbranches.at("Lepton_E").set(*event, signal_lepton.E(), sys);
+        m_Fbranches.at("Lepton_effSF").set(*event, signal_lepton_SF, sys);
+        m_Ibranches.at("Lepton_charge").set(*event, signal_lepton_charge, sys);
+        m_Ibranches.at("Lepton_pdgid").set(*event, signal_lepton_id, sys);
+      }
+
+      static const std::vector<SG::ConstAccessor<float>> acc_tau_wta{
+        SG::ConstAccessor<float>("Tau1_wta"),
+        SG::ConstAccessor<float>("Tau2_wta"),
+        SG::ConstAccessor<float>("Tau3_wta"),
+        SG::ConstAccessor<float>("Tau4_wta")
+      };
+      static const std::vector<SG::ConstAccessor<float>> acc_ecf{
+        SG::ConstAccessor<float>("ECF1"),
+        SG::ConstAccessor<float>("ECF2"),
+        SG::ConstAccessor<float>("ECF3"),
+      };
+
+      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phbb("GN2Xv01_phbb");
+      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_pqcd("GN2Xv01_pqcd");
+      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phcc("GN2Xv01_phcc");
+      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_ptop("GN2Xv01_ptop");
+
+      for(const xAOD::Jet* lrjet : *lrjets)
+      {
+        std::string prefix = "";
+        if (m_Whad.get(*lrjet, sys))
+        {
+          prefix = "Whad_Jet";
+          m_Fbranches.at(prefix+"_DeltaR").set(*event, lrjet->p4().DeltaR(signal_lepton), sys);
+
+          for(auto channel: m_channels){
+            if(channel == HHBBVV::Boosted0Lep){
+              for (int i = 0; i < 4; i++){
+                if(acc_tau_wta[i].isAvailable(*lrjet)) { // Suggested ConstAccessor
+                  float wta_value = acc_tau_wta[i](*lrjet);
+                  wta_value = (wta_value < 1e-8) ? -99. : wta_value ;
+                  m_Fbranches.at(prefix + "_Tau" + std::to_string(i + 1) + "_wta").set(*event, wta_value, sys);
+                }
+              }
+              for (int i = 0; i < 3; i++){
+                if(acc_ecf[i].isAvailable(*lrjet)) { // Suggested ConstAccessor
+                  float ecf_value = acc_ecf[i](*lrjet);
+                  ecf_value = (ecf_value < 1e-8) ? -99. : ecf_value ;
+                  m_Fbranches.at(prefix + "_ECF" + std::to_string(i + 1)).set(*event, ecf_value, sys);
+                }
+              }
+            }
+          }
+        }
+        else if (m_Whad2.get(*lrjet, sys)){
+          for(auto channel: m_channels){
+            if(channel == HHBBVV::SplitBoosted0Lep)prefix = "Whad2_Jet";
+          }
+        }
+        else if (m_Hbb.get(*lrjet, sys)){
+          prefix = "Hbb_Jet";
+        }
+
+        if(!prefix.empty()){
+          m_Fbranches.at(prefix + "_pt").set(*event, lrjet->pt(), sys);
+          m_Fbranches.at(prefix + "_eta").set(*event, lrjet->eta(), sys);
+          m_Fbranches.at(prefix + "_phi").set(*event, lrjet->phi(), sys);
+          m_Fbranches.at(prefix + "_m").set(*event, lrjet->m(), sys);
+
+          float phbb_score = GN2Xv01_phbb(*lrjet);
+          float pqcd_score = GN2Xv01_pqcd(*lrjet);
+          float phcc_score = GN2Xv01_phcc(*lrjet);
+          float ptop_score = GN2Xv01_ptop(*lrjet);
+          float ann_score = m_ANN_70_Score.get(*lrjet, sys);
+          m_Fbranches.at(prefix+"_GN2Xv01_phbb").set(*event, phbb_score, sys);
+          m_Fbranches.at(prefix+"_GN2Xv01_pqcd").set(*event, pqcd_score, sys);
+          m_Fbranches.at(prefix+"_GN2Xv01_phcc").set(*event, phcc_score, sys);
+          m_Fbranches.at(prefix+"_GN2Xv01_ptop").set(*event, ptop_score, sys);
+          m_Fbranches.at(prefix+"_ANN_70_Score").set(*event, ann_score, sys);
+
+          int pass_70 = (int)m_Pass_GN2X_70.get(*lrjet, sys);
+          int pass_60 = (int)m_Pass_GN2X_60.get(*lrjet, sys);
+          int pass_50 = (int)m_Pass_GN2X_50.get(*lrjet, sys);
+          int pass_ANN = (int)m_Pass_ANN_70.get(*lrjet, sys);
+          m_Ibranches.at(prefix+"_Pass_GN2X_70").set(*event, pass_70, sys);
+          m_Ibranches.at(prefix+"_Pass_GN2X_60").set(*event, pass_60, sys);
+          m_Ibranches.at(prefix+"_Pass_GN2X_50").set(*event, pass_50, sys);
+          m_Ibranches.at(prefix+"_Pass_ANN_70").set(*event, pass_ANN, sys);
+
+        }
+      }
+
+      m_Ibranches.at("lrjets_n").set(*event, lrjets->size(), sys);
+      m_Ibranches.at("srjets_n").set(*event, jets->size(), sys);
+      m_Ibranches.at("Selected_Lepton_n").set(*event, (electrons->size()+muons->size()), sys);      
 
       // DiHiggs mass 
       TLorentzVector bb(0,0,0,0);
@@ -156,16 +250,8 @@ namespace HHBBVV
       TLorentzVector HH(0,0,0,0);
       TLorentzVector HH_vis(0,0,0,0);
       TLorentzVector HH_visMet(0,0,0,0);
- 
+
       // TODO: implement bbVV variables: Hbb, Whad, HH system
-      bool WPgiven = !m_isBtag.empty();
-      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
-      for(const xAOD::Jet* jet : *jets) {
-        if (WPgiven) {
-          if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
-        }
-      }
-     
     }
 
     return StatusCode::SUCCESS;

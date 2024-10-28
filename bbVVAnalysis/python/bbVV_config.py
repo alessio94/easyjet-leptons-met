@@ -2,13 +2,15 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg, LeptonOrderingAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
-    get_selected_objects_branches,
+    get_selected_objects_branches_variables,
 )
 
 
-def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
+def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
+             float_variables=None, int_variables=None
+             ):
     cfg = ComponentAccumulator()
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
@@ -29,6 +31,10 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                                      looseEleWP=ElectronWPLabel,
                                      tightEleWPs=[TightEleWPLabel]))
 
+    cfg.merge(LeptonOrderingAlgCfg(flags,
+                                   containerInEleKey=electronkey,
+                                   containerInMuKey=muonkey))
+
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg",
                                 containerInKey=smalljetkey,
                                 containerOutKey="bbVVAnalysisJets_%SYS%",
@@ -45,8 +51,8 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                                 selectBjet=False,
                                 minPt=200e3,
                                 maxEta=2.0,
-                                truncateAtAmount=3,
-                                minimumAmount=2))
+                                truncateAtAmount=-1,  # Keep all lrjets
+                                minimumAmount=flags.Analysis.Large_R_jet.amount))
 
     # Selection
     cfg.addEventAlgo(
@@ -56,7 +62,8 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
-            channel=flags.Analysis.channels,
+            channel=flags.Analysis.channel,
+            cutList=flags.Analysis.CutList,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
         )
@@ -65,26 +72,79 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     # calculate final bbVV vars
     cfg.addEventAlgo(
         CompFactory.HHBBVV.BaselineVarsbbVVAlg(
-            "FinalVarsbbVVAlg",
+            "BaselineVarsbbVVAlg",
             isMC=flags.Input.isMC,
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+            floatVariableList=float_variables,
+            intVariableList=int_variables,
+            channel=flags.Analysis.channel
         )
     )
-
     return cfg
+
+
+def get_BaselineVarshhbbVVAlg_variables(flags):
+
+    objects = ["Hbb", "Whad"]
+    if "SplitBoosted0Lep" in flags.Analysis.channel:
+        objects += ["Whad2"]
+
+    float_variable_names = ["Whad_Jet_DeltaR"]
+
+    for obj in objects:
+        for var in ["pt", "eta", "phi", "m"]:
+            float_variable_names += [obj + "_Jet_" + var]
+        for var in ["phbb", "pqcd", "phcc", "ptop"]:
+            float_variable_names += [obj + "_Jet_GN2Xv01_" + var]
+        float_variable_names += [obj + "_Jet_ANN_70_Score"]
+
+    int_variable_names = ["lrjets_n", "srjets_n", "Selected_Lepton_n"]
+    for obj in objects:
+        for var in ["Pass_GN2X_70", "Pass_GN2X_60", "Pass_GN2X_50", "Pass_ANN_70"]:
+            int_variable_names += [obj + "_Jet_" + var]
+
+    if "Boosted0Lep" in flags.Analysis.channel:
+        for i in range(1, 5):
+            float_variable_names += [f"Whad_Jet_Tau{i}_wta"]
+        for i in range(1, 4):
+            float_variable_names += [f"Whad_Jet_ECF{i}"]
+
+    return float_variable_names, int_variable_names
 
 
 def bbVV_branches(flags):
     branches = []
 
-    # These are the variables always saved with the objects selected by the analysis
-    # This is tunable with the flags amount and variables
-    # in the object configs.
-    branches += get_selected_objects_branches(flags, "bbVV")
+    float_variable_names = []
+    int_variable_names = []
+    all_baseline_variable_names = []
 
-    branches += ["EventInfo.bbVV_pass_sr_%SYS% -> bbVV_pass_SR"
+    baseline_float_variables, baseline_int_variables \
+        = get_BaselineVarshhbbVVAlg_variables(flags)
+    float_variable_names += baseline_float_variables
+    int_variable_names += baseline_int_variables
+
+    all_baseline_variable_names += [
+        *float_variable_names,
+        *int_variable_names
+    ]
+
+    for var in all_baseline_variable_names:
+        branches += [
+            f"EventInfo.{var}_%SYS% -> bbVV_{var}"
+            + flags.Analysis.systematics_suffix_separator + "%SYS%"
+        ]
+
+    object_level_branches, object_level_float_variables, object_level_int_variables \
+        = get_selected_objects_branches_variables(flags, "bbVV")
+    float_variable_names += object_level_float_variables
+    int_variable_names += object_level_int_variables
+
+    branches += object_level_branches
+
+    # cuts in ttree
+    branches += ["EventInfo.PassAllCuts_%SYS% -> PassAllCuts"
                  + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    return branches
+    return branches, float_variable_names, int_variable_names

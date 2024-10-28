@@ -1,0 +1,10 @@
+include: bbVVAnalysis/RunConfig-bbVV.yaml
+
+channel: ["Boosted1Lep"]
+
+Lepton:
+  amount: 1
+
+CutList : # Channel specific cuts here
+      - EXACTLY_ONE_LEPTON
+      - DR_CUT

@@ -206,6 +206,11 @@ ntupler_bbtt_mc23:
   script:
     - easyjet-test bbtt-mc23
 
+ntupler_bbVV_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test bbVV-mc23
+
 ntupler_SHbbyy_mc23af3:
   extends: .ntupler
   script:

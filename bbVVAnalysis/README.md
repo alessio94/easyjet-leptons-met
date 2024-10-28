@@ -5,8 +5,12 @@ Analysis Package for the $HH\rightarrow b\bar{b} VV$ analyis
 
 - `bin/`: Executables
   - `bbVV-ntupler`
+- `datasets/`: List of datasets relevent to bbVV analysis
+  - `PHYS/`: DAOD_PHYS
+    - `nominal`: Systematics
 - `python/`: Main python code to configure the components (objects, selections as well as the variables to save)
   - `bbVV_config`
+  - `Run_bbVV`
 - `share/`: yaml files containing configurations used by the components
   - `bbVV-base`: where all the common flags are set;
   - `RunConfig-bbVV[-bypass]`: configurations called by the executables (see below);
@@ -23,6 +27,28 @@ Analysis Package for the $HH\rightarrow b\bar{b} VV$ analyis
 - run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbVV-ntupler ttbar_PHYS_10evt.root --run-config bbVVAnalysis/RunConfig-bbVV-bypass.yaml --out-file output_PHYS_bbVV.root```
 - run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbVV-ntupler ttbar_PHYSLITE_10evt.root --run-config bbVVAnalysis/RunConfig-bbVV-bypass.yaml --out-file output_PHYSLITE_bbVV.root```
 An alternative is to use the preselection step using the configuration `RunConfig-bbVV.yaml` instead of `RunConfig-bbVV-bypass.yaml`, however fewer events would be recorded.
+
+3. `Run_bbVV.py` script - Assuming you are at the top directory. You can specify your `PHYS` directory to look for mc samples by `--SampleDir` flag
+- Boosted analysis:
+```
+python easyjet/bbVVAnalysis/python/Run_bbVV.py --Boost --Mass 4000
+```
+- Split-Boosted analysis:
+```
+python easyjet/bbVVAnalysis/python/Run_bbVV.py --Mass 3000
+```
+- Run on grid: Using the `easyjet-gridsubmit`, boosted config, all signal samples
+```
+python easyjet/bbVVAnalysis/python/Run_bbVV.py --Boost --GridRun
+```
+- Run on grid: Split-boosted config, ttbar background samples
+```
+python easyjet/bbVVAnalysis/python/Run_bbVV.py --Process top --GridRun
+```
+- See available parser arguments
+```
+python easyjet/bbVVAnalysis/python/Run_bbVV.py -h
+```
 
 # Output
 
@@ -43,4 +69,26 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
 # Main developers
 
 The main developments have been performed by (non extensive list, feel free to add your name):
-Kira Abeling.
+Kira Abeling, JaeJin Hong, Hsuan-Chu Lien, Jared Little
+
+# 0lep_Dev ToDo - Delete(Or check) when done
+* - [x] yaml configuration:
+    * - [x] Include the common yaml for each channel
+    * - [x] Channel specific yaml for clear visual
+        * - [x] Boosted 1lep
+        * - [x] Split-Boosted 1lep(LEAVE 1lep split-boosted as it is)
+        * - [x] Boosted 0lep
+        * - [x] Split-Boosted 0lep
+* - [x] 0lep Split-Boosted implementation:
+    * - [x] Two WHad LRJet
+* - [x] Add ntuple jss branches of WHad LRJet:
+    * - [x] N subjetness(Tau_2, Tau_3, Tau_4)
+    * - [x] Energy_Correlator_Functions(ECF1, ECF2, ECF3)<br>
+-----DO_BELOW_AFTER_MR_TO_MAIN-----<br>
+* - [ ] Implement baseline WHad tagger:
+    * - [ ] Tau_42
+        * - [ ] Tau_42 tagging study
+        * - [ ] Implement Tau_42 working point in the easyJet
+    * - [ ] R21 WHad tagger
+        * - [ ] Access tagger score in the easyJet
+        * - [ ] Implement WHad tagger working point in the easyJet

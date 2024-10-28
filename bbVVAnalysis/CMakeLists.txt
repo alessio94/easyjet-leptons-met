@@ -26,6 +26,7 @@ atlas_add_component(bbVVAnalysis
   FourMomUtils
   TruthUtils
   EventBookkeeperToolsLib
+  EasyjetHubLib
 )
 
 # Install python modules, joboptions, and share content
@@ -38,6 +39,7 @@ atlas_install_python_modules(
 )
 atlas_install_data(
   share/*.yaml
+  datasets/*
 )
 
 # atlas_install_data( data/* )

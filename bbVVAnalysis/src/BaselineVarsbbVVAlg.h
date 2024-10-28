@@ -19,6 +19,8 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+#include "HHbbVVEnums.h"
+
 namespace HHBBVV
 {
 
@@ -36,9 +38,14 @@ public:
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
+
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
+    Gaudi::Property<std::vector<std::string>> m_channel_names
+    { this, "channel", {}, "Which channel to run" };
+    
+    std::vector<HHBBVV::Channel> m_channels; // Which bbVV channels to run
 
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
@@ -76,34 +83,42 @@ private:
     m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input dectorator for selected el"};
     CP::SysReadDecorHandle<bool> 
     m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input dectorator for selected mu"};
+
+    CP::SysReadDecorHandle<bool>
+    m_Whad { this, "Whad", "Whad_%SYS%", "Name of input dectorator for Whad jet"};
+    CP::SysReadDecorHandle<bool>
+    m_Whad2 { this, "Whad2", "Whad2_%SYS%", "Name of input dectorator for Whad jet"};
+    CP::SysReadDecorHandle<bool>
+    m_Hbb { this, "Hbb", "Hbb_%SYS%", "Name of input dectorator for Hbb jet"};
+
+    CP::SysReadDecorHandle<float> 
+    m_ANN_70_Score {this, "ANN_70_Score", "ANN70Tagger_Score", "ANN70Tagger score"};
+
+    CP::SysReadDecorHandle<bool> 
+    m_Pass_GN2X_70 {this, "GN2X_Pass70", "GN2X_select_FixedCutBEff_70", "GN2X_select_FixedCutBEff70 selection"};
+    CP::SysReadDecorHandle<bool> 
+    m_Pass_GN2X_60 {this, "GN2X_Pass60", "GN2X_select_FixedCutBEff_60", "GN2X_select_FixedCutBEff60 selection"};
+    CP::SysReadDecorHandle<bool> 
+    m_Pass_GN2X_50 {this, "GN2X_Pass50", "GN2X_select_FixedCutBEff_50", "GN2X_select_FixedCutBEff50 selection"};
+    CP::SysReadDecorHandle<bool> 
+    m_Pass_ANN_70 {this, "ANN_Pass70", "ANN70Tagger_Tagged", "ANN70Tagger selection"};
+
+    Gaudi::Property<std::vector<std::string>> m_floatVariables
+          {this, "floatVariableList", {}, "Name list of floating variables"};
+
+    Gaudi::Property<std::vector<std::string>> m_intVariables
+          {this, "intVariableList", {}, "Name list of integer variables"};
+
     
-    CP::SysReadDecorHandle<char> 
-    m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
-
     /// \brief Setup sys-aware output decorations
-    // CP::SysWriteDecorHandle<float> m_HH_pt {"HH_pt_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_eta {"HH_eta_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_phi {"HH_phi_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_m {"HH_m_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_vis_pt {"HH_vis_pt_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_vis_eta {"HH_vis_eta_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_vis_phi {"HH_vis_phi_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_vis_m {"HH_vis_m_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_visMet_pt {"HH_visMet_pt_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_visMet_eta {"HH_visMet_eta_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_visMet_phi {"HH_visMet_phi_%SYS%", this};
-    // CP::SysWriteDecorHandle<float> m_HH_visMet_m {"HH_visMet_m_%SYS%", this};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 
-    CP::SysWriteDecorHandle<float> m_selected_lepton_pt {"Lepton_pt_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_eta {"Lepton_eta_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_phi {"Lepton_phi_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_E {"Lepton_E_%SYS%", this};
-    CP::SysWriteDecorHandle<int> m_selected_lepton_charge {"Lepton_charge_%SYS%", this};
-    CP::SysWriteDecorHandle<int> m_selected_lepton_pdgid {"Lepton_pdgid_%SYS%", this};
-    CP::SysWriteDecorHandle<float> m_selected_lepton_SF {"Lepton_effSF_%SYS%", this};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
     // Local variables and functions
 
+    bool m_run_lep = false;
+    
   };
 }
 
