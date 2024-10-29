@@ -112,8 +112,7 @@ def analysis_configuration(parser="default"):
         lambda prevFlags: get_trigger_chains_scale_factor(prevFlags)
     )
 
-    do_PRW = flags.Input.isMC and not flags.Input.isPHYSLITE
-    flags.addFlag("Analysis.doPRW", do_PRW)
+    flags.addFlag("Analysis.doPRW", flags.Input.isMC)
 
     # set HH orthogonality flags, if orthogonality is contained in the given config
     if 'orthogonality' in flags.Analysis:
