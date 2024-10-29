@@ -205,7 +205,7 @@ namespace ttHH
               m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,m_PCBT.get(*JetsCandidate[i], sys),sys);
 	  }
 
-          if (m_PCBT.get(*JetsCandidate[i], sys) >= 3) {
+          if (m_PCBT.get(*JetsCandidate[i], sys) > 3) { // [1,2,3,4,5,6] -> [100%,90%,85%,77%,75%,65%] for GN2v01!
             nBJets77++;
           }
         }
