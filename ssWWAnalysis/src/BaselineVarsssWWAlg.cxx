@@ -240,8 +240,12 @@ namespace ssWWVBS
         m_Fbranches.at("dPhillMET").set(*event, ll.Vect().DeltaPhi(metVec3), sys);
         m_Fbranches.at("dPhil1MET").set(*event, Leading_lep.Vect().DeltaPhi(metVec3), sys);
         m_Fbranches.at("dPhil2MET").set(*event, Subleading_lep.Vect().DeltaPhi(metVec3), sys);
+        // MET Variables;
+        float mT = sqrt((abs(ll.Pt()) + met->met()) * (abs(ll.Pt()) + met->met()) - (ll.Pt() * cos(ll.Phi()) + met->met() * cos(met->phi())) * (ll.Pt() * cos(ll.Phi()) + met->met() * cos(met->phi())) - (ll.Pt() * sin(ll.Phi()) + met->met() * sin(met->phi())) * (ll.Pt() * sin(ll.Phi()) + met->met() * sin(met->phi())));
+        m_Fbranches.at("mT").set(*event, mT, sys);
+        m_Fbranches.at("MET_met").set(*event, met->met(), sys);
+        m_Fbranches.at("MET_phi").set(*event, met->phi(), sys);
       }
-
 
       //jet sector
       TLorentzVector Leading_jet;
@@ -267,7 +271,27 @@ namespace ssWWVBS
         m_Fbranches.at("dEtajj").set(*event, (jets->at(0)->eta())-(jets->at(1)->eta()), sys);
         m_Fbranches.at("dPhijj").set(*event, (jets->at(0)->p4()).DeltaPhi(jets->at(1)->p4()), sys);
       }
-
+      // Zeppenfeld variable
+      TLorentzVector Subsubleading_jet;
+      if (n_jets >=3)
+      {
+        Subsubleading_jet = jets->at(2)->p4();
+        float epsilon_j3 = abs((Subsubleading_jet.Eta() - 0.5 * (Leading_jet.Eta() + Subleading_jet.Eta())) / (Subleading_lep.Eta() - Subleading_jet.Eta()));
+        m_Fbranches.at("epsilon_j3").set(*event, epsilon_j3, sys);
+      }
+      // gap jets
+      int n_gap_jets = 0;
+      if (n_jets >=3)
+      {
+        for (int i = 2; i < n_jets; i++)
+        {
+          if (jets->at(i)->eta() > std::min(Leading_jet.Eta(), Subleading_jet.Eta()) && jets->at(i)->eta() < std::max(Leading_jet.Eta(), Subleading_jet.Eta()))
+          {
+            n_gap_jets++;
+          }
+        }
+      }
+      m_Ibranches.at("nGapJets").set(*event, n_gap_jets, sys);
       // kinematics of vbs jets
       float max_mjj = 0.;
       const xAOD::Jet* vbsJet1 = nullptr;
