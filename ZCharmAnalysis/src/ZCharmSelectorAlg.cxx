@@ -72,7 +72,7 @@ namespace ZCC
     }
 
     // special flag for all cuts
-    ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_pass_cuts.initialize(m_systematicsList, m_eventHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -221,18 +221,15 @@ namespace ZCC
       evaluateCJetCuts(*cjets, m_ZCharmCuts);
       evaluateLargeJetCuts(largeJets);
       
-      bool passedall = true;
+      bool pass_baseline=true;
       for (const auto& [key, value] : m_boolnames) {
-        auto it = std::find(m_STANDARD_CUTS.begin(), m_STANDARD_CUTS.end(), value);
-        if (it != m_STANDARD_CUTS.end()) {
-          passedall &= m_bools.at(key);
+        auto it = std::find(m_BASELINE_CUTS.begin(), m_BASELINE_CUTS.end(), value);
+        if (it != m_BASELINE_CUTS.end()) {
+          pass_baseline &= m_bools.at(key);
         }
       }
-      m_passallcuts.set(*event, passedall, sys);
+      m_pass_cuts.set(*event, pass_baseline, sys);
 
-      bool pass_baseline=false;
-      if(m_bools.at(ZCC::PASS_TRIGGER) && m_bools.at(ZCC::EXACTLY_TWO_LEPTONS) && m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS) && m_bools.at(ZCC::DILEPTON_MASS_WINDOW) && m_bools.at(ZCC::MET)) pass_baseline=true;
-      
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()=="") {
 

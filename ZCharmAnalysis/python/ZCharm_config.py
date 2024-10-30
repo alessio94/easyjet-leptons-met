@@ -87,7 +87,7 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     # calculate final ZCharm vars
     cfg.addEventAlgo(
         CompFactory.ZCC.BaselineVarsZCharmAlg(
-            "FinalVarsZCharmAlg",
+            "BaselineVarsZCharmAlg",
             isMC=flags.Input.isMC,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,

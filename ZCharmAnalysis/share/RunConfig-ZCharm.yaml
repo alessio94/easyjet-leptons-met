@@ -110,5 +110,7 @@ ttree_output:
       truth_labels: true
       btag_details: true
   truth_outputs:
+    electrons: 'container_names.input.truthelectrons'
+    muons: 'container_names.input.truthmuons'
     small_R_jets: 'container_names.input.truth4Jet'
     large_R_jets: ['container_names.input.truth10SoftDropJet']

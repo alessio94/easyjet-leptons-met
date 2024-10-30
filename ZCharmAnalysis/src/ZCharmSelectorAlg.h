@@ -25,45 +25,10 @@
 
 #include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
+#include "ZCharmEnums.h"
 
 namespace ZCC
 {
-  enum TriggerChannel
-  {
-    SLT,
-    DLT,
-  };
-
-  enum Var {
-    ele = 0,
-    mu = 1,
-    leadingele = 2,
-    subleadingele = 3,
-    leadingmu = 4,
-    subleadingmu = 5
-  };
-
-  enum Booleans
-  {
-    IS_ee,
-    IS_mm,
-    IS_em,
-    
-    pass_trigger_SLT,
-    pass_trigger_DLT,
-
-    PASS_TRIGGER,
-    EXACTLY_TWO_LEPTONS,
-    OPPOSITE_CHARGE_LEPTONS,
-    DILEPTON_MASS_WINDOW,
-
-    MET,
-    ONE_B_JETS,
-    TWO_B_JETS,
-    ONE_C_JETS,
-    TWO_C_JETS,
-    ONE_LARGE_JET,
-  };
 
   /// \brief An algorithm for counting containers
   class ZCharmSelectorAlg final : public EL::AnaAlgorithm {
@@ -79,17 +44,12 @@ namespace ZCC
       /// \brief This is the mirror of initialize() and is called after all events are processed.
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
 
-      const std::vector<std::string> m_STANDARD_CUTS{
+      const std::vector<std::string> m_BASELINE_CUTS{
         "PASS_TRIGGER",
         "EXACTLY_TWO_LEPTONS",
         "OPPOSITE_CHARGE_LEPTONS",
         "DILEPTON_MASS_WINDOW",
         "MET",
-        "ONE_B_JETS",
-        "TWO_B_JETS",
-        "ONE_C_JETS",
-        "TWO_C_JETS",
-        "ONE_LARGE_JET",
       };
 
 
@@ -190,7 +150,7 @@ namespace ZCC
       Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
       std::vector<ZCC::Booleans> m_inputCutKeys;
       Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
-      CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+      CP::SysWriteDecorHandle<bool> m_pass_cuts {"PassCuts_%SYS%", this};
 
       std::unordered_map<ZCC::TriggerChannel, std::unordered_map<ZCC::Var, float>> m_pt_threshold;
 

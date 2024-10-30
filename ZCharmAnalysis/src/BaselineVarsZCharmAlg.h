@@ -3,8 +3,8 @@
 */
 
 // Always protect against multiple includes!
-#ifndef ZCHARMANALYSIS_FINALVARSZCHARMALG
-#define ZCHARMANALYSIS_FINALVARSZCHARMALG
+#ifndef ZCHARMANALYSIS_BASELINEVARSZCHARMALG
+#define ZCHARMANALYSIS_BASELINEVARSZCHARMALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
@@ -18,6 +18,7 @@
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
+#include "ZCharmEnums.h"
 
 namespace ZCC
 {
