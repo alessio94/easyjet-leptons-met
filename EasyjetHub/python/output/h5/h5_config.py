@@ -27,11 +27,14 @@ def get_h5_cfg(flags):
         )
     )
     jetcol = flags.Analysis.container_names.input[flags.Analysis.Small_R_jet.jet_type]
+    n_jets = flags.Analysis.h5.n_jets
     types = {}
     primitives = []
-    if flags.Analysis.h5.n_jets > 0:
+    array_format = "AWKWARD"
+    if n_jets > 0:
         types |= {"valid": "CUSTOM"}
         primitives.append("valid")
+        array_format = "PADDED"
     associations = {}
     kinematics = ["ptGeV", "eta", "phi", "massGeV"]
     types |= {x: "CUSTOM" for x in kinematics}
@@ -51,7 +54,8 @@ def get_h5_cfg(flags):
             primitiveToType=types,
             primitiveToAssociation=associations,
             datasetName="jets",
-            maximumSize=flags.Analysis.h5.n_jets,
+            maximumSize=n_jets,
+            arrayFormat=array_format,
             container=jetcol.replace("_%SYS%", "_NOSYS"),
             output=output,
         )
