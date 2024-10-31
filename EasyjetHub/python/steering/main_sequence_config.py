@@ -105,6 +105,12 @@ def preselection_cfg(flags, seqname):
             cfg.merge(bbyy_filter_dalitz_cfg(flags), seqname)
             cfg.merge(sumofweightsalg_cfg(flags), seqname)
 
+    if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_HSTP_samples:
+        cfg.addEventAlgo(
+            CompFactory.Easyjet.DijetHSTPFilter(),
+            seqname
+        )
+
     # Aggregate the configured CP algs in one ConfigSequence,
     # which will handle the container names, copying etc
     configSeq = ConfigSequence()

@@ -1,3 +1,4 @@
+#include "../DijetHSTPFilter.h"
 #include "../GN2XTaggingDecoratorAlg.h"
 #include "../WTaggingDecoratorAlg.h"
 #include "../EventCounterAlg.h"
@@ -22,6 +23,7 @@
 
 using namespace Easyjet;
 
+DECLARE_COMPONENT(DijetHSTPFilter)
 DECLARE_COMPONENT(GN2XTaggingDecoratorAlg)
 DECLARE_COMPONENT(WTaggingDecoratorAlg)
 DECLARE_COMPONENT(EventCounterAlg)

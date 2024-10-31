@@ -29,6 +29,9 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             "generatorWeight_%SYS%",
         ]
 
+        if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_HSTP_samples:
+            eventinfo_branches.variables += ["PassHSTP"]
+
         if flags.Analysis.doPRW:
             for prw in flags.Analysis.PileupReweighting:
                 postfix = ("_" + prw.postfix) if prw.postfix else ""
