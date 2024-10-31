@@ -44,9 +44,7 @@ namespace HHBBVV
 
     ATH_CHECK(m_ANN_70_Score.initialize(m_systematicsList, m_lrjetHandle));
 
-    ATH_CHECK(m_Pass_GN2X_70.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_Pass_GN2X_60.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_Pass_GN2X_50.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_Pass_GN2X_FlatMassQCDEff_0p58.initialize(m_systematicsList, m_lrjetHandle));
     ATH_CHECK(m_Pass_ANN_70.initialize(m_systematicsList, m_lrjetHandle));
 
     // Initialise syst-aware output decorators
@@ -228,13 +226,9 @@ namespace HHBBVV
           m_Fbranches.at(prefix+"_GN2Xv01_ptop").set(*event, ptop_score, sys);
           m_Fbranches.at(prefix+"_ANN_70_Score").set(*event, ann_score, sys);
 
-          int pass_70 = (int)m_Pass_GN2X_70.get(*lrjet, sys);
-          int pass_60 = (int)m_Pass_GN2X_60.get(*lrjet, sys);
-          int pass_50 = (int)m_Pass_GN2X_50.get(*lrjet, sys);
+          int pass_FlatMassQCDEff_0p58 = (int)m_Pass_GN2X_FlatMassQCDEff_0p58.get(*lrjet, sys);
           int pass_ANN = (int)m_Pass_ANN_70.get(*lrjet, sys);
-          m_Ibranches.at(prefix+"_Pass_GN2X_70").set(*event, pass_70, sys);
-          m_Ibranches.at(prefix+"_Pass_GN2X_60").set(*event, pass_60, sys);
-          m_Ibranches.at(prefix+"_Pass_GN2X_50").set(*event, pass_50, sys);
+          m_Ibranches.at(prefix+"_Pass_GN2X_FlatMassQCDEff_0p58").set(*event, pass_FlatMassQCDEff_0p58, sys);
           m_Ibranches.at(prefix+"_Pass_ANN_70").set(*event, pass_ANN, sys);
 
         }

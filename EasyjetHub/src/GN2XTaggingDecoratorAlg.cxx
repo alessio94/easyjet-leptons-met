@@ -20,7 +20,10 @@ namespace Easyjet
     ATH_CHECK(m_jetsInKey.initialize());
 
     ATH_CHECK(m_seltool.retrieve());
-    ATH_CHECK(m_efftool.retrieve());
+    
+    if(m_isMC){
+      ATH_CHECK(m_efftool.retrieve());
+    }
 
     m_GN2XTagDecorKey = m_jetsInKey.key() + ".GN2X_select_" + m_WPname;
     ATH_CHECK(m_GN2XTagDecorKey.initialize());

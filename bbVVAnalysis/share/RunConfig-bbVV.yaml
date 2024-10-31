@@ -29,7 +29,7 @@ Small_R_jet:
 
 Large_R_jet:
   amount: 2
-  GN2X_hbb_wps: ["FixedCutBEff_70", "FixedCutBEff_60", "FixedCutBEff_50"]
+  GN2X_hbb_wps: ["FlatMassQCDEff_0p58"]
   wtag_type: "ANN" # ANN, DNN
   wtag_wp: 70 # [50, 60, 70, 80, 90] ANN, [50, 80] DNN
   max_eta: 2.0

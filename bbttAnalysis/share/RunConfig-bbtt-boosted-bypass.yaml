@@ -13,7 +13,16 @@ OverlapRemoval:
 
 Large_R_jet:
   runMuonJetPtCorr: true
-  GN2X_hbb_wps: ["FixedCutBEff_70", "FixedCutBEff_60", "FixedCutBEff_50"]
+  GN2X_hbb_wps:
+    - "FlatMassQCDEff_0p25"
+    - "FlatMassQCDEff_0p3"
+    - "FlatMassQCDEff_0p37"
+    - "FlatMassQCDEff_0p46"
+    - "FlatMassQCDEff_0p58"
+    - "FlatMassQCDEff_0p74"
+    - "FlatMassQCDEff_0p94"
+    - "FlatMassQCDEff_1p25"
+    - "FlatMassQCDEff_1p55"
 
 # Update output configs for large-R jets
 ttree_output:

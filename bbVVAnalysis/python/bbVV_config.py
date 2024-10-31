@@ -101,7 +101,7 @@ def get_BaselineVarshhbbVVAlg_variables(flags):
 
     int_variable_names = ["lrjets_n", "srjets_n", "Selected_Lepton_n"]
     for obj in objects:
-        for var in ["Pass_GN2X_70", "Pass_GN2X_60", "Pass_GN2X_50", "Pass_ANN_70"]:
+        for var in ["Pass_GN2X_FlatMassQCDEff_0p58", "Pass_ANN_70"]:
             int_variable_names += [obj + "_Jet_" + var]
 
     if "Boosted0Lep" in flags.Analysis.channel:

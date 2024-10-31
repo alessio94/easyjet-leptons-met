@@ -103,7 +103,7 @@ private:
     CP::SysReadDecorHandle<float> m_Tau4_wta = {this, "tau4", "Tau4_wta", "Tau4_wta"};
 
     CP::SysReadDecorHandle<bool> 
-    m_Pass_GN2X_70 {this, "GN2X_Pass70", "GN2X_select_FixedCutBEff_70", "GN2X_select_FixedCutBEff70 selection"};
+    m_Pass_GN2X_FlatMassQCDEff_0p58 {this, "GN2X_PassFlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58 selection"};
     
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "bbVVAnalysisElectrons_%SYS%", "Electron container to read" };

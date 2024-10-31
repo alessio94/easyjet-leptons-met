@@ -95,11 +95,7 @@ private:
     m_ANN_70_Score {this, "ANN_70_Score", "ANN70Tagger_Score", "ANN70Tagger score"};
 
     CP::SysReadDecorHandle<bool> 
-    m_Pass_GN2X_70 {this, "GN2X_Pass70", "GN2X_select_FixedCutBEff_70", "GN2X_select_FixedCutBEff70 selection"};
-    CP::SysReadDecorHandle<bool> 
-    m_Pass_GN2X_60 {this, "GN2X_Pass60", "GN2X_select_FixedCutBEff_60", "GN2X_select_FixedCutBEff60 selection"};
-    CP::SysReadDecorHandle<bool> 
-    m_Pass_GN2X_50 {this, "GN2X_Pass50", "GN2X_select_FixedCutBEff_50", "GN2X_select_FixedCutBEff50 selection"};
+    m_Pass_GN2X_FlatMassQCDEff_0p58 {this, "GN2X_PassFlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58 selection"};
     CP::SysReadDecorHandle<bool> 
     m_Pass_ANN_70 {this, "ANN_Pass70", "ANN70Tagger_Tagged", "ANN70Tagger selection"};
 
