@@ -125,10 +125,13 @@ namespace VBSVV4q{
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_E").set(*event, jet->e(), sys); 
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_M").set(*event, jet->m(), sys); 
 
-          float phbb = m_GN2Xv01_phbb.get(*jet, sys);
-          float phcc = m_GN2Xv01_phcc.get(*jet, sys);
-          float pqcd = m_GN2Xv01_pqcd.get(*jet, sys);
-          float ptop = m_GN2Xv01_ptop.get(*jet, sys);
+      	  float phbb (-99.), phcc (-99.), pqcd (-99.), ptop (-99.);
+          if(m_loadGN2x){
+            phbb = m_GN2Xv01_phbb.get(*jet, sys);
+            phcc = m_GN2Xv01_phcc.get(*jet, sys);
+            pqcd = m_GN2Xv01_pqcd.get(*jet, sys);
+            ptop = m_GN2Xv01_ptop.get(*jet, sys);
+          }
           float fcc = 0.02;
           float ftop = 0.25;
           float XbbScore= log (phbb / (fcc*phcc + ftop*ptop + pqcd*(1-fcc-ftop)));

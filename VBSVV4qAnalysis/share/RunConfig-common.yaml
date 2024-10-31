@@ -2,6 +2,14 @@ include: EasyjetHub/base-config.yaml
 
 do_CP_systematics: false
 
+# tagging jets pairing options
+# HighestMjjForwardJets or LeadingPTjj
+TagJetsCriteria: "LeadingPTjj"
+DeltaRJj: 1.0
+
+# use GN2x information or not (not on current LLJ1 ptag)
+loadGN2x: False
+
 # Toggles for object types
 do_muons: true
 do_electrons: false

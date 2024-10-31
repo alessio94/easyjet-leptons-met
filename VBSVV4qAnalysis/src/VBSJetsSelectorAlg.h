@@ -50,6 +50,7 @@ namespace VBSVV4q{
             CP::SysReadDecorHandle<char> m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
             Gaudi::Property<std::string> m_TagJetsCriteria { this, "TagJetsCriteria", "", "Criteria to use to select tag jets" };
+            Gaudi::Property<float> m_DeltaRJj { this, "DeltaRJj", 1., "DeltaR cut between signal large-R jets and tagging small-R jets" };
 
     };
 }

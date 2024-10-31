@@ -29,7 +29,8 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
             "VBSJetsSelectorAlg",
             smallRjets="VBSVV4qAnalysisJets_%SYS%",
             largeRjets="VBSVV4qAnalysisLargeJets_%SYS%",
-            TagJetsCriteria="LeadingPTjj",
+            TagJetsCriteria=flags.Analysis.TagJetsCriteria,
+            DeltaRJj=flags.Analysis.DeltaRJj,
             VBSJetsContainerOutKey="VBSVV4qAnalysisVBSJets_%SYS%",
             noVBSJetsContainerOutKey="VBSVV4qAnalysisNoVBSJets_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
@@ -62,7 +63,8 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
             isMC=flags.Input.isMC,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
-            intVariableList=int_variables
+            intVariableList=int_variables,
+            loadGN2x=flags.Analysis.loadGN2x
         )
     )
     return cfg
