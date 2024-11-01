@@ -64,6 +64,47 @@ The output file includes the final weight ("weight") which is evaluated consider
 
 The --mergeMyFiles and --mergeToOutput options make sure that the output file will have the same branches as the input with the addition of the final weight. In this way, the input ntuple is not modified.
 
+
+# Note for Working Point and Scale Factor Study   
+
+## Place to find ID&ISO WPs   
+
+### Electron ID&ISO WPs:   
+Main References:   
+`/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2025/rel22.2/2022_Summer_Prerecom_v1/map4.txt`   
+ID: https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/EgammaAnalysisAlgorithms/python/ElectronAnalysisConfig.py#L240    
+ISO: https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/EgammaAnalysisAlgorithms/python/ElectronAnalysisConfig.py#L244    
+
+
+Auxiliary references:   
+ID: https://twiki.cern.ch/twiki/bin/view/AtlasProtected/EGammaIdentificationRun2#Electron_Identification   
+ISO: https://atlas-iff.docs.cern.ch/rel22recommendedisowps/index.html#electron-isolation-working-points    
+
+### Muon ID&ISO WPs:   
+Main References:      
+ID: https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/MuonAnalysisAlgorithms/python/MuonAnalysisConfig.py#L146     
+ID: https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/MuonAnalysisAlgorithms/python/MuonAnalysisConfig.py#L173     
+ISO: https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/MuonAnalysisAlgorithms/python/MuonAnalysisConfig.py#L149     
+
+```
+Not testing LowPt working point because:  
+
+    Something wrong with the working point's name    
+
+    If using "LowPt", will trigger ValueError during MuonAnalysisAlgorithm configuration, raised here: https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/MuonAnalysisAlgorithms/python/MuonAnalysisConfig.py#L188.    
+
+    If using "LowPtEfficiency", will also lead to error since the calibration files in cvmfs (/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/MuonEfficiencyCorrections) have names only containing "LowPt", e.g. "Reco_LowPt_JPsi.root".
+```
+
+Auxiliary References:    
+ID: https://atlas-mcp.docs.cern.ch/guidelines/muonselectiontool/index.html#supported-working-points   
+ISO: https://atlas-iff.docs.cern.ch/rel22recommendedisowps/index.html#muon-isolation-working-points   
+
+### Tau ID&ISO WPs:
+
+PLACE_HOLDER  
+
+
 # Main developers
 
 The main developments have been performed by (non extensive list, feel free to add your name):
