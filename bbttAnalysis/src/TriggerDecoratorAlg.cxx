@@ -434,10 +434,12 @@ namespace HHBBTT
 
     for(const auto& [channel, paths] : mapMatchPaths){
       for(const auto& trig : paths){
-	for(const xAOD::TauJet* tau : *taus){
-	  bool match = m_matchingTool->match(*tau, trig, 0.2);
-	  tau_trigMatchDecos.at(channel)(*tau) |= match;
-	}
+        bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+        if(!pass) continue;
+        for(const xAOD::TauJet* tau : *taus){
+          bool match = m_matchingTool->match(*tau, trig, 0.2);
+          tau_trigMatchDecos.at(channel)(*tau) |= match;
+        }
       }
     }
 
