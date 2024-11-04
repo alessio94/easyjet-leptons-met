@@ -142,7 +142,7 @@ def jet_sequence(
         if jet_flags.runBJetPtCalib:
             configSeq += makeConfig(
                 'Jets.BJetCalib',
-                jetContainerName=calib_name,
+                containerName=calib_name,
                 muonContainerName=drop_sys(flags.Analysis.container_names.output.muons))
             configSeq.setOptionValue('.jetPreselection', jet_flags.btag_wp)
             configSeq.setOptionValue('.muonPreselection', "forBJetCalib")
@@ -207,7 +207,7 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
     if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
         configSeq += makeConfig(
             'Jets.BJetCalib',
-            jetContainerName=output_name,
+            containerName=output_name,
             muonContainerName=drop_sys(flags.Analysis.container_names.output.muons))
         configSeq.setOptionValue('.muonPreselection', "forBJetCalib")
         # Disable small-R b-jet pT reco
