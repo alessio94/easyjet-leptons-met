@@ -125,7 +125,7 @@ def get_large_R_jet_truth_labels(flags):
     parent_bosons = ["Higgs", "Scalar", "Top"]
 
     truth_labels = []
-    if not flags.Input.isPHYSLITE:
+    if not flags.Input.isPHYSLITE and flags.Analysis.Large_R_jet.do_parent_decoration:
         truth_labels += [
             f"parent{p}NMatchedChildren" for p in parent_bosons
         ]
