@@ -38,7 +38,6 @@ Large_R_jet:
   variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_DXcc", "GN2Xv01_phbb", "GN2Xv01_phcc", "GN2Xv01_pqcd", "GN2Xv01_ptop"]
 
 Electron:
-  trackSelection: true
   ID: "TightLH"
   Iso: Tight_VarRad
   min_pT: 27.e+3
@@ -46,7 +45,6 @@ Electron:
   crackVeto: true
 
 Muon:
-  trackSelection: true
   ID: "Medium"
   Iso: PflowTight_VarRad
   min_pT: 27.e+3

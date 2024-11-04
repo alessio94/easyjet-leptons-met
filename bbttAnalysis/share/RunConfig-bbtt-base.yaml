@@ -41,17 +41,21 @@ Small_R_jet:
   amount_bjet: 2
 
 Electron:
-  ID: "LooseBLayerLH"
+  ID: "LooseBLayerLH_nottva"
   Iso: "Loose_VarRad"
   extra_wps:
+    - ["TightLH_nottva", "Loose_VarRad"]
+    - ["LooseBLayerLH", "Loose_VarRad"]
     - ["TightLH", "Loose_VarRad"]
   do_parent_decoration: true
   forceFullSimConfig: true
 
 Muon:
-  ID: "Loose"
+  ID: "Loose_nottva"
   Iso: "PflowLoose_VarRad"
   extra_wps:
+    - ["Medium_nottva", "PflowLoose_VarRad"]
+    - ["Loose", "PflowLoose_VarRad"]
     - ["Medium", "PflowLoose_VarRad"]
   do_parent_decoration: true
 

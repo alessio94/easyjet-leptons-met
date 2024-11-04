@@ -23,6 +23,14 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
         electron_branches.variables += ["passesOR_%SYS%"]
 
     id_wps = [f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}']
+
+    electron_branches.variables += [
+        f"d0sig_{id_wps[0]}"
+    ]
+    electron_branches.variables += [
+        f"z0sintheta_{id_wps[0]}"
+    ]
+
     if 'extra_wps' in flags.Analysis.Electron:
         for wp in flags.Analysis.Electron.extra_wps:
             id_wps.append(wp[0] + "_" + wp[1])

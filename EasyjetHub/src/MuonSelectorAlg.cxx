@@ -50,7 +50,8 @@ namespace Easyjet
         m_mu_recoSF.emplace_back("muon_reco_effSF_"+wp+"_%SYS%", this);
         m_mu_isoSF.emplace_back(wp.find("NonIso")==std::string::npos ?
 				"muon_isol_effSF_"+wp+"_%SYS%" : "", this);
-        m_mu_TTVASF.emplace_back(m_doTTVA ?
+        bool ttvaTurnoff = wp.find("nottva")!=std::string::npos;
+        m_mu_TTVASF.emplace_back(!ttvaTurnoff ?
 				 "muon_TTVA_effSF_"+wp+"_%SYS%" : "", this);
         m_mu_SF.emplace_back("muon_effSF_"+wp+"_%SYS%", this);
       }
@@ -129,7 +130,8 @@ namespace Easyjet
             std::string wp = wps[i];
             float SF = m_mu_recoSF[i].get(*muon,sys);
             if(wp.find("NonIso")==std::string::npos) SF *= m_mu_isoSF[i].get(*muon,sys);
-            if(m_doTTVA) SF *= m_mu_TTVASF[i].get(*muon,sys);
+            bool ttvaTurnoff = wp.find("nottva")!=std::string::npos;
+            if(!ttvaTurnoff) SF *= m_mu_TTVASF[i].get(*muon,sys);
             m_mu_SF[i].set(*muon, SF, sys);
           }
 

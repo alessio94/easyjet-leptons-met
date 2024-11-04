@@ -11,7 +11,6 @@ def MuonSelectorAlgCfg(flags, name="MuonSelectorAlg", **kwargs):
 
     kwargs.setdefault("isMC", flags.Input.isMC)
     kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
-    kwargs.setdefault("doTTVA", flags.Analysis.Muon.trackSelection)
     kwargs.setdefault("muonTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Muon'))
     kwargs.setdefault("muonAmount", flags.Analysis.Lepton.amount)

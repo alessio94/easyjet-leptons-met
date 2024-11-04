@@ -30,7 +30,6 @@ Small_R_jet:
   variables_int_bjets: ["truthLabel"]
 
 Electron:
-  trackSelection: true
   maxD0Significance: 5 
   maxDeltaZ0SinTheta: 0.5
   ID: "LooseLH"
@@ -39,7 +38,6 @@ Electron:
   min_pT_ssWW: 4.5e+3
 
 Muon:
-  trackSelection: true
   maxD0Significance: 15
   maxDeltaZ0SinTheta: 1.5
   ID: "Loose"

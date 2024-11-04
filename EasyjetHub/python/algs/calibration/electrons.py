@@ -39,13 +39,16 @@ def electron_sequence(flags, configAcc):
     for id, iso in wps:
         configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
                                 selectionName=id + '_' + iso)
+        if "nottva" in id:
+            configSeq.setOptionValue('.trackSelection', False)
+        else:
+            configSeq.setOptionValue('.trackSelection', True)
+        id = id.replace("_nottva", "")
         configSeq.setOptionValue('.identificationWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
         configSeq.setOptionValue('.forceFullSimConfig',
                                  flags.Analysis.Electron.forceFullSimConfig
                                  and flags.Analysis.DataType is DataType.FastSim)
-        configSeq.setOptionValue('.trackSelection',
-                                 flags.Analysis.Electron.trackSelection)
         configSeq.setOptionValue('.writeTrackD0Z0', True)
         configSeq.setOptionValue('.maxD0Significance',
                                  flags.Analysis.Electron.maxD0Significance)

@@ -57,9 +57,6 @@ private:
     Gaudi::Property<std::vector<std::string>> m_tightMuonWPs
         { this, "tightMuonWPs", {}, "Tight muon ID + ISO working points, not used to filter collection" };
 
-    Gaudi::Property<bool> m_doTTVA
-      { this, "doTTVA", false, "Is TTVA applied" };
-
     std::vector<CP::SysReadDecorHandle<float>> m_mu_recoSF;
     std::vector<CP::SysReadDecorHandle<float>> m_mu_isoSF;
     std::vector<CP::SysReadDecorHandle<float>> m_mu_TTVASF;

@@ -23,6 +23,14 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
         muon_branches.variables += ["passesOR_%SYS%"]
 
     id_wps = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
+
+    muon_branches.variables += [
+        f"d0sig_{id_wps[0]}"
+    ]
+    muon_branches.variables += [
+        f"z0sintheta_{id_wps[0]}"
+    ]
+
     if 'extra_wps' in flags.Analysis.Muon:
         for wp in flags.Analysis.Muon.extra_wps:
             id_wps.append(wp[0] + "_" + wp[1])

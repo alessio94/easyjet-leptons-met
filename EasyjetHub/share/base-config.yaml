@@ -92,7 +92,6 @@ Photon:
 Electron:
   min_pT: 4.5e+3
   max_eta: 100
-  trackSelection: true
   maxD0Significance: 5.
   maxDeltaZ0SinTheta: 0.5
   chargeIDSelectionRun2: false
@@ -114,7 +113,6 @@ Electron:
 Muon:
   min_pT: 3.e+3
   max_eta: 2.5
-  trackSelection: true
   maxD0Significance: 3
   maxDeltaZ0SinTheta: 0.5
   ID: ""

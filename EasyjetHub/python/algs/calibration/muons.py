@@ -27,10 +27,13 @@ def muon_sequence(flags, configAcc):
     for id, iso in wps:
         configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
                                 selectionName=id + '_' + iso)
-        configSeq.setOptionValue('.quality', id)
+        if "nottva" in id:
+            configSeq.setOptionValue('.trackSelection', False)
+        else:
+            configSeq.setOptionValue('.trackSelection', True)
+        quality = id.replace("_nottva", "")
+        configSeq.setOptionValue('.quality', quality)
         configSeq.setOptionValue('.isolation', iso)
-        configSeq.setOptionValue('.trackSelection',
-                                 flags.Analysis.Muon.trackSelection)
         configSeq.setOptionValue('.writeTrackD0Z0', True)
         configSeq.setOptionValue('.maxD0Significance',
                                  flags.Analysis.Muon.maxD0Significance)
