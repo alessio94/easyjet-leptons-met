@@ -29,10 +29,12 @@ Lepton:
 
 # apply trigger lists to filter events
 do_trigger_filtering: true
-
-# write objects with overlap removal applied
-# turning this on you have to decide on one large R jet collection
 do_overlap_removal: true
+OverlapRemoval:
+  # Enable overlap removal between large-R jets and objects for which 
+  # large-R jet OR removal is implemented in Athena
+  do_large_R_jets: true
+  do_small_R_jet_large_R_jet: false
 
 #Enable cutflow 
 save_vbshiggs_cutflow: true
