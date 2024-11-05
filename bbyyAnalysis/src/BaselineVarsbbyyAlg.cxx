@@ -390,7 +390,10 @@ namespace HHBBYY
             m_Fbranches.at("KF_Phibbyy").set(*event, HH_KF.Phi(), sys);
             m_Fbranches.at("KF_dRHH").set(*event, H_yy.DeltaR(H_bb_KF), sys);
 
+	    //vbf jets selection KF
+	    ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_KFJet1, Hbb_KFJet2, KFJets, KF_HT, HH_KF, "KF_Jet_vbf_j", "KF_Jet_vbf_jj", eventFloats, event, sys));
           }
+	  
           //mva variables
           float KF_topness = compute_Topness(KFJets);
           std::vector<float> KF_eventShapes = compute_EventShapes(Hbb_KFJet1, Hbb_KFJet2, photons);
@@ -402,56 +405,7 @@ namespace HHBBYY
       }   
 
       // bdt (vbf jets selection)
-      TLorentzVector vbf_j[2];
-      TLorentzVector vbf_jj(0.,0.,0.,0.);
-      TLorentzVector yybbjj(0.,0.,0.,0.);
-      float vbf_jj_maxscore = 0;
-
-      if(m_do_nonresonant_BDTs || m_save_VBF_vars){
-        if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
-          if(m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) {
-            vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
-          }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::mjj) {
-            getVBFjets_mjj(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
-          }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::pTsorting) {
-            getVBFjets_pTsorting(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
-          }else if(m_vbfjets_method == HHBBYY::VBFjetsMethod::invalid) {
-            ANA_MSG_ERROR("Invalid vbfjets method imported!!! The default BDT method is called!!!");
-            return StatusCode::FAILURE;
-          }
-
-          vbf_jj = vbf_j[0] + vbf_j[1];
-          yybbjj = vbf_jj + HH;
-          eventFloats.at(HHBBYY::Var::vbfjj_m) = vbf_jj.M();
-          eventFloats.at(HHBBYY::Var::vbfjj_dEta) = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
-        }
-
-      }
-
-      if(m_save_VBF_vars){
-
-        for(unsigned int i=0; i<2; i++){
-          std::string prefix = "Jet_vbf_j"+std::to_string(i+1);
-          m_Fbranches.at(prefix+"_pt").set(*event, vbf_j[i].Pt(), sys);
-          m_Fbranches.at(prefix+"_eta").set(*event, vbf_j[i].Eta(), sys);
-          m_Fbranches.at(prefix+"_phi").set(*event, vbf_j[i].Phi(), sys);
-          m_Fbranches.at(prefix+"_E").set(*event, vbf_j[i].E(), sys);
-          m_Fbranches.at(prefix+"_yybb_dR").set(*event, vbf_j[i].DeltaR(HH), sys);
-          m_Fbranches.at(prefix+"_yybb_deta").set(*event, std::fabs(vbf_j[i].Eta() - HH.Eta()), sys);
-        }
-
-        std::string prefix_vbf = "Jet_vbf_jj";
-        m_Fbranches.at(prefix_vbf+"_maxscore").set(*event, vbf_jj_maxscore, sys);
-        m_Fbranches.at(prefix_vbf+"_m").set(*event, vbf_jj.M(), sys);
-        m_Fbranches.at(prefix_vbf+"_deta").set(*event, std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta()), sys);
-        m_Fbranches.at(prefix_vbf+"_yybb_dR").set(*event, vbf_jj.DeltaR(HH), sys);
-        m_Fbranches.at(prefix_vbf+"_yybb_deta").set(*event, std::fabs(vbf_jj.Eta()-HH.Eta()), sys);
-        m_Fbranches.at(prefix_vbf+"_yybb_pt").set(*event, yybbjj.Pt(), sys);
-        m_Fbranches.at(prefix_vbf+"_yybb_eta").set(*event, yybbjj.Eta(), sys);
-        m_Fbranches.at(prefix_vbf+"_yybb_phi").set(*event, yybbjj.Phi(), sys);
-        m_Fbranches.at(prefix_vbf+"_yybb_m").set(*event, yybbjj.M(), sys);
-
-      }
+      ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_Jet1, Hbb_Jet2, jets, HT, HH, "Jet_vbf_j", "Jet_vbf_jj",eventFloats, event, sys));
 
       // bdt (low and high mHH categorations)
       if(m_do_nonresonant_BDTs){
@@ -1103,6 +1057,60 @@ namespace HHBBYY
     return vars;
   }
 
+  StatusCode BaselineVarsbbyyAlg::vbf_calculations(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+						   const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::JetContainer *jets,
+						   double HT, const TLorentzVector& HH,
+						   const std::string& prefix_j, const std::string& prefix_jj,
+						   std::map<HHBBYY::Var, float> &eventFloats, const xAOD::EventInfo *event, const auto &sys) {
+    TLorentzVector vbf_j[2];
+    TLorentzVector vbf_jj(0., 0., 0., 0.);
+    TLorentzVector yybbjj(0., 0., 0., 0.);
+    float vbf_jj_maxscore = 0;
+
+    if (m_do_nonresonant_BDTs || m_save_VBF_vars) {
+      if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
+	if (m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) {
+	  vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+	} else if (m_vbfjets_method == HHBBYY::VBFjetsMethod::mjj) {
+	  getVBFjets_mjj(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+	} else if (m_vbfjets_method == HHBBYY::VBFjetsMethod::pTsorting) {
+	  getVBFjets_pTsorting(Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
+	} else if (m_vbfjets_method == HHBBYY::VBFjetsMethod::invalid) {
+	  ANA_MSG_ERROR("Invalid vbfjets method imported!!! The default BDT method is called!!!");
+	  return StatusCode::FAILURE;
+	}
+	
+	vbf_jj = vbf_j[0] + vbf_j[1];
+	yybbjj = vbf_jj + HH;
+	eventFloats.at((prefix_jj == "KF_Jet_vbf_jj") ? HHBBYY::Var::KF_vbfjj_m : HHBBYY::Var::vbfjj_m) = vbf_jj.M();
+	eventFloats.at((prefix_jj == "KF_Jet_vbf_jj") ? HHBBYY::Var::KF_vbfjj_dEta : HHBBYY::Var::vbfjj_dEta) = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
+      }
+    }
+    
+    if (m_save_VBF_vars) {
+      for (unsigned int i = 0; i < 2; i++) {
+	std::string full_prefix = prefix_j + std::to_string(i + 1);
+	m_Fbranches.at(full_prefix + "_pt").set(*event, vbf_j[i].Pt(), sys);
+	m_Fbranches.at(full_prefix + "_eta").set(*event, vbf_j[i].Eta(), sys);
+	m_Fbranches.at(full_prefix + "_phi").set(*event, vbf_j[i].Phi(), sys);
+	m_Fbranches.at(full_prefix + "_E").set(*event, vbf_j[i].E(), sys);
+	m_Fbranches.at(full_prefix + "_yybb_dR").set(*event, vbf_j[i].DeltaR(HH), sys);
+	m_Fbranches.at(full_prefix + "_yybb_deta").set(*event, std::fabs(vbf_j[i].Eta() - HH.Eta()), sys);
+      }
+      
+      m_Fbranches.at(prefix_jj + "_maxscore").set(*event, vbf_jj_maxscore, sys);
+      m_Fbranches.at(prefix_jj + "_m").set(*event, vbf_jj.M(), sys);
+      m_Fbranches.at(prefix_jj + "_deta").set(*event, std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta()), sys);
+      m_Fbranches.at(prefix_jj + "_yybb_dR").set(*event, vbf_jj.DeltaR(HH), sys);
+      m_Fbranches.at(prefix_jj + "_yybb_deta").set(*event, std::fabs(vbf_jj.Eta() - HH.Eta()), sys);
+      m_Fbranches.at(prefix_jj + "_yybb_pt").set(*event, yybbjj.Pt(), sys);
+      m_Fbranches.at(prefix_jj + "_yybb_eta").set(*event, yybbjj.Eta(), sys);
+      m_Fbranches.at(prefix_jj + "_yybb_phi").set(*event, yybbjj.Phi(), sys);
+      m_Fbranches.at(prefix_jj + "_yybb_m").set(*event, yybbjj.M(), sys);
+    }
+    return StatusCode::SUCCESS;
+  }
+  
   //#######################################################################################################################################################################################################
   // Convert string to enum (VBF Jets selection method)
   VBFjetsMethod BaselineVarsbbyyAlg::stringToVBFjetsMethod(const std::string& vbfjets_method_str) {

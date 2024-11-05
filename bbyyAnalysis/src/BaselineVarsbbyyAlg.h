@@ -72,6 +72,8 @@ namespace HHBBYY
     j4_pcbt,
     vbfjj_dEta,
     vbfjj_m,
+    KF_vbfjj_dEta,
+    KF_vbfjj_m,
     bbyy_mStar,
     yy_dR,
     bb_dR,
@@ -141,7 +143,13 @@ namespace HHBBYY
                                                       ConstDataVector<xAOD::JetContainer> &categorisation_jets,
                                                       const xAOD::MissingETContainer *met, const auto &sys,
                                                       const std::map<HHBBYY::Var, float> &m_eventFloats);
-
+    
+    StatusCode vbf_calculations(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+				const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::JetContainer *jets,
+				double HT,const TLorentzVector& HH,
+				const std::string& prefix_j, const std::string& prefix_jj,
+				std::map<HHBBYY::Var, float> &eventFloats, const xAOD::EventInfo *event, const auto &sys);
+    
     void performCategorisationBDT(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
                                   const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, 
                                   const xAOD::JetContainer *jets,
