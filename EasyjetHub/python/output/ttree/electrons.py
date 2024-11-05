@@ -48,7 +48,8 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
             "separationMinDCT",
         ]
 
-    if flags.Analysis.Electron.do_IFF_decoration:
+    if flags.Input.isMC and \
+       flags.Analysis.Electron.do_IFF_decoration:
         electron_branches.variables += ["IFFClass_NOSYS"]
 
     if flags.Input.isMC and \

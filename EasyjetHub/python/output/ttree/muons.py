@@ -40,7 +40,8 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
         for id_wp in id_wps
     ]
 
-    if flags.Analysis.Muon.do_IFF_decoration:
+    if flags.Input.isMC and \
+       flags.Analysis.Muon.do_IFF_decoration:
         muon_branches.variables += ["IFFClass_NOSYS"]
 
     if flags.Input.isMC and \
