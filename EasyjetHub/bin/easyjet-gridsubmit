@@ -74,6 +74,9 @@ def main():
         "--nFiles", default=None, help="How many files to run on"
     )
     parser.add_argument(
+        "--nCore", default=None, help="number of CPU cores"
+    )
+    parser.add_argument(
         "--mergeOutput",
         action="store_true",
         help="Merge outputs (TEfficiency merging for CutFlow not supported)",
@@ -148,6 +151,8 @@ def main():
         submit_opts["nGBPerJob"] = args.nGBperJob
     if args.nFiles is not None:
         submit_opts["nFiles"] = args.nFiles
+    if args.nCore is not None:
+        submit_opts["nCore"] = args.nCore
     if args.mergeOutput:
         submit_opts["mergeOutput"] = True
     if args.noEmail:

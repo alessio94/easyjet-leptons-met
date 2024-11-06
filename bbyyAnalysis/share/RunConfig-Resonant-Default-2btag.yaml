@@ -13,5 +13,8 @@ CutList :
       #- EXACTLY_ONE_B_JET
       - EXACTLY_TWO_B_JETS
 
+do_CP_systematics: true
+systematics_regex: ['JET_JER_EffectiveNP_*', 'EG_*'] # for now include only these systematics
+        
 ttree_output:
   include: bbyy-base-output.yaml
