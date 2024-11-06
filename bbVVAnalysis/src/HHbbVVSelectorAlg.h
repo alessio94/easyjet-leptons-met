@@ -2,6 +2,8 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
+/// @author Kira Abeling, JaeJin Hong
+
 // Always protect against multiple includes!
 #ifndef BBVVANALYSIS_HHBBVVSELECTORALG
 #define BBVVANALYSIS_HHBBVVSELECTORALG
@@ -101,6 +103,10 @@ private:
     
     CP::SysReadDecorHandle<float> m_Tau2_wta = {this, "tau2", "Tau2_wta", "Tau2_wta"};
     CP::SysReadDecorHandle<float> m_Tau4_wta = {this, "tau4", "Tau4_wta", "Tau4_wta"};
+
+    Gaudi::Property<std::vector<std::string>> m_GN2X_wps
+      { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the bbVV config" };
+    CP::SysReadDecorHandle<bool> m_Pass_GN2X{"", this}; // Select the most loose WP in HHbbVVSelectorAlg
 
     CP::SysReadDecorHandle<bool> 
     m_Pass_GN2X_FlatMassQCDEff_0p58 {this, "GN2X_PassFlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58 selection"};

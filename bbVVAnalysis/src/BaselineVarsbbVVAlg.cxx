@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
-
+/// @author Kira Abeling, JaeJin Hong
 #include "BaselineVarsbbVVAlg.h"
 #include <AthContainers/ConstDataVector.h>
 
@@ -42,10 +42,19 @@ namespace HHBBVV
     ATH_CHECK(m_Whad.initialize(m_systematicsList, m_lrjetHandle)); // Whad jet
     ATH_CHECK(m_Whad2.initialize(m_systematicsList, m_lrjetHandle)); // Whad2 jet
 
-    ATH_CHECK(m_ANN_70_Score.initialize(m_systematicsList, m_lrjetHandle));
+    for(auto wp: m_GN2X_wps)
+    {
+      CP::SysReadDecorHandle<bool> gnn_handle{"GN2X_select_" + wp, this};
+      m_GN2X_wp_Handles.emplace(wp, gnn_handle);
+      ATH_CHECK(m_GN2X_wp_Handles.at(wp).initialize(m_systematicsList, m_lrjetHandle));
+    }
 
-    ATH_CHECK(m_Pass_GN2X_FlatMassQCDEff_0p58.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_Pass_ANN_70.initialize(m_systematicsList, m_lrjetHandle));
+    m_WTag_score = CP::SysReadDecorHandle<float>
+      (m_WTag_Type.value()+m_WTag_WP.value()+"Tagger_Score", this);
+    m_Pass_WTag = CP::SysReadDecorHandle<bool>
+      (m_WTag_Type.value()+m_WTag_WP.value()+"Tagger_Tagged", this);
+    ATH_CHECK(m_WTag_score.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_Pass_WTag.initialize(m_systematicsList, m_lrjetHandle));
 
     // Initialise syst-aware output decorators
     for(const std::string &var : m_floatVariables){
@@ -219,18 +228,21 @@ namespace HHBBVV
           float pqcd_score = GN2Xv01_pqcd(*lrjet);
           float phcc_score = GN2Xv01_phcc(*lrjet);
           float ptop_score = GN2Xv01_ptop(*lrjet);
-          float ann_score = m_ANN_70_Score.get(*lrjet, sys);
+          float wtag_score = m_WTag_score.get(*lrjet, sys);
           m_Fbranches.at(prefix+"_GN2Xv01_phbb").set(*event, phbb_score, sys);
           m_Fbranches.at(prefix+"_GN2Xv01_pqcd").set(*event, pqcd_score, sys);
           m_Fbranches.at(prefix+"_GN2Xv01_phcc").set(*event, phcc_score, sys);
           m_Fbranches.at(prefix+"_GN2Xv01_ptop").set(*event, ptop_score, sys);
-          m_Fbranches.at(prefix+"_ANN_70_Score").set(*event, ann_score, sys);
+          m_Fbranches.at(prefix+"_"+m_WTag_Type+"_"+m_WTag_WP+"_Score").set(*event, wtag_score, sys);
+          
+          int pass_wtag = (int)m_Pass_WTag.get(*lrjet, sys);
+          m_Ibranches.at(prefix+"_Pass_"+m_WTag_Type+"_"+m_WTag_WP).set(*event, pass_wtag, sys);
 
-          int pass_FlatMassQCDEff_0p58 = (int)m_Pass_GN2X_FlatMassQCDEff_0p58.get(*lrjet, sys);
-          int pass_ANN = (int)m_Pass_ANN_70.get(*lrjet, sys);
-          m_Ibranches.at(prefix+"_Pass_GN2X_FlatMassQCDEff_0p58").set(*event, pass_FlatMassQCDEff_0p58, sys);
-          m_Ibranches.at(prefix+"_Pass_ANN_70").set(*event, pass_ANN, sys);
-
+          for(auto& wp: m_GN2X_wps)
+          {
+            int pass_GN2X = (int)m_GN2X_wp_Handles.at(wp).get(*lrjet, sys);
+            m_Ibranches.at(prefix+"_Pass_GN2X_"+wp).set(*event, pass_GN2X, sys);
+          }
         }
       }
 

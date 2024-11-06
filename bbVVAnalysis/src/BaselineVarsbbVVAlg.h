@@ -2,6 +2,8 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
+/// @author Kira Abeling, JaeJin Hong
+
 // Always protect against multiple includes!
 #ifndef BBVVANALYSIS_FINALVARSBBVVALG
 #define BBVVANALYSIS_FINALVARSBBVVALG
@@ -91,13 +93,16 @@ private:
     CP::SysReadDecorHandle<bool>
     m_Hbb { this, "Hbb", "Hbb_%SYS%", "Name of input dectorator for Hbb jet"};
 
-    CP::SysReadDecorHandle<float> 
-    m_ANN_70_Score {this, "ANN_70_Score", "ANN70Tagger_Score", "ANN70Tagger score"};
+    Gaudi::Property<std::vector<std::string>> m_GN2X_wps
+      { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the bbVV config" };
+    std::unordered_map<std::string, CP::SysReadDecorHandle<bool>> m_GN2X_wp_Handles;
 
-    CP::SysReadDecorHandle<bool> 
-    m_Pass_GN2X_FlatMassQCDEff_0p58 {this, "GN2X_PassFlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58 selection"};
-    CP::SysReadDecorHandle<bool> 
-    m_Pass_ANN_70 {this, "ANN_Pass70", "ANN70Tagger_Tagged", "ANN70Tagger selection"};
+    Gaudi::Property<std::string> m_WTag_Type
+      { this, "wtag_type", "", "WTagger type from the bbVV config"};
+    Gaudi::Property<std::string> m_WTag_WP
+      { this, "wtag_wp", "", "WTagger wp from the bbVV config"};
+    CP::SysReadDecorHandle<float> m_WTag_score{"", this};
+    CP::SysReadDecorHandle<bool> m_Pass_WTag{"", this};
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};

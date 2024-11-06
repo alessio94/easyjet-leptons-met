@@ -2,7 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-/// @author Kira Abeling
+/// @author Kira Abeling, JaeJin Hong
 
 #include "HHbbVVSelectorAlg.h"
 #include <AthenaKernel/Units.h>
@@ -28,7 +28,11 @@ namespace HHBBVV
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_Pass_GN2X_FlatMassQCDEff_0p58.initialize(m_systematicsList, m_lrjetHandle));
+
+    // Choose the first GN2X wp
+    m_Pass_GN2X = CP::SysReadDecorHandle<bool>
+      ("GN2X_select_" + m_GN2X_wps.value().front(), this);
+    ATH_CHECK (m_Pass_GN2X.initialize(m_systematicsList, m_lrjetHandle));
     ATH_CHECK (m_Tau2_wta.initialize(m_systematicsList, m_lrjetHandle));
     ATH_CHECK (m_Tau4_wta.initialize(m_systematicsList, m_lrjetHandle));
 
@@ -562,22 +566,17 @@ namespace HHBBVV
 
   void HHbbVVSelectorAlg::signalBtagging(const xAOD::Jet *&Hbb, const xAOD::Jet *&Whad, const CP::SystematicSet& sys, bool& HBB_BTAG, bool& WHAD_BTAG) {
 
-    HBB_BTAG = (bool)m_Pass_GN2X_FlatMassQCDEff_0p58.get(*Hbb, sys); // Need a systematic way of choosing WP from yaml. Or, a continuous WP?
-    WHAD_BTAG = (bool)m_Pass_GN2X_FlatMassQCDEff_0p58.get(*Whad, sys);
+    HBB_BTAG = (bool)m_Pass_GN2X.get(*Hbb, sys); // Choose the first GN2X wp
+    WHAD_BTAG = (bool)m_Pass_GN2X.get(*Whad, sys);
 
-    HBB_BTAG = true; // Temporary. Need to erase after GN2X decorator is fixed
-    WHAD_BTAG = true;
   }
 
   void HHbbVVSelectorAlg::signalBtagging(const xAOD::Jet *&Hbb, const xAOD::Jet *&Whad, const xAOD::Jet *&Whad2, const CP::SystematicSet& sys, bool& HBB_BTAG, bool& WHAD_BTAG, bool& WHAD2_BTAG) {
 
-    HBB_BTAG = (bool)m_Pass_GN2X_FlatMassQCDEff_0p58.get(*Hbb, sys); // Need a systematic way of choosing WP from yaml
-    WHAD_BTAG = (bool)m_Pass_GN2X_FlatMassQCDEff_0p58.get(*Whad, sys);
-    WHAD2_BTAG = (bool)m_Pass_GN2X_FlatMassQCDEff_0p58.get(*Whad2, sys);
+    HBB_BTAG = (bool)m_Pass_GN2X.get(*Hbb, sys); // Choose the first GN2X wp
+    WHAD_BTAG = (bool)m_Pass_GN2X.get(*Whad, sys);
+    WHAD2_BTAG = (bool)m_Pass_GN2X.get(*Whad2, sys);
 
-    HBB_BTAG = true; // Temporary. Need to erase after GN2X decorator is fixed
-    WHAD_BTAG = true;
-    WHAD2_BTAG = true;
   }
 
 }

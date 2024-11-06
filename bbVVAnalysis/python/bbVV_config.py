@@ -66,6 +66,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             cutList=flags.Analysis.CutList,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
+            GN2X_WPs=flags.Analysis.Large_R_jet.GN2X_hbb_wps
         )
     )
 
@@ -78,7 +79,10 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             eleWP=TightEleWPLabel,
             floatVariableList=float_variables,
             intVariableList=int_variables,
-            channel=flags.Analysis.channel
+            channel=flags.Analysis.channel,
+            GN2X_WPs=flags.Analysis.Large_R_jet.GN2X_hbb_wps,
+            wtag_type=flags.Analysis.Large_R_jet.wtag_type,
+            wtag_wp=flags.Analysis.Large_R_jet.wtag_wp
         )
     )
     return cfg
@@ -92,17 +96,23 @@ def get_BaselineVarshhbbVVAlg_variables(flags):
 
     float_variable_names = ["Whad_Jet_DeltaR"]
 
+    wtag_type = flags.Analysis.Large_R_jet.wtag_type
+    wtag_wp = flags.Analysis.Large_R_jet.wtag_wp
+
     for obj in objects:
         for var in ["pt", "eta", "phi", "m"]:
             float_variable_names += [obj + "_Jet_" + var]
         for var in ["phbb", "pqcd", "phcc", "ptop"]:
             float_variable_names += [obj + "_Jet_GN2Xv01_" + var]
-        float_variable_names += [obj + "_Jet_ANN_70_Score"]
+        float_variable_names += [obj + "_Jet_" + wtag_type
+                                 + "_" + wtag_wp + "_Score"]
 
     int_variable_names = ["lrjets_n", "srjets_n", "Selected_Lepton_n"]
     for obj in objects:
-        for var in ["Pass_GN2X_FlatMassQCDEff_0p58", "Pass_ANN_70"]:
-            int_variable_names += [obj + "_Jet_" + var]
+        for var in flags.Analysis.Large_R_jet.GN2X_hbb_wps:
+            int_variable_names += [obj + "_Jet_Pass_GN2X_" + var]
+        int_variable_names += [obj + "_Jet_Pass_" + wtag_type
+                               + "_" + wtag_wp]
 
     if "Boosted0Lep" in flags.Analysis.channel:
         for i in range(1, 5):
