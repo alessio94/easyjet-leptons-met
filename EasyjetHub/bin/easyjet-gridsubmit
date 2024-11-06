@@ -219,7 +219,10 @@ def main():
         if args.HDBSProductionRole:
             output_ds_name = "group.phys-hdbs.{0}.{1}.{2}".format(campaign, dsid, ds_tags)
         else:
-            output_ds_name = "user.{0}.{1}.{2}.{3}".format(grid_nickname, campaign, dsid, ds_tags)
+            if 'Delayed' in ds_name:
+                output_ds_name = "user.{0}.{1}.delayed_{2}.{3}".format(grid_nickname, campaign, dsid, ds_tags)
+            else:
+                output_ds_name = "user.{0}.{1}.{2}.{3}".format(grid_nickname, campaign, dsid, ds_tags)
         io_list.append(
             {
                 "inDS": ds_name,

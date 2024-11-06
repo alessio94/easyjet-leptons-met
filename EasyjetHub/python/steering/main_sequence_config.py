@@ -215,8 +215,11 @@ def metadata_cfg(flags, **kwargs):
         else:
             dataType = "fullsim"
     else:
-        campaign = str(flags.Input.DataYear).replace("20", "data")
         dataType = "data"
+        if 'Delayed' in flags.Input.TriggerStream:
+            campaign = str(flags.Input.DataYear).replace("20", "delayeddata")
+        else:
+            campaign = str(flags.Input.DataYear).replace("20", "data")
 
     kwargs.setdefault("dataType", dataType)
     kwargs.setdefault("campaign", campaign)
