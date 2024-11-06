@@ -183,6 +183,7 @@ namespace HHBBYY
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
+    CP::SysReadDecorHandle<int> m_truthFlav{"HadronConeExclTruthLabelID", this};
 
     CP::SysReadDecorHandle<int> 
     m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
@@ -192,6 +193,8 @@ namespace HHBBYY
 
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_photonHandle{ this, "photons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
+    CP::SysReadDecorHandle<unsigned int> m_isEMTight
+      {"DFCommonPhotonsIsEMTightIsEMValue", this};
 
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "bbyyAnalysisElectrons_%SYS%", "Electron container to read" };

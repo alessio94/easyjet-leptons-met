@@ -22,6 +22,7 @@ namespace HHBBYY{
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     // Intialise syst-aware output decorators
     ATH_CHECK (m_jetOutHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_KF_MBB.initialize(m_systematicsList, m_eventHandle));
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ANA_CHECK (m_systematicsList.initialize());    
 
@@ -37,56 +38,56 @@ namespace HHBBYY{
     {
       // In case of special Higgs sample, run only on NOSYS
       if (!m_doSystematics && sys.name()!="") continue;
-        // Retrieve inputs
-        const xAOD::EventInfo *event = nullptr;
-        ANA_CHECK (m_eventHandle.retrieve (event, sys));
+
+      // Retrieve inputs
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
         
-        const xAOD::PhotonContainer *photons = nullptr;
-        ANA_CHECK (m_photonHandle.retrieve (photons, sys));
+      const xAOD::PhotonContainer *photons = nullptr;
+      ANA_CHECK (m_photonHandle.retrieve (photons, sys));
 
-        const xAOD::JetContainer *jets = nullptr;
-        ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-        //setup KF tool inputs
-        double KF1_Mbb = -99.;
-        if (jets->size()>=2) {
-          TLorentzVector j1 = jets->at(0)->p4();
-          TLorentzVector j2 = jets->at(1)->p4();
-          TLorentzVector jj = j1 + j2;
-          KF1_Mbb = jj.M();
-        }
-
-        auto workJetContainer = std::make_unique<xAOD::JetContainer>();
-        auto workJetAuxContainer = std::make_unique<xAOD::JetAuxContainer>();
-        workJetContainer->setStore(workJetAuxContainer.get());
-
-        for (const auto jet : *jets) {
-          // Create a new jet in the workJetContainer by copying the existing jet
-          xAOD::Jet* thisJet = new xAOD::Jet();
-          workJetContainer->push_back(thisJet);
-          *thisJet = *jet; // Copy the jet
-        }
-
-        //run KF tool
-        ATH_CHECK(m_KFTool->applyKF(*photons, *workJetContainer, KF1_Mbb));
-
-        // Create a ConstDataVector to store the jets and set ownership
-        auto constDataWorkJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>();
-        constDataWorkJetContainer->reserve(workJetContainer->size());
-
-        // Move the jets from workJetContainer to constDataWorkJetContainer
-        for (xAOD::Jet* jet : *workJetContainer) {
-          auto thisJet = std::make_unique<xAOD::Jet>(*jet);
-          constDataWorkJetContainer->push_back(thisJet.release());
-        }
-
-        static SG::AuxElement::Decorator<float> KF_MBB("KF1_Mbb");
-        KF_MBB(*event) = KF1_Mbb;
-
-        //write to eventstore
-        ATH_CHECK(m_jetOutHandle.record(std::move(constDataWorkJetContainer), sys));
-
+      //setup KF tool inputs
+      double KF1_Mbb = -99.;
+      if (jets->size()>=2) {
+	TLorentzVector j1 = jets->at(0)->p4();
+	TLorentzVector j2 = jets->at(1)->p4();
+	TLorentzVector jj = j1 + j2;
+	KF1_Mbb = jj.M();
       }
-      return StatusCode::SUCCESS;
+
+      auto workJetContainer = std::make_unique<xAOD::JetContainer>();
+      auto workJetAuxContainer = std::make_unique<xAOD::JetAuxContainer>();
+      workJetContainer->setStore(workJetAuxContainer.get());
+
+      for (const auto jet : *jets) {
+	// Create a new jet in the workJetContainer by copying the existing jet
+	xAOD::Jet* thisJet = new xAOD::Jet();
+	workJetContainer->push_back(thisJet);
+	*thisJet = *jet; // Copy the jet
+      }
+
+      //run KF tool
+      ATH_CHECK(m_KFTool->applyKF(*photons, *workJetContainer, KF1_Mbb));
+
+      // Create a ConstDataVector to store the jets and set ownership
+      auto constDataWorkJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>();
+      constDataWorkJetContainer->reserve(workJetContainer->size());
+
+      // Move the jets from workJetContainer to constDataWorkJetContainer
+      for (xAOD::Jet* jet : *workJetContainer) {
+	auto thisJet = std::make_unique<xAOD::Jet>(*jet);
+	constDataWorkJetContainer->push_back(thisJet.release());
+      }
+
+      m_KF_MBB.set(*event, KF1_Mbb, sys);
+
+      //write to eventstore
+      ATH_CHECK(m_jetOutHandle.record(std::move(constDataWorkJetContainer), sys));
+
     }
+    return StatusCode::SUCCESS;
+  }
 }

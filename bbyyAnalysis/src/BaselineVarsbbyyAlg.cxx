@@ -35,9 +35,12 @@ namespace HHBBYY
     if (!m_PCBT.empty()) {
       ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
     }
+    if (m_isMC) ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
     ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_jetHandle));
 
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_isEMTight.initialize(m_systematicsList, m_photonHandle));
+
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
@@ -137,19 +140,12 @@ namespace HHBBYY
         ANA_CHECK (m_KFJetHandle.retrieve (KFJets, sys));
       }
 
-      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
-      static const SG::AuxElement::ConstAccessor<unsigned int> DFCommonPhotonsIsEMTightIsEMValue("DFCommonPhotonsIsEMTightIsEMValue");
-      static const SG::AuxElement::ConstAccessor<float> KF_MBB("KF1_Mbb");
-
       // initialize
       TLorentzVector H_bb(0.,0.,0.,0.);
       TLorentzVector H_yy(0.,0.,0.,0.);
       TLorentzVector HH(0.,0.,0.,0.);
-      TLorentzVector y1(0.,0.,0.,0.);
-      TLorentzVector y2(0.,0.,0.,0.);
 
       int j_passWP=-99;
-      int truthLabel_j = -99;
       int PCBTjet = -99;
       double dRyy = -99.;
       
@@ -206,35 +202,26 @@ namespace HHBBYY
       }
 
       // photon sector
-      if (ph1){
-        y1 = ph1->p4();
-        m_Fbranches.at("Photon1_pt").set(*event, y1.Pt(), sys);
-        m_Fbranches.at("Photon1_eta").set(*event, y1.Eta(), sys);
-        m_Fbranches.at("Photon1_phi").set(*event, y1.Phi(), sys);
-        m_Fbranches.at("Photon1_E").set(*event, y1.E(), sys);
-        m_Ibranches.at("Photon1_isEMTight").set(*event, DFCommonPhotonsIsEMTightIsEMValue(*ph1), sys);
+      std::vector<const xAOD::Photon*> sel_photons = {ph1, ph2};
+      for(unsigned int i=0; i<2; i++){
+        const xAOD::Photon* ph = sel_photons[i];
+        if(!ph) break;
+        std::string prefix = "Photon"+std::to_string(i+1);
+        TLorentzVector y = ph->p4();
+        m_Fbranches.at(prefix+"_pt").set(*event, y.Pt(), sys);
+        m_Fbranches.at(prefix+"_eta").set(*event, y.Eta(), sys);
+        m_Fbranches.at(prefix+"_phi").set(*event, y.Phi(), sys);
+        m_Fbranches.at(prefix+"_E").set(*event, y.E(), sys);
+        m_Ibranches.at(prefix+"_isEMTight").set(*event, m_isEMTight.get(*ph, sys), sys);
         if(m_isMC){
-          float ph_SF = m_ph_SF.get(*ph1, sys);
-          m_Fbranches.at("Photon1_effSF").set(*event, ph_SF, sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, m_ph_SF.get(*ph, sys), sys);
         }
       }
 
       if (ph1 && ph2) {
-        y2 = ph2->p4();
-
         // Build the H(yy) candidate
-        H_yy = y1 + y2;
-        dRyy = (y1).DeltaR(y2);
-
-        m_Fbranches.at("Photon2_pt").set(*event, y2.Pt(), sys);
-        m_Fbranches.at("Photon2_eta").set(*event, y2.Eta(), sys);
-        m_Fbranches.at("Photon2_phi").set(*event, y2.Phi(), sys);
-        m_Fbranches.at("Photon2_E").set(*event, y2.E(), sys);
-        m_Ibranches.at("Photon2_isEMTight").set(*event, DFCommonPhotonsIsEMTightIsEMValue(*ph2), sys);
-        if(m_isMC){
-          float ph_SF = m_ph_SF.get(*ph2, sys);
-          m_Fbranches.at("Photon2_effSF").set(*event, ph_SF, sys);
-        }
+        H_yy = ph1->p4() + ph2->p4();
+        dRyy = ph1->p4().DeltaR(ph2->p4());
 
         m_Fbranches.at("myy").set(*event, H_yy.M(), sys);
         m_Fbranches.at("pTyy").set(*event, H_yy.Pt(), sys);
@@ -242,8 +229,8 @@ namespace HHBBYY
         m_Fbranches.at("Phiyy").set(*event, H_yy.Phi(), sys);
         m_Fbranches.at("dRyy").set(*event, dRyy, sys);
 
-        m_Fbranches.at("Photon1_ptOvermyy").set(*event, y1.Pt()/H_yy.M(), sys);
-        m_Fbranches.at("Photon2_ptOvermyy").set(*event, y2.Pt()/H_yy.M(), sys);
+        m_Fbranches.at("Photon1_ptOvermyy").set(*event, ph1->pt()/H_yy.M(), sys);
+        m_Fbranches.at("Photon2_ptOvermyy").set(*event, ph2->pt()/H_yy.M(), sys);
 
         eventFloats.at(HHBBYY::Var::yy_dR) = dRyy;
 
@@ -252,8 +239,6 @@ namespace HHBBYY
       // inclusive jet sector
       for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)4); i++){	 
         TLorentzVector j = jets->at(i)->p4();
-        if (m_isMC) 
-          truthLabel_j = HadronConeExclTruthLabelID(*jets->at(i));
         j_passWP = static_cast<int>(m_isBtag.get(*jets->at(i), sys));
         PCBTjet= m_PCBT.get(*jets->at(i), sys);
       
@@ -267,8 +252,10 @@ namespace HHBBYY
         if(PCBTgiven)
           m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,PCBTjet,sys);
 
-        if (m_isMC)
-          m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set(*event, truthLabel_j, sys);
+        if (m_isMC){
+          m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set
+            (*event, m_truthFlav.get(*jets->at(i), sys), sys);
+        }
       }
 
       const xAOD::Jet *Hbb_Jet1 = nullptr;
@@ -373,7 +360,6 @@ namespace HHBBYY
             TLorentzVector H_bb_KF = Hbb_KFcandidates[0] + Hbb_KFcandidates[1];
             float KF_dRbb = (Hbb_KFcandidates[0]).DeltaR(Hbb_KFcandidates[1]);
 
-            m_Fbranches.at("KF_mbb").set(*event, KF_MBB(*event), sys);
             m_Fbranches.at("KF_pTbb").set(*event, H_bb_KF.Pt(), sys);
             m_Fbranches.at("KF_Etabb").set(*event, H_bb_KF.Eta(), sys);
             m_Fbranches.at("KF_Phibb").set(*event, H_bb_KF.Phi(), sys);
@@ -502,8 +488,6 @@ namespace HHBBYY
     for(unsigned int i =0; i<2; i++){
       const xAOD::Jet* jet = Hbb_jets[i];
 
-      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
-
       bool PCBTgiven = !m_PCBT.empty();
 
       std::string prefix_bjet = prefix + "HbbCandidate_Jet"+std::to_string(i+1);
@@ -524,8 +508,11 @@ namespace HHBBYY
         m_Ibranches.at(prefix_bjet+"_PassWP").set(*event, static_cast<int>(m_isBtag.get(*jet,sys)), sys);
       if(PCBTgiven)
         m_Ibranches.at(prefix_bjet+"_pcbt").set(*event, m_PCBT.get(*jet, sys), sys);
-      if(m_isMC)
-        m_Ibranches.at(prefix_bjet+"_truthLabel").set(*event, HadronConeExclTruthLabelID(*jet), sys);
+
+      if(m_isMC){
+        m_Ibranches.at(prefix_bjet+"_truthLabel").set
+	  (*event, m_truthFlav.get(*jet, sys), sys);
+      }
     }
 
     TLorentzVector H_bb = Hbb_jets[0]->p4() + Hbb_jets[1]->p4();

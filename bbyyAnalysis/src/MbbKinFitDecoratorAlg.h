@@ -13,6 +13,7 @@
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
@@ -54,6 +55,8 @@ namespace HHBBYY {
 
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
     m_jetOutHandle{ this, "jetContainerOutKey", "bbyyAnalysisKFJets_%SYS%", "Jet container to write" };
+
+    CP::SysWriteDecorHandle<float> m_KF_MBB{"KF_mbb_%SYS%", this};
             
     /// \brief Steerable properties
     Gaudi::Property<bool> m_doSystematics

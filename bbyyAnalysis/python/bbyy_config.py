@@ -189,8 +189,8 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     float_variable_names += ["DeltaPhi_bb_yy_cm_bbyy"]
 
     # Kinematic Fit variables
-    if (flags.Analysis.do_KinematicFit):
-        float_variable_names += ["KF_mbb", "KF_pTbb", "KF_Etabb", "KF_Phibb",
+    if flags.Analysis.do_KinematicFit:
+        float_variable_names += ["KF_pTbb", "KF_Etabb", "KF_Phibb",
                                  "KF_mbbyy", "KF_dRbb", "KF_mbbyystar", "KF_pTbbyy",
                                  "KF_Etabbyy", "KF_Phibbyy", "KF_dRHH"]
         # KF mva variables
@@ -262,13 +262,6 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     return float_variable_names, int_variable_names
 
 
-def get_BaselineVarsbbyyAlg_highlevelvariables(flags):
-    high_level_float_variables = []
-    high_level_int_variables = []
-
-    return high_level_float_variables, high_level_int_variables
-
-
 def get_BaselineVarsbbyyAlg_SH(flags):
     SH_float_variable_names = []
     SH_int_variable_names = []
@@ -316,13 +309,10 @@ def bbyy_branches(flags):
     float_variable_names += baseline_float_variables
     int_variable_names += baseline_int_variables
 
-    # Here are more high level variables which can be stored using the flag
-    # flags.Analysis.store_high_level_variables
-    if flags.Analysis.store_high_level_variables:
-        high_level_float_variables, high_level_int_variables \
-            = get_BaselineVarsbbyyAlg_highlevelvariables(flags)
-        float_variable_names += high_level_float_variables
-        int_variable_names += high_level_int_variables
+    if flags.Analysis.do_KinematicFit:
+        # do not append KF_mbb variables to float_variable_names
+        # as they are stored by the KF algorithm not BaselineVarsbbyyAlg
+        all_baseline_variable_names += ["KF_mbb"]
 
     # Here are special variables to be stored for the SH resonant search
     # flags.Analysis.do_resonant_PNN
