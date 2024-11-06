@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 ///////////////////////////////////////////////////////////////////
@@ -19,6 +19,7 @@
 #include <AthenaBaseComps/AthAlgorithm.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODTruth/TruthParticleContainer.h>
+#include <AsgDataHandles/WriteDecorHandleKey.h>
 
 namespace MC
 {
@@ -189,24 +190,24 @@ private:
     Gaudi::Property<unsigned int> m_nHiggses                {this, "nHiggses", 2, "Number of Higgses to record"};
     Gaudi::Property<std::vector<std::string>> m_decayModes  {this, "decayModes", {""}, "HH decay modes to consider"};
 
-    std::vector<SG::AuxElement::Decorator<int>> m_truthHiggsesPdgIdDecorators;
+    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_truthHiggsesPdgIdDecorKeys;
 
-    std::vector<std::vector<SG::AuxElement::Decorator<float>>>
-        m_truthHiggsesKinDecorators;
+    std::vector<std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>>
+        m_truthHiggsesKinDecorKeys;
 
-    std::vector<SG::AuxElement::Decorator<std::vector<int>>>
-        m_truthChildrenPdgIdFromHiggsesDecorators;
+    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>
+        m_truthChildrenPdgIdFromHiggsesDecorKeys;
 
-    std::vector<SG::AuxElement::Decorator<std::vector<int>>>
-        m_truthInitialChildrenPdgIdFromHiggsesDecorators;
+    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>
+        m_truthInitialChildrenPdgIdFromHiggsesDecorKeys;
 
-    std::vector<std::vector<SG::AuxElement::Decorator<std::vector<float>>>>
-        m_truthChildrenKinFromHiggsesDecorators;
+    std::vector<std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>>
+        m_truthChildrenKinFromHiggsesDecorKeys;
 
-    std::vector<std::vector<SG::AuxElement::Decorator<std::vector<float>>>>
-        m_truthInitialChildrenKinFromHiggsesDecorators;
+    std::vector<std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>>
+        m_truthInitialChildrenKinFromHiggsesDecorKeys;
 
-    std::vector<SG::AuxElement::Decorator<float>> m_truthHHKinDecorators;
+    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_truthHHKinDecorKeys;
 
     std::array<std::string, 4> m_kinVars{"pt", "eta", "phi", "m"};
   };

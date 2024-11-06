@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Victor Ruelas
@@ -10,6 +10,8 @@
 #include "TruthParticleInformationAlg.h"
 #include "TruthUtils.h"
 #include <algorithm>
+
+#include <AsgDataHandles/WriteDecorHandle.h>
 
 #include "TruthUtils/HepMCHelpers.h"
 
@@ -53,27 +55,41 @@ namespace Easyjet
 
     ATH_CHECK(m_EventInfoKey.initialize());
 
-    m_truthHiggsesKinDecorators.resize(m_nHiggses);
-    m_truthChildrenKinFromHiggsesDecorators.resize(m_nHiggses);
-    m_truthInitialChildrenKinFromHiggsesDecorators.resize(m_nHiggses);
+    m_truthHiggsesKinDecorKeys.resize(m_nHiggses);
+    m_truthChildrenKinFromHiggsesDecorKeys.resize(m_nHiggses);
+    m_truthInitialChildrenKinFromHiggsesDecorKeys.resize(m_nHiggses);
     for (unsigned int h = 0; h < m_nHiggses; h++)
     {
       // decorator will show up as "truth_Hx_pdgId", where x is the x higgs
-      m_truthHiggsesPdgIdDecorators.emplace_back(
-          "truth_H" + std::to_string(h + 1) + "_" + "pdgId");
-      m_truthChildrenPdgIdFromHiggsesDecorators.emplace_back(
-          "truth_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
-      m_truthInitialChildrenPdgIdFromHiggsesDecorators.emplace_back(
-          "truth_initial_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
+      m_truthHiggsesPdgIdDecorKeys.emplace_back
+	(m_EventInfoKey.key()+
+	 ".truth_H" + std::to_string(h + 1) + "_" + "pdgId");
+      m_truthChildrenPdgIdFromHiggsesDecorKeys.emplace_back
+	(m_EventInfoKey.key()+
+	 ".truth_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
+      m_truthInitialChildrenPdgIdFromHiggsesDecorKeys.emplace_back
+	(m_EventInfoKey.key()+
+	 ".truth_initial_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
+
+      ATH_CHECK(m_truthHiggsesPdgIdDecorKeys.back().initialize());
+      ATH_CHECK(m_truthChildrenPdgIdFromHiggsesDecorKeys.back().initialize());
+      ATH_CHECK(m_truthInitialChildrenPdgIdFromHiggsesDecorKeys.back().initialize());
 
       for (const std::string &var : m_kinVars)
       {
-        m_truthHiggsesKinDecorators[h].emplace_back(
-            "truth_H" + std::to_string(h + 1) + "_" + var);
-        m_truthChildrenKinFromHiggsesDecorators[h].emplace_back(
-            "truth_children_fromH" + std::to_string(h + 1) + "_" + var);
-        m_truthInitialChildrenKinFromHiggsesDecorators[h].emplace_back(
-            "truth_initial_children_fromH" + std::to_string(h + 1) + "_" + var);
+        m_truthHiggsesKinDecorKeys[h].emplace_back
+	  (m_EventInfoKey.key()+
+	   ".truth_H" + std::to_string(h + 1) + "_" + var);
+        m_truthChildrenKinFromHiggsesDecorKeys[h].emplace_back
+	  (m_EventInfoKey.key()+
+	   ".truth_children_fromH" + std::to_string(h + 1) + "_" + var);
+        m_truthInitialChildrenKinFromHiggsesDecorKeys[h].emplace_back
+	  (m_EventInfoKey.key()+
+	   ".truth_initial_children_fromH" + std::to_string(h + 1) + "_" + var);
+
+	ATH_CHECK(m_truthHiggsesKinDecorKeys[h].back().initialize());
+	ATH_CHECK(m_truthChildrenKinFromHiggsesDecorKeys[h].back().initialize());
+	ATH_CHECK(m_truthInitialChildrenKinFromHiggsesDecorKeys[h].back().initialize());
       }
     }
 
@@ -85,8 +101,8 @@ namespace Easyjet
 
     for (const std::string &var : m_kinVars)
     {
-      m_truthHHKinDecorators.emplace_back(
-          "truth_HH_" + var);
+      m_truthHHKinDecorKeys.emplace_back(m_EventInfoKey.key()+".truth_HH_" + var);
+      ATH_CHECK(m_truthHHKinDecorKeys.back().initialize());
     }
 
     return StatusCode::SUCCESS;
@@ -169,36 +185,55 @@ namespace Easyjet
     }
     for (unsigned int h = 0; h < m_nHiggses; h++)
     {
-      m_truthHiggsesPdgIdDecorators[h](eventInfo) = higgses[h].pdgId();
-      m_truthChildrenPdgIdFromHiggsesDecorators[h](eventInfo) = higgses[h].children_pdgId();
-      m_truthInitialChildrenPdgIdFromHiggsesDecorators[h](eventInfo) = higgses[h].initial_children_pdgId();
+      SG::WriteDecorHandle<xAOD::EventInfo, int> truthHiggsesPdgIdDecorHandle
+	(m_truthHiggsesPdgIdDecorKeys[h]);
+      truthHiggsesPdgIdDecorHandle(eventInfo) = higgses[h].pdgId();
+
+      SG::WriteDecorHandle<xAOD::EventInfo, std::vector<int>>
+	truthChildrenPdgIdFromHiggsesDecorHandle
+	(m_truthChildrenPdgIdFromHiggsesDecorKeys[h]);
+      truthChildrenPdgIdFromHiggsesDecorHandle(eventInfo) =
+	higgses[h].children_pdgId();
+
+      SG::WriteDecorHandle<xAOD::EventInfo, std::vector<int>>
+	truthInitialChildrenPdgIdFromHiggsesDecorHandle
+	(m_truthInitialChildrenPdgIdFromHiggsesDecorKeys[h]);
+      truthInitialChildrenPdgIdFromHiggsesDecorHandle(eventInfo) =
+	higgses[h].initial_children_pdgId();
 
       for (size_t i = 0; i < m_kinVars.size(); i++)
       {
-        m_truthHiggsesKinDecorators[h][i](eventInfo) = higgses[h].p4(i);
-        m_truthChildrenKinFromHiggsesDecorators[h][i](eventInfo) =
-            higgses[h].children_p4(i);
-        m_truthInitialChildrenKinFromHiggsesDecorators[h][i](eventInfo) =
-            higgses[h].initial_children_p4(i);
+        SG::WriteDecorHandle<xAOD::EventInfo, float> truthHiggsesKinDecorHandle
+          (m_truthHiggsesKinDecorKeys[h][i]);
+        truthHiggsesKinDecorHandle(eventInfo) = higgses[h].p4(i);
+
+        SG::WriteDecorHandle<xAOD::EventInfo, std::vector<float>>
+          truthChildrenKinFromHiggsesDecorHandle
+          (m_truthChildrenKinFromHiggsesDecorKeys[h][i]);
+        truthChildrenKinFromHiggsesDecorHandle(eventInfo) =
+          higgses[h].children_p4(i);
+
+        SG::WriteDecorHandle<xAOD::EventInfo, std::vector<float>>
+          truthInitialChildrenKinFromHiggsesDecorHandle
+          (m_truthInitialChildrenKinFromHiggsesDecorKeys[h][i]);
+        truthInitialChildrenKinFromHiggsesDecorHandle(eventInfo) =
+          higgses[h].initial_children_p4(i);
       }
     }
 
     // Reconstruct the HH system
-    // Assume exactly two Higgs for now & check for nullptrs 
-    if (higgses.size() < 2 || higgses[0] == nullptr || higgses[1] == nullptr) 
-    {
-      for (size_t i = 0; i < m_kinVars.size(); i++)
-      {
-        m_truthHHKinDecorators[i](eventInfo) = -999;
-      }
-    } else 
-    {
-      std::array<float, 4> coords = calcHHKinematics(higgses[0], higgses[1]);
-      for (size_t i = 0; i < m_kinVars.size(); i++)
-      {
-        m_truthHHKinDecorators[i](eventInfo) = coords[i];
-      }
+    // Assume exactly two Higgs for now & check for nullptrs
+
+    std::array<float, 4> coords = {-999., -999., -999., -999.};
+    if(higgses.size()>=2 && higgses[0] && higgses[1])
+      coords = calcHHKinematics(higgses[0], higgses[1]);
+
+    for (size_t i = 0; i < m_kinVars.size(); i++){
+      SG::WriteDecorHandle<xAOD::EventInfo, float> truthHHKinDecorHandle
+	(m_truthHHKinDecorKeys[i]);
+      truthHHKinDecorHandle(eventInfo) = coords[i];
     }
+
   }
   
   void TruthParticleInformationAlg::verbosePrintParticleAndChildren(
