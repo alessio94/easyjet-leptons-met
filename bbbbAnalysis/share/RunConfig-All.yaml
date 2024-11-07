@@ -18,8 +18,12 @@ Small_R_jet:
   max_eta: 4.5
   btag_wp: "GN2v01_FixedCutBEff_85"
   btag_extra_wps:
+    - GN2v01_FixedCutBEff_65
     - GN2v01_FixedCutBEff_70
     - GN2v01_FixedCutBEff_77
+    - DL1dv01_FixedCutBEff_70
+    - DL1dv01_FixedCutBEff_77
+    - DL1dv01_FixedCutBEff_85
   doL1Matching: false
   doHLTMatching: false
   saveTriggerInfo: false
@@ -30,6 +34,16 @@ Large_R_jet:
   max_eta: 2.0
   runMuonJetPtCorr: false
   amount_leadingjet: 2
+  GN2X_hbb_wps:
+    - "FlatMassQCDEff_0p25"
+    - "FlatMassQCDEff_0p3"
+    - "FlatMassQCDEff_0p37"
+    - "FlatMassQCDEff_0p46"
+    - "FlatMassQCDEff_0p58"
+    - "FlatMassQCDEff_0p74"
+    - "FlatMassQCDEff_0p94"
+    - "FlatMassQCDEff_1p25"
+    - "FlatMassQCDEff_1p55"
 
 Muon:
   ID: "Loose"
@@ -51,6 +65,11 @@ do_overlap_removal: true
 
 do_CP_systematics: true
 systematics_regex: [".*"]
+
+GRL:
+  years:
+    include: EasyjetHub/bjet_grl_years.yaml
+  store_decoration: true
 
 PileupReweighting:
   - postfix: "bjet"

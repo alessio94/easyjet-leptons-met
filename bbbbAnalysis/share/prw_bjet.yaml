@@ -6,6 +6,6 @@
 'mc23a': 'PileupReweighting/mc23_common/mc23a.410000.physlite.prw.v2.root'
 'mc23d': 'PileupReweighting/mc23_common/mc23d.450000.physlite.prw.v1.root'
 '2017': 'physics_25ns_BjetHLT_Normal2017.actualMu.OflLumi-13TeV-010.root'
-'2018': '/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/GoodRunsLists/data18_13TeV/20190318/physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root'
+'2018': 'purw.actualMu.root'
 '2022': 'purw.actualMu.2022.root'
 '2023': 'purw.actualMu.2023.root'

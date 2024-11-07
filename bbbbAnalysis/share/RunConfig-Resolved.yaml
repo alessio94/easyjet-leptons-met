@@ -44,6 +44,10 @@ do_overlap_removal: true
 do_CP_systematics: false
 systematics_regex: [".*"]
 
+GRL:
+  years:
+    include: EasyjetHub/bjet_grl_years.yaml
+
 # Alternative PRW configuration
 PileupReweighting:
   - postfix: "bjet"
