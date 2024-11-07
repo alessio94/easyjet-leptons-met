@@ -32,6 +32,7 @@ Large_R_jet:
   GN2X_hbb_wps: ["FlatMassQCDEff_1p25", "FlatMassQCDEff_0p58", "FlatMassQCDEff_0p3"]
   wtag_type: "ANN" # ANN, DNN
   wtag_wp: "70" # [50, 60, 70, 80, 90] ANN, [50, 80] DNN
+  wtag_extra_wps: ["50","60","80","90"]
   max_eta: 2.0
   
 

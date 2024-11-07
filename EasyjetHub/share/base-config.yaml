@@ -76,6 +76,7 @@ Large_R_jet:
   variables_int_LargeRJets: []
   wtag_type: ""
   wtag_wp: ""
+  wtag_extra_wps: []
 
 Photon:
   min_pT: 10.e+3

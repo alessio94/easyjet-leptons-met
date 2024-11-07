@@ -136,19 +136,16 @@ def get_large_R_jet_truth_labels(flags):
 
 
 def get_wtag_branches(flags):
+    wtag_branches = []
+
     wtag_type = flags.Analysis.Large_R_jet.wtag_type
     wtag_wp = flags.Analysis.Large_R_jet.wtag_wp
+    wtag_extra_wps = list(flags.Analysis.Large_R_jet.wtag_extra_wps or [])
 
-    if wtag_type == "DNN":
-        wtag_branches = [
-            f"{wtag_type}TaggerTopQuarkContained{wtag_wp}_Tagged",
-            f"{wtag_type}TaggerTopQuarkContained{wtag_wp}_Score",
-        ]
-
-    else:
-        wtag_branches = [
-            f"{wtag_type}{wtag_wp}Tagger_Tagged",
-            f"{wtag_type}{wtag_wp}Tagger_Score",
+    for wp in [wtag_wp] + wtag_extra_wps:
+        wtag_branches += [
+            f"{wtag_type}{wp}Tagger_Tagged",
+            f"{wtag_type}{wp}Tagger_Score",
         ]
 
     return wtag_branches
