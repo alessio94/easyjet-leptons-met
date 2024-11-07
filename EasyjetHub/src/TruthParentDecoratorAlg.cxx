@@ -289,6 +289,25 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   // part 1: read in the particles
   //////////////////////////////////
   SG::ReadHandle<JC> targets(m_target_container_key, cxt);
+
+  using uc_t = unsigned char;
+  SG::WriteDecorHandle<JC,int> pdgid(m_target_pdgid_key, cxt);
+  SG::WriteDecorHandle<JC,float> deltaR(m_target_dr_truth_key, cxt);
+  SG::WriteDecorHandle<JC,JL> link(m_target_link_key, cxt);
+  SG::WriteDecorHandle<JC,char> index(m_target_index_key, cxt);
+  SG::WriteDecorHandle<JC,uc_t> nMatched(m_target_n_matched_key, cxt);
+  SG::WriteDecorHandle<JC,parent_mask_t> mask(m_target_match_mask_key, cxt);
+  SG::WriteDecorHandle<JC,int> matchPdgId(m_match_pdgid_key, cxt);
+  SG::WriteDecorHandle<JC,int> matchChildCount(m_match_children_key, cxt);
+  SG::WriteDecorHandle<JC,JL> matchLink(m_match_link_key, cxt);
+  std::vector<SG::WriteDecorHandle<JC, unsigned char>> cascadeCounts;
+  for (const auto& key: m_cascade_count_writer_keys) {
+    // note that this doesn't currently work, see this jira ticket:
+    //
+    // https://its.cern.ch/jira/browse/ATEAM-909
+    cascadeCounts.emplace_back(key, cxt);
+  }
+
   if (targets->empty()) return StatusCode::SUCCESS;
 
   // read in and sort the parent collection
@@ -369,23 +388,6 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
   ///////////////////////
   // Part 4: decorate!
   ///////////////////////
-  using uc_t = unsigned char;
-  SG::WriteDecorHandle<JC,int> pdgid(m_target_pdgid_key, cxt);
-  SG::WriteDecorHandle<JC,float> deltaR(m_target_dr_truth_key, cxt);
-  SG::WriteDecorHandle<JC,JL> link(m_target_link_key, cxt);
-  SG::WriteDecorHandle<JC,char> index(m_target_index_key, cxt);
-  SG::WriteDecorHandle<JC,uc_t> nMatched(m_target_n_matched_key, cxt);
-  SG::WriteDecorHandle<JC,parent_mask_t> mask(m_target_match_mask_key, cxt);
-  SG::WriteDecorHandle<JC,int> matchPdgId(m_match_pdgid_key, cxt);
-  SG::WriteDecorHandle<JC,int> matchChildCount(m_match_children_key, cxt);
-  SG::WriteDecorHandle<JC,JL> matchLink(m_match_link_key, cxt);
-  std::vector<SG::WriteDecorHandle<JC, unsigned char>> cascadeCounts;
-  for (const auto& key: m_cascade_count_writer_keys) {
-    // note that this doesn't currently work, see this jira ticket:
-    //
-    // https://its.cern.ch/jira/browse/ATEAM-909
-    cascadeCounts.emplace_back(key, cxt);
-  }
 
   for (const J* j: *targets) {
     if (labeled_targets.contains(j)) {
