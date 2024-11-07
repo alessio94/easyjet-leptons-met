@@ -144,7 +144,7 @@ namespace ZCC
         }
       }
 
-      std::string ftag2D_WP = "GN2v01_Continuous2D";
+      std::string ftag2D_WP = "ftag_quantile_GN2v01_Continuous2D";
       std::vector<int> ctag_values = {1,2,3};
       auto cjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       if(std::find(m_PCBTnames.begin(), m_PCBTnames.end(), ftag2D_WP)!=m_PCBTnames.end())

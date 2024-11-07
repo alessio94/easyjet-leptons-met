@@ -143,14 +143,16 @@ namespace ZCC
       int n_bjets = bjets->size();
 
       // c-jet sector
-      std::string ftag2D_WP = "GN2v01_Continuous2D";
+      std::string ftag2D_WP = "ftag_quantile_GN2v01_Continuous2D";
       std::vector<int> ctag_values = {1,2,3};
       auto cjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       if(std::find(m_PCBTnames.begin(), m_PCBTnames.end(), ftag2D_WP)!=m_PCBTnames.end())
       {
         for(const xAOD::Jet* jet : *jets) {
           int pcbt = m_PCBTs.at(ftag2D_WP).get(*jet, sys);
-          if (std::find(ctag_values.begin(), ctag_values.end(), pcbt)!=ctag_values.end() && std::abs(jet->eta())<2.5) cjets->push_back(jet);
+          if (std::find(ctag_values.begin(), ctag_values.end(), pcbt)!=ctag_values.end() && std::abs(jet->eta())<2.5) {
+            cjets->push_back(jet);
+          }
         }
       }
       int n_cjets = cjets->size();
