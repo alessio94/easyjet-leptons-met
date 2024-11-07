@@ -4,6 +4,7 @@
 */
 
 #include "SignalJetsSelectorAlg.h"
+ #include <AthenaKernel/Units.h>
 
 namespace VBSVV4q{
 
@@ -36,7 +37,7 @@ namespace VBSVV4q{
     StatusCode SignalJetsSelectorAlg::execute(){
         /*
             signal jets selection algorithm
-                - leading two large-R jets
+                - leading two large-R jets with m > 40 GeV (pT/eta cuts already applied)
             ToDo: overlap removal with VBS jets
         */
 
@@ -47,9 +48,10 @@ namespace VBSVV4q{
 
             auto SignalJetsCandidates = std::make_unique<ConstDataVector<xAOD::JetContainer> >(SG::VIEW_ELEMENTS);
 
-            if(jets -> size()>1){
-                SignalJetsCandidates -> push_back( jets -> at(0) );
-                SignalJetsCandidates -> push_back( jets -> at(1) );
+	    for(auto jet : *jets){
+                // skip large-R jets with mass below 40 GeV
+                if(jet -> m() < 40.*Athena::Units::GeV) continue;
+                SignalJetsCandidates -> push_back(jet);
             }
 
             ATH_CHECK(m_SignalLargeRJetsOutHandle.record(std::move(SignalJetsCandidates), sys));
