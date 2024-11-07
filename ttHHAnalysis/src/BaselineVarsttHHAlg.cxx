@@ -25,15 +25,6 @@ namespace ttHH
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   { }
-
-  template<typename ParticleType>
-  std::pair<int, int> BaselineVarsttHHAlg::truthOrigin(const ParticleType* particle) {
-    static const SG::AuxElement::ConstAccessor<int> lepttruthOrigin("truthOrigin");
-    static const SG::AuxElement::ConstAccessor<int> lepttruthType("truthType");
-    
-    return {lepttruthOrigin(*particle), lepttruthType(*particle)};
-  }
-
   
   StatusCode BaselineVarsttHHAlg::initialize()
   {
@@ -59,10 +50,15 @@ namespace ttHH
 
     if(m_isMC){
       m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
+      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
+      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
+
       m_mu_SF = CP::SysReadDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
+      ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
+      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
+      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
     }
-    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-    ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
@@ -697,8 +693,11 @@ namespace ttHH
 
     // Truth
     if (m_isMC) {
-      auto [lep_truthOrigin, lep_truthType] = truthOrigin(particle);
+      int lep_truthOrigin = std::abs(lep_pdgid)==11 ?
+        m_ele_truthOrigin.get(*particle, sys) : m_mu_truthOrigin.get(*particle, sys);
       m_Ibranches.at(prefix + "truthOrigin").set(*event, lep_truthOrigin, sys);
+      int lep_truthType = std::abs(lep_pdgid)==11 ?
+        m_ele_truthType.get(*particle, sys) : m_mu_truthType.get(*particle, sys);
       m_Ibranches.at(prefix + "truthType").set(*event, lep_truthType, sys);
     
       int lep_isPrompt = 0;

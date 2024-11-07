@@ -29,13 +29,17 @@ namespace HHBBLL
 
     if(m_isMC){
       m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
+      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
+      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
     }
-    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
     if(m_isMC){
       m_mu_SF = CP::SysReadDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
+      ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
+      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
+      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
     }
-    ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     // Intialise syst-aware output decorators
     for (const std::string &var : m_floatVariables) {
@@ -189,6 +193,7 @@ namespace HHBBLL
       for(unsigned int i=0; i<std::min(size_t(2),leptons.size()); i++){
         std::string prefix = "Lepton"+std::to_string(i+1);
         TLorentzVector tlv = leptons[i].first->p4();
+        int lep_pdgid = leptons[i].second;
         if(i==0) Leading_lep = tlv;
         else if(i==1) Subleading_lep = tlv;
         m_Fbranches.at(prefix+"_pt").set(*event, tlv.Pt(), sys);
@@ -196,7 +201,7 @@ namespace HHBBLL
         m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
         m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
         if(m_isMC){
-          float SF = std::abs(leptons[i].second)==11 ?
+          float SF = std::abs(lep_pdgid)==11 ?
             m_ele_SF.get(*leptons[i].first,sys) :
             m_mu_SF.get(*leptons[i].first,sys);
           m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
@@ -207,13 +212,18 @@ namespace HHBBLL
           
         // leptons truth information
           if (m_isMC){
-            auto [lep_truthOrigin, lep_truthType] = truthOrigin(leptons[i].first);
+            int lep_truthOrigin = std::abs(lep_pdgid)==11 ?
+              m_ele_truthOrigin.get(*leptons[i].first,sys) :
+              m_mu_truthOrigin.get(*leptons[i].first,sys);
             m_Ibranches.at(prefix + "_truthOrigin").set(*event, lep_truthOrigin, sys);
+            int lep_truthType = std::abs(lep_pdgid)==11 ?
+              m_ele_truthType.get(*leptons[i].first,sys) :
+              m_mu_truthType.get(*leptons[i].first,sys);
             m_Ibranches.at(prefix + "_truthType").set(*event, lep_truthType, sys);
             int lep_isPrompt = 0;
-            if (std::abs(leptons[i].second)==13){ // simplistic
+            if (std::abs(lep_pdgid)==13){ // simplistic
               if (lep_truthType==6) lep_isPrompt=1; // isolated prompts
-            } else if (std::abs(leptons[i].second)==11){
+            } else if (std::abs(lep_pdgid)==11){
               if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
             }
             m_Ibranches.at(prefix + "_isPrompt").set(*event, lep_isPrompt, sys);
@@ -351,15 +361,6 @@ namespace HHBBLL
 
     return StatusCode::SUCCESS;
   }
-    
-  template<typename ParticleType>
-    std::pair<int, int> BaselineVarsbbllAlg::truthOrigin(const ParticleType* particle) {
-      static const SG::AuxElement::ConstAccessor<int> lepttruthOrigin("truthOrigin");
-      static const SG::AuxElement::ConstAccessor<int> lepttruthType("truthType");
-    
-      return {lepttruthOrigin(*particle), lepttruthType(*particle)};
-  }
-
 
 }
 

@@ -200,13 +200,6 @@ namespace VBSVV4q{
       }
 
       return StatusCode::SUCCESS;
-    } 
-    template<typename ParticleType>
-    std::pair<int, int> BaselineVarsJJAlg::truthOrigin(const ParticleType* particle) {
-      static const SG::AuxElement::ConstAccessor<int> lepttruthOrigin("truthOrigin");
-      static const SG::AuxElement::ConstAccessor<int> lepttruthType("truthType");
-    
-      return {lepttruthOrigin(*particle), lepttruthType(*particle)};
-  }
+    }
 
 }

@@ -42,11 +42,6 @@ public:
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
 private:
-    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-    // "someInfo"};
-    
-    template<typename ParticleType>
-      std::pair<int, int> truthOrigin(const ParticleType* particle);
     template<typename ParticleType>
       void updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
                                        int lep_pdgid, float lep_sf, 
@@ -85,10 +80,14 @@ private:
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
+    CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
+    CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};
 
     Gaudi::Property<std::string> m_muWPName
       { this, "muonWP", "","Muon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_mu_SF{"", this};
+    CP::SysReadDecorHandle<int> m_mu_truthOrigin{"truthOrigin", this};
+    CP::SysReadDecorHandle<int> m_mu_truthType{"truthType", this};
 
     CP::SysReadDecorHandle<bool> 
       m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};

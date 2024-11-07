@@ -32,13 +32,17 @@ namespace VBSHIGGS{
 
       if(m_isMC){
         m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
+        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+        ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
+        ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
       }
-      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
 
       if(m_isMC){
         m_mu_SF = CP::SysReadDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
+        ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
+        ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
+        ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
       }
-      ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
       if (!m_isBtag.empty()) {
         ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
@@ -209,8 +213,13 @@ namespace VBSHIGGS{
         
           // leptons truth information
           if (m_isMC){
-            auto [lep_truthOrigin, lep_truthType] = truthOrigin(leptons[0].first);
+            int lep_truthOrigin = std::abs(lep_pdgid)==11 ?
+              m_ele_truthOrigin.get(*leptons[0].first,sys) :
+              m_mu_truthOrigin.get(*leptons[0].first,sys);
             m_Ibranches.at("Lepton_truthOrigin").set(*event, lep_truthOrigin, sys);
+            int lep_truthType = std::abs(lep_pdgid)==11 ?
+              m_ele_truthType.get(*leptons[0].first,sys) :
+              m_mu_truthType.get(*leptons[0].first,sys);
             m_Ibranches.at("Lepton_truthType").set(*event, lep_truthType, sys);
             int lep_isPrompt = 0;
             if (std::abs(lep_pdgid)==13){ // simplistic
@@ -331,11 +340,4 @@ namespace VBSHIGGS{
       
       return StatusCode::SUCCESS;
     }
-    template<typename ParticleType>
-    std::pair<int, int> BaselineVarsSemiLepAlg::truthOrigin(const ParticleType* particle) {
-      static const SG::AuxElement::ConstAccessor<int> lepttruthOrigin("truthOrigin");
-      static const SG::AuxElement::ConstAccessor<int> lepttruthType("truthType");
-    
-      return {lepttruthOrigin(*particle), lepttruthType(*particle)};
-  } 
 }

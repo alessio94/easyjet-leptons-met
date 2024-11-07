@@ -37,11 +37,6 @@ public:
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
 private:
-    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-    // "someInfo"};
-    
-    template<typename ParticleType>
-            std::pair<int, int> truthOrigin(const ParticleType* particle);
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
@@ -66,10 +61,14 @@ private:
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
+    CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
+    CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};
 
     Gaudi::Property<std::string> m_muWPName
       { this, "muonWP", "","Muon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_mu_SF{"", this};
+    CP::SysReadDecorHandle<int> m_mu_truthOrigin{"truthOrigin", this};
+    CP::SysReadDecorHandle<int> m_mu_truthType{"truthType", this};
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
