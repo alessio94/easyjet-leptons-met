@@ -26,9 +26,9 @@ def jet_sequence(
         else "AntiKt4EMTopoJets"
     )
 
-    calib_name = drop_sys(flags.Analysis.container_names.allcalib[jet_type])
+    output_name = drop_sys(flags.Analysis.container_names.output[jet_type])
 
-    configSeq += makeConfig("Jets", containerName=calib_name,
+    configSeq += makeConfig("Jets", containerName=output_name,
                             jetCollection=jetColl)
     # don't run JVT only for EMTopo jets
     configSeq.setOptionValue(".runNNJvtUpdate", jet_type != "reco4EMTopoJet")
@@ -83,7 +83,7 @@ def jet_sequence(
         )
 
     if jet_type != "reco4EMTopoJet":
-        configSeq += makeConfig('Jets.JVT', containerName=calib_name)
+        configSeq += makeConfig('Jets.JVT', containerName=output_name)
         configSeq.setOptionValue('.enableFJvt', jet_flags.useFJvt)
 
         btag_wps = []
@@ -97,7 +97,7 @@ def jet_sequence(
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
             configSeq += makeConfig('Jets.FlavourTagging',
-                                    containerName=calib_name,
+                                    containerName=output_name,
                                     selectionName=tagger_wp)
             configSeq.setOptionValue('.btagger', tagger)
             # set the MC/MC SF to default for now, this was broken by
@@ -142,7 +142,7 @@ def jet_sequence(
         if jet_flags.runBJetPtCalib:
             configSeq += makeConfig(
                 'Jets.BJetCalib',
-                containerName=calib_name,
+                containerName=output_name,
                 muonContainerName=drop_sys(flags.Analysis.container_names.output.muons))
             configSeq.setOptionValue('.jetPreselection', jet_flags.btag_wp)
             configSeq.setOptionValue('.muonPreselection', "forBJetCalib")
@@ -157,31 +157,20 @@ def jet_sequence(
             # Note: this is going to run post overlap removal
             configSeq += config.makeConfig(
                 'Jets.FlavourTaggingEventSF',
-                containerName=calib_name + '.baselineJvt',
+                containerName=output_name + '.baselineJvt',
                 selectionName=tagger_wp)
             configSeq.setOptionValue('.btagger', tagger)
             configSeq.setOptionValue('.btagWP', btag_wp)
 
     # Apply kinematic selection
-    configSeq += makeConfig('Jets.PtEtaSelection', containerName=calib_name,
+    configSeq += makeConfig('Jets.PtEtaSelection', containerName=output_name,
                             selectionName='selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', jet_flags.min_pT)
     configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=calib_name)
-
-    # Apply thinning
-    output_name = drop_sys(flags.Analysis.container_names.output[jet_type])
-    configSeq += makeConfig('Thinning', containerName=calib_name)
-    selection_string = "selectPtEta"
-    if jet_type != "reco4EMTopoJet":
-        selection_string += "&&baselineJvt"
-        if jet_flags.useFJvt:
-            selection_string += "&&baselineFJvt"
-    configSeq.setOptionValue('.selectionName', selection_string)
-    configSeq.setOptionValue('.outputName', output_name)
+    configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
     return configSeq
 
@@ -222,8 +211,5 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
-
-    configSeq += makeConfig('Thinning', containerName=output_name)
-    configSeq.setOptionValue('.selectionName', "selectPtEta")
 
     return configSeq

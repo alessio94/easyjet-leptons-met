@@ -40,7 +40,7 @@ def met_sequence(flags, configAcc):
     # Pass all the calibrated jets
     configSeq.setOptionValue(
         '.jets',
-        drop_sys(container_names.allcalib[flags.Analysis.Small_R_jet.jet_type])
+        drop_sys(container_names.output[flags.Analysis.Small_R_jet.jet_type])
     )
     # Add whatever collections are active in the job
     for objtype, coll in preMET_collections.items():

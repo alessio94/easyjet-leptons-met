@@ -81,11 +81,4 @@ def tau_sequence(flags, configAcc):
     configSeq += makeConfig('Thinning', containerName=output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
 
-    for id in wps:
-        configSeq += makeConfig('Thinning', containerName=output_name,
-                                configName=f'Thinning_{id}')
-        configSeq.setOptionValue('.selectionName', id)
-        configSeq.setOptionValue('.outputName', id + output_name)
-        configSeq.setOptionValue('.postfix', id)
-
     return configSeq

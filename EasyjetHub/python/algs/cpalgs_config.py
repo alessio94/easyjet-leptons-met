@@ -21,6 +21,7 @@ from EasyjetHub.algs.calibration.met import met_sequence
 from EasyjetHub.algs.calibration.selection_decoration import (
     selection_decoration_sequence)
 from EasyjetHub.algs.postprocessing.overlap_removal import overlap_sequence
+from EasyjetHub.algs.postprocessing.thinning import thinning_sequence
 from EasyjetHub.algs.calibration.triggerSF import triggerSF_sequence
 from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.steering.utils.systematics_helper import consolidate_systematics_regex
@@ -164,6 +165,8 @@ def cpalgs_cfg(flags):
         log.info("Adding Overlap Removal sequence")
 
         configSeq += overlap_sequence(flags)
+
+    configSeq += thinning_sequence(flags)
 
     if flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF:
         configSeq += triggerSF_sequence(flags)

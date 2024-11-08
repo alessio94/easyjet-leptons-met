@@ -55,8 +55,8 @@ def overlap_sequence(flags):
     # Jets have different flag naming conventions
     if flags.Analysis.do_small_R_jets:
         preOR_collections['jets'] = drop_sys(
-            container_names.allcalib[flags.Analysis.Small_R_jet.jet_type]
-        ) + ".selectPtEta"
+            container_names.output[flags.Analysis.Small_R_jet.jet_type]
+        ) + '.selectPtEta'
         original_names['jets'] = container_names.input[
             flags.Analysis.Small_R_jet.jet_type
         ]
@@ -94,5 +94,4 @@ def overlap_sequence(flags):
                                  "ftag_select_" + flags.Analysis.Small_R_jet.btag_wp)
         configSeq.setOptionValue('.antiTauLabel', 'isAntiTau')
         configSeq.setOptionValue('.doTauAntiTauJetOR', True)
-
     return configSeq

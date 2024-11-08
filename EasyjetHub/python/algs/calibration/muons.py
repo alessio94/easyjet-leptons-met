@@ -16,8 +16,6 @@ def muon_sequence(flags, configAcc):
     config = ConfigFactory()
     makeConfig = config.makeConfig
 
-    # Temporary hack, we should do this in a more systematic way
-    # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.muons)
     configSeq += makeConfig('Muons', containerName=output_name)
     configSeq.setOptionValue('.minPt', flags.Analysis.Muon.min_pT)
@@ -74,13 +72,5 @@ def muon_sequence(flags, configAcc):
 
     configSeq += makeConfig('Thinning', containerName=output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
-
-    for id, iso in wps:
-        label = id + '_' + iso
-        configSeq += makeConfig('Thinning', containerName=output_name,
-                                configName=f'Thinning_{label}')
-        configSeq.setOptionValue('.selectionName', label)
-        configSeq.setOptionValue('.outputName', label + output_name)
-        configSeq.setOptionValue('.postfix', label)
 
     return configSeq

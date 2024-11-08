@@ -63,12 +63,4 @@ def photon_sequence(flags, configAcc):
     configSeq += makeConfig('Thinning', containerName=output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
 
-    for id, iso in wps:
-        label = id + '_' + iso
-        configSeq += makeConfig('Thinning', containerName=output_name,
-                                configName=f'Thinning_{label}')
-        configSeq.setOptionValue('.selectionName', label)
-        configSeq.setOptionValue('.outputName', label + output_name)
-        configSeq.setOptionValue('.postfix', label)
-
     return configSeq

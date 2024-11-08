@@ -30,7 +30,3 @@ output:
   taus:                AnalysisTauJets_%SYS%
   met:                 AnalysisMET_%SYS%
   truthHHParticles:    TruthDiHiggsParticles
-
-# For MET we want all calibrated jets with no filter selection
-allcalib:
-  reco4PFlowJet:       CalibAntiKt4EMPFlowJets_%SYS%
