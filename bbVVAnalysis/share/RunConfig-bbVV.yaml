@@ -29,7 +29,7 @@ Small_R_jet:
 
 Large_R_jet:
   amount: 2
-  GN2X_hbb_wps: ["FlatMassQCDEff_1p25", "FlatMassQCDEff_0p58", "FlatMassQCDEff_0p3"]
+  GN2X_hbb_wps: ["FlatMassQCDEff_1p55", "FlatMassQCDEff_1p25", "FlatMassQCDEff_0p94", "FlatMassQCDEff_0p74", "FlatMassQCDEff_0p58", "FlatMassQCDEff_0p46", "FlatMassQCDEff_0p37", "FlatMassQCDEff_0p3", "FlatMassQCDEff_0p25"]
   wtag_type: "ANN" # ANN, DNN
   wtag_wp: "70" # [50, 60, 70, 80, 90] ANN, [50, 80] DNN
   wtag_extra_wps: ["50","60","80","90"]
@@ -64,7 +64,6 @@ do_overlap_removal: true
 CutList : # Only include general cuts
       - AT_LEAST_TWO_LRJETS
       - LEAD_LRJ_PT
-      - HBB_PT
       - HBB_BTAG
 
 # Enable cutflow
@@ -84,6 +83,8 @@ ttree_output:
   collection_options:
     small_R_jets:
       btag_info: true
+    large_R_jets:
+      truth_labels: true
   truth_outputs:
     small_R_jets: 'container_names.input.truth4Jet'
     higgs_particle: 'container_names.output.truthHHParticles'

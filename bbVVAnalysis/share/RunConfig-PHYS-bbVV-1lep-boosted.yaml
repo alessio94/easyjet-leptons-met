@@ -8,3 +8,4 @@ Lepton:
 CutList : # Channel specific cuts here
       - EXACTLY_ONE_LEPTON
       - DR_CUT
+      - HBB_PT

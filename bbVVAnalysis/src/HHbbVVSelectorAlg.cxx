@@ -311,8 +311,6 @@ namespace HHBBVV
             SubjetnessJetClassification(*lrjets, Hbb, Whad, sys); // WHad is the lrjet with the smaller Tau42
             signalBtagging(Hbb, Whad, sys, HBB_BTAG, WHAD_BTAG);
             ZEROLEPBOOSTED_TOPO = true; // Temporary, need to figure out how to define boosted WHad
-            Hbb_jet_pt = Hbb->pt();
-            if (Hbb_jet_pt > 500. * Athena::Units::GeV) m_bbVVCuts("HBB_PT").passed = true;
             if (HBB_BTAG) m_bbVVCuts("HBB_BTAG").passed = true;
           }
         }
@@ -325,8 +323,6 @@ namespace HHBBVV
             splitboostedJetClassification(*lrjets, Hbb, Whad, Whad2, sys); // Hbb is the lrjet with the higher Hbb score
             signalBtagging(Hbb, Whad, Whad2, sys, HBB_BTAG, WHAD_BTAG, WHAD2_BTAG);
             ZEROLEPSPLITBOOSTED_TOPO = true; // Temporary, need to figure out how to define boosted WHad
-            Hbb_jet_pt = Hbb->pt();
-            if (Hbb_jet_pt > 500. * Athena::Units::GeV) m_bbVVCuts("HBB_PT").passed = true;
             if (HBB_BTAG) m_bbVVCuts("HBB_BTAG").passed = true;
           }
         }
@@ -372,9 +368,9 @@ namespace HHBBVV
       bool pass = false;
       //implement dedicated selection flags here
       for(const auto& channel : m_channels){
-      if(channel == HHBBVV::Boosted1Lep) pass |= (leadLRJ_pt > 500. * Athena::Units::GeV && TWO_LRJETS && ONE_LEP && ONELEPBOOSTED_TOPO && Hbb_jet_pt > 500. * Athena::Units::GeV);
+      if(channel == HHBBVV::Boosted1Lep) pass |= (leadLRJ_pt > 500. * Athena::Units::GeV && TWO_LRJETS && ONE_LEP && ONELEPBOOSTED_TOPO);
       else if(channel == HHBBVV::SplitBoosted1Lep) pass |= (TWO_LRJETS && ONE_LEP && ONELEPSPLITBOOSTED_TOPO);
-      else if(channel == HHBBVV::Boosted0Lep) pass |= (leadLRJ_pt > 500. * Athena::Units::GeV && TWO_LRJETS && VETO_LEP && ZEROLEPBOOSTED_TOPO && Hbb_jet_pt > 500. * Athena::Units::GeV);
+      else if(channel == HHBBVV::Boosted0Lep) pass |= (leadLRJ_pt > 500. * Athena::Units::GeV && TWO_LRJETS && VETO_LEP && ZEROLEPBOOSTED_TOPO);
       else if(channel == HHBBVV::SplitBoosted0Lep) pass |= (leadLRJ_pt > 500. * Athena::Units::GeV && THREE_LRJETS && VETO_LEP && ZEROLEPSPLITBOOSTED_TOPO);
       }
       ATH_MSG_DEBUG("pass:" << pass);
