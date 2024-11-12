@@ -18,6 +18,11 @@ atlas_ctest_setup()
 set( CMAKE_EXPORT_COMPILE_COMMANDS TRUE CACHE BOOL
    "Create compile_commands.json" FORCE )
 
+# ATLAS wants to deprecate calls to AuxElement::auxdata, but we are
+# dragging our feet and at the moment don't even print a warning. This
+# turns on the deprecation warning for Easyjet.
+add_compile_definitions(XAOD_DEPRECATE_AUXDATA=1)
+
 # Set up a work directory project:
 atlas_project( easyjet 1.0.0
    USE AthAnalysis ${AthAnalysis_VERSION}
