@@ -7,7 +7,7 @@ Analyses on GLANCE:
 
 [$HH\rightarrow b\bar{b} \gamma\gamma$](https://atlas-glance.cern.ch/atlas/analysis/analyses/details.php?ref_code=ANA-HIGP-2024-35)
 
-See here a link to the full SH analysis workflow: [[SH(bbyy) analysis workflow]](https://codimd.web.cern.ch/8fyJeyIKQguxXBUaOLa_Dg)
+See here a link to the full SH analysis workflow: [SH(bbyy) analysis workflow](https://codimd.web.cern.ch/8fyJeyIKQguxXBUaOLa_Dg)
 
 # Folder structure
 - `bin/`: Executables

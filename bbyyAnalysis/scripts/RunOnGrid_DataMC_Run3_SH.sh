@@ -1,7 +1,7 @@
 regime="2btag" #choose between 1btag and 2btag
 runConfig="bbyyAnalysis/RunConfig-Resonant-Default-$regime.yaml"
 executable="bbyy-ntupler"
-campaignName="SHbbyy_vXXX"
+campaignName="SHbbyy_vXXX_$regime" # change to your desired campaign name
 dir_PHYS="../easyjet/bbyyAnalysis/datasets/PHYS/nominal"
 dir_PHYSLITE="../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal"
 mc_campaign="mc23_13p6TeV"
@@ -22,7 +22,6 @@ mc_list=(
     "$dir_PHYSLITE/$mc_campaign.tWHyy.$ptag.txt"
     "$dir_PHYSLITE/$mc_campaign.yyjets.$ptag.txt"
     "$dir_PHYSLITE/$mc_campaign.yybb.$ptag.txt"
-    "$dir_PHYSLITE/$mc_campaign.ttyy_nonallhad.$ptag.txt"
 )
 #data 
 easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/data_13p6TeV.Run3.p6269.txt \

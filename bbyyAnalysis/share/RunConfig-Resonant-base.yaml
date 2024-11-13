@@ -1,6 +1,6 @@
 include: bbyyAnalysis/RunConfig-bbyy-base.yaml
 
-do_resonant_PNN: true
+do_resonant_PNN: false # compute PNN scores using stored xml files
 # flag that toggles single photon trigger in the cutflow
 # so that PASS_TRIGGER = single || diphoton
 enable_single_photon_trigger: true
@@ -22,10 +22,10 @@ Electron:
 Photon:
   forceFullSimConfig: true
 
-bypass: false
+bypass: false # true: Save events which fail selections. false: Remove events which fail selections.
 
 Small_R_jet:
-  btag_wp: "GN2v01_FixedCutBEff_77"
+  btag_wp: "GN2v01_FixedCutBEff_77" # can also use "GN2v01_FixedCutBEff_85"
 
 do_GNN2bjetSelection: false
 do_KinematicFit: false
