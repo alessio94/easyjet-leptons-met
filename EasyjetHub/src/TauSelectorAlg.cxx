@@ -54,7 +54,7 @@ namespace Easyjet
       wps.emplace_back(m_looseTauWP);
       for(const auto& wp : wps){
         m_tau_recoSF.emplace_back("tau_Reco_effSF_"+wp+"_%SYS%", this);
-        bool tauIDAvailable = wp.find("Baseline")==std::string::npos;
+        bool tauIDAvailable = wp.find("Baseline")==std::string::npos && wp.find("VeryLoose")==std::string::npos;
         m_tau_IDSF.emplace_back(tauIDAvailable ? "tau_ID_effSF_"+wp+"_%SYS%" : "", this);
         bool eVetoAvailable = wp.find("eleid")!=std::string::npos;
         m_tau_eVetoFakeTauSF.emplace_back(eVetoAvailable ? "tau_EvetoFakeTau_effSF_"+wp+"_%SYS%" : "", this);
@@ -149,7 +149,7 @@ namespace Easyjet
           for(unsigned int i=0; i<wps.size(); i++){
             std::string wp = wps[i];
             float SF = m_tau_recoSF[i].get(*tau,sys);
-            if(wp.find("Baseline")==std::string::npos)
+            if(wp.find("Baseline")==std::string::npos && wp.find("VeryLoose")==std::string::npos)
               SF *=  m_tau_IDSF[i].get(*tau,sys);
             if(wp.find("eleid")!=std::string::npos){
               SF *= m_tau_eVetoFakeTauSF[i].get(*tau,sys);
