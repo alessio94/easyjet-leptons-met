@@ -74,9 +74,9 @@ GRL:
 PileupReweighting:
   - postfix: "bjet"
     lumicalc_files:
-      include: bbbbAnalysis/lumicalc_bjet.yaml
+      include: EasyjetHub/lumicalc_bjet.yaml
     prw_files:
-      include: bbbbAnalysis/prw_bjet.yaml
+      include: EasyjetHub/prw_bjet.yaml
 
 # Include the TTree configuration and update details
 ttree_output:
