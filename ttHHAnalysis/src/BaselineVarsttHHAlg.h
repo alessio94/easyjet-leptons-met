@@ -13,12 +13,17 @@
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
 
+#include <AsgDataHandles/ReadHandleKey.h>
+
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 #include <AthenaKernel/Units.h>
+
+#include <xAODTruth/TruthParticleContainer.h>
+#include <xAODTruth/TruthParticle.h>
 
 namespace ttHH
 {
@@ -93,6 +98,9 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
+    Gaudi::Property<bool> m_isSignal
+      { this, "isSignal", false, "Is this signal sample?" };
+
     Gaudi::Property<bool> m_storeJetBranches
       { this, "storeJetBranches", false, "Store flat jet branches" };
 
@@ -104,6 +112,68 @@ private:
 
     Gaudi::Property<std::vector<std::string>> m_intVariables
           {this, "intVariableList", {}, "Name list of integer variables"};
+
+    SG::ReadHandleKey<xAOD::TruthParticleContainer> m_truthBosonsWithDecayParticlesContainer{
+        this, "TruthBosonsWithDecayParticles", "TruthBosonsWithDecayParticles",
+        "Truth bosons with decay container to run on"};
+
+    SG::ReadHandleKey<xAOD::TruthParticleContainer> m_truthTopContainer{
+        this, "TruthTop", "TruthTop", 
+        "Truth top container to run on"};
+
+    // For shape weights
+    TH2D* m_hist_EFTWeight_shape_CttHH_min3 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_min2_5 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_min2 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_min1_5 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_min1 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_min0_5 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_0_5 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_1 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_1_5 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_2 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_2_5 = nullptr;
+    TH2D* m_hist_EFTWeight_shape_CttHH_3 = nullptr;
+
+    double m_weights_shape_CttHH_min3 = 1;
+    double m_weights_shape_CttHH_min2_5 = 1;
+    double m_weights_shape_CttHH_min2 = 1;
+    double m_weights_shape_CttHH_min1_5 = 1;
+    double m_weights_shape_CttHH_min1 = 1;
+    double m_weights_shape_CttHH_min0_5 = 1;
+    double m_weights_shape_CttHH_0_5 = 1;
+    double m_weights_shape_CttHH_1 = 1;
+    double m_weights_shape_CttHH_1_5 = 1;
+    double m_weights_shape_CttHH_2 = 1;
+    double m_weights_shape_CttHH_2_5 = 1;
+    double m_weights_shape_CttHH_3 = 1;
+
+    // For normalisation weights
+    TH1F* m_hist_EFTWeight_norm_CttHH_min3 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_min2_5 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_min2 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_min1_5 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_min1 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_min0_5 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_0_5 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_1 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_1_5 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_2 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_2_5 = nullptr;
+    TH1F* m_hist_EFTWeight_norm_CttHH_3 = nullptr;
+
+    float m_weights_norm_CttHH_min3 = 1;
+    float m_weights_norm_CttHH_min2_5 = 1;
+    float m_weights_norm_CttHH_min2 = 1;
+    float m_weights_norm_CttHH_min1_5 = 1;
+    float m_weights_norm_CttHH_min1 = 1;
+    float m_weights_norm_CttHH_min0_5 = 1;
+    float m_weights_norm_CttHH_0_5 = 1;
+    float m_weights_norm_CttHH_1 = 1;
+    float m_weights_norm_CttHH_1_5 = 1;
+    float m_weights_norm_CttHH_2 = 1;
+    float m_weights_norm_CttHH_2_5 = 1;
+    float m_weights_norm_CttHH_3 = 1;
 
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
@@ -129,6 +199,12 @@ private:
 				const xAOD::ElectronContainer *electrons,
 				const xAOD::MuonContainer *muons) const;
     float computeChiSquare(float observedMass1, float observedMass2, float targetMass1, float targetMass2, float massResolution);
+    StatusCode loadEFTWeightFile(const std::string& filePath);
+    StatusCode getEFTShapeWeights(TLorentzVector &ttHH_p4, TLorentzVector &HH_p4, TLorentzVector &ttbar_p4);
+    StatusCode getEFTNormWeights();
+    std::tuple<TLorentzVector, TLorentzVector, TLorentzVector> get_ttHH_HH_ttbar_p4(const xAOD::TruthParticleContainer &bosonsContainer, const xAOD::TruthParticleContainer &topsContainer, bool initial);
+    TLorentzVector get_pair_p4(const xAOD::TruthParticleContainer &truthContainer, int target_pdgId, bool initial);
+    double findAndGetEFTWeight(double ttHH_mass, double ttbar_mass, TH2D *hist_EFTWeight_shape);
   };
 }
 

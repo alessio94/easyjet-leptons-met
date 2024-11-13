@@ -97,6 +97,11 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
         )
     )
 
+    is_Signal = (
+        flags.Input.isMC
+        and flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_ttHH_samples
+    )
+
     cfg.addEventAlgo(
         CompFactory.ttHH.BaselineVarsttHHAlg(
             "BaselineVarsttHHAlg",
@@ -108,7 +113,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             eleWP=TightEleWPLabel,
             isMC=flags.Input.isMC,
             floatVariableList=float_variables,
-            intVariableList=int_variables
+            intVariableList=int_variables,
+            isSignal=is_Signal,
         )
     )
 
@@ -137,6 +143,39 @@ def get_BaselineVarsttHHAlg_variables(flags):
 
     float_variable_names += ["HT", "HTall"]
 
+    if (
+        flags.Input.isMC
+        and flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_ttHH_samples
+    ):
+        float_variable_names += [
+            "eft_weight_shape_CttHH_min3",
+            "eft_weight_shape_CttHH_min2_5",
+            "eft_weight_shape_CttHH_min2",
+            "eft_weight_shape_CttHH_min1_5",
+            "eft_weight_shape_CttHH_min1",
+            "eft_weight_shape_CttHH_min0_5",
+            "eft_weight_shape_CttHH_0_5",
+            "eft_weight_shape_CttHH_1",
+            "eft_weight_shape_CttHH_1_5",
+            "eft_weight_shape_CttHH_2",
+            "eft_weight_shape_CttHH_2_5",
+            "eft_weight_shape_CttHH_3",
+        ]
+
+        float_variable_names += [
+            "eft_weight_norm_CttHH_min3",
+            "eft_weight_norm_CttHH_min2_5",
+            "eft_weight_norm_CttHH_min2",
+            "eft_weight_norm_CttHH_min1_5",
+            "eft_weight_norm_CttHH_min1",
+            "eft_weight_norm_CttHH_min0_5",
+            "eft_weight_norm_CttHH_0_5",
+            "eft_weight_norm_CttHH_1",
+            "eft_weight_norm_CttHH_1_5",
+            "eft_weight_norm_CttHH_2",
+            "eft_weight_norm_CttHH_2_5",
+            "eft_weight_norm_CttHH_3",
+        ]
     # float_variable_names += ["topness1", "topness2"]
     int_variable_names += [
         "nJets", "nBJets85", "nBJets77", "nLeptons", "sumPCBT",

@@ -4,3 +4,4 @@ bbyyAnalysis/data/*.root filter=lfs diff=lfs merge=lfs -text
 bbyyAnalysis/data/*.onnx filter=lfs diff=lfs merge=lfs -text
 bbbbAnalysis/data/*.root filter=lfs diff=lfs merge=lfs -text
 EasyjetHub/data/*.json filter=lfs diff=lfs merge=lfs -text
+ttHHAnalysis/data/*.root filter=lfs diff=lfs merge=lfs -text

@@ -9,6 +9,12 @@ bypass: false
 # Decay mode considered for truth decoration
 Truth:
   decayModes: ["bbbb"]
+  DSID_ttHH_samples:
+    - 523072 # MGPy8EG_A14NNPDF23LO_ttHH_semilep*
+    - 523073 # MGPy8EG_A14NNPDF23LO_ttHH_dilep*
+    - 523074 # MGPy8EG_A14NNPDF23LO_ttHH_fullhad*
+    - 525963 # MGPy8EG_A14NNPDF23LO_ttHH_orth4b_SSML*
+    - 545837 # MGPy8EG_A14NNPDF23LO_ttHH_bbyy*
 
 # Toggles for object types
 do_small_R_jets: true

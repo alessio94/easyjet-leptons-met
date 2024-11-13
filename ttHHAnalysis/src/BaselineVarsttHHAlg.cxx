@@ -14,6 +14,11 @@
 #include <tuple>
 #include <AthenaKernel/Units.h>
 
+#include "PathResolver/PathResolver.h"
+#include "TFile.h"
+#include "TH1.h"
+
+
 namespace ttHH
 {
   BaselineVarsttHHAlg::BaselineVarsttHHAlg(const std::string &name,
@@ -80,6 +85,14 @@ namespace ttHH
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
+    if (m_isSignal){
+      std::string pathEFTfile = PathResolverFindCalibFile("ttHHAnalysis/rw_CttHH_min3_to_3_histo.root");
+      ATH_CHECK(loadEFTWeightFile(pathEFTfile));
+    }
+
+    ATH_CHECK(m_truthBosonsWithDecayParticlesContainer.initialize(m_isSignal));
+    ATH_CHECK(m_truthTopContainer.initialize(m_isSignal));
+
     return StatusCode::SUCCESS;
   }
 
@@ -114,11 +127,59 @@ namespace ttHH
 	return StatusCode::FAILURE;
       }
 
+      for (const std::string &string_var: m_floatVariables) {
+        m_Fbranches.at(string_var).set(*event, -99., sys);
+      }
+      
+      for (const auto& string_var: m_intVariables) {
+        m_Ibranches.at(string_var).set(*event, -99, sys);
+      }
+
       TLorentzVector met_vector;
       met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
 
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+
+      if (m_isSignal)
+      {
+        SG::ReadHandle<xAOD::TruthParticleContainer> truthBosonsParticleContainer(m_truthBosonsWithDecayParticlesContainer);
+        ATH_CHECK(truthBosonsParticleContainer.isValid());
+
+        SG::ReadHandle<xAOD::TruthParticleContainer> truthTopParticleContainer(m_truthTopContainer);
+        ATH_CHECK(truthTopParticleContainer.isValid());
+
+        auto [truth_ttHH_p4, truth_HH_p4, truth_ttbar_p4] = get_ttHH_HH_ttbar_p4(*truthBosonsParticleContainer, *truthTopParticleContainer, true);
+        ATH_CHECK(getEFTShapeWeights(truth_ttHH_p4, truth_HH_p4, truth_ttbar_p4));
+        ATH_CHECK(getEFTNormWeights());
+
+        m_Fbranches.at("eft_weight_shape_CttHH_min3").set(*event, m_weights_shape_CttHH_min3, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_min2_5").set(*event, m_weights_shape_CttHH_min2_5, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_min2").set(*event, m_weights_shape_CttHH_min2, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_min1_5").set(*event, m_weights_shape_CttHH_min1_5, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_min1").set(*event, m_weights_shape_CttHH_min1, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_min0_5").set(*event, m_weights_shape_CttHH_min0_5, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_0_5").set(*event, m_weights_shape_CttHH_0_5, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_1").set(*event, m_weights_shape_CttHH_1, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_1_5").set(*event, m_weights_shape_CttHH_1_5, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_2").set(*event, m_weights_shape_CttHH_2, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_2_5").set(*event, m_weights_shape_CttHH_2_5, sys);
+        m_Fbranches.at("eft_weight_shape_CttHH_3").set(*event, m_weights_shape_CttHH_3, sys);
+
+        m_Fbranches.at("eft_weight_norm_CttHH_min3").set(*event, m_weights_norm_CttHH_min3, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_min2_5").set(*event, m_weights_norm_CttHH_min2_5, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_min2").set(*event, m_weights_norm_CttHH_min2, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_min1_5").set(*event, m_weights_norm_CttHH_min1_5, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_min1").set(*event, m_weights_norm_CttHH_min1, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_min0_5").set(*event, m_weights_norm_CttHH_min0_5, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_0_5").set(*event, m_weights_norm_CttHH_0_5, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_1").set(*event, m_weights_norm_CttHH_1, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_1_5").set(*event, m_weights_norm_CttHH_1_5, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_2").set(*event, m_weights_norm_CttHH_2, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_2_5").set(*event, m_weights_norm_CttHH_2_5, sys);
+        m_Fbranches.at("eft_weight_norm_CttHH_3").set(*event, m_weights_norm_CttHH_3, sys);
+
+      }
 
       TLorentzVector H1(0, 0, 0, 0);
       TLorentzVector H2(0, 0, 0, 0);
@@ -135,14 +196,6 @@ namespace ttHH
       double HT = 0; // scalar sum of jet pT
       double HTall = 0; // scalar sum of jet pT and lepton pT
       int nBJets77 = 0; 
-
-      for (const std::string &string_var: m_floatVariables) {
-        m_Fbranches.at(string_var).set(*event, -99., sys);
-      }
-      
-      for (const auto& string_var: m_intVariables) {
-        m_Ibranches.at(string_var).set(*event, -99, sys);
-      }
 
       if (pairedJets->size()>=4 && jets->size()>=4 && bjets->size()>=3){
         int jetsCandidateSize = (jets->size()<6) ? jets->size() : 6;
@@ -485,6 +538,7 @@ namespace ttHH
       m_Fbranches.at("HT").set(*event, HT, sys);
       m_Fbranches.at("HTall").set(*event, HTall, sys);
       m_Ibranches.at("sumPCBT").set(*event, sumPCBT, sys);
+
     }
     return StatusCode::SUCCESS;
 
@@ -657,5 +711,268 @@ namespace ttHH
     
       m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
     }
+  }
+
+  StatusCode BaselineVarsttHHAlg::loadEFTWeightFile(const std::string &filePath)
+  {
+
+    TFile *f = TFile::Open(filePath.c_str());
+    if (!f || f->IsZombie())
+    {
+      ATH_MSG_ERROR("Cannot open file \""
+                    << filePath << "\" or the file is in a bad state.");
+      return StatusCode::FAILURE;
+    }
+
+    // Retrieve the histogram named "EFTweights"
+    m_hist_EFTWeight_shape_CttHH_min3 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min3"));
+    m_hist_EFTWeight_shape_CttHH_min2_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min2_5"));
+    m_hist_EFTWeight_shape_CttHH_min2 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min2"));
+    m_hist_EFTWeight_shape_CttHH_min1_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min1_5"));
+    m_hist_EFTWeight_shape_CttHH_min1 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min1"));
+    m_hist_EFTWeight_shape_CttHH_min0_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min0_5"));
+    m_hist_EFTWeight_shape_CttHH_0_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_0_5"));
+    m_hist_EFTWeight_shape_CttHH_1 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_1"));
+    m_hist_EFTWeight_shape_CttHH_1_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_1_5"));
+    m_hist_EFTWeight_shape_CttHH_2 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_2"));
+    m_hist_EFTWeight_shape_CttHH_2_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_2_5"));
+    m_hist_EFTWeight_shape_CttHH_3 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_3"));
+
+    m_hist_EFTWeight_norm_CttHH_min3 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min3"));
+    m_hist_EFTWeight_norm_CttHH_min2_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min2_5"));
+    m_hist_EFTWeight_norm_CttHH_min2 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min2"));
+    m_hist_EFTWeight_norm_CttHH_min1_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min1_5"));
+    m_hist_EFTWeight_norm_CttHH_min1 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min1"));
+    m_hist_EFTWeight_norm_CttHH_min0_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min0_5"));
+    m_hist_EFTWeight_norm_CttHH_0_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_0_5"));
+    m_hist_EFTWeight_norm_CttHH_1 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_1"));
+    m_hist_EFTWeight_norm_CttHH_1_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_1_5"));
+    m_hist_EFTWeight_norm_CttHH_2 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_2"));
+    m_hist_EFTWeight_norm_CttHH_2_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_2_5"));
+    m_hist_EFTWeight_norm_CttHH_3 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_3"));
+
+    f->Clear(); 
+    f->Close();
+    
+    if (!m_hist_EFTWeight_shape_CttHH_min3) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min3 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_min2_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min2_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_min2) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min2 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_min1_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min1_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_min1) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min1 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_min0_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min0_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_0_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_0_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_1) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_1 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_1_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_1_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_2) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_2 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_2_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_2_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_shape_CttHH_3) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_3 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_min3) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min3 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_min2_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min2_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_min2) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min2 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_min1_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min1_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_min1) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min1 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_min0_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min0_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_0_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_0_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_1) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_1 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_1_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_1_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_2) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_2 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_2_5) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_2_5 not found");
+      return StatusCode::FAILURE;
+      }
+    if (!m_hist_EFTWeight_norm_CttHH_3) {
+      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_3 not found");
+      return StatusCode::FAILURE;
+      }
+
+    ATH_MSG_INFO("Successfully loaded all 'EFTweights' histograms from file \""
+                 << filePath << "\".");
+    return StatusCode::SUCCESS;
+
+  }
+
+  TLorentzVector BaselineVarsttHHAlg::get_pair_p4(const xAOD::TruthParticleContainer &truthContainer, int target_pdgId, bool initial)
+  {
+    // initial (bool), by default true. If set to false, the final truth
+    // particles will be used rather than the initial.
+    TLorentzVector pair_p4;
+    int pair_count = 0;
+    int nParents = 0;
+    int nChildren = 0;
+    int abs_pdgID = 0;
+
+    for (const xAOD::TruthParticle *particle : truthContainer)
+    {
+      nParents = particle->nParents();
+      nChildren = particle->nChildren();
+      abs_pdgID = particle->absPdgId();
+      if (initial)
+      {
+        if (abs_pdgID == target_pdgId && !(particle->status() >= 41))
+        {
+          int parents_with_same_pdgID = 0;
+          for (int i = 0; i < nParents; ++i)
+          {
+            if (particle->parent(i)->pdgId() == particle->pdgId() && nChildren>1)
+            {
+               parents_with_same_pdgID += 1;
+            }
+          }
+          if(parents_with_same_pdgID>1)
+            ATH_MSG_WARNING("Found " << parents_with_same_pdgID << " parents with the same pdgID for truth particle with pdgID = " << particle->pdgId());
+          if(parents_with_same_pdgID==0)
+          {
+            pair_p4 += particle->p4();
+            pair_count += 1;
+          }
+
+        }
+      }
+      else if (abs_pdgID == target_pdgId && nChildren>1)
+      {
+        bool hasSamePdgIdChild = false;
+        for (int i = 0; i < nChildren; ++i) {
+          if (particle->child(i)->pdgId() == particle->pdgId()) {
+            hasSamePdgIdChild = true;
+            break;
+          }
+        }
+        if (!hasSamePdgIdChild) {
+          pair_p4 += particle->p4();
+          pair_count += 1;
+        }
+      } 
+    }
+    if (pair_count != 2) {ATH_MSG_WARNING("Found " << pair_count << " truth particles with pdgID = " << target_pdgId);}
+    return pair_p4;
+  }
+
+  std::tuple<TLorentzVector, TLorentzVector, TLorentzVector> BaselineVarsttHHAlg::get_ttHH_HH_ttbar_p4(const xAOD::TruthParticleContainer &bosonsContainer, const xAOD::TruthParticleContainer &topsContainer, bool initial)
+  {
+    TLorentzVector ttHH_p4;
+    TLorentzVector HH_p4 = get_pair_p4(bosonsContainer, 25, initial);
+    TLorentzVector ttbar_p4 = get_pair_p4(topsContainer, 6, initial);
+    ttHH_p4 = HH_p4 + ttbar_p4;
+    return std::make_tuple(ttHH_p4, HH_p4, ttbar_p4);
+  }
+
+  double BaselineVarsttHHAlg::findAndGetEFTWeight(double ttHH_mass, double ttbar_mass, TH2D *hist_EFTWeight_shape)
+  {
+    int bin_index = hist_EFTWeight_shape->FindBin(ttHH_mass, ttbar_mass);
+    return hist_EFTWeight_shape->GetBinContent(bin_index);
+  }
+
+  StatusCode BaselineVarsttHHAlg::getEFTShapeWeights(TLorentzVector &ttHH_p4, TLorentzVector &HH_p4, TLorentzVector &ttbar_p4)
+  {
+
+    // Get the ttHH invariant mass
+    double ttHH_mass = ttHH_p4.M() / Athena::Units::GeV;
+    double HH_mass = HH_p4.M() / Athena::Units::GeV;
+    double ttbar_mass = ttbar_p4.M() / Athena::Units::GeV;
+
+    ATH_MSG_DEBUG("HH mass: " << HH_mass);
+    ATH_MSG_DEBUG("ttbar mass: " << ttbar_mass);
+    ATH_MSG_DEBUG("ttHH mass: " << ttHH_mass);
+
+    // TODO : Needs to be generalised!!! -> Histograms should not be each in single pointers
+    // Find the bins corresponding to the ttHH invariant mass
+    m_weights_shape_CttHH_min3 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min3);
+    m_weights_shape_CttHH_min2_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min2_5);
+    m_weights_shape_CttHH_min2 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min2);
+    m_weights_shape_CttHH_min1_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min1_5);
+    m_weights_shape_CttHH_min1 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min1);
+    m_weights_shape_CttHH_min0_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min0_5);
+    m_weights_shape_CttHH_0_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_0_5);
+    m_weights_shape_CttHH_1 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_1);
+    m_weights_shape_CttHH_1_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_1_5);
+    m_weights_shape_CttHH_2 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_2);
+    m_weights_shape_CttHH_2_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_2_5);
+    m_weights_shape_CttHH_3 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_3);
+
+    return StatusCode::SUCCESS;
+  }
+
+  StatusCode BaselineVarsttHHAlg::getEFTNormWeights()
+  {
+    m_weights_norm_CttHH_min3 = m_hist_EFTWeight_norm_CttHH_min3->GetBinContent(1);
+    m_weights_norm_CttHH_min2_5 = m_hist_EFTWeight_norm_CttHH_min2_5->GetBinContent(1);
+    m_weights_norm_CttHH_min2 = m_hist_EFTWeight_norm_CttHH_min2->GetBinContent(1);
+    m_weights_norm_CttHH_min1_5 = m_hist_EFTWeight_norm_CttHH_min1_5->GetBinContent(1);
+    m_weights_norm_CttHH_min1 = m_hist_EFTWeight_norm_CttHH_min1->GetBinContent(1);
+    m_weights_norm_CttHH_min0_5 = m_hist_EFTWeight_norm_CttHH_min0_5->GetBinContent(1);
+    m_weights_norm_CttHH_0_5 = m_hist_EFTWeight_norm_CttHH_0_5->GetBinContent(1);
+    m_weights_norm_CttHH_1 = m_hist_EFTWeight_norm_CttHH_1->GetBinContent(1);
+    m_weights_norm_CttHH_1_5 = m_hist_EFTWeight_norm_CttHH_1_5->GetBinContent(1);
+    m_weights_norm_CttHH_2 = m_hist_EFTWeight_norm_CttHH_2->GetBinContent(1);
+    m_weights_norm_CttHH_2_5 = m_hist_EFTWeight_norm_CttHH_2_5->GetBinContent(1);
+    m_weights_norm_CttHH_3 = m_hist_EFTWeight_norm_CttHH_3->GetBinContent(1);
+
+    return StatusCode::SUCCESS;
   }
 }
