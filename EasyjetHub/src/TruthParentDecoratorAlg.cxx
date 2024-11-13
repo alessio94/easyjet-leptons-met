@@ -366,21 +366,27 @@ StatusCode TruthParentDecoratorAlg::execute(const EventContext& cxt) const
       IPMap::mapped_type& barkids = ipmap.at(cbar);
       const xAOD::TruthParticle* child = selectChild(barkids);
       std::vector<std::pair<float, const J*>> drs;
+      float drsMinDR=9999;
+      const J* drsMinMatch = 0;
       for (const auto* j: *targets) {
-        drs.emplace_back(j->p4().DeltaR(child->p4()), j);
-      };
-      const auto& nearest = std::min_element(drs.begin(), drs.end());
-      MatchedParent match;
-      match.parent = p;
-      match.child = child;
-      match.deltaR = nearest->first;
-      match.parent_index = parent_index;
-      match.cascade_pids.insert(child->pdgId());
-      for (auto& histbar: histbars) {
-        match.cascade_pids.insert(selectChild(ipmap.at(histbar))->pdgId());
+        if(j->p4().DeltaR(child->p4()) < drsMinDR) {
+          drsMinDR=j->p4().DeltaR(child->p4());
+          drsMinMatch=j;
+        }
       }
-      if (match.deltaR < m_match_delta_r) {
-        labeled_targets[nearest->second].push_back(match);
+      if(drsMinMatch){
+        MatchedParent match;
+        match.parent = p;
+        match.child = child;
+        match.deltaR = drsMinDR;
+        match.parent_index = parent_index;
+        match.cascade_pids.insert(child->pdgId());
+        for (auto& histbar: histbars) {
+          match.cascade_pids.insert(selectChild(ipmap.at(histbar))->pdgId());
+        }
+        if (match.deltaR < m_match_delta_r) {
+          labeled_targets[drsMinMatch].push_back(match);
+        }
       }
     }
   }
