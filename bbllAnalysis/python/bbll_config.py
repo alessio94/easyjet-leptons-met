@@ -11,16 +11,13 @@ from EasyjetHub.output.ttree.selected_objects import (
 
 
 def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
-             float_variables=None, int_variables=None, float_NW_variables=None,
-             float_PNN_variables=None):
+             float_variables=None, int_variables=None, float_NW_variables=None):
     if not float_variables:
         float_variables = []
     if not int_variables:
         int_variables = []
     if not float_NW_variables:
         float_NW_variables = []
-    if not float_PNN_variables:
-        float_PNN_variables = []
 
     cfg = ComponentAccumulator()
 
@@ -125,15 +122,6 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
             intVariableList=int_variables
         )
     )
-    if flags.Analysis.do_resonant_PNN:
-        cfg.addEventAlgo(
-            CompFactory.HHBBLL.ResonantPNNbbllAlg(
-                "ResonantPNNbbllAlg",
-                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-                floatPNNVariables=float_PNN_variables,
-                mX_values=flags.Analysis.mX_values,
-            )
-        )
 
     return cfg
 
@@ -188,7 +176,6 @@ def bbll_branches(flags):
             all_baseline_variable_names.append(f"mmc_{var}")
 
     float_NW_variable_names = []
-    float_PNN_variable_names = []
     if flags.Analysis.NeutrinoWeighting.doNW:
         # do not append TopReco variables to float_variable_names
         # or int_variable_names as they are stored by the
@@ -201,14 +188,11 @@ def bbll_branches(flags):
             = get_BaselineVarsbbllAlg_highlevelvariables(flags)
         float_variable_names += high_level_float_variables
         int_variable_names += high_level_int_variables
-    if flags.Analysis.do_resonant_PNN:
-        for m_X in flags.Analysis.mX_values:
-            float_PNN_variable_names.append(f"PNN_Score_X{m_X}")
+
     all_baseline_variable_names += [
         *float_variable_names,
         *int_variable_names,
-        *float_NW_variable_names,
-        *float_PNN_variable_names]
+        *float_NW_variable_names]
 
     for var in all_baseline_variable_names:
         branches += [f"EventInfo.{var}_%SYS% -> bbll_{var}"
@@ -240,5 +224,4 @@ def bbll_branches(flags):
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}"
              + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    return (branches, float_variable_names, int_variable_names, float_NW_variable_names,
-            float_PNN_variable_names)
+    return branches, float_variable_names, int_variable_names, float_NW_variable_names
