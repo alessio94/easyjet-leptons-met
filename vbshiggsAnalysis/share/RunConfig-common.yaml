@@ -7,6 +7,9 @@ do_CP_systematics: false
 ### true : select higgs candidate jets ---> load VBF-RNN
 UseVBFRNN : false
 
+# Add truth VBS quark info
+AddTruthVBSQuarks : false
+
 # Toggles for object types
 do_muons: true
 do_electrons: true

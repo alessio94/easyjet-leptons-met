@@ -3,7 +3,9 @@ include: vbshiggsAnalysis/RunConfig-common.yaml
 # Which analysis to consider
 channels: ["FullLep"]
 
+# Use VBFRNN tagger
 UseVBFRNN : true
+
 # Toggles for object types
 do_muons: true
 do_electrons: true

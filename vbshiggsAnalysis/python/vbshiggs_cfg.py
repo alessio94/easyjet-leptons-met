@@ -150,7 +150,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
     )
 
     # truth info
-    if flags.Input.isMC:
+    if flags.Input.isMC and flags.Analysis.AddTruthVBSQuarks:
         cfg.addEventAlgo(
             CompFactory.VBSHIGGS.TruthVBSQuarksInfoAlg(
                 "TruthVBSQuarksInfoAlg",

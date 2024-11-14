@@ -144,7 +144,7 @@ def fullLep_branches(flags):
              + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # truth info
-    if flags.Input.isMC:
+    if flags.Input.isMC and flags.Analysis.AddTruthVBSQuarks:
         branches += ['EventInfo.nVBSQuarks -> nVBSQuarks']
         for var in ['pT', 'eta', 'phi', 'E']:
             branches += [f'EventInfo.VBSQuark1_{var} -> VBSQuark1_{var}']
