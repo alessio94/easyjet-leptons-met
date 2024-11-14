@@ -91,7 +91,7 @@ namespace MULTILEPTON
     {
       if (m_n_leptons == 3 && std::abs(m_total_charge_lep) == 1)
         return CH_ID::hh3l;
-      else if (m_n_leptons == 2 && std::abs(m_total_charge_lep) == 2)
+      else if (m_n_leptons == 2)
         return CH_ID::hh2lsc;
     }
     else if (m_n_taus > 0)

@@ -33,6 +33,8 @@ namespace MULTILEPTON
         SLT,
         DLT,
         ASLT,
+        ETT,
+        MTT,
     };
 
     enum Var
@@ -43,6 +45,7 @@ namespace MULTILEPTON
         leadingmu = 3,
         subleadingele = 4,
         subleadingmu = 5,
+        tau = 6,
     };
 
     enum Booleans

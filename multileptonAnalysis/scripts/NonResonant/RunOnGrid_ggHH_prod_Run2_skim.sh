@@ -4,7 +4,8 @@ campaignName="HHML_v01"
 
 dir_samples="../easyjet/multileptonAnalysis/datasets/PHYS/prod_v1"
 mc_list=(
-    "$dir_samples/mc20_13TeV.HHML.txt"
+    "$dir_samples/mc20_13TeV.ggF_HHML.txt"
+    "$dir_samples/mc20_13TeV.VBF_HHML.txt"
     "$dir_samples/mc20_13TeV.Diboson.txt"
     "$dir_samples/mc20_13TeV.Triboson.txt"
     "$dir_samples/mc20_13TeV.SingleTop.txt"
@@ -31,7 +32,7 @@ easyjet-gridsubmit --data-list $dir_samples/data_Run2.txt \
     --noTag \
     --HDBSProductionRole
 
-#mc
+#mc pure_lep
 for mc_file in "${mc_list[@]}"; do
     cat "$mc_file"
     echo # This adds a newline after each file's content
@@ -41,3 +42,17 @@ done | easyjet-gridsubmit --mc-list /dev/stdin \
     --campaign ${campaignName} \
     --noTag \
     --HDBSProductionRole # --noSubmit
+
+
+# mc bb4l
+runConfig="multileptonAnalysis/RunConfig-multilepton-bb4l.yaml"
+campaignName="HHML_bb4l_v01"
+for mc_file in "${mc_list[@]}"; do
+    cat "$mc_file"
+    echo # This adds a newline after each file's content
+done | easyjet-gridsubmit --mc-list /dev/stdin \
+    --run-config ${runConfig} \
+    --exec ${executable} \
+    --campaign ${campaignName} \
+    --noTag \
+    --HDBSProductionRole  # --noSubmit

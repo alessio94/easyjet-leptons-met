@@ -281,7 +281,7 @@ namespace MULTILEPTON
     }
     if (taus) evaluateBaselineTauTrigger(event, electrons, muons, taus, sys);
 
-    if (m_bools.at(MULTILEPTON::pass_trigger_SLT) || m_bools.at(MULTILEPTON::pass_trigger_DLT)) m_bools.at(MULTILEPTON::PASS_TRIGGER) = true;
+    if (m_bools.at(MULTILEPTON::pass_trigger_SLT) || m_bools.at(MULTILEPTON::pass_trigger_DLT) || m_bools.at(MULTILEPTON::pass_baseline_tau_trigger)) m_bools.at(MULTILEPTON::PASS_TRIGGER) = true;
   }
 
   void MultileptonSelectorAlg::evaluateSingleLeptonTrigger(
@@ -637,7 +637,10 @@ namespace MULTILEPTON
           for (const auto& ele : *electrons){
             for (const auto& tau : *taus){
               bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*tau, trig, 0.2);
-              trigPassed_ETT |= match;
+              bool pass_cut = (
+                  ele->pt() > m_pt_threshold[MULTILEPTON::ETT][MULTILEPTON::ele] &&
+                  tau->pt() > m_pt_threshold[MULTILEPTON::ETT][MULTILEPTON::tau]);
+              trigPassed_ETT |= match && pass_cut;
             }
           }
         }
@@ -677,7 +680,10 @@ namespace MULTILEPTON
           for (const auto& mu : *muons){
             for (const auto& tau : *taus){
               bool match = m_matchingTool->match(*mu, trig) && m_matchingTool->match(*tau, trig, 0.2);
-              trigPassed_MTT |= match;
+              bool pass_cut = (
+                  mu->pt() > m_pt_threshold[MULTILEPTON::MTT][MULTILEPTON::mu] &&
+                  tau->pt() > m_pt_threshold[MULTILEPTON::MTT][MULTILEPTON::tau]);
+              trigPassed_MTT |= match && pass_cut;
             }
           }
         }
@@ -891,7 +897,7 @@ namespace MULTILEPTON
     //mm
     if(year==2015) {
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 19. * Athena::Units::GeV;
-      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 10. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 9. * Athena::Units::GeV;
     }
     else if(year>=2016 && year<=2018) {
       // TODO: why bbll set cut on 24 & 10 GeV?
@@ -908,6 +914,18 @@ namespace MULTILEPTON
     m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingele] = 18. * Athena::Units::GeV;
     m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingmu] = 15. * Athena::Units::GeV;
 
+
+    // Lepton tau triggers
+    // electron-tau
+    m_pt_threshold[MULTILEPTON::ETT][MULTILEPTON::ele] = 18. * Athena::Units::GeV;
+    m_pt_threshold[MULTILEPTON::ETT][MULTILEPTON::tau] = 26. * Athena::Units::GeV;
+
+    // muon-tau
+    m_pt_threshold[MULTILEPTON::MTT][MULTILEPTON::mu] = 15. * Athena::Units::GeV;
+    if (year>=2015 && year<=2017)
+      m_pt_threshold[MULTILEPTON::MTT][MULTILEPTON::tau] = 26. * Athena::Units::GeV;
+    else if (year==2018)
+      m_pt_threshold[MULTILEPTON::MTT][MULTILEPTON::tau] = 36. * Athena::Units::GeV;
   }
 
 
