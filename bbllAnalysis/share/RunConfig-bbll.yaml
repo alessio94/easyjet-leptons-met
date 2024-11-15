@@ -17,6 +17,9 @@ do_met : true
 do_mmc : false
 do_photons : true
 
+#PNN Score
+do_resonant_PNN: false
+
 #NeutrinoWeighting Config
 NeutrinoWeighting:
   doNW: false

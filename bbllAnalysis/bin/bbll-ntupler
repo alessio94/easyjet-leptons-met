@@ -59,7 +59,7 @@ def bbll_job_cfg():
     # custom BranchManagers
     extra_bbll_branches = []
     if flags.Analysis.do_bbll_analysis:
-        extra_bbll_branches,float_variable_names,int_variable_names,float_NW_variable_names = bbll_branches(flags)
+        extra_bbll_branches,float_variable_names,int_variable_names,float_NW_variable_names,float_PNN_variable_names = bbll_branches(flags)
         cfg.merge(
             bbll_cfg(
                 flags,
@@ -70,6 +70,7 @@ def bbll_job_cfg():
                 float_variables=float_variable_names,
                 int_variables=int_variable_names,
                 float_NW_variables=float_NW_variable_names,
+                float_PNN_variables=float_PNN_variable_names,
             ),
             seqname
         )
