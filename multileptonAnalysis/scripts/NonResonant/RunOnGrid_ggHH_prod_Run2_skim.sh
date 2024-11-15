@@ -1,8 +1,8 @@
 runConfig="multileptonAnalysis/RunConfig-multilepton-pure_lep.yaml"
 executable="hhml-ntupler"
-campaignName="HHML_v01"
+campaignName="HHML_pureLep_v02"
 
-dir_samples="../easyjet/multileptonAnalysis/datasets/PHYS/prod_v1"
+dir_samples="../easyjet/multileptonAnalysis/datasets/PHYSLITE/prod_v2"
 mc_list=(
     "$dir_samples/mc20_13TeV.ggF_HHML.txt"
     "$dir_samples/mc20_13TeV.VBF_HHML.txt"
@@ -46,7 +46,7 @@ done | easyjet-gridsubmit --mc-list /dev/stdin \
 
 # mc bb4l
 runConfig="multileptonAnalysis/RunConfig-multilepton-bb4l.yaml"
-campaignName="HHML_bb4l_v01"
+campaignName="HHML_bb4l_v02"
 for mc_file in "${mc_list[@]}"; do
     cat "$mc_file"
     echo # This adds a newline after each file's content

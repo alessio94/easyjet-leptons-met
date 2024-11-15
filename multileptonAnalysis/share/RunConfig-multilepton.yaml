@@ -37,25 +37,25 @@ Tau:
 Electron:
   min_pT: 10.0e+3
   ID: "LooseBLayerLH"
-  Iso: "NonIso"
+  Iso: "Loose_VarRad"
   extra_wps: 
     - ["TightLH", "Tight_VarRad"]
     - ["TightLH", "TightTrackOnly_VarRad"]
     - ["TightLH", "TightTrackOnly_FixedRad"]
-    - ["TightLH", "Loose_VarRad"]
     - ["TightLH", "HighPtCaloOnly"]
-    - ["TightLH", "NonIso"]
+    - ["TightLH", "Loose_VarRad"]
     - ["MediumLH", "Tight_VarRad"]
     - ["MediumLH", "TightTrackOnly_VarRad"]
     - ["MediumLH", "TightTrackOnly_FixedRad"]
-    - ["MediumLH", "Loose_VarRad"]
     - ["MediumLH", "HighPtCaloOnly"]
-    - ["MediumLH", "NonIso"]
+    - ["MediumLH", "Loose_VarRad"]
     - ["LooseBLayerLH", "Tight_VarRad"]
     - ["LooseBLayerLH", "TightTrackOnly_VarRad"]
     - ["LooseBLayerLH", "TightTrackOnly_FixedRad"]
-    - ["LooseBLayerLH", "Loose_VarRad"]
     - ["LooseBLayerLH", "HighPtCaloOnly"]
+    # - ["LooseBLayerLH", "Loose_VarRad"]
+    # - ["TightLH", "NonIso"]
+    # - ["MediumLH", "NonIso"]
   do_parent_decoration: true
   do_track_decoration: true
   do_IFF_decoration: true
@@ -64,27 +64,27 @@ Electron:
 Muon:
   min_pT: 10.0e+3
   ID: "Loose"
-  Iso: "NonIso"
+  Iso: "Loose_VarRad"
   extra_wps:
     - ["Tight", "PflowLoose_VarRad"]
     - ["Tight", "PflowTight_VarRad"]
     - ["Tight", "Loose_VarRad"]
     - ["Tight", "Tight_VarRad"]
-    - ["Tight", "NonIso"]
     - ["Medium", "PflowLoose_VarRad"]
     - ["Medium", "PflowTight_VarRad"]
     - ["Medium", "Loose_VarRad"]
     - ["Medium", "Tight_VarRad"]
-    - ["Medium", "NonIso"]
     - ["HighPt", "PflowLoose_VarRad"]
     - ["HighPt", "PflowTight_VarRad"]
     - ["HighPt", "Loose_VarRad"]
     - ["HighPt", "Tight_VarRad"]
-    - ["HighPt", "NonIso"]
     - ["Loose", "PflowLoose_VarRad"]
     - ["Loose", "PflowTight_VarRad"]
-    - ["Loose", "Loose_VarRad"]
     - ["Loose", "Tight_VarRad"]
+    # - ["Loose", "Loose_VarRad"]
+    # - ["Tight", "NonIso"]
+    # - ["Medium", "NonIso"]
+    # - ["HighPt", "NonIso"]
     # - ["LowPt", "PflowLoose_VarRad"]
     # - ["LowPt", "PflowTight_VarRad"]
     # - ["LowPt", "Loose_VarRad"]
