@@ -73,7 +73,6 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
             tau_branches.variables += [
                 f"tau_effSF_{id_wp}_%SYS%"
                 for id_wp in id_wps
-                if id_wp != "Baseline"
             ]
 
         tau_branches.variables += ["isAnalysisTau_%SYS%"]
