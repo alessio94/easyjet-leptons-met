@@ -25,8 +25,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 
     # anti-iso lepton control region is not compatible with the other
     # regions at the moment:
-    if ("AntiIsoLepHad" in flags.Analysis.channels
-            and len(flags.Analysis.channels) > 1):
+    use_noniso_leptons = "AntiIsoLepHad" in flags.Analysis.channels
+    if (use_noniso_leptons and len(flags.Analysis.channels) > 1):
         raise ValueError("Cannot run 'antiiso-lephad' with any other channels")
 
     # muons:
@@ -80,6 +80,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             tauWP=flags.Analysis.Tau.extra_wps[0],
             muonWPs=muon_WPs,
             eleWPs=ele_WPs,
+            useNonIsoLeptons=use_noniso_leptons,
             eventDecisionOutputDecoration=(
                 "bbtt_pass_presel_noMMC_%SYS%" if flags.Analysis.enable_MMC_cut
                 else "bbtt_pass_presel_%SYS%"),
@@ -131,6 +132,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             CompFactory.HHBBTT.BaselineVarsbbttAlg(
                 "FinalVarsbbttAlg",
                 isMC=flags.Input.isMC,
+                useNonIsoLeptons=use_noniso_leptons,
                 eleWPs=ele_WPs,
                 muonWPs=muon_WPs,
                 tauWP=flags.Analysis.Tau.extra_wps[0],

@@ -138,6 +138,14 @@ namespace HHBBTT
     pass_TopEMuCR,
     pass_AntiIsoLepHad,
   };
+
+  // working points used for selecting leptons:
+  enum LepSelWpDeco
+  {
+    loose_iso,
+    tight_noniso,
+    tight_iso,
+  };
 }
 
 #endif

@@ -75,13 +75,17 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
+    Gaudi::Property<bool> m_useNonIsoLeptons
+      { this, "useNonIsoLeptons", false, "use NonIso lepton wps" };
+
     Gaudi::Property<std::vector<std::string>> m_eleWPNames
       { this, "eleWPs", {},"Electron ID + Iso working points" };
-    std::vector<CP::SysReadDecorHandle<float>> m_ele_SF;
-
     Gaudi::Property<std::vector<std::string>> m_muonWPNames
       { this, "muonWPs", {},"Muon ID + Iso working points" };
-    std::vector<CP::SysReadDecorHandle<float>> m_mu_SF;
+
+    typedef std::unordered_map<HHBBTT::LepSelWpDeco, CP::SysReadDecorHandle<float>> leptonSfDecoMap;
+    leptonSfDecoMap m_ele_SF_decoMap;
+    leptonSfDecoMap m_muon_SF_decoMap;
 
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "","Tau ID working point" };
@@ -134,6 +138,8 @@ private:
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
+    void fillLeptonSfDecoMap(const std::string& prefix, 
+      const std::vector<std::string>& wpNames, leptonSfDecoMap& decoMap);
   };
 } // namespace HHBBTT
 

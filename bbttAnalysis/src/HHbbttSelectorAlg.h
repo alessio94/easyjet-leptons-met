@@ -63,7 +63,9 @@ private:
       { this, "doAntiIDRegions", false, "Select anti-ID taus for fake estimates" };
     Gaudi::Property<bool> m_do1BRegions
       { this, "do1BRegions", false, "Add 1B signal regions" };
-    
+    Gaudi::Property<bool> m_useNonIsoLeptons
+      { this, "useNonIsoLeptons", false, "use NonIso lepton wps" };
+
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
@@ -105,11 +107,12 @@ private:
 
     Gaudi::Property<std::vector<std::string>> m_eleWPNames
       { this, "eleWPs", {},"Electron working point names" };
-    std::vector<CP::SysReadDecorHandle<char>> m_eleWPDecorHandles;
-
     Gaudi::Property<std::vector<std::string>> m_muonWPNames
       { this, "muonWPs", {},"Muon working point names" };
-    std::vector<CP::SysReadDecorHandle<char>> m_muonWPDecorHandles;
+
+    typedef std::unordered_map<HHBBTT::LepSelWpDeco, CP::SysReadDecorHandle<char>> leptonDecoMap;
+    leptonDecoMap m_eleWPDecorHandleMap;   
+    leptonDecoMap m_muonWPDecorHandleMap;
 
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_el_isIso {"selected_el_isIso_%SYS%", this};
@@ -283,7 +286,8 @@ private:
 
     void setThresholds(const xAOD::EventInfo* event,
 		       const CP::SystematicSet& sys);
-
+    
+    void fillLeptonWpDecoMap(const std::vector<std::string>& wpNames, leptonDecoMap& decoMap);
   };
 }
 

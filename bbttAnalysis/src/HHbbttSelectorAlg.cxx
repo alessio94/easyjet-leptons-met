@@ -54,20 +54,16 @@ namespace HHBBTT
 
     m_tauWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_" + m_tauWPName+"_%SYS%", this);
-       
-    for(auto& wp : m_eleWPNames){
-      m_eleWPDecorHandles.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
-    }
-    for(auto& wp : m_muonWPNames){
-      m_muonWPDecorHandles.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
-    }
     
+    fillLeptonWpDecoMap(m_eleWPNames, m_eleWPDecorHandleMap);
+    fillLeptonWpDecoMap(m_muonWPNames, m_muonWPDecorHandleMap);
+
     ATH_CHECK(m_tauWPDecorHandle.initialize(m_systematicsList, m_tauHandle));
     ATH_CHECK(m_antiTauDecorHandle.initialize(m_systematicsList, m_tauHandle));
 
-    for(auto& handle : m_eleWPDecorHandles)
+    for(auto& [k, handle] : m_eleWPDecorHandleMap)
       ATH_CHECK(handle.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-    for(auto& handle : m_muonWPDecorHandles)
+    for(auto& [k, handle] : m_muonWPDecorHandleMap)
       ATH_CHECK(handle.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     ATH_CHECK(m_selected_tau.initialize(m_systematicsList, m_tauHandle));
@@ -211,18 +207,15 @@ namespace HHBBTT
       const xAOD::Electron* ele1 = nullptr;
       for (const xAOD::Electron *electron : *electrons)
       {
-        // check if we need to complicate isolation logic:
-        bool do_antiiso_test = m_eleWPDecorHandles.size() > 1;
-
-        // TODO: cleanup, this makes a lof of assumptions about the wp vector 
-        bool pass_tightId_looseIso = m_eleWPDecorHandles[do_antiiso_test ? 2 : 0].get(*electron, sys); 
-        bool pass_looseId_looseIso = do_antiiso_test
-                                     ? m_eleWPDecorHandles[0].get(*electron, sys) 
+        // determine pass/fail ID and isolation:
+        bool pass_tightId_looseIso = m_eleWPDecorHandleMap.at(HHBBTT::LepSelWpDeco::tight_iso).get(*electron, sys); 
+        bool pass_looseId_looseIso = m_useNonIsoLeptons
+                                     ? m_eleWPDecorHandleMap.at(HHBBTT::LepSelWpDeco::loose_iso).get(*electron, sys) 
                                      : true;
-        bool pass_tightId_noIso = do_antiiso_test
-                                  ? m_eleWPDecorHandles[1].get(*electron, sys) 
+        bool pass_tightId_noIso = m_useNonIsoLeptons
+                                  ? m_eleWPDecorHandleMap.at(HHBBTT::LepSelWpDeco::tight_noniso).get(*electron, sys) 
                                   : pass_tightId_looseIso;
-        bool pass_tightId_antiIso = do_antiiso_test
+        bool pass_tightId_antiIso = m_useNonIsoLeptons
                                     ? pass_tightId_noIso && !pass_tightId_looseIso 
                                     : false;
 
@@ -257,18 +250,15 @@ namespace HHBBTT
       const xAOD::Muon* mu1 = nullptr;
       for (const xAOD::Muon *muon : *muons)
       {
-        // check if we need to complicate isolation logic:
-        bool do_antiiso_test = m_muonWPDecorHandles.size() > 1;
-        
-        // TODO: cleanup, this makes a lof of assumptions about the wp vector
-        bool pass_tightId_looseIso = m_muonWPDecorHandles[do_antiiso_test ? 2 : 0].get(*muon, sys); 
-        bool pass_looseId_looseIso = do_antiiso_test 
-                                     ? m_muonWPDecorHandles[0].get(*muon, sys) 
+        // determine pass/fail ID and isolation:
+        bool pass_tightId_looseIso = m_muonWPDecorHandleMap.at(HHBBTT::LepSelWpDeco::tight_iso).get(*muon, sys); 
+        bool pass_looseId_looseIso = m_useNonIsoLeptons 
+                                     ? m_muonWPDecorHandleMap.at(HHBBTT::LepSelWpDeco::loose_iso).get(*muon, sys) 
                                      : true;
-        bool pass_tightId_noIso = do_antiiso_test
-                                  ? m_muonWPDecorHandles[1].get(*muon, sys) 
+        bool pass_tightId_noIso = m_useNonIsoLeptons
+                                  ? m_muonWPDecorHandleMap.at(HHBBTT::LepSelWpDeco::tight_noniso).get(*muon, sys) 
                                   : pass_tightId_looseIso;
-        bool pass_tightId_antiIso = do_antiiso_test
+        bool pass_tightId_antiIso = m_useNonIsoLeptons
                                     ? pass_tightId_noIso && !pass_tightId_looseIso 
                                     : false;
         
@@ -1156,6 +1146,34 @@ namespace HHBBTT
     else
       m_pt_threshold[HHBBTT::SLT][HHBBTT::mu] = 25. * Athena::Units::GeV;
 
+  }
+
+  void HHbbttSelectorAlg::fillLeptonWpDecoMap(const std::vector<std::string>& wpNames, 
+          leptonDecoMap& decoMap){
+    for(auto& wp : wpNames){
+      CP::SysReadDecorHandle<char> 
+        handle{"baselineSelection_"+wp+"_%SYS%", this};
+      
+      // nottva must be included in the working points used in selecting leptons:
+      if(wp.find("nottva") == std::string::npos) continue;
+
+      // TODO: handle more complicated WP lists
+      bool isTight = !wp.starts_with("Loose");
+      bool isIso = wp.find("NonIso") == std::string::npos;
+      
+      if (!isTight && isIso){ 
+        decoMap.emplace(HHBBTT::LepSelWpDeco::loose_iso, handle);
+        ATH_MSG_INFO("found loose iso wp = "<< wp);
+      }
+      if (isTight && !isIso){ 
+        decoMap.emplace(HHBBTT::LepSelWpDeco::tight_noniso, handle);
+        ATH_MSG_INFO("found tight noniso wp = "<< wp);
+      }
+      if (isTight  && isIso){ 
+        decoMap.emplace(HHBBTT::LepSelWpDeco::tight_iso, handle);
+        ATH_MSG_INFO("found tight iso wp = "<< wp); 
+      }
+    }
   }
 
 }

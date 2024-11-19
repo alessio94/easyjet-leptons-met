@@ -36,19 +36,12 @@ namespace HHBBTT
     ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
 
     if(m_isMC){
-      for(const auto& wp : m_eleWPNames){
-        m_ele_SF.emplace_back("el_effSF_"+wp+"_%SYS%", this);
-      }
+       fillLeptonSfDecoMap("el", m_eleWPNames, m_ele_SF_decoMap);
+       fillLeptonSfDecoMap("muon", m_muonWPNames, m_muon_SF_decoMap);
     }
-    for(auto& handle : m_ele_SF)
+    for(auto& [k, handle] : m_ele_SF_decoMap)
       ATH_CHECK (handle.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-
-    if(m_isMC){
-      for(const auto& wp : m_muonWPNames){
-        m_mu_SF.emplace_back("muon_effSF_"+wp+"_%SYS%", this);
-      }
-    }
-    for(auto& handle : m_mu_SF)
+    for(auto& [k, handle] : m_muon_SF_decoMap)
       ATH_CHECK (handle.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     if(m_isMC){
@@ -191,10 +184,12 @@ namespace HHBBTT
                                : m_selected_el_isIso.get(*leptons[i].first, sys);
         m_Ibranches.at(prefix+"_isIso").set(*event, (int)lep_is_isolated, sys);
         if(m_isMC){
-          int sfWpIndex = (m_muonWPNames.size() > 1 && !lep_is_isolated) ? 2 : 0; // TODO: fixme
-          float SF = std::abs(leptons[i].second)==11 ?
-            m_ele_SF[sfWpIndex].get(*leptons[i].first,sys) :
-            m_mu_SF[sfWpIndex].get(*leptons[i].first,sys);
+          auto idx = m_useNonIsoLeptons 
+                    ? HHBBTT::LepSelWpDeco::tight_noniso 
+                    : HHBBTT::LepSelWpDeco::tight_iso;
+          float SF = (std::abs(leptons[i].second)==11) 
+                    ? m_ele_SF_decoMap.at(idx).get(*leptons[i].first,sys) 
+                    : m_muon_SF_decoMap.at(idx).get(*leptons[i].first,sys);
           m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
         }
       }
@@ -353,6 +348,33 @@ namespace HHBBTT
     }
 
     return StatusCode::SUCCESS;
+  }
+
+  void BaselineVarsbbttAlg::fillLeptonSfDecoMap(const std::string& prefix, 
+          const std::vector<std::string>& wpNames, leptonSfDecoMap& decoMap){
+    for(auto& wp : wpNames){
+      CP::SysReadDecorHandle<float> handle{prefix+"_effSF_"+wp+"_%SYS%", this};
+      
+      // nottva must be included in the working points used in selecting leptons:
+      if(wp.find("nottva") == std::string::npos) continue;
+
+      // TODO: handle more complicated WP lists
+      bool isTight = !wp.starts_with("Loose");
+      bool isIso = wp.find("NonIso") == std::string::npos;
+      
+      if (!isTight && isIso){
+        decoMap.emplace(HHBBTT::LepSelWpDeco::loose_iso, handle);
+        ATH_MSG_INFO("found loose iso wp = "<< wp);
+      }
+      if (isTight && !isIso){
+        decoMap.emplace(HHBBTT::LepSelWpDeco::tight_noniso, handle);
+        ATH_MSG_INFO("found tight noniso wp = "<< wp);
+      }
+      if (isTight && isIso){
+        decoMap.emplace(HHBBTT::LepSelWpDeco::tight_iso, handle);
+        ATH_MSG_INFO("found tight iso wp = "<< wp);
+      }
+    }
   }
 
 }

@@ -3,18 +3,18 @@ include: bbttAnalysis/RunConfig-bbtt-base.yaml
 channels: ["AntiIsoLepHad"]
 
 Electron:
-  ID: "LooseBLayerLH"
+  ID: "LooseBLayerLH_nottva"
   Iso: "NonIso"
   extra_wps:
-    - ["LooseBLayerLH", "Loose_VarRad"]
-    - ["TightLH", "NonIso"] 
+    - ["LooseBLayerLH_nottva", "Loose_VarRad"]
+    - ["TightLH_nottva", "NonIso"] 
 
 Muon:
-  ID: "Loose"
+  ID: "Loose_nottva"
   Iso: "NonIso"
   extra_wps:
-    - ["Loose", "PflowLoose_VarRad"]
-    - ["Medium", "NonIso"]
+    - ["Loose_nottva", "PflowLoose_VarRad"]
+    - ["Medium_nottva", "NonIso"]
 
 # Produce separate files for CutBookKeeper
 # Overkill with a single channel but used for consistency with other multi-channel config
