@@ -95,7 +95,7 @@ private:
 
     Gaudi::Property<std::vector<std::string>> m_GN2X_wps
       { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the bbVV config" };
-    std::unordered_map<std::string, CP::SysReadDecorHandle<bool>> m_GN2X_wp_Handles;
+    std::vector<CP::SysReadDecorHandle<bool>> m_GN2X_wp_Handles;
 
     Gaudi::Property<std::string> m_WTag_Type
       { this, "wtag_type", "", "WTagger type from the bbVV config"};
@@ -103,6 +103,14 @@ private:
       { this, "wtag_wp", "", "WTagger wp from the bbVV config"};
     CP::SysReadDecorHandle<float> m_WTag_score{"", this};
     CP::SysReadDecorHandle<bool> m_Pass_WTag{"", this};
+
+    std::vector<CP::SysReadDecorHandle<float>> m_tau_wta;
+    std::vector<CP::SysReadDecorHandle<float>> m_ecf;
+
+    CP::SysReadDecorHandle<float> m_GN2Xv01_phbb{"GN2Xv01_phbb", this};
+    CP::SysReadDecorHandle<float> m_GN2Xv01_phcc{"GN2Xv01_phcc", this};
+    CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd{"GN2Xv01_pqcd", this};
+    CP::SysReadDecorHandle<float> m_GN2Xv01_ptop{"GN2Xv01_ptop", this};
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};

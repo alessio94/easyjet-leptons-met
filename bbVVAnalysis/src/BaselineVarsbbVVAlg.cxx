@@ -42,12 +42,10 @@ namespace HHBBVV
     ATH_CHECK(m_Whad.initialize(m_systematicsList, m_lrjetHandle)); // Whad jet
     ATH_CHECK(m_Whad2.initialize(m_systematicsList, m_lrjetHandle)); // Whad2 jet
 
-    for(auto wp: m_GN2X_wps)
-    {
-      CP::SysReadDecorHandle<bool> gnn_handle{"GN2X_select_" + wp, this};
-      m_GN2X_wp_Handles.emplace(wp, gnn_handle);
-      ATH_CHECK(m_GN2X_wp_Handles.at(wp).initialize(m_systematicsList, m_lrjetHandle));
-    }
+    for(const auto& wp: m_GN2X_wps)
+      m_GN2X_wp_Handles.emplace_back("GN2X_select_" + wp, this);
+    for(auto& handle : m_GN2X_wp_Handles)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_lrjetHandle));
 
     m_WTag_score = CP::SysReadDecorHandle<float>
       (m_WTag_Type.value()+m_WTag_WP.value()+"Tagger_Score", this);
@@ -55,6 +53,21 @@ namespace HHBBVV
       (m_WTag_Type.value()+m_WTag_WP.value()+"Tagger_Tagged", this);
     ATH_CHECK(m_WTag_score.initialize(m_systematicsList, m_lrjetHandle));
     ATH_CHECK(m_Pass_WTag.initialize(m_systematicsList, m_lrjetHandle));
+
+    for(unsigned int i=1; i<5; i++)
+      m_tau_wta.emplace_back("Tau"+std::to_string(i)+"_wta", this);
+    for(auto& handle : m_tau_wta)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_lrjetHandle));
+
+    for(unsigned int i=1; i<4; i++)
+      m_ecf.emplace_back("ECF"+std::to_string(i), this);
+    for(auto& handle : m_ecf)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_lrjetHandle));
+
+    ATH_CHECK(m_GN2Xv01_phbb.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_GN2Xv01_phcc.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_GN2Xv01_pqcd.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_GN2Xv01_ptop.initialize(m_systematicsList, m_lrjetHandle));
 
     // Initialise syst-aware output decorators
     for(const std::string &var : m_floatVariables){
@@ -165,23 +178,6 @@ namespace HHBBVV
         m_Ibranches.at("Lepton_pdgid").set(*event, signal_lepton_id, sys);
       }
 
-      static const std::vector<SG::ConstAccessor<float>> acc_tau_wta{
-        SG::ConstAccessor<float>("Tau1_wta"),
-        SG::ConstAccessor<float>("Tau2_wta"),
-        SG::ConstAccessor<float>("Tau3_wta"),
-        SG::ConstAccessor<float>("Tau4_wta")
-      };
-      static const std::vector<SG::ConstAccessor<float>> acc_ecf{
-        SG::ConstAccessor<float>("ECF1"),
-        SG::ConstAccessor<float>("ECF2"),
-        SG::ConstAccessor<float>("ECF3"),
-      };
-
-      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phbb("GN2Xv01_phbb");
-      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_pqcd("GN2Xv01_pqcd");
-      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phcc("GN2Xv01_phcc");
-      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_ptop("GN2Xv01_ptop");
-
       for(const xAOD::Jet* lrjet : *lrjets)
       {
         std::string prefix = "";
@@ -193,18 +189,15 @@ namespace HHBBVV
           for(auto channel: m_channels){
             if(channel == HHBBVV::Boosted0Lep){
               for (int i = 0; i < 4; i++){
-                if(acc_tau_wta[i].isAvailable(*lrjet)) { // Suggested ConstAccessor
-                  float wta_value = acc_tau_wta[i](*lrjet);
-                  wta_value = (wta_value < 1e-8) ? -99. : wta_value ;
-                  m_Fbranches.at(prefix + "_Tau" + std::to_string(i + 1) + "_wta").set(*event, wta_value, sys);
-                }
-              }
+                float wta_value = m_tau_wta.at(i).get(*lrjet, sys);
+                wta_value = (wta_value < 1e-8) ? -99. : wta_value ;
+                m_Fbranches.at(prefix + "_Tau" + std::to_string(i + 1) + "_wta").set(*event, wta_value, sys);
+	      }
+
               for (int i = 0; i < 3; i++){
-                if(acc_ecf[i].isAvailable(*lrjet)) { // Suggested ConstAccessor
-                  float ecf_value = acc_ecf[i](*lrjet);
-                  ecf_value = (ecf_value < 1e-8) ? -99. : ecf_value ;
-                  m_Fbranches.at(prefix + "_ECF" + std::to_string(i + 1)).set(*event, ecf_value, sys);
-                }
+                float ecf_value = m_ecf.at(i).get(*lrjet, sys);
+                ecf_value = (ecf_value < 1e-8) ? -99. : ecf_value ;
+                m_Fbranches.at(prefix + "_ECF" + std::to_string(i + 1)).set(*event, ecf_value, sys);
               }
             }
           }
@@ -224,10 +217,10 @@ namespace HHBBVV
           m_Fbranches.at(prefix + "_phi").set(*event, lrjet->phi(), sys);
           m_Fbranches.at(prefix + "_m").set(*event, lrjet->m(), sys);
 
-          float phbb_score = GN2Xv01_phbb(*lrjet);
-          float pqcd_score = GN2Xv01_pqcd(*lrjet);
-          float phcc_score = GN2Xv01_phcc(*lrjet);
-          float ptop_score = GN2Xv01_ptop(*lrjet);
+          float phbb_score = m_GN2Xv01_phbb.get(*lrjet, sys);
+          float pqcd_score = m_GN2Xv01_pqcd.get(*lrjet, sys);
+          float phcc_score = m_GN2Xv01_phcc.get(*lrjet, sys);
+          float ptop_score = m_GN2Xv01_ptop.get(*lrjet, sys);
           float wtag_score = m_WTag_score.get(*lrjet, sys);
           m_Fbranches.at(prefix+"_GN2Xv01_phbb").set(*event, phbb_score, sys);
           m_Fbranches.at(prefix+"_GN2Xv01_pqcd").set(*event, pqcd_score, sys);
@@ -235,13 +228,13 @@ namespace HHBBVV
           m_Fbranches.at(prefix+"_GN2Xv01_ptop").set(*event, ptop_score, sys);
           m_Fbranches.at(prefix+"_"+m_WTag_Type+"_"+m_WTag_WP+"_Score").set(*event, wtag_score, sys);
           
-          int pass_wtag = (int)m_Pass_WTag.get(*lrjet, sys);
+          int pass_wtag = static_cast<int>(m_Pass_WTag.get(*lrjet, sys));
           m_Ibranches.at(prefix+"_Pass_"+m_WTag_Type+"_"+m_WTag_WP).set(*event, pass_wtag, sys);
 
-          for(auto& wp: m_GN2X_wps)
+          for(unsigned int wp=0; wp<m_GN2X_wps.size(); wp++)
           {
-            int pass_GN2X = (int)m_GN2X_wp_Handles.at(wp).get(*lrjet, sys);
-            m_Ibranches.at(prefix+"_Pass_GN2X_"+wp).set(*event, pass_GN2X, sys);
+            int pass_GN2X = static_cast<int>(m_GN2X_wp_Handles.at(wp).get(*lrjet, sys));
+            m_Ibranches.at(prefix+"_Pass_GN2X_"+m_GN2X_wps[wp]).set(*event, pass_GN2X, sys);
           }
         }
       }
