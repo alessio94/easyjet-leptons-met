@@ -95,6 +95,10 @@ private:
     CP::SysReadDecorHandle<char> m_IDTau{"isIDTau", this};
     CP::SysReadDecorHandle<char> m_antiTau{"isAntiTau", this};
 
+    CP::SysReadDecorHandle<char> m_EleRNNLoose{"EleRNNLoose_v1", this};
+    CP::SysReadDecorHandle<char> m_EleRNNMedium{"EleRNNMedium_v1", this};
+    CP::SysReadDecorHandle<char> m_EleRNNTight{"EleRNNTight_v1", this};
+
     CP::SysReadDecorHandle<int>
       m_truthTypeTau{ this, "truthTypeTau", "truthType", "Tau truth type" };
 

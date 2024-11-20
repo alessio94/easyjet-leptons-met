@@ -72,6 +72,10 @@ namespace HHBBTT
     ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_tauHandle));
     ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_tauHandle));
 
+    ATH_CHECK (m_EleRNNLoose.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK (m_EleRNNMedium.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK (m_EleRNNTight.initialize(m_systematicsList, m_tauHandle));
+
     if (m_isMC) {
       ATH_CHECK (m_truthTypeTau.initialize(m_systematicsList, m_tauHandle));
       ATH_CHECK (m_tauTruthJetLabel.initialize(m_systematicsList, m_tauHandle));
@@ -127,10 +131,6 @@ namespace HHBBTT
       for (const auto& var: m_intVariables) {
         m_Ibranches.at(var).set(*event, -99, sys);
       }
-
-      static const SG::AuxElement::ConstAccessor<char> cacc_EleRNNLoose("EleRNNLoose_v1");
-      static const SG::AuxElement::ConstAccessor<char> cacc_EleRNNMedium("EleRNNMedium_v1");
-      static const SG::AuxElement::ConstAccessor<char> cacc_EleRNNTight("EleRNNTight_v1");
 
       // selected leptons ;
       const xAOD::Electron* ele0 = nullptr;
@@ -229,9 +229,9 @@ namespace HHBBTT
 	m_Ibranches.at(prefix+"_isTauID").set(*event, m_IDTau.get(*tau, sys), sys);
 	m_Ibranches.at(prefix+"_isAntiTau").set(*event, m_antiTau.get(*tau, sys), sys);
 	int tau_EleRNN_WP = 0;
-	if(cacc_EleRNNTight(*tau)) tau_EleRNN_WP = 3;
-	else if(cacc_EleRNNMedium(*tau)) tau_EleRNN_WP = 2;
-	else if(cacc_EleRNNLoose(*tau)) tau_EleRNN_WP = 1;
+	if(m_EleRNNTight.get(*tau, sys)) tau_EleRNN_WP = 3;
+	else if(m_EleRNNMedium.get(*tau, sys)) tau_EleRNN_WP = 2;
+	else if(m_EleRNNLoose.get(*tau, sys)) tau_EleRNN_WP = 1;
 	m_Ibranches.at(prefix+"_EleRNN_WP").set(*event, tau_EleRNN_WP, sys);
 
 	if(m_isMC){
