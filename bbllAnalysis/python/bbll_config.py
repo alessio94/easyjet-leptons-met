@@ -83,9 +83,9 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
 
     # MMC decoration
     if flags.Analysis.do_mmc:
-        from EasyjetHub.algs.mmc_tool_config import MissingMassToolV2Cfg
+        from EasyjetHub.algs.mmc_tool_config import MissingMassToolCfg
         cfg.addEventAlgo(CompFactory.HHBBLL.MMCDecoratorAlg(
-            mmcTool=cfg.popToolsAndMerge(MissingMassToolV2Cfg(flags))))
+            mmcTool=cfg.popToolsAndMerge(MissingMassToolCfg(flags))))
 
     # NeutrinoWeighting
     if flags.Analysis.NeutrinoWeighting.doNW:

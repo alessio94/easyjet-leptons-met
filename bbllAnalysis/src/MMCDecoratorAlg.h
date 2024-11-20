@@ -18,7 +18,7 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
-#include <DiTauMassTools/MissingMassToolV2.h>
+#include <DiTauMassTools/MissingMassTool.h>
 
 namespace HHBBLL
 {
@@ -67,9 +67,9 @@ private:
     /// \brief Steerable properties
     Gaudi::Property<std::string> m_method_str { this, "Method", "MLNU3P", 
 						 "MMC method to use"};
-    DiTauMassTools::MMCFitMethodV2::e m_method;
-    ToolHandle<DiTauMassTools::MissingMassToolV2> m_mmcTool
-      { this, "mmcTool", "DiTauMassTools::MissingMassToolV2", "the Missing Mass Calculator tool"};
+    DiTauMassTools::MMCFitMethod::e m_method;
+    ToolHandle<DiTauMassTools::MissingMassTool> m_mmcTool
+      { this, "mmcTool", "DiTauMassTools::MissingMassTool", "the Missing Mass Calculator tool"};
 
   };
 }
