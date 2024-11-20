@@ -8,6 +8,7 @@
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysReadDecorHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
@@ -47,6 +48,13 @@ namespace HHBBYY
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
+
+    CP::SysReadDecorHandle<int> m_R10TruthLabel{"R10TruthLabel_R22v1", this};
+
+    CP::SysReadDecorHandle<float> m_GN2Xv01_phbb{"GN2Xv01_phbb", this};
+    CP::SysReadDecorHandle<float> m_GN2Xv01_phcc{"GN2Xv01_phcc", this};
+    CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd{"GN2Xv01_pqcd", this};
+    CP::SysReadDecorHandle<float> m_GN2Xv01_ptop{"GN2Xv01_ptop", this};
 
     Gaudi::Property<std::vector<std::string>> m_Fvarnames
       {this, "floatVariableList", {}, "Name list of float variables"};

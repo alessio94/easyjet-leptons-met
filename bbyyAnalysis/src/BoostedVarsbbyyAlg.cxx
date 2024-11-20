@@ -22,6 +22,12 @@ namespace HHBBYY
 
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    ATH_CHECK(m_R10TruthLabel.initialize(m_systematicsList, m_jetHandle));
+
+    ATH_CHECK(m_GN2Xv01_phbb.initialize(m_systematicsList, m_jetHandle));
+    ATH_CHECK(m_GN2Xv01_phcc.initialize(m_systematicsList, m_jetHandle));
+    ATH_CHECK(m_GN2Xv01_pqcd.initialize(m_systematicsList, m_jetHandle));
+    ATH_CHECK(m_GN2Xv01_ptop.initialize(m_systematicsList, m_jetHandle));
 
     // Intialise syst-aware output decorators
 
@@ -57,12 +63,6 @@ namespace HHBBYY
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-      static const SG::AuxElement::ConstAccessor<int>  R10TruthLabel_R22v1("R10TruthLabel_R22v1");
-      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phbb("GN2Xv01_phbb");
-      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_pqcd("GN2Xv01_pqcd");
-      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phcc("GN2Xv01_phcc");
-      static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_ptop("GN2Xv01_ptop");
-
       for (const std::string &string_var: m_Fvarnames) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
       }
@@ -75,10 +75,10 @@ namespace HHBBYY
       for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)2); i++){
         TLorentzVector j = jets->at(i)->p4();
 
-        float phbb_score = GN2Xv01_phbb(*jets->at(i));
-        float pqcd_score = GN2Xv01_pqcd(*jets->at(i));
-        float phcc_score = GN2Xv01_phcc(*jets->at(i));
-        float ptop_score = GN2Xv01_ptop(*jets->at(i));
+        float phbb_score = m_GN2Xv01_phbb.get(*jets->at(i), sys);
+        float pqcd_score = m_GN2Xv01_pqcd.get(*jets->at(i), sys);
+        float phcc_score = m_GN2Xv01_phcc.get(*jets->at(i), sys);
+        float ptop_score = m_GN2Xv01_ptop.get(*jets->at(i), sys);
 
         std::string prefix = "LargeRJet"+std::to_string(i+1);
         m_Fbranches.at(prefix+"_pt").set(*event, j.Pt(), sys);
@@ -93,7 +93,7 @@ namespace HHBBYY
         m_Fbranches.at(prefix+"_GN2Xv01_ptop").set(*event, ptop_score, sys);
 
         if (m_isMC){
-          int truthLabel_j = R10TruthLabel_R22v1(*jets->at(i));
+          int truthLabel_j = m_R10TruthLabel.get(*jets->at(i), sys);
           m_Ibranches.at(prefix+"_truthLabel").set(*event, truthLabel_j, sys);
         }
 
