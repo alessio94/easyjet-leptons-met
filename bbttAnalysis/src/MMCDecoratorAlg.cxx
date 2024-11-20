@@ -64,11 +64,11 @@ namespace HHBBTT
     ATH_CHECK (m_mmcTool.retrieve());
 
     if (m_method_str == "MLNU3P") 
-      m_method = DiTauMassTools::MMCFitMethod::MLNU3P;
+      m_method = DiTauMassTools::MMCFitMethodV2::MLNU3P;
     else if (m_method_str == "MAXW") 
-      m_method = DiTauMassTools::MMCFitMethod::MAXW;
+      m_method = DiTauMassTools::MMCFitMethodV2::MAXW;
     else if (m_method_str == "MLM") 
-      m_method = DiTauMassTools::MMCFitMethod::MLM;
+      m_method = DiTauMassTools::MMCFitMethodV2::MLM;
     else {
       ATH_MSG_ERROR("Unknown MMC method " << m_method_str);
       return StatusCode::FAILURE;

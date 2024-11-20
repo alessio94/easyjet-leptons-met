@@ -99,7 +99,8 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
         for wp in btag_wps:
-            if "GN2v01" in wp and "FixedCutBEff" in wp:
+            # Until AFT-748 is solved
+            if "GN2v01" in wp:
                 continue
             eventinfo_branches.variables += [f"ftag_effSF_{wp}_%SYS%"]
 

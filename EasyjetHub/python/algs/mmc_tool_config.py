@@ -2,7 +2,7 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 
 
-def MissingMassToolCfg(flags, **kwargs):
+def MissingMassToolV2Cfg(flags, **kwargs):
     ca = ComponentAccumulator()
 
     kwargs.setdefault("Decorate", False)
@@ -10,5 +10,5 @@ def MissingMassToolCfg(flags, **kwargs):
     kwargs.setdefault("CalibSet", "2019")
     kwargs.setdefault("BeamEnergy", flags.Beam.Energy)
 
-    ca.setPrivateTools(CompFactory.DiTauMassTools.MissingMassTool(**kwargs))
+    ca.setPrivateTools(CompFactory.DiTauMassTools.MissingMassToolV2(**kwargs))
     return ca
