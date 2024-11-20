@@ -97,6 +97,7 @@ private:
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+    CP::SysReadDecorHandle<int> m_truthFlav{"HadronConeExclTruthLabelID", this};
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};

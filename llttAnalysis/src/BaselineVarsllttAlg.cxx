@@ -59,6 +59,7 @@ namespace HLLTT
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
+    if (m_isMC) ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
 
     for (const std::string &var : m_floatVariables){
       ATH_MSG_DEBUG("initializing float variable: " << var);
@@ -109,8 +110,6 @@ namespace HLLTT
 	ATH_MSG_ERROR("Could not retrieve MET");
 	return StatusCode::FAILURE;	
       }
-
-      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
       for (const auto& var: m_floatVariables) {
           m_Fbranches.at(var).set(*event, -99, sys);
@@ -186,7 +185,7 @@ namespace HLLTT
 	  if(std::abs(jet->eta())<2.5){
 	    n_jets += 1;
 	    int truthlabel=-1;
-	    if(m_isMC)truthlabel = HadronConeExclTruthLabelID(*jet);
+	    if(m_isMC) truthlabel = m_truthFlav.get(*jet, sys);
 	    if(n_jets<4){
 	      std::string prefix = "Jet"+std::to_string(n_jets);
 	      m_Fbranches.at(prefix+"_pt").set(*event, jet->pt(), sys);

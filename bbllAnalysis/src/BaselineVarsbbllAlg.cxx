@@ -64,6 +64,7 @@ namespace HHBBLL
       m_PCBTs.emplace(var, rhandle);
       ATH_CHECK (m_PCBTs.at(var).initialize(m_systematicsList, m_jetHandle));
     };
+    if (m_isMC) ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
     ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_jetHandle));
 
     ATH_CHECK (m_met_sig.initialize(m_systematicsList, m_metHandle));
@@ -109,8 +110,6 @@ namespace HHBBLL
       for (const auto& var: m_intVariables) {
         m_Ibranches.at(var).set(*event, -99, sys);
       }
-      
-      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
 
       TLorentzVector Leading_lep;
       TLorentzVector Subleading_lep;
@@ -250,7 +249,7 @@ namespace HHBBLL
         m_Fbranches.at(prefix+"_E").set(*event, bjets->at(i)->e(), sys);
 
         if (m_isMC) {
-          int truthLabel = HadronConeExclTruthLabelID(*bjets->at(i));
+          int truthLabel = m_truthFlav.get(*bjets->at(i), sys);
           m_Ibranches.at(prefix+"_truthLabel").set(*event, truthLabel, sys);
         }
         for (const auto& var: m_PCBTnames) {

@@ -75,6 +75,7 @@ private:
     Gaudi::Property<std::vector<std::string>> m_PCBTnames
       {this, "PCBTDecorList", {}, "Name list of pseudo-continuous b-tagging decorator"};
     std::unordered_map<std::string, CP::SysReadDecorHandle<int>> m_PCBTs;
+    CP::SysReadDecorHandle<int> m_truthFlav{"HadronConeExclTruthLabelID", this};
 
     CP::SysReadDecorHandle<int> m_nmuons{"n_muons_%SYS%", this};
 

@@ -108,8 +108,6 @@ namespace ssWWVBS
         m_Ibranches.at(var).set(*event, -99, sys);
       }
 
-      static const SG::AuxElement::ConstAccessor<int>  HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
-
       // Count leptons
       int n_electrons = electrons->size();
       int n_muons = muons->size();
