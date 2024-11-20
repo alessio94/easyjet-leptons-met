@@ -69,8 +69,8 @@ namespace HH4B
       CP::SysReadHandle<xAOD::JetContainer>
         m_jetHandle{ this, "smallRJetToCount", "", "Small-R jet container to count" }; // For counting only
 
-      Gaudi::Property<std::string> m_btagSelDecor {this, "btagSelDecor", "", "B-tagging working point."};
-      SG::AuxElement::ConstAccessor<char> m_acc_btagSel{"btagSelAcc"};
+      CP::SysReadDecorHandle<char>
+	m_isBtag {this, "btagSelDecor", "", "Name of input dectorator for b-tagging"};
 
       Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
 

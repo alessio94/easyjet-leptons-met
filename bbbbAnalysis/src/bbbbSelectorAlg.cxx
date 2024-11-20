@@ -33,8 +33,8 @@ namespace HH4B
     if (!m_jetHandle.empty()) {
       ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     }
-    if (!m_btagSelDecor.empty()) {
-      m_acc_btagSel = SG::AuxElement::ConstAccessor<char>(m_btagSelDecor);
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
     
     ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
@@ -121,9 +121,9 @@ namespace HH4B
         ANA_CHECK (m_jetHandle.retrieve (jets, sys));
         n_resolved_jets = jets->size();
         // Count b-tagged jets
-        if (!m_btagSelDecor.empty()) {
+        if (!m_isBtag.empty()) {
           for (const xAOD::Jet *jet : *jets) {
-            if (m_acc_btagSel(*jet)) n_b_jets++;
+            if (m_isBtag.get(*jet, sys)) n_b_jets++;
           }
         }
       }
