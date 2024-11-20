@@ -19,26 +19,17 @@ def hhml_cfg(
 
     cfg = ComponentAccumulator()
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    tightMuonWPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
     cfg.merge(MuonSelectorAlgCfg(
         flags,
         containerInKey=muonkey,
         containerOutKey="hhmlAnalysisMuons_%SYS%",
-        looseMuonWP=MuonWPLabel,
-        tightMuonWPs=tightMuonWPs,
-        minPt=9 * Units.GeV,
-        maxEta=flags.Analysis.Muon.max_eta
+        minPt=9 * Units.GeV
     ))
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    tightElectronWP = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
         containerInKey=electronkey,
         containerOutKey="hhmlAnalysisElectrons_%SYS%",
-        looseEleWP=ElectronWPLabel,
-        tightEleWPs=tightElectronWP,
         minPt=9 * Units.GeV
     ))
 
@@ -49,8 +40,7 @@ def hhml_cfg(
     cfg.merge(TauSelectorAlgCfg(
         flags,
         containerInKey=taukey,
-        containerOutKey="hhmlAnalysisTaus_%SYS%",
-        looseTauWP=flags.Analysis.Tau.ID
+        containerOutKey="hhmlAnalysisTaus_%SYS%"
     ))
 
     cfg.merge(JetSelectorAlgCfg(
@@ -87,6 +77,8 @@ def hhml_cfg(
     )
 
     # calculate final hhml vars
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.MULTILEPTON.BaselineVarsMultileptonAlg(
             "FinalVarshhmlAlg",

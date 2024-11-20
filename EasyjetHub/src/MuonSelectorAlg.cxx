@@ -31,22 +31,15 @@ namespace Easyjet
     }
     ANA_CHECK (m_isSelectedMuon.initialize(m_systematicsList, m_inHandle));
 
-    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
-
-    m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+ m_looseMuonWP +"_%SYS%", this);
-    ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
-
     // Select flags
-    for(const auto& wp : m_tightMuonWPs){
-      m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    for(const auto& wp : m_muonWPs){
+      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
     // Scale factors
     if(m_isMC){
-      std::vector<std::string> wps = m_tightMuonWPs;
-      wps.emplace_back(m_looseMuonWP);
-      for(const auto& wp : wps){
+      for(const auto& wp : m_muonWPs){
         m_mu_recoSF.emplace_back("muon_reco_effSF_"+wp+"_%SYS%", this);
         m_mu_isoSF.emplace_back(wp.find("NonIso")==std::string::npos ?
 				"muon_isol_effSF_"+wp+"_%SYS%" : "", this);
@@ -74,7 +67,7 @@ namespace Easyjet
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_muTriggerSF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-    for(auto& handle : m_select_tight_in)
+    for(auto& handle : m_select_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_select_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
@@ -107,27 +100,17 @@ namespace Easyjet
       {
         m_isSelectedMuon.set(*muon, false, sys);
 
-        if(!m_select_loose_in.get(*muon, sys)) continue;
-
-        // skip OR muons
-        if ( m_checkOR ){
-          bool passesOR = m_passesOR.get(*muon, sys);
-          if ( !passesOR ) continue;
-        }
-
         // pT and eta cuts
         if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_tightMuonWPs.size(); i++)
-          m_select_out[i].set(*muon, m_select_tight_in[i].get(*muon,sys), sys);
+        for(unsigned int i=0; i<m_muonWPs.size(); i++)
+          m_select_out[i].set(*muon, m_select_in[i].get(*muon,sys), sys);
 
         if(m_isMC){
-          std::vector<std::string> wps = m_tightMuonWPs;
-          wps.emplace_back(m_looseMuonWP);
-          for(unsigned int i=0; i<wps.size(); i++){
-            std::string wp = wps[i];
+          for(unsigned int i=0; i<m_muonWPs.size(); i++){
+            std::string wp = m_muonWPs[i];
             float SF = m_mu_recoSF[i].get(*muon,sys);
             if(wp.find("NonIso")==std::string::npos) SF *= m_mu_isoSF[i].get(*muon,sys);
             bool ttvaTurnoff = wp.find("nottva")!=std::string::npos;

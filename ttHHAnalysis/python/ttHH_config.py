@@ -22,26 +22,16 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
 
     cfg = ComponentAccumulator()
 
-    LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
-    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="ttHHAnalysisMuons_%SYS%",
-                                 minPt=15 * Units.GeV,
-                                 looseMuonWP=LooseMuonWPLabel,
-                                 tightMuonWPs=[TightMuonWPLabel]))
+                                 minPt=15 * Units.GeV))
 
-    LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    TightEleWP = flags.Analysis.Electron.extra_wps[0]
-    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
         containerInKey=electronkey,
         containerOutKey="ttHHAnalysisElectrons_%SYS%",
-        minPt=15 * Units.GeV,
-        looseEleWP=LooseElectronWPLabel,
-        tightEleWPs=[TightEleWPLabel]))
+        minPt=15 * Units.GeV))
 
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_BTag_SelectorAlg",
                                 containerInKey=smalljetkey,
@@ -83,6 +73,10 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
         )
     )
 
+    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
+    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
+    TightEleWP = flags.Analysis.Electron.extra_wps[0]
+    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.ttHH.ttHHSelectorAlg(
             "ttHHSelectorAlg",

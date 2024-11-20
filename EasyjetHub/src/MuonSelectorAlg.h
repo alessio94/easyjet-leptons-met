@@ -41,21 +41,16 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_inHandle{ this, "containerInKey", "",   "Muon container to read" };
-
-    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
+      m_inHandle{ this, "containerInKey", "",   "Muon container to read" };
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::string> m_looseMuonWP
-        { this, "looseMuonWP", "", "Loose muon ID + ISO working point, used to filter collection" };
-
-    Gaudi::Property<std::vector<std::string>> m_tightMuonWPs
-        { this, "tightMuonWPs", {}, "Tight muon ID + ISO working points, not used to filter collection" };
+    Gaudi::Property<std::vector<std::string>> m_muonWPs
+      { this, "muonWPs", {}, "Muon ID + ISO working points, not used to filter collection" };
 
     std::vector<CP::SysReadDecorHandle<float>> m_mu_recoSF;
     std::vector<CP::SysReadDecorHandle<float>> m_mu_isoSF;
@@ -67,8 +62,7 @@ private:
     std::vector<CP::SysReadDecorHandle<float>> m_muTriggerSF_in;
     std::vector<CP::SysWriteDecorHandle<float>> m_muTriggerSF_out;
 
-    CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
-    std::vector<CP::SysReadDecorHandle<char>> m_select_tight_in;
+    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
@@ -89,7 +83,6 @@ private:
     Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of muons to consider"}; // -1 means ignores this
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort muons by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra muons after pT sorting"}; // -1 means keep them all
-    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
 
     Gaudi::Property<int>   m_muonAmount       {this, "muonAmount", -1, "Number of muons to consider for isMuonXX decoration"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;

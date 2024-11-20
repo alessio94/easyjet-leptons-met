@@ -20,28 +20,20 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         int_variables = []
 
     cfg = ComponentAccumulator()
-    PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=photonkey,
                                    containerOutKey="bbyyAnalysisPhotons_%SYS%",
-                                   minPt=22. * Units.GeV,
-                                   loosePhotonWP=PhotonWPLabel,
-                                   tightPhotonWPs=[f'{wp[0]}_{wp[1]}' for wp in
-                                                   flags.Analysis.Photon.extra_wps]))
+                                   minPt=22. * Units.GeV))
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="bbyyAnalysisMuons_%SYS%",
-                                 minPt=10 * Units.GeV,
-                                 looseMuonWP=MuonWPLabel))
+                                 minPt=10 * Units.GeV))
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="bbyyAnalysisElectrons_%SYS%",
-                                     minPt=10. * Units.GeV,
-                                     looseEleWP=ElectronWPLabel))
+                                     minPt=10. * Units.GeV))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,

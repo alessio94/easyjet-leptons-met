@@ -30,24 +30,14 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         raise ValueError("Cannot run 'antiiso-lephad' with any other channels")
 
     # muons:
-    muonInWpLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
-
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
-                                 containerOutKey="bbttAnalysisMuons_%SYS%",
-                                 looseMuonWP=muonInWpLabel,
-                                 tightMuonWPs=muon_WPs))
+                                 containerOutKey="bbttAnalysisMuons_%SYS%"))
 
     # electrons:
-    electronInWpLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
-
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
-                                     containerOutKey="bbttAnalysisElectrons_%SYS%",
-                                     looseEleWP=electronInWpLabel,
-                                     tightEleWPs=ele_WPs))
+                                     containerOutKey="bbttAnalysisElectrons_%SYS%"))
     # leptons:
     cfg.merge(LeptonOrderingAlgCfg(flags,
                                    containerInEleKey=electronkey,
@@ -56,13 +46,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.merge(TauSelectorAlgCfg(flags,
                                 # Baseline always needed for anti-taus
                                 containerInKey=taukey,
-                                keepAntiTaus=True,
-                                containerOutKey="bbttAnalysisTaus_%SYS%",
-                                # used to filter collection
-                                looseTauWP=flags.Analysis.Tau.ID,
-                                # used for subsequent event selections
-                                # only used to decorate flags + scale factors
-                                tightTauWPs=flags.Analysis.Tau.extra_wps))
+                                containerOutKey="bbttAnalysisTaus_%SYS%"))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,
@@ -73,6 +57,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         selectBjet=False,
         minimumAmount=2))
 
+    muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
+    ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",

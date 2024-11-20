@@ -20,8 +20,10 @@ namespace Easyjet
 
     if(m_keepAntiTaus){
       m_antiTau = CP::SysReadDecorHandle<char>("isAntiTau", this);
+      m_IDTau = CP::SysReadDecorHandle<char>("isIDTau", this);
     }
     ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
 
     for (int i = 0; i < m_tauAmount; i++){
       std::string index = std::to_string(i + 1);
@@ -32,27 +34,20 @@ namespace Easyjet
 
     ANA_CHECK (m_isSelectedTau.initialize(m_systematicsList, m_inHandle));
 
-    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
-
-    m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_looseTauWP+"_%SYS%", this);
-    ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
-
     // Select flags
-    for(const auto& wp : m_tightTauWPs){
-      m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    for(const auto& wp : m_tauWPs){
+      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
-    for(auto& handle : m_select_tight_in)
+    for(auto& handle : m_select_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_select_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Scale factors
     if(m_isMC){
-      std::vector<std::string> wps = m_tightTauWPs;
-      wps.emplace_back(m_looseTauWP);
-      for(const auto& wp : wps){
+      for(const auto& wp : m_tauWPs){
         m_tau_recoSF.emplace_back("tau_Reco_effSF_"+wp+"_%SYS%", this);
         bool tauIDAvailable = wp.find("Baseline")==std::string::npos && wp.find("VeryLoose")==std::string::npos;
         m_tau_IDSF.emplace_back(tauIDAvailable ? "tau_ID_effSF_"+wp+"_%SYS%" : "", this);
@@ -116,38 +111,25 @@ namespace Easyjet
         // selected taus for systematics
         m_isSelectedTau.set(*tau, false, sys);
 
-        if(!m_select_loose_in.get(*tau,sys)) continue;
-
         // If not ID tau nor anti tau, skip
         if(m_keepAntiTaus){
-          bool keep = m_select_tight_in[0].get(*tau,sys) || m_antiTau.get(*tau, sys);
+          bool keep = m_IDTau.get(*tau,sys) || m_antiTau.get(*tau, sys);
           if( !keep ) continue;
-        }
-
-        // If not passing OR, skip
-        if( m_checkOR ){
-          bool passesOR = m_passesOR.get(*tau, sys);
-          if ( !passesOR ) continue;
         }
 	
         if (tau->pt() < m_minPt)
           continue;
-    
-        float this_tau_eta_abs = std::abs(tau->eta());
-        if ((this_tau_eta_abs > m_minEtaVeto &&
-            this_tau_eta_abs < m_maxEtaVeto) ||
-            (this_tau_eta_abs > m_maxEta))
+
+        if (std::abs(tau->eta()) > m_maxEta)
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_tightTauWPs.size(); i++)
-          m_select_out[i].set(*tau, m_select_tight_in[i].get(*tau,sys), sys);
+        for(unsigned int i=0; i<m_tauWPs.size(); i++)
+          m_select_out[i].set(*tau, m_select_in[i].get(*tau,sys), sys);
 
         if(m_isMC){
-          std::vector<std::string> wps = m_tightTauWPs;
-          if(m_looseTauWP!="Baseline") wps.emplace_back(m_looseTauWP);
-          for(unsigned int i=0; i<wps.size(); i++){
-            std::string wp = wps[i];
+          for(unsigned int i=0; i<m_tauWPs.size(); i++){
+            std::string wp = m_tauWPs[i];
             float SF = m_tau_recoSF[i].get(*tau,sys);
             if(wp.find("Baseline")==std::string::npos && wp.find("VeryLoose")==std::string::npos)
               SF *=  m_tau_IDSF[i].get(*tau,sys);

@@ -20,24 +20,14 @@ def lltt_cfg(
 
     cfg = ComponentAccumulator()
 
-    LooseMuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
-    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
-                                 containerOutKey="llttAnalysisMuons_%SYS%",
-                                 looseMuonWP=LooseMuonWPLabel,
-                                 tightMuonWPs=[TightMuonWPLabel]))
+                                 containerOutKey="llttAnalysisMuons_%SYS%"))
 
-    LooseElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    TightElectronWP = flags.Analysis.Electron.extra_wps[0]
-    TightElectronWPLabel = f'{TightElectronWP[0]}_{TightElectronWP[1]}'
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
         containerInKey=electronkey,
-        containerOutKey="llttAnalysisElectrons_%SYS%",
-        looseEleWP=LooseElectronWPLabel,
-        tightEleWPs=[TightElectronWPLabel]))
+        containerOutKey="llttAnalysisElectrons_%SYS%"))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
                                    containerInEleKey=electronkey,
@@ -45,9 +35,7 @@ def lltt_cfg(
 
     cfg.merge(TauSelectorAlgCfg(flags,
                                 containerInKey=taukey,
-                                containerOutKey="llttAnalysisTaus_%SYS%",
-                                # used to filter collection
-                                looseTauWP=flags.Analysis.Tau.ID))
+                                containerOutKey="llttAnalysisTaus_%SYS%"))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,
@@ -65,6 +53,10 @@ def lltt_cfg(
         for c in flags.Analysis.TriggerChains
     ]
 
+    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
+    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
+    TightElectronWP = flags.Analysis.Electron.extra_wps[0]
+    TightElectronWPLabel = f'{TightElectronWP[0]}_{TightElectronWP[1]}'
     cfg.addEventAlgo(
         CompFactory.HLLTT.HllttSelectorAlg(
             "HllttSelectorAlg",

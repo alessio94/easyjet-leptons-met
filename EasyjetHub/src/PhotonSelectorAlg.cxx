@@ -31,27 +31,20 @@ namespace Easyjet
 
     ATH_CHECK (m_isSelectedPhoton.initialize(m_systematicsList, m_inHandle));
 
-    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
-
-    m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+m_loosePhotonWP+"_%SYS%", this);
-    ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
-
     // Select flags
-    for(const auto& wp : m_tightPhotonWPs){
-      m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    for(const auto& wp : m_photonWPs){
+      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
-    for(auto& handle : m_select_tight_in)
+    for(auto& handle : m_select_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_select_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Scale factors
     if(m_isMC){
-      std::vector<std::string> wps = m_tightPhotonWPs;
-      wps.emplace_back(m_loosePhotonWP);
-      for(const auto& wp : wps){
+      for(const auto& wp : m_photonWPs){
         m_ph_idSF.emplace_back
 	  (!m_saveDummySF ? "ph_id_effSF_"+wp+"_%SYS%" : "", this);
         m_ph_isoSF.emplace_back
@@ -74,27 +67,11 @@ namespace Easyjet
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
-    // Initialise vertex container for photon pointing
-    ATH_CHECK (m_vertexContainerInKey.initialize());
-
     return StatusCode::SUCCESS;
   }
 
   StatusCode PhotonSelectorAlg::execute()
   {
-    // vertex related objects and variables
-    SG::ReadHandle<xAOD::VertexContainer> vertices_(m_vertexContainerInKey);
-    const xAOD::Vertex* primary = nullptr;
-    for (const xAOD::Vertex* vtx : *vertices_) {
-      if (vtx->vertexType() == xAOD::VxType::PriVtx) {
-        primary = vtx;
-        break;
-      }
-    }
-    if (!primary) {
-      ATH_MSG_WARNING("Could not find a Primary vertex");
-    }
-
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()) {
 
@@ -114,15 +91,6 @@ namespace Easyjet
 
 	// selected photons for systematics
         m_isSelectedPhoton.set(*photon, false, sys);
-
-        if(!m_select_loose_in.get(*photon,sys)) continue;
-
-        // skip OR photons
-        if ( m_checkOR ){
-          bool passesOR = m_passesOR.get(*photon, sys);
-          if ( !passesOR ) continue;
-        }
-
         
         if (photon->pt() < m_minPt)
           continue;
@@ -131,19 +99,17 @@ namespace Easyjet
           continue ;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_tightPhotonWPs.size(); i++)
-          m_select_out[i].set(*photon, m_select_tight_in[i].get(*photon,sys), sys);
+        for(unsigned int i=0; i<m_photonWPs.size(); i++)
+          m_select_out[i].set(*photon, m_select_in[i].get(*photon,sys), sys);
 
         if(m_isMC){
-          std::vector<std::string> wps = m_tightPhotonWPs;
-          wps.emplace_back(m_loosePhotonWP);
-          for(unsigned int i=0; i<wps.size(); i++){
-	    float SF = 1.;
-	    if(!m_saveDummySF){
-	      std::string wp = wps[i];
-	      SF = m_ph_idSF[i].get(*photon, sys);
-	      if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*photon, sys);
-	    }
+          for(unsigned int i=0; i<m_photonWPs.size(); i++){
+            float SF = 1.;
+            if(!m_saveDummySF){
+              std::string wp = m_photonWPs[i];
+              SF = m_ph_idSF[i].get(*photon, sys);
+              if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*photon, sys);
+            }
             m_ph_SF[i].set(*photon, SF, sys);
           }
         }

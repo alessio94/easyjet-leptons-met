@@ -18,20 +18,15 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
 
     cfg = ComponentAccumulator()
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="ssWWAnalysisMuons_%SYS%",
-                                 looseMuonWP=MuonWPLabel,
                                  minPt=flags.Analysis.Muon.min_pT_ssWW,
                                  maxEta=flags.Analysis.Muon.max_eta_ssWW))
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="ssWWAnalysisElectrons_%SYS%",
-                                     looseEleWP=ElectronWPLabel,
-                                     isMC=flags.Input.isMC,
                                      minPt=flags.Analysis.Electron.min_pT_ssWW))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
@@ -70,6 +65,8 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
     )
 
     # calculate final ssWW vars
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.ssWWVBS.BaselineVarsssWWAlg(
             "FinalVarsssWWAlg",

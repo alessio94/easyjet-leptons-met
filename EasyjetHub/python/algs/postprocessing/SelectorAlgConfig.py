@@ -10,7 +10,9 @@ def MuonSelectorAlgCfg(flags, name="MuonSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 
     kwargs.setdefault("isMC", flags.Input.isMC)
-    kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
+    muon_WPs = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
+    muon_WPs += [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
+    kwargs.setdefault("muonWPs", muon_WPs)
     kwargs.setdefault("muonTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Muon'))
     kwargs.setdefault("muonAmount", flags.Analysis.Lepton.amount)
@@ -23,7 +25,9 @@ def ElectronSelectorAlgCfg(flags, name="ElectronSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 
     kwargs.setdefault("isMC", flags.Input.isMC)
-    kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
+    ele_WPs = [f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}']
+    ele_WPs += [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
+    kwargs.setdefault("eleWPs", ele_WPs)
     kwargs.setdefault("eleTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Electron'))
     kwargs.setdefault("electronAmount", flags.Analysis.Lepton.amount)
@@ -46,7 +50,11 @@ def TauSelectorAlgCfg(flags, name="TauSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 
     kwargs.setdefault("isMC", flags.Input.isMC)
-    kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
+    tau_WPs = [flags.Analysis.Tau.ID]
+    tau_WPs += flags.Analysis.Tau.extra_wps
+    kwargs.setdefault("tauWPs", tau_WPs)
+    kwargs.setdefault("keepAntiTaus",
+                      flags.Analysis.OverlapRemoval.doTauAntiTauJet)
     kwargs.setdefault("tauTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Tau'))
     kwargs.setdefault("tauAmount", flags.Analysis.Tau.amount)
@@ -59,7 +67,9 @@ def PhotonSelectorAlgCfg(flags, name="PhotonSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 
     kwargs.setdefault("isMC", flags.Input.isMC)
-    kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
+    ph_WPs = [f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}']
+    ph_WPs += [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Photon.extra_wps]
+    kwargs.setdefault("photonWPs", ph_WPs)
     kwargs.setdefault("photonAmount", flags.Analysis.Photon.amount)
     kwargs.setdefault("saveDummySF", flags.GeoModel.Run is LHCPeriod.Run2)
 
@@ -71,9 +81,6 @@ def JetSelectorAlgCfg(flags, name="JetSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 
     isSmallRJet = "AntiKt4" in kwargs["containerInKey"]
-    kwargs.setdefault("useJVT", isSmallRJet)
-    kwargs.setdefault("useFJVT", isSmallRJet and flags.Analysis.Small_R_jet.useFJvt)
-    kwargs.setdefault("checkOR", flags.Analysis.do_overlap_removal)
     if kwargs.get("bTagWPDecorName", ""):
         kwargs.setdefault("bjetAmount", flags.Analysis.Small_R_jet.amount_bjet)
     if (isSmallRJet and flags.Analysis.Small_R_jet.runBJetPtCalib) or \

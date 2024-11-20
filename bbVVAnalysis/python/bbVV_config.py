@@ -13,23 +13,13 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
              ):
     cfg = ComponentAccumulator()
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
-    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
-                                 containerOutKey="bbVVAnalysisMuons_%SYS%",
-                                 looseMuonWP=MuonWPLabel,
-                                 tightMuonWPs=[TightMuonWPLabel]))
+                                 containerOutKey="bbVVAnalysisMuons_%SYS%"))
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    TightEleWP = flags.Analysis.Electron.extra_wps[0]
-    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
-                                     containerOutKey="bbVVAnalysisElectrons_%SYS%",
-                                     looseEleWP=ElectronWPLabel,
-                                     tightEleWPs=[TightEleWPLabel]))
+                                     containerOutKey="bbVVAnalysisElectrons_%SYS%"))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
                                    containerInEleKey=electronkey,
@@ -55,6 +45,10 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                 minimumAmount=flags.Analysis.Large_R_jet.amount))
 
     # Selection
+    TightMuonWP = flags.Analysis.Muon.extra_wps[0]
+    TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
+    TightEleWP = flags.Analysis.Electron.extra_wps[0]
+    TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
     cfg.addEventAlgo(
         CompFactory.HHBBVV.HHbbVVSelectorAlg(
             "HHbbVVSelectorAlg",

@@ -19,19 +19,15 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
 
     cfg = ComponentAccumulator()
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="ZCharmAnalysisMuons_%SYS%",
-                                 looseMuonWP=MuonWPLabel,
                                  minPt=flags.Analysis.Muon.min_pT_ZCharm,
                                  maxEta=flags.Analysis.Muon.max_eta_ZCharm))
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="ZCharmAnalysisElectrons_%SYS%",
-                                     looseEleWP=ElectronWPLabel,
                                      isMC=flags.Input.isMC,
                                      minPt=flags.Analysis.Electron.min_pT_ZCharm))
 
@@ -85,6 +81,8 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
         = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp]
 
     # calculate final ZCharm vars
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.ZCC.BaselineVarsZCharmAlg(
             "BaselineVarsZCharmAlg",

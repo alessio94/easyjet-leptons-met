@@ -41,22 +41,17 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_inHandle{ this, "containerInKey", "",   "Electron container to read" };
-
-    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
+      m_inHandle{ this, "containerInKey", "",   "Electron container to read" };
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::string> m_looseEleWP
-      { this, "looseEleWP", "",
-	  "Loose electron ID + ISO working point, used to filter collection" };
-    Gaudi::Property<std::vector<std::string>> m_tightEleWPs
-      { this, "tightEleWPs", {},
-	  "Tight electron ID + ISO working points, not used to filter collection" };
+    Gaudi::Property<std::vector<std::string>> m_eleWPs
+      { this, "eleWPs", {},
+	  "electron ID + ISO working points, not used to filter collection" };
     Gaudi::Property<bool> m_saveDummySF
       { this, "saveDummySF", false, "Store dummy SF=1 in case they are not available"};
 
@@ -71,13 +66,12 @@ private:
     std::vector<CP::SysReadDecorHandle<float>> m_eleTriggerSF_in;
     std::vector<CP::SysWriteDecorHandle<float>> m_eleTriggerSF_out;
 
-    CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
-    std::vector<CP::SysReadDecorHandle<char>> m_select_tight_in;
+    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::ElectronContainer>>
-    m_outHandle{ this, "containerOutKey", "",   "Electron container to write" };
+      m_outHandle{ this, "containerOutKey", "",   "Electron container to write" };
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nElectrons_%SYS%", 
@@ -92,7 +86,6 @@ private:
     Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of electrons to consider"}; // -1 means ignores this
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort electrons by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra electrons after pT sorting"}; // -1 means keep them all
-    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
 
     Gaudi::Property<int>   m_electronAmount       {this, "electronAmount", -1, "Number of electrons to consider for isElectronXX decoration"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;

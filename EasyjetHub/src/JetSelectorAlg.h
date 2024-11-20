@@ -42,20 +42,15 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_inHandle{ this, "containerInKey", "",   "Jet container to read" };
+      m_inHandle{ this, "containerInKey", "",   "Jet container to read" };
 
     // \brief Setup syst-aware input decorations
     CP::SysReadDecorHandle<char> m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     CP::SysReadDecorHandle<int> m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
-
-    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
-
-    CP::SysReadDecorHandle<char> m_jvtselection {"jvt_selection", this};
-    CP::SysReadDecorHandle<char> m_fjvtselection {"fjvt_selection", this};
 
     CP::SysReadDecorHandle<int> m_nmuons_in{this, "nmuons", "",
 	"Number of muons from muon-in-jet correction"};
@@ -63,7 +58,7 @@ private:
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>>
-    m_outHandle{ this, "containerOutKey", "",   "Jet container to write" };
+      m_outHandle{ this, "containerOutKey", "",   "Jet container to write" };
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "nJets_%SYS%", 
@@ -81,9 +76,6 @@ private:
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort jets by pT"};
     Gaudi::Property<bool>  m_PCBTsort         {this, "PCBTsort", false, "Sort jets by PCBT scores"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra jets after pT sorting"}; // -1 means keep them all
-    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
-    Gaudi::Property<bool>  m_useJVT           {this, "useJVT", false, "Apply JVT"};
-    Gaudi::Property<bool>  m_useFJVT          {this, "useFJVT", false, "Apply forwardJVT"};
 
     Gaudi::Property<bool>  m_selectBjet       {this, "selectBjet", false, "Apply bjet selection"};
     Gaudi::Property<int>   m_bjetAmount       {this, "bjetAmount", -1, "Number of jets to consider for isbjetXX decoration"};

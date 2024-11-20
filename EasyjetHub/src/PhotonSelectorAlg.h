@@ -15,7 +15,6 @@
 #include <AthContainers/ConstDataVector.h>
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODEgamma/PhotonContainer.h>
-#include <xAODTracking/VertexContainer.h>
 
 namespace Easyjet
 {
@@ -47,16 +46,11 @@ private:
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_inHandle{ this, "containerInKey", "",   "Photon container to read" };
 
-    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
-
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::string> m_loosePhotonWP
-      { this, "loosePhotonWP", "", "Loose photon ID + Iso working point, used to filter collection" };
-
-    Gaudi::Property<std::vector<std::string>> m_tightPhotonWPs
-      { this, "tightPhotonWPs", {},"Tight photon ID + Iso working points, not used to filter collection" };
+    Gaudi::Property<std::vector<std::string>> m_photonWPs
+      { this, "photonWPs", {},"Photon ID + Iso working points, not used to filter collection" };
     Gaudi::Property<bool> m_saveDummySF
       { this, "saveDummySF", false, "Store dummy SF=1 in case they are not available"};
 
@@ -64,13 +58,12 @@ private:
     std::vector<CP::SysReadDecorHandle<float>> m_ph_isoSF;
     std::vector<CP::SysWriteDecorHandle<float>> m_ph_SF;
 
-    CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
-    std::vector<CP::SysReadDecorHandle<char>> m_select_tight_in;
+    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::PhotonContainer>>
-    m_outHandle{ this, "containerOutKey", "",   "Photon container to write" };
+      m_outHandle{ this, "containerOutKey", "",   "Photon container to write" };
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int> m_nSelPart {this, "decorOutName", "Photons_%SYS%", 
@@ -80,16 +73,11 @@ private:
         this, "decoration", "isAnalysisPhoton_%SYS%", "decoration for per-object if photon is selected"
     };
 
-    /// \brief Setup vertex container for photon pointing
-    SG::ReadHandleKey<xAOD::VertexContainer> m_vertexContainerInKey {this, "VertexContainer", "PrimaryVertices", "Vertex container name"};
-
     Gaudi::Property<float> m_minPt            {this, "minPt", 25e3, "Minimum pT of photons"};
     Gaudi::Property<float> m_maxEta           {this, "maxEta", 100., "Maximum eta of photons"};
     Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of photons to consider"}; // -1 means ignores this
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort photons by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra photons after pT sorting"}; // -1 means keep them all
-    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
-    Gaudi::Property<bool>  m_recomputePhotons {this, "recomputePhotons", true, "Recompute photon eta (and subsequently pT) w.r.t. hardest vertex"}; 
 
     Gaudi::Property<int>   m_photonAmount     {this, "photonAmount", -1, "Number of photons to consider for isPhotonXX decoration"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;

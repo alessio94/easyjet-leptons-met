@@ -41,26 +41,22 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::EventInfo>
-    m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
     CP::SysReadHandle<xAOD::TauJetContainer>
-    m_inHandle{ this, "containerInKey", "",   "Tau container to read" };
+      m_inHandle{ this, "containerInKey", "",   "Tau container to read" };
 
     Gaudi::Property<bool> m_keepAntiTaus
       {this, "keepAntiTaus", false, "Keep anti-taus in addition to ID taus"};
 
     CP::SysReadDecorHandle<char> m_antiTau{"", this};
-
-    CP::SysReadDecorHandle<char> m_passesOR{"passesOR_%SYS%", this};
+    CP::SysReadDecorHandle<char> m_IDTau{"", this};
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::string> m_looseTauWP
-      { this, "looseTauWP", "", "Loose tau ID working point, used to filter collection" };
-
-    Gaudi::Property<std::vector<std::string>> m_tightTauWPs
-      { this, "tightTauWPs", {}, "Tight tau ID working points, not used to filter collection" };
+    Gaudi::Property<std::vector<std::string>> m_tauWPs
+      { this, "tauWPs", {}, "Tau ID working points, not used to filter collection" };
 
     std::vector<CP::SysReadDecorHandle<float>> m_tau_recoSF;
     std::vector<CP::SysReadDecorHandle<float>> m_tau_IDSF;
@@ -73,13 +69,12 @@ private:
     std::vector<CP::SysReadDecorHandle<float>> m_tauTriggerSF_in;
     std::vector<CP::SysWriteDecorHandle<float>> m_tauTriggerSF_out;
 
-    CP::SysReadDecorHandle<char> m_select_loose_in{"", this};
-    std::vector<CP::SysReadDecorHandle<char>> m_select_tight_in;
+    std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
 
     /// \brief Setup syst-aware output container handles
     CP::SysWriteHandle<ConstDataVector<xAOD::TauJetContainer>>
-    m_outHandle{ this, "containerOutKey", "",   "Tau container to write" };
+      m_outHandle{ this, "containerOutKey", "",   "Tau container to write" };
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int>
@@ -91,13 +86,10 @@ private:
     };
 
     Gaudi::Property<float> m_minPt            {this, "minPt", 20e3, "Minimum pT of taus"};
-    Gaudi::Property<float> m_minEtaVeto       {this, "minEtaVeto", 1.37, "Minimum eta veto of EMCal"};
-    Gaudi::Property<float> m_maxEtaVeto       {this, "maxEtaVeto", 1.52, "Maximum eta veto of EMCal"};
     Gaudi::Property<float> m_maxEta           {this, "maxEta", 2.5, "Maximum eta of taus"};
     Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of taus to consider"}; // -1 means ignores this
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort taus by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra taus after pT sorting"}; // -1 means keep them all
-    Gaudi::Property<bool>  m_checkOR          {this, "checkOR", true, "Check the Overlap Removal"};
 
     Gaudi::Property<int>   m_tauAmount       {this, "tauAmount", -1, "Number of taus to consider for isTauXX decoration"};
     std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;

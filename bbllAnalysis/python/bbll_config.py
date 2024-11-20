@@ -24,25 +24,19 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
 
     cfg = ComponentAccumulator()
 
-    PhotonWPLabel = f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}'
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=photonkey,
                                    containerOutKey="bbllAnalysisPhotons_%SYS%",
-                                   minPt=20e3,
-                                   loosePhotonWP=PhotonWPLabel))
+                                   minPt=20e3))
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="bbllAnalysisMuons_%SYS%",
-                                 looseMuonWP=MuonWPLabel,
                                  minPt=9 * Units.GeV))
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="bbllAnalysisElectrons_%SYS%",
-                                     looseEleWP=ElectronWPLabel,
                                      minPt=9 * Units.GeV))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
@@ -113,6 +107,8 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
         = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp]
 
     # calculate final bbll vars
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.HHBBLL.BaselineVarsbbllAlg(
             "FinalVarsbbllAlg",

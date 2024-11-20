@@ -16,22 +16,14 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
 
     cfg = ComponentAccumulator()
 
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="vbshiggsAnalysisMuons_%SYS%",
-                                 looseMuonWP=MuonWPLabel,
-                                 tightMuonWPs=muon_WPs,
                                  minPt=9 * Units.GeV))
 
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
-    ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="vbshiggsAnalysisElectrons_%SYS%",
-                                     looseEleWP=ElectronWPLabel,
-                                     tightEleWPs=ele_WPs,
                                      minPt=9 * Units.GeV))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,

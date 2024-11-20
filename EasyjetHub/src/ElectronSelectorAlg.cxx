@@ -30,22 +30,15 @@ namespace Easyjet
     }
     ANA_CHECK (m_isSelectedElectron.initialize(m_systematicsList, m_inHandle));
 
-    ATH_CHECK (m_passesOR.initialize(m_systematicsList, m_inHandle));
-
-    m_select_loose_in = CP::SysReadDecorHandle<char>("baselineSelection_"+ m_looseEleWP +"_%SYS%", this);
-    ATH_CHECK (m_select_loose_in.initialize(m_systematicsList, m_inHandle));
-
     // Select flags
-    for(const auto& wp : m_tightEleWPs){
-      m_select_tight_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
+    for(const auto& wp : m_eleWPs){
+      m_select_in.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
     // Scale factors
     if(m_isMC){
-      std::vector<std::string> wps = m_tightEleWPs;
-      wps.emplace_back(m_looseEleWP);
-      for(const auto& wp : wps){
+      for(const auto& wp : m_eleWPs){
         // Scale factors not available for DNN yet
         bool sfAvailable = !m_saveDummySF && wp.find("DNN")==std::string::npos;
         m_ele_recoSF.emplace_back(sfAvailable ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
@@ -74,7 +67,7 @@ namespace Easyjet
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_eleTriggerSF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-    for(auto& handle : m_select_tight_in)
+    for(auto& handle : m_select_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_select_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
@@ -107,14 +100,6 @@ namespace Easyjet
       {
         m_isSelectedElectron.set(*electron, false, sys);
 
-        if(!m_select_loose_in.get(*electron, sys)) continue;
-
-        // skip OR electrons
-        if ( m_checkOR ){
-          bool passesOR = m_passesOR.get(*electron, sys);
-          if ( !passesOR ) continue;
-        }
-
         // cuts
         if (electron->pt() < m_minPt)
           continue;
@@ -123,14 +108,12 @@ namespace Easyjet
           continue;
 
         // For some reason this decoration needs to be explicitly copied
-        for(unsigned int i=0; i<m_tightEleWPs.size(); i++)
-          m_select_out[i].set(*electron, m_select_tight_in[i].get(*electron,sys), sys);
+        for(unsigned int i=0; i<m_eleWPs.size(); i++)
+          m_select_out[i].set(*electron, m_select_in[i].get(*electron,sys), sys);
 
         if(m_isMC){
-          std::vector<std::string> wps = m_tightEleWPs;
-          wps.emplace_back(m_looseEleWP);
-          for(unsigned int i=0; i<wps.size(); i++){
-            std::string wp = wps[i];
+          for(unsigned int i=0; i<m_eleWPs.size(); i++){
+            std::string wp = m_eleWPs[i];
             float SF = 1.;
             if(!m_saveDummySF && wp.find("DNN")==std::string::npos){
               SF = m_ele_recoSF[i].get(*electron,sys) * m_ele_idSF[i].get(*electron,sys);
