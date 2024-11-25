@@ -80,7 +80,7 @@ def run_local(
 
 def run_grid(process="top", boosted=False, lepton=True):
     executable = "bbVV-ntupler"
-    ListDir = "bbVVAnalysis/datasets/PHYS/"
+    ListDir = easyjet_build_dir + "/data/bbVVAnalysis/PHYS/"
     if process == "data":
         List = ListDir + "nominal/data_Run3_p6266.txt"
     else:

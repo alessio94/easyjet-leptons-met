@@ -242,7 +242,6 @@ namespace HHBBVV
       //************
       int n_lrjets = lrjets->size();
       float leadLRJ_pt = -999.;
-      float Hbb_jet_pt = -999.;
 
       for (const xAOD::Jet *lrjet : *lrjets)
       {
@@ -285,8 +284,7 @@ namespace HHBBVV
             signalBtagging(Hbb, Whad, sys, HBB_BTAG, WHAD_BTAG);
             ONELEPBOOSTED_TOPO = (Whad->p4().DeltaR(signal_lepton) < 1.0); // Run 2: < 1.0
             if (ONELEPBOOSTED_TOPO) m_bbVVCuts("DR_CUT").passed = true;
-            Hbb_jet_pt = Hbb->pt();
-            if (Hbb_jet_pt > 500. * Athena::Units::GeV) m_bbVVCuts("HBB_PT").passed = true;
+            if (Hbb && Hbb->pt() > 500. * Athena::Units::GeV) m_bbVVCuts("HBB_PT").passed = true;
             if (HBB_BTAG) m_bbVVCuts("HBB_BTAG").passed = true;
           }
         }
@@ -562,16 +560,16 @@ namespace HHBBVV
 
   void HHbbVVSelectorAlg::signalBtagging(const xAOD::Jet *&Hbb, const xAOD::Jet *&Whad, const CP::SystematicSet& sys, bool& HBB_BTAG, bool& WHAD_BTAG) {
 
-    HBB_BTAG = (bool)m_Pass_GN2X.get(*Hbb, sys); // Choose the first GN2X wp
-    WHAD_BTAG = (bool)m_Pass_GN2X.get(*Whad, sys);
+    if(Hbb)HBB_BTAG = (bool)m_Pass_GN2X.get(*Hbb, sys); // Choose the first GN2X wp
+    if(Whad)WHAD_BTAG = (bool)m_Pass_GN2X.get(*Whad, sys);
 
   }
 
   void HHbbVVSelectorAlg::signalBtagging(const xAOD::Jet *&Hbb, const xAOD::Jet *&Whad, const xAOD::Jet *&Whad2, const CP::SystematicSet& sys, bool& HBB_BTAG, bool& WHAD_BTAG, bool& WHAD2_BTAG) {
 
-    HBB_BTAG = (bool)m_Pass_GN2X.get(*Hbb, sys); // Choose the first GN2X wp
-    WHAD_BTAG = (bool)m_Pass_GN2X.get(*Whad, sys);
-    WHAD2_BTAG = (bool)m_Pass_GN2X.get(*Whad2, sys);
+    if(Hbb)HBB_BTAG = (bool)m_Pass_GN2X.get(*Hbb, sys); // Choose the first GN2X wp
+    if(Whad)WHAD_BTAG = (bool)m_Pass_GN2X.get(*Whad, sys);
+    if(Whad2)WHAD2_BTAG = (bool)m_Pass_GN2X.get(*Whad2, sys);
 
   }
 
