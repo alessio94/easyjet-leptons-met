@@ -81,6 +81,14 @@ this will return an undefined value if `something` does not exist! Instead you s
 We discourage any string access within the `execute` method. Not only is it slow, it also pushes configuration errors which should be caught in initialization back to the execution loop.
 Instead you should parse the in initialization and use `enum` or other primitive types within the `execute`.
 
+## Event Selection
+
+Each analysis in EasyJet uses it own custom selector algorithm, e.g. [`XbbCalibSelectorAlg.cxx`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/src/XbbCalibSelectorAlg.cxx). The [`CP::SysFilterReporterCombiner`](https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/SystematicsHandles/SystematicsHandles/SysFilterReporterCombiner.h) is the Athena object that controls if the event passes selection and is propagated to the output dumping algorithm. It has to be [set to false at the beginning of each event processing](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/src/XbbCalibSelectorAlg.cxx#L44) and [set to true](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/src/XbbCalibSelectorAlg.cxx#L98) if the event passes the required selections. The selector algorithm is scheduled in analyses specific python configuration  e.g. in [`XbbCalib_config.py`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/python/XbbCalib_config.py#L45-51).
+
+The selection decision is stored as a decoration who's name is configured by the `eventDecisionOutputDecoration` property as done [here](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/python/XbbCalib_config.py#L48). This decoration should be dumped into the ntuple as done [here](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/python/XbbCalib_config.py#L108-109).
+
+When running with systematics, an event that passes the selection for at least one of the requested systematic variations is stored. The decoration will be stored for all systematics ("\_%SYS%" included in the name) which allows to identify events that passed the selection for a given systematics (or the nominal).
+
 [sh]: https://atlassoftwaredocs.web.cern.ch/AnalysisTools/ana_alg_sys_handle/
 [rh]: https://gitlab.cern.ch/atlas/athena/-/blob/main/Control/StoreGate/StoreGate/ReadDecorHandle.h
 [wh]: https://gitlab.cern.ch/atlas/athena/-/blob/main/Control/StoreGate/StoreGate/WriteDecorHandle.h
