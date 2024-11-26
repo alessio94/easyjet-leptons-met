@@ -46,8 +46,8 @@ Muon:
     #- ["Medium", "PflowLoose_VarRad"]
 
 Tau:
-  ID: "RNNLoose_eleid"
-  extra_wps: ["RNNMedium_eleid"]
+  ID: "Baseline_eleid"
+  extra_wps: ["RNNLoose_eleid"]
   addMuonRM: true
   amount: 2
   variables: ["RNN"]

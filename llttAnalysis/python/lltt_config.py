@@ -175,7 +175,7 @@ def lltt_branches(flags):
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HllttSelectorAlg
-    for var in ["pass_trigger_SLT", "pass_Looseele", "pass_Loosemuo"]:
+    for var in ["pass_trigger_SLT", "pass_Looseele", "pass_Loosemuo", "pass_mrmtaus"]:
         branches += [f"EventInfo.{var}_%SYS% -> lltt_{var}_%SYS%"]
 
     for var in ["_trigger_", "_baseline_", "_"]:

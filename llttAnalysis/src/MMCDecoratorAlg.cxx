@@ -37,6 +37,9 @@ namespace HLLTT
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
+    
+    ATH_CHECK (m_selected_el_amm.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_selected_mu_amm.initialize(m_systematicsList, m_muonHandle));
 
     // Intialise syst-aware output decorators
     ATH_CHECK(m_mmc_status.initialize(m_systematicsList, m_eventHandle));
@@ -118,6 +121,7 @@ namespace HLLTT
       int iamu1(-1);
       int iamu2(-1);
       int isr(-1);
+      int recid(0);
       int iatau1(-1);
       int iatau2(-1);
       float apt(0);
@@ -133,8 +137,9 @@ namespace HLLTT
       int nlep(0);
 
       for(const xAOD::Muon* muon : *muons) {
+	m_selected_mu_amm.set(*muon, false, sys);
 	if (m_selected_mu.get(*muon, sys)){
-	  if(n_lep<4){
+	  if(n_lep<4){	    
             p4lep[n_lep] = muon->genvecP4();
 	    lepid[n_lep] = muon->charge()>0?-13: 13;
             ++n_lep;
@@ -143,6 +148,7 @@ namespace HLLTT
       }
 
       for(const xAOD::Electron* electron : *electrons) {
+	m_selected_el_amm.set(*electron, false, sys);
 	if (m_selected_el.get(*electron, sys)){
 	  if(n_lep<4){
 	    p4lep[n_lep] = electron->genvecP4();
@@ -194,6 +200,8 @@ namespace HLLTT
           }
           // selecting with smaller dr
           if(drmin>1.5||abs(lepid[iamu1])!=13||abs(lepid[iamu2])!=13){
+	    ATH_MSG_DEBUG("Atternative pair of leptons selected event: "<<event->eventNumber()<<" default iamu1="<<iamu1<<" iamu2="<<iamu2<<" drmin="<<drmin
+			  <<" alternative iamu1x="<<iamu1x<<" iamu2x="<<iamu2x<<" drminx="<<drminx<<" nlep="<<n_lep);
 	    if(p4lep[iamu2x].Pt()>aptx){
 	      iamu1 = iamu2x;
 	      iamu2 = iamu1x;
@@ -202,10 +210,31 @@ namespace HLLTT
 	      iamu1 = iamu1x;
 	      iamu2 = iamu2x;
 	    }
+	    recid=1;
           }
         }
 	if(iamu2>-1){
           isr = 0;
+	  ATH_MSG_DEBUG(" Reconstructed isr:"<<isr<<" iamu1:"<<iamu1<<" iamu2:"<<iamu2);
+	  int ix(0);
+	  for(const xAOD::Muon* muon : *muons) {
+	    if (m_selected_mu.get(*muon, sys)){
+	      if(ix<4){
+		if(ix==iamu1||ix==iamu2)m_selected_mu_amm.set(*muon, true, sys);
+		++ix;
+	      }
+	    }
+	  }
+	  if(abs(lepid[iamu1])==11||abs(lepid[iamu2])==11){
+	    for(const xAOD::Electron* electron : *electrons) {
+	      if (m_selected_el.get(*electron, sys)){
+		if(ix<4){
+		  if(ix==iamu1||ix==iamu2)m_selected_el_amm.set(*electron, true, sys);
+		  ++ix;
+		}
+	      }
+	    }
+	  }	  
           if(n_lep ==4){
             iatau1 = -1;
             iatau2 = -1;
@@ -326,7 +355,7 @@ namespace HLLTT
       }
 
       // Decorate ouput
-      types = iatau1+10*iatau2+100*isr;
+      types = isr>0?(iatau1+10*iatau2+100*isr+1000*recid):100*isr;
       ATH_MSG_DEBUG(" MMCDecoratorAlg fits:  event "<<event->eventNumber()<<" mmc m "<< res.M()<<" types "<<types
 		    <<" nlep "<<n_lep<<" ntaus "<<n_taus<<" isr "<<isr<<" iatau1 "<<iatau1<<" iatau2 "<<iatau2);
       m_mmc_status.set(*event, status, sys);

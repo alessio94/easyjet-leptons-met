@@ -73,6 +73,10 @@ private:
     CP::SysReadDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
+    
+    // flag true for mu or ele from a->mumu decay; false is for a->tautau 
+    CP::SysWriteDecorHandle<bool> m_selected_el_amm {"selected_el_amm_%SYS%", this};
+    CP::SysWriteDecorHandle<bool> m_selected_mu_amm {"selected_mu_amm_%SYS%", this};
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int> m_mmc_status {"mmc_status_%SYS%", this};

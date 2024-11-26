@@ -95,6 +95,12 @@ private:
     CP::SysReadDecorHandle<bool> 
     m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input dectorator for selected tau"};
 
+    // flag set for a->mumu constructed.
+    CP::SysReadDecorHandle<bool>
+    m_selected_el_amm { this, "selected_el_amm", "selected_el_amm_%SYS%", "Name of input dectorator for selected el from amumu"};
+    CP::SysReadDecorHandle<bool>
+    m_selected_mu_amm { this, "selected_mu_amm", "selected_mu_amm_%SYS%", "Name of input dectorator for selected mu from amumu"};
+
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
     CP::SysReadDecorHandle<int> m_truthFlav{"HadronConeExclTruthLabelID", this};

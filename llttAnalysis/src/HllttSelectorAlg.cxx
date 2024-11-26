@@ -29,6 +29,7 @@ namespace HLLTT
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_mrmtauHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
@@ -52,6 +53,16 @@ namespace HLLTT
       ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
     m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
+
+    if(m_tauWPName=="RNNLoose_eleid") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigLoose;
+    else if(m_tauWPName=="RNNMedium_eleid") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigMedium;
+    else if(m_tauWPName=="RNNTight_eleid") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigTight;
+    else if(m_tauWPName=="Baseline_eleid") m_tauIDWP = xAOD::TauJetParameters::EleRNNLoose;
+    else if(m_tauWPName=="RNNVeryLoose_eleid") m_tauIDWP = xAOD::TauJetParameters::JetRNNSigVeryLoose;
+    else{
+      ATH_MSG_ERROR("Unknown Tau ID WP ");
+      return StatusCode::FAILURE;
+    }
 
     ATH_CHECK(m_tauWPDecorHandle.initialize(m_systematicsList, m_tauHandle));
     ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
@@ -108,6 +119,9 @@ namespace HLLTT
 
       const xAOD::TauJetContainer *taus = nullptr;
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
+
+      const xAOD::TauJetContainer *mrmtaus = nullptr;
+      ANA_CHECK (m_mrmtauHandle.retrieve (mrmtaus, sys));      
 
       applyTriggerSelection(event, sys);
       m_Bbranches.at("pass_trigger_SLT").set(*event, trigPassed_SLT, sys);
@@ -186,6 +200,21 @@ namespace HLLTT
       //************
       // taujet
       //************
+      int n_mrmtaus = 0;
+      int n_mrmtausnocut = 0;
+      for(const xAOD::TauJet* mrmtau : *mrmtaus) {
+	bool passTauWP = mrmtau->isTau(m_tauIDWP);
+	bool passTaueleid = mrmtau->isTau(xAOD::TauJetParameters::EleRNNLoose);
+	++n_mrmtausnocut;
+	if (passTauWP && mrmtau->pt() > 20. * Athena::Units::GeV){
+	  if (std::abs(mrmtau->eta()) < 2.5&&(std::abs(mrmtau->eta()) <1.37||std::abs(mrmtau->eta()) >1.52)&&(mrmtau->nTracksCharged()==1||mrmtau->nTracksCharged()==3)) {
+	    ++n_mrmtaus;
+	  }
+	}
+	ATH_MSG_DEBUG("Dump MuonRM TauJets: event "<<event->eventNumber()<<" n_mrmtausnocut "<<n_mrmtausnocut<<" n_mrmtaus "<<n_mrmtaus<<" pt "<<mrmtau->pt()
+		      <<" eta "<<mrmtau->eta()<<" phi "<<mrmtau->phi()<<" passTauWP "<<passTauWP<<" passTaueleid "<<passTaueleid<<" RNN "
+		      <<mrmtau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans)<<" ntrk "<<mrmtau->nTracksCharged()<<" taus size "<<taus->size());
+      }
       int n_taus = 0;
       for (const xAOD::TauJet *tau : *taus)
       {
@@ -193,9 +222,11 @@ namespace HLLTT
         m_selected_tau.set(*tau, false, sys);
         if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)
         {
-          if (std::abs(tau->eta()) < 2.5) {
+          if (std::abs(tau->eta()) < 2.5&&tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans)>0.01) {
 	    m_selected_tau.set(*tau, true, sys);
 	    n_taus += 1;
+	    ATH_MSG_DEBUG(" Dump combined TauJets after selection: event "<<event->eventNumber()<<" n_taus "<<n_taus<<" pt "<<tau->pt()<<" eta "<<tau->eta()<<" phi "<<tau->phi()
+			  <<" passTauWP "<<passTauWP<<" RNN "<<tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans));
           }
         }
       }
@@ -213,13 +244,13 @@ namespace HLLTT
 	    bjets->push_back(jet);	      
 	}
       }
-      int n_bjets = bjets->size();
+      //int n_bjets = bjets->size();
 
       if (N_LEPTONS_CUT_LEPLEP){
         // DLT
         if (lep_ptcut_DLT){
 	  pass_baseline_LepLep = true;
-	  if (trigPassed_DLT && n_bjets==0)
+	  if (trigPassed_DLT)
 	    pass_LepLep = true;
         }
       }
@@ -228,7 +259,7 @@ namespace HLLTT
         // DLT
         if (lep_ptcut_DLT){
            pass_baseline_LepHad = true;
-           if (trigPassed_DLT && n_bjets==0)
+           if (trigPassed_DLT)
               pass_LepHad = true;
         }
       }
@@ -237,7 +268,7 @@ namespace HLLTT
         // DLT
 	if (lep_ptcut_DLT){
 	  pass_baseline_HadHad = true;
-	  if (trigPassed_DLT && n_bjets==0)
+	  if (trigPassed_DLT)
 	    pass_HadHad = true;
         }
       } 
@@ -269,6 +300,7 @@ namespace HLLTT
       m_Bbranches.at("pass_HadHad").set(*event, pass_HadHad, sys);
       m_Bbranches.at("pass_Looseele").set(*event, n_looseele==0, sys);
       m_Bbranches.at("pass_Loosemuo").set(*event, n_loosemuo==0, sys);
+      m_Bbranches.at("pass_mrmtaus").set(*event, n_mrmtaus>0, sys);
 
       if (!m_bypass && !pass_baseline_DLT) continue;
 

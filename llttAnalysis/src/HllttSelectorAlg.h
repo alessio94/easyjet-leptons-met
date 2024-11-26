@@ -86,6 +86,9 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
     m_tauHandle{ this, "taus", "llttAnalysisTaus_%SYS%", "Tau container to read" };
 
+    CP::SysReadHandle<xAOD::TauJetContainer>
+    m_mrmtauHandle{ this, "mrmtaus", "TauJets_MuonRM",   "Tau container to read" };
+    
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
@@ -95,6 +98,7 @@ private:
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "", "Tau ID working point" };
     CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
+    xAOD::TauJetParameters::IsTauFlag m_tauIDWP;
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
@@ -116,7 +120,7 @@ private:
     std::vector<std::string> m_Bvarnames{      
       "pass_trigger_SLT", "pass_trigger_DLT", "pass_baseline_DLT", "pass_DLT",
 	"pass_baseline_LepLep", "pass_LepLep", "pass_baseline_LepHad", "pass_LepHad",
-	"pass_baseline_HadHad", "pass_HadHad", "pass_Looseele", "pass_Loosemuo"
+	"pass_baseline_HadHad", "pass_HadHad", "pass_Looseele", "pass_Loosemuo", "pass_mrmtaus"
     };
 
 

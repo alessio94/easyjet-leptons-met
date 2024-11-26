@@ -56,6 +56,9 @@ namespace HLLTT
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
 
+    ATH_CHECK (m_selected_el_amm.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_selected_mu_amm.initialize(m_systematicsList, m_muonHandle));
+
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
@@ -127,7 +130,9 @@ namespace HLLTT
       int n_bjets = 0; 
       TLorentzVector p4lep[4];
       int lepid[4];
-      float lepsf[4]; 
+      float lepsf[4];
+      int iamu1(-1);
+      int iamu2(-1);
 
       for(const xAOD::Muon* muon : *muons) {
 	if (n_lep==4) break;
@@ -136,6 +141,10 @@ namespace HLLTT
             p4lep[n_lep] = muon->p4();
             lepid[n_lep] = muon->charge()>0?-13: 13;
 	    if(m_isMC)lepsf[n_lep] = m_mu_SF.get(*muon, sys);
+	    if(m_selected_mu_amm.get(*muon, sys)){
+	      if(iamu1==-1)iamu1 = n_lep;
+	      else if(iamu2==-1) iamu2 = n_lep;
+	    }
             ++n_lep;
 	    ++n_muo;
 	  }
@@ -148,6 +157,10 @@ namespace HLLTT
 	    p4lep[n_lep] = electron->p4();
 	    lepid[n_lep] = electron->charge()>0? -11:11;
 	    if(m_isMC)lepsf[n_lep] = m_ele_SF.get(*electron, sys);
+	    if(m_selected_el_amm.get(*electron, sys)){
+              if(iamu1==-1)iamu1 = n_lep;
+              else if(iamu2==-1) iamu2 = n_lep;	
+            }
 	    ++n_lep;
 	  }
 	  ++n_ele;
@@ -202,15 +215,7 @@ namespace HLLTT
       // event level info 
       TLorentzVector p4nu;
       p4nu.SetPtEtaPhiM(met->met(),0.,met->phi(),0);
-      int iamu1(-1);
-      int iamu2(-1);
-      float apt(0);
-      float drmin(99.);
       // alternative combination with subleading lepton
-      int iamu1x(-1);
-      int iamu2x(-1);
-      float aptx(0);
-      float drminx(99.);
       // find the leading lepton to decide ee or mumu OS 
       // 1 = mumu - 2 = ee - 3 = emu  Positive is SS, negative is OS
       int dil_type(0);
@@ -246,61 +251,14 @@ namespace HLLTT
       float mmc_maa(0);
       float mmc_ptaa(0);
       float mmc_draa(0);
-      int mmc_types(-1);   
+      int mmc_types(-1);
+      
+      mmc_types = m_mmc_types.get(*event, sys);
+      // decode isr and recid from reconstruction types 
+      if(mmc_types>1000)recid=1;
       
       if( n_lep > 1 ){
-	// select leading lepton and close lepton nearby unbiased search 
-	
-	for(int i = 0; i<n_lep; ++i){
-	  if(p4lep[i].Pt()>apt){ 
-	    iamu1 = i; 
-	    apt = p4lep[i].Pt();
-	  }
-	}
-	// Select OS muon pair with minidr, for higher ma, need to revisit
-	// Muons are stored as the first elements in the lepton container
-        for(int i = 0; i<n_lep; ++i){
-	  if(iamu1 !=i){
-	    float dr = p4lep[iamu1].DeltaR(p4lep[i]);
-	    if( dr<drmin){
-	      iamu2 = i;
-	      drmin = dr;
-	    }
-	  }
-        }
-	//alternative combination with subleading lepton
-	if(n_lep>2){
-          for(int i = 0; i<n_lep; ++i){
-            if(i!=iamu1&&i!=iamu2&&p4lep[i].Pt()>aptx){
-              iamu1x = i;
-              aptx = p4lep[i].Pt();
-            }
-          }
-          for(int i = 0; i<n_lep; ++i){
-            if(iamu1x !=i){
-              float dr = p4lep[iamu1x].DeltaR(p4lep[i]);
-              if( dr<drminx){
-                iamu2x = i;
-                drminx = dr;
-              }
-            }
-          }
-	  //selecting with smaller dr
-	  if(drmin>1.5||abs(lepid[iamu1])!=13||abs(lepid[iamu2])!=13){
-	    ATH_MSG_DEBUG("Atternative pair of leptons selected event: "<<event->eventNumber()<<" default iamu1="<<iamu1<<" iamu2="<<iamu2<<" drmin="<<drmin
-			  <<" alternative iamu1x="<<iamu1x<<" iamu2x="<<iamu2x<<" drminx="<<drminx<<" nlep="<<n_lep);
-	    if(p4lep[iamu2x].Pt()>aptx){
-	      iamu1 = iamu2x;
-	      iamu2 = iamu1x;
-	    }
-	    else{
-	      iamu1 = iamu1x;
-	      iamu2 = iamu2x;
-	    }
-	    recid=1;
-          }
-        }
-        if(iamu2>-1){
+        if(iamu1>-1&&iamu2>-1){
 	  isr = 0;
 	  ATH_MSG_DEBUG(" Reconstructed isr:"<<isr<<" iamu1:"<<iamu1<<" iamu2:"<<iamu2);
 	  if(abs(lepid[iamu1])==13&&abs(lepid[iamu2])==13)dil_type=1;
@@ -454,8 +412,9 @@ namespace HLLTT
 	  Tau1 = tau0;
 	  Tau2 = tau1;
 	  break;
-        default:
-          throw std::runtime_error("Invalid ISR value: " + std::to_string(isr));
+	default:
+	  ATH_MSG_ERROR("Unknown isr "<<isr);
+	  return StatusCode::FAILURE;
 	}
 	
 	m_Fbranches.at("Tau1_pt").set(*event, p4LeadTau.Pt(), sys);
@@ -547,7 +506,7 @@ namespace HLLTT
 	m_Fbranches.at("draa").set(*event, draa, sys);
         m_Fbranches.at("dphimetatt").set(*event, dphimetatt, sys);
 	m_Ibranches.at("osatt").set(*event, osatt, sys);
-	ditau_index = iatau1 + 10*iatau2 + 100*isr;
+	ditau_index = isr>0?(iatau1 + 10*iatau2 + 100*isr+1000*recid):100*isr;
 	// mmc 
 	TLorentzVector mmc_vec(0,0,0,0);
 	mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
