@@ -179,13 +179,17 @@ GRL:
   store_decoration: false
 
 PileupReweighting:
-  - postfix: ""
-    # In general we should not need custom Pileup Reweighting
-    # Uses grl_years to find files
-    # prw_files: {}
-    # We may need special LumiCalc files depending on triggers
-    # Uses grl_years to find files
-    # lumicalc_files: {}
+  prw_files: {}
+  lumicalc_files: {}
+  extra_prw: []
+
+  # In general we should not need custom Pileup Reweighting
+  # postfix: "yourSuffix"
+  # Uses grl_years to find files
+  # prw_files: {}
+  # We may need special LumiCalc files depending on triggers
+  # Uses grl_years to find files
+  # lumicalc_files: {}
 
 # disable CP Algs for calibration
 disable_calib: false

@@ -72,11 +72,12 @@ GRL:
   store_decoration: true
 
 PileupReweighting:
-  - postfix: "bjet"
-    lumicalc_files:
-      include: EasyjetHub/lumicalc_bjet.yaml
-    prw_files:
-      include: EasyjetHub/prw_bjet.yaml
+  extra_prw:
+    - postfix: "bjet"
+      lumicalc_files:
+        include: EasyjetHub/lumicalc_bjet.yaml
+      prw_files:
+        include: EasyjetHub/prw_bjet.yaml
 
 # Include the TTree configuration and update details
 ttree_output:

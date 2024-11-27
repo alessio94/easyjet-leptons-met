@@ -9,22 +9,15 @@ def pileup_sequence(flags):
     config = ConfigFactory()
     makeConfig = config.makeConfig
 
-    # Workaround for mc21 courtesy of
-    # https://its.cern.ch/jira/browse/ATLASG-1628?focusedCommentId=4297949&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-4297949
-    """
-    Check if we still need this. Not so trivial to hack in ConfigBlock
-    tags = flags.Input.AMITag
-    mc21mc23 = (SampleTypes.mc21a.value in tags) or(SampleTypes.mc23a.value in tags)
-    for alg in pileup_sequence.getGaudiConfig2Components():
-        if mc21mc23 and "PileupReweightingAlg" in alg.getName():
-            alg.pileupReweightingTool.PeriodAssignments = []
-            alg.pileupReweightingTool.DataScaleFactor = 1
-        cfg.addEventAlgo(alg, pileup_sequence.getName())
-    """
+    # Nominal config will be used to define RandomRunNumber, if it does not exist yet
+    # in the input (PHYSLITE stores it already)
+    PRW_config = [flags.Analysis.PileupReweighting]
+    # Extra PRW does not alter the RandomRunNumber at this point
+    PRW_config += flags.Analysis.PileupReweighting.extra_prw
 
     altConfig = False
-    for prw in flags.Analysis.PileupReweighting:
-        postfix = ("_" + prw.postfix) if prw.postfix else ""
+    for prw in PRW_config:
+        postfix = ("_" + prw.postfix) if altConfig else ""
         configSeq += makeConfig('PileupReweighting')
         configSeq.setOptionValue('.postfix', postfix)
         configSeq.setOptionValue('.campaign', flags.Input.MCCampaign)

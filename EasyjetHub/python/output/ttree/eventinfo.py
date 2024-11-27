@@ -32,13 +32,6 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
         if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_HSTP_samples:
             eventinfo_branches.variables += ["PassHSTP"]
 
-        if flags.Analysis.doPRW:
-            for prw in flags.Analysis.PileupReweighting:
-                postfix = ("_" + prw.postfix) if prw.postfix else ""
-                eventinfo_branches.variables += [
-                    "PileupWeight" + postfix + "_%SYS%"
-                ]
-
         if flags.GeoModel.Run is LHCPeriod.Run2:
             eventinfo_branches.variables += ["beamSpotWeight"]
 
@@ -62,11 +55,15 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
         # doesn't need to be exhaustive with the extra variables added in the config
         eventinfo_branches.syst_only_for = ["generatorWeight_%SYS%"]
         if flags.Analysis.doPRW:
-            for prw in flags.Analysis.PileupReweighting:
-                postfix = ("_" + prw.postfix) if prw.postfix else ""
-                eventinfo_branches.syst_only_for += [
-                    "PileupWeight" + postfix + "_%SYS%"
-                ]
+            PRW_config = [flags.Analysis.PileupReweighting]
+            PRW_config += flags.Analysis.PileupReweighting.extra_prw
+            altConfig = False
+            for prw in PRW_config:
+                postfix = ("_" + prw.postfix) if altConfig else ""
+                weight = "PileupWeight" + postfix + "_%SYS%"
+                eventinfo_branches.variables += [weight]
+                eventinfo_branches.syst_only_for += [weight]
+                altConfig = True
 
     # Replace L1Topo characters, formatting as done by the
     # trigger selection CP alg
