@@ -12,6 +12,7 @@ def overlap_sequence(flags):
     if (
         flags.Analysis.do_large_R_Topo_jets
         and flags.Analysis.do_large_R_UFO_jets
+        and flags.Analysis.OverlapRemoval.do_large_R_jets
     ):
         raise ValueError('Overlap removal only works with one Large R collection')
 
