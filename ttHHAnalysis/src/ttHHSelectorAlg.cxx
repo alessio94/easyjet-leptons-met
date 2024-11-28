@@ -42,6 +42,8 @@ namespace ttHH
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
 
+    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
+
     for (const std::string &string_var: m_inputCutList) {
       CP::SysWriteDecorHandle<bool> var {string_var+"_%SYS%", this};
       m_Bbranches.emplace(string_var, var);
@@ -118,6 +120,15 @@ namespace ttHH
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
+      const xAOD::MissingETContainer *metCont = nullptr;
+      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
+      const xAOD::MissingET* met = (*metCont)["Final"];
+      if (!met) {
+        ATH_MSG_ERROR("Could not retrieve MET");
+        return StatusCode::FAILURE;
+      }
+
+
       // lepton WP
       for (const xAOD::Electron *electron : *electrons)
       {
@@ -144,7 +155,7 @@ namespace ttHH
         }
       }
 
-      evaluateCuts(*jets, *bjets, *muons, *electrons, m_ttHHCuts);
+      evaluateCuts(*jets, *bjets, *muons, *electrons, met, m_ttHHCuts);
       if (!m_leptonTriggers.empty())
         evaluateTriggerMatchingCuts(m_leptonTriggers, muons, electrons,m_ttHHCuts);
       
@@ -226,10 +237,7 @@ namespace ttHH
 
   }
 
-  void ttHHSelectorAlg::evaluateCuts(const xAOD::JetContainer& jets, const xAOD::JetContainer& bjets,
-                            const xAOD::MuonContainer& muons, 
-			    const xAOD::ElectronContainer& electrons,
-			    CutManager& ttHHCuts)
+  void ttHHSelectorAlg::evaluateCuts(const xAOD::JetContainer& jets, const xAOD::JetContainer& bjets, const xAOD::MuonContainer& muons, const xAOD::ElectronContainer& electrons, const xAOD::MissingET* met, CutManager& ttHHCuts)
   {
 
     int nLeptons = muons.size() + electrons.size();
@@ -242,7 +250,7 @@ namespace ttHH
         HT += jet->pt();
     }
 
-    if (((nLeptons==1 && nBJets>=3) || (nLeptons>=2 && nBJets>=3)) && HT > 400.*Athena::Units::GeV && nJets >= 6 && ttHHCuts.exists("PASS_BASELINE"))
+    if (((nLeptons==1 && nBJets>=3) || (nLeptons>=2 && nBJets>=3)) && HT > 400.*Athena::Units::GeV && nJets >= 6 && met->met() > 30.*Athena::Units::GeV && ttHHCuts.exists("PASS_BASELINE"))
         ttHHCuts("PASS_BASELINE").passed = true;
 
   }
