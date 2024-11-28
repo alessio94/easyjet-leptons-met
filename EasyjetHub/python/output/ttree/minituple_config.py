@@ -244,7 +244,8 @@ def minituple_output_cfg(
     cfg.addService(
         CompFactory.THistSvc(
             Output=[f"{stream_name} DATAFILE='{outfile_name}',"
-                    " OPT='RECREATE'"]
+                    " OPT='RECREATE'"],
+            MaxFileSize=-1  # Disable file size limit as temporary workaround
         )
     )
 
@@ -302,7 +303,8 @@ def minituple_cfg(
         cfg.addService(
             CompFactory.THistSvc(
                 Output=[f"CBK DATAFILE='{cbk_outfile}',"
-                        " OPT='RECREATE'"]
+                        " OPT='RECREATE'"],
+                MaxFileSize=-1  # Disable file size limit as temporary workaround
             )
         )
 
