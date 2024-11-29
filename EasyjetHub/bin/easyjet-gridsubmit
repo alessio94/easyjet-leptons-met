@@ -71,6 +71,9 @@ def main():
         "--nGBperJob", default=None, help="How many GB required per job"
     )
     parser.add_argument(
+        "--nFilesPerJob", default=None, help="How many files to process per job"
+    )
+    parser.add_argument(
         "--nFiles", default=None, help="How many files to run on"
     )
     parser.add_argument(
@@ -149,6 +152,8 @@ def main():
         submit_opts["excludedSite"] = args.excluded_site
     if args.nGBperJob is not None:
         submit_opts["nGBPerJob"] = args.nGBperJob
+    if args.nFilesPerJob is not None:
+        submit_opts["nFilesPerJob"] = args.nFilesPerJob
     if args.nFiles is not None:
         submit_opts["nFiles"] = args.nFiles
     if args.nCore is not None:
