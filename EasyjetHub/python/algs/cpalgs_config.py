@@ -60,9 +60,12 @@ def cpalgs_cfg(flags):
     if flags.Analysis.do_CP_systematics or (bool)(sys_weight_name):
         sysSvc.sigmaRecommended = 1
 
-        if not flags.Analysis.do_CP_systematics and (bool)(sys_weight_name):
+        if (bool)(sys_weight_name):
             # Convert sys weight name to be consolidated
             sys_weight_name = [f".*{sys_weight_name}"]
+            # Join the CP systematics with the sys weight name
+            if flags.Analysis.do_CP_systematics:
+                sys_weight_name += list(flags.Analysis.systematics_regex)
             systs = consolidate_systematics_regex(sys_weight_name)
         else:
             systs = consolidate_systematics_regex(flags.Analysis.systematics_regex)
