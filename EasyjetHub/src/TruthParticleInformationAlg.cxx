@@ -15,6 +15,7 @@
 
 #include "TruthUtils/HepMCHelpers.h"
 
+
 //
 // method implementations
 //
@@ -104,6 +105,15 @@ namespace Easyjet
       m_truthHHKinDecorKeys.emplace_back(m_EventInfoKey.key()+".truth_HH_" + var);
       ATH_CHECK(m_truthHHKinDecorKeys.back().initialize());
     }
+
+    for (const std::string &average_var : m_kinAverageVars)
+    {
+        m_truthHHAverageKinDecorKeys.emplace_back(m_EventInfoKey.key()+".truth_HH_" + average_var);
+        ATH_CHECK(m_truthHHAverageKinDecorKeys.back().initialize());
+    }
+
+    m_absCosThetaStarDecorKey = m_EventInfoKey.key()+".truth_HH_" + m_absCosThetaStar;
+    ATH_CHECK(m_absCosThetaStarDecorKey.initialize());
 
     return StatusCode::SUCCESS;
   }
@@ -225,14 +235,30 @@ namespace Easyjet
     // Assume exactly two Higgs for now & check for nullptrs
 
     std::array<float, 4> coords = {-999., -999., -999., -999.};
-    if(higgses.size()>=2 && higgses[0] && higgses[1])
-      coords = calcHHKinematics(higgses[0], higgses[1]);
+    std::array<float, 2> ave_coords = {-999., -999.};
+    float abs_cos_theta_star = -999.;
+    if(higgses.size()>=2 && higgses[0] && higgses[1]) {
+        coords = calcHHKinematics(higgses[0], higgses[1]);
+        ave_coords = calcHHAverageKinematics(higgses[0], higgses[1]);
+        abs_cos_theta_star = calcHHCosThetaStar(higgses[0], higgses[1]);
+    }
+    ATH_MSG_DEBUG("got abs_cos_theta_star" << abs_cos_theta_star);
 
     for (size_t i = 0; i < m_kinVars.size(); i++){
       SG::WriteDecorHandle<xAOD::EventInfo, float> truthHHKinDecorHandle
 	(m_truthHHKinDecorKeys[i]);
       truthHHKinDecorHandle(eventInfo) = coords[i];
     }
+
+    for (size_t i = 0; i < m_kinAverageVars.size(); i++){
+      SG::WriteDecorHandle<xAOD::EventInfo, float> truthHHAverageKinDecorHandle
+  (m_truthHHAverageKinDecorKeys[i]);
+      truthHHAverageKinDecorHandle(eventInfo) = ave_coords[i];
+    }
+
+    SG::WriteDecorHandle<xAOD::EventInfo, float> absCosThetaStarDecorHandle
+  (m_absCosThetaStarDecorKey);
+    absCosThetaStarDecorHandle(eventInfo) = abs_cos_theta_star;
 
   }
   
@@ -336,6 +362,11 @@ namespace Easyjet
         }
       }
     }
+
+		std::sort(higgses.begin(), higgses.end(), [](TruthScalar &a, TruthScalar &b) {
+			return a.p4(0) > b.p4(0); // biggest pT will be first in array
+		});
+
     return higgses;
   }
 
@@ -366,5 +397,37 @@ namespace Easyjet
     return coords;
    }
 
+
+    std::array<float, 2> TruthParticleInformationAlg::calcHHAverageKinematics(
+        const xAOD::TruthParticle *p1, const xAOD::TruthParticle *p2) const
+    {
+        float ave_pt = (p1->pt()+p2->pt())/2;
+        float ave_eta =  (p1->eta()+p2->eta())/2;
+        std::array<float, 2> ave_coords{ave_pt, ave_eta};
+
+        ATH_MSG_DEBUG("Average pt " << ave_pt << "and eta" << ave_eta);
+
+        return ave_coords;
+    }
+
+    float TruthParticleInformationAlg::calcHHCosThetaStar(
+            const xAOD::TruthParticle *h1_in, const xAOD::TruthParticle *h2_in) const
+    {
+        TLorentzVector h1 = h1_in->p4();
+        TLorentzVector h2 = h2_in->p4();
+        TLorentzVector CM = 0.5*(h1+h2);
+
+        TLorentzVector h1_star = h1-CM;
+        TLorentzVector h2_star = h2-CM;
+
+        ATH_MSG_DEBUG("check if two higges are opposite in CM");
+        ATH_MSG_DEBUG("get x* h1,h2" << h1_star.X() << " , " << h2_star.X()
+                      << " y* h1,h2 " << h1_star.Y() << " , " << h2_star.Y()
+                      << " z* h1,h2 " << h1_star.Z() << " , " << h2_star.Z()
+                      );
+
+	// take whatever out of h1,h2 thetas as abs(cos) anyway
+        return std::abs(cos(h1_star.Theta()));
+    }
 
 }

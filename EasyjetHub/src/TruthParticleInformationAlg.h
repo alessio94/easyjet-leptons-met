@@ -170,6 +170,8 @@ private:
     void debugPrintParticleKinematics(const xAOD::TruthParticle *p) const;
 
     std::array<float, 4> calcHHKinematics(const xAOD::TruthParticle *p1, const xAOD::TruthParticle *p2) const;
+    std::array<float, 2> calcHHAverageKinematics(const xAOD::TruthParticle *p1, const xAOD::TruthParticle *p2) const;
+    float calcHHCosThetaStar(const xAOD::TruthParticle *h1_in, const xAOD::TruthParticle *h2_in) const;
 
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
@@ -208,8 +210,12 @@ private:
         m_truthInitialChildrenKinFromHiggsesDecorKeys;
 
     std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_truthHHKinDecorKeys;
+    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_truthHHAverageKinDecorKeys;
+    SG::WriteDecorHandleKey<xAOD::EventInfo> m_absCosThetaStarDecorKey;
 
     std::array<std::string, 4> m_kinVars{"pt", "eta", "phi", "m"};
+    std::array<std::string, 2> m_kinAverageVars{"average_pt", "average_eta"};
+    std::string m_absCosThetaStar = "abs_cos_theta_star";
   };
 }
 
