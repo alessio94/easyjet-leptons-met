@@ -173,14 +173,14 @@ declare -A CONFIGS=(
     [ttHH-mc20-lite]=ttHHAnalysis/RunConfig-ttHH-bypass.yaml
     [bbll-mc20]=bbllAnalysis/RunConfig-bbll-bypass.yaml
     [bbll-mc20-lite]=bbllAnalysis/RunConfig-bbll-bypass.yaml
-    [lltt-mc20]=llttAnalysis/RunConfig-lltt.yaml
-    [lltt-mc20-lite]=llttAnalysis/RunConfig-lltt.yaml
+    [lltt-mc20]=llttAnalysis/RunConfig-lltt-bypass.yaml
+    [lltt-mc20-lite]=llttAnalysis/RunConfig-lltt-bypass.yaml
     [vbshiggs-mc20]=vbshiggsAnalysis/RunConfig-fullLep-bypass.yaml
     [vbshiggs-mc20-lite]=vbshiggsAnalysis/RunConfig-fullLep-bypass.yaml
     [VBSVV4q-mc20]=VBSVV4qAnalysis/RunConfig-JJ-bypass.yaml
     [VBSVV4q-mc20-lite]=VBSVV4qAnalysis/RunConfig-JJ-bypass.yaml
-    [ssWW-mc20]=ssWWAnalysis/RunConfig-Signal-ssWW.yaml
-    [ssWW-mc20-lite]=ssWWAnalysis/RunConfig-Signal-ssWW.yaml
+    [ssWW-mc20]=ssWWAnalysis/RunConfig-Signal-ssWW-bypass.yaml
+    [ssWW-mc20-lite]=ssWWAnalysis/RunConfig-Signal-ssWW-bypass.yaml
     [ZCharm-mc20]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
     [ZCharm-mc20-lite]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
     # MC20 AF3
@@ -213,7 +213,9 @@ COMMON="-O"
 
 # specific tests
 simple() {
-    $1 $2 -c $3 $COMMON -o analysis.root
+    local CMD="$1 $2 -c $3 $COMMON -o analysis.root"
+    echo "running $CMD"
+    $CMD
     metadata-check -v
 }
 systematics() {
@@ -456,8 +458,10 @@ run-test() {
     local testcmd="${PFX} ${TESTS[$mode]} $file $config"
     trap "error-handler $mode" ERR
     if [[ ! -z ${LOG_FILE+x} ]]; then
+	echo "calling: $testcmd > $LOG_FILE 2>&1"
         $testcmd > $LOG_FILE 2>&1
     else
+	echo "calling: $testcmd"
         $testcmd
     fi
     echo "$mode succeeded" >> test_results.log
@@ -493,3 +497,8 @@ else
     run-test $MODE
     echo "${MODE} completed successfully"
 fi
+
+echo "=== checking directory content ==="
+pwd
+ls
+echo "=================================="
