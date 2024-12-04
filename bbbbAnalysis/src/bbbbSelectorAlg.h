@@ -91,8 +91,6 @@ namespace HH4B
 
       std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
 
-      CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
-
       std::vector<float> eventWeights{};
 
       CP::SysReadDecorHandle<float>

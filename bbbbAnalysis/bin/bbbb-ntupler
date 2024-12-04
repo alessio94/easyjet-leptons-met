@@ -90,7 +90,8 @@ def hh4b_job_cfg():
         bbbb_branches += resolved_branches(flags)
     if flags.Analysis.orthogonality.do_orth_check:
         bbbb_branches += extra_orth_branches
-    bbbb_branches += pass_branches(flags)
+    if len(flags.Analysis.CutList) > 0:
+        bbbb_branches += pass_branches(flags)
 
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically

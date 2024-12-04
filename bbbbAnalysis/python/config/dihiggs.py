@@ -61,20 +61,21 @@ def dihiggs_cfg(
     triggers = flags.Analysis.TriggerChains
     triggers = [trigger.replace(".", "p").replace("-", "_") for trigger in triggers]
 
-    cfg.addEventAlgo(
-        CompFactory.HH4B.bbbbSelectorAlg(
-            "bbbbSelectorAlg",
-            cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_bbbb_cutflow,
-            Triggers=triggers,
-            eventDecisionOutputDecoration=f"pass_{selection_name}_%SYS%",
-            isMC=flags.Input.isMC,
-            bypass=flags.Analysis.bypass,
-            smallRJetToCount=couting_jet_container,
-            largeRJetToCount=couting_lRjet_container,
-            btagSelDecor=btag_name,
+    if len(flags.Analysis.CutList) > 0:
+        cfg.addEventAlgo(
+            CompFactory.HH4B.bbbbSelectorAlg(
+                "bbbbSelectorAlg",
+                cutList=flags.Analysis.CutList,
+                saveCutFlow=flags.Analysis.save_bbbb_cutflow,
+                Triggers=triggers,
+                eventDecisionOutputDecoration=f"pass_{selection_name}_%SYS%",
+                isMC=flags.Input.isMC,
+                bypass=flags.Analysis.bypass,
+                smallRJetToCount=couting_jet_container,
+                largeRJetToCount=couting_lRjet_container,
+                btagSelDecor=btag_name,
+            )
         )
-    )
 
     if flags.Analysis.do_resolved_dihiggs:
         cfg.merge(
