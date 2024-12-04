@@ -285,6 +285,9 @@ namespace HHBBYY
 
         if(ph1 && ph2) {
           HH = H_yy + H_bb;
+          double Higgs_mass = 125. * Athena::Units::GeV;
+          float bbyy_mStar = HH.M() - (H_bb.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
+          eventFloats.at(HHBBYY::Var::bbyy_mStar) = bbyy_mStar;
           fill_bbyy_branches(Hbb_jets, Hyy_photons, "", event, sys);
         }
       }
