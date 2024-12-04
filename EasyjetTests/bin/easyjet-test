@@ -219,7 +219,9 @@ simple() {
     metadata-check -v
 }
 systematics() {
-    $1 $2 -c $3 -o $COMMON --do-CP-systematics True  --systematics-regex ".*"
+    local CMD="$1 $2 -c $3 -o $COMMON --do-CP-systematics True  --systematics-regex .*"
+    echo "running $CMD"
+    $CMD
     metadata-check -v
 }
 fast() {
@@ -467,6 +469,41 @@ run-test() {
     echo "$mode succeeded" >> test_results.log
 }
 
+copy-ntuple(){
+    local mode=$1
+    local postfix="${mode//-/_}"
+    
+    if [[ -z ${CI_JOB_NAME+x} || ! $CI_JOB_NAME == *"ntupler_"* ]]; then
+	echo "Not an ntupler job, will not copy root output to eos"
+	return 0
+    fi
+    if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} ]]; then 
+	echo "eos env not defined, will not copy root output to eos"
+	return 0
+    fi
+    if [[ -z ${CI_PROJECT_PATH+x} || ! $CI_PROJECT_PATH == "easyjet/easyjet" ]]; then 
+	echo "not running on easyjet main repo CI, will not copy root output to eos"
+	return 0
+    fi
+    if [[ -z "${CI_MERGE_REQUEST_IID:-}" ]]; then
+       echo "merge request ID not defined, will not copy root output to eos"
+       return 0
+    fi
+
+    local eosdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/ntuples/$CI_MERGE_REQUEST_IID
+    echo "copying ntuple to $eosdir"
+    echo $EOS_ACCOUNT_PASSWORD | kinit $EOS_ACCOUNT_USERNAME 
+    klist
+    ${PFX} mkdir -p $eosdir
+    ls $eosdir
+    pwd
+    ls
+    ${PFX} cp analysis.root $eosdir/analysis_${postfix}.root
+    ls $eosdir
+    kdestroy
+    echo "copying ntuple succeeded"
+}
+
 test-summary() {
     if [[ ! -z ${EXIT_EARLY+x} ]] ; then
         echo "Waiting 10s to collect test results from other incomplete jobs"
@@ -495,6 +532,7 @@ else
     echo "running ${MODE}"
     trap "echo test failed with exit code \$?" ERR
     run-test $MODE
+    copy-ntuple $MODE
     echo "${MODE} completed successfully"
 fi
 

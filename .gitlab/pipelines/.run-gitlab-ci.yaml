@@ -7,6 +7,8 @@ variables:
 .ntupler:
   stage: run
   needs: [compile]
+  tags:
+    - k8s-eos
   artifacts:
     paths:
       - $EASYJET_TESTDIR/output-branches-analysis.txt
