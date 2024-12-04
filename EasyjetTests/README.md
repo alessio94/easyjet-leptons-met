@@ -21,3 +21,8 @@ Quite a few tests are already implemented in `bin/easyjet-test` and scheduled in
 [ci-files]: https://gitlab.cern.ch/easyjet/hh4b-test-files
 [run-ci]: ../.gitlab/pipelines/.run-gitlab-ci.yaml
 [make-file]: https://training-dataset-dumper.docs.cern.ch/tests/#making-daods-from-aods
+
+Comparing output ntuples
+------------------------
+
+The compareOutputNtuples macro can be used to compare all branches in the output tree present in two root files. The usage is `compareOutputNtuples <old.root> <new.root>`. It will print out the list of branches with and without changes as well as removed and added branches. It will also produce plots that compare the distributions of all branches with differences. The check is done in histogram bins so small differences that do not lead to bin migrations will not be considered.
