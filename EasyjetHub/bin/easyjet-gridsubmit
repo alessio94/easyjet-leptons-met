@@ -80,6 +80,9 @@ def main():
         "--nCore", default=None, help="number of CPU cores"
     )
     parser.add_argument(
+        "--memory", default=None, help="How many MB of memory per core to request"
+    )
+    parser.add_argument(
         "--mergeOutput",
         action="store_true",
         help="Merge outputs (TEfficiency merging for CutFlow not supported)",
@@ -158,6 +161,8 @@ def main():
         submit_opts["nFiles"] = args.nFiles
     if args.nCore is not None:
         submit_opts["nCore"] = args.nCore
+    if args.memory is not None:
+        submit_opts["memory"] = args.memory
     if args.mergeOutput:
         submit_opts["mergeOutput"] = True
     if args.noEmail:
