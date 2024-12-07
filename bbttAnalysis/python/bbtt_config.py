@@ -86,9 +86,9 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
     if flags.Analysis.do_mmc:
         # Keep 2016MC15C as default, as 2019 has higher rate of
         # non-converging fir for bbtt
-        from EasyjetHub.algs.mmc_tool_config import MissingMassToolV2Cfg
+        from EasyjetHub.algs.mmc_tool_config import MissingMassToolCfg
         mmcTool = cfg.popToolsAndMerge(
-            MissingMassToolV2Cfg(flags, CalibSet="2016MC15C"))
+            MissingMassToolCfg(flags, CalibSet="2016MC15C"))
 
         cfg.addEventAlgo(
             CompFactory.HHBBTT.MMCDecoratorAlg(

@@ -27,7 +27,7 @@ def cache_metadata(path):
     for f, m in _fileMetaData.items():
         all_md[f] = {
             "metadata": m.metadata,
-            "level": m.metAccessLevel,
+            "level": m.currentAccessLevel,
         }
     try:
         with open(path, "w") as cached:
@@ -62,7 +62,7 @@ def update_metadata(path):
         if cached:
             md.metadata.update(cached["metadata"])
             md.filename = f
-            md.metAccessLevel = cached["level"]
+            md.currentAccessLevel = cached["level"]
 
 
 def has_metadata(flags, path=None):

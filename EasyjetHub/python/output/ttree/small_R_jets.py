@@ -54,6 +54,16 @@ def get_small_R_jet_branches(
             if 'btag_extra_wps' in flags.Analysis.Small_R_jet:
                 btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
+            # Make sure PCBT is scheduled to get SF
+            for tagger in ["DL1dv01", "GN2v01"]:
+                add_PCBT = False
+                for tagger_wp in btag_wps:
+                    if tagger in tagger_wp:
+                        add_PCBT = True
+                        break
+                if (tagger + "_Continuous") not in btag_wps and add_PCBT:
+                    btag_wps += [tagger + "_Continuous"]
+
             small_R_jet_branches.variables += [
                 f"ftag_select_{btag_wp}"
                 for btag_wp in btag_wps if "Continuous" not in btag_wp
@@ -65,12 +75,11 @@ def get_small_R_jet_branches(
             if flags.Input.isMC:
                 # always add btag truth label if btag is used, when running on MC
                 small_R_jet_branches.variables += ["HadronConeExclTruthLabelID"]
-                for btag_wp in btag_wps:
-                    # Until AFT-748 is solved
-                    if "GN2v01" in btag_wp:
+                for wp in btag_wps:
+                    if "FixedCutBEff" in wp or "Continuous2D" in wp:
                         continue
                     small_R_jet_branches.variables += [
-                        f"ftag_effSF_{btag_wp}_%SYS%"
+                        f"ftag_effSF_{wp}_%SYS%"
                     ]
 
         if flags.Analysis.Small_R_jet.runBJetPtCalib:
