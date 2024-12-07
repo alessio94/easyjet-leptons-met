@@ -499,6 +499,7 @@ copy-ntuple(){
     pwd
     ls
     ${PFX} cp analysis.root $eosdir/analysis_${postfix}.root
+    ${PFX} echo $CI_MERGE_REQUEST_TITLE $eosdir/CI_MERGE_REQUEST_TITLE
     ls $eosdir
     kdestroy
     echo "copying ntuple succeeded"

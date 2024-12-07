@@ -2,7 +2,7 @@
 atlas_subdir(EasyjetTests)
 
 # Find an external package (i.e. ROOT)
-find_package(ROOT COMPONENTS Core Tree Hist Gpad Graf MathCore REQUIRED)
+find_package(ROOT COMPONENTS Core Tree Hist Gpad Graf MathCore RIO REQUIRED)
 
 # We don't want any warnings in compilation
 add_compile_options(-Werror)
@@ -15,6 +15,7 @@ atlas_add_executable( compareOutputNtuples
 
 atlas_install_scripts(
   bin/easyjet-test
+  bin/easyjet-validate
   bin/metadata-check
 )
 

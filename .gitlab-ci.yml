@@ -17,6 +17,7 @@ stages:
   - build
   - unittest
   - run
+  - validate
   - post
 
 # and source it
@@ -31,4 +32,5 @@ include:
   - ".gitlab/pipelines/.build-gitlab-ci.yaml"
   - ".gitlab/pipelines/.unittest-gitlab-ci.yaml"
   - ".gitlab/pipelines/.run-gitlab-ci.yaml"
+  - ".gitlab/pipelines/.validate-gitlab-ci.yaml"
   - ".gitlab/pipelines/.post-gitlab-ci.yaml"
