@@ -50,6 +50,9 @@ namespace HLLTT
     CP::SysReadDecorHandle<float> 
       m_mmc_m { this, "mmc_m", "mmc_m_%SYS%", "MMC mass key"};
 
+    CP::SysReadDecorHandle<int>
+      m_mmc_status { this, "mmc_status", "mmc_status_%SYS%", "MMC status key"};
+    
     CP::SysFilterReporterParams m_filterParams {this, "Hlltt selection"};
 
   };

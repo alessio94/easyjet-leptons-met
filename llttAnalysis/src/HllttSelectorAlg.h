@@ -71,6 +71,9 @@ private:
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
+    Gaudi::Property<bool> m_doAntiTau
+      { this, "doAntiTau", false, "Select anti-ID taus for fake estimates" };
+
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
@@ -127,7 +130,9 @@ private:
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
-
+    // flag tau passing loose(1) and medium(2)
+    CP::SysWriteDecorHandle<int> m_istauID {"istauID_%SYS%", this};
+    
     /// \brief Setup sys-aware output decorations
     CP::SysFilterReporterParams m_filterParams {this, "Hlltt selection"};
     

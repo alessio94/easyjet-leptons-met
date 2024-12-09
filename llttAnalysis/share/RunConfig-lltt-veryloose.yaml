@@ -6,7 +6,7 @@ channels: ["LepLep", "LepHad", "HadHad"]
 
 # Toggles to bypass event selection
 bypass: false
-doAntiTau: false
+doAntiTau: true
 
 # Toggles for object types
 do_small_R_jets: true
@@ -47,7 +47,7 @@ Muon:
     #- ["Medium", "PflowLoose_VarRad"]
 
 Tau:
-  ID: "RNNLoose_eleid"
+  ID: "RNNVeryLoose_eleid"
   extra_wps: ["RNNMedium_eleid"]
   addMuonRM: true
   amount: 2

@@ -24,6 +24,7 @@ namespace HLLTT
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_mmc_status.initialize(m_systematicsList, m_eventHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -47,7 +48,7 @@ namespace HLLTT
 
       bool MMC_MASS = false;
 
-      if (m_mmc_m.get(*event, sys) > m_mmc_min){
+      if (m_mmc_m.get(*event, sys) > m_mmc_min || m_mmc_status.get(*event, sys)==0){
         MMC_MASS = true;
 	ATH_MSG_DEBUG(" MMCSelectorAlg: event "<<event->eventNumber()<<" mmc m "<<m_mmc_m.get(*event, sys)<<" mmc_min "<<m_mmc_min);
       }

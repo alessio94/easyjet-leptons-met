@@ -61,7 +61,7 @@ def lltt_cfg(
         CompFactory.HLLTT.HllttSelectorAlg(
             "HllttSelectorAlg",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-            tauWP=flags.Analysis.Tau.ID,
+            tauWP=flags.Analysis.Tau.extra_wps[0],
             muonWP=TightMuonWPLabel,
             eleWP=TightElectronWPLabel,
             eventDecisionOutputDecoration="lltt_pass_sr_noMMC_%SYS%",
@@ -69,6 +69,7 @@ def lltt_cfg(
             channel=flags.Analysis.channels,
             isMC=flags.Input.isMC,
             bypass=flags.Analysis.bypass,
+            doAntiTau=flags.Analysis.doAntiTau,
         )
     )
 
@@ -104,7 +105,7 @@ def lltt_cfg(
         CompFactory.HLLTT.BaselineVarsllttAlg(
             "FinalVarsllttAlg",
             isMC=flags.Input.isMC,
-            tauWP=flags.Analysis.Tau.ID,
+            tauWP=flags.Analysis.Tau.extra_wps[0],
             muonWP=TightMuonWPLabel,
             eleWP=TightElectronWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,

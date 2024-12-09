@@ -55,6 +55,7 @@ namespace HLLTT
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK (m_istauID.initialize(m_systematicsList, m_tauHandle));
 
     ATH_CHECK (m_selected_el_amm.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK (m_selected_mu_amm.initialize(m_systematicsList, m_muonHandle));
@@ -434,6 +435,7 @@ namespace HLLTT
 	  if(Tau1->isTau(xAOD::TauJetParameters::EleRNNTight)) tau_EleRNN_WP = 3;
 	  else if(Tau1->isTau(xAOD::TauJetParameters::EleRNNMedium)) tau_EleRNN_WP = 2;
 	  else if(Tau1->isTau(xAOD::TauJetParameters::EleRNNLoose)) tau_EleRNN_WP = 1;
+	  tau_EleRNN_WP+=m_istauID.get(*Tau1, sys)*10;
 	  m_Ibranches.at("Tau1_EleRNN_WP").set(*event, tau_EleRNN_WP, sys);
 	}
 	if(m_isMC){
@@ -456,10 +458,11 @@ namespace HLLTT
           m_Ibranches.at("Tau2_nProng").set(*event, Tau2->nTracks(), sys);
           Tau2->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
           m_Ibranches.at("Tau2_decayMode").set(*event, decayMode, sys);
-	  tau_EleRNN_WP = -1;
+	  tau_EleRNN_WP = 0;
           if(Tau2->isTau(xAOD::TauJetParameters::EleRNNTight)) tau_EleRNN_WP = 3;
           else if(Tau2->isTau(xAOD::TauJetParameters::EleRNNMedium)) tau_EleRNN_WP = 2;
           else if(Tau2->isTau(xAOD::TauJetParameters::EleRNNLoose)) tau_EleRNN_WP = 1;
+	  tau_EleRNN_WP+=m_istauID.get(*Tau2, sys)*10;
 	  m_Ibranches.at("Tau2_EleRNN_WP").set(*event, tau_EleRNN_WP, sys);
         }
 	if(m_isMC){

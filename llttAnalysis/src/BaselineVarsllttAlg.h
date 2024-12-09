@@ -94,6 +94,8 @@ private:
     m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input dectorator for selected mu"};
     CP::SysReadDecorHandle<bool> 
     m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input dectorator for selected tau"};
+    CP::SysReadDecorHandle<int>
+    m_istauID { this, "istauID", "istauID_%SYS%", "Name of input dectorator for selected tauID"};
 
     // flag set for a->mumu constructed.
     CP::SysReadDecorHandle<bool>

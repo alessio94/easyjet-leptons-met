@@ -5,7 +5,8 @@ do_lltt_analysis: true
 channels: ["LepLep", "LepHad", "HadHad"]
 
 # Toggles to bypass event selection
-bypass: true
+bypass: false
+doAntiTau: true
 
 # Toggles for object types
 do_small_R_jets: true

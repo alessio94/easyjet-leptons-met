@@ -71,7 +71,8 @@ namespace HLLTT
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK(m_selected_tau.initialize(m_systematicsList, m_tauHandle));
-
+    ATH_CHECK(m_istauID.initialize(m_systematicsList, m_tauHandle));
+    
     // make trigger decorators
     for (auto trig : m_triggers){
       CP::SysReadDecorHandle<bool> deco {this, "trig"+trig, trig, "Name of trigger"};
@@ -202,32 +203,41 @@ namespace HLLTT
       //************
       int n_mrmtaus = 0;
       int n_mrmtausnocut = 0;
+      TLorentzVector p4mrm;
       for(const xAOD::TauJet* mrmtau : *mrmtaus) {
-	bool passTauWP = mrmtau->isTau(m_tauIDWP);
+	bool passTauWP = m_doAntiTau?mrmtau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans)>0.01:mrmtau->isTau(m_tauIDWP);
 	bool passTaueleid = mrmtau->isTau(xAOD::TauJetParameters::EleRNNLoose);
 	++n_mrmtausnocut;
-	if (passTauWP && mrmtau->pt() > 20. * Athena::Units::GeV){
-	  if (std::abs(mrmtau->eta()) < 2.5&&(std::abs(mrmtau->eta()) <1.37||std::abs(mrmtau->eta()) >1.52)&&(mrmtau->nTracksCharged()==1||mrmtau->nTracksCharged()==3)) {
+	if (passTauWP && passTaueleid && mrmtau->pt() > 20. * Athena::Units::GeV){
+	  if (std::abs(mrmtau->eta()) < 2.5&&(std::abs(mrmtau->eta()) <1.37||std::abs(mrmtau->eta()) >1.52)&&(mrmtau->nTracksCharged()==1||mrmtau->nTracksCharged()==3)){
+	    p4mrm=mrmtau->p4();
 	    ++n_mrmtaus;
 	  }
+	  ATH_MSG_DEBUG("Dump MuonRM TauJets: event "<<event->eventNumber()<<" n_mrmtausnocut "<<n_mrmtausnocut<<" n_mrmtaus "<<n_mrmtaus<<" pt "<<mrmtau->pt()
+			<<" eta "<<mrmtau->eta()<<" phi "<<mrmtau->phi()<<" passTauRNNVeryLoose "<<passTauWP<<" passTaueleid "<<passTaueleid<<" RNN "
+			<<mrmtau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans)<<" ntrk "<<mrmtau->nTracksCharged()<<" taus size "<<taus->size());
 	}
-	ATH_MSG_DEBUG("Dump MuonRM TauJets: event "<<event->eventNumber()<<" n_mrmtausnocut "<<n_mrmtausnocut<<" n_mrmtaus "<<n_mrmtaus<<" pt "<<mrmtau->pt()
-		      <<" eta "<<mrmtau->eta()<<" phi "<<mrmtau->phi()<<" passTauWP "<<passTauWP<<" passTaueleid "<<passTaueleid<<" RNN "
-		      <<mrmtau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans)<<" ntrk "<<mrmtau->nTracksCharged()<<" taus size "<<taus->size());
       }
       int n_taus = 0;
       for (const xAOD::TauJet *tau : *taus)
       {
         bool passTauWP = m_tauWPDecorHandle.get(*tau, sys);
+	bool passTauWPloose = m_doAntiTau?tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans)>0.01:passTauWP;
         m_selected_tau.set(*tau, false, sys);
-        if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)
+	m_istauID.set(*tau, 0, sys);
+        if (passTauWPloose&& tau->pt() > 20. * Athena::Units::GeV)
         {
-          if (std::abs(tau->eta()) < 2.5&&tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans)>0.01) {
+	  //MRMTaus are preferred and other taus ignored
+	  if((n_mrmtaus==1&&p4mrm.DeltaR(tau->p4())<0.001)||n_mrmtaus!=1){
 	    m_selected_tau.set(*tau, true, sys);
+	    int tauid=0;
+	    if(tau->isTau(xAOD::TauJetParameters::JetRNNSigLoose))tauid = 1;
+	    if(tau->isTau(xAOD::TauJetParameters::JetRNNSigMedium))tauid = 2;
+	    m_istauID.set(*tau, tauid, sys);
 	    n_taus += 1;
 	    ATH_MSG_DEBUG(" Dump combined TauJets after selection: event "<<event->eventNumber()<<" n_taus "<<n_taus<<" pt "<<tau->pt()<<" eta "<<tau->eta()<<" phi "<<tau->phi()
-			  <<" passTauWP "<<passTauWP<<" RNN "<<tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans));
-          }
+			  <<" passTauWP "<<passTauWP<<" RNN "<<tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans)<<" tauid "<<tauid);
+	  }
         }
       }
       //************
