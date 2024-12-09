@@ -148,6 +148,9 @@ OverlapRemoval:
   # Enable overlap removal between small-R jets and large-R jets
   # Athena default is true
   do_small_R_jet_large_R_jet: true
+  # Switch priority in the overlap removal between photons and leptons
+  # Athena default is false
+  favourPhotonOverLepton: false
 
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22

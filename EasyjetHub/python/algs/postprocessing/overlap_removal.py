@@ -82,6 +82,8 @@ def overlap_sequence(flags):
     configSeq.setOptionValue('.addToAllSelections', True)
     configSeq.setOptionValue('.doJetFatJetOR',
                              flags.Analysis.OverlapRemoval.do_small_R_jet_large_R_jet)
+    configSeq.setOptionValue('.favourPhotonOverLepton',
+                             flags.Analysis.OverlapRemoval.favourPhotonOverLepton)
     for objtype, coll in preOR_collections.items():
         configSeq.setOptionValue(f'.{objtype}', coll)
 

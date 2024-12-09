@@ -50,6 +50,9 @@ Photon:
     - ["Tight", "NonIso"]
     - ["Loose", "FixedCutLoose"]
 
+OverlapRemoval:
+  favourPhotonOverLepton: false # if set to true, HgamOR is applied
+
 # orthogonality studies  
 orthogonality:
   include: EasyjetHub/orth-config.yaml 
