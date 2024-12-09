@@ -110,5 +110,17 @@ GNN_path_run3:
 #  choose VBF jets selection method
 VBFjetsMethod: "mjj" # "mjj" "pTsorting"
 
+#Use a dedicated GRL for bbyy due to photon triggers
+grl_files:
+  include: bbyyAnalysis/photon_grl.yaml
+
+PileupReweighting:
+  extra_prw:
+    - postfix: "photon"
+      lumicalc_files:
+        include: bbyyAnalysis/lumicalc_photon.yaml
+      prw_files:
+        include: bbyyAnalysis/prw_photon.yaml
+
 ttree_output:
   include: bbyy-base-output.yaml
