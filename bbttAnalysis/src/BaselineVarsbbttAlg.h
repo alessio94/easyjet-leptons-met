@@ -75,6 +75,9 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
+    Gaudi::Property<bool> m_doMMC
+      {this, "doMMC", true, "Run with MMC?"};
+
     Gaudi::Property<bool> m_useNonIsoLeptons
       { this, "useNonIsoLeptons", false, "use NonIso lepton wps" };
 

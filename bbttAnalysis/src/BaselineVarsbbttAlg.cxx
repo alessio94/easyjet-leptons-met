@@ -30,11 +30,12 @@ namespace HHBBTT
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    ATH_CHECK (m_mmc_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_mmc_eta.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
-
+    if(m_doMMC){
+       ATH_CHECK (m_mmc_pt.initialize(m_systematicsList, m_eventHandle));
+       ATH_CHECK (m_mmc_eta.initialize(m_systematicsList, m_eventHandle));
+       ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
+       ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
+    }
     if(m_isMC){
        fillLeptonSfDecoMap("el", m_eleWPNames, m_ele_SF_decoMap);
        fillLeptonSfDecoMap("muon", m_muonWPNames, m_muon_SF_decoMap);
@@ -327,23 +328,23 @@ namespace HHBBTT
         m_Fbranches.at("HH_vis_phi").set(*event, HH_vis.Phi(), sys);
         m_Fbranches.at("HH_vis_m").set(*event, HH_vis.M(), sys);
 
-        float MMC_m = m_mmc_m.get(*event, sys);
-	TLorentzVector mmc_vec(0,0,0,0);
+        float MMC_m = m_doMMC ? m_mmc_m.get(*event, sys) : 0.;
         if(MMC_m>0){
+          TLorentzVector mmc_vec(0,0,0,0);
           mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
                                m_mmc_eta.get(*event, sys),
                                m_mmc_phi.get(*event, sys),
                                MMC_m);
-
           TLorentzVector HH = bb+mmc_vec;
           m_Fbranches.at("HH_pt").set(*event, HH.Pt(), sys);
           m_Fbranches.at("HH_eta").set(*event, HH.Eta(), sys);
           m_Fbranches.at("HH_phi").set(*event, HH.Phi(), sys);
           m_Fbranches.at("HH_m").set(*event, HH.M(), sys);
-        }
 
-        if(MMC_m>0) m_Fbranches.at("HH_delta_phi").set(*event, bb.DeltaPhi(mmc_vec),sys);
+          m_Fbranches.at("HH_delta_phi").set(*event, bb.DeltaPhi(mmc_vec),sys);
+        }
         m_Fbranches.at("HH_vis_delta_phi").set(*event, bb.DeltaPhi(tautau_vis),sys);
+        
       }
     }
 

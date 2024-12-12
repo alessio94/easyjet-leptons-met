@@ -121,6 +121,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                 useNonIsoLeptons=use_noniso_leptons,
                 eleWPs=ele_WPs,
                 muonWPs=muon_WPs,
+                doMMC=flags.Analysis.do_mmc,
                 tauWP=flags.Analysis.Tau.extra_wps[0],
                 bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
@@ -150,18 +151,18 @@ def get_BaselineVarsbbttAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
+    combined_particles = [
+        "H_bb",
+        "H_vis_tautau",
+        "HH_vis",
+    ]
+
     if flags.Analysis.do_mmc:
-        combined_particles = [
-            "H_bb",
-            "H_vis_tautau",
-            "HH",
-            "HH_vis",
-        ]
+        combined_particles += ["HH"]
 
-        for particle in combined_particles:
-            for var in ["pt", "eta", "phi", "m"]:
-                float_variable_names.append(f"{particle}_{var}")
-
+    for particle in combined_particles:
+        for var in ["pt", "eta", "phi", "m"]:
+            float_variable_names.append(f"{particle}_{var}")
     return float_variable_names, int_variable_names
 
 
@@ -169,11 +170,15 @@ def get_BaselineVarsbbttAlg_highlevelvariables(flags):
     high_level_float_variables = []
     high_level_int_variables = []
 
+    high_level_float_variables += [
+        "HH_vis_delta_phi",
+    ]
+
     if flags.Analysis.do_mmc:
         high_level_float_variables += [
             "HH_delta_phi",
-            "HH_vis_delta_phi",
         ]
+
     return high_level_float_variables, high_level_int_variables
 
 
