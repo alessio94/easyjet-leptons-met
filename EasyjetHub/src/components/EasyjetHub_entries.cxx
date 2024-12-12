@@ -17,6 +17,7 @@
 #include "../OrthogonalityAlg.h"
 #include "../SumOfWeightsAlg.h"
 #include "../TruthWBosonInformationAlg.h"
+#include "../STXSAlg.h"
 #include "../MetadataHistAlg.h"
 #include "../ElectronDecoratorAlg.h"
 #include "../LeptonOrderingAlg.h"
@@ -42,6 +43,7 @@ DECLARE_COMPONENT(EventInfoGlobalAlg)
 DECLARE_COMPONENT(OrthogonalityAlg)
 DECLARE_COMPONENT(SumOfWeightsAlg)
 DECLARE_COMPONENT(TruthWBosonInformationAlg)
+DECLARE_COMPONENT(STXSAlg)
 DECLARE_COMPONENT(MetadataHistAlg)
 DECLARE_COMPONENT(ElectronDecoratorAlg)
 DECLARE_COMPONENT(LeptonOrderingAlg)

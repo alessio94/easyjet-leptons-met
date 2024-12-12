@@ -5,7 +5,7 @@ from PathResolver import PathResolver
 from Campaigns.Utils import Campaign
 from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
 from AthenaCommon.Utils.unixtools import find_datafile
-
+from EasyjetHub.steering.utils.log_helper import log
 
 MCSampleYears = {
     Campaign.MC20a: (2015, 2016),
@@ -176,3 +176,53 @@ def get_grl_files(flags):
                     "Specify GRL files in the config file."
                 )
     return list(grl_files)
+
+
+def STXS_info(DSID):
+    has_STXS = False
+    has_STXS_unc = False  # e.g. bbH prod mode has STXS bin but tool doesn't give unc
+    prodmode = ""  # in format that TruthWeightTools expects
+
+    fdir = "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/DerivationFrameworkHiggs/"
+    fname = "HiggsMCsamples.cfg"
+    file_with_DSIDs = fdir + fname
+    log.info(f"will decide if sample {DSID} has STXS based on {file_with_DSIDs}")
+
+    # names written in file DSID not the same as unc tool expects
+    # only list the ones TruthWeightTools understands
+    prodmode_for_unc_dict = {
+        "GGF": "ggF",
+        "VBF": "VBF",
+        "WH": "WH",
+        "QQ2ZH": "qqZH",
+        "GG2ZH": "ggZH",
+        "TTH": "ttH"
+    }
+
+    try:
+        with open(file_with_DSIDs) as fp:
+            for i_line in fp.readlines():
+                if "#" in i_line:
+                    uncom = i_line[:i_line.find("#")]
+                else:
+                    uncom = i_line
+
+                if str(DSID) in uncom.strip().split(" "):
+                    has_STXS = True
+                    log.info("STXS should be there")
+
+                    pattern = "HTXS.MCsamples."
+                    prodmode_start = uncom.find(pattern) + len(pattern)
+                    prodmode_temp = uncom[prodmode_start:uncom.find(":")]
+                    log.info("from DSID file have prod", prodmode_temp)
+                    if prodmode_temp in prodmode_for_unc_dict.keys():
+                        has_STXS_unc = True
+                        prodmode = prodmode_for_unc_dict[prodmode_temp]
+
+                    break
+    except IOError:
+        log.info(f"not clear in {file_with_DSIDs} if STXS DSID: {DSID}")
+
+    log.info(f"got prodmode {prodmode}")
+    log.info(f"has_STXS {has_STXS} has_STXS_unc {has_STXS_unc}")
+    return prodmode, has_STXS, has_STXS_unc

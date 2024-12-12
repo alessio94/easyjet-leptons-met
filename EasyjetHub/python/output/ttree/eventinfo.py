@@ -1,6 +1,7 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from AthenaConfiguration.Enums import LHCPeriod
 from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
+from EasyjetHub.steering.sample_metadata import STXS_info
 
 
 def get_event_info_branches(flags, tree_flags, trigger_chains):
@@ -48,6 +49,12 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             ]
         if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_nWLep_samples:
             eventinfo_branches.variables += ["nWLep"]
+
+        _, has_STXS, has_STXS_unc = STXS_info(flags.Input.MCChannelNumber)
+        if has_STXS:
+            eventinfo_branches.variables += ["HTXS_Category_Stage1_2_pTjet30"]
+        if has_STXS_unc:
+            eventinfo_branches.variables += ["HTXS_Weights_Stage1_2_pTjet30"]
 
         # Need syst_only_for not to be empty to avoid applying SYST on all
         # other branches
@@ -123,8 +130,7 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             ]
         eventinfo_branches.variables += ["truth_HH_average_pt",
                                          "truth_HH_average_eta",
-                                         "truth_HH_abs_cos_theta_star"
-                                         ]
+                                         "truth_HH_abs_cos_theta_star"]
 
     if flags.Analysis.GRL.store_decoration and not flags.Input.isMC:
         from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists

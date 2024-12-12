@@ -4,3 +4,6 @@
 [submodule "VBFTagger"]
 	path = VBFTagger
 	url = https://gitlab.cern.ch/vbftagger/vbftagger.git
+[submodule "TruthWeightTools"]
+	path = TruthWeightTools
+	url = https://gitlab.cern.ch/atlas_higgs_combination/software/TruthWeightTools.git
