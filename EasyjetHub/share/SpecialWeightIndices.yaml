@@ -13,7 +13,7 @@
 - DSID: 343981 # ggFH(yy) mc20
   weightIndex: 151
   weightName: " nnlops-nominal-pdflhc "
-  sysWeightName: "GEN_nnlopsnominalpdflhc"
+  sysWeightName: "GEN_nnlopsminusnominalminuspdflhc"
 - DSID: 346214 # VBFH(yy) mc20
   weightIndex: 109
   weightName: " PDF set = 90400 "
