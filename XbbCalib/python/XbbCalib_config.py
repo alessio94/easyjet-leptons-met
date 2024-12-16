@@ -31,7 +31,10 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                 containerOutKey="XbbCalibJets_%SYS%",
                                 minPt=flags.Analysis.Small_R_jet.min_pT,
                                 maxEta=2.5,
-                                minimumAmount=1
+                                minimumAmount=1,
+                                bTagWPDecorName="ftag_select_"
+                                                + flags.Analysis.Small_R_jet.btag_wp,
+                                selectBjet=True,
                                 ))
 
     cfg.merge(ElectronSelectorAlgCfg(flags,
@@ -111,10 +114,6 @@ def XbbCalib_branches(flags):
     branches += object_level_branches
 
     branches += ["EventInfo.XbbCalib_pass_sr_%SYS% -> XbbCalib_pass_SR"
-                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
-
-    branches += [flags.Analysis.container_names.output.reco10UFOJet
-                 + ".isAnalysisJet_%SYS% -> recojet_antikt10UFO_isAnalysisLRJet"
                  + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names

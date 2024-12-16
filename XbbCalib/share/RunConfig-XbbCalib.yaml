@@ -29,7 +29,13 @@ Electron:
 Muon:
   min_pT: 28.e+3
   ID: "Medium"
-  Iso: "PflowTight_VarRad"
+  Iso: "Tight_VarRad"
+
+# list of triggers per year to consider
+Trigger:
+  include: XbbCalib/trigger.yaml
+# apply trigger lists to filter events
+do_trigger_filtering: true
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
@@ -54,8 +60,8 @@ ttree_output:
     electrons: 'container_names.output.electrons'
     met : 'container_names.output.met'
   collection_options:
-    #large_R_jets:
-    #  run_selection: true
+    large_R_jets:
+      run_selection: true
     small_R_jets:
       btag_info: true
       run_selection: true
