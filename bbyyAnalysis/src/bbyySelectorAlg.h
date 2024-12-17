@@ -75,6 +75,7 @@ namespace HHBBYY
           "AT_LEAST_TWO_B_JETS",
           "EXACTLY_ONE_B_JET",
           "EXACTLY_TWO_B_JETS",
+          "EXACTLY_ONE_OR_TWO_B_JETS",
       };
 
       void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 

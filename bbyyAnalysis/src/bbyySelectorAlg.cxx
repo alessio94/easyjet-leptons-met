@@ -451,7 +451,6 @@ namespace HHBBYY
     // If Forward Jets + Central jets >=2 --> The event passes.
     if (jets.size() >= 2 && bbyyCuts.exists("AT_LEAST_TWO_JETS"))
       bbyyCuts("AT_LEAST_TWO_JETS").passed = true;
-
     if (bjets.size()>=1 && bbyyCuts.exists("AT_LEAST_ONE_B_JET"))
       bbyyCuts("AT_LEAST_ONE_B_JET").passed = true;
     if (bjets.size()==1 && bbyyCuts.exists("EXACTLY_ONE_B_JET"))
@@ -460,7 +459,8 @@ namespace HHBBYY
       bbyyCuts("AT_LEAST_TWO_B_JETS").passed = true;
     if (bjets.size()==2 && bbyyCuts.exists("EXACTLY_TWO_B_JETS")) 
       bbyyCuts("EXACTLY_TWO_B_JETS").passed = true;
-
+    if ((bjets.size()==1 || bjets.size()==2) && bbyyCuts.exists("EXACTLY_ONE_OR_TWO_B_JETS")) 
+      bbyyCuts("EXACTLY_ONE_OR_TWO_B_JETS").passed = true;
   }
   void bbyySelectorAlg::setRunNumberQuantities(unsigned int rdmNumber){
     // References:
