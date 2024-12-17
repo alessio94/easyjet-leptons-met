@@ -48,10 +48,13 @@ namespace VBSVV4q{
 
             auto SignalJetsCandidates = std::make_unique<ConstDataVector<xAOD::JetContainer> >(SG::VIEW_ELEMENTS);
 
-	    for(auto jet : *jets){
+            for(auto jet : *jets){
                 // skip large-R jets with mass below 40 GeV
                 if(jet -> m() < 40.*Athena::Units::GeV) continue;
                 SignalJetsCandidates -> push_back(jet);
+
+                // up to two
+                if(SignalJetsCandidates->size() == 2) break; 
             }
 
             ATH_CHECK(m_SignalLargeRJetsOutHandle.record(std::move(SignalJetsCandidates), sys));

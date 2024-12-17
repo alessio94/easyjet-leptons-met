@@ -70,6 +70,7 @@ echo $exitcode > $eostmpdir/CI_VAL_EXIT_CODE
 echo "===== ls $eostmpdir ====="
 ls $eostmpdir
 
+xrdfs root://eosuser.cern.ch mkdir $eosplotdir
 xrdcp -rf $eostmpdir root://eosuser.cern.ch//$eosplotdir
 
 echo "exit $exitcode"
