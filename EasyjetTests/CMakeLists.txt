@@ -14,9 +14,7 @@ atlas_add_executable( compareOutputNtuples
 )
 
 atlas_install_scripts(
-  bin/easyjet-test
-  bin/easyjet-validate
-  bin/metadata-check
+  bin/*
 )
 
 atlas_install_generic(

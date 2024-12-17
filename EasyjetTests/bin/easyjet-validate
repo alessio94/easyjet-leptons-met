@@ -21,7 +21,8 @@ if [[ -z "${VALIDATION_REFERENCE_MR:-}" ]]; then
     exit 1
 fi
 
-eosplotdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/plots/$CI_MERGE_REQUEST_IID/$postfix
+eosplotdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/plots/$CI_MERGE_REQUEST_IID/
+eostmpdir=$postfix
 eosfile=$EOS_ACCOUNT_PATH/gitlab_ci_output/ntuples/$CI_MERGE_REQUEST_IID/analysis_${postfix}.root
 refeosdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/ntuples/$VALIDATION_REFERENCE_MR
 refeosfile=$refeosdir/analysis_${postfix}.root
@@ -29,32 +30,22 @@ refeosfile=$refeosdir/analysis_${postfix}.root
 echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME 
 klist
 
-if [[ ! -r ${eosfile} ]]; then
-    echo "$eosfile is not readable"
-    exit 1
-fi
-
-if [[ ! -r ${refeosfile} ]]; then
-    echo "$eosfile is not readable"
-    exit 1
-fi
-
-mkdir -p $eosplotdir
 echo "compareOutputNtuples root://eosuser.cern.ch//$refeosfile root://eosuser.cern.ch//$eosfile"
 compareOutputNtuples root://eosuser.cern.ch//$refeosfile root://eosuser.cern.ch//$eosfile 2>&1 | tee branch-diff-log.txt
 echo "comparing ntuples succeeded"
 
-echo $CI_MERGE_REQUEST_TITLE > $eosplotdir/CI_MERGE_REQUEST_TITLE
-echo $VALIDATION_REFERENCE_MR > $eosplotdir/VALIDATION_REFERENCE_MR
-cat $refeosdir/CI_MERGE_REQUEST_TITLE > $eosplotdir/VALIDATION_MERGE_REQUEST_TITLE
-echo $CI_COMMIT_MESSAGE > $eosplotdir/CI_COMMIT_MESSAGE
-echo $CI_COMMIT_SHA > $eosplotdir/CI_COMMIT_SHA
-echo $CI_COMMIT_SHORT_SHA > $eosplotdir/CI_COMMIT_SHORT_SHA
+mkdir -p $eostmpdir
+echo $CI_MERGE_REQUEST_TITLE > $eostmpdir/CI_MERGE_REQUEST_TITLE
+echo $VALIDATION_REFERENCE_MR > $eostmpdir/VALIDATION_REFERENCE_MR
+xrdcp root://eosuser.cern.ch//$refeosdir/CI_MERGE_REQUEST_TITLE $eostmpdir/VALIDATION_MERGE_REQUEST_TITLE
+echo $CI_COMMIT_MESSAGE > $eostmpdir/CI_COMMIT_MESSAGE
+echo $CI_COMMIT_SHA > $eostmpdir/CI_COMMIT_SHA
+echo $CI_COMMIT_SHORT_SHA > $eostmpdir/CI_COMMIT_SHORT_SHA
 
-cp branch-diff-log.txt $eosplotdir
+cp branch-diff-log.txt $eostmpdir
 if [[ ! -z "$(ls -A compare_output/)" ]]; then
     echo "compare_output folder not empty, copying figures to eos"
-    cp compare_output/* $eosplotdir
+    cp compare_output/* $eostmpdir
 fi
 
 ndiff=`\grep  -- '----> .* branches are different'  branch-diff-log.txt | awk '{print $2}'`
@@ -74,10 +65,12 @@ if [[ ! "$ndiff" == 0 ]]; then
     echo "$ndiff branches are different, please check plots"
     exitcode=22
 fi
-echo "$ndiff branches are different, $nrm are removed, and $nadd are added" > $eosplotdir/CI_VAL_SUMMARY
-echo $exitcode > $eosplotdir/CI_VAL_EXIT_CODE
-echo "===== ls $eosplotdir ====="
-ls $eosplotdir
+echo "$ndiff branches are different, $nrm are removed, and $nadd are added" > $eostmpdir/CI_VAL_SUMMARY
+echo $exitcode > $eostmpdir/CI_VAL_EXIT_CODE
+echo "===== ls $eostmpdir ====="
+ls $eostmpdir
+
+xrdcp -rf $eostmpdir root://eosuser.cern.ch//$eosplotdir
 
 echo "exit $exitcode"
 

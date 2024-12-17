@@ -26,16 +26,11 @@
     - cvmfs
   before_script:
     - source /release_setup.sh
-  script:
-    - |
-      /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/cppcheck/current/cppcheck*/bin/cppcheck \
-      --check-level=exhaustive --xml-version=2 --error-exitcode=1 \
-      --enable=warning,portability,performance \
-      -D "DECLARE_COMPONENT(type)=void()" \
-      -D "ANA_MSG_HEADER(name)=void()" \
-      -D "ANA_MSG_SOURCE(name,title)=void()" \
-      --suppress="iterateByValue:VBFTagger/Root/VBFTagger.cxx" \
-      .
+    - env
+  script: # not compiled yet in the CI, the script is not yet installed, call it explicitly
+    - pwd
+    - ls 
+    - EasyjetTests/bin/easyjet-cppcheck .
   needs: []
 
 .mypy_check_template: &mypy_check_template

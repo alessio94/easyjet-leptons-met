@@ -490,17 +490,15 @@ copy-ntuple(){
        return 0
     fi
 
-    local eosdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/ntuples/$CI_MERGE_REQUEST_IID
+    local eosdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/ntuples/
+    local eostmpdir=$CI_MERGE_REQUEST_IID
     echo "copying ntuple to $eosdir"
     echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME 
     klist
-    ${PFX} mkdir -p $eosdir
-    ls $eosdir
-    pwd
-    ls
-    ${PFX} cp analysis.root $eosdir/analysis_${postfix}.root
-    ${PFX} echo $CI_MERGE_REQUEST_TITLE > $eosdir/CI_MERGE_REQUEST_TITLE
-    ls $eosdir
+    mkdir -p $eostmpdir
+    cp analysis.root $eostmpdir/analysis_${postfix}.root
+    echo $CI_MERGE_REQUEST_TITLE > $eostmpdir/CI_MERGE_REQUEST_TITLE
+    ${PFX} xrdcp -rf $eostmpdir  root://eosuser.cern.ch//$eosdir
     echo "copying ntuple succeeded"
 }
 

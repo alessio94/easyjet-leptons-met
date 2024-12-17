@@ -30,10 +30,11 @@ clang_tidy:
   tags:
     - cvmfs
   before_script:
-    - source $(find /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/Clang/current/ -mindepth 3 -maxdepth 3 -type f -name setup.sh)
+    - env
     - cd build
-  script: # exclude auto-generated files from clang check (only way I found to do it).
-    - mv compile_commands.json compile_commands_back.json
-    - jq -M 'map(select(.file | test("build/") | not))' compile_commands_back.json > compile_commands.json
-    - run-clang-tidy -j8 -use-color -config-file ../.clang-tidy -warnings-as-errors '*'
+  script: # not compiled yet in the CI, the script is not yet installed, call it explicitly
+    - pwd
+    - ls
+    - ls ..
+    - ../EasyjetTests/bin/easyjet-clang-tidy ../
   needs: [cmake]
