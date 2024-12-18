@@ -17,5 +17,3 @@ ttree_output:
 
 Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_90"
-  btag_extra_wps:
-    - GN2v01_Continuous
