@@ -191,7 +191,7 @@ declare -A CONFIGS=(
     [fast-awkward-mc20af3]=EasyjetHub/awkward-config-noEle.yaml
     [SHbbyy-mc20af3-lite]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     # MC23
-    [bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
+    [bbbb-mc23]=bbbbAnalysis/RunConfig-HH4b-All-NoSyst.yaml
     [bbtt-mc23]=bbttAnalysis/RunConfig-bbtt-bypass.yaml
     [bbVV-mc23]=bbVVAnalysis/RunConfig-bbVV-bypass.yaml
     [bbtt-mc23-syst]=bbttAnalysis/RunConfig-bbtt-bypass-syst.yaml
@@ -204,7 +204,7 @@ declare -A CONFIGS=(
     [mc23af3]=EasyjetHub/RunConfig-noEle.yaml
     [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     # non-ntupler
-    [aod-fast-bbbb-mc23]=bbbbAnalysis/RunConfig-Resolved.yaml
+    [aod-fast-bbbb-mc23]=bbbbAnalysis/RunConfig-HH4b-Resolved.yaml
     [hist-syst-bbbb-mc23]=bbbbAnalysis/histonly-config.yaml
 )
 

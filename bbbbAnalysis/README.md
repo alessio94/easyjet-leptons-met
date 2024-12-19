@@ -20,6 +20,8 @@ Analysis Package for Analysis Package for the $HH\rightarrow b\bar{b} b\bar{b}$ 
   - `BaselineVarsBoostedAlg` / `BaselineVarsBoostedAlg`: Compute the baseline variables for the analysis (see explanations [here](https://gitlab.cern.ch/easyjet/easyjet/-/blob/main/bbbbAnalysis/docs/Algorithms.md?ref_type=heads#baselinevarsresolvedalg) and [there](https://gitlab.cern.ch/easyjet/easyjet/-/blob/main/bbbbAnalysis/docs/Algorithms.md?ref_type=heads#baselinevarsboostedalg));
   - `JetBoostHistograms` / `JetBoostHistogramsAlg`: Defines and runs the H5 histogramming of jet quantities for the $SH$ boosted analysis;
   - `MassPlaneBoostHistograms` / `MassPlaneBoostHistogramsAlg`: Defines and runs the H5 histogramming of mHH for different matching criteria for the $SH$ boosted analysis.
+- `datasets/`: input DAOD samples for grid submission
+- `scripts/`: grid submission scripts
 
 # How to Run
 
@@ -28,6 +30,18 @@ Analysis Package for Analysis Package for the $HH\rightarrow b\bar{b} b\bar{b}$ 
 2. Run the ntupler on those files:
     - Resolved: ```bbbb-ntupler ttbar_PHYS_10evt.root --run-config bbbbAnalysis/RunConfig-Resolved.yaml --out-file output_PHYS_bbbb_resolved_ntuple.root ```
     - Boosted: ```bbbb-ntupler ttbar_PHYS_10evt.root --run-config bbbbAnalysis/RunConfig-SH4b.yaml --out-file output_PHYS_bbbb_boosted_ntuple.root ```
+
+3. Input PHYS samples can be found in the "datasets" directory.
+
+4. Choose your run-config file.
+
+5. Running on the Grid (* Please test your setup before running bulk grid submission)
+- This is hadled by the easyjet-gridsubmit script. To run a test job on the grid please use the following command:
+"easyjet-gridsubmit --mc-list input_sample.txt --exec bbbb-ntupler --run-config bbbbAnalysis/RunConfig-All.yaml --campaign TestXXX  --nGBperJob 2 --noTag"
+
+- It is recommended to run from a central tag for large scale productions. If you have some local updates, you will be invited to commit them and a tag will be created to be pushed on your fork. If you want to avoid this, you can use the --noTag options.
+
+- Grid submission scripts are now available in the "scripts" directory.
 
 # Output
 
@@ -50,4 +64,4 @@ While for the boosted analyis:
 # Main developers
 
 The main developments have been performed by (non extensive list, feel free to add your name):
-Arely Cortes Gonzalez, Dan Guest, Victor Hugo Ruelas Rivera, Teng Jian Khoo, Frederic Renner.  
+Arely Cortes Gonzalez, Dan Guest, Victor Hugo Ruelas Rivera, Teng Jian Khoo, Frederic Renner.

@@ -51,7 +51,7 @@ Muon:
 
 # list of triggers per year to consider
 Trigger:
-  include: bbbbAnalysis/triggers-recommended.yaml
+  include: bbbbAnalysis/triggers-HH4b.yaml
 
 # can alternatively use the CutList to filter events to get trigger eff
 do_trigger_filtering: true
@@ -62,6 +62,9 @@ CutList:
   - AT_LEAST_FOUR_JETS_TWO_BJETS_OR_TWO_LRJETS
 
 do_overlap_removal: true
+
+OverlapRemoval:
+  do_small_R_jet_large_R_jet: false
 
 do_CP_systematics: true
 systematics_regex: [".*"]
