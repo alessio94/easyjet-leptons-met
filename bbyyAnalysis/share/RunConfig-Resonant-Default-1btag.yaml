@@ -1,5 +1,7 @@
 include: bbyyAnalysis/RunConfig-Resonant-base.yaml
 
+do_resonant_onebtag: true
+
 CutList :
       - PASS_TRIGGER
       - TWO_TIGHTID_ISO_PHOTONS

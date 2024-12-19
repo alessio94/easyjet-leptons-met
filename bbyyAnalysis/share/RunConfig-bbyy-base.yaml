@@ -77,6 +77,7 @@ store_high_level_variables: false
 #Enable cutflow 
 save_bbyy_cutflow: true
 do_resonant_PNN: false
+do_resonant_onebtag: false
 
 # flag that toggles single photon trigger in the cutflow
 # so that PASS_TRIGGER = single || diphoton

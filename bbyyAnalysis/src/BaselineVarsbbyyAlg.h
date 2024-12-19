@@ -251,6 +251,9 @@ namespace HHBBYY
     Gaudi::Property<bool> m_doSystematics
       { this, "doSystematics", false, "Run on all systematics" };
 
+    Gaudi::Property<bool> m_doResonantonebtag
+      { this, "doResonantonebtag", false, "Compute additional quantities for the one btag region of the resonant SHbbyy analysis." };
+
     CP::SysReadDecorHandle<bool> 
     m_selected_ph { this, "selected_ph", "selected_ph_%SYS%", "Name of input decorator for selected ph"};
 

@@ -543,6 +543,13 @@ namespace HHBBYY
     m_Fbranches.at(prefix+"Phibbyy").set(*event, HH.Phi(), sys);
     m_Fbranches.at(prefix+"dRbbyy").set(*event, H_yy.DeltaR(H_bb), sys);
 
+    // Want to compute the three body mass for the SHbbyy 
+    // analysis, onebtag region (variable used for PNN)
+    if(m_doResonantonebtag){
+      TLorentzVector H_byy = Hbb_jets[0]->p4() + H_yy;
+      m_Fbranches.at(prefix+"mbyy").set(*event, H_byy.M(), sys);
+    }
+
     std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(Hyy_photons[0]->p4(),Hyy_photons[1]->p4(),Hbb_jets[0]->p4(),Hbb_jets[1]->p4());
 
     m_Fbranches.at(prefix+"cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);

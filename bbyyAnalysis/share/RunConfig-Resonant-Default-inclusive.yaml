@@ -17,3 +17,5 @@ ttree_output:
 
 Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_90"
+
+do_resonant_onebtag: true

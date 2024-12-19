@@ -113,6 +113,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             floatVariableList=float_variables,
             intVariableList=int_variables,
             doSystematics=flags.Analysis.do_CP_systematics,
+            doResonantonebtag=flags.Analysis.do_resonant_onebtag
         )
     )
 
@@ -179,6 +180,11 @@ def get_BaselineVarsbbyyAlg_variables(flags):
         float_variable_names += ["bdtSel_score"]
 
     float_variable_names += ["DeltaPhi_bb_yy_cm_bbyy"]
+
+    # three body mass used for
+    # SHbbyy, onebtag region
+    if flags.Analysis.do_resonant_onebtag:
+        float_variable_names += ["mbyy"]
 
     # Kinematic Fit variables
     if flags.Analysis.do_KinematicFit:
