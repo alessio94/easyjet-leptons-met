@@ -36,7 +36,7 @@ namespace HHBBTT
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
 
-    ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
+    if (m_saveCutFlow) ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
@@ -670,7 +670,7 @@ namespace HHBBTT
       //****************
 
       // do the CUTFLOW only with sys="" -> NOSYS
-      if (sys.name()==""){
+      if (sys.name()=="" && m_saveCutFlow){
 
         // Compute total_events
         m_total_events+=1;
