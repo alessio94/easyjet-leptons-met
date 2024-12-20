@@ -1,4 +1,4 @@
-include: RunConfig-fullLep-bypass.yaml
+include: vbshiggsAnalysis/RunConfig-fullLep.yaml
 
 do_CP_systematics: true
 systematics_regex: [".*"]

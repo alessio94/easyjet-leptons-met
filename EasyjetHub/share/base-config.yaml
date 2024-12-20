@@ -101,6 +101,7 @@ Electron:
   do_parent_decoration: false
   do_track_decoration: false
   do_IFF_decoration: false
+  do_reco_decoration: false
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []

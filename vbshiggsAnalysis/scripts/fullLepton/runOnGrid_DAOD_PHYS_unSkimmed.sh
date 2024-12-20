@@ -5,7 +5,7 @@ campaignName="VBSHiggs_v4_unskimmed"
 mc_list=(
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_FullLep_signal_DAOD_PHYS_p6490.txt"
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_EWVVjj_DAOD_PHYS_p6490.txt"
-    "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490S/mc20_VH_DAOD_PHYS_p6490.txt"
+    "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_VH_DAOD_PHYS_p6490.txt"
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_Wjets_DAOD_PHYS_p6490.txt"
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_Zjets_DAOD_PHYS_p6490.txt"
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_stop_DAOD_PHYS_p6490.txt"
@@ -27,7 +27,7 @@ easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --HDBSProductionRole
 
 #data
-easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/data_Run2_p6266.txt \
+easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/data_Run2_p6490.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
     --campaign ${campaignName} \

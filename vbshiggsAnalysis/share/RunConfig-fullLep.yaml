@@ -34,19 +34,28 @@ Truth:
     - 545785 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp8
 
 Electron:
+  maxD0Significance: 10
+  maxDeltaZ0SinTheta: 0.5
   ID: "LooseBLayerLH"
-  Iso: "Loose_VarRad"
+  Iso: "NonIso"
   amount: 2
   extra_wps:
+    - ["LooseBLayerLH", "Loose_VarRad"]
+    - ["LooseBLayerLH", "Tight_VarRad"]
+    - ["LooseBLayerLH", "TightTrackOnly_VarRad"]
+    - ["LooseBLayerLH", "TightTrackOnly_FixedRad"]
+
     - ["MediumLH", "Loose_VarRad"]
     - ["MediumLH", "Tight_VarRad"]
     - ["MediumLH", "TightTrackOnly_VarRad"]
     - ["MediumLH", "TightTrackOnly_FixedRad"]
+    - ["MediumLH", "NonIso"]
 
     - ["TightLH", "Loose_VarRad"]
     - ["TightLH", "Tight_VarRad"]
     - ["TightLH", "TightTrackOnly_VarRad"]
     - ["TightLH", "TightTrackOnly_FixedRad"]
+    - ["TightLH", "NonIso"]
 
     - ["LooseDNNElectron", "Loose_VarRad"]
     - ["LooseDNNElectron", "Tight_VarRad"]
@@ -63,16 +72,24 @@ Electron:
     - ["TightDNNElectron", "TightTrackOnly_VarRad"]
     - ["TightDNNElectron", "TightTrackOnly_FixedRad"]
   do_IFF_decoration: true
+  do_reco_decoration: true
 Muon:
+  maxD0Significance: 10
+  maxDeltaZ0SinTheta: 0.5
   ID: "Loose"
-  Iso: "PflowLoose_VarRad"
+  Iso: "NonIso"
   amount: 2
   extra_wps:
+    - ["Loose", "PflowLoose_VarRad"]
+    - ["Loose", "PflowTight_VarRad"]
+    
     - ["Medium", "PflowLoose_VarRad"]
     - ["Medium", "PflowTight_VarRad"]
+    - ["Medium", "NonIso"]
 
     - ["Tight", "PflowLoose_VarRad"]
     - ["Tight", "PflowTight_VarRad"]
+    - ["Tight", "NonIso"]
   do_IFF_decoration: true
 
 Lepton:

@@ -19,6 +19,9 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
     electron_branches.add_four_mom_branches(do_mass=False)
     electron_branches.variables += ["charge"]
 
+    if flags.Analysis.Electron.do_reco_decoration:
+        electron_branches.variables += ["author"]
+
     if flags.Analysis.do_overlap_removal:
         electron_branches.variables += ["passesOR_%SYS%"]
 

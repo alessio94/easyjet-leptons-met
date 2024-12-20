@@ -1,6 +1,6 @@
-runConfig="vbshiggsAnalysis/RunConfig-fullLep.yaml"
+runConfig="vbshiggsAnalysis/RunConfig-fullLep-bypass-syst.yaml"
 executable="vbshiggs-ntupler"
-campaignName="VBSHiggs_v9_skim"
+campaignName="VBSHiggs_v1_Syst_skim"
 
 mc_list=(
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_FullLep_signal_DAOD_PHYS_p6490.txt"
