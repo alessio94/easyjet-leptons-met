@@ -80,6 +80,15 @@ namespace ssWWVBS
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
+    for ( auto name : m_channel_names){
+      //std::cout<<"name=  "<<name<<std::endl;
+      if( name == "SR") m_channels.push_back(ssWWVBS::SR);
+      else if ( name == "ZCR") m_channels.push_back(ssWWVBS::WZCR);
+      else{
+        ATH_MSG_ERROR("Unknown channel");
+        return StatusCode::FAILURE;
+      }
+    }
 
     std::vector<std::string> boolnameslist;
     for (const auto& [key, value] : m_boolnames) {
@@ -183,6 +192,11 @@ namespace ssWWVBS
       m_bools.at(ssWWVBS::DIJETS_MASS) = false;
       m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) = false;
       m_bools.at(ssWWVBS::BJET_VETO) = false;
+      m_bools.at(ssWWVBS::pass_SR) = false;
+
+      m_bools.at(ssWWVBS::PASS_THREE_LEPTONS) = false; 
+      m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS) = false;
+      m_bools.at(ssWWVBS::pass_WZCR) = false;
 
       setThresholds(event, sys);
 
@@ -225,7 +239,90 @@ namespace ssWWVBS
 
       bool pass_baseline=false;
       if(m_bools.at(ssWWVBS::PASS_TRIGGER) && m_bools.at(ssWWVBS::PASS_TWO_LEPTONS) && m_bools.at(ssWWVBS::DILEPTON_MASS_THRESHOLD)) pass_baseline=true;
+
+
+      // definition of SR and WZCR events: eee, mmm, mme, eem
+      const xAOD::Electron *ele2;
+      const xAOD::Muon *mu2;
+
+      // std::cout<<"     ssWWSelectorAlg::execute()     : line  248"<<std::endl;
+      if(pass_baseline && m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) ){ 
+            if(m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) && m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) && m_bools.at(ssWWVBS::DIJETS_MASS) && m_bools.at(ssWWVBS::BJET_VETO) ){
+              if( m_bools.at(ssWWVBS::MET)){
+                m_bools.at(ssWWVBS::pass_SR)=1;
+              }
+            }      
+      }
+      else if(pass_baseline && m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS)){
+            if (electrons->size() == 3) {
+              ele0 = electrons->at(0);
+              ele1 = electrons->at(1);
+              ele2 = electrons->at(2);
+              TLorentzVector p4_ele0 = ele0->p4();
+              TLorentzVector p4_ele1 = ele1->p4();
+              TLorentzVector p4_ele2 = ele2->p4();
+              // Calculate the invariant mass
+              TLorentzVector totalP4 = p4_ele0 + p4_ele1 + p4_ele2;
+              double mlll = totalP4.M();
+              if(mlll>106.* Athena::Units::GeV  && (ele0->charge()*ele1->charge()<0 || ele0->charge()*ele2->charge()<0 || ele1->charge()*ele2->charge()<0)){
+                    m_bools.at(ssWWVBS::pass_WZCR)=1;
+              }
+            }
+            else if (muons->size() == 3) {
+              mu0 = muons->at(0);
+              mu1 = muons->at(1);
+              mu2 = muons->at(2);
+              TLorentzVector p4_mu0 = mu0->p4();
+              TLorentzVector p4_mu1 = mu1->p4();
+              TLorentzVector p4_mu2 = mu2->p4();
+              // Calculate the invariant mass
+              TLorentzVector totalP4 = p4_mu0 + p4_mu1 + p4_mu2;
+              double mlll = totalP4.M();
+              if(mlll>106.* Athena::Units::GeV && (mu0->charge()*mu1->charge()<0 || mu0->charge()*mu2->charge()<0 || mu1->charge()*mu2->charge()<0)){
+                    m_bools.at(ssWWVBS::pass_WZCR)=1;
+              }
+            }
+            else if (muons->size() == 1 && electrons->size() == 2) {
+              mu0 = muons->at(0);
+              ele0 = electrons->at(0);
+              ele1 = electrons->at(1);
+              TLorentzVector p4_mu0 = mu0->p4();
+              TLorentzVector p4_ele1 = ele1->p4();
+              TLorentzVector p4_ele0 = ele0->p4();
+              // Calculate the invariant mass
+              TLorentzVector totalP4 = p4_ele0 + p4_ele1 + p4_mu0;
+              double mlll = totalP4.M();
+              if(mlll>106.* Athena::Units::GeV && (ele0->charge()*ele1->charge()<0)){
+                    m_bools.at(ssWWVBS::pass_WZCR)=1;
+              }
+            }
+            else if (muons->size() == 2 && electrons->size() == 1) {
+              mu0 = muons->at(0);
+              mu1 = muons->at(1);
+              ele0 = electrons->at(0);
+              TLorentzVector p4_mu0 = mu0->p4();
+              TLorentzVector p4_mu1 = mu1->p4();
+              TLorentzVector p4_ele0 = ele0->p4();
+              // Calculate the invariant mass
+              TLorentzVector totalP4 = p4_mu0 + p4_mu1 + p4_ele0;
+              double mlll = totalP4.M();
+              if(mlll>106.* Athena::Units::GeV && (mu0->charge()*mu1->charge()<0)){ 
+                    m_bools.at(ssWWVBS::pass_WZCR)=1;
+              }
+            }
+      }
+      //std::cout<<"     ssWWSelectorAlg::execute()     : line  316"<<std::endl;
       
+      bool pass = false;
+      for(const auto& channel : m_channels){
+        if(channel == ssWWVBS::SR){
+          pass |= m_bools.at(ssWWVBS::pass_SR);
+        }
+        else if(channel == ssWWVBS::WZCR){
+          pass |= m_bools.at(ssWWVBS::pass_WZCR);
+        }
+      }
+
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()=="") {
 
@@ -261,7 +358,7 @@ namespace ssWWVBS
         m_Bbranches.at(key).set(*event, var, sys);
       }
 
-      if (!m_bypass && !pass_baseline) continue;
+      if (!m_bypass && !pass_baseline && !pass) continue;
       filter.setPassed(true);
     }
     return StatusCode::SUCCESS;
@@ -587,6 +684,9 @@ namespace ssWWVBS
     if (electrons.size() + muons.size() == 2)
       m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) = true;
 
+    if (electrons.size() + muons.size() == 3)
+      m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS) = true;
+
     if (electrons.size() >= 2)
     {
       mll = (electrons.at(0)->p4() + electrons.at(1)->p4()).M();
@@ -644,6 +744,7 @@ namespace ssWWVBS
     m_bools.at(ssWWVBS::IS_mm) = (muons.size() >= 2);
     m_bools.at(ssWWVBS::IS_em) = (electrons.size() > 0) && (electrons.size() < 2) && (muons.size() > 0) && (muons.size() < 2);
     if(ssWWCuts.exists("PASS_TWO_LEPTONS")) m_bools.at(ssWWVBS::PASS_TWO_LEPTONS) = (electrons.size() + muons.size() >= 2);
+    if(ssWWCuts.exists("PASS_THREE_LEPTONS")) m_bools.at(ssWWVBS::PASS_THREE_LEPTONS) = (electrons.size() + muons.size() >= 3);
     if(ssWWCuts.exists("BJET_VETO")) m_bools.at(ssWWVBS::BJET_VETO) = (bjets.size() > 0);
 
   }  

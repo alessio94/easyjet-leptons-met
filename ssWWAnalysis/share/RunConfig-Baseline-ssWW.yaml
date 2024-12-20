@@ -1,5 +1,7 @@
 include: EasyjetHub/base-config.yaml
 
+channels: ["SR","WZCR"]
+
 # Which analysis to consider
 do_ssWW_analysis: true
 
@@ -48,7 +50,7 @@ Muon:
   max_eta_ssWW: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
 
 Lepton:
-  amount: 2
+  amount: 3
   variables_int: ["isPrompt","truthOrigin", "truthType"]
 
 

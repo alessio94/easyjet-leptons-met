@@ -147,7 +147,10 @@ def ssWW_branches(flags):
 
     branches += object_level_branches
 
-    branches += ["EventInfo.ssWW_pass_sr_%SYS% -> ssWW_pass_SR_%SYS%"]
+    # branches += ["EventInfo.ssWW_pass_sr_%SYS% -> ssWW_pass_SR_%SYS%"]
+
+    for region in ["SR", "WZCR"]:
+        branches += [f"EventInfo.pass_{region}_%SYS% -> ssWW_pass_{region}_%SYS%"]
 
     if (flags.Analysis.save_ssWW_cutflow):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories

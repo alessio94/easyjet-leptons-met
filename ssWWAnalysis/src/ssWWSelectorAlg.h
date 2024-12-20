@@ -29,6 +29,12 @@
 
 namespace ssWWVBS
 {
+  enum Channel
+  {
+    SR,
+    WZCR,
+  };
+
   enum TriggerChannel
   {
     SLT,
@@ -70,6 +76,11 @@ namespace ssWWVBS
     DIJETS_MASS,
     DIJETS_DELTA_RAPIDITY,
     BJET_VETO,
+    pass_SR,
+
+    PASS_THREE_LEPTONS,
+    EXACTLY_THREE_LEPTONS,
+    pass_WZCR,
 
   };
 
@@ -105,6 +116,11 @@ namespace ssWWVBS
     private :
       // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
       // "someInfo"};
+
+      Gaudi::Property<std::vector<std::string>> m_channel_names
+      { this, "channel", {}, "Which channel to run" };
+
+      std::vector<ssWWVBS::Channel> m_channels;
 
       Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
@@ -190,6 +206,10 @@ namespace ssWWVBS
         {ssWWVBS::DIJETS_MASS, "DIJETS_MASS"},
         {ssWWVBS::DIJETS_DELTA_RAPIDITY, "DIJETS_DELTA_RAPIDITY"},
         {ssWWVBS::BJET_VETO, "BJET_VETO"},
+        {ssWWVBS::PASS_THREE_LEPTONS, "PASS_THREE_LEPTONS"},
+        {ssWWVBS::EXACTLY_THREE_LEPTONS, "EXACTLY_THREE_LEPTONS"},
+        {ssWWVBS::pass_WZCR, "pass_WZCR"},
+        {ssWWVBS::pass_SR, "pass_SR"},
       };
 
       CutManager m_ssWWCuts;

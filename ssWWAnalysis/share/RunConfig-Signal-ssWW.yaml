@@ -20,3 +20,6 @@ Muon:
   Iso: "PflowLoose_VarRad" # previouly FixedCutPflowTight
   min_pT_ssWW: 27000
   max_eta_ssWW: 2.5
+
+Lepton:
+  amount: 3 #if 2 the WZCR will be emty
