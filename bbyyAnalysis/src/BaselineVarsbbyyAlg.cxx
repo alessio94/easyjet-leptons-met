@@ -237,24 +237,26 @@ namespace HHBBYY
       }
 
       // inclusive jet sector
-      for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)4); i++){	 
-        TLorentzVector j = jets->at(i)->p4();
-        j_passWP = static_cast<int>(m_isBtag.get(*jets->at(i), sys));
-        PCBTjet= m_PCBT.get(*jets->at(i), sys);
-      
-        m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, j.Pt(), sys);
-        m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, j.Eta(), sys);
-        m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, j.Phi(), sys);
-        m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, j.E(), sys);
+      if (m_save_extra_vars){
+        for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)4); i++){	 
+          TLorentzVector j = jets->at(i)->p4();
+          j_passWP = static_cast<int>(m_isBtag.get(*jets->at(i), sys));
+          PCBTjet= m_PCBT.get(*jets->at(i), sys);
+        
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, j.Pt(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, j.Eta(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, j.Phi(), sys);
+          m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, j.E(), sys);
 
-        m_Ibranches.at("Jet"+std::to_string(i+1)+"_PassWP").set(*event,j_passWP,sys);
+          m_Ibranches.at("Jet"+std::to_string(i+1)+"_PassWP").set(*event,j_passWP,sys);
 
-        if(PCBTgiven)
-          m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,PCBTjet,sys);
+          if (PCBTgiven)
+            m_Ibranches.at("Jet"+std::to_string(i+1)+"_pcbt").set(*event,PCBTjet,sys);
 
-        if (m_isMC){
-          m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set
-            (*event, m_truthFlav.get(*jets->at(i), sys), sys);
+          if (m_isMC){
+            m_Ibranches.at("Jet"+std::to_string(i+1)+"_truthLabel").set
+              (*event, m_truthFlav.get(*jets->at(i), sys), sys);
+          }
         }
       }
 
@@ -293,21 +295,22 @@ namespace HHBBYY
       }
 
       // More global variables
-      m_Fbranches.at("HT").set(*event, HT, sys);
+      if(m_save_extra_vars){
+        float topness = compute_Topness(jets);
+        m_Fbranches.at("topness").set(*event, topness, sys);
+        
+        std::vector<float> eventShapes = compute_EventShapes(Hbb_Jet1, Hbb_Jet2, photons);
+        m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
+        m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
 
-      float topness = compute_Topness(jets);
-      m_Fbranches.at("topness").set(*event, topness, sys);
-      
-      std::vector<float> eventShapes = compute_EventShapes(Hbb_Jet1, Hbb_Jet2, photons);
-      m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
-      m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
+        eventFloats.at(HHBBYY::Var::sphericityT) = eventShapes[0];
+        eventFloats.at(HHBBYY::Var::planarFlow) = eventShapes[1];
+        eventFloats.at(HHBBYY::Var::topness) = topness;
 
-      eventFloats.at(HHBBYY::Var::sphericityT) = eventShapes[0];
-      eventFloats.at(HHBBYY::Var::planarFlow) = eventShapes[1];
-      eventFloats.at(HHBBYY::Var::topness) = topness;
-
-      float pTBalance = compute_pTBalance(Hbb_Jet1, Hbb_Jet2, photons);
-      m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
+        float pTBalance = compute_pTBalance(Hbb_Jet1, Hbb_Jet2, photons);
+        m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
+        m_Fbranches.at("HT").set(*event, HT, sys);
+      }
 
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
@@ -496,10 +499,13 @@ namespace HHBBYY
       std::string prefix_bjet = prefix + "HbbCandidate_Jet"+std::to_string(i+1);
       m_Ibranches.at(prefix_bjet+"_n_muons").set
 	(*event, m_nmuons.get(*jet, sys), sys);
-      float uncorrPt = jet->jetP4("NoBJetCalibMomentum").Pt();
-      m_Fbranches.at(prefix_bjet+"_uncorrPt").set(*event, uncorrPt, sys);
-      float muonCorrPt = jet->jetP4("MuonCorrMomentum").Pt();
-      m_Fbranches.at(prefix_bjet+"_muonCorrPt").set(*event, muonCorrPt, sys);
+
+      if(m_save_extra_vars){
+        float uncorrPt = jet->jetP4("NoBJetCalibMomentum").Pt();
+        m_Fbranches.at(prefix_bjet+"_uncorrPt").set(*event, uncorrPt, sys);
+        float muonCorrPt = jet->jetP4("MuonCorrMomentum").Pt();
+        m_Fbranches.at(prefix_bjet+"_muonCorrPt").set(*event, muonCorrPt, sys);
+      }
 
       TLorentzVector jet_tlv = jet->p4();
       m_Fbranches.at(prefix_bjet+"_pt").set(*event, jet_tlv.Pt(), sys);
@@ -545,22 +551,25 @@ namespace HHBBYY
 
     // Want to compute the three body mass for the SHbbyy 
     // analysis, onebtag region (variable used for PNN)
-    if(m_doResonantonebtag){
+    if (m_doResonantonebtag){
       TLorentzVector H_byy = Hbb_jets[0]->p4() + H_yy;
       m_Fbranches.at(prefix+"mbyy").set(*event, H_byy.M(), sys);
     }
 
-    std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(Hyy_photons[0]->p4(),Hyy_photons[1]->p4(),Hbb_jets[0]->p4(),Hbb_jets[1]->p4());
+    if (m_save_extra_vars){
+      std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(Hyy_photons[0]->p4(),Hyy_photons[1]->p4(),Hbb_jets[0]->p4(),Hbb_jets[1]->p4());
 
-    m_Fbranches.at(prefix+"cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);
-    m_Fbranches.at(prefix+"phi_yy_cm_bbyy").set(*event,vec_angular_variables_CM[1], sys);
-  
-    m_Fbranches.at(prefix+"Photon1_cos_theta_cm_gamgam").set(*event,vec_angular_variables_CM[2], sys);
-    m_Fbranches.at(prefix+"Photon1_phi_cm_gamgam").set(*event,vec_angular_variables_CM[3], sys);
-  
-    m_Fbranches.at(prefix+"HbbCandidate_Jet1_cos_theta_cm_bb").set(*event,vec_angular_variables_CM[4], sys);
-    m_Fbranches.at(prefix+"HbbCandidate_Jet1_phi_cm_bb").set(*event,vec_angular_variables_CM[5], sys);
-    m_Fbranches.at(prefix+"DeltaPhi_bb_yy_cm_bbyy").set(*event,vec_angular_variables_CM[6], sys);
+      m_Fbranches.at(prefix+"cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);
+      m_Fbranches.at(prefix+"phi_yy_cm_bbyy").set(*event,vec_angular_variables_CM[1], sys);
+    
+      m_Fbranches.at(prefix+"Photon1_cos_theta_cm_gamgam").set(*event,vec_angular_variables_CM[2], sys);
+      m_Fbranches.at(prefix+"Photon1_phi_cm_gamgam").set(*event,vec_angular_variables_CM[3], sys);
+    
+      m_Fbranches.at(prefix+"HbbCandidate_Jet1_cos_theta_cm_bb").set(*event,vec_angular_variables_CM[4], sys);
+      m_Fbranches.at(prefix+"HbbCandidate_Jet1_phi_cm_bb").set(*event,vec_angular_variables_CM[5], sys);
+      m_Fbranches.at(prefix+"DeltaPhi_bb_yy_cm_bbyy").set(*event,vec_angular_variables_CM[6], sys);
+    }
+
   }
 
   void BaselineVarsbbyyAlg::loadGNN(const std::string &filePath) {

@@ -113,7 +113,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             floatVariableList=float_variables,
             intVariableList=int_variables,
             doSystematics=flags.Analysis.do_CP_systematics,
-            doResonantonebtag=flags.Analysis.do_resonant_onebtag
+            doResonantonebtag=flags.Analysis.do_resonant_onebtag,
+            save_extra_vars=flags.Analysis.save_extra_vars
         )
     )
 
@@ -159,19 +160,24 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     float_variable_names += ["myy", "pTyy", "Etayy", "Phiyy", "dRyy"]
     float_variable_names += ["mbb", "pTbb", "Etabb", "Phibb", "dRbb"]
 
-    float_variable_names += ["cos_theta_yy_cm_bbyy", "phi_yy_cm_bbyy"]
+    if (flags.Analysis.save_extra_vars):
+        float_variable_names += ["cos_theta_yy_cm_bbyy", "phi_yy_cm_bbyy"]
 
-    float_variable_names += ["Photon1_cos_theta_cm_gamgam", "Photon1_phi_cm_gamgam"]
+        float_variable_names += ["Photon1_cos_theta_cm_gamgam", "Photon1_phi_cm_gamgam"]
 
     # HbbCandidate jets
+    HbbCandidate_float_vars = ["pt", "phi", "eta", "E"]
+    if (flags.Analysis.save_extra_vars):
+        HbbCandidate_float_vars += ["uncorrPt", "muonCorrPt"]
     for i in range(1, 3):
-        for var in ["pt", "phi", "eta", "E", "uncorrPt", "muonCorrPt"]:
+        for var in HbbCandidate_float_vars:
             float_variable_names += [f"HbbCandidate_Jet{i}_" + var]
         for var in ["truthLabel", "pcbt", "n_muons"]:
             int_variable_names += [f"HbbCandidate_Jet{i}_" + var]
 
-    float_variable_names += ["HbbCandidate_Jet1_cos_theta_cm_bb",
-                             "HbbCandidate_Jet1_phi_cm_bb"]
+    if (flags.Analysis.save_extra_vars):
+        float_variable_names += ["HbbCandidate_Jet1_cos_theta_cm_bb",
+                                 "HbbCandidate_Jet1_phi_cm_bb"]
 
     # di-higgs variables
     float_variable_names += ["mbbyy", "mbbyy_star", "pTbbyy", "Etabbyy",
@@ -179,7 +185,8 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     if flags.Analysis.do_nonresonant_BDTs:
         float_variable_names += ["bdtSel_score"]
 
-    float_variable_names += ["DeltaPhi_bb_yy_cm_bbyy"]
+    if (flags.Analysis.save_extra_vars):
+        float_variable_names += ["DeltaPhi_bb_yy_cm_bbyy"]
 
     # three body mass used for
     # SHbbyy, onebtag region
@@ -253,9 +260,12 @@ def get_BaselineVarsbbyyAlg_variables(flags):
                                      "GNN_" + c + "_Jet_vbf_jj_deta"]
             int_variable_names += ["GNN_" + c + "_bdtSel_category"]
 
-    # mva variables
-    float_variable_names += ["HT", "topness", "sphericityT", "planarFlow",
-                             "pTBalance"]
+    # save extra variables which may be useful, but are
+    # not necessary for barebones SHbbyy analysis
+    if (flags.Analysis.save_extra_vars):
+        # mva variables
+        float_variable_names += ["HT", "topness", "sphericityT", "planarFlow",
+                                 "pTBalance"]
 
     return float_variable_names, int_variable_names
 

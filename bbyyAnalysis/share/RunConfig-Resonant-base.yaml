@@ -26,6 +26,7 @@ bypass: false # true: Save events which fail selections. false: Remove events wh
 
 Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_90" # can also use "GN2v01_FixedCutBEff_85"
+  amount: 0 # only used for saving extra variables
 
 do_GNN2bjetSelection: false
 do_KinematicFit: false
@@ -33,4 +34,4 @@ do_trigger_filtering: true
 save_bbyy_cutflow: false
 do_nonresonant_BDTs: false
 save_VBF_vars: false
-save_bbyy_cutflow: false
+save_extra_vars: false
