@@ -42,7 +42,9 @@ namespace HHBBYY
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     
-    ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
+    // only initialize the generator weights for systematics branches if you want an MC normalized cutflow for 
+    // every systematics branch
+    if (m_saveCutFlow) ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
 
     m_photonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_photonWPName+"_%SYS%", this);
@@ -225,57 +227,59 @@ namespace HHBBYY
       // if event is passed to output writing or not
       if (m_bypass or passedall) filter.setPassed(true);
 
-      // do the CUTFLOW only with sys="" -> NOSYS
-      if (sys.name()!=m_specialSysWeight) continue;
+      // only do the cutflow if you are on the nominal branch, and want the cutflow done at all
+      if(sys.name()!=m_specialSysWeight && m_saveCutFlow){
 
-      // Compute total_events
-      m_total_events+=1; 
-      if (m_isMC) m_total_mcEventWeight+=  m_generatorWeight.get(*event, sys);
+        // Compute total_events
+        m_total_events+=1; 
+        if (m_isMC) m_total_mcEventWeight+=  m_generatorWeight.get(*event, sys);
 
-      // Count how many cuts the event passed and increase the relative counter
-      for (const auto &cut : m_inputCutList) {
-        if(m_bbyyCuts.exists(cut)) {
-          if (m_bbyyCuts(cut).passed) {
-            bool pass = true;
-            if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER") 
-              pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
-            else if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER_MATCHING")
-              pass = m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
-            m_bbyyCuts(cut).counter += pass;
-            if (m_isMC) m_bbyyCuts(cut).w_counter += m_generatorWeight.get(*event, sys) * pass;
+        // Count how many cuts the event passed and increase the relative counter
+        for (const auto &cut : m_inputCutList) {
+          if(m_bbyyCuts.exists(cut)) {
+            if (m_bbyyCuts(cut).passed) {
+              bool pass = true;
+              if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER") 
+                pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
+              else if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER_MATCHING")
+                pass = m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
+              m_bbyyCuts(cut).counter += pass;
+              if (m_isMC) m_bbyyCuts(cut).w_counter += m_generatorWeight.get(*event, sys) * pass;
+            }
           }
         }
-      }
 
-      // Check how many consecutive cuts are passed by the event.
-      unsigned int consecutive_cuts = 0;
-      for (size_t i = 0; i < m_bbyyCuts.size(); ++i) {
-        if (m_bbyyCuts[i].passed)
-        {
-          if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER"){
-            if (not m_bools.at(HHBBYY::pass_trigger_diphoton)) break;
-            consecutive_cuts += m_bools.at(HHBBYY::pass_trigger_diphoton);
-          }else if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER_MATCHING"){
-            if (not m_bools.at(HHBBYY::pass_matching_trigger_diphoton)) break;
-            consecutive_cuts += m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
-          }else
-            consecutive_cuts++;
+        // Check how many consecutive cuts are passed by the event.
+        unsigned int consecutive_cuts = 0;
+        for (size_t i = 0; i < m_bbyyCuts.size(); ++i) {
+          if (m_bbyyCuts[i].passed)
+          {
+            if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER"){
+              if (not m_bools.at(HHBBYY::pass_trigger_diphoton)) break;
+              consecutive_cuts += m_bools.at(HHBBYY::pass_trigger_diphoton);
+            }else if (not m_enableSinglePhotonTrigger and m_inputCutList.at(i) == "PASS_TRIGGER_MATCHING"){
+              if (not m_bools.at(HHBBYY::pass_matching_trigger_diphoton)) break;
+              consecutive_cuts += m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
+            }else
+              consecutive_cuts++;
+          }
+          else
+            break;
         }
-        else
-          break;
-      }
 
-      // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
-      // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
-      for (unsigned int i=0; i<consecutive_cuts; i++) {
-        std::string cut = m_inputCutList.at(i);
-        bool pass = true;
-        if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER")
-          pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
-        else if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER_MATCHING")
-          pass = m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
-        m_bbyyCuts[i].relativeCounter += pass;
-        if (m_isMC) m_bbyyCuts(cut).w_relativeCounter += m_generatorWeight.get(*event, sys) * pass;
+        // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
+        // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
+        for (unsigned int i=0; i<consecutive_cuts; i++) {
+          std::string cut = m_inputCutList.at(i);
+          bool pass = true;
+          if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER")
+            pass = m_bools.at(HHBBYY::pass_trigger_diphoton);
+          else if (not m_enableSinglePhotonTrigger and cut == "PASS_TRIGGER_MATCHING")
+            pass = m_bools.at(HHBBYY::pass_matching_trigger_diphoton);
+          m_bbyyCuts[i].relativeCounter += pass;
+          if (m_isMC) m_bbyyCuts(cut).w_relativeCounter += m_generatorWeight.get(*event, sys) * pass;
+        }
+
       }
 
     }

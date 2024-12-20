@@ -1,5 +1,7 @@
 include: bbyyAnalysis/RunConfig-Resonant-base.yaml
 
+do_resonant_onebtag: true
+
 CutList :
       - PASS_TRIGGER
       - TWO_TIGHTID_ISO_PHOTONS
@@ -10,12 +12,7 @@ CutList :
       - EXACTLY_ONE_OR_TWO_B_JETS
 
 do_CP_systematics: true
-systematics_regex: ['JET_JER_EffectiveNP_*', 'EG_*'] # for now include only these systematics
+systematics_regex: [".*"]
         
 ttree_output:
   include: bbyy-base-output.yaml
-
-Small_R_jet:
-  btag_wp: "GN2v01_FixedCutBEff_90"
-
-do_resonant_onebtag: true

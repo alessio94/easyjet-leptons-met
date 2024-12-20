@@ -25,11 +25,12 @@ Photon:
 bypass: false # true: Save events which fail selections. false: Remove events which fail selections.
 
 Small_R_jet:
-  btag_wp: "GN2v01_FixedCutBEff_77" # can also use "GN2v01_FixedCutBEff_85"
+  btag_wp: "GN2v01_FixedCutBEff_90" # can also use "GN2v01_FixedCutBEff_85"
 
 do_GNN2bjetSelection: false
 do_KinematicFit: false
 do_trigger_filtering: true
+save_bbyy_cutflow: false
 do_nonresonant_BDTs: false
 save_VBF_vars: false
-
+save_bbyy_cutflow: false
