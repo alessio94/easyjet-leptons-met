@@ -22,9 +22,11 @@ def met_sequence(flags, configAcc):
         electrons=f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}',
         photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
         muons=f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}',
-        taus=(flags.Analysis.Tau.extra_wps[0]
-              if flags.Analysis.OverlapRemoval.doTauAntiTauJet else
-              flags.Analysis.Tau.ID),
+        taus=(
+            flags.Analysis.Tau.extra_wps[0]
+            if flags.Analysis.OverlapRemoval.doTauAntiTauJet
+            else flags.Analysis.Tau.ID
+        ),
     )
     # Construct the names of the view containers with working point selection
     # We need to use the '.' style so that the algs operate on the full
@@ -35,9 +37,14 @@ def met_sequence(flags, configAcc):
             selection = METselections[objtype]
             preMET_collections[objtype] = f'{collname}.{selection}'
 
-    configSeq += makeConfig('MissingET',
-                            containerName=drop_sys(container_names.output.met))
+    configSeq += makeConfig(
+        'MissingET', containerName=drop_sys(container_names.output.met)
+    )
     # Pass all the calibrated jets
+    configSeq.setOptionValue(
+        ".useJVT",
+        flags.Analysis.Small_R_jet.jet_type != "reco4EMTopoJet"
+    )
     configSeq.setOptionValue(
         '.jets',
         drop_sys(container_names.output[flags.Analysis.Small_R_jet.jet_type])
