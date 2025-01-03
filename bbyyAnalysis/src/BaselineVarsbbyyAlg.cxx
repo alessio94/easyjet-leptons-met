@@ -48,6 +48,7 @@ namespace HHBBYY
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
     if(m_doKF){
       ATH_CHECK (m_KFJetHandle.initialize(m_systematicsList));
+      ATH_CHECK (m_KF_MBB.initialize(m_systematicsList, m_eventHandle));
     }
 
     ATH_CHECK (m_selected_ph.initialize(m_systematicsList, m_photonHandle));
@@ -144,6 +145,7 @@ namespace HHBBYY
       TLorentzVector H_bb(0.,0.,0.,0.);
       TLorentzVector H_yy(0.,0.,0.,0.);
       TLorentzVector HH(0.,0.,0.,0.);
+      int year = m_year.get(*event, sys);
 
       int j_passWP=-99;
       int PCBTjet = -99;
@@ -284,6 +286,7 @@ namespace HHBBYY
       // Fill the bb and bbyy branches
       if (jets->size() >= 2) {
         fill_bb_branches(Hbb_jets, "", event, sys);
+        if (m_doKF) {eventFloats.at(HHBBYY::Var::bb_m_KF_unconstrained) = m_KF_MBB.get(*event, sys);}
 
         if(ph1 && ph2) {
           HH = H_yy + H_bb;
@@ -318,6 +321,18 @@ namespace HHBBYY
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
       m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
 
+      // bdt (vbf jets selection)
+      ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_Jet1, Hbb_Jet2, jets, HT, HH, "Jet_vbf_j", "Jet_vbf_jj",eventFloats, event, sys));
+
+      // bdt (low and high mHH categorations)
+      if(m_do_nonresonant_BDTs){
+        if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
+          performCategorisationBDT(ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, metCont, sys, eventFloats, eventInts, false, false, year);
+        }
+        m_Fbranches.at("bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
+        m_Ibranches.at("bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category), sys);
+      }
+
       //KF jets sector
       if (m_doKF){
         for(const xAOD::Jet* KFjet : *KFJets) {
@@ -327,6 +342,8 @@ namespace HHBBYY
             if (WPgiven && m_isBtag.get(*KFjet, sys)) KF_bjets->push_back(KFjet);
           }
           m_Fbranches.at("KF_HT").set(*event, KF_HT, sys);
+          eventFloats.at(HHBBYY::Var::jets_HT_KF) = KF_HT;
+
           //inclusive jets sector
           for (std::size_t i=0; i<std::min(KFJets->size(),(std::size_t)4); i++){	 
             TLorentzVector j = KFJets->at(i)->p4();
@@ -375,15 +392,16 @@ namespace HHBBYY
             double Higgs_mass = 125. * Athena::Units::GeV;
             TLorentzVector HH_KF = H_yy + H_bb_KF;
             float KF_bbyy_mStar = HH_KF.M() - (H_bb_KF.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
+            eventFloats.at(HHBBYY::Var::bbyy_mStar_KF) = KF_bbyy_mStar;
             m_Fbranches.at("KF_mbbyy").set(*event, HH_KF.M(), sys);
-            m_Fbranches.at("KF_mbbyystar").set(*event, KF_bbyy_mStar, sys);
+            m_Fbranches.at("KF_mbbyy_star").set(*event, KF_bbyy_mStar, sys);
             m_Fbranches.at("KF_pTbbyy").set(*event, HH_KF.Pt(), sys);
             m_Fbranches.at("KF_Etabbyy").set(*event, HH_KF.Eta(), sys);
             m_Fbranches.at("KF_Phibbyy").set(*event, HH_KF.Phi(), sys);
             m_Fbranches.at("KF_dRHH").set(*event, H_yy.DeltaR(H_bb_KF), sys);
 
-	    //vbf jets selection KF
-	    ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_KFJet1, Hbb_KFJet2, KFJets, KF_HT, HH_KF, "KF_Jet_vbf_j", "KF_Jet_vbf_jj", eventFloats, event, sys));
+	          //vbf jets selection KF
+	          ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_KFJet1, Hbb_KFJet2, KFJets, KF_HT, HH_KF, "KF_Jet_vbf_j", "KF_Jet_vbf_jj", eventFloats, event, sys));
           }
 	  
           //mva variables
@@ -394,24 +412,23 @@ namespace HHBBYY
           m_Fbranches.at("KF_sphericityT").set(*event, KF_eventShapes[0], sys);
           m_Fbranches.at("KF_planarFlow").set(*event, KF_eventShapes[1], sys);
           m_Fbranches.at("KF_pTBalance").set(*event, KF_pTBalance, sys);                   
+          eventFloats.at(HHBBYY::Var::sphericityT_KF) = KF_eventShapes[0];
+          eventFloats.at(HHBBYY::Var::planarFlow_KF) = KF_eventShapes[1];
+          eventFloats.at(HHBBYY::Var::topness_KF) = KF_topness;
+          
+          if(m_do_nonresonant_BDTs){   
+            if (ph1 && ph2 && Hbb_KFJet1 && Hbb_KFJet2){    
+              performCategorisationBDT(ph1, ph2, Hbb_KFJet1, Hbb_KFJet2, KFJets, metCont, sys, eventFloats, eventInts, true, false, year);
+            }
+            m_Fbranches.at("KF_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_KF), sys);
+            m_Ibranches.at("KF_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category_KF), sys);
+
+          }
       }   
-
-      // bdt (vbf jets selection)
-      ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_Jet1, Hbb_Jet2, jets, HT, HH, "Jet_vbf_j", "Jet_vbf_jj",eventFloats, event, sys));
-
-      // bdt (low and high mHH categorations)
-      if(m_do_nonresonant_BDTs){
-        if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
-          performCategorisationBDT(ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, metCont, sys, eventFloats, eventInts);
-        }
-        m_Fbranches.at("bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
-        m_Ibranches.at("bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category), sys);
-      }
 
       //GNN Implementation
       if(m_doGNN_tagging)
       {
-        int year = m_year.get(*event, sys);
         float pile_up;
         if(2015<=year && year<=2016) {
           pile_up = event->averageInteractionsPerCrossing();
@@ -461,27 +478,27 @@ namespace HHBBYY
             TLorentzVector GNN_H_bb = GNN_jets[0]->p4() + GNN_jets[1]->p4();
             TLorentzVector GNN_HH = H_yy + GNN_H_bb;
             float GNN_bbyy_mStar = GNN_HH.M() - (GNN_H_bb.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
-            eventFloats.at(HHBBYY::Var::bbyy_mStar) = GNN_bbyy_mStar;
+            eventFloats.at(HHBBYY::Var::bbyy_mStar_GNN) = GNN_bbyy_mStar;
   
             TLorentzVector GNN_vbf_jj = GNN_vbf_j[0] + GNN_vbf_j[1];
             m_Fbranches.at("GNN_" + prefix + "_Jet_vbf_jj_maxscore").set(*event, GNN_vbf_jj_maxscore, sys);
             m_Fbranches.at("GNN_" + prefix + "_Jet_vbf_jj_m").set(*event, GNN_vbf_jj.M(), sys);
             m_Fbranches.at("GNN_" + prefix + "_Jet_vbf_jj_deta").set(*event, std::fabs(GNN_vbf_j[0].Eta() - GNN_vbf_j[1].Eta()), sys);
-            eventFloats.at(HHBBYY::Var::vbfjj_m) = GNN_vbf_jj.M();
-            eventFloats.at(HHBBYY::Var::vbfjj_dEta) = std::fabs(GNN_vbf_j[0].Eta() - GNN_vbf_j[1].Eta());
+            eventFloats.at(HHBBYY::Var::vbfjj_m_GNN) = GNN_vbf_jj.M();
+            eventFloats.at(HHBBYY::Var::vbfjj_dEta_GNN) = std::fabs(GNN_vbf_j[0].Eta() - GNN_vbf_j[1].Eta());
   
             std::vector<float> GNN_eventShapes = compute_EventShapes(GNN_jets[0], GNN_jets[1], photons);
             m_Fbranches.at("GNN_" + prefix + "_sphericityT").set(*event, GNN_eventShapes[0], sys);
             m_Fbranches.at("GNN_" + prefix + "_planarFlow").set(*event, GNN_eventShapes[1], sys);
-            eventFloats.at(HHBBYY::Var::sphericityT) = GNN_eventShapes[0];
-            eventFloats.at(HHBBYY::Var::planarFlow) = GNN_eventShapes[1];
+            eventFloats.at(HHBBYY::Var::sphericityT_GNN) = GNN_eventShapes[0];
+            eventFloats.at(HHBBYY::Var::planarFlow_GNN) = GNN_eventShapes[1];
   
             float GNN_pTBalance = compute_pTBalance(GNN_jets[0], GNN_jets[1], photons);
             m_Fbranches.at("GNN_" + prefix + "_pTBalance").set(*event, GNN_pTBalance, sys);
   
-            performCategorisationBDT(ph1, ph2, GNN_jets[0], GNN_jets[1], jets, metCont, sys, eventFloats, eventInts);
-            m_Fbranches.at("GNN_" + prefix + "_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
-            m_Ibranches.at("GNN_" + prefix + "_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category), sys);
+            performCategorisationBDT(ph1, ph2, GNN_jets[0], GNN_jets[1], jets, metCont, sys, eventFloats, eventInts, false, true, year);
+            m_Fbranches.at("GNN_" + prefix + "_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_GNN), sys);
+            m_Ibranches.at("GNN_" + prefix + "_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category_GNN), sys);
           }
         }
       }
@@ -985,12 +1002,19 @@ namespace HHBBYY
   std::vector<float> BaselineVarsbbyyAlg::makeXGBoostDMatrixLegacyNonres(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
                                                                          ConstDataVector<xAOD::JetContainer> &categorisation_jets,
                                                                          const xAOD::MissingETContainer *met, const auto &sys, 
-                                                                         const std::map<HHBBYY::Var, float> &eventFloats) {
+                                                                         const std::map<HHBBYY::Var, float> &eventFloats, bool isKFvariables, bool isGNNvariables) {
     // Assuming that the jets are already sorted by btagging score and then pT (jetSelectorAlg)
     // initialize the variables
     std::vector<float> vars(HHBBYY::Var::NVars, 0.0f);
-    vars[HHBBYY::Var::j3_pcbt] = -9;
-    vars[HHBBYY::Var::j4_pcbt] = -9;
+    vars[HHBBYY::Var::j3_pt] = -99;
+    vars[HHBBYY::Var::j3_eta] = -99;
+    vars[HHBBYY::Var::y1_phi] = -99;
+    vars[HHBBYY::Var::j3_pcbt] = -99;
+    vars[HHBBYY::Var::j4_pt] = -99;
+    vars[HHBBYY::Var::j4_eta] = -99;
+    vars[HHBBYY::Var::j4_phi] = -99;
+    vars[HHBBYY::Var::j4_pcbt] = -99;
+
 
     // Sort jets by pcbt and then by pT if same pcbt
     TLorentzVector H_bb = categorisation_jets.at(0)->p4() + categorisation_jets.at(1)->p4();
@@ -999,13 +1023,14 @@ namespace HHBBYY
     float myy = (ph1->p4() + ph2->p4()).M();
     vars[HHBBYY::Var::y1_ptOverMyy] = ph1->pt() / myy;
     vars[HHBBYY::Var::y1_eta] = ph1->eta();
-    vars[HHBBYY::Var::y1y1_deltaPhi] = 0;  // dPhi(y1, y1);
+    vars[HHBBYY::Var::y1_phi] = ph1->phi() ;
     vars[HHBBYY::Var::y2_ptOverMyy] = ph2->pt() / myy;
     vars[HHBBYY::Var::y2_eta] = ph2->eta();
-    vars[HHBBYY::Var::y1y2_deltaPhi] = xAOD::P4Helpers::deltaPhi(ph1, ph2);
+    vars[HHBBYY::Var::y2_phi] = ph2->phi();
     // met
     vars[HHBBYY::Var::met] = (*met)["Final"]->met();
-    vars[HHBBYY::Var::y1met_deltaPhi] = xAOD::P4Helpers::deltaPhi(ph1, (*met)["Final"]);
+    vars[HHBBYY::Var::met_phi] = (*met)["Final"]->phi();
+
 
     // jets
     int jet_ith = 0;
@@ -1015,21 +1040,15 @@ namespace HHBBYY
       if (jet_ith <= 1) {
         vars[HHBBYY::Var::j1_pt + (jet_ith * 4)] = jet->pt();
         vars[HHBBYY::Var::j1_eta + (jet_ith * 4)] = jet->eta();
-        vars[HHBBYY::Var::y1j1_deltaPhi + (jet_ith * 4)] = xAOD::P4Helpers::deltaPhi(ph1, jet);
-        int pseudoCont_score = m_PCBT.get(*jet, sys);
-        // -9 for non-central jets, otherwise use GN2bin + 1 (just an arbitrary convention in the BDT model)
-        pseudoCont_score = (pseudoCont_score <= 0 && std::abs(jet->eta()) > 2.5) ? -9 : pseudoCont_score + 1;
-        vars[HHBBYY::Var::j1_pcbt + (jet_ith * 4)] = pseudoCont_score;
+        vars[HHBBYY::Var::j1_phi + (jet_ith * 4)] = jet->phi();
+        vars[HHBBYY::Var::j1_pcbt + (jet_ith * 4)] = m_PCBT.get(*jet, sys);
 
       } else {
         // Input variables for j2 and j3 are not contiguous, so cannot be included in previous if 
         vars[HHBBYY::Var::j3_pt + ((jet_ith - 2) * 4)] = jet->pt();
         vars[HHBBYY::Var::j3_eta + ((jet_ith - 2) * 4)] = jet->eta();
-        vars[HHBBYY::Var::y1j3_deltaPhi + ((jet_ith - 2) * 4)] = xAOD::P4Helpers::deltaPhi(ph1, jet);
-        int pseudoCont_score = m_PCBT.get(*jet, sys);
-        // -9 for non-central jets, otherwise use GN2bin + 1 (just an arbitrary convention in the BDT model)
-        pseudoCont_score = (pseudoCont_score <= 0 && std::abs(jet->eta()) > 2.5) ? -9 : pseudoCont_score + 1;
-        vars[HHBBYY::Var::j3_pcbt + ((jet_ith - 2) * 4)] = pseudoCont_score;
+        vars[HHBBYY::Var::j3_phi + ((jet_ith - 2) * 4)] = jet->phi();
+        vars[HHBBYY::Var::j3_pcbt + ((jet_ith - 2) * 4)] = m_PCBT.get(*jet, sys);
       }
       jet_ith++;
     }
@@ -1037,29 +1056,61 @@ namespace HHBBYY
     // jj
     vars[HHBBYY::Var::bb_pt] = H_bb.Pt();
     vars[HHBBYY::Var::bb_eta] = H_bb.Eta();
-    vars[HHBBYY::Var::y1bb_deltaPhi] = xAOD::P4Helpers::deltaPhi(ph1->phi(), H_bb.Phi());
-    vars[HHBBYY::Var::bb_m] = H_bb.M();
-    // event level jet variables
-    vars[HHBBYY::Var::jets_HT] = eventFloats.at(HHBBYY::Var::jets_HT);
-    // ChiWt variable
-    vars[HHBBYY::Var::topness] = eventFloats.at(HHBBYY::Var::topness);
+    vars[HHBBYY::Var::bb_phi] = H_bb.Phi();
+    vars[HHBBYY::Var::bb_m] = (isKFvariables) ? eventFloats.at(HHBBYY::Var::bb_m_KF_unconstrained) : H_bb.M(); // for KF we need to use the version of bb_m from the second iteration
 
-    if(categorisation_jets.size()==4){
-      vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::vbfjj_dEta);
-      vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m);
-    }else{
-      vars[HHBBYY::Var::vbfjj_dEta] = -999;
-      vars[HHBBYY::Var::vbfjj_m] = -999;
-    }
-    vars[HHBBYY::Var::bbyy_mStar] = eventFloats.at(HHBBYY::Var::bbyy_mStar);
-    vars[HHBBYY::Var::yy_dR] = eventFloats.at(HHBBYY::Var::yy_dR);
     vars[HHBBYY::Var::bb_dR] = categorisation_jets.at(0)->p4().DeltaR(categorisation_jets.at(1)->p4());
-    vars[HHBBYY::Var::sphericityT] = eventFloats.at(HHBBYY::Var::sphericityT);
-    vars[HHBBYY::Var::planarFlow] = eventFloats.at(HHBBYY::Var::planarFlow);
+    vars[HHBBYY::Var::yy_dR] = eventFloats.at(HHBBYY::Var::yy_dR);
+
+    vars[HHBBYY::Var::jets_HT] = (isKFvariables) ? eventFloats.at(HHBBYY::Var::jets_HT_KF) : eventFloats.at(HHBBYY::Var::jets_HT);
+      // ChiWt variable
+    vars[HHBBYY::Var::topness] = (isKFvariables) ? eventFloats.at(HHBBYY::Var::topness_KF) : eventFloats.at(HHBBYY::Var::topness);
+
+    // event level jet variables
+    if (isKFvariables && !isGNNvariables){
+      if(categorisation_jets.size()==4){
+        //Use non-KF variables for VBF to get closure with local training for now
+        //vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::vbfjj_dEta_KF);
+        //vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m_KF);
+        vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m);
+      }else{
+        vars[HHBBYY::Var::vbfjj_dEta] = 0; //-999; //another arbitrary convention...
+        vars[HHBBYY::Var::vbfjj_m] = 0; //-999;
+      }
+      vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::remove_me_deta_yybb_jj); // this is not correct but it matches our local (buggy) model
+      vars[HHBBYY::Var::bbyy_mStar] =  eventFloats.at(HHBBYY::Var::bbyy_mStar_KF);
+      vars[HHBBYY::Var::sphericityT] = eventFloats.at(HHBBYY::Var::sphericityT_KF);
+      vars[HHBBYY::Var::planarFlow] = eventFloats.at(HHBBYY::Var::planarFlow_KF);
+    } else if (!isKFvariables && !isGNNvariables){
+      if(categorisation_jets.size()==4){
+        vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::vbfjj_dEta);
+        vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m);
+      }else{
+        vars[HHBBYY::Var::vbfjj_dEta] = 0; //-999;
+        vars[HHBBYY::Var::vbfjj_m] = 0; //-999;
+      }
+      vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::remove_me_deta_yybb_jj); // this is not correct but it matches our local (buggy) model
+
+      vars[HHBBYY::Var::bbyy_mStar] =  eventFloats.at(HHBBYY::Var::bbyy_mStar);
+      vars[HHBBYY::Var::sphericityT] = eventFloats.at(HHBBYY::Var::sphericityT);
+      vars[HHBBYY::Var::planarFlow] = eventFloats.at(HHBBYY::Var::planarFlow);
+    } else if (!isKFvariables && isGNNvariables){
+      if(categorisation_jets.size()==4){
+        vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::vbfjj_dEta_GNN);
+        vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m_GNN);
+      }else{
+        vars[HHBBYY::Var::vbfjj_dEta] = -999;
+        vars[HHBBYY::Var::vbfjj_m] = -999;
+      }
+      vars[HHBBYY::Var::bbyy_mStar] =  eventFloats.at(HHBBYY::Var::bbyy_mStar_GNN);
+      vars[HHBBYY::Var::sphericityT] = eventFloats.at(HHBBYY::Var::sphericityT_GNN);
+      vars[HHBBYY::Var::planarFlow] = eventFloats.at(HHBBYY::Var::planarFlow_GNN);
+    }
 
     const float bbyy_sumPt = ph1->pt() + ph2->pt() + categorisation_jets.at(0)->pt() + categorisation_jets.at(1)->pt();
     TLorentzVector HH = ph1->p4() + ph2->p4() + categorisation_jets.at(0)->p4() + categorisation_jets.at(1)->p4();
     vars[HHBBYY::Var::bbyy_ptOverSumPt] = HH.Pt() / bbyy_sumPt;
+
     return vars;
   }
 
@@ -1088,8 +1139,9 @@ namespace HHBBYY
 	
 	vbf_jj = vbf_j[0] + vbf_j[1];
 	yybbjj = vbf_jj + HH;
-	eventFloats.at((prefix_jj == "KF_Jet_vbf_jj") ? HHBBYY::Var::KF_vbfjj_m : HHBBYY::Var::vbfjj_m) = vbf_jj.M();
-	eventFloats.at((prefix_jj == "KF_Jet_vbf_jj") ? HHBBYY::Var::KF_vbfjj_dEta : HHBBYY::Var::vbfjj_dEta) = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
+	eventFloats.at((prefix_jj == "KF_Jet_vbf_jj") ? HHBBYY::Var::vbfjj_m_KF : HHBBYY::Var::vbfjj_m) = vbf_jj.M();
+	eventFloats.at((prefix_jj == "KF_Jet_vbf_jj") ? HHBBYY::Var::vbfjj_dEta_KF : HHBBYY::Var::vbfjj_dEta) = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
+  if (prefix_jj != "KF_Jet_vbf_jj") {eventFloats.at(HHBBYY::Var::remove_me_deta_yybb_jj) = std::fabs(vbf_jj.Eta() - HH.Eta());} //to be removed
       }
     }
     
@@ -1303,57 +1355,172 @@ namespace HHBBYY
                                                      const xAOD::JetContainer *jets,
                                                      const xAOD::MissingETContainer *met, const auto &sys,
                                                      std::map<HHBBYY::Var, float> &eventFloats, 
-                                                     std::map<HHBBYY::Var, int> &eventInts) {
+                                                     std::map<HHBBYY::Var, int> &eventInts, bool isKFvariables, bool isGNNvariables, int year) {
 
-    if (m_bdts.size()!=3){
-      ANA_MSG_ERROR("3 BDTs are required: 2 for Low and High mass regions");
+    if (m_bdts.size()!=11){
+      ANA_MSG_ERROR("11 BDTs are required");
       return;
     }
+
+    if (isKFvariables && isGNNvariables){
+      ANA_MSG_ERROR("There is no BDT models trained using the GNN event selection and the KF");
+      return;
+    }
+
 
     int XGBoostCat = -99;
     float XGBoostScore = -99.;
 
     // load data array for xgboost model prediction
     ConstDataVector<xAOD::JetContainer> cat_jets = categorisation_jets(Hbb_Jet1, Hbb_Jet2, jets);
-    std::vector<float> vars = makeXGBoostDMatrixLegacyNonres(ph1, ph2,  cat_jets, met, sys, eventFloats);
+    std::vector<float> vars = makeXGBoostDMatrixLegacyNonres(ph1, ph2,  cat_jets, met, sys, eventFloats, isKFvariables, isGNNvariables);
 
     // High mass channel Selection
-    if (eventFloats.at(HHBBYY::Var::bbyy_mStar) >= 350 * Athena::Units::GeV) {
-      // get BDT score
-      const float score = m_bdts.at(HHBBYY::BDT::high_mass)->GetClassification(vars);
+    if (!isKFvariables){
+      if (eventFloats.at(isGNNvariables ? HHBBYY::Var::bbyy_mStar_GNN : HHBBYY::Var::bbyy_mStar) >= 350 * Athena::Units::GeV) {
+        // get BDT score
+        float score = -99;
+        if (year<2019) {
+          score = m_bdts.at(HHBBYY::BDT::HH2025_high_mass_Run2)->GetClassification(vars);
+        
+          if (score >= 0.920) {
+            XGBoostCat = 3;
+          } else if (score >= 0.860) {
+            XGBoostCat = 2;
+          } else if (score >= 0.680) {
+            XGBoostCat = 1;
+          } else {
+            XGBoostCat = 0;
+          }
+          XGBoostScore = score;
+        } else {
+          score = m_bdts.at(HHBBYY::BDT::HH2025_high_mass_Run3)->GetClassification(vars);
+        
+          if (score >= 0.870) {
+            XGBoostCat = 2003;
+          } else if (score >= 0.725) {
+            XGBoostCat = 2002;
+          } else if (score >= 0.385) {
+            XGBoostCat = 2001;
+          } else {
+            XGBoostCat = 2000;
+          }
+          XGBoostScore = score;
+        }
+      } else if (eventFloats.at(isGNNvariables ? HHBBYY::Var::bbyy_mStar_GNN : HHBBYY::Var::bbyy_mStar) < 350 * Athena::Units::GeV) {
+        float score = -99;
+        if (year<2019) {
+          // get BDT score
+          score = m_bdts.at(HHBBYY::BDT::HH2025_low_mass_Run2)->GetClassification(vars);
 
-      if (score >= 0.905) {
-        XGBoostCat = 3;
-      } else if (score >= 0.830) {
-        XGBoostCat = 2;
-      } else if (score >= 0.545) {
-        XGBoostCat = 1;
-      } else {
-        XGBoostCat = 0;
+          if (score >= 0.970) {
+            XGBoostCat = 1004;
+          } else if (score >= 0.935) {
+            XGBoostCat = 1003;
+          } else if (score >= 0.830) {
+            XGBoostCat = 1002;
+          } else if (score >= 0.480) {
+            XGBoostCat = 1001;
+          } else {
+            XGBoostCat = 1000;
+          }
+          XGBoostScore = score;
+        } else{
+          // get BDT score
+          score = m_bdts.at(HHBBYY::BDT::HH2025_low_mass_Run3)->GetClassification(vars);
+
+          if (score >= 0.925) {
+            XGBoostCat = 3004;
+          } else if (score >= 0.860) {
+            XGBoostCat = 3003;
+          } else if (score >= 0.710) {
+            XGBoostCat = 3002;
+          } else if (score >= 0.430) {
+            XGBoostCat = 3001;
+          } else {
+            XGBoostCat = 3000;
+          }
+          XGBoostScore = score;
+        }
+
       }
-
-      XGBoostScore = score;
-
+      eventInts.at(isGNNvariables ? HHBBYY::Var::bdt_sel_category_GNN : HHBBYY::Var::bdt_sel_category) = XGBoostCat;
+      eventFloats.at(isGNNvariables ? HHBBYY::Var::bdt_sel_score_GNN : HHBBYY::Var::bdt_sel_score) = XGBoostScore;
     } else {
-      // get BDT score
-      const float score = m_bdts.at(HHBBYY::BDT::low_mass)->GetClassification(vars);
+      if (eventFloats.at(HHBBYY::Var::bbyy_mStar_KF) >= 350 * Athena::Units::GeV) {
+        float score = -99;
+        if (year<2019) {
+          // get BDT score
+          score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run2)->GetClassification(vars);
 
-      if (score >= 0.950) {
-        XGBoostCat = 1004;
-      } else if (score >= 0.89) {
-        XGBoostCat = 1003;
-      } else if (score >= 0.785) {
-        XGBoostCat = 1002;
-      } else if (score >= 0.430) {
-        XGBoostCat = 1001;
+          if (score >= 0.925) {
+            XGBoostCat = 3;
+          } else if (score >= 0.830) {
+            XGBoostCat = 2;
+          } else if (score >= 0.635) {
+            XGBoostCat = 1;
+          } else {
+            XGBoostCat = 0;
+          }
+
+          XGBoostScore = score;
+        } else {
+          score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run3)->GetClassification(vars);
+
+          if (score >= 0.870) {
+            XGBoostCat = 2003;
+          } else if (score >= 0.740) {
+            XGBoostCat = 2002;
+          } else if (score >= 0.415) {
+            XGBoostCat = 2001;
+          } else {
+            XGBoostCat = 2000;
+          }
+
+          XGBoostScore = score;
+        }
       } else {
-        XGBoostCat = 1000;
-      }
+        float score = -99;
+        if (year<2019) {
+          // get BDT score
+          score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run2)->GetClassification(vars);
+  
+          if (score >= 0.965) {
+            XGBoostCat = 1004;
+          } else if (score >= 0.910) {
+            XGBoostCat = 1003;
+          } else if (score >= 0.785) {
+            XGBoostCat = 1002;
+          } else if (score >= 0.440) {
+            XGBoostCat = 1001;
+          } else {
+            XGBoostCat = 1000;
+          }
+  
+          XGBoostScore = score;
+        } else{
+          score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run3)->GetClassification(vars);
+  
+          if (score >= 0.920) {
+            XGBoostCat = 3004;
+          } else if (score >= 0.850) {
+            XGBoostCat = 3003;
+          } else if (score >= 0.715) {
+            XGBoostCat = 3002;
+          } else if (score >= 0.415) {
+            XGBoostCat = 3001;
+          } else {
+            XGBoostCat = 3000;
+          }
+  
+          XGBoostScore = score;
+        }
 
-      XGBoostScore = score;
+      }  
+      eventInts.at(HHBBYY::Var::bdt_sel_category_KF) = XGBoostCat;
+      eventFloats.at(HHBBYY::Var::bdt_sel_score_KF) = XGBoostScore;
     }
-    eventInts.at(HHBBYY::Var::bdt_sel_category) = XGBoostCat;
-    eventFloats.at(HHBBYY::Var::bdt_sel_score) = XGBoostScore;
+
   }
 
   ConstDataVector<xAOD::JetContainer> BaselineVarsbbyyAlg::categorisation_jets(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,

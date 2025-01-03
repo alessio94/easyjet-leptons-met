@@ -103,6 +103,14 @@ BDT_path:
   - "bbyyAnalysis/bdt_legacy_lowMass.root"
   - "bbyyAnalysis/bdt_legacy_highMass.root"
   - "bbyyAnalysis/bdt_legacy_vbf_jets.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_run2_lowMass.root" #For Higgs Pairs 2025 version with KF
+  - "bbyyAnalysis/bdt_HH2025_KF_run2_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_run3_lowMass.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_run3_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_run2_lowMass.root" #For Higgs Pairs 2025 version without KF
+  - "bbyyAnalysis/bdt_HH2025_run2_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_run3_lowMass.root"
+  - "bbyyAnalysis/bdt_HH2025_run3_highMass.root"
 
 GNN_path_run2:
   - "bbyyAnalysis/GNN_ggFTarget_run2.onnx"

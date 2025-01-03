@@ -29,9 +29,17 @@
 namespace HHBBYY
 {
   enum BDT {
-    low_mass  = 0,
-    high_mass = 1,
-    VBFjets   = 2
+    low_mass_Run2  = 0,
+    high_mass_Run2 = 1,
+    VBFjets   = 2,
+    HH2025_KF_low_mass_Run2 = 3,
+    HH2025_KF_high_mass_Run2 = 4,
+    HH2025_KF_low_mass_Run3 = 5,
+    HH2025_KF_high_mass_Run3 = 6,
+    HH2025_low_mass_Run2 = 7,
+    HH2025_high_mass_Run2 = 8,
+    HH2025_low_mass_Run3 = 9,
+    HH2025_high_mass_Run3 = 10
   };
 
   enum GNN {
@@ -42,38 +50,36 @@ namespace HHBBYY
   enum Var {
     y1_ptOverMyy = 0,
     y1_eta,
-    y1y1_deltaPhi,
+    y1_phi,
     y2_ptOverMyy,
     y2_eta,
-    y1y2_deltaPhi,
+    y2_phi,
     met,
-    y1met_deltaPhi,
+    met_phi,
     j1_pt,
     j1_eta,
-    y1j1_deltaPhi,
+    j1_phi,
     j1_pcbt,
     j2_pt,
     j2_eta,
-    y1j2_deltaPhi,
+    j2_phi,
     j2_pcbt,
     bb_pt,
     bb_eta,
-    y1bb_deltaPhi,
+    bb_phi,
     bb_m,
     jets_HT,
     topness,
     j3_pt,
     j3_eta,
-    y1j3_deltaPhi,
+    j3_phi,
     j3_pcbt,
     j4_pt,
     j4_eta,
-    y1j4_deltaPhi,
+    j4_phi,
     j4_pcbt,
     vbfjj_dEta,
     vbfjj_m,
-    KF_vbfjj_dEta,
-    KF_vbfjj_m,
     bbyy_mStar,
     yy_dR,
     bb_dR,
@@ -83,6 +89,24 @@ namespace HHBBYY
     NVars,
     bdt_sel_score,
     bdt_sel_category,
+    jets_HT_KF,
+    topness_KF,
+    bdt_sel_score_KF,
+    bdt_sel_category_KF,
+    bdt_sel_score_GNN,
+    bdt_sel_category_GNN,
+    vbfjj_dEta_KF,
+    vbfjj_m_KF,
+    vbfjj_dEta_GNN,
+    vbfjj_m_GNN,
+    sphericityT_KF,
+    planarFlow_KF,
+    sphericityT_GNN,
+    planarFlow_GNN,
+    bbyy_mStar_KF,
+    bbyy_mStar_GNN,
+    bb_m_KF_unconstrained,
+    remove_me_deta_yybb_jj, //don't use this 
     size_enum,
   };
 
@@ -142,7 +166,7 @@ namespace HHBBYY
     std::vector<float> makeXGBoostDMatrixLegacyNonres(const xAOD::Photon *ph1, const xAOD::Photon *ph2, 
                                                       ConstDataVector<xAOD::JetContainer> &categorisation_jets,
                                                       const xAOD::MissingETContainer *met, const auto &sys,
-                                                      const std::map<HHBBYY::Var, float> &m_eventFloats);
+                                                      const std::map<HHBBYY::Var, float> &m_eventFloats, bool isKFvariables, bool isGNNvariables);
     
     StatusCode vbf_calculations(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
 				const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::JetContainer *jets,
@@ -155,7 +179,7 @@ namespace HHBBYY
                                   const xAOD::JetContainer *jets,
                                   const xAOD::MissingETContainer *met,
                                   const auto &sys, std::map<HHBBYY::Var, float> &m_eventFloats,
-                                  std::map<HHBBYY::Var, int> &m_eventInts);
+                                  std::map<HHBBYY::Var, int> &m_eventInts, bool isKFvariables, bool isGNNvariables, int year);
 
     void loadBDT(const std::string &filePath, std::unique_ptr<MVAUtils::BDT> &bdt);
 
@@ -204,6 +228,9 @@ namespace HHBBYY
 
     CP::SysReadHandle<xAOD::JetContainer>
     m_KFJetHandle{this, "KFJets", "", "KF Jet container to read"};
+
+    CP::SysReadDecorHandle<float> m_KF_MBB
+      {"KF_mbb_%SYS%", this};
 
     Gaudi::Property<std::string> m_photonWPName
       { this, "photonWP", "", "Photon ID + Iso working point" };

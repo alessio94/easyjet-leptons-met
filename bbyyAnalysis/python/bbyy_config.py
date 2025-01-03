@@ -196,11 +196,14 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     # Kinematic Fit variables
     if flags.Analysis.do_KinematicFit:
         float_variable_names += ["KF_pTbb", "KF_Etabb", "KF_Phibb",
-                                 "KF_mbbyy", "KF_dRbb", "KF_mbbyystar", "KF_pTbbyy",
+                                 "KF_mbbyy", "KF_dRbb", "KF_mbbyy_star", "KF_pTbbyy",
                                  "KF_Etabbyy", "KF_Phibbyy", "KF_dRHH"]
         # KF mva variables
         float_variable_names += ["KF_HT", "KF_topness", "KF_sphericityT",
                                  "KF_planarFlow", "KF_pTBalance"]
+
+        float_variable_names += ["KF_bdtSel_score"]
+        int_variable_names += ["KF_bdtSel_category"]
 
         for i in range(1, 5):
             for var in ["pt", "phi", "eta", "E"]:
