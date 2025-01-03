@@ -71,6 +71,7 @@ echo "===== ls $eostmpdir ====="
 ls $eostmpdir
 
 xrdfs root://eosuser.cern.ch mkdir $eosplotdir
+xrdfs root://eosuser.cern.ch rmdir $eosplotdir/$eostmpdir > /dev/null 2>&1 || true
 xrdcp -rf $eostmpdir root://eosuser.cern.ch//$eosplotdir
 
 echo "exit $exitcode"
