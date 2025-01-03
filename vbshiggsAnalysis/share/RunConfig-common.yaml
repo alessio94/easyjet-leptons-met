@@ -40,7 +40,7 @@ OverlapRemoval:
   do_small_R_jet_large_R_jet: false
 
 #Enable cutflow 
-save_vbshiggs_cutflow: true
+save_cutflow: true
 
 # Toggles for reconstructed objects decorations
 Small_R_jet:

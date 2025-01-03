@@ -66,7 +66,7 @@ def dihiggs_cfg(
             CompFactory.HH4B.bbbbSelectorAlg(
                 "bbbbSelectorAlg",
                 cutList=flags.Analysis.CutList,
-                saveCutFlow=flags.Analysis.save_bbbb_cutflow,
+                saveCutFlow=flags.Analysis.save_cutflow,
                 Triggers=triggers,
                 eventDecisionOutputDecoration=f"pass_{selection_name}_%SYS%",
                 isMC=flags.Input.isMC,
@@ -113,7 +113,7 @@ def pass_branches(flags):
         + flags.Analysis.systematics_suffix_separator + "%SYS%"
     ]
 
-    if (flags.Analysis.save_bbbb_cutflow):
+    if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS%"

@@ -46,7 +46,7 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
             vbsjets="VBSVV4qAnalysisVBSJets_%SYS%",
             eventDecisionOutputDecoration="VBSVV4q_pass_sel_%SYS%",
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_VBSVV4q_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
         )
@@ -141,7 +141,7 @@ def JJ_branches(flags):
     branches += object_level_branches
     branches += ["EventInfo.VBSVV4q_pass_sel_%SYS% -> pass_sel_%SYS%"]
 
-    if (flags.Analysis.save_VBSVV4q_cutflow):
+    if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]

@@ -71,7 +71,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             photonWP=SelectedPhotonLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_bbyy_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             photonTriggers=flags.Analysis.TriggerChains,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             eventDecisionOutputDecoration=f"bbyy_pass_{selection_name}_%SYS%",
@@ -364,7 +364,7 @@ def bbyy_branches(flags):
         [f"EventInfo.bbyy_pass_{s_name}_{sys_suffix} -> bbyy_pass_{s_name}"
          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
-    if (flags.Analysis.save_bbyy_cutflow):
+    if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
             extra = ""

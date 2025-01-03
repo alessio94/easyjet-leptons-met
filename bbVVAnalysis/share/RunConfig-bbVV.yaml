@@ -66,9 +66,6 @@ CutList : # Only include general cuts
       - LEAD_LRJ_PT
       - HBB_BTAG
 
-# Enable cutflow
-save_bbVV_cutflow: true
-
 # Include the TTree configuration and update details
 ttree_output:
   include: EasyjetHub/AnalysisMiniTree-config.yaml

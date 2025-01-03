@@ -219,6 +219,9 @@ channels: []
 splitOutputTree: false
 splitCBK: false
 
+#Enable cutflow
+save_cutflow: false
+
 histograms: false
 h5:
   n_jets: 10

@@ -69,7 +69,7 @@ do_trigger_filtering: true
 do_overlap_removal: true
 
 #Enable cutflow 
-save_ZCharm_cutflow: true
+save_cutflow: true
 
 CutList :
       - PASS_TRIGGER

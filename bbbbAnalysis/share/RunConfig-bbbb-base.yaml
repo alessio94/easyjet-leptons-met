@@ -31,7 +31,7 @@ loose_jet_cleaning: true
 do_overlap_removal: false
 
 do_trigger_filtering: false
-save_bbbb_cutflow: true
+save_cutflow: true
 bypass: true
 selection_name: "nothing"
 CutList: []

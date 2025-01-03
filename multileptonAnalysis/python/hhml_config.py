@@ -67,7 +67,7 @@ def hhml_cfg(
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             eventDecisionOutputDecoration="hhml_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_hhml_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             isMC=flags.Input.isMC,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),

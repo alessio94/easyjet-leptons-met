@@ -68,7 +68,7 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
             eventDecisionOutputDecoration="ZCharm_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_ZCharm_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             isMC=flags.Input.isMC,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
@@ -167,7 +167,7 @@ def ZCharm_branches(flags):
 
     branches += ["EventInfo.ZCharm_pass_sr_%SYS% -> ZCharm_pass_SR_%SYS%"]
 
-    if (flags.Analysis.save_ZCharm_cutflow):
+    if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> ZCharm_{cut}_%SYS%"]

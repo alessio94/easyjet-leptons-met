@@ -36,7 +36,7 @@ namespace MULTILEPTON
     ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
 
-    ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
+    if (m_saveCutFlow) ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
@@ -134,7 +134,7 @@ namespace MULTILEPTON
       //****************
 
       // do the CUTFLOW only with sys="" -> NOSYS
-      if (sys.name()=="") {
+      if (sys.name()=="" && m_saveCutFlow) {
         // Compute total_events
         m_total_events+=1;
         if(m_isMC) m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);

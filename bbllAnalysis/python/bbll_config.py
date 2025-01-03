@@ -66,7 +66,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             eventDecisionOutputDecoration="bbll_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_bbll_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             isMC=flags.Input.isMC,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
@@ -223,7 +223,7 @@ def bbll_branches(flags):
     branches += ["EventInfo.bbll_pass_sr_%SYS% -> bbll_pass_SR"
                  + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    if (flags.Analysis.save_bbll_cutflow):
+    if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> bbll_{cut}"

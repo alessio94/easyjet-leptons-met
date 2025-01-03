@@ -55,7 +55,7 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             eventDecisionOutputDecoration="ssWW_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_ssWW_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             isMC=flags.Input.isMC,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
@@ -152,7 +152,7 @@ def ssWW_branches(flags):
     for region in ["SR", "WZCR"]:
         branches += [f"EventInfo.pass_{region}_%SYS% -> ssWW_pass_{region}_%SYS%"]
 
-    if (flags.Analysis.save_ssWW_cutflow):
+    if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> ssWW_{cut}_%SYS%"]

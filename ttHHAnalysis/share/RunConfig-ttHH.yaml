@@ -72,7 +72,7 @@ systematics_regex: [".*"]
 do_overlap_removal: true
 
 #Enable cutflow 
-save_ttHH_cutflow: false
+save_cutflow: false
 
 CutList:
   - PASS_TRIGGER

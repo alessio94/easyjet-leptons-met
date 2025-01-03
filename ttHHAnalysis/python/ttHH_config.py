@@ -83,7 +83,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_ttHH_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             triggerLists=flags.Analysis.TriggerChains,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             eventDecisionOutputDecoration="ttHH_pass_baseline_%SYS%",
@@ -239,7 +239,7 @@ def ttHH_branches(flags):
         branches += [f"EventInfo.pass_matching_trigger_{trig}_%SYS% \
                              -> ttHH_pass_matching_trigger_{trig}_%SYS%"]
 
-    if (flags.Analysis.save_ttHH_cutflow):
+    if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> ttHH_{cut}"

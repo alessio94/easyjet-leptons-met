@@ -55,7 +55,6 @@ Trigger:
 
 # can alternatively use the CutList to filter events to get trigger eff
 do_trigger_filtering: true
-save_bbbb_cutflow: true
 bypass: false
 selection_name: "preselection"
 CutList:

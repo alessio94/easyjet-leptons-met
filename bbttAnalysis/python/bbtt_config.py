@@ -76,7 +76,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             do1BRegions=flags.Analysis.do_1B_regions,
             useTriggerSelections=flags.Analysis.do_trigger_offline_filtering,
             bypass=flags.Analysis.bypass,
-            saveCutFlow=flags.Analysis.save_bbtt_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             cutList=(
                 flags.Analysis.CutList if hasattr(flags.Analysis, "CutList") else []),
         )

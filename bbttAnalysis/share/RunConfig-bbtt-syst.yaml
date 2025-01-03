@@ -4,4 +4,4 @@ do_CP_systematics: true
 systematics_regex: [".*"]
 
 store_high_level_variables: false
-save_bbtt_cutflow: false
+save_cutflow: false

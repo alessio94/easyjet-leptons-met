@@ -20,7 +20,7 @@ def semiLep_cfg(flags, float_variables=None, int_variables=None):
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             eventDecisionOutputDecoration="vbshiggs_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_vbshiggs_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
         )
@@ -109,7 +109,7 @@ def semiLep_branches(flags):
     branches += object_level_branches
     branches += ["EventInfo.vbshiggs_pass_sr_%SYS% -> pass_SR_%SYS%"]
 
-    if (flags.Analysis.save_vbshiggs_cutflow):
+    if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]

@@ -75,7 +75,7 @@ do_overlap_removal: true
 store_high_level_variables: false
 
 #Enable cutflow 
-save_bbyy_cutflow: true
+save_cutflow: true
 do_resonant_PNN: false
 do_resonant_onebtag: false
 

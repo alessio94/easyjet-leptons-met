@@ -72,7 +72,7 @@ OverlapRemoval:
   do_small_R_jet_large_R_jet: false
 
 #Enable cutflow 
-save_ssWW_cutflow: true
+save_cutflow: true
 
 CutList :
       - PASS_TRIGGER
