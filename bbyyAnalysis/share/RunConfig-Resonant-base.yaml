@@ -35,3 +35,4 @@ save_cutflow: false
 do_nonresonant_BDTs: false
 save_VBF_vars: false
 save_extra_vars: false
+save_nonresonant_BDTInput_variables: false

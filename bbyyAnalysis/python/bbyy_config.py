@@ -114,7 +114,9 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             intVariableList=int_variables,
             doSystematics=flags.Analysis.do_CP_systematics,
             doResonantonebtag=flags.Analysis.do_resonant_onebtag,
-            save_extra_vars=flags.Analysis.save_extra_vars
+            save_extra_vars=flags.Analysis.save_extra_vars,
+            save_nonresonant_BDTInput_variables=(
+                flags.Analysis.save_nonresonant_BDTInput_variables)
         )
     )
 
@@ -265,7 +267,7 @@ def get_BaselineVarsbbyyAlg_variables(flags):
 
     # save extra variables which may be useful, but are
     # not necessary for barebones SHbbyy analysis
-    if (flags.Analysis.save_extra_vars):
+    if (flags.Analysis.save_nonresonant_BDTInput_variables):
         # mva variables
         float_variable_names += ["HT", "topness", "sphericityT", "planarFlow",
                                  "pTBalance"]

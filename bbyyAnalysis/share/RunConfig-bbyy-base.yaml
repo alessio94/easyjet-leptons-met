@@ -98,6 +98,7 @@ selection_name: "allcuts"
 do_nonresonant_BDTs: true
 save_VBF_vars: true
 save_extra_vars: true
+save_nonresonant_BDTInput_variables: true
 
 BDT_path:
   - "bbyyAnalysis/bdt_legacy_lowMass.root"

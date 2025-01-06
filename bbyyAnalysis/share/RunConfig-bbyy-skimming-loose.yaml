@@ -22,3 +22,6 @@ Electron:
 
 Photon:
   forceFullSimConfig: true
+
+save_extra_vars: false
+do_GNN2bjetSelection: false

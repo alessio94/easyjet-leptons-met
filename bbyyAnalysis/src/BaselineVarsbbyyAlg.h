@@ -284,6 +284,10 @@ namespace HHBBYY
     Gaudi::Property<bool> m_save_extra_vars
       { this, "save_extra_vars", false, "Compute quantities which may be useful, but are not needed for the barebones SHbbyy analysis." };
 
+    Gaudi::Property<bool> m_save_nonresonant_BDTInput_variables
+      {this, "save_nonresonant_BDTInput_variables", false, "Compute quantities useful for the non-resonant BDT training"};
+
+
     CP::SysReadDecorHandle<bool> 
     m_selected_ph { this, "selected_ph", "selected_ph_%SYS%", "Name of input decorator for selected ph"};
 

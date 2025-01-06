@@ -239,7 +239,7 @@ namespace HHBBYY
       }
 
       // inclusive jet sector
-      if (m_save_extra_vars){
+      if (m_save_nonresonant_BDTInput_variables){
         for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)4); i++){	 
           TLorentzVector j = jets->at(i)->p4();
           j_passWP = static_cast<int>(m_isBtag.get(*jets->at(i), sys));
@@ -298,7 +298,7 @@ namespace HHBBYY
       }
 
       // More global variables
-      if(m_save_extra_vars){
+      if(m_save_nonresonant_BDTInput_variables){
         float topness = compute_Topness(jets);
         m_Fbranches.at("topness").set(*event, topness, sys);
         

@@ -2,3 +2,6 @@ include: bbyyAnalysis/RunConfig-bbyy-bypass.yaml
 
 do_CP_systematics: true
 systematics_regex: [".*"]
+
+save_extra_vars: false
+do_GNN2bjetSelection: false
