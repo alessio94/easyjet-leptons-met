@@ -64,11 +64,6 @@ ntupler_fast_mc20:
   script:
     - easyjet-test fast-mc20
 
-ntupler_bbyy_mc20:
-  extends: .ntupler
-  script:
-    - easyjet-test bbyy-mc20
-
 ntupler_bbyy_mc20_syst:
   extends: .ntupler
   script:
@@ -217,6 +212,11 @@ ntupler_SHbbyy_mc23af3:
   extends: .ntupler
   script:
     - easyjet-test SHbbyy-mc23af3
+
+ntupler_bbyy_mc23_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test bbyy-mc23-lite
 
 # Commented until ATLASG-2734 is solved
 #ntupler_bbtt_mc23_lite_syst:

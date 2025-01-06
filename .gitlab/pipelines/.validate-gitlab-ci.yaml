@@ -112,16 +112,6 @@ validator_fast_mc20:
   script:
     - easyjet-validate fast-mc20
 
-validator_bbyy_mc20:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true 
-    - job: ntupler_bbyy_mc20
-      artifacts: false 
-  script:
-    - easyjet-validate bbyy-mc20
-
 validator_bbyy_mc20_syst:
   extends: .ntuple_validation
   needs:
@@ -466,3 +456,12 @@ validator_hhml_mc23_lite:
   script:
     - easyjet-validate hhml-mc23-lite
 
+validator_bbyy_mc23_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true 
+    - job: ntupler_bbyy_mc23_lite
+      artifacts: false 
+  script:
+    - easyjet-validate bbyy-mc23-lite
