@@ -1,5 +1,5 @@
 ptag=p6266
-campaign=v6
+campaign=v7
 dir_samples="../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal"
 mc_campaign="mc20_13TeV"
 mc_list=(
@@ -43,12 +43,13 @@ mc_list=(
 easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13TeV.Run2.${ptag}.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
     --exec bbyy-ntupler \
+    --nGBperJob 100 \
     --campaign ${campaign}
 
 #mc
 easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
     --exec bbyy-ntupler \
-    --nGBperJob 2 \
+    --nGBperJob 10 \
     --campaign ${campaign}
 
