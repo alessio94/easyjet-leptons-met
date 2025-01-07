@@ -7,6 +7,6 @@ def get_truthelectron_branches(flags, input_container, output_prefix):
         output_prefix,
     )
 
-    truthelectron_branches.variables = ["px", "py", "pz", "e", "m"]
+    truthelectron_branches.variables = ["px", "py", "pz", "e", "m", "charge"]
 
     return truthelectron_branches.get_output_list()

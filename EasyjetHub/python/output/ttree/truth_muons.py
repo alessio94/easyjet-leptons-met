@@ -7,6 +7,6 @@ def get_truthmuon_branches(flags, input_container, output_prefix):
         output_prefix,
     )
 
-    truthmuon_branches.variables = ["px", "py", "pz", "e", "m"]
+    truthmuon_branches.variables = ["px", "py", "pz", "e", "m", "charge"]
 
     return truthmuon_branches.get_output_list()
