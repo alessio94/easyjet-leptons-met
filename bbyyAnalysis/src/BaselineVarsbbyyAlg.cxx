@@ -372,12 +372,14 @@ namespace HHBBYY
 
             std::vector<TLorentzVector> Hbb_KFcandidates = {Hbb_KFJet1->p4(), Hbb_KFJet2->p4()};
 
-            for(unsigned int i=0; i<2; i++){
-              std::string prefix = "KF_HbbCandidate_Jet"+std::to_string(i+1);
-              m_Fbranches.at(prefix+"_pt").set(*event, Hbb_KFcandidates[i].Pt(), sys);
-              m_Fbranches.at(prefix+"_eta").set(*event, Hbb_KFcandidates[i].Eta(), sys);
-              m_Fbranches.at(prefix+"_phi").set(*event, Hbb_KFcandidates[i].Phi(), sys);
-              m_Fbranches.at(prefix+"_E").set(*event, Hbb_KFcandidates[i].E(), sys);
+            if (m_save_HbbCand_vars){
+              for(unsigned int i=0; i<2; i++){
+                std::string prefix = "KF_HbbCandidate_Jet"+std::to_string(i+1);
+                m_Fbranches.at(prefix+"_pt").set(*event, Hbb_KFcandidates[i].Pt(), sys);
+                m_Fbranches.at(prefix+"_eta").set(*event, Hbb_KFcandidates[i].Eta(), sys);
+                m_Fbranches.at(prefix+"_phi").set(*event, Hbb_KFcandidates[i].Phi(), sys);
+                m_Fbranches.at(prefix+"_E").set(*event, Hbb_KFcandidates[i].E(), sys);
+              }
             }
 
             TLorentzVector H_bb_KF = Hbb_KFcandidates[0] + Hbb_KFcandidates[1];
@@ -508,36 +510,40 @@ namespace HHBBYY
   }
 
   void BaselineVarsbbyyAlg::fill_bb_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys) {
-    for(unsigned int i =0; i<2; i++){
-      const xAOD::Jet* jet = Hbb_jets[i];
+    
+    if (m_save_HbbCand_vars){
+      for(unsigned int i =0; i<2; i++){
+        const xAOD::Jet* jet = Hbb_jets[i];
 
-      bool PCBTgiven = !m_PCBT.empty();
+        bool PCBTgiven = !m_PCBT.empty();
 
-      std::string prefix_bjet = prefix + "HbbCandidate_Jet"+std::to_string(i+1);
-      m_Ibranches.at(prefix_bjet+"_n_muons").set
-	(*event, m_nmuons.get(*jet, sys), sys);
+        std::string prefix_bjet = prefix + "HbbCandidate_Jet"+std::to_string(i+1);
+        m_Ibranches.at(prefix_bjet+"_n_muons").set
+	        (*event, m_nmuons.get(*jet, sys), sys);
 
-      if(m_save_extra_vars){
-        float uncorrPt = jet->jetP4("NoBJetCalibMomentum").Pt();
-        m_Fbranches.at(prefix_bjet+"_uncorrPt").set(*event, uncorrPt, sys);
-        float muonCorrPt = jet->jetP4("MuonCorrMomentum").Pt();
-        m_Fbranches.at(prefix_bjet+"_muonCorrPt").set(*event, muonCorrPt, sys);
-      }
+        if(m_save_extra_vars){
+          float uncorrPt = jet->jetP4("NoBJetCalibMomentum").Pt();
+          m_Fbranches.at(prefix_bjet+"_uncorrPt").set(*event, uncorrPt, sys);
+          float muonCorrPt = jet->jetP4("MuonCorrMomentum").Pt();
+          m_Fbranches.at(prefix_bjet+"_muonCorrPt").set(*event, muonCorrPt, sys);
+        }
 
-      TLorentzVector jet_tlv = jet->p4();
-      m_Fbranches.at(prefix_bjet+"_pt").set(*event, jet_tlv.Pt(), sys);
-      m_Fbranches.at(prefix_bjet+"_eta").set(*event, jet_tlv.Eta(), sys);
-      m_Fbranches.at(prefix_bjet+"_phi").set(*event, jet_tlv.Phi(), sys);
-      m_Fbranches.at(prefix_bjet+"_E").set(*event, jet_tlv.E(), sys);
+        TLorentzVector jet_tlv = jet->p4();
+        m_Fbranches.at(prefix_bjet+"_pt").set(*event, jet_tlv.Pt(), sys);
+        m_Fbranches.at(prefix_bjet+"_eta").set(*event, jet_tlv.Eta(), sys);
+        m_Fbranches.at(prefix_bjet+"_phi").set(*event, jet_tlv.Phi(), sys);
+        m_Fbranches.at(prefix_bjet+"_E").set(*event, jet_tlv.E(), sys);
 
-      if(prefix.find("GNN") != std::string::npos)
-        m_Ibranches.at(prefix_bjet+"_PassWP").set(*event, static_cast<int>(m_isBtag.get(*jet,sys)), sys);
-      if(PCBTgiven)
-        m_Ibranches.at(prefix_bjet+"_pcbt").set(*event, m_PCBT.get(*jet, sys), sys);
 
-      if(m_isMC){
-        m_Ibranches.at(prefix_bjet+"_truthLabel").set
-	  (*event, m_truthFlav.get(*jet, sys), sys);
+        if(prefix.find("GNN") != std::string::npos)
+          m_Ibranches.at(prefix_bjet+"_PassWP").set(*event, static_cast<int>(m_isBtag.get(*jet,sys)), sys);
+        if(PCBTgiven)
+          m_Ibranches.at(prefix_bjet+"_pcbt").set(*event, m_PCBT.get(*jet, sys), sys);
+
+        if(m_isMC){
+          m_Ibranches.at(prefix_bjet+"_truthLabel").set
+	        (*event, m_truthFlav.get(*jet, sys), sys);
+        }
       }
     }
 

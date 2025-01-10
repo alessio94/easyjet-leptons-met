@@ -281,6 +281,9 @@ namespace HHBBYY
     Gaudi::Property<bool> m_doResonantonebtag
       { this, "doResonantonebtag", false, "Compute additional quantities for the one btag region of the resonant SHbbyy analysis." };
 
+    Gaudi::Property<bool> m_save_HbbCand_vars
+      { this, "save_HbbCand_vars", false, "Save HbbCandidate Jet quantities" };
+
     Gaudi::Property<bool> m_save_extra_vars
       { this, "save_extra_vars", false, "Compute quantities which may be useful, but are not needed for the barebones SHbbyy analysis." };
 

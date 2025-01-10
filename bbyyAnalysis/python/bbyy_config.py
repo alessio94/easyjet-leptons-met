@@ -114,6 +114,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             intVariableList=int_variables,
             doSystematics=flags.Analysis.do_CP_systematics,
             doResonantonebtag=flags.Analysis.do_resonant_onebtag,
+            save_HbbCand_vars=flags.Analysis.save_HbbCand_vars,
             save_extra_vars=flags.Analysis.save_extra_vars,
             save_nonresonant_BDTInput_variables=(
                 flags.Analysis.save_nonresonant_BDTInput_variables)
@@ -168,14 +169,15 @@ def get_BaselineVarsbbyyAlg_variables(flags):
         float_variable_names += ["Photon1_cos_theta_cm_gamgam", "Photon1_phi_cm_gamgam"]
 
     # HbbCandidate jets
-    HbbCandidate_float_vars = ["pt", "phi", "eta", "E"]
-    if (flags.Analysis.save_extra_vars):
-        HbbCandidate_float_vars += ["uncorrPt", "muonCorrPt"]
-    for i in range(1, 3):
-        for var in HbbCandidate_float_vars:
-            float_variable_names += [f"HbbCandidate_Jet{i}_" + var]
-        for var in ["truthLabel", "pcbt", "n_muons"]:
-            int_variable_names += [f"HbbCandidate_Jet{i}_" + var]
+    if (flags.Analysis.save_HbbCand_vars):
+        HbbCandidate_float_vars = ["pt", "phi", "eta", "E"]
+        if (flags.Analysis.save_extra_vars):
+            HbbCandidate_float_vars += ["uncorrPt", "muonCorrPt"]
+        for i in range(1, 3):
+            for var in HbbCandidate_float_vars:
+                float_variable_names += [f"HbbCandidate_Jet{i}_" + var]
+            for var in ["truthLabel", "pcbt", "n_muons"]:
+                int_variable_names += [f"HbbCandidate_Jet{i}_" + var]
 
     if (flags.Analysis.save_extra_vars):
         float_variable_names += ["HbbCandidate_Jet1_cos_theta_cm_bb",
@@ -211,9 +213,10 @@ def get_BaselineVarsbbyyAlg_variables(flags):
             for var in ["pt", "phi", "eta", "E"]:
                 float_variable_names += [f"KF_Jet{i}_" + var]
 
-        for i in range(1, 3):
-            for var in ["pt", "phi", "eta", "E"]:
-                float_variable_names += [f"KF_HbbCandidate_Jet{i}_" + var]
+        if flags.Analysis.save_HbbCand_vars:
+            for i in range(1, 3):
+                for var in ["pt", "phi", "eta", "E"]:
+                    float_variable_names += [f"KF_HbbCandidate_Jet{i}_" + var]
 
     # VBFJets
     if flags.Analysis.save_VBF_vars:
