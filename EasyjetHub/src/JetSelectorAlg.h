@@ -70,6 +70,7 @@ private:
     Gaudi::Property<float> m_minPt            {this, "minPt", 25e3, "Minimum pT of jets"};
     Gaudi::Property<float> m_maxPt            {this, "maxPt", -1, "Maximum pT of jets"};
     Gaudi::Property<float> m_maxEta           {this, "maxEta", 4.5, "Maximum eta of jets"}; // default is central jets
+    Gaudi::Property<float> m_minMass          {this, "minMass", -1, "Minimum mass of jets"};
     Gaudi::Property<float> m_maxMass          {this, "maxMass", -1, "Maximum mass of jets"};
     Gaudi::Property<int>   m_minimumAmount    {this, "minimumAmount", -1, "Minimum number of jets to consider"}; // -1 means ignores this
     Gaudi::Property<int>   m_maximumAmount    {this, "maximumAmount", -1, "Maximum number of jets to consider"};

@@ -114,6 +114,8 @@ namespace Easyjet
           continue;
         if (m_maxMass > 0 && jet->m() > m_maxMass)
           continue;
+        if (m_minMass > 0 && jet->m() < m_minMass)
+          continue;
 
         bool isSelected = false;
         // select btagging wp if given and select_bjet flag is on. if not given always push back

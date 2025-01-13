@@ -69,6 +69,11 @@ def get_BaselineVarsFullLepAlg_variables(flags):
     objects = ["LargeJet1", "ll", "Hdijet", "Hj1l1", "Hj2l2"]
     if not flags.Analysis.UseVBFRNN:
         objects += ["VBSJ1", "VBSJ2", "VBSdijet"]
+    else:
+        objects += ["RNNJets_boosted_20gev_Jet1", "RNNJets_boosted_20gev_Jet2",
+                    "RNNJets_boosted_30gev_Jet1", "RNNJets_boosted_30gev_Jet2",
+                    "RNNJets_resolved_20gev_Jet1", "RNNJets_resolved_20gev_Jet2",
+                    "RNNJets_resolved_30gev_Jet1", "RNNJets_resolved_30gev_Jet2"]
 
     for object in objects:
         for var in ["m", "pt", "eta", "phi"]:

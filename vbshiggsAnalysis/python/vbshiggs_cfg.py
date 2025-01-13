@@ -43,6 +43,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                                 containerOutKey="vbshiggsAnalysisLargeJets_%SYS%",
                                 minPt=250 * Units.GeV,
                                 maxEta=2.0,
+                                minMass=40 * Units.GeV,
                                 minimumAmount=1))
 
     if not flags.Analysis.UseVBFRNN:

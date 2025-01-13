@@ -31,6 +31,13 @@ namespace VBSHIGGS{
       if( !m_UseVBFRNN ){
         ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
       }
+      else {
+        ATH_CHECK (m_RNNjetBoosted20GeVHandle.initialize(m_systematicsList));
+        ATH_CHECK (m_RNNjetBoosted30GeVHandle.initialize(m_systematicsList));
+        ATH_CHECK (m_RNNjetResolved20GeVHandle.initialize(m_systematicsList));
+        ATH_CHECK (m_RNNjetResolved30GeVHandle.initialize(m_systematicsList));
+      }
+
 
       if(m_isMC){
         m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
@@ -103,8 +110,19 @@ namespace VBSHIGGS{
         ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
 
         const xAOD::JetContainer *vbsjets = nullptr;
-        if(!m_UseVBFRNN)
+        const xAOD::JetContainer *RNNJets_boosted_20gev = nullptr;
+        const xAOD::JetContainer *RNNJets_boosted_30gev = nullptr;
+        const xAOD::JetContainer *RNNJets_resolved_20gev = nullptr;
+        const xAOD::JetContainer *RNNJets_resolved_30gev = nullptr;
+        if(!m_UseVBFRNN) {
           ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
+        }
+        else {
+          ANA_CHECK (m_RNNjetBoosted20GeVHandle.retrieve (RNNJets_boosted_20gev, sys));
+          ANA_CHECK (m_RNNjetBoosted30GeVHandle.retrieve (RNNJets_boosted_30gev, sys));
+          ANA_CHECK (m_RNNjetResolved20GeVHandle.retrieve (RNNJets_resolved_20gev, sys));
+          ANA_CHECK (m_RNNjetResolved30GeVHandle.retrieve (RNNJets_resolved_30gev, sys));
+        }
 
         const xAOD::MuonContainer *muons = nullptr;
         ANA_CHECK (m_muonHandle.retrieve (muons, sys));
@@ -424,6 +442,26 @@ namespace VBSHIGGS{
             m_Fbranches.at("dEtaVBSjj").set(*event, (vbsJet1->eta())-vbsJet2->eta(), sys);
             m_Fbranches.at("dPhiVBSjj").set(*event, (vbsJet1->p4()).DeltaPhi(vbsJet2->p4()), sys);
             
+          }
+        }
+
+        //kinematics of RNN jets
+        else {
+          std::vector<const xAOD::JetContainer*> RNNJets = {RNNJets_boosted_20gev,RNNJets_boosted_30gev,RNNJets_resolved_20gev,RNNJets_resolved_30gev};
+          std::vector<std::string> RNNJets_names = {"RNNJets_boosted_20gev","RNNJets_boosted_30gev","RNNJets_resolved_20gev","RNNJets_resolved_30gev"};
+          for(unsigned int i=0; i<RNNJets.size(); i++) {
+            const xAOD::JetContainer *RNNJets_container = RNNJets[i];
+            std::string RNNJets_container_name = RNNJets_names[i];
+
+            for(unsigned int j=0; j<std::min(size_t(2),RNNJets_container->size()); j++) {
+              std::string prefix = "Jet"+std::to_string(j+1);
+              const xAOD::Jet* RNNJet = RNNJets_container->at(0);
+
+              m_Fbranches.at(RNNJets_container_name+"_"+prefix+"_m").set(*event, RNNJet->m(), sys);
+              m_Fbranches.at(RNNJets_container_name+"_"+prefix+"_pt").set(*event, RNNJet->pt(), sys);
+              m_Fbranches.at(RNNJets_container_name+"_"+prefix+"_eta").set(*event, RNNJet->eta(), sys);
+              m_Fbranches.at(RNNJets_container_name+"_"+prefix+"_phi").set(*event, RNNJet->phi(), sys);
+            }
           }
         }
       }
