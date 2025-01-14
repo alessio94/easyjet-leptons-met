@@ -50,7 +50,7 @@ namespace VBSVV4q{
             ANA_CHECK (m_smallRjetHandle.retrieve (smallRjets, sys));
 
             const xAOD::JetContainer *largeRjets = nullptr;
-            ANA_CHECK (m_smallRjetHandle.retrieve (largeRjets, sys));
+            ANA_CHECK (m_largeRjetHandle.retrieve (largeRjets, sys));
 
             // make sure they are pT sorted
             //std::sort(smallRjets->begin(), smallRjets->end(), [] (const xAOD::Jet* a, const xAOD::Jet* b) {return a->pt() > b->pt(); });
