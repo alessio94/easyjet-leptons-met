@@ -107,6 +107,12 @@ def main():
         action="store_true",
         help="Run with HDBS production role",
     )
+    parser.add_argument(
+        "--framework",
+        type=str,
+        default="easyjet",
+        help="The name of the framework to use during submission"
+    )
     args = parser.parse_args()
 
     # check ntupler command is available before submitting
@@ -167,6 +173,8 @@ def main():
         submit_opts["mergeOutput"] = True
     if args.noEmail:
         submit_opts["noEmail"] = True
+    if args.framework:
+        submit_opts["framework"] = args.framework
 
     if args.asetup is None:
         atlas_project = os.environ["AtlasProject"]
