@@ -9,7 +9,9 @@ For questions, [join the EasyJet MM team](https://mattermost.web.cern.ch/signup_
 - FW developers, notifications and bug reports: [easyjet dev](https://mattermost.web.cern.ch/easyjet/channels/easyjet-dev).
 - Major HH decay channels have a corresponding mattermost channel, e.g. bbbb, bbtautau, etc.
 
-Meetings will be biweekly at 5 pm on Tuesday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/) or [the dihiggs subgroup indico](https://indico.cern.ch/category/10816/), and announced on the e-group [atlas-phys-hdbs-dihiggs-hhframework@cern.ch](https://e-groups.cern.ch/e-groups/Egroup.do?egroupName=atlas-phys-hdbs-dihiggs-hhframework)
+Meetings will be biweekly at 5 pm on Tuesday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/) or [the dihiggs subgroup indico](https://indico.cern.ch/category/10816/), and announced on the e-group [atlas-phys-hdbs-dihiggs-hhframework@cern.ch](https://e-groups.cern.ch/e-groups/Egroup.do?egroupName=atlas-phys-hdbs-dihiggs-hhframework).
+
+**It is mandatory for all developpers to register to the atlas-phys-hdbs-dihiggs-hhframework egroup to be able to run the pipeline.**
 
 # Installation
 
