@@ -146,11 +146,9 @@ def JJ_branches(flags):
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]
 
-    """
-    for cat in ["SLT"]:
+    for cat in ["SJT"]:
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> pass_trigger_{cat}"
-             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
-    """
+                + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names

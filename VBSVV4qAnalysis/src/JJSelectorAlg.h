@@ -75,7 +75,7 @@ namespace VBSVV4q{
 
       CP::SysReadHandle<xAOD::EventInfo> m_eventHandle{ this, "event", "EventInfo",  "EventInfo container to read" };
 
-      CP::SysReadDecorHandle<bool> m_passTriggerSLT {this, "passTriggerSLT", "pass_trigger_SLT_%SYS%", "events pass any singlep triggers"};
+      CP::SysReadDecorHandle<bool> m_passTriggerSJT {this, "passTriggerSJT", "pass_trigger_SJT_%SYS%", "events pass any singjet triggers"};
 
       CP::SysFilterReporterParams m_filterParams {this, "VBSVV4q selection"};
 

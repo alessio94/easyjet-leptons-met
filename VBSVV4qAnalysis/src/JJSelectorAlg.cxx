@@ -20,7 +20,7 @@ namespace VBSVV4q{
 
     // Initialise global event filter
     ATH_CHECK (m_filterParams.initialize(m_systematicsList));
-    ATH_CHECK (m_passTriggerSLT.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_passTriggerSJT.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_LargeRJetsHandle.initialize(m_systematicsList));
@@ -109,9 +109,9 @@ namespace VBSVV4q{
 
       if ( largeJets->size() >= 1 )  m_bools.at(VBSVV4q::PASS_ONE_LARGE_JET) = true;
       
-      //if (!m_passTriggerSLT.empty() and m_passTriggerSLT.get(*event, sys)) {
-      //  m_bools.at(VBSVV4q::PASS_TRIGGER) = true;
-      //} 
+      if (!m_passTriggerSJT.empty() and m_passTriggerSJT.get(*event, sys)) {
+        m_bools.at(VBSVV4q::PASS_TRIGGER) = true;
+      } 
       
       vbsjetsSelection(vbsjets);
 
