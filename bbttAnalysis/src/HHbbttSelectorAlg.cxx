@@ -139,7 +139,7 @@ namespace HHBBTT
       }
     }
 
-    ATH_CHECK (initialiseCutflow());
+    if (m_saveCutFlow) ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
 

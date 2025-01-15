@@ -60,7 +60,7 @@ namespace MULTILEPTON
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
-    ATH_CHECK (initialiseCutflow());
+    if (m_saveCutFlow) ATH_CHECK (initialiseCutflow());
 
     return StatusCode::SUCCESS;
   }
