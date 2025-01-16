@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.cpalgs_config import get_sys_weight_name
 from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
@@ -89,7 +90,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
                 KinFitTool=CompFactory.KinematicFitTool(
                     JetMinPt=25. * Units.GeV,
                     bTagWPDecorName=(
-                        "ftag_select_" + flags.Analysis.Small_R_jet.btag_wp)),
+                        "ftag_select_" + flags.Analysis.Small_R_jet.btag_wp),
+                    isRun3=flags.GeoModel.Run is LHCPeriod.Run3),
                 doSystematics=flags.Analysis.do_CP_systematics,
             )
         )
