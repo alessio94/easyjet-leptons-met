@@ -36,10 +36,12 @@ namespace HH4B
       return StatusCode::FAILURE;
     }
     int year = m_years.size() == 1 ? m_years[0] : 2016; // in case of mc20a which corresponds to 2015+2016
-    std::string path = "bbbbAnalysis/jet_trigger_scale_factors_"+std::to_string(year)+".root";
+    std::string path;
+    if (year >= 2022) path = "EasyjetHub/jet_trigger_scale_factors_2223.root"; // Run 3 calibration file
+    else path = "dummy.root"; // TODO: place holder for Run 2 calibration file
     std::string resolvedPath = PathResolverFindCalibFile(path);
+    if (resolvedPath=="") ATH_MSG_WARNING("Failed to load calibration file " << path << ". " + m_matchingLevel + " jet scale factor set to 1.");
     TFile* jetSFFile = new TFile(resolvedPath.c_str(), "READ");
-    if (!jetSFFile) ATH_MSG_WARNING("Failed to load calibration file " << path << ". " + m_matchingLevel + " jet scale factor set to 1.");
 
     // get trigger leg thresholds from trigger name. Build the matching pattern and the SF map.
     std::regex l1NameParser("(\\d*)(J)(\\d*)((p|\\.)(\\d*)ETA(\\d*))?");
@@ -56,11 +58,19 @@ namespace HH4B
         {
           if (std::regex_match(legName, match, l1NameParser))
           {
-            std::string threshold = match[3].str()=="" ? "1" : match[3].str();
+            std::string threshold = match[3].str();
             unsigned int multiplicity = match[1].str()=="" ? 1 : std::stoi(match[1].str());
-            TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get(
-                ("L1_"+threshold+"_jet_sf").c_str())));
-            if (h) {m_jetTriggerSFMap.emplace(std::stoi(threshold), h); }
+            std::string sfName = m_matchingLevel+"_J"+threshold;
+            std::string histName = std::to_string(year)+"/"+sfName+"/"+sfName;
+            TH2D *h(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_scale_factors").c_str())));
+            if (h)
+            {
+              m_jetTriggerSFMap.emplace(std::stoi(threshold), h);
+              TH2D *h_stats_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_stats_abs_uncertainty").c_str())));
+              TH2D *h_syst_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_systematic_abs_uncertainty").c_str())));
+              if (h_stats_unc) {m_jetTriggerSFStatsMap.emplace(std::stoi(threshold), h_stats_unc);}
+              if (h_syst_unc) {m_jetTriggerSFSystMap.emplace(std::stoi(threshold), h_syst_unc);}
+            }
             else { ATH_MSG_WARNING("No trigger jet scale factor for L1 threshold J" << threshold); }
             for (unsigned int i=0; i< multiplicity; i++) // flattern the multiplicity
             {
@@ -78,9 +88,17 @@ namespace HH4B
           {
             if (jetSFFile && m_jetTriggerSFMap.find(legInfo.threshold) == m_jetTriggerSFMap.end())
             {
-              TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get(
-                  (m_matchingLevel+"_"+std::to_string(legInfo.threshold)+"_jet_sf").c_str())));
-              if (h) { m_jetTriggerSFMap.emplace(legInfo.threshold, h); }
+              std::string sfName = m_matchingLevel+"_j"+std::to_string(legInfo.threshold);
+              std::string histName = std::to_string(year)+"/"+sfName+"/"+sfName;
+              TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_scale_factors").c_str())));
+              if (h)
+              {
+                m_jetTriggerSFMap.emplace(legInfo.threshold, h);
+                TH2D* h_stats_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_stats_abs_uncertainty").c_str())));
+                TH2D* h_syst_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_systematic_abs_uncertainty").c_str())));
+                if (h_stats_unc) {m_jetTriggerSFStatsMap.emplace(legInfo.threshold, h_stats_unc);}
+                if (h_syst_unc) {m_jetTriggerSFSystMap.emplace(legInfo.threshold, h_syst_unc);}
+              }
               else { ATH_MSG_WARNING("No trigger jet scale factor for HLT threshold j" << legInfo.threshold); }
             }
             for (unsigned int i = 0; i < legInfo.multiplicity; i++) // flattern the multiplicity
@@ -129,28 +147,28 @@ namespace HH4B
                     this, modifiedTrigName + m_matchingLevel + "SF",
                     modifiedTrigName + "_" + m_matchingLevel + "SF_%SYS%",
                     "jet-level jet trigger SF"));
-      m_jetSFup.emplace(
+      m_jetSFStatsUp.emplace(
           trig,
           CP::SysWriteDecorHandle<float>(
-              this, modifiedTrigName + m_matchingLevel + "SFup",
-              modifiedTrigName + "_" + m_matchingLevel + "SF__1up",
-              "jet-level jet trigger SF syst up"));
-      m_jetSFdown.emplace(
+              this, modifiedTrigName + m_matchingLevel + "SFStatsUp",
+              modifiedTrigName + "_" + m_matchingLevel + "SF_stats_1up",
+              "jet-level jet trigger SF stats uncertainty up"));
+      m_jetSFSystUp.emplace(
           trig,
           CP::SysWriteDecorHandle<float>(
-              this, modifiedTrigName + m_matchingLevel + "SFdown",
-              modifiedTrigName + "_" + m_matchingLevel + "SF__1down",
-              "jet-level jet trigger SF syst down"));
+              this, modifiedTrigName + m_matchingLevel + "SFSystUp",
+              modifiedTrigName + "_" + m_matchingLevel + "SF_syst_1up",
+              "jet-level jet trigger SF syst uncertainty up"));
       ATH_CHECK(m_jetSF.at(trig).initialize(m_systematicsList, m_outJetHandle));
-      ATH_CHECK(m_jetSFup.at(trig).initialize(m_systematicsList, m_outJetHandle));
-      ATH_CHECK(m_jetSFdown.at(trig).initialize(m_systematicsList, m_outJetHandle));
+      ATH_CHECK(m_jetSFStatsUp.at(trig).initialize(m_systematicsList, m_outJetHandle));
+      ATH_CHECK(m_jetSFSystUp.at(trig).initialize(m_systematicsList, m_outJetHandle));
 
       m_eventSFKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF");
-      m_eventSFupKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF__1up");
-      m_eventSFdownKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF__1down");
+      m_eventSFStatsUpKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF_stats_1up");
+      m_eventSFSystUpKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF_syst_1up");
       ATH_CHECK(m_eventSFKey.at(trig).initialize());
-      ATH_CHECK(m_eventSFupKey.at(trig).initialize());
-      ATH_CHECK(m_eventSFdownKey.at(trig).initialize());
+      ATH_CHECK(m_eventSFStatsUpKey.at(trig).initialize());
+      ATH_CHECK(m_eventSFSystUpKey.at(trig).initialize());
     }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
@@ -162,16 +180,16 @@ namespace HH4B
   StatusCode SmallRJetTriggerSFAlg::execute()
   {
     std::unordered_map< std::string, SG::ReadDecorHandle<xAOD::JetContainer, std::vector<int>>> jetThresholds;
-    std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::EventInfo, float>> eventSF, eventSFup, eventSFdown;
+    std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::EventInfo, float>> eventSF, eventSFStatsUp, eventSFSystUp;
     for (auto &trig : m_triggers)
     {
       jetThresholds.emplace(trig, m_ThresholdsDecorKey.at(trig));
       SG::WriteDecorHandle<xAOD::EventInfo, float> wdh_eventSF(m_eventSFKey.at(trig));
-      SG::WriteDecorHandle<xAOD::EventInfo, float> wdh_eventSFup(m_eventSFupKey.at(trig));
-      SG::WriteDecorHandle<xAOD::EventInfo, float> wdh_eventSFdown(m_eventSFdownKey.at(trig));
+      SG::WriteDecorHandle<xAOD::EventInfo, float> wdh_eventSFStatsUp(m_eventSFStatsUpKey.at(trig));
+      SG::WriteDecorHandle<xAOD::EventInfo, float> wdh_eventSFSystUp(m_eventSFSystUpKey.at(trig));
       eventSF.emplace(trig, wdh_eventSF);
-      eventSFup.emplace(trig, wdh_eventSFup);
-      eventSFdown.emplace(trig, wdh_eventSFdown);
+      eventSFStatsUp.emplace(trig, wdh_eventSFStatsUp);
+      eventSFSystUp.emplace(trig, wdh_eventSFSystUp);
     }
 
     // Loop over all systs
@@ -192,8 +210,8 @@ namespace HH4B
         for (auto &trig : m_triggers)
         {
           m_jetSF.at(trig).set(*jet, 1, sys);
-          m_jetSFup.at(trig).set(*jet, 1, sys);
-          m_jetSFdown.at(trig).set(*jet, 1, sys);
+          m_jetSFStatsUp.at(trig).set(*jet, 1, sys);
+          m_jetSFSystUp.at(trig).set(*jet, 1, sys);
           if (jetThresholds.at(trig)(*jet).empty())
             m_Threshold.at(trig).set(*jet, -99, sys);
           else {
@@ -214,8 +232,8 @@ namespace HH4B
       for (auto &trig : m_triggers)
       {
         float tmpEventSF = 1.0; // multiply all jet-level  SFs to get event-level  SF
-        float tmpEventSFup = 1.0;
-        float tmpEventSFdown = 1.0;
+        float tmpEventSFStatsUp = 1.0;
+        float tmpEventSFSystUp = 1.0;
 
         // L1 matching can have multiple thresholds even after ambiguity resolution
         // create a map to keep track of used thresholds to avoid double-matching
@@ -259,15 +277,20 @@ namespace HH4B
               m_Threshold.at(trig).set(*jet, legThreshold, sys);
 
               float jetSF = 1.0;
-              float jetSFup = 1.0;
-              float jetSFdown = 1.0;
+              float jetSFStatsUp = 1.0;
+              float jetSFSystUp = 1.0;
               float jetPt = jet->jetP4("NoBJetCalibMomentum").Pt() * 0.001;
               float jetEta = jet->jetP4("NoBJetCalibMomentum").Eta();
 
+              // calibration valid range
+              float maxPt = 300.;
+              float minPt = 20.;
+              float maxEta = 2.4;
+              if (m_matchingLevelEnum == TrigMatchingLevel::L1 && legThreshold == 45) maxEta = 2.1;
+
               // if SF exists and jet in the valid kinematic region, assign jet-level SF as a function of NoBJetCalibMomentum pt, eta and Threshold.
-              if (jetPt>=20 && std::abs(jetEta)<2.5 && m_jetTriggerSFMap.find(legThreshold) != m_jetTriggerSFMap.end())
+              if (jetPt>=minPt && std::abs(jetEta)<maxEta && m_jetTriggerSFMap.find(legThreshold) != m_jetTriggerSFMap.end())
               {
-                float maxPt = m_matchingLevelEnum==TrigMatchingLevel::L1 ? 300 : 200; // TODO: hard-coded valid pt range; double check when calibration is finalized
                 int bin = m_jetTriggerSFMap.at(legThreshold)->FindBin(jetPt<maxPt ? jetPt : maxPt-0.1, jetEta);
                 jetSF = m_jetTriggerSFMap.at(legThreshold)->GetBinContent(bin);
                 if (jetSF == 0)
@@ -278,17 +301,18 @@ namespace HH4B
                                   << ". Setting SF to 1.");
                   jetSF = 1.;
                 }
-                // TODO: add proper systematics
-                jetSFup = jetSF + m_jetTriggerSFMap.at(legThreshold)->GetBinError(bin);
-                jetSFdown = jetSF - m_jetTriggerSFMap.at(legThreshold)->GetBinError(bin);
+                else {
+                  jetSFStatsUp = jetSF + m_jetTriggerSFStatsMap.at(legThreshold)->GetBinContent(bin);
+                  jetSFSystUp = jetSF + m_jetTriggerSFSystMap.at(legThreshold)->GetBinContent(bin);
+                }
               }
 
               m_jetSF.at(trig).set(*jet, jetSF, sys);
-              m_jetSFup.at(trig).set(*jet, jetSFup, sys);
-              m_jetSFdown.at(trig).set(*jet, jetSFdown, sys);
+              m_jetSFStatsUp.at(trig).set(*jet, jetSFStatsUp, sys);
+              m_jetSFSystUp.at(trig).set(*jet, jetSFSystUp, sys);
               tmpEventSF *= jetSF;
-              tmpEventSFup *= jetSFup;
-              tmpEventSFdown *= jetSFdown;
+              tmpEventSFStatsUp *= jetSFStatsUp;
+              tmpEventSFSystUp *= jetSFSystUp;
 
               break; // only label one offline jet for a given leg threshold
             }
@@ -296,8 +320,8 @@ namespace HH4B
         }
 
         eventSF.at(trig)(*event) = tmpEventSF;
-        eventSFup.at(trig)(*event) = tmpEventSFup;
-        eventSFdown.at(trig)(*event) = tmpEventSFdown;
+        eventSFStatsUp.at(trig)(*event) = tmpEventSFStatsUp;
+        eventSFSystUp.at(trig)(*event) = tmpEventSFSystUp;
       }
 
       // Write to eventstore

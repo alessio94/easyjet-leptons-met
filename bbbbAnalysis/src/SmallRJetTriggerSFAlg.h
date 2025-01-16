@@ -55,16 +55,18 @@ private:
 
     // jet-level jet trigger  SF
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_jetSF;
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_jetSFup;
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_jetSFdown;
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_jetSFStatsUp;
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_jetSFSystUp;
 
     // event-level jet trigger  SF
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::EventInfo>> m_eventSFKey;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::EventInfo>> m_eventSFupKey;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::EventInfo>> m_eventSFdownKey;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::EventInfo>> m_eventSFStatsUpKey;
+    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::EventInfo>> m_eventSFSystUpKey;
 
     // calibration map
     std::unordered_map<int, TH2D*> m_jetTriggerSFMap;
+    std::unordered_map<int, TH2D*> m_jetTriggerSFStatsMap;
+    std::unordered_map<int, TH2D*> m_jetTriggerSFSystMap;
 
     std::optional<TrigMatchingLevel> m_matchingLevelEnum;
   };

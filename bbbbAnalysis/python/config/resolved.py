@@ -20,7 +20,7 @@ def resolved_cfg(flags, smalljetkey):
                               containerInKey=smalljetkey.replace("%SYS%", "NOSYS"),
                               containerOutKey="smallRJetsForTriggerMatching",
                               minPt=20 * Units.GeV,
-                              maxEta=2.5))
+                              maxEta=2.4))
         if flags.Analysis.Small_R_jet.doL1Matching:
             cfg.addEventAlgo(
                 CompFactory.HH4B.SmallRJetTriggerSFAlg(
@@ -147,23 +147,25 @@ def resolved_branches(flags):
                 branches += [
                     f'EventInfo.trigSF_{trig}_{matchLevel}SF'
                     f'->trigSF_{trig}_{matchLevel}SF',
-                    f'EventInfo.trigSF_{trig}_{matchLevel}SF__1up'
-                    f'->trigSF_{trig}_{matchLevel}SF__1up',
-                    f'EventInfo.trigSF_{trig}_{matchLevel}SF__1down'
-                    f'->trigSF_{trig}_{matchLevel}SF__1down',
+                    f'EventInfo.trigSF_{trig}_{matchLevel}SF_stats_1up'
+                    f'->trigSF_{trig}_{matchLevel}SF_stats_1up',
+                    f'EventInfo.trigSF_{trig}_{matchLevel}SF_syst_1up'
+                    f'->trigSF_{trig}_{matchLevel}SF_syst_1up',
                 ]
+                # more jet-level info for validation
                 if flags.Analysis.Small_R_jet.saveTriggerInfo:
                     jet_coll = f'trig{matchLevel}MatchedSmallRJets'
                     branches += [
-                        f'{jet_coll}.uncorrPt->{jet_coll}_uncorrPt',
+                        f'{jet_coll}.NoBJetCalibMomentum_pt'
+                        f'->{jet_coll}_NoBJetCalibMomentum_pt',
                         f'{jet_coll}.{trig}_{matchLevel}threshold_NOSYS'
                         f'->{jet_coll}_{trig}_{matchLevel}threshold',
                         f'{jet_coll}.{trig}_{matchLevel}SF_NOSYS'
                         f'->{jet_coll}_{trig}_{matchLevel}SF',
-                        f'{jet_coll}.{trig}_{matchLevel}SF__1up'
-                        f'->{jet_coll}_{trig}_{matchLevel}SF__1up',
-                        f'{jet_coll}.{trig}_{matchLevel}SF__1down'
-                        f'->{jet_coll}_{trig}_{matchLevel}SF__1down',
+                        f'{jet_coll}.{trig}_{matchLevel}SF_stats_1up'
+                        f'->{jet_coll}_{trig}_{matchLevel}SF_stats_1up',
+                        f'{jet_coll}.{trig}_{matchLevel}SF_syst_1up'
+                        f'->{jet_coll}_{trig}_{matchLevel}SF_syst_1up',
                     ]
 
     return branches
