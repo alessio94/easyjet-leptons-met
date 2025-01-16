@@ -44,10 +44,12 @@ do_overlap_removal: true
 OverlapRemoval:
   # Enable overlap removal between large-R jets and objects for which
   # large-R jet OR removal is implemented in Athena
-  do_large_R_jets: true
+  do_large_R_jets: false
   # Enable overlap removal between small-R jets and large-R jets
   # Athena default is true
-  do_small_R_jet_large_R_jet: true
+  do_small_R_jet_large_R_jet: false
+  # Enable overlap removal for boosted muons and electrons
+  do_boostedLeptons: true
 
 # Include the TTree configuration and update details
 ttree_output:
