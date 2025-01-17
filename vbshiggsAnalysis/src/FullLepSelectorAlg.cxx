@@ -152,7 +152,7 @@ namespace VBSHIGGS{
       if (m_bools.at(VBSHIGGS::PASS_TWO_SIGNAL_JETS)) resolvedSelection(HJets, bjets, sys);
       if (m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET)) boostedSelection(largeJets, sys);
 
-      bool pass_preselection = m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) ;
+      bool pass_preselection = m_bools.at(VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS) && m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) ;
 
       m_passallcuts.set(*event, pass_preselection, sys);
 
@@ -260,7 +260,7 @@ namespace VBSHIGGS{
         m_bools.at(VBSHIGGS::PASS_TWO_OS_CHARGE_LEPTONS) = true;
         
     }
-    else if (n_leptons == 2 && ele0 && mu0) {
+    else if (n_leptons >= 2 && ele0 && mu0) {
       if (ele0->charge() * mu0->charge() == 1 )
         m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) = true;
       else
