@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 ///////////////////////////////////////////////////////////////////
@@ -25,7 +25,19 @@
 
 namespace Easyjet
 {
-    /// \brief An algorithm for STXS uncertanties
+
+  enum STXSProdMode {
+    UnDef = -1,
+    ggF = 0,
+    VBF = 1,
+    qqZH = 2,
+    WH = 3,
+    ggZH = 4,
+    ttH = 5
+  };
+
+
+  /// \brief An algorithm for STXS uncertanties
   class STXSAlg final : public AthAlgorithm
   {
     /// \brief The standard constructor
@@ -51,15 +63,18 @@ private:
 
     ToolHandle<TruthWeightTools::HiggsWeightTool> m_twTools{
         this, "twTools", "", "portal to HiggsWeightTool giving STXS uncert"};
-    std::string m_twTools_prodmode;
+    STXSProdMode m_prodmode = STXSProdMode::UnDef;
+
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_HTXS_Njets30_Key;
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_HTXS_Stage1_Key;
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_HTXS_pTH_Key;
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_HTXS_Stage1p2_Key;
+    SG::ReadDecorHandleKey<xAOD::EventInfo> m_HTXS_Stage1p2Fine_Key;
 
     SG::WriteDecorHandleKey<xAOD::EventInfo> m_HTXSBinDecorKey;
     SG::WriteDecorHandleKey<xAOD::EventInfo> m_HTXSWeightsDecorKey;
 
-    std::string m_HTXSBin = "Category_Stage1_2_pTjet30";
-    std::string m_HTXSWeights = "Weights_Stage1_2_pTjet30";
-
-    };
+  };
 }
 
 #endif

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Oleksii Kurdysh
@@ -10,6 +10,7 @@
 #include "STXSAlg.h"
 
 #include <AsgDataHandles/ReadHandle.h>
+#include <AsgDataHandles/ReadDecorHandle.h>
 #include <AsgDataHandles/WriteDecorHandle.h>
 
 #include "TruthWeightTools/HiggsWeightTool.h"
@@ -32,16 +33,33 @@ namespace Easyjet
     ATH_CHECK(m_twTools.retrieve( DisableTool{m_twTools.empty()} ));
     ATH_MSG_DEBUG("+++ twTools empty? " << m_twTools.empty());
     if (!m_twTools.empty()) {
-      m_twTools_prodmode = m_twTools->getProperty("ProdMode").toString();
+      std::string twTools_prodmode = m_twTools->getProperty("ProdMode").toString();
+      if(twTools_prodmode=="ggF") m_prodmode = STXSProdMode::ggF;
+      else if(twTools_prodmode=="VBF") m_prodmode = STXSProdMode::VBF;
+      else if(twTools_prodmode=="qqZH") m_prodmode = STXSProdMode::qqZH;
+      else if(twTools_prodmode=="WH") m_prodmode = STXSProdMode::WH;
+      else if(twTools_prodmode=="ggZH") m_prodmode = STXSProdMode::ggZH;
+      else if(twTools_prodmode=="ttH") m_prodmode = STXSProdMode::ttH;
     }
 
-	m_HTXSBinDecorKey = m_EventInfoKey.key()+".HTXS_" + m_HTXSBin;
-	ATH_CHECK(m_HTXSBinDecorKey.initialize());
+    m_HTXS_Njets30_Key = m_EventInfoKey.key()+".HTXS_Njets_pTjet30";
+    m_HTXS_Stage1_Key = m_EventInfoKey.key()+".HTXS_Stage1_Category_pTjet30";
+    m_HTXS_pTH_Key = m_EventInfoKey.key()+".HTXS_Higgs_pt";
+    m_HTXS_Stage1p2_Key = m_EventInfoKey.key()+".HTXS_Stage1_2_Category_pTjet30";
+    m_HTXS_Stage1p2Fine_Key = m_EventInfoKey.key()+".HTXS_Stage1_2_Fine_Category_pTjet30";
+    ATH_CHECK(m_HTXS_Njets30_Key.initialize());
+    ATH_CHECK(m_HTXS_Stage1_Key.initialize());
+    ATH_CHECK(m_HTXS_pTH_Key.initialize());
+    ATH_CHECK(m_HTXS_Stage1p2_Key.initialize());
+    ATH_CHECK(m_HTXS_Stage1p2Fine_Key.initialize());
 
-	if (!m_twTools.empty()) {
-	  m_HTXSWeightsDecorKey = m_EventInfoKey.key() + ".HTXS_" + m_HTXSWeights;
-	  ATH_CHECK(m_HTXSWeightsDecorKey.initialize());
-	}
+    m_HTXSBinDecorKey = m_EventInfoKey.key()+".HTXS_Category_Stage1_2_pTjet30";
+    ATH_CHECK(m_HTXSBinDecorKey.initialize());
+
+    if (!m_twTools.empty()) {
+      m_HTXSWeightsDecorKey = m_EventInfoKey.key() + ".HTXS_Weights_Stage1_2_pTjet30";
+      ATH_CHECK(m_HTXSWeightsDecorKey.initialize());
+    }
 
     return StatusCode::SUCCESS;
   }
@@ -64,7 +82,7 @@ namespace Easyjet
     HTXSBinDecorHandle(*eventInfo) = HTXS_Stage1p2;
 
     if(!m_twTools.empty()) {
-        std::vector<double> HTXS_w =  STXSWeights(*eventInfo,HTXS_Njets30,HTXS_Stage1,HTXS_pTH,HTXS_Stage1p2,HTXS_Stage1p2Fine);
+        std::vector<double> HTXS_w = STXSWeights(*eventInfo,HTXS_Njets30,HTXS_Stage1,HTXS_pTH,HTXS_Stage1p2,HTXS_Stage1p2Fine);
 
         SG::WriteDecorHandle <xAOD::EventInfo, std::vector<double>> HTXSWeightsDecorHandle
             (m_HTXSWeightsDecorKey);
@@ -77,32 +95,15 @@ namespace Easyjet
   std::tuple<int,int,float,int,int> STXSAlg::STXSInfo(
     const xAOD::EventInfo &eventInfo) const
   {
-    int HTXS_Njets30 = -999;
-    int HTXS_Stage1 = -999;
-    float HTXS_pTH = -999.0;
-    int HTXS_Stage1p2 = -999;
-    int HTXS_Stage1p2Fine = -999;
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Njets30(m_HTXS_Njets30_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1(m_HTXS_Stage1_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, float> HTXS_pTH(m_HTXS_pTH_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1p2(m_HTXS_Stage1p2_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1p2Fine(m_HTXS_Stage1p2Fine_Key);
 
-    static const SG::AuxElement::ConstAccessor<int> acc_HTXS_Njets30("HTXS_Njets_pTjet30");
-    static const SG::AuxElement::ConstAccessor<int> acc_HTXS_Stage1("HTXS_Stage1_Category_pTjet30");
-    static const SG::AuxElement::ConstAccessor<float> acc_HTXS_pTH("HTXS_Higgs_pt"); // Needs to be in MeV
-    static const SG::AuxElement::ConstAccessor<int> acc_HTXS_Stage1p2("HTXS_Stage1_2_Category_pTjet30");
-    static const SG::AuxElement::ConstAccessor<int> acc_HTXS_Stage1p2Fine("HTXS_Stage1_2_Fine_Category_pTjet30");
-
-    bool ok_acc_HTXS_Njets30 = acc_HTXS_Njets30.isAvailable(eventInfo);
-    bool ok_acc_HTXS_Stage1 = acc_HTXS_Stage1.isAvailable(eventInfo);
-    bool ok_acc_HTXS_pTH = acc_HTXS_pTH.isAvailable(eventInfo);
-    bool ok_acc_HTXS_Stage1p2 = acc_HTXS_Stage1p2.isAvailable(eventInfo);
-    bool ok_acc_HTXS_Stage1p2Fine = acc_HTXS_Stage1p2Fine.isAvailable(eventInfo);
-    if (ok_acc_HTXS_Njets30 && ok_acc_HTXS_Stage1 && ok_acc_HTXS_pTH && ok_acc_HTXS_Stage1p2 && ok_acc_HTXS_Stage1p2Fine) {
-      HTXS_Njets30 = acc_HTXS_Njets30(eventInfo);
-      HTXS_Stage1 = acc_HTXS_Stage1(eventInfo);
-      HTXS_pTH = acc_HTXS_pTH(eventInfo);
-      HTXS_Stage1p2 = acc_HTXS_Stage1p2(eventInfo);
-      HTXS_Stage1p2Fine = acc_HTXS_Stage1p2Fine(eventInfo);
-    }
     ATH_MSG_DEBUG("++++ found HTXS_pTH (MeV) " << HTXS_pTH << " and bin " << HTXS_Stage1p2);
-    return {HTXS_Njets30,HTXS_Stage1,HTXS_pTH,HTXS_Stage1p2,HTXS_Stage1p2Fine};
+    return {HTXS_Njets30(eventInfo), HTXS_Stage1(eventInfo), HTXS_pTH(eventInfo),
+      HTXS_Stage1p2(eventInfo), HTXS_Stage1p2Fine(eventInfo)};
   }
 
 
@@ -111,11 +112,12 @@ namespace Easyjet
   {
     std::vector<double> HTXS_w;
     TruthWeightTools::HiggsWeights hw = m_twTools->getHiggsWeights(HTXS_Njets30, HTXS_pTH, HTXS_Stage1, HTXS_Stage1p2, HTXS_Stage1p2Fine, &eventInfo);
-    if (m_twTools_prodmode == "ggF") HTXS_w = hw.ggF_scheme;
-    else if (m_twTools_prodmode == "VBF") HTXS_w = hw.qq2Hqq_scheme;
-    else if ((m_twTools_prodmode == "qqZH") || (m_twTools_prodmode == "WH")) HTXS_w = hw.qq2Hll_scheme;
-    else if (m_twTools_prodmode == "ggZH") HTXS_w = hw.gg2Hll_scheme;
-    else if (m_twTools_prodmode == "ttH") HTXS_w = hw.ttH_scheme;
+    if (m_prodmode == STXSProdMode::ggF) HTXS_w = hw.ggF_scheme;
+    else if (m_prodmode == STXSProdMode::VBF) HTXS_w = hw.qq2Hqq_scheme;
+    else if (m_prodmode == STXSProdMode::qqZH ||
+	     m_prodmode == STXSProdMode::WH) HTXS_w = hw.qq2Hll_scheme;
+    else if (m_prodmode == STXSProdMode::ggZH) HTXS_w = hw.gg2Hll_scheme;
+    else if (m_prodmode == STXSProdMode::ttH) HTXS_w = hw.ttH_scheme;
     for (const auto &w: HTXS_w) {
       ATH_MSG_DEBUG("++++ found HTXS weight (printing array) " << w);
     }
