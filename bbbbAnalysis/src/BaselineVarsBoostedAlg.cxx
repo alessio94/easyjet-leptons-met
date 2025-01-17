@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Frederic Renner
@@ -24,6 +24,14 @@ namespace HH4B
     ATH_CHECK (m_LargeRJetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    ATH_CHECK(m_R10TruthLabel.initialize(m_systematicsList, m_LargeRJetHandle));
+    ATH_CHECK(m_GN2Xv01_phbb.initialize(m_systematicsList, m_LargeRJetHandle));
+    ATH_CHECK(m_GN2Xv01_phcc.initialize(m_systematicsList, m_LargeRJetHandle));
+    ATH_CHECK(m_GN2Xv01_pqcd.initialize(m_systematicsList, m_LargeRJetHandle));
+    ATH_CHECK(m_GN2Xv01_ptop.initialize(m_systematicsList, m_LargeRJetHandle));
+    ATH_CHECK(m_Tau2_wta.initialize(m_systematicsList, m_LargeRJetHandle));
+    ATH_CHECK(m_Tau3_wta.initialize(m_systematicsList, m_LargeRJetHandle));
+
     // make decorators
     for (const std::string &string_var: m_Fvars) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
@@ -39,15 +47,6 @@ namespace HH4B
 
   StatusCode BaselineVarsBoostedAlg ::execute()
   {
-    static const SG::AuxElement::ConstAccessor<int>    R10TruthLabel_R22v1("R10TruthLabel_R22v1");
-    static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phbb("GN2Xv01_phbb");
-    static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_pqcd("GN2Xv01_pqcd");
-    static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_phcc("GN2Xv01_phcc");
-    static const SG::AuxElement::ConstAccessor<float>  GN2Xv01_ptop("GN2Xv01_ptop");
-
-    static const SG::AuxElement::ConstAccessor<float>  Tau2_wta("Tau2_wta");
-    static const SG::AuxElement::ConstAccessor<float>  Tau3_wta("Tau3_wta");
-
     for (const auto& sys : m_systematicsList.systematicsVector()) {
       // container we read in
       const xAOD::EventInfo *eventInfo = nullptr;
@@ -86,29 +85,29 @@ namespace HH4B
         m_Fdecos.at("boosted_hh_delta_eta").set(*eventInfo, h1_v4.Eta() - h2_v4.Eta(), sys);
         m_Fdecos.at("boosted_hh_delta_phi").set(*eventInfo, h1_v4.DeltaPhi(h2_v4), sys);
 
-        float tau32, phbb_score, pqcd_score, phcc_score, ptop_score, hbb_disc;
-
         for (std::size_t i=0; i<2; i++){
+
           std::string prefix = "boosted_h"+std::to_string(i+1);
 
-          tau32 = Tau3_wta(*largeRjets->at(i))/Tau2_wta(*largeRjets->at(i));
+          float tau32 = m_Tau3_wta.get(*largeRjets->at(i),sys) /
+	    m_Tau2_wta.get(*largeRjets->at(i),sys);
           m_Fdecos.at(prefix+"_Tau32_wta").set(*eventInfo, tau32, sys);
 
-          phbb_score = GN2Xv01_phbb(*largeRjets->at(i));
-          pqcd_score = GN2Xv01_pqcd(*largeRjets->at(i));
-          phcc_score = GN2Xv01_phcc(*largeRjets->at(i));
-          ptop_score = GN2Xv01_ptop(*largeRjets->at(i));
+          float phbb_score = m_GN2Xv01_phbb.get(*largeRjets->at(i), sys);
+          float pqcd_score = m_GN2Xv01_pqcd.get(*largeRjets->at(i), sys);
+          float phcc_score = m_GN2Xv01_phcc.get(*largeRjets->at(i), sys);
+          float ptop_score = m_GN2Xv01_ptop.get(*largeRjets->at(i), sys);
 
           m_Fdecos.at(prefix+"_GN2Xv01_phbb").set(*eventInfo, phbb_score, sys);
           m_Fdecos.at(prefix+"_GN2Xv01_pqcd").set(*eventInfo, pqcd_score, sys);
           m_Fdecos.at(prefix+"_GN2Xv01_phcc").set(*eventInfo, phcc_score, sys);
           m_Fdecos.at(prefix+"_GN2Xv01_ptop").set(*eventInfo, ptop_score, sys);
 
-          hbb_disc = calculateGN2Xv01_disc(phbb_score, pqcd_score, phcc_score, ptop_score);
+          float hbb_disc = calculateGN2Xv01_disc(phbb_score, pqcd_score, phcc_score, ptop_score);
           m_Fdecos.at(prefix+"_GN2Xv01_disc").set(*eventInfo, hbb_disc, sys);
 
           if (m_isMC){
-            int truthLabel_i = R10TruthLabel_R22v1(*largeRjets->at(i));
+            int truthLabel_i = m_R10TruthLabel.get(*largeRjets->at(i), sys);
             m_Fdecos.at(prefix+"_truthLabel").set(*eventInfo, truthLabel_i, sys);
           }
         }
