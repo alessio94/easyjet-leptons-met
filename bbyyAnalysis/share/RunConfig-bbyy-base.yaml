@@ -18,6 +18,7 @@ do_GNN2bjetSelection: true
 
 # Toggles for reconstructed objects decorations
 Small_R_jet:
+  min_pT: 25.e+3
   useFJvt: true
   # btagging nominal working point
   btag_wp: "GN2v01_FixedCutBEff_85"
