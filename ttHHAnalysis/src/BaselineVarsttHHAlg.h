@@ -101,7 +101,7 @@ private:
       { this, "isSignal", false, "Is this signal sample?" };
 
     Gaudi::Property<bool> m_storeJetBranches
-      { this, "storeJetBranches", false, "Store flat jet branches" };
+      { this, "storeJetBranches", true, "Store flat jet branches" };
 
     Gaudi::Property<bool> m_runTopness
       { this, "runTopness", false, "Store topness variables" };

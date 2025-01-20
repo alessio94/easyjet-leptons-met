@@ -28,8 +28,8 @@ Small_R_jet:
   btag_wp: GN2v01_FixedCutBEff_85
   btag_extra_wps:
     - GN2v01_Continuous
-  #amount: 6
-  #variables_int_allJets: ["pcbt"]
+  amount: 6
+  variables_int_allJets: ["pcbt"]
 
 Electron:
   ID: "LooseBLayerLH"
@@ -84,9 +84,9 @@ ttree_output:
   include: EasyjetHub/AnalysisMiniTree-config.yaml
   # Our overrides. All defaults are off
   reco_outputs:
-    small_R_jets: 'container_names.output.reco4PFlowJet'
+    #small_R_jets: 'container_names.output.reco4PFlowJet'
     met: 'container_names.output.met'
-  collection_options:
-    small_R_jets:
-      btag_info: true
-      run_selection: true
+      # collection_options:
+      #   small_R_jets:
+      #     btag_info: true
+      #     run_selection: true

@@ -200,7 +200,7 @@ namespace ttHH
         m_ttHHCuts[i].relativeCounter+=1;
       }
 
-      if (!m_bypass and (!m_ttHHCuts("PASS_BASELINE").passed or !m_ttHHCuts("PASS_TRIGGER").passed)) continue;
+      if (!m_bypass and (!m_ttHHCuts("PASS_BASELINE").passed or !m_ttHHCuts("PASS_TRIGGER_MATCHING").passed)) continue;
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
@@ -250,7 +250,7 @@ namespace ttHH
         HT += jet->pt();
     }
 
-    if (((nLeptons==1 && nBJets>=3) || (nLeptons>=2 && nBJets>=3)) && HT > 400.*Athena::Units::GeV && nJets >= 6 && met->met() > 30.*Athena::Units::GeV && ttHHCuts.exists("PASS_BASELINE"))
+    if (((nLeptons==1 && nBJets>=3) || (nLeptons==2 && nBJets>=3)) && HT > 400.*Athena::Units::GeV && nJets >= 6 && met->met() > 30.*Athena::Units::GeV && ttHHCuts.exists("PASS_BASELINE"))
         ttHHCuts("PASS_BASELINE").passed = true;
 
   }
