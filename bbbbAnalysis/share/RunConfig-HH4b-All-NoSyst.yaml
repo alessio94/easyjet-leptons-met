@@ -1,3 +1,4 @@
 include: bbbbAnalysis/RunConfig-HH4b-All.yaml
 
 do_CP_systematics: false
+systematics_regex: []

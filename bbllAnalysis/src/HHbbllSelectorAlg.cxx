@@ -216,7 +216,7 @@ namespace HHBBLL
       bool pass_baseline=false;
       if(m_bools.at(HHBBLL::PASS_TRIGGER) && m_bools.at(HHBBLL::EXACTLY_TWO_LEPTONS) && m_bools.at(HHBBLL::EXACTLY_TWO_B_JETS)) pass_baseline=true;
 
-      if ((m_bypass or pass_baseline)) filter.setPassed(true);
+      if ((m_bypass || pass_baseline)) filter.setPassed(true);
       
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()=="") {

@@ -225,7 +225,7 @@ namespace HHBBYY
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
-      if (m_bypass or passedall) filter.setPassed(true);
+      if (m_bypass || passedall) filter.setPassed(true);
 
       // only do the cutflow if you are on the nominal branch, and want the cutflow done at all
       if(sys.name()!=m_specialSysWeight && m_saveCutFlow){

@@ -50,11 +50,12 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
         if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_nWLep_samples:
             eventinfo_branches.variables += ["nWLep"]
 
-        _, has_STXS, has_STXS_unc = STXS_info(flags.Input.MCChannelNumber)
-        if has_STXS:
-            eventinfo_branches.variables += ["HTXS_Category_Stage1_2_pTjet30"]
-        if has_STXS_unc:
-            eventinfo_branches.variables += ["HTXS_Weights_Stage1_2_pTjet30"]
+        if flags.Analysis.Truth.do_STXS:
+            _, has_STXS, has_STXS_unc = STXS_info(flags.Input.MCChannelNumber)
+            if has_STXS:
+                eventinfo_branches.variables += ["HTXS_Category_Stage1_2_pTjet30"]
+            if has_STXS_unc:
+                eventinfo_branches.variables += ["HTXS_Weights_Stage1_2_pTjet30"]
 
         # Need syst_only_for not to be empty to avoid applying SYST on all
         # other branches

@@ -10,6 +10,7 @@ kinematicGroup: "compressed"
 # Decay mode considered for truth decoration
 Truth:
   decayModes: ["bbbb"]
+  do_STXS: false
 
 do_small_R_jets: false
 do_large_R_UFO_jets: false

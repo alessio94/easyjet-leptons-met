@@ -186,6 +186,11 @@ def STXS_info(DSID):
     fdir = "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/DerivationFrameworkHiggs/"
     fname = "HiggsMCsamples.cfg"
     file_with_DSIDs = fdir + fname
+
+    if not Path(file_with_DSIDs).exists():
+        log.info(f"file {file_with_DSIDs} does not exist")
+        return prodmode, has_STXS, has_STXS_unc
+
     log.info(f"will decide if sample {DSID} has STXS based on {file_with_DSIDs}")
 
     # names written in file DSID not the same as unc tool expects
@@ -199,30 +204,31 @@ def STXS_info(DSID):
         "TTH": "ttH"
     }
 
-    try:
-        with open(file_with_DSIDs) as fp:
-            for i_line in fp.readlines():
-                if "#" in i_line:
-                    uncom = i_line[:i_line.find("#")]
-                else:
-                    uncom = i_line
+    with open(file_with_DSIDs) as fp:
+        for i_line in fp.readlines():
+            if "#" in i_line:
+                uncom = i_line[:i_line.find("#")]
+            else:
+                uncom = i_line
 
-                if str(DSID) in uncom.strip().split(" "):
-                    has_STXS = True
-                    log.info("STXS should be there")
+            if str(DSID) in uncom.strip().split(" "):
+                has_STXS = True
+                log.info("STXS should be there")
 
-                    pattern = "HTXS.MCsamples."
-                    prodmode_start = uncom.find(pattern) + len(pattern)
-                    prodmode_temp = uncom[prodmode_start:uncom.find(":")]
-                    log.info("from DSID file have prod", prodmode_temp)
-                    if prodmode_temp in prodmode_for_unc_dict.keys():
-                        has_STXS_unc = True
-                        prodmode = prodmode_for_unc_dict[prodmode_temp]
-
+                pattern = "HTXS.MCsamples."
+                if pattern not in uncom:
+                    log.info(f"not clear in {file_with_DSIDs} if STXS DSID: {DSID}")
                     break
-    except IOError:
-        log.info(f"not clear in {file_with_DSIDs} if STXS DSID: {DSID}")
 
-    log.info(f"got prodmode {prodmode}")
+                prodmode_start = uncom.find(pattern) + len(pattern)
+                prodmode_temp = uncom[prodmode_start:uncom.find(":")]
+                log.info(f"from DSID file have prod {prodmode_temp}")
+                if prodmode_temp in prodmode_for_unc_dict.keys():
+                    has_STXS_unc = True
+                    prodmode = prodmode_for_unc_dict[prodmode_temp]
+                break
+
+    if prodmode != "":
+        log.info(f"got prodmode {prodmode}")
     log.info(f"has_STXS {has_STXS} has_STXS_unc {has_STXS_unc}")
     return prodmode, has_STXS, has_STXS_unc

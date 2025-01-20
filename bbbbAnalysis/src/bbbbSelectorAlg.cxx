@@ -138,38 +138,38 @@ namespace HH4B
 
       // Global event filter true if any syst passes and controls
       // if event is passed to output writing or not
-      if (m_bypass or passedall) filter.setPassed(true);
+      if (m_bypass || passedall) filter.setPassed(true);
 
       // Only store cutflow for NOSYS
       if (sys.name()=="" && m_saveCutFlow){
 
-	// Compute total_events
-	m_total_events+=1;
-	if (m_isMC) m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);
+        // Compute total_events
+        m_total_events+=1;
+        if (m_isMC) m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);
 
-	// Count how many cuts the event passed and increase the relative counter
-	for (const auto &cut : m_inputCutList) {
-	  if(m_bbbbCuts.exists(cut)) {
-	    if (m_bbbbCuts(cut).passed) {
-	      m_bbbbCuts(cut).counter += 1;
-	      if (m_isMC) m_bbbbCuts(cut).w_counter += m_generatorWeight.get(*event, sys);
-	    }
-	  }
-	}
+        // Count how many cuts the event passed and increase the relative counter
+        for (const auto &cut : m_inputCutList) {
+          if(m_bbbbCuts.exists(cut)) {
+            if (m_bbbbCuts(cut).passed) {
+              m_bbbbCuts(cut).counter += 1;
+              if (m_isMC) m_bbbbCuts(cut).w_counter += m_generatorWeight.get(*event, sys);
+            }
+          }
+        }
 
-	// Check how many consecutive cuts are passed by the event.
-	unsigned int consecutive_cuts = 0;
-	for (size_t i = 0; i < m_bbbbCuts.size(); ++i) {
-	  if (m_bbbbCuts[i].passed) consecutive_cuts++;
-	  else break;
-	}
+        // Check how many consecutive cuts are passed by the event.
+        unsigned int consecutive_cuts = 0;
+        for (size_t i = 0; i < m_bbbbCuts.size(); ++i) {
+          if (m_bbbbCuts[i].passed) consecutive_cuts++;
+          else break;
+        }
 
-	// Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
-	// I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
-	for (unsigned int i=0; i<consecutive_cuts; i++) {
-	  m_bbbbCuts[i].relativeCounter += 1;
-	  if (m_isMC) m_bbbbCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
-	}
+        // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
+        // I think this is an elegant way to do it :) . Considering the difficulties a configurable cut list imposes. 
+        for (unsigned int i=0; i<consecutive_cuts; i++) {
+          m_bbbbCuts[i].relativeCounter += 1;
+          if (m_isMC) m_bbbbCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
+        }
       }
 
     }

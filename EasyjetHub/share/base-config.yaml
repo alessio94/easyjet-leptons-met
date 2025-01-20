@@ -21,6 +21,7 @@ do_bbyy_analysis: false
 # Truth-related properties
 Truth:
   decayModes: []
+  do_STXS: true
   include: DSID_samples.yaml
 
 # Toggles for reconstructed objects properties
