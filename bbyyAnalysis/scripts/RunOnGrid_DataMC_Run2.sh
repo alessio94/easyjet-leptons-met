@@ -1,5 +1,5 @@
-ptag=p6266
-campaign=v7
+ptag=p6490
+campaign=v8
 dir_samples="../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal"
 mc_campaign="mc20_13TeV"
 mc_list=(
@@ -31,16 +31,17 @@ mc_list=(
     "$dir_samples/$mc_campaign.qqZH_yy.$ptag.txt"
     "$dir_samples/$mc_campaign.ggZH_yy.$ptag.txt"
     "$dir_samples/$mc_campaign.ttH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.tHjb.$ptag.txt"
-    "$dir_samples/$mc_campaign.tWHyy.$ptag.txt"
-    "$dir_samples/$mc_campaign.bbH_yy.$ptag.txt"
+    #"$dir_samples/$mc_campaign.tHjb.$ptag.txt" #Derivation is missing atm
+    #"$dir_samples/$mc_campaign.tWHyy.$ptag.txt" #Derivation is missing atm
+    #"$dir_samples/$mc_campaign.bbH_yy.$ptag.txt" #Derivation is missing atm
     "$dir_samples/$mc_campaign.yyjets.$ptag.txt"
     "$dir_samples/$mc_compaign.yybb.$ptag.txt"
     "$dir_samples/$mc_campaign.ttyy_nonallhad.$ptag.txt"
+    "$dir_samples/$mc_campaign.ttyy_allhad.$ptag.txt"
 )
 
 #data 
-easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13TeV.Run2.${ptag}.txt \
+easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13TeV.Run2.p6479.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 100 \

@@ -1,6 +1,6 @@
-ptag=p6266
-campaign=v7
-dir_samples="../easyjet/bbyyAnalysis/datasets/PHYS/nominal"
+ptag=p6491
+campaign=v8
+dir_samples="../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal"
 mc_campaign="mc23_13p6TeV"
 mc_list=(
     "$dir_samples/$mc_campaign.ggFHH_bbyy_SM.$ptag.txt"
@@ -36,21 +36,23 @@ mc_list=(
     "$dir_samples/$mc_campaign.VBFHH_bbyy_kl1kvv1kv1p5_FS.$ptag.txt"
     "$dir_samples/$mc_campaign.VBFHH_bbyy_kl0kvv0kv1_FS.$ptag.txt"
     "$dir_samples/$mc_campaign.VBFHH_bbyy_klm5kvv1kv0p5_FS.$ptag.txt"
-    "$dir_samples/$mc_campaign.ggFH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.VBFH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.WpH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.WmH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.qqZH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.ggZH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.ttH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.bbH_yy.$ptag.txt"
-    "$dir_samples/$mc_campaign.tHjb.$ptag.txt"
-    "$dir_samples/$mc_campaign.tWHyy.$ptag.txt"
+    #"$dir_samples/$mc_campaign.ggFH_yy.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.VBFH_yy.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.WpH_yy.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.WmH_yy.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.qqZH_yy.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.ggZH_yy.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.ttH_yy.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.bbH_yy.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.tHjb.$ptag.txt" #p6491 are not available atm
+    #"$dir_samples/$mc_campaign.tWHyy.$ptag.txt" #p6491 are not available atm
     "$dir_samples/$mc_campaign.yyjets.$ptag.txt"
     "$dir_samples/$mc_compaign.yybb.$ptag.txt"
+    "$dir_samples/$mc_campaign.ttyy_nonallhad.$ptag.txt"
+    "$dir_samples/$mc_campaign.ttyy_allhad.$ptag.txt"
 )
 #data 
-easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/data_13p6TeV.Run3.p6269.txt \
+easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/data_13p6TeV.Run3.p6482.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 100 \
