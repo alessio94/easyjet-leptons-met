@@ -224,15 +224,18 @@ def get_BaselineVarsbbyyAlg_variables(flags):
     # VBFJets
     if flags.Analysis.save_VBF_vars:
         for i in range(1, 3):
-            for var in ["pt", "eta", "phi", "E", "yybb_dR", "yybb_deta"]:
+            for var in ["pt", "eta", "phi", "E"]:
                 float_variable_names += [f"Jet_vbf_j{i}_" + var]
                 if (flags.Analysis.do_KinematicFit):
                     float_variable_names += [f"KF_Jet_vbf_j{i}_" + var]
-        for var in ["maxscore", "m", "deta", "yybb_dR", "yybb_deta", "yybb_pt",
-                    "yybb_eta", "yybb_phi", "yybb_m"]:
+        for var in ["m", "deta"]:
             float_variable_names += ["Jet_vbf_jj_" + var]
             if (flags.Analysis.do_KinematicFit):
                 float_variable_names += ["KF_Jet_vbf_jj_" + var]
+        if ("BDT" in flags.Analysis.VBFjetsMethod):
+            float_variable_names += ["Jet_vbf_jj_maxscore"]
+            if (flags.Analysis.do_KinematicFit):
+                float_variable_names += ["KF_Jet_vbf_jj_maxscore"]
 
     # GNN HbbCandidate jets
     if (flags.Analysis.do_GNN2bjetSelection):

@@ -1158,19 +1158,11 @@ namespace HHBBYY
 	m_Fbranches.at(full_prefix + "_eta").set(*event, vbf_j[i].Eta(), sys);
 	m_Fbranches.at(full_prefix + "_phi").set(*event, vbf_j[i].Phi(), sys);
 	m_Fbranches.at(full_prefix + "_E").set(*event, vbf_j[i].E(), sys);
-	m_Fbranches.at(full_prefix + "_yybb_dR").set(*event, vbf_j[i].DeltaR(HH), sys);
-	m_Fbranches.at(full_prefix + "_yybb_deta").set(*event, std::fabs(vbf_j[i].Eta() - HH.Eta()), sys);
       }
       
-      m_Fbranches.at(prefix_jj + "_maxscore").set(*event, vbf_jj_maxscore, sys);
+      if (m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) m_Fbranches.at(prefix_jj + "_maxscore").set(*event, vbf_jj_maxscore, sys);
       m_Fbranches.at(prefix_jj + "_m").set(*event, vbf_jj.M(), sys);
       m_Fbranches.at(prefix_jj + "_deta").set(*event, std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta()), sys);
-      m_Fbranches.at(prefix_jj + "_yybb_dR").set(*event, vbf_jj.DeltaR(HH), sys);
-      m_Fbranches.at(prefix_jj + "_yybb_deta").set(*event, std::fabs(vbf_jj.Eta() - HH.Eta()), sys);
-      m_Fbranches.at(prefix_jj + "_yybb_pt").set(*event, yybbjj.Pt(), sys);
-      m_Fbranches.at(prefix_jj + "_yybb_eta").set(*event, yybbjj.Eta(), sys);
-      m_Fbranches.at(prefix_jj + "_yybb_phi").set(*event, yybbjj.Phi(), sys);
-      m_Fbranches.at(prefix_jj + "_yybb_m").set(*event, yybbjj.M(), sys);
     }
     return StatusCode::SUCCESS;
   }
