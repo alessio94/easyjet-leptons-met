@@ -80,6 +80,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             bypass=flags.Analysis.bypass,
             enableSinglePhotonTrigger=flags.Analysis.enable_single_photon_trigger,
             specialSysWeight=get_sys_weight_name(flags),
+            saveTriggerInfo=flags.Analysis.save_pass_trigger_info,
         )
     )
 
@@ -383,14 +384,15 @@ def bbyy_branches(flags):
             branches += [f"EventInfo.{cut}_{sys_suffix} -> bbyy_{cut}{extra}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
-    photon_triggers = [
-        "pass_trigger_single_photon",
-        "pass_trigger_diphoton",
-        "pass_matching_trigger_single_photon",
-        "pass_matching_trigger_diphoton"]
+    if (flags.Analysis.save_pass_trigger_info):
+        photon_triggers = [
+            "pass_trigger_single_photon",
+            "pass_trigger_diphoton",
+            "pass_matching_trigger_single_photon",
+            "pass_matching_trigger_diphoton"]
 
-    for trigger in photon_triggers:
-        branches += [f"EventInfo.{trigger}_{sys_suffix} -> {trigger}"
-                     + flags.Analysis.systematics_suffix_separator + sys_suffix]
+        for trigger in photon_triggers:
+            branches += [f"EventInfo.{trigger}_{sys_suffix} -> {trigger}"
+                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     return branches, float_variable_names, int_variable_names

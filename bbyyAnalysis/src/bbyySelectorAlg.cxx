@@ -19,6 +19,7 @@ namespace HHBBYY
     declareProperty("cutList", m_inputCutList);
     declareProperty("saveCutFlow",m_saveCutFlow);
     declareProperty("photonTriggers",m_photonTriggers);
+    declareProperty("saveTriggerInfo", m_saveTriggerInfo);
   }
 
 
@@ -166,11 +167,13 @@ namespace HHBBYY
         evaluateTriggerCuts(*event, m_photonTriggers, m_bbyyCuts);
         evaluateTriggerMatchingCuts(m_photonTriggers, photons, m_bbyyCuts);
       }
-      m_Bbranches.at("pass_trigger_single_photon").set(*event, m_bools.at(HHBBYY::pass_trigger_single_photon), sys);
-      m_Bbranches.at("pass_trigger_diphoton").set(*event, m_bools.at(HHBBYY::pass_trigger_diphoton), sys);
+      if (m_saveTriggerInfo){
+        m_Bbranches.at("pass_trigger_single_photon").set(*event, m_bools.at(HHBBYY::pass_trigger_single_photon), sys);
+        m_Bbranches.at("pass_trigger_diphoton").set(*event, m_bools.at(HHBBYY::pass_trigger_diphoton), sys);
 
-      m_Bbranches.at("pass_matching_trigger_single_photon").set(*event, m_bools.at(HHBBYY::pass_matching_trigger_single_photon), sys);
-      m_Bbranches.at("pass_matching_trigger_diphoton").set(*event, m_bools.at(HHBBYY::pass_matching_trigger_diphoton), sys);
+        m_Bbranches.at("pass_matching_trigger_single_photon").set(*event, m_bools.at(HHBBYY::pass_matching_trigger_single_photon), sys);
+        m_Bbranches.at("pass_matching_trigger_diphoton").set(*event, m_bools.at(HHBBYY::pass_matching_trigger_diphoton), sys);
+      }
 
       if (m_bbyyCuts.exists("TWO_LOOSE_PHOTONS"))
       m_bbyyCuts("TWO_LOOSE_PHOTONS").passed = (photons->size() >= 2);

@@ -101,6 +101,7 @@ save_VBF_vars: true
 save_extra_vars: true
 save_nonresonant_BDTInput_variables: true
 save_HbbCand_vars: true
+save_pass_trigger_info: true
 
 BDT_path:
   - "bbyyAnalysis/bdt_legacy_lowMass.root"

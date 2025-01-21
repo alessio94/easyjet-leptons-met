@@ -138,6 +138,7 @@ namespace HHBBYY
       std::unordered_map<std::string,  SG::ReadDecorHandleKey<xAOD::EventInfo>> m_triggerDecorKeys;
 
       bool m_saveCutFlow;
+      bool m_saveTriggerInfo;
       long long int m_total_events{0};
       double m_total_mcEventWeight{0.0};
 

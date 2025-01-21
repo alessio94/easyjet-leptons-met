@@ -28,3 +28,4 @@ Photon:
 save_extra_vars: false
 do_GNN2bjetSelection: false
 save_HbbCand_vars: false
+save_pass_trigger_info: false
