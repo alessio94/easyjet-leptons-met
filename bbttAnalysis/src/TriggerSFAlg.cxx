@@ -31,14 +31,6 @@ namespace HHBBTT
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      for(const auto& wp : m_eleWPNames){
-        m_ele_SF.emplace_back("el_effSF_"+wp+"_%SYS%", this);
-      }
-    }
-    for(auto& handle : m_ele_SF)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-
-    if(m_isMC){
       for(const auto& trig : m_eleTrigSF){
         m_eleTriggerSF.emplace
           (trig, CP::SysReadDecorHandle<float>("el_trigEffSF_"+trig+"_%SYS%", this));
@@ -47,25 +39,12 @@ namespace HHBBTT
     }
 
     if(m_isMC){
-      for(const auto& wp : m_muonWPNames){
-        m_mu_SF.emplace_back("muon_effSF_"+wp+"_%SYS%", this);
-      }
-    }
-    for(auto& handle : m_mu_SF)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
-
-    if(m_isMC){
       for(const auto& trig : m_muonTrigSF){
         m_muonTriggerSF.emplace
           (trig, CP::SysReadDecorHandle<float>("muon_trigEffSF_"+trig+"_%SYS%", this));
         ATH_CHECK (m_muonTriggerSF.at(trig).initialize(m_systematicsList, m_muonHandle));
       }
     }
-
-    if(m_isMC){
-      m_tau_effSF = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
-    }
-    ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_tauHandle, SG::AllowEmpty));
 
     if(m_isMC){
       for(const auto& trig : m_tauTrigSF){
@@ -160,10 +139,10 @@ namespace HHBBTT
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
           if(!tau0) tau0 = tau;
-	  else if(!tau1){
-	    tau1 = tau;
-	    break;
-	  }
+          else if(!tau1){
+            tau1 = tau;
+            break;
+          }
         }
       }
       std::vector<const xAOD::TauJet*> sel_taus = {tau0, tau1};

@@ -135,9 +135,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.HHBBTT.TriggerSFAlg(
             "TriggerSFAlg",
             isMC=flags.Input.isMC,
-            eleWPs=ele_WPs,
-            muonWPs=muon_WPs,
-            tauWP=flags.Analysis.Tau.extra_wps[0],
             eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
             muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
             tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau')

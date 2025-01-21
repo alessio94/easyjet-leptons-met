@@ -71,25 +71,13 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
-    Gaudi::Property<std::vector<std::string>> m_eleWPNames
-      { this, "eleWPs", {},"Electron ID + Iso working points" };
-    std::vector<CP::SysReadDecorHandle<float>> m_ele_SF;
-
     Gaudi::Property<std::vector<std::string>> m_eleTrigSF
       {this, "eleTriggerSF", {}, "List of electron trigger SF"};
     std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_eleTriggerSF;
 
-    Gaudi::Property<std::vector<std::string>> m_muonWPNames
-      { this, "muonWPs", {},"Muon ID + Iso working points" };
-    std::vector<CP::SysReadDecorHandle<float>> m_mu_SF;
-
     Gaudi::Property<std::vector<std::string>> m_muonTrigSF
       {this, "muonTriggerSF", {}, "List of muon trigger SF"};
     std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_muonTriggerSF;
-
-    Gaudi::Property<std::string> m_tauWPName
-      { this, "tauWP", "","Tau ID working point" };
-    CP::SysReadDecorHandle<float> m_tau_effSF{"", this};
 
     Gaudi::Property<std::vector<std::string>> m_tauTrigSF
       {this, "tauTriggerSF", {}, "List of tau trigger SF"};
