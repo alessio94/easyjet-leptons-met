@@ -241,7 +241,7 @@ namespace VBSHIGGS{
 	        m_Fbranches.at(prefix+"_MET"+"_mT").set(*event, mt_lept_met, sys);
 
           if(m_isMC){
-            float SF = -99;
+            float SF = 1.;
             if(std::abs(leptons[i].second)==11 ){
               SF = m_ele_SF.get(*leptons[i].first,sys);
 
@@ -306,14 +306,6 @@ namespace VBSHIGGS{
         m_Fbranches.at("dPhillMET").set(*event, ll.DeltaPhi(metVec), sys);
         m_Fbranches.at("dPhil1MET").set(*event, Leading_lep.DeltaPhi(metVec), sys);
         m_Fbranches.at("dPhil2MET").set(*event, Subleading_lep.DeltaPhi(metVec), sys);
-
-        //jet sector
-        for (std::size_t i=0; i<std::min(signalJets->size(),(std::size_t)2); i++){
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_pt").set(*event, signalJets->at(i)->pt(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_eta").set(*event, signalJets->at(i)->eta(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_phi").set(*event, signalJets->at(i)->phi(), sys);
-          m_Fbranches.at("Jet"+std::to_string(i+1)+"_E").set(*event, signalJets->at(i)->e(), sys); 
-        }
 
         //b-jet sector
         for (std::size_t i=0; i<std::min(HJets->size(),(std::size_t)2); i++){

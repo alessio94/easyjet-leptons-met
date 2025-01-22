@@ -38,7 +38,7 @@ Electron:
   maxDeltaZ0SinTheta: 0.5
   ID: "LooseBLayerLH"
   Iso: "NonIso"
-  amount: 2
+  amount: 0
   extra_wps:
     - ["LooseBLayerLH", "Loose_VarRad"]
     - ["LooseBLayerLH", "Tight_VarRad"]
@@ -78,7 +78,7 @@ Muon:
   maxDeltaZ0SinTheta: 0.5
   ID: "Loose"
   Iso: "NonIso"
-  amount: 2
+  amount: 0
   extra_wps:
     - ["Loose", "PflowLoose_VarRad"]
     - ["Loose", "PflowTight_VarRad"]

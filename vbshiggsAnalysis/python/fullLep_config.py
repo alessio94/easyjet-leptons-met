@@ -136,6 +136,7 @@ def fullLep_branches(flags):
     int_variable_names += object_level_int_variables
 
     branches += object_level_branches
+
     branches += ["EventInfo.vbshiggs_pass_sr_%SYS% -> pass_SR_%SYS%"]
 
     if (flags.Analysis.save_cutflow):
