@@ -102,16 +102,16 @@ namespace VBSVV4q{
             else if(m_TagJetsCriteria == "LeadingPTjj"){
                 // loop over small-R jets
                 for(auto srjet : *smallRjets){
-                    bool passORJ = false;
+                    bool passORJ = true;
                     // loop over signal large-R jets
                     for(auto lrjet : *largeRjets){
                         // skip overlapping jets
-                        if( srjet->p4().DeltaR(lrjet->p4()) < m_DeltaRJj ) continue;
-            			passORJ = true;
-		            }
+                        if( srjet->p4().DeltaR(lrjet->p4()) < m_DeltaRJj )
+                            passORJ = false;
+                    }
 
                     // store the tag jets
-		            if(passORJ)
+                    if(passORJ)
                         VBSJetContainer -> push_back(srjet);
 
                     // ToImprove

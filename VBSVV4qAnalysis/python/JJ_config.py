@@ -28,7 +28,7 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
         CompFactory.VBSVV4q.VBSJetsSelectorAlg(
             "VBSJetsSelectorAlg",
             smallRjets="VBSVV4qAnalysisJets_%SYS%",
-            largeRjets="VBSVV4qAnalysisLargeJets_%SYS%",
+            largeRjets="VBSVV4qAnalysisSigLargeJets_%SYS%",
             TagJetsCriteria=flags.Analysis.TagJetsCriteria,
             DeltaRJj=flags.Analysis.DeltaRJj,
             VBSJetsContainerOutKey="VBSVV4qAnalysisVBSJets_%SYS%",
