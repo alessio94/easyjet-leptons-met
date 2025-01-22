@@ -15,7 +15,7 @@ def MuonSelectorAlgCfg(flags, name="MuonSelectorAlg", **kwargs):
     kwargs.setdefault("muonWPs", muon_WPs)
     kwargs.setdefault("muonTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Muon'))
-    kwargs.setdefault("muonAmount", flags.Analysis.Lepton.amount)
+    kwargs.setdefault("muonAmount", flags.Analysis.Muon.amount)
 
     cfg.addEventAlgo(CompFactory.Easyjet.MuonSelectorAlg(name, **kwargs))
     return cfg
@@ -30,7 +30,7 @@ def ElectronSelectorAlgCfg(flags, name="ElectronSelectorAlg", **kwargs):
     kwargs.setdefault("eleWPs", ele_WPs)
     kwargs.setdefault("eleTriggerSF",
                       get_trigger_legs_scale_factor_list(flags, 'Electron'))
-    kwargs.setdefault("electronAmount", flags.Analysis.Lepton.amount)
+    kwargs.setdefault("electronAmount", flags.Analysis.Electron.amount)
     kwargs.setdefault("saveDummySF", flags.GeoModel.Run is LHCPeriod.Run2)
 
     cfg.addEventAlgo(CompFactory.Easyjet.ElectronSelectorAlg(name, **kwargs))
