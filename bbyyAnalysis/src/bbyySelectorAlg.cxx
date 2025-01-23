@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "bbyySelectorAlg.h"
@@ -86,34 +86,13 @@ namespace HHBBYY
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize()); 
-    
-    m_bbyyCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
-
-    for (const std::string &cut : m_inputCutList)  { 
-      // Initialize a vector of CutEntry structs based on the input Cut List
-      m_bbyyCuts.add(cut);
-    }
 
     // Intialise booleans with value false.
     for (auto& [key, value] : m_boolnames) {
       m_bools.emplace(key, false);
     };
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_bbyyCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));  
-
+    
+    ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
 
@@ -301,23 +280,15 @@ namespace HHBBYY
       m_bbyyCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
       m_bbyyCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
       m_bbyyCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
-      m_bbyyCuts.DoWeightedAbsoluteEfficiency(m_total_mcEventWeight, efficiency("WeightedAbsoluteEfficiency"));
-      m_bbyyCuts.DoWeightedRelativeEfficiency(m_total_mcEventWeight, efficiency("WeightedRelativeEfficiency"));
-      m_bbyyCuts.DoWeightedStandardCutFlow(m_total_mcEventWeight, efficiency("WeightedStandardCutFlow"));
+      if(m_isMC){
+	m_bbyyCuts.DoWeightedAbsoluteEfficiency(m_total_mcEventWeight, efficiency("WeightedAbsoluteEfficiency"));
+	m_bbyyCuts.DoWeightedRelativeEfficiency(m_total_mcEventWeight, efficiency("WeightedRelativeEfficiency"));
+	m_bbyyCuts.DoWeightedStandardCutFlow(m_total_mcEventWeight, efficiency("WeightedStandardCutFlow"));
+      }
       m_bbyyCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
     }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      delete efficiency("WeightedAbsoluteEfficiency");
-      delete efficiency("WeightedRelativeEfficiency");
-      delete efficiency("WeightedStandardCutFlow");
-      delete hist("EventsPassed_BinLabeling");
-    }
 
-
-     return StatusCode::SUCCESS;
+    return StatusCode::SUCCESS;
 
   }
 
@@ -478,4 +449,36 @@ namespace HHBBYY
     m_bools.at(HHBBYY::is16) = 296939 <= rdmNumber && rdmNumber <= 311481;
   }
 
+  StatusCode bbyySelectorAlg::initialiseCutflow(){
+
+    // This is used even when the cutflow isn't saved
+    m_bbyyCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
+
+    for (const std::string &cut : m_inputCutList)  {
+      // Initialize a vector of CutEntry structs based on the input Cut List
+      m_bbyyCuts.add(cut);
+    }
+
+    if(m_saveCutFlow){
+      //After filling the CutManager, book your histograms.
+      const unsigned int nbins = m_bbyyCuts.size() + 1; //  need an extra bin for the total num of events.
+      ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbyy cuts.Needs rescaling to total events.;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+      if (m_isMC){
+	ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon",
+				     nbins, 0.5, nbins + 0.5)));
+	ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon",
+				     nbins, 0.5, nbins + 0.5)));
+	ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->bbyy cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon",
+				     nbins, 0.5, nbins + 0.5)));
+      }
+      ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+    }
+
+    return StatusCode::SUCCESS;
+  }
 }

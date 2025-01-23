@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "MultileptonSelectorAlg.h"
@@ -198,17 +198,6 @@ namespace MULTILEPTON
         m_hhmlCuts.DoWeightedStandardCutFlow(m_total_mcEventWeight, efficiency("WeightedStandardCutFlow"));
       }
       m_hhmlCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
-    }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      if(m_isMC) {
-        delete efficiency("WeightedAbsoluteEfficiency");
-        delete efficiency("WeightedRelativeEfficiency");
-        delete efficiency("WeightedStandardCutFlow");
-      }
-      delete hist("EventsPassed_BinLabeling");
     }
 
     return StatusCode::SUCCESS;

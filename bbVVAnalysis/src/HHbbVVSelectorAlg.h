@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Kira Abeling, JaeJin Hong
@@ -47,6 +47,8 @@ public:
     /// \brief Finalisation method, for cleanup, final print out etc
     StatusCode finalize() override;
 
+private:
+
     float Tau42(const xAOD::Jet* lrjet, const CP::SystematicSet& sys);
 
     void distJetClassification(const xAOD::JetContainer& lrjets, const xAOD::Jet *&Hbb, const xAOD::Jet *&Whad,
@@ -65,6 +67,8 @@ public:
 
     void signalBtagging(const xAOD::Jet *&Hbb, const xAOD::Jet *&Whad, const xAOD::Jet *&Whad2, const CP::SystematicSet& sys, bool& HBB_BTAG, bool& WHAD_BTAG, bool& WHAD2_BTAG);
 
+    StatusCode initialiseCutflow();
+
     const std::vector<std::string> m_STANDARD_CUTS{
           // add more standard cuts
           "LEAD_LRJ_PT", // Leading lrjet pt > 500 GeV
@@ -76,10 +80,6 @@ public:
           "HBB_PT", // Hbb_lrjet pass pt > 500 GeV cut
           "HBB_BTAG" // Hbb_Btag pass the Btag WP cut
       };
-
-
-
-private:
 
     /// \brief Steerable properties
     Gaudi::Property<std::vector<std::string>> m_channel_names
@@ -162,7 +162,7 @@ private:
 
 
     Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
-    bool m_saveCutFlow = true;
+    Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", true};
 
     CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
     

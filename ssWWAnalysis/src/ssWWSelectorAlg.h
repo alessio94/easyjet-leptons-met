@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -98,6 +98,7 @@ namespace ssWWVBS
       /// \brief This is the mirror of initialize() and is called after all events are processed.
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
 
+    private :
       const std::vector<std::string> m_STANDARD_CUTS{
         "PASS_TRIGGER",
         "PASS_TWO_LEPTONS",
@@ -111,11 +112,6 @@ namespace ssWWVBS
         "DIJETS_DELTA_RAPIDITY",
         "BJET_VETO",
       };
-
-
-    private :
-      // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-      // "someInfo"};
 
       Gaudi::Property<std::vector<std::string>> m_channel_names
       { this, "channel", {}, "Which channel to run" };
@@ -247,6 +243,8 @@ namespace ssWWVBS
                           const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons, CutManager& ssWWCuts);
       void setThresholds(const xAOD::EventInfo* event,
 			 const CP::SystematicSet& sys);
+
+      StatusCode initialiseCutflow();
   };
 
 }

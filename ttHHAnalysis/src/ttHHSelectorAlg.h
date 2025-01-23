@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -48,6 +48,7 @@ namespace ttHH
       /// \brief This is the mirror of initialize() and is called after all events are processed.
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
 
+    private:
       const std::vector<std::string> m_STANDARD_CUTS{
           "PASS_TRIGGER",
           "PASS_BASELINE", 
@@ -65,9 +66,7 @@ namespace ttHH
                                       const xAOD::MuonContainer* muons,  const xAOD::ElectronContainer* electrons,
                                       CutManager& ttHHCuts);
 
-    private :
-      // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-      // "someInfo"};
+      StatusCode initialiseCutflow();
 
       /// \brief Setup syst-aware input container handles
       CutManager m_ttHHCuts;

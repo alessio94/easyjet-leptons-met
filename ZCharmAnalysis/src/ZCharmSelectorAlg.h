@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -44,6 +44,8 @@ namespace ZCC
       /// \brief This is the mirror of initialize() and is called after all events are processed.
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
 
+    private :
+
       const std::vector<std::string> m_BASELINE_CUTS{
         "PASS_TRIGGER",
         "EXACTLY_TWO_LEPTONS",
@@ -51,11 +53,6 @@ namespace ZCC
         "DILEPTON_MASS_WINDOW",
         "MET",
       };
-
-
-    private :
-      // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-      // "someInfo"};
 
       Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
@@ -182,6 +179,7 @@ namespace ZCC
       void evaluateCJetCuts(const ConstDataVector<xAOD::JetContainer>& cjets, CutManager& ZCharmCuts);
       void evaluateLargeJetCuts(const xAOD::JetContainer *largeJets);
       void setThresholds(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
+      StatusCode initialiseCutflow();
   };
 
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -55,6 +55,8 @@ namespace HH4B
       void evaluateTriggerCuts(const xAOD::EventInfo& event, 
                           const std::vector<std::string> &Triggers, CutManager& bbbbCuts);
       void evaluateJetCuts(const int nBoostedJets, const int nResolvedJets, const int nBJets, CutManager& bbbbCuts);
+
+      StatusCode initialiseCutflow();
 
       /// \brief Setup syst-aware input container handles
       CutManager m_bbbbCuts;

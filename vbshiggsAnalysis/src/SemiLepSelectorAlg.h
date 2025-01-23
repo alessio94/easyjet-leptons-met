@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef VBSHIGGSANALYSIS_SEMILEPSELECTORALG_H
@@ -39,6 +39,8 @@ namespace VBSHIGGS{
       StatusCode execute() override;
       /// \brief This is the mirror of initialize() and is called after all events are processed.
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
+
+    private:
       const std::vector<std::string> m_STANDARD_CUTS{
         "PASS_TRIGGER",
         "PASS_ONE_LEPTON",
@@ -60,6 +62,7 @@ namespace VBSHIGGS{
       void vbsjetsSelection(const xAOD::JetContainer * vbsjets);
       void resolvedSelection(const xAOD::JetContainer *HJets, const std::vector<const xAOD::Jet*>& bjets, const CP::SystematicSet& sys);
       void boostedSelection(const xAOD::JetContainer *largeJets, const CP::SystematicSet& sys);
+      StatusCode initialiseCutflow();
       
       Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };
 

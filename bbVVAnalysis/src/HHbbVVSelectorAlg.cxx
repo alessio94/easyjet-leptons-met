@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Kira Abeling, JaeJin Hong
@@ -86,24 +86,7 @@ namespace HHBBVV
       }
     }
 
-    m_bbVVCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS); // Check our inputCutList is valid
-
-    for (const std::string &cut : m_inputCutList)  {
-      // Initialize a vector of CutEntry structs based on the input Cut List
-      m_bbVVCuts.add(cut);
-      ATH_MSG_DEBUG("bbVVCut = " << cut);
-    }
-
-
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_bbVVCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
-
-
-
+    if(m_saveCutFlow) ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
 
@@ -393,12 +376,6 @@ namespace HHBBVV
       m_bbVVCuts.DoStandardCutFlow(n_evt, efficiency("StandardCutFlow"));
       m_bbVVCuts.DoCutflowLabeling(n_evt, hist("EventsPassed_BinLabeling"));
     }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      delete hist("EventsPassed_BinLabeling");
-    }
 
     // Cut information
     ATH_MSG_DEBUG("###########cuts##########");
@@ -571,6 +548,25 @@ namespace HHBBVV
     if(Whad)WHAD_BTAG = (bool)m_Pass_GN2X.get(*Whad, sys);
     if(Whad2)WHAD2_BTAG = (bool)m_Pass_GN2X.get(*Whad2, sys);
 
+  }
+
+  StatusCode HHbbVVSelectorAlg::initialiseCutflow(){
+    m_bbVVCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS); // Check our inputCutList is valid
+
+    for (const std::string &cut : m_inputCutList)  {
+      // Initialize a vector of CutEntry structs based on the input Cut List
+      m_bbVVCuts.add(cut);
+      ATH_MSG_DEBUG("bbVVCut = " << cut);
+    }
+
+    //After filling the CutManager, book your histograms.
+    const unsigned int nbins = m_bbVVCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+
+    return StatusCode::SUCCESS;
   }
 
 }

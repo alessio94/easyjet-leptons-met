@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "ZCharmSelectorAlg.h"
@@ -77,42 +77,7 @@ namespace ZCC
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
-    std::vector<std::string> boolnameslist;
-    for (const auto& [key, value] : m_boolnames) {
-      boolnameslist.push_back(value);
-    }
-    m_ZCharmCuts.CheckInputCutList(m_inputCutList, boolnameslist);
-
-    m_inputCutKeys.resize(m_inputCutList.size());
-    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
-    for (const auto& [key, value]: m_boolnames) {
-      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
-      if (it != m_inputCutList.end()) {
-        auto index = it - m_inputCutList.begin();
-        m_inputCutKeys.at(index) = key;
-        inputWasFound.at(index) = true;
-      }
-    }
-
-    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
-      if(inputWasFound.at(index)) continue;
-      ATH_MSG_ERROR("Doubled or falsely spelled cuts in CutList (see config file)." + m_inputCutList[index]);
-    }
-
-    for (const auto &cut : m_inputCutKeys) {
-      m_ZCharmCuts.add(m_boolnames[cut]);
-    }
-
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_ZCharmCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of ZCharm cuts;Cuts;#epsilon",
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of ZCharm cuts;Cuts;#epsilon",
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of ZCharm cuts;Cuts;#epsilon",
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
-
+    if(m_saveCutFlow) ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
 
@@ -285,12 +250,6 @@ namespace ZCC
       m_ZCharmCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
       m_ZCharmCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
 
-    }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      delete hist("EventsPassed_BinLabeling");
     }
 
     return StatusCode::SUCCESS;
@@ -619,6 +578,47 @@ namespace ZCC
       m_pt_threshold[ZCC::DLT][ZCC::subleadingmu] = 15. * Athena::Units::GeV;
     }
 
+  }
+
+  StatusCode ZCharmSelectorAlg::initialiseCutflow(){
+
+    std::vector<std::string> boolnameslist;
+    for (const auto& [key, value] : m_boolnames) {
+      boolnameslist.push_back(value);
+    }
+    m_ZCharmCuts.CheckInputCutList(m_inputCutList, boolnameslist);
+
+    m_inputCutKeys.resize(m_inputCutList.size());
+    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
+    for (const auto& [key, value]: m_boolnames) {
+      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
+      if (it != m_inputCutList.end()) {
+        auto index = it - m_inputCutList.begin();
+        m_inputCutKeys.at(index) = key;
+        inputWasFound.at(index) = true;
+      }
+    }
+
+    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
+      if(inputWasFound.at(index)) continue;
+      ATH_MSG_ERROR("Doubled or falsely spelled cuts in CutList (see config file)." + m_inputCutList[index]);
+    }
+
+    for (const auto &cut : m_inputCutKeys) {
+      m_ZCharmCuts.add(m_boolnames[cut]);
+    }
+
+    //After filling the CutManager, book your histograms.
+    const unsigned int nbins = m_ZCharmCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of ZCharm cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of ZCharm cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of ZCharm cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+
+    return StatusCode::SUCCESS;
   }
 
 }

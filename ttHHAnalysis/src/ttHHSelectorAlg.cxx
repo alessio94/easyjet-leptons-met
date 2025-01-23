@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "ttHHSelectorAlg.h"
@@ -70,25 +70,9 @@ namespace ttHH
     ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
-    ATH_CHECK (m_systematicsList.initialize()); 
+    ATH_CHECK (m_systematicsList.initialize());
 
-    m_ttHHCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
-
-    for (const std::string &cut : m_inputCutList)  { 
-      // Initialize a vector of CutEntry structs based on the input Cut List
-      m_ttHHCuts.add(cut);
-    }
-
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_ttHHCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of ttHH(4b) cuts;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of ttHH(4b) cuts;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of ttHH(4b) cuts;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));    
-
+    ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
 
@@ -225,15 +209,8 @@ namespace ttHH
       m_ttHHCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
       m_ttHHCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
     }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      delete hist("EventsPassed_BinLabeling");
-    }
 
-
-     return StatusCode::SUCCESS;
+    return StatusCode::SUCCESS;
 
   }
 
@@ -289,4 +266,30 @@ namespace ttHH
     m_triggers_matchs.at(ttHH::pass_matching_trigger_singlep) = pass_matching_trigger_singlep;
     m_triggers_matchs.at(ttHH::pass_matching_trigger_dilep) = pass_matching_trigger_dilep;
   }
+
+  StatusCode ttHHSelectorAlg::initialiseCutflow(){
+
+    // This is used even when the cutflow isn't saved
+    m_ttHHCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
+
+    for (const std::string &cut : m_inputCutList)  {
+      // Initialize a vector of CutEntry structs based on the input Cut List
+      m_ttHHCuts.add(cut);
+    }
+
+    if(m_saveCutFlow){
+      //After filling the CutManager, book your histograms.
+      const unsigned int nbins = m_ttHHCuts.size() + 1; //  need an extra bin for the total num of events.
+      ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of ttHH(4b) cuts;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of ttHH(4b) cuts;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of ttHH(4b) cuts;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+    }
+
+    return StatusCode::SUCCESS;
+  }
+
 }

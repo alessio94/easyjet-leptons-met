@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "bbbbSelectorAlg.h"
@@ -55,33 +55,9 @@ namespace HH4B
     }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
-    ATH_CHECK (m_systematicsList.initialize()); 
-    
-    m_bbbbCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
+    ATH_CHECK (m_systematicsList.initialize());
 
-    for (const std::string &cut : m_inputCutList)  { 
-      // Initialize a vector of CutEntry structs based on the input Cut List
-      m_bbbbCuts.add(cut);
-    }
-
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_bbbbCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH-> cuts.Needs rescaling to total events.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5))); 
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH-> cuts.Needs rescaling to total events.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH-> cuts.Needs rescaling to total events.;Cuts;#epsilon", 
-                                  nbins, 0.5, nbins + 0.5)));
-    if (m_isMC) {
-      ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH-> cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
-                                    nbins, 0.5, nbins + 0.5))); 
-      ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH-> cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
-                                    nbins, 0.5, nbins + 0.5)));
-      ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH-> cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon", 
-                                    nbins, 0.5, nbins + 0.5)));
-    }
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));  
-
+    if(m_saveCutFlow) ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
 
@@ -194,19 +170,8 @@ namespace HH4B
       }
       m_bbbbCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
     }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      if (m_isMC) {
-        delete efficiency("WeightedAbsoluteEfficiency");
-        delete efficiency("WeightedRelativeEfficiency");
-        delete efficiency("WeightedStandardCutFlow");
-      }
-      delete hist("EventsPassed_BinLabeling");
-    }
 
-     return StatusCode::SUCCESS;
+    return StatusCode::SUCCESS;
 
   }
 
@@ -243,6 +208,36 @@ namespace HH4B
 
     if ((nBoostedJets >= 2 || (nResolvedJets >= 4 && nBJets >= 2)) && bbbbCuts.exists("AT_LEAST_FOUR_JETS_TWO_BJETS_OR_TWO_LRJETS"))
       bbbbCuts("AT_LEAST_FOUR_JETS_TWO_BJETS_OR_TWO_LRJETS").passed = true;
+  }
+
+  StatusCode bbbbSelectorAlg::initialiseCutflow(){
+
+    m_bbbbCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS);
+
+    for (const std::string &cut : m_inputCutList)  {
+      // Initialize a vector of CutEntry structs based on the input Cut List
+      m_bbbbCuts.add(cut);
+    }
+
+    //After filling the CutManager, book your histograms.
+    const unsigned int nbins = m_bbbbCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH-> cuts.Needs rescaling to total events.;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH-> cuts.Needs rescaling to total events.;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH-> cuts.Needs rescaling to total events.;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    if (m_isMC) {
+      ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH-> cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH-> cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH-> cuts.Needs rescaling to sumOfWeights.;Cuts;#epsilon",
+				   nbins, 0.5, nbins + 0.5)));
+    }
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+
+    return StatusCode::SUCCESS;
   }
 
 }

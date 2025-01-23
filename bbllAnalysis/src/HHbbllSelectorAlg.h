@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -77,6 +77,7 @@ namespace HHBBLL
       /// \brief This is the mirror of initialize() and is called after all events are processed.
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
 
+    private :
       const std::vector<std::string> m_STANDARD_CUTS{
         "EXACTLY_TWO_LEPTONS",    
         "PASS_TRIGGER",
@@ -84,11 +85,6 @@ namespace HHBBLL
         "EXACTLY_TWO_B_JETS",
 	"VBFVETO_SR1",
       };
-
-
-    private :
-      // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-      // "someInfo"};
 
       Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
@@ -204,6 +200,7 @@ namespace HHBBLL
                           const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons);
       void setThresholds(const xAOD::EventInfo* event,
 			 const CP::SystematicSet& sys);
+      StatusCode initialiseCutflow();
   };
 
 }

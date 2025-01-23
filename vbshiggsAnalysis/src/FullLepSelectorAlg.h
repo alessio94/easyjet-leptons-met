@@ -41,6 +41,8 @@ namespace VBSHIGGS{
       StatusCode execute() override;
       /// \brief This is the mirror of initialize() and is called after all events are processed.
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
+
+    private:
       const std::vector<std::string> m_STANDARD_CUTS{
         "PASS_TRIGGER",
         "PASS_AT_LEAST_TWO_LEPTONS",
@@ -74,6 +76,7 @@ namespace VBSHIGGS{
       void resolvedSelection(const xAOD::JetContainer *HJets, const std::vector<const xAOD::Jet*>& bjets, const CP::SystematicSet& sys);
       void boostedSelection(const xAOD::JetContainer *largeJets, const CP::SystematicSet& sys);
       void eventCategorisation();
+      StatusCode initialiseCutflow();
       
       Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };
 

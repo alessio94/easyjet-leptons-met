@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "SemiLepSelectorAlg.h"
@@ -45,47 +45,13 @@ namespace VBSHIGGS{
       ATH_CHECK(m_Bbranches.at(key).initialize(m_systematicsList, m_eventHandle));
     }
 
-    std::vector<std::string> boolnameslist;
-    for (const auto& [key, value] : m_boolnames) {
-      boolnameslist.push_back(value);
-    }
-    m_vbshiggsCuts.CheckInputCutList(m_inputCutList, boolnameslist);
-
-    m_inputCutKeys.resize(m_inputCutList.size());
-    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
-    for (const auto& [key, value]: m_boolnames) {
-      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
-      if (it != m_inputCutList.end()) {
-        auto index = it - m_inputCutList.begin();
-        m_inputCutKeys.at(index) = key;
-        inputWasFound.at(index) = true;
-      }
-    }
-    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
-      if(inputWasFound.at(index)) continue;
-      ATH_MSG_ERROR("CutLists don't match. Please double check your configuration " + m_inputCutList[index]);
-    }
-
-    for (const auto &cut : m_inputCutKeys) {
-      m_vbshiggsCuts.add(m_boolnames[cut]);
-    }
-
      // special flag for all cuts
     ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_vbshiggsCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of vbshiggs cuts;Cuts;#epsilon",
-                                nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of vbshiggs cuts;Cuts;#epsilon",
-                                nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of vbshiggs cuts;Cuts;#epsilon",
-                                nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
-
+    if(m_saveCutFlow) ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
   StatusCode SemiLepSelectorAlg::execute(){
@@ -210,12 +176,6 @@ namespace VBSHIGGS{
       m_vbshiggsCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
 
     }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      delete hist("EventsPassed_BinLabeling");
-    }
 
     return StatusCode::SUCCESS;
   }
@@ -301,4 +261,44 @@ namespace VBSHIGGS{
     m_bools.at(VBSHIGGS::PASS_MERG_BASELINE) = pass_merged_baseline;
 
   }
+
+  StatusCode SemiLepSelectorAlg::initialiseCutflow(){
+        std::vector<std::string> boolnameslist;
+    for (const auto& [key, value] : m_boolnames) {
+      boolnameslist.push_back(value);
+    }
+    m_vbshiggsCuts.CheckInputCutList(m_inputCutList, boolnameslist);
+
+    m_inputCutKeys.resize(m_inputCutList.size());
+    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
+    for (const auto& [key, value]: m_boolnames) {
+      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
+      if (it != m_inputCutList.end()) {
+        auto index = it - m_inputCutList.begin();
+        m_inputCutKeys.at(index) = key;
+        inputWasFound.at(index) = true;
+      }
+    }
+    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
+      if(inputWasFound.at(index)) continue;
+      ATH_MSG_ERROR("CutLists don't match. Please double check your configuration " + m_inputCutList[index]);
+    }
+
+    for (const auto &cut : m_inputCutKeys) {
+      m_vbshiggsCuts.add(m_boolnames[cut]);
+    }
+
+    //After filling the CutManager, book your histograms.
+    const unsigned int nbins = m_vbshiggsCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of vbshiggs cuts;Cuts;#epsilon",
+                                nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of vbshiggs cuts;Cuts;#epsilon",
+                                nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of vbshiggs cuts;Cuts;#epsilon",
+                                nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+
+    return StatusCode::SUCCESS;
+  }
+
 }//name space

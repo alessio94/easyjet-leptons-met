@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "JJSelectorAlg.h"
@@ -29,10 +29,6 @@ namespace VBSVV4q{
     ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_LargeRJetsHandle));
     ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_LargeRJetsHandle));
 
-    //if (!m_isBtag.empty()) {
-    //  ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
-    //}
-
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
     ATH_CHECK (m_year.initialize(m_systematicsList, m_eventHandle));
 
@@ -42,48 +38,14 @@ namespace VBSVV4q{
       m_Bbranches.emplace(key, whandle);
       ATH_CHECK(m_Bbranches.at(key).initialize(m_systematicsList, m_eventHandle));
     }
-   
-    std::vector<std::string> boolnameslist;
-    for (const auto& [key, value] : m_boolnames) {
-      boolnameslist.push_back(value);
-    }
-    m_VBSVV4qCuts.CheckInputCutList(m_inputCutList, boolnameslist);
-
-    m_inputCutKeys.resize(m_inputCutList.size());
-    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
-    for (const auto& [key, value]: m_boolnames) {
-      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
-      if (it != m_inputCutList.end()) {
-        auto index = it - m_inputCutList.begin();
-        m_inputCutKeys.at(index) = key;
-        inputWasFound.at(index) = true;
-      }
-    }
-    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
-      if(inputWasFound.at(index)) continue;
-      ATH_MSG_ERROR("CutLists don't match. Please double check your configuration " + m_inputCutList[index]);
-    }
-
-    for (const auto &cut : m_inputCutKeys) {
-      m_VBSVV4qCuts.add(m_boolnames[cut]);
-    }
 
     // special flag for all cuts
     ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
-    
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_VBSVV4qCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of VBSVV4q cuts;Cuts;#epsilon",
-                                nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of VBSVV4q cuts;Cuts;#epsilon",
-                                nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of VBSVV4q cuts;Cuts;#epsilon",
-                                nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
 
+    if (m_saveCutFlow) ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
   
@@ -177,12 +139,7 @@ namespace VBSVV4q{
       m_VBSVV4qCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
 
     }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      delete hist("EventsPassed_BinLabeling");
-    }
+
     return StatusCode::SUCCESS;
   }
 
@@ -201,5 +158,45 @@ namespace VBSVV4q{
     }
 
   }//vbsjetsSelection
+
+  StatusCode JJSelectorAlg::initialiseCutflow(){
+
+    std::vector<std::string> boolnameslist;
+    for (const auto& [key, value] : m_boolnames) {
+      boolnameslist.push_back(value);
+    }
+    m_VBSVV4qCuts.CheckInputCutList(m_inputCutList, boolnameslist);
+
+    m_inputCutKeys.resize(m_inputCutList.size());
+    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
+    for (const auto& [key, value]: m_boolnames) {
+      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
+      if (it != m_inputCutList.end()) {
+        auto index = it - m_inputCutList.begin();
+        m_inputCutKeys.at(index) = key;
+        inputWasFound.at(index) = true;
+      }
+    }
+    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
+      if(inputWasFound.at(index)) continue;
+      ATH_MSG_ERROR("CutLists don't match. Please double check your configuration " + m_inputCutList[index]);
+    }
+
+    for (const auto &cut : m_inputCutKeys) {
+      m_VBSVV4qCuts.add(m_boolnames[cut]);
+    }
+
+    //After filling the CutManager, book your histograms.
+    const unsigned int nbins = m_VBSVV4qCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of VBSVV4q cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of VBSVV4q cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of VBSVV4q cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+
+    return StatusCode::SUCCESS;
+  }
 
 }//name space
