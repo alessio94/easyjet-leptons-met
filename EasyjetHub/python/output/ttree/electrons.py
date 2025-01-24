@@ -50,6 +50,11 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
             "radiusConv",
             "separationMinDCT",
         ]
+        if not flags.Input.isPHYSLITE:
+            electron_branches.variables += [
+                "DFCommonAddAmbiguity",
+                "ambiguityType"
+            ]
 
     if flags.Input.isMC and \
        flags.Analysis.Electron.do_IFF_decoration:
