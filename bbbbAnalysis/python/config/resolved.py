@@ -89,6 +89,14 @@ def resolved_cfg(flags, smalljetkey):
             )
         )
 
+        # calculate trigger buckets
+        cfg.addEventAlgo(
+            CompFactory.HH4B.TriggerDecoratorAlg(
+                "HH4bTriggerDecoratorAlg",
+                jets=flags.Analysis.container_names.input.reco4PFlowJet,
+                triggerLists=flags.Analysis.TriggerChains,
+            )
+        )
     return cfg
 
 

@@ -22,6 +22,7 @@ atlas_add_component(bbbbAnalysis
   src/MassPlaneBoostHistograms.cxx
   src/MassPlaneBoostHistogramsAlg.cxx
   src/SmallRJetTriggerSFAlg.cxx
+  src/TriggerDecoratorAlg.cxx
   src/components/bbbbAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -41,6 +42,7 @@ atlas_add_component(bbbbAnalysis
   TrigCompositeUtilsLib
   PathResolver
   EasyjetHubLib
+  TriggerMatchingToolLib
 )
 
 # Install python modules, joboptions, and share content
