@@ -41,8 +41,6 @@ namespace HHBBYY
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_isEMTight.initialize(m_systematicsList, m_photonHandle));
 
-    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
@@ -122,12 +120,6 @@ namespace HHBBYY
 
       const xAOD::PhotonContainer *photons = nullptr;
       ANA_CHECK (m_photonHandle.retrieve (photons, sys));
-
-      const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
-
-      const xAOD::MuonContainer *muons = nullptr;
-      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
 
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
@@ -319,7 +311,6 @@ namespace HHBBYY
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
-      m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
 
       // bdt (vbf jets selection)
       ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_Jet1, Hbb_Jet2, jets, HT, HH, "Jet_vbf_j", "Jet_vbf_jj",eventFloats, event, sys));

@@ -124,6 +124,13 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         )
     )
 
+    cfg.addEventAlgo(
+        CompFactory.HHBBYY.LeptonVarsbbyyAlg(
+            "LeptonVarsbbyyAlg",
+            doSystematics=flags.Analysis.do_CP_systematics,
+        )
+    )
+
     if flags.Analysis.do_Boosted:
         cfg.addEventAlgo(
             CompFactory.HHBBYY.BoostedVarsbbyyAlg(
