@@ -110,16 +110,7 @@ def jet_sequence(
                                     containerName=output_name,
                                     selectionName=tagger_wp)
             configSeq.setOptionValue('.btagger', tagger)
-            # set the MC/MC SF to default for now, this was broken by
-            # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
-            configSeq.setOptionValue('.generator', 'default')
             configSeq.setOptionValue('.btagWP', btag_wp)
-            configSeq.setOptionValue('.eigenvectorReductionB',
-                                     jet_flags.btag_egReductionB)
-            configSeq.setOptionValue('.eigenvectorReductionC',
-                                     jet_flags.btag_egReductionC)
-            configSeq.setOptionValue('.eigenvectorReductionLight',
-                                     jet_flags.btag_egReductionLight)
             # save pb / pc / pu / ptau
             if tagger not in tagger_set:
                 configSeq.setOptionValue('.saveScores', 'All')
@@ -137,13 +128,43 @@ def jet_sequence(
                     bTagCalibFile = 'xAODBTaggingEfficiency/13p6TeV/' \
                         '2023-22-13TeV-MC21-CDI-2023-09-13_v1.root'
 
-            if "FixedCutBEff" in btag_wp:
-                configSeq.setOptionValue('.noEffSF', True)
-            elif tagger_wp == "GN2v01_Continuous2D":
-                configSeq.setOptionValue('.noEffSF', True)
+            if tagger_wp == "GN2v01_Continuous2D":
                 from AthenaCommon.Utils.unixtools import find_datafile
                 bTagCalibFile = find_datafile(
                     'EasyjetHub/2023-22-13p6TeV-MC21-CDI_GN2v01_Test_2024-07-ctag_noSF_NewCutValues_fTau_Ctag.root')  # noqa
+
+            if bTagCalibFile:
+                configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
+
+        for tagger in tagger_set:
+            tagger_wp = tagger + "_Continuous"
+            # Note: this is going to run post overlap removal
+            configSeq += config.makeConfig(
+                'Jets.FlavourTaggingEventSF',
+                containerName=output_name + '.baselineJvt',
+                selectionName=tagger_wp)
+            configSeq.setOptionValue('.btagger', tagger)
+            # set the MC/MC SF to default for now, this was broken by
+            # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
+            configSeq.setOptionValue('.generator', 'default')
+            configSeq.setOptionValue('.eigenvectorReductionB',
+                                     jet_flags.btag_egReductionB)
+            configSeq.setOptionValue('.eigenvectorReductionC',
+                                     jet_flags.btag_egReductionC)
+            configSeq.setOptionValue('.eigenvectorReductionLight',
+                                     jet_flags.btag_egReductionLight)
+
+            bTagCalibFile = None
+            if 'btagCDI' in jet_flags:
+                bTagCalibFile = jet_flags.btagCDI
+            # if DL1dv01 in tagger name overwrite the CDI
+            elif "DL1dv01" in tagger:
+                if flags.GeoModel.Run is LHCPeriod.Run2:
+                    bTagCalibFile = 'xAODBTaggingEfficiency/13TeV/' \
+                        '2023-22-13TeV-MC20-CDI-2023-09-13_v1.root'
+                elif flags.GeoModel.Run is LHCPeriod.Run3:
+                    bTagCalibFile = 'xAODBTaggingEfficiency/13p6TeV/' \
+                        '2023-22-13TeV-MC21-CDI-2023-09-13_v1.root'
 
             if bTagCalibFile:
                 configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
@@ -155,20 +176,6 @@ def jet_sequence(
                 muonContainerName=drop_sys(flags.Analysis.container_names.output.muons))
             configSeq.setOptionValue('.jetPreselection', jet_flags.btag_wp)
             configSeq.setOptionValue('.muonPreselection', "forBJetCalib")
-
-        for tagger_wp in btag_wps:
-            tagger, btag_wp = tagger_wp.split("_", 1)
-
-            if "FixedCutBEff" in btag_wp or btag_wp == "Continuous2D":
-                continue
-
-            # Note: this is going to run post overlap removal
-            configSeq += config.makeConfig(
-                'Jets.FlavourTaggingEventSF',
-                containerName=output_name + '.baselineJvt',
-                selectionName=tagger_wp)
-            configSeq.setOptionValue('.btagger', tagger)
-            configSeq.setOptionValue('.btagWP', btag_wp)
 
     # Apply kinematic selection
     configSeq += makeConfig('Jets.PtEtaSelection', containerName=output_name,

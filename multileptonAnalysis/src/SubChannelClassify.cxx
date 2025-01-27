@@ -3,6 +3,7 @@
 //
 
 #include "SubChannelClassify.h"
+#include <numeric>
 
 namespace MULTILEPTON
 {

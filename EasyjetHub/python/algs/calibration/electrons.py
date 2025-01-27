@@ -34,6 +34,7 @@ def electron_sequence(flags, configAcc):
                              and flags.Analysis.DataType is DataType.FastSim)
     configSeq.setOptionValue('.decorrelationModel',
                              flags.Analysis.Electron.correlationModelScale)
+    configSeq.setOptionValue('.writeTrackD0Z0', True)
 
     # PID configuration
     for id, iso in wps:
@@ -49,7 +50,6 @@ def electron_sequence(flags, configAcc):
         configSeq.setOptionValue('.forceFullSimConfig',
                                  flags.Analysis.Electron.forceFullSimConfig
                                  and flags.Analysis.DataType is DataType.FastSim)
-        configSeq.setOptionValue('.writeTrackD0Z0', True)
         configSeq.setOptionValue('.maxD0Significance',
                                  flags.Analysis.Electron.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',

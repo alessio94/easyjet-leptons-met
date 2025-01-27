@@ -20,6 +20,7 @@ def muon_sequence(flags, configAcc):
     configSeq += makeConfig('Muons', containerName=output_name)
     configSeq.setOptionValue('.minPt', flags.Analysis.Muon.min_pT)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
+    configSeq.setOptionValue('.writeTrackD0Z0', True)
 
     # PID configuration
     for id, iso in wps:
@@ -32,7 +33,6 @@ def muon_sequence(flags, configAcc):
         quality = id.replace("_nottva", "")
         configSeq.setOptionValue('.quality', quality)
         configSeq.setOptionValue('.isolation', iso)
-        configSeq.setOptionValue('.writeTrackD0Z0', True)
         configSeq.setOptionValue('.maxD0Significance',
                                  flags.Analysis.Muon.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',
