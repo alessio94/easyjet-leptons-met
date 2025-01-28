@@ -40,13 +40,8 @@ namespace Easyjet
     // Scale factors
     if(m_isMC){
       for(const auto& wp : m_muonWPs){
-        m_mu_recoSF.emplace_back("muon_reco_effSF_"+wp+"_%SYS%", this);
-        m_mu_isoSF.emplace_back(wp.find("NonIso")==std::string::npos ?
-				"muon_isol_effSF_"+wp+"_%SYS%" : "", this);
-        bool ttvaTurnoff = wp.find("nottva")!=std::string::npos;
-        m_mu_TTVASF.emplace_back(!ttvaTurnoff ?
-				 "muon_TTVA_effSF_"+wp+"_%SYS%" : "", this);
-        m_mu_SF.emplace_back("muon_effSF_"+wp+"_%SYS%", this);
+        m_mu_SF_in.emplace_back("effSF_"+wp+"_%SYS%", this);
+        m_mu_SF_out.emplace_back("effSF_"+wp+"_%SYS%", this);
       }
 
       for(const auto& trig : m_muTrigSF){
@@ -55,13 +50,9 @@ namespace Easyjet
       }
     }
 
-    for(auto& handle : m_mu_recoSF)
+    for(auto& handle : m_mu_SF_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_mu_isoSF)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_mu_TTVASF)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_mu_SF)
+    for(auto& handle : m_mu_SF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
     for(auto& handle : m_muTriggerSF_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
@@ -110,12 +101,7 @@ namespace Easyjet
 
         if(m_isMC){
           for(unsigned int i=0; i<m_muonWPs.size(); i++){
-            std::string wp = m_muonWPs[i];
-            float SF = m_mu_recoSF[i].get(*muon,sys);
-            if(wp.find("NonIso")==std::string::npos) SF *= m_mu_isoSF[i].get(*muon,sys);
-            bool ttvaTurnoff = wp.find("nottva")!=std::string::npos;
-            if(!ttvaTurnoff) SF *= m_mu_TTVASF[i].get(*muon,sys);
-            m_mu_SF[i].set(*muon, SF, sys);
+            m_mu_SF_out[i].set(*muon, m_mu_SF_in[i].get(*muon,sys), sys);
           }
 
           for(unsigned int i=0; i<m_muTrigSF.size(); i++){

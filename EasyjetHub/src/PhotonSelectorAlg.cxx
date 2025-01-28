@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Abraham Tishelman-Charny
@@ -45,20 +45,15 @@ namespace Easyjet
     // Scale factors
     if(m_isMC){
       for(const auto& wp : m_photonWPs){
-        m_ph_idSF.emplace_back
-	  (!m_saveDummySF ? "ph_id_effSF_"+wp+"_%SYS%" : "", this);
-        m_ph_isoSF.emplace_back
-	  ((!m_saveDummySF && wp.find("NonIso")==std::string::npos) ?
-	   "ph_isol_effSF_"+wp+"_%SYS%" : "", this);
-        m_ph_SF.emplace_back("ph_effSF_"+wp+"_%SYS%", this);
+        m_ph_SF_in.emplace_back
+	  (!m_saveDummySF ? "effSF_"+wp+"_%SYS%" : "", this);
+        m_ph_SF_out.emplace_back("effSF_"+wp+"_%SYS%", this);
       }
     }
 
-    for(auto& handle : m_ph_idSF)
+    for(auto& handle : m_ph_SF_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_ph_isoSF)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_ph_SF)
+    for(auto& handle : m_ph_SF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
     // Intialise syst-aware input/output decorators
@@ -104,13 +99,8 @@ namespace Easyjet
 
         if(m_isMC){
           for(unsigned int i=0; i<m_photonWPs.size(); i++){
-            float SF = 1.;
-            if(!m_saveDummySF){
-              std::string wp = m_photonWPs[i];
-              SF = m_ph_idSF[i].get(*photon, sys);
-              if(wp.find("NonIso")==std::string::npos) SF *= m_ph_isoSF[i].get(*photon, sys);
-            }
-            m_ph_SF[i].set(*photon, SF, sys);
+            float SF = m_saveDummySF ? 1. : m_ph_SF_in[i].get(*photon, sys);
+            m_ph_SF_out[i].set(*photon, SF, sys);
           }
         }
 

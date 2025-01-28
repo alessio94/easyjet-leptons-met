@@ -145,8 +145,8 @@ private:
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
-    void fillLeptonSfDecoMap(const std::string& prefix, 
-      const std::vector<std::string>& wpNames, leptonSfDecoMap& decoMap);
+    void fillLeptonSfDecoMap(const std::vector<std::string>& wpNames,
+			     leptonSfDecoMap& decoMap);
   };
 } // namespace HHBBTT
 

@@ -1,4 +1,5 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
+from AthenaConfiguration.Enums import LHCPeriod
 
 
 def get_electron_branches(flags, tree_flags, input_container, output_prefix):
@@ -66,14 +67,16 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
             ]
         electron_branches.variables += truth_labels
 
-    # Requires ElectronSelectorAlg to be run
-    if tree_flags.collection_options.electrons.run_selection:
-        if flags.Input.isMC:
+    if flags.Input.isMC:
+        # No Run 2 SF yet
+        if flags.GeoModel.Run is LHCPeriod.Run3:
             electron_branches.variables += [
-                f"el_effSF_{id_wp}_%SYS%"
+                f"effSF_{id_wp}_%SYS%"
                 for id_wp in id_wps
             ]
 
+    # Requires ElectronSelectorAlg to be run
+    if tree_flags.collection_options.electrons.run_selection:
         electron_branches.variables += ["isAnalysisElectron_%SYS%"]
         for index in range(flags.Analysis.Electron.amount):
             electron_branches.variables += [f"isElectron{index+1}_%SYS%"]

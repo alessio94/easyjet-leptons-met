@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef EASYJET_TAUSELECTORALG
@@ -58,10 +58,7 @@ private:
     Gaudi::Property<std::vector<std::string>> m_tauWPs
       { this, "tauWPs", {}, "Tau ID working points, not used to filter collection" };
 
-    std::vector<CP::SysReadDecorHandle<float>> m_tau_recoSF;
-    std::vector<CP::SysReadDecorHandle<float>> m_tau_IDSF;
-    std::vector<CP::SysReadDecorHandle<float>> m_tau_eVetoFakeTauSF;
-    std::vector<CP::SysReadDecorHandle<float>> m_tau_eVetoTrueTauSF;
+    std::vector<CP::SysReadDecorHandle<float>> m_tau_SF_in;
     std::vector<CP::SysWriteDecorHandle<float>> m_tau_SF_out;
 
     Gaudi::Property<std::vector<std::string>> m_tauTrigSF

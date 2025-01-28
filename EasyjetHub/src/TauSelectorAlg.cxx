@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "TauSelectorAlg.h"
@@ -48,13 +48,8 @@ namespace Easyjet
     // Scale factors
     if(m_isMC){
       for(const auto& wp : m_tauWPs){
-        m_tau_recoSF.emplace_back("tau_Reco_effSF_"+wp+"_%SYS%", this);
-        bool tauIDAvailable = wp.find("Baseline")==std::string::npos && wp.find("VeryLoose")==std::string::npos;
-        m_tau_IDSF.emplace_back(tauIDAvailable ? "tau_ID_effSF_"+wp+"_%SYS%" : "", this);
-        bool eVetoAvailable = wp.find("eleid")!=std::string::npos;
-        m_tau_eVetoFakeTauSF.emplace_back(eVetoAvailable ? "tau_EvetoFakeTau_effSF_"+wp+"_%SYS%" : "", this);
-        m_tau_eVetoTrueTauSF.emplace_back(eVetoAvailable ? "tau_EvetoTrueTau_effSF_"+wp+"_%SYS%" : "", this);
-        m_tau_SF_out.emplace_back("tau_effSF_"+wp+"_%SYS%", this);
+        m_tau_SF_in.emplace_back("effSF_"+wp+"_%SYS%", this);
+        m_tau_SF_out.emplace_back("effSF_"+wp+"_%SYS%", this);
       }
 
       for(const auto& trig : m_tauTrigSF){
@@ -63,13 +58,7 @@ namespace Easyjet
       }
     }
 
-    for(auto& handle : m_tau_recoSF)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_tau_IDSF)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_tau_eVetoFakeTauSF)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_tau_eVetoTrueTauSF)
+    for(auto& handle : m_tau_SF_in)
       ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_tau_SF_out)
       ATH_CHECK (handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
@@ -130,14 +119,7 @@ namespace Easyjet
         if(m_isMC){
           for(unsigned int i=0; i<m_tauWPs.size(); i++){
             std::string wp = m_tauWPs[i];
-            float SF = m_tau_recoSF[i].get(*tau,sys);
-            if(wp.find("Baseline")==std::string::npos && wp.find("VeryLoose")==std::string::npos)
-              SF *=  m_tau_IDSF[i].get(*tau,sys);
-            if(wp.find("eleid")!=std::string::npos){
-              SF *= m_tau_eVetoFakeTauSF[i].get(*tau,sys);
-              SF *= m_tau_eVetoTrueTauSF[i].get(*tau,sys);
-            }
-            m_tau_SF_out[i].set(*tau, SF, sys);
+            m_tau_SF_out[i].set(*tau, m_tau_SF_in[i].get(*tau,sys), sys);
           }
 
           for(unsigned int i=0; i<m_tauTrigSF.size(); i++){

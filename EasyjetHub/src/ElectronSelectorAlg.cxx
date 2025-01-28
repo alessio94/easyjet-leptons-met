@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Minori Fujimoto
@@ -41,12 +41,8 @@ namespace Easyjet
       for(const auto& wp : m_eleWPs){
         // Scale factors not available for DNN yet
         bool sfAvailable = !m_saveDummySF && wp.find("DNN")==std::string::npos;
-        m_ele_recoSF.emplace_back(sfAvailable ? "el_reco_effSF_"+wp+"_%SYS%" : "", this);
-        m_ele_idSF.emplace_back(sfAvailable ? "el_id_effSF_"+wp+"_%SYS%" : "", this);
-        m_ele_isoSF.emplace_back
-          ((sfAvailable && wp.find("NonIso")==std::string::npos) ?
-           "el_isol_effSF_"+wp+"_%SYS%" : "", this);
-        m_ele_SF.emplace_back("el_effSF_"+wp+"_%SYS%", this);
+	m_ele_SF_in.emplace_back(sfAvailable ? "effSF_"+wp+"_%SYS%" : "", this);
+        m_ele_SF_out.emplace_back("effSF_"+wp+"_%SYS%", this);
       }
 
       for(const auto& trig : m_eleTrigSF){
@@ -55,13 +51,9 @@ namespace Easyjet
       }
     }
 
-    for(auto& handle : m_ele_recoSF)
+    for(auto& handle : m_ele_SF_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_ele_idSF)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_ele_isoSF)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_ele_SF)
+    for(auto& handle : m_ele_SF_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
     for(auto& handle : m_eleTriggerSF_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
@@ -116,10 +108,9 @@ namespace Easyjet
             std::string wp = m_eleWPs[i];
             float SF = 1.;
             if(!m_saveDummySF && wp.find("DNN")==std::string::npos){
-              SF = m_ele_recoSF[i].get(*electron,sys) * m_ele_idSF[i].get(*electron,sys);
-              if(wp.find("NonIso")==std::string::npos) SF *= m_ele_isoSF[i].get(*electron,sys);
+              SF = m_ele_SF_in[i].get(*electron,sys);
             }
-            m_ele_SF[i].set(*electron, SF, sys);
+            m_ele_SF_out[i].set(*electron, SF, sys);
           }
 
           for(unsigned int i=0; i<m_eleTrigSF.size(); i++){

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "BaselineVarsbbllAlg.h"
@@ -28,14 +28,14 @@ namespace HHBBLL
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      m_ele_SF = CP::SysReadDecorHandle<float>("el_effSF_"+m_eleWPName+"_%SYS%", this);
+      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
       ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
       ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
       ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
     }
 
     if(m_isMC){
-      m_mu_SF = CP::SysReadDecorHandle<float>("muon_effSF_"+m_muWPName+"_%SYS%", this);
+      m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
       ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
       ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
       ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));

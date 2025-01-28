@@ -50,14 +50,14 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
             ]
         muon_branches.variables += truth_labels
 
+    if flags.Input.isMC:
+        muon_branches.variables += [
+            f"effSF_{id_wp}_%SYS%"
+            for id_wp in id_wps
+        ]
+
     # Requires MuonSelectorAlg to be run
     if tree_flags.collection_options.muons.run_selection:
-        if flags.Input.isMC:
-            muon_branches.variables += [
-                f"muon_effSF_{id_wp}_%SYS%"
-                for id_wp in id_wps
-            ]
-
         muon_branches.variables += ["isAnalysisMuon_%SYS%"]
         for index in range(flags.Analysis.Muon.amount):
             muon_branches.variables += [f"isMuon{index+1}_%SYS%"]

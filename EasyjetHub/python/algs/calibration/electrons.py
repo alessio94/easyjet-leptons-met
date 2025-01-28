@@ -65,6 +65,7 @@ def electron_sequence(flags, configAcc):
         # for reconstruction efficiency correction in Run 3
         configSeq.setOptionValue('.correlationModelReco',
                                  flags.Analysis.Electron.correlationModelReco)
+        configSeq.setOptionValue('.saveCombinedSF', True)
         # No DNN SF yet
         if "DNN" in id and flags.Input.isMC:
             print("WARNING! Electron DNN ID does not have SF available yet")

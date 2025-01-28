@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "BaselineVarsbbyyAlg.h"
@@ -52,7 +52,7 @@ namespace HHBBYY
     ATH_CHECK (m_selected_ph.initialize(m_systematicsList, m_photonHandle));
 
     if(m_isMC){
-      m_ph_SF = CP::SysReadDecorHandle<float>("ph_effSF_"+m_photonWPName+"_%SYS%", this);
+      m_ph_SF = CP::SysReadDecorHandle<float>("effSF_"+m_photonWPName+"_%SYS%", this);
     }
     ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
     
@@ -1150,7 +1150,7 @@ namespace HHBBYY
 	m_Fbranches.at(full_prefix + "_phi").set(*event, vbf_j[i].Phi(), sys);
 	m_Fbranches.at(full_prefix + "_E").set(*event, vbf_j[i].E(), sys);
       }
-      
+
       if (m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) m_Fbranches.at(prefix_jj + "_maxscore").set(*event, vbf_jj_maxscore, sys);
       m_Fbranches.at(prefix_jj + "_m").set(*event, vbf_jj.M(), sys);
       m_Fbranches.at(prefix_jj + "_deta").set(*event, std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta()), sys);

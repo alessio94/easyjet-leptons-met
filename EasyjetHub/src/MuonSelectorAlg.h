@@ -52,10 +52,8 @@ private:
     Gaudi::Property<std::vector<std::string>> m_muonWPs
       { this, "muonWPs", {}, "Muon ID + ISO working points, not used to filter collection" };
 
-    std::vector<CP::SysReadDecorHandle<float>> m_mu_recoSF;
-    std::vector<CP::SysReadDecorHandle<float>> m_mu_isoSF;
-    std::vector<CP::SysReadDecorHandle<float>> m_mu_TTVASF;
-    std::vector<CP::SysWriteDecorHandle<float>> m_mu_SF;
+    std::vector<CP::SysReadDecorHandle<float>> m_mu_SF_in;
+    std::vector<CP::SysWriteDecorHandle<float>> m_mu_SF_out;
 
     Gaudi::Property<std::vector<std::string>> m_muTrigSF
       {this, "muonTriggerSF", {}, "List of muon trigger SF"};

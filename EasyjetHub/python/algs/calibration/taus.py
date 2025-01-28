@@ -45,6 +45,7 @@ def tau_sequence(flags, configAcc):
             configSeq.setOptionValue('.useGNTau', True)
         quality = id.replace("_eleid", "").replace("GNTau", "").replace("RNN", "")
         configSeq.setOptionValue('.quality', quality)
+        configSeq.setOptionValue('.saveCombinedSF', True)
 
     # Anti-tau selections
     if flags.Analysis.do_bbtt_analysis:

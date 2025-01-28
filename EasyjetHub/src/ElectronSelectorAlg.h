@@ -55,11 +55,8 @@ private:
     Gaudi::Property<bool> m_saveDummySF
       { this, "saveDummySF", false, "Store dummy SF=1 in case they are not available"};
 
-        
-    std::vector<CP::SysReadDecorHandle<float>> m_ele_recoSF;
-    std::vector<CP::SysReadDecorHandle<float>> m_ele_idSF;
-    std::vector<CP::SysReadDecorHandle<float>> m_ele_isoSF;
-    std::vector<CP::SysWriteDecorHandle<float>> m_ele_SF;
+    std::vector<CP::SysReadDecorHandle<float>> m_ele_SF_in;
+    std::vector<CP::SysWriteDecorHandle<float>> m_ele_SF_out;
 
     Gaudi::Property<std::vector<std::string>> m_eleTrigSF
       {this, "eleTriggerSF", {}, "List of electron trigger SF"};

@@ -37,8 +37,8 @@ namespace HHBBTT
        ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
     }
     if(m_isMC){
-       fillLeptonSfDecoMap("el", m_eleWPNames, m_ele_SF_decoMap);
-       fillLeptonSfDecoMap("muon", m_muonWPNames, m_muon_SF_decoMap);
+       fillLeptonSfDecoMap(m_eleWPNames, m_ele_SF_decoMap);
+       fillLeptonSfDecoMap(m_muonWPNames, m_muon_SF_decoMap);
     }
     for(auto& [k, handle] : m_ele_SF_decoMap)
       ATH_CHECK (handle.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
@@ -46,7 +46,7 @@ namespace HHBBTT
       ATH_CHECK (handle.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     if(m_isMC){
-      m_tau_effSF = CP::SysReadDecorHandle<float>("tau_effSF_"+m_tauWPName+"_%SYS%", this);
+      m_tau_effSF = CP::SysReadDecorHandle<float>("effSF_"+m_tauWPName+"_%SYS%", this);
     }
     ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_tauHandle, SG::AllowEmpty));
 
@@ -351,10 +351,10 @@ namespace HHBBTT
     return StatusCode::SUCCESS;
   }
 
-  void BaselineVarsbbttAlg::fillLeptonSfDecoMap(const std::string& prefix, 
-          const std::vector<std::string>& wpNames, leptonSfDecoMap& decoMap){
+  void BaselineVarsbbttAlg::fillLeptonSfDecoMap(const std::vector<std::string>& wpNames,
+						leptonSfDecoMap& decoMap){
     for(auto& wp : wpNames){
-      CP::SysReadDecorHandle<float> handle{prefix+"_effSF_"+wp+"_%SYS%", this};
+      CP::SysReadDecorHandle<float> handle{"effSF_"+wp+"_%SYS%", this};
       
       // nottva must be included in the working points used in selecting leptons:
       if(wp.find("nottva") == std::string::npos) continue;

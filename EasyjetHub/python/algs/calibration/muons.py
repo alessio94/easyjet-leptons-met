@@ -37,6 +37,7 @@ def muon_sequence(flags, configAcc):
                                  flags.Analysis.Muon.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',
                                  flags.Analysis.Muon.maxDeltaZ0SinTheta)
+        configSeq.setOptionValue('.saveCombinedSF', True)
 
     if flags.Analysis.Small_R_jet.runBJetPtCalib or \
        flags.Analysis.Large_R_jet.runMuonJetPtCorr:

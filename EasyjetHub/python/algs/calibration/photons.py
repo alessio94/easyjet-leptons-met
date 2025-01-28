@@ -44,6 +44,7 @@ def photon_sequence(flags, configAcc):
         configSeq.setOptionValue('.forceFullSimConfig',
                                  flags.Analysis.Photon.forceFullSimConfig
                                  and flags.Analysis.DataType is DataType.FastSim)
+        configSeq.setOptionValue('.saveCombinedSF', True)
 
         # No Run 2 SF yet
         if flags.GeoModel.Run is LHCPeriod.Run2 and flags.Input.isMC:

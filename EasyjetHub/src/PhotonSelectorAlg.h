@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef EASYJET_PHOTONSELECTORALG
@@ -54,9 +54,8 @@ private:
     Gaudi::Property<bool> m_saveDummySF
       { this, "saveDummySF", false, "Store dummy SF=1 in case they are not available"};
 
-    std::vector<CP::SysReadDecorHandle<float>> m_ph_idSF;
-    std::vector<CP::SysReadDecorHandle<float>> m_ph_isoSF;
-    std::vector<CP::SysWriteDecorHandle<float>> m_ph_SF;
+    std::vector<CP::SysReadDecorHandle<float>> m_ph_SF_in;
+    std::vector<CP::SysWriteDecorHandle<float>> m_ph_SF_out;
 
     std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
