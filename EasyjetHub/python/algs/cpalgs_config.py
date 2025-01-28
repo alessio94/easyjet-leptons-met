@@ -86,6 +86,10 @@ def cpalgs_cfg(flags):
             histogramName="systematics",
             systematicsService=sysSvc,
         )
+        if hasattr(flags.Analysis, "ttree_output"):
+            syslistalg.RootStreamName = ('CBK' if flags.Analysis.splitCBK else
+                                         flags.Analysis.ttree_output.stream_name)
+
         cfg.addEventAlgo(syslistalg)
 
     # Create SelectionNameSvc explicitly
