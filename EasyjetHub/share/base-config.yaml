@@ -17,6 +17,7 @@ do_event_cleaning: true
 loose_jet_cleaning: false
 do_bbtt_analysis: false
 do_bbyy_analysis: false
+do_thinning: true
 
 # Truth-related properties
 Truth:

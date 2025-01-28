@@ -176,7 +176,9 @@ def cpalgs_cfg(flags):
 
         configSeq += overlap_sequence(flags)
 
-    configSeq += thinning_sequence(flags)
+    if flags.Analysis.do_thinning:
+        log.info("Adding thinning sequence")
+        configSeq += thinning_sequence(flags)
 
     if flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF:
         configSeq += triggerSF_sequence(flags)
