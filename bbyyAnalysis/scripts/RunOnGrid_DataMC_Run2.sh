@@ -1,5 +1,6 @@
 ptag=p6266
-campaign=v8
+campaign=v8p1_noJERMETMu
+campaign1=v8p1_JERMETMu
 dir_samples="../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal"
 mc_campaign="mc20_13TeV"
 mc_list=(
@@ -35,22 +36,27 @@ mc_list=(
     "$dir_samples/$mc_campaign.tWHyy.$ptag.txt"
     "$dir_samples/$mc_campaign.bbH_yy.$ptag.txt"
     "$dir_samples/$mc_campaign.yyjets.$ptag.txt"
-    "$dir_samples/$mc_compaign.yybb.$ptag.txt"
+    "$dir_samples/$mc_campaign.yybb.$ptag.txt"
     "$dir_samples/$mc_campaign.ttyy_nonallhad.p6490.txt" #p6266 are not available
-    "$dir_samples/$mc_campaign.ttyy_allhad.6490.txt" #p6266 are not available
+    "$dir_samples/$mc_campaign.ttyy_allhad.p6490.txt" #p6266 are not available
 )
 
 #data 
 easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13TeV.Run2.${ptag}.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst.yaml \
     --exec bbyy-ntupler \
-    --nGBperJob 100 \
+    --nGBperJob 50 \
     --campaign ${campaign}
 
 #mc
 easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst.yaml \
     --exec bbyy-ntupler \
-    --nGBperJob 10 \
+    --nGBperJob 2 \
     --campaign ${campaign}
 
+easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst1.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 2 \
+    --campaign ${campaign1}

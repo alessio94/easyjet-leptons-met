@@ -1,5 +1,6 @@
 ptag=p6266
-campaign=v8
+campaign=v8p1_noJERMETMu
+campaign1=v8p1_JERMETMu
 dir_samples="../easyjet/bbyyAnalysis/datasets/PHYS/nominal"
 mc_campaign="mc23_13p6TeV"
 mc_list=(
@@ -55,13 +56,19 @@ mc_list=(
 easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/data_13p6TeV.Run3.p6269.txt \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst.yaml \
     --exec bbyy-ntupler \
-    --nGBperJob 100 \
+    --nGBperJob 50 \
     --campaign ${campaign}
 
 #mc
 easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst.yaml \
     --exec bbyy-ntupler \
-    --nGBperJob 10 \
+    --nGBperJob 5 \
     --campaign ${campaign}
+
+easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst1.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 5 \
+    --campaign ${campaign1}
 
