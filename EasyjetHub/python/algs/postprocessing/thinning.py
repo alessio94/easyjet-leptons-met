@@ -27,7 +27,7 @@ def thinning_sequence(flags):
                 '.selectionName', 'selectPtEta&&' + selections[objtype])
             configSeq.setOptionValue('.postfix', 'thin')
 
-    if flags.Analysis.do_small_R_jets:
+    if flags.Analysis.do_small_R_jets and flags.Analysis.Small_R_jet.do_thinning:
         jet_type = flags.Analysis.Small_R_jet.jet_type
         selection_string = 'selectPtEta'
         if jet_type != 'reco4EMTopoJet':

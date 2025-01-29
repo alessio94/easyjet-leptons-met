@@ -49,6 +49,7 @@ Small_R_jet:
   uncertToolConfigPath: ""
   uncertToolMCType: ""
   do_parent_decoration: true
+  do_thinning: true
   amount: 0
   amount_bjet: 0
   amount_cjet: 0
