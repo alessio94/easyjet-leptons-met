@@ -79,6 +79,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             saveCutFlow=flags.Analysis.save_cutflow,
             cutList=(
                 flags.Analysis.CutList if hasattr(flags.Analysis, "CutList") else []),
+            RootStreamName=('CBK' if flags.Analysis.splitCBK else
+                            flags.Analysis.ttree_output.stream_name)
         )
     )
 
