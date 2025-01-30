@@ -35,7 +35,6 @@ namespace VBSHIGGS
   enum Booleans{
     PASS_TRIGGER,
     PASS_ONE_LEPTON,
-    PASS_AT_LEAST_TWO_LEPTONS,
     PASS_EXACTLY_TWO_LEPTONS,
     PASS_TWO_SS_CHARGE_LEPTONS,
     PASS_TWO_OS_CHARGE_LEPTONS,
@@ -51,11 +50,6 @@ namespace VBSHIGGS
     PASS_VBS_BASELINE,
     PASS_RES_BASELINE,
     PASS_MERG_BASELINE,
-    IS_SF,
-    IS_ee,
-    IS_mm,
-    IS_em,
-    Pass_ll,
   };
 }
 

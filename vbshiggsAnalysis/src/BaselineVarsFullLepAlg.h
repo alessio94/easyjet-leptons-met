@@ -45,13 +45,9 @@ namespace VBSHIGGS{
 
         CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "",   "VBS Jet container to read" };
         
-        CP::SysReadHandle<xAOD::JetContainer> m_RNNjetBoosted20GeVHandle{ this, "RNNJets_boosted_20gev", "RNNJets_boosted_20gev_%SYS%", "input RNN jets container for boosted 20 GeV" };
+        CP::SysReadHandle<xAOD::JetContainer> m_RNNjetBoostedHandle{ this, "RNNJets_boosted", "RNNJets_boosted_%SYS%", "input RNN jets container for boosted 20 GeV" };
 
-        CP::SysReadHandle<xAOD::JetContainer> m_RNNjetBoosted30GeVHandle{ this, "RNNJets_boosted_30gev", "RNNJets_boosted_%SYS%", "input RNN jets container for boosted 30 GeV" };
-
-        CP::SysReadHandle<xAOD::JetContainer> m_RNNjetResolved20GeVHandle{ this, "RNNJets_resolved_20gev", "RNNJets_resolved_20gev_%SYS%", "input RNN jets container for resolved 20 GeV" };
-
-        CP::SysReadHandle<xAOD::JetContainer> m_RNNjetResolved30GeVHandle{ this, "RNNJets_resolved_30gev", "RNNJets_resolved_%SYS%", "input RNN jets container for resolved 30 GeV" };
+        CP::SysReadHandle<xAOD::JetContainer> m_RNNjetResolvedHandle{ this, "RNNJets_resolved", "RNNJets_resolved_%SYS%", "input RNN jets container for resolved 20 GeV" };
         
         CP::SysReadHandle<xAOD::ElectronContainer> m_electronHandle{ this, "electrons", "vbshiggsAnalysisElectrons_%SYS%",   "Electron container to read" };
 

@@ -70,10 +70,10 @@ def get_BaselineVarsFullLepAlg_variables(flags):
     if not flags.Analysis.UseVBFRNN:
         objects += ["VBSJ1", "VBSJ2", "VBSdijet"]
     else:
-        objects += ["RNNJets_boosted_20gev_Jet1", "RNNJets_boosted_20gev_Jet2",
-                    "RNNJets_boosted_30gev_Jet1", "RNNJets_boosted_30gev_Jet2",
-                    "RNNJets_resolved_20gev_Jet1", "RNNJets_resolved_20gev_Jet2",
-                    "RNNJets_resolved_30gev_Jet1", "RNNJets_resolved_30gev_Jet2"]
+        objects += ["RNNJets_boosted_Jet1",
+                    "RNNJets_boosted_Jet2",
+                    "RNNJets_resolved_Jet1",
+                    "RNNJets_resolved_Jet2",]
 
     for object in objects:
         for var in ["m", "pt", "eta", "phi"]:
@@ -137,17 +137,10 @@ def fullLep_branches(flags):
 
     branches += object_level_branches
 
-    branches += ["EventInfo.vbshiggs_pass_sr_%SYS% -> pass_SR_%SYS%"]
-
     if (flags.Analysis.save_cutflow):
-        cutList = flags.Analysis.CutList + flags.Analysis.Categories
+        cutList = flags.Analysis.CutList
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]
-
-    for cat in ["SLT"]:
-        branches += \
-            [f"EventInfo.pass_trigger_{cat}_%SYS% -> pass_trigger_{cat}"
-             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # truth info
     if flags.Input.isMC and flags.Analysis.AddTruthVBSQuarks:
@@ -159,7 +152,7 @@ def fullLep_branches(flags):
     # VBF tagger
     if flags.Analysis.UseVBFRNN:
         vars = ['RNNScore', 'nRNNJets']
-        regs = ['resolved', 'resolved_20gev', 'boosted', 'boosted_20gev']
+        regs = ['resolved', 'boosted']
         for var in vars:
             for reg in regs:
                 branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}_%SYS%']

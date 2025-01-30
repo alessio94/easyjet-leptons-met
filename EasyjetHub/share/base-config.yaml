@@ -178,6 +178,8 @@ Trigger:
 
   scale_factor:
     doSF: False
+  # Enable writing trigger flags in AnalysisMiniTree
+  writeOutput: True
 
 GRL:
   # list of directories to search for files

@@ -80,21 +80,9 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 VBFTagger=vbftagger,
                 containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
                 containerSigJetsKey="vbshiggsAnalysisHJets_%SYS%",
-                pTCut=30.e3,
-                nMaxJets=2,
-                DecTag="_resolved"
-            )
-        )
-
-        cfg.addEventAlgo(
-            CompFactory.VBFTaggerAlgSys(
-                "VBFTaggerAlg_resolved_20gev",
-                VBFTagger=vbftagger,
-                containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
-                containerSigJetsKey="vbshiggsAnalysisHJets_%SYS%",
                 pTCut=20.e3,
                 nMaxJets=2,
-                DecTag="_resolved_20gev"
+                DecTag="_resolved"
             )
         )
 
@@ -106,22 +94,9 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
                 containerSigLargeRJetsKey="vbshiggsAnalysisLargeJets_%SYS%",
                 OnlyFirstLargeRJet=True,
-                pTCut=30.e3,
-                nMaxJets=2,
-                DecTag="_boosted"
-            )
-        )
-
-        cfg.addEventAlgo(
-            CompFactory.VBFTaggerAlgSys(
-                "VBFTaggerAlg_boosted_20gev",
-                VBFTagger=vbftagger,
-                containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
-                containerSigLargeRJetsKey="vbshiggsAnalysisLargeJets_%SYS%",
-                OnlyFirstLargeRJet=True,
                 pTCut=20.e3,
                 nMaxJets=2,
-                DecTag="_boosted_20gev"
+                DecTag="_boosted"
             )
         )
 

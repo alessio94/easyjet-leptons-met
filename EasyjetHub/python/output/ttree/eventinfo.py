@@ -79,7 +79,8 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
         f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
         for c in trigger_chains
     ]
-    eventinfo_branches.variables += trigger_branches
+    if flags.Analysis.Trigger.writeOutput:
+        eventinfo_branches.variables += trigger_branches
 
     # Event-level scale factors
     if flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF:

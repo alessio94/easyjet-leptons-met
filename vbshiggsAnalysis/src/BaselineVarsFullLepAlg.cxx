@@ -32,25 +32,23 @@ namespace VBSHIGGS{
         ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
       }
       else {
-        ATH_CHECK (m_RNNjetBoosted20GeVHandle.initialize(m_systematicsList));
-        ATH_CHECK (m_RNNjetBoosted30GeVHandle.initialize(m_systematicsList));
-        ATH_CHECK (m_RNNjetResolved20GeVHandle.initialize(m_systematicsList));
-        ATH_CHECK (m_RNNjetResolved30GeVHandle.initialize(m_systematicsList));
+        ATH_CHECK (m_RNNjetBoostedHandle.initialize(m_systematicsList));
+        ATH_CHECK (m_RNNjetResolvedHandle.initialize(m_systematicsList));
       }
 
 
       if(m_isMC){
         m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-	ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-	ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
-	ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
+        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+        ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
+        ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
       }
 
       if(m_isMC){
         m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
-	ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
-	ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
-	ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
+        ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
+        ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
+        ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
       }
 
       if (!m_isBtag.empty()) {
@@ -110,18 +108,14 @@ namespace VBSHIGGS{
         ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
 
         const xAOD::JetContainer *vbsjets = nullptr;
-        const xAOD::JetContainer *RNNJets_boosted_20gev = nullptr;
-        const xAOD::JetContainer *RNNJets_boosted_30gev = nullptr;
-        const xAOD::JetContainer *RNNJets_resolved_20gev = nullptr;
-        const xAOD::JetContainer *RNNJets_resolved_30gev = nullptr;
+        const xAOD::JetContainer *RNNJets_boosted= nullptr;
+        const xAOD::JetContainer *RNNJets_resolved = nullptr;
         if(!m_UseVBFRNN) {
           ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
         }
         else {
-          ANA_CHECK (m_RNNjetBoosted20GeVHandle.retrieve (RNNJets_boosted_20gev, sys));
-          ANA_CHECK (m_RNNjetBoosted30GeVHandle.retrieve (RNNJets_boosted_30gev, sys));
-          ANA_CHECK (m_RNNjetResolved20GeVHandle.retrieve (RNNJets_resolved_20gev, sys));
-          ANA_CHECK (m_RNNjetResolved30GeVHandle.retrieve (RNNJets_resolved_30gev, sys));
+          ANA_CHECK (m_RNNjetBoostedHandle.retrieve (RNNJets_boosted, sys));
+          ANA_CHECK (m_RNNjetResolvedHandle.retrieve (RNNJets_resolved, sys));
         }
 
         const xAOD::MuonContainer *muons = nullptr;
@@ -439,8 +433,8 @@ namespace VBSHIGGS{
 
         //kinematics of RNN jets
         else {
-          std::vector<const xAOD::JetContainer*> RNNJets = {RNNJets_boosted_20gev,RNNJets_boosted_30gev,RNNJets_resolved_20gev,RNNJets_resolved_30gev};
-          std::vector<std::string> RNNJets_names = {"RNNJets_boosted_20gev","RNNJets_boosted_30gev","RNNJets_resolved_20gev","RNNJets_resolved_30gev"};
+          std::vector<const xAOD::JetContainer*> RNNJets = {RNNJets_boosted,RNNJets_resolved};
+          std::vector<std::string> RNNJets_names = {"RNNJets_boosted","RNNJets_resolved"};
           for(unsigned int i=0; i<RNNJets.size(); i++) {
             const xAOD::JetContainer *RNNJets_container = RNNJets[i];
             std::string RNNJets_container_name = RNNJets_names[i];
