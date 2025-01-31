@@ -142,8 +142,8 @@ def get_BaselineVarsbbllAlg_variables(flags):
         for var in ["m", "pT", "dR", "Eta", "Phi"]:
             float_variable_names.append(f"{var}{object}")
 
-    float_variable_names += ["met_x", "met_y", "mbbll",
-                             "mbbllmet", "MET_sig", "mT_Lepton1_Met", "mT_Lepton2_Met",
+    float_variable_names += ["mbbll", "mbbllmet", "MET_sig",
+                             "mT_Lepton1_Met", "mT_Lepton2_Met",
                              "mT_L_min", "dRbl_min", "HT2", "HT2r", "mT2_bb", "mbl"]
 
     int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets"]
@@ -231,10 +231,11 @@ def bbll_branches(flags):
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbllSelectorAlg
-    for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
-        branches += \
-            [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}"
-             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+    if flags.Analysis.store_high_level_variables:
+        for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
+            branches += \
+                [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}"
+                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return (branches, float_variable_names, int_variable_names, float_NW_variable_names,
             float_PNN_variable_names)

@@ -171,6 +171,9 @@ namespace HHBBLL
       std::vector<HHBBLL::Booleans> m_inputCutKeys;
       Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+      double m_total_mcEventWeight{0.0};
+      CP::SysReadDecorHandle<float>
+        m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
 
       std::unordered_map<HHBBLL::TriggerChannel, std::unordered_map<HHBBLL::Var, float>> m_pt_threshold;
 

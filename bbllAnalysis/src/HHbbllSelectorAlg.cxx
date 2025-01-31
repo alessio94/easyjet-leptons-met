@@ -35,7 +35,8 @@ namespace HHBBLL
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+    if (m_saveCutFlow) ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
@@ -184,16 +185,18 @@ namespace HHBBLL
       if ((m_bypass || pass_baseline)) filter.setPassed(true);
       
       // do the CUTFLOW only with sys="" -> NOSYS
-      if (sys.name()=="") {
+      if (sys.name()=="" && m_saveCutFlow) {
 
         // Compute total_events
         m_total_events+=1;
+	if (m_isMC) m_total_mcEventWeight+=  m_generatorWeight.get(*event, sys);
 
         for (const auto &cut : m_inputCutKeys) {
           if (m_bbllCuts.exists(m_boolnames.at(cut))) {
             m_bbllCuts(m_boolnames.at(cut)).passed = m_bools.at(cut);
             if (m_bbllCuts(m_boolnames.at(cut)).passed) {
               m_bbllCuts(m_boolnames.at(cut)).counter += 1;
+	      if (m_isMC) m_bbllCuts(m_boolnames.at(cut)).w_counter += m_generatorWeight.get(*event, sys);
             }
           }
         }

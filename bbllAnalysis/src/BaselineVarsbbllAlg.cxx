@@ -290,10 +290,6 @@ namespace HHBBLL
         m_Fbranches.at("mbl").set(*event, m_bl, sys);
       }
 
-      // MET
-      m_Fbranches.at("met_x").set(*event, met->mpx(), sys);
-      m_Fbranches.at("met_y").set(*event, met->mpy(), sys);
-      
       // DeltaR_min of all 𝑏-tagged jet and lepton combinations
       std::vector<const xAOD::IParticle*> allLeptons;
 

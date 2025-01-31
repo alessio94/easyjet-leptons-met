@@ -1,7 +1,14 @@
 include: bbllAnalysis/RunConfig-bbll-Resonant.yaml
 
+save_bbll_cutflow: false
+
+store_high_level_variables: false
+
 NeutrinoWeighting:
   include: NeutrinoWeighting.yaml
 
+Trigger:
+  writeOutput: False
+
 do_CP_systematics: true
-systematics_regex: ["FT_*", "EG_*", "MUON_*", "JET_*", "PRW_DATASF"]
+systematics_regex: [".*"]
