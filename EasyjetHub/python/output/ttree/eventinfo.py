@@ -134,7 +134,7 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
                                          "truth_HH_average_eta",
                                          "truth_HH_abs_cos_theta_star"]
 
-    if flags.Analysis.GRL.store_decoration and not flags.Input.isMC:
+    if flags.Analysis.GRL.store_decoration:
         from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
         for key in getGoodRunsLists().keys():
             for year in flags.Analysis.Years:

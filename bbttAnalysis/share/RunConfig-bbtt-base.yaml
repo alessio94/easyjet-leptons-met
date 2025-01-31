@@ -25,6 +25,9 @@ do_taus: true
 do_met : true
 do_mmc : true
 
+GRL:
+  store_decoration: true
+
 # Toggles for reconstructed objects decorations
 Small_R_jet:
   useFJvt: true
