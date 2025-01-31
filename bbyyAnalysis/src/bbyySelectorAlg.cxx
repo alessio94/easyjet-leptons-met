@@ -210,7 +210,7 @@ namespace HHBBYY
       if (m_bypass || passedall) filter.setPassed(true);
 
       // only do the cutflow if you are on the nominal branch, and want the cutflow done at all
-      if(sys.name()!=m_specialSysWeight && m_saveCutFlow){
+      if(sys.name()==m_specialSysWeight && m_saveCutFlow){
 
         // Compute total_events
         m_total_events+=1; 
