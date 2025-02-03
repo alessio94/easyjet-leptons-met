@@ -383,12 +383,40 @@ namespace HHBBTT
       const xAOD::Jet* jet0 = jets->size()>0 ? jets->at(0) : nullptr;
       const xAOD::Jet* jet1 = jets->size()>1 ? jets->at(1) : nullptr;
 
+      auto eta_lt2p8_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
+          SG::VIEW_ELEMENTS);
+      auto eta_lt2p5_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
+          SG::VIEW_ELEMENTS);
+
+      for (const xAOD::Jet *jet : *jets)
+      {
+        if(std::abs(jet->eta()) < 2.8)
+          eta_lt2p8_jets->push_back(jet);
+
+        if(std::abs(jet->eta()) < 2.5)
+          eta_lt2p5_jets->push_back(jet);
+      }
+
+      const xAOD::Jet* eta_lt2p8_jet0 = nullptr;
+      const xAOD::Jet* eta_lt2p5_jet0 = nullptr;
+      const xAOD::Jet* eta_lt2p5_jet1 = nullptr;
+
+      if(eta_lt2p8_jets->size() > 0)
+        eta_lt2p8_jet0=eta_lt2p8_jets->at(0);
+
+      if(eta_lt2p5_jets->size() > 0)
+        eta_lt2p5_jet0 = eta_lt2p5_jets->at(0);
+      
+      if(eta_lt2p5_jets->size() > 1)
+        eta_lt2p5_jet1 = eta_lt2p5_jets->at(1);
+      
       if(m_useTriggerSel){
-	applyTriggerSelection(event, trigPass_decos,
-			      ele0, ele_trigMatchDecos,
-			      mu0, mu_trigMatchDecos,
-			      tau0, tau1, tau_trigMatchDecos,
-			      jet0, jet1);
+        applyTriggerSelection(event, trigPass_decos,
+                              ele0, ele_trigMatchDecos,
+                              mu0, mu_trigMatchDecos,
+                              tau0, tau1, tau_trigMatchDecos,
+                              jet0, jet1, eta_lt2p5_jet0,
+                              eta_lt2p5_jet1,  eta_lt2p8_jet0);
       }
       else{
         m_bools.at(HHBBTT::pass_trigger_SLT) = true;
@@ -437,15 +465,16 @@ namespace HHBBTT
       bool jet_ptcut_DTT_4J12 = false;
       bool jet_ptcut_DTT_L1Topo = false;
 
+      if (eta_lt2p8_jet0 && eta_lt2p8_jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet])
+        jet_ptcut_DTT_L1Topo = true;
+
       if (n_jets >= 2)
       {
         m_bools.at(HHBBTT::TWO_JETS) = true;
         if (jet0->pt() > m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet])
           jet_ptcut_DTT_2016 = true;
-        if (jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet])
-          jet_ptcut_DTT_L1Topo = true;
-        if (jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
-	    jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet])
+        if (eta_lt2p5_jet0 && eta_lt2p5_jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
+            eta_lt2p5_jet1 && eta_lt2p5_jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet])
           jet_ptcut_DTT_4J12 = true;
 
 
@@ -745,7 +774,9 @@ namespace HHBBTT
    const xAOD::Muon* mu, const muTrigMatchReadDecoMap& mu_trigMatchDecos,
    const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
    const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
-   const xAOD::Jet* jet0, const xAOD::Jet* jet1){
+   const xAOD::Jet* jet0, const xAOD::Jet* jet1, 
+   const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1,
+   const xAOD::Jet* eta_lt2p8_jet0){
 
     // only run trigger selection if in channel
     bool use_SLT = false;
@@ -755,16 +786,16 @@ namespace HHBBTT
     bool use_DBT = false;
     for (const auto &channel : m_channels){
       if (channel == HHBBTT::LepHad || channel == HHBBTT::AntiIsoLepHad){
-	use_SLT = true;
-	use_LTT = true;
+        use_SLT = true;
+        use_LTT = true;
       }
       else if (channel == HHBBTT::HadHad){
-	use_STT = true;
-	use_DTT = true;
-	use_DBT = true;
+        use_STT = true;
+        use_DTT = true;
+        use_DBT = true;
       }
       else if (channel == HHBBTT::ZCR || channel == HHBBTT::TopEMuCR){
-	use_SLT = true;
+        use_SLT = true;
       }
     }
 
@@ -786,12 +817,12 @@ namespace HHBBTT
     }
     if(use_DTT){
       applyDiTauTriggerSelection(event, triggerdecos,
-				 tau0, tau1, tau_trigMatchDecos,
-				 jet0, jet1);
+				 tau0, tau1, tau_trigMatchDecos, jet0,
+         eta_lt2p5_jet0, eta_lt2p5_jet1, eta_lt2p8_jet0);
     }
     if(use_DBT){
       applyDiBJetTriggerSelection(event, triggerdecos,
-         jet0, jet1);
+         eta_lt2p5_jet0, eta_lt2p5_jet1);
     }
 
   }
@@ -870,16 +901,19 @@ namespace HHBBTT
     }
     else trigPassed_MTT_high = false;
 
-    bool trigPassed_MTT_low = triggerdecos.at(HHBBTT::MTT_low)(*event);
+    bool trigPassed_MTT_low = triggerdecos.at(HHBBTT::MTT_low)(*event);  
+    /*Eta cuts not applied for LTT as they are in DTT
+    If LTT is included again, this should be revisited*/
+
     if(mu && tau && jet0 && jet1){
       trigPassed_MTT_low &= mu_trigMatchDecos.at(HHBBTT::MTT_low)(*mu);
       trigPassed_MTT_low &= tau_trigMatchDecos.at(HHBBTT::MTT_low)(*tau);
       trigPassed_MTT_low &=
-	(mu->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::mu] &&
-	 tau->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::leadingtau] &&
-	 tau->pt() < m_pt_threshold[HHBBTT::MTT_low][HHBBTT::leadingtaumax] &&
-	 jet0->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::leadingjet] &&
-	 jet1->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::subleadingjet]);
+        (mu->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::mu] &&
+         tau->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::leadingtau] &&
+         tau->pt() < m_pt_threshold[HHBBTT::MTT_low][HHBBTT::leadingtaumax] &&
+         jet0->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::leadingjet] &&
+         jet1->pt() > m_pt_threshold[HHBBTT::MTT_low][HHBBTT::subleadingjet]);
     }
     else trigPassed_MTT_low = false;
 
@@ -905,69 +939,70 @@ namespace HHBBTT
   void HHbbttSelectorAlg::applyDiTauTriggerSelection
   (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
    const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
-   const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
-   const xAOD::Jet* jet0, const xAOD::Jet* jet1){
+   const tauTrigMatchReadDecoMap& tau_trigMatchDecos, const xAOD::Jet* jet0,
+   const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1,
+   const xAOD::Jet* eta_lt2p8_jet0){
 
     bool trigPassed_DTT_2016 = triggerdecos.at(HHBBTT::DTT_2016)(*event);
     if(tau0 && tau1 && jet0){
       trigPassed_DTT_2016 &= tau_trigMatchDecos.at(HHBBTT::DTT_2016)(*tau0);
       trigPassed_DTT_2016 &= tau_trigMatchDecos.at(HHBBTT::DTT_2016)(*tau1);
       trigPassed_DTT_2016 &=
-	(tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
-	 tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
-	 jet0->pt() > m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet]);
+        (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
+         tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
+         jet0->pt() > m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet]);
     }
     else trigPassed_DTT_2016 = false;
     m_bools.at(HHBBTT::pass_trigger_DTT_2016) = trigPassed_DTT_2016;
 
     bool trigPassed_DTT_4J12 = triggerdecos.at(HHBBTT::DTT_4J12)(*event);
-    if(tau0 && tau1 && jet0 && jet1){
+    if(tau0 && tau1 && eta_lt2p5_jet0 && eta_lt2p5_jet1){
       trigPassed_DTT_4J12 &= tau_trigMatchDecos.at(HHBBTT::DTT_4J12)(*tau0);
       trigPassed_DTT_4J12 &= tau_trigMatchDecos.at(HHBBTT::DTT_4J12)(*tau1);
       trigPassed_DTT_4J12 &=
-	(tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
-	 tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
-	 jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
-	 jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet]);
+        (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
+         tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
+         eta_lt2p5_jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
+         eta_lt2p5_jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet]);
     }
     else trigPassed_DTT_4J12 = false;
     m_bools.at(HHBBTT::pass_trigger_DTT_4J12) = trigPassed_DTT_4J12;
 
     bool trigPassed_DTT_L1Topo = triggerdecos.at(HHBBTT::DTT_L1Topo)(*event);
-    if(tau0 && tau1 && jet0){
+    if(tau0 && tau1 && eta_lt2p8_jet0){
       trigPassed_DTT_L1Topo &= tau_trigMatchDecos.at(HHBBTT::DTT_L1Topo)(*tau0);
       trigPassed_DTT_L1Topo &= tau_trigMatchDecos.at(HHBBTT::DTT_L1Topo)(*tau1);
       trigPassed_DTT_L1Topo &=
-	 (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
-	  tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
+        (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
+         tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
          tau0->p4().DeltaR(tau1->p4())<2.5 &&
-	  jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
+         eta_lt2p8_jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
     }
     else trigPassed_DTT_L1Topo = false;
     m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) = trigPassed_DTT_L1Topo;
 
     bool trigPassed_DTT_4J12_delayed = triggerdecos.at(HHBBTT::DTT_4J12_delayed)(*event);
-    if(tau0 && tau1 && jet0 && jet1){
+    if(tau0 && tau1 && eta_lt2p5_jet0 && eta_lt2p5_jet1){
       trigPassed_DTT_4J12_delayed &= tau_trigMatchDecos.at(HHBBTT::DTT_4J12_delayed)(*tau0);
       trigPassed_DTT_4J12_delayed &= tau_trigMatchDecos.at(HHBBTT::DTT_4J12_delayed)(*tau1);
       trigPassed_DTT_4J12_delayed &=
         (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
          tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
-         jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
-         jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet]);
+         eta_lt2p5_jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
+         eta_lt2p5_jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet]);
     }
     else trigPassed_DTT_4J12_delayed = false;
     m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed) = trigPassed_DTT_4J12_delayed;
 
     bool trigPassed_DTT_L1Topo_delayed = triggerdecos.at(HHBBTT::DTT_L1Topo_delayed)(*event);
-    if(tau0 && tau1 && jet0){
+    if(tau0 && tau1 && eta_lt2p8_jet0){
       trigPassed_DTT_L1Topo_delayed &= tau_trigMatchDecos.at(HHBBTT::DTT_L1Topo_delayed)(*tau0);
       trigPassed_DTT_L1Topo_delayed &= tau_trigMatchDecos.at(HHBBTT::DTT_L1Topo_delayed)(*tau1);
       trigPassed_DTT_L1Topo_delayed &=
-         (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
-          tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
-         tau0->p4().DeltaR(tau1->p4())<2.5 &&
-          jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
+        (tau0->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] &&
+         tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] &&
+         tau0->p4().DeltaR(tau1->p4())<2.5 && 
+         eta_lt2p8_jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet]);
     }
     else trigPassed_DTT_L1Topo_delayed = false;
     m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed) = trigPassed_DTT_L1Topo_delayed;
@@ -982,16 +1017,16 @@ namespace HHBBTT
   }
 
   
-   void HHbbttSelectorAlg::applyDiBJetTriggerSelection
+  void HHbbttSelectorAlg::applyDiBJetTriggerSelection
   (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
-   const xAOD::Jet* jet0, const xAOD::Jet* jet1){
+   const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1){
 
     bool trigPassed_DBT = triggerdecos.at(HHBBTT::DBT)(*event);
-    if( jet0 && jet1){
+    if(eta_lt2p5_jet0 && eta_lt2p5_jet1){
       //TO DO: implement bjet trig-matching
       trigPassed_DBT &=
-	 (jet0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] &&
-          jet1->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet]);
+        (eta_lt2p5_jet0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] &&
+         eta_lt2p5_jet1->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet]);
     }
     else trigPassed_DBT = false;
 
@@ -1104,8 +1139,8 @@ namespace HHBBTT
     // Di-tau triggers
     m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 70. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 70. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 50. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 50. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30. * Athena::Units::GeV;
     if(year >= 2022){

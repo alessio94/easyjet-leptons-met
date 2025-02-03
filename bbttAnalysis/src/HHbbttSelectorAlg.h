@@ -260,7 +260,9 @@ private:
        const xAOD::Muon* mu, const muTrigMatchReadDecoMap& mu_trigMatchDecos,
        const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
        const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
-       const xAOD::Jet* jet0, const xAOD::Jet* jet1);
+       const xAOD::Jet* jet0, const xAOD::Jet* jet1,
+       const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1,
+       const xAOD::Jet* eta_lt2p8_jet0);
 
     void applySingleLepTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
@@ -279,10 +281,11 @@ private:
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
        const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
        const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
-       const xAOD::Jet* jet0, const xAOD::Jet* jet1);
+       const xAOD::Jet* jet0, const xAOD::Jet* eta_lt2p5_jet0, 
+       const xAOD::Jet* eta_lt2p5_jet1, const xAOD::Jet* eta_lt2p8_jet0);
     void applyDiBJetTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
-       const xAOD::Jet* jet0, const xAOD::Jet* jet1);
+       const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1);
 
     void setThresholds(const xAOD::EventInfo* event,
 		       const CP::SystematicSet& sys);
