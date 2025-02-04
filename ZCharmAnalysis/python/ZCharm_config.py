@@ -69,7 +69,6 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             eventDecisionOutputDecoration="ZCharm_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_cutflow,
-            isMC=flags.Input.isMC,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')

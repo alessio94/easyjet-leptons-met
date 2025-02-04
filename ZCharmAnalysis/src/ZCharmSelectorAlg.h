@@ -54,9 +54,6 @@ namespace ZCC
         "MET",
       };
 
-      Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
-
       Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
