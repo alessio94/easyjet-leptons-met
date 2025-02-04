@@ -11,7 +11,7 @@ For questions, [join the EasyJet MM team](https://mattermost.web.cern.ch/signup_
 
 Meetings will be biweekly at 5 pm on Tuesday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/) or [the dihiggs subgroup indico](https://indico.cern.ch/category/10816/), and announced on the e-group [atlas-phys-hdbs-dihiggs-hhframework@cern.ch](https://e-groups.cern.ch/e-groups/Egroup.do?egroupName=atlas-phys-hdbs-dihiggs-hhframework).
 
-**It is mandatory for all developpers to register to the atlas-phys-hdbs-dihiggs-hhframework egroup to be able to run the pipeline.**
+**It is mandatory for all developers to register to the atlas-phys-hdbs-dihiggs-hhframework egroup to be able to run the pipeline.**
 
 # Installation
 
@@ -37,13 +37,13 @@ You can omit the `--no-checkout` option and the subsequent lines if you want to 
 
 ### Installation as developer
 
-If not familiar with git already, pleas have a look at the [ATLAS git tutorial](https://atlassoftwaredocs.web.cern.ch/gittutorial/)
+If not familiar with git already, please have a look at the [ATLAS git tutorial](https://atlassoftwaredocs.web.cern.ch/gittutorial/)
 
 In case you want to make some developments to the software itself, we recommend you to:
 1. Fork the branch using [this link](https://gitlab.cern.ch/easyjet/easyjet/-/forks/new). Please remember to put your username in the Project URL.
 2. Clone the repository with a sparse checkout and set it as upstream:
 
-``` 
+```
 setupATLAS
 lsetup git
 git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup once
@@ -57,7 +57,7 @@ git submodule update --init --recursive
 
 If you need to update a large amount of packages, a full checkout is also possible
 
-``` 
+```
 setupATLAS
 lsetup git
 git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup once
@@ -65,7 +65,7 @@ git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/ea
 ```
 
 3. Go to the directory and set your forked branch as origin and fetch it:
-``` 
+```
 cd easyjet
 git remote add origin ssh://git@gitlab.cern.ch:7999/$(git config user.name)/easyjet.git
 git fetch origin
@@ -111,9 +111,16 @@ git push origin YourNewFavoriteBranch
 
 This can be repeated several times if needed
 
-7. When your development is complet, you can create a Merge Request (make sure you merge onto the upstream main). Please favour small and contained MRs, instead of big ones introducing several features.
+7. Check that your code will pass the flake8, cppcheck and clang-tidy checks of the CI, and fix if necessary:
+```
+flake8 --ignore=W503,E741 . --per-file-ignores="hub.py:F401
+easyjet-cppcheck .
+easyjet-clang-tidy ..
+```
 
-8. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
+8. When your development is complete, you can create a Merge Request (make sure you merge onto the upstream main). Please favour small and contained MRs, instead of big ones introducing several features.
+
+9. In case the MR highlights some conflicts and requests you to rebase your developments, please follow:
 ```
 git pull --rebase upstream main
 ```
@@ -172,7 +179,7 @@ easyjet-ntupler ttbar_PHYS_10evt.root --run-config EasyjetHub/RunConfig.yaml --o
 >Feel free to increase the number of events, though beware of how many events may be in your file in case it takes a long time.
 You should find a new ROOT files, `analysis-variables.root`.
 
-* To run analysis specific code run the executable of the analysis you want to run. For example to run the bbtautau analysis run `bbtt-ntupler <file> ...`. For more information on each individual analyis read the README in the analysis subfolder. 
+* To run analysis specific code run the executable of the analysis you want to run. For example to run the bbtautau analysis run `bbtt-ntupler <file> ...`. For more information on each individual analysis read the README in the analysis subfolder.
 
 To process Monte Carlo or PHYSLITE samples the command is exactly the same: configuration is automatically setup from the sample's metadata.
 
@@ -287,7 +294,7 @@ Below are specific tips to get this set up more effectively, or specifically for
   3. Disable the `C/C++ IntelliSense` extension
   4. Reload your session
 - Take care that you *must* compile in a `build/` dir that is on the same level as the `easyjet` source dir (i.e. you navigate there from inside `easyjet` with the path `../build`). This is assumed by the `.vscode` configuration.
-- The `.vscode` setup seems to work best when opening the `easyjet` top-level folder directly in VSCode. If you want to edit files in your run directory etc, you can simply `Add Folder to Workspace` in the options menu, which creates an `Untitled` workspace whose configuration you can then save (`Save Workspace As...`). 
+- The `.vscode` setup seems to work best when opening the `easyjet` top-level folder directly in VSCode. If you want to edit files in your run directory etc, you can simply `Add Folder to Workspace` in the options menu, which creates an `Untitled` workspace whose configuration you can then save (`Save Workspace As...`).
 
 Recommended extensions:
 - `Python`, `Pylance`, `autopep8` -- for python coding support
