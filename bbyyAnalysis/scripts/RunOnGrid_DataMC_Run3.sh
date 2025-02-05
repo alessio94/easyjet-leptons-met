@@ -48,7 +48,7 @@ mc_list=(
     "$dir_samples/$mc_campaign.tHjb.$ptag.txt"
     "$dir_samples/$mc_campaign.tWHyy.$ptag.txt"
     "$dir_samples/$mc_campaign.yyjets.$ptag.txt"
-    "$dir_samples/$mc_compaign.yybb.$ptag.txt"
+    "$dir_samples/$mc_campaign.yybb.$ptag.txt"
     "$dir_samples/$mc_campaign.ttyy_nonallhad.p6491.txt" #p6266 are not available
     "$dir_samples/$mc_campaign.ttyy_allhad.p6491.txt" #p6266 are not available
 )
