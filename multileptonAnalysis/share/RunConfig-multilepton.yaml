@@ -31,7 +31,7 @@ Small_R_jet:
 
 Tau:
   ID: "RNNMedium"
-  amount: 3
+  amount: 0
   do_parent_decoration: true
 
 Electron:

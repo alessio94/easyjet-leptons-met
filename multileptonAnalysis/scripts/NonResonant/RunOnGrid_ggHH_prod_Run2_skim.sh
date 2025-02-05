@@ -1,6 +1,4 @@
-runConfig="multileptonAnalysis/RunConfig-multilepton-pure_lep.yaml"
 executable="hhml-ntupler"
-campaignName="HHML_pureLep_v02"
 
 dir_samples="../easyjet/multileptonAnalysis/datasets/PHYSLITE/prod_v2"
 mc_list=(
@@ -24,35 +22,36 @@ mc_list=(
     "$dir_samples/mc20_13TeV.tttt.txt"
 )
 
-#data 
-easyjet-gridsubmit --data-list $dir_samples/data_Run2.txt \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName} \
-    --noTag \
-    --HDBSProductionRole
+campaignTag="v03"
+configTags=(
+    "2l"
+    "3l"
+    "bb4l"
+    "tau"
+    "VeryLooseTau"
+)
 
-#mc pure_lep
-for mc_file in "${mc_list[@]}"; do
-    cat "$mc_file"
-    echo # This adds a newline after each file's content
-done | easyjet-gridsubmit --mc-list /dev/stdin \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName} \
-    --noTag \
-    --HDBSProductionRole # --noSubmit
+for configTag in "${configTags[@]}"; do
+    runConfig="multileptonAnalysis/RunConfig-multilepton-${configTag}.yaml"
+    campaignName="HHML_${configTag}_${campaignTag}"
+    echo "runConfig: $runConfig. campaignName: $campaignName"
 
+    #data 
+    easyjet-gridsubmit --data-list $dir_samples/data_Run2.txt \
+        --run-config ${runConfig} \
+        --exec ${executable} \
+        --campaign ${campaignName} \
+        --noTag \
+        --HDBSProductionRole
 
-# mc bb4l
-runConfig="multileptonAnalysis/RunConfig-multilepton-bb4l.yaml"
-campaignName="HHML_bb4l_v02"
-for mc_file in "${mc_list[@]}"; do
-    cat "$mc_file"
-    echo # This adds a newline after each file's content
-done | easyjet-gridsubmit --mc-list /dev/stdin \
-    --run-config ${runConfig} \
-    --exec ${executable} \
-    --campaign ${campaignName} \
-    --noTag \
-    --HDBSProductionRole  # --noSubmit
+    #mc pure_lep
+    for mc_file in "${mc_list[@]}"; do
+        cat "$mc_file"
+        echo # This adds a newline after each file's content
+    done | easyjet-gridsubmit --mc-list /dev/stdin \
+        --run-config ${runConfig} \
+        --exec ${executable} \
+        --campaign ${campaignName} \
+        --noTag \
+        --HDBSProductionRole # --noSubmit
+done

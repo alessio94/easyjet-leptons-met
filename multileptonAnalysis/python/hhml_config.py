@@ -50,8 +50,6 @@ def hhml_cfg(
         bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
         selectBjet=False,
         minPt=20 * Units.GeV,
-        truncateAtAmount=flags.Analysis.Small_R_jet.amount,
-
     ))
 
     # Selection
