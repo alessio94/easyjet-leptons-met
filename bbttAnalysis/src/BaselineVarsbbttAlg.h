@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -49,16 +49,22 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "bbttAnalysisJets_%SYS%", "Jet container to read" };
+      m_bbttJetHandle{ this, "bbttJets", "bbttAnalysisJets_%SYS%", "Jet container to read" };
     
     CP::SysReadHandle<xAOD::ElectronContainer>
-      m_electronHandle{ this, "electrons", "bbttAnalysisElectrons_%SYS%", "Electron container to read" };
+      m_bbttElectronHandle{ this, "bbttElectrons", "bbttAnalysisElectrons_%SYS%", "Electron container to read" };
+    CP::SysReadHandle<xAOD::ElectronContainer>
+      m_electronHandle{ this, "electrons", "AnalysisElectrons_%SYS%", "Original electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-      m_muonHandle{ this, "muons", "bbttAnalysisMuons_%SYS%", "Muon container to read" };
+      m_bbttMuonHandle{ this, "bbttMuons", "bbttAnalysisMuons_%SYS%", "Muon container to read" };
+    CP::SysReadHandle<xAOD::MuonContainer>
+      m_muonHandle{ this, "muons", "AnalysisMuons_%SYS%", "Original muon container to read" };
 
     CP::SysReadHandle<xAOD::TauJetContainer>
-      m_tauHandle{ this, "taus", "bbttAnalysisTaus_%SYS%", "Tau container to read" };
+      m_bbttTauHandle{ this, "bbttTaus", "bbttAnalysisTaus_%SYS%", "Tau container to read" };
+    CP::SysReadHandle<xAOD::TauJetContainer>
+      m_tauHandle{ this, "taus", "AnalysisTaus_%SYS%", "Original tau container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
@@ -89,6 +95,9 @@ private:
     typedef std::unordered_map<HHBBTT::LepSelWpDeco, CP::SysReadDecorHandle<float>> leptonSfDecoMap;
     leptonSfDecoMap m_ele_SF_decoMap;
     leptonSfDecoMap m_muon_SF_decoMap;
+    Gaudi::Property<bool> m_saveDummy_ele_SF
+      {this, "saveDummyEleSF", false,
+	  "To be used in case no recommendations are not available"};
 
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "","Tau ID working point" };

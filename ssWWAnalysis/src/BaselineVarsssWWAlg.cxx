@@ -22,24 +22,29 @@ namespace ssWWVBS
   StatusCode BaselineVarsssWWAlg::initialize()
   {
     // Read syst-aware input handles
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ssWWJetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ssWWElectronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ssWWMuonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
-      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
-    }
+      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_ssWWElectronHandle));
+      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_ssWWElectronHandle));
 
-    if(m_isMC){
+      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_ssWWMuonHandle));
+      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_ssWWMuonHandle));
+
+      // SF access
+      if(!m_saveDummy_ele_SF){
+        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+      }
+
+      ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
       ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
-      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
-      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
     }
 
     // Intialise syst-aware output decorators
@@ -57,13 +62,13 @@ namespace ssWWVBS
     };
 
     if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_ssWWJetHandle));
     }
 
     ATH_CHECK (m_METSig.initialize(m_systematicsList, m_metHandle));
 
     if (m_isMC) {
-      ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_ssWWJetHandle));
     }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
@@ -84,13 +89,13 @@ namespace ssWWVBS
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
       const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      ANA_CHECK (m_ssWWJetHandle.retrieve (jets, sys));
 
       const xAOD::MuonContainer *muons = nullptr;
-      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+      ANA_CHECK (m_ssWWMuonHandle.retrieve (muons, sys));
 
       const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+      ANA_CHECK (m_ssWWElectronHandle.retrieve (electrons, sys));
 
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
@@ -184,9 +189,11 @@ namespace ssWWVBS
         m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
         m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
         if(m_isMC){
-          float SF = std::abs(lep_pdgid)==11 ?
-          m_ele_SF.get(*leptons[i].first,sys) :
-          m_mu_SF.get(*leptons[i].first,sys);
+          float SF = 1.;
+          if(std::abs(lep_pdgid)==13)
+            SF = m_mu_SF.get(*leptons[i].first,sys);
+          else if(!m_saveDummy_ele_SF)
+            SF = m_ele_SF.get(*leptons[i].first,sys);
           m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
         }
         int charge = lep_pdgid > 0 ? -1 : 1;

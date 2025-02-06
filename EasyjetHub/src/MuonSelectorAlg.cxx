@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Minori Fujimoto
@@ -37,27 +37,6 @@ namespace Easyjet
       m_select_out.emplace_back("baselineSelection_"+wp+"_%SYS%", this);
     }
 
-    // Scale factors
-    if(m_isMC){
-      for(const auto& wp : m_muonWPs){
-        m_mu_SF_in.emplace_back("effSF_"+wp+"_%SYS%", this);
-        m_mu_SF_out.emplace_back("effSF_"+wp+"_%SYS%", this);
-      }
-
-      for(const auto& trig : m_muTrigSF){
-        m_muTriggerSF_in.emplace_back("muon_trigEffSF_"+trig+"_%SYS%", this);
-        m_muTriggerSF_out.emplace_back("muon_trigEffSF_"+trig+"_%SYS%", this);
-      }
-    }
-
-    for(auto& handle : m_mu_SF_in)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_mu_SF_out)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-    for(auto& handle : m_muTriggerSF_in)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_muTriggerSF_out)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
     for(auto& handle : m_select_in)
       ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     for(auto& handle : m_select_out)
@@ -98,17 +77,6 @@ namespace Easyjet
         // For some reason this decoration needs to be explicitly copied
         for(unsigned int i=0; i<m_muonWPs.size(); i++)
           m_select_out[i].set(*muon, m_select_in[i].get(*muon,sys), sys);
-
-        if(m_isMC){
-          for(unsigned int i=0; i<m_muonWPs.size(); i++){
-            m_mu_SF_out[i].set(*muon, m_mu_SF_in[i].get(*muon,sys), sys);
-          }
-
-          for(unsigned int i=0; i<m_muTrigSF.size(); i++){
-            m_muTriggerSF_out[i].set
-              (*muon, m_muTriggerSF_in[i].get(*muon, sys), sys);
-          }
-        }
 
         // If cuts are passed, save the object
         workContainer->push_back(muon);

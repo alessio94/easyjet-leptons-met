@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 
@@ -21,27 +21,31 @@ namespace VBSHIGGS{
       ATH_MSG_INFO("*********************************\n");
 
       // Read syst-aware input handles
-      ATH_CHECK (m_largejetHandle.initialize(m_systematicsList));
+      ATH_CHECK (m_vbsLRJetHandle.initialize(m_systematicsList));
       ATH_CHECK (m_signaljetHandle.initialize(m_systematicsList));
       ATH_CHECK (m_HCandHandle.initialize(m_systematicsList));
-      ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
-      ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-      ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+      ATH_CHECK (m_vbsJetHandle.initialize(m_systematicsList));
+      ATH_CHECK (m_vbsElectronHandle.initialize(m_systematicsList));
+      ATH_CHECK (m_vbsMuonHandle.initialize(m_systematicsList));
       ATH_CHECK (m_metHandle.initialize(m_systematicsList));
       ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
       if(m_isMC){
-        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-        ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
-        ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
-      }
+        ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_vbsElectronHandle));
+        ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_vbsElectronHandle));
+        ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_vbsMuonHandle));
+        ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_vbsMuonHandle));
 
-      if(m_isMC){
+        // For SF access
+        if(!m_saveDummy_ele_SF){
+          ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+          m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+          ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+        }
+
+        ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
         m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
         ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
-        ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
-        ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
       }
 
       if (!m_isBtag.empty()) {
@@ -70,14 +74,14 @@ namespace VBSHIGGS{
         ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_HCandHandle));
       }
 
-      ATH_CHECK (m_eleECIDS.initialize(m_systematicsList, m_electronHandle));
+      ATH_CHECK (m_eleECIDS.initialize(m_systematicsList, m_vbsElectronHandle));
       
       ATH_CHECK (m_METSig.initialize(m_systematicsList, m_metHandle));
 
-      ATH_CHECK (m_GN2Xv01_phbb.initialize(m_systematicsList, m_largejetHandle));
-      ATH_CHECK (m_GN2Xv01_phcc.initialize(m_systematicsList, m_largejetHandle));
-      ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_largejetHandle));
-      ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_largejetHandle));
+      ATH_CHECK (m_GN2Xv01_phbb.initialize(m_systematicsList, m_vbsLRJetHandle));
+      ATH_CHECK (m_GN2Xv01_phcc.initialize(m_systematicsList, m_vbsLRJetHandle));
+      ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_vbsLRJetHandle));
+      ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_vbsLRJetHandle));
 
       // Intialise syst list (must come after all syst-aware inputs and outputs)
       ATH_CHECK (m_systematicsList.initialize());
@@ -92,7 +96,7 @@ namespace VBSHIGGS{
         ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
         const xAOD::JetContainer *largeJets = nullptr;
-        ANA_CHECK (m_largejetHandle.retrieve (largeJets, sys));
+        ANA_CHECK (m_vbsLRJetHandle.retrieve (largeJets, sys));
 
         const xAOD::JetContainer *signalJets = nullptr;
         ANA_CHECK (m_signaljetHandle.retrieve (signalJets, sys));
@@ -101,13 +105,13 @@ namespace VBSHIGGS{
         ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
 
         const xAOD::JetContainer *vbsjets = nullptr;
-        ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
+        ANA_CHECK (m_vbsJetHandle.retrieve (vbsjets, sys));
 
         const xAOD::MuonContainer *muons = nullptr;
-        ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+        ANA_CHECK (m_vbsMuonHandle.retrieve (muons, sys));
 
         const xAOD::ElectronContainer *electrons = nullptr;
-        ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+        ANA_CHECK (m_vbsElectronHandle.retrieve (electrons, sys));
 
         const xAOD::MissingETContainer *metCont = nullptr;
         ANA_CHECK (m_metHandle.retrieve (metCont, sys));
@@ -197,7 +201,7 @@ namespace VBSHIGGS{
           if(m_isMC){
             float SF = -99;
             if(std::abs(leptons[0].second)==11 ){
-              SF = m_ele_SF.get(*leptons[0].first,sys);
+              if(!m_saveDummy_ele_SF) SF = m_ele_SF.get(*leptons[0].first,sys);
 
               int ele_ECIDS = m_eleECIDS.get(*leptons[0].first, sys);
               m_Ibranches.at("Lepton_ele_ECIDS").set(*event, ele_ECIDS, sys);

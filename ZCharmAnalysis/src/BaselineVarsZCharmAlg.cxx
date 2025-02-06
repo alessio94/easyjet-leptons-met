@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "BaselineVarsZCharmAlg.h"
@@ -21,42 +21,46 @@ namespace ZCC
   StatusCode BaselineVarsZCharmAlg::initialize()
   {
     // Read syst-aware input handles
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_largejetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ZCharmJetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ZCharmLRJetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ZCharmElectronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ZCharmMuonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
-      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
-    }
+      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_ZCharmElectronHandle));
+      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_ZCharmElectronHandle));
+      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_ZCharmMuonHandle));
+      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_ZCharmMuonHandle));
 
-    if(m_isMC){
+      // SF access
+      if(!m_saveDummy_ele_SF){
+        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+      }
+
+      ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
       ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
-      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
-      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
     }
 
     if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_ZCharmJetHandle));
     }
 
     for (const std::string &var : m_PCBTnames){
       ATH_MSG_DEBUG("initializing PCBT: " << var);
       CP::SysReadDecorHandle<int> rhandle{var, this};
       m_PCBTs.emplace(var, rhandle);
-      ATH_CHECK(m_PCBTs.at(var).initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK(m_PCBTs.at(var).initialize(m_systematicsList, m_ZCharmJetHandle));
     };
 
     ATH_CHECK (m_METSig.initialize(m_systematicsList, m_metHandle));
 
     if (m_isMC) {
-      ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_ZCharmJetHandle));
     }
 
     // Intialise syst-aware output decorators
@@ -73,10 +77,10 @@ namespace ZCC
       ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
     };
     
-    ATH_CHECK (m_GN2Xv01_phbb.initialize(m_systematicsList, m_largejetHandle));
-    ATH_CHECK (m_GN2Xv01_phcc.initialize(m_systematicsList, m_largejetHandle));
-    ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_largejetHandle));
-    ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_largejetHandle));
+    ATH_CHECK (m_GN2Xv01_phbb.initialize(m_systematicsList, m_ZCharmLRJetHandle));
+    ATH_CHECK (m_GN2Xv01_phcc.initialize(m_systematicsList, m_ZCharmLRJetHandle));
+    ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_ZCharmLRJetHandle));
+    ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_ZCharmLRJetHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -96,16 +100,16 @@ namespace ZCC
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
       const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      ANA_CHECK (m_ZCharmJetHandle.retrieve (jets, sys));
 
       const xAOD::JetContainer *largeJets  = nullptr;
-      ANA_CHECK (m_largejetHandle.retrieve (largeJets , sys));
+      ANA_CHECK (m_ZCharmLRJetHandle.retrieve (largeJets , sys));
 
       const xAOD::MuonContainer *muons = nullptr;
-      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+      ANA_CHECK (m_ZCharmMuonHandle.retrieve (muons, sys));
 
       const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+      ANA_CHECK (m_ZCharmElectronHandle.retrieve (electrons, sys));
 
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
@@ -206,9 +210,11 @@ namespace ZCC
         m_Fbranches.at(prefix+"_phi").set(*event, tlv.Phi(), sys);
         m_Fbranches.at(prefix+"_E").set(*event, tlv.E(), sys);
         if(m_isMC){
-          float SF = std::abs(lep_pdgid)==11 ?
-          m_ele_SF.get(*leptons[i].first,sys) :
-          m_mu_SF.get(*leptons[i].first,sys);
+          float SF = 1.;
+          if(std::abs(lep_pdgid)==13)
+            SF = m_mu_SF.get(*leptons[i].first,sys);
+          else if(!m_saveDummy_ele_SF)
+            SF = m_ele_SF.get(*leptons[i].first,sys);
           m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
         }
         int charge = lep_pdgid > 0 ? -1 : 1;

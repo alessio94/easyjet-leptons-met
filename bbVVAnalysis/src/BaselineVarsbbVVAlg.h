@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Kira Abeling, JaeJin Hong
@@ -53,16 +53,20 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "bbVVAnalysisJets_%SYS%", "Jet container to read" };
+      m_bbVVJetHandle{ this, "bbVVJets", "bbVVAnalysisJets_%SYS%", "Jet container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
-      m_lrjetHandle{ this, "lrjets", "bbVVAnalysisLRJets_%SYS%", "Large-R jet container to read" };
+      m_bbVVLRJetHandle{ this, "bbVVLRets", "bbVVAnalysisLRJets_%SYS%", "Large-R jet container to read" };
     
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "bbVVAnalysisElectrons_%SYS%", "Electron container to read" };
+      m_bbVVElectronHandle{ this, "bbVVElectrons", "bbVVAnalysisElectrons_%SYS%", "Electron container to read" };
+    CP::SysReadHandle<xAOD::ElectronContainer>
+      m_electronHandle{ this, "electrons", "AnalysisElectrons_%SYS%", "Original electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "bbVVAnalysisMuons_%SYS%", "Muon container to read" };
+      m_bbVVMuonHandle{ this, "bbVVMuons", "bbVVAnalysisMuons_%SYS%", "Muon container to read" };
+    CP::SysReadHandle<xAOD::MuonContainer>
+      m_muonHandle{ this, "muons", "AnalysisMuons_%SYS%", "Original muon container to read" };
 
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
@@ -76,6 +80,9 @@ private:
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
+    Gaudi::Property<bool> m_saveDummy_ele_SF
+      {this, "saveDummyEleSF", false,
+	  "To be used in case no recommendations are not available"};
 
     Gaudi::Property<std::string> m_muWPName
       { this, "muonWP", "","Muon ID + Iso working point" };

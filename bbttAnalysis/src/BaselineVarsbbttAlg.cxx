@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "BaselineVarsbbttAlg.h"
@@ -24,62 +24,68 @@ namespace HHBBTT
   {
 
     // Read syst-aware input handles
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbttJetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbttTauHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbttElectronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbttMuonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_doMMC){
-       ATH_CHECK (m_mmc_pt.initialize(m_systematicsList, m_eventHandle));
-       ATH_CHECK (m_mmc_eta.initialize(m_systematicsList, m_eventHandle));
-       ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
-       ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
+      ATH_CHECK (m_mmc_pt.initialize(m_systematicsList, m_eventHandle));
+      ATH_CHECK (m_mmc_eta.initialize(m_systematicsList, m_eventHandle));
+      ATH_CHECK (m_mmc_phi.initialize(m_systematicsList, m_eventHandle));
+      ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
     }
-    if(m_isMC){
-       fillLeptonSfDecoMap(m_eleWPNames, m_ele_SF_decoMap);
-       fillLeptonSfDecoMap(m_muonWPNames, m_muon_SF_decoMap);
-    }
-    for(auto& [k, handle] : m_ele_SF_decoMap)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
-    for(auto& [k, handle] : m_muon_SF_decoMap)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty));
 
     if(m_isMC){
+      // SF access
+      if(!m_saveDummy_ele_SF){
+        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+        fillLeptonSfDecoMap(m_eleWPNames, m_ele_SF_decoMap);
+        for(auto& [k, handle] : m_ele_SF_decoMap)
+          ATH_CHECK (handle.initialize(m_systematicsList, m_electronHandle));
+      }
+
+      ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+      fillLeptonSfDecoMap(m_muonWPNames, m_muon_SF_decoMap);
+      for(auto& [k, handle] : m_muon_SF_decoMap)
+        ATH_CHECK (handle.initialize(m_systematicsList, m_muonHandle));
+
+      ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
       m_tau_effSF = CP::SysReadDecorHandle<float>("effSF_"+m_tauWPName+"_%SYS%", this);
+      ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_tauHandle));
     }
-    ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_tauHandle, SG::AllowEmpty));
 
-    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_selected_el_isIso.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
-    ATH_CHECK (m_selected_mu_isIso.initialize(m_systematicsList, m_muonHandle));
-    ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_bbttElectronHandle));
+    ATH_CHECK (m_selected_el_isIso.initialize(m_systematicsList, m_bbttElectronHandle));
+    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_bbttMuonHandle));
+    ATH_CHECK (m_selected_mu_isIso.initialize(m_systematicsList, m_bbttMuonHandle));
+    ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_bbttTauHandle));
 
     if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_bbttJetHandle));
     }
     for (const std::string &var : m_PCBTnames){
       ATH_MSG_DEBUG("initializing PCBT: " << var);
       CP::SysReadDecorHandle<int> rhandle{var, this};
       m_PCBTs.emplace(var, rhandle);
-      ATH_CHECK(m_PCBTs.at(var).initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK(m_PCBTs.at(var).initialize(m_systematicsList, m_bbttJetHandle));
     };
     if (m_isMC) {
-      ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_bbttJetHandle));
     }
-    ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_jetHandle));
+    ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_bbttJetHandle));
 
-    ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_tauHandle));
-    ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_bbttTauHandle));
+    ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_bbttTauHandle));
 
-    ATH_CHECK (m_EleRNNLoose.initialize(m_systematicsList, m_tauHandle));
-    ATH_CHECK (m_EleRNNMedium.initialize(m_systematicsList, m_tauHandle));
-    ATH_CHECK (m_EleRNNTight.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK (m_EleRNNLoose.initialize(m_systematicsList, m_bbttTauHandle));
+    ATH_CHECK (m_EleRNNMedium.initialize(m_systematicsList, m_bbttTauHandle));
+    ATH_CHECK (m_EleRNNTight.initialize(m_systematicsList, m_bbttTauHandle));
 
     if (m_isMC) {
-      ATH_CHECK (m_truthTypeTau.initialize(m_systematicsList, m_tauHandle));
-      ATH_CHECK (m_tauTruthJetLabel.initialize(m_systematicsList, m_tauHandle));
+      ATH_CHECK (m_truthTypeTau.initialize(m_systematicsList, m_bbttTauHandle));
+      ATH_CHECK (m_tauTruthJetLabel.initialize(m_systematicsList, m_bbttTauHandle));
     }
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
@@ -114,16 +120,16 @@ namespace HHBBTT
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
       const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      ANA_CHECK (m_bbttJetHandle.retrieve (jets, sys));
 
       const xAOD::MuonContainer *muons = nullptr;
-      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+      ANA_CHECK (m_bbttMuonHandle.retrieve (muons, sys));
 
       const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+      ANA_CHECK (m_bbttElectronHandle.retrieve (electrons, sys));
 
       const xAOD::TauJetContainer *taus = nullptr;
-      ANA_CHECK (m_tauHandle.retrieve (taus, sys));
+      ANA_CHECK (m_bbttTauHandle.retrieve (taus, sys));
 
       for (const auto& var: m_floatVariables) {
         m_Fbranches.at(var).set(*event, -99, sys);
@@ -188,9 +194,11 @@ namespace HHBBTT
           auto idx = m_useNonIsoLeptons 
                     ? HHBBTT::LepSelWpDeco::tight_noniso 
                     : HHBBTT::LepSelWpDeco::tight_iso;
-          float SF = (std::abs(leptons[i].second)==11) 
-                    ? m_ele_SF_decoMap.at(idx).get(*leptons[i].first,sys) 
-                    : m_muon_SF_decoMap.at(idx).get(*leptons[i].first,sys);
+          float SF = 1.;
+          if(std::abs(leptons[i].second)==13)
+            SF = m_muon_SF_decoMap.at(idx).get(*leptons[i].first,sys);
+          else if(!m_saveDummy_ele_SF)
+            SF = m_ele_SF_decoMap.at(idx).get(*leptons[i].first,sys);
           m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
         }
       }

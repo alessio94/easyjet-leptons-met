@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "TriggerSFAlg.h"
@@ -26,37 +26,34 @@ namespace HHBBTT
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbttTauHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbttEleHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbttMuonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    if(m_isMC){
-      for(const auto& trig : m_eleTrigSF){
-        m_eleTriggerSF.emplace
-          (trig, CP::SysReadDecorHandle<float>("el_trigEffSF_"+trig+"_%SYS%", this));
-        ATH_CHECK (m_eleTriggerSF.at(trig).initialize(m_systematicsList, m_electronHandle));
-      }
+    for(const auto& trig : m_eleTrigSF){
+      m_eleTriggerSF.emplace
+	(trig, CP::SysReadDecorHandle<float>("el_trigEffSF_"+trig+"_%SYS%", this));
+      ATH_CHECK (m_eleTriggerSF.at(trig).initialize(m_systematicsList, m_electronHandle));
     }
 
-    if(m_isMC){
-      for(const auto& trig : m_muonTrigSF){
-        m_muonTriggerSF.emplace
-          (trig, CP::SysReadDecorHandle<float>("muon_trigEffSF_"+trig+"_%SYS%", this));
-        ATH_CHECK (m_muonTriggerSF.at(trig).initialize(m_systematicsList, m_muonHandle));
-      }
+    for(const auto& trig : m_muonTrigSF){
+      m_muonTriggerSF.emplace
+	(trig, CP::SysReadDecorHandle<float>("muon_trigEffSF_"+trig+"_%SYS%", this));
+      ATH_CHECK (m_muonTriggerSF.at(trig).initialize(m_systematicsList, m_muonHandle));
     }
 
-    if(m_isMC){
-      for(const auto& trig : m_tauTrigSF){
-        m_tauTriggerSF.emplace
-          (trig, CP::SysReadDecorHandle<float>("tau_trigEffSF_"+trig+"_%SYS%", this));
-        ATH_CHECK (m_tauTriggerSF.at(trig).initialize(m_systematicsList, m_tauHandle));
-      }
+    for(const auto& trig : m_tauTrigSF){
+      m_tauTriggerSF.emplace
+	(trig, CP::SysReadDecorHandle<float>("tau_trigEffSF_"+trig+"_%SYS%", this));
+      ATH_CHECK (m_tauTriggerSF.at(trig).initialize(m_systematicsList, m_tauHandle));
     }
 
-    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
-    ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_tauHandle));
+    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_bbttEleHandle));
+    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_bbttMuonHandle));
+    ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_bbttTauHandle));
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
@@ -100,13 +97,13 @@ namespace HHBBTT
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
       const xAOD::MuonContainer *muons = nullptr;
-      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+      ANA_CHECK (m_bbttMuonHandle.retrieve (muons, sys));
 
       const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+      ANA_CHECK (m_bbttEleHandle.retrieve (electrons, sys));
 
       const xAOD::TauJetContainer *taus = nullptr;
-      ANA_CHECK (m_tauHandle.retrieve (taus, sys));
+      ANA_CHECK (m_bbttTauHandle.retrieve (taus, sys));
 
       m_eventTriggerSF.set(*event, -999., sys);
 
@@ -147,7 +144,7 @@ namespace HHBBTT
       }
       std::vector<const xAOD::TauJet*> sel_taus = {tau0, tau1};
 
-      if(m_isMC) computeTriggerSF(event, sys, runBoolDecos, ele0, mu0, tau0, tau1);
+      computeTriggerSF(event, sys, runBoolDecos, ele0, mu0, tau0, tau1);
     }
 
     return StatusCode::SUCCESS;

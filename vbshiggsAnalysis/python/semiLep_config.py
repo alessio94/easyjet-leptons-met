@@ -1,11 +1,16 @@
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.Enums import LHCPeriod
+
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
 
-def semiLep_cfg(flags, float_variables=None, int_variables=None):
+def semiLep_cfg(flags, muonkey, electronkey,
+                float_variables=None, int_variables=None):
     if not float_variables:
         float_variables = []
     if not int_variables:
@@ -33,8 +38,9 @@ def semiLep_cfg(flags, float_variables=None, int_variables=None):
         CompFactory.VBSHIGGS.BaselineVarsSemiLepAlg(
             "FinalVarsSemiLepAlg",
             isMC=flags.Input.isMC,
-            muonWP=MuonWPLabel,
-            eleWP=ElectronWPLabel,
+            muons=muonkey, muonWP=MuonWPLabel,
+            electrons=electronkey, eleWP=ElectronWPLabel,
+            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_"
                           + flags.Analysis.Small_R_jet.btag_extra_wps[0],

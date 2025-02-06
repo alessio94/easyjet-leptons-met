@@ -42,20 +42,6 @@ namespace Easyjet
     for(auto& handle : m_select_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
-    // Scale factors
-    if(m_isMC){
-      for(const auto& wp : m_photonWPs){
-        m_ph_SF_in.emplace_back
-	  (!m_saveDummySF ? "effSF_"+wp+"_%SYS%" : "", this);
-        m_ph_SF_out.emplace_back("effSF_"+wp+"_%SYS%", this);
-      }
-    }
-
-    for(auto& handle : m_ph_SF_in)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_ph_SF_out)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-
     // Intialise syst-aware input/output decorators
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
@@ -96,13 +82,6 @@ namespace Easyjet
         // For some reason this decoration needs to be explicitly copied
         for(unsigned int i=0; i<m_photonWPs.size(); i++)
           m_select_out[i].set(*photon, m_select_in[i].get(*photon,sys), sys);
-
-        if(m_isMC){
-          for(unsigned int i=0; i<m_photonWPs.size(); i++){
-            float SF = m_saveDummySF ? 1. : m_ph_SF_in[i].get(*photon, sys);
-            m_ph_SF_out[i].set(*photon, SF, sys);
-          }
-        }
 
         m_isSelectedPhoton.set(*photon, true, sys);
         workContainer->push_back(photon);

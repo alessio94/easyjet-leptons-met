@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 /// @author Kira Abeling, JaeJin Hong
 #include "BaselineVarsbbVVAlg.h"
@@ -19,55 +19,58 @@ namespace HHBBVV
   StatusCode BaselineVarsbbVVAlg::initialize()
   {
     // Read syst-aware input handles
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbVVJetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbVVLRJetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbVVElectronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbVVMuonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    // SF access
     if(m_isMC){
-      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-    }
-    ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle, SG::AllowEmpty));
+      if(!m_saveDummy_ele_SF){
+	ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+	m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+	ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+      }
 
-    if(m_isMC){
+      ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
+      ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
     }
-    ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle, SG::AllowEmpty ));
 
-    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
-    ATH_CHECK(m_Hbb.initialize(m_systematicsList, m_lrjetHandle)); // Hbb jet
-    ATH_CHECK(m_Whad.initialize(m_systematicsList, m_lrjetHandle)); // Whad jet
-    ATH_CHECK(m_Whad2.initialize(m_systematicsList, m_lrjetHandle)); // Whad2 jet
+    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_bbVVElectronHandle));
+    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_bbVVMuonHandle));
+    ATH_CHECK(m_Hbb.initialize(m_systematicsList, m_bbVVLRJetHandle)); // Hbb jet
+    ATH_CHECK(m_Whad.initialize(m_systematicsList, m_bbVVLRJetHandle)); // Whad jet
+    ATH_CHECK(m_Whad2.initialize(m_systematicsList, m_bbVVLRJetHandle)); // Whad2 jet
 
     for(const auto& wp: m_GN2X_wps)
       m_GN2X_wp_Handles.emplace_back("GN2X_select_" + wp, this);
     for(auto& handle : m_GN2X_wp_Handles)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_lrjetHandle));
+      ATH_CHECK(handle.initialize(m_systematicsList, m_bbVVLRJetHandle));
 
     m_WTag_score = CP::SysReadDecorHandle<float>
       (m_WTag_Type.value()+m_WTag_WP.value()+"Tagger_Score", this);
     m_Pass_WTag = CP::SysReadDecorHandle<bool>
       (m_WTag_Type.value()+m_WTag_WP.value()+"Tagger_Tagged", this);
-    ATH_CHECK(m_WTag_score.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_Pass_WTag.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_WTag_score.initialize(m_systematicsList, m_bbVVLRJetHandle));
+    ATH_CHECK(m_Pass_WTag.initialize(m_systematicsList, m_bbVVLRJetHandle));
 
     for(unsigned int i=1; i<5; i++)
       m_tau_wta.emplace_back("Tau"+std::to_string(i)+"_wta", this);
     for(auto& handle : m_tau_wta)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_lrjetHandle));
+      ATH_CHECK(handle.initialize(m_systematicsList, m_bbVVLRJetHandle));
 
     for(unsigned int i=1; i<4; i++)
       m_ecf.emplace_back("ECF"+std::to_string(i), this);
     for(auto& handle : m_ecf)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_lrjetHandle));
+      ATH_CHECK(handle.initialize(m_systematicsList, m_bbVVLRJetHandle));
 
-    ATH_CHECK(m_GN2Xv01_phbb.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_GN2Xv01_phcc.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_GN2Xv01_pqcd.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_GN2Xv01_ptop.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_GN2Xv01_phbb.initialize(m_systematicsList, m_bbVVLRJetHandle));
+    ATH_CHECK(m_GN2Xv01_phcc.initialize(m_systematicsList, m_bbVVLRJetHandle));
+    ATH_CHECK(m_GN2Xv01_pqcd.initialize(m_systematicsList, m_bbVVLRJetHandle));
+    ATH_CHECK(m_GN2Xv01_ptop.initialize(m_systematicsList, m_bbVVLRJetHandle));
 
     // Initialise syst-aware output decorators
     for(const std::string &var : m_floatVariables){
@@ -114,16 +117,16 @@ namespace HHBBVV
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
       const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      ANA_CHECK (m_bbVVJetHandle.retrieve (jets, sys));
 
       const xAOD::JetContainer *lrjets = nullptr;
-      ANA_CHECK (m_lrjetHandle.retrieve (lrjets, sys));
+      ANA_CHECK (m_bbVVLRJetHandle.retrieve (lrjets, sys));
 
       const xAOD::MuonContainer *muons = nullptr;
-      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+      ANA_CHECK (m_bbVVMuonHandle.retrieve (muons, sys));
 
       const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+      ANA_CHECK (m_bbVVElectronHandle.retrieve (electrons, sys));
 
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
@@ -152,7 +155,8 @@ namespace HHBBVV
       for(const xAOD::Electron* electron : *electrons) {
         if (m_selected_el.get(*electron, sys)){
           signal_lepton = electron->p4();
-          signal_lepton_SF = m_ele_SF.get(*electron, sys);
+          signal_lepton_SF = m_saveDummy_ele_SF ?
+	    1. : m_ele_SF.get(*electron, sys);
           signal_lepton_charge = electron->charge();
           signal_lepton_id = signal_lepton_charge > 0 ? -11 : 11;
           break; // At most one lepton selected

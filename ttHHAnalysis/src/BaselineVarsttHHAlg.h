@@ -57,7 +57,7 @@ private:
     m_bjetHandle{ this, "bjets", "ttHHAnalysisJets_BTag_%SYS%", "BJet container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "ttHHAnalysisJets_%SYS%", "Jet container to read" };
+    m_ttHHJetHandle{ this, "ttHHJets", "ttHHAnalysisJets_%SYS%", "Jet container to read" };
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
@@ -66,10 +66,14 @@ private:
     m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "ttHHAnalysisMuons_%SYS%", "Muon container to read" };
+    m_ttHHMuonHandle{ this, "ttHHMuons", "ttHHAnalysisMuons_%SYS%", "Muon container to read" };
+    CP::SysReadHandle<xAOD::MuonContainer>
+    m_muonHandle{ this, "muons", "AnalysisMuons_%SYS%", "Original muon container to read" };
 
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "ttHHAnalysisElectrons_%SYS%", "Electron container to read" };
+    m_ttHHElectronHandle{ this, "ttHHElectrons", "ttHHAnalysisElectrons_%SYS%", "Electron container to read" };
+    CP::SysReadHandle<xAOD::ElectronContainer>
+    m_electronHandle{ this, "electrons", "AnalysisElectrons_%SYS%", "Original electron container to read" };
 
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read "};
@@ -80,6 +84,10 @@ private:
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
+    Gaudi::Property<bool> m_saveDummy_ele_SF
+      {this, "saveDummyEleSF", false,
+	  "To be used in case no recommendations are not available"};
+
     CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
     CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};
 

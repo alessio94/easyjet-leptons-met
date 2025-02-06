@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef EASYJET_MUONSELECTORALG
@@ -46,19 +46,8 @@ private:
     CP::SysReadHandle<xAOD::MuonContainer>
       m_inHandle{ this, "containerInKey", "",   "Muon container to read" };
 
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
-
     Gaudi::Property<std::vector<std::string>> m_muonWPs
       { this, "muonWPs", {}, "Muon ID + ISO working points, not used to filter collection" };
-
-    std::vector<CP::SysReadDecorHandle<float>> m_mu_SF_in;
-    std::vector<CP::SysWriteDecorHandle<float>> m_mu_SF_out;
-
-    Gaudi::Property<std::vector<std::string>> m_muTrigSF
-      {this, "muonTriggerSF", {}, "List of muon trigger SF"};
-    std::vector<CP::SysReadDecorHandle<float>> m_muTriggerSF_in;
-    std::vector<CP::SysWriteDecorHandle<float>> m_muTriggerSF_out;
 
     std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;

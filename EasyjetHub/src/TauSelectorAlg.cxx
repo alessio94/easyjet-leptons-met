@@ -45,28 +45,6 @@ namespace Easyjet
     for(auto& handle : m_select_out)
       ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
 
-    // Scale factors
-    if(m_isMC){
-      for(const auto& wp : m_tauWPs){
-        m_tau_SF_in.emplace_back("effSF_"+wp+"_%SYS%", this);
-        m_tau_SF_out.emplace_back("effSF_"+wp+"_%SYS%", this);
-      }
-
-      for(const auto& trig : m_tauTrigSF){
-        m_tauTriggerSF_in.emplace_back("tau_trigEffSF_"+trig+"_%SYS%", this);
-        m_tauTriggerSF_out.emplace_back("tau_trigEffSF_"+trig+"_%SYS%", this);
-      }
-    }
-
-    for(auto& handle : m_tau_SF_in)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_tau_SF_out)
-      ATH_CHECK (handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-    for(auto& handle : m_tauTriggerSF_in)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
-    for(auto& handle : m_tauTriggerSF_out)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
-
     // Initialise syst-aware input/output decorators 
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
@@ -116,18 +94,6 @@ namespace Easyjet
         for(unsigned int i=0; i<m_tauWPs.size(); i++)
           m_select_out[i].set(*tau, m_select_in[i].get(*tau,sys), sys);
 
-        if(m_isMC){
-          for(unsigned int i=0; i<m_tauWPs.size(); i++){
-            std::string wp = m_tauWPs[i];
-            m_tau_SF_out[i].set(*tau, m_tau_SF_in[i].get(*tau,sys), sys);
-          }
-
-          for(unsigned int i=0; i<m_tauTrigSF.size(); i++){
-            m_tauTriggerSF_out[i].set
-	      (*tau, m_tauTriggerSF_in[i].get(*tau, sys), sys);
-          }
-        }
-
         // If cuts are passed, save the object
         workContainer->push_back(tau);
         m_isSelectedTau.set(*tau, true, sys);
@@ -163,11 +129,11 @@ namespace Easyjet
 
         // keep only the requested amount
         workContainer->erase(workContainer->begin() + nKeep,
-     			                   workContainer->end());
+			     workContainer->end());
       }
 
       //lead/sublead tau
-      if(m_tauAmount > 0){
+      if(m_tauAmount > 0){	
         int nTau = 0;
         for (const xAOD::TauJet *tau : *workContainer) {
           nTau++;

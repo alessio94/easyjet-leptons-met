@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Giulia Di Gregorio, Luis Falda
@@ -34,34 +34,40 @@ namespace ttHH
 
     ATH_CHECK (m_bjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_pairedJetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ttHHJetHandle.initialize(m_systematicsList));
 
     if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_ttHHJetHandle));
     }
     if (!m_PCBT.empty()) {
-      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_ttHHJetHandle));
     }
 
-    ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ttHHMuonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_ttHHElectronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_electronHandle));
-      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_electronHandle));
+      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_ttHHElectronHandle));
+      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_ttHHElectronHandle));
+      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_ttHHMuonHandle));
+      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_ttHHMuonHandle));
 
+      // For SF access
+      if(!m_saveDummy_ele_SF){
+        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+      }
+
+      ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
       ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
-      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_muonHandle));
-      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_muonHandle));
     }
 
-    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_electronHandle));
-    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_muonHandle));
+    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_ttHHElectronHandle));
+    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_ttHHMuonHandle));
 
     // Intialise syst-aware output decorators
 
@@ -101,7 +107,7 @@ namespace ttHH
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
       const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      ANA_CHECK (m_ttHHJetHandle.retrieve (jets, sys));
 
       const xAOD::JetContainer *bjets = nullptr;
       ANA_CHECK (m_bjetHandle.retrieve (bjets, sys));
@@ -113,7 +119,7 @@ namespace ttHH
       ANA_CHECK (m_pairedJetHandle.retrieve (pairedJets, sys));
 
       const xAOD::MuonContainer *muons = nullptr;
-      ANA_CHECK (m_muonHandle.retrieve (muons, sys));
+      ANA_CHECK (m_ttHHMuonHandle.retrieve (muons, sys));
 
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
@@ -135,7 +141,7 @@ namespace ttHH
       met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
 
       const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+      ANA_CHECK (m_ttHHElectronHandle.retrieve (electrons, sys));
 
       if (m_isSignal)
       {
@@ -461,7 +467,9 @@ namespace ttHH
         } else { // ele 
           const xAOD::Electron* electron0 = electrons->at(0);
           m_Ibranches.at("total_charge").set(*event, electron0->charge(), sys);
-          updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+          updateLeptonBranch(event, 1, electron0, 11,
+			     m_isMC && !m_saveDummy_ele_SF ?
+			     m_ele_SF.get(*electron0, sys) : 1.0 , sys);
 	  HTall = electron0->pt();
         }
 
@@ -495,18 +503,26 @@ namespace ttHH
           const xAOD::Electron* electron0 = electrons->at(0);
           if (muon0->pt()>electron0->pt()){
             updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
-            updateLeptonBranch(event, 2, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+            updateLeptonBranch(event, 2, electron0, 11,
+			       m_isMC && !m_saveDummy_ele_SF ?
+			       m_ele_SF.get(*electron0, sys) : 1.0 , sys);
           } else {
             updateLeptonBranch(event, 2, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
-            updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+            updateLeptonBranch(event, 1, electron0, 11,
+			       m_isMC && !m_saveDummy_ele_SF ?
+			       m_ele_SF.get(*electron0, sys) : 1.0 , sys);
           }
 
         } else { //ee
           
           const xAOD::Electron* electron0 = electrons->at(0);
           const xAOD::Electron* electron1 = electrons->at(1);          
-          updateLeptonBranch(event, 1, electron0, 11, m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
-          updateLeptonBranch(event, 2, electron1, 11, m_isMC ? m_ele_SF.get(*electron1, sys) : 1.0 , sys);
+          updateLeptonBranch(event, 1, electron0, 11,
+			     m_isMC && !m_saveDummy_ele_SF ?
+			     m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+          updateLeptonBranch(event, 2, electron1, 11,
+			     m_isMC && !m_saveDummy_ele_SF ?
+			     m_ele_SF.get(*electron1, sys) : 1.0 , sys);
         }
       } else { //not 2l
         m_Ibranches.at("dilept_type").set(*event, 0, sys);

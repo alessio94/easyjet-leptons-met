@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg, LeptonOrderingAlgCfg)
@@ -69,8 +70,9 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
         CompFactory.HHBBVV.BaselineVarsbbVVAlg(
             "BaselineVarsbbVVAlg",
             isMC=flags.Input.isMC,
-            muonWP=TightMuonWPLabel,
-            eleWP=TightEleWPLabel,
+            electrons=electronkey, eleWP=TightEleWPLabel,
+            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
+            muons=muonkey, muonWP=TightMuonWPLabel,
             floatVariableList=float_variables,
             intVariableList=int_variables,
             channel=flags.Analysis.channel,

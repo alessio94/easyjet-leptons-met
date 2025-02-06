@@ -1,8 +1,9 @@
-# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
+from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
@@ -121,10 +122,11 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                 "FinalVarsbbttAlg",
                 isMC=flags.Input.isMC,
                 useNonIsoLeptons=use_noniso_leptons,
-                eleWPs=ele_WPs,
-                muonWPs=muon_WPs,
+                electrons=electronkey, eleWPs=ele_WPs,
+                saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
+                muons=muonkey, muonWPs=muon_WPs,
+                taus=taukey, tauWP=flags.Analysis.Tau.extra_wps[0],
                 doMMC=flags.Analysis.do_mmc,
-                tauWP=flags.Analysis.Tau.extra_wps[0],
                 bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
                 floatVariableList=float_variables,
@@ -133,15 +135,18 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         )
 
     # calculate event trigger SF
-    cfg.addEventAlgo(
-        CompFactory.HHBBTT.TriggerSFAlg(
-            "TriggerSFAlg",
-            isMC=flags.Input.isMC,
-            eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
-            muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
-            tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau')
+    if flags.Input.isMC:
+        cfg.addEventAlgo(
+            CompFactory.HHBBTT.TriggerSFAlg(
+                "TriggerSFAlg",
+                eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
+                muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
+                tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),
+                electrons=electronkey,
+                muons=muonkey,
+                taus=taukey
+            )
         )
-    )
 
     return cfg
 

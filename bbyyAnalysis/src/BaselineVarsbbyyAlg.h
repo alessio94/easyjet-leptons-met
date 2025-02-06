@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -151,6 +151,7 @@ namespace HHBBYY
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
+  private:
     float compute_Topness(const xAOD::JetContainer *jets);
     std::vector<float> compute_EventShapes(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::PhotonContainer *photons);
     float compute_pTBalance(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::PhotonContainer *photons);
@@ -194,16 +195,11 @@ namespace HHBBYY
     std::vector<const xAOD::Jet*> getHbb_GNN_ggFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys);
     std::vector<const xAOD::Jet*> getHbb_GNN_VBFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys);
 
-
-  private:
-    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-    // "someInfo"};
-
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
+      m_bbyyJetHandle{ this, "bbyyJets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
@@ -216,15 +212,12 @@ namespace HHBBYY
     m_nmuons{ this, "nmuons", "n_muons_%SYS%", "Number of muons from muon-in-jet correction"};
 
     CP::SysReadHandle<xAOD::PhotonContainer>
-    m_photonHandle{ this, "photons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
+      m_bbyyPhotonHandle{ this, "bbyyPhotons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
+    CP::SysReadHandle<xAOD::PhotonContainer>
+      m_photonHandle{ this, "photons", "AnalysisPhotons_%SYS%", "Original photon container to read" };
+
     CP::SysReadDecorHandle<unsigned int> m_isEMTight
       {"DFCommonPhotonsIsEMTightIsEMValue", this};
-
-    CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "bbyyAnalysisElectrons_%SYS%", "Electron container to read" };
-
-    CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "bbyyAnalysisMuons_%SYS%", "Muon container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
     m_KFJetHandle{this, "KFJets", "", "KF Jet container to read"};
@@ -235,6 +228,9 @@ namespace HHBBYY
     Gaudi::Property<std::string> m_photonWPName
       { this, "photonWP", "", "Photon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ph_SF{"", this};
+    Gaudi::Property<bool> m_saveDummy_ph_SF
+      {this, "saveDummyPhotonSF", false,
+	  "To be used in case no recommendations are not available"};
 
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };

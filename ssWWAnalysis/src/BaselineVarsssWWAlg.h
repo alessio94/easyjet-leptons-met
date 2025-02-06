@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -41,13 +41,17 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "ssWWAnalysisJets_%SYS%", "Jet container to read" };
+      m_ssWWJetHandle{ this, "ssWWJets", "ssWWAnalysisJets_%SYS%", "Jet container to read" };
     
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "ssWWAnalysisElectrons_%SYS%", "Electron container to read" };
+      m_ssWWElectronHandle{ this, "ssWWElectrons", "ssWWAnalysisElectrons_%SYS%", "Electron container to read" };
+    CP::SysReadHandle<xAOD::ElectronContainer>
+      m_electronHandle{ this, "electrons", "AnalysisElectrons_%SYS%", "Original electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "ssWWAnalysisMuons_%SYS%", "Muon container to read" };
+      m_ssWWMuonHandle{ this, "ssWWMuons", "ssWWAnalysisMuons_%SYS%", "Muon container to read" };
+    CP::SysReadHandle<xAOD::MuonContainer>
+      m_muonHandle{ this, "muons", "AnalysisMuons_%SYS%", "Original muon container to read" };
 
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
@@ -61,6 +65,10 @@ private:
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
+    Gaudi::Property<bool> m_saveDummy_ele_SF
+      {this, "saveDummyEleSF", false,
+	  "To be used in case no recommendations are not available"};
+
     CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
     CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};
 

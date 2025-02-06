@@ -132,6 +132,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         cfg.merge(
             fullLep_cfg(
                 flags,
+                muonkey, electronkey,
                 float_variables=float_variable_names,
                 int_variables=int_variable_names)
         )
@@ -142,6 +143,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         cfg.merge(
             semiLep_cfg(
                 flags,
+                muonkey, electronkey,
                 float_variables=float_variable_names,
                 int_variables=int_variable_names)
         )

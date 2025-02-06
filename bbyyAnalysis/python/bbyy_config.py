@@ -100,7 +100,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
     cfg.addEventAlgo(
         CompFactory.HHBBYY.BaselineVarsbbyyAlg(
             "BaselineVarsbbyyAlg",
-            photonWP=SelectedPhotonLabel,
+            photons=photonkey, photonWP=SelectedPhotonLabel,
+            saveDummyPhotonSF=flags.GeoModel.Run is LHCPeriod.Run2,
             KFJets="bbyyAnalysisKFJets_%SYS%" if flags.Analysis.do_KinematicFit else "",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0],  # noqa

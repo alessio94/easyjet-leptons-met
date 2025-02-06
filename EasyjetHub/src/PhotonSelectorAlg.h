@@ -46,16 +46,8 @@ private:
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_inHandle{ this, "containerInKey", "",   "Photon container to read" };
 
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
-
     Gaudi::Property<std::vector<std::string>> m_photonWPs
       { this, "photonWPs", {},"Photon ID + Iso working points, not used to filter collection" };
-    Gaudi::Property<bool> m_saveDummySF
-      { this, "saveDummySF", false, "Store dummy SF=1 in case they are not available"};
-
-    std::vector<CP::SysReadDecorHandle<float>> m_ph_SF_in;
-    std::vector<CP::SysWriteDecorHandle<float>> m_ph_SF_out;
 
     std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;

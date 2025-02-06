@@ -28,18 +28,18 @@ namespace HHBBYY
     ATH_MSG_INFO("       BaselineVarsbbyyAlg       \n");
     ATH_MSG_INFO("*********************************\n");
 
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_bbyyJetHandle.initialize(m_systematicsList));
     if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_bbyyJetHandle));
     }
     if (!m_PCBT.empty()) {
-      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_jetHandle));
+      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_bbyyJetHandle));
     }
-    if (m_isMC) ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_jetHandle));
-    ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_jetHandle));
+    if (m_isMC) ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_bbyyJetHandle));
+    ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_bbyyJetHandle));
 
-    ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_isEMTight.initialize(m_systematicsList, m_photonHandle));
+    ATH_CHECK (m_bbyyPhotonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_isEMTight.initialize(m_systematicsList, m_bbyyPhotonHandle));
 
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
@@ -49,12 +49,13 @@ namespace HHBBYY
       ATH_CHECK (m_KF_MBB.initialize(m_systematicsList, m_eventHandle));
     }
 
-    ATH_CHECK (m_selected_ph.initialize(m_systematicsList, m_photonHandle));
+    ATH_CHECK (m_selected_ph.initialize(m_systematicsList, m_bbyyPhotonHandle));
 
-    if(m_isMC){
+    if(m_isMC && !m_saveDummy_ph_SF){
+      ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
       m_ph_SF = CP::SysReadDecorHandle<float>("effSF_"+m_photonWPName+"_%SYS%", this);
+      ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
     }
-    ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
     
     for (const std::string &string_var: m_floatVariables) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
@@ -116,10 +117,10 @@ namespace HHBBYY
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
 
       const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      ANA_CHECK (m_bbyyJetHandle.retrieve (jets, sys));
 
       const xAOD::PhotonContainer *photons = nullptr;
-      ANA_CHECK (m_photonHandle.retrieve (photons, sys));
+      ANA_CHECK (m_bbyyPhotonHandle.retrieve (photons, sys));
 
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
@@ -208,7 +209,8 @@ namespace HHBBYY
         m_Fbranches.at(prefix+"_E").set(*event, y.E(), sys);
         m_Ibranches.at(prefix+"_isEMTight").set(*event, m_isEMTight.get(*ph, sys), sys);
         if(m_isMC){
-          m_Fbranches.at(prefix+"_effSF").set(*event, m_ph_SF.get(*ph, sys), sys);
+          float SF = m_saveDummy_ph_SF ? 1. : m_ph_SF.get(*ph, sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
         }
       }
 
@@ -393,8 +395,8 @@ namespace HHBBYY
             m_Fbranches.at("KF_Phibbyy").set(*event, HH_KF.Phi(), sys);
             m_Fbranches.at("KF_dRHH").set(*event, H_yy.DeltaR(H_bb_KF), sys);
 
-	          //vbf jets selection KF
-	          ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_KFJet1, Hbb_KFJet2, KFJets, KF_HT, HH_KF, "KF_Jet_vbf_j", "KF_Jet_vbf_jj", eventFloats, event, sys));
+	    //vbf jets selection KF
+	    ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_KFJet1, Hbb_KFJet2, KFJets, KF_HT, HH_KF, "KF_Jet_vbf_j", "KF_Jet_vbf_jj", eventFloats, event, sys));
           }
 	  
           //mva variables

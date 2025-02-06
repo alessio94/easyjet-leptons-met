@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -55,21 +55,24 @@ private:
 
     CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "bbttAnalysisJets_%SYS%", "Jet container to read" };
-    
+
     CP::SysReadHandle<xAOD::ElectronContainer>
-      m_electronHandle{ this, "electrons", "bbttAnalysisElectrons_%SYS%", "Electron container to read" };
+      m_electronHandle{ this, "electrons", "AnalysisElectrons_%SYS%", "Original electron container to read" };
+    CP::SysReadHandle<xAOD::ElectronContainer>
+      m_bbttEleHandle{ this, "bbttElectrons", "bbttAnalysisElectrons_%SYS%", "bbtt electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-      m_muonHandle{ this, "muons", "bbttAnalysisMuons_%SYS%", "Muon container to read" };
+      m_muonHandle{ this, "muons", "AnalysisMuons_%SYS%", "Original muon container to read" };
+    CP::SysReadHandle<xAOD::MuonContainer>
+      m_bbttMuonHandle{ this, "bbttMuons", "bbttAnalysisMuons_%SYS%", "bbtt muon container to read" };
 
     CP::SysReadHandle<xAOD::TauJetContainer>
-      m_tauHandle{ this, "taus", "bbttAnalysisTaus_%SYS%", "Tau container to read" };
+      m_tauHandle{ this, "taus", "AnalysisTaus_%SYS%", "Original tau container to read" };
+    CP::SysReadHandle<xAOD::TauJetContainer>
+      m_bbttTauHandle{ this, "bbttTaus", "bbttAnalysisTaus_%SYS%", "bbtt tau container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
-
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<std::vector<std::string>> m_eleTrigSF
       {this, "eleTriggerSF", {}, "List of electron trigger SF"};
@@ -83,12 +86,9 @@ private:
       {this, "tauTriggerSF", {}, "List of tau trigger SF"};
     std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_tauTriggerSF;
 
-    CP::SysReadDecorHandle<bool> 
-      m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};
-    CP::SysReadDecorHandle<bool> 
-      m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input decorator for selected mu"};
-    CP::SysReadDecorHandle<bool> 
-      m_selected_tau { this, "selected_tau", "selected_tau_%SYS%", "Name of input decorator for selected tau"};
+    CP::SysReadDecorHandle<bool> m_selected_el{"selected_el_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
     
     CP::SysReadDecorHandle<unsigned int> m_year{this, "year", "dataTakingYear", ""};
 

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #ifndef EASYJET_ELECTRONSELECTORALG
@@ -46,22 +46,9 @@ private:
     CP::SysReadHandle<xAOD::ElectronContainer>
       m_inHandle{ this, "containerInKey", "",   "Electron container to read" };
 
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
-
     Gaudi::Property<std::vector<std::string>> m_eleWPs
       { this, "eleWPs", {},
 	  "electron ID + ISO working points, not used to filter collection" };
-    Gaudi::Property<bool> m_saveDummySF
-      { this, "saveDummySF", false, "Store dummy SF=1 in case they are not available"};
-
-    std::vector<CP::SysReadDecorHandle<float>> m_ele_SF_in;
-    std::vector<CP::SysWriteDecorHandle<float>> m_ele_SF_out;
-
-    Gaudi::Property<std::vector<std::string>> m_eleTrigSF
-      {this, "eleTriggerSF", {}, "List of electron trigger SF"};
-    std::vector<CP::SysReadDecorHandle<float>> m_eleTriggerSF_in;
-    std::vector<CP::SysWriteDecorHandle<float>> m_eleTriggerSF_out;
 
     std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;

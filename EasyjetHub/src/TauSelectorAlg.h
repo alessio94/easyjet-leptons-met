@@ -52,19 +52,8 @@ private:
     CP::SysReadDecorHandle<char> m_antiTau{"", this};
     CP::SysReadDecorHandle<char> m_IDTau{"", this};
 
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
-
     Gaudi::Property<std::vector<std::string>> m_tauWPs
       { this, "tauWPs", {}, "Tau ID working points, not used to filter collection" };
-
-    std::vector<CP::SysReadDecorHandle<float>> m_tau_SF_in;
-    std::vector<CP::SysWriteDecorHandle<float>> m_tau_SF_out;
-
-    Gaudi::Property<std::vector<std::string>> m_tauTrigSF
-      {this, "tauTriggerSF", {}, "List of tau trigger SF"};
-    std::vector<CP::SysReadDecorHandle<float>> m_tauTriggerSF_in;
-    std::vector<CP::SysWriteDecorHandle<float>> m_tauTriggerSF_out;
 
     std::vector<CP::SysReadDecorHandle<char>> m_select_in;
     std::vector<CP::SysWriteDecorHandle<char>> m_select_out;
