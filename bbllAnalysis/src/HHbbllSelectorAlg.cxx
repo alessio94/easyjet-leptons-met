@@ -126,10 +126,7 @@ namespace HHBBLL
         return StatusCode::FAILURE;
       }
 
-      m_bools.at(HHBBLL::Pass_ll) = false;
       m_bools.at(HHBBLL::IS_SF) = false;
-      m_bools.at(HHBBLL::IS_ee) = false;
-      m_bools.at(HHBBLL::IS_mm) = false;
       m_bools.at(HHBBLL::IS_em) = false;
       m_bools.at(HHBBLL::pass_trigger_SLT) = false;
       m_bools.at(HHBBLL::pass_trigger_DLT) = false;
@@ -168,7 +165,7 @@ namespace HHBBLL
       evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_bbllCuts, sys);
       evaluateLeptonCuts(*electrons, *muons, m_bbllCuts);
       evaluateJetCuts(*bjets, *nonbjets, m_bbllCuts);
-      evaluateBJetLeptonCuts(*bjets,  *electrons, *muons);
+      evaluateLeptonCuts(*electrons, *muons);
 
       bool passedall = true;
       for (const auto& [key, value] : m_boolnames) {
@@ -596,25 +593,15 @@ namespace HHBBLL
     if(bbllCuts.exists("VBFVETO_SR1")) m_bools.at(HHBBLL::VBFVETO_SR1) = VBFVeto;
   }
 
-  void HHbbllSelectorAlg::evaluateBJetLeptonCuts
-  (const ConstDataVector<xAOD::JetContainer>& bjets,
-   const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons)
+  void HHbbllSelectorAlg::evaluateLeptonCuts
+  (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons)
   {
-    bool TWO_ISO_ELECTRONS = (electrons.size() >= 2);
-    bool TWO_ISO_MUONS = (muons.size() >= 2);
-    bool TWO_ISO_ELECMUs = (electrons.size() == 1 && muons.size() == 1);
-    bool EXACTLY_TWO_B_JETS = bjets.size()==2;
-
-    bool IS_ee = electrons.size() == 2 && muons.size() == 0;
-    bool IS_mm = electrons.size() == 0 && muons.size() == 2;
+    bool EXACTLY_TWO_ISO_ELECTRONS = (electrons.size() == 2);
+    bool EXACTLY_TWO_ISO_MUONS = (muons.size() == 2);
     bool IS_em = electrons.size() == 1 && muons.size() == 1;
 
-    m_bools.at(HHBBLL::IS_ee) = IS_ee;
-    m_bools.at(HHBBLL::IS_mm) = IS_mm;
     m_bools.at(HHBBLL::IS_em) = IS_em;
-    m_bools.at(HHBBLL::IS_SF) = (IS_ee || IS_mm);
-    m_bools.at(HHBBLL::Pass_ll) = ((TWO_ISO_ELECTRONS || TWO_ISO_MUONS || TWO_ISO_ELECMUs) && EXACTLY_TWO_B_JETS);
-
+    m_bools.at(HHBBLL::IS_SF) = (EXACTLY_TWO_ISO_ELECTRONS || EXACTLY_TWO_ISO_MUONS);
   }
 
   void HHbbllSelectorAlg::setThresholds(const xAOD::EventInfo* event,

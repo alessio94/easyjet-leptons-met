@@ -46,10 +46,7 @@ namespace HHBBLL
 
   enum Booleans
   {
-    Pass_ll,
     IS_SF,
-    IS_ee,
-    IS_mm,
     IS_em,
     pass_trigger_SLT,
     pass_trigger_DLT,
@@ -149,10 +146,7 @@ namespace HHBBLL
       std::unordered_map<HHBBLL::Booleans, CP::SysWriteDecorHandle<bool> > m_Bbranches;
       std::unordered_map<HHBBLL::Booleans, bool> m_bools;
       std::unordered_map<HHBBLL::Booleans, std::string> m_boolnames{
-        {HHBBLL::Pass_ll, "Pass_ll"},
         {HHBBLL::IS_SF, "IS_SF"},
-        {HHBBLL::IS_ee, "IS_ee"},
-        {HHBBLL::IS_mm, "IS_mm"},
         {HHBBLL::IS_em, "IS_em"},
         {HHBBLL::pass_trigger_SLT, "pass_trigger_SLT"},
         {HHBBLL::pass_trigger_DLT, "pass_trigger_DLT"},
@@ -199,8 +193,7 @@ namespace HHBBLL
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
 			      const xAOD::MuonContainer& muons, CutManager& bbllCuts);
       void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts);
-      void evaluateBJetLeptonCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
-                          const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons);
+      void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons);
       void setThresholds(const xAOD::EventInfo* event,
 			 const CP::SystematicSet& sys);
       StatusCode initialiseCutflow();

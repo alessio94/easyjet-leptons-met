@@ -7,13 +7,13 @@ from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
-    JetSelectorAlgCfg, PhotonSelectorAlgCfg)
+    JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
 
-def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
+def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
              float_variables=None, int_variables=None, float_NW_variables=None,
              float_PNN_variables=None):
     if not float_variables:
@@ -26,11 +26,6 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
         float_PNN_variables = []
 
     cfg = ComponentAccumulator()
-
-    cfg.merge(PhotonSelectorAlgCfg(flags,
-                                   containerInKey=photonkey,
-                                   containerOutKey="bbllAnalysisPhotons_%SYS%",
-                                   minPt=20e3))
 
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
@@ -224,9 +219,6 @@ def bbll_branches(flags):
 
     branches += object_level_branches
 
-    branches += ["EventInfo.bbll_pass_sr_%SYS% -> bbll_pass_SR"
-                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
-
     if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
         for cut in cutList:
@@ -236,6 +228,8 @@ def bbll_branches(flags):
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbllSelectorAlg
     if flags.Analysis.store_high_level_variables:
+        branches += ["EventInfo.bbll_pass_sr_%SYS% -> bbll_pass_SR"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
         for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
             branches += \
                 [f"EventInfo.pass_trigger_{cat}_%SYS% -> bbll_pass_trigger_{cat}"

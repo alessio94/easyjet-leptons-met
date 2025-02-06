@@ -66,7 +66,6 @@ def bbll_job_cfg():
                 smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet, 
                 muonkey=flags.Analysis.container_names.output.muons,
                 electronkey=flags.Analysis.container_names.output.electrons,
-                photonkey=flags.Analysis.container_names.output.photons,
                 float_variables=float_variable_names,
                 int_variables=int_variable_names,
                 float_NW_variables=float_NW_variable_names,

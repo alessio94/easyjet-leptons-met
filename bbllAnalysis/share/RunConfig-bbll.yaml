@@ -17,7 +17,6 @@ do_muons: true
 do_electrons: true
 do_met : true
 do_mmc : false
-do_photons : true
 
 #PNN Score
 do_resonant_PNN: false
@@ -56,10 +55,6 @@ Lepton:
   amount: 2
   variables_int: ["isPrompt","truthOrigin", "truthType"]
 
-Photon:
-  ID: "Tight"
-  Iso: "FixedCutTight"
-
 # orthogonality studies  
 orthogonality:
   include: EasyjetHub/orth-config.yaml 
@@ -88,10 +83,7 @@ CutList :
 
 Categories :
       - IS_SF
-      - IS_ee
-      - IS_mm
       - IS_em
-      - Pass_ll
 
 # Include the TTree configuration and update details
 ttree_output:
@@ -103,7 +95,6 @@ ttree_output:
     muons: 'container_names.output.muons'
     electrons: 'container_names.output.electrons'
     met : 'container_names.output.met'
-    photons: 'container_names.output.photons'
   collection_options:
     small_R_jets:
       btag_info: true
