@@ -1,22 +1,30 @@
 # list of DSID of samples for which to store HF classification 
 # related information
 DSID_HF_class_samples:
-  - 410470 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_nonallhad
-  - 410472 #mc20 PhPy8EG_A14_ttbar_hdamp258p75_dil
-  - 410480 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_SingleLep
-  - 410482 #mc20 PhPy8EG_A14_ttbar_hdamp517p5_dil
-  - 411233 #mc20 PowhegHerwig7EvtGen_tt_hdamp258p75_713_SingleLep
-  - 411234 #mc20 PowhegHerwig7EvtGen_tt_hdamp258p75_713_dil
-  - 601229 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_SingleLep
-  - 601230 #mc23 PhPy8EG_A14_ttbar_hdamp258p75_dil
-  - 601491 #mc20 PhPy8EG_A14_ttbar_pThard1_dil
-  - 601497 #mc20 PhPy8EG_A14_ttbar_pThard1_singlelep
-  - 603190 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_bzd5_dilep_shower
-  - 603191 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_pTdef1_pThard1_dilep
-  - 603192 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_bzd5_ljets_shower
-  - 603193 #mc20 PhPy8_A14_NNPDF31_ttbb_4FS_pTdef1_pThard1_ljets
+  - 410470 #mc20 ttbar 5FS PhPy8 ljets (nonallhad)
+  - 410472 #mc20 ttbar 5FS PhPy8 dilep
+  - 601229 #mc23 ttbar 5FS PhPy8 ljets
+  - 601230 #mc23 ttbar 5FS PhPy8 dilep
+  - 411233 #mc20 ttbar 5FS PhH7 ljets 
+  - 411234 #mc20 ttbar 5FS PhH7 dilep
+  - 601414 #mc23 ttbar 5FS PhH7 dilep
+  - 601415 #mc23 ttbar 5FS PhH7 dilep
+  - 601497 #mc20 and mc23 ttbar 5FS PhPy8 pT_hard ljets
+  - 601491 #mc20 and mc23 ttbar 5FS PhPy8 pT_hard dilep
+  - 410480 #mc20 ttbar 5FS PhPy8 h_dump ljets
+  - 410482 #mc20 ttbar 5FS PhPy8 h_dump dilep
+  - 601398 #mc23 ttbar 5FS PhPy8 h_dump ljets
+  - 601399 #mc23 ttbar 5FS PhPy8 h_dump dilep
+  - 603192 #mc20 ttbb 4FS PhPy8 ljets
+  - 603190 #mc20 ttbb 4FS PhPy8 dilep
+  - 603193 #mc20 ttbb 4FS PhPy8 pT_hard ljets
+  - 603191 #mc20 ttbb 4FS PhPy8 pT_hard dilep
   - 603905 #mc20 ttbb PhH7 ljets
   - 603906 #mc20 ttbb PhH7 dilep
+  - 600737 #mc20 ttbb 4FS PhPy8 dipole recoil ljets
+  - 600738 #mc20 ttbb 4FS PhPy8 dipole recoil dilep
+  - 600792 #mc20 ttbb 4FS PhPy8 bornzerodamp ljets
+  - 600791 #mc20 ttbb 4FS PhPy8 bornzerodamp dilep
 
 # list of DSID of samples for which to store WLep related information
 # for overlap removal between samples
