@@ -179,7 +179,7 @@ namespace HHBBYY
         bool passPhoton_TightID_NonIsoWP = m_photonTNIWPDecorHandle.get(*photon, sys);
         bool passPhoton_LooseID_IsoWP = m_photonLIWPDecorHandle.get(*photon, sys);
 
-        m_selected_ph.set(*photon, passPhoton_TightID_NonIsoWP || passPhoton_LooseID_IsoWP, sys);
+        m_selected_ph.set(*photon, true, sys);
 
         if (passPhotonWP) n_photons++;
         if (passPhoton_TightID_NonIsoWP) n_TightID_NonIso_photons++;
