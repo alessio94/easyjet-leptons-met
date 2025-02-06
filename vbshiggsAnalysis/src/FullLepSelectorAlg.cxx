@@ -122,7 +122,7 @@ namespace VBSHIGGS{
       m_passallcuts.set(*event, pass_preselection, sys);
 
       // do the CUTFLOW only with sys="" -> NOSYS
-      if (sys.name()==""){
+      if (sys.name()=="" && m_saveCutFlow){
       
         // Compute total_events
         m_total_events+=1;

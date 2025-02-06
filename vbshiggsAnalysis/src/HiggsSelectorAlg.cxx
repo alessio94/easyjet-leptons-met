@@ -88,7 +88,7 @@ namespace VBSHIGGS{
             if ( nBjets == 1 ){
                 if (hjet1 != bJet1) hjet2 = bJet1;
             }
-            if (hjet1 && hjet2) {
+            if (hjet1 && hjet2 && nBjets >0) {
                 HiggsJetCandidates->push_back(hjet1);
                 HiggsJetCandidates->push_back(hjet2);
             }
