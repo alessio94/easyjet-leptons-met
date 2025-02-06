@@ -94,10 +94,10 @@ ntupler_bbll_mc20:
   script:
     - easyjet-test bbll-mc20
 
-ntupler_bbll_mc20_lite:
+ntupler_bbll_mc20_lite_syst:
   extends: .ntupler
   script:
-    - easyjet-test bbll-mc20-lite
+    - easyjet-test bbll-mc20-lite-syst
 
 ntupler_lltt_mc20:
   extends: .ntupler

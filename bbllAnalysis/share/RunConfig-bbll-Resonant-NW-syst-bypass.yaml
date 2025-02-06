@@ -1,4 +1,4 @@
-include: bbllAnalysis/RunConfig-bbll-Resonant-NW.yaml
+include: bbllAnalysis/RunConfig-bbll-Resonant-NW-bypass.yaml
 
 save_bbll_cutflow: false
 

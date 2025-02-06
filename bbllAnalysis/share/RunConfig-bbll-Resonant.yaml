@@ -1,6 +1,0 @@
-include: bbllAnalysis/RunConfig-bbll.yaml
-
-Electron:
-  forceFullSimConfig: true
-
-

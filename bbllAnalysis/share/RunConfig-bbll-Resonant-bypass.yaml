@@ -1,6 +1,0 @@
-include: bbllAnalysis/RunConfig-bbll-bypass.yaml
-
-Electron:
-  forceFullSimConfig: true
-
-
