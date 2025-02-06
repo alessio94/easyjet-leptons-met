@@ -68,9 +68,12 @@ def get_large_R_jet_branches(
 
     split_tags = flags.Input.AMITag.split("_")
     is_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5834")
+    is_valid_for_v02 = get_valid_ami_tag(split_tags, "p", "p6490")
     if lr_jet_type == "UFO" and is_valid_ptag:
         if tree_flags.collection_options.large_R_jets.btag_details:
-            large_R_jet_branches.variables += get_large_R_gn2_branches()
+            large_R_jet_branches.variables += get_large_R_gn2_branches(
+                is_valid_for_v02
+            )
         if flags.Analysis.Large_R_jet.GN2X_hbb_wps:
             large_R_jet_branches.variables += get_large_R_gn2_tag_branches(flags)
 
@@ -101,13 +104,20 @@ def get_substructure_branches(flags, lr_jet_type):
     return substructure_vars
 
 
-def get_large_R_gn2_branches():
+def get_large_R_gn2_branches(is_valid_for_v02):
     gn2_branches = [
         "GN2Xv01_phbb",
         "GN2Xv01_phcc",
         "GN2Xv01_ptop",
         "GN2Xv01_pqcd",
     ]
+    if is_valid_for_v02:
+        gn2_branches += [
+            "GN2Xv02_phbb",
+            "GN2Xv02_phcc",
+            "GN2Xv02_ptop",
+            "GN2Xv02_pqcd",
+        ]
     return gn2_branches
 
 

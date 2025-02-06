@@ -21,6 +21,8 @@ from EasyjetHub.output.ttree.minituple_config import minituple_cfg
 
 from XbbCalib.XbbCalib_config import XbbCalib_branches
 from XbbCalib.XbbCalib_config import XbbCalib_cfg
+from XbbCalib.ZbbjCalib_config import ZbbjCalib_branches
+from XbbCalib.ZbbjCalib_config import ZbbjCalib_cfg
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 
 def XbbCalib_job_cfg():
@@ -43,7 +45,7 @@ def XbbCalib_job_cfg():
     # For more sophistication this could be done using
     # custom BranchManagers
     extra_XbbCalib_branches = []
-    if flags.Analysis.do_XbbCalib:
+    if flags.Analysis.do_ttbarCalib:
         extra_XbbCalib_branches,float_variable_names,int_variable_names = XbbCalib_branches(flags)
 
         cfg.merge(
@@ -59,7 +61,20 @@ def XbbCalib_job_cfg():
             seqname
         )
         cfg.merge(event_counter_cfg("n_XbbCalib"), seqname)
+    elif flags.Analysis.do_ZbbjCalib:
+        extra_XbbCalib_branches,float_variable_names,int_variable_names = ZbbjCalib_branches(flags)
 
+        cfg.merge(
+            ZbbjCalib_cfg(
+                flags,
+                largejetkey=flags.Analysis.container_names.output.reco10UFOJet,
+                float_variables=float_variable_names,
+                int_variables=int_variable_names,
+            ),
+            seqname
+        )
+        cfg.merge(event_counter_cfg("n_ZbbjCalib"), seqname)
+        
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
     # rather than statically in the yaml
