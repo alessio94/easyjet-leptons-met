@@ -30,7 +30,7 @@ Small_R_jet:
   amount: 6
 
 Tau:
-  ID: "RNNMedium"
+  ID: "RNNMedium_eleid"
   amount: 0
   do_parent_decoration: true
 
