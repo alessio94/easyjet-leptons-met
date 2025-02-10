@@ -272,6 +272,16 @@ validator_ZCharm_mc20_lite:
   script:
     - easyjet-validate ZCharm-mc20-lite
 
+validator_llyy_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true 
+    - job: ntupler_llyy_mc20
+      artifacts: false 
+  script:
+    - easyjet-validate llyy-mc20
+
 # MC20 AF3
 
 validator_mc20af3_lite:
@@ -465,3 +475,13 @@ validator_bbyy_mc23_lite:
       artifacts: false 
   script:
     - easyjet-validate bbyy-mc23-lite
+
+validator_llyy_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true 
+    - job: ntupler_llyy_mc23
+      artifacts: false 
+  script:
+    - easyjet-validate llyy-mc23

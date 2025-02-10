@@ -64,6 +64,7 @@ declare -A DATAFILES=(
     [ssWW-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [ZCharm-mc20]=${PHYS_TTBAR_MC20}
     [ZCharm-mc20-lite]=${PHYSLITE_TTBAR_MC20}
+    [llyy-mc20]=${PHYS_TTBAR_MC20}
     # MC20 AF3
     [mc20af3-lite]=${PHYSLITE_SH4B_BOOSTED_MC20_AF3}
     [fast-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
@@ -86,6 +87,7 @@ declare -A DATAFILES=(
     [emtopo-mc23]=${PHYS_TTBAR_MC23}
     [hhml-mc23]=${PHYS_TTBAR_MC23}
     [hhml-mc23-lite]=${PHYSLITE_TTBAR_MC23}
+    [llyy-mc23]=${PHYS_TTBAR_MC23}
     # systematics enabled
     [syst-mc23]=${PHYS_TTBAR_MC23}
     # non-ntupler workflows
@@ -125,6 +127,7 @@ declare -A TESTS=(
     [ssWW-mc20-lite]="simple ssWW-ntupler"
     [ZCharm-mc20]="simple ZCharm-ntupler"
     [ZCharm-mc20-lite]="simple ZCharm-ntupler"
+    [llyy-mc20]="simple llyy-ntupler" 
     # MC20 AF3
     [mc20af3-lite]="simple easyjet-ntupler"
     [fast-mc20af3]="fast easyjet-ntupler"
@@ -148,6 +151,7 @@ declare -A TESTS=(
     [emtopo-mc23]="simple easyjet-ntupler"
     [hhml-mc23]="simple hhml-ntupler"
     [hhml-mc23-lite]="simple hhml-ntupler"
+    [llyy-mc23]="simple llyy-ntupler" 
     # non-ntupler
     [aod-fast-bbbb-mc23]="aod-fast bbbb-ntupler"
     [h5-fast-mc23]="h5-fast easyjet-ntupler"
@@ -182,6 +186,7 @@ declare -A CONFIGS=(
     [ssWW-mc20-lite]=ssWWAnalysis/RunConfig-Signal-ssWW-bypass.yaml
     [ZCharm-mc20]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
     [ZCharm-mc20-lite]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
+    [llyy-mc20]=HZallyyAnalysis/RunConfig-llyy-bypass.yaml
     # MC20 AF3
     [fast-mc20af3]=EasyjetHub/RunConfig-noEle.yaml
     [fast-mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE-noEle.yaml
@@ -200,6 +205,7 @@ declare -A CONFIGS=(
     [emtopo-mc23]=EasyjetHub/RunConfig-EMTopo.yaml
     [hhml-mc23]=multileptonAnalysis/RunConfig-multilepton-bypass.yaml
     [hhml-mc23-lite]=multileptonAnalysis/RunConfig-multilepton-bypass.yaml
+    [llyy-mc23]=HZallyyAnalysis/RunConfig-llyy-bypass.yaml
     # MC23 AF3
     [mc23af3]=EasyjetHub/RunConfig-noEle.yaml
     [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml

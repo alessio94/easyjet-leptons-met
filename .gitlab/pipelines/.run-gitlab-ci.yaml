@@ -144,6 +144,11 @@ ntupler_ZCharm_mc20_lite:
   script:
     - easyjet-test ZCharm-mc20-lite
 
+ntupler_llyy_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test llyy-mc20
+
 # MC20 AF3
 
 ntupler_mc20af3_lite:
@@ -217,6 +222,11 @@ ntupler_bbyy_mc23_lite:
   extends: .ntupler
   script:
     - easyjet-test bbyy-mc23-lite
+
+ntupler_llyy_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test llyy-mc23
 
 # Commented until ATLASG-2734 is solved
 #ntupler_bbtt_mc23_lite_syst:
