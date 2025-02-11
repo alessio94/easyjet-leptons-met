@@ -30,6 +30,10 @@ Small_R_jet:
   amount: 4
   variables_int_allJets: ["truthLabel", "PassWP", "pcbt"]
 
+  btag_egReductionB: "Medium"
+  btag_egReductionC: "Medium"
+  btag_egReductionLight: "Medium"
+
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
