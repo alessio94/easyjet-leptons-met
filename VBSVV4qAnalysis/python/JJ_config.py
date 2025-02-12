@@ -64,6 +64,7 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables,
+            loadDisCoJet=flags.Analysis.loadDisCoJet,
             loadGN2x=flags.Analysis.loadGN2x
         )
     )
@@ -95,6 +96,9 @@ def get_BaselineVarsJJAlg_variables(flags):
     jet_vars += ["Tau1_wta", "Tau2_wta", "Tau3_wta"]
     jet_vars += ["ZCut12", "KtDR", "Angularity"]
     jet_vars += ["FoxWolfram0", "FoxWolfram2", "Aplanarity", "PlanarFlow", "Qw"]
+    jet_vars += ["TruthLabel"]
+    if flags.Analysis.loadDisCoJet:
+        jet_vars += ["DisCoJet"]
     for object in ["SigJet1", "SigJet2"]:
         for var in jet_vars:
             float_variable_names.append(f"{object}_{var}")

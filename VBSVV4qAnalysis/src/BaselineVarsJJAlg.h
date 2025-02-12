@@ -16,6 +16,8 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 
+#include "BoostedJetTaggers/JSSTaggerUtils.h"
+
 namespace VBSVV4q{
 
     /// \brief An algorithm for counting containers
@@ -51,14 +53,23 @@ namespace VBSVV4q{
         CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
         //CP::SysReadDecorHandle<int> m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
+        // Xbb tagger
         Gaudi::Property<bool> m_loadGN2x { this, "loadGN2x", false, "retrieve GN2x information" };
         CP::SysReadDecorHandle<float> m_GN2Xv01_phbb = {this, "phbb", "GN2Xv01_phbb", "GN2Xv01_phbb"};
         CP::SysReadDecorHandle<float> m_GN2Xv01_phcc = {this, "phcc", "GN2Xv01_phcc", "GN2Xv01_phcc"};
         CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd = {this, "pqcd", "GN2Xv01_pqcd", "GN2Xv01_pqcd"};
         CP::SysReadDecorHandle<float> m_GN2Xv01_ptop = {this, "ptop", "GN2Xv01_ptop", "GN2Xv01_ptop"};        
 
+        // truth labelling
+        CP::SysReadDecorHandle<int> m_truth_label = {this, "TruthLabel", "R10TruthLabel_R22v1", "TruthLabel"};
+
+        // jss
         std::vector<std::string> m_JSS_list = {"ECF1", "ECF2", "ECF3", "Split12", "Split23", "Tau1_wta", "Tau2_wta", "Tau3_wta", "ZCut12",  "KtDR", "Angularity", "FoxWolfram0", "FoxWolfram2", "Aplanarity", "PlanarFlow", "Qw"};
         std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_JSS;
+
+        // boson tagger
+        Gaudi::Property<bool> m_loadDisCoJet { this, "loadDisCoJet", false, "retrieve DisCoJet information" };
+        CP::SysReadDecorHandle<float> m_discojet = {this, "discojet", "SmoothVContainedHPDisCoJet_HLScore", "discojet"};
 
         Gaudi::Property<std::vector<std::string>> m_floatVariables {this, "floatVariableList", {}, "Name list of floating variables"};
 

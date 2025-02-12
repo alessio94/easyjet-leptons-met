@@ -1,0 +1,95 @@
+####################################################################################
+# Title :
+# Smooth W/Z Tagger Config File for VanillaSD jets === DisCoJet Tagger
+#
+# Author :
+# Config file and tagger: Antonio Giannini <antonio.giannini@cern.ch>
+#
+# Description :
+# The simple W/Z tagger provides four smoothed cut functions :
+# - a lower cut on the jet mass 
+# - an upper cut on the jet mass
+# - an upper cut on DisCoJet score
+#
+# Jets:
+#   anti-kt R = 1.0 jets using UFOs as inputs (pile-up corrected with CSSK)
+#   Grooming: Soft Drop algorithm with beta = 1 and z_cut = 0.1
+#
+# The smoothed cut functions are parameterized in units of ! [GeV] ! for pT and mass
+#
+#
+# Tagger Descriptions :
+# - Fully contained W tagger 
+# - optimized for a flat signal efficiency of 50% in W' => WZ sample
+####################################################################################
+
+DecorationName: SmoothVContainedHPDisCoJet
+
+pTCutLow: 200.0
+
+pTCutHigh: 3000.0
+
+MassCutLow: (3.e+1)
+
+MassCutHigh: (1.e+11)
+
+ScoreCut: (9.0e-01)
+
+ConstTaggerFileName: ONNXModel_VVJJ_Model_m175RScaling_19nov22.onnx
+
+nPixelsEta: 40
+aEta: -1.
+bEta: 1.
+nPixelsPhi: 40
+aPhi: -1.
+bPhi: 1.
+nColors: 3
+DoRScaling: 1
+### the jet pT is in MeV
+RScaling_p0: 0.0761
+RScaling_p1: 379.e+3
+
+### DisCo model
+HLTaggerFileName: ONNXModel_VVJJ_Model_DisCoJet_v3p4_29jan23.onnx
+
+### features scaling
+pT_mean: 1057499.4322267568
+pT_std: 632815.5552974025
+CNN_mean: 0.41914928969317944
+CNN_std: 0.26219755550581314
+D2_mean: 1.843364652322218
+D2_std: 1.1233424322420948
+nTracks_mean: 34.496766414695436
+nTracks_std: 14.20516207469109
+ZCut12_mean: 0.17946512199714132
+ZCut12_std: 0.11242177597689654
+Tau1_wta_mean: 0.12169673107833152
+Tau1_wta_std: 0.10171421670837238
+Tau2_wta_mean: 0.034075931408149795
+Tau2_wta_std: 0.029437446243220068
+Tau3_wta_mean: 0.034075931408149795
+Tau3_wta_std: 0.029437446243220068
+KtDR_mean: 0.3436279364499411
+KtDR_std: 0.2514286294065179
+Split12_mean: 64898.5831341518
+Split12_std: 74130.9205989215
+Split23_mean: 15977.956458910798
+Split23_std: 19760.244720716877
+ECF1_mean: 926244.1366570235
+ECF1_std: 550186.3174721162
+ECF2_mean: 66886306777.9822
+ECF2_std: 100074973335.11166
+ECF3_mean: 1825952364676673.2
+ECF3_std: 8517381932740778.0
+Angularity_mean: 0.0029476792696605395
+Angularity_std: 0.005341696806448512
+FoxWolfram0_mean: -1.0956076963703285
+FoxWolfram0_std: 1219.4039921708675
+FoxWolfram2_mean: -1.2871217526426613
+FoxWolfram2_std: 1219.403759784504
+Aplanarity_mean: -1.4568905868200512
+Aplanarity_std: 1219.4035489655118
+PlanarFlow_mean: 0.45121124369841187
+PlanarFlow_std: 0.25586101842436065
+Qw_mean: 40822.27313412783
+Qw_std: 36040.22166934536

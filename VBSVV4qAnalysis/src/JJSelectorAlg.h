@@ -57,7 +57,7 @@ namespace VBSVV4q{
       void eventCategorisation();
 
       StatusCode initialiseCutflow();
-      
+
       Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
       /// \brief Setup syst-aware input container handles

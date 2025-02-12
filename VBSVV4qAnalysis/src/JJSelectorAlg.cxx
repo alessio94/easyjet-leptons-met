@@ -46,6 +46,7 @@ namespace VBSVV4q{
     ATH_CHECK (m_systematicsList.initialize());
 
     if (m_saveCutFlow) ATH_CHECK (initialiseCutflow());
+
     return StatusCode::SUCCESS;
   }
   

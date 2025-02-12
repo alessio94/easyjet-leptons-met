@@ -55,6 +55,11 @@ namespace VBSVV4q{
         ATH_CHECK(m_JSS.at(jss).initialize(m_systematicsList, m_LargeRJetsHandle));
       }
 
+      ATH_CHECK (m_truth_label.initialize(m_systematicsList, m_LargeRJetsHandle));
+      
+      // boson tagger
+      ATH_CHECK (m_discojet.initialize(m_systematicsList, m_LargeRJetsHandle));
+
       // Intialise syst list (must come after all syst-aware inputs and outputs)
       ATH_CHECK (m_systematicsList.initialize());
 
@@ -119,13 +124,15 @@ namespace VBSVV4q{
         for ( auto jet : *SigLargeRJets ){
           iii++;
 
+          // kinematics
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_pT").set(*event, jet->pt(), sys);
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_eta").set(*event, jet->eta(), sys);
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_phi").set(*event, jet->phi(), sys);
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_E").set(*event, jet->e(), sys); 
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_M").set(*event, jet->m(), sys); 
 
-          float phbb (-99.), phcc (-99.), pqcd (-99.), ptop (-99.);
+          // xbb tagger
+      	  float phbb (-99.), phcc (-99.), pqcd (-99.), ptop (-99.);
           if(m_loadGN2x){
             phbb = m_GN2Xv01_phbb.get(*jet, sys);
             phcc = m_GN2Xv01_phcc.get(*jet, sys);
@@ -142,6 +149,12 @@ namespace VBSVV4q{
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_ptop").set(*event, ptop, sys);
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_DXbb").set(*event, XbbScore, sys);
 
+          // truth labelling
+          int tlabel (-99);
+          tlabel = m_truth_label.get(*jet, sys);
+          m_Fbranches.at("SigJet" + std::to_string(iii) + "_TruthLabel").set(*event, tlabel, sys);
+
+          // jss variables
           for(const auto & jss : m_JSS_list){
             float jss_var = m_JSS.at(jss).get(*jet, sys);
             m_Fbranches.at("SigJet" + std::to_string(iii) + "_" + jss).set(*event, jss_var, sys);
@@ -151,6 +164,13 @@ namespace VBSVV4q{
             float D2 = m_JSS.at("ECF3").get(*jet, sys) * std::pow( m_JSS.at("ECF1").get(*jet, sys), 3.0 ) / std::pow( m_JSS.at("ECF2").get(*jet, sys), 3.0 );
             m_Fbranches.at("SigJet" + std::to_string(iii) + "_D2").set(*event, D2, sys);
           }
+
+          // boson tagger
+          float discojet (-99.);
+          if(m_loadDisCoJet){
+            discojet = m_discojet.get(*jet, sys);
+          }
+          m_Fbranches.at("SigJet" + std::to_string(iii) + "_DisCoJet").set(*event, discojet, sys); 
 
         }
 

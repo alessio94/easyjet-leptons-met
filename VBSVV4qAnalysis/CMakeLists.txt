@@ -23,6 +23,7 @@ atlas_add_component(VBSVV4qAnalysis
   TriggerMatchingToolLib
   EventBookkeeperToolsLib
   EasyjetHubLib
+  BoostedJetTaggersLib
 )
 
 # Install python modules, joboptions, and share content
@@ -34,7 +35,7 @@ atlas_install_python_modules(
   python/*.py
 )
 atlas_install_data(
-  share/*.yaml
+  share/*
   )
 
 # atlas_install_data( data/* )
