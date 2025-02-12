@@ -1,4 +1,4 @@
-#include "h5histograms.h"
+#include "HDF5Utils/histogram.h"
 #include "MassPlaneBoostHistograms.h"
 #include "xAODJet/Jet.h"
 
@@ -183,6 +183,7 @@ namespace bhist {
 
   void MassHist::write(H5::Group& group) {
     H5::Group sub = group.createGroup(m_name);
+    namespace h5h = H5Utils::hist;
     h5h::write_hist_to_group(sub, m_hist, "h1h2");
     h5h::write_hist_to_group(sub, m_dihiggs, "hh");
   }

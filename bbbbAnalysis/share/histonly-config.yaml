@@ -32,4 +32,6 @@ Trigger:
 do_CP_systematics: true
 systematics_regex: [".*"]
 
+# special for hist configuration
 histograms: true
+save_bbbb_cutflow: false

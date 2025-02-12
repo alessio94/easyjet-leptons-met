@@ -1,4 +1,4 @@
-#include "h5histograms.h"
+#include "HDF5Utils/histogram.h"
 #include "JetBoostHistograms.h"
 #include "xAODJet/Jet.h"
 
@@ -144,7 +144,7 @@ namespace bhist {
   }
   template <typename T, typename F>
   void JetHist<T,F>::write(H5::Group& group) {
-    h5h::write_hist_to_group(group, m_histogram, m_name);
+    H5Utils::hist::write_hist_to_group(group, m_histogram, m_name);
   }
 
 
@@ -157,7 +157,7 @@ namespace bhist {
     m_histogram(weight);
   }
   void WeightHist::write(H5::Group& group) {
-    h5h::write_hist_to_group(group, m_histogram, "weights");
+    H5Utils::hist::write_hist_to_group(group, m_histogram, "weights");
   }
 
 }
