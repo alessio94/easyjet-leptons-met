@@ -164,6 +164,8 @@ namespace HHBBYY
       std::unordered_map<std::string, std::string> m_triggerMap{
         {"HLT_g120_loose", "single_photon"},
         {"HLT_g140_loose", "single_photon"},
+        {"HLT_g140_loose_L1EM22VHI", "single_photon"},
+        {"HLT_g140_loose_L1eEM26M", "single_photon"},
         {"HLT_g35_loose_g25_loose", "diphoton"},
         {"HLT_g35_medium_g25_medium_L12EM20VH", "diphoton"},
         {"HLT_g35_medium_g25_medium_L12eEM24L", "diphoton"}
