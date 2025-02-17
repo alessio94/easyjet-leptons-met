@@ -41,7 +41,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         containerInKey=smalljetkey,
         containerOutKey="bbyyAnalysisJets_%SYS%",
         PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0], # noqa
-        minPt=25. * Units.GeV,
+        minPt=float(flags.Analysis.Small_R_jet.min_pT),
         pTsort=False,
         PCBTsort=True,
         bTagWPDecorName="",
