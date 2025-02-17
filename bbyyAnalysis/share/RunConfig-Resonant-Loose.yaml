@@ -5,6 +5,9 @@ enable_single_photon_trigger: true
 
 Small_R_jet:
   min_pT: 20.e+3
+  btag_egReductionB: "Loose"
+  btag_egReductionC: "Loose"
+  btag_egReductionLight: "Loose"
 
 CutList :
       - PASS_TRIGGER
