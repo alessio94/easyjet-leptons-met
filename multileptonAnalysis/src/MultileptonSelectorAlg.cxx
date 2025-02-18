@@ -40,6 +40,10 @@ namespace MULTILEPTON
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK(m_is22_75bunches.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is23_75bunches.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is23_400bunches.initialize(m_systematicsList, m_eventHandle));
+
     ATH_CHECK (m_matchingTool.retrieve());
 
     // Intialise booleans with value false. Also initialise syst-aware output decorators
@@ -294,33 +298,32 @@ namespace MULTILEPTON
         "HLT_e140_lhloose_nod0"
       };
     }
-    // TODO: Add 2022 and 2023 triggers
-    // else if(m_is22_75bunches.get(*event, sys)){
-    //   single_ele_paths = {
-    //     "HLT_e17_lhvloose_L1EM15VHI", "HLT_e20_lhvloose_L1EM15VH",
-    //     "HLT_e250_etcut_L1EM22VHI"
-    //   };
-    // }
-    // else if(year==2022){
-    //   single_ele_paths = {
-    //     "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
-    //     "HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
-    //   };
-    // }
-    // else if(m_is23_75bunches.get(*event, sys)){
-    //   single_ele_paths = {
-    //     "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
-    //     "HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
-    //     "HLT_e300_etcut_L1EM22VHI"
-    //   };
-    // }
-    // else if(year==2023){
-    //   single_ele_paths = {
-    //     "HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M",
-    //     "HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
-    //     "HLT_e300_etcut_L1eEM26M"
-    //   };
-    // }
+    else if(m_is22_75bunches.get(*event, sys)){
+      single_ele_paths = {
+        "HLT_e17_lhvloose_L1EM15VHI", "HLT_e20_lhvloose_L1EM15VH",
+        "HLT_e250_etcut_L1EM22VHI"
+      };
+    }
+    else if(year==2022){
+      single_ele_paths = {
+        "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
+        "HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
+      };
+    }
+    else if(m_is23_75bunches.get(*event, sys)){
+      single_ele_paths = {
+        "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
+        "HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
+        "HLT_e300_etcut_L1EM22VHI"
+      };
+    }
+    else if(year==2023){
+      single_ele_paths = {
+        "HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M",
+        "HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
+        "HLT_e300_etcut_L1eEM26M"
+      };
+    }
 
     bool trigPassed_SET = false;
     if (electrons){
@@ -344,17 +347,16 @@ namespace MULTILEPTON
     else if(2016<=year && year<=2018){
       single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
     }
-    // TODO: Add 2022 and 2023 triggers
-    // else if(2022<=year && year<=2023 &&
-	  //   !m_is22_75bunches.get(*event, sys) &&
-	  //   !m_is23_75bunches.get(*event, sys) &&
-	  //   !m_is23_400bunches.get(*event, sys)){
-    //   single_mu_paths = {
-    //     "HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
-    //     "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
-    //     "HLT_mu80_msonly_3layersEC_L1MU14FCH"
-    //   };
-    // }
+    else if(2022<=year && year<=2023 &&
+	    !m_is22_75bunches.get(*event, sys) &&
+	    !m_is23_75bunches.get(*event, sys) &&
+	    !m_is23_400bunches.get(*event, sys)){
+      single_mu_paths = {
+        "HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
+        "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
+        "HLT_mu80_msonly_3layersEC_L1MU14FCH"
+      };
+    }
 
     bool trigPassed_SMT = false;
     if (muons){
@@ -391,17 +393,16 @@ namespace MULTILEPTON
         "HLT_2e24_lhvloose_nod0"
       };
     }
-    // TODO: Add 2022 and 2023 triggers
-    // else if(year==2022){
-    //   di_ele_paths = {
-    //     "HLT_2e17_lhvloose_L12EM15VHI", "HLT_2e24_lhvloose_L12EM20VH"
-    //   };
-    // }
-    // else if(year==2023){
-    //   di_ele_paths = {
-    //     "HLT_2e17_lhvloose_L12eEM18M", "HLT_2e24_lhvloose_L12eEM24L"
-    //   };
-    // }
+    else if(year==2022){
+      di_ele_paths = {
+        "HLT_2e17_lhvloose_L12EM15VHI", "HLT_2e24_lhvloose_L12EM20VH"
+      };
+    }
+    else if(year==2023){
+      di_ele_paths = {
+        "HLT_2e17_lhvloose_L12eEM18M", "HLT_2e24_lhvloose_L12eEM24L"
+      };
+    }
 
     bool trigPassed_DET = false;
     if (electrons && electrons->size() >= 2){
@@ -434,10 +435,9 @@ namespace MULTILEPTON
     else if(2016<=year && year<=2018){
       di_mu_paths = {"HLT_mu22_mu8noL1"};
     }
-    // TODO: Add 2022 and 2023 triggers
-    // else if(2022<=year && year<=2023){
-    //   di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
-    // }
+    else if(2022<=year && year<=2023){
+      di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
+    }
 
     bool trigPassed_DMT = false;
     if (muons && muons->size() >= 2){
@@ -469,10 +469,9 @@ namespace MULTILEPTON
     else if(2016<=year && year<=2018){
       emu_paths = {"HLT_e17_lhloose_nod0_mu14"};
     }
-    // TODO: Add 2022 and 2023 triggers
-    // else if(2022<=year && year<=2023){
-    //   emu_paths = {"HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
-    // }
+    else if(2022<=year && year<=2023){
+      emu_paths = {"HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
+    }
     bool trigPassed_EMT = false;
     if (electrons && muons){
       for(const auto& trig : emu_paths){
@@ -852,10 +851,9 @@ namespace MULTILEPTON
     // electron
     if(year==2015)
       m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele] = 25. * Athena::Units::GeV;
-    // TODO: Add 2022 and 2023 triggers
     // 2022 75 bunches
-    // else if(m_is22_75bunches.get(*event, sys))
-    //   m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele] = 18. * Athena::Units::GeV;
+    else if(m_is22_75bunches.get(*event, sys))
+      m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele] = 18. * Athena::Units::GeV;
     else
       m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::ele] = 27. * Athena::Units::GeV;
 
@@ -864,9 +862,8 @@ namespace MULTILEPTON
       m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 21. * Athena::Units::GeV;
     else if(year>=2016 && year<=2018)
       m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 27. * Athena::Units::GeV;
-    // TODO: Add 2022 and 2023 triggers
-    // else
-    //   m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 25. * Athena::Units::GeV;
+    else
+      m_pt_threshold[MULTILEPTON::SLT][MULTILEPTON::mu] = 25. * Athena::Units::GeV;
 
 
     //Di-lepton triggers
@@ -889,15 +886,13 @@ namespace MULTILEPTON
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 9. * Athena::Units::GeV;
     }
     else if(year>=2016 && year<=2018) {
-      // TODO: why bbll set cut on 24 & 10 GeV?
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 23. * Athena::Units::GeV;
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 9. * Athena::Units::GeV;
     } 
-    // TODO: Add 2022 and 2023 triggers
-    // else {
-    //   m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 15. * Athena::Units::GeV;
-    //   m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 15. * Athena::Units::GeV;
-    // }
+    else {
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 15. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 15. * Athena::Units::GeV;
+    }
 
     //Asymmetric Lepton triggers
     m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingele] = 18. * Athena::Units::GeV;

@@ -117,6 +117,13 @@ private:
     CP::SysReadDecorHandle<unsigned int> m_year{
         this, "year", "dataTakingYear",""};
 
+    CP::SysReadDecorHandle<bool> m_is22_75bunches{
+        this, "is2022_75bunches", "is2022_75bunches", ""};
+    CP::SysReadDecorHandle<bool> m_is23_75bunches{
+        this, "is2023_75bunches", "is2023_75bunches", ""};
+    CP::SysReadDecorHandle<bool> m_is23_400bunches{
+        this, "is2023_400bunches", "is2023_400bunches", ""};
+
     CP::SysFilterReporterParams m_filterParams{
         this, "Multilepton selection"};
 
