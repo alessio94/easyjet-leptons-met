@@ -114,6 +114,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             electrons="vbshiggsAnalysisElectrons_%SYS%",
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             triggerLists=trigger_branches,
+            saveHighLevelVariables=flags.Analysis.save_high_level_variables,
         )
     )
 

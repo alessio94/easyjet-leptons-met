@@ -44,6 +44,23 @@ namespace VBSHIGGS
       ATH_CHECK(m_runBooleans_key.at(runBool).initialize());
     }
 
+    if(m_saveHighLevelVariables) {
+      ANA_CHECK(ele0_passSET_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(ele1_passSET_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(mu0_passSMT_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(mu1_passSMT_decor.initialize(m_systematicsList, m_eventHandle));
+
+      ANA_CHECK(ele0_trigPassed_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(ele1_trigPassed_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(mu0_trigPassed_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(mu1_trigPassed_decor.initialize(m_systematicsList, m_eventHandle));
+
+      ANA_CHECK(ele0_trigMatched_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(ele1_trigMatched_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(mu0_trigMatched_decor.initialize(m_systematicsList, m_eventHandle));
+      ANA_CHECK(mu1_trigMatched_decor.initialize(m_systematicsList, m_eventHandle));
+    }
+
     ////////////////////////////////
 
     ATH_CHECK (m_systematicsList.initialize());
@@ -78,6 +95,16 @@ namespace VBSHIGGS
       for (auto& [channel, var] : m_trig_bools) {
         m_trig_branches.at(channel).set(*event, var, sys);
       }
+
+      ele0_trigPassed.clear();
+      ele1_trigPassed.clear();
+      mu0_trigPassed.clear();
+      mu1_trigPassed.clear();
+
+      ele0_trigMatched.clear();
+      ele1_trigMatched.clear();
+      mu0_trigMatched.clear();
+      mu1_trigMatched.clear();
 
     }
     return StatusCode::SUCCESS;
@@ -117,16 +144,36 @@ namespace VBSHIGGS
       mu0 = muons->at(0);
     }
 
-
     // Based on decision of group, only SLT will remain in the analysis code
-    if (ele0 || mu0) evaluateSingleLeptonTrigger(event, runBoolDecos, ele0, mu0, sys);
-    if (ele1 || mu1) evaluateSingleLeptonTrigger(event, runBoolDecos, ele1, mu1, sys);
+    if (ele0 || mu0) evaluateSingleLeptonTrigger(event, runBoolDecos, ele0, mu0, sys, ele0_trigPassed, mu0_trigPassed, ele0_trigMatched, mu0_trigMatched, ele0_passSET, mu0_passSMT);
+    if (ele1 || mu1) evaluateSingleLeptonTrigger(event, runBoolDecos, ele1, mu1, sys, ele1_trigPassed, mu1_trigPassed, ele1_trigMatched, mu1_trigMatched, ele1_passSET, mu1_passSMT);
+
+    if(m_saveHighLevelVariables) {
+      // Store the output as decorators which will be written into the nTuples
+      ele0_passSET_decor.set(*event, ele0_passSET, sys);
+      ele1_passSET_decor.set(*event, ele1_passSET, sys);
+      mu0_passSMT_decor.set(*event, mu0_passSMT, sys);
+      mu1_passSMT_decor.set(*event, mu1_passSMT, sys);
+
+      ele0_trigPassed_decor.set(*event, ele0_trigPassed, sys);
+      ele1_trigPassed_decor.set(*event, ele1_trigPassed, sys);
+      mu0_trigPassed_decor.set(*event, mu0_trigPassed, sys);
+      mu1_trigPassed_decor.set(*event, mu1_trigPassed, sys);
+
+      ele0_trigMatched_decor.set(*event, ele0_trigMatched, sys);
+      ele1_trigMatched_decor.set(*event, ele1_trigMatched, sys);
+      mu0_trigMatched_decor.set(*event, mu0_trigMatched, sys);
+      mu1_trigMatched_decor.set(*event, mu1_trigMatched, sys);
+    }
   }
 
   void TriggerDecoratorAlg::evaluateSingleLeptonTrigger
   (const xAOD::EventInfo *event, const runBoolReadDecoMap& runBoolDecos,
    const xAOD::Electron *ele, const xAOD::Muon *mu,
-   const CP::SystematicSet& sys)
+   const CP::SystematicSet& sys,
+   std::vector<std::string>& ele_trigPassed, std::vector<std::string>& mu_trigPassed,
+   std::vector<std::string>& ele_trigMatched, std::vector<std::string>& mu_trigMatched,
+   bool& ele_passSET, bool& mu_passSMT)
   {
 
     // Check single electron triggers
@@ -139,11 +186,14 @@ namespace VBSHIGGS
       for(const auto& trig : single_ele_paths){
         bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
         if (pass){
+          if(m_saveHighLevelVariables) ele_trigPassed.push_back(trig); // Record trigger name if it is passed for the electron
           bool match = m_matchingTool->match(*ele, trig);
+          if (match & m_saveHighLevelVariables) ele_trigMatched.push_back(trig); // Record trigger name if it is matched for the electron
           trigPassed_SET |= match;
         }
       }
       trigPassed_SET &= ele->pt() > m_pt_threshold[VBSHIGGS::SLT][VBSHIGGS::ele];
+      ele_passSET = trigPassed_SET;
     }
 
     // Check single muon triggers
@@ -155,18 +205,20 @@ namespace VBSHIGGS
       for(const auto& trig : single_mu_paths){
         bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
         if (pass){
+          if(m_saveHighLevelVariables) mu_trigPassed.push_back(trig); // Record trigger name if it is passed for the muon
           bool match = m_matchingTool->match(*mu, trig);
+          if (match & m_saveHighLevelVariables) mu_trigMatched.push_back(trig); // Record trigger name if it is matched for the muon
           trigPassed_SMT |= match;
         }
       }
       trigPassed_SMT &= mu->pt() > m_pt_threshold[VBSHIGGS::SLT][VBSHIGGS::mu];
+      mu_passSMT = trigPassed_SMT;
     }
 
     if(trigPassed_SET || trigPassed_SMT){
       m_trig_bools.at(VBSHIGGS::SLT) = true;
     }
   }
-
 
   void TriggerDecoratorAlg::setThresholds(const xAOD::EventInfo* event,
 					const runBoolReadDecoMap& runBoolDecos, const CP::SystematicSet& sys) {

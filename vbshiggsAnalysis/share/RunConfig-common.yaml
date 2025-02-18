@@ -2,6 +2,9 @@ include: EasyjetHub/base-config.yaml
 
 do_CP_systematics: false
 
+# Variables that we would want for nominal only nTuples
+save_high_level_variables: true
+
 ### tagging jets vs RNN strategy
 ### false: select tagging jets ---> higgs candidate jets
 ### true : select higgs candidate jets ---> load VBF-RNN

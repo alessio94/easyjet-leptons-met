@@ -162,4 +162,12 @@ def fullLep_branches(flags):
             for reg in regs:
                 branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}_%SYS%']
 
+    if flags.Analysis.save_high_level_variables:
+        for cat in ["ele0_passSET", "ele1_passSET", "mu0_passSMT", "mu1_passSMT",
+                    "ele0_trigPassed", "ele1_trigPassed",
+                    "mu0_trigPassed", "mu1_trigPassed",
+                    "ele0_trigMatched", "ele1_trigMatched",
+                    "mu0_trigMatched", "mu1_trigMatched"]:
+            branches += [f"EventInfo.{cat}_%SYS% -> {cat}_%SYS%"]
+
     return branches, float_variable_names, int_variable_names
