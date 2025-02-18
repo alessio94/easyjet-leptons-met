@@ -11,7 +11,9 @@ add_compile_options(-Werror)
 atlas_add_component(XbbCalib
   src/BaselineVarsXbbCalibAlg.cxx
   src/BaselineVarsZbbjCalibAlg.cxx
+  src/BaselineVarsZllCalibAlg.cxx
   src/ZbbjCalibSelectorAlg.cxx
+  src/ZllCalibSelectorAlg.cxx
   src/XbbCalibSelectorAlg.cxx
   src/components/XbbCalib_entries.cxx
   LINK_LIBRARIES
@@ -36,6 +38,7 @@ atlas_install_scripts(
 atlas_install_python_modules(
   python/XbbCalib_config.py
   python/ZbbjCalib_config.py
+  python/ZllCalib_config.py
 )
 atlas_install_data(
   share/*.yaml
