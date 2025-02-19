@@ -74,6 +74,9 @@ def main():
         "--nFilesPerJob", default=None, help="How many files to process per job"
     )
     parser.add_argument(
+        "--maxNFilesPerJob", default=None, help="Max files per job"
+    )
+    parser.add_argument(
         "--nFiles", default=None, help="How many files to run on"
     )
     parser.add_argument(
@@ -163,6 +166,8 @@ def main():
         submit_opts["nGBPerJob"] = args.nGBperJob
     if args.nFilesPerJob is not None:
         submit_opts["nFilesPerJob"] = args.nFilesPerJob
+    if args.maxNFilesPerJob is not None:
+        submit_opts["maxNFilesPerJob"] = args.maxNFilesPerJob   
     if args.nFiles is not None:
         submit_opts["nFiles"] = args.nFiles
     if args.nCore is not None:
