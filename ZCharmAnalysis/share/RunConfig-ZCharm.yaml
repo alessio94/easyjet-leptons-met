@@ -1,5 +1,10 @@
 include: EasyjetHub/base-config.yaml
 
+GRL:
+  # good runs lists to filter events
+  files:
+    include: EasyjetHub/lepton_grl.yaml
+
 # Which analysis to consider
 do_ZCharm_analysis: true
 
@@ -29,6 +34,7 @@ Small_R_jet:
     - GN2v01_Continuous
     - GN2v01_FixedCutBEff_77
     - GN2v01_FixedCutBEff_70
+  useFJvt: true
   
   variables_int_bjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]    
   variables_int_cjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]
