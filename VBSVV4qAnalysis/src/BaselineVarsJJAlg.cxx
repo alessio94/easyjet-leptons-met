@@ -54,8 +54,8 @@ namespace VBSVV4q{
         m_JSS.emplace(jss, CP::SysReadDecorHandle<float>(jss, this));
         ATH_CHECK(m_JSS.at(jss).initialize(m_systematicsList, m_LargeRJetsHandle));
       }
-
-      ATH_CHECK (m_truth_label.initialize(m_systematicsList, m_LargeRJetsHandle));
+      if (m_isMC)
+        ATH_CHECK (m_truth_label.initialize(m_systematicsList, m_LargeRJetsHandle));
       
       // boson tagger
       ATH_CHECK (m_discojet.initialize(m_systematicsList, m_LargeRJetsHandle));
@@ -150,10 +150,11 @@ namespace VBSVV4q{
           m_Fbranches.at("SigJet" + std::to_string(iii) + "_DXbb").set(*event, XbbScore, sys);
 
           // truth labelling
-          int tlabel (-99);
-          tlabel = m_truth_label.get(*jet, sys);
-          m_Fbranches.at("SigJet" + std::to_string(iii) + "_TruthLabel").set(*event, tlabel, sys);
-
+          if (m_isMC){
+            int tlabel (-99);
+            tlabel = m_truth_label.get(*jet, sys);
+            m_Fbranches.at("SigJet" + std::to_string(iii) + "_TruthLabel").set(*event, tlabel, sys);
+          }
           // jss variables
           for(const auto & jss : m_JSS_list){
             float jss_var = m_JSS.at(jss).get(*jet, sys);
