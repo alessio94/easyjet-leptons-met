@@ -58,7 +58,6 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             pTsort=True,
             PCBTsort=False,
             bTagWPDecorName="",
-            checkOR=False,
             selectBjet=False))
 
     selection_name = flags.Analysis.selection_name
