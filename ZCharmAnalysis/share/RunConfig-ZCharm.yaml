@@ -3,7 +3,13 @@ include: EasyjetHub/base-config.yaml
 GRL:
   # good runs lists to filter events
   files:
-    include: EasyjetHub/lepton_grl.yaml
+    include: ZCharmAnalysis/lepton_grl.yaml
+
+PileupReweighting:
+  lumicalc_files:
+    include: ZCharmAnalysis/lumicalc_lepton.yaml
+  prw_files:
+    include: ZCharmAnalysis/prw_lepton.yaml
 
 # Which analysis to consider
 do_ZCharm_analysis: true

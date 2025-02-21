@@ -1,7 +1,6 @@
 import json
 import pickle
 from pathlib import Path
-from PathResolver import PathResolver
 from Campaigns.Utils import Campaign
 from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
 from AthenaCommon.Utils.unixtools import find_datafile
@@ -127,17 +126,6 @@ def get_prw_files(flags, prw_flags):
                 f"Could not find PRW for year {year} or campaign {campaign}. "
                 "Specify PRW files in the config file."
             )
-
-    if flags.Input.MCChannelNumber:
-        dsid = str(flags.Input.MCChannelNumber)
-        data_type = get_data_type(flags)
-        if data_type == DataType.FastSim:
-            simulation_type = "AFII"
-        else:
-            simulation_type = "FS"
-        config = f"dev/PileupReweighting/share/DSID{dsid[:3]}xxx/pileup_{campaign}_dsid{dsid}_{simulation_type}.root"  # noqa
-        if PathResolver.FindCalibFile(config):
-            prw_files.add(config)
 
     return list(prw_files)
 
