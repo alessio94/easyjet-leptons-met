@@ -59,5 +59,6 @@ truth_outputs:
   taus: ''
   electrons: ''
   muons: ''
+  met: ''
 # custom extra output branches
 extra_output_branches: []

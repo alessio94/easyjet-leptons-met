@@ -12,6 +12,7 @@ input:
   truthtaus:           TruthTaus
   truthelectrons:      TruthElectrons
   truthmuons:          TruthMuons
+  truthmet:            MET_Truth
   truthBSMParticles:   TruthBSMWithDecayParticles
   truthSMParticles:    TruthBosonsWithDecayParticles
   met:                 AntiKt4EMPFlow

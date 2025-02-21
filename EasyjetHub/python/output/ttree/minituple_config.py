@@ -27,6 +27,7 @@ from EasyjetHub.output.ttree.truth_taus import get_truthtau_branches
 from EasyjetHub.output.ttree.truth_electrons import get_truthelectron_branches
 from EasyjetHub.output.ttree.truth_muons import get_truthmuon_branches
 from EasyjetHub.output.ttree.met import get_met_branches
+from EasyjetHub.output.ttree.truth_met import get_truthmet_branches
 from EasyjetHub.steering.utils.config_flags import ConfigItem
 
 from AnalysisAlgorithmsConfig.ConfigAccumulator import ConfigAccumulator
@@ -218,6 +219,15 @@ def minituple_output_cfg(
                 flags, tree_flags.truth_outputs.muons
             ),
             output_prefix="truthmuon",
+        )
+
+    if flags.Input.isMC and tree_flags.truth_outputs.met:
+        tree_branches += get_truthmet_branches(
+            flags,
+            input_container=substitute_container_name(
+                flags, tree_flags.truth_outputs.met
+            ),
+            output_prefix="truthmet",
         )
 
     if extra_output_branches:

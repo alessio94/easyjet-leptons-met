@@ -136,3 +136,7 @@ ttree_output:
     small_R_jets: 'container_names.input.truth4Jet'
     higgs_particle: 'container_names.output.truthHHParticles'
     taus: 'container_names.input.truthtaus'
+    electrons: 'container_names.input.truthelectrons'
+    muons: 'container_names.input.truthmuons'
+    met: 'container_names.input.truthmet'
+
