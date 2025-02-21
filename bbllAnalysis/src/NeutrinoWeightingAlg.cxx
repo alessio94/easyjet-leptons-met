@@ -67,8 +67,7 @@ namespace HHBBLL
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
-
-      m_solutions.set(*event, 0, sys);
+      if(m_save_extra_vars) m_solutions.set(*event, 0, sys);
 
       for (const std::string &string_var : m_floatVariables) {
         if (string_var == "NW_neutrinoweight") {
@@ -197,7 +196,7 @@ namespace HHBBLL
         }
       }
  
-      m_solutions.set(*event, solutions, sys);
+      if(m_save_extra_vars) m_solutions.set(*event, solutions, sys);
   
       m_fBranches.at("NW_neutrinoweight").set(*event, neutrinoweight, sys);
       /*

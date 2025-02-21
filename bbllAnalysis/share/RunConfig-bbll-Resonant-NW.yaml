@@ -1,11 +1,19 @@
 include: bbllAnalysis/RunConfig-bbll.yaml
 
+save_extra_vars: true
+store_high_level_variables: true
+
 Electron:
   forceFullSimConfig: true
 
+Small_R_jet:
+  variables_bjets: ["uncorrPt", "muonCorrPt"]
+
 NeutrinoWeighting:
   include: NeutrinoWeighting.yaml
-
+  
 do_resonant_PNN: true
+
+run_Run2_train: true
 
 mX_values: [251, 260, 300, 400, 500, 600, 800, 1000]

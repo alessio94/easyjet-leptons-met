@@ -156,12 +156,13 @@ namespace HHBBLL
       }
       n_bjets = bjets->size();
 
-      m_Ibranches.at("nJets").set(*event, n_jets, sys);
-      m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
-      m_Ibranches.at("nMuons").set(*event, n_muons, sys);
-      m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
-      m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
-
+      if(m_save_extra_vars) {
+	m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
+	m_Ibranches.at("nMuons").set(*event, n_muons, sys);
+	m_Ibranches.at("nJets").set(*event, n_jets, sys);
+	m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
+	m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
+      }
       // Electron sector
       const xAOD::Electron* ele0 = nullptr;
       const xAOD::Electron* ele1 = nullptr;
@@ -240,7 +241,6 @@ namespace HHBBLL
 	ll = Leading_lep + Subleading_lep;
 	m_Fbranches.at("mll").set(*event, ll.M(), sys);
 	m_Fbranches.at("pTll").set(*event, ll.Pt(), sys);
-	m_Fbranches.at("Etall").set(*event, ll.Eta(), sys);
 	m_Fbranches.at("Phill").set(*event, ll.Phi(), sys);
 	m_Fbranches.at("dRll").set(*event, Leading_lep.DeltaR(Subleading_lep), sys);
       }
@@ -266,18 +266,18 @@ namespace HHBBLL
         }
 	m_Ibranches.at(prefix+"_nmuons").set
 	  (*event, m_nmuons.get(*bjets->at(i), sys), sys);
+	if(m_save_extra_vars) { 
 	float uncorrPt = bjets->at(i)->jetP4("NoBJetCalibMomentum").Pt();
 	m_Fbranches.at(prefix+"_uncorrPt").set(*event, uncorrPt, sys);
 	float muonCorrPt = bjets->at(i)->jetP4("MuonCorrMomentum").Pt();
 	m_Fbranches.at(prefix+"_muonCorrPt").set(*event, muonCorrPt, sys);
+	}
       }
-
       if (bjets->size()>=2) {
         // build the H(bb) candidate
         bb = Leading_bjet + Subleading_bjet;
         m_Fbranches.at("mbb").set(*event, bb.M(), sys);
         m_Fbranches.at("pTbb").set(*event, bb.Pt(), sys);
-        m_Fbranches.at("Etabb").set(*event, bb.Eta(), sys);
         m_Fbranches.at("Phibb").set(*event, bb.Phi(), sys);
         m_Fbranches.at("dRbb").set(*event, Leading_bjet.DeltaR(Subleading_bjet), sys);
       }
@@ -313,12 +313,12 @@ namespace HHBBLL
           deltaRs.push_back(bjet->p4().DeltaR(lepton->p4()));
         }
       }
-      if (!deltaRs.empty()) {
-	auto minDeltaR = *std::min_element(std::begin(deltaRs), std::end(deltaRs));
-        m_Fbranches.at("dRbl_min").set(*event, minDeltaR, sys);
+      if(m_save_extra_vars) {
+	if (!deltaRs.empty()) {
+	  auto minDeltaR = *std::min_element(std::begin(deltaRs), std::end(deltaRs));
+	  m_Fbranches.at("dRbl_min").set(*event, minDeltaR, sys);
+	}
       }
-
-
       // met
       met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
       float met_sig = m_met_sig.get(*met, sys);
@@ -348,21 +348,20 @@ namespace HHBBLL
 	if ((electrons->size()+muons->size()) >= 2)
 	{
 	  float mt_lept2_met = TMath::Sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - TMath::Cos(Subleading_lep.DeltaPhi(met_vector))));
-	  float mt_l_min = std::min(mt_lept1_met, mt_lept2_met);
 	  m_Fbranches.at("mT_Lepton2_Met").set(*event, mt_lept2_met, sys);
-	  m_Fbranches.at("mT_L_min").set(*event, mt_l_min, sys);
+	  if(m_save_extra_vars) {
+	    float mt_l_min = std::min(mt_lept1_met, mt_lept2_met);
+	    m_Fbranches.at("mT_L_min").set(*event, mt_l_min, sys);
+	  }
 	}
       }
       // stransverse mass of b-jet pair MT2_bb
       ComputeMT2 mt2_calculator = ComputeMT2(Leading_bjet, Subleading_bjet, met_vector, 0, 0);
       double mT2_bb = mt2_calculator.Compute();
       m_Fbranches.at("mT2_bb").set(*event, mT2_bb, sys);
-
     }
 
     return StatusCode::SUCCESS;
   }
 
 }
-
-

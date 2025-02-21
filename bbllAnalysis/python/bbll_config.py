@@ -94,6 +94,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
                 "NeutrinoWeightingAlg",
                 bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 floatNWVariables=float_NW_variables,
+                save_extra_vars=flags.Analysis.save_extra_vars,
                 NW_cutList=flags.Analysis.NeutrinoWeighting.cutList,
                 NeutrinoWeightingTools=[
                     NeutrinoWeightingTool_1,
@@ -117,7 +118,8 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
             floatVariableList=float_variables,
-            intVariableList=int_variables
+            intVariableList=int_variables,
+            save_extra_vars=flags.Analysis.save_extra_vars
         )
     )
     if flags.Analysis.do_resonant_PNN:
@@ -127,6 +129,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
                 bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 floatPNNVariables=float_PNN_variables,
                 mX_values=flags.Analysis.mX_values,
+                run_Run2_train=flags.Analysis.run_Run2_train
             )
         )
 
@@ -138,15 +141,17 @@ def get_BaselineVarsbbllAlg_variables(flags):
     int_variable_names = []
 
     for object in ["ll", "bb"]:
-        for var in ["m", "pT", "dR", "Eta", "Phi"]:
+        for var in ["m", "pT", "dR", "Phi"]:
             float_variable_names.append(f"{var}{object}")
 
     float_variable_names += ["mbbll", "mbbllmet", "MET_sig",
                              "mT_Lepton1_Met", "mT_Lepton2_Met",
-                             "mT_L_min", "dRbl_min", "HT2", "HT2r", "mT2_bb", "mbl"]
+                             "HT2", "HT2r", "mT2_bb", "mbl"]
+    if (flags.Analysis.save_extra_vars):
+        int_variable_names += ["nJets", "nBJets", "nElectrons",
+                               "nMuons", "nCentralJets"]
 
-    int_variable_names += ["nJets", "nBJets", "nElectrons", "nMuons", "nCentralJets"]
-
+        float_variable_names += ["mT_L_min", "dRbl_min"]
     return float_variable_names, int_variable_names
 
 
@@ -188,7 +193,8 @@ def bbll_branches(flags):
         # do not append TopReco variables to float_variable_names
         # or int_variable_names as they are stored by the
         # TopReco algortithm not BaselineVarsbbllAlg
-        all_baseline_variable_names.append("NW_solutions")
+        if (flags.Analysis.save_extra_vars):
+            all_baseline_variable_names.append("NW_solutions")
         for var in ["neutrinoweight"]:
             float_NW_variable_names.append(f"NW_{var}")
     if flags.Analysis.store_high_level_variables:
@@ -198,7 +204,8 @@ def bbll_branches(flags):
         int_variable_names += high_level_int_variables
     if flags.Analysis.do_resonant_PNN:
         for m_X in flags.Analysis.mX_values:
-            float_PNN_variable_names.append(f"PNN_Score_X{m_X}")
+            float_PNN_variable_names += [f"PNN_Score_X{m_X}"]
+            float_PNN_variable_names += [f"PNN_Score_SR2_X{m_X}"]
     all_baseline_variable_names += [
         *float_variable_names,
         *int_variable_names,

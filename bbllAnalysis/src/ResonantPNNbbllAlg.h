@@ -49,6 +49,8 @@ namespace HHBBLL
 
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
+    CP::SysReadDecorHandle<unsigned int> m_year
+	{this, "year", "dataTakingYear", ""};
     CP::SysReadDecorHandle<float>
       m_met_sig {this, "METSignificance", "significance", "Met Significance"};
 
@@ -79,12 +81,25 @@ namespace HHBBLL
       m_Fbranches;
 
     CP::SysReadDecorHandle<float> m_NW{"NW_neutrinoweight_%SYS%", this};
-
-    const std::string m_PNN_ScoreLabel = "PNN_Score";
-    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA;
-    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB;
-    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC;
-    std::map<std::string, double> pnn_inputs;
+    Gaudi::Property<bool> m_run_Run2_train
+      { this, "run_Run2_train", false, "use either the Run2 or Run3 PNN training." };
+    //
+    const std::string m_PNN_ScoreLabel_SR1 = "PNN_Score";
+    const std::string m_PNN_ScoreLabel_SR2 = "PNN_Score_SR2";
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA_SR1_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB_SR1_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC_SR1_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA_SR2_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB_SR2_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC_SR2_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA_SR1_Run3;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB_SR1_Run3;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC_SR1_Run3;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA_SR2_Run3;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB_SR2_Run3;
+    std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC_SR2_Run3;
+    std::map<std::string, double> pnn_inputs_SR1;
+    std::map<std::string, double> pnn_inputs_SR2;
   };
 }
 #endif

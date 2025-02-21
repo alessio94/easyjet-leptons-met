@@ -76,6 +76,9 @@ private:
     Gaudi::Property<std::vector<std::string>> m_floatVariables
     { this, "floatNWVariables", {}, "List of float variables to write out" };
 
+    Gaudi::Property<bool> m_save_extra_vars
+      { this, "save_extra_vars", false, "Compute quantities which may be useful." };
+
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
       m_fBranches;
 

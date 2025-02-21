@@ -96,6 +96,9 @@ private:
     CP::SysReadDecorHandle<float>
     m_met_sig {this, "METSignificance", "significance", "Met Significance"};
 
+    Gaudi::Property<bool> m_save_extra_vars
+      { this, "save_extra_vars", false, "Compute quantities which may be useful." };
+
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
         m_Fbranches;

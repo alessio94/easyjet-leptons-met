@@ -1,15 +1,16 @@
-runConfig="bbllAnalysis/RunConfig-bbll-Resonant-NW.yaml"
+runConfig="bbllAnalysis/RunConfig-bbll-Resonant-NW-syst.yaml"
 executable="bbll-ntupler"
-campaignName="XHHbbll_v00"
+campaignName="XHHbbll_v06"
 
 dir_samples="../easyjet/bbllAnalysis/datasets/PHYS/"
 mc_list=(
     "$dir_samples/mc23_resonantXHH_samples_p6266.txt"
     "$dir_samples/mc23_Zjet_background_p6266.txt"
-    "$dir_samples/mc23_Wjet_background_p6266."
+    "$dir_samples/mc23_Wjet_background_p6266.txt"
     "$dir_samples/mc23_top_background_p6266.txt"
     "$dir_samples/mc23_diboson_background_p6266.txt"
-    "$dir_samples/mc23_singleH_background_p6226.txt"
+    "$dir_samples/mc23_singleH_background_p6266.txt"
+    "$dir_samples/mc23_alternative_samples_p6266.txt"
 )
 
 #data 

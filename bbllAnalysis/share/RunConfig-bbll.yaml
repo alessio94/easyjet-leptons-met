@@ -6,6 +6,7 @@ do_bbll_analysis: true
 bypass: false
 
 store_high_level_variables: true
+save_extra_vars: false
 
 # Decay mode considered for truth decoration
 Truth:
@@ -20,6 +21,7 @@ do_mmc : false
 
 #PNN Score
 do_resonant_PNN: false
+run_Run2_train: false
 
 #NeutrinoWeighting Config
 NeutrinoWeighting:
@@ -36,7 +38,7 @@ Small_R_jet:
     - GN2v01_Continuous
   
   variables_int_bjets: ["truthLabel", "nmuons", "pcbt_GN2v01"]
-  variables_bjets: ["uncorrPt", "muonCorrPt"]
+  variables_bjets: []
   systModelJES: "Category"
   systModelJER: "Full"
   btag_egReductionB: "Medium"

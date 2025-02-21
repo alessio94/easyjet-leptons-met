@@ -19,7 +19,7 @@
 namespace HHBBLL
 {
   ResonantPNNbbllAlg::ResonantPNNbbllAlg(const std::string &name,
-                                           ISvcLocator *pSvcLocator)
+					   ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {}
 
@@ -44,27 +44,90 @@ namespace HHBBLL
     //Retrieve NW
     ATH_CHECK (m_NW.initialize(m_systematicsList, m_eventHandle));
     //
+    ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
+    //
     ATH_CHECK (m_systematicsList.initialize());
     //
-    std::ifstream input_stream_pnn_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_setA.json"));
-    if(!input_stream_pnn_cv1.is_open()) {
-      ATH_MSG_ERROR("Could not open bbllAnalysis/PNN_setA.json");
-      return StatusCode::FAILURE;
+    if(m_run_Run2_train) { //Use Run2 trainings for SR1 and SR2
+      //SR1
+      std::ifstream input_stream_pnn_sr1_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run2_SR1.json"));
+      if(!input_stream_pnn_sr1_cv1.is_open()) {
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetA_Run2_SR1.json");
+	return StatusCode::FAILURE;
+      }
+      std::ifstream input_stream_pnn_sr1_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run2_SR1.json"));
+      if(!input_stream_pnn_sr1_cv2.is_open()) {
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetB_Run2_SR1.json");
+	return StatusCode::FAILURE;
+      }
+      std::ifstream input_stream_pnn_sr1_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run2_SR1.json"));
+      if(!input_stream_pnn_sr1_cv3.is_open()) {
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetC_Run2_SR1.json");
+	return StatusCode::FAILURE;
+      }
+      //SR2
+      std::ifstream input_stream_pnn_sr2_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run2_SR2.json"));
+      if(!input_stream_pnn_sr2_cv1.is_open()) {
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetA_Run2_SR2.json");
+	return StatusCode::FAILURE;
+      }
+      std::ifstream input_stream_pnn_sr2_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run2_SR2.json"));
+      if(!input_stream_pnn_sr2_cv2.is_open()) {
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetB_Run2_SR2.json");
+	return StatusCode::FAILURE;
+      }
+      std::ifstream input_stream_pnn_sr2_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run2_SR2.json"));
+      if(!input_stream_pnn_sr2_cv3.is_open()) {
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetC_Run2_SR2.json");
+	return StatusCode::FAILURE;
+      }
+      m_model_PNN_setA_SR1_Run2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr1_cv1));
+      m_model_PNN_setB_SR1_Run2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr1_cv2));
+      m_model_PNN_setC_SR1_Run2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr1_cv3));
+      m_model_PNN_setA_SR2_Run2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr2_cv1));
+      m_model_PNN_setB_SR2_Run2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr2_cv2));
+      m_model_PNN_setC_SR2_Run2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr2_cv3));
     }
-    std::ifstream input_stream_pnn_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_setB.json"));
-    if(!input_stream_pnn_cv2.is_open()) {
-      ATH_MSG_ERROR("Could not open bbllAnalysis/PNN_setB.json");
-      return StatusCode::FAILURE;
+    else { //Run3 trainings
+      //SR1
+      std::ifstream input_stream_pnn_sr1_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run3_SR1.json"));
+      if(!input_stream_pnn_sr1_cv1.is_open()) {
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetA_Run3_SR1.json");
+	return StatusCode::FAILURE;
+      }
+      std::ifstream input_stream_pnn_sr1_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run3_SR1.json"));
+      if(!input_stream_pnn_sr1_cv2.is_open()) {
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetB_Run3_SR1.json");
+	return StatusCode::FAILURE;
+      }
+      std::ifstream input_stream_pnn_sr1_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run3_SR1.json"));
+      if(!input_stream_pnn_sr1_cv3.is_open()) {
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetC_Run3_SR1.json");
+	return StatusCode::FAILURE;
+      }
+      //SR2 just a placeholder atm
+      std::ifstream input_stream_pnn_sr2_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run2_SR2.json"));
+      if(!input_stream_pnn_sr2_cv1.is_open()) {
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetA_Run3_SR2.json");
+	return StatusCode::FAILURE;
+      }
+      std::ifstream input_stream_pnn_sr2_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run2_SR2.json"));
+      if(!input_stream_pnn_sr2_cv2.is_open()) {
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetB_Run3_SR2.json");
+	return StatusCode::FAILURE;
+      }
+      std::ifstream input_stream_pnn_sr2_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run2_SR2.json"));
+      if(!input_stream_pnn_sr2_cv3.is_open()) {
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetC_Run3_SR2.json");
+	return StatusCode::FAILURE;
+      }
+      m_model_PNN_setA_SR1_Run3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr1_cv1));
+      m_model_PNN_setB_SR1_Run3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr1_cv2));
+      m_model_PNN_setC_SR1_Run3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr1_cv3));
+      m_model_PNN_setA_SR2_Run3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr2_cv1));
+      m_model_PNN_setB_SR2_Run3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr2_cv2));
+      m_model_PNN_setC_SR2_Run3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr2_cv3));
     }
-    std::ifstream input_stream_pnn_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_setC.json"));
-    if(!input_stream_pnn_cv3.is_open()) {
-      ATH_MSG_ERROR("Could not open bbllAnalysis/PNN_setC.json");
-      return StatusCode::FAILURE;
-    }
-    m_model_PNN_setA = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_cv1));
-    m_model_PNN_setB = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_cv2));
-    m_model_PNN_setC = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_cv3));
-    //
     return StatusCode::SUCCESS;
   }
 
@@ -93,6 +156,7 @@ namespace HHBBLL
        	return StatusCode::FAILURE;	
       }
       //
+      int year = m_year.get(*event, sys);
       // Count objects
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
@@ -227,45 +291,90 @@ namespace HHBBLL
       mT_Lepton1_Met = leptons.size()>=1 ? TMath::Sqrt(2 * met->met() * Leading_lep.Pt() * (1 - TMath::Cos(Leading_lep.DeltaPhi(met_vector)))) : 0.;
       mT_Lepton2_Met = leptons.size()>=2 ? TMath::Sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - TMath::Cos(Subleading_lep.DeltaPhi(met_vector)))) : 0.;  
       //
-      pnn_inputs["bbll_Etabb_NOSYS"] = etabb;
-      pnn_inputs["bbll_Etall_NOSYS"] = etall;
-      pnn_inputs["bbll_HT2_NOSYS"] = HT2;
-      pnn_inputs["bbll_HT2r_NOSYS"] = HT2r;
-      pnn_inputs["bbll_Jet_b1_eta_NOSYS"] = eta_b1;
-      pnn_inputs["bbll_Jet_b1_pt_NOSYS"] = pt_b1;
-      pnn_inputs["bbll_Jet_b2_eta_NOSYS"] = eta_b2;
-      pnn_inputs["bbll_Jet_b2_pt_NOSYS"] = pt_b2;
-      pnn_inputs["bbll_MET_sig_NOSYS"] = MET_sig;
-      pnn_inputs["bbll_NW_neutrinoweight_NOSYS"] = nw_weight;
-      pnn_inputs["bbll_Phill_NOSYS"] = phill;
-      pnn_inputs["bbll_dRbb_NOSYS"] = dRbb;
-      pnn_inputs["bbll_dRll_NOSYS"] = dRll;
-      pnn_inputs["bbll_mT_Lepton1_Met_NOSYS"] = mT_Lepton1_Met;
-      pnn_inputs["bbll_mT_Lepton2_Met_NOSYS"] = mT_Lepton2_Met;
-      pnn_inputs["bbll_mbb_NOSYS"] = mbb;
-      pnn_inputs["bbll_mbbll_NOSYS"] = var_mbbll;
-      pnn_inputs["bbll_mbbllmet_NOSYS"] = var_mbbllmet;
-      pnn_inputs["bbll_mll_NOSYS"] = mll;
-      pnn_inputs["bbll_pTbb_NOSYS"] = pTbb;
-      pnn_inputs["bbll_pTll_NOSYS"] = pTll;
-      pnn_inputs["met_met_NOSYS"] = MET;
-      pnn_inputs["met_phi_NOSYS"] = MET_phi;
-      pnn_inputs["met_sumet_NOSYS"] = MET_sumMET;
+      pnn_inputs_SR1["bbll_Jet_b2_pt_NOSYS"] = pt_b2;
+      pnn_inputs_SR1["bbll_mll_NOSYS"] = mll;
+      pnn_inputs_SR1["bbll_Phill_NOSYS"] = phill;
+      pnn_inputs_SR1["bbll_pTbb_NOSYS"] = pTbb;
+      pnn_inputs_SR1["bbll_mbb_NOSYS"] = mbb;
+      pnn_inputs_SR1["bbll_dRbb_NOSYS"] = dRbb;
+      pnn_inputs_SR1["met_met_NOSYS"] = MET;
+      pnn_inputs_SR1["met_sumet_NOSYS"] = MET_sumMET;
+      pnn_inputs_SR1["bbll_mbbll_NOSYS"] = var_mbbll;
+      pnn_inputs_SR1["bbll_mT_Lepton1_Met_NOSYS"] = mT_Lepton1_Met;
+      pnn_inputs_SR1["bbll_mT_Lepton2_Met_NOSYS"] = mT_Lepton2_Met;
+      pnn_inputs_SR1["bbll_mbbllmet_NOSYS"] = var_mbbllmet;
+      pnn_inputs_SR1["bbll_HT2_NOSYS"] = HT2;
+      pnn_inputs_SR1["bbll_NW_neutrinoweight_NOSYS"] = nw_weight;
+      //
+      pnn_inputs_SR2["bbll_Etabb_NOSYS"] = etabb;
+      pnn_inputs_SR2["bbll_Etall_NOSYS"] = etall;
+      pnn_inputs_SR2["bbll_HT2_NOSYS"] = HT2;
+      pnn_inputs_SR2["bbll_HT2r_NOSYS"] = HT2r;
+      pnn_inputs_SR2["bbll_Jet_b1_eta_NOSYS"] = eta_b1;
+      pnn_inputs_SR2["bbll_Jet_b1_pt_NOSYS"] = pt_b1;
+      pnn_inputs_SR2["bbll_Jet_b2_eta_NOSYS"] = eta_b2;
+      pnn_inputs_SR2["bbll_Jet_b2_pt_NOSYS"] = pt_b2;
+      pnn_inputs_SR2["bbll_MET_sig_NOSYS"] = MET_sig;
+      pnn_inputs_SR2["bbll_NW_neutrinoweight_NOSYS"] = nw_weight;
+      pnn_inputs_SR2["bbll_Phill_NOSYS"] = phill;
+      pnn_inputs_SR2["bbll_dRbb_NOSYS"] = dRbb;
+      pnn_inputs_SR2["bbll_dRll_NOSYS"] = dRll;
+      pnn_inputs_SR2["bbll_mT_Lepton1_Met_NOSYS"] = mT_Lepton1_Met;
+      pnn_inputs_SR2["bbll_mT_Lepton2_Met_NOSYS"] = mT_Lepton2_Met;
+      pnn_inputs_SR2["bbll_mbb_NOSYS"] = mbb;
+      pnn_inputs_SR2["bbll_mbbll_NOSYS"] = var_mbbll;
+      pnn_inputs_SR2["bbll_mbbllmet_NOSYS"] = var_mbbllmet;
+      pnn_inputs_SR2["bbll_mll_NOSYS"] = mll;
+      pnn_inputs_SR2["bbll_pTbb_NOSYS"] = pTbb;
+      pnn_inputs_SR2["bbll_pTll_NOSYS"] = pTll;
+      pnn_inputs_SR2["met_met_NOSYS"] = MET;
+      pnn_inputs_SR2["met_phi_NOSYS"] = MET_phi;
+      pnn_inputs_SR2["met_sumet_NOSYS"] = MET_sumMET;
       //
       uint64_t eventNum = event->eventNumber();
-      std::map<std::string, std::map<std::string, double> > in_nodes;
-      double PNN_Score = -99;
+      std::map<std::string, std::map<std::string, double> > in_nodes_SR1;
+      std::map<std::string, std::map<std::string, double> > in_nodes_SR2;
+      double PNN_Score_SR1 = -99;
+      double PNN_Score_SR2 = -99;
       //
       for (const auto& mX : m_mX_values) {
-	pnn_inputs["mass_scaled"] = mX;
-	in_nodes["node_0"] = pnn_inputs;
+	pnn_inputs_SR1["mass_scaled"] = mX;
+	pnn_inputs_SR2["mass_scaled"] = mX;
+	in_nodes_SR1["node_0"] = pnn_inputs_SR1;
+	in_nodes_SR2["node_0"] = pnn_inputs_SR2;
 	//
-	if (eventNum % 3 == 0){PNN_Score = m_model_PNN_setC->compute(in_nodes)["out_0"];}
-	else if (eventNum % 3 == 1){PNN_Score = m_model_PNN_setA->compute(in_nodes)["out_0"];}
-	else if (eventNum % 3 == 2){PNN_Score = m_model_PNN_setB->compute(in_nodes)["out_0"];}
-	//
-	std::string branch_name =  m_PNN_ScoreLabel+ "_X" + std::to_string(int(mX));
-	m_Fbranches.at(branch_name).set(*event, PNN_Score, sys);
+	std::string branch_name_SR1 =  m_PNN_ScoreLabel_SR1+ "_X" + std::to_string(int(mX));
+	std::string branch_name_SR2 =  m_PNN_ScoreLabel_SR2+ "_X" + std::to_string(int(mX));
+	if (year>=2015 && year <=2018){
+	  if (eventNum % 3 == 0){
+	    PNN_Score_SR1 = m_model_PNN_setC_SR1_Run2->compute(in_nodes_SR1)["out_0"];
+	    PNN_Score_SR2 = m_model_PNN_setC_SR2_Run2->compute(in_nodes_SR2)["out_0"];
+	  }
+	  else if (eventNum % 3 == 1){
+	    PNN_Score_SR1 = m_model_PNN_setA_SR1_Run2->compute(in_nodes_SR1)["out_0"];
+	    PNN_Score_SR2 = m_model_PNN_setA_SR2_Run2->compute(in_nodes_SR2)["out_0"];
+	  }
+	  else if (eventNum % 3 == 2){
+	    PNN_Score_SR1 = m_model_PNN_setB_SR1_Run2->compute(in_nodes_SR1)["out_0"];
+	    PNN_Score_SR2 = m_model_PNN_setB_SR2_Run2->compute(in_nodes_SR2)["out_0"];
+	  }
+	}
+	else if(year>=2022 && year<=2023){
+	  if (eventNum % 3 == 0){
+	    PNN_Score_SR1 = m_model_PNN_setC_SR1_Run3->compute(in_nodes_SR1)["out_0"];
+	    PNN_Score_SR2 = m_model_PNN_setC_SR2_Run3->compute(in_nodes_SR2)["out_0"];
+	  }
+	  else if (eventNum % 3 == 1){
+	    PNN_Score_SR1 = m_model_PNN_setA_SR1_Run3->compute(in_nodes_SR1)["out_0"];
+	    PNN_Score_SR2 = m_model_PNN_setA_SR2_Run3->compute(in_nodes_SR2)["out_0"];
+	  }
+	  else if (eventNum % 3 == 2){
+	    PNN_Score_SR1 = m_model_PNN_setB_SR1_Run3->compute(in_nodes_SR1)["out_0"];
+	    PNN_Score_SR2 = m_model_PNN_setB_SR2_Run3->compute(in_nodes_SR2)["out_0"];
+	  }
+	}
+	m_Fbranches.at(branch_name_SR1).set(*event, PNN_Score_SR1, sys);
+	m_Fbranches.at(branch_name_SR2).set(*event, PNN_Score_SR2, sys);
       }
     }
     return StatusCode::SUCCESS;

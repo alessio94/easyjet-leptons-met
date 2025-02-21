@@ -1,11 +1,3 @@
-include: bbllAnalysis/RunConfig-bbll-Resonant-NW-bypass.yaml
+include: bbllAnalysis/RunConfig-bbll-Resonant-NW-syst.yaml
 
-save_bbll_cutflow: false
-
-store_high_level_variables: false
-
-Trigger:
-  writeOutput: False
-
-do_CP_systematics: true
-systematics_regex: [".*"]
+bypass: true

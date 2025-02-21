@@ -1,11 +1,3 @@
-include: bbllAnalysis/RunConfig-bbll-bypass.yaml
+include: bbllAnalysis/RunConfig-bbll-Resonant-NW.yaml
 
-Electron:
-  forceFullSimConfig: true
-
-NeutrinoWeighting:
-  include: NeutrinoWeighting.yaml
-
-do_resonant_PNN: true
-
-mX_values: [251, 260, 300, 400, 500, 600, 800, 1000]
+bypass: true
