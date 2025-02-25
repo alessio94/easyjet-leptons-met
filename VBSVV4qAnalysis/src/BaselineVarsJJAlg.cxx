@@ -170,8 +170,8 @@ namespace VBSVV4q{
           float discojet (-99.);
           if(m_loadDisCoJet){
             discojet = m_discojet.get(*jet, sys);
+	    m_Fbranches.at("SigJet" + std::to_string(iii) + "_DisCoJet").set(*event, discojet, sys); 
           }
-          m_Fbranches.at("SigJet" + std::to_string(iii) + "_DisCoJet").set(*event, discojet, sys); 
 
         }
 

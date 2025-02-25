@@ -6,3 +6,4 @@ include: VBSVV4qAnalysis/RunConfig-JJ.yaml
 loadDisCoJet: False
 
 bypass: true #enabling Run through mode
+do_trigger_filtering: false

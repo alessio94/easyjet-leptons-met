@@ -2,3 +2,4 @@ include: bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml
 
 # flag that toggles run-through mode in the SelectorAlg
 bypass: true
+do_trigger_filtering: false

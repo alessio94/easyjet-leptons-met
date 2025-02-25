@@ -64,7 +64,7 @@ namespace VBSVV4q{
         CP::SysReadDecorHandle<int> m_truth_label = {this, "TruthLabel", "R10TruthLabel_R22v1", "TruthLabel"};
 
         // jss
-        std::vector<std::string> m_JSS_list = {"ECF1", "ECF2", "ECF3", "Split12", "Split23", "Tau1_wta", "Tau2_wta", "Tau3_wta", "ZCut12",  "KtDR", "Angularity", "FoxWolfram0", "FoxWolfram2", "Aplanarity", "PlanarFlow", "Qw"};
+        std::vector<std::string> m_JSS_list = {"ECF1", "ECF2", "ECF3", "Split12", "Split23", "Tau1_wta", "Tau2_wta", "Tau3_wta", "Qw"};
         std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_JSS;
 
         // boson tagger

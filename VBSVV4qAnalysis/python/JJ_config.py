@@ -94,8 +94,7 @@ def get_BaselineVarsJJAlg_variables(flags):
     jet_vars += ["DXbb", "phbb", "phcc", "pqcd", "ptop"]
     jet_vars += ["D2", "ECF1", "ECF2", "ECF3", "Split12", "Split23", ]
     jet_vars += ["Tau1_wta", "Tau2_wta", "Tau3_wta"]
-    jet_vars += ["ZCut12", "KtDR", "Angularity"]
-    jet_vars += ["FoxWolfram0", "FoxWolfram2", "Aplanarity", "PlanarFlow", "Qw"]
+    jet_vars += ["Qw"]
     if flags.Input.isMC:
         jet_vars += ["TruthLabel"]
     if flags.Analysis.loadDisCoJet:
