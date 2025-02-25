@@ -41,8 +41,9 @@ namespace HHBBLL
     }
     //
     ATH_CHECK (m_met_sig.initialize(m_systematicsList, m_metHandle));
-    //Retrieve NW
+    //Retrieve NW and mT2bb
     ATH_CHECK (m_NW.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_mT2bb.initialize(m_systematicsList, m_eventHandle));
     //
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
     //
@@ -105,18 +106,18 @@ namespace HHBBLL
 	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetC_Run3_SR1.json");
 	return StatusCode::FAILURE;
       }
-      //SR2 just a placeholder atm
-      std::ifstream input_stream_pnn_sr2_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run2_SR2.json"));
+      //SR2
+      std::ifstream input_stream_pnn_sr2_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run3_SR2.json"));
       if(!input_stream_pnn_sr2_cv1.is_open()) {
 	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetA_Run3_SR2.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr2_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run2_SR2.json"));
+      std::ifstream input_stream_pnn_sr2_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run3_SR2.json"));
       if(!input_stream_pnn_sr2_cv2.is_open()) {
 	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetB_Run3_SR2.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr2_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run2_SR2.json"));
+      std::ifstream input_stream_pnn_sr2_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run3_SR2.json"));
       if(!input_stream_pnn_sr2_cv3.is_open()) {
 	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetC_Run3_SR2.json");
 	return StatusCode::FAILURE;
@@ -183,6 +184,7 @@ namespace HHBBLL
       TLorentzVector b1l2;
       TLorentzVector b2l1;
       TLorentzVector b2l2;
+      double m_bl = -99;
       //
       // Electron sector
       const xAOD::Electron* ele0 = nullptr;
@@ -239,57 +241,68 @@ namespace HHBBLL
       if (bjets->size()>=2 && leptons.size()>=2) {
 	bbll = ll + bb;
 	bbllmet = bbll + met_vector;
+	b1l1 = Leading_bjet+Leading_lep;
+	b2l1 = Subleading_bjet+Leading_lep;
+	b1l2 = Leading_bjet+Subleading_lep;
+	b2l2 = Subleading_bjet+Subleading_lep;
+	double m_b1l1 = b1l1.M();
+	double m_b2l1 = b2l1.M();
+	double m_b1l2 = b1l2.M();
+	double m_b2l2 = b2l2.M();
+	m_bl = std::min(std::max(m_b1l1, m_b2l2), std::max(m_b2l1, m_b1l2));
       }
       //
       //Retrieve NW
       double nw_weight = m_NW.get(*event,sys);
+      double mT2_bb = m_mT2bb.get(*event,sys);
+      //
       double pt_b1 = -99;
       double pt_b2 = -99;
-      double eta_b1 = -99;
-      double eta_b2 = -99;
       double mll = -99;
       double pTll = -99;
       double dRll = -99;
-      double etall = -99;
       double phill = -99;
       double pTbb = -99;
       double mbb = -99;
       double dRbb = -99;
-      double etabb = -99;
       double MET = -99;
       double MET_sumMET = -99;
       double MET_sig = -99;
-      double MET_phi = -99;
       double mT_Lepton1_Met = -99;
       double mT_Lepton2_Met = -99;
       double HT2 = -99;
       double var_mbbll = -99;
       double var_mbbllmet = -99;
-      double HT2r = -99;      
+      double HT2r = -99;
+      double pt_l1 = -99;
+      double pt_l2 = -99;
+      double var_mbl = -99;
+      double var_mT2_bb = -99;
+      double var_met_ptll = -99;
       //
       pt_b1 = bjets->size() >= 1 ?  Leading_bjet.Pt() : 0.;
       pt_b2 = bjets->size() >= 2 ?  Subleading_bjet.Pt() : 0.;
-      eta_b1 = bjets->size() >= 1 ? Leading_bjet.Eta() : 0.;
-      eta_b2 = bjets->size() >= 2 ? Subleading_bjet.Eta() : 0.;
+      pt_l1 = leptons.size()>=1 ? Leading_lep.Pt() : 0.;
+      pt_l2 = leptons.size()>=2 ? Subleading_lep.Pt() : 0.;
       mll = leptons.size()>=2 ? ll.M() : 0.;
       pTll = leptons.size()>=2 ? ll.Pt() : 0.;
-      etall = leptons.size()>=2 ? ll.Eta() : 0.;
       phill = leptons.size()>=2 ? ll.Phi() : 0.;
       dRll = leptons.size()>=2 ? Leading_lep.DeltaR(Subleading_lep) : 0.;
       pTbb = bjets->size()>=2 ? bb.Pt() : 0.;
       mbb = bjets->size()>=2 ? bb.M() : 0.;
-      etabb = bjets->size()>=2 ? bb.Eta() : 0.;
       dRbb = bjets->size()>=2 ? Leading_bjet.DeltaR(Subleading_bjet) : 0.;
       MET = met_vector.Pt();
       MET_sig = met_sig;
-      MET_phi = met_vector.Phi();
       MET_sumMET = sumet;
       var_mbbll = (bjets->size()>=2 && leptons.size()>=2) ? bbll.M() : 0.;
       var_mbbllmet = (bjets->size()>=2 && leptons.size()>=2) ? bbllmet.M() : 0.;
       HT2 = (bjets->size()>=2 && leptons.size()>=2) ? (met_vector + ll).Perp() + bb.Perp() : 0.;
       HT2r = (bjets->size()>=2 && leptons.size()>=2) ? HT2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + Leading_bjet.Pt() + Subleading_bjet.Pt()) : 0.;
       mT_Lepton1_Met = leptons.size()>=1 ? TMath::Sqrt(2 * met->met() * Leading_lep.Pt() * (1 - TMath::Cos(Leading_lep.DeltaPhi(met_vector)))) : 0.;
-      mT_Lepton2_Met = leptons.size()>=2 ? TMath::Sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - TMath::Cos(Subleading_lep.DeltaPhi(met_vector)))) : 0.;  
+      mT_Lepton2_Met = leptons.size()>=2 ? TMath::Sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - TMath::Cos(Subleading_lep.DeltaPhi(met_vector)))) : 0.;
+      var_mbl = (bjets->size()>=2 && leptons.size()>=2) ? m_bl : 0.;
+      var_mT2_bb = bjets->size()>=2 ? mT2_bb : 0.;
+      var_met_ptll = leptons.size()>=2 ? std::abs(MET + pTll) : 0.;
       //
       pnn_inputs_SR1["bbll_Jet_b2_pt_NOSYS"] = pt_b2;
       pnn_inputs_SR1["bbll_mll_NOSYS"] = mll;
@@ -306,30 +319,27 @@ namespace HHBBLL
       pnn_inputs_SR1["bbll_HT2_NOSYS"] = HT2;
       pnn_inputs_SR1["bbll_NW_neutrinoweight_NOSYS"] = nw_weight;
       //
-      pnn_inputs_SR2["bbll_Etabb_NOSYS"] = etabb;
-      pnn_inputs_SR2["bbll_Etall_NOSYS"] = etall;
-      pnn_inputs_SR2["bbll_HT2_NOSYS"] = HT2;
-      pnn_inputs_SR2["bbll_HT2r_NOSYS"] = HT2r;
-      pnn_inputs_SR2["bbll_Jet_b1_eta_NOSYS"] = eta_b1;
+      pnn_inputs_SR2["bbll_Lepton1_pt_NOSYS"] = pt_l1;
+      pnn_inputs_SR2["bbll_Lepton2_pt_NOSYS"] = pt_l2;
       pnn_inputs_SR2["bbll_Jet_b1_pt_NOSYS"] = pt_b1;
-      pnn_inputs_SR2["bbll_Jet_b2_eta_NOSYS"] = eta_b2;
       pnn_inputs_SR2["bbll_Jet_b2_pt_NOSYS"] = pt_b2;
-      pnn_inputs_SR2["bbll_MET_sig_NOSYS"] = MET_sig;
-      pnn_inputs_SR2["bbll_NW_neutrinoweight_NOSYS"] = nw_weight;
-      pnn_inputs_SR2["bbll_Phill_NOSYS"] = phill;
-      pnn_inputs_SR2["bbll_dRbb_NOSYS"] = dRbb;
+      pnn_inputs_SR2["bbll_mll_NOSYS"] = mll;
+      pnn_inputs_SR2["bbll_pTll_NOSYS"] = pTll;
       pnn_inputs_SR2["bbll_dRll_NOSYS"] = dRll;
+      pnn_inputs_SR2["bbll_pTbb_NOSYS"] = pTbb;
+      pnn_inputs_SR2["bbll_mbb_NOSYS"] = mbb;
+      pnn_inputs_SR2["bbll_dRbb_NOSYS"] = dRbb;
+      pnn_inputs_SR2["met_met_NOSYS"] = MET;
+      pnn_inputs_SR2["bbll_MET_sig_NOSYS"] = MET_sig;
+      pnn_inputs_SR2["bbll_mbl_NOSYS"] = var_mbl;
+      pnn_inputs_SR2["bbll_mT2_bb_NOSYS"] = var_mT2_bb;
+      pnn_inputs_SR2["bbll_mbbll_NOSYS"] = var_mbbll;
       pnn_inputs_SR2["bbll_mT_Lepton1_Met_NOSYS"] = mT_Lepton1_Met;
       pnn_inputs_SR2["bbll_mT_Lepton2_Met_NOSYS"] = mT_Lepton2_Met;
-      pnn_inputs_SR2["bbll_mbb_NOSYS"] = mbb;
-      pnn_inputs_SR2["bbll_mbbll_NOSYS"] = var_mbbll;
       pnn_inputs_SR2["bbll_mbbllmet_NOSYS"] = var_mbbllmet;
-      pnn_inputs_SR2["bbll_mll_NOSYS"] = mll;
-      pnn_inputs_SR2["bbll_pTbb_NOSYS"] = pTbb;
-      pnn_inputs_SR2["bbll_pTll_NOSYS"] = pTll;
-      pnn_inputs_SR2["met_met_NOSYS"] = MET;
-      pnn_inputs_SR2["met_phi_NOSYS"] = MET_phi;
-      pnn_inputs_SR2["met_sumet_NOSYS"] = MET_sumMET;
+      pnn_inputs_SR2["bbll_HT2r_NOSYS"] = HT2r;
+      pnn_inputs_SR2["bbll_NW_neutrinoweight_NOSYS"] = nw_weight;
+      pnn_inputs_SR2["abs_met_ptll"] = var_met_ptll;      
       //
       uint64_t eventNum = event->eventNumber();
       std::map<std::string, std::map<std::string, double> > in_nodes_SR1;

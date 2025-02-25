@@ -81,6 +81,7 @@ namespace HHBBLL
       m_Fbranches;
 
     CP::SysReadDecorHandle<float> m_NW{"NW_neutrinoweight_%SYS%", this};
+    CP::SysReadDecorHandle<float> m_mT2bb{"mT2_bb_%SYS%", this};
     Gaudi::Property<bool> m_run_Run2_train
       { this, "run_Run2_train", false, "use either the Run2 or Run3 PNN training." };
     //

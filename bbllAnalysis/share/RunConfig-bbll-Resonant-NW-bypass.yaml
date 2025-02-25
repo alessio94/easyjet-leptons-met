@@ -1,3 +1,5 @@
 include: bbllAnalysis/RunConfig-bbll-Resonant-NW.yaml
 
 bypass: true
+
+do_trigger_filtering: false
