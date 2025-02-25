@@ -46,7 +46,7 @@ namespace HHBBVV
     ATH_CHECK(m_Whad2.initialize(m_systematicsList, m_bbVVLRJetHandle)); // Whad2 jet
 
     for(const auto& wp: m_GN2X_wps)
-      m_GN2X_wp_Handles.emplace_back("GN2X_select_" + wp, this);
+      m_GN2X_wp_Handles.emplace_back("xbb_select_GN2Xv01_" + wp, this);
     for(auto& handle : m_GN2X_wp_Handles)
       ATH_CHECK(handle.initialize(m_systematicsList, m_bbVVLRJetHandle));
 
@@ -237,7 +237,7 @@ namespace HHBBVV
 
           for(unsigned int wp=0; wp<m_GN2X_wps.size(); wp++)
           {
-            int pass_GN2X = static_cast<int>(m_GN2X_wp_Handles.at(wp).get(*lrjet, sys));
+            int pass_GN2X = m_GN2X_wp_Handles.at(wp).get(*lrjet, sys);
             m_Ibranches.at(prefix+"_Pass_GN2X_"+m_GN2X_wps[wp]).set(*event, pass_GN2X, sys);
           }
         }

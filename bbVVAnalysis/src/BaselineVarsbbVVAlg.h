@@ -102,7 +102,7 @@ private:
 
     Gaudi::Property<std::vector<std::string>> m_GN2X_wps
       { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the bbVV config" };
-    std::vector<CP::SysReadDecorHandle<bool>> m_GN2X_wp_Handles;
+    std::vector<CP::SysReadDecorHandle<int>> m_GN2X_wp_Handles;
 
     Gaudi::Property<std::string> m_WTag_Type
       { this, "wtag_type", "", "WTagger type from the bbVV config"};

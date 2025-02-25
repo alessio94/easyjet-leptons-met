@@ -124,10 +124,10 @@ def get_large_R_gn2_branches(is_valid_for_v02):
 def get_large_R_gn2_tag_branches(flags):
     gn2_tag_branches = []
     for wp in flags.Analysis.Large_R_jet.GN2X_hbb_wps:
-        gn2_tag_branches += ["GN2X_select_" + wp]
+        gn2_tag_branches += ["xbb_select_GN2Xv01_" + wp]
         # Disable SF for now to avoid warnings with preliminary json
         # if flags.Input.isMC:
-        #    gn2_tag_branches += ["GN2X_effSF_" + wp + "_NOSYS"]
+        #    gn2_tag_branches += ["xbb_effSF_GN2Xv01_" + wp + "_NOSYS"]
     return gn2_tag_branches
 
 

@@ -106,10 +106,7 @@ private:
 
     Gaudi::Property<std::vector<std::string>> m_GN2X_wps
       { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the bbVV config" };
-    CP::SysReadDecorHandle<bool> m_Pass_GN2X{"", this}; // Select the most loose WP in HHbbVVSelectorAlg
-
-    CP::SysReadDecorHandle<bool> 
-    m_Pass_GN2X_FlatMassQCDEff_0p58 {this, "GN2X_PassFlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58", "GN2X_select_FlatMassQCDEff_0p58 selection"};
+    CP::SysReadDecorHandle<int> m_Pass_GN2X{"", this}; // Select the most loose WP in HHbbVVSelectorAlg
     
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "bbVVAnalysisElectrons_%SYS%", "Electron container to read" };

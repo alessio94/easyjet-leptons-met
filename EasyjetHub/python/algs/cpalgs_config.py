@@ -7,7 +7,6 @@ from EasyjetHub.algs.calibration.jets import (
     jet_sequence,
     lr_jet_sequence,
 )
-from EasyjetHub.output.ttree.GN2X_decor_config import GN2X_decor_cfg
 from EasyjetHub.output.ttree.wtag_decor_config import wtag_decor_cfg
 from EasyjetHub.output.ttree.tau_decor_config import tau_decor_cfg
 from EasyjetHub.output.ttree.jet_decor_config import jet_decor_cfg
@@ -116,9 +115,6 @@ def cpalgs_cfg(flags):
 
     if flags.Analysis.Large_R_jet.wtag_type and flags.Analysis.Large_R_jet.wtag_wp:
         cfg.merge(wtag_decor_cfg(flags))
-
-    if flags.Analysis.Large_R_jet.GN2X_hbb_wps:
-        cfg.merge(GN2X_decor_cfg(flags))
 
     # Aggregate the configured CP algs in one ConfigSequence,
     # which will handle the container names, copying etc

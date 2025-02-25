@@ -30,8 +30,8 @@ namespace HHBBVV
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
 
     // Choose the first GN2X wp
-    m_Pass_GN2X = CP::SysReadDecorHandle<bool>
-      ("GN2X_select_" + m_GN2X_wps.value().front(), this);
+    m_Pass_GN2X = CP::SysReadDecorHandle<int>
+      ("xbb_select_GN2Xv01_" + m_GN2X_wps.value().front(), this);
     ATH_CHECK (m_Pass_GN2X.initialize(m_systematicsList, m_lrjetHandle));
     ATH_CHECK (m_Tau2_wta.initialize(m_systematicsList, m_lrjetHandle));
     ATH_CHECK (m_Tau4_wta.initialize(m_systematicsList, m_lrjetHandle));

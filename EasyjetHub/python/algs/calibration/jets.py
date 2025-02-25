@@ -1,6 +1,7 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AthenaConfiguration.Enums import LHCPeriod
+from AthenaCommon.Utils.unixtools import find_datafile
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
@@ -206,6 +207,18 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
     )
     configSeq += makeConfig('Jets', containerName=output_name,
                             jetCollection=input_name)
+
+    for GN2X_wp in flags.Analysis.Large_R_jet.GN2X_hbb_wps:
+        jSONCalibFile = find_datafile(
+            "EasyjetHub/Xbb_lookup_table_prelim_Oct30_2024.json")
+        configSeq += config.makeConfig(
+            'Jets.XbbTagging',
+            containerName=output_name)
+        # no eff SF provided for the moment
+        configSeq.setOptionValue('.noEffSF', True)
+        configSeq.setOptionValue('.calibFile', jSONCalibFile)
+        configSeq.setOptionValue('.Xbbtagger', "GN2Xv01")
+        configSeq.setOptionValue('.XbbWP', GN2X_wp)
 
     # Optional muon-in-jet correction for large-R jets
     if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
