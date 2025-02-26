@@ -13,8 +13,13 @@ namespace Easyjet
     ATH_CHECK(m_runNumberKey.initialize());
     ATH_CHECK(m_rdmRunNumberKey.initialize());
 
+    ATH_CHECK(m_vertexContainerKey.initialize());
+
     m_yearDecorKey = "EventInfo.dataTakingYear";
     ATH_CHECK(m_yearDecorKey.initialize());
+
+    m_nVertexDecorKey = "EventInfo.nPrimaryVertices";
+    ATH_CHECK(m_nVertexDecorKey.initialize());
 
     for(const auto& period : m_runPeriods){
       m_runPeriodsDecor_keys.emplace_back("EventInfo.is"+std::get<0>(period));
@@ -64,6 +69,13 @@ namespace Easyjet
     SG::WriteDecorHandle<xAOD::EventInfo, bool> l1TopoDisabled(m_L1TopoDisabledDecorKey);
     l1TopoDisabled(*eventInfo) =
       (runNumber == 336506) || (runNumber == 336548) || (runNumber == 336567);
+
+    // Save number of primary vertices
+    SG::ReadHandle<xAOD::VertexContainer> vertexContainer(m_vertexContainerKey);
+    ATH_CHECK(vertexContainer.isValid());
+
+    SG::WriteDecorHandle<xAOD::EventInfo, unsigned int> nVertexDecorHandle(m_nVertexDecorKey);
+    nVertexDecorHandle(*eventInfo) = vertexContainer->size();
 
     return StatusCode::SUCCESS;
   }

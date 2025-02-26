@@ -21,6 +21,7 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             "dataTakingYear",
             "averageInteractionsPerCrossing",
             "actualInteractionsPerCrossing",
+            "nPrimaryVertices"
         ]
     )
     if flags.Input.isMC:

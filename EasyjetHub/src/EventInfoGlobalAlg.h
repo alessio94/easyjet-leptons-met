@@ -3,8 +3,9 @@
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <xAODEventInfo/EventInfo.h>
+#include "xAODTracking/VertexContainer.h"
 
-#include <AsgDataHandles/WriteDecorHandle.h>
+#include <StoreGate/WriteDecorHandle.h>
 #include <StoreGate/ReadDecorHandle.h>
 
 
@@ -31,12 +32,17 @@ private:
     SG::ReadHandleKey<xAOD::EventInfo> m_EventInfoKey{
         this, "EventInfoKey", "EventInfo", "EventInfo container to dump"};
 
-  // Necessary additions to get the year of data taking per event.
+    // Necessary additions to get the year of data taking per event.
     SG::ReadDecorHandleKey<xAOD::EventInfo> m_runNumberKey{
         this, "runNumberDecorKey", "EventInfo.runNumber", "Run number"};
     SG::ReadDecorHandleKey<xAOD::EventInfo> m_rdmRunNumberKey{
         this, "RandomRunNumberDecorKey", "EventInfo.RandomRunNumber", "Random run number"};
 
+    ///Primary vertex container
+    SG::ReadHandleKey<xAOD::VertexContainer>  m_vertexContainerKey
+      {this,"VertexContainerName", "PrimaryVertices"};
+
+    SG::WriteDecorHandleKey<xAOD::EventInfo> m_nVertexDecorKey;
     SG::WriteDecorHandleKey<xAOD::EventInfo> m_yearDecorKey;
 
     // References:
