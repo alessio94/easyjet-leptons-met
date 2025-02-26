@@ -13,6 +13,7 @@ atlas_add_component(bbyyAnalysis
   src/MbbKinFitDecoratorAlg.cxx
   src/BaselineVarsbbyyAlg.cxx
   src/LeptonVarsbbyyAlg.cxx
+  src/PhotonVarsbbyyAlg.cxx
   src/bbyySelectorAlg.cxx
   src/bbyyFilterDalitzAlg.cxx
   src/components/bbyyAnalysis_entries.cxx

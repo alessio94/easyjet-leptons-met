@@ -20,10 +20,12 @@ namespace HHBBYY
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
-    ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
-    m_Ibranches_lep.emplace("nLeptons", CP::SysWriteDecorHandle<int>{"nLeptons_%SYS%", this});
-    ATH_CHECK(m_Ibranches_lep.at("nLeptons").initialize(m_systematicsList, m_eventHandle));
+    for (const std::string &string_var: m_intVariables) {
+      CP::SysWriteDecorHandle<int> var {string_var+"_%SYS%", this};
+      m_Ibranches.emplace(string_var, var);
+      ATH_CHECK (m_Ibranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
+    }
   
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -49,8 +51,7 @@ namespace HHBBYY
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
 
-      m_Ibranches_lep.at("nLeptons").set(*event, -99, sys);
-      m_Ibranches_lep.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
+      m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
 
     }
 

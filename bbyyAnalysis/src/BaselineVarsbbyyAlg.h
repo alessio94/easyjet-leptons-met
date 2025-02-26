@@ -153,29 +153,30 @@ namespace HHBBYY
 
   private:
     float compute_Topness(const xAOD::JetContainer *jets);
-    std::vector<float> compute_EventShapes(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::PhotonContainer *photons);
-    float compute_pTBalance(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::PhotonContainer *photons);
+    std::vector<float> compute_EventShapes(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const std::vector<TLorentzVector>& photons, const int& n_photons);
+    float compute_pTBalance(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const std::vector<TLorentzVector>& photons, const int& n_photons);
     
     VBFjetsMethod stringToVBFjetsMethod(const std::string& vbfjets_method_str);
-    float getVBFjets_BDT(float ht, const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+    float getVBFjets_BDT(float ht, const TLorentzVector& ph1, const TLorentzVector& ph2,
                       const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                       const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
     void getVBFjets_mjj(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                         const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
     void getVBFjets_pTsorting(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                               const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
-    std::vector<float> makeXGBoostDMatrixLegacyNonres(const xAOD::Photon *ph1, const xAOD::Photon *ph2, 
+    std::vector<float> makeXGBoostDMatrixLegacyNonres(const TLorentzVector& ph1, const TLorentzVector& ph2, 
                                                       ConstDataVector<xAOD::JetContainer> &categorisation_jets,
                                                       const xAOD::MissingETContainer *met, const auto &sys,
                                                       const std::map<HHBBYY::Var, float> &m_eventFloats, bool isKFvariables, bool isGNNvariables);
     
-    StatusCode vbf_calculations(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+    StatusCode vbf_calculations(const TLorentzVector& ph1, const TLorentzVector& ph2,
+                const int& n_photons,
 				const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::JetContainer *jets,
 				double HT,const TLorentzVector& HH,
 				const std::string& prefix_j, const std::string& prefix_jj,
 				std::map<HHBBYY::Var, float> &eventFloats, const xAOD::EventInfo *event, const auto &sys);
     
-    void performCategorisationBDT(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+    void performCategorisationBDT(const TLorentzVector& ph1, const TLorentzVector& ph2,
                                   const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, 
                                   const xAOD::JetContainer *jets,
                                   const xAOD::MissingETContainer *met,
@@ -189,11 +190,11 @@ namespace HHBBYY
     std::vector<double> compute_angular_variables_CM(const TLorentzVector& lz_photon1,const TLorentzVector& lz_photon2,const TLorentzVector& lz_b_jet1,const TLorentzVector& lz_b_jet2);
 
     void fill_bb_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys);
-    void fill_bbyy_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::vector<const xAOD::Photon*> &Hyy_photons, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys);
+    void fill_bbyy_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::vector<TLorentzVector> &Hyy_photons, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys);
     void loadGNN(const std::string &filePath);
 
-    std::vector<const xAOD::Jet*> getHbb_GNN_ggFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys);
-    std::vector<const xAOD::Jet*> getHbb_GNN_VBFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys);
+    std::vector<const xAOD::Jet*> getHbb_GNN_ggFTarget(const xAOD::JetContainer *jets, const TLorentzVector& ph1, const TLorentzVector& ph2, float& max_score, float pile_up, const auto &sys);
+    std::vector<const xAOD::Jet*> getHbb_GNN_VBFTarget(const xAOD::JetContainer *jets, const TLorentzVector& ph1, const TLorentzVector& ph2, float& max_score, float pile_up, const auto &sys);
 
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
@@ -211,26 +212,11 @@ namespace HHBBYY
     CP::SysReadDecorHandle<int>
     m_nmuons{ this, "nmuons", "n_muons_%SYS%", "Number of muons from muon-in-jet correction"};
 
-    CP::SysReadHandle<xAOD::PhotonContainer>
-      m_bbyyPhotonHandle{ this, "bbyyPhotons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
-    CP::SysReadHandle<xAOD::PhotonContainer>
-      m_photonHandle{ this, "photons", "AnalysisPhotons_%SYS%", "Original photon container to read" };
-
-    CP::SysReadDecorHandle<unsigned int> m_isEMTight
-      {"DFCommonPhotonsIsEMTightIsEMValue", this};
-
     CP::SysReadHandle<xAOD::JetContainer>
     m_KFJetHandle{this, "KFJets", "", "KF Jet container to read"};
 
     CP::SysReadDecorHandle<float> m_KF_MBB
       {"KF_mbb_%SYS%", this};
-
-    Gaudi::Property<std::string> m_photonWPName
-      { this, "photonWP", "", "Photon ID + Iso working point" };
-    CP::SysReadDecorHandle<float> m_ph_SF{"", this};
-    Gaudi::Property<bool> m_saveDummy_ph_SF
-      {this, "saveDummyPhotonSF", false,
-	  "To be used in case no recommendations are not available"};
 
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
@@ -285,12 +271,28 @@ namespace HHBBYY
 
     Gaudi::Property<bool> m_save_nonresonant_BDTInput_variables
       {this, "save_nonresonant_BDTInput_variables", false, "Compute quantities useful for the non-resonant BDT training"};
-
-
-    CP::SysReadDecorHandle<bool> 
-    m_selected_ph { this, "selected_ph", "selected_ph_%SYS%", "Name of input decorator for selected ph"};
-
     
+    CP::SysReadDecorHandle<float> m_Photon1_pt 
+      { this, "Photon1_pt", "Photon1_pt_%SYS%", "Photon 1 pT decoration" };
+    CP::SysReadDecorHandle<float> m_Photon1_eta 
+      { this, "Photon1_eta", "Photon1_eta_%SYS%", "Photon 1 eta decoration" };
+    CP::SysReadDecorHandle<float> m_Photon1_phi 
+      { this, "Photon1_phi", "Photon1_phi_%SYS%", "Photon 1 phi decoration" };
+    CP::SysReadDecorHandle<float> m_Photon1_E 
+      { this, "Photon1_E", "Photon1_E_%SYS%", "Photon 1 Energy decoration" };
+    
+    CP::SysReadDecorHandle<float> m_Photon2_pt 
+      { this, "Photon2_pt", "Photon2_pt_%SYS%", "Photon 2 pT decoration" };
+    CP::SysReadDecorHandle<float> m_Photon2_eta 
+      { this, "Photon2_eta", "Photon2_eta_%SYS%", "Photon 2 eta decoration" };
+    CP::SysReadDecorHandle<float> m_Photon2_phi 
+      { this, "Photon2_phi", "Photon2_phi_%SYS%", "Photon 2 phi decoration" };
+    CP::SysReadDecorHandle<float> m_Photon2_E 
+      { this, "Photon2_E", "Photon2_E_%SYS%", "Photon 2 Energy decoration" };
+
+    CP::SysReadDecorHandle<int> m_nPhotons
+      { this, "nPhotons", "nPhotons_%SYS%", "Number of photons decoration" };
+
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;

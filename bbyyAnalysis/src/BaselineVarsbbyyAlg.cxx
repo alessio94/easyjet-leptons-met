@@ -29,17 +29,18 @@ namespace HHBBYY
     ATH_MSG_INFO("*********************************\n");
 
     ATH_CHECK (m_bbyyJetHandle.initialize(m_systematicsList));
+
+
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_bbyyJetHandle));
     }
+
     if (!m_PCBT.empty()) {
       ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_bbyyJetHandle));
     }
+
     if (m_isMC) ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_bbyyJetHandle));
     ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_bbyyJetHandle));
-
-    ATH_CHECK (m_bbyyPhotonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_isEMTight.initialize(m_systematicsList, m_bbyyPhotonHandle));
 
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
@@ -49,14 +50,6 @@ namespace HHBBYY
       ATH_CHECK (m_KF_MBB.initialize(m_systematicsList, m_eventHandle));
     }
 
-    ATH_CHECK (m_selected_ph.initialize(m_systematicsList, m_bbyyPhotonHandle));
-
-    if(m_isMC && !m_saveDummy_ph_SF){
-      ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
-      m_ph_SF = CP::SysReadDecorHandle<float>("effSF_"+m_photonWPName+"_%SYS%", this);
-      ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
-    }
-    
     for (const std::string &string_var: m_floatVariables) {
       CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
       m_Fbranches.emplace(string_var, var);
@@ -96,7 +89,17 @@ namespace HHBBYY
       return StatusCode::FAILURE;
     }
 
+    ATH_CHECK (m_Photon1_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_Photon1_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_Photon1_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_Photon1_E.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK (m_Photon2_pt.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_Photon2_eta.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_Photon2_phi.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK (m_Photon2_E.initialize(m_systematicsList, m_eventHandle));
+
+    ATH_CHECK (m_nPhotons.initialize(m_systematicsList, m_eventHandle));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -119,9 +122,6 @@ namespace HHBBYY
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_bbyyJetHandle.retrieve (jets, sys));
 
-      const xAOD::PhotonContainer *photons = nullptr;
-      ANA_CHECK (m_bbyyPhotonHandle.retrieve (photons, sys));
-
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
       const xAOD::MissingET* met = (*metCont)["Final"];
@@ -142,7 +142,6 @@ namespace HHBBYY
 
       int j_passWP=-99;
       int PCBTjet = -99;
-      double dRyy = -99.;
       
       // Maps for per-event outputs
       std::map<HHBBYY::Var, float> eventFloats;
@@ -183,54 +182,6 @@ namespace HHBBYY
       }
       
       eventFloats.at(HHBBYY::Var::jets_HT) = HT;
-
-      const xAOD::Photon* ph1 = nullptr;
-      const xAOD::Photon* ph2 = nullptr;
-      for(const xAOD::Photon* photon : *photons) {
-        if (m_selected_ph.get(*photon, sys)){
-          if(!ph1) ph1 = photon;
-          else if (!ph2){
-            ph2 = photon;
-            break;
-          }
-        }
-      }
-
-      // photon sector
-      std::vector<const xAOD::Photon*> sel_photons = {ph1, ph2};
-      for(unsigned int i=0; i<2; i++){
-        const xAOD::Photon* ph = sel_photons[i];
-        if(!ph) break;
-        std::string prefix = "Photon"+std::to_string(i+1);
-        TLorentzVector y = ph->p4();
-        m_Fbranches.at(prefix+"_pt").set(*event, y.Pt(), sys);
-        m_Fbranches.at(prefix+"_eta").set(*event, y.Eta(), sys);
-        m_Fbranches.at(prefix+"_phi").set(*event, y.Phi(), sys);
-        m_Fbranches.at(prefix+"_E").set(*event, y.E(), sys);
-        m_Ibranches.at(prefix+"_isEMTight").set(*event, m_isEMTight.get(*ph, sys), sys);
-        if(m_isMC){
-          float SF = m_saveDummy_ph_SF ? 1. : m_ph_SF.get(*ph, sys);
-          m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
-        }
-      }
-
-      if (ph1 && ph2) {
-        // Build the H(yy) candidate
-        H_yy = ph1->p4() + ph2->p4();
-        dRyy = ph1->p4().DeltaR(ph2->p4());
-
-        m_Fbranches.at("myy").set(*event, H_yy.M(), sys);
-        m_Fbranches.at("pTyy").set(*event, H_yy.Pt(), sys);
-        m_Fbranches.at("Etayy").set(*event, H_yy.Eta(), sys);
-        m_Fbranches.at("Phiyy").set(*event, H_yy.Phi(), sys);
-        m_Fbranches.at("dRyy").set(*event, dRyy, sys);
-
-        m_Fbranches.at("Photon1_ptOvermyy").set(*event, ph1->pt()/H_yy.M(), sys);
-        m_Fbranches.at("Photon2_ptOvermyy").set(*event, ph2->pt()/H_yy.M(), sys);
-
-        eventFloats.at(HHBBYY::Var::yy_dR) = dRyy;
-
-      }
 
       // inclusive jet sector
       if (m_save_nonresonant_BDTInput_variables){
@@ -275,14 +226,28 @@ namespace HHBBYY
       }
 
       std::vector<const xAOD::Jet*> Hbb_jets = {Hbb_Jet1, Hbb_Jet2};
-      std::vector<const xAOD::Photon*> Hyy_photons = {ph1, ph2};
+
+      TLorentzVector ph1(0.,0.,0.,0.);
+      ph1.SetPtEtaPhiE(m_Photon1_pt.get(*event, sys), 
+                       m_Photon1_eta.get(*event, sys), 
+                       m_Photon1_phi.get(*event, sys), 
+                       m_Photon1_E.get(*event, sys));
+      TLorentzVector ph2(0.,0.,0.,0.);
+        ph2.SetPtEtaPhiE(m_Photon2_pt.get(*event, sys), 
+                         m_Photon2_eta.get(*event, sys), 
+                         m_Photon2_phi.get(*event, sys), 
+                         m_Photon2_E.get(*event, sys));
+      int n_photons = m_nPhotons.get(*event, sys);
+      
+      std::vector<TLorentzVector> Hyy_photons = {ph1, ph2};
 
       // Fill the bb and bbyy branches
       if (jets->size() >= 2) {
         fill_bb_branches(Hbb_jets, "", event, sys);
         if (m_doKF) {eventFloats.at(HHBBYY::Var::bb_m_KF_unconstrained) = m_KF_MBB.get(*event, sys);}
 
-        if(ph1 && ph2) {
+        if(n_photons >= 2){
+          H_yy = ph1 + ph2;
           HH = H_yy + H_bb;
           double Higgs_mass = 125. * Athena::Units::GeV;
           float bbyy_mStar = HH.M() - (H_bb.M() - Higgs_mass)-(H_yy.M() - Higgs_mass);
@@ -296,7 +261,7 @@ namespace HHBBYY
         float topness = compute_Topness(jets);
         m_Fbranches.at("topness").set(*event, topness, sys);
         
-        std::vector<float> eventShapes = compute_EventShapes(Hbb_Jet1, Hbb_Jet2, photons);
+        std::vector<float> eventShapes = compute_EventShapes(Hbb_Jet1, Hbb_Jet2, Hyy_photons, n_photons);
         m_Fbranches.at("sphericityT").set(*event, eventShapes[0], sys);
         m_Fbranches.at("planarFlow").set(*event, eventShapes[1], sys);
 
@@ -304,22 +269,21 @@ namespace HHBBYY
         eventFloats.at(HHBBYY::Var::planarFlow) = eventShapes[1];
         eventFloats.at(HHBBYY::Var::topness) = topness;
 
-        float pTBalance = compute_pTBalance(Hbb_Jet1, Hbb_Jet2, photons);
+        float pTBalance = compute_pTBalance(Hbb_Jet1, Hbb_Jet2, Hyy_photons, n_photons);
         m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
         m_Fbranches.at("HT").set(*event, HT, sys);
       }
 
-      m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
 
       // bdt (vbf jets selection)
-      ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_Jet1, Hbb_Jet2, jets, HT, HH, "Jet_vbf_j", "Jet_vbf_jj",eventFloats, event, sys));
+      ATH_CHECK(vbf_calculations(ph1,ph2,n_photons,Hbb_Jet1, Hbb_Jet2, jets, HT, HH, "Jet_vbf_j", "Jet_vbf_jj",eventFloats, event, sys));
 
       // bdt (low and high mHH categorations)
       if(m_do_nonresonant_BDTs){
-        if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
+        if (n_photons >= 2 && Hbb_Jet1 && Hbb_Jet2) {
           performCategorisationBDT(ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, metCont, sys, eventFloats, eventInts, false, false, year);
         }
         m_Fbranches.at("bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
@@ -395,14 +359,14 @@ namespace HHBBYY
             m_Fbranches.at("KF_Phibbyy").set(*event, HH_KF.Phi(), sys);
             m_Fbranches.at("KF_dRHH").set(*event, H_yy.DeltaR(H_bb_KF), sys);
 
-	    //vbf jets selection KF
-	    ATH_CHECK(vbf_calculations(ph1,ph2,Hbb_KFJet1, Hbb_KFJet2, KFJets, KF_HT, HH_KF, "KF_Jet_vbf_j", "KF_Jet_vbf_jj", eventFloats, event, sys));
+            //vbf jets selection KF
+            ATH_CHECK(vbf_calculations(ph1,ph2,n_photons,Hbb_KFJet1, Hbb_KFJet2, KFJets, KF_HT, HH_KF, "KF_Jet_vbf_j", "KF_Jet_vbf_jj", eventFloats, event, sys));
           }
-	  
+
           //mva variables
           float KF_topness = compute_Topness(KFJets);
-          std::vector<float> KF_eventShapes = compute_EventShapes(Hbb_KFJet1, Hbb_KFJet2, photons);
-          float KF_pTBalance = compute_pTBalance(Hbb_KFJet1, Hbb_KFJet2, photons);
+          std::vector<float> KF_eventShapes = compute_EventShapes(Hbb_KFJet1, Hbb_KFJet2, Hyy_photons, n_photons);
+          float KF_pTBalance = compute_pTBalance(Hbb_KFJet1, Hbb_KFJet2, Hyy_photons, n_photons);
           m_Fbranches.at("KF_topness").set(*event, KF_topness, sys);
           m_Fbranches.at("KF_sphericityT").set(*event, KF_eventShapes[0], sys);
           m_Fbranches.at("KF_planarFlow").set(*event, KF_eventShapes[1], sys);
@@ -412,7 +376,7 @@ namespace HHBBYY
           eventFloats.at(HHBBYY::Var::topness_KF) = KF_topness;
           
           if(m_do_nonresonant_BDTs){   
-            if (ph1 && ph2 && Hbb_KFJet1 && Hbb_KFJet2){    
+            if (n_photons >= 2 && Hbb_KFJet1 && Hbb_KFJet2){    
               performCategorisationBDT(ph1, ph2, Hbb_KFJet1, Hbb_KFJet2, KFJets, metCont, sys, eventFloats, eventInts, true, false, year);
             }
             m_Fbranches.at("KF_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_KF), sys);
@@ -433,7 +397,7 @@ namespace HHBBYY
         }
         for(int i=0; i<2; i++)
         {
-          if(nCentralJets>=2 && ph1 && ph2) 
+          if(nCentralJets>=2 && n_photons>=2) 
           {
             float GNN_maxscore = -99.;
             float GNN_vbf_jj_maxscore=0.;
@@ -482,13 +446,13 @@ namespace HHBBYY
             eventFloats.at(HHBBYY::Var::vbfjj_m_GNN) = GNN_vbf_jj.M();
             eventFloats.at(HHBBYY::Var::vbfjj_dEta_GNN) = std::fabs(GNN_vbf_j[0].Eta() - GNN_vbf_j[1].Eta());
   
-            std::vector<float> GNN_eventShapes = compute_EventShapes(GNN_jets[0], GNN_jets[1], photons);
+            std::vector<float> GNN_eventShapes = compute_EventShapes(GNN_jets[0], GNN_jets[1], Hyy_photons, n_photons);
             m_Fbranches.at("GNN_" + prefix + "_sphericityT").set(*event, GNN_eventShapes[0], sys);
             m_Fbranches.at("GNN_" + prefix + "_planarFlow").set(*event, GNN_eventShapes[1], sys);
             eventFloats.at(HHBBYY::Var::sphericityT_GNN) = GNN_eventShapes[0];
             eventFloats.at(HHBBYY::Var::planarFlow_GNN) = GNN_eventShapes[1];
   
-            float GNN_pTBalance = compute_pTBalance(GNN_jets[0], GNN_jets[1], photons);
+            float GNN_pTBalance = compute_pTBalance(GNN_jets[0], GNN_jets[1], Hyy_photons, n_photons);
             m_Fbranches.at("GNN_" + prefix + "_pTBalance").set(*event, GNN_pTBalance, sys);
   
             performCategorisationBDT(ph1, ph2, GNN_jets[0], GNN_jets[1], jets, metCont, sys, eventFloats, eventInts, false, true, year);
@@ -549,9 +513,9 @@ namespace HHBBYY
     m_Fbranches.at(prefix+"dRbb").set(*event, Hbb_jets[0]->p4().DeltaR(Hbb_jets[1]->p4()), sys);
   }
 
-  void BaselineVarsbbyyAlg::fill_bbyy_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::vector<const xAOD::Photon*> &Hyy_photons, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys) {
+  void BaselineVarsbbyyAlg::fill_bbyy_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::vector<TLorentzVector> &Hyy_photons, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys) {
     TLorentzVector H_bb = Hbb_jets[0]->p4() + Hbb_jets[1]->p4();
-    TLorentzVector H_yy = Hyy_photons[0]->p4() + Hyy_photons[1]->p4();
+    TLorentzVector H_yy = Hyy_photons[0] + Hyy_photons[1];
 
     TLorentzVector HH = H_yy + H_bb;
 
@@ -573,7 +537,7 @@ namespace HHBBYY
     }
 
     if (m_save_extra_vars){
-      std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(Hyy_photons[0]->p4(),Hyy_photons[1]->p4(),Hbb_jets[0]->p4(),Hbb_jets[1]->p4());
+      std::vector<double> vec_angular_variables_CM=compute_angular_variables_CM(Hyy_photons[0], Hyy_photons[1], Hbb_jets[0]->p4(), Hbb_jets[1]->p4());
 
       m_Fbranches.at(prefix+"cos_theta_yy_cm_bbyy").set(*event,vec_angular_variables_CM[0],sys);
       m_Fbranches.at(prefix+"phi_yy_cm_bbyy").set(*event,vec_angular_variables_CM[1], sys);
@@ -654,10 +618,8 @@ namespace HHBBYY
     m_output_node_dims_sum.push_back(output_node_dims_sum);
   }
 
-  std::vector<const xAOD::Jet*> BaselineVarsbbyyAlg::getHbb_GNN_ggFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys){
-    TLorentzVector y1 = ph1->p4();
-    TLorentzVector y2 = ph2->p4();
-    TLorentzVector H_yy = y1 + y2;
+  std::vector<const xAOD::Jet*> BaselineVarsbbyyAlg::getHbb_GNN_ggFTarget(const xAOD::JetContainer *jets, const TLorentzVector& ph1, const TLorentzVector& ph2, float& max_score, float pile_up, const auto &sys){
+    TLorentzVector H_yy = ph1 + ph2;
 
     std::vector<float> node3 = {static_cast<float>(H_yy.Pt()/H_yy.M()), static_cast<float>(H_yy.Eta()), static_cast<float>(H_yy.Phi()), static_cast<float>(H_yy.E()/H_yy.M()), -2., 1.};
 
@@ -747,10 +709,8 @@ namespace HHBBYY
     return GNN_jets;
   }
 
-  std::vector<const xAOD::Jet*> BaselineVarsbbyyAlg::getHbb_GNN_VBFTarget(const xAOD::JetContainer *jets, const xAOD::Photon *ph1, const xAOD::Photon *ph2, float& max_score, float pile_up, const auto &sys){
-    TLorentzVector y1 = ph1->p4();
-    TLorentzVector y2 = ph2->p4();
-    TLorentzVector H_yy = y1 + y2;
+  std::vector<const xAOD::Jet*> BaselineVarsbbyyAlg::getHbb_GNN_VBFTarget(const xAOD::JetContainer *jets, const TLorentzVector& ph1, const TLorentzVector& ph2, float& max_score, float pile_up, const auto &sys){
+    TLorentzVector H_yy = ph1 + ph2;
 
     std::vector<float> node3 = {static_cast<float>(H_yy.Pt()/H_yy.M()), static_cast<float>(H_yy.Eta()), static_cast<float>(H_yy.Phi()), static_cast<float>(H_yy.E()/H_yy.M()), -2., 1.};
 
@@ -900,14 +860,12 @@ namespace HHBBYY
   eventShapes[1] = planarFlow;
   */
   std::vector<float> BaselineVarsbbyyAlg::compute_EventShapes(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
-                                                 const xAOD::PhotonContainer *photons){
+                                                 const std::vector<TLorentzVector>& photons, const int& n_photons){
     std::vector<float> eventShapes(2);
-    if (Hbb_Jet1 && Hbb_Jet2 && photons->size() >= 2) {
-      TLorentzVector photon1 = photons->at(0)->p4();
-      TLorentzVector photon2 = photons->at(1)->p4();
+    if (Hbb_Jet1 && Hbb_Jet2 && n_photons >= 2) {
       TLorentzVector bjet1 = Hbb_Jet1->p4();
       TLorentzVector bjet2 = Hbb_Jet2->p4();
-      std::vector<TLorentzVector> p4_vec = {photon1, photon2, bjet1, bjet2};
+      std::vector<TLorentzVector> p4_vec = {photons[0], photons[1], bjet1, bjet2};
 
       TMatrixDSym MomentumTensor = TMatrixDSym(3);
       TMatrixDSym MomentumTensorT = TMatrixDSym(3);
@@ -959,15 +917,14 @@ namespace HHBBYY
   }
 
   float BaselineVarsbbyyAlg::compute_pTBalance(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
-                                            const xAOD::PhotonContainer *photons){
+                                            const std::vector<TLorentzVector>& photons,
+                                            const int& n_photons){
     float pTBalance = -99;
-    if (Hbb_Jet1 && Hbb_Jet2 && photons->size() >= 2) {
-      TLorentzVector photon1 = photons->at(0)->p4();
-      TLorentzVector photon2 = photons->at(1)->p4();
+    if (Hbb_Jet1 && Hbb_Jet2 && n_photons >= 2) {
       TLorentzVector bjet1 = Hbb_Jet1->p4();
       TLorentzVector bjet2 = Hbb_Jet2->p4();
       float numerator, denominator;
-      std::vector<TLorentzVector> p4_vec = {photon1, photon2, bjet1, bjet2};
+      std::vector<TLorentzVector> p4_vec = {photons[0], photons[1], bjet1, bjet2};
       TLorentzVector numerator_p4(0.,0.,0.,0.);
       denominator = 0;
       for(const auto& p4 : p4_vec){
@@ -998,7 +955,7 @@ namespace HHBBYY
     f->Close();
   }
 
-  std::vector<float> BaselineVarsbbyyAlg::makeXGBoostDMatrixLegacyNonres(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+  std::vector<float> BaselineVarsbbyyAlg::makeXGBoostDMatrixLegacyNonres(const TLorentzVector& ph1, const TLorentzVector& ph2,
                                                                          ConstDataVector<xAOD::JetContainer> &categorisation_jets,
                                                                          const xAOD::MissingETContainer *met, const auto &sys, 
                                                                          const std::map<HHBBYY::Var, float> &eventFloats, bool isKFvariables, bool isGNNvariables) {
@@ -1019,13 +976,13 @@ namespace HHBBYY
     TLorentzVector H_bb = categorisation_jets.at(0)->p4() + categorisation_jets.at(1)->p4();
 
     // photons
-    float myy = (ph1->p4() + ph2->p4()).M();
-    vars[HHBBYY::Var::y1_ptOverMyy] = ph1->pt() / myy;
-    vars[HHBBYY::Var::y1_eta] = ph1->eta();
-    vars[HHBBYY::Var::y1_phi] = ph1->phi() ;
-    vars[HHBBYY::Var::y2_ptOverMyy] = ph2->pt() / myy;
-    vars[HHBBYY::Var::y2_eta] = ph2->eta();
-    vars[HHBBYY::Var::y2_phi] = ph2->phi();
+    float myy = (ph1 + ph2).M();
+    vars[HHBBYY::Var::y1_ptOverMyy] = ph1.Pt() / myy;
+    vars[HHBBYY::Var::y1_eta] = ph1.Eta();
+    vars[HHBBYY::Var::y1_phi] = ph1.Phi() ;
+    vars[HHBBYY::Var::y2_ptOverMyy] = ph2.Pt() / myy;
+    vars[HHBBYY::Var::y2_eta] = ph2.Eta();
+    vars[HHBBYY::Var::y2_phi] = ph2.Phi();
     // met
     vars[HHBBYY::Var::met] = (*met)["Final"]->met();
     vars[HHBBYY::Var::met_phi] = (*met)["Final"]->phi();
@@ -1059,7 +1016,7 @@ namespace HHBBYY
     vars[HHBBYY::Var::bb_m] = (isKFvariables) ? eventFloats.at(HHBBYY::Var::bb_m_KF_unconstrained) : H_bb.M(); // for KF we need to use the version of bb_m from the second iteration
 
     vars[HHBBYY::Var::bb_dR] = categorisation_jets.at(0)->p4().DeltaR(categorisation_jets.at(1)->p4());
-    vars[HHBBYY::Var::yy_dR] = eventFloats.at(HHBBYY::Var::yy_dR);
+    vars[HHBBYY::Var::yy_dR] = ph1.DeltaR(ph2);
 
     vars[HHBBYY::Var::jets_HT] = (isKFvariables) ? eventFloats.at(HHBBYY::Var::jets_HT_KF) : eventFloats.at(HHBBYY::Var::jets_HT);
       // ChiWt variable
@@ -1106,14 +1063,15 @@ namespace HHBBYY
       vars[HHBBYY::Var::planarFlow] = eventFloats.at(HHBBYY::Var::planarFlow_GNN);
     }
 
-    const float bbyy_sumPt = ph1->pt() + ph2->pt() + categorisation_jets.at(0)->pt() + categorisation_jets.at(1)->pt();
-    TLorentzVector HH = ph1->p4() + ph2->p4() + categorisation_jets.at(0)->p4() + categorisation_jets.at(1)->p4();
+    const float bbyy_sumPt = ph1.Pt() + ph2.Pt() + categorisation_jets.at(0)->pt() + categorisation_jets.at(1)->pt();
+    TLorentzVector HH = ph1 + ph2 + categorisation_jets.at(0)->p4() + categorisation_jets.at(1)->p4();
     vars[HHBBYY::Var::bbyy_ptOverSumPt] = HH.Pt() / bbyy_sumPt;
 
     return vars;
   }
 
-  StatusCode BaselineVarsbbyyAlg::vbf_calculations(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+  StatusCode BaselineVarsbbyyAlg::vbf_calculations(const TLorentzVector& ph1, const TLorentzVector& ph2,
+                           const int& n_photons,
 						   const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::JetContainer *jets,
 						   double HT, const TLorentzVector& HH,
 						   const std::string& prefix_j, const std::string& prefix_jj,
@@ -1124,7 +1082,7 @@ namespace HHBBYY
     float vbf_jj_maxscore = 0;
 
     if (m_do_nonresonant_BDTs || m_save_VBF_vars) {
-      if (ph1 && ph2 && Hbb_Jet1 && Hbb_Jet2) {
+      if (n_photons >= 2 && Hbb_Jet1 && Hbb_Jet2) {
 	if (m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) {
 	  vbf_jj_maxscore = getVBFjets_BDT(HT, ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, vbf_j);
 	} else if (m_vbfjets_method == HHBBYY::VBFjetsMethod::mjj) {
@@ -1146,11 +1104,11 @@ namespace HHBBYY
     
     if (m_save_VBF_vars) {
       for (unsigned int i = 0; i < 2; i++) {
-	std::string full_prefix = prefix_j + std::to_string(i + 1);
-	m_Fbranches.at(full_prefix + "_pt").set(*event, vbf_j[i].Pt(), sys);
-	m_Fbranches.at(full_prefix + "_eta").set(*event, vbf_j[i].Eta(), sys);
-	m_Fbranches.at(full_prefix + "_phi").set(*event, vbf_j[i].Phi(), sys);
-	m_Fbranches.at(full_prefix + "_E").set(*event, vbf_j[i].E(), sys);
+        std::string full_prefix = prefix_j + std::to_string(i + 1);
+        m_Fbranches.at(full_prefix + "_pt").set(*event, vbf_j[i].Pt(), sys);
+        m_Fbranches.at(full_prefix + "_eta").set(*event, vbf_j[i].Eta(), sys);
+        m_Fbranches.at(full_prefix + "_phi").set(*event, vbf_j[i].Phi(), sys);
+        m_Fbranches.at(full_prefix + "_E").set(*event, vbf_j[i].E(), sys);
       }
 
       if (m_vbfjets_method == HHBBYY::VBFjetsMethod::BDT) m_Fbranches.at(prefix_jj + "_maxscore").set(*event, vbf_jj_maxscore, sys);
@@ -1176,7 +1134,7 @@ namespace HHBBYY
   }
 
   // Selects VBF jets based on VBF jet BDT score
-  float BaselineVarsbbyyAlg::getVBFjets_BDT(float ht, const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+  float BaselineVarsbbyyAlg::getVBFjets_BDT(float ht, const TLorentzVector& ph1, const TLorentzVector& ph2,
                                          const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                                          const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]) {
 
@@ -1197,9 +1155,7 @@ namespace HHBBYY
     if (nCandidateVBFJets >= 2) {
 
       // candidate photons
-      TLorentzVector y1 = ph1->p4();
-      TLorentzVector y2 = ph2->p4();
-      TLorentzVector yy = y1 + y2;
+      TLorentzVector yy = ph1 + ph2;
       // candidate bjets
       TLorentzVector b1 = Hbb_Jet1->p4();
       TLorentzVector b2 = Hbb_Jet2->p4();
@@ -1340,7 +1296,7 @@ namespace HHBBYY
   }
 
   // Low and High mass regions (categorization)
-  void BaselineVarsbbyyAlg::performCategorisationBDT(const xAOD::Photon *ph1, const xAOD::Photon *ph2,
+  void BaselineVarsbbyyAlg::performCategorisationBDT(const TLorentzVector& ph1, const TLorentzVector& ph2,
                                                      const xAOD::Jet *Hbb_Jet1, 
                                                      const xAOD::Jet *Hbb_Jet2, 
                                                      const xAOD::JetContainer *jets,

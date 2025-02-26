@@ -8,6 +8,34 @@ def get_selected_objects_branches_variables(flags, analysis):
     float_variable_names = []
     int_variable_names = []
 
+    # functions in a dictionary
+    get_selected_X_branches_variables = {
+        "Jet": get_selected_jet_branches_variables,
+        "Jet_b": get_selected_jet_b_tagged_branches_variables,
+        "Jet_c": get_selected_jet_c_tagged_branches_variables,
+        "LargeRJet": get_selected_largeR_jet_branches_variables,
+        "Photon": get_selected_photon_branches_variables,
+        "Electron": get_selected_electron_branches_variables,
+        "Muon": get_selected_muon_branches_variables,
+        "Tau": get_selected_tau_branches_variables,
+        "Lepton": get_selected_lepton_branches_variables
+    }
+
+    for object_type in get_selected_X_branches_variables.keys():
+        _branches, _float_variable_names, _int_variable_names = \
+            get_selected_X_branches_variables[object_type](flags, analysis)
+        branches += _branches
+        float_variable_names += _float_variable_names
+        int_variable_names += _int_variable_names
+
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_jet_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
     if not flags.Analysis.do_CP_systematics:
         sys_suffix = "NOSYS"
     else:
@@ -29,6 +57,19 @@ def get_selected_objects_branches_variables(flags, analysis):
                         -> {analysis}_Jet{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_jet_b_tagged_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
+
     # B tagged jets
     for var in [*flags.Analysis.Small_R_jet.variables_int_bjets,
                 *flags.Analysis.Small_R_jet.variables_bjets]:
@@ -44,6 +85,19 @@ def get_selected_objects_branches_variables(flags, analysis):
             branches += [f"EventInfo.Jet_b{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Jet_b{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
+
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_jet_c_tagged_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
 
     # C tagged jets
     for var in [*flags.Analysis.Small_R_jet.variables_int_cjets,
@@ -61,6 +115,19 @@ def get_selected_objects_branches_variables(flags, analysis):
                         -> {analysis}_Jet_c{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_largeR_jet_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
+
     # Large R jets
     for var in [*flags.Analysis.Large_R_jet.variables_int_LargeRJets,
                 *flags.Analysis.Large_R_jet.variables_LargeRJets]:
@@ -76,6 +143,19 @@ def get_selected_objects_branches_variables(flags, analysis):
             branches += [f"EventInfo.LargeRJet{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_LargeRJet{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
+
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_photon_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
 
     # Photons
     for var in [*flags.Analysis.Photon.variables,
@@ -93,6 +173,19 @@ def get_selected_objects_branches_variables(flags, analysis):
                         -> {analysis}_Photon{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_electron_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
+
     # Electrons
     for var in [*flags.Analysis.Electron.variables,
                 *flags.Analysis.Electron.variables_int]:
@@ -108,6 +201,19 @@ def get_selected_objects_branches_variables(flags, analysis):
             branches += [f"EventInfo.Electron{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Electron{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
+
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_muon_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
 
     # Muons
     for var in [*flags.Analysis.Muon.variables,
@@ -125,6 +231,19 @@ def get_selected_objects_branches_variables(flags, analysis):
                         -> {analysis}_Muon{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_tau_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
+
     # Taus
     for var in [*flags.Analysis.Tau.variables,
                 *flags.Analysis.Tau.variables_int]:
@@ -140,6 +259,19 @@ def get_selected_objects_branches_variables(flags, analysis):
             branches += [f"EventInfo.Tau{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Tau{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
+
+    return branches, float_variable_names, int_variable_names
+
+
+def get_selected_lepton_branches_variables(flags, analysis):
+    branches = []
+    float_variable_names = []
+    int_variable_names = []
+
+    if not flags.Analysis.do_CP_systematics:
+        sys_suffix = "NOSYS"
+    else:
+        sys_suffix = "%SYS%"
 
     # Selected Lepton
     for var in [*flags.Analysis.Lepton.variables,

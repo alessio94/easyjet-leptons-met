@@ -1,6 +1,7 @@
 #include "../MbbKinFitDecoratorAlg.h"
 #include "../BaselineVarsbbyyAlg.h"
 #include "../LeptonVarsbbyyAlg.h"
+#include "../PhotonVarsbbyyAlg.h"
 #include "../bbyySelectorAlg.h"
 #include "../ResonantPNNbbyyAlg.h"
 #include "../BoostedVarsbbyyAlg.h"
@@ -9,6 +10,7 @@
 DECLARE_COMPONENT(HHBBYY::MbbKinFitDecoratorAlg)
 DECLARE_COMPONENT(HHBBYY::BaselineVarsbbyyAlg)
 DECLARE_COMPONENT(HHBBYY::LeptonVarsbbyyAlg)
+DECLARE_COMPONENT(HHBBYY::PhotonVarsbbyyAlg)
 DECLARE_COMPONENT(HHBBYY::bbyySelectorAlg)
 DECLARE_COMPONENT(HHBBYY::bbyyFilterDalitzAlg)
 DECLARE_COMPONENT(SHBBYY::ResonantPNNbbyyAlg)

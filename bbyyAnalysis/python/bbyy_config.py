@@ -8,17 +8,20 @@ from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     PhotonSelectorAlgCfg, MuonSelectorAlgCfg, ElectronSelectorAlgCfg,
     JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
-    get_selected_objects_branches_variables,
+    get_selected_photon_branches_variables,
+    get_selected_jet_branches_variables,
 )
 import AthenaCommon.SystemOfUnits as Units
+from itertools import chain
 
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
              float_variables=None, int_variables=None):
+    keys = ["baseline", "photons", "leptons"]
     if not float_variables:
-        float_variables = []
+        float_variables = {key: [] for key in keys}
     if not int_variables:
-        int_variables = []
+        int_variables = {key: [] for key in keys}
 
     cfg = ComponentAccumulator()
     cfg.merge(PhotonSelectorAlgCfg(flags,
@@ -97,10 +100,29 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         )
 
     cfg.addEventAlgo(
+        CompFactory.HHBBYY.LeptonVarsbbyyAlg(
+            "LeptonVarsbbyyAlg",
+            intVariableList=int_variables['leptons'],
+            doSystematics=flags.Analysis.do_CP_systematics,
+        )
+    )
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBYY.PhotonVarsbbyyAlg(
+            "PhotonVarsbbyyAlg",
+            photons=photonkey,
+            photonWP=SelectedPhotonLabel,
+            saveDummyPhotonSF=flags.GeoModel.Run is LHCPeriod.Run2,
+            floatVariableList=float_variables['photons'],
+            intVariableList=int_variables['photons'],
+            doSystematics=flags.Analysis.do_CP_systematics,
+            isMC=flags.Input.isMC,
+        )
+    )
+
+    cfg.addEventAlgo(
         CompFactory.HHBBYY.BaselineVarsbbyyAlg(
             "BaselineVarsbbyyAlg",
-            photons=photonkey, photonWP=SelectedPhotonLabel,
-            saveDummyPhotonSF=flags.GeoModel.Run is LHCPeriod.Run2,
             KFJets="bbyyAnalysisKFJets_%SYS%" if flags.Analysis.do_KinematicFit else "",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0],  # noqa
@@ -113,21 +135,14 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             save_VBF_vars=flags.Analysis.save_VBF_vars,
             isMC=flags.Input.isMC,
             doKF=flags.Analysis.do_KinematicFit,
-            floatVariableList=float_variables,
-            intVariableList=int_variables,
+            floatVariableList=float_variables['baseline'],
+            intVariableList=int_variables['baseline'],
             doSystematics=flags.Analysis.do_CP_systematics,
             doResonantonebtag=flags.Analysis.do_resonant_onebtag,
             save_HbbCand_vars=flags.Analysis.save_HbbCand_vars,
             save_extra_vars=flags.Analysis.save_extra_vars,
             save_nonresonant_BDTInput_variables=(
                 flags.Analysis.save_nonresonant_BDTInput_variables)
-        )
-    )
-
-    cfg.addEventAlgo(
-        CompFactory.HHBBYY.LeptonVarsbbyyAlg(
-            "LeptonVarsbbyyAlg",
-            doSystematics=flags.Analysis.do_CP_systematics,
         )
     )
 
@@ -159,18 +174,37 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
     return cfg
 
 
+def get_PhotonVarsbbyyAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    # Photon variables
+    int_variable_names += ["nPhotons"]
+    float_variable_names += ["myy", "pTyy", "Etayy", "Phiyy", "dRyy"]
+
+    return float_variable_names, int_variable_names
+
+
+def get_LeptonVarsbbyyAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    # Lepton variables
+    int_variable_names += ["nLeptons"]
+
+    return float_variable_names, int_variable_names
+
+
 def get_BaselineVarsbbyyAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
     # Number of objects
-    int_variable_names += ["nPhotons", "nJets", "nCentralJets", "nBJets", "nLeptons",
-                           ]
+    int_variable_names += ["nJets", "nCentralJets", "nBJets"]
     if flags.Analysis.do_nonresonant_BDTs:
         int_variable_names += ["bdtSel_category"]
 
     # Reconstructed Higgses
-    float_variable_names += ["myy", "pTyy", "Etayy", "Phiyy", "dRyy"]
     float_variable_names += ["mbb", "pTbb", "Etabb", "Phibb", "dRbb"]
 
     if (flags.Analysis.save_extra_vars):
@@ -329,17 +363,27 @@ def bbyy_branches(flags):
     # this will be all the variables that are calculated by the
     # BaselineVarsbbllAlg algorithm
     all_baseline_variable_names = []
-    float_variable_names = []
-    int_variable_names = []
+    keys = ["baseline", "photons", "leptons", "jets"]
+    float_variable_names = {key: [] for key in keys}
+    int_variable_names = {key: [] for key in keys}
 
     # these are the variables that will always be stored by easyjet specific to HHbbyy
     baseline_float_variables, baseline_int_variables \
         = get_BaselineVarsbbyyAlg_variables(flags)
-    float_variable_names += baseline_float_variables
-    int_variable_names += baseline_int_variables
+    photon_float_variables, photon_int_variables \
+        = get_PhotonVarsbbyyAlg_variables(flags)
+    lepton_float_variables, lepton_int_variables \
+        = get_LeptonVarsbbyyAlg_variables(flags)
+
+    float_variable_names['baseline'] += baseline_float_variables
+    int_variable_names['baseline'] += baseline_int_variables
+    float_variable_names['photons'] += photon_float_variables
+    int_variable_names['photons'] += photon_int_variables
+    float_variable_names['leptons'] += lepton_float_variables
+    int_variable_names['leptons'] += lepton_int_variables
 
     if flags.Analysis.do_KinematicFit:
-        # do not append KF_mbb variables to float_variable_names
+        # do not append KF_mbb variables to float_variable_names['baseline']
         # as they are stored by the KF algorithm not BaselineVarsbbyyAlg
         all_baseline_variable_names += ["KF_mbb"]
 
@@ -348,17 +392,18 @@ def bbyy_branches(flags):
     if flags.Analysis.do_resonant_PNN:
         SH_float_variables, SH_int_variables \
             = get_BaselineVarsbbyyAlg_SH(flags)
-        float_variable_names += SH_float_variables
-        int_variable_names += SH_int_variables
+        float_variable_names['baseline'] += SH_float_variables
+        int_variable_names['baseline'] += SH_int_variables
 
     # Here are some variables which can be stored for the boosted case
     if flags.Analysis.do_Boosted:
         boosted_float_variables, boosted_int_variables \
             = get_BoostedVarsbbyyAlg(flags)
-        float_variable_names += boosted_float_variables
-        int_variable_names += boosted_int_variables
+        float_variable_names['baseline'] += boosted_float_variables
+        int_variable_names['baseline'] += boosted_int_variables
 
-    all_baseline_variable_names += [*float_variable_names, *int_variable_names]
+    all_baseline_variable_names += [*chain.from_iterable(float_variable_names.values()),
+                                    *chain.from_iterable(int_variable_names.values())]
 
     if not flags.Analysis.do_CP_systematics:
         sys_suffix = "NOSYS"
@@ -372,12 +417,30 @@ def bbyy_branches(flags):
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
     # in the object configs.
-    object_level_branches, object_level_float_variables, object_level_int_variables \
-        = get_selected_objects_branches_variables(flags, "bbyy")
-    float_variable_names += object_level_float_variables
-    int_variable_names += object_level_int_variables
+    object_level_branches = {key: [] for key in keys}
+    object_level_float_variables = {key: [] for key in keys}
+    object_level_int_variables = {key: [] for key in keys}
 
-    branches += object_level_branches
+    (object_level_branches['photons'],
+     object_level_float_variables['photons'],
+     object_level_int_variables['photons']) = \
+        get_selected_photon_branches_variables(flags, "bbyy")
+
+    float_variable_names['photons'] += object_level_float_variables['photons']
+    int_variable_names['photons'] += object_level_int_variables['photons']
+
+    (object_level_branches['jets'],
+     object_level_float_variables['jets'],
+     object_level_int_variables['jets']) = \
+        get_selected_jet_branches_variables(flags, "bbyy")
+
+    # TODO this will have to be changed in "jets"
+    # when moving Jet-related variables in separate algo
+    float_variable_names['baseline'] += object_level_float_variables["jets"]
+    int_variable_names['baseline'] += object_level_int_variables["jets"]
+
+    branches += object_level_branches["photons"]
+    branches += object_level_branches["jets"]
 
     # More event info variables:
     s_name = flags.Analysis.selection_name

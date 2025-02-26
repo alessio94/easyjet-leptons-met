@@ -48,14 +48,14 @@ namespace HHBBYY
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
-    CP::SysReadDecorHandle<unsigned int> m_year
-      {this, "year", "dataTakingYear", ""};
- 
     Gaudi::Property<bool> m_doSystematics
       { this, "doSystematics", false, "Run on all systematics" };
+    
+    Gaudi::Property<std::vector<std::string>> m_intVariables
+      {this, "intVariableList", {}, "Name list of integer variables"};
 
     /// \brief Setup sys-aware output decorations
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches_lep;
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
   };
 }
 #endif
