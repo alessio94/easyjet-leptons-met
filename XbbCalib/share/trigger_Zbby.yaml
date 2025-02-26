@@ -1,0 +1,13 @@
+selection:
+  chains:
+    '2015':
+    - 'HLT_g120_loose'
+    '2016':
+    - 'HLT_g140_loose'
+    '2017':
+    - 'HLT_g140_loose'
+    '2018':
+    - 'HLT_g140_loose'
+
+# scale_factor:
+#   doSF: True

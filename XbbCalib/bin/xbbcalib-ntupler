@@ -21,6 +21,8 @@ from EasyjetHub.output.ttree.minituple_config import minituple_cfg
 
 from XbbCalib.XbbCalib_config import XbbCalib_branches
 from XbbCalib.XbbCalib_config import XbbCalib_cfg
+from XbbCalib.ZbbyCalib_config import ZbbyCalib_branches
+from XbbCalib.ZbbyCalib_config import ZbbyCalib_cfg
 from XbbCalib.ZbbjCalib_config import ZbbjCalib_branches
 from XbbCalib.ZbbjCalib_config import ZbbjCalib_cfg
 from XbbCalib.ZllCalib_config import ZllCalib_branches
@@ -63,6 +65,25 @@ def XbbCalib_job_cfg():
             seqname
         )
         cfg.merge(event_counter_cfg("n_XbbCalib"), seqname)
+
+    elif flags.Analysis.do_ZbbyCalib:
+        extra_XbbCalib_branches,float_variable_names,int_variable_names = ZbbyCalib_branches(flags)
+
+        cfg.merge(
+            ZbbyCalib_cfg(
+                flags,
+                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
+                largejetkey=flags.Analysis.container_names.output.reco10UFOJet,
+                muonkey=flags.Analysis.container_names.output.muons,
+                electronkey=flags.Analysis.container_names.output.electrons,
+                photonkey=flags.Analysis.container_names.output.photons,
+                float_variables=float_variable_names,
+                int_variables=int_variable_names,
+            ),
+            seqname
+        )
+
+        cfg.merge(event_counter_cfg("n_ZbbyCalib"), seqname)
     elif flags.Analysis.do_ZbbjCalib:
         extra_XbbCalib_branches,float_variable_names,int_variable_names = ZbbjCalib_branches(flags)
 

@@ -1,8 +1,9 @@
 include: EasyjetHub/base-config.yaml
 
 # Which analysis to consider
-do_ttbarCalib: true
-do_ZbbjCalib: false
+#do_XbbCalib: true
+do_ttbarCalib: false
+do_ZbbyCalib: true
 
 # Toggles to bypass event selection
 bypass: false
@@ -13,15 +14,25 @@ do_small_R_jets: true
 do_muons: true
 do_electrons: true
 do_met: true
+do_photons: true
+
+do_overlap_removal: true
+
+OverlapRemoval:
+  do_large_R_jets: true
+  do_small_R_jet_large_R_jet: false
+
+#PileupReweighting:
+#  prw_files: 
+#    include: EasyJetHub/share/prw.yaml
+#  lumicalc_files:
+#    include: EasyJetHub/share/lumicalc.yaml
 
 # Toggles for reconstructed objects decorations
-Small_R_jet:
-  min_pT: 28.e+3
-  btag_wp: "GN2v01_FixedCutBEff_77"
-
 Large_R_jet:
   min_pT: 200.e+3
   max_eta: 2.0
+  min_m: 40.e+3
   runMuonJetPtCorr: false
   GN2X_hbb_wps:
     - "FlatMassQCDEff_0p25"
@@ -34,6 +45,14 @@ Large_R_jet:
     - "FlatMassQCDEff_1p25"
     - "FlatMassQCDEff_1p55"
 
+Photon:
+  ID: "Tight" # Loose, Tight
+  Iso: "FixedCutTight"
+  min_pT: 150.e+3
+
+Small_R_jet:
+  btag_wp: "GN2v01_FixedCutBEff_77"
+  
 Electron:
   min_pT: 28.e+3
   ID: "TightLH"
@@ -43,26 +62,12 @@ Muon:
   min_pT: 28.e+3
   ID: "Medium"
   Iso: "Tight_VarRad"
-
 # list of triggers per year to consider
 Trigger:
-  include: XbbCalib/trigger.yaml
+  include: XbbCalib/trigger_Zbby.yaml
 # apply trigger lists to filter events
-do_trigger_filtering: true
+do_trigger_filtering: false
 
-# write objects with overlap removal applied
-# turning this on you have to decide on one large R jet collection
-do_overlap_removal: true
-
-OverlapRemoval:
-  # Enable overlap removal between large-R jets and objects for which
-  # large-R jet OR removal is implemented in Athena
-  do_large_R_jets: false
-  # Enable overlap removal between small-R jets and large-R jets
-  # Athena default is true
-  do_small_R_jet_large_R_jet: false
-  # Enable overlap removal for boosted muons and electrons
-  do_boostedLeptons: true
 
 # Include the TTree configuration and update details
 ttree_output:
@@ -70,17 +75,20 @@ ttree_output:
   # Our overrides. All defaults are off
   reco_outputs:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-    small_R_jets: 'container_names.output.reco4PFlowJet'
-    muons: 'container_names.output.muons'
-    electrons: 'container_names.output.electrons'
     met : 'container_names.output.met'
+    photons : 'container_names.output.photons'
+  truth_outputs:
+    large_R_jets: 'container_names.input.truth10SoftDropJet'
   collection_options:
     large_R_jets:
       run_selection: true
-    small_R_jets:
-      btag_info: true
+      btag_details: true
+      truth_labels: true
+    photons:    
       run_selection: true
-    electrons:
-      run_selection: true
-    muons:
-      run_selection: true
+
+# CutList :
+#   - PASS_TRIGGER 
+#   - PASS_ONE_LARGE_JET
+#   - PASS_ONE_PHOTON
+#   - PASS_BASELINE

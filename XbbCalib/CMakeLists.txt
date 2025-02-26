@@ -16,6 +16,10 @@ atlas_add_component(XbbCalib
   src/ZllCalibSelectorAlg.cxx
   src/XbbCalibSelectorAlg.cxx
   src/components/XbbCalib_entries.cxx
+  src/ZbbyCalibSelectorAlg.cxx
+  src/BaselineVarsZbbyCalibAlg.cxx 
+  src/ZcandSelectorAlg.cxx
+
   LINK_LIBRARIES
   AthenaBaseComps
   AsgTools
@@ -37,6 +41,7 @@ atlas_install_scripts(
 )
 atlas_install_python_modules(
   python/XbbCalib_config.py
+  python/ZbbyCalib_config.py
   python/ZbbjCalib_config.py
   python/ZllCalib_config.py
 )

@@ -63,7 +63,7 @@ namespace XBBCALIB
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
       const xAOD::MissingETContainer *metCont = nullptr;
-      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
+      ANA_CHECK (m_metHandle.retrieve (metCont, sys));     
       const xAOD::MissingET* met = (*metCont)["Final"];
       if (!met) {
       	ATH_MSG_ERROR("Could not retrieve MET");
@@ -84,16 +84,16 @@ namespace XBBCALIB
       // selected Probe Jet ;
       if (lrjets->size() >= 1)
       {
-        m_Fbranches.at("probe_jet_pt").set(*event, lrjets->at(0)->pt(), sys);  
-        m_Fbranches.at("probe_jet_eta").set(*event, lrjets->at(0)->eta(), sys);  
-        m_Fbranches.at("probe_jet_phi").set(*event, lrjets->at(0)->phi(), sys);  
+        m_Fbranches.at("probe_jet_pt").set(*event, lrjets->at(0)->pt(), sys);
+        m_Fbranches.at("probe_jet_eta").set(*event, lrjets->at(0)->eta(), sys);
+        m_Fbranches.at("probe_jet_phi").set(*event, lrjets->at(0)->phi(), sys);
       }
 
       if (jets->size() >= 1)
       {
-        m_Fbranches.at("tag_jet_pt").set(*event, jets->at(0)->pt(), sys);  
-        m_Fbranches.at("tag_jet_eta").set(*event, jets->at(0)->eta(), sys);  
-        m_Fbranches.at("tag_jet_phi").set(*event, jets->at(0)->phi(), sys);  
+        m_Fbranches.at("tag_jet_pt").set(*event, jets->at(0)->pt(), sys);
+        m_Fbranches.at("tag_jet_eta").set(*event, jets->at(0)->eta(), sys);
+        m_Fbranches.at("tag_jet_phi").set(*event, jets->at(0)->phi(), sys);
       }
 
     }
