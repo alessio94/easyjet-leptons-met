@@ -200,13 +200,16 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
-    input_name = flags.Analysis.container_names.input[
-        f"reco10{lr_jet_type}Jet"]
     output_name = drop_sys(
         flags.Analysis.container_names.output[f"reco10{lr_jet_type}Jet"]
     )
+
+    # Need to keep DAOD_PHYS collection name regardless of input
+    # due to CP algs configs in Athena
+    jetColl = "AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets"
+
     configSeq += makeConfig('Jets', containerName=output_name,
-                            jetCollection=input_name)
+                            jetCollection=jetColl)
 
     for GN2X_wp in flags.Analysis.Large_R_jet.GN2X_hbb_wps:
         jSONCalibFile = find_datafile(
