@@ -4,6 +4,7 @@ input:
   reco4EMTopoJet:      AntiKt4EMTopoJets
   reco10TopoJet:       AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets
   reco10UFOJet:        AntiKt10UFOCSSKSoftDropBeta100Zcut10Jets
+  reco10RCJet:         AntiKt10EMTopoRCJets
   muons:               Muons
   electrons:           Electrons
   photons:             Photons
@@ -28,6 +29,7 @@ output:
   reco4EMTopoJet:      AnalysisAntiKt4EMTopoJets_%SYS%
   reco10TopoJet:       AnalysisAntiKt10LCTopoTrimmedPtFrac5SmallR20Jets_%SYS%
   reco10UFOJet:        AnalysisAntiKt10UFOCSSKSoftDropBeta100Zcut10Jets_%SYS%
+  reco10RCJet:         AnalysisAntiKt10EMTopoRCJets_%SYS%
   muons:               AnalysisMuons_%SYS%
   electrons:           AnalysisElectrons_%SYS%
   photons:             AnalysisPhotons_%SYS%

@@ -4,9 +4,7 @@ from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.calibration.jets import (
-    jet_sequence,
-    lr_jet_sequence,
-)
+    jet_sequence, lr_jet_sequence, rc_jet_sequence)
 from EasyjetHub.output.ttree.wtag_decor_config import wtag_decor_cfg
 from EasyjetHub.output.ttree.tau_decor_config import tau_decor_cfg
 from EasyjetHub.output.ttree.jet_decor_config import jet_decor_cfg
@@ -160,6 +158,13 @@ def cpalgs_cfg(flags):
             configSeq += lr_jet_sequence(
                 flags,
                 lr_jet_type="UFO",
+                configAcc=configAccumulator,
+            )
+
+        if flags.Analysis.do_large_R_RC_jets:
+            log.info("Adding large-R RC jet seq")
+            configSeq += rc_jet_sequence(
+                flags,
                 configAcc=configAccumulator,
             )
 

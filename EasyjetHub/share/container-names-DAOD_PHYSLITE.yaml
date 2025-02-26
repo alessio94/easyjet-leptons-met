@@ -3,6 +3,7 @@ input:
   reco4PFlowJet:       AnalysisJets
   reco10TopoJet:       ''
   reco10UFOJet:        AnalysisLargeRJets
+  reco10RCJet:         ''
   truth4Jet:           AntiKt4TruthDressedWZJets
   truth10TrimmedJet:   AntiKt10TruthTrimmedPtFrac5SmallR20Jets
   truth10SoftDropJet:  AntiKt10TruthSoftDropBeta100Zcut10Jets
@@ -25,6 +26,7 @@ output:
   reco4PFlowJet:       AnalysisAntiKt4EMPFlowJets_%SYS%
   reco10TopoJet:       ''
   reco10UFOJet:        AnalysisAntiKt10UFOCSSKSoftDropBeta100Zcut10Jets_%SYS%
+  reco10RCJet:         ''
   muons:               AnalysisMuons_%SYS%
   electrons:           AnalysisElectrons_%SYS%
   photons:             AnalysisPhotons_%SYS%

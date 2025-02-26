@@ -241,3 +241,23 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
 
     return configSeq
+
+
+def rc_jet_sequence(flags, configAcc):
+    configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
+
+    input_name = flags.Analysis.container_names.input["reco10RCJet"]
+    output_name = drop_sys(
+        flags.Analysis.container_names.output["reco10RCJet"]
+    )
+    configSeq += makeConfig('ReclusteredJetCalibration', containerName=output_name,
+                            jetCollection=input_name)
+    configSeq.setOptionValue('.jetInput',
+                             flags.Analysis.container_names.input["reco4EMTopoJet"])
+
+    # Add systematic object links
+    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+
+    return configSeq

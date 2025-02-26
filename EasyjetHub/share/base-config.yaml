@@ -2,6 +2,7 @@
 do_small_R_jets: false
 do_large_R_Topo_jets: false
 do_large_R_UFO_jets: false
+do_large_R_RC_jets: false
 do_muons: false
 do_electrons: false
 do_photons: false
