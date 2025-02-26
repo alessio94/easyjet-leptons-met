@@ -40,6 +40,9 @@ def met_sequence(flags, configAcc):
     configSeq += makeConfig(
         'MissingET', containerName=drop_sys(container_names.output.met)
     )
+    configSeq.setOptionValue(
+        ".useLRT",
+        flags.Analysis.Muon.MergeLRT or flags.Analysis.Electron.MergeLRT)
     # Pass all the calibrated jets
     configSeq.setOptionValue(
         ".useJVT",

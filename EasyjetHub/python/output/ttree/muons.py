@@ -22,11 +22,14 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.do_overlap_removal:
         muon_branches.variables += ["passesOR_%SYS%"]
 
-    id_wps = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
-
     muon_branches.variables += [
         "d0sig_NOSYS", "z0sintheta_NOSYS"
     ]
+
+    if flags.Analysis.Muon.MergeLRT:
+        muon_branches.variables += ["isLRT"]
+
+    id_wps = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
 
     if 'extra_wps' in flags.Analysis.Muon:
         for wp in flags.Analysis.Muon.extra_wps:

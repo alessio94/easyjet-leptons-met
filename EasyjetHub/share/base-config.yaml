@@ -101,6 +101,7 @@ Electron:
   chargeIDSelectionRun2: false
   ID: ""
   Iso: ""
+  MergeLRT: false
   do_parent_decoration: false
   do_track_decoration: false
   do_IFF_decoration: false
@@ -122,6 +123,7 @@ Muon:
   maxDeltaZ0SinTheta: 0.5
   ID: ""
   Iso: ""
+  MergeLRT: false
   do_parent_decoration: false
   do_IFF_decoration: false
   amount: 0

@@ -17,7 +17,14 @@ def muon_sequence(flags, configAcc):
     makeConfig = config.makeConfig
 
     output_name = drop_sys(flags.Analysis.container_names.output.muons)
+
+    if flags.Analysis.Muon.MergeLRT:
+        configSeq += makeConfig('Muons.LRTMerging')
+        configSeq.setOptionValue('.containerName', 'Muons_LRTMerged')
+
     configSeq += makeConfig('Muons', containerName=output_name)
+    if flags.Analysis.Muon.MergeLRT:
+        configSeq.setOptionValue('.inputContainer', 'Muons_LRTMerged')
     configSeq.setOptionValue('.minPt', flags.Analysis.Muon.min_pT)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
     configSeq.setOptionValue('.writeTrackD0Z0', True)

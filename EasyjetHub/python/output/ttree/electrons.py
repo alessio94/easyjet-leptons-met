@@ -26,11 +26,14 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.do_overlap_removal:
         electron_branches.variables += ["passesOR_%SYS%"]
 
-    id_wps = [f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}']
-
     electron_branches.variables += [
         "d0sig_NOSYS", "z0sintheta_NOSYS"
     ]
+
+    if flags.Analysis.Electron.MergeLRT:
+        electron_branches.variables += ["isLRT"]
+
+    id_wps = [f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}']
 
     if 'extra_wps' in flags.Analysis.Electron:
         for wp in flags.Analysis.Electron.extra_wps:
@@ -73,6 +76,7 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
             electron_branches.variables += [
                 f"effSF_{id_wp}_%SYS%"
                 for id_wp in id_wps
+                if not ("DNN" in id_wp or "NoPix" in id_wp)
             ]
 
     # Requires ElectronSelectorAlg to be run

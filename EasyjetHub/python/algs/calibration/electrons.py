@@ -24,10 +24,15 @@ def electron_sequence(flags, configAcc):
         print("EGamma group to contribute to the Electron AF3 recommendations as")
         print("you're relying on them")
 
-    # Temporary hack, we should do this in a more systematic way
-    # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.electrons)
+
+    if flags.Analysis.Electron.MergeLRT:
+        configSeq += makeConfig('Electrons.LRTMerging')
+        configSeq.setOptionValue('.containerName', 'Electrons_LRTMerged')
+
     configSeq += makeConfig('Electrons', containerName=output_name)
+    if flags.Analysis.Electron.MergeLRT:
+        configSeq.setOptionValue('.inputContainer', 'Electrons_LRTMerged')
     configSeq.setOptionValue('.crackVeto', True)
     configSeq.setOptionValue('.forceFullSimConfig',
                              flags.Analysis.Electron.forceFullSimConfig
@@ -66,14 +71,20 @@ def electron_sequence(flags, configAcc):
         configSeq.setOptionValue('.correlationModelReco',
                                  flags.Analysis.Electron.correlationModelReco)
         configSeq.setOptionValue('.saveCombinedSF', True)
-        # No DNN SF yet
-        if "DNN" in id and flags.Input.isMC:
-            print("WARNING! Electron DNN ID does not have SF available yet")
-            configSeq.setOptionValue('.noEffSF', True)
-        # No Run 2 SF yet
-        if flags.GeoModel.Run is LHCPeriod.Run2 and flags.Input.isMC:
-            print("WARNING! Run 2 electron SF are not available yet")
-            configSeq.setOptionValue('.noEffSF', True)
+
+        if flags.Input.isMC:
+            # No DNN SF yet
+            if "DNN" in id:
+                print("WARNING! Electron DNN ID does not have SF available yet")
+                configSeq.setOptionValue('.noEffSF', True)
+            # No Run 2 SF yet
+            if flags.GeoModel.Run is LHCPeriod.Run2:
+                print("WARNING! Run 2 electron SF are not available yet")
+                configSeq.setOptionValue('.noEffSF', True)
+            # No NoPix SF yet
+            if "NoPix" in id:
+                print("WARNING! Electron NoPix ID does not have SF available yet")
+                configSeq.setOptionValue('.noEffSF', True)
 
     # Electron trigger SF
     trigSF_flags = flags.Analysis.Trigger.scale_factor
