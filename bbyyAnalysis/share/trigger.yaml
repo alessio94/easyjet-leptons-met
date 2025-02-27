@@ -18,6 +18,8 @@ selection:
     '2023':
     - 'HLT_g35_medium_g25_medium_L12eEM24L'
     - 'HLT_g140_loose_L1eEM26M'
+    '2024':
+    - 'HLT_g35_medium_g25_medium_L12eEM24L'
 
 scale_factor:
   doSF: True
@@ -35,6 +37,7 @@ scale_factor:
     # No SF for 2023 trigger yet
     '2022': []
     '2023': []
+    '2024': []
 
     #'2022':
     #- 'HLT_g35_medium_g25_medium_L12EM20VH'
