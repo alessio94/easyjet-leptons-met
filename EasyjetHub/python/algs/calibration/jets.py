@@ -257,8 +257,8 @@ def rc_jet_sequence(flags, configAcc):
     )
     configSeq += makeConfig('ReclusteredJetCalibration', containerName=output_name,
                             jetCollection=input_name)
-    configSeq.setOptionValue('.jetInput',
-                             flags.Analysis.container_names.input["reco4EMTopoJet"])
+    configSeq.setOptionValue('.jetInput', drop_sys(
+        flags.Analysis.container_names.output["reco4EMTopoJet"]))
 
     # Add systematic object links
     configSeq += makeConfig('SystObjectLink', containerName=output_name)
