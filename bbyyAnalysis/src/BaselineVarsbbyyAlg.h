@@ -36,10 +36,16 @@ namespace HHBBYY
     HH2025_KF_high_mass_Run2 = 4,
     HH2025_KF_low_mass_Run3 = 5,
     HH2025_KF_high_mass_Run3 = 6,
-    HH2025_low_mass_Run2 = 7,
-    HH2025_high_mass_Run2 = 8,
-    HH2025_low_mass_Run3 = 9,
-    HH2025_high_mass_Run3 = 10
+    HH2025_KF_low_mass_Run3_with2024 = 7,
+    HH2025_KF_high_mass_Run3_with2024 = 8,
+    HH2025_KF_low_mass_Run23 = 9,
+    HH2025_KF_high_mass_Run23 = 10,
+    HH2025_KF_low_mass_Run23_with2024 = 11,
+    HH2025_KF_high_mass_Run23_with2024 = 12,
+    HH2025_low_mass_Run2 = 13,
+    HH2025_high_mass_Run2 = 14,
+    HH2025_low_mass_Run3 = 15,
+    HH2025_high_mass_Run3 = 16
   };
 
   enum GNN {
@@ -93,6 +99,12 @@ namespace HHBBYY
     topness_KF,
     bdt_sel_score_KF,
     bdt_sel_category_KF,
+    bdt_sel_score_KF_with2024,
+    bdt_sel_category_KF_with2024,
+    bdt_sel_score_KF_corr,
+    bdt_sel_category_KF_corr,
+    bdt_sel_score_KF_corr_with2024,
+    bdt_sel_category_KF_corr_with2024,
     bdt_sel_score_GNN,
     bdt_sel_category_GNN,
     vbfjj_dEta_KF,
@@ -106,7 +118,6 @@ namespace HHBBYY
     bbyy_mStar_KF,
     bbyy_mStar_GNN,
     bb_m_KF_unconstrained,
-    remove_me_deta_yybb_jj, //don't use this 
     size_enum,
   };
 
@@ -181,7 +192,7 @@ namespace HHBBYY
                                   const xAOD::JetContainer *jets,
                                   const xAOD::MissingETContainer *met,
                                   const auto &sys, std::map<HHBBYY::Var, float> &m_eventFloats,
-                                  std::map<HHBBYY::Var, int> &m_eventInts, bool isKFvariables, bool isGNNvariables, int year);
+                                  std::map<HHBBYY::Var, int> &m_eventInts, bool isKFvariables, bool isGNNvariables, bool isCorrelatedModel, bool is2024Model, int year);
 
     void loadBDT(const std::string &filePath, std::unique_ptr<MVAUtils::BDT> &bdt);
 

@@ -250,8 +250,12 @@ def get_BaselineVarsbbyyAlg_variables(flags):
         float_variable_names += ["KF_HT", "KF_topness", "KF_sphericityT",
                                  "KF_planarFlow", "KF_pTBalance"]
 
-        float_variable_names += ["KF_bdtSel_score"]
-        int_variable_names += ["KF_bdtSel_category"]
+        float_variable_names += ["KF_bdtSel_score", "KF_corr_bdtSel_score",
+                                 "KF_with2024_bdtSel_score",
+                                 "KF_corr_with2024_bdtSel_score"]
+        int_variable_names += ["KF_bdtSel_category", "KF_corr_bdtSel_category",
+                               "KF_with2024_bdtSel_category",
+                               "KF_corr_with2024_bdtSel_category"]
 
         for i in range(1, 5):
             for var in ["pt", "phi", "eta", "E"]:

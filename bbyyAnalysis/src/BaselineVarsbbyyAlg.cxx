@@ -284,7 +284,7 @@ namespace HHBBYY
       // bdt (low and high mHH categorations)
       if(m_do_nonresonant_BDTs){
         if (n_photons >= 2 && Hbb_Jet1 && Hbb_Jet2) {
-          performCategorisationBDT(ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, metCont, sys, eventFloats, eventInts, false, false, year);
+          performCategorisationBDT(ph1, ph2, Hbb_Jet1, Hbb_Jet2, jets, metCont, sys, eventFloats, eventInts, false, false, false, false, year);
         }
         m_Fbranches.at("bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score), sys);
         m_Ibranches.at("bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category), sys);
@@ -377,11 +377,25 @@ namespace HHBBYY
           
           if(m_do_nonresonant_BDTs){   
             if (n_photons >= 2 && Hbb_KFJet1 && Hbb_KFJet2){    
-              performCategorisationBDT(ph1, ph2, Hbb_KFJet1, Hbb_KFJet2, KFJets, metCont, sys, eventFloats, eventInts, true, false, year);
-            }
-            m_Fbranches.at("KF_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_KF), sys);
-            m_Ibranches.at("KF_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category_KF), sys);
+              performCategorisationBDT(ph1, ph2, Hbb_KFJet1, Hbb_KFJet2, KFJets, metCont, sys, eventFloats, eventInts, true, false, false, false, year);
+              m_Fbranches.at("KF_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_KF), sys);
+              m_Ibranches.at("KF_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category_KF), sys);
 
+              // correlated
+              performCategorisationBDT(ph1, ph2, Hbb_KFJet1, Hbb_KFJet2, KFJets, metCont, sys, eventFloats, eventInts, true, false, true, false, year);
+              m_Fbranches.at("KF_corr_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_KF_corr), sys);
+              m_Ibranches.at("KF_corr_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category_KF_corr), sys);
+
+              // with 2024 data
+              performCategorisationBDT(ph1, ph2, Hbb_KFJet1, Hbb_KFJet2, KFJets, metCont, sys, eventFloats, eventInts, true, false, false, true, year);
+              m_Fbranches.at("KF_with2024_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_KF_with2024), sys);
+              m_Ibranches.at("KF_with2024_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category_KF_with2024), sys);
+
+              // correlated with 2024 data 
+              performCategorisationBDT(ph1, ph2, Hbb_KFJet1, Hbb_KFJet2, KFJets, metCont, sys, eventFloats, eventInts, true, false, true, true, year);
+              m_Fbranches.at("KF_corr_with2024_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_KF_corr_with2024), sys);
+              m_Ibranches.at("KF_corr_with2024_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category_KF_corr_with2024), sys);
+            }
           }
       }   
 
@@ -455,7 +469,7 @@ namespace HHBBYY
             float GNN_pTBalance = compute_pTBalance(GNN_jets[0], GNN_jets[1], Hyy_photons, n_photons);
             m_Fbranches.at("GNN_" + prefix + "_pTBalance").set(*event, GNN_pTBalance, sys);
   
-            performCategorisationBDT(ph1, ph2, GNN_jets[0], GNN_jets[1], jets, metCont, sys, eventFloats, eventInts, false, true, year);
+            performCategorisationBDT(ph1, ph2, GNN_jets[0], GNN_jets[1], jets, metCont, sys, eventFloats, eventInts, false, true, false, false, year);
             m_Fbranches.at("GNN_" + prefix + "_bdtSel_score").set(*event, eventFloats.at(HHBBYY::Var::bdt_sel_score_GNN), sys);
             m_Ibranches.at("GNN_" + prefix + "_bdtSel_category").set(*event, eventInts.at(HHBBYY::Var::bdt_sel_category_GNN), sys);
           }
@@ -964,7 +978,7 @@ namespace HHBBYY
     std::vector<float> vars(HHBBYY::Var::NVars, 0.0f);
     vars[HHBBYY::Var::j3_pt] = -99;
     vars[HHBBYY::Var::j3_eta] = -99;
-    vars[HHBBYY::Var::y1_phi] = -99;
+    vars[HHBBYY::Var::j3_phi] = -99;
     vars[HHBBYY::Var::j3_pcbt] = -99;
     vars[HHBBYY::Var::j4_pt] = -99;
     vars[HHBBYY::Var::j4_eta] = -99;
@@ -1026,14 +1040,12 @@ namespace HHBBYY
     if (isKFvariables && !isGNNvariables){
       if(categorisation_jets.size()==4){
         //Use non-KF variables for VBF to get closure with local training for now
-        //vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::vbfjj_dEta_KF);
-        //vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m_KF);
-        vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m);
+        vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::vbfjj_dEta_KF);
+        vars[HHBBYY::Var::vbfjj_m] = eventFloats.at(HHBBYY::Var::vbfjj_m_KF);
       }else{
         vars[HHBBYY::Var::vbfjj_dEta] = 0; //-999; //another arbitrary convention...
         vars[HHBBYY::Var::vbfjj_m] = 0; //-999;
       }
-      vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::remove_me_deta_yybb_jj); // this is not correct but it matches our local (buggy) model
       vars[HHBBYY::Var::bbyy_mStar] =  eventFloats.at(HHBBYY::Var::bbyy_mStar_KF);
       vars[HHBBYY::Var::sphericityT] = eventFloats.at(HHBBYY::Var::sphericityT_KF);
       vars[HHBBYY::Var::planarFlow] = eventFloats.at(HHBBYY::Var::planarFlow_KF);
@@ -1045,7 +1057,6 @@ namespace HHBBYY
         vars[HHBBYY::Var::vbfjj_dEta] = 0; //-999;
         vars[HHBBYY::Var::vbfjj_m] = 0; //-999;
       }
-      vars[HHBBYY::Var::vbfjj_dEta] = eventFloats.at(HHBBYY::Var::remove_me_deta_yybb_jj); // this is not correct but it matches our local (buggy) model
 
       vars[HHBBYY::Var::bbyy_mStar] =  eventFloats.at(HHBBYY::Var::bbyy_mStar);
       vars[HHBBYY::Var::sphericityT] = eventFloats.at(HHBBYY::Var::sphericityT);
@@ -1098,7 +1109,6 @@ namespace HHBBYY
 	yybbjj = vbf_jj + HH;
 	eventFloats.at((prefix_jj == "KF_Jet_vbf_jj") ? HHBBYY::Var::vbfjj_m_KF : HHBBYY::Var::vbfjj_m) = vbf_jj.M();
 	eventFloats.at((prefix_jj == "KF_Jet_vbf_jj") ? HHBBYY::Var::vbfjj_dEta_KF : HHBBYY::Var::vbfjj_dEta) = std::fabs(vbf_j[0].Eta() - vbf_j[1].Eta());
-  if (prefix_jj != "KF_Jet_vbf_jj") {eventFloats.at(HHBBYY::Var::remove_me_deta_yybb_jj) = std::fabs(vbf_jj.Eta() - HH.Eta());} //to be removed
       }
     }
     
@@ -1302,10 +1312,10 @@ namespace HHBBYY
                                                      const xAOD::JetContainer *jets,
                                                      const xAOD::MissingETContainer *met, const auto &sys,
                                                      std::map<HHBBYY::Var, float> &eventFloats, 
-                                                     std::map<HHBBYY::Var, int> &eventInts, bool isKFvariables, bool isGNNvariables, int year) {
+                                                     std::map<HHBBYY::Var, int> &eventInts, bool isKFvariables, bool isGNNvariables, bool isCorrelatedModel, bool is2024Model, int year) {
 
-    if (m_bdts.size()!=11){
-      ANA_MSG_ERROR("11 BDTs are required");
+    if (m_bdts.size()!=17){
+      ANA_MSG_ERROR("17 BDTs are required");
       return;
     }
 
@@ -1330,11 +1340,11 @@ namespace HHBBYY
         if (year<2019) {
           score = m_bdts.at(HHBBYY::BDT::HH2025_high_mass_Run2)->GetClassification(vars);
         
-          if (score >= 0.920) {
+          if (score >= 0.925) {
             XGBoostCat = 3;
-          } else if (score >= 0.860) {
+          } else if (score >= 0.865) {
             XGBoostCat = 2;
-          } else if (score >= 0.680) {
+          } else if (score >= 0.67) {
             XGBoostCat = 1;
           } else {
             XGBoostCat = 0;
@@ -1345,9 +1355,9 @@ namespace HHBBYY
         
           if (score >= 0.870) {
             XGBoostCat = 2003;
-          } else if (score >= 0.725) {
+          } else if (score >= 0.735) {
             XGBoostCat = 2002;
-          } else if (score >= 0.385) {
+          } else if (score >= 0.450) {
             XGBoostCat = 2001;
           } else {
             XGBoostCat = 2000;
@@ -1362,11 +1372,11 @@ namespace HHBBYY
 
           if (score >= 0.970) {
             XGBoostCat = 1004;
-          } else if (score >= 0.935) {
+          } else if (score >= 0.940) {
             XGBoostCat = 1003;
-          } else if (score >= 0.830) {
+          } else if (score >= 0.880) {
             XGBoostCat = 1002;
-          } else if (score >= 0.480) {
+          } else if (score >= 0.545) {
             XGBoostCat = 1001;
           } else {
             XGBoostCat = 1000;
@@ -1378,11 +1388,11 @@ namespace HHBBYY
 
           if (score >= 0.925) {
             XGBoostCat = 3004;
-          } else if (score >= 0.860) {
+          } else if (score >= 0.865) {
             XGBoostCat = 3003;
-          } else if (score >= 0.710) {
+          } else if (score >= 0.750) {
             XGBoostCat = 3002;
-          } else if (score >= 0.430) {
+          } else if (score >= 0.465) {
             XGBoostCat = 3001;
           } else {
             XGBoostCat = 3000;
@@ -1393,81 +1403,229 @@ namespace HHBBYY
       }
       eventInts.at(isGNNvariables ? HHBBYY::Var::bdt_sel_category_GNN : HHBBYY::Var::bdt_sel_category) = XGBoostCat;
       eventFloats.at(isGNNvariables ? HHBBYY::Var::bdt_sel_score_GNN : HHBBYY::Var::bdt_sel_score) = XGBoostScore;
-    } else {
-      if (eventFloats.at(HHBBYY::Var::bbyy_mStar_KF) >= 350 * Athena::Units::GeV) {
-        float score = -99;
-        if (year<2019) {
-          // get BDT score
-          score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run2)->GetClassification(vars);
+    } else { //KF models
+      if (!isCorrelatedModel) { //uncorrelated model
+        if (!is2024Model) { //uncorrelated model without 2024
+          if (eventFloats.at(HHBBYY::Var::bbyy_mStar_KF) >= 350 * Athena::Units::GeV) {
+            float score = -99;
+            if (year<2019) {
+              // get BDT score
+              score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run2)->GetClassification(vars);
 
-          if (score >= 0.925) {
-            XGBoostCat = 3;
-          } else if (score >= 0.830) {
-            XGBoostCat = 2;
-          } else if (score >= 0.635) {
-            XGBoostCat = 1;
+              if (score >= 0.935) {
+                XGBoostCat = 3;
+              } else if (score >= 0.855) {
+                XGBoostCat = 2;
+              } else if (score >= 0.595) {
+                XGBoostCat = 1;
+              } else {
+                XGBoostCat = 0;
+              }
+
+              XGBoostScore = score;
+            } else {
+              score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run3)->GetClassification(vars);
+
+              if (score >= 0.880) {
+                XGBoostCat = 2003;
+              } else if (score >= 0.745) {
+                XGBoostCat = 2002;
+              } else if (score >= 0.400) {
+                XGBoostCat = 2001;
+              } else {
+                XGBoostCat = 2000;
+              }
+
+              XGBoostScore = score;
+            }
           } else {
-            XGBoostCat = 0;
+            float score = -99;
+            if (year<2019) {
+              // get BDT score
+              score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run2)->GetClassification(vars);
+      
+              if (score >= 0.975) {
+                XGBoostCat = 1004;
+              } else if (score >= 0.945) {
+                XGBoostCat = 1003;
+              } else if (score >= 0.825) {
+                XGBoostCat = 1002;
+              } else if (score >= 0.520) {
+                XGBoostCat = 1001;
+              } else {
+                XGBoostCat = 1000;
+              }
+      
+              XGBoostScore = score;
+            } else{
+              score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run3)->GetClassification(vars);
+      
+              if (score >= 0.920) {
+                XGBoostCat = 3004;
+              } else if (score >= 0.855) {
+                XGBoostCat = 3003;
+              } else if (score >= 0.670) {
+                XGBoostCat = 3002;
+              } else if (score >= 0.370) {
+                XGBoostCat = 3001;
+              } else {
+                XGBoostCat = 3000;
+              }
+      
+              XGBoostScore = score;
+            }
+
           }
+          eventInts.at(HHBBYY::Var::bdt_sel_category_KF) = XGBoostCat;
+          eventFloats.at(HHBBYY::Var::bdt_sel_score_KF) = XGBoostScore;
+        } else { //uncorrelated model with 2024
+          if (eventFloats.at(HHBBYY::Var::bbyy_mStar_KF) >= 350 * Athena::Units::GeV) {
+            float score = -99;
+            if (year<2019) {
+              // get BDT score
+              score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run2)->GetClassification(vars);
 
-          XGBoostScore = score;
-        } else {
-          score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run3)->GetClassification(vars);
+              if (score >= 0.935) {
+                XGBoostCat = 3;
+              } else if (score >= 0.855) {
+                XGBoostCat = 2;
+              } else if (score >= 0.595) {
+                XGBoostCat = 1;
+              } else {
+                XGBoostCat = 0;
+              }
 
-          if (score >= 0.870) {
-            XGBoostCat = 2003;
-          } else if (score >= 0.740) {
-            XGBoostCat = 2002;
-          } else if (score >= 0.415) {
-            XGBoostCat = 2001;
+              XGBoostScore = score;
+            } else {
+              score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run3_with2024)->GetClassification(vars);
+
+              if (score >= 0.945) {
+                XGBoostCat = 2003;
+              } else if (score >= 0.865) {
+                XGBoostCat = 2002;
+              } else if (score >= 0.595) {
+                XGBoostCat = 2001;
+              } else {
+                XGBoostCat = 2000;
+              }
+
+              XGBoostScore = score;
+            }
           } else {
-            XGBoostCat = 2000;
-          }
+            float score = -99;
+            if (year<2019) {
+              // get BDT score
+              score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run2)->GetClassification(vars);
+      
+              if (score >= 0.975) {
+                XGBoostCat = 1004;
+              } else if (score >= 0.945) {
+                XGBoostCat = 1003;
+              } else if (score >= 0.825) {
+                XGBoostCat = 1002;
+              } else if (score >= 0.520) {
+                XGBoostCat = 1001;
+              } else {
+                XGBoostCat = 1000;
+              }
+      
+              XGBoostScore = score;
+            } else{
+              score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run3_with2024)->GetClassification(vars);
+      
+              if (score >= 0.960) {
+                XGBoostCat = 3004;
+              } else if (score >= 0.935) {
+                XGBoostCat = 3003;
+              } else if (score >= 0.875) {
+                XGBoostCat = 3002;
+              } else if (score >= 0.585) {
+                XGBoostCat = 3001;
+              } else {
+                XGBoostCat = 3000;
+              }
+      
+              XGBoostScore = score;
+            }
 
-          XGBoostScore = score;
+          }
+          eventInts.at(HHBBYY::Var::bdt_sel_category_KF_with2024) = XGBoostCat;
+          eventFloats.at(HHBBYY::Var::bdt_sel_score_KF_with2024) = XGBoostScore;
+
         }
-      } else {
-        float score = -99;
-        if (year<2019) {
-          // get BDT score
-          score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run2)->GetClassification(vars);
-  
-          if (score >= 0.965) {
-            XGBoostCat = 1004;
-          } else if (score >= 0.910) {
-            XGBoostCat = 1003;
-          } else if (score >= 0.785) {
-            XGBoostCat = 1002;
-          } else if (score >= 0.440) {
-            XGBoostCat = 1001;
+      } else { //correlated model
+        if (!is2024Model) { //correlated model without 2024
+          if (eventFloats.at(HHBBYY::Var::bbyy_mStar_KF) >= 350 * Athena::Units::GeV) {
+            float score = -99;
+            // get BDT score
+            score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run23)->GetClassification(vars);
+            if (score >= 0.950) {
+              XGBoostCat = 3;
+            } else if (score >= 0.870) {
+              XGBoostCat = 2;
+            } else if (score >= 0.675) {
+              XGBoostCat = 1;
+            } else {
+              XGBoostCat = 0;
+            }
+            XGBoostScore = score;
           } else {
-            XGBoostCat = 1000;
+            float score = -99;
+            // get BDT score
+            score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run23)->GetClassification(vars);
+            if (score >= 0.975) {
+              XGBoostCat = 1004;
+            } else if (score >= 0.950) {
+              XGBoostCat = 1003;
+            } else if (score >= 0.875) {
+              XGBoostCat = 1002;
+            } else if (score >= 0.605) {
+              XGBoostCat = 1001;
+            } else {
+              XGBoostCat = 1000;
+            }
+            XGBoostScore = score;
           }
-  
-          XGBoostScore = score;
-        } else{
-          score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run3)->GetClassification(vars);
-  
-          if (score >= 0.920) {
-            XGBoostCat = 3004;
-          } else if (score >= 0.850) {
-            XGBoostCat = 3003;
-          } else if (score >= 0.715) {
-            XGBoostCat = 3002;
-          } else if (score >= 0.415) {
-            XGBoostCat = 3001;
+          eventInts.at(HHBBYY::Var::bdt_sel_category_KF_corr) = XGBoostCat;
+          eventFloats.at(HHBBYY::Var::bdt_sel_score_KF_corr) = XGBoostScore;
+        } else { //correlated model with 2024
+          if (eventFloats.at(HHBBYY::Var::bbyy_mStar_KF) >= 350 * Athena::Units::GeV) {
+            float score = -99;
+            // get BDT score
+            score = m_bdts.at(HHBBYY::BDT::HH2025_KF_high_mass_Run23_with2024)->GetClassification(vars);
+            if (score >= 0.960) {
+              XGBoostCat = 3;
+            } else if (score >= 0.925) {
+              XGBoostCat = 2;
+            } else if (score >= 0.775) {
+              XGBoostCat = 1;
+            } else {
+              XGBoostCat = 0;
+            }
+            XGBoostScore = score;
           } else {
-            XGBoostCat = 3000;
+            float score = -99;
+            // get BDT score
+            score = m_bdts.at(HHBBYY::BDT::HH2025_KF_low_mass_Run23_with2024)->GetClassification(vars);
+            if (score >= 0.980) {
+              XGBoostCat = 1004;
+            } else if (score >= 0.960) {
+              XGBoostCat = 1003;
+            } else if (score >= 0.895) {
+              XGBoostCat = 1002;
+            } else if (score >= 0.620) {
+              XGBoostCat = 1001;
+            } else {
+              XGBoostCat = 1000;
+            }
+            XGBoostScore = score;
           }
-  
-          XGBoostScore = score;
+          eventInts.at(HHBBYY::Var::bdt_sel_category_KF_corr_with2024) = XGBoostCat;
+          eventFloats.at(HHBBYY::Var::bdt_sel_score_KF_corr_with2024) = XGBoostScore;
         }
 
-      }  
-      eventInts.at(HHBBYY::Var::bdt_sel_category_KF) = XGBoostCat;
-      eventFloats.at(HHBBYY::Var::bdt_sel_score_KF) = XGBoostScore;
+      }
     }
-
   }
 
   ConstDataVector<xAOD::JetContainer> BaselineVarsbbyyAlg::categorisation_jets(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
