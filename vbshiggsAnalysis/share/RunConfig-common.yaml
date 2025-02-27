@@ -54,7 +54,23 @@ Small_R_jet:
   # to use multiple btagging WPs
   btag_extra_wps:
     - GN2v01_Continuous
-    
+
+Large_R_jet:
+  min_pT: 200.e+3
+  maxEta: 2.0
+  runMuonJetPtCorr: false
+  amount_leadingjet: 1
+  GN2X_hbb_wps:
+    - "FlatMassQCDEff_0p25"
+    - "FlatMassQCDEff_0p3"
+    - "FlatMassQCDEff_0p37"
+    - "FlatMassQCDEff_0p46"
+    - "FlatMassQCDEff_0p58"
+    - "FlatMassQCDEff_0p74"
+    - "FlatMassQCDEff_0p94"
+    - "FlatMassQCDEff_1p25"
+    - "FlatMassQCDEff_1p55"
+
 # Include the TTree configuration and update details
 ttree_output:
   include: EasyjetHub/AnalysisMiniTree-config.yaml

@@ -90,7 +90,7 @@ namespace VBSHIGGS{
       ATH_CHECK (m_GN2Xv01_phcc.initialize(m_systematicsList, m_vbsLRJetHandle));
       ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_vbsLRJetHandle));
       ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_vbsLRJetHandle));
-
+      
       // Intialise syst list (must come after all syst-aware inputs and outputs)
       ATH_CHECK (m_systematicsList.initialize());
       return StatusCode::SUCCESS;
@@ -399,11 +399,6 @@ namespace VBSHIGGS{
           m_Fbranches.at("LargeJet1_pt").set(*event, largeJet->pt(), sys);
           m_Fbranches.at("LargeJet1_eta").set(*event, largeJet->eta(), sys);
           m_Fbranches.at("LargeJet1_phi").set(*event, largeJet->phi(), sys);
-
-          m_Fbranches.at("LargeJet1_phbb").set(*event, phbb, sys);
-          m_Fbranches.at("LargeJet1_phcc").set(*event, phcc, sys);
-          m_Fbranches.at("LargeJet1_pqcd").set(*event, pqcd, sys);
-          m_Fbranches.at("LargeJet1_ptop").set(*event, ptop, sys);
           m_Fbranches.at("LargeJet1_DXbb").set(*event, XbbScore, sys);
         }
 
