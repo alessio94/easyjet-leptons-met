@@ -158,9 +158,7 @@ namespace HHBBTT
     float triggerSF = 1.;
     int year = m_year.get(*event, sys);
 
-    if(m_categoryBranches.at(HHBBTT::pass_baseline_SLT).get(*event, sys) ||
-       m_categoryBranches.at(HHBBTT::pass_ZCR).get(*event, sys) ||
-       m_categoryBranches.at(HHBBTT::pass_TopEMuCR).get(*event, sys)){
+    if(m_categoryBranches.at(HHBBTT::pass_baseline_SLT).get(*event, sys)){
       if(ele0){
 	std::string single_ele_SF_path;
 	getSingleEleTriggers(year, event, runBoolDecos, single_ele_SF_path);
