@@ -1,7 +1,8 @@
-ptag=p6266
-campaign=v8p1_noJERMETMu
-campaign1=v8p1_JERMETMu
-dir_samples="../easyjet/bbyyAnalysis/datasets/PHYS/nominal"
+ptag=p6491
+ptag_mc23e=p6522
+campaign=v9
+dir_samples="../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal"
+dir_mc_samples_mc23e="../easyjet/bbyyAnalysis/datasets/PHYS/nominal"
 mc_campaign="mc23_13p6TeV"
 mc_list=(
     "$dir_samples/$mc_campaign.ggFHH_bbyy_SM.$ptag.txt"
@@ -49,26 +50,45 @@ mc_list=(
     "$dir_samples/$mc_campaign.tWHyy.$ptag.txt"
     "$dir_samples/$mc_campaign.yyjets.$ptag.txt"
     "$dir_samples/$mc_campaign.yybb.$ptag.txt"
-    "$dir_samples/$mc_campaign.ttyy_nonallhad.p6491.txt" #p6266 are not available
-    "$dir_samples/$mc_campaign.ttyy_allhad.p6491.txt" #p6266 are not available
+    "$dir_samples/$mc_campaign.ttyy_nonallhad.$ptag.txt" 
+    "$dir_samples/$mc_campaign.ttyy_allhad.$ptag.txt"
 )
+mc_list_mc23e=(
+    "$dir_mc_samples_mc23e/$mc_campaign.ggFHH_bbyy_SM.$ptag_mc23e.txt"
+    "$dir_mc_samples_mc23e/$mc_campaign.ggFHH_bbyy_BSM.$ptag_mc23e.txt"
+    "$dir_mc_samples_mc23e/$mc_campaign.VBFHH_bbyy_SM.$ptag_mc23e.txt"
+    "$dir_mc_samples_mc23e/$mc_campaign.VBFHH_bbyy_BSM.$ptag_mc23e.txt"
+    "$dir_mc_samples_mc23e/$mc_campaign.VBFHH_bbyy_FS.$ptag_mc23e.txt"
+    "$dir_mc_samples_mc23e/$mc_campaign.SingleHyy.$ptag_mc23e.txt"
+    "$dir_mc_samples_mc23e/$mc_campaign.yyjets.$ptag_mc23e.txt"
+    "$dir_mc_samples_mc23e/$mc_campaign.yybb.$ptag_mc23e.txt"
+    "$dir_mc_samples_mc23e/$mc_campaign.ttyy.$ptag_mc23e.txt"
+)
+
 #data 
-easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYS/nominal/data_13p6TeV.Run3.p6269.txt \
-    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst.yaml \
+easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_13p6TeV.Run3.p6482.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
     --exec bbyy-ntupler \
     --nGBperJob 50 \
     --campaign ${campaign}
 
 #mc
 easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
-    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst.yaml \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
     --exec bbyy-ntupler \
-    --nGBperJob 5 \
+    --nGBperJob 20 \
     --campaign ${campaign}
 
-easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
-    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-loose-syst1.yaml \
+#data24
+easyjet-gridsubmit --data-list ../easyjet/bbyyAnalysis/datasets/PHYSLITE/nominal/data_23p6TeV_2024.Run3.p6515.txt \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
     --exec bbyy-ntupler \
-    --nGBperJob 5 \
-    --campaign ${campaign1}
+    --nGBperJob 50 \
+    --campaign ${campaign}
 
+#mc23e
+easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list_mc23e[@]}") \
+    --run-config bbyyAnalysis/RunConfig-bbyy-skimming-legacy.yaml \
+    --exec bbyy-ntupler \
+    --nGBperJob 20 \
+    --campaign ${campaign}
