@@ -123,7 +123,8 @@ namespace MULTILEPTON
     // find the opposite sign lepton and move it to index 0
     for (auto& lep : m_leptons)
     {
-      if (get<1>(lep) * m_total_charge_lep < 0)
+      // First term is PDG of lepton (charge is negative of PDGs)
+      if ( - get<1>(lep) * m_total_charge_lep < 0)
       {
         std::swap(m_leptons[0], lep);
         break;

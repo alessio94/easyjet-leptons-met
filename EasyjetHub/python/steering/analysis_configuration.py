@@ -178,6 +178,9 @@ def get_trigger_chains_scale_factor(flags, obj=None):
     if obj:
         if not hasattr(flags.Analysis.Trigger.scale_factor, obj):
             return {}
+        if not hasattr(flags.Analysis.Trigger.scale_factor[obj], "chains"):
+            return {}
+
         triggerChains = getattr(flags.Analysis.Trigger.scale_factor, obj).chains
     else:
         triggerChains = (

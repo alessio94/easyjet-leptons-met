@@ -31,6 +31,7 @@ Small_R_jet:
 
 Tau:
   ID: "RNNMedium_eleid"
+  extra_wps: ["RNNTight_eleid"]
   amount: 0
   do_parent_decoration: true
 
