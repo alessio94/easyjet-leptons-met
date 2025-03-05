@@ -16,7 +16,10 @@ Muon:
     - ["Loose_nottva", "PflowLoose_VarRad"]
     - ["Medium_nottva", "NonIso"]
 
-# Produce separate files for CutBookKeeper
-# Overkill with a single channel but used for consistency with other multi-channel config
-splitOutputTree: False
+
+# Produce separate files for CutBookKeeper, 
+# and append AntiIsoLepHad on minitree output file
+# Overkill with a single channel but used for 
+# consistency with other multi-channel config
+splitOutputTree: true
 splitCBK: true

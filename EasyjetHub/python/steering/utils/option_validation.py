@@ -155,8 +155,8 @@ def validate_systematics_flags(flags):
 
 def validate_output(flags):
     if flags.Analysis.splitOutputTree:
-        assert len(flags.Analysis.channels) > 1, (
-            "Should configure at least two channels to "
+        assert len(flags.Analysis.channels) > 0, (
+            "Should configure at least one channel to "
             "split output trees"
         )
         assert not flags.Analysis.bypass, (
