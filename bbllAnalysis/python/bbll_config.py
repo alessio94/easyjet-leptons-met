@@ -3,23 +3,27 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
+from itertools import chain
 from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
     JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
-    get_selected_objects_branches_variables,
+    get_selected_lepton_branches_variables,
+    get_selected_jet_b_tagged_branches_variables,
+
 )
 
 
 def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
              float_variables=None, int_variables=None, float_NW_variables=None,
              float_PNN_variables=None):
+    keys = ["baseline", "jets", "leptons"]
     if not float_variables:
-        float_variables = []
+        float_variables = {key: [] for key in keys}
     if not int_variables:
-        int_variables = []
+        int_variables = {key: [] for key in keys}
     if not float_NW_variables:
         float_NW_variables = []
     if not float_PNN_variables:
@@ -72,6 +76,34 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
                     else False),
         )
     )
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+    cfg.addEventAlgo(
+        CompFactory.HHBBLL.LeptonVarsbbllAlg(
+            "LeptonVarsbbllAlg",
+            isMC=flags.Input.isMC,
+            electrons=electronkey, eleWP=ElectronWPLabel,
+            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
+            muons=muonkey, muonWP=MuonWPLabel,
+            floatVariableList=float_variables['leptons'],
+            intVariableList=int_variables['leptons'],
+            doSystematics=flags.Analysis.do_CP_systematics,
+        )
+    )
+    btag_pcbt_wps \
+        = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp]
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBLL.BJetsVarsbbllAlg(
+            "BJetsVarsbbllAlg",
+            isMC=flags.Input.isMC,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+            PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
+            floatVariableList=float_variables['jets'],
+            intVariableList=int_variables['jets'],
+            doSystematics=flags.Analysis.do_CP_systematics,
+        )
+    )
 
     # MMC decoration
     if flags.Analysis.do_mmc:
@@ -102,23 +134,13 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             )
         )
 
-    btag_pcbt_wps \
-        = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp]
-
     # calculate final bbll vars
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.HHBBLL.BaselineVarsbbllAlg(
             "FinalVarsbbllAlg",
             isMC=flags.Input.isMC,
-            electrons=electronkey, eleWP=ElectronWPLabel,
-            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
-            muons=muonkey, muonWP=MuonWPLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-            PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
-            floatVariableList=float_variables,
-            intVariableList=int_variables,
+            floatVariableList=float_variables['baseline'],
+            intVariableList=int_variables['baseline'],
             save_extra_vars=flags.Analysis.save_extra_vars
         )
     )
@@ -136,22 +158,42 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
     return cfg
 
 
+def get_bjetsVarsbbllAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    # bjet variables
+    int_variable_names = ["nBJets"]
+    float_variable_names += ["mbb", "pTbb", "dRbb", "Phibb", "mT2_bb"]
+    if (flags.Analysis.save_extra_vars):
+        int_variable_names += ["nJets", "nCentralJets"]
+
+    return float_variable_names, int_variable_names
+
+
+def get_LeptonVarsbbllAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    # Lepton variables
+    int_variable_names = ["nLeptons"]
+    float_variable_names += ["mll", "pTll", "dRll", "Phill"]
+    if (flags.Analysis.save_extra_vars):
+        int_variable_names += ["nElectrons",
+                               "nMuons"]
+
+    return float_variable_names, int_variable_names
+
+
 def get_BaselineVarsbbllAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ll", "bb"]:
-        for var in ["m", "pT", "dR", "Phi"]:
-            float_variable_names.append(f"{var}{object}")
-
     float_variable_names += ["mbbll", "mbbllmet", "MET_sig",
                              "mT_Lepton1_Met", "mT_Lepton2_Met",
-                             "HT2", "HT2r", "mT2_bb", "mbl"]
+                             "HT2", "HT2r", "mbl"]
     if (flags.Analysis.save_extra_vars):
-        int_variable_names += ["nJets", "nBJets", "nElectrons",
-                               "nMuons", "nCentralJets"]
-
-        float_variable_names += ["mT_L_min", "dRbl_min"]
+        float_variable_names += ["mT_L_min"]
     return float_variable_names, int_variable_names
 
 
@@ -168,8 +210,9 @@ def bbll_branches(flags):
     # this will be all the variables that are calculated by the
     # BaselineVarsbbllAlg algorithm
     all_baseline_variable_names = []
-    float_variable_names = []
-    int_variable_names = []
+    keys = ["baseline", "leptons", "jets"]
+    float_variable_names = {key: [] for key in keys}
+    int_variable_names = {key: [] for key in keys}
 
     # these are the variables that will always be stored by easyjet specific to HHbbtt
     # further below there are more high level variables which can be
@@ -177,8 +220,17 @@ def bbll_branches(flags):
     # flags.Analysis.store_high_level_variables
     baseline_float_variables, baseline_int_variables \
         = get_BaselineVarsbbllAlg_variables(flags)
-    float_variable_names += baseline_float_variables
-    int_variable_names += baseline_int_variables
+    lepton_float_variables, lepton_int_variables \
+        = get_LeptonVarsbbllAlg_variables(flags)
+    bjet_float_variables, bjet_int_variables \
+        = get_bjetsVarsbbllAlg_variables(flags)
+
+    float_variable_names['baseline'] += baseline_float_variables
+    int_variable_names['baseline'] += baseline_int_variables
+    float_variable_names['leptons'] += lepton_float_variables
+    int_variable_names['leptons'] += lepton_int_variables
+    float_variable_names['jets'] += bjet_float_variables
+    int_variable_names['jets'] += bjet_int_variables
 
     if flags.Analysis.do_mmc:
         # do not append mmc variables to float_variable_names
@@ -200,15 +252,15 @@ def bbll_branches(flags):
     if flags.Analysis.store_high_level_variables:
         high_level_float_variables, high_level_int_variables \
             = get_BaselineVarsbbllAlg_highlevelvariables(flags)
-        float_variable_names += high_level_float_variables
-        int_variable_names += high_level_int_variables
+        float_variable_names['baseline'] += high_level_float_variables
+        int_variable_names['baseline'] += high_level_int_variables
     if flags.Analysis.do_resonant_PNN:
         for m_X in flags.Analysis.mX_values:
             float_PNN_variable_names += [f"PNN_Score_X{m_X}"]
             float_PNN_variable_names += [f"PNN_Score_SR2_X{m_X}"]
     all_baseline_variable_names += [
-        *float_variable_names,
-        *int_variable_names,
+        *chain.from_iterable(float_variable_names.values()),
+        *chain.from_iterable(int_variable_names.values()),
         *float_NW_variable_names,
         *float_PNN_variable_names]
 
@@ -219,12 +271,28 @@ def bbll_branches(flags):
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
     # in the object configs.
-    object_level_branches, object_level_float_variables, object_level_int_variables \
-        = get_selected_objects_branches_variables(flags, "bbll")
-    float_variable_names += object_level_float_variables
-    int_variable_names += object_level_int_variables
+    object_level_branches = {key: [] for key in keys}
+    object_level_float_variables = {key: [] for key in keys}
+    object_level_int_variables = {key: [] for key in keys}
 
-    branches += object_level_branches
+    (object_level_branches['leptons'],
+     object_level_float_variables['leptons'],
+     object_level_int_variables['leptons']) = \
+        get_selected_lepton_branches_variables(flags, "bbll")
+
+    float_variable_names['leptons'] += object_level_float_variables['leptons']
+    int_variable_names['leptons'] += object_level_int_variables['leptons']
+
+    (object_level_branches['jets'],
+     object_level_float_variables['jets'],
+     object_level_int_variables['jets']) = \
+        get_selected_jet_b_tagged_branches_variables(flags, "bbll")
+
+    float_variable_names['jets'] += object_level_float_variables['jets']
+    int_variable_names['jets'] += object_level_int_variables["jets"]
+
+    branches += object_level_branches["leptons"]
+    branches += object_level_branches["jets"]
 
     if (flags.Analysis.save_cutflow):
         cutList = flags.Analysis.CutList + flags.Analysis.Categories
