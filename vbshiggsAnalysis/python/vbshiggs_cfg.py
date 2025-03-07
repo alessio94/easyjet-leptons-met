@@ -54,38 +54,8 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             )
         )
 
-    # set jets container labels
     if flags.Analysis.UseVBFRNN:
-        # use full small-R jets pool to select signal jets
-        SignalJetsLabel = "vbshiggsAnalysisJets_%SYS%"
-    else:
-        # use the small-R jets after selecting tagging jets
-        SignalJetsLabel = "vbshiggsAnalysisSignalJets_%SYS%"
-
-    # signal jets selection
-    cfg.addEventAlgo(
-        CompFactory.VBSHIGGS.HiggsSelectorAlg(
-            "HiggsSelectorAlg",
-            jets=SignalJetsLabel,
-            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-        )
-    )
-
-    if flags.Analysis.UseVBFRNN:
-        # VBF-RNN tagger: resolved
         vbftagger = CompFactory.VBFTagger("VBFTaggerTool", modelTag="VBFRNNv0")
-        cfg.addEventAlgo(
-            CompFactory.VBFTaggerAlgSys(
-                "VBFTaggerAlg_resolved",
-                VBFTagger=vbftagger,
-                containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
-                containerSigJetsKey="vbshiggsAnalysisHJets_%SYS%",
-                pTCut=20.e3,
-                nMaxJets=2,
-                DecTag="_resolved"
-            )
-        )
-
         # VBF-RNN tagger: boosted
         cfg.addEventAlgo(
             CompFactory.VBFTaggerAlgSys(
@@ -99,6 +69,37 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 DecTag="_boosted"
             )
         )
+
+    if flags.Analysis.do_resolved:
+        # set jets container labels
+        if flags.Analysis.UseVBFRNN:
+            # use full small-R jets pool to select signal jets
+            SignalJetsLabel = "vbshiggsAnalysisJets_%SYS%"
+        else:
+            # use the small-R jets after selecting tagging jets
+            SignalJetsLabel = "vbshiggsAnalysisSignalJets_%SYS%"
+        # signal jets selection
+        cfg.addEventAlgo(
+            CompFactory.VBSHIGGS.HiggsSelectorAlg(
+                "HiggsSelectorAlg",
+                jets=SignalJetsLabel,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+            )
+        )
+
+        if flags.Analysis.UseVBFRNN:
+            if flags.Analysis.do_resolved:
+                cfg.addEventAlgo(
+                    CompFactory.VBFTaggerAlgSys(
+                        "VBFTaggerAlg_resolved",
+                        VBFTagger=vbftagger,
+                        containerAllJetsKey="vbshiggsAnalysisJets_%SYS%",
+                        containerSigJetsKey="vbshiggsAnalysisHJets_%SYS%",
+                        pTCut=20.e3,
+                        nMaxJets=2,
+                        DecTag="_resolved"
+                    )
+                )
 
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 

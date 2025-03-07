@@ -21,8 +21,11 @@ namespace VBSHIGGS{
     ATH_CHECK (m_filterParams.initialize(m_systematicsList));
     ATH_CHECK (m_passTriggerSLT.initialize(m_systematicsList, m_eventHandle));
 
-    ATH_CHECK (m_signaljetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_HCandHandle.initialize(m_systematicsList));
+    if (m_doResolved){
+      ATH_CHECK (m_signaljetHandle.initialize(m_systematicsList));
+      ATH_CHECK (m_HCandHandle.initialize(m_systematicsList));
+    }
+
     ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_largejetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_GN2Xv01_phbb.initialize(m_systematicsList, m_largejetHandle));
@@ -30,7 +33,7 @@ namespace VBSHIGGS{
     ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_largejetHandle));
     ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_largejetHandle));
 
-    if (!m_isBtag.empty()) {
+    if (!m_isBtag.empty() && m_doResolved) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
     }
 
@@ -70,10 +73,12 @@ namespace VBSHIGGS{
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
   
       const xAOD::JetContainer *signalJets = nullptr;
-      ANA_CHECK (m_signaljetHandle.retrieve (signalJets, sys));
-
       const xAOD::JetContainer *HJets = nullptr;
-      ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
+
+      if (m_doResolved){
+        ANA_CHECK (m_signaljetHandle.retrieve (signalJets, sys));
+        ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
+      }
 
       const xAOD::JetContainer *vbsjets = nullptr;
       if( !m_UseVBFRNN )
@@ -84,9 +89,12 @@ namespace VBSHIGGS{
 
       bool WPgiven = !m_isBtag.empty();
       std::vector<const xAOD::Jet*> bjets;
-      for(const xAOD::Jet* jet : *signalJets) {
-        if (WPgiven) {
-          if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets.push_back(jet);
+
+      if (m_doResolved){
+        for(const xAOD::Jet* jet : *signalJets) {
+          if (WPgiven) {
+            if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets.push_back(jet);
+          }
         }
       }
 
@@ -106,19 +114,23 @@ namespace VBSHIGGS{
 
       for (auto& [key, value] : m_boolnames) m_bools.at(key) = false;
 
-      if ( HJets->size() >= 2) m_bools.at(VBSHIGGS::PASS_TWO_SIGNAL_JETS) = true;
+      if (m_doResolved){
+        if ( HJets->size() >= 2) m_bools.at(VBSHIGGS::PASS_TWO_SIGNAL_JETS) = true;
+      }
       if ( largeJets->size() >= 1 )  m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET) = true;
-      
+
       if (!m_passTriggerSLT.empty() and m_passTriggerSLT.get(*event, sys)) {
         m_bools.at(VBSHIGGS::PASS_TRIGGER) = true;
       } 
-      
+
       leptonSelection(electrons, muons, met);
-      if (m_bools.at(VBSHIGGS::PASS_TWO_SIGNAL_JETS)) resolvedSelection(bjets);
+      if (m_bools.at(VBSHIGGS::PASS_TWO_SIGNAL_JETS) && m_doResolved) resolvedSelection(bjets);
       if (m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET)) boostedSelection(largeJets, sys);
 
-      bool pass_preselection = m_bools.at(VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS) && m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) ;
-
+      bool pass_preselection = m_bools.at(VBSHIGGS::PASS_TRIGGER) && m_bools.at(VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS) && m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) ;
+      if (!m_doResolved){
+        pass_preselection &= m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET);
+      }
       m_passallcuts.set(*event, pass_preselection, sys);
 
       // do the CUTFLOW only with sys="" -> NOSYS
@@ -262,7 +274,7 @@ namespace VBSHIGGS{
     float ftop = 0.25;
     float XbbScore= log (phbb / (fcc*phcc + ftop*ptop + pqcd*(1-fcc-ftop)));
 
-    bool pass_merged_baseline = m_bools.at(VBSHIGGS::PASS_TRIGGER) && m_bools.at(VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS) && XbbScore > 1.560 ;
+    bool pass_merged_baseline = m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET) && XbbScore > 1.560 ;
 
     m_bools.at(VBSHIGGS::PASS_MERG_BASELINE) = pass_merged_baseline;
 

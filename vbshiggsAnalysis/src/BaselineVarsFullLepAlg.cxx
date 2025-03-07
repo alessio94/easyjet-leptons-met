@@ -20,9 +20,11 @@ namespace VBSHIGGS{
       ATH_MSG_INFO("*********************************\n");
 
       // Read syst-aware input handles
+      if (m_doResolved){
+        ATH_CHECK (m_signaljetHandle.initialize(m_systematicsList));
+        ATH_CHECK (m_HCandHandle.initialize(m_systematicsList));
+      }
       ATH_CHECK (m_vbsLRJetHandle.initialize(m_systematicsList));
-      ATH_CHECK (m_signaljetHandle.initialize(m_systematicsList));
-      ATH_CHECK (m_HCandHandle.initialize(m_systematicsList));
       ATH_CHECK (m_vbsElectronHandle.initialize(m_systematicsList));
       ATH_CHECK (m_vbsMuonHandle.initialize(m_systematicsList));
       ATH_CHECK (m_metHandle.initialize(m_systematicsList));
@@ -33,7 +35,8 @@ namespace VBSHIGGS{
       }
       else {
         ATH_CHECK (m_RNNjetBoostedHandle.initialize(m_systematicsList));
-        ATH_CHECK (m_RNNjetResolvedHandle.initialize(m_systematicsList));
+        if (m_doResolved) 
+          ATH_CHECK (m_RNNjetResolvedHandle.initialize(m_systematicsList));
       }
 
 
@@ -56,12 +59,14 @@ namespace VBSHIGGS{
         ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
       }
 
-      if (!m_isBtag.empty()) {
-        ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
-      }
-      
-      if (!m_PCBT.empty()) {
-        ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_HCandHandle));
+      if (m_doResolved){
+        if (!m_isBtag.empty()) {
+          ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_signaljetHandle));
+        }
+        
+        if (!m_PCBT.empty()) {
+          ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_HCandHandle));
+        }
       }
 
       // Intialise syst-aware output decorators
@@ -106,11 +111,13 @@ namespace VBSHIGGS{
         const xAOD::JetContainer *largeJets = nullptr;
         ANA_CHECK (m_vbsLRJetHandle.retrieve (largeJets, sys));
 
-        const xAOD::JetContainer *signalJets = nullptr;
-        ANA_CHECK (m_signaljetHandle.retrieve (signalJets, sys));
-        
+
+        const xAOD::JetContainer *signalJets = nullptr;    
         const xAOD::JetContainer *HJets = nullptr;
-        ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
+        if (m_doResolved){
+          ANA_CHECK (m_signaljetHandle.retrieve (signalJets, sys));
+          ANA_CHECK (m_HCandHandle.retrieve (HJets, sys));
+        }
 
         const xAOD::JetContainer *vbsjets = nullptr;
         const xAOD::JetContainer *RNNJets_boosted= nullptr;
@@ -120,7 +127,8 @@ namespace VBSHIGGS{
         }
         else {
           ANA_CHECK (m_RNNjetBoostedHandle.retrieve (RNNJets_boosted, sys));
-          ANA_CHECK (m_RNNjetResolvedHandle.retrieve (RNNJets_resolved, sys));
+          if (m_doResolved)
+            ANA_CHECK (m_RNNjetResolvedHandle.retrieve (RNNJets_resolved, sys));
         }
 
         const xAOD::MuonContainer *muons = nullptr;
@@ -143,49 +151,48 @@ namespace VBSHIGGS{
         for (const auto& var: m_intVariables) {
           m_Ibranches.at(var).set(*event, -99, sys);
         }
-        
-        int n_jets = signalJets->size();
-        if(!m_UseVBFRNN) n_jets += vbsjets->size();
-        
         int n_largeJets = largeJets->size();
         int nCentralJets = 0;
         int nForwardJets = 0;
 
         int n_electrons = electrons->size();
         int n_muons = muons->size();
-
-        // b-jet sector
         bool WPgiven = !m_isBtag.empty();
         bool PCBTgiven = !m_PCBT.empty();
-        auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+        if (m_doResolved){
+          int n_jets = signalJets->size();
+          if(!m_UseVBFRNN) n_jets += vbsjets->size();
+          auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+        
 
-        // number of central jets
-        for(const xAOD::Jet* jet : *signalJets) {
-          // count central jets
-          if (std::abs(jet->eta())<2.5) nCentralJets++;
-          else nForwardJets++;
+          // number of central jets
+          for(const xAOD::Jet* jet : *signalJets) {
+            // count central jets
+            if (std::abs(jet->eta())<2.5) nCentralJets++;
+            else nForwardJets++;
 
-          if (WPgiven) {
-            if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
+            if (WPgiven) {
+              if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
+            }
           }
-        }
 
+          int n_bjets = bjets->size();
+
+          m_Ibranches.at("nJets").set(*event, n_jets, sys);
+          m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
+          
+        }
         if(!m_UseVBFRNN){
           for(const xAOD::Jet* vbsjet : *vbsjets) {
             if (std::abs(vbsjet->eta())<2.5) nCentralJets++;
             else nForwardJets++;
           }
         }
-
-        int n_bjets = bjets->size();
-
-        m_Ibranches.at("nJets").set(*event, n_jets, sys);
-        m_Ibranches.at("nLargeJets").set(*event, n_largeJets, sys);
-        m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
-        m_Ibranches.at("nMuons").set(*event, n_muons, sys);
-        m_Ibranches.at("nBJets").set(*event, n_bjets, sys);
         m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
         m_Ibranches.at("nForwardJets").set(*event, nForwardJets, sys);
+        m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
+        m_Ibranches.at("nMuons").set(*event, n_muons, sys);
+        m_Ibranches.at("nLargeJets").set(*event, n_largeJets, sys);
 
         // selected leptons ;
         const xAOD::Electron* ele0 = nullptr;
@@ -276,7 +283,7 @@ namespace VBSHIGGS{
             m_Ibranches.at(prefix + "_isPrompt").set(*event, lep_isPrompt, sys);
           }
           
-        }
+        }//Leptons
 
         //MET Significance 
         float METSig = m_METSig.get(*met, sys);
@@ -306,85 +313,87 @@ namespace VBSHIGGS{
         m_Fbranches.at("dPhil1MET").set(*event, Leading_lep.DeltaPhi(metVec), sys);
         m_Fbranches.at("dPhil2MET").set(*event, Subleading_lep.DeltaPhi(metVec), sys);
 
-        //b-jet sector
-        for (std::size_t i=0; i<std::min(HJets->size(),(std::size_t)2); i++){
-          std::string prefix = "Jet_Higgs_candidate"+std::to_string(i+1);
-          m_Fbranches.at(prefix+"_m").set(*event, HJets->at(i)->m(), sys);
-          m_Fbranches.at(prefix+"_pt").set(*event, HJets->at(i)->pt(), sys);
-          m_Fbranches.at(prefix+"_eta").set(*event, HJets->at(i)->eta(), sys);
-          m_Fbranches.at(prefix+"_phi").set(*event, HJets->at(i)->phi(), sys);
-          m_Fbranches.at(prefix+"_E").set(*event, HJets->at(i)->e(), sys);
+        if (m_doResolved){
+          //b-jet sector
+          for (std::size_t i=0; i<std::min(HJets->size(),(std::size_t)2); i++){
+            std::string prefix = "Jet_Higgs_candidate"+std::to_string(i+1);
+            m_Fbranches.at(prefix+"_m").set(*event, HJets->at(i)->m(), sys);
+            m_Fbranches.at(prefix+"_pt").set(*event, HJets->at(i)->pt(), sys);
+            m_Fbranches.at(prefix+"_eta").set(*event, HJets->at(i)->eta(), sys);
+            m_Fbranches.at(prefix+"_phi").set(*event, HJets->at(i)->phi(), sys);
+            m_Fbranches.at(prefix+"_E").set(*event, HJets->at(i)->e(), sys);
 
-          if(PCBTgiven)
-            m_Ibranches.at(prefix+"_pcbt").set(*event, m_PCBT.get(*HJets->at(i), sys),sys);
+            if(PCBTgiven)
+              m_Ibranches.at(prefix+"_pcbt").set(*event, m_PCBT.get(*HJets->at(i), sys),sys);
 
-          if (m_isMC) {
-            m_Ibranches.at(prefix+"_truthLabel").set(*event, m_truthFlav.get(*HJets->at(i), sys), sys);
+            if (m_isMC) {
+              m_Ibranches.at(prefix+"_truthLabel").set(*event, m_truthFlav.get(*HJets->at(i), sys), sys);
+            }
+          }
+
+          TLorentzVector HDijet;
+          TLorentzVector HJet1;
+          TLorentzVector HJet2;
+          if (HJets->size() >=2){
+            HDijet = HJets->at(0)->p4()+ HJets->at(1)->p4();
+            HJet1 = HJets->at(0)->p4();
+            HJet2 = HJets->at(1)->p4();
+            m_Fbranches.at("Hdijet_m").set(*event, HDijet.M(), sys);
+            m_Fbranches.at("Hdijet_pt").set(*event, HDijet.Pt(), sys);
+            m_Fbranches.at("Hdijet_eta").set(*event, HDijet.Eta(), sys);
+            m_Fbranches.at("Hdijet_phi").set(*event, HDijet.Phi(), sys);
+            m_Fbranches.at("dRHjj").set(*event, HJet1.DeltaR(HJet2), sys);
+            m_Fbranches.at("dPhiHjj").set(*event, HJet1.DeltaPhi(HJet2), sys);
+            m_Fbranches.at("dEtaHjj").set(*event, HJet1.Eta() - HJet2.Eta(), sys);
+          }
+        
+          // leading b-jet + leadinglepton sector
+          if (HJets->size()>=2 && nLeptons>=2){
+            TLorentzVector HJ1l1 = HJet1 + Leading_lep;
+            m_Fbranches.at("Hj1l1_m").set(*event, HJ1l1.M(), sys);
+            m_Fbranches.at("Hj1l1_pt").set(*event, HJ1l1.Pt(), sys);
+            m_Fbranches.at("Hj1l1_eta").set(*event, HJ1l1.Eta(), sys);
+            m_Fbranches.at("Hj1l1_phi").set(*event, HJ1l1.Phi(), sys);
+            m_Fbranches.at("dRHj1l1").set(*event, HJet1.DeltaR(Leading_lep), sys);
+            m_Fbranches.at("dPhiHj1l1").set(*event, HJet1.DeltaPhi(Leading_lep), sys);
+            m_Fbranches.at("dEtaHj1l1").set(*event, HJet1.Eta() - Leading_lep.Eta(), sys);
+          
+            TLorentzVector HJ2l2 = HJet2 + Subleading_lep;
+            m_Fbranches.at("Hj2l2_m").set(*event, HJ2l2.M(), sys);
+            m_Fbranches.at("Hj2l2_pt").set(*event, HJ2l2.Pt(), sys);
+            m_Fbranches.at("Hj2l2_eta").set(*event, HJ2l2.Eta(), sys);
+            m_Fbranches.at("Hj2l2_phi").set(*event, HJ2l2.Phi(), sys);
+            m_Fbranches.at("dRHj2l2").set(*event, HJet2.DeltaR(Subleading_lep), sys);
+            m_Fbranches.at("dPhiHj2l2").set(*event, HJet2.DeltaPhi(Subleading_lep), sys);
+            m_Fbranches.at("dEtaHj2l2").set(*event, HJet2.Eta() - Subleading_lep.Eta(), sys);
+
+            TLorentzVector Hjjll = ll + HDijet;
+            TLorentzVector Hjjllmet = ll + HDijet + metVec;
+            m_Fbranches.at("Hdijetll_m").set(*event, Hjjll.M(), sys);
+            m_Fbranches.at("Hdijetllmet_m").set(*event, Hjjllmet.M(), sys);
+
+            double ht2 = (metVec + ll).Perp() + HDijet.Perp();
+            double ht2r = ht2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + HJet1.Pt() + HJet2.Pt());
+
+            m_Fbranches.at("HT2").set(*event, ht2, sys);
+            m_Fbranches.at("HT2r").set(*event, ht2r, sys);
+
+          }
+        
+
+          //min Delta R (bjet, lepton)
+          std::vector<double> deltaRs;
+          for(unsigned int i=0; i<std::min(size_t(2),leptons.size()); i++){
+            TLorentzVector tlv = leptons[i].first->p4();
+            for (const auto& HJet : *HJets) {
+              deltaRs.push_back(HJet->p4().DeltaR(tlv));
+            }
+          }
+          if (!deltaRs.empty()) {
+            auto minDeltaR = *std::min_element(std::begin(deltaRs), std::end(deltaRs));
+            m_Fbranches.at("dRbl_min").set(*event, minDeltaR, sys);
           }
         }
-
-        TLorentzVector HDijet;
-        TLorentzVector HJet1;
-        TLorentzVector HJet2;
-        if (HJets->size() >=2){
-          HDijet = HJets->at(0)->p4()+ HJets->at(1)->p4();
-          HJet1 = HJets->at(0)->p4();
-          HJet2 = HJets->at(1)->p4();
-          m_Fbranches.at("Hdijet_m").set(*event, HDijet.M(), sys);
-          m_Fbranches.at("Hdijet_pt").set(*event, HDijet.Pt(), sys);
-          m_Fbranches.at("Hdijet_eta").set(*event, HDijet.Eta(), sys);
-          m_Fbranches.at("Hdijet_phi").set(*event, HDijet.Phi(), sys);
-          m_Fbranches.at("dRHjj").set(*event, HJet1.DeltaR(HJet2), sys);
-          m_Fbranches.at("dPhiHjj").set(*event, HJet1.DeltaPhi(HJet2), sys);
-          m_Fbranches.at("dEtaHjj").set(*event, HJet1.Eta() - HJet2.Eta(), sys);
-        }
-        
-        // leading b-jet + leadinglepton sector
-        if (HJets->size()>=2 && nLeptons>=2){
-          TLorentzVector HJ1l1 = HJet1 + Leading_lep;
-          m_Fbranches.at("Hj1l1_m").set(*event, HJ1l1.M(), sys);
-          m_Fbranches.at("Hj1l1_pt").set(*event, HJ1l1.Pt(), sys);
-          m_Fbranches.at("Hj1l1_eta").set(*event, HJ1l1.Eta(), sys);
-          m_Fbranches.at("Hj1l1_phi").set(*event, HJ1l1.Phi(), sys);
-          m_Fbranches.at("dRHj1l1").set(*event, HJet1.DeltaR(Leading_lep), sys);
-          m_Fbranches.at("dPhiHj1l1").set(*event, HJet1.DeltaPhi(Leading_lep), sys);
-          m_Fbranches.at("dEtaHj1l1").set(*event, HJet1.Eta() - Leading_lep.Eta(), sys);
-        
-          TLorentzVector HJ2l2 = HJet2 + Subleading_lep;
-          m_Fbranches.at("Hj2l2_m").set(*event, HJ2l2.M(), sys);
-          m_Fbranches.at("Hj2l2_pt").set(*event, HJ2l2.Pt(), sys);
-          m_Fbranches.at("Hj2l2_eta").set(*event, HJ2l2.Eta(), sys);
-          m_Fbranches.at("Hj2l2_phi").set(*event, HJ2l2.Phi(), sys);
-          m_Fbranches.at("dRHj2l2").set(*event, HJet2.DeltaR(Subleading_lep), sys);
-          m_Fbranches.at("dPhiHj2l2").set(*event, HJet2.DeltaPhi(Subleading_lep), sys);
-          m_Fbranches.at("dEtaHj2l2").set(*event, HJet2.Eta() - Subleading_lep.Eta(), sys);
-
-          TLorentzVector Hjjll = ll + HDijet;
-          TLorentzVector Hjjllmet = ll + HDijet + metVec;
-          m_Fbranches.at("Hdijetll_m").set(*event, Hjjll.M(), sys);
-          m_Fbranches.at("Hdijetllmet_m").set(*event, Hjjllmet.M(), sys);
-
-          double ht2 = (metVec + ll).Perp() + HDijet.Perp();
-          double ht2r = ht2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + HJet1.Pt() + HJet2.Pt());
-
-          m_Fbranches.at("HT2").set(*event, ht2, sys);
-          m_Fbranches.at("HT2r").set(*event, ht2r, sys);
-
-        }
-
-        //min Delta R (bjet, lepton)
-        std::vector<double> deltaRs;
-        for(unsigned int i=0; i<std::min(size_t(2),leptons.size()); i++){
-          TLorentzVector tlv = leptons[i].first->p4();
-          for (const auto& HJet : *HJets) {
-            deltaRs.push_back(HJet->p4().DeltaR(tlv));
-          }
-        }
-        if (!deltaRs.empty()) {
-          auto minDeltaR = *std::min_element(std::begin(deltaRs), std::end(deltaRs));
-          m_Fbranches.at("dRbl_min").set(*event, minDeltaR, sys);
-        }
-
         // Large R jets kinematics
         if ( n_largeJets >= 1 ){
           const xAOD::Jet* largeJet = largeJets->at(0);
@@ -433,8 +442,12 @@ namespace VBSHIGGS{
 
         //kinematics of RNN jets
         else {
-          std::vector<const xAOD::JetContainer*> RNNJets = {RNNJets_boosted,RNNJets_resolved};
-          std::vector<std::string> RNNJets_names = {"RNNJets_boosted","RNNJets_resolved"};
+          std::vector<const xAOD::JetContainer*> RNNJets = {RNNJets_boosted};
+          std::vector<std::string> RNNJets_names = {"RNNJets_boosted"};
+          if (m_doResolved){
+            RNNJets.emplace_back(RNNJets_resolved);
+            RNNJets_names.emplace_back("RNNJets_resolved");
+          }
           for(unsigned int i=0; i<RNNJets.size(); i++) {
             const xAOD::JetContainer *RNNJets_container = RNNJets[i];
             std::string RNNJets_container_name = RNNJets_names[i];

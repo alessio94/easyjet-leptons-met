@@ -97,6 +97,9 @@ namespace VBSHIGGS{
 
         Gaudi::Property<std::vector<std::string>> m_intVariables {this, "intVariableList", {}, "Name list of integer variables"};
 
+        // do resolved category
+        Gaudi::Property<bool> m_doResolved { this, "do_resolved", false, "Run Resolved category" };
+
         /// \brief Setup sys-aware output decorations
         std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 

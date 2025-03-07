@@ -128,6 +128,9 @@ namespace VBSHIGGS{
 
       Gaudi::Property<bool> m_UseVBFRNN { this, "UseVBFRNN", false, "Not use VBS tagging jets or yes (i.e. use VBF-RNN jets or not)" };
 
+      // do resolved category
+      Gaudi::Property<bool> m_doResolved { this, "do_resolved", false, "Run Resolved category" };
+
   };
 }
 #endif

@@ -3,6 +3,7 @@ include: vbshiggsAnalysis/RunConfig-common.yaml
 # Which analysis to consider
 channels: ["FullLep"]
 
+do_resolved: true
 # Use VBFRNN tagger
 UseVBFRNN : true
 

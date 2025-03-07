@@ -28,7 +28,6 @@ def fullLep_cfg(flags, muonkey, electronkey, float_variables=None, int_variables
         VBSJetsLabel = "vbshiggsAnalysisVBSJets_%SYS%"
         # use the small-R jets after selecting tagging jets
         SignalJetsLabel = "vbshiggsAnalysisSignalJets_%SYS%"
-
     # Selection
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.FullLepSelectorAlg(
@@ -41,6 +40,7 @@ def fullLep_cfg(flags, muonkey, electronkey, float_variables=None, int_variables
             saveCutFlow=flags.Analysis.save_cutflow,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
+            do_resolved=flags.Analysis.do_resolved
         )
     )
 
@@ -61,7 +61,8 @@ def fullLep_cfg(flags, muonkey, electronkey, float_variables=None, int_variables
             PCBTDecorName="ftag_quantile_"
                           + flags.Analysis.Small_R_jet.btag_extra_wps[0],
             floatVariableList=float_variables,
-            intVariableList=int_variables
+            intVariableList=int_variables,
+            do_resolved=flags.Analysis.do_resolved
         )
     )
     return cfg
@@ -71,38 +72,49 @@ def get_BaselineVarsFullLepAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    objects = ["LargeJet1", "ll", "Hdijet", "Hj1l1", "Hj2l2"]
+    objects = ["LargeJet1", "ll"]
+    if flags.Analysis.do_resolved:
+        objects += ["Hdijet", "Hj1l1", "Hj2l2"]
+
     if not flags.Analysis.UseVBFRNN:
         objects += ["VBSJ1", "VBSJ2", "VBSdijet"]
     else:
         objects += ["RNNJets_boosted_Jet1",
-                    "RNNJets_boosted_Jet2",
-                    "RNNJets_resolved_Jet1",
-                    "RNNJets_resolved_Jet2",]
+                    "RNNJets_boosted_Jet2"]
+        if flags.Analysis.do_resolved:
+            objects += ["RNNJets_resolved_Jet1",
+                        "RNNJets_resolved_Jet2"]
 
     for object in objects:
         for var in ["m", "pt", "eta", "phi"]:
             float_variable_names.append(f"{object}_{var}")
 
-    objects = ["ll", "Hjj", "Hj1l1", "Hj2l2"]
+    objects = ["ll"]
+    if flags.Analysis.do_resolved:
+        objects += ["Hjj", "Hj1l1", "Hj2l2"]
     if not flags.Analysis.UseVBFRNN:
         objects += ["VBSjj"]
     for object in objects:
         for var in ["dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
 
-    for object in ["Jet_Higgs_candidate1", "Jet_Higgs_candidate2"]:
-        for var in ["m", "pt", "eta", "phi", "E"]:
-            float_variable_names.append(f"{object}_{var}")
-        for var in ["pcbt", "truthLabel"]:
-            int_variable_names.append(f"{object}_{var}")
+    if flags.Analysis.do_resolved:
+        for object in ["Jet_Higgs_candidate1", "Jet_Higgs_candidate2"]:
+            for var in ["m", "pt", "eta", "phi", "E"]:
+                float_variable_names.append(f"{object}_{var}")
+            for var in ["pcbt", "truthLabel"]:
+                int_variable_names.append(f"{object}_{var}")
 
     float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET", "METSig",
-                             "dRbl_min", "Hdijetll_m", "Hdijetllmet_m", "HT2", "HT2r",
-                             "Lepton1_MET_mT", "Lepton2_MET_mT", "LargeJet1_DXbb"]
+                             "Hdijetll_m", "Hdijetllmet_m", "Lepton1_MET_mT",
+                             "Lepton2_MET_mT", "LargeJet1_DXbb"]
 
-    int_variable_names += ["nLargeJets", "nJets", "nBJets", "nCentralJets",
-                           "nForwardJets", "nLeptons", "nElectrons", "nMuons"]
+    int_variable_names += ["nLargeJets", "nLeptons", "nElectrons", "nMuons",
+                           "nCentralJets", "nForwardJets"]
+
+    if flags.Analysis.do_resolved:
+        float_variable_names += ["dRbl_min", "HT2", "HT2r"]
+        int_variable_names += ["nJets", "nBJets"]
 
     return float_variable_names, int_variable_names
 
@@ -133,7 +145,8 @@ def fullLep_branches(flags):
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
     # in the object configs.
-    object_level_branches, object_level_float_variables, object_level_int_variables \
+    object_level_branches, object_level_float_variables, \
+        object_level_int_variables \
         = get_selected_objects_branches_variables(flags, "FullLep")
     float_variable_names += object_level_float_variables
     int_variable_names += object_level_int_variables
@@ -155,14 +168,16 @@ def fullLep_branches(flags):
     # VBF tagger
     if flags.Analysis.UseVBFRNN:
         vars = ['RNNScore', 'nRNNJets']
-        regs = ['resolved', 'boosted']
+        regs = ['boosted']
+        if flags.Analysis.do_resolved:
+            regs += ['resolved']
         for var in vars:
             for reg in regs:
                 branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}_%SYS%']
 
     if flags.Analysis.save_high_level_variables:
-        for cat in ["ele0_passSET", "ele1_passSET", "mu0_passSMT", "mu1_passSMT",
-                    "ele0_trigPassed", "ele1_trigPassed",
+        for cat in ["ele0_passSET", "ele1_passSET", "mu0_passSMT",
+                    "mu1_passSMT", "ele0_trigPassed", "ele1_trigPassed",
                     "mu0_trigPassed", "mu1_trigPassed",
                     "ele0_trigMatched", "ele1_trigMatched",
                     "mu0_trigMatched", "mu1_trigMatched"]:
