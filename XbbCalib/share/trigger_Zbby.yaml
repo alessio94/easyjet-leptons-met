@@ -8,6 +8,12 @@ selection:
     - 'HLT_g140_loose'
     '2018':
     - 'HLT_g140_loose'
+    '2022':
+    - 'HLT_g140_loose_L1EM22VHI'
+    '2023':
+    - 'HLT_g140_loose_L1EM22VHI'
+    - 'HLT_g140_loose_L1eEM26M'
+
 
 # scale_factor:
 #   doSF: True

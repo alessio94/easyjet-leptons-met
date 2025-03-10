@@ -66,7 +66,7 @@ private:
     //GN2X
     Gaudi::Property<std::vector<std::string>> m_GN2X_wps
       { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the Zbb+y config" };
-    std::vector<CP::SysReadDecorHandle<bool>> m_GN2X_wp_Handles;
+    std::vector<CP::SysReadDecorHandle<int>> m_GN2X_wp_Handles;
 
     CP::SysReadDecorHandle<float> m_WTag_score{"", this};
     CP::SysReadDecorHandle<float> m_GN2Xv01_phbb{"GN2Xv01_phbb", this};
