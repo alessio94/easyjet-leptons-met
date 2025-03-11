@@ -23,13 +23,14 @@ def llyy_cfg(flags, muonkey, electronkey, photonkey,
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=photonkey,
                                    containerOutKey="llyyAnalysisPhotons_%SYS%",
-                                   minPt=22. * Units.GeV))
+                                   minPt=5 * Units.GeV))
 
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="llyyAnalysisMuons_%SYS%",
                                  minPt=9 * Units.GeV))
+
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
@@ -39,12 +40,6 @@ def llyy_cfg(flags, muonkey, electronkey, photonkey,
     cfg.merge(LeptonOrderingAlgCfg(flags,
                                    containerInEleKey=electronkey,
                                    containerInMuKey=muonkey))
-    # cfg.merge(JetSelectorAlgCfg(flags,
-    #                            containerInKey=smalljetkey,
-    #                            containerOutKey="llyyAnalysisJets_%SYS%",
-    #                            minPt=20 * Units.GeV,
-    #                            minimumAmount=2))  # -1 means ignores this
-
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
     # Selection
@@ -59,7 +54,7 @@ def llyy_cfg(flags, muonkey, electronkey, photonkey,
             "HZAllyySelectorAlg",
             eventDecisionOutputDecoration="llyy_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
-            saveCutFlow=flags.Analysis.save_llyy_cutflow,
+            saveCutFlow=flags.Analysis.save_cutflow,
             isMC=flags.Input.isMC,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
@@ -92,10 +87,14 @@ def get_BaselineVarsllyyAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-# for object in ["ll", "bb"]:
     for object in ["ll", "yy", "H_Za"]:
-        for var in ["m", "pT", "dR", "Eta", "Phi"]:
+        for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
             float_variable_names.append(f"{var}{object}")
+
+    for object in ["yy"]:
+        for var in ["X"]:
+            float_variable_names.append(f"{var}{object}")
+
     int_variable_names += ["nElectrons", "nMuons", "nPhotons"]
 
     return float_variable_names, int_variable_names
@@ -133,23 +132,12 @@ def llyy_branches(flags):
         for var in ["status", "pt", "eta", "phi", "m"]:
             all_baseline_variable_names.append(f"mmc_{var}")
 
-    float_NW_variable_names = []
-    float_PNN_variable_names = []
-    if flags.Analysis.NeutrinoWeighting.doNW:
-        # do not append TopReco variables to float_variable_names
-        # or int_variable_names as they are stored by the
-        # TopReco algortithm not BaselineVarsllyyAlg
-        all_baseline_variable_names.append("NW_solutions")
-        for var in ["neutrinoweight"]:
-            float_NW_variable_names.append(f"NW_{var}")
     if flags.Analysis.store_high_level_variables:
         high_level_float_variables, high_level_int_variables \
             = get_BaselineVarsllyyAlg_highlevelvariables(flags)
         float_variable_names += high_level_float_variables
         int_variable_names += high_level_int_variables
-    if flags.Analysis.do_resonant_PNN:
-        for m_X in flags.Analysis.mX_values:
-            float_PNN_variable_names.append(f"PNN_Score_X{m_X}")
+
     all_baseline_variable_names += [
         *float_variable_names,
         *int_variable_names]
@@ -170,17 +158,21 @@ def llyy_branches(flags):
     branches += ["EventInfo.llyy_pass_sr_%SYS% -> llyy_pass_SR"
                  + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    if (flags.Analysis.save_llyy_cutflow):
-        cutList = flags.Analysis.CutList + flags.Analysis.Categories
+    if (flags.Analysis.save_cutflow):
+        cutList = flags.Analysis.CutList
         for cut in cutList:
             branches += [f"EventInfo.{cut}_%SYS% -> llyy_{cut}"
                          + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHllyySelectorAlg
-    for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
-        branches += \
-            [f"EventInfo.pass_trigger_{cat}_%SYS% -> llyy_pass_trigger_{cat}"
-             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+    if flags.Analysis.store_high_level_variables:
+        branches += ["EventInfo.llyy_pass_sr_%SYS% -> llyy_pass_SR"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+        for cat in ["SLT", "DLT"]:
+            branches += \
+                [f"EventInfo.pass_trigger_{cat}_%SYS% -> llyy_pass_trigger_{cat}"
+                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return (branches, float_variable_names, int_variable_names)

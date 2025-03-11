@@ -48,6 +48,7 @@ namespace HZALLYY
     Gaudi::Property<std::string> m_phWPName
       { this, "phWP", "", "Photon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ph_SF{"", this};
+   
     
     CP::SysReadHandle<xAOD::ElectronContainer>
       m_electronHandle{ this, "electrons", "AnalysisElectrons_%SYS%", "Original Electron container to read" };

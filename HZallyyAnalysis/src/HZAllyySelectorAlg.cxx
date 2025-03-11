@@ -30,7 +30,7 @@ namespace HZALLYY
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
     if (m_saveCutFlow) ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
-    
+
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is17_periodB5_B8.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is22_75bunches.initialize(m_systematicsList, m_eventHandle));
@@ -52,63 +52,14 @@ namespace HZALLYY
       m_triggerdecos.emplace(trig, deco);
       ATH_CHECK(m_triggerdecos.at(trig).initialize(m_systematicsList, m_eventHandle));
     }
-    
-    //Asymmetric Lepton triggers
-    //Configuration 1
-    m_pt_threshold[HZALLYY::ASLT1_em][HZALLYY::leadingele] = 27. * Athena::Units::GeV;
-    m_pt_threshold[HZALLYY::ASLT1_em][HZALLYY::leadingmu] = 9. * Athena::Units::GeV;
-    
-    m_pt_threshold[HZALLYY::ASLT1_me][HZALLYY::leadingmu] = 26. * Athena::Units::GeV;
-    m_pt_threshold[HZALLYY::ASLT1_me][HZALLYY::leadingele] = 9. * Athena::Units::GeV;
-    
-    //Configuration 2
-    m_pt_threshold[HZALLYY::ASLT2][HZALLYY::leadingele] = 18. * Athena::Units::GeV;
-    m_pt_threshold[HZALLYY::ASLT2][HZALLYY::leadingmu] = 15. * Athena::Units::GeV;
-    
-    
+          
     // special flag for all cuts
     ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
     
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
-    
-    std::vector<std::string> boolnameslist;
-    for (const auto& [key, value] : m_boolnames) {
-      boolnameslist.push_back(value);
-    }
-    
-    m_llyyCuts.CheckInputCutList(m_inputCutList, boolnameslist);
-    m_inputCutKeys.resize(m_inputCutList.size());
-    
-    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
-    for (const auto& [key, value]: m_boolnames) {
-      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
-      if (it != m_inputCutList.end()) {
-        auto index = it - m_inputCutList.begin();
-        m_inputCutKeys.at(index) = key;
-        inputWasFound.at(index) = true;
-      }
-    }
-    
-    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
-      if(inputWasFound.at(index)) continue;
-      ATH_MSG_ERROR("Doubled or falsely spelled cuts in CutList (see config file)." + m_inputCutList[index]);
-    }
-    
-    for (const auto &cut : m_inputCutKeys) {
-      m_llyyCuts.add(m_boolnames[cut]);
-    }
-    
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_llyyCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of H->Za->llyy cuts;Cuts;#epsilon",
-				 nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of H->Za->llyy cuts;Cuts;#epsilon",
-				 nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of H->Za->llyy cuts;Cuts;#epsilon",
-				 nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
-    
+
+    if(m_saveCutFlow) ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
   
@@ -117,7 +68,7 @@ namespace HZALLYY
   {
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
-    
+      
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
       {
@@ -136,18 +87,10 @@ namespace HZALLYY
 	const xAOD::PhotonContainer *photons = nullptr;
 	ANA_CHECK (m_photonHandle.retrieve (photons, sys));    
 	
-	m_bools.at(HZALLYY::Pass_ll) = false;
-	m_bools.at(HZALLYY::IS_SF) = false;
-	m_bools.at(HZALLYY::IS_ee) = false;
-	m_bools.at(HZALLYY::IS_mm) = false;
-	m_bools.at(HZALLYY::IS_em) = false;
 	m_bools.at(HZALLYY::pass_trigger_SLT) = false;
 	m_bools.at(HZALLYY::pass_trigger_DLT) = false;
-	m_bools.at(HZALLYY::pass_trigger_ASLT1_em) = false;
-	m_bools.at(HZALLYY::pass_trigger_ASLT1_me) = false;
-	m_bools.at(HZALLYY::pass_trigger_ASLT2) = false;
-	m_bools.at(HZALLYY::EXACTLY_TWO_LEPTONS) = false;
 	m_bools.at(HZALLYY::PASS_TRIGGER) = false;
+	m_bools.at(HZALLYY::EXACTLY_TWO_LEPTONS) = false;	
 	m_bools.at(HZALLYY::TWO_OPPOSITE_CHARGE_LEPTONS) = false;
 	m_bools.at(HZALLYY::ATLEAST_TWO_PHOTONS) = false;
 	
@@ -170,15 +113,9 @@ namespace HZALLYY
 	  mu1 = muons->at(1);
 	}
 	
-	if (electrons->size() == 1 && muons->size() == 1) {
-	  ele0 = electrons->at(0);
-	  mu0 = muons->at(0);
-	}
-	
 	evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_llyyCuts, sys);
 	evaluateLeptonCuts(*electrons, *muons, m_llyyCuts);
 	evaluatePhotonCuts(*photons, m_llyyCuts);
-	
 	
 	bool passedall = true;
 	for (const auto& [key, value] : m_boolnames) {
@@ -190,10 +127,13 @@ namespace HZALLYY
 	m_passallcuts.set(*event, passedall, sys);
 	
 	bool pass_baseline=false;
-	if(m_bools.at(HZALLYY::PASS_TRIGGER) && m_bools.at(HZALLYY::EXACTLY_TWO_LEPTONS) ) pass_baseline=true;
+	if(m_bools.at(HZALLYY::PASS_TRIGGER) &&
+	   m_bools.at(HZALLYY::EXACTLY_TWO_LEPTONS) &&
+	   m_bools.at(HZALLYY::TWO_OPPOSITE_CHARGE_LEPTONS) &&
+	   m_bools.at(HZALLYY::ATLEAST_TWO_PHOTONS)) pass_baseline=true;
 	
 	if ((m_bypass or pass_baseline)) filter.setPassed(true);
-      
+	
 	// do the CUTFLOW only with sys="" -> NOSYS
 	if (sys.name()=="" && m_saveCutFlow) {
 	  
@@ -226,11 +166,10 @@ namespace HZALLYY
 	for (unsigned int i=0; i<consecutive_cuts; i++) {
 	  m_llyyCuts[i].relativeCounter+=1;
 	}
-
+	
 	for (auto& [key, var] : m_bools) {
 	  m_Bbranches.at(key).set(*event, var, sys);
 	}
-      
       }
     return StatusCode::SUCCESS;
   }
@@ -241,45 +180,34 @@ namespace HZALLYY
     ATH_MSG_INFO("Total events = " << m_total_events <<std::endl);
     ANA_CHECK (m_filterParams.finalize ());
     m_llyyCuts.CheckCutResults(); // Print CheckCutResults
-
+    
     if(m_saveCutFlow) {
       m_llyyCuts.DoAbsoluteEfficiency(m_total_events, efficiency("AbsoluteEfficiency"));
       m_llyyCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
       m_llyyCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
       m_llyyCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
-
+      
     }
-    else {
-      delete efficiency("AbsoluteEfficiency");
-      delete efficiency("RelativeEfficiency");
-      delete efficiency("StandardCutFlow");
-      delete hist("EventsPassed_BinLabeling");
-    }
-
+    
     return StatusCode::SUCCESS;
   }
-
+  
   void HZAllyySelectorAlg::evaluateTriggerCuts
   (const xAOD::EventInfo *event,
    const xAOD::Electron* ele0, const xAOD::Electron* ele1,
    const xAOD::Muon* mu0, const xAOD::Muon* mu1,
    CutManager& llyyCuts, const CP::SystematicSet& sys) {
-
+    
     if (!llyyCuts.exists("PASS_TRIGGER"))
-        return;
-
+      return;
+    
     if (ele0 || mu0) evaluateSingleLeptonTrigger(event, ele0, mu0, sys);
     if (ele1 || mu1) evaluateSingleLeptonTrigger(event, ele1, mu1, sys);
     if ((ele0 && ele1) || (mu0 && mu1)) evaluateDiLeptonTrigger(event, ele0, ele1, mu0, mu1, sys);
-    if (ele0 && mu0) evaluateAsymmetricLeptonTrigger(event, ele0, mu0, sys);
-
-    bool pass_trigger_ASLT = m_bools.at(HZALLYY::pass_trigger_ASLT1_em) ||
-      m_bools.at(HZALLYY::pass_trigger_ASLT1_me) ||
-      m_bools.at(HZALLYY::pass_trigger_ASLT2);
-
-    if (m_bools.at(HZALLYY::pass_trigger_SLT) || m_bools.at(HZALLYY::pass_trigger_DLT) || pass_trigger_ASLT) m_bools.at(HZALLYY::PASS_TRIGGER) = true;
+    
+    if (m_bools.at(HZALLYY::pass_trigger_SLT) || m_bools.at(HZALLYY::pass_trigger_DLT) ) m_bools.at(HZALLYY::PASS_TRIGGER) = true;
   }
-
+  
   void HZAllyySelectorAlg::evaluateSingleLeptonTrigger
   (const xAOD::EventInfo *event,
    const xAOD::Electron *ele, const xAOD::Muon *mu,
@@ -287,7 +215,7 @@ namespace HZALLYY
   {
     // Check single electron triggers
     std::vector<std::string> single_ele_paths;
-
+    
     int year = m_year.get(*event, sys);
     if(year==2015){
       single_ele_paths = {
@@ -327,7 +255,7 @@ namespace HZALLYY
         "HLT_e300_etcut_L1eEM26M"
       };
     }
-
+    
     bool trigPassed_SET = false;
     if(ele){
       for(const auto& trig : single_ele_paths){
@@ -342,7 +270,7 @@ namespace HZALLYY
 
     // Check single muon triggers
     std::vector<std::string> single_mu_paths;
-
+    
     if(year==2015){
       single_mu_paths = {"HLT_mu20_iloose_L1MU15", "HLT_mu50"};
     }
@@ -359,7 +287,7 @@ namespace HZALLYY
         "HLT_mu80_msonly_3layersEC_L1MU14FCH"
       };
     }
-
+    
     bool trigPassed_SMT = false;
     if (mu){
       for(const auto& trig : single_mu_paths){
@@ -371,10 +299,10 @@ namespace HZALLYY
       }
       trigPassed_SMT &= mu->pt() > m_pt_threshold[HZALLYY::SLT][HZALLYY::mu];
     }
-
+    
     m_bools.at(HZALLYY::pass_trigger_SLT) |= (trigPassed_SET || trigPassed_SMT);
   }
-
+  
   void HZAllyySelectorAlg::evaluateDiLeptonTrigger
   (const xAOD::EventInfo *event,
    const xAOD::Electron *ele0, const xAOD::Electron *ele1,
@@ -382,7 +310,7 @@ namespace HZALLYY
    const CP::SystematicSet& sys)
   {
     std::vector<std::string> di_ele_paths;
-
+    
     int year = m_year.get(*event, sys);
     if(year==2015){
       di_ele_paths = {"HLT_2e12_lhloose_L12EM10VH"};
@@ -410,7 +338,7 @@ namespace HZALLYY
         "HLT_2e17_lhvloose_L12eEM18M", "HLT_2e24_lhvloose_L12eEM24L"
       };
     }
-
+    
     bool trigPassed_DET = false;
     if (ele0 && ele1) {
       for (const auto &trig : di_ele_paths){
@@ -423,10 +351,10 @@ namespace HZALLYY
       trigPassed_DET &= ele0->pt() > m_pt_threshold[HZALLYY::DLT][HZALLYY::leadingele];
       trigPassed_DET &= ele1->pt() > m_pt_threshold[HZALLYY::DLT][HZALLYY::subleadingele];
     }
-
+    
     // Check di-muon triggers
     std::vector<std::string> di_mu_paths;
-
+    
     if(year==2015){
       di_mu_paths = {"HLT_mu18_mu8noL1"};
     }
@@ -436,7 +364,7 @@ namespace HZALLYY
     else if(2022<=year && year<=2023){
       di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
     }
-
+    
     bool trigPassed_DMT = false;
     if (mu0 && mu1) {
       for (const auto &trig : di_mu_paths){
@@ -449,110 +377,9 @@ namespace HZALLYY
       trigPassed_DMT &= mu0->pt() > m_pt_threshold[HZALLYY::DLT][HZALLYY::leadingmu];
       trigPassed_DMT &= mu1->pt() > m_pt_threshold[HZALLYY::DLT][HZALLYY::subleadingmu];
     }
-
+    
     m_bools.at(HZALLYY::pass_trigger_DLT) = (trigPassed_DET || trigPassed_DMT);
   }
-
-  void HZAllyySelectorAlg::evaluateAsymmetricLeptonTrigger
-  (const xAOD::EventInfo *event,
-   const xAOD::Electron *ele, const xAOD::Muon *mu,
-   const CP::SystematicSet& sys)
-  {
-    int year = m_year.get(*event, sys);
-
-    bool trigPassed_ASLT1_em = false;
-    bool trigPassed_ASLT1_me = false;
-    bool trigPassed_ASLT2 = false;
-    if (ele && mu) {
-
-      std::vector<std::string> asym_lepton_paths;
-
-      if(year==2015){
-        asym_lepton_paths = {"HLT_e17_lhloose_mu14"};
-      }
-      else if(2016<=year && year<=2018){
-        asym_lepton_paths = {"HLT_e17_lhloose_nod0_mu14"};
-      }
-      else if(2022<=year && year<=2023){
-        asym_lepton_paths = {"HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
-      }
-
-      for(const auto& trig : asym_lepton_paths){
-        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-        if (pass){
-          bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
-          trigPassed_ASLT2 |= match;
-        }
-      }
-      trigPassed_ASLT2 &= ele->pt() > m_pt_threshold[HZALLYY::ASLT2][HZALLYY::leadingele];
-      trigPassed_ASLT2 &= mu->pt() > m_pt_threshold[HZALLYY::ASLT2][HZALLYY::leadingmu];
-
-      if (ele->pt() > mu->pt()) {
-
-        asym_lepton_paths = {};
-
-        if(year==2016){
-          asym_lepton_paths = {"HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1"};
-        }
-        else if(2017<=year && year<=2018){
-          asym_lepton_paths = {"HLT_e26_lhmedium_nod0_mu8noL1"};
-        }
-        else if(2022<=year && year<=2023){
-          asym_lepton_paths = {"HLT_e26_lhmedium_mu8noL1_L1EM22VHI"};
-        }
-
-        for(const auto& trig : asym_lepton_paths){
-          bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-          if (pass){
-            bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
-            trigPassed_ASLT1_em |= match;
-          }
-        }
-        trigPassed_ASLT1_em &= ele->pt() > m_pt_threshold[HZALLYY::ASLT1_em][HZALLYY::leadingele];
-        trigPassed_ASLT1_em &= mu->pt() > m_pt_threshold[HZALLYY::ASLT1_em][HZALLYY::leadingmu];
-
-      } else {
-
-        asym_lepton_paths = {};
-
-        if(year==2015){
-          asym_lepton_paths = {"HLT_e7_lhmedium_mu24"};
-        }
-        else if(2016<=year && year<=2018){
-          asym_lepton_paths = {"HLT_e7_lhmedium_nod0_mu24"};
-        }
-        else if(2022<=year && year<=2023){
-          asym_lepton_paths = {"HLT_e7_lhmedium_mu24_L1MU14FCH"};
-        }
-
-        for(const auto& trig : asym_lepton_paths){
-          bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-          if (pass){
-            bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
-            trigPassed_ASLT1_me |= match;
-          }
-        }
-        trigPassed_ASLT1_me &= ele->pt() > m_pt_threshold[HZALLYY::ASLT1_me][HZALLYY::leadingele];
-        trigPassed_ASLT1_me &= mu->pt() > m_pt_threshold[HZALLYY::ASLT1_me][HZALLYY::leadingmu];
-      }
-    }
-
-    m_bools.at(HZALLYY::pass_trigger_ASLT1_em) = trigPassed_ASLT1_em;
-    m_bools.at(HZALLYY::pass_trigger_ASLT1_me) = trigPassed_ASLT1_me;
-    m_bools.at(HZALLYY::pass_trigger_ASLT2) = trigPassed_ASLT2;
-  }
-
-
-  void HZAllyySelectorAlg::evaluatePhotonCuts
-  (const xAOD::PhotonContainer& photons, CutManager& llyyCuts)
-  
-  {
-    bool Two_Photons = false;
-    if (photons.size() >= 2) Two_Photons = true;
-    if (Two_Photons && llyyCuts.exists("ATLEAST_TWO_PHOTONS"))
-      m_bools.at(HZALLYY::ATLEAST_TWO_PHOTONS) = true;
-  }
-
   
   void HZAllyySelectorAlg::evaluateLeptonCuts
   (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
@@ -560,29 +387,34 @@ namespace HZALLYY
   {
     bool Two_Opposite_Sign_Electrons = false;
     bool Two_Opposite_Sign_Muons = false;
-    bool Opposite_Sign_ElecMu = false;
-
-    if (electrons.size() + muons.size() == 2)
-      m_bools.at(HZALLYY::EXACTLY_TWO_LEPTONS) = true;
-
+    
+    if ( (electrons.size() == 2 || muons.size() == 2) &&
+	 llyyCuts.exists("EXACTLY_TWO_LEPTONS"))
+      {
+	m_bools.at(HZALLYY::EXACTLY_TWO_LEPTONS) = true;
+      }
+    
     if (electrons.size() >= 2)
       {
 	Two_Opposite_Sign_Electrons = electrons.at(0)->charge()*electrons.at(1)->charge() == -1;
-
       }
     if (muons.size() >= 2)
       {
 	Two_Opposite_Sign_Muons = muons.at(0)->charge()*muons.at(1)->charge() == -1;
       }
-    if (electrons.size() == 1 && muons.size() == 1)
-      {
-	Opposite_Sign_ElecMu = electrons.at(0)->charge()*muons.at(0)->charge() == -1;
-      }
-    if ((Two_Opposite_Sign_Electrons || Two_Opposite_Sign_Muons || Opposite_Sign_ElecMu)
+    if ((Two_Opposite_Sign_Electrons || Two_Opposite_Sign_Muons )
 	&& llyyCuts.exists("TWO_OPPOSITE_CHARGE_LEPTONS"))
       {
 	m_bools.at(HZALLYY::TWO_OPPOSITE_CHARGE_LEPTONS) = true;
       }
+  }
+  
+ void HZAllyySelectorAlg::evaluatePhotonCuts
+  (const xAOD::PhotonContainer& photons, CutManager& llyyCuts)
+    
+  {
+    if (photons.size() >= 2 && llyyCuts.exists("ATLEAST_TWO_PHOTONS"))
+      m_bools.at(HZALLYY::ATLEAST_TWO_PHOTONS) = true;
   }
   
   void HZAllyySelectorAlg::setThresholds(const xAOD::EventInfo* event,
@@ -625,11 +457,11 @@ namespace HZALLYY
     //mm
     if(year==2015) {
       m_pt_threshold[HZALLYY::DLT][HZALLYY::leadingmu] = 19. * Athena::Units::GeV;
-      m_pt_threshold[HZALLYY::DLT][HZALLYY::subleadingmu] = 10. * Athena::Units::GeV;
+      m_pt_threshold[HZALLYY::DLT][HZALLYY::subleadingmu] = 9. * Athena::Units::GeV;
     }
     else if(year>=2016 && year<=2018) {
-      m_pt_threshold[HZALLYY::DLT][HZALLYY::leadingmu] = 24. * Athena::Units::GeV;
-      m_pt_threshold[HZALLYY::DLT][HZALLYY::subleadingmu] = 10. * Athena::Units::GeV;
+      m_pt_threshold[HZALLYY::DLT][HZALLYY::leadingmu] = 23. * Athena::Units::GeV;
+      m_pt_threshold[HZALLYY::DLT][HZALLYY::subleadingmu] = 9. * Athena::Units::GeV;
     } else {
       m_pt_threshold[HZALLYY::DLT][HZALLYY::leadingmu] = 15. * Athena::Units::GeV;
       m_pt_threshold[HZALLYY::DLT][HZALLYY::subleadingmu] = 15. * Athena::Units::GeV;
@@ -637,5 +469,47 @@ namespace HZALLYY
 
   }
 
+  StatusCode  HZAllyySelectorAlg::initialiseCutflow(){
+    
+    std::vector<std::string> boolnameslist;
+    for (const auto& [key, value] : m_boolnames) {
+      boolnameslist.push_back(value);
+    }
+    m_llyyCuts.CheckInputCutList(m_inputCutList, boolnameslist);
+
+    m_inputCutKeys.resize(m_inputCutList.size());
+    std::vector<bool> inputWasFound (m_inputCutList.size(), false);
+    for (const auto& [key, value]: m_boolnames) {
+      auto it = std::find(m_inputCutList.begin(), m_inputCutList.end(), value);
+      if (it != m_inputCutList.end()) {
+        auto index = it - m_inputCutList.begin();
+        m_inputCutKeys.at(index) = key;
+        inputWasFound.at(index) = true;
+      }
+    }
+
+    for (unsigned int index = 0; index < inputWasFound.size(); index++) {
+      if(inputWasFound.at(index)) continue;
+      ATH_MSG_ERROR("Doubled or falsely spelled cuts in CutList (see config file)." + m_inputCutList[index]);
+    }
+
+    for (const auto &cut : m_inputCutKeys) {
+      m_llyyCuts.add(m_boolnames[cut]);
+    }
+
+    //After filling the CutManager, book your histograms.
+    const unsigned int nbins = m_llyyCuts.size() + 1; //  need an extra bin for the total num of events.
+    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of H->Za->llyy cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of H->Za->llyy cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of H->Za->llyy cuts;Cuts;#epsilon",
+				 nbins, 0.5, nbins + 0.5)));
+    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
+
+    return StatusCode::SUCCESS;
+  }
+
+  
 }
 

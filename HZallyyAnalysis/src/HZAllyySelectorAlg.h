@@ -28,10 +28,7 @@ namespace HZALLYY
   enum TriggerChannel
     {
       SLT,
-      DLT,
-      ASLT1_em,
-      ASLT1_me,
-      ASLT2,
+      DLT
     };
 
   enum Var {
@@ -45,18 +42,10 @@ namespace HZALLYY
 
   enum Booleans
     {
-      Pass_ll,
-      IS_SF,
-      IS_ee,
-      IS_mm,
-      IS_em,
       pass_trigger_SLT,
       pass_trigger_DLT,
-      pass_trigger_ASLT1_em,
-      pass_trigger_ASLT1_me,
-      pass_trigger_ASLT2,
-      EXACTLY_TWO_LEPTONS,
       PASS_TRIGGER,
+      EXACTLY_TWO_LEPTONS,
       TWO_OPPOSITE_CHARGE_LEPTONS,
       ATLEAST_TWO_PHOTONS
     };
@@ -74,16 +63,16 @@ namespace HZALLYY
     StatusCode execute() override;
     /// \brief This is the mirror of initialize() and is called after all events are processed.
     StatusCode finalize() override; ///I added this to write the cutflow histogram.
-
-    const std::vector<std::string> m_STANDARD_CUTS{
-      "EXACTLY_TWO_LEPTONS",    
-        "PASS_TRIGGER",
-        "TWO_OPPOSITE_CHARGE_LEPTONS",
-	"ATLEAST_TWO_PHOTONS"
-	};
-
-
+    
   private :
+    
+    const std::vector<std::string> m_STANDARD_CUTS{
+      "PASS_TRIGGER",
+      "EXACTLY_TWO_LEPTONS",          
+      "TWO_OPPOSITE_CHARGE_LEPTONS",
+      "ATLEAST_TWO_PHOTONS"
+    };
+
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
 
@@ -107,12 +96,10 @@ namespace HZALLYY
 
     CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "llyyAnalysisMuons_%SYS%", "Muon container to read" };
-
+    
     CP::SysReadDecorHandle<unsigned int> m_year
       {this, "year", "dataTakingYear", ""};
-    double m_total_mcEventWeight{0.0};
-    CP::SysReadDecorHandle<float> m_generatorWeight
-      { this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
+   
     CP::SysReadDecorHandle<bool> m_is17_periodB5_B8
       {this, "is2017_periodB5_B8", "is2017_periodB5_B8", ""};
     CP::SysReadDecorHandle<bool> m_is22_75bunches
@@ -121,16 +108,13 @@ namespace HZALLYY
       {this, "is2023_75bunches", "is2023_75bunches", ""};
     CP::SysReadDecorHandle<bool> m_is23_400bunches
       {this, "is2023_400bunches", "is2023_400bunches", ""};
-      
+    
     CP::SysFilterReporterParams m_filterParams {this, "HZAllyy selection"};
-
+    
     std::unordered_map<HZALLYY::TriggerChannel, std::string> m_triggerChannels = 
       {
         {HZALLYY::SLT, "SLT"},
-        {HZALLYY::DLT, "DLT"},
-        {HZALLYY::ASLT1_em, "ASLT1_em"},
-        {HZALLYY::ASLT1_me, "ASLT1_me"},
-        {HZALLYY::ASLT2, "ASLT2"},
+        {HZALLYY::DLT, "DLT"}
       };
 
     Gaudi::Property<std::vector<std::string>> m_triggers 
@@ -146,21 +130,12 @@ namespace HZALLYY
     std::unordered_map<HZALLYY::Booleans, CP::SysWriteDecorHandle<bool> > m_Bbranches;
     std::unordered_map<HZALLYY::Booleans, bool> m_bools;
     std::unordered_map<HZALLYY::Booleans, std::string> m_boolnames{
-      {HZALLYY::Pass_ll, "Pass_ll"},
-      {HZALLYY::IS_SF, "IS_SF"},
-      {HZALLYY::IS_ee, "IS_ee"},
-      {HZALLYY::IS_mm, "IS_mm"},
-      {HZALLYY::IS_em, "IS_em"},
       {HZALLYY::pass_trigger_SLT, "pass_trigger_SLT"},
       {HZALLYY::pass_trigger_DLT, "pass_trigger_DLT"},
-      {HZALLYY::pass_trigger_ASLT1_em, "pass_trigger_ASLT1_em"},
-      {HZALLYY::pass_trigger_ASLT1_me, "pass_trigger_ASLT1_me"},
-      {HZALLYY::pass_trigger_ASLT2, "pass_trigger_ASLT2"},
-      {HZALLYY::EXACTLY_TWO_LEPTONS, "EXACTLY_TWO_LEPTONS"},
       {HZALLYY::PASS_TRIGGER, "PASS_TRIGGER"},
+      {HZALLYY::EXACTLY_TWO_LEPTONS, "EXACTLY_TWO_LEPTONS"},
       {HZALLYY::TWO_OPPOSITE_CHARGE_LEPTONS, "TWO_OPPOSITE_CHARGE_LEPTONS"},
       {HZALLYY::ATLEAST_TWO_PHOTONS, "ATLEAST_TWO_PHOTONS"},
-        
      };
 
     CutManager m_llyyCuts;
@@ -168,12 +143,15 @@ namespace HZALLYY
     std::vector<HZALLYY::Booleans> m_inputCutKeys;
     Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
     CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+    double m_total_mcEventWeight{0.0};
+    CP::SysReadDecorHandle<float> m_generatorWeight
+      { this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
 
     std::unordered_map<HZALLYY::TriggerChannel, std::unordered_map<HZALLYY::Var, float>> m_pt_threshold;
 
     void evaluatePhotonCuts
       (const xAOD::PhotonContainer& photons, CutManager& llyyCuts);
-      
+    
     void evaluateTriggerCuts
       (const xAOD::EventInfo* event,
        const xAOD::Electron* ele0, const xAOD::Electron* ele1,
@@ -188,19 +166,16 @@ namespace HZALLYY
        const xAOD::Electron* ele0, const xAOD::Electron* ele1,
        const xAOD::Muon* mu0, const xAOD::Muon* mu1,
        const CP::SystematicSet& sys);
-    void evaluateAsymmetricLeptonTrigger
-      (const xAOD::EventInfo* event,
-       const xAOD::Electron* ele, const xAOD::Muon* mu,
-       const CP::SystematicSet& sys);
-
+    
     void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
 			    const xAOD::MuonContainer& muons, CutManager& llyyCuts);
-     
     void setThresholds(const xAOD::EventInfo* event,
 		       const CP::SystematicSet& sys);
+    StatusCode initialiseCutflow();
   };
 
 }
 
 #endif // HZALLYYANALYSIS_HZALLYYSELECTORALG
 
+ 
