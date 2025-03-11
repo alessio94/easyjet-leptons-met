@@ -113,7 +113,7 @@ This can be repeated several times if needed
 
 7. Check that your code will pass the flake8, cppcheck and clang-tidy checks of the CI, and fix if necessary:
 ```
-flake8 --ignore=W503,E741 . --per-file-ignores="hub.py:F401
+flake8 --ignore=W503,E741 . --per-file-ignores="hub.py:F401"
 easyjet-cppcheck .
 easyjet-clang-tidy ..
 ```
