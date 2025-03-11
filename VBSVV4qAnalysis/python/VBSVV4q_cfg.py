@@ -9,8 +9,6 @@ from VBSVV4qAnalysis.JJ_config import JJ_cfg, JJ_branches
 
 import AthenaCommon.SystemOfUnits as Units
 
-import os
-
 
 def VBSVV4q_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
 
@@ -50,12 +48,11 @@ def VBSVV4q_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
 
     # boson tagger
     if flags.Analysis.loadDisCoJet:
-        os.environ["WorkDir_DIR"] = GetDataPath() + "/VBSVV4qAnalysis/"
         VTagger = CompFactory.JSSTaggerUtils(
             "JSSTaggerUtils/DisCoJetTagger",
             ContainerName=flags.Analysis.container_names.input.reco10UFOJet,
             CalibArea="Local",
-            ConfigFile=flags.Analysis.DisCoJetCfg
+            ConfigFile="/VBSVV4qAnalysis/" + flags.Analysis.DisCoJetCfg
         )
 
         cfg.addEventAlgo(
@@ -100,11 +97,3 @@ def VBSVV4q_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         """
 
     return cfg
-
-
-def GetDataPath():
-
-    for dirpath in os.environ["DATAPATH"].split(":"):
-        fullpath = dirpath + "/VBSVV4qAnalysis/"
-        if os.path.exists(fullpath):
-            return dirpath

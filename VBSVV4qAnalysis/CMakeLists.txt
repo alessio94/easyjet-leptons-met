@@ -36,6 +36,7 @@ atlas_install_python_modules(
 )
 atlas_install_data(
   share/*
+  data/*
   )
 
 # atlas_install_data( data/* )
