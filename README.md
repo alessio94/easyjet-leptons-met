@@ -64,6 +64,8 @@ git lfs install #IMPORTANT: needed to pull LFS files; only needs to be setup onc
 git clone --recursive --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 ```
 
+Note that if you have issues with `lfs`, see the `LFS issues` section of the Troubleshooting section at the end of this README.
+
 3. Go to the directory and set your forked branch as origin and fetch it:
 ```
 cd easyjet
@@ -302,3 +304,45 @@ Recommended extensions:
 - `GitLens` -- for git integration, diffs, viewing commits etc
 - `CMake` -- maybe. It is possible to set up CMake for compilation and debugging but may not be trivial.
 - Some markdown extension -- for writing READMEs like this
+
+# Troubleshooting
+
+## LFS issues
+
+Note that an error which comes up sometimes related to LFS files is something like the following:
+
+```
+Downloading bbyyAnalysis/data/bdt_HH2025_KF_corr_Data2024_highMass.root (7.8 MB)
+Error downloading object: bbyyAnalysis/data/bdt_HH2025_KF_corr_Data2024_highMass.root (fbca55b): Smudge error: Error downloading bbyyAnalysis/data/bdt_HH2025_KF_corr_Data2024_highMass.root (fbca55bf8118ce5d7f9f93bcb899727635d3a33ee6b1364463a5e8041ba593c1): [fbca55bf8118ce5d7f9f93bcb899727635d3a33ee6b1364463a5e8041ba593c1] Object does not exist on the server or you don't have permissions to access it: [404] Object does not exist on the server or you don't have permissions to access it
+
+Errors logged to '/afs/cern.ch/work/a/atishelm/private/easyjet_main/easyjet/.git/lfs/logs/20250311T191121.858745341.log'.
+Use `git lfs logs last` to view the log.
+error: external filter 'git-lfs filter-process' failed
+fatal: bbyyAnalysis/data/bdt_HH2025_KF_corr_Data2024_highMass.root: smudge filter lfs failed
+```
+
+As documented in https://gitlab.cern.ch/easyjet/easyjet/-/issues/187#note_7594498, the suggested solution is to run the following before trying to checkout again:
+
+```
+git lfs fetch --all upstream
+```
+
+Then if you want to use `https` protocol:
+
+```
+git config lfs.url https://gitlab.cern.ch/$(git config user.name)/easyjet.git/info/lfs
+git config lfs.https://gitlab.cern.ch/$(git config user.name)/easyjet.git/info/lfs.locksverify true
+```
+
+or alternatively run those commands to set things up with `ssh` protocol:
+
+```
+git config lfs.url ssh://git@gitlab.cern.ch:7999/$(git config user.name)/easyjet.git/info/lfs
+git config lfs.ssh://git@gitlab.cern.ch:7999/$(git config user.name)/easyjet.git/info/lfs.locksverify true
+```
+
+Then:
+
+```
+git lfs push --all origin
+```
