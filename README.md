@@ -126,7 +126,7 @@ git pull --rebase upstream main
 ```
 Then fix the potential conflicts and push to the current branch:
 ```
-git push -f origin $(git symbolic-ref --short HEAD)
+git push --force-with-lease origin $(git symbolic-ref --short HEAD)
 ```
 Please favour `rebase` over `merge` as it can badly affect the commit history. By default `git pull`, will use merge, unless you provide the explicit `--rebase` option.
 
