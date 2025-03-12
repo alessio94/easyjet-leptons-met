@@ -1,11 +1,9 @@
-#ptag=p6266
-ptag=p5855
+ptag=p6619
 campaign=v1
-dir_samples="../easyjet/llyyAnalysis/datasets/PHYS/nominal"
-#mc_campaign="mc23_13p6TeV"
+dir_samples="../easyjet/HZallyyAnalysis/datasets/PHYS"
 mc_campaign="mc23"
 mc_list=(
-     "$dir_samples/$mc_campaign.Zallyy_Signal_prompt_$ptag.txt"
+     "$dir_samples/$mc_campaign_HZallyy_$ptag.txt"
 )
 
 easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
