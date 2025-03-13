@@ -65,10 +65,6 @@ namespace HZALLYY
      Gaudi::Property<bool> m_saveDummy_ele_SF
       {this, "saveDummyEleSF", false,
 	  "To be used in case no recommendations are available"};
-
-     Gaudi::Property<bool> m_saveDummy_ph_SF
-      {this, "saveDummyPhotonSF", false,
-	  "To be used in case no recommendations are available"};
      
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };

@@ -43,7 +43,7 @@ namespace HH4B
     for (const std::string &trig : m_Triggers)
     {
       std::string triggerDecorName = "trigPassed_"+trig;
-      SG::ReadDecorHandleKey< xAOD::EventInfo > triggerDecorKey = m_eventHandle.getNamePattern() + "." + triggerDecorName;
+      SG::ReadDecorHandleKey< xAOD::EventInfo > triggerDecorKey("EventInfo." + triggerDecorName);
       m_triggerDecorKeys.emplace(trig,triggerDecorKey);
       ATH_CHECK(m_triggerDecorKeys.at(trig).initialize());
     }

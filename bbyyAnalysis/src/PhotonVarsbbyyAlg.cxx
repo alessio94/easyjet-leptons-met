@@ -25,7 +25,7 @@ namespace HHBBYY
     ATH_CHECK (m_selected_ph.initialize(m_systematicsList, m_bbyyPhotonHandle));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     
-    if(m_isMC && !m_saveDummy_ph_SF){
+    if(m_isMC){
       ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
       m_ph_SF = CP::SysReadDecorHandle<float>("effSF_"+m_photonWPName+"_%SYS%", this);
       ATH_CHECK (m_ph_SF.initialize(m_systematicsList, m_photonHandle, SG::AllowEmpty));
@@ -97,8 +97,7 @@ namespace HHBBYY
         m_Fbranches.at(prefix+"_E").set(*event, y.E(), sys);
         m_Ibranches.at(prefix+"_isEMTight").set(*event, m_isEMTight.get(*ph, sys), sys);
         if(m_isMC){
-          float SF = m_saveDummy_ph_SF ? 1. : m_ph_SF.get(*ph, sys);
-          m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, m_ph_SF.get(*ph, sys), sys);
         }
       }
       

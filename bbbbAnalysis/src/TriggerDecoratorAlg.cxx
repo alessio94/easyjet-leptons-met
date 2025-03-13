@@ -28,7 +28,7 @@ namespace HH4B
       std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '.', 'p');
 
       std::string triggerDecorName = "trigPassed_"+modifiedTrigName;
-      SG::ReadDecorHandleKey< xAOD::EventInfo > triggerDecorKey = "EventInfo." + triggerDecorName;
+      SG::ReadDecorHandleKey< xAOD::EventInfo > triggerDecorKey("EventInfo." + triggerDecorName);
 
       m_triggerdecoKeys.emplace(trig, triggerDecorKey);
       ATH_CHECK(m_triggerdecoKeys.at(trig).initialize());

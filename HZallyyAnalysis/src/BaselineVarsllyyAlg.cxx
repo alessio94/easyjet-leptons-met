@@ -43,12 +43,9 @@ namespace HZALLYY {
 	  ATH_CHECK(m_ele_SF.initialize(m_systematicsList, m_electronHandle));
 	}
       
-      if (!m_saveDummy_ph_SF)
-	{
-	  ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
-	  m_ph_SF = CP::SysReadDecorHandle < float > ("effSF_" + m_phWPName + "_%SYS%", this);
-	  ATH_CHECK(m_ph_SF.initialize(m_systematicsList, m_photonHandle));
-	}
+      ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
+      m_ph_SF = CP::SysReadDecorHandle < float > ("effSF_" + m_phWPName + "_%SYS%", this);
+      ATH_CHECK(m_ph_SF.initialize(m_systematicsList, m_photonHandle));
       
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle < float > ("effSF_" + m_muWPName + "_%SYS%", this);
@@ -133,8 +130,7 @@ namespace HZALLYY {
 	
 	
 	if(m_isMC){
-          float SF = m_saveDummy_ph_SF ? 1. : m_ph_SF.get(*ph, sys);
-          m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
+          m_Fbranches.at(prefix+"_effSF").set(*event, m_ph_SF.get(*ph, sys), sys);
         }
 
 

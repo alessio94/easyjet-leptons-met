@@ -52,10 +52,6 @@ namespace HHBBYY
     
     CP::SysReadDecorHandle<float> m_ph_SF{"", this};
     
-    Gaudi::Property<bool> m_saveDummy_ph_SF
-      {this, "saveDummyPhotonSF", false,
-	  "To be used in case no recommendations are not available"};
-
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 

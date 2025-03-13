@@ -1,5 +1,4 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
-from AthenaConfiguration.Enums import LHCPeriod
 
 
 def get_photon_branches(flags, tree_flags, input_container, output_prefix):
@@ -62,12 +61,10 @@ def get_photon_branches(flags, tree_flags, input_container, output_prefix):
         ]
 
     if flags.Input.isMC:
-        # No Run 2 SF yet
-        if flags.GeoModel.Run is LHCPeriod.Run3:
-            photon_branches.variables += [
-                f"effSF_{id_wp}_%SYS%"
-                for id_wp in id_wps
-            ]
+        photon_branches.variables += [
+            f"effSF_{id_wp}_%SYS%"
+            for id_wp in id_wps
+        ]
 
     # Requires PhotonSelectorAlg to be run
     if tree_flags.collection_options.photons.run_selection:
