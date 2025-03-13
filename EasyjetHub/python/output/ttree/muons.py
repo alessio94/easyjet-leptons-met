@@ -19,6 +19,12 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
     muon_branches.add_four_mom_branches(do_mass=False)
     muon_branches.variables += ["charge"]
 
+    if tree_flags.collection_options.muons.iso_variables:
+        muon_branches.variables += [
+            "neflowisol20",
+            "ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt500"
+        ]
+
     if flags.Analysis.do_overlap_removal:
         muon_branches.variables += ["passesOR_%SYS%"]
 

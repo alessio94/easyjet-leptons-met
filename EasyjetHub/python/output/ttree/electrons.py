@@ -20,6 +20,12 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
     electron_branches.add_four_mom_branches(do_mass=False)
     electron_branches.variables += ["charge"]
 
+    if tree_flags.collection_options.electrons.iso_variables:
+        electron_branches.variables += [
+            "topoetcone20",
+            "ptvarcone30_Nonprompt_All_MaxWeightTTVALooseCone_pt1000"
+        ]
+
     if flags.Analysis.Electron.do_reco_decoration:
         electron_branches.variables += ["author"]
 

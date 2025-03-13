@@ -135,13 +135,16 @@ ttree_output:
       truth_parent_info: true
       run_selection: true
     taus:
+      score_branches: True
       truth_branches: True
       truth_parent_info: true
       run_selection: true
     electrons:
+      iso_variables: true
       run_selection: true
       truth_parent_info: true
     muons:
+      iso_variables: true
       run_selection: true
       truth_parent_info: true
   truth_outputs:

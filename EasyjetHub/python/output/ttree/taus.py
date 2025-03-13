@@ -20,6 +20,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
 
     tau_branches.add_four_mom_branches(do_mass=False)
     tau_branches.variables += ["charge", "nProng", "decayMode"]
+
     if flags.Analysis.do_bbtt_analysis:
         tau_branches.variables += ["isIDTau", "isAntiTau",
                                    "trigMatch_Tau35", "trigMatch_Tau25"]
@@ -39,15 +40,15 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
     if tree_flags.collection_options.taus.score_branches:
         tau_branches.variables += [
             "RNNJetScoreSigTrans",
-            "RNNEleScoreSigTrans"
+            "RNNEleScoreSigTrans_v1"
         ]
 
         split_tags = flags.Input.AMITag.split("_")
         gntau_valid_ptag = (
-            get_valid_ami_tag(split_tags, "p", "p6266") and not flags.Input.isPHYSLITE)
+            get_valid_ami_tag(split_tags, "p", "p6491") and not flags.Input.isPHYSLITE)
         if gntau_valid_ptag:
             tau_branches.variables += [
-                "GNTauScoreSigTrans_v0"
+                "GNTauScoreSigTrans_v0prune"
             ]
 
     if flags.Input.isMC and tree_flags.collection_options.taus.truth_branches:

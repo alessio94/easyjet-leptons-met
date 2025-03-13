@@ -44,10 +44,12 @@ collection_options:
     run_selection: true
   
   electrons:
+    iso_variables: false
     run_selection: true
     truth_parent_info: false
 
   muons:
+    iso_variables: false
     run_selection: true
     truth_parent_info: false
 
