@@ -66,7 +66,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 OnlyFirstLargeRJet=True,
                 pTCut=20.e3,
                 nMaxJets=2,
-                DecTag="_boosted"
+                DecTag="_boostedCategory"
             )
         )
 
@@ -97,7 +97,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                         containerSigJetsKey="vbshiggsAnalysisHJets_%SYS%",
                         pTCut=20.e3,
                         nMaxJets=2,
-                        DecTag="_resolved"
+                        DecTag="_resolvedCategory"
                     )
                 )
 

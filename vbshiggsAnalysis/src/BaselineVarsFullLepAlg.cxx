@@ -443,10 +443,10 @@ namespace VBSHIGGS{
         //kinematics of RNN jets
         else {
           std::vector<const xAOD::JetContainer*> RNNJets = {RNNJets_boosted};
-          std::vector<std::string> RNNJets_names = {"RNNJets_boosted"};
+          std::vector<std::string> RNNJets_names = {"RNNJets_boostedCategory"};
           if (m_doResolved){
             RNNJets.emplace_back(RNNJets_resolved);
-            RNNJets_names.emplace_back("RNNJets_resolved");
+            RNNJets_names.emplace_back("RNNJets_resolvedCategory");
           }
           for(unsigned int i=0; i<RNNJets.size(); i++) {
             const xAOD::JetContainer *RNNJets_container = RNNJets[i];

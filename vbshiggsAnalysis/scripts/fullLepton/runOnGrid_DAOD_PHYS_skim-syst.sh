@@ -1,6 +1,6 @@
-runConfig="vbshiggsAnalysis/RunConfig-fullLep-bypass-syst.yaml"
+runConfig="vbshiggsAnalysis/RunConfig-fullLep-syst.yaml"
 executable="vbshiggs-ntupler"
-campaignName="VBSHiggs_v1_Syst_skim"
+campaignName="VBSHiggs_Syst"
 
 mc_list=(
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_FullLep_signal_DAOD_PHYS_p6490.txt"
@@ -23,6 +23,7 @@ easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --campaign ${campaignName} \
     --noTag \
     --mergeOutput \
+    --nGBperJob 5 \
     --noEmail \
     --HDBSProductionRole
 

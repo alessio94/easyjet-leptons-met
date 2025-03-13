@@ -79,11 +79,11 @@ def get_BaselineVarsFullLepAlg_variables(flags):
     if not flags.Analysis.UseVBFRNN:
         objects += ["VBSJ1", "VBSJ2", "VBSdijet"]
     else:
-        objects += ["RNNJets_boosted_Jet1",
-                    "RNNJets_boosted_Jet2"]
+        objects += ["RNNJets_boostedCategory_Jet1",
+                    "RNNJets_boostedCategory_Jet2"]
         if flags.Analysis.do_resolved:
-            objects += ["RNNJets_resolved_Jet1",
-                        "RNNJets_resolved_Jet2"]
+            objects += ["RNNJets_resolvedCategory_Jet1",
+                        "RNNJets_resolvedCategory_Jet2"]
 
     for object in objects:
         for var in ["m", "pt", "eta", "phi"]:
@@ -168,9 +168,9 @@ def fullLep_branches(flags):
     # VBF tagger
     if flags.Analysis.UseVBFRNN:
         vars = ['RNNScore', 'nRNNJets']
-        regs = ['boosted']
+        regs = ['boostedCategory']
         if flags.Analysis.do_resolved:
-            regs += ['resolved']
+            regs += ['resolvedCategory']
         for var in vars:
             for reg in regs:
                 branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}_%SYS%']
