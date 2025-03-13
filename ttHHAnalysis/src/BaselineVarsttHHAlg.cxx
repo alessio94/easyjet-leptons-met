@@ -86,11 +86,35 @@ namespace ttHH
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
+    
+    std::vector<std::string> wc_values = {
+      "min3", "min2p5", "min2", "min1p5", "min1", "min0p5",
+      "0p5", "1", "1p5", "2", "2p5", "3"
+    };
+  
+    for (const auto& val : wc_values) {
+        m_hist_EFTWeight_smeft_shape[val] = nullptr;
+        m_hist_EFTWeight_smeftmassless_shape[val] = nullptr;
+        m_hist_EFTWeight_heft_shape[val] = nullptr;
+    
+        m_weights_smeft_shape[val] = 1.0;
+        m_weights_smeftmassless_shape[val] = 1.0;
+        m_weights_heft_shape[val] = 1.0;
+    
+        m_hist_EFTWeight_smeft_norm[val] = nullptr;
+        m_hist_EFTWeight_smeftmassless_norm[val] = nullptr;
+        m_hist_EFTWeight_heft_norm[val] = nullptr;
+    
+        m_weights_smeft_norm[val] = 1.0;
+        m_weights_smeftmassless_norm[val] = 1.0;
+        m_weights_heft_norm[val] = 1.0;
+    }
 
     if (m_isSignal){
       std::string pathEFTfile = PathResolverFindCalibFile("ttHHAnalysis/rw_CttHH_min3_to_3_histo.root");
       ATH_CHECK(loadEFTWeightFile(pathEFTfile));
     }
+  
 
     ATH_CHECK(m_truthBosonsWithDecayParticlesContainer.initialize(m_isSignal));
     ATH_CHECK(m_truthTopContainer.initialize(m_isSignal));
@@ -155,32 +179,30 @@ namespace ttHH
         ATH_CHECK(getEFTShapeWeights(truth_ttHH_p4, truth_HH_p4, truth_ttbar_p4));
         ATH_CHECK(getEFTNormWeights());
 
-        m_Fbranches.at("eft_weight_shape_CttHH_min3").set(*event, m_weights_shape_CttHH_min3, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_min2_5").set(*event, m_weights_shape_CttHH_min2_5, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_min2").set(*event, m_weights_shape_CttHH_min2, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_min1_5").set(*event, m_weights_shape_CttHH_min1_5, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_min1").set(*event, m_weights_shape_CttHH_min1, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_min0_5").set(*event, m_weights_shape_CttHH_min0_5, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_0_5").set(*event, m_weights_shape_CttHH_0_5, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_1").set(*event, m_weights_shape_CttHH_1, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_1_5").set(*event, m_weights_shape_CttHH_1_5, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_2").set(*event, m_weights_shape_CttHH_2, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_2_5").set(*event, m_weights_shape_CttHH_2_5, sys);
-        m_Fbranches.at("eft_weight_shape_CttHH_3").set(*event, m_weights_shape_CttHH_3, sys);
-
-        m_Fbranches.at("eft_weight_norm_CttHH_min3").set(*event, m_weights_norm_CttHH_min3, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_min2_5").set(*event, m_weights_norm_CttHH_min2_5, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_min2").set(*event, m_weights_norm_CttHH_min2, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_min1_5").set(*event, m_weights_norm_CttHH_min1_5, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_min1").set(*event, m_weights_norm_CttHH_min1, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_min0_5").set(*event, m_weights_norm_CttHH_min0_5, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_0_5").set(*event, m_weights_norm_CttHH_0_5, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_1").set(*event, m_weights_norm_CttHH_1, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_1_5").set(*event, m_weights_norm_CttHH_1_5, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_2").set(*event, m_weights_norm_CttHH_2, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_2_5").set(*event, m_weights_norm_CttHH_2_5, sys);
-        m_Fbranches.at("eft_weight_norm_CttHH_3").set(*event, m_weights_norm_CttHH_3, sys);
-
+        for (const auto& [key, weight] : m_weights_smeft_shape) {
+          std::string branchName = "eft_weight_smeft_shape_CttHH_" + key;
+          m_Fbranches.at(branchName).set(*event, weight, sys);
+        }
+        for (const auto& [key, weight] : m_weights_smeftmassless_shape) {
+          std::string branchName = "eft_weight_smeftmassless_shape_CttHH_" + key;
+          m_Fbranches.at(branchName).set(*event, weight, sys);
+        }
+        for (const auto& [key, weight] : m_weights_heft_shape) {
+          std::string branchName = "eft_weight_heft_shape_CttHH_" + key;
+          m_Fbranches.at(branchName).set(*event, weight, sys);
+        }
+        for (const auto& [key, weight] : m_weights_smeft_norm) {
+          std::string branchName = "eft_weight_smeft_norm_CttHH_" + key;
+          m_Fbranches.at(branchName).set(*event, weight, sys);
+        }
+        for (const auto& [key, weight] : m_weights_smeftmassless_norm) {
+          std::string branchName = "eft_weight_smeftmassless_norm_CttHH_" + key;
+          m_Fbranches.at(branchName).set(*event, weight, sys);
+        }
+        for (const auto& [key, weight] : m_weights_heft_norm) {
+          std::string branchName = "eft_weight_heft_norm_CttHH_" + key;
+          m_Fbranches.at(branchName).set(*event, weight, sys);
+        }
       }
 
       TLorentzVector H1(0, 0, 0, 0);
@@ -740,131 +762,71 @@ namespace ttHH
     }
 
     // Retrieve the histogram named "EFTweights"
-    m_hist_EFTWeight_shape_CttHH_min3 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min3"));
-    m_hist_EFTWeight_shape_CttHH_min2_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min2_5"));
-    m_hist_EFTWeight_shape_CttHH_min2 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min2"));
-    m_hist_EFTWeight_shape_CttHH_min1_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min1_5"));
-    m_hist_EFTWeight_shape_CttHH_min1 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min1"));
-    m_hist_EFTWeight_shape_CttHH_min0_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_min0_5"));
-    m_hist_EFTWeight_shape_CttHH_0_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_0_5"));
-    m_hist_EFTWeight_shape_CttHH_1 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_1"));
-    m_hist_EFTWeight_shape_CttHH_1_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_1_5"));
-    m_hist_EFTWeight_shape_CttHH_2 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_2"));
-    m_hist_EFTWeight_shape_CttHH_2_5 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_2_5"));
-    m_hist_EFTWeight_shape_CttHH_3 = dynamic_cast<TH2D *>(f->Get("EFTweights_shape_CttHH_3"));
+    for (auto& [key, hist] : m_hist_EFTWeight_smeft_shape) {
+      std::string histName = "EFTweights_SMEFT_shape_CttHH_" + key;
+      m_hist_EFTWeight_smeft_shape[key] = dynamic_cast<TH2D *>(f->Get(histName.c_str()));
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_smeftmassless_shape) {
+      std::string histName = "EFTweights_SMEFTmassless_shape_CttHH_" + key;
+      m_hist_EFTWeight_smeftmassless_shape[key] = dynamic_cast<TH2D *>(f->Get(histName.c_str()));
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_heft_shape) {
+      std::string histName = "EFTweights_HEFT_shape_CttHH_" + key;
+      m_hist_EFTWeight_heft_shape[key] = dynamic_cast<TH2D *>(f->Get(histName.c_str()));
+    }
 
-    m_hist_EFTWeight_norm_CttHH_min3 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min3"));
-    m_hist_EFTWeight_norm_CttHH_min2_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min2_5"));
-    m_hist_EFTWeight_norm_CttHH_min2 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min2"));
-    m_hist_EFTWeight_norm_CttHH_min1_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min1_5"));
-    m_hist_EFTWeight_norm_CttHH_min1 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min1"));
-    m_hist_EFTWeight_norm_CttHH_min0_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_min0_5"));
-    m_hist_EFTWeight_norm_CttHH_0_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_0_5"));
-    m_hist_EFTWeight_norm_CttHH_1 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_1"));
-    m_hist_EFTWeight_norm_CttHH_1_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_1_5"));
-    m_hist_EFTWeight_norm_CttHH_2 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_2"));
-    m_hist_EFTWeight_norm_CttHH_2_5 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_2_5"));
-    m_hist_EFTWeight_norm_CttHH_3 = dynamic_cast<TH1F *>(f->Get("EFTweights_norm_CttHH_3"));
+    for (auto& [key, hist] : m_hist_EFTWeight_smeft_norm) {
+      std::string histName = "EFTweights_SMEFT_norm_CttHH_" + key;
+      m_hist_EFTWeight_smeft_norm[key] = dynamic_cast<TH1F *>(f->Get(histName.c_str()));
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_smeftmassless_norm) {
+      std::string histName = "EFTweights_SMEFTmassless_norm_CttHH_" + key;
+      m_hist_EFTWeight_smeftmassless_norm[key] = dynamic_cast<TH1F *>(f->Get(histName.c_str()));
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_heft_norm) {
+      std::string histName = "EFTweights_HEFT_norm_CttHH_" + key;
+      m_hist_EFTWeight_heft_norm[key] = dynamic_cast<TH1F *>(f->Get(histName.c_str()));
+    }
 
     f->Clear(); 
     f->Close();
-    
-    if (!m_hist_EFTWeight_shape_CttHH_min3) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min3 not found");
-      return StatusCode::FAILURE;
+
+    for (auto& [key, hist] : m_hist_EFTWeight_smeft_shape) {
+      if (!hist) {
+        ATH_MSG_ERROR("m_hist_EFTWeight_smeft_shape[" << key << "] not found");
+        return StatusCode::FAILURE;
       }
-    if (!m_hist_EFTWeight_shape_CttHH_min2_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min2_5 not found");
-      return StatusCode::FAILURE;
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_smeftmassless_shape) {
+      if (!hist) {
+        ATH_MSG_ERROR("m_hist_EFTWeight_smeftmassless_shape[" << key << "] not found");
+        return StatusCode::FAILURE;
       }
-    if (!m_hist_EFTWeight_shape_CttHH_min2) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min2 not found");
-      return StatusCode::FAILURE;
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_heft_shape) {
+      if (!hist) {
+        ATH_MSG_ERROR("m_hist_EFTWeight_heft_shape[" << key << "] not found");
+        return StatusCode::FAILURE;
       }
-    if (!m_hist_EFTWeight_shape_CttHH_min1_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min1_5 not found");
-      return StatusCode::FAILURE;
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_smeft_norm) {
+      if (!hist) {
+        ATH_MSG_ERROR("m_hist_EFTWeight_smeft_norm[" << key << "] not found");
+        return StatusCode::FAILURE;
       }
-    if (!m_hist_EFTWeight_shape_CttHH_min1) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min1 not found");
-      return StatusCode::FAILURE;
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_smeftmassless_norm) {
+      if (!hist) {
+        ATH_MSG_ERROR("m_hist_EFTWeight_smeftmassless_norm[" << key << "] not found");
+        return StatusCode::FAILURE;
       }
-    if (!m_hist_EFTWeight_shape_CttHH_min0_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_min0_5 not found");
-      return StatusCode::FAILURE;
+    }
+    for (auto& [key, hist] : m_hist_EFTWeight_heft_norm) {
+      if (!hist) {
+        ATH_MSG_ERROR("m_hist_EFTWeight_heft_norm[" << key << "] not found");
+        return StatusCode::FAILURE;
       }
-    if (!m_hist_EFTWeight_shape_CttHH_0_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_0_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_shape_CttHH_1) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_1 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_shape_CttHH_1_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_1_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_shape_CttHH_2) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_2 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_shape_CttHH_2_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_2_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_shape_CttHH_3) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_shape_CttHH_3 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_min3) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min3 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_min2_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min2_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_min2) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min2 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_min1_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min1_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_min1) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min1 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_min0_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_min0_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_0_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_0_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_1) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_1 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_1_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_1_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_2) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_2 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_2_5) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_2_5 not found");
-      return StatusCode::FAILURE;
-      }
-    if (!m_hist_EFTWeight_norm_CttHH_3) {
-      ATH_MSG_ERROR("m_hist_EFTWeight_norm_CttHH_3 not found");
-      return StatusCode::FAILURE;
-      }
+    }
 
     ATH_MSG_INFO("Successfully loaded all 'EFTweights' histograms from file \""
                  << filePath << "\".");
@@ -955,38 +917,30 @@ namespace ttHH
     ATH_MSG_DEBUG("ttbar mass: " << ttbar_mass);
     ATH_MSG_DEBUG("ttHH mass: " << ttHH_mass);
 
-    // TODO : Needs to be generalised!!! -> Histograms should not be each in single pointers
-    // Find the bins corresponding to the ttHH invariant mass
-    m_weights_shape_CttHH_min3 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min3);
-    m_weights_shape_CttHH_min2_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min2_5);
-    m_weights_shape_CttHH_min2 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min2);
-    m_weights_shape_CttHH_min1_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min1_5);
-    m_weights_shape_CttHH_min1 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min1);
-    m_weights_shape_CttHH_min0_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_min0_5);
-    m_weights_shape_CttHH_0_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_0_5);
-    m_weights_shape_CttHH_1 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_1);
-    m_weights_shape_CttHH_1_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_1_5);
-    m_weights_shape_CttHH_2 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_2);
-    m_weights_shape_CttHH_2_5 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_2_5);
-    m_weights_shape_CttHH_3 = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_shape_CttHH_3);
+    for (auto& [key, weight] : m_weights_smeft_shape) {
+      weight = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_smeft_shape[key]);
+    }
+    for (auto& [key, weight] : m_weights_smeftmassless_shape) {
+      weight = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_smeftmassless_shape[key]);
+    }
+    for (auto& [key, weight] : m_weights_heft_shape) {
+      weight = findAndGetEFTWeight(ttHH_mass, ttbar_mass, m_hist_EFTWeight_heft_shape[key]);
+    }
 
     return StatusCode::SUCCESS;
   }
 
   StatusCode BaselineVarsttHHAlg::getEFTNormWeights()
   {
-    m_weights_norm_CttHH_min3 = m_hist_EFTWeight_norm_CttHH_min3->GetBinContent(1);
-    m_weights_norm_CttHH_min2_5 = m_hist_EFTWeight_norm_CttHH_min2_5->GetBinContent(1);
-    m_weights_norm_CttHH_min2 = m_hist_EFTWeight_norm_CttHH_min2->GetBinContent(1);
-    m_weights_norm_CttHH_min1_5 = m_hist_EFTWeight_norm_CttHH_min1_5->GetBinContent(1);
-    m_weights_norm_CttHH_min1 = m_hist_EFTWeight_norm_CttHH_min1->GetBinContent(1);
-    m_weights_norm_CttHH_min0_5 = m_hist_EFTWeight_norm_CttHH_min0_5->GetBinContent(1);
-    m_weights_norm_CttHH_0_5 = m_hist_EFTWeight_norm_CttHH_0_5->GetBinContent(1);
-    m_weights_norm_CttHH_1 = m_hist_EFTWeight_norm_CttHH_1->GetBinContent(1);
-    m_weights_norm_CttHH_1_5 = m_hist_EFTWeight_norm_CttHH_1_5->GetBinContent(1);
-    m_weights_norm_CttHH_2 = m_hist_EFTWeight_norm_CttHH_2->GetBinContent(1);
-    m_weights_norm_CttHH_2_5 = m_hist_EFTWeight_norm_CttHH_2_5->GetBinContent(1);
-    m_weights_norm_CttHH_3 = m_hist_EFTWeight_norm_CttHH_3->GetBinContent(1);
+    for (auto& [key, weight] : m_weights_smeft_norm) {
+      weight = m_hist_EFTWeight_smeft_norm[key]->GetBinContent(1);
+    }
+    for (auto& [key, weight] : m_weights_smeftmassless_norm) {
+      weight = m_hist_EFTWeight_smeftmassless_norm[key]->GetBinContent(1);
+    }
+    for (auto& [key, weight] : m_weights_heft_norm) {
+      weight = m_hist_EFTWeight_heft_norm[key]->GetBinContent(1);
+    }
 
     return StatusCode::SUCCESS;
   }

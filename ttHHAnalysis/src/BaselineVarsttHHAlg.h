@@ -129,58 +129,22 @@ private:
         "Truth top container to run on"};
 
     // For shape weights
-    TH2D* m_hist_EFTWeight_shape_CttHH_min3 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_min2_5 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_min2 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_min1_5 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_min1 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_min0_5 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_0_5 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_1 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_1_5 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_2 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_2_5 = nullptr;
-    TH2D* m_hist_EFTWeight_shape_CttHH_3 = nullptr;
+    std::map<std::string, TH2D*> m_hist_EFTWeight_smeft_shape;
+    std::map<std::string, TH2D*> m_hist_EFTWeight_smeftmassless_shape;
+    std::map<std::string, TH2D*> m_hist_EFTWeight_heft_shape;
 
-    double m_weights_shape_CttHH_min3 = 1;
-    double m_weights_shape_CttHH_min2_5 = 1;
-    double m_weights_shape_CttHH_min2 = 1;
-    double m_weights_shape_CttHH_min1_5 = 1;
-    double m_weights_shape_CttHH_min1 = 1;
-    double m_weights_shape_CttHH_min0_5 = 1;
-    double m_weights_shape_CttHH_0_5 = 1;
-    double m_weights_shape_CttHH_1 = 1;
-    double m_weights_shape_CttHH_1_5 = 1;
-    double m_weights_shape_CttHH_2 = 1;
-    double m_weights_shape_CttHH_2_5 = 1;
-    double m_weights_shape_CttHH_3 = 1;
+    std::map<std::string, double> m_weights_smeft_shape;
+    std::map<std::string, double> m_weights_smeftmassless_shape;
+    std::map<std::string, double> m_weights_heft_shape;
 
     // For normalisation weights
-    TH1F* m_hist_EFTWeight_norm_CttHH_min3 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_min2_5 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_min2 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_min1_5 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_min1 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_min0_5 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_0_5 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_1 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_1_5 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_2 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_2_5 = nullptr;
-    TH1F* m_hist_EFTWeight_norm_CttHH_3 = nullptr;
+    std::map<std::string, TH1F*> m_hist_EFTWeight_smeft_norm;
+    std::map<std::string, TH1F*> m_hist_EFTWeight_smeftmassless_norm;
+    std::map<std::string, TH1F*> m_hist_EFTWeight_heft_norm;
 
-    float m_weights_norm_CttHH_min3 = 1;
-    float m_weights_norm_CttHH_min2_5 = 1;
-    float m_weights_norm_CttHH_min2 = 1;
-    float m_weights_norm_CttHH_min1_5 = 1;
-    float m_weights_norm_CttHH_min1 = 1;
-    float m_weights_norm_CttHH_min0_5 = 1;
-    float m_weights_norm_CttHH_0_5 = 1;
-    float m_weights_norm_CttHH_1 = 1;
-    float m_weights_norm_CttHH_1_5 = 1;
-    float m_weights_norm_CttHH_2 = 1;
-    float m_weights_norm_CttHH_2_5 = 1;
-    float m_weights_norm_CttHH_3 = 1;
+    std::map<std::string, float> m_weights_smeft_norm;
+    std::map<std::string, float> m_weights_smeftmassless_norm;
+    std::map<std::string, float> m_weights_heft_norm;
 
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
