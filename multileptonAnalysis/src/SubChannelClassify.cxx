@@ -58,7 +58,7 @@ namespace MULTILEPTON
 
     if (m_sub_channel_id == CH_ID::hhbb4l)
     {
-      m_sub_channel_flavor = static_cast<int>(classify_flavor_4L());
+      // m_sub_channel_flavor = static_cast<int>(classify_flavor_4L());
     }
     else if (m_sub_channel_id == CH_ID::hh3l || m_sub_channel_id == CH_ID::hh3l1tau)
     {
@@ -83,8 +83,7 @@ namespace MULTILEPTON
 
   CH_ID SubChannelClassify::classify_id() const
   {
-    if (m_n_bjets >= 1 && m_n_bjets <= 3 && m_n_leptons == 4 && m_n_taus == 0 &&
-        m_total_charge_lep == 0)
+    if (m_n_bjets >= 0 && m_n_bjets <= 3 && m_n_leptons >= 4 && m_n_taus >= 0)
     {
       return CH_ID::hhbb4l;
     }

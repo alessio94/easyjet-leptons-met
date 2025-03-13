@@ -11,6 +11,8 @@ Small_R_jet:
 
 Electron:
   min_pT: 4.5e+3
+  Iso: "NonIso"
 
 Muon:
   min_pT: 3.e+3
+  Iso: "NonIso"
