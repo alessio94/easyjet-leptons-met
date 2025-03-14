@@ -153,4 +153,5 @@ ttree_output:
     taus: 'container_names.input.truthtaus'
     electrons: 'container_names.input.truthelectrons'
     muons: 'container_names.input.truthmuons'
-
+Truth:
+  do_STXS: false

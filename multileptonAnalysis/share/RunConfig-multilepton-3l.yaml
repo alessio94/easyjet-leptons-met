@@ -18,6 +18,3 @@ Muon:
 
 Lepton:
   amount: 3
-
-bypass: true #enabling Run through mode
-do_trigger_filtering: false
