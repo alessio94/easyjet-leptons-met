@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Frederic Renner
@@ -20,7 +20,9 @@ namespace Easyjet
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
 
     // Intialise syst-aware input/output decorators  
-    ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));  
+    ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
+
+    ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_inHandle));
     }
@@ -107,6 +109,8 @@ namespace Easyjet
       for (const xAOD::Jet *jet : *inContainer)
       {
         // cuts
+	if(!m_select.get(*jet, sys))
+	  continue;
         if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
           continue;
         // cuts for calibrated large-R jet

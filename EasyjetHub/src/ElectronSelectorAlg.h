@@ -46,6 +46,9 @@ private:
     CP::SysReadHandle<xAOD::ElectronContainer>
       m_inHandle{ this, "containerInKey", "",   "Electron container to read" };
 
+    CP::SysReadDecorHandle<char> m_select
+      {"baselineSelection_outputSelect_thin_%SYS%", this};
+    
     Gaudi::Property<std::vector<std::string>> m_eleWPs
       { this, "eleWPs", {},
 	  "electron ID + ISO working points, not used to filter collection" };

@@ -22,6 +22,8 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
+
     for (int i = 0; i < m_electronAmount; i++){
       std::string index = std::to_string(i + 1);
       CP::SysWriteDecorHandle<bool> whandle{"isElectron" + index + "_%SYS%", this};
@@ -70,10 +72,10 @@ namespace Easyjet
         m_isSelectedElectron.set(*electron, false, sys);
 
         // cuts
-        if (electron->pt() < m_minPt)
-          continue;
-
-        if (std::abs(electron->eta()) > m_maxEta)
+	if(!m_select.get(*electron, sys))
+	  continue;
+	
+        if (electron->pt() < m_minPt || std::abs(electron->eta()) > m_maxEta)
           continue;
 
         // For some reason this decoration needs to be explicitly copied

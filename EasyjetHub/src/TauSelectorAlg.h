@@ -46,6 +46,9 @@ private:
     CP::SysReadHandle<xAOD::TauJetContainer>
       m_inHandle{ this, "containerInKey", "",   "Tau container to read" };
 
+    CP::SysReadDecorHandle<char> m_select
+      {"baselineSelection_outputSelect_thin_%SYS%", this};
+
     Gaudi::Property<bool> m_keepAntiTaus
       {this, "keepAntiTaus", false, "Keep anti-taus in addition to ID taus"};
 

@@ -46,6 +46,9 @@ private:
     CP::SysReadHandle<xAOD::PhotonContainer>
     m_inHandle{ this, "containerInKey", "",   "Photon container to read" };
 
+    CP::SysReadDecorHandle<char> m_select
+      {"baselineSelection_outputSelect_thin_%SYS%", this};
+    
     Gaudi::Property<std::vector<std::string>> m_photonWPs
       { this, "photonWPs", {},"Photon ID + Iso working points, not used to filter collection" };
 

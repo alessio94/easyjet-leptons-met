@@ -48,6 +48,9 @@ private:
       m_inHandle{ this, "containerInKey", "",   "Jet container to read" };
 
     // \brief Setup syst-aware input decorations
+    CP::SysReadDecorHandle<char> m_select
+      {"baselineSelection_outputSelect_thin_%SYS%", this};
+    
     CP::SysReadDecorHandle<char> m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     CP::SysReadDecorHandle<int> m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
