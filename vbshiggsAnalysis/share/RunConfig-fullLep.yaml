@@ -95,7 +95,8 @@ Muon:
 
 Lepton:
   amount: 2
-  variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS"]
+  variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS", 
+                  "ele_firstEgMotherTruthType", "ele_firstEgMotherTruthOrigin", "ele_firstEgMotherPdgId"]
 
 # list of triggers per year to consider
 Trigger:

@@ -43,6 +43,9 @@ namespace VBSHIGGS{
       if(m_isMC){
         ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_vbsElectronHandle));
         ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_vbsElectronHandle));
+        ATH_CHECK (m_ele_firstEgMotherTruthType.initialize(m_systematicsList, m_vbsElectronHandle));
+        ATH_CHECK (m_ele_firstEgMotherTruthOrigin.initialize(m_systematicsList, m_vbsElectronHandle));
+        ATH_CHECK (m_ele_firstEgMotherPdgId.initialize(m_systematicsList, m_vbsElectronHandle));
 
         ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_vbsMuonHandle));
         ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_vbsMuonHandle));
@@ -246,20 +249,30 @@ namespace VBSHIGGS{
           float mt_lept_met = std::sqrt(2 * met->met() * tlv.Pt() * (1 - std::cos(tlv.DeltaPhi(metVec))));
 	        m_Fbranches.at(prefix+"_MET"+"_mT").set(*event, mt_lept_met, sys);
 
+          if(std::abs(lep_pdgid)==11){
+            int ele_ECIDS = m_eleECIDS.get(*leptons[i].first, sys);
+            m_Ibranches.at(prefix+"_ele_ECIDS").set(*event, ele_ECIDS, sys);
+          }
           if(m_isMC){
             float SF = 1.;
-            if(std::abs(leptons[i].second)==11){
+            if(std::abs(lep_pdgid)==11){
               if(!m_saveDummy_ele_SF) SF = m_ele_SF.get(*leptons[i].first,sys);
 
-              int ele_ECIDS = m_eleECIDS.get(*leptons[i].first, sys);
-              m_Ibranches.at(prefix+"_ele_ECIDS").set(*event, ele_ECIDS, sys);
+              int ele_firstEgMotherTruthType = m_ele_firstEgMotherTruthType.get(*leptons[i].first,sys);
+              m_Ibranches.at(prefix+"_ele_firstEgMotherTruthType").set(*event, ele_firstEgMotherTruthType, sys);
+
+              int ele_firstEgMotherTruthOrigin = m_ele_firstEgMotherTruthOrigin.get(*leptons[i].first,sys);
+              m_Ibranches.at(prefix+"_ele_firstEgMotherTruthOrigin").set(*event, ele_firstEgMotherTruthOrigin, sys);
+
+              int ele_firstEgMotherPdgId = m_ele_firstEgMotherPdgId.get(*leptons[i].first,sys);
+              m_Ibranches.at(prefix+"_ele_firstEgMotherPdgId").set(*event, ele_firstEgMotherPdgId, sys);   
             }
             else{
               SF = m_mu_SF.get(*leptons[i].first,sys);
             }
             m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
           }
-          int charge = leptons[i].second>0 ? -1 : 1;
+          int charge = lep_pdgid > 0 ? -1 : 1;
           m_Ibranches.at(prefix+"_charge").set(*event, charge, sys);
           m_Ibranches.at(prefix+"_pdgid").set(*event, lep_pdgid, sys);
         

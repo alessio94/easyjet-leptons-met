@@ -68,13 +68,20 @@ namespace VBSHIGGS{
         {this, "saveDummyEleSF", false,
 	  "To be used in case no recommendations are not available"};
 
+        // electron truth information
         CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
         CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};
+        CP::SysReadDecorHandle<int> m_ele_firstEgMotherTruthType{"firstEgMotherTruthType", this};
+        CP::SysReadDecorHandle<int> m_ele_firstEgMotherTruthOrigin{"firstEgMotherTruthOrigin", this};
+        CP::SysReadDecorHandle<int> m_ele_firstEgMotherPdgId{"firstEgMotherPdgId", this};
 
         Gaudi::Property<std::string> m_muWPName { this, "muonWP", "","Muon ID + Iso working point" };
         CP::SysReadDecorHandle<float> m_mu_SF{"", this};
+
+        // muon truth information
         CP::SysReadDecorHandle<int> m_mu_truthOrigin{"truthOrigin", this};
         CP::SysReadDecorHandle<int> m_mu_truthType{"truthType", this};
+        
 
         CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
