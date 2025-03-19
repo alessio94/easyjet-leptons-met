@@ -91,6 +91,10 @@ Muon:
     - ["Tight", "PflowLoose_VarRad"]
     - ["Tight", "PflowTight_VarRad"]
     - ["Tight", "NonIso"]
+
+    - ["HighPt", "PflowLoose_VarRad"]
+    - ["HighPt", "PflowTight_VarRad"]
+    - ["HighPt", "NonIso"]
   do_IFF_decoration: true
 
 Lepton:
