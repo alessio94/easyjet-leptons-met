@@ -108,6 +108,10 @@ def analysis_configuration(parser="default"):
         lambda prevFlags: get_trigger_chains(prevFlags)
     )
     flags.addFlag(
+        "Analysis.TriggerChainsDeco",
+        lambda prevFlags: get_trigger_chains(prevFlags, type="decoration")
+    )
+    flags.addFlag(
         "Analysis.TriggerChainsSF",
         lambda prevFlags: get_trigger_chains_scale_factor(prevFlags)
     )
@@ -148,7 +152,7 @@ def analysis_configuration(parser="default"):
     return flags, args
 
 
-def get_trigger_chains(flags):
+def get_trigger_chains(flags, type="selection"):
 
     trigger_year_list = flags.Analysis.trigger_year
     if trigger_year_list == "Auto":
@@ -159,11 +163,12 @@ def get_trigger_chains(flags):
         )
 
     trigger_chains = set()
-    if flags.hasCategory("Analysis.Trigger"):
+    if flags.hasCategory("Analysis.Trigger") and \
+       flags.hasCategory("Analysis.Trigger." + type):
         try:
             for year in trigger_year_list:
                 trigger_chains |= set(
-                    flags.Analysis.Trigger.selection.chains[str(year)])
+                    flags.Analysis.Trigger[type].chains[str(year)])
         except KeyError as err:
             log.error(f"Trigger chains for {year} not defined.")
             raise err

@@ -52,6 +52,10 @@ def trigger_sequence(flags):
         '.triggerChainsForSelection',
         list(flags.Analysis.TriggerChains),
     )
+    configSeq.setOptionValue(
+        '.triggerChainsForDecoration',
+        list(flags.Analysis.TriggerChainsDeco),
+    )
     configSeq.setOptionValue('.noFilter',
                              not flags.Analysis.do_trigger_filtering)
 
