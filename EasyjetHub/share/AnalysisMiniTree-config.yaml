@@ -45,6 +45,7 @@ collection_options:
   
   electrons:
     iso_variables: false
+    id_variables: false
     run_selection: true
     truth_parent_info: false
 

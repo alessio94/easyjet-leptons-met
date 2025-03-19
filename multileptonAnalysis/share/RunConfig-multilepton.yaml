@@ -37,9 +37,23 @@ Tau:
 
 Electron:
   min_pT: 10.0e+3
-  ID: "LooseBLayerLH"
+  ID: "LooseDNN"
   Iso: "Loose_VarRad"
   extra_wps: 
+    - ["TightDNN", "Tight_VarRad"]
+    - ["TightDNN", "TightTrackOnly_VarRad"]
+    - ["TightDNN", "TightTrackOnly_FixedRad"]
+    - ["TightDNN", "HighPtCaloOnly"]
+    - ["TightDNN", "Loose_VarRad"]
+    - ["MediumDNN", "Tight_VarRad"]
+    - ["MediumDNN", "TightTrackOnly_VarRad"]
+    - ["MediumDNN", "TightTrackOnly_FixedRad"]
+    - ["MediumDNN", "HighPtCaloOnly"]
+    - ["MediumDNN", "Loose_VarRad"]
+    - ["LooseDNN", "Tight_VarRad"]
+    - ["LooseDNN", "TightTrackOnly_VarRad"]
+    - ["LooseDNN", "TightTrackOnly_FixedRad"]
+    - ["LooseDNN", "HighPtCaloOnly"]
     - ["TightLH", "Tight_VarRad"]
     - ["TightLH", "TightTrackOnly_VarRad"]
     - ["TightLH", "TightTrackOnly_FixedRad"]
@@ -54,13 +68,13 @@ Electron:
     - ["LooseBLayerLH", "TightTrackOnly_VarRad"]
     - ["LooseBLayerLH", "TightTrackOnly_FixedRad"]
     - ["LooseBLayerLH", "HighPtCaloOnly"]
-    # - ["LooseBLayerLH", "Loose_VarRad"]
+    - ["LooseBLayerLH", "Loose_VarRad"]
     # - ["TightLH", "NonIso"]
     # - ["MediumLH", "NonIso"]
   do_parent_decoration: true
   do_track_decoration: true
   do_IFF_decoration: true
-  chargeIDSelectionRun2: true
+  chargeIDSelectionRun2: false
 
 Muon:
   min_pT: 10.0e+3
@@ -82,7 +96,7 @@ Muon:
     - ["Loose", "PflowLoose_VarRad"]
     - ["Loose", "PflowTight_VarRad"]
     - ["Loose", "Tight_VarRad"]
-    # - ["Loose", "Loose_VarRad"]
+   # - ["Loose", "Loose_VarRad"]
     # - ["Tight", "NonIso"]
     # - ["Medium", "NonIso"]
     # - ["HighPt", "NonIso"]
@@ -135,11 +149,12 @@ ttree_output:
       truth_parent_info: true
       run_selection: true
     taus:
-      score_branches: True
-      truth_branches: True
+      score_branches: true
+      truth_branches: true
       truth_parent_info: true
       run_selection: true
     electrons:
+      id_variables: true
       iso_variables: true
       run_selection: true
       truth_parent_info: true

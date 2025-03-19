@@ -26,6 +26,17 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
             "ptvarcone30_Nonprompt_All_MaxWeightTTVALooseCone_pt1000"
         ]
 
+    if tree_flags.collection_options.electrons.id_variables:
+        if not flags.Input.isPHYSLITE:
+            electron_branches.variables += [
+                "DFCommonElectronsDNN_pel",
+                "DFCommonElectronsDNN_pcf",
+                "DFCommonElectronsDNN_ppc",
+                "DFCommonElectronsDNN_phf",
+                "DFCommonElectronsDNN_ple",
+                "DFCommonElectronsDNN_plh"
+            ]
+
     if flags.Analysis.Electron.do_reco_decoration:
         electron_branches.variables += ["author"]
 
