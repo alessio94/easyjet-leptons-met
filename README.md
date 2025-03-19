@@ -11,7 +11,7 @@ For questions, [join the EasyJet MM team](https://mattermost.web.cern.ch/signup_
 
 Meetings will be biweekly at 5 pm on Tuesday, Central European Time, see [the indico easyjet group](https://indico.cern.ch/category/17096/) or [the dihiggs subgroup indico](https://indico.cern.ch/category/10816/), and announced on the e-group [atlas-phys-hdbs-dihiggs-hhframework@cern.ch](https://e-groups.cern.ch/e-groups/Egroup.do?egroupName=atlas-phys-hdbs-dihiggs-hhframework).
 
-**It is mandatory for all developers to register to the atlas-phys-hdbs-dihiggs-hhframework egroup to be able to run the pipeline.** The pipeline results can be found on https://easyjet-validation.web.cern.ch/ .
+**It is mandatory for all developers to register to the atlas-phys-hdbs-dihiggs-hhframework egroup to be able to run the pipeline.** The pipeline results can be found on https://easyjet-validation.web.cern.ch/ . **In addition please do not use the `main` branch in your fork.** This one is often protected and prevent us from rebasing and sometimes from running the pipeline.
 
 # Installation
 
