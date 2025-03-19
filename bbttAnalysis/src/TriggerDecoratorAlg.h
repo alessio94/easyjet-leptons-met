@@ -60,7 +60,9 @@ namespace HHBBTT
 	{HHBBTT::DTT_L1Topo_delayed, "DTT_L1Topo_delayed"},
 	{HHBBTT::DBT, "DBT"},
 	{HHBBTT::trigMatch_Tau35, "Tau35"},
-	{HHBBTT::trigMatch_Tau25, "Tau25"}
+	{HHBBTT::trigMatch_Tau25, "Tau25"},
+	{HHBBTT::DBT_L1, "DBT_L1"},
+	{HHBBTT::DBT_HLT, "DBT_HLT"}
       };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
@@ -99,6 +101,9 @@ namespace HHBBTT
     SG::ReadHandleKey<xAOD::TauJetContainer> m_tausKey
       { this, "taus", "", "Tau container" };
 
+    SG::ReadHandleKey<xAOD::JetContainer> m_jetsKey
+      { this, "jets", "", "Jet container" };
+
     Gaudi::Property<std::vector<std::string>> m_triggers 
       { this, "triggerLists", {}, "Name list of trigger" };
     std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::EventInfo> >
@@ -113,6 +118,12 @@ namespace HHBBTT
       SG::WriteDecorHandleKey<xAOD::ElectronContainer> > m_ele_trigMatch_DecorKey;
     std::unordered_map<HHBBTT::TriggerChannel,
       SG::WriteDecorHandleKey<xAOD::TauJetContainer> > m_tau_trigMatch_DecorKey;
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::WriteDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_DecorKey;
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::WriteDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_ThresholdKey;
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::WriteDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_OnlinePtKey;
 
     ToolHandle<Trig::IMatchingTool> m_matchingTool
       { this, "trigMatchingTool", "", "Trigger matching tool"};
@@ -126,7 +137,18 @@ namespace HHBBTT
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::MuonContainer, bool> > muTrigMatchWriteDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::ElectronContainer, bool> > eleTrigMatchWriteDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::TauJetContainer, bool> > tauTrigMatchWriteDecoMap;
-    
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::JetContainer, bool> > jetTrigMatchWriteDecoMap;
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>> > jetTrigMatchThresholdMap;
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::JetContainer, float> > jetTrigMatchOnlinePtMap;
+    typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::JetContainer, std::vector<int>> > jetReadTrigMatchThresholdMap;
+    typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::JetContainer, float> > jetReadTrigMatchptMap;
+
+    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_L1ThresholdsDecorKey; // list of matched thresholds from JetDecoratorAlg
+    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_HLTThresholdsDecorKey;
+
+    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_L1ETDecorKey;
+    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_HLTPTDecorKey;
+
     void checkSingleMuTriggers
       (int year, const xAOD::EventInfo* eventInfo,
        const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
@@ -171,12 +193,26 @@ namespace HHBBTT
        const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::TauJetContainer* taus,
-       tauTrigMatchWriteDecoMap& tau_trigMatchDecos) const;
+       tauTrigMatchWriteDecoMap& tau_trigMatchDecos,
+       const xAOD::JetContainer* jets,
+       jetTrigMatchWriteDecoMap& jet_trigMatchDecos,
+       jetTrigMatchThresholdMap& jet_trigMatchThresholds,
+       jetTrigMatchOnlinePtMap& jet_trigMatchOnlinePt,
+       jetReadTrigMatchThresholdMap& jetL1Thresholds,
+       jetReadTrigMatchptMap& jetL1ET) const;
 
      void checkDiBJetTriggers
       (int year, const xAOD::EventInfo* eventInfo,
        const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
-       passWriteDecoMap& pass_decos) const;
+       passWriteDecoMap& pass_decos,
+       const xAOD::JetContainer* jets,
+       jetTrigMatchWriteDecoMap& jet_trigMatchDecos,
+       jetTrigMatchThresholdMap& jet_trigMatchThresholds,
+       jetTrigMatchOnlinePtMap& jet_trigMatchOnlinePt,
+       jetReadTrigMatchThresholdMap& jetL1Thresholds,
+       jetReadTrigMatchThresholdMap& jetHLTThresholds,
+       jetReadTrigMatchptMap& jetL1ET,
+       jetReadTrigMatchptMap& jetHLTPT) const;
 
     
   };

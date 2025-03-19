@@ -91,6 +91,11 @@ private:
     CP::SysReadDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
     
     CP::SysReadDecorHandle<unsigned int> m_year{this, "year", "dataTakingYear", ""};
+    Gaudi::Property<std::vector<unsigned int>> m_SF_year{ this, "SFyears", {}, "List of years to read jet trigger SF files"};
+
+    // calibration map
+    std::unordered_map<int, TH2D*> m_L1_jetTriggerSFMap;
+    std::unordered_map<int, TH2D*> m_HLT_jetTriggerSFMap;
 
     const std::unordered_map<HHBBTT::RunBooleans, std::string> m_runBooleans =
       {

@@ -31,7 +31,9 @@ namespace HHBBTT
     DTT_4J12_delayed,
     DTT_L1Topo_delayed,
     trigMatch_Tau35,
-    trigMatch_Tau25
+    trigMatch_Tau25,
+    DBT_L1,
+    DBT_HLT
   };
 
   enum Var
@@ -43,6 +45,8 @@ namespace HHBBTT
     subleadingtau = 4,
     leadingjet = 5,
     subleadingjet = 6,
+    leadingjet_matchL1 = 7,
+    subleadingjet_matchL1 = 8,
   };
 
   enum RunBooleans

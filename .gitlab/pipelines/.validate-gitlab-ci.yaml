@@ -50,16 +50,6 @@ validator_bbtt_data22:
   script:
     - easyjet-validate bbtt-data22
 
-validator_bbtt_data22_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true 
-    - job: ntupler_bbtt_data22_lite
-      artifacts: false 
-  script:
-    - easyjet-validate bbtt-data22-lite
-
 validator_ttHH_data22_lite:
   extends: .ntuple_validation
   needs:

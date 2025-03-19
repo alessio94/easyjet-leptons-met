@@ -42,6 +42,8 @@ Small_R_jet:
   btag_egReductionC: "Medium"
   btag_egReductionLight: "Medium"
   amount_bjet: 2
+  doHLTMatching: true
+  doL1Matching: true
 
 Electron:
   ID: "LooseBLayerLH_nottva"

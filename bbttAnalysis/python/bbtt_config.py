@@ -139,6 +139,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         cfg.addEventAlgo(
             CompFactory.HHBBTT.TriggerSFAlg(
                 "TriggerSFAlg",
+                SFyears=flags.Analysis.Years,
                 eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
                 muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
                 tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),

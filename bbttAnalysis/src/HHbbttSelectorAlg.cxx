@@ -5,6 +5,7 @@
 /// @author Carl Gwilliam
 
 #include "HHbbttSelectorAlg.h"
+#include "AthenaBaseComps/AthMsgStreamMacros.h"
 
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
@@ -43,6 +44,7 @@ namespace HHBBTT
     ATH_CHECK(m_is2016_periodA.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is2016_periodB_D3.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is2022_75bunches.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is2023_first_2400bunches.initialize(m_systematicsList, m_eventHandle));
     
     // Intialise booleans with value false. Also initialise syst-aware output decorators
     for (auto& [key, value] : m_boolnames) {
@@ -125,6 +127,19 @@ namespace HHBBTT
       ATH_CHECK(m_tau_trigMatch_DecorKey.at(channel).initialize());
     }
 
+    for (const auto& [channel, name] : m_triggerChannels){
+      if(name.find("DTT") || name.find("DBT")){
+        SG::ReadDecorHandleKey<xAOD::JetContainer> deco;
+        deco = m_jetHandle.getNamePattern() + ".trigMatch_"+name;
+        m_jet_trigMatch_DecorKey.emplace(channel, deco);
+        ATH_CHECK(m_jet_trigMatch_DecorKey.at(channel).initialize());
+        SG::ReadDecorHandleKey<xAOD::JetContainer> deco_th;
+        deco_th = m_jetHandle.getNamePattern() + ".trigMatch_"+name+"_threshold";
+        m_jet_trigMatch_ThresholdKey.emplace(channel, deco_th);
+        ATH_CHECK(m_jet_trigMatch_ThresholdKey.at(channel).initialize());
+      }
+    }
+
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
     for ( auto name : m_channel_names){
@@ -169,7 +184,15 @@ namespace HHBBTT
     for (const auto& [channel, key] : m_tau_trigMatch_DecorKey){
       tau_trigMatchDecos.emplace(channel, key);
     }
+    jetTrigMatchReadDecoMap jet_trigMatchDecos;
+    for (const auto& [channel, key] : m_jet_trigMatch_DecorKey){
+      jet_trigMatchDecos.emplace(channel, key);
+    }
 
+    jetTrigMatchThresholdReadMap jet_trigMatchThresholds;
+    for (const auto& [channel, key] : m_jet_trigMatch_ThresholdKey){
+      jet_trigMatchThresholds.emplace(channel, key);
+    }
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()){
       CP::SysFilterReporter filter (filterCombiner, sys);
@@ -1143,6 +1166,9 @@ namespace HHBBTT
     m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 50. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30. * Athena::Units::GeV;
+    m_trigger_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet_matchL1] = 25;
+    m_trigger_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet_matchL1] = 12;
+    m_trigger_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet_matchL1] = 12;
     if(year >= 2022){
       m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 20. * Athena::Units::GeV;
       m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
@@ -1154,7 +1180,7 @@ namespace HHBBTT
     // Di-b-jets triggers
     m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet] = 20. * Athena::Units::GeV;
-    
+
     // Single-lepton triggers
     if(year==2015)
       m_pt_threshold[HHBBTT::SLT][HHBBTT::ele] = 25. * Athena::Units::GeV;

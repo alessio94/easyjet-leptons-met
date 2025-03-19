@@ -21,6 +21,7 @@ def HHbbttTriggerDecoratorCfg(flags, **kwargs):
             muons=flags.Analysis.container_names.input.muons,
             electrons=flags.Analysis.container_names.input.electrons,
             taus=flags.Analysis.container_names.input.taus,
+            jets=flags.Analysis.container_names.input.reco4PFlowJet,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             **kwargs

@@ -104,6 +104,8 @@ private:
       {this, "is2016_periodB_D3", "is2016_periodB_D3", ""};
     CP::SysReadDecorHandle<bool> m_is2022_75bunches
       {this, "is2022_75bunches", "is2022_75bunches", ""};
+    CP::SysReadDecorHandle<bool> m_is2023_first_2400bunches
+      {this, "is2023_first_2400bunches", "is2023_first_2400bunches", ""};
 
     Gaudi::Property<std::vector<std::string>> m_eleWPNames
       { this, "eleWPs", {},"Electron working point names" };
@@ -139,6 +141,8 @@ private:
 	{HHBBTT::DTT_4J12_delayed, "DTT_4J12_delayed"},
 	{HHBBTT::DTT_L1Topo_delayed, "DTT_L1Topo_delayed"},
 	{HHBBTT::DBT, "DBT"},
+	{HHBBTT::DBT_L1, "DBT_L1"},
+	{HHBBTT::DBT_HLT, "DBT_HLT"}
       };
 
     std::unordered_map<HHBBTT::TriggerChannel,
@@ -150,6 +154,10 @@ private:
       SG::ReadDecorHandleKey<xAOD::ElectronContainer> > m_ele_trigMatch_DecorKey;
     std::unordered_map<HHBBTT::TriggerChannel,
       SG::ReadDecorHandleKey<xAOD::TauJetContainer> > m_tau_trigMatch_DecorKey;
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::ReadDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_DecorKey;
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::ReadDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_ThresholdKey;
 
     /// \brief Setup sys-aware output decorations
     CP::SysFilterReporterParams m_filterParams {this, "HHbbtautau selection"};
@@ -246,6 +254,7 @@ private:
     /// \brief Internal variables
 
     std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, float>> m_pt_threshold;
+    std::unordered_map<HHBBTT::TriggerChannel, std::unordered_map<HHBBTT::Var, int>> m_trigger_pt_threshold;
 
     StatusCode initialiseCutflow();
 
@@ -253,6 +262,8 @@ private:
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::MuonContainer, bool> > muTrigMatchReadDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::ElectronContainer, bool> > eleTrigMatchReadDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::TauJetContainer, bool> > tauTrigMatchReadDecoMap;
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::JetContainer, bool> > jetTrigMatchReadDecoMap;
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::JetContainer, std::vector<int>> > jetTrigMatchThresholdReadMap;
 
     void applyTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
