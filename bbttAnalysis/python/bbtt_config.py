@@ -91,7 +91,9 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         # non-converging fir for bbtt
         from EasyjetHub.algs.mmc_tool_config import MissingMassToolCfg
         mmcTool = cfg.popToolsAndMerge(
-            MissingMassToolCfg(flags, CalibSet="2016MC15C"))
+            MissingMassToolCfg(
+                flags, CalibSet="2024",
+                ParamFilePath="MMC_params_v051224_angle_noLikelihoodFit.root"))
 
         cfg.addEventAlgo(
             CompFactory.HHBBTT.MMCDecoratorAlg(
