@@ -37,7 +37,7 @@ You can omit the `--no-checkout` option and the subsequent lines if you want to 
 
 ### Installation as developer
 
-If not familiar with git already, please have a look at the [ATLAS git tutorial](https://atlassoftwaredocs.web.cern.ch/gittutorial/)
+If not familiar with git already, please have a look at the [ATLAS git tutorial](https://atlas-software.docs.cern.ch/athena/git/)
 
 In case you want to make some developments to the software itself, we recommend you to:
 1. Fork the branch using [this link](https://gitlab.cern.ch/easyjet/easyjet/-/forks/new). Please remember to put your username in the Project URL.
@@ -228,7 +228,7 @@ This will start up an interactive terminal inside the container, which has read/
 * your home directory (`$HOME`) with the same full path name (e.g. `/Users/myname`).
 The terminal itself begins in an empty directory, `/workdir`. *The `delegated` suffix for these mounted volumes helps optimise the read/write access for better responsiveness.* Within this terminal, you can follow the instructions to source the `/release_setup.sh` script, in place of `setupATLAS; asetup`.
 
-If you encounter any issues, some relevant instructions are available at <https://atlassoftwaredocs.web.cern.ch/athena/dev-setup/>. The `AthAnalysis` containers do not require `cvmfs` access, but you may need to experiment with the command line arguments when launching the container.
+If you encounter any issues, some relevant instructions are available at <https://atlas-software.docs.cern.ch/athena/containers/dev-setup/>. The `AthAnalysis` containers do not require `cvmfs` access, but you may need to experiment with the command line arguments when launching the container.
 
 [registry]: https://gitlab.cern.ch/atlas/athena/container_registry/8440
 
@@ -286,7 +286,7 @@ Note: if you want to retrieve CutFlows saved as TEfficiency, you will need to se
 # Editing with VSCode support
 
 You may already be using VSCode to edit easyjet -- if you aren't, this is a remarkably convenient tool with which to get helpful hints in your coding.
-First, off you can get started from the [atlassoftwaredocs](https://atlassoftwaredocs.web.cern.ch/guides/vscode/) instructions.
+First, off you can get started from the [atlassoftwaredocs](https://atlas-software.docs.cern.ch/athena/ide/) instructions.
 Below are specific tips to get this set up more effectively, or specifically for easyjet.
 
 - Unlike a sparse checkout of the `athena` repository, you do not need to add the `.vscode` directory -- it is present already.
