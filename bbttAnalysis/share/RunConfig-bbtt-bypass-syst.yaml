@@ -1,7 +1,5 @@
-include: bbttAnalysis/RunConfig-bbtt-bypass.yaml
+include: bbttAnalysis/RunConfig-bbtt-syst.yaml
 
-do_CP_systematics: true
-systematics_regex: [".*"]
-
-store_high_level_variables: false
-save_cutflow: false
+bypass: true
+do_trigger_filtering: false
+splitOutputTree: false

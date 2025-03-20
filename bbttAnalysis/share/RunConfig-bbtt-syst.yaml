@@ -5,3 +5,6 @@ systematics_regex: [".*"]
 
 store_high_level_variables: false
 save_cutflow: false
+
+Trigger:
+  writeOutput: false
