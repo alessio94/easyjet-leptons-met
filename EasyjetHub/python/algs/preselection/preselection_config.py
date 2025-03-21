@@ -60,3 +60,26 @@ def trigger_sequence(flags):
                              not flags.Analysis.do_trigger_filtering)
 
     return configSeq
+
+
+def overlap_VGammaOR(flags):
+    configSeq = ConfigSequence()
+    config = ConfigFactory()
+    makeConfig = config.makeConfig
+
+    configSeq += makeConfig('VGammaOR')
+    configSeq.setOptionValue('noFilter', flags.Analysis.bypass_VGammaOR)
+    if flags.Analysis.VGammaOR_ypT_cuts:
+        configSeq.setOptionValue('photon_pT_cuts',
+                                 list(flags.Analysis.VGammaOR_ypT_cuts))
+    if flags.Analysis.VGammaOR_dR_lepton_photon_cuts:
+        configSeq.setOptionValue('dR_lepton_photon_cuts',
+                                 list(flags.Analysis.VGammaOR_dR_lepton_photon_cuts))
+    # Add option later if any analysis needs to modify the default list
+    # configSeq.setOptionValue('keepInOverlap',
+    # [700011, 700012, 700013, 700014, 700015, 700016, 700017])
+    # Added DSIDs correpsonding to the needs of XbbCalib, VBSHiggs analysis
+    configSeq.setOptionValue('removeInOverlap',
+                             list(flags.Analysis.Truth.DSID_vgammaOR))
+
+    return configSeq

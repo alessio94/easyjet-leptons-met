@@ -14,6 +14,11 @@ do_overlap_removal: false
 # Other global event configs
 bypass: false
 do_event_cleaning: true
+# VgammaOR settings
+do_VgammaOR: false
+bypass_VGammaOR: false
+VGammaOR_ypT_cuts: [] # Default photon_pT_cuts = [10e3]
+VGammaOR_dR_lepton_photon_cuts: [] # Default dR_lepton_photon_cuts = [0.0, 0.05, 0.075, 0.1, 0.125, 0.15, 0.2]
 # apply loose jet cleaning only
 loose_jet_cleaning: false
 do_bbtt_analysis: false

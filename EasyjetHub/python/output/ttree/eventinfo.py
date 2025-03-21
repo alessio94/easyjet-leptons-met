@@ -141,5 +141,10 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             for year in flags.Analysis.Years:
                 if str(year) in key:
                     eventinfo_branches.variables += [key]
-
+    # Add VgammaOR if the DSID is relevant&filtering is not applied
+    if (
+        flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_vgammaOR
+        and flags.Analysis.bypass_VGammaOR and flags.Analysis.do_VgammaOR
+    ):
+        eventinfo_branches.variables += ["in_vgamma_overlap_%SYS%"]
     return eventinfo_branches.get_output_list()

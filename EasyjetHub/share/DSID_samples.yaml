@@ -54,3 +54,72 @@ DSID_HSTP_samples:
   - 801172 #Py8EG_A14 JZ7
   - 801173 #Py8EG_A14 JZ8
   - 801174 #Py8EG_A14 JZ9incl
+
+DSID_vgammaOR:
+  - 700320 #Sh_2211, Zee_maxHTpTV2_BFilter
+  - 700321 #Sh_2211, Zee_maxHTpTV2_CFilterBVeto
+  - 700322 #Sh_2211, Zee_maxHTpTV2_CVetoBVeto
+  - 700323 #Sh_2211, Zmumu_maxHTpTV2_BFilter
+  - 700324 #Sh_2211, Zmumu_maxHTpTV2_CFilterBVeto
+  - 700325 #Sh_2211, Zmumu_maxHTpTV2_CVetoBVeto
+  - 700326
+  - 700327
+  - 700328
+  - 700329
+  - 700330
+  - 700331
+  - 700332
+  - 700333 
+  - 700334
+  - 700338
+  - 700339
+  - 700340
+  - 700341
+  - 700342
+  - 700343
+  - 700344
+  - 700345
+  - 700346
+  - 700347
+  - 700348
+  - 700349
+  - 700358 #Sh_2211, Zee2jets_Min_N_TChannel
+  - 700359 #Sh_2211, Zmm2jets_Min_N_TChannel.deriv
+  - 700360 #Sh_2211,Ztt2jets_Min_N_TChannel
+  - 700439
+  - 700440
+  - 700441
+  - 700467 #Sh_2211, Zee_maxHTpTV2_m10_40_pT5_BFilte
+  - 700468 #Sh_2211, Zee_maxHTpTV2_m10_40_pT5_CFilterBVeto
+  - 700469 #Sh_2211, Zee_maxHTpTV2_m10_40_pT5_CVetoBVeto
+  - 700470 #Sh_2211, Zmumu_maxHTpTV2_m10_40_pT5_BFilte
+  - 700471 #Sh_2211, Zmumu_maxHTpTV2_m10_40_pT5_CFilterBVeto
+  - 700472 #Sh_2211, Zmumu_maxHTpTV2_m10_40_pT5_CVetoBVeto
+  - 700473
+  - 700474
+  - 700475
+  - 700476
+  - 700477
+  - 700478
+  - 700479
+  - 700480
+  - 700481
+  - 700598
+  - 700599
+  - 700792 #Sh_2211, Ztautau_maxHTpTV2_BFilter.
+  - 700793 #Sh_2211, Ztautau_maxHTpTV2_CFilterBVeto
+  - 700794 #Sh_2211, Ztautau_maxHTpTV2_CVetoBVeto
+  - 700849 #Sh_2214, Zqq_ptZ_200_ECMS
+  - 700855 #Sh_2214, Zbb_ptZ_200_ECMS
+
+
+ 
+
+
+
+
+
+
+
+
+

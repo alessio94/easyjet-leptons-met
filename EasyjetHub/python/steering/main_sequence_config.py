@@ -19,6 +19,7 @@ from EasyjetHub.algs.event_counter_config import (
 from EasyjetHub.algs.preselection.preselection_config import (
     event_selection_sequence,
     trigger_sequence,
+    overlap_VGammaOR,
 )
 from EasyjetHub.algs.truth.truth_config import truth_info_cfg
 from EasyjetHub.output.ttree.minituple_config import minituple_cfg
@@ -114,6 +115,14 @@ def preselection_cfg(flags, seqname):
     # Aggregate the configured CP algs in one ConfigSequence,
     # which will handle the container names, copying etc
     configSeq = ConfigSequence()
+    # Remove overlap between Z+jet & Vgamma samples
+    # Events in Z+jets are removed or a falg is added w/ the OR info
+
+    if flags.Analysis.do_VgammaOR:
+        if flags.Analysis.bypass_VGammaOR:
+            log.warning("Disabling VgammaOR filtering, all events will pass!")
+        log.info("Adding VgammaOR analysis algs")
+        configSeq += overlap_VGammaOR(flags)
 
     if not flags.Analysis.do_trigger_filtering:
         log.warning("Disabling trigger filtering, all events will pass!")
