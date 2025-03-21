@@ -1,5 +1,4 @@
 # Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
-
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.Enums import LHCPeriod
@@ -105,11 +104,12 @@ def get_BaselineVarsFullLepAlg_variables(flags):
             for var in ["pcbt", "truthLabel"]:
                 int_variable_names.append(f"{object}_{var}")
 
-    float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET", "METSig",
-                             "Hdijetll_m", "Hdijetllmet_m", "Lepton1_MET_mT",
-                             "Lepton2_MET_mT", "LargeJet1_DXbb"]
+        float_variable_names += ["Hdijetll_m", "Hdijetllmet_m"]
 
-    int_variable_names += ["nLargeJets", "nLeptons", "nElectrons", "nMuons",
+    float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET", "METSig",
+                             "Lepton1_MET_mT", "Lepton2_MET_mT", "LargeJet1_DXbb"]
+
+    int_variable_names += ["nLargeJets", "nLeptons",
                            "nCentralJets", "nForwardJets"]
 
     if flags.Analysis.do_resolved:
@@ -153,10 +153,9 @@ def fullLep_branches(flags):
 
     branches += object_level_branches
 
-    if (flags.Analysis.save_cutflow):
-        cutList = flags.Analysis.CutList
-        for cut in cutList:
-            branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]
+    cutList = flags.Analysis.CutList
+    for cut in cutList:
+        branches += [f"EventInfo.{cut}_%SYS% -> {cut}_%SYS%"]
 
     # truth info
     if flags.Input.isMC and flags.Analysis.AddTruthVBSQuarks:

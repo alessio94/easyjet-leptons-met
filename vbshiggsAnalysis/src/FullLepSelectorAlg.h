@@ -48,21 +48,13 @@ namespace VBSHIGGS{
         "PASS_EXACTLY_TWO_LEPTONS",    
         "PASS_TWO_SS_CHARGE_LEPTONS",
         "PASS_TWO_OS_CHARGE_LEPTONS",
-        "PASS_MET",
-        "PASS_RES_EXACTLY_ONE_B_JET",
-        "PASS_RES_EXACTLY_TWO_B_JETS",
         "PASS_ONE_LARGE_JET",
         "PASS_TWO_SIGNAL_JETS",
-        "PASS_RES_BASELINE",
-        "PASS_MERG_BASELINE"
       };
       std::vector<std::string> m_Bvarnames{};
      
       void setThresholds(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
-      void leptonSelection(const xAOD::ElectronContainer* electrons,const xAOD::MuonContainer* muons, const xAOD::MissingET *met);
-      void resolvedSelection(const std::vector<const xAOD::Jet*>& bjets);
-      void boostedSelection(const xAOD::JetContainer *largeJets, const CP::SystematicSet& sys);
-      void eventCategorisation();
+      void leptonSelection(const xAOD::ElectronContainer* electrons,const xAOD::MuonContainer* muons);
       StatusCode initialiseCutflow();
       
       Gaudi::Property<bool> m_bypass{ this, "bypass", false, "Run selector algorithm in pass-through mode" };
@@ -112,13 +104,8 @@ namespace VBSHIGGS{
         {VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS, "PASS_EXACTLY_TWO_LEPTONS"},
         {VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS, "PASS_TWO_SS_CHARGE_LEPTONS"},
         {VBSHIGGS::PASS_TWO_OS_CHARGE_LEPTONS, "PASS_TWO_OS_CHARGE_LEPTONS"},
-        {VBSHIGGS::PASS_MET, "PASS_MET"},
-        {VBSHIGGS::PASS_RES_EXACTLY_ONE_B_JET, "PASS_RES_EXACTLY_ONE_B_JET"},
-        {VBSHIGGS::PASS_RES_EXACTLY_TWO_B_JETS, "PASS_RES_EXACTLY_TWO_B_JETS"},
         {VBSHIGGS::PASS_ONE_LARGE_JET, "PASS_ONE_LARGE_JET"},
         {VBSHIGGS::PASS_TWO_SIGNAL_JETS, "PASS_TWO_SIGNAL_JETS"},
-        {VBSHIGGS::PASS_RES_BASELINE, "PASS_RES_BASELINE"},
-        {VBSHIGGS::PASS_MERG_BASELINE, "PASS_MERG_BASELINE"},
       };
 
       CP::SysReadDecorHandle<unsigned int> m_year {this, "year", "dataTakingYear", ""};

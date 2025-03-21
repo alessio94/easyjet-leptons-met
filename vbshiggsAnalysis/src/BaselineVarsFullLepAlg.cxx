@@ -158,8 +158,6 @@ namespace VBSHIGGS{
         int nCentralJets = 0;
         int nForwardJets = 0;
 
-        int n_electrons = electrons->size();
-        int n_muons = muons->size();
         bool WPgiven = !m_isBtag.empty();
         bool PCBTgiven = !m_PCBT.empty();
         if (m_doResolved){
@@ -193,8 +191,6 @@ namespace VBSHIGGS{
         }
         m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
         m_Ibranches.at("nForwardJets").set(*event, nForwardJets, sys);
-        m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
-        m_Ibranches.at("nMuons").set(*event, n_muons, sys);
         m_Ibranches.at("nLargeJets").set(*event, n_largeJets, sys);
 
         // selected leptons ;

@@ -117,15 +117,13 @@ namespace VBSHIGGS{
       if (m_doResolved){
         if ( HJets->size() >= 2) m_bools.at(VBSHIGGS::PASS_TWO_SIGNAL_JETS) = true;
       }
-      if ( largeJets->size() >= 1 )  m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET) = true;
+      if ( largeJets->size() == 1 )  m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET) = true;
 
       if (!m_passTriggerSLT.empty() and m_passTriggerSLT.get(*event, sys)) {
         m_bools.at(VBSHIGGS::PASS_TRIGGER) = true;
       } 
 
-      leptonSelection(electrons, muons, met);
-      if (m_bools.at(VBSHIGGS::PASS_TWO_SIGNAL_JETS) && m_doResolved) resolvedSelection(bjets);
-      if (m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET)) boostedSelection(largeJets, sys);
+      leptonSelection(electrons, muons);
 
       bool pass_preselection = m_bools.at(VBSHIGGS::PASS_TRIGGER) && m_bools.at(VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS) && m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS) ;
       if (!m_doResolved){
@@ -195,7 +193,7 @@ namespace VBSHIGGS{
     return StatusCode::SUCCESS;
   }
 
-  void FullLepSelectorAlg :: leptonSelection (const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer* muons, const xAOD::MissingET *met){
+  void FullLepSelectorAlg :: leptonSelection (const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer* muons){
 
     int n_leptons = 0;
 
@@ -242,43 +240,7 @@ namespace VBSHIGGS{
     if (n_leptons == 2)
       m_bools.at(VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS) = true;
 
-    // met cut
-    if (met->met() > 30 * Athena::Units::GeV) m_bools.at(VBSHIGGS::PASS_MET) = true;
   }//Lepton Selection
-
-  //Resolved Analysis
-  void FullLepSelectorAlg :: resolvedSelection(const std::vector<const xAOD::Jet*>& bjets){
-    int mNBJets = bjets.size();
-
-    // require exactly 2 bjets in the event
-    if (mNBJets==1) m_bools.at(VBSHIGGS::PASS_RES_EXACTLY_ONE_B_JET) = true;
-    if (mNBJets==2) m_bools.at(VBSHIGGS::PASS_RES_EXACTLY_TWO_B_JETS) = true;
-
-    bool pass_resolved_baseline = m_bools.at(VBSHIGGS::PASS_TRIGGER) && m_bools.at(VBSHIGGS::PASS_EXACTLY_TWO_LEPTONS) && m_bools.at(VBSHIGGS::PASS_TWO_SS_CHARGE_LEPTONS );
-
-    m_bools.at(VBSHIGGS::PASS_RES_BASELINE) = pass_resolved_baseline;
-
-  }
-
-  //boosted Analysis
-  void FullLepSelectorAlg :: boostedSelection(const xAOD::JetContainer *largeJets, const CP::SystematicSet& sys){
-    //leading Large-R jet in the event
-    const xAOD::Jet* largeJet = largeJets->at(0);
-    
-    //construct GN2X score
-    float phbb = m_GN2Xv01_phbb.get(*largeJet, sys);
-    float phcc = m_GN2Xv01_phcc.get(*largeJet, sys);
-    float pqcd = m_GN2Xv01_pqcd.get(*largeJet, sys);
-    float ptop = m_GN2Xv01_ptop.get(*largeJet, sys);
-    float fcc = 0.02;
-    float ftop = 0.25;
-    float XbbScore= log (phbb / (fcc*phcc + ftop*ptop + pqcd*(1-fcc-ftop)));
-
-    bool pass_merged_baseline = m_bools.at(VBSHIGGS::PASS_ONE_LARGE_JET) && XbbScore > 1.560 ;
-
-    m_bools.at(VBSHIGGS::PASS_MERG_BASELINE) = pass_merged_baseline;
-
-  }
 
   StatusCode FullLepSelectorAlg::initialiseCutflow(){
 

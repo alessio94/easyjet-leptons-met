@@ -13,6 +13,28 @@ UseVBFRNN : false
 # Add truth VBS quark info
 AddTruthVBSQuarks : false
 
+# expand list to store nWLep truth information
+Truth:
+  DSID_nWLep_samples:
+    - 525362 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp1
+    - 525363 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp2
+    - 525364 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp5
+    - 525365 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp10
+    - 525366 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klm5
+    - 525367 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp1
+    - 525368 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp2
+    - 525369 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp5
+    - 525370 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klp10
+    - 525371 # MGPy8EG_ssWWhjj_ltvvbbjj_EW8_LO_klm5
+    - 545778 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vm7
+    - 545779 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vm4
+    - 545780 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vm2
+    - 545781 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2v0
+    - 545782 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp2
+    - 545783 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp4
+    - 545784 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp6
+    - 545785 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp8
+
 # Toggles for object types
 do_muons: true
 do_electrons: true
@@ -44,32 +66,6 @@ OverlapRemoval:
 
 #Enable cutflow 
 save_cutflow: true
-
-# Toggles for reconstructed objects decorations
-Small_R_jet:
-  # btagging working points 
-  btag_wp: "GN2v01_FixedCutBEff_90"
-  amount: 0
-  
-  # to use multiple btagging WPs
-  btag_extra_wps:
-    - GN2v01_Continuous
-
-Large_R_jet:
-  min_pT: 200.e+3
-  maxEta: 2.0
-  runMuonJetPtCorr: false
-  amount_leadingjet: 1
-  GN2X_hbb_wps:
-    - "FlatMassQCDEff_0p25"
-    - "FlatMassQCDEff_0p3"
-    - "FlatMassQCDEff_0p37"
-    - "FlatMassQCDEff_0p46"
-    - "FlatMassQCDEff_0p58"
-    - "FlatMassQCDEff_0p74"
-    - "FlatMassQCDEff_0p94"
-    - "FlatMassQCDEff_1p25"
-    - "FlatMassQCDEff_1p55"
 
 # Include the TTree configuration and update details
 ttree_output:
