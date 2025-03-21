@@ -3,7 +3,7 @@ include: EasyjetHub/base-config.yaml
 do_CP_systematics: false
 
 # tagging jets pairing options
-# HighestMjjForwardJets or LeadingPTjj
+# HighestMjjForwardJets or HighestMjjJets or LeadingPTjj 
 TagJetsCriteria: "LeadingPTjj"
 DeltaRJj: 1.0
 

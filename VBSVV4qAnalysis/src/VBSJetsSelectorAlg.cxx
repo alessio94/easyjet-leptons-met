@@ -38,7 +38,8 @@ namespace VBSVV4q{
     StatusCode VBSJetsSelectorAlg::execute(){
 
         /*
-            -) HighestMjjForwardJets : small-R jets pair among forward, no btag and opposite eta, with the highest mjj
+            -) HighestMjjForwardJets : small-R jets pair after overlap, forward no btag and opposite eta, with the highest mjj
+            -) HighestMjjJets        : small-R jets pair after overlap removal, no btag and opposite eta, with the highest mjj
             -) LeadingPTjj           : small-R jets pair with highest pT after overlap removal with signal large-R jets
         */
 
@@ -59,25 +60,39 @@ namespace VBSVV4q{
             auto VBSJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer> >(SG::VIEW_ELEMENTS);
             auto nonVBSJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
                 smallRjets->begin(), smallRjets->end(), SG::VIEW_ELEMENTS);
-
+                
+            auto NoOverLappingJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer> >(SG::VIEW_ELEMENTS);
             float maxMjj = 0;
             const xAOD::Jet* vbsJet1 = nullptr;
             const xAOD::Jet* vbsJet2 = nullptr;
-
+            
+            // get no overlapping jets firstly
+            for(auto srjet : *smallRjets){
+                bool passORJ = true;
+                // loop over signal large-R jets
+                for(auto lrjet : *largeRjets){
+                    // skip overlapping jets
+                    if( srjet->p4().DeltaR(lrjet->p4()) < m_DeltaRJj )
+                        passORJ = false;
+                }
+                // store the NoOverLappingJet
+                if(passORJ)
+                    NoOverLappingJetContainer -> push_back(srjet);
+            }
             // tag jets pairing 
-            if(m_TagJetsCriteria == "HighestMjjForwardJets"){
-                for(unsigned int i=0; i<smallRjets->size(); i++){
-                    const xAOD::Jet* jet1 = smallRjets->at(i);
-                    // only forward jets (for now)
-                    if ( abs(jet1->eta())<2.5 ) continue;
+            if(m_TagJetsCriteria == "HighestMjjForwardJets" || m_TagJetsCriteria == "HighestMjjJets"){
+                for(unsigned int i=0; i<NoOverLappingJetContainer->size(); i++){
+                    const xAOD::Jet* jet1 = NoOverLappingJetContainer->at(i);
+                    // for HighestMjjForwardJets the eta cut should be applied.
+                    if (m_TagJetsCriteria == "HighestMjjForwardJets" && abs(jet1->eta())<2.5 ) continue;
 
                     // non b-tagged jets
                     if ( !m_isBtag.empty() && m_isBtag.get(*jet1, sys) ) continue;
 
                     for(unsigned int j=0; j<i; j++){
-                        const xAOD::Jet* jet2 = smallRjets->at(j);
+                        const xAOD::Jet* jet2 = NoOverLappingJetContainer->at(j);
         
-                        if ( abs(jet2->eta())<2.5 ) continue;
+                        if (m_TagJetsCriteria == "HighestMjjForwardJets" && abs(jet2->eta())<2.5 ) continue;
         
                         if ( !m_isBtag.empty() && m_isBtag.get(*jet2, sys) ) continue;
                         
@@ -100,20 +115,16 @@ namespace VBSVV4q{
 
             }
             else if(m_TagJetsCriteria == "LeadingPTjj"){
-                // loop over small-R jets
-                for(auto srjet : *smallRjets){
-                    bool passORJ = true;
-                    // loop over signal large-R jets
-                    for(auto lrjet : *largeRjets){
-                        // skip overlapping jets
-                        if( srjet->p4().DeltaR(lrjet->p4()) < m_DeltaRJj )
-                            passORJ = false;
+                // loop over NoOverLappingJet
+                for(auto srjet : *NoOverLappingJetContainer){
+                    if (VBSJetContainer->size() == 0){
+                        vbsJet1 = srjet;
+                        VBSJetContainer -> push_back(vbsJet1);
                     }
-
-                    // store the tag jets
-                    if(passORJ)
-                        VBSJetContainer -> push_back(srjet);
-
+                    else if (VBSJetContainer->size() == 1){
+                        vbsJet2 = srjet;
+                        VBSJetContainer -> push_back(vbsJet2);
+                    }
                     // ToImprove
                     // up to two
                     if(VBSJetContainer->size() == 2) break;
@@ -121,10 +132,10 @@ namespace VBSVV4q{
             }
 
             // sort VBS tag jets
-            std::sort(VBSJetContainer->begin(), VBSJetContainer->end(),
-                [] (const xAOD::Jet* a,
-                    const xAOD::Jet* b) {
-                    return a->pt() > b->pt(); });
+            //std::sort(VBSJetContainer->begin(), VBSJetContainer->end(),
+            //    [] (const xAOD::Jet* a,
+            //        const xAOD::Jet* b) {
+            //        return a->pt() > b->pt(); });
 
             // now erase VBS jets from the signal jet collection
             if (vbsJet1 && vbsJet2) {
