@@ -13,7 +13,11 @@ Analysis Package for the $HH\rightarrow b\bar{b} \tau\tau$ analyis
   - `HHbbttSelectorAlg`: Find if the event pass the baseline bbtt selection;
   - `MMCDecoratorAlg`: Compute the tau tau MMC mass;
   - `MMCSelectorAlg`: Filter events based on MMC;
-  - `BaselineVarsbbttAlg`: Compute the baseline variables for the analysis.
+  - `BaselineVarsbbttAlg`: Compute the baseline variables for the analysis;
+  - `AntiTauDecoratorAlg`: Get Anti-tau and do its trigger matching; 
+  - `TriggerDecoratorAlg`: Get trigger matching information;
+  - `TriggerSFAlg`: Get trigger SFs;
+  - `TriggerUtils`: Define trigger pass.
 
 # How to Run
 
@@ -23,7 +27,21 @@ Analysis Package for the $HH\rightarrow b\bar{b} \tau\tau$ analyis
 - run the analysis on <span style="color: #F2385A">PHYS</span>: ```bbtt-ntupler ttbar_PHYS_10evt.root --run-config bbttAnalysis/RunConfig-bbtt-bypass.yaml --out-file output_PHYS_bbtt.root```
 - run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbtt-ntupler ttbar_PHYSLITE_10evt.root --run-config bbttAnalysis/RunConfig-bbtt-bypass.yaml --out-file output_PHYSLITE_bbtt.root```
 An alternative is to use the preselection step using the configuration `RunConfig-bbtt.yaml` instead of `RunConfig-bbtt-bypass.yaml`, however fewer events would be recorded.
-- possible channels are `lephad`, `hadhad`, `lephad1b` (`lephad` one b-tag region), `hadhad1b` (`hadhad` one b-tag region), `ZCR` (Z+HF control region) and `TopEMuCR` (top control region, similar to ZCR but with different flavour leptons)
+- possible channels are, `HadHad`, `LepHad`, `ZCR` (Z+HF control region) and `TopEMuCR` (top control region, similar to ZCR but with different flavour leptons)
+
+3. Run the grid jobs:
+- setup environment: \
+  `lsetup rucio; voms-proxy-init -voms atlas` \
+  `lsetup panda`
+
+  
+- For nominal mc23 signal job: \
+`easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt.yaml --campaign EJ_example --mc-list ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc23/mc23_13p6TeV.HH_bbtt.prod.txt --noTag --channels HadHad LepHad ZCR TopEMuCR` \
+You will get separated-by-channel output root files and additional cbk.root on grid.
+- If you want to submit only with hadhad channel, you can remove other channels from `/easyjet/bbttAnalysis/share/RunConfig-bbtt.yaml` and 
+from `--channels` option
+- For Anti-Iso LepHad region use a different config file `../easyjet/bbttAnalysis/share/RunConfig-bbtt-antiiso.yaml` with option `--channels AntiIsoLepHad`
+
 
 # Output
 
@@ -35,7 +53,7 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
     * electron / muon / tau kinematics (implemented as a vector): `el_NOSYS_X` / `mu_NOSYS_X` / `tau_NOSYS_X`;
     * jet kinematics (implemented as a vector): `recojet_antikt4PFlow_NOSYS_X`;
     * $E_T^{miss}$ : `met_NOSYS_X`.
-* Standard set of `bbtt` variables, including:
+* Standard set of `bbtt` variables only for nominal jobs, including:
     * cuts to pass: `bbtt_pass_X_NOSYS`.
     * Missing Mass Calculator (MMC) outputs: `bbtt_mmc_X`;
     * selected lepton: `bbtt_Lepton_X_NOSYS`;
@@ -43,6 +61,7 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
     * Leading and sub-leading b-jets: `bbtt_Leading_Bjet_X` and `bbtt_Sublead_Bjet_X`;
     * Reconstructed Higgs candidates: `bbtt_H_bb_X` and `bbtt_H_vis_tautau_X`;
     * HH variables: `bbtt_HH_X` and `bbtt_HH_vis_X`.
+* The whole output branch list can be found [here](https://gitlab.cern.ch/atlas-physics/HDBS/DiHiggs/bbtautau/HHARD/-/tree/master/docs/ntuples?ref_type=heads) in the [HHARD](https://gitlab.cern.ch/atlas-physics/HDBS/DiHiggs/bbtautau/HHARD) postprocessing framework 
 
 # Main developers
 
