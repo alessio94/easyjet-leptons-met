@@ -57,7 +57,6 @@ namespace HHBBLL
     PASS_TRIGGER,
     TWO_OPPOSITE_CHARGE_LEPTONS,
     EXACTLY_TWO_B_JETS,
-    VBFVETO_SR1,
   };
 
   /// \brief An algorithm for counting containers
@@ -80,7 +79,6 @@ namespace HHBBLL
         "PASS_TRIGGER",
         "TWO_OPPOSITE_CHARGE_LEPTONS",
         "EXACTLY_TWO_B_JETS",
-	"VBFVETO_SR1",
       };
 
       Gaudi::Property<bool> m_isMC
@@ -157,7 +155,6 @@ namespace HHBBLL
         {HHBBLL::PASS_TRIGGER, "PASS_TRIGGER"},
         {HHBBLL::TWO_OPPOSITE_CHARGE_LEPTONS, "TWO_OPPOSITE_CHARGE_LEPTONS"},
         {HHBBLL::EXACTLY_TWO_B_JETS, "EXACTLY_TWO_B_JETS"},
-	{HHBBLL::VBFVETO_SR1, "VBFVETO_SR1"},
       };
 
       CutManager m_bbllCuts;
@@ -192,8 +189,7 @@ namespace HHBBLL
 
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
 			      const xAOD::MuonContainer& muons, CutManager& bbllCuts);
-      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts);
-      void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons);
+      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets);
       void setThresholds(const xAOD::EventInfo* event,
 			 const CP::SystematicSet& sys);
       StatusCode initialiseCutflow();

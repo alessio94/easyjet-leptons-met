@@ -116,7 +116,6 @@ namespace HHBBLL
       met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
       float met_sig = m_met_sig.get(*met, sys);
       m_Fbranches.at("MET_sig").set(*event, met_sig, sys);
-
       Leading_lep.SetPtEtaPhiE(m_Lepton1_pt.get(*event, sys), 
 			       m_Lepton1_eta.get(*event, sys), 
 			       m_Lepton1_phi.get(*event, sys), 
@@ -155,27 +154,28 @@ namespace HHBBLL
         bbllmet = bbll + met_vector;
         m_Fbranches.at("mbbll").set(*event, bbll.M(), sys);
         m_Fbranches.at("mbbllmet").set(*event, bbllmet.M(), sys);
-        // Ht2r mesure for boostedness of the two Higgs bosons
-        double ht2 = (met_vector + ll).Perp() + bb.Perp();
-        double ht2r = ht2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + Leading_bjet.Pt() + Subleading_bjet.Pt());
-        m_Fbranches.at("HT2").set(*event, ht2, sys);
-        m_Fbranches.at("HT2r").set(*event, ht2r, sys);
-      }
-
-      // Transverse mass of the pT-leading lepton wrt met
-      if (n_leptons >= 1)
-      {
-	float mt_lept1_met = TMath::Sqrt(2 * met->met() * Leading_lep.Pt() * (1 - TMath::Cos(Leading_lep.DeltaPhi(met_vector))));
-	m_Fbranches.at("mT_Lepton1_Met").set(*event, mt_lept1_met, sys);
-	if (n_leptons >= 2)
-	{
-	  float mt_lept2_met = TMath::Sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - TMath::Cos(Subleading_lep.DeltaPhi(met_vector))));
-	  m_Fbranches.at("mT_Lepton2_Met").set(*event, mt_lept2_met, sys);
-	  if(m_save_extra_vars) {
-	    float mt_l_min = std::min(mt_lept1_met, mt_lept2_met);
-	    m_Fbranches.at("mT_L_min").set(*event, mt_l_min, sys);
-	  }
+	if(m_save_extra_vars) {
+	  // Ht2r mesure for boostedness of the two Higgs bosons
+	  double ht2 = (met_vector + ll).Perp() + bb.Perp();
+	  double ht2r = ht2 / (met->met() + Leading_lep.Pt() + Subleading_lep.Pt() + Leading_bjet.Pt() + Subleading_bjet.Pt());
+	  m_Fbranches.at("HT2").set(*event, ht2, sys);
+	  m_Fbranches.at("HT2r").set(*event, ht2r, sys);
 	}
+      }
+      if(m_save_extra_vars) {
+	// Transverse mass of the pT-leading lepton wrt met
+	if (n_leptons >= 1)
+	  {
+	    float mt_lept1_met = TMath::Sqrt(2 * met->met() * Leading_lep.Pt() * (1 - TMath::Cos(Leading_lep.DeltaPhi(met_vector))));
+	    m_Fbranches.at("mT_Lepton1_Met").set(*event, mt_lept1_met, sys);
+	    if (n_leptons >= 2)
+	      {
+		float mt_lept2_met = TMath::Sqrt(2 * met->met() * Subleading_lep.Pt() * (1 - TMath::Cos(Subleading_lep.DeltaPhi(met_vector))));
+		m_Fbranches.at("mT_Lepton2_Met").set(*event, mt_lept2_met, sys);
+		float mt_l_min = std::min(mt_lept1_met, mt_lept2_met);
+		m_Fbranches.at("mT_L_min").set(*event, mt_l_min, sys);
+	      }
+	  }
       }
     }
     return StatusCode::SUCCESS;

@@ -162,10 +162,13 @@ namespace HHBBLL
       }
       TLorentzVector ll(0.,0.,0.,0.);
       if(leptons.size() >=2) {
+	ll = Leading_lep+Subleading_lep;
 	m_Fbranches.at("mll").set(*event, ll.M(), sys);
 	m_Fbranches.at("pTll").set(*event, ll.Pt(), sys);
-	m_Fbranches.at("Phill").set(*event, ll.Phi(), sys);
 	m_Fbranches.at("dRll").set(*event, Leading_lep.DeltaR(Subleading_lep), sys);
+	if(m_save_extra_vars) {	
+	m_Fbranches.at("Phill").set(*event, ll.Phi(), sys);
+	}
       }
     }
     return StatusCode::SUCCESS;

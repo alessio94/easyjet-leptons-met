@@ -137,7 +137,6 @@ namespace HHBBLL
       m_bools.at(HHBBLL::PASS_TRIGGER) = false;
       m_bools.at(HHBBLL::TWO_OPPOSITE_CHARGE_LEPTONS) = false;
       m_bools.at(HHBBLL::EXACTLY_TWO_B_JETS) = false;
-      m_bools.at(HHBBLL::VBFVETO_SR1) = false;
       setThresholds(event, sys);
 
       // Leptons
@@ -164,8 +163,7 @@ namespace HHBBLL
       
       evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_bbllCuts, sys);
       evaluateLeptonCuts(*electrons, *muons, m_bbllCuts);
-      evaluateJetCuts(*bjets, *nonbjets, m_bbllCuts);
-      evaluateLeptonCuts(*electrons, *muons);
+      evaluateJetCuts(*bjets);
 
       bool passedall = true;
       for (const auto& [key, value] : m_boolnames) {
@@ -552,56 +550,19 @@ namespace HHBBLL
     {
       m_bools.at(HHBBLL::TWO_OPPOSITE_CHARGE_LEPTONS) = true;
     }
+    bool EXACTLY_TWO_ISO_ELECTRONS = (electrons.size() == 2);
+    bool EXACTLY_TWO_ISO_MUONS = (muons.size() == 2);
+    bool IS_em = electrons.size() == 1 && muons.size() == 1;
+    m_bools.at(HHBBLL::IS_em) = IS_em;
+    m_bools.at(HHBBLL::IS_SF) = (EXACTLY_TWO_ISO_ELECTRONS || EXACTLY_TWO_ISO_MUONS);
   }
 
-  void HHbbllSelectorAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& bbllCuts)					  
+  void HHbbllSelectorAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets)					  
   {
 
     ///All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the bbll_config file.
     if (bjets.size()==2)
       m_bools.at(HHBBLL::EXACTLY_TWO_B_JETS) = true;
-
-    bool VBFVeto = false;
-    float max_mjj = 0;
-    float max_delta_eta_jj = 0;
-
-    if (nonbjets.size() >= 2){
-      bool jetsFound = false;
-
-      for(unsigned int i=0;i<nonbjets.size()-1;i++){
-        for(unsigned int j=i+1;j<nonbjets.size();j++){
-	  const xAOD::Jet* nonbjet1 = nonbjets.at(i);
-          const xAOD::Jet* nonbjet2 = nonbjets.at(j);
-
-	  if (nonbjet1->pt() >= 30. * Athena::Units::GeV
-            && nonbjet2->pt() >= 30. * Athena::Units::GeV) {
-	    jetsFound = true;
-
-            float mjj = (nonbjet1->p4() + nonbjet2->p4()).M();
-	    float delta_eta_jj = std::abs(nonbjet1->eta() - nonbjet2->eta());
-
-	    if (mjj > max_mjj) max_mjj = mjj;
-	    if (delta_eta_jj > max_delta_eta_jj)  max_delta_eta_jj = delta_eta_jj;
-	  }
-        }
-      }
-
-      if (jetsFound) {
-        VBFVeto = !(max_delta_eta_jj > 4 && max_mjj > 600. * Athena::Units::GeV);
-      }
-    }
-    if(bbllCuts.exists("VBFVETO_SR1")) m_bools.at(HHBBLL::VBFVETO_SR1) = VBFVeto;
-  }
-
-  void HHbbllSelectorAlg::evaluateLeptonCuts
-  (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons)
-  {
-    bool EXACTLY_TWO_ISO_ELECTRONS = (electrons.size() == 2);
-    bool EXACTLY_TWO_ISO_MUONS = (muons.size() == 2);
-    bool IS_em = electrons.size() == 1 && muons.size() == 1;
-
-    m_bools.at(HHBBLL::IS_em) = IS_em;
-    m_bools.at(HHBBLL::IS_SF) = (EXACTLY_TWO_ISO_ELECTRONS || EXACTLY_TWO_ISO_MUONS);
   }
 
   void HHbbllSelectorAlg::setThresholds(const xAOD::EventInfo* event,

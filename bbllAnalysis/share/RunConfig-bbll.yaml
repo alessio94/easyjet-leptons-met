@@ -81,7 +81,6 @@ CutList :
       - EXACTLY_TWO_LEPTONS
       - TWO_OPPOSITE_CHARGE_LEPTONS
       - EXACTLY_TWO_B_JETS
-      - VBFVETO_SR1
 
 Categories :
       - IS_SF

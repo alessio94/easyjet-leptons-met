@@ -164,9 +164,10 @@ def get_bjetsVarsbbllAlg_variables(flags):
 
     # bjet variables
     int_variable_names = ["nBJets"]
-    float_variable_names += ["mbb", "pTbb", "dRbb", "Phibb", "mT2_bb"]
+    float_variable_names += ["mbb", "pTbb", "dRbb", "mT2_bb"]
     if (flags.Analysis.save_extra_vars):
         int_variable_names += ["nJets", "nCentralJets"]
+        float_variable_names += ["Phibb"]
 
     return float_variable_names, int_variable_names
 
@@ -177,10 +178,11 @@ def get_LeptonVarsbbllAlg_variables(flags):
 
     # Lepton variables
     int_variable_names = ["nLeptons"]
-    float_variable_names += ["mll", "pTll", "dRll", "Phill"]
+    float_variable_names += ["mll", "pTll", "dRll"]
     if (flags.Analysis.save_extra_vars):
         int_variable_names += ["nElectrons",
                                "nMuons"]
+        float_variable_names += ["Phill"]
 
     return float_variable_names, int_variable_names
 
@@ -189,11 +191,10 @@ def get_BaselineVarsbbllAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    float_variable_names += ["mbbll", "mbbllmet", "MET_sig",
-                             "mT_Lepton1_Met", "mT_Lepton2_Met",
-                             "HT2", "HT2r", "mbl"]
+    float_variable_names += ["mbbll", "mbbllmet", "mbl", "MET_sig"]
     if (flags.Analysis.save_extra_vars):
-        float_variable_names += ["mT_L_min"]
+        float_variable_names += ["mT_L_min", "mT_Lepton1_Met",
+                                 "mT_Lepton2_Met", "HT2", "HT2r"]
     return float_variable_names, int_variable_names
 
 

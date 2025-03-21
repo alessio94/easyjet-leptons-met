@@ -130,9 +130,12 @@ namespace HHBBLL
         bb = Leading_bjet + Subleading_bjet;
         m_Fbranches.at("mbb").set(*event, bb.M(), sys);
         m_Fbranches.at("pTbb").set(*event, bb.Pt(), sys);
-        m_Fbranches.at("Phibb").set(*event, bb.Phi(), sys);
-        m_Fbranches.at("dRbb").set(*event, Leading_bjet.DeltaR(Subleading_bjet), sys);
+	m_Fbranches.at("dRbb").set(*event, Leading_bjet.DeltaR(Subleading_bjet), sys);
+	if(m_save_extra_vars) {
+	  m_Fbranches.at("Phibb").set(*event, bb.Phi(), sys);
+	}
       }
+      //
       met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
       ComputeMT2 mt2_calculator = ComputeMT2(Leading_bjet, Subleading_bjet, met_vector, 0, 0);
       double mT2_bb = mt2_calculator.Compute();
