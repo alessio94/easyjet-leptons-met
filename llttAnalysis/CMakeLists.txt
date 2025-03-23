@@ -10,7 +10,7 @@ add_compile_options(-Werror)
 # Build the Athena component library
 atlas_add_component(llttAnalysis
   src/BaselineVarsllttAlg.cxx
-  src/MMCDecoratorAlg.cxx
+  src/LeptonPairDecoratorAlg.cxx
   src/MMCSelectorAlg.cxx
   src/HllttSelectorAlg.cxx
   src/components/llttAnalysis_entries.cxx

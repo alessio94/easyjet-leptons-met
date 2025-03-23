@@ -61,7 +61,6 @@ def lltt_cfg(
     cfg.addEventAlgo(
         CompFactory.HLLTT.HllttSelectorAlg(
             "HllttSelectorAlg",
-            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             tauWP=flags.Analysis.Tau.extra_wps[0],
             muonWP=TightMuonWPLabel,
             eleWP=TightElectronWPLabel,
@@ -79,19 +78,21 @@ def lltt_cfg(
         baseline = "_baseline_"
     else:
         baseline = "_"
-    if flags.Analysis.do_mmc:
-        from EasyjetHub.algs.mmc_tool_config import MissingMassToolCfg
-        cfg.addEventAlgo(
-            CompFactory.HLLTT.MMCDecoratorAlg(
-                "MMCDecoratorAlg",
-                passLepLep="pass" + baseline + "LepLep_%SYS%",
-                passLepHad="pass" + baseline + "LepHad_%SYS%",
-                passHadHad="pass" + baseline + "HadHad_%SYS%",
-                channel=flags.Analysis.channels,
-                mmcTool=cfg.popToolsAndMerge(MissingMassToolCfg(flags))
-            )
-        )
 
+    from EasyjetHub.algs.mmc_tool_config import MissingMassToolCfg
+    cfg.addEventAlgo(
+        CompFactory.HLLTT.LeptonPairDecoratorAlg(
+            "LeptonPairDecoratorAlg",
+            passLepLep="pass" + baseline + "LepLep_%SYS%",
+            passLepHad="pass" + baseline + "LepHad_%SYS%",
+            passHadHad="pass" + baseline + "HadHad_%SYS%",
+            channel=flags.Analysis.channels,
+            mmcTool=cfg.popToolsAndMerge(MissingMassToolCfg(flags)),
+            doMMCfit=flags.Analysis.do_mmc
+        )
+    )
+
+    if flags.Analysis.do_mmc:
         cfg.addEventAlgo(
             CompFactory.HLLTT.MMCSelectorAlg(
                 "MMCSelectorAlg",
@@ -166,8 +167,8 @@ def lltt_branches(flags):
     for var in all_baseline_variable_names:
         branches += [f"EventInfo.{var}_%SYS% -> lltt_{var}"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]
-
-    branches += ["EventInfo.lltt_pass_sr_%SYS% -> lltt_pass_SR_%SYS%"]
+    if flags.Analysis.do_mmc:
+        branches += ["EventInfo.lltt_pass_sr_%SYS% -> lltt_pass_SR_%SYS%"]
 
     object_level_branches, object_level_float_variables, object_level_int_variables \
         = get_selected_objects_branches_variables(flags, "lltt")

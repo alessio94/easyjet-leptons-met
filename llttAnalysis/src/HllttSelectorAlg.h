@@ -76,9 +76,6 @@ private:
 
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
-
-    CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "llttAnalysisJets_%SYS%", "Jet container to read" };
     
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "llttAnalysisElectrons_%SYS%", "Electron container to read" };
@@ -102,9 +99,6 @@ private:
       { this, "tauWP", "", "Tau ID working point" };
     CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
     xAOD::TauJetParameters::IsTauFlag m_tauIDWP;
-
-    CP::SysReadDecorHandle<char> 
-    m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     std::unordered_map<std::string, CP::SysReadDecorHandle<bool> > m_triggerdecos;
 

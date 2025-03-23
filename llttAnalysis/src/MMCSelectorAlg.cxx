@@ -48,7 +48,7 @@ namespace HLLTT
 
       bool MMC_MASS = false;
 
-      if (m_mmc_m.get(*event, sys) > m_mmc_min || m_mmc_status.get(*event, sys)==0){
+      if (m_mmc_m.get(*event, sys) > m_mmc_min || m_mmc_status.get(*event, sys)<1){
         MMC_MASS = true;
 	ATH_MSG_DEBUG(" MMCSelectorAlg: event "<<event->eventNumber()<<" mmc m "<<m_mmc_m.get(*event, sys)<<" mmc_min "<<m_mmc_min);
       }

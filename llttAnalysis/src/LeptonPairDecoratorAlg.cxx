@@ -4,7 +4,7 @@
 
 /// @author Carl Gwilliam
 
-#include "MMCDecoratorAlg.h"
+#include "LeptonPairDecoratorAlg.h"
 
 using ROOT::Math::PtEtaPhiMVector;
 using ROOT::Math::PxPyPzEVector;
@@ -12,14 +12,14 @@ using ROOT::Math::VectorUtil::DeltaR;
 
 namespace HLLTT
 {
-  MMCDecoratorAlg ::MMCDecoratorAlg(const std::string &name,
+  LeptonPairDecoratorAlg ::LeptonPairDecoratorAlg(const std::string &name,
                                   ISvcLocator *pSvcLocator)
     : EL::AnaAlgorithm(name, pSvcLocator)
   {
   
   }
 
-  StatusCode MMCDecoratorAlg ::initialize()
+  StatusCode LeptonPairDecoratorAlg ::initialize()
   {
 
     // Read syst-aware input handles
@@ -78,7 +78,7 @@ namespace HLLTT
     return StatusCode::SUCCESS;
   }
 
-  StatusCode MMCDecoratorAlg ::execute()
+  StatusCode LeptonPairDecoratorAlg ::execute()
   {
 
     // Loop over all systs
@@ -112,7 +112,7 @@ namespace HLLTT
       // Setup MMC inputs and outputs
       const xAOD::IParticle* part1 = nullptr;
       const xAOD::IParticle* part2 = nullptr;
-      int status = 0;      
+      int status = m_doMMCfit?0:-1; //-1 no mmc variables saved       
       PtEtaPhiMVector res(0,0,0,0);
 
       int n_lep(0);
@@ -220,6 +220,7 @@ namespace HLLTT
 	  for(const xAOD::Muon* muon : *muons) {
 	    if (m_selected_mu.get(*muon, sys)){
 	      if(ix<4){
+		// save which muon from a->mumu
 		if(ix==iamu1||ix==iamu2)m_selected_mu_amm.set(*muon, true, sys);
 		++ix;
 	      }
@@ -229,6 +230,7 @@ namespace HLLTT
 	    for(const xAOD::Electron* electron : *electrons) {
 	      if (m_selected_el.get(*electron, sys)){
 		if(ix<4){
+		  // save which muon from a->mumu 
 		  if(ix==iamu1||ix==iamu2)m_selected_el_amm.set(*electron, true, sys);
 		  ++ix;
 		}
@@ -339,7 +341,7 @@ namespace HLLTT
       }
 
       // Run MMC if find eligible particle content
-      if (part1 && part2) {
+      if (part1 && part2 && m_doMMCfit) {
 	auto code = m_mmcTool->apply(*event, part1, part2, met, jets->size());
 	
 	if (code != CP::CorrectionCode::Ok) 
@@ -352,18 +354,19 @@ namespace HLLTT
 	if (status == 1) {
 	  res = m_mmcTool->GetResonanceVec(m_method)*1e3;
 	}
+	else status = 0;
       }
 
       // Decorate ouput
       types = isr>0?(iatau1+10*iatau2+100*isr+1000*recid):100*isr;
-      ATH_MSG_DEBUG(" MMCDecoratorAlg fits:  event "<<event->eventNumber()<<" mmc m "<< res.M()<<" types "<<types
+      ATH_MSG_DEBUG(" LeptonPairDecoratorAlg fits:  event "<<event->eventNumber()<<" mmc m "<< res.M()<<" types "<<types
 		    <<" nlep "<<n_lep<<" ntaus "<<n_taus<<" isr "<<isr<<" iatau1 "<<iatau1<<" iatau2 "<<iatau2);
       m_mmc_status.set(*event, status, sys);
       m_mmc_types.set(*event, types, sys);
       m_mmc_pt.set(*event, res.Pt(), sys);
       m_mmc_eta.set(*event, res.Eta(), sys);
       m_mmc_phi.set(*event, res.Phi(), sys);
-      m_mmc_m.set(*event, res.M(), sys);            
+      m_mmc_m.set(*event, res.M(), sys);
     }
 
     return StatusCode::SUCCESS;

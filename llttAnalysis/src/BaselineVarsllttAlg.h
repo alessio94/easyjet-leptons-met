@@ -112,6 +112,11 @@ private:
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
     CP::SysReadDecorHandle<int> m_truthFlav{"HadronConeExclTruthLabelID", this};
+    // save lepton flavor 
+    CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
+    CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};
+    CP::SysReadDecorHandle<int> m_mu_truthOrigin{"truthOrigin", this};
+    CP::SysReadDecorHandle<int> m_mu_truthType{"truthType", this};
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};

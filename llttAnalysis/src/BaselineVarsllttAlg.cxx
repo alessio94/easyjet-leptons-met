@@ -63,7 +63,13 @@ namespace HLLTT
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_llttJetHandle));
     }
-    if (m_isMC) ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_llttJetHandle));
+    if (m_isMC){
+      ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_llttJetHandle));
+      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_llttElectronHandle));
+      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_llttElectronHandle));
+      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_llttMuonHandle));
+      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_llttMuonHandle));
+    }
 
     for (const std::string &var : m_floatVariables){
       ATH_MSG_DEBUG("initializing float variable: " << var);
@@ -132,6 +138,8 @@ namespace HLLTT
       TLorentzVector p4lep[4];
       int lepid[4];
       float lepsf[4];
+      int leptruthorig[4];
+      int leptruthtype[4];
       int iamu1(-1);
       int iamu2(-1);
 
@@ -141,7 +149,12 @@ namespace HLLTT
 	  if(n_lep<4){
             p4lep[n_lep] = muon->p4();
             lepid[n_lep] = muon->charge()>0?-13: 13;
-	    if(m_isMC)lepsf[n_lep] = m_mu_SF.get(*muon, sys);
+	    if(m_isMC){
+	      lepsf[n_lep] = m_mu_SF.get(*muon, sys);
+	      leptruthorig[n_lep] = m_mu_truthOrigin.get(*muon,sys);
+	      leptruthtype[n_lep] = m_mu_truthType.get(*muon,sys);
+	    }
+	    // selecting which muon is from a->mumu
 	    if(m_selected_mu_amm.get(*muon, sys)){
 	      if(iamu1==-1)iamu1 = n_lep;
 	      else if(iamu2==-1) iamu2 = n_lep;
@@ -157,8 +170,12 @@ namespace HLLTT
           if(n_lep<4){
             p4lep[n_lep] = electron->p4();
             lepid[n_lep] = electron->charge()>0? -11:11;
-            if(m_isMC)
+            if(m_isMC){
               lepsf[n_lep] = m_saveDummy_ele_SF ? 1. : m_ele_SF.get(*electron, sys);
+	      leptruthorig[n_lep] = m_ele_truthOrigin.get(*electron,sys);
+              leptruthtype[n_lep] = m_ele_truthType.get(*electron,sys);
+	    }
+	    // selecting which muon is from a->mumu
             if(m_selected_el_amm.get(*electron, sys)){
               if(iamu1==-1)iamu1 = n_lep;
               else if(iamu2==-1) iamu2 = n_lep;	
@@ -171,25 +188,16 @@ namespace HLLTT
 
       // selecting taus
       int n_taus = 0;
-      float lead_tau_sf(1.);
-      float sublead_tau_sf(1.);
       const xAOD::TauJet* tau0 = nullptr;
       const xAOD::TauJet* tau1 = nullptr;
       
       for(const xAOD::TauJet* tau : *taus) {
         if (m_selected_tau.get(*tau, sys)){
 	  ++n_taus;
-	  if (!tau0){
-	    if(m_isMC)lead_tau_sf = m_tau_effSF.get(*tau,sys);
-	    tau0 = tau;
-	  }
-	  else if(!tau1){
-	    if(m_isMC)sublead_tau_sf = m_tau_effSF.get(*tau,sys);
-	    tau1 = tau;
-	  }
+	  if (!tau0) tau0 = tau;
+	  else if(!tau1) tau1 = tau;
 	}
       }
-
       //************
       // jet
       //************
@@ -199,16 +207,6 @@ namespace HLLTT
 	{	  
 	  if(std::abs(jet->eta())<2.5){
 	    n_jets += 1;
-	    int truthlabel=-1;
-	    if(m_isMC) truthlabel = m_truthFlav.get(*jet, sys);
-	    if(n_jets<4){
-	      std::string prefix = "Jet"+std::to_string(n_jets);
-	      m_Fbranches.at(prefix+"_pt").set(*event, jet->pt(), sys);
-	      m_Fbranches.at(prefix+"_eta").set(*event, jet->eta(), sys);
-	      m_Fbranches.at(prefix+"_phi").set(*event, jet->phi(), sys);
-	      m_Fbranches.at(prefix+"_E").set(*event, jet->e(), sys);
-	      if(m_isMC)m_Ibranches.at(prefix+"_truthLabel").set(*event, truthlabel, sys);
-	    }
 	    if (WPgiven && m_isBtag.get(*jet, sys))
 	      bjets->push_back(jet);
 	  }
@@ -348,7 +346,7 @@ namespace HLLTT
           }
         }
       }
-      // save stuff here:  
+      // save stuff here:
       m_Ibranches.at("isr").set(*event, isr, sys);
       m_Ibranches.at("recid").set(*event, recid, sys);
       m_Ibranches.at("nlep").set(*event, n_lep, sys);      
@@ -362,127 +360,125 @@ namespace HLLTT
       if(isr>0){ 	
 	m_Fbranches.at("Lepton1_pt").set(*event, p4lep[iamu1].Pt(), sys);
         m_Fbranches.at("Lepton1_eta").set(*event, p4lep[iamu1].Eta(), sys);
-        m_Fbranches.at("Lepton1_phi").set(*event, p4lep[iamu1].Phi(), sys);
-	if(m_isMC)m_Fbranches.at("Lepton1_effSF").set(*event, lepsf[iamu1], sys);	
+        m_Fbranches.at("Lepton1_phi").set(*event, p4lep[iamu1].Phi(), sys);	
+	if(m_isMC)m_Fbranches.at("Lepton1_effSF").set(*event, lepsf[iamu1], sys);
         m_Ibranches.at("Lepton1_pdgid").set(*event, lepid[iamu1], sys);
-	
+	if(m_isMC){
+	  m_Ibranches.at("Lepton1_truthOrig").set(*event, leptruthorig[iamu1], sys);
+          m_Ibranches.at("Lepton1_truthType").set(*event, leptruthtype[iamu1], sys);
+	}	  	
         m_Fbranches.at("Lepton2_pt").set(*event, p4lep[iamu2].Pt(), sys);
         m_Fbranches.at("Lepton2_eta").set(*event, p4lep[iamu2].Eta(), sys);
         m_Fbranches.at("Lepton2_phi").set(*event, p4lep[iamu2].Phi(), sys);
 	if(m_isMC)m_Fbranches.at("Lepton2_effSF").set(*event, lepsf[iamu2], sys);
         m_Ibranches.at("Lepton2_pdgid").set(*event, lepid[iamu2], sys);
-      
-	TLorentzVector p4LeadTau;
-	TLorentzVector p4SubleadTau;
-	int leadTau_pdgId;
-	int subleadTau_pdgId;
-	float leadTau_sf(1);
-	float subleadTau_sf(1);
+	if(m_isMC){
+          m_Ibranches.at("Lepton2_truthOrig").set(*event, leptruthorig[iamu2], sys);
+          m_Ibranches.at("Lepton2_truthType").set(*event, leptruthtype[iamu2], sys);
+	}
+	std::vector<TLorentzVector> p4Tau;
+	std::vector<int> tau_pdgId;
+	std::vector<float> tau_sf;
+	std::vector<int> tau_truthorig;
+        std::vector<int> tau_truthtype;	
+
 	const xAOD::TauJet* Tau1 = nullptr;
 	const xAOD::TauJet* Tau2 = nullptr;
-	switch(isr){
+	static const SG::AuxElement::ConstAccessor<int> acc_PartonTruthLabelID("PartonTruthLabelID");
+	switch(isr){	    
 	case 1:
-	  p4LeadTau = p4lep[iatau1];
-	  p4SubleadTau = p4lep[iatau2];
-	  leadTau_pdgId = lepid[iatau1];
-	  subleadTau_pdgId = lepid[iatau2];
-	  if(m_isMC){	    
-	    leadTau_sf = lepsf[iatau1];
-	    subleadTau_sf = lepsf[iatau2];
+	  for(const int iatau : {iatau1, iatau2}){
+	    p4Tau.push_back(p4lep[iatau]);
+	    tau_pdgId.push_back(lepid[iatau]);
+	    if(m_isMC){	    
+	      tau_sf.push_back(lepsf[iatau]);
+	      tau_truthorig.push_back(leptruthorig[iatau]);
+	      tau_truthtype.push_back(leptruthtype[iatau]);
+	    }
 	  }
 	  break;
 	case 2:
-	  p4LeadTau = p4lep[iatau1];
-	  p4SubleadTau = tau0->p4();
-	  leadTau_pdgId = lepid[iatau1];
-	  subleadTau_pdgId = tau0->charge()>0?-15:15;
+	  p4Tau.push_back(p4lep[iatau1]);
+	  tau_pdgId.push_back(lepid[iatau1]);
+	  if(m_isMC){	    
+	    tau_sf.push_back(lepsf[iatau1]);
+	    tau_truthorig.push_back(leptruthorig[iatau1]);
+	    tau_truthtype.push_back(leptruthtype[iatau1]);
+	  }
+
+	  p4Tau.push_back(tau0->p4());
+	  tau_pdgId.push_back(tau0->charge()>0?-15:15);
 	  if(m_isMC){
-	    leadTau_sf = lepsf[iatau1];
-	    subleadTau_sf = lead_tau_sf; //m_tau_effSF.get(*tau0,sys);
+	    tau_sf.push_back(m_tau_effSF.get(*tau0,sys));
+	    const xAOD::Jet *truthJet = xAOD::TauHelpers::getLink<xAOD::Jet>(tau0, "truthJetLink");
+            tau_truthorig.push_back((truthJet) ? acc_PartonTruthLabelID(*truthJet): -99);
+	    tau_truthtype.push_back(TauAnalysisTools::getTruthParticleType(*tau0));
 	  }
 	  Tau2 = tau0;
 	  break;
 	case 3:
-	  p4LeadTau = tau0->p4();
-	  p4SubleadTau = tau1->p4();
-	  leadTau_pdgId = tau0->charge()>0?-15:15;
-	  subleadTau_pdgId = tau1->charge()>0?-15:15;
-	  if(m_isMC){
-	    leadTau_sf = lead_tau_sf; //m_tau_effSF.get(*tau0,sys);
-	    subleadTau_sf = sublead_tau_sf; //m_tau_effSF.get(*tau1,sys);
+	  for (const auto& tau : {tau0, tau1}){
+	    p4Tau.push_back(tau->p4());
+	    tau_pdgId.push_back(tau->charge()>0?-15:15);
+	    if(m_isMC){
+	      tau_sf.push_back(m_tau_effSF.get(*tau,sys));
+	      const xAOD::Jet *truthJet = xAOD::TauHelpers::getLink<xAOD::Jet>(tau, "truthJetLink");
+              tau_truthorig.push_back((truthJet) ? acc_PartonTruthLabelID(*truthJet): -99);
+	      tau_truthtype.push_back(TauAnalysisTools::getTruthParticleType(*tau0));
+	    }
 	  }
 	  Tau1 = tau0;
 	  Tau2 = tau1;
-	  break;
+	  break;  
 	default:
 	  ATH_MSG_ERROR("Unknown isr "<<isr);
 	  return StatusCode::FAILURE;
 	}
-	
-	m_Fbranches.at("Tau1_pt").set(*event, p4LeadTau.Pt(), sys);
-	m_Fbranches.at("Tau1_eta").set(*event, p4LeadTau.Eta(), sys);
-	m_Fbranches.at("Tau1_phi").set(*event, p4LeadTau.Phi(), sys);
-	m_Fbranches.at("Tau1_E").set(*event, p4LeadTau.E(), sys);
-	m_Ibranches.at("Tau1_pdgid").set(*event, leadTau_pdgId, sys);
-	m_Ibranches.at("Tau1_charge").set(*event, leadTau_pdgId>0?-1:1, sys);
-	int decayMode=-1;
-	int tau_EleRNN_WP = 0;
-	if(Tau1){ 
-	  m_Fbranches.at("Tau1_RNN").set(*event, Tau1->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans), sys);
-	  m_Ibranches.at("Tau1_charge").set(*event, Tau1->charge(), sys);
-	  m_Ibranches.at("Tau1_nProng").set(*event, Tau1->nTracks(), sys);
-	  Tau1->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
-	  m_Ibranches.at("Tau1_decayMode").set(*event, decayMode, sys);
-	  if(Tau1->isTau(xAOD::TauJetParameters::EleRNNTight)) tau_EleRNN_WP = 3;
-	  else if(Tau1->isTau(xAOD::TauJetParameters::EleRNNMedium)) tau_EleRNN_WP = 2;
-	  else if(Tau1->isTau(xAOD::TauJetParameters::EleRNNLoose)) tau_EleRNN_WP = 1;
-	  tau_EleRNN_WP+=m_istauID.get(*Tau1, sys)*10;
-	  m_Ibranches.at("Tau1_EleRNN_WP").set(*event, tau_EleRNN_WP, sys);
-	}
-	if(m_isMC){
-	  m_Fbranches.at("Tau1_effSF").set(*event, leadTau_sf, sys);
-	  if(Tau1){
-	    ATH_MSG_DEBUG("Dump tau truthType: event  "<<event->eventNumber()<<" isr "<<isr<<" Tau1 pt "<< Tau1->pt()<<" nProng "<<Tau1->nTracks()<<" truthType "<<int(TauAnalysisTools::getTruthParticleType(*Tau1)));
-	    m_Ibranches.at("Tau1_truthType").set(*event, int(TauAnalysisTools::getTruthParticleType(*Tau1)), sys);
+	for(unsigned int i=0; i<2; i++){
+	  std::string prefix = "Tau"+std::to_string(i+1);
+	  m_Fbranches.at(prefix+"_pt").set(*event, p4Tau[i].Pt(), sys);
+	  m_Fbranches.at(prefix+"_eta").set(*event, p4Tau[i].Eta(), sys);
+	  m_Fbranches.at(prefix+"_phi").set(*event, p4Tau[i].Phi(), sys);
+	  m_Fbranches.at(prefix+"_E").set(*event, p4Tau[i].E(), sys);
+	  m_Ibranches.at(prefix+"_pdgid").set(*event, tau_pdgId[i], sys);
+	  m_Ibranches.at(prefix+"_charge").set(*event, tau_pdgId[i]>0?-1:1, sys);
+	  int decayMode=-1;
+	  int tau_EleRNN_WP = 0;
+	  const xAOD::TauJet* tau = i==0 ? Tau1 : Tau2;
+	  if(tau){
+	    m_Fbranches.at(prefix+"_RNN").set(*event, tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans), sys);
+	    m_Ibranches.at(prefix+"_charge").set(*event, tau->charge(), sys);
+	    m_Ibranches.at(prefix+"_nProng").set(*event, tau->nTracks(), sys);
+	    tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
+	    m_Ibranches.at(prefix+"_decayMode").set(*event, decayMode, sys);
+	    if(tau->isTau(xAOD::TauJetParameters::EleRNNTight)) tau_EleRNN_WP = 3;
+	    else if(tau->isTau(xAOD::TauJetParameters::EleRNNMedium)) tau_EleRNN_WP = 2;
+	    else if(tau->isTau(xAOD::TauJetParameters::EleRNNLoose)) tau_EleRNN_WP = 1;
+	    tau_EleRNN_WP+=m_istauID.get(*tau, sys)*10;
+	    m_Ibranches.at(prefix+"_EleRNN_WP").set(*event, tau_EleRNN_WP, sys);
 	  }
-	}
-        m_Fbranches.at("Tau2_pt").set(*event, p4SubleadTau.Pt(), sys);
-        m_Fbranches.at("Tau2_eta").set(*event, p4SubleadTau.Eta(), sys);
-        m_Fbranches.at("Tau2_phi").set(*event, p4SubleadTau.Phi(), sys);
-        m_Fbranches.at("Tau2_E").set(*event, p4SubleadTau.E(), sys);
-	m_Ibranches.at("Tau2_pdgid").set(*event, subleadTau_pdgId, sys);
-	m_Ibranches.at("Tau2_charge").set(*event, subleadTau_pdgId>0?-1:1, sys);
-	if(Tau2){
-          m_Fbranches.at("Tau2_RNN").set(*event, Tau2->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans), sys);
-          m_Ibranches.at("Tau2_charge").set(*event, Tau2->charge(), sys);
-	  decayMode = -1;
-          m_Ibranches.at("Tau2_nProng").set(*event, Tau2->nTracks(), sys);
-          Tau2->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
-          m_Ibranches.at("Tau2_decayMode").set(*event, decayMode, sys);
-	  tau_EleRNN_WP = 0;
-          if(Tau2->isTau(xAOD::TauJetParameters::EleRNNTight)) tau_EleRNN_WP = 3;
-          else if(Tau2->isTau(xAOD::TauJetParameters::EleRNNMedium)) tau_EleRNN_WP = 2;
-          else if(Tau2->isTau(xAOD::TauJetParameters::EleRNNLoose)) tau_EleRNN_WP = 1;
-	  tau_EleRNN_WP+=m_istauID.get(*Tau2, sys)*10;
-	  m_Ibranches.at("Tau2_EleRNN_WP").set(*event, tau_EleRNN_WP, sys);
+	  if(m_isMC){
+	    m_Fbranches.at(prefix+"_effSF").set(*event, tau_sf[i], sys);
+	    m_Ibranches.at(prefix+"_truthOrig").set(*event, tau_truthorig[i], sys);
+	    m_Ibranches.at(prefix+"_truthType").set(*event, tau_truthtype[i], sys);
+	    if(tau){
+	      ATH_MSG_DEBUG("Dump tau truthType: event  "<<event->eventNumber()<<" isr "<<isr<<" Tau"<<i+1<<" pt "<< tau->pt()<<" nProng "<<tau->nTracks()
+			  <<" truthType decoded "<<tau_truthtype[i]<<" truthType "<<int(TauAnalysisTools::getTruthParticleType(*tau)));
+	    }
+	  }
         }
-	if(m_isMC){
-	  m_Fbranches.at("Tau2_effSF").set(*event, subleadTau_sf, sys);
-	  if(Tau2){
-	    ATH_MSG_DEBUG("Dump tau truthType: event  "<<event->eventNumber()<<" isr "<<isr<<" Tau2 pt "<< Tau2->pt()<<" nProng "<<Tau2->nTracks()<<" truthType "<<int(TauAnalysisTools::getTruthParticleType(*Tau2)));
-	    m_Ibranches.at("Tau2_truthType").set(*event, int(TauAnalysisTools::getTruthParticleType(*Tau2)), sys);
-	  }
-	}
+	////////
 	if(msgLvl(MSG::DEBUG)&&abs(osatt)==4){ // mu+tau final state
 	  ATH_MSG_DEBUG("Dump mu+tau: merged jets event  "<<event->eventNumber()<<" osatt "<<osatt);
 	  for(const xAOD::Muon* muon : *muons) {
 	    if (m_selected_mu.get(*muon, sys)){
 	      TLorentzVector p4x = muon->p4();
-	      if(fabs(p4x.Pt()-p4LeadTau.Pt())<0.001){ // matching with pt of muon 
+	      if(fabs(p4x.Pt()-p4Tau[0].Pt())<0.001){ // matching with pt of muon 
 		const xAOD::TrackParticle* ptrk = muon->trackParticle( xAOD::Muon::InnerDetectorTrackParticle );
 		if(ptrk){
-		  ATH_MSG_DEBUG("Dump mu+tau: muon from tau decay pt "<<p4x.Pt()<<" eta "<<p4x.Eta()<<" phi "<<p4x.Phi()<<" charge "<<muon->charge()<<
-		  		" trk index "<<ptrk->index()<<" pt "<<ptrk->pt()<<" eta "<<ptrk->eta()<<" phi "<<ptrk->phi()<<" charge "<<ptrk->charge());
+		  ATH_MSG_DEBUG("Dump mu+tau: muon from tau decay pt "<<p4x.Pt()<<" eta "<<p4x.Eta()<<" phi "<<p4x.Phi()<<" charge "
+				<<muon->charge()<<" trk index "<<ptrk->index()<<" pt "<<ptrk->pt()<<" eta "<<ptrk->eta()<<" phi "
+				<<ptrk->phi()<<" charge "<<ptrk->charge());
 		}
 	      }
 	    }
@@ -492,8 +488,8 @@ namespace HLLTT
 	  for(const auto& tpLink : tpLinks){
 	    if( !tpLink.isValid() ) continue;	    
 	    const xAOD::TrackParticle* ptrk =(*tpLink)->track();
-	    ATH_MSG_DEBUG("Dump mu+tau: tracks from tau decay nProng "<<tau0->nTracks()<<" pt "<<p4SubleadTau.Pt()<<" eta "<<p4SubleadTau.Eta()<<
-	    		  " phi "<<p4SubleadTau.Phi()<<" charge "<<tau0->charge()<<" trk "<<nTrkTau<<" index "<<ptrk->index()<<" pt "<<
+	    ATH_MSG_DEBUG("Dump mu+tau: tracks from tau decay nProng "<<tau0->nTracks()<<" pt "<<p4Tau[1].Pt()<<" eta "<<p4Tau[1].Eta()<<
+	    		  " phi "<<p4Tau[1].Phi()<<" charge "<<tau0->charge()<<" trk "<<nTrkTau<<" index "<<ptrk->index()<<" pt "<<
 	    		  ptrk->pt()<<" eta "<<ptrk->eta()<<" phi "<<ptrk->phi()<<" charge "<<ptrk->charge());
 	    ++nTrkTau;
 	  }
@@ -511,27 +507,29 @@ namespace HLLTT
         m_Fbranches.at("dphimetatt").set(*event, dphimetatt, sys);
 	m_Ibranches.at("osatt").set(*event, osatt, sys);
 	ditau_index = isr>0?(iatau1 + 10*iatau2 + 100*isr+1000*recid):100*isr;
-	// mmc 
-	TLorentzVector mmc_vec(0,0,0,0);
-	mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
-			     m_mmc_eta.get(*event, sys),
-			     m_mmc_phi.get(*event, sys),
-			     m_mmc_m.get(*event, sys));
-	mmc_maa = (p4lep[iamu1]+p4lep[iamu2]+mmc_vec).M();
-	mmc_ptaa = (p4lep[iamu1]+p4lep[iamu2]+mmc_vec).Pt();
-	mmc_draa = (p4lep[iamu1]+p4lep[iamu2]).DeltaR(mmc_vec);
 	mmc_types = m_mmc_types.get(*event, sys);
-	if(ditau_index != mmc_types){ 
-	  ATH_MSG_WARNING("Ditau idexes in MMC do not match with selected: ditau_indexes "
-			  << ditau_index<<", mmc_types "<<mmc_types);
+	if(ditau_index != mmc_types){
+          ATH_MSG_WARNING("Ditau idexes in MMC do not match with selected: ditau_indexes "
+                          << ditau_index<<", mmc_types "<<mmc_types);
+        }
+	// do_mmc is set
+	if(m_mmc_status.get(*event, sys)>-1){
+	  TLorentzVector mmc_vec(0,0,0,0);
+	  mmc_vec.SetPtEtaPhiM(m_mmc_pt.get(*event, sys),
+			       m_mmc_eta.get(*event, sys),
+			       m_mmc_phi.get(*event, sys),
+			       m_mmc_m.get(*event, sys));
+	  mmc_maa = (p4lep[iamu1]+p4lep[iamu2]+mmc_vec).M();
+	  mmc_ptaa = (p4lep[iamu1]+p4lep[iamu2]+mmc_vec).Pt();
+	  mmc_draa = (p4lep[iamu1]+p4lep[iamu2]).DeltaR(mmc_vec);
+	  if(mmc_types>0)ATH_MSG_DEBUG(" mmc dump: event "<<event->eventNumber()<<" status "<<m_mmc_status.get(*event, sys)<<" mmc pt "
+				       <<m_mmc_pt.get(*event, sys)<<" mmc eta "<<m_mmc_eta.get(*event, sys)<<" mmc phi "<<m_mmc_phi.get(*event, sys)
+				       <<" mmc m "<<m_mmc_m.get(*event, sys)<<" mmc maa "<<mmc_maa<<" mmc ptaa "<<mmc_ptaa<<" mmc draa "<<mmc_draa
+				       <<" maa "<<maa<<" ptaa "<<ptaa<<" draa "<<draa);
+	  m_Fbranches.at("mmc_maa").set(*event, mmc_maa, sys);
+	  m_Fbranches.at("mmc_ptaa").set(*event, mmc_ptaa, sys);
+	  m_Fbranches.at("mmc_draa").set(*event, mmc_draa, sys);
 	}
-	if(mmc_types>0)ATH_MSG_DEBUG(" mmc dump: event "<<event->eventNumber()<<" status "<<m_mmc_status.get(*event, sys)<<" mmc pt "
-			<<m_mmc_pt.get(*event, sys)<<" mmc eta "<<m_mmc_eta.get(*event, sys)<<" mmc phi "<<m_mmc_phi.get(*event, sys)
-			<<" mmc m "<<m_mmc_m.get(*event, sys)<<" mmc maa "<<mmc_maa<<" mmc ptaa "<<mmc_ptaa<<" mmc draa "<<mmc_draa
-			<<" maa "<<maa<<" ptaa "<<ptaa<<" draa "<<draa);
-	m_Fbranches.at("mmc_maa").set(*event, mmc_maa, sys);
-	m_Fbranches.at("mmc_ptaa").set(*event, mmc_ptaa, sys);
-	m_Fbranches.at("mmc_draa").set(*event, mmc_draa, sys);
       }
     }
 

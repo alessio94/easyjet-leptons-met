@@ -3,8 +3,8 @@
 */
 
 // Always protect against multiple includes!
-#ifndef LLTTANALYSIS_MMCDECORATORALG
-#define LLTTANALYSIS_MMCDECORATORALG
+#ifndef LLTTANALYSIS_LEPTONPAIRDECORATORALG
+#define LLTTANALYSIS_LEPTONPAIRDECORATORALG
 
 #include <memory>
 
@@ -30,11 +30,11 @@ namespace HLLTT
 {
 
   /// \brief An algorithm for counting containers
-  class MMCDecoratorAlg final : public EL::AnaAlgorithm
+  class LeptonPairDecoratorAlg final : public EL::AnaAlgorithm
   {
     /// \brief The standard constructor
 public:
-    MMCDecoratorAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    LeptonPairDecoratorAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -50,7 +50,7 @@ private:
 
     CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "llttAnalysisJets_%SYS%", "Jet container to read" };
-    
+
     CP::SysReadHandle<xAOD::ElectronContainer>
       m_electronHandle{ this, "electrons", "llttAnalysisElectrons_%SYS%", "Electron container to read" };
 
@@ -65,6 +65,9 @@ private:
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
+
+    Gaudi::Property<bool> m_doMMCfit
+      { this, "doMMCfit", false, "Do MMC fit for di-tau pairs" };
 
     CP::SysReadDecorHandle<bool> m_pass_baseline_LepLep {this, "passLepLep", "", "events pass (baseline) LepLep"};
     CP::SysReadDecorHandle<bool> m_pass_baseline_LepHad {this, "passLepHad", "", "events pass (baseline) LepHad"};

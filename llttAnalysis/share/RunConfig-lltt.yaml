@@ -4,8 +4,9 @@ include: EasyjetHub/base-config.yaml
 do_lltt_analysis: true
 channels: ["LepLep", "LepHad", "HadHad"]
 
-# Toggles to bypass event selection
+# Toggles to bypass event selection for signal events 
 bypass: false
+# do AntiTau selection if needed
 doAntiTau: false
 
 # Toggles for object types
@@ -15,7 +16,7 @@ do_muons: true
 do_electrons: true
 do_taus: true
 do_met : true
-do_mmc : true
+do_mmc : false
 do_baseline : true
 
 # Decay mode considered for truth decoration
@@ -26,8 +27,6 @@ Truth:
 Small_R_jet:
   # btagging nominal working point
   btag_wp: "DL1dv01_FixedCutBEff_77"
-  amount: 3
-  variables_int_allJets: ["truthLabel"]
 
 Electron:
   forceFullSimConfig: true
@@ -52,10 +51,11 @@ Tau:
   addMuonRM: true
   amount: 2
   variables: ["RNN"]
-  variables_int: ["pdgid", "truthType", "EleRNN_WP"]
+  variables_int: ["pdgid", "truthOrig", "truthType", "EleRNN_WP"]
 
 Lepton:
   amount: 2
+  variables_int: ["truthOrig", "truthType"]
 
 # list of triggers per year to consider
 Trigger:
@@ -75,14 +75,4 @@ ttree_output:
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:
-    small_R_jets: 'container_names.output.reco4PFlowJet'
-    muons: 'container_names.output.muons'
-    electrons: 'container_names.output.electrons'
-    taus: 'container_names.output.taus'
     met : 'container_names.output.met'
-  collection_options:
-    small_R_jets:
-      btag_info: true
-  truth_outputs:
-    small_R_jets: 'container_names.input.truth4Jet'
-    higgs_particle: 'container_names.output.truthHHParticles'
