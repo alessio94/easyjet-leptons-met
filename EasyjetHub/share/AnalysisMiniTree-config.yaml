@@ -30,6 +30,7 @@ collection_options:
     truth_labels: false
     btag_details: true
     run_selection: false
+    no_bjet_calib_p4: false
 
   taus:
     score_branches: false

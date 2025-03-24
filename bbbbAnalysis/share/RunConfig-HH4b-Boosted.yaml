@@ -23,7 +23,7 @@ Large_R_jet:
   min_pT: 200.e+3
   max_pT: 3000.e+3
   max_eta: 2.0
-  runMuonJetPtCorr: false
+  runMuonJetPtCorr: true
   amount_leadingjet: 2
   GN2X_hbb_wps:
     - "FlatMassQCDEff_0p25"
@@ -70,6 +70,7 @@ ttree_output:
     large_R_jets:
       truth_labels: true
       substructure_info: true
+      no_bjet_calib_p4: true
       run_selection: true
   truth_outputs:
     small_R_jets: 'container_names.input.truth4Jet'

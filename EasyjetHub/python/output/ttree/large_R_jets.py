@@ -40,7 +40,18 @@ def get_large_R_jet_branches(
             large_R_jet_branches.variables += ["passesOR_%SYS%"]
 
     if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
-        large_R_jet_branches.variables += ["n_muons_%SYS%"]
+        if tree_flags.collection_options.large_R_jets.no_bjet_calib_p4:
+            large_R_jet_branches.variables += ["n_muons_%SYS%"]
+
+            large_R_jet_branches.variables += [
+                f"NoBJetCalibMomentum_{var}"
+                for var in ["pt", "eta", "phi", "m"]
+            ]
+            if tree_flags.slim_variables_with_syst:
+                large_R_jet_branches.syst_only_for += [
+                    "NoBJetCalibMomentum_pt",
+                    "NoBJetCalibMomentum_m",
+                ]
 
     if flags.Input.isMC and tree_flags.collection_options.large_R_jets.truth_labels:
         large_R_jet_branches.variables += [
