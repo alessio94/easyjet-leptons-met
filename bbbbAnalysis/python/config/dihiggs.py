@@ -66,6 +66,7 @@ def dihiggs_cfg(
                 minPt=200. * Units.GeV,
                 maxPt=3000. * Units.GeV,
                 maxMass=600. * Units.GeV,
+                minMass=40. * Units.GeV,
                 maxEta=2.0,
                 jetAmount=2,
             )

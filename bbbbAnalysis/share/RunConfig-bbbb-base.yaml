@@ -1,5 +1,7 @@
 include: EasyjetHub/base-config.yaml
 
+systematics_suffix_separator: "___"
+
 # Which analysis to consider
 do_resolved_dihiggs: false
 do_boosted_dihiggs: false

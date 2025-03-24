@@ -94,6 +94,16 @@ def hh4b_job_cfg():
         bbbb_branches += extra_orth_branches
     if len(flags.Analysis.CutList) > 0:
         bbbb_branches += pass_branches(flags)
+    
+    # Speicially modify GRL for atlas-schema requirement
+    # Have to store the decoration again
+    if flags.Analysis.GRL.store_decoration:
+        from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
+        for key in getGoodRunsLists().keys():
+            for year in flags.Analysis.Years:
+                if f"GRL{year}" in key:
+                    bbbb_branches += [f"EventInfo.{key} -> "
+                                      + key.replace(f"GRL{year}", f"GRL_{year}")]
 
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
