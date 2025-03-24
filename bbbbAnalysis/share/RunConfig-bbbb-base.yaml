@@ -4,6 +4,11 @@ include: EasyjetHub/base-config.yaml
 do_resolved_dihiggs: false
 do_boosted_dihiggs: false
 
+### tagging jets vs RNN strategy
+### false: will not select vbf jets 
+### true : will select vbf jets (load VBF-RNN)
+UseVBFRNN : false
+
 pairingStrategy: "minDeltaR"
 kinematicGroup: "compressed"
 

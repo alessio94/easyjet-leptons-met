@@ -8,7 +8,10 @@ from EasyjetHub.output.ttree.selected_objects import (
 )
 
 
-def resolved_cfg(flags, smalljetkey):
+def resolved_cfg(flags, smalljetkey, float_variables=None):
+    if not float_variables:
+        float_variables = []
+
     cfg = ComponentAccumulator()
 
     # This is a jet trigger scale factor block
@@ -84,8 +87,10 @@ def resolved_cfg(flags, smalljetkey):
         cfg.addEventAlgo(
             CompFactory.HH4B.BaselineVarsResolvedAlg(
                 "FinalVarsResolvedAlg_" + btag_wp,
+                UseVBFRNN=flags.Analysis.UseVBFRNN,
                 smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_sys,
                 bTagWP=btag_wp,
+                floatVariableList=float_variables,
             )
         )
 
@@ -100,8 +105,26 @@ def resolved_cfg(flags, smalljetkey):
     return cfg
 
 
+def get_BaselineVarsResolvedAlg_variables(flags):
+    float_variable_names = []
+
+    objects = []
+    if flags.Analysis.UseVBFRNN:
+        objects += ["resolved_RNNJets_Jet1", "resolved_RNNJets_Jet2"]
+
+    for object in objects:
+        for var in ["m", "pt", "eta", "phi"]:
+            float_variable_names.append(f"{object}_{var}")
+
+    return float_variable_names
+
+
 def resolved_branches(flags):
     branches = []
+    float_variable_names = []
+
+    baseline_float_variables = get_BaselineVarsResolvedAlg_variables(flags)
+    float_variable_names += baseline_float_variables
 
     # These are the variables always saved with the objects selected by the analysis
     # This is tunable with the flags amount and variables
@@ -176,4 +199,11 @@ def resolved_branches(flags):
                         f'->{jet_coll}_{trig}_{matchLevel}SF_syst_1up',
                     ]
 
-    return branches
+    # VBF tagger
+    if flags.Analysis.UseVBFRNN:
+        vars = ['RNNScore', 'nRNNJets']
+        reg = 'resolved'
+        for var in vars:
+            branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}_%SYS%']
+
+    return branches, float_variable_names

@@ -85,9 +85,11 @@ def hh4b_job_cfg():
     # custom BranchManagers
     bbbb_branches = []
     if flags.Analysis.do_boosted_dihiggs:
-        bbbb_branches += boosted_branches(flags)
+        bbbb_extra_branches, float_variable_names = boosted_branches(flags)
+        bbbb_branches += bbbb_extra_branches
     if flags.Analysis.do_resolved_dihiggs:
-        bbbb_branches += resolved_branches(flags)
+        bbbb_extra_branches, float_variable_names = resolved_branches(flags)
+        bbbb_branches += bbbb_extra_branches 
     if flags.Analysis.orthogonality.do_orth_check:
         bbbb_branches += extra_orth_branches
     if len(flags.Analysis.CutList) > 0:

@@ -1,7 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
-from bbbbAnalysis.config.boosted import boosted_cfg
-from bbbbAnalysis.config.resolved import resolved_cfg
+from bbbbAnalysis.config.boosted import boosted_cfg, boosted_branches
+from bbbbAnalysis.config.resolved import resolved_cfg, resolved_branches
 from bbbbAnalysis.config.boost_histograms import histograms_cfg
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.output.ttree.selected_objects import (
@@ -18,10 +18,12 @@ def dihiggs_cfg(
     cfg = ComponentAccumulator()
 
     couting_jet_container = ""
+    couting_bjet_container = ""
     btag_name = ""
     if flags.Analysis.do_small_R_jets:
         smalljetkey = flags.Analysis.container_names.output.reco4PFlowJet
         couting_jet_container = "resolvedAnalysisSmallRJets_%SYS%"
+        couting_bjet_container = "resolvedAnalysisSmallRBJets_%SYS%"
         if flags.Analysis.Small_R_jet.btag_wp != "":
             btag_name = f"ftag_select_{flags.Analysis.Small_R_jet.btag_wp}"
         # Used only for counting
@@ -32,6 +34,18 @@ def dihiggs_cfg(
                 containerOutKey=couting_jet_container,
                 bTagWPDecorName=btag_name,
                 selectBjet=False,
+                minPt=20. * Units.GeV,
+                maxEta=2.5,
+                minimumAmount=4,
+            )
+        )  # -1 means ignores this
+        cfg.merge(
+            JetSelectorAlgCfg(
+                flags, name="SmallRBJetSelectorAlg",
+                containerInKey=smalljetkey,
+                containerOutKey=couting_bjet_container,
+                bTagWPDecorName=btag_name,
+                selectBjet=True,
                 minPt=20. * Units.GeV,
                 maxEta=2.5,
                 minimumAmount=4,
@@ -57,6 +71,39 @@ def dihiggs_cfg(
             )
         )  # -1 means ignores this
 
+    if flags.Analysis.UseVBFRNN:
+        vbftagger = CompFactory.VBFTagger("VBFTaggerTool", modelTag="VBFRNNv0")
+
+        # VBF-RNN tagger: resolved
+        if flags.Analysis.do_resolved_dihiggs:
+            cfg.addEventAlgo(
+                CompFactory.VBFTaggerAlgSys(
+                    "VBFTaggerAlg_resolved",
+                    VBFTagger=vbftagger,
+                    containerAllJetsKey="resolvedAnalysisSmallRJets_%SYS%",
+                    containerSigLargeRJetsKey="resolvedAnalysisSmallRBJets_%SYS%",
+                    OnlyFirstLargeRJet=False,
+                    pTCut=20.e3,
+                    nMaxJets=2,
+                    DecTag="_resolved"
+                )
+            )
+
+        # VBF-RNN tagger: boosted
+        if flags.Analysis.do_boosted_dihiggs:
+            cfg.addEventAlgo(
+                CompFactory.VBFTaggerAlgSys(
+                    "VBFTaggerAlg_boosted",
+                    VBFTagger=vbftagger,
+                    containerAllJetsKey="resolvedAnalysisSmallRJets_%SYS%",
+                    containerSigLargeRJetsKey="boostedAnalysisLargeRJets_%SYS%",
+                    OnlyFirstLargeRJet=False,
+                    pTCut=20.e3,
+                    nMaxJets=2,
+                    DecTag="_boosted"
+                )
+            )
+
     selection_name = flags.Analysis.selection_name
     triggers = flags.Analysis.TriggerChains
     triggers = [trigger.replace(".", "p").replace("-", "_") for trigger in triggers]
@@ -78,19 +125,23 @@ def dihiggs_cfg(
         )
 
     if flags.Analysis.do_resolved_dihiggs:
+        bbbb_extra_branches, float_variable_names = resolved_branches(flags)
         cfg.merge(
             resolved_cfg(
                 flags,
                 smalljetkey=smalljetkey,
+                float_variables=float_variable_names,
             )
         )
         cfg.merge(event_counter_cfg("n_resolved"))
 
     if flags.Analysis.do_boosted_dihiggs:
+        bbbb_extra_branches, float_variable_names = boosted_branches(flags)
         cfg.merge(
             boosted_cfg(
                 flags,
                 largejetkey=lr10jets_sys,
+                float_variables=float_variable_names,
             )
         )
         cfg.merge(event_counter_cfg("n_merged"))

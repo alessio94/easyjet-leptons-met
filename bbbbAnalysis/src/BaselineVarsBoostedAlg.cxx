@@ -22,6 +22,9 @@ namespace HH4B
     ATH_MSG_INFO("*********************************\n");
 
     ATH_CHECK (m_LargeRJetHandle.initialize(m_systematicsList));
+    if(m_UseVBFRNN){
+      ATH_CHECK (m_RNNjetBoostedHandle.initialize(m_systematicsList));
+    }
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     ATH_CHECK(m_R10TruthLabel.initialize(m_systematicsList, m_LargeRJetHandle));
@@ -55,6 +58,11 @@ namespace HH4B
       const xAOD::JetContainer *largeRjets = nullptr;
       ANA_CHECK (m_LargeRJetHandle.retrieve (largeRjets, sys));
       std::size_t n_largeRjets = largeRjets->size();
+
+      const xAOD::JetContainer *RNNJets= nullptr;
+      if(m_UseVBFRNN) {
+        ANA_CHECK (m_RNNjetBoostedHandle.retrieve (RNNJets, sys));
+      }
 
       // set defaults
       for (const std::string& var : m_Fvars) {
@@ -111,6 +119,31 @@ namespace HH4B
             m_Fdecos.at(prefix+"_truthLabel").set(*eventInfo, truthLabel_i, sys);
           }
         }
+
+        if (m_UseVBFRNN){
+          std::string RNNJets_names = "boosted_RNNJets";
+
+          std::vector<float> rnn_jet_m(2, -99.0f);
+          std::vector<float> rnn_jet_pt(2, -99.0f);
+          std::vector<float> rnn_jet_eta(2, -99.0f);
+          std::vector<float> rnn_jet_phi(2, -99.0f);
+          for(unsigned int j=0; j<std::min(size_t(2),RNNJets->size()); j++) {
+            const xAOD::Jet* RNNJet = RNNJets->at(j);
+            rnn_jet_m[j] = RNNJet->m();
+            rnn_jet_pt[j] = RNNJet->pt();
+            rnn_jet_eta[j] = RNNJet->eta();
+            rnn_jet_phi[j] = RNNJet->phi();
+          }
+
+          for(unsigned int j=0; j<2; j++) {
+            std::string prefix = "Jet"+std::to_string(j+1);
+
+            m_Fdecos.at(RNNJets_names+"_"+prefix+"_m").set(*eventInfo, rnn_jet_m[j], sys);
+            m_Fdecos.at(RNNJets_names+"_"+prefix+"_pt").set(*eventInfo, rnn_jet_pt[j], sys);
+            m_Fdecos.at(RNNJets_names+"_"+prefix+"_eta").set(*eventInfo, rnn_jet_eta[j], sys);
+            m_Fdecos.at(RNNJets_names+"_"+prefix+"_phi").set(*eventInfo, rnn_jet_phi[j], sys);
+          }
+        } // end of RNN jets
       }
     }
     return StatusCode::SUCCESS;

@@ -43,6 +43,7 @@ atlas_add_component(bbbbAnalysis
   TrigCompositeUtilsLib
   PathResolver
   EasyjetHubLib
+  VBFTaggerLib
   TriggerMatchingToolLib
 )
 

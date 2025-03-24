@@ -39,6 +39,8 @@ private:
     CP::SysListHandle m_systematicsList {this};
     CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "smallRContainerInKey", "", "Jet container to read" };
+    CP::SysReadHandle<xAOD::JetContainer> 
+      m_RNNjetResolvedHandle{ this, "RNNJets_resolved", "RNNJets_resolved_%SYS%", "input RNN jets container for resolved 20 GeV" };
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
@@ -66,6 +68,11 @@ private:
       "resolved_DeltaEtaHH_",
     };
     // clang-format on
+  
+    Gaudi::Property<std::vector<std::string>> m_Fvars_RNN
+      {this, "floatVariableList", {}, "Name list of floating variables"};
+    
+  Gaudi::Property<bool> m_UseVBFRNN { this, "UseVBFRNN", false, "Add VBF-RNN jets in ntuples or not" };
   };
 }
 
