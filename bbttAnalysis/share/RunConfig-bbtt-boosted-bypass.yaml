@@ -1,36 +1,5 @@
-include: bbttAnalysis/RunConfig-bbtt-base.yaml
+include: bbttAnalysis/RunConfig-bbtt-boosted.yaml
 
-channels: ["HadHad","LepHad","ZCR","TopEMuCR"]
-
-bypass: true
+bypass: true 
 do_trigger_filtering: false
 splitOutputTree: false
-
-do_large_R_UFO_jets: true
-OverlapRemoval:
-  do_large_R_jets: false
-  do_small_R_jet_large_R_jet: false
-
-Large_R_jet:
-  runMuonJetPtCorr: true
-  GN2X_hbb_wps:
-    - "FlatMassQCDEff_0p25"
-    - "FlatMassQCDEff_0p3"
-    - "FlatMassQCDEff_0p37"
-    - "FlatMassQCDEff_0p46"
-    - "FlatMassQCDEff_0p58"
-    - "FlatMassQCDEff_0p74"
-    - "FlatMassQCDEff_0p94"
-    - "FlatMassQCDEff_1p25"
-    - "FlatMassQCDEff_1p55"
-
-# Update output configs for large-R jets
-ttree_output:
-  reco_outputs:
-    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-  collection_options:
-    large_R_jets:
-      substructure_info: true
-      truth_labels: true
-  truth_outputs:
-    higgs_particle: 'container_names.output.truthHHParticles'

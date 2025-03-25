@@ -80,7 +80,8 @@ namespace HHBBTT
     pass_trigger_DTT_4J12_delayed,
     pass_trigger_DTT_L1Topo_delayed,
     pass_trigger_DBT,
-
+    
+    AT_LEAST_TWO_LRJETS,
     TWO_JETS,
     TWO_BJETS,
     ONE_BJET,

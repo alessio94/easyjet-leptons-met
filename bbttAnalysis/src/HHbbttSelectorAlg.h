@@ -69,12 +69,18 @@ private:
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
+    Gaudi::Property<bool> m_doBoostedAnalysis
+      { this, "doBoostedAnalysis", false, "Run the boosted analysis selection" };
+      
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "bbttAnalysisJets_%SYS%", "Jet container to read" };
     
+    CP::SysReadHandle<xAOD::JetContainer>
+      m_lRjetHandle{ this, "largeRjets", "bbttAnalysisLargeRJets_%SYS%", "Large-R jet container to read" };
+
     CP::SysReadHandle<xAOD::ElectronContainer>
     m_electronHandle{ this, "electrons", "bbttAnalysisElectrons_%SYS%", "Electron container to read" };
 
@@ -94,6 +100,9 @@ private:
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+
+    CP::SysReadDecorHandle<int> 
+    m_Pass_GN2X{this, "GN2X_WP", "", "GN2X_hbb_wp from the bbtt config"}; 
 
     CP::SysReadDecorHandle<unsigned int> m_year
       {this, "year", "dataTakingYear", ""};
@@ -185,6 +194,7 @@ private:
     {HHBBTT::pass_trigger_DTT_L1Topo_delayed, "pass_trigger_DTT_L1Topo_delayed"},
     {HHBBTT::pass_trigger_DBT, "pass_trigger_DBT"},
     {HHBBTT::TWO_JETS, "TWO_JETS"},
+    {HHBBTT::AT_LEAST_TWO_LRJETS, "AT_LEAST_TWO_LRJETS"},
     {HHBBTT::TWO_BJETS, "TWO_BJETS"},
     {HHBBTT::ONE_BJET, "ONE_BJET"},
     {HHBBTT::MTAUTAU_VIS_MASS, "MTAUTAU_VIS_MASS"},
@@ -274,6 +284,7 @@ private:
        const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1,
        const xAOD::Jet* eta_lt2p8_jet0);
 
+    void applyCutFlow(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
     void applySingleLepTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
        const xAOD::Electron* ele, const eleTrigMatchReadDecoMap& ele_trigMatchDecos,

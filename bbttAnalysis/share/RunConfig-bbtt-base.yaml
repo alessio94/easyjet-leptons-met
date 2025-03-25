@@ -8,6 +8,7 @@ do_bbtt_analysis: true
 do_antiID_regions: true
 do_1B_regions: true
 enable_MMC_cut: false
+do_boosted_dihiggs: false
 
 # Toggles to bypass event selection
 bypass: false
@@ -90,7 +91,7 @@ do_trigger_filtering: true
 # use trigger selections in offline algorithms
 do_trigger_offline_filtering: true
 
-#Enable cutflow 
+# Enable cutflow 
 save_cutflow: true
 
 # list of cuts in cutflow
@@ -105,6 +106,7 @@ do_overlap_removal: true
 OverlapRemoval:
   doTauAntiTauJet: true
 
+# Compute high level variables as HH mass etc.
 store_high_level_variables: true
 
 # Include the TTree configuration and update details

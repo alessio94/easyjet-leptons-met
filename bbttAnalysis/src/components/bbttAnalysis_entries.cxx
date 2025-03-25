@@ -1,4 +1,5 @@
 #include "../BaselineVarsbbttAlg.h"
+#include "../BaselineVarsBoostedbbttAlg.h"
 #include "../MMCDecoratorAlg.h"
 #include "../MMCSelectorAlg.h"
 #include "../HHbbttSelectorAlg.h"
@@ -8,6 +9,7 @@
 
 using namespace HHBBTT;
 
+DECLARE_COMPONENT(BaselineVarsBoostedbbttAlg)
 DECLARE_COMPONENT(BaselineVarsbbttAlg)
 DECLARE_COMPONENT(MMCDecoratorAlg)
 DECLARE_COMPONENT(MMCSelectorAlg)

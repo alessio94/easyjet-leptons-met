@@ -33,6 +33,14 @@ namespace HHBBTT
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
+    if(m_doBoostedAnalysis) {
+      ATH_CHECK (m_lRjetHandle.initialize(m_systematicsList));
+    }
+
+    if (!m_Pass_GN2X.empty()) {
+      ATH_CHECK (m_Pass_GN2X.initialize(m_systematicsList, m_lRjetHandle));  
+    }
+
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
@@ -203,9 +211,80 @@ namespace HHBBTT
 
       setThresholds(event, sys);
 
+      //************
+      // jet
+      //************
+
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
+      int n_jets = 0;
+      bool WPgiven = !m_isBtag.empty();
+      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
+          SG::VIEW_ELEMENTS);
+
+      for (const xAOD::Jet *jet : *jets)
+      {
+        if (std::abs(jet->eta()) < 2.5)
+        {
+          n_jets += 1;
+          if (WPgiven)
+          {
+            if (m_isBtag.get(*jet, sys))
+              bjets->push_back(jet);
+          }
+        }
+      }
+
+      // Boosted selection
+      if (m_doBoostedAnalysis) {
+
+        //***************
+        // boosted Jets
+        //***************
+        int n_boosted_jets = 0;
+        const xAOD::JetContainer *lRjets = nullptr;
+        ANA_CHECK (m_lRjetHandle.retrieve (lRjets, sys));
+        n_boosted_jets = lRjets->size();
+
+        int n_boosted_b_jets = 0;
+        int n_boosted_tau_jets = 0;
+        for (const xAOD::Jet *lRjet : *lRjets) {
+            if (m_Pass_GN2X.get(*lRjet, sys)) n_boosted_b_jets++;
+        }
+        // TODO: activate tau Tagging.
+        n_boosted_tau_jets = 1;
+
+        // check there are at least 2 boosted jets
+        bool pass = false;
+        m_bools.at(HHBBTT::AT_LEAST_TWO_LRJETS) = (n_boosted_jets >= 2);
+
+        if (n_boosted_b_jets >= 1 && n_boosted_tau_jets >= 1) {
+          pass = true;
+        }
+
+        // do the CUTFLOW only with sys="" -> NOSYS
+        if (sys.name()=="" && m_saveCutFlow){
+          applyCutFlow(event,sys);
+        }
+
+        // Fill syst-aware output decorators
+        for (auto& [key, var] : m_bools) {
+          m_Bbranches.at(key).set(*event, var, sys);
+        };
+
+        // Prevent selection if bypass
+        if (!m_bypass && !pass ) continue;
+        
+        filter.setPassed(true);
+        
+        // Exit boosted selection
+        continue;
+      }
+      
+      //************
+      // lepton
+      //************
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
 
@@ -218,9 +297,7 @@ namespace HHBBTT
       // Apply selection
       for (auto& [key, value] : m_boolnames) m_bools.at(key) = false;
 
-      //************
-      // lepton
-      //************
+
       int n_leptons_looseId_iso = 0;
       int n_leptons_tightId_iso = 0;
       int n_leptons_tightId_antiiso = 0;
@@ -463,27 +540,6 @@ namespace HHBBTT
 	 m_bools.at(HHBBTT::pass_trigger_DBT));
 
 
-      //************
-      // jet
-      //************
-      int n_jets = 0;
-      bool WPgiven = !m_isBtag.empty();
-      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
-          SG::VIEW_ELEMENTS);
-
-      for (const xAOD::Jet *jet : *jets)
-      {
-        if (std::abs(jet->eta()) < 2.5)
-        {
-          n_jets += 1;
-          if (WPgiven)
-          {
-            if (m_isBtag.get(*jet, sys))
-              bjets->push_back(jet);
-          }
-        }
-      }
-
       bool jet_ptcut_DTT_2016 = false;
       bool jet_ptcut_DTT_4J12 = false;
       bool jet_ptcut_DTT_L1Topo = false;
@@ -717,43 +773,9 @@ namespace HHBBTT
         else if(channel == HHBBTT::AntiIsoLepHad) pass |= m_bools.at(HHBBTT::pass_AntiIsoLepHad);
       }
 
-      //****************
-      // Cutflow
-      //****************
-
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()=="" && m_saveCutFlow){
-
-        // Compute total_events
-        m_total_events+=1;
-        if(m_isMC) m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);
-
-
-        // Count which cuts the event passed
-        for (const auto &cut : m_inputCutKeys) {
-          if(m_bbttCuts.exists(m_boolnames.at(cut))) {
-            m_bbttCuts(m_boolnames.at(cut)).passed = m_bools.at(cut);
-            if (m_bbttCuts(m_boolnames.at(cut)).passed) {
-              m_bbttCuts(m_boolnames.at(cut)).counter += 1;
-              if(m_isMC) m_bbttCuts(m_boolnames.at(cut)).w_counter += m_generatorWeight.get(*event, sys);
-            }
-          }
-        }
-
-        // Check how many consecutive cuts are passed by the event.
-        unsigned int consecutive_cuts = 0;
-        for (size_t i = 0; i < m_bbttCuts.size(); ++i) {
-          if (m_bbttCuts[i].passed)
-            consecutive_cuts++;
-          else
-            break;
-        }
-
-        // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
-        for (unsigned int i=0; i<consecutive_cuts; i++) {
-          m_bbttCuts[i].relativeCounter += 1;
-          if(m_isMC) m_bbttCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
-        }
+        applyCutFlow(event,sys);
       }
 
       // Fill syst-aware output decorators
@@ -789,6 +811,43 @@ namespace HHBBTT
     }
 
     return StatusCode::SUCCESS;
+  }
+
+  void HHbbttSelectorAlg::applyCutFlow(
+    const xAOD::EventInfo* event, const CP::SystematicSet& sys
+  ) { 
+        //****************
+        // Cutflow
+        //****************
+        // Compute total_events
+        m_total_events+=1;
+        if(m_isMC) m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);
+
+        // Count which cuts the event passed
+        for (const auto &cut : m_inputCutKeys) {
+          if(m_bbttCuts.exists(m_boolnames.at(cut))) {
+            m_bbttCuts(m_boolnames.at(cut)).passed = m_bools.at(cut);
+            if (m_bbttCuts(m_boolnames.at(cut)).passed) {
+              m_bbttCuts(m_boolnames.at(cut)).counter += 1;
+              if(m_isMC) m_bbttCuts(m_boolnames.at(cut)).w_counter += m_generatorWeight.get(*event, sys);
+            }
+          }
+        }
+
+        // Check how many consecutive cuts are passed by the event.
+        unsigned int consecutive_cuts = 0;
+        for (size_t i = 0; i < m_bbttCuts.size(); ++i) {
+          if (m_bbttCuts[i].passed)
+            consecutive_cuts++;
+          else
+            break;
+        }
+
+        // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
+        for (unsigned int i=0; i<consecutive_cuts; i++) {
+          m_bbttCuts[i].relativeCounter += 1;
+          if(m_isMC) m_bbttCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
+        }
   }
 
   void HHbbttSelectorAlg::applyTriggerSelection

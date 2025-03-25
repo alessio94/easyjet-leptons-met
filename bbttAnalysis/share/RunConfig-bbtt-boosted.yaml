@@ -1,0 +1,93 @@
+include: bbttAnalysis/RunConfig-bbtt-base.yaml
+
+# Which analysis and channels to consider
+do_bbtt_analysis: false
+do_antiID_regions: false
+do_1B_regions: false
+enable_MMC_cut: false
+do_boosted_dihiggs: true
+
+# split output file
+splitCBK: true
+
+# Toggles for object types
+do_large_R_UFO_jets: true
+do_mmc : false
+
+# Triggers
+Trigger:
+  selection:
+    include: trigger_boosted.yaml
+  # TODO: for the moment no SF are avalailable
+  scale_factor:
+    doSF: false
+  
+# TODO: this is not implemented for the momement in the boosted analysis
+# it tells you which of the many trigger has fired ..
+# do_trigger_offline_filtering: true
+
+# TODO: overlap removal, now disabled
+do_overlap_removal: false
+OverlapRemoval:
+  doTauAntiTauJet: false
+  do_large_R_jets: false 
+  do_small_R_jet_large_R_jet: false
+
+# Update output configs for large-R jets
+ttree_output:
+  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  reco_outputs:
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    taus: 'container_names.output.taus'
+  collection_options:
+    large_R_jets:
+      substructure_info: true
+      truth_labels: true
+      btag_info: true
+      truth_parent_info: true
+      run_selection: true
+    small_R_jets:
+      btag_info: true
+      ruth_parent_info: true
+      no_bjet_calib_p4: true
+      run_selection: true
+  truth_outputs:
+    large_R_jets: 'container_names.input.truth10SoftDropJet'
+    small_R_jets: 'container_names.input.truth4Jet'
+    higgs_particle: 'container_names.output.truthHHParticles'
+    taus: 'container_names.input.truthtaus'
+
+# Enable cutflow 
+save_cutflow: true
+CutList:
+  - AT_LEAST_TWO_LRJETS
+
+Large_R_jet:
+  # correction for the b-jet correction
+  # adding back muon pt inside the large-R jet. 
+  # TODO: Does it work (!?), why in the 4b they have it off ? 
+  runMuonJetPtCorr: true
+
+  # TODO: which working point do we need ??
+  # b-tag efficiency working points, do we have to select just one ?
+  GN2X_hbb_wps:
+    - "FlatMassQCDEff_0p25"
+    - "FlatMassQCDEff_0p3"
+    - "FlatMassQCDEff_0p37"
+    - "FlatMassQCDEff_0p46"
+    - "FlatMassQCDEff_0p58"
+    - "FlatMassQCDEff_0p74"
+    - "FlatMassQCDEff_0p94"
+    - "FlatMassQCDEff_1p25"
+    - "FlatMassQCDEff_1p55"
+  amount_leadingjet: 2 
+Small_R_jet:
+  doL1Matching: false
+  amount_bjet: 0
+
+Tau:
+  amount: 0
+
+Lepton:
+  amount: 0
