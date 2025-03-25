@@ -17,6 +17,7 @@
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
+#include <xAODJet/JetContainer.h>
 
 namespace HZALLYY
 {
@@ -59,10 +60,13 @@ namespace HZALLYY
     CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "AnalysisMuons_%SYS%", "Original Muon container to read" };
 
-     CP::SysReadHandle<xAOD::MuonContainer>
+    CP::SysReadHandle<xAOD::MuonContainer>
       m_llyymuonHandle{ this, "llyymuons", "llyyAnalysisMuons_%SYS%", "Muon container to read" };
 
-     Gaudi::Property<bool> m_saveDummy_ele_SF
+    CP::SysReadHandle<xAOD::JetContainer>
+      m_llyyjetHandle{ this, "Jets", "llyyAnalysisJets_%SYS%", "Jet container to read" };
+    
+    Gaudi::Property<bool> m_saveDummy_ele_SF
       {this, "saveDummyEleSF", false,
 	  "To be used in case no recommendations are available"};
      

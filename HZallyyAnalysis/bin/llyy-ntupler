@@ -52,6 +52,7 @@ def llyy_job_cfg():
                 muonkey=flags.Analysis.container_names.output.muons,
                 electronkey=flags.Analysis.container_names.output.electrons,
                 photonkey=flags.Analysis.container_names.output.photons,
+                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
                 float_variables=float_variable_names,
                 int_variables=int_variable_names,
             ),

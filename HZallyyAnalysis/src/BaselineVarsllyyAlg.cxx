@@ -27,6 +27,7 @@ namespace HZALLYY {
     ATH_CHECK(m_llyyphotonHandle.initialize(m_systematicsList));
     ATH_CHECK(m_llyyelectronHandle.initialize(m_systematicsList));
     ATH_CHECK(m_llyymuonHandle.initialize(m_systematicsList));
+    ATH_CHECK(m_llyyjetHandle.initialize(m_systematicsList));
     ATH_CHECK(m_eventHandle.initialize(m_systematicsList));
     
     if (m_isMC) {
@@ -90,6 +91,9 @@ namespace HZALLYY {
 
       const xAOD::ElectronContainer * electrons = nullptr;
       ANA_CHECK(m_llyyelectronHandle.retrieve(electrons, sys));
+
+      const xAOD::JetContainer *jets = nullptr;
+      ANA_CHECK(m_llyyjetHandle.retrieve (jets, sys));
       
       for (const std::string & string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set( * event, -99., sys);
@@ -104,6 +108,9 @@ namespace HZALLYY {
       // Count photons
       int n_photons = 0;
       n_photons = photons -> size();
+
+      int n_jets = 0;
+      n_jets = jets -> size();
       
       // Photon sector
       // initialize
@@ -162,6 +169,7 @@ namespace HZALLYY {
       m_Ibranches.at("nElectrons").set( * event, n_electrons, sys);
       m_Ibranches.at("nMuons").set( * event, n_muons, sys);
       m_Ibranches.at("nPhotons").set( * event, n_photons, sys);
+      m_Ibranches.at("nJets").set( * event, n_jets, sys);
       
       // Electron sector
       const xAOD::Electron * ele0 = nullptr;
@@ -279,6 +287,8 @@ namespace HZALLYY {
 	m_Fbranches.at("dEtaH_Za").set(*event, Z_ll.Eta() - a_yy.Eta(), sys);
 	
       }
+
+           
     } // 
     
     return StatusCode::SUCCESS;

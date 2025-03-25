@@ -5,13 +5,13 @@ from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
-    PhotonSelectorAlgCfg)
+    PhotonSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
 
-def llyy_cfg(flags, muonkey, electronkey, photonkey,
+def llyy_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
              float_variables=None, int_variables=None):
     if not float_variables:
         float_variables = []
@@ -40,6 +40,13 @@ def llyy_cfg(flags, muonkey, electronkey, photonkey,
     cfg.merge(LeptonOrderingAlgCfg(flags,
                                    containerInEleKey=electronkey,
                                    containerInMuKey=muonkey))
+
+    cfg.merge(JetSelectorAlgCfg(flags,
+                                containerInKey=smalljetkey,
+                                containerOutKey="llyyAnalysisJets_%SYS%",
+                                minPt=20 * Units.GeV,
+                                selectBjet=False))
+
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
     # Selection
@@ -94,7 +101,7 @@ def get_BaselineVarsllyyAlg_variables(flags):
         for var in ["X"]:
             float_variable_names.append(f"{var}{object}")
 
-    int_variable_names += ["nElectrons", "nMuons", "nPhotons"]
+    int_variable_names += ["nElectrons", "nMuons", "nPhotons", "nJets"]
 
     return float_variable_names, int_variable_names
 

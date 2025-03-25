@@ -10,22 +10,19 @@ Truth:
   decayModes: ["bbtt", "bbWW", "bbZZ", "bbyy"]
 
 # Toggles for object types
-do_small_R_jets: false
+do_small_R_jets: true
 do_muons: true
 do_electrons: true
 do_met : false
 do_mmc : false
 do_photons : true
 
-#PNN Score
-do_resonant_PNN: false
-
-#NeutrinoWeighting Config
-NeutrinoWeighting:
-  doNW: false
-
 # Toggles for reconstructed objects decorations
 
+Small_R_jet:
+  min_pT: 20.e+3
+  max_eta: 4.4
+  runBJetPtCalib: false
 
 Electron:
   ID: "MediumLH"
@@ -77,6 +74,7 @@ ttree_output:
     muons: 'container_names.output.muons'
     electrons: 'container_names.output.electrons'
     photons: 'container_names.output.photons'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
 #truth_outputs:
 #  small_R_jets: 'container_names.input.truth4Jet'
 #  higgs_particle: 'container_names.output.truthHHParticles'

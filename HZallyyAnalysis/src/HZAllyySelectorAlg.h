@@ -19,6 +19,7 @@
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
+#include <xAODJet/JetContainer.h>
 
 #include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
@@ -96,7 +97,7 @@ namespace HZALLYY
 
     CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "llyyAnalysisMuons_%SYS%", "Muon container to read" };
-    
+
     CP::SysReadDecorHandle<unsigned int> m_year
       {this, "year", "dataTakingYear", ""};
    
