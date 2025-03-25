@@ -93,6 +93,7 @@ git checkout YourExisitingBranch
 5bis. Optional: in case you need to install Athena to test some changes in the Athena code
 
 ```
+# Inside the easyjet/ directory
 git atlas init-workdir ssh://git@gitlab.cern.ch:7999/$(git config user.name)/athena.git
 cd athena
 git atlas addpkg YourFavoritePackage1 YourFavoritePackage2
