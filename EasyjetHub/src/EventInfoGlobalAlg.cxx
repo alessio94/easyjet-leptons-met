@@ -21,6 +21,13 @@ namespace Easyjet
     m_nVertexDecorKey = "EventInfo.nPrimaryVertices";
     ATH_CHECK(m_nVertexDecorKey.initialize());
 
+    m_PVxDecorKey = "EventInfo.PrimaryVertexPosX";
+    m_PVyDecorKey = "EventInfo.PrimaryVertexPosY";
+    m_PVzDecorKey = "EventInfo.PrimaryVertexPosZ";
+    ATH_CHECK(m_PVxDecorKey.initialize(m_doRetrievePV));
+    ATH_CHECK(m_PVyDecorKey.initialize(m_doRetrievePV));
+    ATH_CHECK(m_PVzDecorKey.initialize(m_doRetrievePV));
+
     for(const auto& period : m_runPeriods){
       m_runPeriodsDecor_keys.emplace_back("EventInfo.is"+std::get<0>(period));
       ATH_CHECK(m_runPeriodsDecor_keys.back().initialize());
@@ -76,6 +83,18 @@ namespace Easyjet
 
     SG::WriteDecorHandle<xAOD::EventInfo, unsigned int> nVertexDecorHandle(m_nVertexDecorKey);
     nVertexDecorHandle(*eventInfo) = vertexContainer->size();
+    
+    // Save the highest SumPt2 primary vertex postion
+    if (m_doRetrievePV) {
+      SG::WriteDecorHandle<xAOD::EventInfo, float> PVxDecorHandle(m_PVxDecorKey);
+      PVxDecorHandle(*eventInfo) = vertexContainer->at(0)->x();
+      
+      SG::WriteDecorHandle<xAOD::EventInfo, float> PVyDecorHandle(m_PVyDecorKey);
+      PVyDecorHandle(*eventInfo) = vertexContainer->at(0)->y();
+      
+      SG::WriteDecorHandle<xAOD::EventInfo, float> PVzDecorHandle(m_PVzDecorKey);
+      PVzDecorHandle(*eventInfo) = vertexContainer->at(0)->z();
+    }
 
     return StatusCode::SUCCESS;
   }

@@ -43,6 +43,9 @@ private:
       {this,"VertexContainerName", "PrimaryVertices"};
 
     SG::WriteDecorHandleKey<xAOD::EventInfo> m_nVertexDecorKey;
+    SG::WriteDecorHandleKey<xAOD::EventInfo> m_PVxDecorKey;
+    SG::WriteDecorHandleKey<xAOD::EventInfo> m_PVyDecorKey;
+    SG::WriteDecorHandleKey<xAOD::EventInfo> m_PVzDecorKey;
     SG::WriteDecorHandleKey<xAOD::EventInfo> m_yearDecorKey;
 
     // References:
@@ -73,6 +76,8 @@ private:
       { this, "isMC", false, "Is this simulation?" };
     Gaudi::Property<std::vector<unsigned int>> m_years
       { this, "Years", false, "which years are running" };  
+    Gaudi::Property<bool> m_doRetrievePV{
+      this, "doRetrievePV", false, "retrive PV information?"};
 
 };
 

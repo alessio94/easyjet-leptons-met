@@ -10,6 +10,7 @@ do_taus: false
 do_met: false
 do_mmc: false
 do_overlap_removal: false
+do_primary_vertex_pos: false
 
 # Other global event configs
 bypass: false
@@ -131,7 +132,9 @@ Muon:
   Iso: ""
   MergeLRT: false
   do_parent_decoration: false
+  do_track_decoration: false
   do_IFF_decoration: false
+  do_reco_decoration: false
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []

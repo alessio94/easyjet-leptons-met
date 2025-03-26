@@ -24,6 +24,15 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             "nPrimaryVertices"
         ]
     )
+    if flags.Analysis.do_primary_vertex_pos:
+        eventinfo_branches.variables += [
+            "beamPosX",
+            "beamPosY",
+            "beamPosZ",
+            "PrimaryVertexPosX",
+            "PrimaryVertexPosY",
+            "PrimaryVertexPosZ",
+        ]
     if flags.Input.isMC:
         eventinfo_branches.variables += [
             "mcChannelNumber",

@@ -28,6 +28,7 @@ def muon_sequence(flags, configAcc):
     configSeq.setOptionValue('.minPt', flags.Analysis.Muon.min_pT)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
     configSeq.setOptionValue('.writeTrackD0Z0', True)
+    configSeq.setOptionValue('.decorateTruth', True)
 
     # PID configuration
     for id, iso in wps:

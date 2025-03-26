@@ -22,7 +22,13 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
     if tree_flags.collection_options.muons.iso_variables:
         muon_branches.variables += [
             "neflowisol20",
-            "ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt500"
+            "neflowisol20_CloseByCorr",
+            "topoetcone20",
+            "topoetcone20_CloseByCorr",
+            "ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt500",
+            "ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt500_CloseByCorr",
+            "ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt1000",
+            "ptvarcone30_Nonprompt_All_MaxWeightTTVA_pt1000_CloseByCorr"
         ]
 
     if flags.Analysis.do_overlap_removal:
@@ -32,8 +38,38 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
         "d0sig_NOSYS", "z0sintheta_NOSYS"
     ]
 
+    if flags.Analysis.Muon.do_reco_decoration:
+        muon_branches.variables += ["author", "muonType"]
+
     if flags.Analysis.Muon.MergeLRT:
         muon_branches.variables += ["isLRT"]
+
+    if flags.Analysis.Muon.do_track_decoration:
+        muon_branches.variables += [
+            "idtrack_pt",
+            "idtrack_eta",
+            "idtrack_phi",
+            "idtrack_d0",
+            "idtrack_z0",
+            "idtrack_chi2OverDoF",
+            "idtrack_nIBL",
+            "idtrack_nPIX",
+            "idtrack_nPIX_shared",
+            "idtrack_nSCT",
+            "idtrack_nSCT_shared",
+            "cbtrack_d0",
+            "cbtrack_z0",
+            "cbtrack_chi2OverDoF",
+            "numberOfPrecisionLayers",
+            "numberOfPrecisionHoleLayers"
+        ]
+
+        if (flags.Input.ProcessingTags == ["StreamDAOD_LLP1"]):
+            muon_branches.variables += [
+                "idtrack_nNextToIBL",
+                "idtrack_nPIX_split",
+                "idtrack_nTRT"
+            ]
 
     id_wps = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
 

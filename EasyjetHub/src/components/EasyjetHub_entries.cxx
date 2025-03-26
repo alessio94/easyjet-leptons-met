@@ -18,6 +18,7 @@
 #include "../STXSAlg.h"
 #include "../MetadataHistAlg.h"
 #include "../ElectronDecoratorAlg.h"
+#include "../MuonTrackDecoratorAlg.h"
 #include "../LeptonOrderingAlg.h"
 
 using namespace Easyjet;
@@ -42,4 +43,5 @@ DECLARE_COMPONENT(TruthWBosonInformationAlg)
 DECLARE_COMPONENT(STXSAlg)
 DECLARE_COMPONENT(MetadataHistAlg)
 DECLARE_COMPONENT(ElectronDecoratorAlg)
+DECLARE_COMPONENT(MuonTrackDecoratorAlg)
 DECLARE_COMPONENT(LeptonOrderingAlg)
