@@ -7,7 +7,6 @@
 #include "../ElectronSelectorAlg.h"
 #include "../TauSelectorAlg.h"
 #include "../EventSelectorAlg.h"
-#include "../TruthParentDecoratorAlg.h"
 #include "../JetDeepCopyAlg.h"
 #include "../TauDecoratorAlg.h"
 #include "../JetDecoratorAlg.h"
@@ -32,7 +31,6 @@ DECLARE_COMPONENT(MuonSelectorAlg)
 DECLARE_COMPONENT(ElectronSelectorAlg)
 DECLARE_COMPONENT(TauSelectorAlg)
 DECLARE_COMPONENT(EventSelectorAlg)
-DECLARE_COMPONENT(TruthParentDecoratorAlg)
 DECLARE_COMPONENT(JetDeepCopyAlg)
 DECLARE_COMPONENT(TauDecoratorAlg)
 DECLARE_COMPONENT(JetDecoratorAlg)
