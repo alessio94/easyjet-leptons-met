@@ -11,6 +11,7 @@ pairingStrategy: "minDeltaR"
 do_small_R_jets: true
 do_large_R_UFO_jets: true
 do_muons: true
+do_photons: true
 do_met: true
 
 Small_R_jet:
@@ -45,6 +46,11 @@ Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
 
+# photon ID and isolation requirements
+Photon:
+  ID: "Tight" # Loose, Tight
+  Iso: "FixedCutLoose"
+
 # list of triggers per year to consider
 Trigger:
   include: bbbbAnalysis/triggers-HH4b.yaml
@@ -60,6 +66,7 @@ do_overlap_removal: true
 
 OverlapRemoval:
   do_small_R_jet_large_R_jet: false
+  do_photon_jet: false
 
 do_CP_systematics: true
 systematics_regex: [".*"]
@@ -83,6 +90,7 @@ ttree_output:
   reco_outputs:
     small_R_jets: 'container_names.output.reco4PFlowJet'
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    photons: 'container_names.output.photons'
     met: 'container_names.output.met'
   collection_options:
     small_R_jets:
@@ -95,6 +103,11 @@ ttree_output:
       truth_labels: true
       substructure_info: true
       run_selection: true
+    photons:
+      shower_shapes: false
+      truth_labels: false
+      iso_variables: false
+      run_selection: false
   truth_outputs:
     small_R_jets: 'container_names.input.truth4Jet'
     large_R_jets: 'container_names.input.truth10SoftDropJet'

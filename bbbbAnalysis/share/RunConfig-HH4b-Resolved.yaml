@@ -10,6 +10,7 @@ pairingStrategy: "minDeltaR"
 # Toggles for object types
 do_small_R_jets: true
 do_muons: true
+do_photons: true
 
 Small_R_jet:
   min_pT: 20.e+3
@@ -25,6 +26,12 @@ Small_R_jet:
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
+
+# photon ID and isolation requirements
+Photon:
+  ID: "Tight" # Loose, Tight
+  Iso: "FixedCutLoose"
+
 
 # list of triggers per year to consider
 Trigger:
@@ -61,6 +68,7 @@ ttree_output:
   # Our overrides. All defaults are off
   reco_outputs:
     small_R_jets: 'container_names.output.reco4PFlowJet'
+    photons: 'container_names.output.photons'
   collection_options:
     small_R_jets:
       truth_parent_info: true
@@ -68,6 +76,11 @@ ttree_output:
       JVT_details: true
       no_bjet_calib_p4: true
       btag_details: true
+    photons:
+      shower_shapes: false
+      truth_labels: false
+      iso_variables: false
+      run_selection: false
   truth_outputs:
     small_R_jets: 'container_names.input.truth4Jet'
     higgs_particle: 'container_names.output.truthHHParticles'

@@ -59,7 +59,6 @@ namespace HH4B
       if(m_UseVBFRNN) {
         ANA_CHECK (m_RNNjetResolvedHandle.retrieve (RNNJets, sys));
       }
-
       // set defaults
       for (const std::string& var : m_vars)
       {

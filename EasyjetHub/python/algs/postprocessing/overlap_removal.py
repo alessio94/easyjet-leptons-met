@@ -86,6 +86,8 @@ def overlap_sequence(flags):
                              flags.Analysis.OverlapRemoval.favourPhotonOverLepton)
     configSeq.setOptionValue('.boostedLeptons',
                              flags.Analysis.OverlapRemoval.do_boostedLeptons)
+    configSeq.setOptionValue('.doPhJetOR',
+                             flags.Analysis.OverlapRemoval.do_photon_jet)
     for objtype, coll in preOR_collections.items():
         configSeq.setOptionValue(f'.{objtype}', coll)
 

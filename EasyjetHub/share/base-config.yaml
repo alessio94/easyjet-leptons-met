@@ -166,6 +166,9 @@ OverlapRemoval:
   # Enable overlap removal for boosted leptons
   # Athena default is false
   do_boostedLeptons: false
+  # Enable overlap removal between jet and photon
+  # Athena default is true
+  do_photon_jet: true
 
 # list of triggers to apply
 # "Auto" configures mc from the r-tag, data from year, e.g. data22
