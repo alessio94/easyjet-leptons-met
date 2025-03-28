@@ -15,7 +15,7 @@ def jet_decor_cfg(flags, **kwargs):
             or flags.Analysis.Small_R_jet.doL1Matching):
         kwargs.setdefault("doHLTMatching", flags.Analysis.Small_R_jet.doHLTMatching)
         kwargs.setdefault("doL1Matching", flags.Analysis.Small_R_jet.doL1Matching)
-        kwargs.setdefault("triggerList", flags.Analysis.TriggerChains)
+        kwargs.setdefault("triggerList", flags.Analysis.TriggerChainsDeco)
         from TrigDecisionTool.TrigDecisionToolConfig import TrigDecisionToolCfg
         kwargs.setdefault("TrigDecisionTool", cfg.getPrimaryAndMerge(
             TrigDecisionToolCfg(flags)))
