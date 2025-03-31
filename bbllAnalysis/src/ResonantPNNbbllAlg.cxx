@@ -51,35 +51,35 @@ namespace HHBBLL
     //
     if(m_run_Run2_train) { //Use Run2 trainings for SR1 and SR2
       //SR1
-      std::ifstream input_stream_pnn_sr1_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run2_SR1.json"));
+      std::ifstream input_stream_pnn_sr1_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SR1_Run2_A.json"));
       if(!input_stream_pnn_sr1_cv1.is_open()) {
-	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetA_Run2_SR1.json");
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SR1_Run2_A.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr1_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run2_SR1.json"));
+      std::ifstream input_stream_pnn_sr1_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SR1_Run2_B.json"));
       if(!input_stream_pnn_sr1_cv2.is_open()) {
-	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetB_Run2_SR1.json");
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SR1_Run2_B.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr1_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run2_SR1.json"));
+      std::ifstream input_stream_pnn_sr1_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SR1_Run2_C.json"));
       if(!input_stream_pnn_sr1_cv3.is_open()) {
-	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetC_Run2_SR1.json");
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SR1_Run2_C.json");
 	return StatusCode::FAILURE;
       }
       //SR2
-      std::ifstream input_stream_pnn_sr2_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run2_SR2.json"));
+      std::ifstream input_stream_pnn_sr2_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SR2_Run2_A.json"));
       if(!input_stream_pnn_sr2_cv1.is_open()) {
-	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetA_Run2_SR2.json");
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SR2_Run2_A.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr2_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run2_SR2.json"));
+      std::ifstream input_stream_pnn_sr2_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SR2_Run2_B.json"));
       if(!input_stream_pnn_sr2_cv2.is_open()) {
-	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetB_Run2_SR2.json");
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SR2_Run2_B.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr2_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run2_SR2.json"));
+      std::ifstream input_stream_pnn_sr2_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SR2_Run2_C.json"));
       if(!input_stream_pnn_sr2_cv3.is_open()) {
-	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SetC_Run2_SR2.json");
+	ATH_MSG_ERROR("Could not open Run2 bbllAnalysis/PNN_SR2_Run2_C.json");
 	return StatusCode::FAILURE;
       }
       m_model_PNN_setA_SR1_Run2 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr1_cv1));
@@ -91,35 +91,35 @@ namespace HHBBLL
     }
     else { //Run3 trainings
       //SR1
-      std::ifstream input_stream_pnn_sr1_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run3_SR1.json"));
+      std::ifstream input_stream_pnn_sr1_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SR1_Run3_A.json"));
       if(!input_stream_pnn_sr1_cv1.is_open()) {
-	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetA_Run3_SR1.json");
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SR1_Run3_A.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr1_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run3_SR1.json"));
+      std::ifstream input_stream_pnn_sr1_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SR1_Run3_B.json"));
       if(!input_stream_pnn_sr1_cv2.is_open()) {
-	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetB_Run3_SR1.json");
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SR1_Run3_B.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr1_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run3_SR1.json"));
+      std::ifstream input_stream_pnn_sr1_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SR1_Run3_C.json"));
       if(!input_stream_pnn_sr1_cv3.is_open()) {
-	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetC_Run3_SR1.json");
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SR1_Run3_C.json");
 	return StatusCode::FAILURE;
       }
       //SR2
-      std::ifstream input_stream_pnn_sr2_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SetA_Run3_SR2.json"));
+      std::ifstream input_stream_pnn_sr2_cv1(PathResolverFindCalibFile("bbllAnalysis/PNN_SR2_Run3_A.json"));
       if(!input_stream_pnn_sr2_cv1.is_open()) {
-	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetA_Run3_SR2.json");
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SR2_Run3_A.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr2_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SetB_Run3_SR2.json"));
+      std::ifstream input_stream_pnn_sr2_cv2(PathResolverFindCalibFile("bbllAnalysis/PNN_SR2_Run3_B.json"));
       if(!input_stream_pnn_sr2_cv2.is_open()) {
-	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetB_Run3_SR2.json");
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SR2_Run3_B.json");
 	return StatusCode::FAILURE;
       }
-      std::ifstream input_stream_pnn_sr2_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SetC_Run3_SR2.json"));
+      std::ifstream input_stream_pnn_sr2_cv3(PathResolverFindCalibFile("bbllAnalysis/PNN_SR2_Run3_C.json"));
       if(!input_stream_pnn_sr2_cv3.is_open()) {
-	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SetC_Run3_SR2.json");
+	ATH_MSG_ERROR("Could not open Run3 bbllAnalysis/PNN_SR2_Run3_C.json");
 	return StatusCode::FAILURE;
       }
       m_model_PNN_setA_SR1_Run3 = std::make_unique<lwt::LightweightGraph> (lwt::parse_json_graph(input_stream_pnn_sr1_cv1));

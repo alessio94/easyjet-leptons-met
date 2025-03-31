@@ -16,4 +16,4 @@ do_resonant_PNN: true
 
 run_Run2_train: true
 
-mX_values: [251, 260, 300, 400, 500, 600, 800, 1000]
+mX_values: [251, 260, 300, 400, 500, 600, 800, 1000, 1500, 3000]
