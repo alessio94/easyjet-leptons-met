@@ -27,7 +27,7 @@ easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --noEmail \
     --nCore 16 \
     --memory 4000 \
-    --HDBSProductionRole
+    --ProductionRole HMBS
 
 #data
 easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/data_Run2_p6490.txt \
@@ -37,4 +37,4 @@ easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/d
     --noTag \
     --mergeOutput \
     --noEmail \
-    --HDBSProductionRole
+    --ProductionRole HMBS

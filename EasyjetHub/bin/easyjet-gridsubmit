@@ -106,9 +106,10 @@ def main():
         help="Don't send panda emails",
     )
     parser.add_argument(
-        "--HDBSProductionRole",
-        action="store_true",
-        help="Run with HDBS production role",
+        "--ProductionRole",
+        type=str,
+        choices=["HMBS", "HIGP"],
+        help="Run with production role",
     )
     parser.add_argument(
         "--framework",
@@ -239,8 +240,8 @@ def main():
         else:
             dsid = f"{ds_name_split[0]}.{ds_name_split[1]}"
         output_ds_name = ""
-        if args.HDBSProductionRole:
-            output_ds_name = "group.phys-hdbs.{0}.{1}.{2}".format(campaign, dsid, ds_tags)
+        if args.ProductionRole:
+            output_ds_name = "group.phys-{0}.{1}.{2}.{3}".format(args.ProductionRole.lower(), campaign, dsid, ds_tags)
         else:
             if 'Delayed' in ds_name:
                 output_ds_name = "user.{0}.{1}.delayed_{2}.{3}".format(grid_nickname, campaign, dsid, ds_tags)
@@ -271,9 +272,9 @@ def main():
             "--notExpandInDS",
             "--exec", exec_cmd,
         ]
-        if args.HDBSProductionRole:
+        if args.ProductionRole:
             cmd += [
-                "--voms", "atlas:/atlas/phys-hdbs/Role=production",
+                "--voms", "atlas:/atlas/phys-{0}/Role=production".format(args.ProductionRole.lower()),
                 "--official",
             ]
 

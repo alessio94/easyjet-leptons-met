@@ -42,7 +42,7 @@ for configTag in "${configTags[@]}"; do
         --exec ${executable} \
         --campaign ${campaignName} \
         --noTag \
-        --HDBSProductionRole
+        --ProductionRole HIGP
 
     #mc pure_lep
     for mc_file in "${mc_list[@]}"; do
@@ -53,5 +53,5 @@ for configTag in "${configTags[@]}"; do
         --exec ${executable} \
         --campaign ${campaignName} \
         --noTag \
-        --HDBSProductionRole # --noSubmit
+        --ProductionRole HIGP
 done

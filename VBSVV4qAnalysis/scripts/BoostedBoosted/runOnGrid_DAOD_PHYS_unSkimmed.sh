@@ -22,7 +22,7 @@ easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
     --noTag \
     --mergeOutput \
     --noEmail \
-    --HDBSProductionRole
+    --ProductionRole HMBS
 
 #data
 easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/data_Run2_p6266.txt \
@@ -32,5 +32,5 @@ easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/data_Ru
     --noTag \
     --mergeOutput \
     --noEmail \
-    --HDBSProductionRole
+    --ProductionRole HMBS
  

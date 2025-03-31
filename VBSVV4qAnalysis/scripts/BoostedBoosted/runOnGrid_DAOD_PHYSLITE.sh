@@ -16,7 +16,7 @@ easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
     --noTag \
     --mergeOutput \
     --noEmail \
-    --HDBSProductionRole
+    --ProductionRole HMBS
 
 #data
 easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/data_Run2_p6266.txt \
@@ -26,5 +26,5 @@ easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYSLITE/dat
     --noTag \
     --mergeOutput \
     --noEmail \
-    --HDBSProductionRole
+    --ProductionRole HMBS
 
