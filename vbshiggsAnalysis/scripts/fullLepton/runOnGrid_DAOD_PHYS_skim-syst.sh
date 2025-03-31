@@ -25,7 +25,6 @@ easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
     --mergeOutput \
     --nGBperJob 2 \
     --noEmail \
-    --nCore 16 \
     --memory 4000 \
     --ProductionRole HMBS
 

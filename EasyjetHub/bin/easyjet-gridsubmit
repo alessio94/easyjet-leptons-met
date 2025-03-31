@@ -80,9 +80,6 @@ def main():
         "--nFiles", default=None, help="How many files to run on"
     )
     parser.add_argument(
-        "--nCore", default=None, help="number of CPU cores"
-    )
-    parser.add_argument(
         "--memory", default=None, help="How many MB of memory per core to request"
     )
     parser.add_argument(
@@ -171,8 +168,6 @@ def main():
         submit_opts["maxNFilesPerJob"] = args.maxNFilesPerJob   
     if args.nFiles is not None:
         submit_opts["nFiles"] = args.nFiles
-    if args.nCore is not None:
-        submit_opts["nCore"] = args.nCore
     if args.memory is not None:
         submit_opts["memory"] = args.memory
     if args.mergeOutput:
