@@ -24,6 +24,7 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include "NeutrinoWeightingTool.h"
+#include <xAODTruth/TruthParticleContainer.h>
 using namespace lwt;
 namespace HHBBLL
 {
@@ -87,20 +88,33 @@ namespace HHBBLL
     //
     const std::string m_PNN_ScoreLabel_SR1 = "PNN_Score";
     const std::string m_PNN_ScoreLabel_SR2 = "PNN_Score_SR2";
+    const std::string m_PNN_ScoreLabel_SR1_SM = "PNN_Score_SR1_SM";
+    const std::string m_PNN_ScoreLabel_SR2_SM = "PNN_Score_SR2_SM";
+    const std::string m_DNN_ScoreLabel_SR1 = "DNN_Score_SR1";
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA_SR1_Run2;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB_SR1_Run2;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC_SR1_Run2;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA_SR2_Run2;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB_SR2_Run2;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC_SR2_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_DNN_setA_SR1_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_DNN_setB_SR1_Run2;
+    std::unique_ptr<lwt::LightweightGraph> m_model_DNN_setC_SR1_Run2;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA_SR1_Run3;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB_SR1_Run3;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC_SR1_Run3;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setA_SR2_Run3;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setB_SR2_Run3;
     std::unique_ptr<lwt::LightweightGraph> m_model_PNN_setC_SR2_Run3;
+    std::unique_ptr<lwt::LightweightGraph> m_model_DNN_setA_SR1_Run3;
+    std::unique_ptr<lwt::LightweightGraph> m_model_DNN_setB_SR1_Run3;
+    std::unique_ptr<lwt::LightweightGraph> m_model_DNN_setC_SR1_Run3;
     std::map<std::string, double> pnn_inputs_SR1;
     std::map<std::string, double> pnn_inputs_SR2;
+    std::map<std::string, double> dnn_inputs_SR1;
+    double m_bbllmet_min = std::numeric_limits<double>::max();
+    double m_bbllmet_max = std::numeric_limits<double>::lowest();
+
   };
 }
 #endif
