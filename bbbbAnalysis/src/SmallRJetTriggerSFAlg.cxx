@@ -151,21 +151,21 @@ namespace HH4B
           trig,
           CP::SysWriteDecorHandle<float>(
               this, modifiedTrigName + m_matchingLevel + "SFStatsUp",
-              modifiedTrigName + "_" + m_matchingLevel + "SF_stats_1up",
+              modifiedTrigName + "_" + m_matchingLevel + "SF_stats__1up",
               "jet-level jet trigger SF stats uncertainty up"));
       m_jetSFSystUp.emplace(
           trig,
           CP::SysWriteDecorHandle<float>(
               this, modifiedTrigName + m_matchingLevel + "SFSystUp",
-              modifiedTrigName + "_" + m_matchingLevel + "SF_syst_1up",
+              modifiedTrigName + "_" + m_matchingLevel + "SF_syst__1up",
               "jet-level jet trigger SF syst uncertainty up"));
       ATH_CHECK(m_jetSF.at(trig).initialize(m_systematicsList, m_outJetHandle));
       ATH_CHECK(m_jetSFStatsUp.at(trig).initialize(m_systematicsList, m_outJetHandle));
       ATH_CHECK(m_jetSFSystUp.at(trig).initialize(m_systematicsList, m_outJetHandle));
 
       m_eventSFKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF");
-      m_eventSFStatsUpKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF_stats_1up");
-      m_eventSFSystUpKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF_syst_1up");
+      m_eventSFStatsUpKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF_stats__1up");
+      m_eventSFSystUpKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF_syst__1up");
       ATH_CHECK(m_eventSFKey.at(trig).initialize());
       ATH_CHECK(m_eventSFStatsUpKey.at(trig).initialize());
       ATH_CHECK(m_eventSFSystUpKey.at(trig).initialize());

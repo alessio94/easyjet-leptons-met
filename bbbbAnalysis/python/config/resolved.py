@@ -178,10 +178,10 @@ def resolved_branches(flags):
                 branches += [
                     f'EventInfo.trigSF_{trig}_{matchLevel}SF'
                     f'->trigSF_{trig}_{matchLevel}SF',
-                    f'EventInfo.trigSF_{trig}_{matchLevel}SF_stats_1up'
-                    f'->trigSF_{trig}_{matchLevel}SF_stats_1up',
-                    f'EventInfo.trigSF_{trig}_{matchLevel}SF_syst_1up'
-                    f'->trigSF_{trig}_{matchLevel}SF_syst_1up',
+                    f'EventInfo.trigSF_{trig}_{matchLevel}SF_stats__1up'
+                    f'->trigSF_{trig}_{matchLevel}SF_stats__1up',
+                    f'EventInfo.trigSF_{trig}_{matchLevel}SF_syst__1up'
+                    f'->trigSF_{trig}_{matchLevel}SF_syst__1up',
                 ]
                 # more jet-level info for validation
                 if flags.Analysis.Small_R_jet.saveTriggerInfo:
@@ -193,10 +193,10 @@ def resolved_branches(flags):
                         f'->{jet_coll}_{trig}_{matchLevel}threshold',
                         f'{jet_coll}.{trig}_{matchLevel}SF_NOSYS'
                         f'->{jet_coll}_{trig}_{matchLevel}SF',
-                        f'{jet_coll}.{trig}_{matchLevel}SF_stats_1up'
-                        f'->{jet_coll}_{trig}_{matchLevel}SF_stats_1up',
-                        f'{jet_coll}.{trig}_{matchLevel}SF_syst_1up'
-                        f'->{jet_coll}_{trig}_{matchLevel}SF_syst_1up',
+                        f'{jet_coll}.{trig}_{matchLevel}SF_stats__1up'
+                        f'->{jet_coll}_{trig}_{matchLevel}SF_stats__1up',
+                        f'{jet_coll}.{trig}_{matchLevel}SF_syst__1up'
+                        f'->{jet_coll}_{trig}_{matchLevel}SF_syst__1up',
                     ]
 
     # VBF tagger
