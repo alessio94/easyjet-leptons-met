@@ -453,7 +453,6 @@ namespace HHBBLL
 
       // Compute scaled mass
       double mass_scaled_SM = ((var_mbbllmet - m_bbllmet_min)/range_bbllmet);
-      std::cout << "mass scaled:" << mass_scaled_SM << std::endl;
       
       std::map<std::string, double> pnn_inputs_SR1_SM = pnn_inputs_SR1;
       std::map<std::string, double> pnn_inputs_SR2_SM = pnn_inputs_SR2;
