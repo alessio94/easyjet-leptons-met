@@ -20,6 +20,7 @@
 #include "../ElectronDecoratorAlg.h"
 #include "../MuonTrackDecoratorAlg.h"
 #include "../LeptonOrderingAlg.h"
+#include "../SecVtxFilterAlg.h"
 
 using namespace Easyjet;
 
@@ -45,3 +46,4 @@ DECLARE_COMPONENT(MetadataHistAlg)
 DECLARE_COMPONENT(ElectronDecoratorAlg)
 DECLARE_COMPONENT(MuonTrackDecoratorAlg)
 DECLARE_COMPONENT(LeptonOrderingAlg)
+DECLARE_COMPONENT(SecVtxFilterAlg)

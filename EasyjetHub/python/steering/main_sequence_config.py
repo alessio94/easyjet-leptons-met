@@ -20,6 +20,7 @@ from EasyjetHub.algs.preselection.preselection_config import (
     event_selection_sequence,
     trigger_sequence,
     overlap_VGammaOR,
+    secondary_vertex_filter_cfg,
 )
 from EasyjetHub.algs.truth.truth_config import truth_info_cfg
 from EasyjetHub.output.ttree.minituple_config import minituple_cfg
@@ -111,6 +112,11 @@ def preselection_cfg(flags, seqname):
             CompFactory.Easyjet.DijetHSTPFilter(),
             seqname
         )
+
+    if flags.Analysis.do_vertex_filtering and flags.Input.ProcessingTags == [
+        "StreamDAOD_LLP1"
+    ]:
+        cfg.merge(secondary_vertex_filter_cfg(flags), seqname)
 
     # Aggregate the configured CP algs in one ConfigSequence,
     # which will handle the container names, copying etc

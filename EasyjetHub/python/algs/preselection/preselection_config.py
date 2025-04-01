@@ -1,5 +1,7 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
+from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from EasyjetHub.steering.sample_metadata import get_grl_files
 
 
@@ -83,3 +85,17 @@ def overlap_VGammaOR(flags):
                              list(flags.Analysis.Truth.DSID_vgammaOR))
 
     return configSeq
+
+
+def secondary_vertex_filter_cfg(flags):
+    cfg = ComponentAccumulator()
+
+    LLP1VrtSecInclusiveSuffix = flags.Analysis.VSI_container_suffix
+    vertex_collection = "VrtSecInclusive_SecondaryVertices" + LLP1VrtSecInclusiveSuffix
+    cfg.addEventAlgo(
+        CompFactory.Easyjet.SecVtxFilterAlg(
+            "SecVtxFilterAlg", vertexIn=vertex_collection
+        )
+    )
+
+    return cfg

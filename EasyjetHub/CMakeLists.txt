@@ -41,6 +41,7 @@ atlas_add_library( EasyjetHubLib
                    ${ROOT_LIBRARIES}
                    BoostedJetTaggersLib 
                    JetAnalysisInterfacesLib
+		   EventBookkeeperToolsLib
 
 )
 

@@ -25,6 +25,9 @@ loose_jet_cleaning: false
 do_bbtt_analysis: false
 do_bbyy_analysis: false
 do_thinning: true
+# LLP1 filtering
+do_vertex_filtering: false
+VSI_container_suffix: ""
 
 # Truth-related properties
 Truth:
