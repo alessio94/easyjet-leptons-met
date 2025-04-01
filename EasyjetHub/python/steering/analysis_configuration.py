@@ -172,6 +172,9 @@ def get_trigger_chains(flags, type="selection"):
         except KeyError as err:
             log.error(f"Trigger chains for {year} not defined.")
             raise err
+    else:
+        # Default to selection chains
+        trigger_chains = get_trigger_chains(flags, "selection")
 
     return list(trigger_chains)
 
