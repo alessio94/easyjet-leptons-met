@@ -8,10 +8,7 @@ from EasyjetHub.output.ttree.selected_objects import (
 )
 
 
-def resolved_cfg(flags, smalljetkey, float_variables=None):
-    if not float_variables:
-        float_variables = []
-
+def resolved_trigger_SF_cfg(flags, smalljetkey):
     cfg = ComponentAccumulator()
 
     # This is a jet trigger scale factor block
@@ -24,13 +21,15 @@ def resolved_cfg(flags, smalljetkey, float_variables=None):
                               containerOutKey="smallRJetsForTriggerMatching",
                               minPt=20 * Units.GeV,
                               maxEta=2.4))
+        # temporary solution for boosted trigger
+        resolved_chain = [t for t in flags.Analysis.TriggerChains if "_a10" not in t]
         if flags.Analysis.Small_R_jet.doL1Matching:
             cfg.addEventAlgo(
                 CompFactory.HH4B.SmallRJetTriggerSFAlg(
                     "SmallRJetL1SFAlg",
                     containerInKey="smallRJetsForTriggerMatching",
                     containerOutKey="trigL1MatchedSmallRJets",
-                    triggers=flags.Analysis.TriggerChains,
+                    triggers=resolved_chain,
                     years=flags.Analysis.Years,
                     matchingLevel="L1",
                     doL1SF=flags.Analysis.Small_R_jet.doL1Matching,
@@ -43,13 +42,37 @@ def resolved_cfg(flags, smalljetkey, float_variables=None):
                     "SmallRJetHLTSFAlg",
                     containerInKey="smallRJetsForTriggerMatching",
                     containerOutKey="trigHLTMatchedSmallRJets",
-                    triggers=flags.Analysis.TriggerChains,
+                    triggers=resolved_chain,
                     years=flags.Analysis.Years,
                     matchingLevel="HLT",
                     doL1SF=flags.Analysis.Small_R_jet.doL1Matching,
                     doHLTSF=flags.Analysis.Small_R_jet.doHLTMatching
                 )
             )
+
+    return cfg
+
+
+def resolved_trigger_bucket_cfg(flags):
+    cfg = ComponentAccumulator()
+
+    # calculate trigger buckets
+    cfg.addEventAlgo(
+        CompFactory.HH4B.TriggerDecoratorAlg(
+            "HH4bTriggerDecoratorAlg",
+            jets=flags.Analysis.container_names.input.reco4PFlowJet,
+            triggerLists=flags.Analysis.TriggerChains,
+        )
+    )
+
+    return cfg
+
+
+def resolved_cfg(flags, smalljetkey, float_variables=None):
+    if not float_variables:
+        float_variables = []
+
+    cfg = ComponentAccumulator()
 
     # this is a resolved dihiggs analysis chain
     btag_wps = [flags.Analysis.Small_R_jet.btag_wp]
@@ -94,14 +117,6 @@ def resolved_cfg(flags, smalljetkey, float_variables=None):
             )
         )
 
-        # calculate trigger buckets
-        cfg.addEventAlgo(
-            CompFactory.HH4B.TriggerDecoratorAlg(
-                "HH4bTriggerDecoratorAlg",
-                jets=flags.Analysis.container_names.input.reco4PFlowJet,
-                triggerLists=flags.Analysis.TriggerChains,
-            )
-        )
     return cfg
 
 
@@ -165,9 +180,24 @@ def resolved_branches(flags):
                 + flags.Analysis.systematics_suffix_separator + "%SYS%"
             ]
 
+    # VBF tagger
+    if flags.Analysis.UseVBFRNN:
+        vars = ['RNNScore', 'nRNNJets']
+        reg = 'resolved'
+        for var in vars:
+            branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}'
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    return branches, float_variable_names
+
+
+def resolved_trigger_SF_branches(flags):
+    branches = []
+
     if flags.Input.isMC:
         # add trigger scale factor output
-        for trig in flags.Analysis.TriggerChains:
+        resolved_chain = [t for t in flags.Analysis.TriggerChains if "_a10" not in t]
+        for trig in resolved_chain:
             trig = trig.replace("-", "_").replace(".", "p")
             matchLevels = []
             if flags.Analysis.Small_R_jet.doL1Matching:
@@ -179,9 +209,11 @@ def resolved_branches(flags):
                     f'EventInfo.trigSF_{trig}_{matchLevel}SF'
                     f'->trigSF_{trig}_{matchLevel}SF',
                     f'EventInfo.trigSF_{trig}_{matchLevel}SF_stats__1up'
-                    f'->trigSF_{trig}_{matchLevel}SF_stats__1up',
+                    f'->trigSF_{trig}_{matchLevel}SF'
+                    + flags.Analysis.systematics_suffix_separator + 'stats__1up',
                     f'EventInfo.trigSF_{trig}_{matchLevel}SF_syst__1up'
-                    f'->trigSF_{trig}_{matchLevel}SF_syst__1up',
+                    f'->trigSF_{trig}_{matchLevel}SF'
+                    + flags.Analysis.systematics_suffix_separator + 'syst__1up',
                 ]
                 # more jet-level info for validation
                 if flags.Analysis.Small_R_jet.saveTriggerInfo:
@@ -194,16 +226,23 @@ def resolved_branches(flags):
                         f'{jet_coll}.{trig}_{matchLevel}SF_NOSYS'
                         f'->{jet_coll}_{trig}_{matchLevel}SF',
                         f'{jet_coll}.{trig}_{matchLevel}SF_stats__1up'
-                        f'->{jet_coll}_{trig}_{matchLevel}SF_stats__1up',
+                        f'->{jet_coll}_{trig}_{matchLevel}SF'
+                        + flags.Analysis.systematics_suffix_separator + 'stats__1up',
                         f'{jet_coll}.{trig}_{matchLevel}SF_syst__1up'
-                        f'->{jet_coll}_{trig}_{matchLevel}SF_syst__1up',
+                        f'->{jet_coll}_{trig}_{matchLevel}SF'
+                        + flags.Analysis.systematics_suffix_separator + 'syst__1up',
                     ]
 
-    # VBF tagger
-    if flags.Analysis.UseVBFRNN:
-        vars = ['RNNScore', 'nRNNJets']
-        reg = 'resolved'
-        for var in vars:
-            branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}_%SYS%']
+    return branches
 
-    return branches, float_variable_names
+
+def resolved_trigger_bucket_branches(flags):
+    branches = ['EventInfo.bucket -> trigger_bucket']
+
+    for trig in ["1b", "2b1j", "2bHT", "2b2j", "j75", "j80"]:
+        branches += [
+            f'EventInfo.pass_trigger_{trig}'
+            f' -> trigger_bucket_{trig}',
+        ]
+
+    return branches

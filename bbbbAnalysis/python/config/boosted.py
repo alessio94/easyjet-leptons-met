@@ -81,6 +81,7 @@ def boosted_branches(flags):
         vars = ['RNNScore', 'nRNNJets']
         reg = 'boosted'
         for var in vars:
-            branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}_%SYS%']
+            branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}'
+                         + flags.Analysis.systematics_suffix_separator + '%SYS%']
 
     return branches, float_variable_names

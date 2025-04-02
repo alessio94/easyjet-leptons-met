@@ -1,7 +1,10 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from bbbbAnalysis.config.boosted import boosted_cfg, boosted_branches
-from bbbbAnalysis.config.resolved import resolved_cfg, resolved_branches
+from bbbbAnalysis.config.resolved import (
+    resolved_branches, resolved_cfg,
+    resolved_trigger_SF_cfg, resolved_trigger_bucket_cfg
+)
 from bbbbAnalysis.config.boost_histograms import histograms_cfg
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.output.ttree.selected_objects import (
@@ -66,7 +69,6 @@ def dihiggs_cfg(
                 minPt=200. * Units.GeV,
                 maxPt=3000. * Units.GeV,
                 maxMass=600. * Units.GeV,
-                minMass=40. * Units.GeV,
                 maxEta=2.0,
                 jetAmount=2,
             )
@@ -146,6 +148,19 @@ def dihiggs_cfg(
             )
         )
         cfg.merge(event_counter_cfg("n_merged"))
+
+    if flags.Analysis.do_resolved_trigger_SF:
+        cfg.merge(
+            resolved_trigger_SF_cfg(
+                flags,
+                smalljetkey=smalljetkey,
+            )
+        )
+
+    if flags.Analysis.do_resolved_trigger_bucket:
+        cfg.merge(
+            resolved_trigger_bucket_cfg(flags)
+        )
 
     if flags.Analysis.histograms:
         cfg.merge(histograms_cfg(flags))

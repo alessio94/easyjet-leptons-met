@@ -5,6 +5,9 @@ include: bbbbAnalysis/RunConfig-bbbb-base.yaml
 # with all syst on
 do_resolved_dihiggs: true
 
+do_resolved_trigger_SF: true
+do_resolved_trigger_bucket: true
+
 pairingStrategy: "minDeltaR"
 
 # Toggles for object types

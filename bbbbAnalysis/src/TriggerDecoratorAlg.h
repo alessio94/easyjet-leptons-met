@@ -76,6 +76,7 @@ namespace HH4B
 
     typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::EventInfo, bool> > trigReadDecoMap;
     typedef std::unordered_map<HH4B::TriggerChannel, SG::WriteDecorHandle<xAOD::EventInfo, bool> > passWriteDecoMap;
+    typedef std::unordered_map<int, std::unordered_map<HH4B::TriggerChannel, std::vector<std::string>>> triggerMap;
 
     void evaluateTriggerCuts(const xAOD::EventInfo* eventInfo, const std::vector<std::string> &Triggers,
                                                   const trigReadDecoMap& triggerdecos, passWriteDecoMap& pass_decos, 
@@ -87,7 +88,7 @@ namespace HH4B
                                 passWriteDecoMap& pass_decos, 
                                 SG::WriteDecorHandle<xAOD::EventInfo, int>& m_bucketDecorator) const;
     
-    const std::unordered_map<int, std::unordered_map<HH4B::TriggerChannel, std::vector<std::string>>> m_triggerMap = {
+    const triggerMap m_triggerMap = {
         {2016, {
             {HH4B::SINGB, {
                 "HLT_j225_bmv2c2060_split"
@@ -145,6 +146,22 @@ namespace HH4B
         }}
     };
 
+    const std::vector<std::string>& getTriggerPaths(
+          const triggerMap& trigger_map,
+          int year,
+          HH4B::TriggerChannel triggerType) const
+      {
+          static const std::vector<std::string> emptyVec;
+          
+          auto yearIt = trigger_map.find(year);
+          if (yearIt == trigger_map.end()) return emptyVec;
+          
+          const auto& channel_map = yearIt->second;
+          auto channelIt = channel_map.find(triggerType);
+          if (channelIt == channel_map.end()) return emptyVec;
+          
+          return channelIt->second;
+      }
   };
 }
 

@@ -70,11 +70,10 @@ namespace HH4B
     SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> year(m_yearKey);
 
     if (year(*eventInfo) < 2022) {
-
-        std::vector<std::string> SINGbTrigPaths = m_triggerMap.at(year(*eventInfo)).at(HH4B::SINGB);
-        std::vector<std::string> diBsingJTrigPaths = m_triggerMap.at(year(*eventInfo)).at(HH4B::DIB_SINGJ);
-        std::vector<std::string> DIbHTTrigPaths = m_triggerMap.at(year(*eventInfo)).at(HH4B::DIB_HT);
-        std::vector<std::string> diBdiJTrigPaths = m_triggerMap.at(year(*eventInfo)).at(HH4B::DIB_DIJ);
+        const auto& SINGbTrigPaths = getTriggerPaths(m_triggerMap, year(*eventInfo), HH4B::SINGB);
+        const auto& diBsingJTrigPaths = getTriggerPaths(m_triggerMap, year(*eventInfo), HH4B::DIB_SINGJ);
+        const auto& DIbHTTrigPaths = getTriggerPaths(m_triggerMap, year(*eventInfo), HH4B::DIB_HT);
+        const auto& diBdiJTrigPaths = getTriggerPaths(m_triggerMap, year(*eventInfo), HH4B::DIB_DIJ);
 
         if (!SINGbTrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), SINGbTrigPaths, triggerdecos, pass_decos, HH4B::SINGB);
         if (!diBsingJTrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), diBsingJTrigPaths, triggerdecos, pass_decos, HH4B::DIB_SINGJ);
@@ -82,14 +81,15 @@ namespace HH4B
         if (!diBdiJTrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), diBdiJTrigPaths, triggerdecos, pass_decos, HH4B::DIB_DIJ);
 
     } else if (year(*eventInfo) == 2022) {
-        std::vector<std::string> J80TrigPaths = m_triggerMap.at(year(*eventInfo)).at(HH4B::J80);
+
+        const auto& J80TrigPaths = getTriggerPaths(m_triggerMap, year(*eventInfo), HH4B::J80);
 
         if (!J80TrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), J80TrigPaths, triggerdecos, pass_decos, HH4B::J80);
 
     } else if (year(*eventInfo) == 2023) {
 
-        std::vector<std::string> J75TrigPaths = m_triggerMap.at(year(*eventInfo)).at(HH4B::J75);
-        std::vector<std::string> J80TrigPaths = m_triggerMap.at(year(*eventInfo)).at(HH4B::J80);
+        const auto& J75TrigPaths = getTriggerPaths(m_triggerMap, year(*eventInfo), HH4B::J75);
+        const auto& J80TrigPaths = getTriggerPaths(m_triggerMap, year(*eventInfo), HH4B::J80);
 
         if (!J75TrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), J75TrigPaths, triggerdecos, pass_decos, HH4B::J75);
         if (!J80TrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), J80TrigPaths, triggerdecos, pass_decos, HH4B::J80);
@@ -150,7 +150,11 @@ namespace HH4B
 
     for (const std::string &trigger : Triggers)
     {
-      bool pass = triggerdecos.at(trigger)(*eventInfo);
+      bool pass = false;
+      auto it = triggerdecos.find(trigger);
+      if (it != triggerdecos.end()) {
+          pass = it->second(*eventInfo);
+      }
       if (pass) {
         pass_decos.at(flag)(*eventInfo) = true;
         break;

@@ -1,10 +1,13 @@
 include: EasyjetHub/base-config.yaml
 
-systematics_suffix_separator: "___"
+systematics_suffix_separator: "_"
 
 # Which analysis to consider
 do_resolved_dihiggs: false
 do_boosted_dihiggs: false
+
+do_resolved_trigger_SF: false
+do_resolved_trigger_bucket: false
 
 ### tagging jets vs RNN strategy
 ### false: will not select vbf jets 

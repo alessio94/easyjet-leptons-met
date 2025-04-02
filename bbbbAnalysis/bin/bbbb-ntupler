@@ -26,7 +26,7 @@ from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from bbbbAnalysis.utils.option_validation import validate_hh4b_analysis_prerequisites
 from bbbbAnalysis.config.dihiggs import dihiggs_cfg
 from bbbbAnalysis.config.boosted import boosted_branches
-from bbbbAnalysis.config.resolved import resolved_branches
+from bbbbAnalysis.config.resolved import resolved_branches, resolved_trigger_SF_branches, resolved_trigger_bucket_branches
 from bbbbAnalysis.config.dihiggs import pass_branches
 from EasyjetHub.algs.orthogonality.orth_config import orth_branches
 from EasyjetHub.algs.orthogonality.orth_config import orth_cfg
@@ -90,20 +90,16 @@ def hh4b_job_cfg():
     if flags.Analysis.do_resolved_dihiggs:
         bbbb_extra_branches, float_variable_names = resolved_branches(flags)
         bbbb_branches += bbbb_extra_branches 
+    if flags.Analysis.do_resolved_trigger_SF:
+        bbbb_extra_branches = resolved_trigger_SF_branches(flags)
+        bbbb_branches += bbbb_extra_branches 
+    if flags.Analysis.do_resolved_trigger_bucket:
+        bbbb_extra_branches = resolved_trigger_bucket_branches(flags)
+        bbbb_branches += bbbb_extra_branches 
     if flags.Analysis.orthogonality.do_orth_check:
         bbbb_branches += extra_orth_branches
     if len(flags.Analysis.CutList) > 0:
         bbbb_branches += pass_branches(flags)
-    
-    # Speicially modify GRL for atlas-schema requirement
-    # Have to store the decoration again
-    if flags.Analysis.GRL.store_decoration:
-        from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
-        for key in getGoodRunsLists().keys():
-            for year in flags.Analysis.Years:
-                if f"GRL{year}" in key:
-                    bbbb_branches += [f"EventInfo.{key} -> "
-                                      + key.replace(f"GRL{year}", f"GRL_{year}")]
 
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
