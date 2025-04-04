@@ -49,7 +49,7 @@ private:
 
     // \brief Setup syst-aware input decorations
     CP::SysReadDecorHandle<char> m_select
-      {"baselineSelection_outputSelect_thin_%SYS%", this};
+      {this, "baselineSelectionName", "baselineSelection_outputSelect_thin_%SYS%", "Name of baseline selection decorator"};
     
     CP::SysReadDecorHandle<char> m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 

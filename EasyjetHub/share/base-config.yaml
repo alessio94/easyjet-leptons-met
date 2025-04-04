@@ -82,6 +82,7 @@ Large_R_jet:
   max_pT: -1
   max_eta: 100
   runMuonJetPtCorr: false
+  do_thinning: true
   do_parent_decoration: true
   amount: 0
   amount_leadingjet: 0

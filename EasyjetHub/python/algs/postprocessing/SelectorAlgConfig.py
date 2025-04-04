@@ -65,11 +65,14 @@ def JetSelectorAlgCfg(flags, name="JetSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 
     isSmallRJet = "AntiKt4" in kwargs["containerInKey"]
+    isLargeRJet = "AntiKt10" in kwargs["containerInKey"]
     if kwargs.get("bTagWPDecorName", ""):
         kwargs.setdefault("bjetAmount", flags.Analysis.Small_R_jet.amount_bjet)
     if (isSmallRJet and flags.Analysis.Small_R_jet.runBJetPtCalib) or \
        (not isSmallRJet and flags.Analysis.Large_R_jet.runMuonJetPtCorr):
         kwargs.setdefault("nmuons", "n_muons_%SYS%")
+    if isLargeRJet and not flags.Analysis.Large_R_jet.do_thinning:
+        kwargs.setdefault("baselineSelectionName", "")
 
     cfg.addEventAlgo(CompFactory.Easyjet.JetSelectorAlg(name, **kwargs))
     return cfg

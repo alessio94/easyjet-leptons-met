@@ -34,6 +34,7 @@ Large_R_jet:
   max_pT: 3000.e+3
   max_eta: 2.0
   runMuonJetPtCorr: true
+  do_thinning: true
   GN2X_hbb_wps:
     - "FlatMassQCDEff_0p25"
     - "FlatMassQCDEff_0p3"

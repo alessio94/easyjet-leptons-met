@@ -45,7 +45,7 @@ def thinning_sequence(flags):
         configSeq.setOptionValue('.selectionName', 'selectPtEta')
         configSeq.setOptionValue('.postfix', 'thin')
 
-    if flags.Analysis.do_large_R_UFO_jets:
+    if flags.Analysis.do_large_R_UFO_jets and flags.Analysis.Large_R_jet.do_thinning:
         configSeq += makeConfig('Thinning', containerName=drop_sys(
             flags.Analysis.container_names.output.reco10UFOJet))
         configSeq.setOptionValue('.selectionName', 'selectPtEta')
