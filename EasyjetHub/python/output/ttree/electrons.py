@@ -44,7 +44,7 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
         electron_branches.variables += ["passesOR_%SYS%"]
 
     electron_branches.variables += [
-        "d0sig_NOSYS", "z0sintheta_NOSYS"
+        "d0_NOSYS", "d0sig_NOSYS", "z0sintheta_NOSYS", "z0sinthetasig_NOSYS"
     ]
 
     if flags.Analysis.Electron.MergeLRT:

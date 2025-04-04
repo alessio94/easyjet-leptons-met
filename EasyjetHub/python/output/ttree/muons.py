@@ -35,7 +35,7 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
         muon_branches.variables += ["passesOR_%SYS%"]
 
     muon_branches.variables += [
-        "d0sig_NOSYS", "z0sintheta_NOSYS"
+        "d0_NOSYS", "d0sig_NOSYS", "z0sintheta_NOSYS", "z0sinthetasig_NOSYS"
     ]
 
     if flags.Analysis.Muon.do_reco_decoration:
