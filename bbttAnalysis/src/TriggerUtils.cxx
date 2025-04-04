@@ -258,8 +258,13 @@ namespace HHBBTT
     else if(year==2018){
       ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"HLT_tau35_medium1_tracktwoEF_tau25_medium1_tracktwoEF_L1TAU20IM_2TAU12IM_4J12p0ETA23"};
-      tau35_match_paths = {"HLT_tau35_medium1_tracktwoEF"};
-      tau25_match_paths = {"HLT_tau25_medium1_tracktwoEF"};
+      // single tau35_medium1 trigger is missing for some runs in 2018
+      // COMA list including tau35_medium1 trigger :
+      // https://atlas-tagservices.cern.ch/tagservices/RunBrowser/runBrowserReport/runBrowserReport.php?fnt=&pn=&runs=&gfile=&smk=&cn=HLT_tau35_medium1_tracktwoEF&stt=&stm=
+      if(runBoolDecos.at(HHBBTT::is18_tau35_medium1)(*eventInfo)){
+        tau35_match_paths = {"HLT_tau35_medium1_tracktwoEF"};
+        tau25_match_paths = {"HLT_tau25_medium1_tracktwoEF"};
+      }
 
       if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
         ditau_paths_L1Topo.emplace_back("HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_L1DR_TAU20ITAU12I_J25");

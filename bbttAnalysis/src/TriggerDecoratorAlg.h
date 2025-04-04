@@ -79,6 +79,7 @@ namespace HHBBTT
 	{HHBBTT::is17PeriodB5_B7, "is2017_periodB5_B7"},
 	{HHBBTT::is17PeriodB8_end, "is2017_periodB8_end"},
 	{HHBBTT::is18PeriodB_end, "is2018_periodB_end"},
+	{HHBBTT::is18_tau35_medium1, "is2018_tau35_medium1"},
 	{HHBBTT::is18PeriodK_end, "is2018_periodK_end"},
 	{HHBBTT::is22_75bunches, "is2022_75bunches"},
 	{HHBBTT::is23_75bunches, "is2023_75bunches"},
@@ -214,7 +215,6 @@ namespace HHBBTT
        jetReadTrigMatchptMap& jetL1ET,
        jetReadTrigMatchptMap& jetHLTPT) const;
 
-    
   };
 }
 
