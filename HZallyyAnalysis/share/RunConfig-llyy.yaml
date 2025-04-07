@@ -14,7 +14,6 @@ do_small_R_jets: true
 do_muons: true
 do_electrons: true
 do_met : false
-do_mmc : false
 do_photons : true
 
 # Toggles for reconstructed objects decorations
@@ -38,21 +37,19 @@ Lepton:
 
 Photon:
   ID: "Loose"
-  Iso: "NonIso"
+  Iso: "FixedCutLoose"
   amount: 2
+
 # orthogonality studies  
 orthogonality:
   include: EasyjetHub/orth-config.yaml 
-  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
+  do_orth_check: false 
 
 # list of triggers per year to consider
 Trigger:
   include: HZallyyAnalysis/trigger.yaml
-# apply trigger lists to filter events
-do_trigger_filtering: true
 
-# write objects with overlap removal applied
-# turning this on you have to decide on one large R jet collection
+do_trigger_filtering: true
 do_overlap_removal: true
 
 #Enable cutflow 
@@ -62,7 +59,11 @@ CutList :
       - PASS_TRIGGER
       - EXACTLY_TWO_LEPTONS
       - TWO_OPPOSITE_CHARGE_LEPTONS
-      - ATLEAST_TWO_PHOTONS
+      - LEP1_LEP2_DR
+      - LEP1_LEP2_PT
+      - DILEP_MASS
+      - DILEP_PT
+      - ATLEAST_ONE_PHOTON
 
 # Include the TTree configuration and update details
 

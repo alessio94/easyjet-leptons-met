@@ -48,7 +48,11 @@ namespace HZALLYY
       PASS_TRIGGER,
       EXACTLY_TWO_LEPTONS,
       TWO_OPPOSITE_CHARGE_LEPTONS,
-      ATLEAST_TWO_PHOTONS
+      LEP1_LEP2_DR,
+      LEP1_LEP2_PT,
+      DILEP_MASS,
+      DILEP_PT,
+      ATLEAST_ONE_PHOTON
     };
 
   /// \brief An algorithm for counting containers
@@ -71,7 +75,11 @@ namespace HZALLYY
       "PASS_TRIGGER",
       "EXACTLY_TWO_LEPTONS",          
       "TWO_OPPOSITE_CHARGE_LEPTONS",
-      "ATLEAST_TWO_PHOTONS"
+      "LEP1_LEP2_DR",
+      "LEP1_LEP2_PT",
+      "DILEP_MASS",
+      "DILEP_PT",
+      "ATLEAST_ONE_PHOTON"
     };
 
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
@@ -136,7 +144,12 @@ namespace HZALLYY
       {HZALLYY::PASS_TRIGGER, "PASS_TRIGGER"},
       {HZALLYY::EXACTLY_TWO_LEPTONS, "EXACTLY_TWO_LEPTONS"},
       {HZALLYY::TWO_OPPOSITE_CHARGE_LEPTONS, "TWO_OPPOSITE_CHARGE_LEPTONS"},
-      {HZALLYY::ATLEAST_TWO_PHOTONS, "ATLEAST_TWO_PHOTONS"},
+      {HZALLYY::LEP1_LEP2_DR, "LEP1_LEP2_DR"},
+      {HZALLYY::LEP1_LEP2_PT, "LEP1_LEP2_PT"},
+      {HZALLYY::DILEP_MASS, "DILEP_MASS"},
+      {HZALLYY::DILEP_PT, "DILEP_PT"},
+      {HZALLYY::ATLEAST_ONE_PHOTON, "ATLEAST_ONE_PHOTON"},
+      
      };
 
     CutManager m_llyyCuts;

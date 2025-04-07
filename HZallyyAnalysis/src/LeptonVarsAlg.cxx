@@ -2,32 +2,22 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "BaselineVarsllyyAlg.h"
-
-#include "AthContainers/AuxElement.h"
-
-#include <AthContainers/ConstDataVector.h>
-
-#include "TLorentzVector.h"
-
-#include "EasyjetHub/MT2_ROOT.h"
+#include "LeptonVarsAlg.h"
 
 namespace HZALLYY {
-  BaselineVarsllyyAlg::BaselineVarsllyyAlg(const std::string & name,
+  LeptonVarsAlg::LeptonVarsAlg(const std::string & name,
     ISvcLocator * pSvcLocator): AthHistogramAlgorithm(name, pSvcLocator) {
     
   }
   
-  StatusCode BaselineVarsllyyAlg::initialize() {
+  StatusCode LeptonVarsAlg::initialize() {
     ATH_MSG_INFO("*********************************\n");
-    ATH_MSG_INFO("       BaselineVarsllyyAlg       \n");
+    ATH_MSG_INFO("       LeptonVarsAlg       \n");
     ATH_MSG_INFO("*********************************\n");
     
     // Read syst-aware input handles
-    ATH_CHECK(m_llyyphotonHandle.initialize(m_systematicsList));
     ATH_CHECK(m_llyyelectronHandle.initialize(m_systematicsList));
     ATH_CHECK(m_llyymuonHandle.initialize(m_systematicsList));
-    ATH_CHECK(m_llyyjetHandle.initialize(m_systematicsList));
     ATH_CHECK(m_eventHandle.initialize(m_systematicsList));
     
     if (m_isMC) {
@@ -43,10 +33,6 @@ namespace HZALLYY {
 	  m_ele_SF = CP::SysReadDecorHandle < float > ("effSF_" + m_eleWPName + "_%SYS%", this);
 	  ATH_CHECK(m_ele_SF.initialize(m_systematicsList, m_electronHandle));
 	}
-      
-      ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
-      m_ph_SF = CP::SysReadDecorHandle < float > ("effSF_" + m_phWPName + "_%SYS%", this);
-      ATH_CHECK(m_ph_SF.initialize(m_systematicsList, m_photonHandle));
       
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle < float > ("effSF_" + m_muWPName + "_%SYS%", this);
@@ -74,7 +60,7 @@ namespace HZALLYY {
     return StatusCode::SUCCESS;
   }
   
-  StatusCode BaselineVarsllyyAlg::execute() {
+  StatusCode LeptonVarsAlg::execute() {
     
     // Loop over all systs
     for (const auto & sys: m_systematicsList.systematicsVector()) {
@@ -82,79 +68,19 @@ namespace HZALLYY {
       // Retrieve inputs
       const xAOD::EventInfo * event = nullptr;
       ANA_CHECK(m_eventHandle.retrieve(event, sys));
-      
-      const xAOD::PhotonContainer * photons = nullptr;
-      ANA_CHECK(m_llyyphotonHandle.retrieve(photons, sys));
-      
+            
       const xAOD::MuonContainer * muons = nullptr;
       ANA_CHECK(m_llyymuonHandle.retrieve(muons, sys));
 
       const xAOD::ElectronContainer * electrons = nullptr;
       ANA_CHECK(m_llyyelectronHandle.retrieve(electrons, sys));
 
-      const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK(m_llyyjetHandle.retrieve (jets, sys));
-      
       for (const std::string & string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set( * event, -99., sys);
       }
       
       for (const auto &var: m_intVariables) {
         m_Ibranches.at(var).set( * event, -99, sys);
-      }
-
-      static const SG::AuxElement::ConstAccessor < int > HadronConeExclTruthLabelID("HadronConeExclTruthLabelID");
-
-      // Count photons
-      int n_photons = 0;
-      n_photons = photons -> size();
-
-      int n_jets = 0;
-      n_jets = jets -> size();
-      
-      // Photon sector
-      // initialize
-      const xAOD::Photon * ph0 = nullptr;
-      const xAOD::Photon * ph1 = nullptr;
-      
-      for (unsigned int i = 0; i < std::min(size_t(2), photons -> size()); i++) {
-      	const xAOD::Photon * ph = photons -> at(i);
-        if (i == 0) ph0 = ph;
-        else if (i == 1) ph1 = ph;
-      }// end photon
-      
-            
-      for (unsigned int i = 0; i < std::min(size_t(2), photons -> size()); i++) {
-      	const xAOD::Photon * ph = photons -> at(i);
-        if (!ph) continue;
-        std::string prefix = "Photon" + std::to_string(i + 1);
-        TLorentzVector tlv = photons -> at(i) -> p4();
-	
-        m_Fbranches.at(prefix + "_pt").set( * event, tlv.Pt(), sys);
-        m_Fbranches.at(prefix + "_eta").set( * event, tlv.Eta(), sys);
-        m_Fbranches.at(prefix + "_phi").set( * event, tlv.Phi(), sys);
-        m_Fbranches.at(prefix + "_E").set( * event, tlv.E(), sys);
-	
-	
-	if(m_isMC){
-          m_Fbranches.at(prefix+"_effSF").set(*event, m_ph_SF.get(*ph, sys), sys);
-        }
-
-
-	
-      }
-      
-      TLorentzVector yy(0., 0., 0., 0.);
-      if (ph0 && ph1) {
-        yy = ph0 -> p4() + ph1 -> p4();
-        m_Fbranches.at("myy").set( * event, yy.M(), sys);
-        m_Fbranches.at("pTyy").set( * event, yy.Pt(), sys);
-        m_Fbranches.at("Etayy").set( * event, yy.Eta(), sys);
-        m_Fbranches.at("Phiyy").set( * event, yy.Phi(), sys);
-        m_Fbranches.at("dRyy").set( * event, ph0 -> p4().DeltaR(ph1 -> p4()), sys);
-	m_Fbranches.at("dPhiyy").set( * event, ph0 -> p4().DeltaPhi(ph1 -> p4()), sys);
-	m_Fbranches.at("dEtayy").set( * event,  ph0 -> p4().Eta()- ph1 -> p4().Eta() , sys);
-	m_Fbranches.at("Xyy").set( * event, (ph0 -> p4().DeltaR(ph1 -> p4()) * yy.Pt())/(2*yy.M()) , sys);
       }
       
       int n_electrons = 0;
@@ -168,14 +94,12 @@ namespace HZALLYY {
 
       m_Ibranches.at("nElectrons").set( * event, n_electrons, sys);
       m_Ibranches.at("nMuons").set( * event, n_muons, sys);
-      m_Ibranches.at("nPhotons").set( * event, n_photons, sys);
-      m_Ibranches.at("nJets").set( * event, n_jets, sys);
-      
+      m_Ibranches.at("nLeptons").set(*event, electrons->size() + muons->size(), sys);
       // Electron sector
       const xAOD::Electron * ele0 = nullptr;
       const xAOD::Electron * ele1 = nullptr;
       
-      for (unsigned int i = 0; i < std::min(size_t(2), electrons -> size()); i++) {
+      for (unsigned int i = 0; i < std::min(std::size_t(2), electrons -> size()); i++) {
         const xAOD::Electron * ele = electrons -> at(i);
         if (i == 0) ele0 = ele;
         else if (i == 1) ele1 = ele;
@@ -185,7 +109,7 @@ namespace HZALLYY {
       const xAOD::Muon * mu0 = nullptr;
       const xAOD::Muon * mu1 = nullptr;
       
-      for (unsigned int i = 0; i < std::min(size_t(2), muons -> size()); i++) {
+      for (unsigned int i = 0; i < std::min(std::size_t(2), muons -> size()); i++) {
         const xAOD::Muon * mu = muons -> at(i);
         if (i == 0) mu0 = mu;
         else if (i == 1) mu1 = mu;
@@ -207,7 +131,7 @@ namespace HZALLYY {
       TLorentzVector Subleading_lep;
       TLorentzVector ll;
       
-      for (unsigned int i = 0; i < std::min(size_t(2), leptons.size()); i++) {
+      for (unsigned int i = 0; i < std::min(std::size_t(2), leptons.size()); i++) {
 	
         std::string prefix = "Lepton" + std::to_string(i + 1);
         TLorentzVector tlv = leptons[i].first -> p4();
@@ -265,30 +189,11 @@ namespace HZALLYY {
         m_Fbranches.at("Etall").set( * event, ll.Eta(), sys);
         m_Fbranches.at("Phill").set( * event, ll.Phi(), sys);
         m_Fbranches.at("dRll").set( * event, Leading_lep.DeltaR(Subleading_lep), sys);
-	m_Fbranches.at("dPhill").set( * event, Leading_lep.DeltaPhi(Subleading_lep), sys);
-	m_Fbranches.at("dEtall").set( * event, Leading_lep.Eta() - Subleading_lep.Eta() , sys);
+	m_Fbranches.at("dPhill").set( * event, abs(Leading_lep.DeltaPhi(Subleading_lep)), sys);
+	m_Fbranches.at("dEtall").set( * event, abs(Leading_lep.Eta() - Subleading_lep.Eta()) , sys);
 	
       }
-      
-      // H->Za->yyll system building
-      if (ph0 && ph1 && leptons.size() >= 2) {
-	
-        TLorentzVector Z_ll  = Leading_lep + Subleading_lep;
-        TLorentzVector a_yy  = ph0 -> p4() + ph1 -> p4();
-        TLorentzVector H_Za  = a_yy + Z_ll;
-        
-        // Set variables for the H->aa system
-	m_Fbranches.at("mH_Za").set(*event, H_Za.M(), sys);
-        m_Fbranches.at("pTH_Za").set(*event, H_Za.Pt(), sys);
-        m_Fbranches.at("EtaH_Za").set(*event, H_Za.Eta(), sys);
-        m_Fbranches.at("PhiH_Za").set(*event, H_Za.Phi(), sys);
-        m_Fbranches.at("dRH_Za").set(*event, Z_ll.DeltaR(a_yy), sys);
-	m_Fbranches.at("dPhiH_Za").set(*event, Z_ll.DeltaPhi(a_yy), sys);
-	m_Fbranches.at("dEtaH_Za").set(*event, Z_ll.Eta() - a_yy.Eta(), sys);
-	
-      }
-
-           
+                
     } // 
     
     return StatusCode::SUCCESS;

@@ -3,8 +3,8 @@
 */
 
 // Always protect against multiple includes!
-#ifndef HZALLYYANALYSIS_FINALVARSHZALLYYALG
-#define HZALLYYANALYSIS_FINALVARSHZALLYYALG
+#ifndef HZALLYYANALYSIS_LEPTONVARSALG
+#define HZALLYYANALYSIS_LEPTONVARSALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
@@ -16,18 +16,16 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
-#include <xAODEgamma/PhotonContainer.h>
-#include <xAODJet/JetContainer.h>
 
 namespace HZALLYY
 {
   
   /// \brief An algorithm for counting containers
-  class BaselineVarsllyyAlg final : public AthHistogramAlgorithm
+  class LeptonVarsAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
   public:
-    BaselineVarsllyyAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    LeptonVarsAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -40,20 +38,9 @@ namespace HZALLYY
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
     
-    CP::SysReadHandle<xAOD::PhotonContainer>
-      m_llyyphotonHandle{ this, "llyyphotons", "llyyAnalysisPhotons_%SYS%", "Photons container to read" };
-
-     CP::SysReadHandle<xAOD::PhotonContainer>
-      m_photonHandle{ this, "photons", "AnalysisPhotons_%SYS%", "Original Photons container to read" };
-    
-    Gaudi::Property<std::string> m_phWPName
-      { this, "phWP", "", "Photon ID + Iso working point" };
-    CP::SysReadDecorHandle<float> m_ph_SF{"", this};
-   
-    
     CP::SysReadHandle<xAOD::ElectronContainer>
       m_electronHandle{ this, "electrons", "AnalysisElectrons_%SYS%", "Original Electron container to read" };
-
+    
     CP::SysReadHandle<xAOD::ElectronContainer>
       m_llyyelectronHandle{ this, "llyyelectrons", "llyyAnalysisElectrons_%SYS%", "Electron container to read" };
     
@@ -62,9 +49,6 @@ namespace HZALLYY
 
     CP::SysReadHandle<xAOD::MuonContainer>
       m_llyymuonHandle{ this, "llyymuons", "llyyAnalysisMuons_%SYS%", "Muon container to read" };
-
-    CP::SysReadHandle<xAOD::JetContainer>
-      m_llyyjetHandle{ this, "Jets", "llyyAnalysisJets_%SYS%", "Jet container to read" };
     
     Gaudi::Property<bool> m_saveDummy_ele_SF
       {this, "saveDummyEleSF", false,
@@ -87,9 +71,10 @@ namespace HZALLYY
     CP::SysReadDecorHandle<float> m_mu_SF{"", this};
     CP::SysReadDecorHandle<int> m_mu_truthOrigin{"truthOrigin", this};
     CP::SysReadDecorHandle<int> m_mu_truthType{"truthType", this};
-    
-    CP::SysReadDecorHandle<int> m_nmuons{"n_muons_%SYS%", this};
 
+    Gaudi::Property<bool> m_doSystematics
+      { this, "doSystematics", false, "Run on all systematics" };
+    
     Gaudi::Property<std::vector<std::string>> m_floatVariables
       {this, "floatVariableList", {}, "Name list of floating variables"};
     

@@ -92,7 +92,11 @@ namespace HZALLYY
 	m_bools.at(HZALLYY::PASS_TRIGGER) = false;
 	m_bools.at(HZALLYY::EXACTLY_TWO_LEPTONS) = false;	
 	m_bools.at(HZALLYY::TWO_OPPOSITE_CHARGE_LEPTONS) = false;
-	m_bools.at(HZALLYY::ATLEAST_TWO_PHOTONS) = false;
+	m_bools.at(HZALLYY::LEP1_LEP2_DR) = false;
+	m_bools.at(HZALLYY::LEP1_LEP2_PT) = false;
+	m_bools.at(HZALLYY::DILEP_MASS) = false;
+	m_bools.at(HZALLYY::DILEP_PT) = false;
+	m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON) = false;
 	
 	setThresholds(event, sys);
 	
@@ -130,7 +134,11 @@ namespace HZALLYY
 	if(m_bools.at(HZALLYY::PASS_TRIGGER) &&
 	   m_bools.at(HZALLYY::EXACTLY_TWO_LEPTONS) &&
 	   m_bools.at(HZALLYY::TWO_OPPOSITE_CHARGE_LEPTONS) &&
-	   m_bools.at(HZALLYY::ATLEAST_TWO_PHOTONS)) pass_baseline=true;
+	   m_bools.at(HZALLYY::LEP1_LEP2_DR) && 
+	   m_bools.at(HZALLYY::LEP1_LEP2_PT) &&
+	   m_bools.at(HZALLYY::DILEP_MASS) &&
+	   m_bools.at(HZALLYY::DILEP_PT) &&
+	   m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON)) pass_baseline=true;
 	
 	if ((m_bypass or pass_baseline)) filter.setPassed(true);
 	
@@ -387,6 +395,15 @@ namespace HZALLYY
   {
     bool Two_Opposite_Sign_Electrons = false;
     bool Two_Opposite_Sign_Muons = false;
+    bool ee_deltaR = false;
+    bool mumu_deltaR = false;
+    bool electron_pT_thr_pass = false;
+    bool muon_pT_thr_pass = false;
+    bool ee_mass_thr_pass = false;
+    bool mumu_mass_thr_pass = false;
+    bool ee_pT_thr_pass = false;
+    bool mumu_pT_thr_pass = false;
+    
     
     if ( (electrons.size() == 2 || muons.size() == 2) &&
 	 llyyCuts.exists("EXACTLY_TWO_LEPTONS"))
@@ -397,24 +414,77 @@ namespace HZALLYY
     if (electrons.size() >= 2)
       {
 	Two_Opposite_Sign_Electrons = electrons.at(0)->charge()*electrons.at(1)->charge() == -1;
+
+	double ee_dR = electrons.at(0)->p4().DeltaR(electrons.at(1)->p4());
+	if (ee_dR > 0.2)
+	  ee_deltaR = true;
+	
+	if ( electrons.at(0)->pt() > 27 * Athena::Units::GeV &&  electrons.at(1)->pt() > 20 * Athena::Units::GeV  )
+	  electron_pT_thr_pass = true;
+
+	double m_ee = (electrons.at(0)->p4() + electrons.at(1)->p4()).M();
+	if (m_ee >= 81 * Athena::Units::GeV && m_ee <= 101 * Athena::Units::GeV)
+	  ee_mass_thr_pass = true;
+	
+	double pT_ee = (electrons.at(0)->p4() + electrons.at(1)->p4()).Pt();
+	if (pT_ee > 10 * Athena::Units::GeV)
+	  ee_pT_thr_pass = true;
       }
+    
     if (muons.size() >= 2)
       {
 	Two_Opposite_Sign_Muons = muons.at(0)->charge()*muons.at(1)->charge() == -1;
+
+	double mumu_dR = muons.at(0)->p4().DeltaR(muons.at(1)->p4());
+	if (mumu_dR > 0.2)
+	  mumu_deltaR = true;
+	
+	if ( muons.at(0)->pt() > 27 * Athena::Units::GeV &&  muons.at(1)->pt() > 20 * Athena::Units::GeV  )
+	  muon_pT_thr_pass = true;
+
+	double m_mumu = (muons.at(0)->p4() + muons.at(1)->p4()).M();
+	if (m_mumu >= 81 * Athena::Units::GeV && m_mumu <= 101 * Athena::Units::GeV)
+	  mumu_mass_thr_pass = true;
+	
+	double pT_mumu = (muons.at(0)->p4() + muons.at(1)->p4()).Pt();
+	if (pT_mumu > 10 * Athena::Units::GeV)
+	  mumu_pT_thr_pass = true;
       }
+    
     if ((Two_Opposite_Sign_Electrons || Two_Opposite_Sign_Muons )
 	&& llyyCuts.exists("TWO_OPPOSITE_CHARGE_LEPTONS"))
       {
 	m_bools.at(HZALLYY::TWO_OPPOSITE_CHARGE_LEPTONS) = true;
       }
+
+    if ( (ee_deltaR || mumu_deltaR) && llyyCuts.exists("LEP1_LEP2_DR"))
+      {
+	m_bools.at(HZALLYY::LEP1_LEP2_DR) = true;
+      }
+    
+    if ( (electron_pT_thr_pass || muon_pT_thr_pass) &&  llyyCuts.exists("LEP1_LEP2_PT"))
+      {
+	m_bools.at(HZALLYY::LEP1_LEP2_PT) = true;
+      }
+
+    if ( (ee_mass_thr_pass || mumu_mass_thr_pass) &&  llyyCuts.exists("DILEP_MASS"))
+      {
+	m_bools.at(HZALLYY::DILEP_MASS) = true;
+      }
+    
+    if ( (ee_pT_thr_pass || mumu_pT_thr_pass) && llyyCuts.exists("DILEP_PT"))
+      {
+	m_bools.at(HZALLYY::DILEP_PT) = true;
+      }
+
   }
   
  void HZAllyySelectorAlg::evaluatePhotonCuts
   (const xAOD::PhotonContainer& photons, CutManager& llyyCuts)
     
   {
-    if (photons.size() >= 2 && llyyCuts.exists("ATLEAST_TWO_PHOTONS"))
-      m_bools.at(HZALLYY::ATLEAST_TWO_PHOTONS) = true;
+    if (photons.size() > 0 && llyyCuts.exists("ATLEAST_ONE_PHOTON"))
+      m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON) = true;
   }
   
   void HZAllyySelectorAlg::setThresholds(const xAOD::EventInfo* event,
