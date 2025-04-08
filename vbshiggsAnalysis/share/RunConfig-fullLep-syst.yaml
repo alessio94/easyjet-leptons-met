@@ -14,7 +14,7 @@ UseVBFRNN : true
 
 Electron:
   ID: "TightLH"
-  Iso: "TightTrackOnly_VarRad"
+  Iso: "Tight_VarRad"
   
 Muon:
   ID: "Medium"
