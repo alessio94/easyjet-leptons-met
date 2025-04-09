@@ -46,4 +46,11 @@ StatusCode SecVtxFilterAlg ::execute() {
   return StatusCode::SUCCESS;
 }
 
+StatusCode SecVtxFilterAlg::finalize() {
+   ATH_MSG_INFO(m_filterParams.summary());
+
+   // Return gracefully:
+   return StatusCode::SUCCESS;
+}
+
 } // namespace Easyjet
