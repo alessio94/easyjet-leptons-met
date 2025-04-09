@@ -1,0 +1,129 @@
+#!/bin/env python
+
+#
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+#
+
+#
+# Extends easyjet-ntupler with dihiggs-specific algorithms
+#
+
+import sys
+import time
+
+from EasyjetHub.hub import (
+    AnalysisArgumentParser,
+    analysis_configuration,
+    run_job,
+    default_sequence_cfg,
+)
+from EasyjetHub.output.ttree.minituple_config import minituple_cfg
+
+from yyMLAnalysis.yyml_config import yyml_branches
+from yyMLAnalysis.yyml_config import yyml_cfg
+from EasyjetHub.algs.event_counter_config import event_counter_cfg
+from EasyjetHub.algs.orthogonality.orth_config import orth_branches
+from EasyjetHub.algs.orthogonality.orth_config import orth_cfg
+
+def yyml_job_cfg():
+    parser = AnalysisArgumentParser()
+
+    # Fill the configuration flags from the
+    # parsed arguments
+    # Returned flags are locked
+    flags, args = analysis_configuration(parser)
+
+    # Get a standard ComponentAccumulator with the following infrastructure:
+    # - basic services for event loop, messaging etc
+    # - apply preselection on triggers and data quality
+    # - build event info with calibrations etc
+    seqname = "yymlSeq"
+    cfg = default_sequence_cfg(flags, seqname)
+
+    # Optionally run orthogonality check (only runs if you set do_orth_check to true in your RunConfig)
+    extra_orth_branches = []
+    if(flags.Analysis.orthogonality.do_orth_check):
+        cfg.merge(
+            orth_cfg(
+                flags,
+                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
+                photonkey=flags.Analysis.container_names.output.photons,
+            ),
+            seqname
+        )
+        
+        extra_orth_branches = orth_branches(flags)
+
+    # Extend the list of output branches via flags
+    # For more sophistication this could be done using
+    # custom BranchManagers
+    extra_yyml_branches = []
+    if flags.Analysis.do_yyml_analysis:
+        extra_yyml_branches,float_variable_names, float_vector_variable_names, \
+            int_variable_names, char_vector_variable_names = yyml_branches(flags)
+        cfg.merge(
+            yyml_cfg(
+                flags,
+                photonkey=flags.Analysis.container_names.output.photons,
+                electronkey=flags.Analysis.container_names.output.electrons,
+                muonkey=flags.Analysis.container_names.output.muons,
+                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
+                taukey=flags.Analysis.container_names.output.taus,
+                float_variables=float_variable_names,
+                float_vector_variables=float_vector_variable_names,
+                int_variables=int_variable_names,
+                char_vector_variables=char_vector_variable_names
+            ),
+            seqname
+        )
+        if not flags.Analysis.suppress_metadata_json:
+            cfg.merge(event_counter_cfg("n_yyml"), seqname)
+
+    # Explicitly call the minituple config because we want to provide
+    # additional branches, the list of which is generated dynamically
+    # rather than statically in the yaml
+    extra_branches = extra_yyml_branches + extra_orth_branches
+    if flags.Analysis.out_file:
+        tree_flags = flags.Analysis.ttree_output
+        cfg.merge(
+            minituple_cfg(
+                flags, tree_flags,
+                flags.Analysis.out_file,
+                extra_output_branches=extra_branches
+            ),
+            seqname,
+        )
+
+    # Record the number of events for logging and tests
+    if not flags.Analysis.suppress_metadata_json:
+        cfg.merge(event_counter_cfg("n_events"), seqname)
+
+    return cfg, flags, args
+
+
+def main():
+    # record the total run time
+    starttime = time.process_time()
+
+    cfg, flags, args = yyml_job_cfg()
+
+    if args.dry_run:
+        return_code = 1
+    else:
+        return_code = run_job(flags, args, cfg)
+
+    # this is for unit tests: if jobs run too long something is wrong
+    if args.timeout:
+        duration = time.process_time() - starttime
+        if duration > args.timeout:
+            raise RuntimeError(
+                f"runtime ({duration:.1f}s) exceed timeout ({args.timeout:.0f}s)"
+            )
+    return return_code.isSuccess()
+
+
+# Execute the main function if this file was executed as a script
+if __name__ == "__main__":
+    is_successful = main()
+    sys.exit(0 if is_successful else 1)
+
