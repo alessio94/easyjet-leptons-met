@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.Enums import LHCPeriod
 
 
 def jet_decor_cfg(flags, **kwargs):
@@ -13,7 +14,15 @@ def jet_decor_cfg(flags, **kwargs):
 
     if (flags.Analysis.Small_R_jet.doHLTMatching
             or flags.Analysis.Small_R_jet.doL1Matching):
-        kwargs.setdefault("doHLTMatching", flags.Analysis.Small_R_jet.doHLTMatching)
+
+        if flags.Analysis.Small_R_jet.doHLTMatching:
+            if flags.GeoModel.Run is LHCPeriod.Run2:
+                print("WARNING! HLT jet matching is not yet supported for Run 2. ")
+                print("You should get in touch with the Trigger Core Software group ")
+                print("to contribute to the necessary developments")
+            else:
+                kwargs.setdefault("doHLTMatching", True)
+
         kwargs.setdefault("doL1Matching", flags.Analysis.Small_R_jet.doL1Matching)
         kwargs.setdefault("triggerList", flags.Analysis.TriggerChainsDeco)
         from TrigDecisionTool.TrigDecisionToolConfig import TrigDecisionToolCfg
