@@ -246,21 +246,23 @@ def bbtt_branches(flags):
     if flags.Analysis.store_high_level_variables:
         branches += object_level_branches
 
-    branches += ["EventInfo.bbtt_pass_presel_%SYS% -> bbtt_pass_presel"
-                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+    if flags.Analysis.store_high_level_variables:
+        branches += ["EventInfo.bbtt_pass_presel_%SYS% -> bbtt_pass_presel"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbttSelectorAlg
-    for var in ["_trigger_", "_baseline_"]:
-        for cat in ["SR", "SLT", "LTT", "STT", "DTT",
-                    "DTT_2016", "DTT_4J12", "DTT_L1Topo",
-                    "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT"]:
-            if (var == "_baseline_"
-                    and cat in ["DTT_4J12_delayed", "DTT_L1Topo_delayed"]):
-                continue
-            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> "
-                         f"bbtt_pass{var}{cat}"
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+    if flags.Analysis.store_high_level_variables:
+        for var in ["_trigger_", "_baseline_"]:
+            for cat in ["SR", "SLT", "LTT", "STT", "DTT",
+                        "DTT_2016", "DTT_4J12", "DTT_L1Topo",
+                        "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT"]:
+                if (var == "_baseline_"
+                        and cat in ["DTT_4J12_delayed", "DTT_L1Topo_delayed"]):
+                    continue
+                branches += [f"EventInfo.pass{var}{cat}_%SYS% -> "
+                             f"bbtt_pass{var}{cat}"
+                             + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     for cat in ["SR", "SLT", "LTT", "STT", "DTT",
                 "DTT_2016", "DTT_4J12", "DTT_L1Topo",
@@ -271,7 +273,12 @@ def bbtt_branches(flags):
                          f"bbtt_pass_{cat}_{nb}"
                          + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    for cat in ["baseline_LepHad", "baseline_HadHad", "LepHad", "HadHad",
+    if flags.Analysis.store_high_level_variables:
+        for cat in ["baseline_LepHad", "baseline_HadHad"]:
+            branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    for cat in ["LepHad", "HadHad",
                 "ZCR", "TopEMuCR", "AntiIsoLepHad"]:
         branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]
