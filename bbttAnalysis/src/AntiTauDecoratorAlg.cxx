@@ -163,7 +163,7 @@ namespace HHBBTT
             tau->discriminant(xAOD::TauJetParameters::RNNJetScoreSigTrans);
           int decayMode = -1;
           tau->panTauDetail(xAOD::TauJetParameters::PanTau_DecayMode, decayMode);
-          isAntiTau = (!isTauID && score>m_antiTauScoreThreshold &&
+          isAntiTau = (!isTauID && score>=m_antiTauScoreThreshold &&
 		       decayMode!=xAOD::TauJetParameters::Mode_NotSet);
     
           // for SLT and DBT no anti-tau trigger matching is required

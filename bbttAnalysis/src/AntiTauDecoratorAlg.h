@@ -74,7 +74,7 @@ namespace HHBBTT
     CP::SysReadDecorHandle<float> m_GNTau_score{"GNTauScoreSigTrans_v0", this};
 
     Gaudi::Property<double> m_antiTauScoreThreshold
-      { this, "antiTauScoreThreshold", 0.01,
+      { this, "antiTauScoreThreshold", 0.,
 	"Lower threshold of RNN/GNTau score for Anti-Id taus" };
 
     CP::SysReadDecorHandle<bool> m_triggerMatchSTT{"trigMatch_STT", this};
