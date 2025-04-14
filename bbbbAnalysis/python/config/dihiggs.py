@@ -26,7 +26,8 @@ def dihiggs_cfg(
     if flags.Analysis.do_small_R_jets:
         smalljetkey = flags.Analysis.container_names.output.reco4PFlowJet
         couting_jet_container = "resolvedAnalysisSmallRJets_%SYS%"
-        couting_bjet_container = "resolvedAnalysisSmallRBJets_%SYS%"
+        couting_rnnjet_container = "bbbbAnalysisSmallRRNNJets_%SYS%"
+        couting_bjet_container = "bbbbAnalysisSmallRBJets_%SYS%"
         if flags.Analysis.Small_R_jet.btag_wp != "":
             btag_name = f"ftag_select_{flags.Analysis.Small_R_jet.btag_wp}"
         # Used only for counting
@@ -42,6 +43,21 @@ def dihiggs_cfg(
                 minimumAmount=4,
             )
         )  # -1 means ignores this
+
+        # RNN Jet candidates
+        cfg.merge(
+            JetSelectorAlgCfg(
+                flags, name="SmallRRNNJetSelectorAlg",
+                containerInKey=smalljetkey,
+                containerOutKey=couting_rnnjet_container,
+                bTagWPDecorName=btag_name,
+                selectBjet=False,
+                minPt=20. * Units.GeV,
+                minimumAmount=2,
+            )
+        )  # -1 means ignores this
+
+        # b-jets for RNN tagger (resolved category)
         cfg.merge(
             JetSelectorAlgCfg(
                 flags, name="SmallRBJetSelectorAlg",
@@ -83,8 +99,8 @@ def dihiggs_cfg(
                 CompFactory.VBFTaggerAlgSys(
                     "VBFTaggerAlg_resolved",
                     VBFTagger=vbftagger,
-                    containerAllJetsKey="resolvedAnalysisSmallRJets_%SYS%",
-                    containerSigLargeRJetsKey="resolvedAnalysisSmallRBJets_%SYS%",
+                    containerAllJetsKey=couting_rnnjet_container,
+                    containerSigJetsKey=couting_bjet_container,
                     OnlyFirstLargeRJet=False,
                     pTCut=20.e3,
                     nMaxJets=2,
@@ -98,8 +114,8 @@ def dihiggs_cfg(
                 CompFactory.VBFTaggerAlgSys(
                     "VBFTaggerAlg_boosted",
                     VBFTagger=vbftagger,
-                    containerAllJetsKey="resolvedAnalysisSmallRJets_%SYS%",
-                    containerSigLargeRJetsKey="boostedAnalysisLargeRJets_%SYS%",
+                    containerAllJetsKey=couting_rnnjet_container,
+                    containerSigLargeRJetsKey=couting_lRjet_container,
                     OnlyFirstLargeRJet=False,
                     pTCut=20.e3,
                     nMaxJets=2,

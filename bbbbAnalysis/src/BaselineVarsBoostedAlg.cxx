@@ -66,7 +66,7 @@ namespace HH4B
 
       // set defaults
       for (const std::string& var : m_Fvars) {
-        m_Fdecos.at(var).set(*eventInfo, -1, sys);
+        m_Fdecos.at(var).set(*eventInfo, -99, sys);
       }
 
       // large jet sector
