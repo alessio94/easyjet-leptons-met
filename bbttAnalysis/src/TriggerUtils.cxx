@@ -241,8 +241,8 @@ namespace HHBBTT
       }
 
       if(runBoolDecos.at(HHBBTT::is17PeriodB1_B4)(*eventInfo)){
-        // For Period B1 to B4 in 2017, should use this trigger but go to L1Topo selection
-        ditau_paths_L1Topo = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
+        // For Period B1 to B4 in 2017, should use this trigger and 2016 selection
+        ditau_paths_2016 = {"HLT_tau35_medium1_tracktwo_tau25_medium1_tracktwo"};
         tau25_match_paths.emplace_back("HLT_tau25_medium1_tracktwo");
       }
       else if(!runBoolDecos.at(HHBBTT::l1topo_disabled)(*eventInfo) &&

@@ -305,6 +305,7 @@ private:
        const xAOD::Jet* eta_lt2p5_jet1, const xAOD::Jet* eta_lt2p8_jet0);
     void applyDiBJetTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+       const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
        const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1);
     void applyLargeRJetsTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos);

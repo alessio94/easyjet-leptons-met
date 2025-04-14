@@ -505,6 +505,7 @@ namespace HHBBTT
       bool jet_ptcut_DTT_2016 = false;
       bool jet_ptcut_DTT_4J12 = false;
       bool jet_ptcut_DTT_L1Topo = false;
+      bool two_central_jets_lead45 = false;
 
       if (eta_lt2p8_jet0 && eta_lt2p8_jet0->pt() > m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet])
         jet_ptcut_DTT_L1Topo = true;
@@ -517,13 +518,16 @@ namespace HHBBTT
         if (eta_lt2p5_jet0 && eta_lt2p5_jet0->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] &&
             eta_lt2p5_jet1 && eta_lt2p5_jet1->pt() > m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet])
           jet_ptcut_DTT_4J12 = true;
+	if (eta_lt2p5_jet0 && eta_lt2p5_jet0->pt() > 45. * Athena::Units::GeV &&
+	    eta_lt2p5_jet1 && eta_lt2p5_jet1->pt() > 20. * Athena::Units::GeV)
+          two_central_jets_lead45 = true;
 
 
         if (bjets->size() == 2)
         {
-          m_bools.at(HHBBTT::TWO_BJETS) = true; //(bjets->at(0)->pt() > 45. * Athena::Units::GeV && bjets->at(1)->pt() > 20. * Athena::Units::GeV);
+          m_bools.at(HHBBTT::TWO_BJETS) = true;
         } else if (bjets->size() == 1) {
-          m_bools.at(HHBBTT::ONE_BJET) = true; //(bjets->at(0)->pt() > 45. * Athena::Units::GeV);
+          m_bools.at(HHBBTT::ONE_BJET) = true;
         }
       }
 
@@ -543,7 +547,7 @@ namespace HHBBTT
 	  m_bools.at(HHBBTT::MTAUTAU_VIS_MASS) &&
 	  m_bools.at(HHBBTT::TWO_JETS)){
         // SLT
-        if (lep_ptcut_SLT && tau_ptcut_SLT){
+        if (lep_ptcut_SLT && tau_ptcut_SLT && two_central_jets_lead45){
           m_bools.at(pass_baseline_SLT) = true;
           if (m_bools.at(HHBBTT::pass_trigger_SLT)){
             if (m_bools.at(HHBBTT::TWO_BJETS))
@@ -554,7 +558,7 @@ namespace HHBBTT
         }
 
         // LTT
-        if (lep_ptcut_LTT && tau_ptcut_LTT){
+        if (lep_ptcut_LTT && tau_ptcut_LTT && two_central_jets_lead45){
           m_bools.at(HHBBTT::pass_baseline_LTT) = true;
           if (m_bools.at(HHBBTT::pass_trigger_LTT)){
             if (!m_bools.at(HHBBTT::pass_SLT_2B) &&
@@ -572,7 +576,7 @@ namespace HHBBTT
 	  m_bools.at(HHBBTT::MTAUTAU_VIS_MASS) &&
 	  m_bools.at(HHBBTT::TWO_JETS)){
         // STT
-        if (tau_ptcut_STT){
+        if (tau_ptcut_STT && two_central_jets_lead45){
           m_bools.at(HHBBTT::pass_baseline_STT) = true;
           if (m_bools.at(HHBBTT::pass_trigger_STT)) {
             if (m_bools.at(HHBBTT::TWO_BJETS)) m_bools.at(HHBBTT::pass_STT_2B) = true;
@@ -580,7 +584,7 @@ namespace HHBBTT
           }
         }
         // DTT
-        if(!m_bools.at(HHBBTT::pass_baseline_STT) && tau_ptcut_DTT){
+        if(!m_bools.at(HHBBTT::pass_baseline_STT) && tau_ptcut_DTT && two_central_jets_lead45){
           int year = m_year.get(*event, sys);
           if(2015<=year && year<=2016){
             if(jet_ptcut_DTT_2016){
@@ -877,7 +881,7 @@ namespace HHBBTT
          eta_lt2p5_jet0, eta_lt2p5_jet1, eta_lt2p8_jet0);
     }
     if(use_DBT){
-      applyDiBJetTriggerSelection(event, triggerdecos,
+      applyDiBJetTriggerSelection(event, triggerdecos, tau0, tau1,
          eta_lt2p5_jet0, eta_lt2p5_jet1);
     }
     if(use_LARGE_R_JETS){
@@ -1078,13 +1082,19 @@ namespace HHBBTT
   
   void HHbbttSelectorAlg::applyDiBJetTriggerSelection
   (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+   const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
    const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1){
 
     bool trigPassed_DBT = triggerdecos.at(HHBBTT::DBT)(*event);
-    if(eta_lt2p5_jet0 && eta_lt2p5_jet1){
+    if(tau0 && tau1 && eta_lt2p5_jet0 && eta_lt2p5_jet1){
       //TO DO: implement bjet trig-matching
+      //Option: We could collect pt values in a vector, sort them in a descending order
+      //and check against a vector of trigger thresholds. Leaving like this for now
+      //in case we want to go below the thresholds
       trigPassed_DBT &=
-        (eta_lt2p5_jet0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] &&
+        (tau0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingtau] &&
+         tau1->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingtau] &&
+         eta_lt2p5_jet0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] &&
          eta_lt2p5_jet1->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet]);
     }
     else trigPassed_DBT = false;
@@ -1212,17 +1222,16 @@ namespace HHBBTT
     m_trigger_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet_matchL1] = 25;
     m_trigger_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet_matchL1] = 12;
     m_trigger_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet_matchL1] = 12;
-    if(year >= 2022){
-      m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 20. * Athena::Units::GeV;
-      m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
-      m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
-      m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
-      m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 20. * Athena::Units::GeV;
+    if(m_is2023_first_2400bunches.get(*event, sys)){
+      m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 35. * Athena::Units::GeV;
+      m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 25. * Athena::Units::GeV;
     }
 
     // Di-b-jets triggers
-    m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] = 20. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet] = 20. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingtau] = 30. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingtau] = 25. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] = 30. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet] = 25. * Athena::Units::GeV;
 
     // Single-lepton triggers
     if(year==2015)
