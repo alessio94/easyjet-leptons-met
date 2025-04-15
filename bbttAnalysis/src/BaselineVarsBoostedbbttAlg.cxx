@@ -5,7 +5,6 @@
 /// @author Giacomo Magni and Marko Mihovilovic
 
 #include "BaselineVarsBoostedbbttAlg.h"
-#include "AthContainers/AuxElement.h"
 
 namespace HHBBTT
 {
@@ -23,7 +22,7 @@ namespace HHBBTT
 
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_lRjetHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_sRjetHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_Pass_GN2X.initialize(m_systematicsList, m_lRjetHandle));
 
     // make decorators
     for (const std::string &string_var: m_floatVariables) {
@@ -50,9 +49,6 @@ namespace HHBBTT
       ANA_CHECK (m_lRjetHandle.retrieve (largeRjets, sys));
       std::size_t n_largeRjets = largeRjets->size();
 
-      const xAOD::JetContainer *smallRjets = nullptr;
-      ANA_CHECK (m_sRjetHandle.retrieve (smallRjets, sys));
-
       // set defaults
       for (const std::string& var : m_floatVariables) {
         m_Fbranches.at(var).set(*eventInfo, -99, sys);
@@ -68,18 +64,28 @@ namespace HHBBTT
           m_Fbranches.at(prefix+"_pt").set(*eventInfo, h_v4.Pt(), sys);
           m_Fbranches.at(prefix+"_eta").set(*eventInfo, h_v4.Eta(), sys);
           m_Fbranches.at(prefix+"_phi").set(*eventInfo, h_v4.Phi(), sys);
-          m_Fbranches.at(prefix+"_E").set(*eventInfo, h_v4.E(), sys);
         }
 
-        TLorentzVector h1_v4 = largeRjets->at(0)->p4();
-        TLorentzVector h2_v4 = largeRjets->at(1)->p4();
+        const xAOD::Jet* b_jet = nullptr;
+        const xAOD::Jet* tau_jet = nullptr;
+        
+        // TODO: __BOOSTED__ use tau tagging
+        for (const xAOD::Jet *lRjet : *largeRjets) {
+          if (m_Pass_GN2X.get(*lRjet, sys) && !b_jet) {
+            b_jet = lRjet;
+          } else if (!tau_jet) {
+            tau_jet = lRjet;
+          }
+        }
+        if (!tau_jet || !b_jet) continue;
 
+        TLorentzVector h1_v4 = b_jet->p4();
+        TLorentzVector h2_v4 = tau_jet->p4();
         TLorentzVector hh_v4 = h1_v4 + h2_v4;
         m_Fbranches.at("boosted_hh_m").set(*eventInfo, hh_v4.M(), sys);
         m_Fbranches.at("boosted_hh_pt").set(*eventInfo, hh_v4.Pt(), sys);
         m_Fbranches.at("boosted_hh_delta_eta").set(*eventInfo, h1_v4.Eta() - h2_v4.Eta(), sys);
         m_Fbranches.at("boosted_hh_delta_phi").set(*eventInfo, h1_v4.DeltaPhi(h2_v4), sys);
-
       }
     }
     return StatusCode::SUCCESS;

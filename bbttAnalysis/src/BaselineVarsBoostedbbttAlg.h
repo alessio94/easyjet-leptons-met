@@ -40,10 +40,6 @@ private:
 
     CP::SysReadHandle<xAOD::JetContainer>
       m_lRjetHandle{ this, "largeRjets", "bbttAnalysisLargeRJets_%SYS%", "Large-R jet container to read" };
-
-    CP::SysReadHandle<xAOD::JetContainer>
-      m_sRjetHandle{ this, "smallRjets", "bbttAnalysisJets_%SYS%", "Samll-R jet container to read" };
-    
       
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
@@ -53,6 +49,9 @@ private:
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
       {this, "floatVariableList", {}, "Name list of floating variables"};
+    
+    CP::SysReadDecorHandle<int> 
+    m_Pass_GN2X{this, "GN2X_WP", "", "GN2X b-tagging working point"}; 
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 

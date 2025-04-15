@@ -28,7 +28,7 @@ output:
   reco4PFlowJet:       AnalysisAntiKt4EMPFlowJets_%SYS%
   reco4EMTopoJet:      AnalysisAntiKt4EMTopoJets_%SYS%
   reco10TopoJet:       AnalysisAntiKt10LCTopoTrimmedPtFrac5SmallR20Jets_%SYS%
-  reco10UFOJet:        AnalysisAntiKt10UFOCSSKSoftDropBeta100Zcut10Jets_%SYS%
+  reco10UFOJet:        AnalysisAntiKt10UFOCSSKSoftDropBeta100Zcut10LargeRJets_%SYS%
   reco10RCJet:         AnalysisAntiKt10EMTopoRCJets_%SYS%
   muons:               AnalysisMuons_%SYS%
   electrons:           AnalysisElectrons_%SYS%

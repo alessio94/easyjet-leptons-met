@@ -69,8 +69,8 @@ private:
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
-    Gaudi::Property<bool> m_doBoostedAnalysis
-      { this, "doBoostedAnalysis", false, "Run the boosted analysis selection" };
+    Gaudi::Property<bool> m_doLargeRJets
+      { this, "doLargeRJets", false, "Read the Large-R jets, used for boosted channel" };
       
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
@@ -102,7 +102,7 @@ private:
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     CP::SysReadDecorHandle<int> 
-    m_Pass_GN2X{this, "GN2X_WP", "", "GN2X_hbb_wp from the bbtt config"}; 
+    m_Pass_GN2X{this, "GN2X_WP", "", "GN2X b-tagging working point"}; 
 
     CP::SysReadDecorHandle<unsigned int> m_year
       {this, "year", "dataTakingYear", ""};
@@ -151,7 +151,8 @@ private:
 	{HHBBTT::DTT_L1Topo_delayed, "DTT_L1Topo_delayed"},
 	{HHBBTT::DBT, "DBT"},
 	{HHBBTT::DBT_L1, "DBT_L1"},
-	{HHBBTT::DBT_HLT, "DBT_HLT"}
+	{HHBBTT::DBT_HLT, "DBT_HLT"},
+        {HHBBTT::LARGE_R_JETS, "LARGE_R_JETS"}
       };
 
     std::unordered_map<HHBBTT::TriggerChannel,
@@ -193,6 +194,7 @@ private:
     {HHBBTT::pass_trigger_DTT_4J12_delayed, "pass_trigger_DTT_4J12_delayed"},
     {HHBBTT::pass_trigger_DTT_L1Topo_delayed, "pass_trigger_DTT_L1Topo_delayed"},
     {HHBBTT::pass_trigger_DBT, "pass_trigger_DBT"},
+    {HHBBTT::pass_trigger_LARGE_R_JETS, "pass_trigger_LARGE_R_JETS"},
     {HHBBTT::TWO_JETS, "TWO_JETS"},
     {HHBBTT::AT_LEAST_TWO_LRJETS, "AT_LEAST_TWO_LRJETS"},
     {HHBBTT::TWO_BJETS, "TWO_BJETS"},
@@ -248,6 +250,7 @@ private:
     {HHBBTT::pass_ZCR, "pass_ZCR"},
     {HHBBTT::pass_TopEMuCR, "pass_TopEMuCR"},
     {HHBBTT::pass_AntiIsoLepHad, "pass_AntiIsoLepHad"},
+    {HHBBTT::pass_Boosted, "pass_Boosted"},
     };
 
     /// \brief Cutflow Variables
@@ -307,6 +310,8 @@ private:
     void applyDiBJetTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
        const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1);
+    void applyLargeRJetsTriggerSelection
+      (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos);
 
     void setThresholds(const xAOD::EventInfo* event,
 		       const CP::SystematicSet& sys);

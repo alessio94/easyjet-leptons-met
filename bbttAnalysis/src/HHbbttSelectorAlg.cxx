@@ -33,7 +33,7 @@ namespace HHBBTT
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    if(m_doBoostedAnalysis) {
+    if(m_doLargeRJets) {
       ATH_CHECK (m_lRjetHandle.initialize(m_systematicsList));
     }
 
@@ -156,6 +156,7 @@ namespace HHBBTT
       else if ( name == "ZCR") m_channels.push_back(HHBBTT::ZCR);
       else if ( name == "TopEMuCR") m_channels.push_back(HHBBTT::TopEMuCR);
       else if ( name == "AntiIsoLepHad") m_channels.push_back(HHBBTT::AntiIsoLepHad);
+      else if ( name == "Boosted") m_channels.push_back(HHBBTT::Boosted);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -211,6 +212,9 @@ namespace HHBBTT
 
       setThresholds(event, sys);
 
+      // Apply selection
+      for (auto& [key, value] : m_boolnames) m_bools.at(key) = false;
+
       //************
       // jet
       //************
@@ -237,7 +241,7 @@ namespace HHBBTT
       }
 
       // Boosted selection
-      if (m_doBoostedAnalysis) {
+      if (m_doLargeRJets) {
 
         //***************
         // boosted Jets
@@ -252,34 +256,15 @@ namespace HHBBTT
         for (const xAOD::Jet *lRjet : *lRjets) {
             if (m_Pass_GN2X.get(*lRjet, sys)) n_boosted_b_jets++;
         }
-        // TODO: activate tau Tagging.
+        // TODO: __BOOSTED__ activate tau Tagging.
         n_boosted_tau_jets = 1;
 
-        // check there are at least 2 boosted jets
-        bool pass = false;
+        // check if there are at least 2 boosted jets
         m_bools.at(HHBBTT::AT_LEAST_TWO_LRJETS) = (n_boosted_jets >= 2);
 
-        if (n_boosted_b_jets >= 1 && n_boosted_tau_jets >= 1) {
-          pass = true;
-        }
+        bool pass_boosted = (n_boosted_b_jets >= 1 && n_boosted_tau_jets >= 1);
+        m_bools.at(HHBBTT::pass_Boosted) = pass_boosted;
 
-        // do the CUTFLOW only with sys="" -> NOSYS
-        if (sys.name()=="" && m_saveCutFlow){
-          applyCutFlow(event,sys);
-        }
-
-        // Fill syst-aware output decorators
-        for (auto& [key, var] : m_bools) {
-          m_Bbranches.at(key).set(*event, var, sys);
-        };
-
-        // Prevent selection if bypass
-        if (!m_bypass && !pass ) continue;
-        
-        filter.setPassed(true);
-        
-        // Exit boosted selection
-        continue;
       }
       
       //************
@@ -293,9 +278,6 @@ namespace HHBBTT
 
       const xAOD::TauJetContainer *taus = nullptr;
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
-
-      // Apply selection
-      for (auto& [key, value] : m_boolnames) m_bools.at(key) = false;
 
 
       int n_leptons_looseId_iso = 0;
@@ -529,6 +511,7 @@ namespace HHBBTT
         m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed) = true;
         m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed) = true;
         m_bools.at(HHBBTT::pass_trigger_DBT) = true;
+        m_bools.at(HHBBTT::pass_trigger_LARGE_R_JETS) = true;
 
       }
 
@@ -666,6 +649,12 @@ namespace HHBBTT
         }
       }
 
+      // Boosted selection
+      m_bools.at(HHBBTT::pass_Boosted) = (
+        m_bools.at(HHBBTT::pass_trigger_LARGE_R_JETS) && 
+        m_bools.at(HHBBTT::pass_Boosted)
+      );
+
       m_bools.at(HHBBTT::pass_baseline_DTT) =
 	      (m_bools.at(HHBBTT::pass_baseline_DTT_2016)  ||
 	       m_bools.at(HHBBTT::pass_baseline_DTT_4J12)  ||
@@ -771,6 +760,7 @@ namespace HHBBTT
         else if(channel == HHBBTT::ZCR) pass |= m_bools.at(HHBBTT::pass_ZCR);
         else if(channel == HHBBTT::TopEMuCR) pass |= m_bools.at(HHBBTT::pass_TopEMuCR);
         else if(channel == HHBBTT::AntiIsoLepHad) pass |= m_bools.at(HHBBTT::pass_AntiIsoLepHad);
+        else if(channel == HHBBTT::Boosted) pass |= m_bools.at(HHBBTT::pass_Boosted);
       }
 
       // do the CUTFLOW only with sys="" -> NOSYS
@@ -783,6 +773,7 @@ namespace HHBBTT
         m_Bbranches.at(key).set(*event, var, sys);
       };
 
+      // discard events not passing
       if (!m_bypass && !pass) continue;
 
       // Global event filter true if any syst passes and controls
@@ -866,6 +857,7 @@ namespace HHBBTT
     bool use_STT = false;
     bool use_DTT = false;
     bool use_DBT = false;
+    bool use_LARGE_R_JETS = false;
     for (const auto &channel : m_channels){
       if (channel == HHBBTT::LepHad || channel == HHBBTT::AntiIsoLepHad){
         use_SLT = true;
@@ -878,6 +870,9 @@ namespace HHBBTT
       }
       else if (channel == HHBBTT::ZCR || channel == HHBBTT::TopEMuCR){
         use_SLT = true;
+      }
+      else if (channel == HHBBTT::Boosted){
+        use_LARGE_R_JETS = true;
       }
     }
 
@@ -905,6 +900,9 @@ namespace HHBBTT
     if(use_DBT){
       applyDiBJetTriggerSelection(event, triggerdecos,
          eta_lt2p5_jet0, eta_lt2p5_jet1);
+    }
+    if(use_LARGE_R_JETS){
+      applyLargeRJetsTriggerSelection(event, triggerdecos);
     }
 
   }
@@ -1115,6 +1113,13 @@ namespace HHBBTT
     m_bools.at(HHBBTT::pass_trigger_DBT) = trigPassed_DBT;
   }
 
+  void HHbbttSelectorAlg::applyLargeRJetsTriggerSelection
+  (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos){
+
+    bool trigPassed_largeRjets = triggerdecos.at(HHBBTT::LARGE_R_JETS)(*event);
+    m_bools.at(HHBBTT::pass_trigger_LARGE_R_JETS) = trigPassed_largeRjets;
+  
+  };
 
   StatusCode HHbbttSelectorAlg ::initialiseCutflow()
   {

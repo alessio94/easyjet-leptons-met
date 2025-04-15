@@ -160,6 +160,8 @@ namespace HHBBTT
 			 const runBoolReadDecoMap& runBoolDecos,
 			 std::vector<std::string>& dib_paths);
 
+  void getLargeRJetsTriggers(int year, 
+			 std::vector<std::string>& boosted_paths);
 }
 
 #endif

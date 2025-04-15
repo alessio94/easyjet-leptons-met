@@ -10,7 +10,7 @@ chains:
   - 'HLT_2j330_a10t_lcw_jes_35smcINF_L1J100'
   '2022':
   - 'HLT_j420_35smcINF_a10sd_cssk_pf_jes_ftf_preselj225_L1J100'
-  - 'HLT_2j330_35smcINF_a10t_lcw_jes_L1SC111_CJ15'
+  - 'HLT_2j330_35smcINF_a10t_lcw_jes_L1SC111-CJ15'
   '2023':
   - 'HLT_j420_35smcINF_a10sd_cssk_pf_jes_ftf_preselj225_L1J100'
-  - 'HLT_2j330_35smcINF_a10t_lcw_jes_L1SC111_CJ15'
+  - 'HLT_2j330_35smcINF_a10t_lcw_jes_L1SC111-CJ15'

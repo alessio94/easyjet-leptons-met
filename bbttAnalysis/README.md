@@ -14,6 +14,7 @@ Analysis Package for the $HH\rightarrow b\bar{b} \tau\tau$ analyis
   - `MMCDecoratorAlg`: Compute the tau tau MMC mass;
   - `MMCSelectorAlg`: Filter events based on MMC;
   - `BaselineVarsbbttAlg`: Compute the baseline variables for the analysis;
+  - `BaselineVarsbBoostedbttAlg`: Compute variables for the boosted analysis;
   - `AntiTauDecoratorAlg`: Get Anti-tau and do its trigger matching; 
   - `TriggerDecoratorAlg`: Get trigger matching information;
   - `TriggerSFAlg`: Get trigger SFs;

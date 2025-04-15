@@ -62,7 +62,8 @@ namespace HHBBTT
 	{HHBBTT::trigMatch_Tau35, "Tau35"},
 	{HHBBTT::trigMatch_Tau25, "Tau25"},
 	{HHBBTT::DBT_L1, "DBT_L1"},
-	{HHBBTT::DBT_HLT, "DBT_HLT"}
+	{HHBBTT::DBT_HLT, "DBT_HLT"},
+        {HHBBTT::LARGE_R_JETS, "LARGE_R_JETS"}
       };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
@@ -215,6 +216,12 @@ namespace HHBBTT
        jetReadTrigMatchptMap& jetL1ET,
        jetReadTrigMatchptMap& jetHLTPT) const;
 
+    void checkLargeRJetsTriggers
+      (int year, 
+      const xAOD::EventInfo* eventInfo,
+      const trigReadDecoMap& triggerdecos,
+      passWriteDecoMap& pass_decos) const;
+    
   };
 }
 

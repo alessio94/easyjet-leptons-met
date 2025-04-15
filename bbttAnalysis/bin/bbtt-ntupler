@@ -21,7 +21,7 @@ from EasyjetHub.output.ttree.minituple_config import minituple_cfg
 
 from bbttAnalysis.bbtt_config import bbtt_branches
 from bbttAnalysis.bbtt_config import bbtt_cfg
-from bbttAnalysis.boosted_config import boosted_branches_variables, boosted_cfg
+from bbttAnalysis.boosted_config import boosted_branches_variables
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 from EasyjetHub.algs.orthogonality.orth_config import orth_branches
 from EasyjetHub.algs.orthogonality.orth_config import orth_cfg
@@ -60,33 +60,25 @@ def bbtt_job_cfg():
     # For more sophistication this could be done using
     # custom BranchManagers
     extra_bbtt_branches = []
-    if flags.Analysis.do_bbtt_analysis:
-        extra_bbtt_branches,float_variable_names,int_variable_names = bbtt_branches(flags)
-        cfg.merge(
-            bbtt_cfg(
-                flags,
-                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet, 
-                muonkey=flags.Analysis.container_names.output.muons,
-                electronkey=flags.Analysis.container_names.output.electrons,
-                taukey=flags.Analysis.container_names.output.taus,
-                float_variables=float_variable_names,
-                int_variables=int_variable_names,
-            ),
-            seqname
-        )
-        cfg.merge(event_counter_cfg("n_bbtt"), seqname)
-    elif flags.Analysis.do_boosted_dihiggs:
+    if flags.Analysis.do_boosted_dihiggs:
         extra_bbtt_branches, float_variable_names  = boosted_branches_variables(flags)
-        cfg.merge(
-            boosted_cfg(
-                flags,
-                smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet, 
-                largeRjetkey=flags.Analysis.container_names.output.reco10UFOJet, 
-                float_variables=float_variable_names,
-            ),
-            seqname
-        )
-        cfg.merge(event_counter_cfg("n_bbtt_boosted"), seqname)
+        int_variable_names = []
+    else:
+        extra_bbtt_branches,float_variable_names,int_variable_names = bbtt_branches(flags)
+    
+    cfg.merge(
+        bbtt_cfg(
+            flags,
+            smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet, 
+            muonkey=flags.Analysis.container_names.output.muons,
+            electronkey=flags.Analysis.container_names.output.electrons,
+            taukey=flags.Analysis.container_names.output.taus,
+            float_variables=float_variable_names,
+            int_variables=int_variable_names,
+        ),
+        seqname
+    )
+    cfg.merge(event_counter_cfg("n_bbtt"), seqname)
 
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically

@@ -58,6 +58,26 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         selectBjet=False,
         minimumAmount=2))
 
+    GN2X_WP = ""
+    if flags.Analysis.do_large_R_UFO_jets:
+        cfg.merge(
+            JetSelectorAlgCfg(
+                flags,
+                name="LargeRJetSelectorAlg",
+                containerInKey=flags.Analysis.container_names.output.reco10UFOJet,
+                containerOutKey="bbttAnalysisLargeRJets_%SYS%",
+                bTagWPDecorName="",
+                selectBjet=False,
+                minPt=200.0 * Units.GeV,
+                maxPt=3000.0 * Units.GeV,
+                maxMass=600.0 * Units.GeV,
+                maxEta=2.0,
+                jetAmount=flags.Analysis.Large_R_jet.amount_leadingjet,
+            )
+        )
+        # Use the loosest working point for selection here.
+        GN2X_WP = f"xbb_select_GN2Xv01_{flags.Analysis.Large_R_jet.GN2X_hbb_wps[0]}"
+
     muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
     ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
     cfg.addEventAlgo(
@@ -81,7 +101,9 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             cutList=(
                 flags.Analysis.CutList if hasattr(flags.Analysis, "CutList") else []),
             RootStreamName=('CBK' if flags.Analysis.splitCBK else
-                            flags.Analysis.ttree_output.stream_name)
+                            flags.Analysis.ttree_output.stream_name),
+            doLargeRJets=flags.Analysis.do_large_R_UFO_jets,
+            GN2X_WP=GN2X_WP,
         )
     )
 
@@ -119,25 +141,37 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 
     # calculate final bbtt vars
     if flags.Analysis.store_high_level_variables:
-        cfg.addEventAlgo(
-            CompFactory.HHBBTT.BaselineVarsbbttAlg(
-                "FinalVarsbbttAlg",
-                isMC=flags.Input.isMC,
-                useNonIsoLeptons=use_noniso_leptons,
-                electrons=electronkey, eleWPs=ele_WPs,
-                saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
-                muons=muonkey, muonWPs=muon_WPs,
-                taus=taukey, tauWP=flags.Analysis.Tau.extra_wps[0],
-                doMMC=flags.Analysis.do_mmc,
-                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-                PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
-                floatVariableList=float_variables,
-                intVariableList=int_variables
+
+        if flags.Analysis.do_boosted_dihiggs:
+            cfg.addEventAlgo(
+                CompFactory.HHBBTT.BaselineVarsBoostedbbttAlg(
+                    "BaselineVarsBoostedbbttAlg",
+                    isMC=flags.Input.isMC,
+                    floatVariableList=float_variables,
+                    GN2X_WP=GN2X_WP,
+                )
             )
-        )
+        else:
+            cfg.addEventAlgo(
+                CompFactory.HHBBTT.BaselineVarsbbttAlg(
+                    "FinalVarsbbttAlg",
+                    isMC=flags.Input.isMC,
+                    useNonIsoLeptons=use_noniso_leptons,
+                    electrons=electronkey, eleWPs=ele_WPs,
+                    saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
+                    muons=muonkey, muonWPs=muon_WPs,
+                    taus=taukey, tauWP=flags.Analysis.Tau.extra_wps[0],
+                    doMMC=flags.Analysis.do_mmc,
+                    bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+                    PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
+                    floatVariableList=float_variables,
+                    intVariableList=int_variables
+                )
+            )
 
     # calculate event trigger SF
-    if flags.Input.isMC:
+    # TODO: __BOOSTED__ for the moment we don't have SF for boosted Jets
+    if flags.Input.isMC and not flags.Analysis.do_boosted_dihiggs:
         cfg.addEventAlgo(
             CompFactory.HHBBTT.TriggerSFAlg(
                 "TriggerSFAlg",
@@ -282,5 +316,11 @@ def bbtt_branches(flags):
                 "ZCR", "TopEMuCR", "AntiIsoLepHad"]:
         branches += [f"EventInfo.pass_{cat}_%SYS% -> bbtt_pass_{cat}"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    if "Boosted" in flags.Analysis.channels:
+        branches += [
+            "EventInfo.pass_Boosted_%SYS% -> bbtt_pass_Boosted"
+            + flags.Analysis.systematics_suffix_separator + "%SYS%"
+        ]
 
     return branches, float_variable_names, int_variable_names

@@ -11,6 +11,7 @@ namespace HHBBTT
     ZCR,
     TopEMuCR,
     AntiIsoLepHad,
+    Boosted
   };
 
   enum TriggerChannel
@@ -33,7 +34,8 @@ namespace HHBBTT
     trigMatch_Tau35,
     trigMatch_Tau25,
     DBT_L1,
-    DBT_HLT
+    DBT_HLT,
+    LARGE_R_JETS
   };
 
   enum Var
@@ -81,6 +83,7 @@ namespace HHBBTT
     pass_trigger_DTT_4J12_delayed,
     pass_trigger_DTT_L1Topo_delayed,
     pass_trigger_DBT,
+    pass_trigger_LARGE_R_JETS,
     
     AT_LEAST_TWO_LRJETS,
     TWO_JETS,
@@ -142,6 +145,7 @@ namespace HHBBTT
     pass_ZCR,
     pass_TopEMuCR,
     pass_AntiIsoLepHad,
+    pass_Boosted
   };
 
   // working points used for selecting leptons:

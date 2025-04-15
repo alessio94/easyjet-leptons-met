@@ -265,6 +265,11 @@ namespace HHBBTT
            jetL1Thresholds, jetHLTThresholds,
            jetL1ET, jetHLTPT);
 
+    checkLargeRJetsTriggers(
+      year(*eventInfo), 
+      eventInfo.cptr(),
+      triggerdecos,
+      pass_decos);
 
     return StatusCode::SUCCESS;
   }
@@ -586,6 +591,27 @@ void TriggerDecoratorAlg::checkDiBJetTriggers
     }
 
 
+  }
+
+  void TriggerDecoratorAlg::checkLargeRJetsTriggers(
+   int year, 
+   const xAOD::EventInfo* eventInfo,
+   const trigReadDecoMap& triggerdecos,
+   passWriteDecoMap& pass_decos
+  ) const {
+    
+    // get triggers name
+    std::vector<std::string> largeRjets_paths;
+    getLargeRJetsTriggers(year, largeRjets_paths);
+
+    // Loop on triggers
+    bool trigPassed_largeRjets = false;
+    for(const auto& trig : largeRjets_paths){
+      bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+      trigPassed_largeRjets |= pass;
+      // TODO: __BOOSTED__ map also each jet ?
+    }  
+    pass_decos.at(HHBBTT::LARGE_R_JETS)(*eventInfo) |= trigPassed_largeRjets;
   }
 
 }
