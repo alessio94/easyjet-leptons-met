@@ -316,10 +316,6 @@ class AnalysisArgumentParser(ArgumentParser):
             **AnalysisArgumentParser.oropt,
         )
         self.add_analysis_arg(
-            "-j", "--loose-jet-cleaning",
-            **AnalysisArgumentParser.oropt
-        )
-        self.add_analysis_arg(
             "-y", "--do-CP-systematics",
             **AnalysisArgumentParser.oropt
         )

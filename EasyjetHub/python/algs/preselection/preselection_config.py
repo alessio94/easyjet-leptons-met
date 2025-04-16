@@ -16,7 +16,7 @@ def event_selection_sequence(flags):
     configSeq.setOptionValue('.runEventCleaning', flags.Analysis.do_event_cleaning)
     configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
 
-    if not flags.Analysis.loose_jet_cleaning:
+    if flags.Analysis.add_BadBatman_jet_cleaning:
         configSeq.setOptionValue(
             '.selectionFlags',
             [

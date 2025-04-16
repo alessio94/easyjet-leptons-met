@@ -60,7 +60,7 @@ Trigger:
 do_trigger_filtering: true
 
 # apply loose jet cleaning only
-loose_jet_cleaning: true
+add_BadBatman_jet_cleaning: false
 
 # if you want to truth match (is MC protected)
 # Whether to activate CP alg systematic variations

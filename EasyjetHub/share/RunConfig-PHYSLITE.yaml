@@ -34,7 +34,7 @@ Trigger:
 do_trigger_filtering: true
 
 # apply loose jet cleaning only
-loose_jet_cleaning: true
+add_BadBatman_jet_cleaning: false
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
