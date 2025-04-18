@@ -1,7 +1,7 @@
 '2017': 'physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root'
 '2018': 'physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root'
-'2022': 'purw.actualMu.2022.ignore_TRIGLAR.root'
-'2023': 'purw.actualMu.2023.ignoreTRIG_JETCTPIN.root'
+'2022': 'purw.actualMu.ignoreTRIGLARroot'
+'2023': 'purw.actualMu.ignoreTRIGJETCTPIN.root'
 # Common MC PRW files in addition to the ones by year
 'mc20a': 'PileupReweighting/mc20_common/mc20a.284500.physlite.prw.v1.root'
 'mc20d': 'PileupReweighting/mc20_common/mc20d.300000.physlite.prw.v1.root'
