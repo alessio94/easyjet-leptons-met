@@ -135,19 +135,6 @@ namespace HHBBTT
       ATH_CHECK(m_tau_trigMatch_DecorKey.at(channel).initialize());
     }
 
-    for (const auto& [channel, name] : m_triggerChannels){
-      if(name.find("DTT") || name.find("DBT")){
-        SG::ReadDecorHandleKey<xAOD::JetContainer> deco;
-        deco = m_jetHandle.getNamePattern() + ".trigMatch_"+name;
-        m_jet_trigMatch_DecorKey.emplace(channel, deco);
-        ATH_CHECK(m_jet_trigMatch_DecorKey.at(channel).initialize());
-        SG::ReadDecorHandleKey<xAOD::JetContainer> deco_th;
-        deco_th = m_jetHandle.getNamePattern() + ".trigMatch_"+name+"_threshold";
-        m_jet_trigMatch_ThresholdKey.emplace(channel, deco_th);
-        ATH_CHECK(m_jet_trigMatch_ThresholdKey.at(channel).initialize());
-      }
-    }
-
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
     for ( auto name : m_channel_names){
@@ -193,15 +180,7 @@ namespace HHBBTT
     for (const auto& [channel, key] : m_tau_trigMatch_DecorKey){
       tau_trigMatchDecos.emplace(channel, key);
     }
-    jetTrigMatchReadDecoMap jet_trigMatchDecos;
-    for (const auto& [channel, key] : m_jet_trigMatch_DecorKey){
-      jet_trigMatchDecos.emplace(channel, key);
-    }
 
-    jetTrigMatchThresholdReadMap jet_trigMatchThresholds;
-    for (const auto& [channel, key] : m_jet_trigMatch_ThresholdKey){
-      jet_trigMatchThresholds.emplace(channel, key);
-    }
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector()){
       CP::SysFilterReporter filter (filterCombiner, sys);

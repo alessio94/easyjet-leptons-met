@@ -175,7 +175,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         cfg.addEventAlgo(
             CompFactory.HHBBTT.TriggerSFAlg(
                 "TriggerSFAlg",
-                SFyears=flags.Analysis.Years,
                 eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
                 muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
                 tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),
@@ -283,6 +282,30 @@ def bbtt_branches(flags):
     if flags.Analysis.store_high_level_variables:
         branches += ["EventInfo.bbtt_pass_presel_%SYS% -> bbtt_pass_presel"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    # special jet branches only for bbtautau
+    smalljetkey = flags.Analysis.container_names.output.reco4PFlowJet
+    small_R_prefix = (
+        "recojet_antikt4"
+        + flags.Analysis.Small_R_jet.jet_type.replace("reco4", "").replace("Jet", "")  # noqa: E501
+    )
+    branches += [
+        f'{smalljetkey}.trigMatch_L1_onlinept'
+        f'->{small_R_prefix}_trigMatch_L1_onlinept'
+        + flags.Analysis.systematics_suffix_separator + "%SYS%",
+        f'{smalljetkey}.trigMatch_L1_onlineeta'
+        f'->{small_R_prefix}_trigMatch_L1_onlineeta'
+        + flags.Analysis.systematics_suffix_separator + "%SYS%"
+    ]
+    if flags.GeoModel.Run is LHCPeriod.Run3:
+        branches += [
+            f'{smalljetkey}.trigMatch_HLT_threshold'
+            f'->{small_R_prefix}_trigMatch_HLT_threshold'
+            + flags.Analysis.systematics_suffix_separator + "%SYS%",
+            f'{smalljetkey}.trigMatch_HLT_onlinept'
+            f'->{small_R_prefix}_trigMatch_HLT_onlinept'
+            + flags.Analysis.systematics_suffix_separator + "%SYS%"
+        ]
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbttSelectorAlg

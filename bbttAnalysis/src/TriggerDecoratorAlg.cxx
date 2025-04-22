@@ -46,17 +46,17 @@ namespace HHBBTT
       m_triggerdecoKeys.emplace(trig, deco);
       ATH_CHECK(m_triggerdecoKeys.at(trig).initialize());
       // initialize the read handle to read a list of matched thresholds
-      m_L1ThresholdsDecorKey.emplace(
-            trig, m_jetsKey.key() + ".match" + modifiedTrigName + "_L1thresholds");
-      m_HLTThresholdsDecorKey.emplace(
-            trig, m_jetsKey.key() + ".match" + modifiedTrigName + "_HLTthresholds");
       m_L1ETDecorKey.emplace(
             trig, m_jetsKey.key() + ".match" + modifiedTrigName + "_L1et");
+      m_L1EtaDecorKey.emplace(
+            trig, m_jetsKey.key() + ".match" + modifiedTrigName + "_L1eta");
+      m_HLTThresholdsDecorKey.emplace(
+            trig, m_jetsKey.key() + ".match" + modifiedTrigName + "_HLTthresholds");
       m_HLTPTDecorKey.emplace(
             trig, m_jetsKey.key() + ".match" + modifiedTrigName + "_HLTpt");
-      ATH_CHECK(m_L1ThresholdsDecorKey.at(trig).initialize());
-      ATH_CHECK(m_HLTThresholdsDecorKey.at(trig).initialize());
       ATH_CHECK(m_L1ETDecorKey.at(trig).initialize());
+      ATH_CHECK(m_L1EtaDecorKey.at(trig).initialize());
+      ATH_CHECK(m_HLTThresholdsDecorKey.at(trig).initialize());
       ATH_CHECK(m_HLTPTDecorKey.at(trig).initialize());
     }
 
@@ -114,19 +114,23 @@ namespace HHBBTT
     }
 
     for (const auto& [channel, name] : m_triggerChannels){
-      if(name.find("DTT") || name.find("DBT")){
-        SG::WriteDecorHandleKey<xAOD::JetContainer> deco;
-        deco = m_jetsKey.key() + ".trigMatch_"+name;
-        m_jet_trigMatch_DecorKey.emplace(channel, deco);
-        ATH_CHECK(m_jet_trigMatch_DecorKey.at(channel).initialize());
-        SG::WriteDecorHandleKey<xAOD::JetContainer> deco_th;
-        deco_th = m_jetsKey.key() + ".trigMatch_"+name+"_threshold";
-        m_jet_trigMatch_ThresholdKey.emplace(channel, deco_th);
-        ATH_CHECK(m_jet_trigMatch_ThresholdKey.at(channel).initialize());
+      if(name == "L1" || name == "HLT" ){
         SG::WriteDecorHandleKey<xAOD::JetContainer> deco_pt;
         deco_pt = m_jetsKey.key() + ".trigMatch_"+name+"_onlinept";
         m_jet_trigMatch_OnlinePtKey.emplace(channel, deco_pt);
         ATH_CHECK(m_jet_trigMatch_OnlinePtKey.at(channel).initialize());
+      }
+      if(name == "HLT" ){
+        SG::WriteDecorHandleKey<xAOD::JetContainer> deco_th;
+        deco_th = m_jetsKey.key() + ".trigMatch_"+name+"_threshold";
+        m_jet_trigMatch_ThresholdKey.emplace(channel, deco_th);
+        ATH_CHECK(m_jet_trigMatch_ThresholdKey.at(channel).initialize());
+      }
+      if(name == "L1" ){
+        SG::WriteDecorHandleKey<xAOD::JetContainer> deco_eta;
+        deco_eta = m_jetsKey.key() + ".trigMatch_"+name+"_onlineeta";
+        m_jet_trigMatch_OnlineEtaKey.emplace(channel, deco_eta);
+        ATH_CHECK(m_jet_trigMatch_OnlineEtaKey.at(channel).initialize());
       }
     }
 
@@ -136,16 +140,16 @@ namespace HHBBTT
 
   StatusCode TriggerDecoratorAlg::execute(const EventContext& ctx) const
   {
-    jetReadTrigMatchThresholdMap jetL1Thresholds;
     jetReadTrigMatchThresholdMap jetHLTThresholds;
-    jetReadTrigMatchptMap jetL1ET;
-    jetReadTrigMatchptMap jetHLTPT;
+    jetReadTrigMatchfloatMap jetHLTPT;
+    jetReadTrigMatchfloatMap jetL1ET;
+    jetReadTrigMatchfloatMap jetL1Eta;
     for (auto &trig : m_triggers)
     {
-      jetL1Thresholds.emplace(trig, m_L1ThresholdsDecorKey.at(trig));
       jetHLTThresholds.emplace(trig, m_HLTThresholdsDecorKey.at(trig));
-      jetL1ET.emplace(trig, m_L1ETDecorKey.at(trig));
       jetHLTPT.emplace(trig, m_HLTPTDecorKey.at(trig));
+      jetL1ET.emplace(trig, m_L1ETDecorKey.at(trig));
+      jetL1Eta.emplace(trig, m_L1EtaDecorKey.at(trig));
     }
 
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_eventInfoKey,ctx);
@@ -203,14 +207,6 @@ namespace HHBBTT
       }
     }
 
-    jetTrigMatchWriteDecoMap jet_trigMatchDecos;
-    for (const auto& [channel, key] : m_jet_trigMatch_DecorKey){
-      jet_trigMatchDecos.emplace(channel, key);
-      for(const xAOD::Jet* jet : *jets){
-	jet_trigMatchDecos.at(channel)(*jet) = false;
-      }
-    }
-
     jetTrigMatchThresholdMap jet_trigMatchThresholds;
     for (const auto& [channel, key] : m_jet_trigMatch_ThresholdKey){
       jet_trigMatchThresholds.emplace(channel, key);
@@ -219,11 +215,19 @@ namespace HHBBTT
       }
     }
 
-    jetTrigMatchOnlinePtMap jet_trigMatchOnlinePt;
+    jetTrigMatchOnlineFloatMap jet_trigMatchOnlinePt;
     for (const auto& [channel, key] : m_jet_trigMatch_OnlinePtKey){
       jet_trigMatchOnlinePt.emplace(channel, key);
       for(const xAOD::Jet* jet : *jets){
 	jet_trigMatchOnlinePt.at(channel)(*jet) = -99.;
+      }
+    }
+
+    jetTrigMatchOnlineFloatMap jet_trigMatchOnlineEta;
+    for (const auto& [channel, key] : m_jet_trigMatch_OnlineEtaKey){
+      jet_trigMatchOnlineEta.emplace(channel, key);
+      for(const xAOD::Jet* jet : *jets){
+	jet_trigMatchOnlineEta.at(channel)(*jet) = -99.;
       }
     }
 
@@ -253,17 +257,16 @@ namespace HHBBTT
 
     checkDiTauTriggers(year(*eventInfo), eventInfo.cptr(),
 		       runBoolDecos, triggerdecos, pass_decos,
-		       taus.cptr(), tau_trigMatchDecos,
-		       jets.cptr(), jet_trigMatchDecos,
-		       jet_trigMatchThresholds, jet_trigMatchOnlinePt,
-           jetL1Thresholds, jetL1ET);
+		       taus.cptr(), tau_trigMatchDecos, jets.cptr(),
+		       jet_trigMatchOnlinePt, jet_trigMatchOnlineEta,
+           jetL1ET, jetL1Eta);
     
     checkDiBJetTriggers(year(*eventInfo), eventInfo.cptr(),
 		       runBoolDecos, triggerdecos, pass_decos,
-		       jets.cptr(), jet_trigMatchDecos,
-		       jet_trigMatchThresholds, jet_trigMatchOnlinePt,
-           jetL1Thresholds, jetHLTThresholds,
-           jetL1ET, jetHLTPT);
+		       jets.cptr(), jet_trigMatchThresholds,
+           jet_trigMatchOnlinePt, jet_trigMatchOnlineEta,
+           jetHLTThresholds, jetHLTPT,
+           jetL1ET, jetL1Eta);
 
     checkLargeRJetsTriggers(
       year(*eventInfo), 
@@ -460,11 +463,11 @@ namespace HHBBTT
    const xAOD::TauJetContainer* taus,
    tauTrigMatchWriteDecoMap& tau_trigMatchDecos,
    const xAOD::JetContainer* jets,
-   jetTrigMatchWriteDecoMap& jet_trigMatchDecos,
-   jetTrigMatchThresholdMap& jet_trigMatchThresholds,
-   jetTrigMatchOnlinePtMap& jet_trigMatchOnlinePt,
-   jetReadTrigMatchThresholdMap& jetL1Thresholds,
-   jetReadTrigMatchptMap& jetL1ET) const {
+   jetTrigMatchOnlineFloatMap& jet_trigMatchOnlinePt,
+   jetTrigMatchOnlineFloatMap& jet_trigMatchOnlineEta,
+   jetReadTrigMatchfloatMap& jetL1ET,
+   jetReadTrigMatchfloatMap& jetL1Eta) const{
+
 
     std::vector<std::string> ditau_paths_2016;
     std::vector<std::string> ditau_paths_L1Topo;
@@ -513,12 +516,9 @@ namespace HHBBTT
 	    tau_trigMatchDecos.at(channel)(*tau) |= match;
 	    tau_trigMatchDecos.at(HHBBTT::DTT)(*tau) |= match;
 	  }
-	  for (const xAOD::Jet *jet : *jets){
-	    bool match = !jetL1Thresholds.at("trigPassed_"+trig)(*jet).empty();
-	    jet_trigMatchDecos.at(channel)(*jet) |= match;
-	    jet_trigMatchDecos.at(HHBBTT::DTT)(*jet) |= match;
-	    jet_trigMatchThresholds.at(channel)(*jet) = jetL1Thresholds.at("trigPassed_"+trig)(*jet);
-	    jet_trigMatchOnlinePt.at(channel)(*jet) = jetL1ET.at("trigPassed_"+trig)(*jet);
+    for (const xAOD::Jet *jet : *jets){
+      jet_trigMatchOnlinePt.at(HHBBTT::L1)(*jet) = jetL1ET.at("trigPassed_"+trig)(*jet);
+      jet_trigMatchOnlineEta.at(HHBBTT::L1)(*jet) = jetL1Eta.at("trigPassed_"+trig)(*jet);
 	  }
 	}
       }
@@ -550,13 +550,13 @@ void TriggerDecoratorAlg::checkDiBJetTriggers
    const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
    passWriteDecoMap& pass_decos,
    const xAOD::JetContainer* jets,
-   jetTrigMatchWriteDecoMap& jet_trigMatchDecos,
    jetTrigMatchThresholdMap& jet_trigMatchThresholds,
-   jetTrigMatchOnlinePtMap& jet_trigMatchOnlinePt,
-   jetReadTrigMatchThresholdMap& jetL1Thresholds,
+   jetTrigMatchOnlineFloatMap& jet_trigMatchOnlinePt,
+   jetTrigMatchOnlineFloatMap& jet_trigMatchOnlineEta,
    jetReadTrigMatchThresholdMap& jetHLTThresholds,
-   jetReadTrigMatchptMap& jetL1ET,
-   jetReadTrigMatchptMap& jetHLTPT) const {
+   jetReadTrigMatchfloatMap& jetHLTPT,
+   jetReadTrigMatchfloatMap& jetL1ET,
+   jetReadTrigMatchfloatMap& jetL1Eta) const {
 
     std::vector<std::string> dib_paths;
     getDiBJetTriggers(year, eventInfo, runBoolDecos, dib_paths);
@@ -573,15 +573,10 @@ void TriggerDecoratorAlg::checkDiBJetTriggers
 	mapDecisions.at(channel) |= pass;
 	if(pass){
 	  for (const xAOD::Jet *jet : *jets){
-	    bool matchL1 = !jetL1Thresholds.at("trigPassed_"+trig)(*jet).empty();
-	    jet_trigMatchDecos.at(HHBBTT::DBT_L1)(*jet) |= matchL1;
-	    jet_trigMatchThresholds.at(HHBBTT::DBT_L1)(*jet) = jetL1Thresholds.at("trigPassed_"+trig)(*jet);
-	    jet_trigMatchOnlinePt.at(HHBBTT::DBT_L1)(*jet) = jetL1ET.at("trigPassed_"+trig)(*jet);
-	    bool matchHLT = !jetHLTThresholds.at("trigPassed_"+trig)(*jet).empty();
-	    jet_trigMatchDecos.at(HHBBTT::DBT_HLT)(*jet) |= matchHLT;
-	    jet_trigMatchThresholds.at(HHBBTT::DBT_HLT)(*jet) = jetHLTThresholds.at("trigPassed_"+trig)(*jet);
-	    jet_trigMatchOnlinePt.at(HHBBTT::DBT_HLT)(*jet) = jetHLTPT.at("trigPassed_"+trig)(*jet);
-	    jet_trigMatchDecos.at(HHBBTT::DBT)(*jet) |= matchHLT;
+	    jet_trigMatchOnlinePt.at(HHBBTT::L1)(*jet) = jetL1ET.at("trigPassed_"+trig)(*jet);
+      jet_trigMatchOnlineEta.at(HHBBTT::L1)(*jet) = jetL1Eta.at("trigPassed_"+trig)(*jet);
+	    jet_trigMatchThresholds.at(HHBBTT::HLT)(*jet) = jetHLTThresholds.at("trigPassed_"+trig)(*jet);
+	    jet_trigMatchOnlinePt.at(HHBBTT::HLT)(*jet) = jetHLTPT.at("trigPassed_"+trig)(*jet);
 	  }
 	}
       }

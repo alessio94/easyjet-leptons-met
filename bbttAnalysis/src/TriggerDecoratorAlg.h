@@ -61,8 +61,8 @@ namespace HHBBTT
 	{HHBBTT::DBT, "DBT"},
 	{HHBBTT::trigMatch_Tau35, "Tau35"},
 	{HHBBTT::trigMatch_Tau25, "Tau25"},
-	{HHBBTT::DBT_L1, "DBT_L1"},
-	{HHBBTT::DBT_HLT, "DBT_HLT"},
+	{HHBBTT::L1, "L1"},
+	{HHBBTT::HLT, "HLT"},
         {HHBBTT::LARGE_R_JETS, "LARGE_R_JETS"}
       };
 
@@ -121,11 +121,11 @@ namespace HHBBTT
     std::unordered_map<HHBBTT::TriggerChannel,
       SG::WriteDecorHandleKey<xAOD::TauJetContainer> > m_tau_trigMatch_DecorKey;
     std::unordered_map<HHBBTT::TriggerChannel,
-      SG::WriteDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_DecorKey;
-    std::unordered_map<HHBBTT::TriggerChannel,
       SG::WriteDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_ThresholdKey;
     std::unordered_map<HHBBTT::TriggerChannel,
       SG::WriteDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_OnlinePtKey;
+    std::unordered_map<HHBBTT::TriggerChannel,
+      SG::WriteDecorHandleKey<xAOD::JetContainer> > m_jet_trigMatch_OnlineEtaKey;
 
     ToolHandle<Trig::IMatchingTool> m_matchingTool
       { this, "trigMatchingTool", "", "Trigger matching tool"};
@@ -139,17 +139,16 @@ namespace HHBBTT
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::MuonContainer, bool> > muTrigMatchWriteDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::ElectronContainer, bool> > eleTrigMatchWriteDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::TauJetContainer, bool> > tauTrigMatchWriteDecoMap;
-    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::JetContainer, bool> > jetTrigMatchWriteDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>> > jetTrigMatchThresholdMap;
-    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::JetContainer, float> > jetTrigMatchOnlinePtMap;
+    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::WriteDecorHandle<xAOD::JetContainer, float> > jetTrigMatchOnlineFloatMap;
     typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::JetContainer, std::vector<int>> > jetReadTrigMatchThresholdMap;
-    typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::JetContainer, float> > jetReadTrigMatchptMap;
+    typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::JetContainer, float> > jetReadTrigMatchfloatMap;
 
-    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_L1ThresholdsDecorKey; // list of matched thresholds from JetDecoratorAlg
     std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_HLTThresholdsDecorKey;
+    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_HLTPTDecorKey;
 
     std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_L1ETDecorKey;
-    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_HLTPTDecorKey;
+    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_L1EtaDecorKey;
 
     void checkSingleMuTriggers
       (int year, const xAOD::EventInfo* eventInfo,
@@ -197,24 +196,23 @@ namespace HHBBTT
        const xAOD::TauJetContainer* taus,
        tauTrigMatchWriteDecoMap& tau_trigMatchDecos,
        const xAOD::JetContainer* jets,
-       jetTrigMatchWriteDecoMap& jet_trigMatchDecos,
-       jetTrigMatchThresholdMap& jet_trigMatchThresholds,
-       jetTrigMatchOnlinePtMap& jet_trigMatchOnlinePt,
-       jetReadTrigMatchThresholdMap& jetL1Thresholds,
-       jetReadTrigMatchptMap& jetL1ET) const;
+       jetTrigMatchOnlineFloatMap& jet_trigMatchOnlinePt,
+       jetTrigMatchOnlineFloatMap& jet_trigMatchOnlineEta,
+       jetReadTrigMatchfloatMap& jetL1ET,
+       jetReadTrigMatchfloatMap& jetL1Eta) const;
 
      void checkDiBJetTriggers
       (int year, const xAOD::EventInfo* eventInfo,
        const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::JetContainer* jets,
-       jetTrigMatchWriteDecoMap& jet_trigMatchDecos,
        jetTrigMatchThresholdMap& jet_trigMatchThresholds,
-       jetTrigMatchOnlinePtMap& jet_trigMatchOnlinePt,
-       jetReadTrigMatchThresholdMap& jetL1Thresholds,
+       jetTrigMatchOnlineFloatMap& jet_trigMatchOnlinePt,
+       jetTrigMatchOnlineFloatMap& jet_trigMatchOnlineEta,
        jetReadTrigMatchThresholdMap& jetHLTThresholds,
-       jetReadTrigMatchptMap& jetL1ET,
-       jetReadTrigMatchptMap& jetHLTPT) const;
+       jetReadTrigMatchfloatMap& jetHLTPT,
+       jetReadTrigMatchfloatMap& jetL1ET,
+       jetReadTrigMatchfloatMap& jetL1Eta) const;
 
     void checkLargeRJetsTriggers
       (int year, 

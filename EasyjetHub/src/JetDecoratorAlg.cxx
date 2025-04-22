@@ -193,7 +193,7 @@ namespace Easyjet
                 minDRL1 = dR;
                 bestL1 = l1_jet;
                 std::vector<std::string> thrNames = l1_jet->thrNames();
-                std::stringstream ss(l1Name);
+                std::stringstream ss(std::regex_replace(l1Name, std::regex("-"), "_"));
                 std::string legName;
                 std::smatch match;
                 while (getline(ss, legName, '_')) // loop over legs

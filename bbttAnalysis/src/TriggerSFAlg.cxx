@@ -10,8 +10,6 @@
 #include "TriggerUtils.h"
 
 #include "TLorentzVector.h"
-#include "PathResolver/PathResolver.h"
-#include <TFile.h>
 
 namespace HHBBTT
 {
@@ -58,38 +56,6 @@ namespace HHBBTT
     ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_bbttTauHandle));
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
-
-    // Load calibration file by year
-    if (m_SF_year.empty()) {
-      ATH_MSG_ERROR("Year is not set");
-      return StatusCode::FAILURE;
-    }
-    int SF_year = m_SF_year[0];
-    std::string path = "EasyjetHub/jet_trigger_scale_factors_2223.root";
-    std::string resolvedPath = PathResolverFindCalibFile(path);
-    TFile* jetSFFile = new TFile(resolvedPath.c_str(), "READ");
-    if (!jetSFFile) ATH_MSG_WARNING("Failed to load calibration file " << path << ". jet scale factor set to 1.");
-
-    std::vector<int> m_L1_thresholds = {45, 25, 15, 12};
-    std::vector<int> m_HLT_thresholds = {80, 55, 28, 20};
-    if (SF_year == 2023){
-      m_HLT_thresholds.push_back(75);
-      m_HLT_thresholds.push_back(50);
-      m_HLT_thresholds.push_back(25);
-    }
-
-    if (jetSFFile){
-      for (auto L1_threshold : m_L1_thresholds){
-        TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get(
-                  ("L1_"+std::to_string(L1_threshold)+"_jet_sf").c_str())));
-        if (h) {m_L1_jetTriggerSFMap.emplace(L1_threshold, h); }
-      }
-      for (auto HLT_threshold : m_HLT_thresholds){
-        TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get(
-                  ("HLT_"+std::to_string(HLT_threshold)+"_jet_sf").c_str())));
-        if (h) {m_HLT_jetTriggerSFMap.emplace(HLT_threshold, h); }
-      }
-    }
 
     for(const auto& [runBool, name] : m_runBooleans) {
       SG::ReadDecorHandleKey<xAOD::EventInfo> deco;

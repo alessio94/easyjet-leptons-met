@@ -33,8 +33,8 @@ namespace HHBBTT
     DTT_L1Topo_delayed,
     trigMatch_Tau35,
     trigMatch_Tau25,
-    DBT_L1,
-    DBT_HLT,
+    L1,
+    HLT,
     LARGE_R_JETS
   };
 

@@ -150,8 +150,6 @@ private:
 	{HHBBTT::DTT_4J12_delayed, "DTT_4J12_delayed"},
 	{HHBBTT::DTT_L1Topo_delayed, "DTT_L1Topo_delayed"},
 	{HHBBTT::DBT, "DBT"},
-	{HHBBTT::DBT_L1, "DBT_L1"},
-	{HHBBTT::DBT_HLT, "DBT_HLT"},
         {HHBBTT::LARGE_R_JETS, "LARGE_R_JETS"}
       };
 
@@ -274,8 +272,6 @@ private:
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::MuonContainer, bool> > muTrigMatchReadDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::ElectronContainer, bool> > eleTrigMatchReadDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::TauJetContainer, bool> > tauTrigMatchReadDecoMap;
-    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::JetContainer, bool> > jetTrigMatchReadDecoMap;
-    typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::JetContainer, std::vector<int>> > jetTrigMatchThresholdReadMap;
 
     void applyTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
