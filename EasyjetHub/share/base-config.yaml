@@ -22,6 +22,8 @@ VGammaOR_ypT_cuts: [] # Default photon_pT_cuts = [10e3]
 VGammaOR_dR_lepton_photon_cuts: [] # Default dR_lepton_photon_cuts = [0.0, 0.05, 0.075, 0.1, 0.125, 0.15, 0.2]
 # apply loose jet cleaning + BadBatman
 add_BadBatman_jet_cleaning: true
+#apply tight jet cleaning. Works only for ptag >= 6139!
+do_tight_jet_cleaning: false
 do_bbtt_analysis: false
 do_bbyy_analysis: false
 do_thinning: true

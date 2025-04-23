@@ -16,21 +16,17 @@ def event_selection_sequence(flags):
     configSeq.setOptionValue('.runEventCleaning', flags.Analysis.do_event_cleaning)
     configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
 
+    selectionFlags = ['DFCommonJets_eventClean_LooseBad']
+    if flags.Analysis.do_tight_jet_cleaning:
+        selectionFlags = ['DFCommonJets_eventClean_TightBad']
+    invertFlags = [False]
+
     if flags.Analysis.add_BadBatman_jet_cleaning:
-        configSeq.setOptionValue(
-            '.selectionFlags',
-            [
-                'DFCommonJets_eventClean_LooseBad',
-                'DFCommonJets_isBadBatman',
-            ],
-        )
-        configSeq.setOptionValue(
-            '.invertFlags',
-            [
-                False,
-                True,
-            ],
-        )
+        selectionFlags += ['DFCommonJets_isBadBatman']
+        invertFlags += [True]
+
+    configSeq.setOptionValue('.selectionFlags', selectionFlags)
+    configSeq.setOptionValue('.invertFlags', invertFlags)
 
     # Run GRL decoration optionally, already available in PHYSLITE
     if flags.Analysis.GRL.store_decoration and not flags.Input.isPHYSLITE:
