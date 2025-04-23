@@ -13,8 +13,9 @@ from EasyjetHub.hub import (
     analysis_configuration,
     run_job,
     default_sequence_cfg,
+    output_cfg
 )
-from EasyjetHub.output.ttree.minituple_config import minituple_cfg
+from EasyjetHub.output.ttree.minituple_config import check_ntuple_output_file
 
 from ZCharmAnalysis.ZCharm_config import ZCharm_branches
 from ZCharmAnalysis.ZCharm_config import ZCharm_cfg
@@ -60,34 +61,33 @@ def ZCharm_job_cfg():
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
     # rather than statically in the yaml
-    if flags.Analysis.out_file:
-        tree_flags = flags.Analysis.ttree_output
-        cfg.merge(
-            minituple_cfg(
-                flags, tree_flags,
-                flags.Analysis.out_file,
-                extra_output_branches=extra_ZCharm_branches
-            ),
-            seqname,
-        )
+    outcfg, ntuple_output_file_list = output_cfg(
+        flags,
+        seqname,
+        extra_ZCharm_branches)
+    cfg.merge(outcfg)
 
     # Record the number of events for logging and tests
     if not flags.Analysis.suppress_metadata_json:
         cfg.merge(event_counter_cfg("n_events"), seqname)
 
-    return cfg, flags, args
+    return cfg, flags, args, ntuple_output_file_list
 
 
 def main():
     # record the total run time
     starttime = time.process_time()
 
-    cfg, flags, args = ZCharm_job_cfg()
+    cfg, flags, args, ntuple_output_file_list = ZCharm_job_cfg()
     # cfg.getService("MessageSvc").defaultLimit=999999
     if args.dry_run:
-        return_code = 1
+        return_code = BootstrapHelper.StatusCode(True)
     else:
         return_code = run_job(flags, args, cfg)
+        from os import environ
+        outpklfile = environ.get("PICKLECAFILE", None) # check if --stop-after-config
+        if return_code and outpklfile is None:
+            check_ntuple_output_file(ntuple_output_file_list)
 
     # this is for unit tests: if jobs run too long something is wrong
     if args.timeout:

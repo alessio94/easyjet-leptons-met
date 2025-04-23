@@ -6,9 +6,9 @@ All output writing is done via the TTree algorithms provided in [`PhysicsAnalysi
 - `TreeFillerAlg` handles the actual operation of reading `xAOD` data and filling the `TTree` branches
 Further details are in the [atlassoftwaredocs AnalysisSWTutorial](https://atlassoftwaredocs.web.cern.ch/AnalysisSWTutorial/basic_trees/).
 
-In the basic job run by `easyjet-ntupler`, the full TTree creation is handled by the `minituple_cfg()` function in [`minituple_config.py`](./minituple_config.py). For convenience, the function [`EasyjetHub.steering.main_sequence_config.output_cfg`](../../steering/main_sequence_config.py), accessible also as `EasyjetHub.hub.output_cfg`, will call `minituple_cfg()` if any TTree output file is specified (via `-O` or `--out-file`), while also setting up support for `h5` and `xAOD` output formats.
+In the basic job run by `easyjet-ntupler`, the full TTree creation is handled by the `minituple_cfg()` function in [`minituple_config.py`](./minituple_config.py). For convenience, the function [`EasyjetHub.steering.main_sequence_config.output_cfg`](../../steering/main_sequence_config.py), accessible also as `EasyjetHub.hub.output_cfg`, will call `minituple_cfg()` if any TTree output file is specified (via `-O` or `--out-file`), while also setting up support for `h5` and `xAOD` output formats. `output_cfg()` is the recommended wrapper around `minituple_cfg()` that should be used by analyses.
 
-There are two routes to adding branches into the output file using`minituple_cfg()`. Each job is permitted to define a list of TTree configurations, which populate the `flags.Analysis.ttree_configs` list. For each of these configurations:
+Each job is permitted to define a list of TTree configurations, which populate the `flags.Analysis.ttree_configs` list. For each of these configurations:
 - A structured set of branches is defined when calling `minituple_cfg()`, passing in the current TTree configuration. The detailed branch lists and configuration logic are defined in modules in this directory, corresponding to each of the object containers. The template TTree configuration is defined in [`EasyjetHub/share/AnalysisMiniTree-config.yaml`](../../../share/AnalysisMiniTree-config.yaml), including the tree name and the lists of containers and details to write. The template has all flags defaulted to off, so all desired content should be explicitly switched on (see e.g. [`EasyjetHub/share/RunConfig.yaml`](../../../share/RunConfig.yaml)).
 - Arbitrary additions can be made in two ways:
   1. A fixed set of branches can be added setting the `extra_output_branches` flag under the TTree config in the yaml.
@@ -16,10 +16,6 @@ There are two routes to adding branches into the output file using`minituple_cfg
 The syntax for `extra_output_branches` is specified below.
 
 Other arguments to `minituple_cfg()` permit direct configuration of the tree name, target ROOT file and the directory to which the tree is written. [^1]
-
-[^1]: Note that if `minituple_cfg()` is called via [`EasyjetHub.steering.main_sequence_config.output_cfg`](../../steering/main_sequence_config.py), all TTree configs will be read and written to the same output file, with identical selection.
-
-For even more control over the branch content, the `tree_cfg()` function that is called within `minituple_cfg()` can be used directly. This permits the full list of branches to be specified freely.
 
 
 ### Tree configuration in yaml

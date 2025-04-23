@@ -1,6 +1,9 @@
 from operator import attrgetter
 from typing import List, Optional
 
+import ROOT
+
+
 from AthenaConfiguration.AthConfigFlags import AthConfigFlags
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
@@ -254,8 +257,7 @@ def minituple_output_cfg(
     cfg.addService(
         CompFactory.THistSvc(
             Output=[f"{stream_name} DATAFILE='{outfile_name}',"
-                    " OPT='RECREATE'"],
-            MaxFileSize=-1  # Disable file size limit as temporary workaround
+                    " OPT='RECREATE'"]
         )
     )
 
@@ -318,6 +320,7 @@ def minituple_cfg(
             )
         )
 
+    ntuple_output_file_list = []
     channelList = [""]
     if flags.Analysis.splitOutputTree:
         channelList = flags.Analysis.channels
@@ -337,7 +340,7 @@ def minituple_cfg(
                     # Dummy output decoration, required for all selector alg
                     eventDecisionOutputDecoration="out_" + channel + "_%SYS%"),
                 sequenceName=channelSeqName)
-
+        ntuple_output_file_list += [outfile]
         cfg.merge(
             minituple_output_cfg(
                 flags, tree_flags,
@@ -349,4 +352,15 @@ def minituple_cfg(
             channelSeqName,
         )
 
-    return cfg
+    return cfg, ntuple_output_file_list
+
+
+def check_ntuple_output_file(
+        ntuple_output_file_list):
+
+    for out_file_name in ntuple_output_file_list:
+        out_file = ROOT.TFile.Open(out_file_name, "READ")
+        if out_file.IsZombie() or out_file.TestBit(ROOT.TFile.kRecovered):
+            raise RuntimeError(
+                "Output file ", out_file_name, " not properly closed"
+            )

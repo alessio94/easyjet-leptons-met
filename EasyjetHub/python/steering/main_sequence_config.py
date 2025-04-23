@@ -181,25 +181,23 @@ def event_building_cfg(flags, seqname):
 
 
 # Configure output file writing
-def output_cfg(flags, seqname):
+def output_cfg(flags, seqname, extra_output_branches=None):
 
     cfg = ComponentAccumulator()
     cfg.addSequence(CompFactory.AthSequencer(seqname), "AthAlgSeq")
 
-    # Configure however many TTree outputs are configured.
-    # This config only handles one output file, as it comes from the
-    # command line arguments. In principle we could set up multiple
-    # output files, but that needs more custom config hooks
-    # If additional branches need to be configured dynamically,
-    # i.e. via python, then minituple_cfg should be called explicitly
+    ntuple_output_file_list = []
     if flags.Analysis.out_file:
         tree_flags = flags.Analysis.ttree_output
+        out_cfg, ntuple_output_file_list = minituple_cfg(
+            flags,
+            tree_flags,
+            flags.Analysis.out_file,
+            extra_output_branches=extra_output_branches
+        )
         cfg.merge(
-            minituple_cfg(
-                flags, tree_flags,
-                flags.Analysis.out_file,
-            ),
-            seqname,
+            out_cfg,
+            seqname
         )
 
     if flags.Analysis.h5_output:
@@ -217,7 +215,7 @@ def output_cfg(flags, seqname):
     if not flags.Analysis.suppress_metadata_json:
         cfg.merge(event_counter_cfg("n_events"), seqname)
 
-    return cfg
+    return cfg, ntuple_output_file_list
 
 
 def metadata_cfg(flags, **kwargs):

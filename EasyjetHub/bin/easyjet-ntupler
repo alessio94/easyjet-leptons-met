@@ -12,6 +12,7 @@ import sys
 import time
 
 from EasyjetHub import hub
+from EasyjetHub.output.ttree.minituple_config import check_ntuple_output_file
 
 
 def minimal_job_cfg():
@@ -27,15 +28,16 @@ def minimal_job_cfg():
     # - build event info with calibrations etc
     seqname = "EasyjetSeq"
     cfg = hub.default_sequence_cfg(flags, seqname)
-    cfg.merge(hub.output_cfg(flags, seqname))
-
-    return cfg, flags, args
+    outcfg, ntuple_output_file_list = hub.output_cfg(flags, seqname)
+    cfg.merge(outcfg)
+    
+    return cfg, flags, args, ntuple_output_file_list
 
 
 def main():
     # record the total run time
     starttime = time.process_time()
-    cfg, flags, args = minimal_job_cfg()
+    cfg, flags, args, ntuple_output_file_list = minimal_job_cfg()
 
     # Exit after full configuration purely for testing
     if args.dry_run:
@@ -45,6 +47,10 @@ def main():
         return_code = 1
     else:
         return_code = hub.run_job(flags, args, cfg).isSuccess()
+        from os import environ
+        outpklfile = environ.get("PICKLECAFILE", None) # check if --stop-after-config
+        if return_code and outpklfile is None:
+            check_ntuple_output_file(ntuple_output_file_list)
 
     # this is for unit tests: if jobs run too long something is wrong
     if args.timeout:

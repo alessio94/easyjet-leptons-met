@@ -17,8 +17,9 @@ from EasyjetHub.hub import (
     analysis_configuration,     # lives in flags
     run_job,                    # lives in run
     default_sequence_cfg,       # lives in main_sequence_config
+    output_cfg
 )
-from EasyjetHub.output.ttree.minituple_config import minituple_cfg
+from EasyjetHub.output.ttree.minituple_config import check_ntuple_output_file
 from EasyjetHub.output.h5.h5_config import get_h5_cfg
 from EasyjetHub.output.xaod import get_xaod_cfg
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
@@ -104,45 +105,32 @@ def hh4b_job_cfg():
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
     # rather than statically in the yaml
-    if flags.Analysis.out_file:
-        tree_flags = flags.Analysis.ttree_output
-        cfg.merge(
-            minituple_cfg(
-                flags, tree_flags,
-                flags.Analysis.out_file,
-                extra_output_branches=bbbb_branches
-            ),
-            seqname,
-        )
-
-    if flags.Analysis.h5_output:
-        cfg.merge(
-            get_h5_cfg(flags),
-            seqname,
-        )
-
-    if flags.Output.AODFileName:
-        cfg.merge(
-            get_xaod_cfg(flags, seqname),
-            seqname
-        )
-
+    outcfg, ntuple_output_file_list = output_cfg(
+        flags,
+        seqname,
+        bbbb_branches)
+    cfg.merge(outcfg)
+    
     # Record the number of events for logging and tests
     cfg.merge(event_counter_cfg("n_events"), seqname)
 
-    return cfg, flags, args
+    return cfg, flags, args, ntuple_output_file_list
 
 
 def main():
     # record the total run time
     starttime = time.process_time()
 
-    cfg, flags, args = hh4b_job_cfg()
+    cfg, flags, args, ntuple_output_file_list = hh4b_job_cfg()
 
     if args.dry_run:
-        return_code = 1
+        return_code = BootstrapHelper.StatusCode(True)
     else:
         return_code = run_job(flags, args, cfg)
+        from os import environ
+        outpklfile = environ.get("PICKLECAFILE", None) # check if --stop-after-config
+        if return_code and outpklfile is None:
+            check_ntuple_output_file(ntuple_output_file_list)
 
     # this is for unit tests: if jobs run too long something is wrong
     if args.timeout:
