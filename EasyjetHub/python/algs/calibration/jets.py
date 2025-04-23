@@ -94,14 +94,8 @@ def jet_sequence(
             btag_wps += jet_flags.btag_extra_wps
 
         # Make sure PCBT is scheduled to get SF
-        for tagger in ["DL1dv01", "GN2v01"]:
-            add_PCBT = False
-            for tagger_wp in btag_wps:
-                if tagger in tagger_wp:
-                    add_PCBT = True
-                    break
-            if (tagger + "_Continuous") not in btag_wps and add_PCBT:
-                btag_wps += [tagger + "_Continuous"]
+        if "GN2v01_Continuous" not in btag_wps:
+            btag_wps += ["GN2v01_Continuous"]
 
         tagger_set = set()
 
@@ -120,14 +114,6 @@ def jet_sequence(
             bTagCalibFile = None
             if 'btagCDI' in jet_flags:
                 bTagCalibFile = jet_flags.btagCDI
-            # if DL1dv01 in tagger name overwrite the CDI
-            elif "DL1dv01" in tagger:
-                if flags.GeoModel.Run is LHCPeriod.Run2:
-                    bTagCalibFile = 'xAODBTaggingEfficiency/13TeV/' \
-                        '2023-22-13TeV-MC20-CDI-2023-09-13_v1.root'
-                elif flags.GeoModel.Run is LHCPeriod.Run3:
-                    bTagCalibFile = 'xAODBTaggingEfficiency/13p6TeV/' \
-                        '2023-22-13TeV-MC21-CDI-2023-09-13_v1.root'
 
             if tagger_wp == "GN2v01_Continuous2D":
                 from AthenaCommon.Utils.unixtools import find_datafile
@@ -158,14 +144,6 @@ def jet_sequence(
             bTagCalibFile = None
             if 'btagCDI' in jet_flags:
                 bTagCalibFile = jet_flags.btagCDI
-            # if DL1dv01 in tagger name overwrite the CDI
-            elif "DL1dv01" in tagger:
-                if flags.GeoModel.Run is LHCPeriod.Run2:
-                    bTagCalibFile = 'xAODBTaggingEfficiency/13TeV/' \
-                        '2023-22-13TeV-MC20-CDI-2023-09-13_v1.root'
-                elif flags.GeoModel.Run is LHCPeriod.Run3:
-                    bTagCalibFile = 'xAODBTaggingEfficiency/13p6TeV/' \
-                        '2023-22-13TeV-MC21-CDI-2023-09-13_v1.root'
 
             if bTagCalibFile:
                 configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)

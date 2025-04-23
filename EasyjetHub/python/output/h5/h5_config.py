@@ -38,7 +38,7 @@ def get_h5_cfg(flags):
     associations = {}
     kinematics = ["ptGeV", "eta", "phi", "massGeV"]
     types |= {x: "CUSTOM" for x in kinematics}
-    btagging = [f"DL1dv01_p{x}" for x in "cub"]
+    btagging = [f"GN2v01_p{x}" for x in "cub"]
     types |= {x: "HALF" for x in btagging}
     associations = {x: f"btaggingLink/{x}" for x in btagging}
     primitives += kinematics + btagging

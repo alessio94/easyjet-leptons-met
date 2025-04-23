@@ -62,7 +62,7 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
 You will need to execute the following command to tun the post-processing:
 bbllPostProcess.py --inFile easyjet_ntuple.root --xSectionsConfig ../easyjet/bbllAnalysis/share/XSectionData.yaml --outFile output_postprocessed_ntuple.root --mergeMyFiles --mergeToOutput
 
-The output file includes the final weight ("weight") which is evaluated considering the final sum of weights, cross-section, luminosity, MC weight and the different scale factors (SF = weight_ftag_effSF_DL1dv01_FixedCutBEff_77_NOSYS * weight_jvt_effSF_NOSYS * bbll_Lepton1_effSF_NOSYS * bbll_Lepton2_effSF_NOSYS):
+The output file includes the final weight ("weight") which is evaluated considering the final sum of weights, cross-section, luminosity, MC weight and the different scale factors (SF = weight_ftag_effSF_GN2v01_FixedCutBEff_77_NOSYS * weight_jvt_effSF_NOSYS * bbll_Lepton1_effSF_NOSYS * bbll_Lepton2_effSF_NOSYS):
 weight = eventWeight * PileupWeight * Luminosity * AMIXsection * kFactor * FilterEff * SF / sumOfWeights
 
 The --mergeMyFiles and --mergeToOutput options make sure that the output file will have the same branches as the input with the addition of the final weight. In this way, the input ntuple is not modified.

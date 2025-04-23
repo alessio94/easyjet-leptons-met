@@ -49,7 +49,7 @@ TreeBranches += [
 | --------------------------- | ------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | containerInKey              | string | "AntiKt4EMPFlowJets"      | xAOD::JetContainer name                                                                                                                                                        |
 | containerOutKey             | string | "MyContainer"             | xAOD::JetContainer name                                                                                                                                                        |
-| bTagWP                      | string | "DL1dv00_FixedCutBEff_77" | select jets with a btagging working point. Ignore with empty string ``                                                                                                         |
+| bTagWP                      | string | "GN2v01_FixedCutBEff_77" | select jets with a btagging working point. Ignore with empty string ``                                                                                                         |
 | minPt                       | float  | 20_000                    | minimum pt                                                                                                                                                                     |
 | maxEta                      | float  | 2.0                       | maximum eta                                                                                                                                                                    |
 | minimumAmount               | int    | 4                         | minimum amount of the output jets you require. It can be ignored with `-1`. It will return an empty container if the condition is not fulfilled                                |
@@ -100,7 +100,7 @@ Calculate variables for the paired small R jets for a given btagging working poi
 | option               | type   | example                   | meaning                                               |
 | -------------------- | ------ | ------------------------- | ----------------------------------------------------- |
 | smallRcontainerInKey | string | "MyPairedJets"            | xAOD::JetContainer name                               |
-| bTagWP               | string | "DL1dv00_FixedCutBEff_77" | btagging working point (needed for unique decoration) |
+| bTagWP               | string | "GN2v01_FixedCutBEff_77" | btagging working point (needed for unique decoration) |
 
 Decorations per working point in the format `EventInfo.resolved_{variable}_{bTagWP}`:
 | variable | meaning                                                        |
@@ -131,7 +131,7 @@ Calculate variables for the boosted regime and decorate eventInfo per btagging w
 | option                     | type   | example                        | meaning                                                                          |
 | -------------------------- | ------ | ------------------------------ | -------------------------------------------------------------------------------- |
 | largeRContainerInKey       | string | "MyPtSortedLargeRJets"         | xAOD::JetContainer name                                                          |
-| bTagWP                     | string | "DL1r_FixedCutBEff_77"         | btagging working point (needed for unique decoration)                            |
+| bTagWP                     | string | "GN2v01_FixedCutBEff_77"         | btagging working point (needed for unique decoration)                            |
 
 
 Decorations per working point in the format `EventInfo.boosted_{variable}_{bTagWP}`:

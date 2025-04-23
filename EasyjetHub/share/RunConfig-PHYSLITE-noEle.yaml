@@ -13,11 +13,11 @@ do_large_R_UFO_jets: true
 # Toggles for reconstructed objects decorations
 Small_R_jet:
   # nominal btagging working point, used for b-jet pT calibration in particular
-  btag_wp: "DL1dv01_FixedCutBEff_77"
+  btag_wp: "GN2v01_FixedCutBEff_77"
   # additional btagging working points, available for selections and per-jet SFs
   btag_extra_wps:
-    - DL1dv01_FixedCutBEff_70
-    - DL1dv01_FixedCutBEff_85
+    - GN2v01_FixedCutBEff_70
+    - GN2v01_FixedCutBEff_85
 
 #Electron:
 #  ID: "LooseBLayerLH"

@@ -12,15 +12,10 @@ Small_R_jet:
 
   # to use multiple btagging WPs
   btag_extra_wps:
-    - DL1dv01_FixedCutBEff_60
-    - DL1dv01_FixedCutBEff_70
-    - DL1dv01_FixedCutBEff_77
-    - DL1dv01_FixedCutBEff_85
     - GN2v01_FixedCutBEff_65
     - GN2v01_FixedCutBEff_70
     - GN2v01_FixedCutBEff_85
     - GN2v01_Continuous
-    - DL1dv01_Continuous
   
-  variables_int_bjets: ["pcbt_GN2v01", "pcbt_DL1dv01"]
+  variables_int_bjets: ["pcbt_GN2v01"]
 

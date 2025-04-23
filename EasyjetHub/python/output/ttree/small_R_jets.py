@@ -55,14 +55,8 @@ def get_small_R_jet_branches(
                 btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
             # Make sure PCBT is scheduled to get SF
-            for tagger in ["DL1dv01", "GN2v01"]:
-                add_PCBT = False
-                for tagger_wp in btag_wps:
-                    if tagger in tagger_wp:
-                        add_PCBT = True
-                        break
-                if (tagger + "_Continuous") not in btag_wps and add_PCBT:
-                    btag_wps += [tagger + "_Continuous"]
+            if "GN2v01_Continuous" not in btag_wps:
+                btag_wps += ["GN2v01_Continuous"]
 
             small_R_jet_branches.variables += [
                 f"ftag_select_{btag_wp}"
@@ -147,22 +141,7 @@ def get_small_R_jet_branches(
 
     # ftag scores pb, pc, pl
     if tree_flags.collection_options.small_R_jets.btag_details:
-        small_R_jet_branches.variables += [
-            "DL1dv01_pb",
-            "DL1dv01_pc",
-            "DL1dv01_pu"
-        ]
-
         split_tags = flags.Input.AMITag.split("_")
-        gn2v00_valid_ptag = (get_valid_ami_tag(split_tags, "p", "p5855")
-                             and not get_valid_ami_tag(split_tags, "p", "p6187"))
-        if gn2v00_valid_ptag:
-            small_R_jet_branches.variables += [
-                "GN2v00_pb",
-                "GN2v00_pc",
-                "GN2v00_pu",
-            ]
-
         gn2v01_valid_ptag = (
             (get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
             or get_valid_ami_tag(split_tags, "p", "p6255"))

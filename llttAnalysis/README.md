@@ -58,7 +58,7 @@ If everything works you should have a rootfile named outputfile.root. In the fil
   - el_pt/el_eta/el_phi/el_charge
   - mu_pt/mu_eta/mu_phi/mu_charge
   - tau_pt/tau_eta/tau_phi/tau_charge/tau_nProng/tau_isIDTau/tau_isAntiTau
-  - recojet_antikt4PFlow_pt/recojet_antikt4PFlow_eta/recojet_antikt4PFlow_phi/recojet_antikt4PFlow_m/recojet_antikt4PFlow_NNJvtPass/recojet_antikt4PFlow_ftag_select_DL1dv01_FixedCutBEff_77/
+  - recojet_antikt4PFlow_pt/recojet_antikt4PFlow_eta/recojet_antikt4PFlow_phi/recojet_antikt4PFlow_m/recojet_antikt4PFlow_NNJvtPass/recojet_antikt4PFlow_ftag_select_GN2v01_FixedCutBEff_77/
   - MET
 - truth level information
 - output of the Missing Mass Calculator (MMC)

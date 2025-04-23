@@ -18,14 +18,12 @@ do_met : true
 # Toggles for reconstructed objects decorations
 Small_R_jet:
   # btagging nominal working point
-  btag_wp: "DL1dv01_FixedCutBEff_77"
+  btag_wp: "GN2v01_FixedCutBEff_77"
 
   btag_extra_wps:
-    - DL1dv01_FixedCutBEff_60
-    - DL1dv01_FixedCutBEff_70
-    - DL1dv01_FixedCutBEff_85
-    - DL1dv01_Continuous
-    # - GN2v01_FixedCutBEff_85
+    - GN2v01_FixedCutBEff_70
+    - GN2v01_FixedCutBEff_85
+    - GN2v01_Continuous
 
 Large_R_jet:
   amount: 2

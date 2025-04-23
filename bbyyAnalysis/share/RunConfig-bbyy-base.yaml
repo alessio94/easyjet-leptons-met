@@ -25,7 +25,6 @@ Small_R_jet:
   # to use multiple btagging WPs
   btag_extra_wps:
     - GN2v01_Continuous
-    #DL1dv01
 
   amount: 4
   variables_int_allJets: ["truthLabel", "PassWP", "pcbt"]
