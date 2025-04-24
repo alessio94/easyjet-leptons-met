@@ -3,6 +3,8 @@ variables:
   FF_USE_NEW_BASH_EVAL_STRATEGY: true
 
 .ntuple_validation:
+  variables:
+    GIT_STRATEGY: none
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_PROJECT_PATH == 'easyjet/easyjet'
   stage: validate

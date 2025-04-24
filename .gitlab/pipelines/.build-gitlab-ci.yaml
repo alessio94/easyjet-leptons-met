@@ -19,6 +19,10 @@ compile:
     - cd build
     - make clean # make sure we don't have residual compilation results
     - make -j $(nproc) 2>&1 | tee -a cmake.log # dump the log files
+    - cd ..
+    - mv build builtmp
+    - cp -rL builtmp build  ### copy all symlinks to avoid clone in each test job, did not find a way to force cmake to avod symlinks for now
+    - rm -rf builtmp
   artifacts:
     paths:
       - build

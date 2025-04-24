@@ -3,8 +3,10 @@ variables:
   EASYJET_LOG_LEVEL: INFO
   # default test directory for easyjet-test, can be overridden by -d
   EASYJET_TESTDIR: ci_testdir
-
+  
 .ntupler:
+  variables:
+    GIT_STRATEGY: none
   stage: run
   needs: [compile]
   tags:
