@@ -215,7 +215,7 @@ declare -A CONFIGS=(
 )
 
 # some common variables in the tests
-COMMON="-O"
+COMMON="-O -e $TEST_RUN_NEVENTS"
 
 # specific tests
 simple() {
@@ -488,11 +488,11 @@ copy-ntuple(){
 	echo "Not an ntupler job, will not copy root output to eos"
 	return 0
     fi
-    if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} ]]; then 
+    if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x}  || -z ${TEST_RUN_NEVENTS} ]]; then
 	echo "eos env not defined, will not copy root output to eos"
 	return 0
     fi
-    if [[ -z ${CI_PROJECT_PATH+x} || ! $CI_PROJECT_PATH == "easyjet/easyjet" ]]; then 
+    if [[ -z ${CI_PROJECT_PATH+x} || ! $CI_PROJECT_PATH == "easyjet/easyjet" ]]; then
 	echo "not running on easyjet main repo CI, will not copy root output to eos"
 	return 0
     fi
@@ -509,7 +509,17 @@ copy-ntuple(){
     mkdir -p $eostmpdir
     cp analysis.root $eostmpdir/analysis_${postfix}.root
     echo $CI_MERGE_REQUEST_TITLE > $eostmpdir/CI_MERGE_REQUEST_TITLE
-    ${PFX} xrdcp -rf $eostmpdir  root://eosuser.cern.ch//$eosdir
+    ${PFX} xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch mkdir $eosdir/$eostmpdir/
+    ${PFX} xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $eosdir/$eostmpdir/analysis_${postfix}.root > /dev/null 2>&1 || true
+    ${PFX} xrdcp $eostmpdir/analysis_${postfix}.root  root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosdir/$eostmpdir
+
+    #lets not copy CI_MERGE_REQUEST_TITLE when not needed
+    xrdcp root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosdir/$eostmpdir/CI_MERGE_REQUEST_TITLE CI_MERGE_REQUEST_TITLE > /dev/null 2>&1 || true
+    if ! diff -N CI_MERGE_REQUEST_TITLE $eostmpdir/CI_MERGE_REQUEST_TITLE > /dev/null 2>&1; then
+	echo "copying title $CI_MERGE_REQUEST_TITLE"
+	${PFX} xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $eosdir/$eostmpdir/CI_MERGE_REQUEST_TITLE > /dev/null 2>&1 || true
+        ${PFX} xrdcp $eostmpdir/CI_MERGE_REQUEST_TITLE  root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosdir/$eostmpdir
+    fi
     echo "copying ntuple succeeded"
 }
 

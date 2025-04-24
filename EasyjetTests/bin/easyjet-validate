@@ -6,7 +6,7 @@ set -Eeu
 mode=$1
 postfix="${mode//-/_}"
   
-if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} ]]; then 
+if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x} ]]; then
     echo "eos env not defined, cannot validate ntuple"
     exit 1
 fi
@@ -30,14 +30,14 @@ refeosfile=$refeosdir/analysis_${postfix}.root
 echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME 
 klist
 
-echo "compareOutputNtuples root://eosuser.cern.ch//$refeosfile root://eosuser.cern.ch//$eosfile"
-compareOutputNtuples root://eosuser.cern.ch//$refeosfile root://eosuser.cern.ch//$eosfile 2>&1 | tee branch-diff-log.txt
+echo "compareOutputNtuples root://${EOS_ACCOUNT_PROJECT}.cern.ch//$refeosfile root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosfile"
+compareOutputNtuples root://${EOS_ACCOUNT_PROJECT}.cern.ch//$refeosfile root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosfile 2>&1 | tee branch-diff-log.txt
 echo "comparing ntuples succeeded"
 
 mkdir -p $eostmpdir
 echo $CI_MERGE_REQUEST_TITLE > $eostmpdir/CI_MERGE_REQUEST_TITLE
 echo $VALIDATION_REFERENCE_MR > $eostmpdir/VALIDATION_REFERENCE_MR
-xrdcp root://eosuser.cern.ch//$refeosdir/CI_MERGE_REQUEST_TITLE $eostmpdir/VALIDATION_MERGE_REQUEST_TITLE
+xrdcp root://${EOS_ACCOUNT_PROJECT}.cern.ch//$refeosdir/CI_MERGE_REQUEST_TITLE $eostmpdir/VALIDATION_MERGE_REQUEST_TITLE
 echo $CI_COMMIT_MESSAGE > $eostmpdir/CI_COMMIT_MESSAGE
 echo $CI_COMMIT_SHA > $eostmpdir/CI_COMMIT_SHA
 echo $CI_COMMIT_SHORT_SHA > $eostmpdir/CI_COMMIT_SHORT_SHA
@@ -70,9 +70,11 @@ echo $exitcode > $eostmpdir/CI_VAL_EXIT_CODE
 echo "===== ls $eostmpdir ====="
 ls $eostmpdir
 
-xrdfs root://eosuser.cern.ch mkdir $eosplotdir
-xrdfs root://eosuser.cern.ch rmdir $eosplotdir/$eostmpdir > /dev/null 2>&1 || true
-xrdcp -rf $eostmpdir root://eosuser.cern.ch//$eosplotdir
+xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch mkdir $eosplotdir
+#lets cleanup properly with painful xrootd
+for rmeosfile in `xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch ls $eosplotdir/$eostmpdir | grep -v ".sys"`; do xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $rmeosfile; done > /dev/null 2>&1 || true
+xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rmdir $eosplotdir/$eostmpdir > /dev/null 2>&1 || true
+xrdcp -rf $eostmpdir root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosplotdir
 
 echo "exit $exitcode"
 
