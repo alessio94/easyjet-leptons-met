@@ -5,6 +5,8 @@ variables:
   EASYJET_TESTDIR: ci_testdir
   
 .ntupler:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_PROJECT_PATH == 'easyjet/easyjet'
   variables:
     GIT_STRATEGY: none
   stage: run

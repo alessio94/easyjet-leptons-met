@@ -7,33 +7,33 @@ set -Eeu
 # mode-based switches
 ################################################
 
-#tag from easyjet/hh4b-test-files
-TAG=rel25019
+INPUT_EOS_DIR=root://${EOS_ACCOUNT_PROJECT}.cern.ch//${EOS_ACCOUNT_PATH}/gitlab_ci_input
 
 # standard samples
 # Data
-PHYS_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYS_10evts.r13286_p4910_p6479.pool.root
-PHYSLITE_DATA_2018=data18_13TeV.00362204.physics.DAOD_PHYSLITE_10evts.r13286_p4910_p6479.pool.root
-PHYS_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYS_10evts.r14755_p5604_p6482.pool.root
-PHYSLITE_DATA_2022=data22_13p6TeV.00436656.physics_Main.DAOD_PHYSLITE_10evts.r14755_p5604_p6482.pool.root
+PHYS_DATA_2018=$INPUT_EOS_DIR/data18_13TeV.00362204.physics_Main.deriv.DAOD_PHYS.r13286_p4910_p6479/DAOD_PHYS.41579215._000285.pool.root.1
+PHYSLITE_DATA_2018=$INPUT_EOS_DIR/data18_13TeV.00362204.physics_Main.deriv.DAOD_PHYSLITE.r13286_p4910_p6479/DAOD_PHYSLITE.41579215._000186.pool.root.1
+PHYS_DATA_2022=$INPUT_EOS_DIR/data22_13p6TeV.00436656.physics_Main.deriv.DAOD_PHYS.r14755_p5604_p6482/DAOD_PHYS.41577945._000080.pool.root.1
+PHYSLITE_DATA_2022=$INPUT_EOS_DIR/data22_13p6TeV.00436656.physics_Main.deriv.DAOD_PHYSLITE.r14755_p5604_p6482/DAOD_PHYSLITE.41577945._000022.pool.root.1
 
 # MC20
-PHYS_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYS_10evts.e6337_s3681_r13144_r13146_p6490.pool.root
-PHYSLITE_TTBAR_MC20=mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYSLITE_10evts.e6337_s3681_r13144_r13146_p6490.pool.root
-PHYS_BBYY_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYS_10evts.e8222_s3681_r13167_r13146_p6490.pool.root
-PHYSLITE_BBYY_MC20=mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.DAOD_PHYSLITE_10evts.e8222_s3681_r13167_r13146_p6490.pool.root
-PHYS_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYS_10evts.e8448_a907_r14860_p6490.pool.root
-PHYSLITE_SH4B_BOOSTED_MC20_AF3=mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.DAOD_PHYSLITE_10evts.e8448_a907_r14860_p6490.pool.root
+PHYS_TTBAR_MC20=$INPUT_EOS_DIR/mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.deriv.DAOD_PHYS.e6337_s3681_r13144_r13146_p6490/DAOD_PHYS.41651760._000216.pool.root.1
+PHYSLITE_TTBAR_MC20=$INPUT_EOS_DIR/mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.deriv.DAOD_PHYSLITE.e6337_s3681_r13144_r13146_p6490/DAOD_PHYSLITE.41651768._000226.pool.root.1
+PHYS_BBYY_MC20=$INPUT_EOS_DIR/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.deriv.DAOD_PHYS.e8222_s3681_r13167_r13146_p6490/DAOD_PHYS.42010195._000001.pool.root.1
+PHYSLITE_BBYY_MC20=$INPUT_EOS_DIR/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHHH01d0.deriv.DAOD_PHYSLITE.e8222_s3681_r13167_r13146_p6490/DAOD_PHYSLITE.42010195._000006.pool.root.1
+PHYS_SH4B_BOOSTED_MC20_AF3=$INPUT_EOS_DIR/mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.deriv.DAOD_PHYS.e8448_a907_r14860_p6490/DAOD_PHYS.42217915._000001.pool.root.1
+
+PHYSLITE_SHBBYY_BOOSTED_MC20_AF3=$INPUT_EOS_DIR/mc20_13TeV.801359.Py8EG_A14NNPDF23LO_XHS_X1000_S70_HyySbb.deriv.DAOD_PHYSLITE.e8531_a907_r14861_p6490/DAOD_PHYSLITE.43245741._000002.pool.root.1
 
 # MC23
-PHYS_TTBAR_MC23=mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYS_10evts.e8514_s4159_r15530_p6491.pool.root
-PHYSLITE_TTBAR_MC23=mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYSLITE_10evts.e8514_s4159_r15530_p6491.pool.root
-PHYS_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYS_10evts.e8514_e8528_a911_s4114_r15224_r15225_p6491.pool.root
-PHYSLITE_JETS_MC23_AF3=mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.DAOD_PHYSLITE_10evts.e8514_e8528_a911_s4114_r15224_r15225_p6491.pool.root
+PHYS_TTBAR_MC23=$INPUT_EOS_DIR/mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.deriv.DAOD_PHYS.e8514_s4159_r15530_p6491/DAOD_PHYS.41633411._000193.pool.root.1
+PHYSLITE_TTBAR_MC23=$INPUT_EOS_DIR/mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.deriv.DAOD_PHYSLITE.e8514_s4159_r15530_p6491/DAOD_PHYSLITE.41633394._000690.pool.root.1
+PHYS_JETS_MC23_AF3=$INPUT_EOS_DIR/mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.deriv.DAOD_PHYS.e8514_e8528_a911_s4114_r15224_r15225_p6491/DAOD_PHYS.41636221._000329.pool.root.1
+PHYSLITE_JETS_MC23_AF3=$INPUT_EOS_DIR/mc23_13p6TeV.801171.Py8EG_A14NNPDF23LO_jj_JZ6.deriv.DAOD_PHYSLITE.e8514_e8528_a911_s4114_r15224_r15225_p6491/DAOD_PHYSLITE.41636221._000161.pool.root.1
+
 
 # Test name convention
 # [CONFIG_INPUTTYPE]
-
 
 declare -A DATAFILES=(
     # Data
@@ -65,12 +65,12 @@ declare -A DATAFILES=(
     [ZCharm-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [llyy-mc20]=${PHYS_TTBAR_MC20}
     # MC20 AF3
-    [mc20af3-lite]=${PHYSLITE_SH4B_BOOSTED_MC20_AF3}
+    [mc20af3-lite]=${PHYSLITE_SHBBYY_BOOSTED_MC20_AF3}
     [fast-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
-    [fast-mc20af3-lite]=${PHYSLITE_SH4B_BOOSTED_MC20_AF3}
+    [fast-mc20af3-lite]=${PHYSLITE_SHBBYY_BOOSTED_MC20_AF3}
     [sh4b-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
     [fast-awkward-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
-    [SHbbyy-mc20af3-lite]=${PHYSLITE_SH4B_BOOSTED_MC20_AF3}
+    [SHbbyy-mc20af3-lite]=${PHYSLITE_SHBBYY_BOOSTED_MC20_AF3}
     # MC23
     [mc23]=${PHYS_TTBAR_MC23}
     [fast-mc23]=${PHYS_TTBAR_MC23}
@@ -457,16 +457,16 @@ error-handler() {
 }
 
 run-test() {
-    local mode=$1
-    local download_path=${DATAFILES[$mode]}
-    local file=${download_path##*/}
-    local config=${CONFIGS[$mode]-$DEFAULT_CONFIG}
-
-    # get files
-    if [[ ! -f ${file} ]] ; then
-        echo "getting file ${file} from ${DATA_URL}"
-        ${PFX} curl -s ${DATA_URL}/${TAG}/${download_path} > ${file}
+    
+    if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x}  || -z ${TEST_RUN_NEVENTS} ]]; then
+	echo "eos env not defined, will not run on input files"
+	return 0
     fi
+    echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME 
+    klist
+    local mode=$1
+    local file=${DATAFILES[$mode]}
+    local config=${CONFIGS[$mode]-$DEFAULT_CONFIG}
 
     local testcmd="${PFX} ${TESTS[$mode]} $file $config"
     trap "error-handler $mode" ERR
@@ -484,12 +484,12 @@ copy-ntuple(){
     local mode=$1
     local postfix="${mode//-/_}"
     
-    if [[ -z ${CI_JOB_NAME+x} || ! $CI_JOB_NAME == *"ntupler_"* ]]; then
-	echo "Not an ntupler job, will not copy root output to eos"
-	return 0
-    fi
     if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x}  || -z ${TEST_RUN_NEVENTS} ]]; then
 	echo "eos env not defined, will not copy root output to eos"
+	return 0
+    fi
+    if [[ -z ${CI_JOB_NAME+x} || ! $CI_JOB_NAME == *"ntupler_"* ]]; then
+	echo "Not an ntupler job, will not copy root output to eos"
 	return 0
     fi
     if [[ -z ${CI_PROJECT_PATH+x} || ! $CI_PROJECT_PATH == "easyjet/easyjet" ]]; then
