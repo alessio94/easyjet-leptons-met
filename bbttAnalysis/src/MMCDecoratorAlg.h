@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -24,8 +24,23 @@
 
 #include "HHbbttEnums.h"
 
+using ROOT::Math::PtEtaPhiMVector;
+
 namespace HHBBTT
 {
+
+  struct MMCResult {
+    int status;
+    PtEtaPhiMVector res;
+    PtEtaPhiMVector nu1;
+    PtEtaPhiMVector nu2;
+
+    MMCResult(int stat, const PtEtaPhiMVector& r, const PtEtaPhiMVector& n1,
+	      const PtEtaPhiMVector& n2)
+        : status(stat), res(r), nu1(n1), nu2(n2) {}
+
+    MMCResult() : status(0) {}  // default constructor
+  };
 
   /// \brief An algorithm for counting containers
   class MMCDecoratorAlg final : public EL::AnaAlgorithm
@@ -64,12 +79,17 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
-    CP::SysReadDecorHandle<bool> m_pass_LepHad {this, "passLepHad", "pass_baseline_LepHad_%SYS%", "events pass lep-had selections"};
-    CP::SysReadDecorHandle<bool> m_pass_HadHad {this, "passHadHad", "pass_baseline_HadHad_%SYS%", "events pass had-had selections"};
+    CP::SysReadDecorHandle<bool> m_pass_LepHad {"pass_baseline_LepHad_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_pass_HadHad {"pass_baseline_HadHad_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_pass_LepHad_1B {"pass_LepHad_1B_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_pass_HadHad_1B {"pass_HadHad_1B_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_pass_LepHad_OS {"OS_CHARGE_LEPHAD_%SYS%", this};
 
     CP::SysReadDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysReadDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
+    CP::SysReadDecorHandle<char> m_isBtag
+      {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
     /// \brief Setup sys-aware output decorations
     CP::SysWriteDecorHandle<int> m_mmc_status {"mmc_status_%SYS%", this};
@@ -97,6 +117,9 @@ private:
       { this, "channel", {}, "Which channel to run" };
 
     std::vector<HHBBTT::Channel> m_channels;
+
+    Gaudi::Property<bool> m_skipSystematicsCR
+      {this, "skipSystematicsCR", true, "Use nominal value for MMC in some selected CR"};
 
   };
 }
