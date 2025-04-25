@@ -1,6 +1,7 @@
-runConfig="vbshiggsAnalysis/RunConfig-fullLep-syst.yaml"
+runConfigs=("vbshiggsAnalysis/RunConfig-fullLep-syst_Set1.yaml" "vbshiggsAnalysis/RunConfig-fullLep-syst_Set2.yaml")
+campaignNames=("VBSHiggs_Syst1" "VBSHiggs_Syst2")
 executable="vbshiggs-ntupler"
-campaignName="VBSHiggs_Syst"
+
 
 mc_list=(
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_FullLep_signal_DAOD_PHYS_p6490.txt"
@@ -17,22 +18,24 @@ mc_list=(
 )
 
 #mc
-easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
-    --run-config ${runConfig} \
-    --exec ${executable}  \
-    --campaign ${campaignName} \
-    --noTag \
-    --mergeOutput \
-    --nGBperJob 2 \
-    --noEmail \
-    --memory 4000 \
-    --ProductionRole HMBS
+for runConfig in  "${!runConfigs[@]}"; do
+    easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
+        --run-config ${runConfigs[$runConfig]} \
+        --exec ${executable}  \
+        --campaign ${campaignNames[$runConfig]} \
+        --noTag \
+        --mergeOutput \
+        --nGBperJob 2 \
+        --noEmail \
+        --memory 4000 \
+        --ProductionRole HMBS
+done
 
-#data
+# data
 easyjet-gridsubmit --data-list ../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/data_Run2_p6490.txt \
-    --run-config ${runConfig} \
+    --run-config ${runConfigs[0]} \
     --exec ${executable} \
-    --campaign ${campaignName} \
+    --campaign ${campaignNames[0]}\
     --noTag \
     --mergeOutput \
     --noEmail \
