@@ -11,11 +11,11 @@ namespace HHBBVV
 {
   BaselineVarsbbVVAlg::BaselineVarsbbVVAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator)
+    : AthHistogramAlgorithm(name, pSvcLocator)
   {
 
   }
-
+  
   StatusCode BaselineVarsbbVVAlg::initialize()
   {
     // Read syst-aware input handles
@@ -23,24 +23,40 @@ namespace HHBBVV
     ATH_CHECK (m_bbVVLRJetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_bbVVElectronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_bbVVMuonHandle.initialize(m_systematicsList));
+
+    ATH_CHECK (m_bbVVTauHandle.initialize(m_systematicsList));
+
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     // SF access
     if(m_isMC){
       if(!m_saveDummy_ele_SF){
-	ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-	m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-	ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
       }
-
+      
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
       ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
+      
+      if (!m_tauHandle.empty()) {
+        ATH_CHECK (m_tauHandle.initialize(m_systematicsList));
+        m_tau_effSF = CP::SysReadDecorHandle<float>("effSF_"+m_tauWPName+"_%SYS%", this);
+        ATH_CHECK (m_tau_effSF.initialize(m_systematicsList, m_tauHandle));
+      }
     }
-
+    
     ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_bbVVElectronHandle));
     ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_bbVVMuonHandle));
+      
+    ATH_CHECK (m_matched_el.initialize(m_systematicsList, m_bbVVElectronHandle));
+    ATH_CHECK (m_matched_mu.initialize(m_systematicsList, m_bbVVMuonHandle));
+    
+    ATH_CHECK (m_selected_tau.initialize(m_systematicsList, m_bbVVTauHandle));
+    
+    
     ATH_CHECK(m_Hbb.initialize(m_systematicsList, m_bbVVLRJetHandle)); // Hbb jet
     ATH_CHECK(m_Whad.initialize(m_systematicsList, m_bbVVLRJetHandle)); // Whad jet
     ATH_CHECK(m_Whad2.initialize(m_systematicsList, m_bbVVLRJetHandle)); // Whad2 jet
@@ -49,7 +65,7 @@ namespace HHBBVV
       m_GN2X_wp_Handles.emplace_back("xbb_select_GN2Xv01_" + wp, this);
     for(auto& handle : m_GN2X_wp_Handles)
       ATH_CHECK(handle.initialize(m_systematicsList, m_bbVVLRJetHandle));
-
+    
     m_WTag_score = CP::SysReadDecorHandle<float>
       (m_WTag_Type.value()+m_WTag_WP.value()+"Tagger_Score", this);
     m_Pass_WTag = CP::SysReadDecorHandle<bool>
@@ -87,15 +103,18 @@ namespace HHBBVV
 
     for(const std::string &channel : m_channel_names){
       if (channel.std::string::find("1Lep") != std::string::npos)m_run_lep = true;
+      if (channel.std::string::find("VBF") != std::string::npos) m_bbVV_tau = true;
 
       if( channel == "Boosted1Lep") m_channels.push_back(HHBBVV::Boosted1Lep);
       else if ( channel == "SplitBoosted1Lep") m_channels.push_back(HHBBVV::SplitBoosted1Lep);
       else if( channel == "Boosted0Lep") m_channels.push_back(HHBBVV::Boosted0Lep);
       else if ( channel == "SplitBoosted0Lep") m_channels.push_back(HHBBVV::SplitBoosted0Lep);
+      else if ( channel == "VBFBoosted1Lep") m_channels.push_back(HHBBVV::VBFboosted1Lep);
+      else if ( channel == "VBFSplitboosted1Lep") m_channels.push_back(HHBBVV::VBFsplitboosted1Lep);
       else{
         ATH_MSG_ERROR("Unknown channel: "
           << channel << std::endl
-          << "Available are: [\"Boosted1Lep\", \"SplitBoosted1Lep\", \"Boosted0Lep\", \"SplitBoosted0lep\"]");
+          << "Available are: [\"Boosted1Lep\", \"SplitBoosted1Lep\", \"Boosted0Lep\", \"SplitBoosted0lep\", \"VBFSplitboosted1Lep\", \"VBFBoosted1Lep\"]");
         return StatusCode::FAILURE;
       }
       ATH_MSG_DEBUG("Running Channel: " << channel);
@@ -128,12 +147,18 @@ namespace HHBBVV
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_bbVVElectronHandle.retrieve (electrons, sys));
 
+      const xAOD::TauJetContainer *taus = nullptr;
+      if(m_bbVV_tau){
+        ANA_CHECK (m_bbVVTauHandle.retrieve (taus, sys));
+      }
+
+      
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
       const xAOD::MissingET* met = (*metCont)["Final"];
       if (!met) {
-      	ATH_MSG_ERROR("Could not retrieve MET");
-      	return StatusCode::FAILURE;
+          ATH_MSG_ERROR("Could not retrieve MET");
+          return StatusCode::FAILURE;
       }
 
       for (const std::string &string_var: m_floatVariables) { // Initialize
@@ -151,16 +176,18 @@ namespace HHBBVV
       float signal_lepton_SF = -99.;
       int signal_lepton_charge = -99;
       int signal_lepton_id = -99;
+      int signal_lepton_match = -99;
+      const xAOD::TauJet* tau0 = nullptr;
 
       for(const xAOD::Electron* electron : *electrons) {
         if (m_selected_el.get(*electron, sys)){
           signal_lepton = electron->p4();
           signal_lepton_SF = m_saveDummy_ele_SF ?
-	    1. : m_ele_SF.get(*electron, sys);
+                1. : m_ele_SF.get(*electron, sys);
           signal_lepton_charge = electron->charge();
           signal_lepton_id = signal_lepton_charge > 0 ? -11 : 11;
           break; // At most one lepton selected
-      	}
+            }
       }
       for(const xAOD::Muon* muon : *muons) {
         if (m_selected_mu.get(*muon, sys)){
@@ -180,8 +207,27 @@ namespace HHBBVV
         m_Fbranches.at("Lepton_effSF").set(*event, signal_lepton_SF, sys);
         m_Ibranches.at("Lepton_charge").set(*event, signal_lepton_charge, sys);
         m_Ibranches.at("Lepton_pdgid").set(*event, signal_lepton_id, sys);
+        
       }
-
+      // VBF Boosted Triggermatched Leptons and Tau's
+      for(const std::string &channel : m_channel_names){
+          if (channel == "VBFBoosted1Lep"){
+            for(const xAOD::Muon* muon : *muons) {
+                signal_lepton_match = m_matched_mu.get(*muon, sys);
+            }
+            for(const xAOD::Electron* electron : *electrons) {
+                signal_lepton_match = m_matched_el.get(*electron, sys);
+            }
+            m_Ibranches.at("Lepton_matched").set(*event, signal_lepton_match, sys);
+            for(const xAOD::TauJet* tau : *taus) {
+                if(m_selected_tau.get(*tau, sys) && !tau0) tau0 = tau;
+                else{
+                    break;
+                }
+            }
+          }
+      }
+      
       for(const xAOD::Jet* lrjet : *lrjets)
       {
         std::string prefix = "";
@@ -196,7 +242,7 @@ namespace HHBBVV
                 float wta_value = m_tau_wta.at(i).get(*lrjet, sys);
                 wta_value = (wta_value < 1e-8) ? -99. : wta_value ;
                 m_Fbranches.at(prefix + "_Tau" + std::to_string(i + 1) + "_wta").set(*event, wta_value, sys);
-	      }
+              }
 
               for (int i = 0; i < 3; i++){
                 float ecf_value = m_ecf.at(i).get(*lrjet, sys);
@@ -206,13 +252,15 @@ namespace HHBBVV
             }
           }
         }
-        else if (m_Whad2.get(*lrjet, sys)){
-          for(auto channel: m_channels){
-            if(channel == HHBBVV::SplitBoosted0Lep)prefix = "Whad2_Jet";
-          }
-        }
         else if (m_Hbb.get(*lrjet, sys)){
           prefix = "Hbb_Jet";
+        }
+        else{
+          for(auto channel: m_channels){
+             if(channel == HHBBVV::SplitBoosted0Lep){
+               if (m_Whad2.get(*lrjet, sys)) prefix = "Whad2_Jet";
+             }
+          }
         }
 
         if(!prefix.empty()){

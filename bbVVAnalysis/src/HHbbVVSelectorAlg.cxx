@@ -13,13 +13,11 @@
 
 namespace HHBBVV
 {
-  HHbbVVSelectorAlg ::HHbbVVSelectorAlg(const std::string &name,
+  HHbbVVSelectorAlg::HHbbVVSelectorAlg(const std::string &name,
                                   ISvcLocator *pSvcLocator)
-    : EL::AnaAlgorithm(name, pSvcLocator)
-  {
-  }
+    : EL::AnaAlgorithm(name, pSvcLocator) {}
 
-  StatusCode HHbbVVSelectorAlg ::initialize()
+  StatusCode HHbbVVSelectorAlg::initialize()
   {
 
     // Initialise global event filter
@@ -28,7 +26,7 @@ namespace HHBBVV
     // Read syst-aware input handles
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
-
+    
     // Choose the first GN2X wp
     m_Pass_GN2X = CP::SysReadDecorHandle<int>
       ("xbb_select_GN2Xv01_" + m_GN2X_wps.value().front(), this);
@@ -43,12 +41,13 @@ namespace HHBBVV
 
     m_eleWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
+
     m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
       ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
-
+    
     ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
-
+    
     ATH_CHECK(m_selected_el.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
 
@@ -69,11 +68,10 @@ namespace HHBBVV
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
-
+      
     for ( auto name : m_channel_names){
       if (name.std::string::find("1Lep") != std::string::npos)m_run_lep = true;
       if (name.std::string::find("0Lep") != std::string::npos)m_run_had = true;
-
       if( name == "Boosted1Lep") m_channels.push_back(HHBBVV::Boosted1Lep);
       else if ( name == "SplitBoosted1Lep") m_channels.push_back(HHBBVV::SplitBoosted1Lep);
       else if( name == "Boosted0Lep") m_channels.push_back(HHBBVV::Boosted0Lep);
@@ -90,9 +88,9 @@ namespace HHBBVV
     return StatusCode::SUCCESS;
   }
 
-  StatusCode HHbbVVSelectorAlg ::execute()
+  StatusCode HHbbVVSelectorAlg::execute()
   {
-    // Global filter originally false
+// Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
     // Loop over all systs
@@ -534,7 +532,6 @@ namespace HHBBVV
     }
   }
 
-
   void HHbbVVSelectorAlg::signalBtagging(const xAOD::Jet *&Hbb, const xAOD::Jet *&Whad, const CP::SystematicSet& sys, bool& HBB_BTAG, bool& WHAD_BTAG) {
 
     if(Hbb)HBB_BTAG = (bool)m_Pass_GN2X.get(*Hbb, sys); // Choose the first GN2X wp
@@ -549,7 +546,7 @@ namespace HHBBVV
     if(Whad2)WHAD2_BTAG = (bool)m_Pass_GN2X.get(*Whad2, sys);
 
   }
-
+  
   StatusCode HHbbVVSelectorAlg::initialiseCutflow(){
     m_bbVVCuts.CheckInputCutList(m_inputCutList,m_STANDARD_CUTS); // Check our inputCutList is valid
 

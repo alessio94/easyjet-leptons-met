@@ -3,15 +3,17 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
-    MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg, LeptonOrderingAlgCfg)
+    MuonSelectorAlgCfg, ElectronSelectorAlgCfg,
+    TauSelectorAlgCfg, JetSelectorAlgCfg, LeptonOrderingAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
+from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
-def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
-             float_variables=None, int_variables=None
-             ):
+
+def vbf_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey, taukey,
+            float_variables=None, int_variables=None):
     cfg = ComponentAccumulator()
 
     cfg.merge(MuonSelectorAlgCfg(flags,
@@ -26,14 +28,19 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                    containerInEleKey=electronkey,
                                    containerInMuKey=muonkey))
 
+    cfg.merge(TauSelectorAlgCfg(flags,
+                                # Baseline always needed for anti-taus
+                                containerInKey=taukey,
+                                containerOutKey="bbVVAnalysisTauJets_%SYS%"))
+
     cfg.merge(JetSelectorAlgCfg(flags, name="SmallJetSelectorAlg",
                                 containerInKey=smalljetkey,
                                 containerOutKey="bbVVAnalysisJets_%SYS%",
                                 bTagWPDecorName="",  # empty string: "" ignores btagging
                                 selectBjet=False,
-                                maxEta=2.5,
-                                truncateAtAmount=2,  # -1 means keep all
-                                minimumAmount=2))  # -1 means ignores this
+                                maxEta=flags.Analysis.Small_R_jet.max_eta,
+                                truncateAtAmount=-1,  # -1 means keep all
+                                minimumAmount=-1))  # -1 means ignores this
 
     cfg.merge(JetSelectorAlgCfg(flags, name="LargeJetSelectorAlg",
                                 containerInKey=largejetkey,
@@ -41,7 +48,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                 bTagWPDecorName="",
                                 selectBjet=False,
                                 minPt=200e3,
-                                maxEta=2.0,
+                                maxEta=flags.Analysis.Large_R_jet.max_eta,
                                 truncateAtAmount=-1,  # Keep all lrjets
                                 minimumAmount=flags.Analysis.Large_R_jet.amount))
 
@@ -51,16 +58,24 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     TightEleWP = flags.Analysis.Electron.extra_wps[0]
     TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
 
+    # trigger selection
+    trigger_branches = [
+        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
+        for c in flags.Analysis.TriggerChains
+    ]
+
     cfg.addEventAlgo(
-        CompFactory.HHBBVV.HHbbVVSelectorAlg(
-            "HHbbVVSelectorAlg",
+        CompFactory.HHBBVV.VBFSelectorAlg(
+            "VBFSelectorAlg",
             eventDecisionOutputDecoration="bbVV_pass_sr_%SYS%",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+            tauWP=flags.Analysis.Tau.ID,
             muonWP=TightMuonWPLabel,
             eleWP=TightEleWPLabel,
+            triggerLists=trigger_branches,
+            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             channel=flags.Analysis.channel,
-            cutList=(flags.Analysis.CutList
-                     if hasattr(flags.Analysis, "CutList") else []),
+            cutList=flags.Analysis.CutList,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
             GN2X_WPs=flags.Analysis.Large_R_jet.GN2X_hbb_wps
@@ -75,6 +90,7 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             electrons=electronkey, eleWP=TightEleWPLabel,
             saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             muons=muonkey, muonWP=TightMuonWPLabel,
+            taus=taukey, tauWP=flags.Analysis.Tau.ID,
             floatVariableList=float_variables,
             intVariableList=int_variables,
             channel=flags.Analysis.channel,
@@ -92,37 +108,13 @@ def get_BaselineVarshhbbVVAlg_variables(flags):
     int_variable_names = ["lrjets_n", "srjets_n", "Selected_Lepton_n"]
     float_variable_names = ["Whad_Jet_DeltaR"]
 
-    objects = ["Hbb", "Whad"]
-    if "SplitBoosted0Lep" in flags.Analysis.channel:
-        objects += ["Whad2"]
-
-    wtag_type = flags.Analysis.Large_R_jet.wtag_type
-    wtag_wp = flags.Analysis.Large_R_jet.wtag_wp
-
-    for obj in objects:
-        for var in ["pt", "eta", "phi", "m"]:
-            float_variable_names += [obj + "_Jet_" + var]
-        for var in ["phbb", "pqcd", "phcc", "ptop"]:
-            float_variable_names += [obj + "_Jet_GN2Xv01_" + var]
-        float_variable_names += [obj + "_Jet_" + wtag_type
-                                 + "_" + wtag_wp + "_Score"]
-
-    for obj in objects:
-        for var in flags.Analysis.Large_R_jet.GN2X_hbb_wps:
-            int_variable_names += [obj + "_Jet_Pass_GN2X_" + var]
-        int_variable_names += [obj + "_Jet_Pass_" + wtag_type
-                                   + "_" + wtag_wp]
-
-    if "Boosted0Lep" in flags.Analysis.channel:
-        for i in range(1, 5):
-            float_variable_names += [f"Whad_Jet_Tau{i}_wta"]
-        for i in range(1, 4):
-            float_variable_names += [f"Whad_Jet_ECF{i}"]
+    for var in ["matched", "leptype"]:
+        int_variable_names += ["Lepton_" + var]
 
     return float_variable_names, int_variable_names
 
 
-def bbVV_branches(flags):
+def vbf_branches(flags):
     branches = []
 
     float_variable_names = []
@@ -155,5 +147,11 @@ def bbVV_branches(flags):
     # cuts in ttree
     branches += ["EventInfo.PassAllCuts_%SYS% -> PassAllCuts"
                  + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    for var in ["_trigger_"]:
+        for cat in ["LRT", "SLT"]:
+            branches += [f"EventInfo.pass{var}{cat}_%SYS% -> "
+                         f"bbVV_pass{var}{cat}"
+                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names

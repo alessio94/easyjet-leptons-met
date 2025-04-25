@@ -9,8 +9,7 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(bbVVAnalysis
-  src/BaselineVarsbbVVAlg.cxx
-  src/HHbbVVSelectorAlg.cxx
+  src/*.cxx
   src/components/bbVVAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
@@ -24,6 +23,7 @@ atlas_add_component(bbVVAnalysis
   xAODTruth
   SystematicsHandlesLib
   FourMomUtils
+  TriggerMatchingToolLib
   TruthUtils
   EventBookkeeperToolsLib
   EasyjetHubLib
@@ -36,6 +36,7 @@ atlas_install_scripts(
 
 atlas_install_python_modules(
   python/bbVV_config.py
+  python/VBF_config.py
 )
 atlas_install_data(
   share/*.yaml
