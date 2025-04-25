@@ -72,7 +72,7 @@ ls $eostmpdir
 
 xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch mkdir $eosplotdir
 #lets cleanup properly with painful xrootd
-for rmeosfile in `xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch ls $eosplotdir/$eostmpdir | grep -v ".sys"`; do xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $rmeosfile; done > /dev/null 2>&1 || true
+for rmeosfile in `xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch ls $eosplotdir/$eostmpdir | grep -v "\.sys\.v"`; do xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $rmeosfile; done > /dev/null 2>&1 || true
 xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rmdir $eosplotdir/$eostmpdir > /dev/null 2>&1 || true
 xrdcp -rf $eostmpdir root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosplotdir
 
