@@ -13,13 +13,18 @@ channels: ["FullLep"]
 UseVBFRNN : true
 
 Electron:
-  ID: "TightLH"
-  Iso: "Tight_VarRad"
+  ID: "MediumLH"
+  Iso: "NonIso"
+  extra_wps:
+    - ["TightLH", "Tight_VarRad"]
   
 Muon:
-  ID: "Medium"
-  Iso: "PflowTight_VarRad"
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+  eta_max: 2.5
+  maxD0Significance: 10
   extra_wps:
+    - ["Medium", "PflowTight_VarRad"]
     - ["HighPt", "PflowTight_VarRad"]
 Lepton:
   amount: 2
