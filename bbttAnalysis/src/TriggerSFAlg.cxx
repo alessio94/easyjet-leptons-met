@@ -112,8 +112,8 @@ namespace HHBBTT
 
       for(const xAOD::Electron* electron : *electrons) {
         if (m_selected_el.get(*electron, sys)){
-          if(!ele0) ele0 = electron;
-          else{
+          if(!ele0){
+            ele0 = electron;
             break;
           }
         }
@@ -122,8 +122,8 @@ namespace HHBBTT
       const xAOD::Muon* mu0 = nullptr;
       for(const xAOD::Muon* muon : *muons) {
         if (m_selected_mu.get(*muon, sys)){
-          if(!mu0) mu0 = muon;
-          else{
+          if(!mu0){
+            mu0 = muon;
             break;
           }
         }
