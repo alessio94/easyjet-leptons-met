@@ -13,6 +13,7 @@ variables:
   needs: [compile]
   tags:
     - k8s-eos
+    - cvmfs
   artifacts:
     paths:
       - $EASYJET_TESTDIR/output-branches-analysis.txt
@@ -283,18 +284,24 @@ syst_mc23:
 # non-ntupler workflows
 
 aod_fast_bbbb_mc23:
+  tags:
+    - cvmfs
   stage: run
   needs: [compile]
   script:
     - easyjet-test aod-fast-bbbb-mc23
 
 h5_fast_mc23:
+  tags:
+    - cvmfs
   stage: run
   needs: [compile]
   script:
     - easyjet-test h5-fast-mc23
 
 hist_syst_bbbb_mc23:
+  tags:
+    - cvmfs
   stage: run
   needs: [compile]
   script:
@@ -303,12 +310,16 @@ hist_syst_bbbb_mc23:
 # metatests
 
 test_fail:
+  tags:
+    - cvmfs
   stage: run
   needs: [compile]
   script:
     - (! easyjet-test fail)
 
 test_all:
+  tags:
+    - cvmfs
   stage: run
   needs: [compile]
   script:
