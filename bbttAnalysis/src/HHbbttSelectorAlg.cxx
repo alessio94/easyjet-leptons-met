@@ -439,7 +439,8 @@ namespace HHBBTT
       else if (n_taus == 2) {
         tautau_vis = tau0->p4() + tau1->p4();
       }
-      m_bools.at(HHBBTT::MTAUTAU_VIS_MASS) = tautau_vis.M() > 40. * Athena::Units::GeV;
+      m_bools.at(HHBBTT::MTAUTAU_VIS_MASS_CUT_LEPHAD) = tautau_vis.M() > 30. * Athena::Units::GeV;
+      m_bools.at(HHBBTT::MTAUTAU_VIS_MASS_CUT_HADHAD) = tautau_vis.M() > 40. * Athena::Units::GeV;
 
       const xAOD::Jet* jet0 = jets->size()>0 ? jets->at(0) : nullptr;
       const xAOD::Jet* jet1 = jets->size()>1 ? jets->at(1) : nullptr;
@@ -544,7 +545,7 @@ namespace HHBBTT
       if ((m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) || 
            m_bools.at(HHBBTT::N_LEPTONS_CUT_ANTIISOLEPHAD)) &&
 	  m_bools.at(HHBBTT::ONE_TAU) &&
-	  m_bools.at(HHBBTT::MTAUTAU_VIS_MASS) &&
+	  m_bools.at(HHBBTT::MTAUTAU_VIS_MASS_CUT_LEPHAD) &&
 	  m_bools.at(HHBBTT::TWO_JETS)){
         // SLT
         if (lep_ptcut_SLT && tau_ptcut_SLT && two_central_jets_lead45){
@@ -573,7 +574,7 @@ namespace HHBBTT
 
       if (m_bools.at(HHBBTT::N_LEPTONS_CUT_HADHAD) &&
 	  m_bools.at(HHBBTT::TWO_TAU) &&
-	  m_bools.at(HHBBTT::MTAUTAU_VIS_MASS) &&
+	  m_bools.at(HHBBTT::MTAUTAU_VIS_MASS_CUT_HADHAD) &&
 	  m_bools.at(HHBBTT::TWO_JETS)){
         // STT
         if (tau_ptcut_STT && two_central_jets_lead45){
