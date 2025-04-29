@@ -15,6 +15,7 @@ mc_list=(
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_ttbar_DAOD_PHYS_p6490.txt"
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_VVV_DAOD_PHYS_p6490.txt"
     "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_Vgamma_DAOD_PHYS_p6490.txt"
+    "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/mc20_tty_DAOD_PHYS_p6490.txt"
 )
 
 #mc
