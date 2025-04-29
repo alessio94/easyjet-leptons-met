@@ -67,7 +67,7 @@ namespace HLLTT
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK(m_selected_tau.initialize(m_systematicsList, m_tauHandle));
     ATH_CHECK(m_istauID.initialize(m_systematicsList, m_tauHandle));
-    
+
     // make trigger decorators
     for (auto trig : m_triggers){
       CP::SysReadDecorHandle<bool> deco {this, "trig"+trig, trig, "Name of trigger"};
@@ -92,7 +92,6 @@ namespace HLLTT
 
   StatusCode HllttSelectorAlg ::execute()
   {
-
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
@@ -118,9 +117,9 @@ namespace HLLTT
       ANA_CHECK (m_mrmtauHandle.retrieve (mrmtaus, sys));      
 
       applyTriggerSelection(event, sys);
+      // flags for leplep                                              
       m_Bbranches.at("pass_trigger_SLT").set(*event, trigPassed_SLT, sys);
       m_Bbranches.at("pass_trigger_DLT").set(*event, trigPassed_DLT, sys);
-
       // flags for leplep
       bool N_LEPTONS_CUT_LEPLEP = false;
       bool pass_baseline_LepLep = false;
@@ -243,7 +242,7 @@ namespace HLLTT
         }
       }
 
-      if (N_LEPTONS_CUT_LEPHAD && n_taus==1){
+      if (N_LEPTONS_CUT_LEPHAD && n_taus>=1){
         // DLT
         if (lep_ptcut_DLT){
            pass_baseline_LepHad = true;
@@ -252,7 +251,7 @@ namespace HLLTT
         }
       }
 
-      if (N_LEPTONS_CUT_HADHAD && n_taus ==2 ){
+      if (N_LEPTONS_CUT_HADHAD && n_taus >=2 ){
         // DLT
 	if (lep_ptcut_DLT){
 	  pass_baseline_HadHad = true;

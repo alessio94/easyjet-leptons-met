@@ -254,7 +254,7 @@ namespace HLLTT
               isr = 1;
             }
           }
-	  if(n_lep==3&&n_taus==1){
+	  if(n_lep==3&&n_taus>=1){
             iatau1 = -1;
             for(int j = 0; j<n_lep; ++j){
               if(j !=iamu1 && j !=iamu2){
@@ -266,7 +266,7 @@ namespace HLLTT
 	      iatau2 = 0;
             }
           }
-          if(n_lep ==2&&n_taus==2){
+          if(n_lep ==2&&n_taus>=2){
             isr = 3;
 	    iatau1 = 0;
 	    iatau2 = 1;

@@ -7,13 +7,13 @@ from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
     TauSelectorAlgCfg, JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
-    get_selected_objects_branches_variables,
-)
+    get_selected_objects_branches_variables)
+from EasyjetHub.steering.analysis_configuration import (
+    get_trigger_legs_scale_factor_list)
 
 
-def lltt_cfg(
-        flags, smalljetkey, muonkey, electronkey,
-        taukey, float_variables=None, int_variables=None):
+def lltt_cfg(flags, smalljetkey, muonkey, electronkey,
+             taukey, float_variables=None, int_variables=None):
     if not float_variables:
         float_variables = []
     if not int_variables:
@@ -117,6 +117,20 @@ def lltt_cfg(
         )
     )
 
+    # calculate event trigger SLT SF, no DLT SF yet
+    if flags.Input.isMC and flags.Analysis.do_trigsf:
+        cfg.addEventAlgo(
+            CompFactory.HLLTT.TriggerSFAlg(
+                "TriggerSFAlg",
+                passTrigSLT="pass_trigger_SLT_%SYS%",
+                passTrigDLT="pass_trigger_DLT_%SYS%",
+                eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
+                muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
+                electrons="llttAnalysisElectrons_%SYS%",
+                muons="llttAnalysisMuons_%SYS%"
+            )
+        )
+
     return cfg
 
 
@@ -152,6 +166,9 @@ def lltt_branches(flags):
     # stored using the flag
     # flags.Analysis.store_high_level_variables
     float_variable_names, int_variable_names = get_BaselineVarsllttAlg_variables(flags)
+
+    if flags.Input.isMC and flags.Analysis.do_trigsf:
+        all_baseline_variable_names.append("eventTriggerSF")
 
     if flags.Analysis.do_mmc:
         # do not append mmc variables to float_variable_names

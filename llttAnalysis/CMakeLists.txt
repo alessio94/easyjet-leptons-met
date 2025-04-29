@@ -13,6 +13,7 @@ atlas_add_component(llttAnalysis
   src/LeptonPairDecoratorAlg.cxx
   src/MMCSelectorAlg.cxx
   src/HllttSelectorAlg.cxx
+  src/TriggerSFAlg.cxx
   src/components/llttAnalysis_entries.cxx
   LINK_LIBRARIES
   AthenaBaseComps
