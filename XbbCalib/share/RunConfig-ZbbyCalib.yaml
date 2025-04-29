@@ -11,7 +11,7 @@ bypass: false
 # VgammaORTool Setup
 do_VgammaOR: true
 bypass_VGammaOR: true 
-VGammaOR_ypT_cuts: [20.e+3]
+VGammaOR_ypT_cuts: [20.e+3] #photon
 VGammaOR_dR_lepton_photon_cuts: [0.1]
 # Toggles for object types
 do_large_R_UFO_jets: true
