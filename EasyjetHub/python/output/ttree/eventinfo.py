@@ -40,6 +40,9 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             "generatorWeight_%SYS%",
         ]
 
+        if not flags.Input.isPHYSLITE:
+            eventinfo_branches.variables += ["RandomLumiBlockNumber"]
+
         if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_HSTP_samples:
             eventinfo_branches.variables += ["PassHSTP"]
 
