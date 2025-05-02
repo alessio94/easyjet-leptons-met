@@ -105,6 +105,7 @@ def get_small_R_jet_branches(
                 "JVFCorr",
                 "NNJvt",
                 "NNJvtRpt",
+                "DFCommonJets_fJvt",
             ]
 
             if flags.Input.isMC:
