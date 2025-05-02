@@ -1214,10 +1214,10 @@ namespace HHBBTT
     m_pt_threshold[HHBBTT::STT][HHBBTT::leadingtau] = min_tau_STT;
 
     // Di-tau triggers
-    m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 70. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 70. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 50. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 50. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_2016][HHBBTT::leadingjet] = 60. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet] = 60. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::leadingjet] = 45. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DTT_4J12][HHBBTT::subleadingjet] = 45. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT][HHBBTT::leadingtau] = 40. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau] = 30. * Athena::Units::GeV;
     m_trigger_pt_threshold[HHBBTT::DTT_L1Topo][HHBBTT::leadingjet_matchL1] = 25;
@@ -1229,8 +1229,8 @@ namespace HHBBTT
     }
 
     // Di-b-jets triggers
-    m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingtau] = 30. * Athena::Units::GeV;
-    m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingtau] = 25. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingtau] = 25. * Athena::Units::GeV;
+    m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingtau] = 20. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] = 30. * Athena::Units::GeV;
     m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet] = 25. * Athena::Units::GeV;
 
