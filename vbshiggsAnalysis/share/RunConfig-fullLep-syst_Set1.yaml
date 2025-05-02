@@ -56,7 +56,7 @@ ttree_output:
       btag_info: false
 
     large_R_jets:
-      btag_details: false
+      btag_details: true
 
 CutList :
       - PASS_EXACTLY_TWO_LEPTONS
