@@ -129,6 +129,7 @@ ttree_output:
       truth_branches: True
       truth_parent_info: true
       run_selection: true
+      score_branches: true
     electrons:
       run_selection: true
       truth_parent_info: true

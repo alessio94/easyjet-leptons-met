@@ -45,7 +45,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
 
         split_tags = flags.Input.AMITag.split("_")
         gntau_valid_ptag = (
-            get_valid_ami_tag(split_tags, "p", "p6491") and not flags.Input.isPHYSLITE)
+            get_valid_ami_tag(split_tags, "p", "p6479") and not flags.Input.isPHYSLITE)
         if gntau_valid_ptag:
             tau_branches.variables += [
                 "GNTauScoreSigTrans_v0prune"
