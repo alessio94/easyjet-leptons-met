@@ -23,14 +23,14 @@ def hhml_cfg(
         flags,
         containerInKey=muonkey,
         containerOutKey="hhmlAnalysisMuons_%SYS%",
-        minPt=9 * Units.GeV
+        minPt=flags.Analysis.Muon.min_pT * Units.MeV
     ))
 
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
         containerInKey=electronkey,
         containerOutKey="hhmlAnalysisElectrons_%SYS%",
-        minPt=9 * Units.GeV
+        minPt=flags.Analysis.Electron.min_pT * Units.MeV
     ))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
@@ -49,7 +49,7 @@ def hhml_cfg(
         containerOutKey="hhmlAnalysisJets_%SYS%",
         bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
         selectBjet=False,
-        minPt=20 * Units.GeV,
+        minPt=flags.Analysis.Small_R_jet.min_pT * Units.MeV,
     ))
 
     # Selection
