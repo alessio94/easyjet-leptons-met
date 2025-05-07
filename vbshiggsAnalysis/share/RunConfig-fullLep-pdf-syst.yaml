@@ -13,14 +13,64 @@ channels: ["FullLep"]
 UseVBFRNN : true
 
 Electron:
-  ID: "TightLH"
-  Iso: "Tight_VarRad"
+  # maxD0Significance: 10
+  # maxDeltaZ0SinTheta: 0.5
+  # amount: 0
+  ID: "LooseBLayerLH"
+  Iso: "NonIso"
+  extra_wps:
+    - ["LooseBLayerLH", "Loose_VarRad"]
+    - ["LooseBLayerLH", "Tight_VarRad"]
+    - ["LooseBLayerLH", "TightTrackOnly_VarRad"]
+    - ["LooseBLayerLH", "TightTrackOnly_FixedRad"]
+
+    - ["MediumLH", "Loose_VarRad"]
+    - ["MediumLH", "Tight_VarRad"]
+    - ["MediumLH", "TightTrackOnly_VarRad"]
+    - ["MediumLH", "TightTrackOnly_FixedRad"]
+    - ["MediumLH", "NonIso"]
+
+    - ["TightLH", "Loose_VarRad"]
+    - ["TightLH", "Tight_VarRad"]
+    - ["TightLH", "TightTrackOnly_VarRad"]
+    - ["TightLH", "TightTrackOnly_FixedRad"]
+    - ["TightLH", "NonIso"]
+
+    - ["LooseDNNElectron", "Loose_VarRad"]
+    - ["LooseDNNElectron", "Tight_VarRad"]
+    - ["LooseDNNElectron", "TightTrackOnly_VarRad"]
+    - ["LooseDNNElectron", "TightTrackOnly_FixedRad"]
+
+    - ["MediumDNNElectron", "Loose_VarRad"]
+    - ["MediumDNNElectron", "Tight_VarRad"]
+    - ["MediumDNNElectron", "TightTrackOnly_VarRad"]
+    - ["MediumDNNElectron", "TightTrackOnly_FixedRad"]
+
+    - ["TightDNNElectron", "Loose_VarRad"]
+    - ["TightDNNElectron", "Tight_VarRad"]
+    - ["TightDNNElectron", "TightTrackOnly_VarRad"]
+    - ["TightDNNElectron", "TightTrackOnly_FixedRad"]
   
 Muon:
-  ID: "Medium"
-  Iso: "PflowTight_VarRad"
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+  eta_max: 2.5
+  maxD0Significance: 10
   extra_wps:
+    - ["Loose", "NonIso"]
+    - ["Loose", "PflowTight_VarRad"]
+    
+    - ["Medium", "PflowLoose_VarRad"]
+    - ["Medium", "PflowTight_VarRad"]
+    - ["Medium", "NonIso"]
+
+    - ["Tight", "PflowLoose_VarRad"]
+    - ["Tight", "PflowTight_VarRad"]
+    - ["Tight", "NonIso"]
+
+    - ["HighPt", "PflowLoose_VarRad"]
     - ["HighPt", "PflowTight_VarRad"]
+    - ["HighPt", "NonIso"]
 Lepton:
   amount: 2
   variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS", 
