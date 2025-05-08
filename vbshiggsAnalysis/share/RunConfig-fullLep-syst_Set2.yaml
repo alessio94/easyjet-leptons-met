@@ -17,6 +17,8 @@ Electron:
   Iso: "NonIso"
   extra_wps:
     - ["TightLH", "Tight_VarRad"]
+  do_IFF_decoration: true
+  do_reco_decoration: true
   
 Muon:
   ID: "Loose"
@@ -26,6 +28,7 @@ Muon:
   extra_wps:
     - ["Medium", "PflowTight_VarRad"]
     - ["HighPt", "PflowTight_VarRad"]
+  do_IFF_decoration: true
 Lepton:
   amount: 2
   variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS", 
