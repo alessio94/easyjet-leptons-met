@@ -10,7 +10,8 @@ DeltaRJj: 1.0
 # retrieve DisCoJet tagger (yes only on LLJ1)
 loadDisCoJet: True
 DisCoJetCfg: "SmoothedContainedVTagger_AntiKt10VanillaSD_HP_1VarDisCoJet_v3p4.dat"
-
+# HighestPT or HighestScore order
+SigJetsCriteria: "HighestPT"
 # use GN2x information or not (not on current LLJ1 ptag)
 loadGN2x: False
 

@@ -20,6 +20,8 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
             SmallRJets="VBSVV4qAnalysisJets_%SYS%",
             LargeRJets="VBSVV4qAnalysisLargeJets_%SYS%",
             SigLargeRJets="VBSVV4qAnalysisSigLargeJets_%SYS%",
+            SigJetsCriteria=flags.Analysis.SigJetsCriteria,
+            loadDisCoJet=flags.Analysis.loadDisCoJet,
         )
     )
 

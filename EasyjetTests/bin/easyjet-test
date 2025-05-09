@@ -24,7 +24,7 @@ PHYSLITE_BBYY_MC20=$INPUT_EOS_DIR/mc20_13TeV.600021.PhPy8EG_PDF4LHC15_HHbbyy_cHH
 PHYS_SH4B_BOOSTED_MC20_AF3=$INPUT_EOS_DIR/mc20_13TeV.801636.Py8EG_A14NNPDF23LO_XHS_X3000_S70_4b.deriv.DAOD_PHYS.e8448_a907_r14860_p6490/DAOD_PHYS.42217915._000001.pool.root.1
 
 PHYSLITE_SHBBYY_BOOSTED_MC20_AF3=$INPUT_EOS_DIR/mc20_13TeV.801359.Py8EG_A14NNPDF23LO_XHS_X1000_S70_HyySbb.deriv.DAOD_PHYSLITE.e8531_a907_r14861_p6490/DAOD_PHYSLITE.43245741._000002.pool.root.1
-
+LLJ1_TTBAR_MC20=$INPUT_EOS_DIR/mc20_13TeV.410471.PhPy8EG_A14_ttbar_hdamp258p75_allhad.deriv.DAOD_LLJ1.e6337_s3681_r13144_p6453/DAOD_LLJ1.41575619._000167.pool.root.1
 # MC23
 PHYS_TTBAR_MC23=$INPUT_EOS_DIR/mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.deriv.DAOD_PHYS.e8514_s4159_r15530_p6491/DAOD_PHYS.41633411._000193.pool.root.1
 PHYSLITE_TTBAR_MC23=$INPUT_EOS_DIR/mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.deriv.DAOD_PHYSLITE.e8514_s4159_r15530_p6491/DAOD_PHYSLITE.41633394._000690.pool.root.1
@@ -59,6 +59,7 @@ declare -A DATAFILES=(
     [vbshiggs-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [VBSVV4q-mc20]=${PHYS_TTBAR_MC20}
     [VBSVV4q-mc20-lite]=${PHYSLITE_TTBAR_MC20}
+    [VBSVV4q-mc20-llj1]=${LLJ1_TTBAR_MC20}
     [ssWW-mc20]=${PHYS_TTBAR_MC20}
     [ssWW-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [ZCharm-mc20]=${PHYS_TTBAR_MC20}
@@ -123,6 +124,7 @@ declare -A TESTS=(
     [vbshiggs-mc20-lite]="simple vbshiggs-ntupler"
     [VBSVV4q-mc20]="simple VBSVV4q-ntupler"
     [VBSVV4q-mc20-lite]="simple VBSVV4q-ntupler"
+    [VBSVV4q-mc20-llj1]="simple VBSVV4q-ntupler"
     [ssWW-mc20]="simple ssWW-ntupler"
     [ssWW-mc20-lite]="simple ssWW-ntupler"
     [ZCharm-mc20]="simple ZCharm-ntupler"
@@ -183,6 +185,7 @@ declare -A CONFIGS=(
     [vbshiggs-mc20-lite]=vbshiggsAnalysis/RunConfig-fullLep-bypass.yaml
     [VBSVV4q-mc20]=VBSVV4qAnalysis/RunConfig-JJ-bypass.yaml
     [VBSVV4q-mc20-lite]=VBSVV4qAnalysis/RunConfig-JJ-bypass.yaml
+    [VBSVV4q-mc20-llj1]=VBSVV4qAnalysis/RunConfig-JJ-discojet.yaml
     [ssWW-mc20]=ssWWAnalysis/RunConfig-Signal-ssWW-bypass.yaml
     [ssWW-mc20-lite]=ssWWAnalysis/RunConfig-Signal-ssWW-bypass.yaml
     [ZCharm-mc20]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml

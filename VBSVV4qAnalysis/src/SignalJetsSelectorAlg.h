@@ -39,7 +39,9 @@ namespace VBSVV4q{
 
             // signal jets to write
             CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_SignalLargeRJetsOutHandle{ this, "SigLargeRJets", "", "Signal Jets candidates container to write"};
-            
+            Gaudi::Property<bool> m_loadDisCoJet { this, "loadDisCoJet", false, "retrieve DisCoJet information" };
+            CP::SysReadDecorHandle<float> m_discojet = {this, "discojet", "SmoothVContainedHPDisCoJet_HLScore", "discojet"};
+            Gaudi::Property<std::string> m_SigJetsCriteria { this, "SigJetsCriteria", "", "Criteria to use to select signal jets" };            
             // it will be useful for resolved
             CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
