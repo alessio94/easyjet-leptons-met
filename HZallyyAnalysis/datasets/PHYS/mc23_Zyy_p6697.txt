@@ -1,0 +1,6 @@
+mc23_13p6TeV.700873.Sh_2214_eegammagamma.deriv.DAOD_PHYS.e8514_s4162_r14622_p6697
+mc23_13p6TeV.700873.Sh_2214_eegammagamma.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697
+mc23_13p6TeV.700874.Sh_2214_mumugammagamma.deriv.DAOD_PHYS.e8514_s4162_r14622_p6697
+mc23_13p6TeV.700874.Sh_2214_mumugammagamma.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697
+mc23_13p6TeV.700875.Sh_2214_tautaugammagamma.deriv.DAOD_PHYS.e8514_s4162_r14622_p6697
+mc23_13p6TeV.700875.Sh_2214_tautaugammagamma.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697
