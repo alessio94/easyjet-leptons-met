@@ -4,6 +4,9 @@ include: EasyjetHub/base-config.yaml
 # Which analysis to consider
 do_yyml_analysis: true
 
+# CutBookKeeper histPattern
+cbkHistPattern: "CutBookkeeper_%RUN%_%SYS%"
+
 # Toggles for object types
 do_photons: true
 do_electrons: true
