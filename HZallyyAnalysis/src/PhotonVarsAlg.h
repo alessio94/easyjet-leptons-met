@@ -46,7 +46,7 @@ namespace HZALLYY
     Gaudi::Property<std::string> m_phWPName
       { this, "phWP", "", "Photon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ph_SF{"", this};
-   
+
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
     

@@ -28,9 +28,13 @@ namespace HZALLYY
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+    
     if (m_saveCutFlow) ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
-
+    m_photonLIWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_photon_LooseID_Iso_WPName+"_%SYS%", this);
+    ATH_CHECK(m_photonLIWPDecorHandle.initialize(m_systematicsList, m_photonHandle));
+    
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is17_periodB5_B8.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is22_75bunches.initialize(m_systematicsList, m_eventHandle));
@@ -96,8 +100,8 @@ namespace HZALLYY
 	m_bools.at(HZALLYY::LEP1_LEP2_PT) = false;
 	m_bools.at(HZALLYY::DILEP_MASS) = false;
 	m_bools.at(HZALLYY::DILEP_PT) = false;
-	m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON) = false;
-	
+	m_bools.at(HZALLYY::ATLEAST_ONE_LOOSE_NonIso_PHOTON) = false;
+		
 	setThresholds(event, sys);
 	
 	// Leptons
@@ -138,7 +142,7 @@ namespace HZALLYY
 	   m_bools.at(HZALLYY::LEP1_LEP2_PT) &&
 	   m_bools.at(HZALLYY::DILEP_MASS) &&
 	   m_bools.at(HZALLYY::DILEP_PT) &&
-	   m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON)) pass_baseline=true;
+	   m_bools.at(HZALLYY::ATLEAST_ONE_LOOSE_NonIso_PHOTON)) pass_baseline=true;
 	
 	if ((m_bypass or pass_baseline)) filter.setPassed(true);
 	
@@ -483,8 +487,8 @@ namespace HZALLYY
   (const xAOD::PhotonContainer& photons, CutManager& llyyCuts)
     
   {
-    if (photons.size() > 0 && llyyCuts.exists("ATLEAST_ONE_PHOTON"))
-      m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON) = true;
+    if (photons.size() > 0 && llyyCuts.exists("ATLEAST_ONE_LOOSE_NonIso_PHOTON"))
+      m_bools.at(HZALLYY::ATLEAST_ONE_LOOSE_NonIso_PHOTON) = true;
   }
   
   void HZAllyySelectorAlg::setThresholds(const xAOD::EventInfo* event,

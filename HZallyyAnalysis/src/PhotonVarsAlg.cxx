@@ -18,7 +18,7 @@ namespace HZALLYY {
     // Read syst-aware input handles
     ATH_CHECK(m_llyyphotonHandle.initialize(m_systematicsList));
     ATH_CHECK(m_eventHandle.initialize(m_systematicsList));
-    
+       
     if (m_isMC) {
       ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
       m_ph_SF = CP::SysReadDecorHandle < float > ("effSF_" + m_phWPName + "_%SYS%", this);
@@ -64,6 +64,7 @@ namespace HZALLYY {
       for (const auto &var: m_intVariables) {
         m_Ibranches.at(var).set( * event, -99, sys);
       }
+
       
       for (unsigned int i = 0; i < std::min(std::size_t(2), photons -> size()); i++) {
       	const xAOD::Photon * ph = photons -> at(i);

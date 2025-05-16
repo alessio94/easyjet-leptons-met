@@ -37,8 +37,10 @@ Lepton:
 
 Photon:
   ID: "Loose"
-  Iso: "FixedCutLoose"
+  Iso: "NonIso"
   amount: 2
+  extra_wps: 
+    - ["Loose", "FixedCutLoose"]
 
 # orthogonality studies  
 orthogonality:
@@ -63,7 +65,7 @@ CutList :
       - LEP1_LEP2_PT
       - DILEP_MASS
       - DILEP_PT
-      - ATLEAST_ONE_PHOTON
+      - ATLEAST_ONE_LOOSE_NonIso_PHOTON
 
 # Include the TTree configuration and update details
 

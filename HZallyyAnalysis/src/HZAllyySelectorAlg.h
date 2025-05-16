@@ -52,7 +52,7 @@ namespace HZALLYY
       LEP1_LEP2_PT,
       DILEP_MASS,
       DILEP_PT,
-      ATLEAST_ONE_PHOTON
+      ATLEAST_ONE_LOOSE_NonIso_PHOTON
     };
 
   /// \brief An algorithm for counting containers
@@ -79,7 +79,7 @@ namespace HZALLYY
       "LEP1_LEP2_PT",
       "DILEP_MASS",
       "DILEP_PT",
-      "ATLEAST_ONE_PHOTON"
+      "ATLEAST_ONE_LOOSE_NonIso_PHOTON"
     };
 
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
@@ -90,6 +90,9 @@ namespace HZALLYY
 
     Gaudi::Property<bool> m_bypass
       { this, "bypass", false, "Run selector algorithm in pass-through mode" };
+
+    Gaudi::Property<std::string> m_photon_LooseID_Iso_WPName
+      { this, "photon_LI_WP", "Loose_FixedCutLoose", "Photon loose ID + Iso working point" };
 
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
@@ -105,6 +108,8 @@ namespace HZALLYY
 
     CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "llyyAnalysisMuons_%SYS%", "Muon container to read" };
+
+    CP::SysReadDecorHandle<char> m_photonLIWPDecorHandle{"", this};
 
     CP::SysReadDecorHandle<unsigned int> m_year
       {this, "year", "dataTakingYear", ""};
@@ -148,7 +153,7 @@ namespace HZALLYY
       {HZALLYY::LEP1_LEP2_PT, "LEP1_LEP2_PT"},
       {HZALLYY::DILEP_MASS, "DILEP_MASS"},
       {HZALLYY::DILEP_PT, "DILEP_PT"},
-      {HZALLYY::ATLEAST_ONE_PHOTON, "ATLEAST_ONE_PHOTON"},
+      {HZALLYY::ATLEAST_ONE_LOOSE_NonIso_PHOTON, "ATLEAST_ONE_LOOSE_NonIso_PHOTON"},
       
      };
 
