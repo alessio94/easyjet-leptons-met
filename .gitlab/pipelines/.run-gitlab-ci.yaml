@@ -3,7 +3,7 @@ variables:
   EASYJET_LOG_LEVEL: INFO
   # default test directory for easyjet-test, can be overridden by -d
   EASYJET_TESTDIR: ci_testdir
-  
+
 .ntupler:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_PROJECT_PATH == 'easyjet/easyjet'
@@ -18,7 +18,7 @@ variables:
     paths:
       - $EASYJET_TESTDIR/output-branches-analysis.txt
       - $EASYJET_TESTDIR/userJobMetadata.json
-    expire_in: 1 week      
+    expire_in: 1 week
 
 # Data
 
@@ -51,7 +51,7 @@ ntupler_SHbbyy_data22_lite:
   extends: .ntupler
   script:
     - easyjet-test SHbbyy-data22-lite
-    
+
 # MC20
 
 ntupler_mc20:
@@ -149,6 +149,26 @@ ntupler_llyy_mc20:
   script:
     - easyjet-test llyy-mc20
 
+ntupler_xbbcalib_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test xbbcalib-mc20
+
+ntupler_zllcalib_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test zllcalib-mc20
+
+ntupler_zbbycalib_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test zbbycalib-mc20
+
+ntupler_zbbjcalib_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test zbbjcalib-mc20
+
 # MC20 AF3
 
 ntupler_mc20af3_lite:
@@ -217,7 +237,7 @@ ntupler_bbVVVBF_mc23:
   extends: .ntupler
   script:
     - easyjet-test bbVVVBF-mc23
- 
+
 ntupler_SHbbyy_mc23af3:
   extends: .ntupler
   script:
@@ -232,6 +252,27 @@ ntupler_llyy_mc23:
   extends: .ntupler
   script:
     - easyjet-test llyy-mc23
+
+ntupler_xbbcalib_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test xbbcalib-mc23
+
+ntupler_zllcalib_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test zllcalib-mc23
+
+ntupler_zbbycalib_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test zbbycalib-mc23
+
+ntupler_zbbjcalib_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test zbbjcalib-mc23
+
 
 # Commented until ATLASG-2734 is solved
 #ntupler_bbtt_mc23_lite_syst:
@@ -253,7 +294,7 @@ ntupler_EMTopo_mc23:
   extends: .ntupler
   script:
     - easyjet-test emtopo-mc23
-  
+
 ntupler_hhml_mc23:
   extends: .ntupler
   script:

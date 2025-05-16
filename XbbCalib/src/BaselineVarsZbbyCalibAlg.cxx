@@ -2,7 +2,7 @@
   Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
 */
 
-/// @author 
+/// @author
 
 #include "BaselineVarsZbbyCalibAlg.h"
 
@@ -84,12 +84,12 @@ namespace XBBCALIB
       if (lrjets->size() >= 1)
       {
         const xAOD::Jet* largeJet = lrjets->at(0);
-        m_Fbranches.at("Zcand_pt").set(*event, largeJet->pt(), sys);  
-        m_Fbranches.at("Zcand_eta").set(*event, largeJet->eta(), sys);  
-        m_Fbranches.at("Zcand_phi").set(*event, largeJet->phi(), sys);  
-        m_Fbranches.at("Zcand_m").set(*event, largeJet->m(), sys);  
-    
-    //construct GN2X score
+        m_Fbranches.at("Zcand_pt").set(*event, largeJet->pt(), sys);
+        m_Fbranches.at("Zcand_eta").set(*event, largeJet->eta(), sys);
+        m_Fbranches.at("Zcand_phi").set(*event, largeJet->phi(), sys);
+        m_Fbranches.at("Zcand_m").set(*event, largeJet->m(), sys);
+
+        //construct GN2X score
         float GN2Xv01_phbb = m_GN2Xv01_phbb.get(*largeJet, sys);
         float GN2Xv01_phcc = m_GN2Xv01_phcc.get(*largeJet, sys);
         float GN2Xv01_pqcd = m_GN2Xv01_pqcd.get(*largeJet, sys);
@@ -101,26 +101,26 @@ namespace XBBCALIB
         m_Fbranches.at("Zcand_GN2Xv01_ptop").set(*event, GN2Xv01_ptop, sys);
         for(unsigned int wp=0; wp<m_GN2X_wps.size(); wp++)
           {
-	    int pass_GN2X = m_GN2X_wp_Handles.at(wp).get(*largeJet, sys);
+            int pass_GN2X = m_GN2X_wp_Handles.at(wp).get(*largeJet, sys);
             m_Ibranches.at("Zcand_Pass_GN2X_"+m_GN2X_wps[wp]).set(*event, pass_GN2X, sys);
           }
 
-       
+
       }
       m_Ibranches.at("lrjets_n").set(*event, lrjets->size(), sys);
       // This should be ok, as exactly one photon req.
       if (photons->size() >= 1)
       {
-        m_Fbranches.at("photon_pt").set(*event, photons->at(0)->pt(), sys);  
-        m_Fbranches.at("photon_eta").set(*event, photons->at(0)->eta(), sys);  
-        m_Fbranches.at("photon_phi").set(*event, photons->at(0)->phi(), sys);  
-        m_Fbranches.at("photon_m").set(*event, photons->at(0)->m(), sys);  
+        m_Fbranches.at("photon_pt").set(*event, photons->at(0)->pt(), sys);
+        m_Fbranches.at("photon_eta").set(*event, photons->at(0)->eta(), sys);
+        m_Fbranches.at("photon_phi").set(*event, photons->at(0)->phi(), sys);
+        m_Fbranches.at("photon_m").set(*event, photons->at(0)->m(), sys);
       }
       m_Ibranches.at("photons_n").set(*event, photons->size(), sys);
 
 
       // Calculate vars
-      
+
 
     }
     return StatusCode::SUCCESS;

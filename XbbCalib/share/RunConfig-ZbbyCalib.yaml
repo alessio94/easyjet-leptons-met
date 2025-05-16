@@ -1,16 +1,17 @@
 include: EasyjetHub/base-config.yaml
 
 # Which analysis to consider
-#do_XbbCalib: true
-do_ttbarCalib: false
 do_ZbbyCalib: true
+do_ZbbjCalib: false
+do_ttbarCalib: false
+do_ZllCalib: false
 
 # Toggles to bypass event selection
 bypass: false
 
 # VgammaORTool Setup
 do_VgammaOR: true
-bypass_VGammaOR: true 
+bypass_VGammaOR: true
 VGammaOR_ypT_cuts: [20.e+3] #photon
 VGammaOR_dR_lepton_photon_cuts: [0.1]
 # Toggles for object types
@@ -28,7 +29,7 @@ OverlapRemoval:
   do_small_R_jet_large_R_jet: false
 
 #PileupReweighting:
-#  prw_files: 
+#  prw_files:
 #    include: EasyJetHub/share/prw.yaml
 #  lumicalc_files:
 #    include: EasyJetHub/share/lumicalc.yaml
@@ -57,7 +58,7 @@ Photon:
 
 Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_77"
-  
+
 Electron:
   min_pT: 28.e+3
   ID: "TightLH"
@@ -89,11 +90,11 @@ ttree_output:
       run_selection: true
       btag_details: true
       truth_labels: true
-    photons:    
+    photons:
       run_selection: true
 
 # CutList :
-#   - PASS_TRIGGER 
+#   - PASS_TRIGGER
 #   - PASS_ONE_LARGE_JET
 #   - PASS_ONE_PHOTON
 #   - PASS_BASELINE

@@ -65,6 +65,10 @@ declare -A DATAFILES=(
     [ZCharm-mc20]=${PHYS_TTBAR_MC20}
     [ZCharm-mc20-lite]=${PHYSLITE_TTBAR_MC20}
     [llyy-mc20]=${PHYS_TTBAR_MC20}
+    [xbbcalib-mc20]=${PHYS_TTBAR_MC20}
+    [zllcalib-mc20]=${PHYS_TTBAR_MC20}
+    [zbbycalib-mc20]=${PHYS_TTBAR_MC20}
+    [zbbjcalib-mc20]=${PHYS_TTBAR_MC20}
     # MC20 AF3
     [mc20af3-lite]=${PHYSLITE_SHBBYY_BOOSTED_MC20_AF3}
     [fast-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
@@ -90,6 +94,10 @@ declare -A DATAFILES=(
     [yyml-mc23]=${PHYS_TTBAR_MC23}
     [yyml-mc23-lite]=${PHYSLITE_TTBAR_MC23}
     [llyy-mc23]=${PHYS_TTBAR_MC23}
+    [xbbcalib-mc23]=${PHYS_TTBAR_MC23}
+    [zllcalib-mc23]=${PHYS_TTBAR_MC23}
+    [zbbycalib-mc23]=${PHYS_TTBAR_MC23}
+    [zbbjcalib-mc23]=${PHYS_TTBAR_MC23}
     # systematics enabled
     [syst-mc23]=${PHYS_TTBAR_MC23}
     # non-ntupler workflows
@@ -129,7 +137,11 @@ declare -A TESTS=(
     [ssWW-mc20-lite]="simple ssWW-ntupler"
     [ZCharm-mc20]="simple ZCharm-ntupler"
     [ZCharm-mc20-lite]="simple ZCharm-ntupler"
-    [llyy-mc20]="simple llyy-ntupler" 
+    [llyy-mc20]="simple llyy-ntupler"
+    [xbbcalib-mc20]="simple xbbcalib-ntupler"
+    [zllcalib-mc20]="simple xbbcalib-ntupler"
+    [zbbycalib-mc20]="simple xbbcalib-ntupler"
+    [zbbjcalib-mc20]="simple xbbcalib-ntupler"
     # MC20 AF3
     [mc20af3-lite]="simple easyjet-ntupler"
     [fast-mc20af3]="fast easyjet-ntupler"
@@ -155,7 +167,11 @@ declare -A TESTS=(
     [hhml-mc23-lite]="simple hhml-ntupler"
     [yyml-mc23]="simple yyml-ntupler"
     [yyml-mc23-lite]="simple yyml-ntupler"
-    [llyy-mc23]="simple llyy-ntupler" 
+    [llyy-mc23]="simple llyy-ntupler"
+    [xbbcalib-mc23]="simple xbbcalib-ntupler"
+    [zllcalib-mc23]="simple xbbcalib-ntupler"
+    [zbbycalib-mc23]="simple xbbcalib-ntupler"
+    [zbbjcalib-mc23]="simple xbbcalib-ntupler"
     # non-ntupler
     [aod-fast-bbbb-mc23]="aod-fast bbbb-ntupler"
     [h5-fast-mc23]="h5-fast easyjet-ntupler"
@@ -191,6 +207,10 @@ declare -A CONFIGS=(
     [ZCharm-mc20]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
     [ZCharm-mc20-lite]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
     [llyy-mc20]=HZallyyAnalysis/RunConfig-llyy-bypass.yaml
+    [xbbcalib-mc20]=XbbCalib/RunConfig-XbbCalib-bypass.yaml
+    [zllcalib-mc20]=XbbCalib/RunConfig_Zll-bypass.yaml
+    [zbbycalib-mc20]=XbbCalib/RunConfig-ZbbyCalib-bypass.yaml
+    [zbbjcalib-mc20]=XbbCalib/RunConfig_Zbbj-MC-bypass.yaml
     # MC20 AF3
     [fast-mc20af3]=EasyjetHub/RunConfig-noEle.yaml
     [fast-mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE-noEle.yaml
@@ -212,6 +232,10 @@ declare -A CONFIGS=(
     [yyml-mc23]=yyMLAnalysis/RunConfig-yyml-bypass.yaml
     [yyml-mc23-lite]=yyMLAnalysis/RunConfig-yyml-bypass.yaml
     [llyy-mc23]=HZallyyAnalysis/RunConfig-llyy-bypass.yaml
+    [xbbcalib-mc23]=XbbCalib/RunConfig-XbbCalib-bypass.yaml
+    [zllcalib-mc23]=XbbCalib/RunConfig_Zll-bypass.yaml
+    [zbbycalib-mc23]=XbbCalib/RunConfig-ZbbyCalib-bypass.yaml
+    [zbbjcalib-mc23]=XbbCalib/RunConfig_Zbbj-MC-bypass.yaml
     # MC23 AF3
     [mc23af3]=EasyjetHub/RunConfig-noEle.yaml
     [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
@@ -463,12 +487,12 @@ error-handler() {
 }
 
 run-test() {
-    
+
     if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x}  || -z ${TEST_RUN_NEVENTS} ]]; then
-	echo "eos env not defined, will not run on input files"
-	return 0
+        echo "eos env not defined, will not run on input files"
+        return 0
     fi
-    echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME 
+    echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME
     klist
     local mode=$1
     local file=${DATAFILES[$mode]}
@@ -477,10 +501,10 @@ run-test() {
     local testcmd="${PFX} ${TESTS[$mode]} $file $config"
     trap "error-handler $mode" ERR
     if [[ ! -z ${LOG_FILE+x} ]]; then
-	echo "calling: $testcmd > $LOG_FILE 2>&1"
+        echo "calling: $testcmd > $LOG_FILE 2>&1"
         $testcmd > $LOG_FILE 2>&1
     else
-	echo "calling: $testcmd"
+        echo "calling: $testcmd"
         $testcmd
     fi
     echo "$mode succeeded" >> test_results.log
@@ -489,18 +513,18 @@ run-test() {
 copy-ntuple(){
     local mode=$1
     local postfix="${mode//-/_}"
-    
+
     if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x}  || -z ${TEST_RUN_NEVENTS} ]]; then
-	echo "eos env not defined, will not copy root output to eos"
-	return 0
+        echo "eos env not defined, will not copy root output to eos"
+        return 0
     fi
     if [[ -z ${CI_JOB_NAME+x} || ! $CI_JOB_NAME == *"ntupler_"* ]]; then
-	echo "Not an ntupler job, will not copy root output to eos"
-	return 0
+        echo "Not an ntupler job, will not copy root output to eos"
+        return 0
     fi
     if [[ -z ${CI_PROJECT_PATH+x} || ! $CI_PROJECT_PATH == "easyjet/easyjet" ]]; then
-	echo "not running on easyjet main repo CI, will not copy root output to eos"
-	return 0
+        echo "not running on easyjet main repo CI, will not copy root output to eos"
+        return 0
     fi
     if [[ -z "${CI_MERGE_REQUEST_IID:-}" ]]; then
        echo "merge request ID not defined, will not copy root output to eos"
@@ -510,7 +534,7 @@ copy-ntuple(){
     local eosdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/ntuples/
     local eostmpdir=$CI_MERGE_REQUEST_IID
     echo "copying ntuple to $eosdir"
-    echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME 
+    echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME
     klist
     mkdir -p $eostmpdir
     cp analysis.root $eostmpdir/analysis_${postfix}.root
@@ -522,8 +546,8 @@ copy-ntuple(){
     #lets not copy CI_MERGE_REQUEST_TITLE when not needed
     xrdcp root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosdir/$eostmpdir/CI_MERGE_REQUEST_TITLE CI_MERGE_REQUEST_TITLE > /dev/null 2>&1 || true
     if ! diff -N CI_MERGE_REQUEST_TITLE $eostmpdir/CI_MERGE_REQUEST_TITLE > /dev/null 2>&1; then
-	echo "copying title $CI_MERGE_REQUEST_TITLE"
-	${PFX} xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $eosdir/$eostmpdir/CI_MERGE_REQUEST_TITLE > /dev/null 2>&1 || true
+        echo "copying title $CI_MERGE_REQUEST_TITLE"
+        ${PFX} xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $eosdir/$eostmpdir/CI_MERGE_REQUEST_TITLE > /dev/null 2>&1 || true
         ${PFX} xrdcp $eostmpdir/CI_MERGE_REQUEST_TITLE  root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosdir/$eostmpdir
     fi
     echo "copying ntuple succeeded"
