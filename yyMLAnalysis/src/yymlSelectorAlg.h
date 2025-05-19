@@ -151,32 +151,26 @@ private:
     StatusCode initialiseCutflow();
 
     void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo,
-        const std::vector<std::string> &photonTriggers, const CutManager& yymlCuts);
+        const std::vector<std::string> &photonTriggers);
 
     void evaluateTriggerMatchingCuts(const std::vector<std::string> &photonTriggers,
-        const xAOD::PhotonContainer* photons, const CutManager& yymlCuts);
+        const xAOD::PhotonContainer* photons);
 
 
-    bool evaluate1l0tauSelection(const SubChannelClassify &classify,
-        const CutManager& yymlCuts);
+    bool evaluate1l0tauSelection(const SubChannelClassify &classify);
 
-    bool evaluate0l1tauSelection(const SubChannelClassify &classify,
-        const CutManager& yymlCuts);
+    bool evaluate0l1tauSelection(const SubChannelClassify &classify);
 
-    bool evaluate2l0tauSelection(const SubChannelClassify &classify,
-        const CutManager& yymlCuts);
+    bool evaluate2l0tauSelection(const SubChannelClassify &classify);
 
-    bool evaluate1l1tauSelection(const SubChannelClassify &classify,
-        const CutManager& yymlCuts);
+    bool evaluate1l1tauSelection(const SubChannelClassify &classify);
 
-    bool evaluate0l2tauSelection(const SubChannelClassify &classify,
-        const CutManager& yymlCuts);
+    bool evaluate0l2tauSelection(const SubChannelClassify &classify);
 
     void applyChannelSelection(
         const xAOD::ElectronContainer& electrons,
         const xAOD::MuonContainer& muons,
-        const xAOD::TauJetContainer& taus,
-        CutManager& yymlCuts);
+        const xAOD::TauJetContainer& taus);
 
     // TODO: used together with m_pt_threshold above for Multilepton and bbll, probably not needed for diphoton triggers
     // void setThresholds(

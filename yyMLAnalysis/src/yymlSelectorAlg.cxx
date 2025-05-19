@@ -68,7 +68,7 @@ namespace HHYYML
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
-    if (m_saveCutFlow) ATH_CHECK (initialiseCutflow());
+    ATH_CHECK (initialiseCutflow());
 
     return StatusCode::SUCCESS;
   }
@@ -103,16 +103,18 @@ namespace HHYYML
       const xAOD::TauJetContainer *taus = nullptr;
       ANA_CHECK (m_tauHandle.retrieve (taus, sys));
 
-      bool WPgiven = !m_isBtag.empty();
-      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
-      auto nonbjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
-      for(const xAOD::Jet* jet : *jets) {
-        if (WPgiven) {
-          if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet); // TODO: is this eta cut needed/appropriate?
-          else nonbjets->push_back(jet);
-        }
-      }
+      // // Not yet using btag decisions in selection at production level
+      // bool WPgiven = !m_isBtag.empty();
+      // auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      // auto nonbjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      // for(const xAOD::Jet* jet : *jets) {
+      //   if (WPgiven) {
+      //     if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet); // TODO: is this eta cut needed/appropriate?
+      //     else nonbjets->push_back(jet);
+      //   }
+      // }
 
+      // Reset boolean decisions to default=false
       for (const auto& [key, value] : m_bools) {
         m_bools.at(key) = false;
       }
@@ -128,30 +130,36 @@ namespace HHYYML
       }
 
       // apply baseline selection for objects
-
+      // internally use m_bools to keep track of decisions
       if (!m_photonTriggers.empty()) {
-        evaluateTriggerCuts(*event, m_photonTriggers, m_yymlCuts);
-        evaluateTriggerMatchingCuts(m_photonTriggers, photons, m_yymlCuts);
+        evaluateTriggerCuts(*event, m_photonTriggers);
+        evaluateTriggerMatchingCuts(m_photonTriggers, photons);
+      }
+      applyChannelSelection(*electrons, *muons, *taus);
+
+      // Fill syst-aware output decorators and cut outcomes with decisions from m_bools
+      for (auto& [key, var] : m_bools) {
+        m_Bbranches.at(key).set(*event, var, sys);
+        if (m_yymlCuts.exists(m_boolnames[key])) {
+          m_yymlCuts(m_boolnames[key]).passed = var;
+        }
+      };
+
+      bool pass_cuts=true;
+      for (CutEntry& cut : m_yymlCuts) {
+        pass_cuts = pass_cuts && cut.passed;
       }
 
-      applyChannelSelection(*electrons, *muons, *taus, m_yymlCuts);
+      bool pass_any_subchannel = m_bools.at(HHYYML::pass_1l0tau) ||
+                                 m_bools.at(HHYYML::pass_0l1tau) ||
+                                 m_bools.at(HHYYML::pass_2l0tau) ||
+                                 m_bools.at(HHYYML::pass_1l1tau) ||
+                                 m_bools.at(HHYYML::pass_0l2tau);
 
-      bool pass_baseline=false;
-      // TODO: only if PASS_TRIGGER is also in listed cuts?
-      if(m_bools.at(HHYYML::PASS_TRIGGER)) pass_baseline=true;
+      bool pass_event = pass_cuts && pass_any_subchannel;
 
-      bool pass_selection = false;
-      for (const auto& [key, value] : m_bools) {
-        if (key == HHYYML::PASS_TRIGGER ||
-            key == HHYYML::pass_trigger_diphoton ||
-            key == HHYYML::pass_matching_trigger_diphoton)
-          continue;
-        // pass selection if any of the sub-channel selections pass
-        pass_selection |= value;
-      }
-
-      pass_baseline &= pass_selection;
-
+      // write out if in bypass mode or at least this systematic passes all cuts
+      if (m_bypass || pass_event) filter.setPassed(true);
 
       //****************
       // Cutflow
@@ -190,17 +198,6 @@ namespace HHYYML
         }
       }
 
-      // Fill syst-aware output decorators
-      for (auto& [key, var] : m_bools) {
-        m_Bbranches.at(key).set(*event, var, sys);
-      };
-
-      // if not in bypass mode and baseline not passed, don't write out (at least not due to this systematic)
-      if (!m_bypass && !pass_baseline) continue;
-
-      // Global event filter true if any syst passes and controls
-      // if event is passed to output writing or not
-      filter.setPassed(true);
     } // End loop over all systs
     return StatusCode::SUCCESS;
   }
@@ -227,11 +224,7 @@ namespace HHYYML
   }
 
   void yymlSelectorAlg::evaluateTriggerCuts(const xAOD::EventInfo& event,
-    const std::vector<std::string> &photonTriggers, const CutManager& yymlCuts) {
-
-    // If not requested as a cut, will default to false without determining decision explicitly (but still decorate it)
-    if (!yymlCuts.exists("PASS_TRIGGER"))
-        return;
+    const std::vector<std::string> &photonTriggers) {
 
     bool pass_trigger_diphoton = false;
 
@@ -249,11 +242,7 @@ namespace HHYYML
   }
 
   void yymlSelectorAlg::evaluateTriggerMatchingCuts(const std::vector<std::string> &photonTriggers, 
-    const xAOD::PhotonContainer* photons, const CutManager& yymlCuts) {
-
-    // If not requested as a cut, will default to false without determining decision explicitly (but still decorate it)
-    if (!yymlCuts.exists("pass_matching_trigger_diphoton"))
-    return;
+    const xAOD::PhotonContainer* photons) {
 
     bool pass_matching_trigger_diphoton = false;
     if (photons->size() >= 2 ) {
@@ -296,33 +285,34 @@ namespace HHYYML
       m_yymlCuts.add(m_boolnames[cut]);
     }
 
-    //After filling the CutManager, book your histograms.
-    const unsigned int nbins = m_yymlCuts.size() + 1; //  need an extra bin for the total num of events.
-    ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->yyml cuts;Cuts;#epsilon",
-				 nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->yyml cuts;Cuts;#epsilon",
-				 nbins, 0.5, nbins + 0.5)));
-    ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->yyml cuts;Cuts;#epsilon",
-				 nbins, 0.5, nbins + 0.5)));
-    if(m_isMC) {
-      ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->multilepton cuts;Cuts;#epsilon",
-        nbins, 0.5, nbins + 0.5)));
-      ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->multilepton cuts;Cuts;#epsilon",
-        nbins, 0.5, nbins + 0.5)));
-      ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->multilepton cuts;Cuts;#epsilon",
-        nbins, 0.5, nbins + 0.5)));
+    if (m_saveCutFlow) {
+      //After filling the CutManager, book your histograms.
+      const unsigned int nbins = m_yymlCuts.size() + 1; //  need an extra bin for the total num of events.
+      ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->yyml cuts;Cuts;#epsilon",
+          nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->yyml cuts;Cuts;#epsilon",
+          nbins, 0.5, nbins + 0.5)));
+      ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->yyml cuts;Cuts;#epsilon",
+          nbins, 0.5, nbins + 0.5)));
+      if(m_isMC) {
+        ANA_CHECK (book (TEfficiency("WeightedAbsoluteEfficiency","Weighted Absolute Efficiency of HH->multilepton cuts;Cuts;#epsilon",
+          nbins, 0.5, nbins + 0.5)));
+        ANA_CHECK (book (TEfficiency("WeightedRelativeEfficiency","Weighted Relative Efficiency of HH->multilepton cuts;Cuts;#epsilon",
+          nbins, 0.5, nbins + 0.5)));
+        ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->multilepton cuts;Cuts;#epsilon",
+          nbins, 0.5, nbins + 0.5)));
+      }
+      ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
     }
-    ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
 
     return StatusCode::SUCCESS;
   }
 
   bool yymlSelectorAlg::evaluate1l0tauSelection(
-    const SubChannelClassify &classify,
-    const CutManager& yymlCuts) {
+    const SubChannelClassify &classify) {
 
     auto sub_channel_id = classify.getSubChannelId();
-    if (!yymlCuts.exists("pass_1l0tau") || sub_channel_id != CH_ID::hh1l0tau) return false;
+    if (sub_channel_id != CH_ID::hh1l0tau) return false;
     bool pass_selection = true;
 
     // TODO: apply additional object-level selections
@@ -331,11 +321,10 @@ namespace HHYYML
   }
 
   bool yymlSelectorAlg::evaluate0l1tauSelection(
-    const SubChannelClassify &classify,
-    const CutManager& yymlCuts) {
+    const SubChannelClassify &classify) {
 
     auto sub_channel_id = classify.getSubChannelId();
-    if (!yymlCuts.exists("pass_0l1tau") || sub_channel_id != CH_ID::hh0l1tau) return false;
+    if (sub_channel_id != CH_ID::hh0l1tau) return false;
     bool pass_selection = true;
 
     // TODO: apply additional object-level selections
@@ -344,11 +333,10 @@ namespace HHYYML
   }
 
   bool yymlSelectorAlg::evaluate2l0tauSelection(
-    const SubChannelClassify &classify,
-    const CutManager& yymlCuts) {
+    const SubChannelClassify &classify) {
 
     auto sub_channel_id = classify.getSubChannelId();
-    if (!yymlCuts.exists("pass_2l0tau") || sub_channel_id != CH_ID::hh2l0tau) return false;
+    if (sub_channel_id != CH_ID::hh2l0tau) return false;
     bool pass_selection = true;
 
     // TODO: apply additional object-level selections
@@ -357,11 +345,10 @@ namespace HHYYML
   }
 
   bool yymlSelectorAlg::evaluate1l1tauSelection(
-    const SubChannelClassify &classify,
-    const CutManager& yymlCuts) {
+    const SubChannelClassify &classify) {
 
     auto sub_channel_id = classify.getSubChannelId();
-    if (!yymlCuts.exists("pass_1l1tau") || sub_channel_id != CH_ID::hh1l1tau) return false;
+    if (sub_channel_id != CH_ID::hh1l1tau) return false;
     bool pass_selection = true;
 
     // TODO: apply additional object-level selections
@@ -370,11 +357,10 @@ namespace HHYYML
   }
 
   bool yymlSelectorAlg::evaluate0l2tauSelection(
-    const SubChannelClassify &classify,
-    const CutManager& yymlCuts) {
+    const SubChannelClassify &classify) {
 
     auto sub_channel_id = classify.getSubChannelId();
-    if (!yymlCuts.exists("pass_0l2tau") || sub_channel_id != CH_ID::hh0l2tau) return false;
+    if (sub_channel_id != CH_ID::hh0l2tau) return false;
     bool pass_selection = true;
 
     // TODO: apply additional object-level selections
@@ -385,26 +371,15 @@ namespace HHYYML
   void yymlSelectorAlg::applyChannelSelection(
     const xAOD::ElectronContainer& electrons,
     const xAOD::MuonContainer& muons,
-    const xAOD::TauJetContainer& taus,
-    CutManager& yymlCuts) {
+    const xAOD::TauJetContainer& taus) {
 
     auto classifier = SubChannelClassify(&electrons, &muons, &taus);
 
-    if (yymlCuts.exists("pass_1l0tau")) {
-      m_bools.at(HHYYML::pass_1l0tau) = evaluate1l0tauSelection(classifier, yymlCuts);
-    }
-    if (yymlCuts.exists("pass_0l1tau")) {
-      m_bools.at(HHYYML::pass_0l1tau) = evaluate0l1tauSelection(classifier, yymlCuts);
-    }
-    if (yymlCuts.exists("pass_2l0tau")) {
-      m_bools.at(HHYYML::pass_2l0tau) = evaluate2l0tauSelection(classifier, yymlCuts);
-    }
-    if (yymlCuts.exists("pass_1l1tau")) {
-      m_bools.at(HHYYML::pass_1l1tau) = evaluate1l1tauSelection(classifier, yymlCuts);
-    }
-    if (yymlCuts.exists("pass_0l2tau")) {
-      m_bools.at(HHYYML::pass_0l2tau) = evaluate0l2tauSelection(classifier, yymlCuts);
-    }
+    m_bools.at(HHYYML::pass_1l0tau) = evaluate1l0tauSelection(classifier);
+    m_bools.at(HHYYML::pass_0l1tau) = evaluate0l1tauSelection(classifier);
+    m_bools.at(HHYYML::pass_2l0tau) = evaluate2l0tauSelection(classifier);
+    m_bools.at(HHYYML::pass_1l1tau) = evaluate1l1tauSelection(classifier);
+    m_bools.at(HHYYML::pass_0l2tau) = evaluate0l2tauSelection(classifier);
 
   }
 
