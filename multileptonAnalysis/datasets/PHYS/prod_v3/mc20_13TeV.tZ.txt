@@ -1,4 +1,0 @@
-mc20_13TeV.410560.MadGraphPythia8EvtGen_A14_tZ_4fl_tchan_noAllHad.deriv.DAOD_PHYS.e5803_s3681_r13144_p6490
-mc20_13TeV.410560.MadGraphPythia8EvtGen_A14_tZ_4fl_tchan_noAllHad.deriv.DAOD_PHYS.e5803_s3681_r13145_p6490
-mc20_13TeV.410560.MadGraphPythia8EvtGen_A14_tZ_4fl_tchan_noAllHad.deriv.DAOD_PHYS.e5803_s3681_r13167_p6490
-
