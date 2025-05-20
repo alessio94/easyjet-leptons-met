@@ -38,9 +38,3 @@ save_nonresonant_BDTInput_variables: false
 
 Truth:
   do_STXS: false
-
-Electron:
-  forceFullSimConfig: true
-
-Photon:
-  forceFullSimConfig: true

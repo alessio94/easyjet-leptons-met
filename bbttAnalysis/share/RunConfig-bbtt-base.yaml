@@ -53,7 +53,7 @@ Electron:
     - ["LooseBLayerLH", "Loose_VarRad"]
     - ["TightLH", "Loose_VarRad"]
   do_parent_decoration: true
-  forceFullSimConfig: true
+  correlationModelId: "TOTAL"
 
 Muon:
   ID: "Loose_nottva"

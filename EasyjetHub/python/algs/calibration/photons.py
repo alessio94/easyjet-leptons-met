@@ -22,9 +22,6 @@ def photon_sequence(flags, configAcc):
     configSeq += makeConfig('Photons', containerName=output_name)
     configSeq.setOptionValue('.recomputeIsEM', False)
     configSeq.setOptionValue('.crackVeto', True)
-    if flags.GeoModel.Run is LHCPeriod.Run3 and flags.Input.isMC:
-        configSeq.setOptionValue('.forceFullSimConfigForP4', True)
-    configSeq.setOptionValue('.forceFullSimConfigForIso', True)
     configSeq.setOptionValue('.decorrelationModel',
                              flags.Analysis.Photon.correlationModelScale)
 
@@ -34,9 +31,6 @@ def photon_sequence(flags, configAcc):
                                 selectionName=id + '_' + iso)
         configSeq.setOptionValue('.qualityWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
-        if flags.GeoModel.Run is LHCPeriod.Run3 and flags.Input.isMC:
-            configSeq.setOptionValue('.forceFullSimConfigForID', True)
-        configSeq.setOptionValue('.forceFullSimConfigForIso', True)
         configSeq.setOptionValue('.saveCombinedSF', True)
 
         # No Run 2 SF yet

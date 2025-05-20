@@ -1,6 +1,5 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
-from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
 from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
@@ -18,12 +17,6 @@ def electron_sequence(flags, configAcc):
     config = ConfigFactory()
     makeConfig = config.makeConfig
 
-    if flags.Analysis.Electron.forceFullSimConfig \
-       and flags.Analysis.DataType is DataType.FastSim:
-        print("WARNING! If not already done, you should get in touch with the")
-        print("EGamma group to contribute to the Electron AF3 recommendations as")
-        print("you're relying on them")
-
     output_name = drop_sys(flags.Analysis.container_names.output.electrons)
 
     if flags.Analysis.Electron.MergeLRT:
@@ -34,9 +27,6 @@ def electron_sequence(flags, configAcc):
     if flags.Analysis.Electron.MergeLRT:
         configSeq.setOptionValue('.inputContainer', 'Electrons_LRTMerged')
     configSeq.setOptionValue('.crackVeto', True)
-    configSeq.setOptionValue('.forceFullSimConfig',
-                             flags.Analysis.Electron.forceFullSimConfig
-                             and flags.Analysis.DataType is DataType.FastSim)
     configSeq.setOptionValue('.decorrelationModel',
                              flags.Analysis.Electron.correlationModelScale)
     configSeq.setOptionValue('.writeTrackD0Z0', True)
@@ -52,9 +42,6 @@ def electron_sequence(flags, configAcc):
         id = id.replace("_nottva", "")
         configSeq.setOptionValue('.identificationWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
-        configSeq.setOptionValue('.forceFullSimConfig',
-                                 flags.Analysis.Electron.forceFullSimConfig
-                                 and flags.Analysis.DataType is DataType.FastSim)
         configSeq.setOptionValue('.maxD0Significance',
                                  flags.Analysis.Electron.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',

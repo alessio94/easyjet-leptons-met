@@ -34,9 +34,9 @@ Small_R_jet:
 Electron:
   ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"
-  forceFullSimConfig: true
   extra_wps:
     - ["TightLH", "Tight_VarRad"]
+  correlationModelId: "TOTAL"
 
 Muon:
   ID: "Loose"

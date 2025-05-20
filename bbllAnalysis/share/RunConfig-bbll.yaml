@@ -48,6 +48,7 @@ Small_R_jet:
 Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
+  correlationModelId: "TOTAL"
 
 Muon:
   ID: "Medium"

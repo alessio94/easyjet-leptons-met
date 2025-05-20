@@ -1,8 +1,5 @@
 include: bbllAnalysis/RunConfig-bbll.yaml
 
-Electron:
-  forceFullSimConfig: true
-
 NeutrinoWeighting:
   include: NeutrinoWeighting.yaml
 

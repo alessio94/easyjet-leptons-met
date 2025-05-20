@@ -102,7 +102,6 @@ Photon:
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
-  forceFullSimConfig: false
   correlationModelScale: "1NP_v1"
   extra_wps: []
 
@@ -122,7 +121,6 @@ Electron:
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
-  forceFullSimConfig: false
   correlationModelScale: "1NP_v1"
   correlationModelId: "SIMPLIFIED"
   correlationModelIso: "SIMPLIFIED"

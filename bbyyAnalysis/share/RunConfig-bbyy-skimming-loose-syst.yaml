@@ -17,12 +17,6 @@ CutList :
       - EXACTLY_ZERO_LEPTONS
       - AT_LEAST_TWO_JETS
 
-Electron:
-  forceFullSimConfig: true
-
-Photon:
-  forceFullSimConfig: true
-
 do_CP_systematics: true
 systematics_regex: ["^(?!.*(MUON|MET|JER)).*$"]
 

@@ -3,9 +3,6 @@ include: bbllAnalysis/RunConfig-bbll.yaml
 save_extra_vars: true
 store_high_level_variables: true
 
-Electron:
-  forceFullSimConfig: true
-
 Small_R_jet:
   variables_bjets: ["uncorrPt", "muonCorrPt"]
 

@@ -34,13 +34,13 @@ Small_R_jet:
     - GN2v01_Continuous
 
 Electron:
-  forceFullSimConfig: true
   ID: "LooseBLayerLH"
   Iso: "NonIso"
   #Iso: "Loose_VarRad"
   extra_wps:
     - ["TightLH", "NonIso"]
     #- ["TightLH", "Loose_VarRad"]
+  correlationModelId: "TOTAL"
 
 Muon:
   ID: "Loose"
