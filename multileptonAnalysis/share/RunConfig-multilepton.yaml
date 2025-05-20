@@ -97,7 +97,7 @@ Muon:
     - ["Loose", "PflowLoose_VarRad"]
     - ["Loose", "PflowTight_VarRad"]
     - ["Loose", "Tight_VarRad"]
-   # - ["Loose", "Loose_VarRad"]
+    # - ["Loose", "Loose_VarRad"]
     # - ["Tight", "NonIso"]
     # - ["Medium", "NonIso"]
     # - ["HighPt", "NonIso"]
