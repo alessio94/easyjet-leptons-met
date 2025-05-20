@@ -313,11 +313,11 @@ namespace HHBBYY
           continue;
         }
         else
-          pass_trigger_single_photon = m_triggerDecorHandle(event);
+          pass_trigger_single_photon |= m_triggerDecorHandle(event);
       }
       else
       {
-        pass_trigger_diphoton = m_triggerDecorHandle(event);
+        pass_trigger_diphoton |= m_triggerDecorHandle(event);
       }
      
     }
@@ -348,11 +348,11 @@ namespace HHBBYY
             continue;
           }
           else
-            pass_matching_trigger_single_photon = m_matchingTool->match(*photons->at(0), trigger) || m_matchingTool->match(*photons->at(1), trigger);
+            pass_matching_trigger_single_photon |= m_matchingTool->match(*photons->at(0), trigger) || m_matchingTool->match(*photons->at(1), trigger);
         }
         else
         {
-          pass_matching_trigger_diphoton = m_matchingTool->match({photons->at(0), photons->at(1)}, trigger);
+          pass_matching_trigger_diphoton |= m_matchingTool->match({photons->at(0), photons->at(1)}, trigger);
         }
      
       }
