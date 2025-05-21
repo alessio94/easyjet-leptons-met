@@ -17,6 +17,7 @@ Analysis Package for the $HH\rightarrow b\bar{b} VV$ analyis
   - `trigger`: list of the triggers to use per year.
 - `src/`: C++ code
   - `HHbbVVSelectorAlg`: Find if the event pass the baseline bbVV selection;
+  - `VBFSelectorAlg`: bbVV-VBF analysis object selection
   - `BaselineVarsbbVVAlg`: Compute the baseline variables for the analysis.
 
 # How to Run
@@ -28,22 +29,30 @@ Analysis Package for the $HH\rightarrow b\bar{b} VV$ analyis
 - run the analysis on <span style="color: #4BD9D9;">PHYSLITE</span>: ```bbVV-ntupler ttbar_PHYSLITE_10evt.root --run-config bbVVAnalysis/RunConfig-bbVV-bypass.yaml --out-file output_PHYSLITE_bbVV.root```
 An alternative is to use the preselection step using the configuration `RunConfig-bbVV.yaml` instead of `RunConfig-bbVV-bypass.yaml`, however fewer events would be recorded.
 
-3. `Run_bbVV.py` script - Assuming you are at the top directory. You can specify your `PHYS` directory to look for mc samples by `--SampleDir` flag
-- Boosted analysis:
+3. `Run_bbVV.py` and `Run_VBF.py` scripts - Assuming you are at the top directory. You can specify your `PHYS` directory to look for mc samples by `--SampleDir` flag
+- Boosted 0lep analysis:
 ```
 python easyjet/bbVVAnalysis/python/Run_bbVV.py --Boost --Mass 4000
 ```
-- Split-Boosted analysis:
+- Split-Boosted 0lep analysis:
 ```
 python easyjet/bbVVAnalysis/python/Run_bbVV.py --Mass 3000
 ```
+- VBF 1lep analysis: Run over signal samples
+```
+python easyjet/bbVVAnalysis/python/Run_VBF.py
+```
 - Run on grid: Using the `easyjet-gridsubmit`, boosted config, all signal samples
 ```
-python easyjet/bbVVAnalysis/python/Run_bbVV.py --Boost --GridRun
+python easyjet/bbVVAnalysis/python/Run_bbVV.py --Boost --GridRun --campaign mc23a
 ```
-- Run on grid: Split-boosted config, ttbar background samples
+- Run on grid: Split-boosted config, top background samples, year 2024
 ```
-python easyjet/bbVVAnalysis/python/Run_bbVV.py --Process top --GridRun
+python easyjet/bbVVAnalysis/python/Run_bbVV.py --Process top --GridRun --campaign mc23e
+```
+- Run on grid: VBF 1lepton config, dijet background samples, year 2018
+```
+python easyjet/bbVVAnalysis/python/Run_VBF.py --Process dijet --GridRun --campaign mc20e
 ```
 - See available parser arguments
 ```
@@ -69,26 +78,4 @@ If these run properly, your outputs files should contain a TTree `AnalysisMiniTr
 # Main developers
 
 The main developments have been performed by (non extensive list, feel free to add your name):
-Kira Abeling, JaeJin Hong, Hsuan-Chu Lien, Jared Little
-
-# 0lep_Dev ToDo - Delete(Or check) when done
-* - [x] yaml configuration:
-    * - [x] Include the common yaml for each channel
-    * - [x] Channel specific yaml for clear visual
-        * - [x] Boosted 1lep
-        * - [x] Split-Boosted 1lep(LEAVE 1lep split-boosted as it is)
-        * - [x] Boosted 0lep
-        * - [x] Split-Boosted 0lep
-* - [x] 0lep Split-Boosted implementation:
-    * - [x] Two WHad LRJet
-* - [x] Add ntuple jss branches of WHad LRJet:
-    * - [x] N subjetness(Tau_2, Tau_3, Tau_4)
-    * - [x] Energy_Correlator_Functions(ECF1, ECF2, ECF3)<br>
------DO_BELOW_AFTER_MR_TO_MAIN-----<br>
-* - [ ] Implement baseline WHad tagger:
-    * - [ ] Tau_42
-        * - [ ] Tau_42 tagging study
-        * - [ ] Implement Tau_42 working point in the easyJet
-    * - [ ] R21 WHad tagger
-        * - [ ] Access tagger score in the easyJet
-        * - [ ] Implement WHad tagger working point in the easyJet
+Kira Abeling, JaeJin Hong, Hsuan-Chu Lien, Jared Little, Celine Stauch

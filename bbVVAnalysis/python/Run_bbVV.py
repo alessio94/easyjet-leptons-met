@@ -78,25 +78,32 @@ def run_local(
         os.path.realpath(outputFile))
 
 
-def run_grid(process="top", boosted=False, lepton=True):
+def run_grid(process="top", boosted=False, lepton=True, campaign="mc23a", tag="NONE"):
     executable = "bbVV-ntupler"
-    ListDir = easyjet_build_dir + "/data/bbVVAnalysis/PHYS/"
+    ListDir = easyjet_build_dir + "/data/bbVVAnalysis/PHYS/nominal/" + campaign + "/"
     if process == "data":
-        List = ListDir + "nominal/data_Run3_p6266.txt"
+        List = ListDir + "data_*.txt"
     else:
-        List = ListDir + "nominal/mc23_" + process + "_p6266.txt"
+        List = ListDir + campaign + "_" + process + "_p6697.txt"
 
     lep_channel = "1lep" if lepton else "0lep"
     boosted_channel = "boosted" if boosted else "splitboosted"
     configFile = "bbVVAnalysis/RunConfig-PHYS-bbVV-" + lep_channel + \
                  "-" + boosted_channel + ".yaml"
 
+    if tag != "NONE":
+        ej_gittag = tag
+    else:
+        ej_gittag = campaign
+
     if process == "data":
         command = ("easyjet-gridsubmit --data-list " + List
-                   + " --run-config " + configFile + " --exec " + executable)
+                   + " --run-config " + configFile + " --exec " + executable
+                   + " --campaign " + ej_gittag + "_%Y_%m_%d")
     else:
         command = ("easyjet-gridsubmit --mc-list "
-                   + List + " --run-config " + configFile + " --exec " + executable)
+                   + List + " --run-config " + configFile + " --exec " + executable
+                   + " --campaign " + ej_gittag + "_%Y_%m_%d")
     print(command)
     subprocess.run(command, shell=True)
     print("End of Run_bbVV.py, check your BigPanda!")
@@ -106,22 +113,29 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--Process", help="Define which process: signal, dijet, top, data",
-        default="signal")
+        "--Process",
+        help="Define which process: bbWW0lep / "
+        "dijet, singletop, ttbar, diboson, Wjets, Zjets / "
+        "data",
+        default="bbWW0lep")
     parser.add_argument(
         "--Boost", help="Boosted: True, SplitBoosted: False", action='store_true')
     parser.add_argument(
         "--Lepton", help="Run bbVV 1lep channel", action='store_true')
     parser.add_argument(
         "--Mass",
-        help="1lep Boosted: 2000, 3000, 4000 /"
-        "0lep Boosted: 2000, 4000, 6000 /"
+        help="1lep Boosted: 2000, 3000, 4000 / "
+        "0lep Boosted: 2000, 4000, 6000 / "
         "0lep SplitBoosted: 2000, 3000, 4000",
         type=int, default=2000)
     parser.add_argument("--GridRun", help="Run on Grid", action='store_true')
     parser.add_argument(
         "--SampleDir", help="Type your PHYS directory",
         default="/eos/atlas/atlascerngroupdisk/phys-higp/higgs-pairs/bbVV/")
+    parser.add_argument(
+        "--campaign", help="mc23a, mc23d, mc23e", default="mc23a")
+    parser.add_argument(
+        "--tag", help="Custom tag pattern", default="NONE")
     args = parser.parse_args()
     process = args.Process
     boost = args.Boost
@@ -129,14 +143,17 @@ if __name__ == "__main__":
     mass = args.Mass
     lepton = args.Lepton
     sample_dir = args.SampleDir
+    campaign = args.campaign
+    tag = args.tag
     print(
         "Process:", process, "\tLepton:", lepton, "\tBoost:", boost,
-        "\tMass: ", mass, "\tGrid:", grid, "\tSampleDir:", sample_dir)
+        "\tMass: ", mass, "\tGrid:", grid, "\tSampleDir:", sample_dir,
+        "\tCampaign:", campaign, "\tTag:", tag)
 
     # Need to synchronize with io_manager / run_grid
     if grid:
         print("Running on Grid.")
-        run_grid(process, boost, lepton)
+        run_grid(process, boost, lepton, campaign, tag)
     else:
         print("Running locally.")
         run_local(process, boost, mass, lepton, sample_dir)
