@@ -1,8 +1,23 @@
-# Zbby calibration (WIP)
+# Run easyjet for Xbb Calibration. (WIP)
 
-
-To run:
+To run a test job
 
 ```
-xbbcalib-ntupler /eos/atlas/atlascerngroupdisk/phys-hmbs/mbl/VBS_Higgs/MC/DAOD_PHYS/LepChan/mc20a/mc20_13TeV.525362.MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_klp1.deriv.DAOD_PHYS.e8545_s3681_r13167_p6026/DAOD_PHYS.37982158._000001.pool.root.1 --run-config ../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml --out-file output.root
+lsetup rucio
+rucio get --nrandom 1 mc20_13TeV.700353.Sh_2211_pTZ100_Zbbgamma.deriv.DAOD_PHYS.e8312_s3681_r13145_p6490
+```
+ 
+Run test 
+
+```
+xbbcalib-ntupler run/mc20_13TeV.700353.Sh_2211_pTZ100_Zbbgamma.deriv.DAOD_PHYS.e8312_s3681_r13145_p6490/DAOD_PHYS.<sample downloaded>.pool.root.1 --run-config ../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml --out-file output.root -e 10
+```
+
+Then to submit to the grid (Zbb+y specific example when running the production including systematics)
+
+```
+lsetup rucio
+lsetup panda
+
+python3 ../easyjet/XbbCalib/scripts/XbbCalib-submitGrid.py -c ../easyjet/XbbCalib/share/RunConfig-ZbbyCalib-syst.yaml --tag <XbbCalib-date-version> -s "all" --nGBPerJob 2 --memory 4000 
 ```
