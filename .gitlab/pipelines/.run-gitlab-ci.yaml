@@ -124,6 +124,11 @@ ntupler_VBSVV4q_mc20_lite:
   script:
     - easyjet-test VBSVV4q-mc20-lite
 
+ntupler_VBSVV4q_mc20_llj1:
+  extends: .ntupler
+  script:
+    - easyjet-test VBSVV4q-mc20-llj1
+
 ntupler_ssWW_mc20:
   extends: .ntupler
   script:
