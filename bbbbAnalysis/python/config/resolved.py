@@ -20,7 +20,7 @@ def resolved_trigger_SF_cfg(flags, smalljetkey):
                               containerInKey=smalljetkey.replace("%SYS%", "NOSYS"),
                               containerOutKey="smallRJetsForTriggerMatching",
                               minPt=20 * Units.GeV,
-                              maxEta=2.4))
+                              maxEta=2.5))
         # temporary solution for boosted trigger
         resolved_chain = [t for t in flags.Analysis.TriggerChains if "_a10" not in t]
         if flags.Analysis.Small_R_jet.doL1Matching:

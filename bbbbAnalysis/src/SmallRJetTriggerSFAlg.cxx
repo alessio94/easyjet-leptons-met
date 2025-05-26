@@ -286,7 +286,11 @@ namespace HH4B
               float maxPt = 300.;
               float minPt = 20.;
               float maxEta = 2.4;
-              if (m_matchingLevelEnum == TrigMatchingLevel::L1 && legThreshold == 45) maxEta = 2.1;
+              if (m_matchingLevelEnum == TrigMatchingLevel::L1) 
+              {
+                if (legThreshold == 45) maxEta = 2.1;
+                else if (legThreshold == 15) maxEta = 2.5;
+              }
 
               // if SF exists and jet in the valid kinematic region, assign jet-level SF as a function of NoBJetCalibMomentum pt, eta and Threshold.
               if (jetPt>=minPt && std::abs(jetEta)<maxEta && m_jetTriggerSFMap.find(legThreshold) != m_jetTriggerSFMap.end())
