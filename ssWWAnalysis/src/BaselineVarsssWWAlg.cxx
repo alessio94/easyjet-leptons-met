@@ -3,7 +3,9 @@
 */
 
 #include "BaselineVarsssWWAlg.h"
+#include "ssWWSelectorAlg.h"
 
+#include <AthenaKernel/Units.h>
 #include "AthContainers/AuxElement.h"
 #include <AthContainers/ConstDataVector.h>
 
@@ -27,6 +29,16 @@ namespace ssWWVBS
     ATH_CHECK (m_ssWWMuonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+
+    m_eleWPDecorHandle = CP::SysReadDecorHandle<char>
+    ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
+    m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_muWPName+"_%SYS%", this);
+    ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
+    
+    ATH_CHECK (m_ele_selected.initialize(m_systematicsList, m_ssWWElectronHandle));
+    ATH_CHECK (m_mu_selected.initialize(m_systematicsList, m_ssWWMuonHandle));
 
     if(m_isMC){
       ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_ssWWElectronHandle));
@@ -131,7 +143,9 @@ namespace ssWWVBS
         else nForwardJets++;
 
         if (WPgiven) {
-          if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
+          // if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
+          // May be wrong, but just a attempt to get the btagging working
+          if (m_isBtag.get(*jet, sys)) bjets->push_back(jet);
           else nonbjets->push_back(jet);
         }
       }
@@ -144,28 +158,27 @@ namespace ssWWVBS
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
       m_Ibranches.at("nForwardJets").set(*event, nForwardJets, sys);
 
-      // selected leptons ;
+      // selected leptons;
       const xAOD::Electron* ele0 = nullptr;
       const xAOD::Electron* ele1 = nullptr;
-
       for(const xAOD::Electron* electron : *electrons) {
-        if(!ele0) ele0 = electron;
-        else{
+        if(!ele0 && m_ele_selected.get(*electron, sys)) ele0 = electron;
+        else if(ele0 && m_ele_selected.get(*electron, sys)) {
           ele1 = electron;
           break;
         }
       }
-
+      
       const xAOD::Muon* mu0 = nullptr;
       const xAOD::Muon* mu1 = nullptr;
       for(const xAOD::Muon* muon : *muons) {
-        if(!mu0) mu0 = muon;
-        else{
+        if(!mu0 && m_mu_selected.get(*muon, sys)) mu0 = muon;
+        else if(mu0 && m_mu_selected.get(*muon, sys)) {
           mu1 = muon;
           break;
         }
       }
-
+      
       std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
       if(ele0) leptons.emplace_back(ele0, -11*ele0->charge());
       if(mu0) leptons.emplace_back(mu0, -13*mu0->charge());

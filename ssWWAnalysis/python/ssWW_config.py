@@ -30,7 +30,8 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="ssWWAnalysisElectrons_%SYS%",
-                                     minPt=flags.Analysis.Electron.min_pT_ssWW))
+                                     minPt=flags.Analysis.Electron.min_pT_ssWW,
+                                     maxEta=flags.Analysis.Electron.max_eta_ssWW))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
                                    containerInEleKey=electronkey,
@@ -51,7 +52,38 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
         for c in flags.Analysis.TriggerChains
     ]
 
-    # Selection
+    if "extra_wps" in flags.Analysis.Electron:
+        el_exps = flags.Analysis.Electron.extra_wps
+        if len(el_exps) > 0:
+            wps = el_exps[0]
+            ElectronWPLabel = f'{wps[0]}_{wps[1]}'
+        else:
+            ElectronWPLabel = (
+                f'{flags.Analysis.Electron.ID}_'
+                + f'{flags.Analysis.Electron.Iso}'
+            )
+    else:
+        ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+
+    if "extra_wps" in flags.Analysis.Muon:
+        mu_exps = flags.Analysis.Muon.extra_wps
+        consider_extra_wp = any(len(wp) == 4 for wp in mu_exps)
+        if len(mu_exps) > 0:
+            wps = mu_exps[0]
+            if len(wps) == 4:
+                MuonWPLabel = f'{wps[0]}_{wps[1]}_{wps[2]}_{wps[3]}'
+                MuonWPLabel = MuonWPLabel.replace('.', 'p')
+            elif consider_extra_wp:
+                MuonWPLabel = f'{wps[0]}_{wps[1]}'
+                + f'{flags.Analysis.Muon.maxD0Significance}_'
+                + f'{flags.Analysis.Muon.maxDeltaZ0SinTheta}'
+                MuonWPLabel = MuonWPLabel.replace('.', 'p')
+            else:
+                MuonWPLabel = f'{wps[0]}_{wps[1]}'
+        else:
+            MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    else:
+        MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     cfg.addEventAlgo(
         CompFactory.ssWWVBS.ssWWSelectorAlg(
             "ssWWSelectorAlg",
@@ -59,6 +91,8 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
             eventDecisionOutputDecoration="ssWW_pass_sr_%SYS%",
             cutList=flags.Analysis.CutList,
             saveCutFlow=flags.Analysis.save_cutflow,
+            eleWP=ElectronWPLabel,
+            muonWP=MuonWPLabel,
             isMC=flags.Input.isMC,
             triggerLists=trigger_branches,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
@@ -68,8 +102,6 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
     )
 
     # calculate final ssWW vars
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.ssWWVBS.BaselineVarsssWWAlg(
             "FinalVarsssWWAlg",
@@ -163,7 +195,7 @@ def ssWW_branches(flags):
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in ssWWSelectorAlg
-    for cat in ["SLT", "DLT", "ASLT1_em", "ASLT1_me", "ASLT2"]:
+    for cat in ["SLT"]:
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> ssWW_pass_trigger_{cat}_%SYS%"]
 

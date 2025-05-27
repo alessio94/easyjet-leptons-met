@@ -37,11 +37,7 @@ namespace ssWWVBS
 
   enum TriggerChannel
   {
-    SLT,
-    DLT,
-    ASLT1_em,
-    ASLT1_me,
-    ASLT2,
+    SLT
   };
 
   enum Var {
@@ -58,24 +54,23 @@ namespace ssWWVBS
     IS_ee,
     IS_mm,
     IS_em,
+    IS_me,
     
     pass_trigger_SLT,
-    pass_trigger_DLT,
-    pass_trigger_ASLT1_em,
-    pass_trigger_ASLT1_me,
-    pass_trigger_ASLT2,
 
     PASS_TRIGGER,
     PASS_TWO_LEPTONS,
+    PASS_LEPTON_ID,
     EXACTLY_TWO_LEPTONS,
     TWO_SAME_CHARGE_LEPTONS,
     DILEPTON_MASS_THRESHOLD,
     DILEPTON_MASS_SIDEBAND_EE,
     MET,
     AT_LEAST_TWO_JETS,
-    DIJETS_MASS,
+    DIJETS_MASS_LOW,
     DIJETS_DELTA_RAPIDITY,
     BJET_VETO,
+    DIJETS_MASS_HIGH,
     pass_SR,
 
     PASS_THREE_LEPTONS,
@@ -102,15 +97,17 @@ namespace ssWWVBS
       const std::vector<std::string> m_STANDARD_CUTS{
         "PASS_TRIGGER",
         "PASS_TWO_LEPTONS",
+        "PASS_LEPTON_ID",
         "EXACTLY_TWO_LEPTONS",
         "TWO_SAME_CHARGE_LEPTONS",
         "DILEPTON_MASS_THRESHOLD",
         "DILEPTON_MASS_SIDEBAND_EE",
         "MET",
         "AT_LEAST_TWO_JETS",
-        "DIJETS_MASS",
+        "DIJETS_MASS_LOW",
         "DIJETS_DELTA_RAPIDITY",
         "BJET_VETO",
+        "DIJETS_MASS_HIGH",
       };
 
       Gaudi::Property<std::vector<std::string>> m_channel_names
@@ -145,6 +142,14 @@ namespace ssWWVBS
       CP::SysReadHandle<xAOD::MissingETContainer>
       m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
+      Gaudi::Property<std::string> m_eleWPName
+  {this, "eleWP", "","Electron ID + Iso working point" };
+      CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
+
+      Gaudi::Property<std::string> m_muonWPName
+  {this, "muonWP", "","Muon ID + Iso cuts" };
+      CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
+
       CP::SysReadDecorHandle<unsigned int> m_year
 	{this, "year", "dataTakingYear", ""};
 
@@ -163,11 +168,7 @@ namespace ssWWVBS
 
       std::unordered_map<ssWWVBS::TriggerChannel, std::string> m_triggerChannels = 
       {
-        {ssWWVBS::SLT, "SLT"},
-        {ssWWVBS::DLT, "DLT"},
-        {ssWWVBS::ASLT1_em, "ASLT1_em"},
-        {ssWWVBS::ASLT1_me, "ASLT1_me"},
-        {ssWWVBS::ASLT2, "ASLT2"},
+        {ssWWVBS::SLT, "SLT"}
       };
 
       Gaudi::Property<std::vector<std::string>> m_triggers 
@@ -186,22 +187,21 @@ namespace ssWWVBS
         {ssWWVBS::IS_ee, "IS_ee"},
         {ssWWVBS::IS_mm, "IS_mm"},
         {ssWWVBS::IS_em, "IS_em"},
+        {ssWWVBS::IS_me, "IS_me"},
         {ssWWVBS::pass_trigger_SLT, "pass_trigger_SLT"},
-        {ssWWVBS::pass_trigger_DLT, "pass_trigger_DLT"},
-        {ssWWVBS::pass_trigger_ASLT1_em, "pass_trigger_ASLT1_em"},
-        {ssWWVBS::pass_trigger_ASLT1_me, "pass_trigger_ASLT1_me"},
-        {ssWWVBS::pass_trigger_ASLT2, "pass_trigger_ASLT2"},
         {ssWWVBS::PASS_TRIGGER, "PASS_TRIGGER"},
         {ssWWVBS::PASS_TWO_LEPTONS, "PASS_TWO_LEPTONS"},
+        {ssWWVBS::PASS_LEPTON_ID, "PASS_LEPTON_ID"},
         {ssWWVBS::EXACTLY_TWO_LEPTONS, "EXACTLY_TWO_LEPTONS"},
         {ssWWVBS::TWO_SAME_CHARGE_LEPTONS, "TWO_SAME_CHARGE_LEPTONS"},
         {ssWWVBS::DILEPTON_MASS_THRESHOLD, "DILEPTON_MASS_THRESHOLD"},
         {ssWWVBS::DILEPTON_MASS_SIDEBAND_EE, "DILEPTON_MASS_SIDEBAND_EE"},
         {ssWWVBS::MET, "MET"},
         {ssWWVBS::AT_LEAST_TWO_JETS, "AT_LEAST_TWO_JETS"},
-        {ssWWVBS::DIJETS_MASS, "DIJETS_MASS"},
+        {ssWWVBS::DIJETS_MASS_LOW, "DIJETS_MASS_LOW"},
         {ssWWVBS::DIJETS_DELTA_RAPIDITY, "DIJETS_DELTA_RAPIDITY"},
         {ssWWVBS::BJET_VETO, "BJET_VETO"},
+        {ssWWVBS::DIJETS_MASS_HIGH, "DIJETS_MASS_HIGH"},
         {ssWWVBS::PASS_THREE_LEPTONS, "PASS_THREE_LEPTONS"},
         {ssWWVBS::EXACTLY_THREE_LEPTONS, "EXACTLY_THREE_LEPTONS"},
         {ssWWVBS::pass_WZCR, "pass_WZCR"},
@@ -214,6 +214,10 @@ namespace ssWWVBS
       Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
 
+      CP::SysWriteDecorHandle<bool> m_ele_selected {"ele_is_selected_%SYS%", this};
+      CP::SysWriteDecorHandle<bool> m_mu_selected {"mu_is_selected_%SYS%", this};
+      
+
       std::unordered_map<ssWWVBS::TriggerChannel, std::unordered_map<ssWWVBS::Var, float>> m_pt_threshold;
 
       void evaluateTriggerCuts
@@ -221,26 +225,24 @@ namespace ssWWVBS
 	 const xAOD::Electron* ele0, const xAOD::Electron* ele1,
 	 const xAOD::Muon* mu0, const xAOD::Muon* mu1,
 	 CutManager& ssWWCuts, const CP::SystematicSet& sys);
+      
       void evaluateSingleLeptonTrigger
 	(const xAOD::EventInfo* event, 
 	 const xAOD::Electron* ele, const xAOD::Muon* mu,
 	 const CP::SystematicSet& sys);
-      void evaluateDiLeptonTrigger
-	(const xAOD::EventInfo* event,
-	 const xAOD::Electron* ele0, const xAOD::Electron* ele1,
-	 const xAOD::Muon* mu0, const xAOD::Muon* mu1,
-	 const CP::SystematicSet& sys);
-      void evaluateAsymmetricLeptonTrigger
-	(const xAOD::EventInfo* event,
-	 const xAOD::Electron* ele, const xAOD::Muon* mu,
-	 const CP::SystematicSet& sys);
-
-      void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
-                          const xAOD::MuonContainer& muons, CutManager& ssWWCuts);
+      void evaulateLeptonIDCuts
+  (const xAOD::Electron*& ele0, const xAOD::Electron*& ele1,
+   const xAOD::Muon*& mu0, const xAOD::Muon*& mu1,
+   CutManager& ssWWCuts, const CP::SystematicSet& sys);
+      void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,const xAOD::MuonContainer& muons,
+                          const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+                          const xAOD::Muon* mu0, const xAOD::Muon* mu1,
+                          CutManager& ssWWCuts);
       void evaluateMetCuts(const xAOD::MissingET* met, CutManager& ssWWCuts);
-      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& ssWWCuts);
+      void evaluateJetCuts(const xAOD::JetContainer& jets, CutManager& ssWWCuts);
       void evaluateBJetLeptonCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
-                          const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons, CutManager& ssWWCuts);
+                          const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
+                          CutManager& ssWWCuts);
       void setThresholds(const xAOD::EventInfo* event,
 			 const CP::SystematicSet& sys);
 

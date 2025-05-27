@@ -1,24 +1,32 @@
 include: ssWWAnalysis/RunConfig-Baseline-ssWW.yaml
 
 Small_R_jet:
-  min_pT_ssWW: 25000
+  min_pT_ssWW: 20000
   max_eta_ssWW: 4.5 ## To be sure
 
 Electron:
   maxD0Significance: 5
   maxDeltaZ0SinTheta: 0.5
-  ID: "TightLH"
-  Iso: "Loose_VarRad" # previously Gradient
-  min_pT_ssWW: 27000
-  crackVeto: true
-  chargeIDSelectionRun2: false
+  ID: "LooseLH"
+  Iso: "NonIso"
+  extra_wps:
+  - ["TightLH", "Tight_VarRad"]  # previously Gradient
+  min_pT_ssWW: 4.5e+3
+  max_eta_ssWW: 2.47
+  crackVeto: false
+  chargeIDSelectionRun2: true
+  do_track_decoration: true
+  do_IFF_decoration: true
+
 
 Muon:
-  maxD0Significance: 3
-  maxDeltaZ0SinTheta: 0.5
-  ID: "Medium"
-  Iso: "PflowLoose_VarRad" # previouly FixedCutPflowTight
-  min_pT_ssWW: 27000
+  maxD0Significance: 15
+  maxDeltaZ0SinTheta: 1.5
+  ID: "Loose"
+  Iso: "NonIso"
+  extra_wps:
+  - ["Medium", "PflowTight_VarRad", 3, 0.5] # previously FixedCutPflowTight
+  min_pT_ssWW: 3.0e+3
   max_eta_ssWW: 2.5
 
 Lepton:

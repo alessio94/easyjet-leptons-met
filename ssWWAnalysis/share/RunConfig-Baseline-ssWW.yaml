@@ -35,7 +35,7 @@ Electron:
   maxD0Significance: 5 
   maxDeltaZ0SinTheta: 0.5
   ID: "LooseLH"
-  Iso: None
+  Iso: "NonIso"
   min_pT: 4.5e+3
   min_pT_ssWW: 4.5e+3
   do_IFF_decoration: true
@@ -44,7 +44,7 @@ Muon:
   maxD0Significance: 15
   maxDeltaZ0SinTheta: 1.5
   ID: "Loose"
-  Iso: None
+  Iso: "NonIso"
   min_pT: 3.e+3
   max_eta: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
   min_pT_ssWW: 3.e+3
@@ -75,22 +75,25 @@ OverlapRemoval:
 save_cutflow: true
 
 CutList :
-      - PASS_TRIGGER
-      - PASS_TWO_LEPTONS
-      - EXACTLY_TWO_LEPTONS
-      - TWO_SAME_CHARGE_LEPTONS
-      - DILEPTON_MASS_THRESHOLD
-      - DILEPTON_MASS_SIDEBAND_EE
-      - MET
-      - AT_LEAST_TWO_JETS
-      - DIJETS_MASS
-      - DIJETS_DELTA_RAPIDITY
-      - BJET_VETO
+  - PASS_TRIGGER
+  - PASS_TWO_LEPTONS
+  - PASS_LEPTON_ID
+  - EXACTLY_TWO_LEPTONS
+  - TWO_SAME_CHARGE_LEPTONS
+  - DILEPTON_MASS_THRESHOLD
+  - DILEPTON_MASS_SIDEBAND_EE
+  - AT_LEAST_TWO_JETS
+  - DIJETS_MASS_LOW
+  - MET
+  - BJET_VETO
+  - DIJETS_DELTA_RAPIDITY
+  - DIJETS_MASS_HIGH
 
 Categories :
-      - IS_ee
-      - IS_mm
-      - IS_em
+  - IS_ee
+  - IS_mm
+  - IS_em
+  - IS_me
 
 # Include the TTree configuration and update details
 ttree_output:

@@ -72,10 +72,27 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
             ]
 
     id_wps = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
+    consider_extra_wp = any(len(wp) == 4 for wp in flags.Analysis.Muon.extra_wps)
 
     if 'extra_wps' in flags.Analysis.Muon:
         for wp in flags.Analysis.Muon.extra_wps:
-            id_wps.append(wp[0] + "_" + wp[1])
+            if len(wp) == 4:
+                id_wps.append(
+                    (
+                        wp[0] + "_" + wp[1] + "_"
+                        + str(wp[2]) + "_" + str(wp[3])
+                    ).replace('.', 'p')
+                )
+            elif consider_extra_wp:
+                id_wps.append(
+                    (
+                        wp[0] + "_" + wp[1] + "_"
+                        + str(flags.Analysis.Muon.maxD0Significance) + "_"
+                        + str(flags.Analysis.Muon.maxDeltaZ0SinTheta)
+                    ).replace('.', 'p')
+                )
+            else:
+                id_wps.append(wp[0] + "_" + wp[1])
 
     muon_branches.variables += [
         f"baselineSelection_{id_wp}_%SYS%"

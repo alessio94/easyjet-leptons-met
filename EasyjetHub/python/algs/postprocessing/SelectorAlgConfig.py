@@ -6,7 +6,17 @@ def MuonSelectorAlgCfg(flags, name="MuonSelectorAlg", **kwargs):
     cfg = ComponentAccumulator()
 
     muon_WPs = [f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}']
-    muon_WPs += [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
+    consider_extra_wp = any(len(wp) == 4 for wp in flags.Analysis.Muon.extra_wps)
+
+    for wp in flags.Analysis.Muon.extra_wps:
+        if len(wp) == 4:
+            muon_WPs += [f'{wp[0]}_{wp[1]}_{wp[2]}_{wp[3]}'.replace('.', 'p')]
+        elif consider_extra_wp:
+            wp_str = f"{wp[0]}_{wp[1]}_{flags.Analysis.Muon.maxD0Significance}"
+            + f"_{flags.Analysis.Muon.maxDeltaZ0SinTheta}"
+            muon_WPs += [wp_str.replace('.', 'p')]
+        else:
+            muon_WPs += [f'{wp[0]}_{wp[1]}']
     kwargs.setdefault("muonWPs", muon_WPs)
     kwargs.setdefault("muonAmount", flags.Analysis.Muon.amount)
 

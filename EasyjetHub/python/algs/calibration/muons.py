@@ -8,9 +8,18 @@ from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_
 def muon_sequence(flags, configAcc):
 
     wps = [(flags.Analysis.Muon.ID, flags.Analysis.Muon.Iso)]
+    impact_params = [(flags.Analysis.Muon.maxD0Significance,
+                      flags.Analysis.Muon.maxDeltaZ0SinTheta)]
+    extra_params_concern = False
     if 'extra_wps' in flags.Analysis.Muon:
         for wp in flags.Analysis.Muon.extra_wps:
             wps.append((wp[0], wp[1]))
+            if len(wp) == 4:
+                extra_params_concern = True
+                impact_params.append((wp[2], wp[3]))
+            else:
+                impact_params.append((flags.Analysis.Muon.maxD0Significance,
+                                     flags.Analysis.Muon.maxDeltaZ0SinTheta))
 
     configSeq = ConfigSequence()
     config = ConfigFactory()
@@ -31,9 +40,20 @@ def muon_sequence(flags, configAcc):
     configSeq.setOptionValue('.decorateTruth', True)
 
     # PID configuration
-    for id, iso in wps:
-        configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
-                                selectionName=id + '_' + iso)
+    doBaseline = True
+    for (id, iso), (maxD0Significance, maxDeltaZ0SinTheta) in zip(wps, impact_params):
+        if extra_params_concern and not doBaseline:
+            impact_params_name = str(maxD0Significance) + '_' + str(maxDeltaZ0SinTheta)
+            impact_params_name = impact_params_name.replace('.', 'p')
+            configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
+                                    selectionName=id + '_' + iso + '_'
+                                    + impact_params_name)
+        else:
+            configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
+                                    selectionName=id + '_' + iso)
+            if extra_params_concern:
+                doBaseline = False
+
         if "nottva" in id:
             configSeq.setOptionValue('.trackSelection', False)
         else:
@@ -42,9 +62,9 @@ def muon_sequence(flags, configAcc):
         configSeq.setOptionValue('.quality', quality)
         configSeq.setOptionValue('.isolation', iso)
         configSeq.setOptionValue('.maxD0Significance',
-                                 flags.Analysis.Muon.maxD0Significance)
+                                 maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',
-                                 flags.Analysis.Muon.maxDeltaZ0SinTheta)
+                                 maxDeltaZ0SinTheta)
         configSeq.setOptionValue('.saveCombinedSF', True)
 
     if flags.Analysis.Small_R_jet.runBJetPtCalib or \

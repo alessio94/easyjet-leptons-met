@@ -19,6 +19,7 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
 
+
 namespace ssWWVBS
 {
 
@@ -65,6 +66,7 @@ private:
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
+    CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
     Gaudi::Property<bool> m_saveDummy_ele_SF
       {this, "saveDummyEleSF", false,
 	  "To be used in case no recommendations are not available"};
@@ -75,8 +77,12 @@ private:
     Gaudi::Property<std::string> m_muWPName
       { this, "muonWP", "","Muon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_mu_SF{"", this};
+    CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
     CP::SysReadDecorHandle<int> m_mu_truthOrigin{"truthOrigin", this};
     CP::SysReadDecorHandle<int> m_mu_truthType{"truthType", this};
+
+    CP::SysReadDecorHandle<bool> m_ele_selected{"ele_is_selected_%SYS%", this};
+    CP::SysReadDecorHandle<bool> m_mu_selected{"mu_is_selected_%SYS%", this};
 
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};

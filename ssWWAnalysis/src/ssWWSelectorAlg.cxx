@@ -37,7 +37,19 @@ namespace ssWWVBS
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+    
+    // Pass the lepton WP
+    m_eleWPDecorHandle = CP::SysReadDecorHandle<char>
+    ("baselineSelection_" + m_eleWPName+"_%SYS%", this);
+    m_muonWPDecorHandle = CP::SysReadDecorHandle<char>
+      ("baselineSelection_"+m_muonWPName+"_%SYS%", this);
+    ATH_CHECK(m_eleWPDecorHandle.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK(m_muonWPDecorHandle.initialize(m_systematicsList, m_muonHandle));
+    
+    // special decorators for leptons
+    ATH_CHECK (m_ele_selected.initialize(m_systematicsList, m_electronHandle));
+    ATH_CHECK (m_mu_selected.initialize(m_systematicsList, m_muonHandle));
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
@@ -61,19 +73,6 @@ namespace ssWWVBS
       m_triggerdecos.emplace(trig, deco);
       ATH_CHECK(m_triggerdecos.at(trig).initialize(m_systematicsList, m_eventHandle));
     }
-
-    //Asymmetric Lepton triggers
-    //Configuration 1
-    m_pt_threshold[ssWWVBS::ASLT1_em][ssWWVBS::leadingele] = 27. * Athena::Units::GeV;
-    m_pt_threshold[ssWWVBS::ASLT1_em][ssWWVBS::leadingmu] = 9. * Athena::Units::GeV;
-
-    m_pt_threshold[ssWWVBS::ASLT1_me][ssWWVBS::leadingmu] = 26. * Athena::Units::GeV;
-    m_pt_threshold[ssWWVBS::ASLT1_me][ssWWVBS::leadingele] = 9. * Athena::Units::GeV;
-
-    //Configuration 2
-    m_pt_threshold[ssWWVBS::ASLT2][ssWWVBS::leadingele] = 18. * Athena::Units::GeV;
-    m_pt_threshold[ssWWVBS::ASLT2][ssWWVBS::leadingmu] = 15. * Athena::Units::GeV;
-
 
     // special flag for all cuts
     ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
@@ -139,22 +138,20 @@ namespace ssWWVBS
       m_bools.at(ssWWVBS::IS_ee) = false;
       m_bools.at(ssWWVBS::IS_mm) = false;
       m_bools.at(ssWWVBS::IS_em) = false;
+      m_bools.at(ssWWVBS::IS_me) = false;
 
       m_bools.at(ssWWVBS::pass_trigger_SLT) = false;
-      m_bools.at(ssWWVBS::pass_trigger_DLT) = false;
-      m_bools.at(ssWWVBS::pass_trigger_ASLT1_em) = false;
-      m_bools.at(ssWWVBS::pass_trigger_ASLT1_me) = false;
-      m_bools.at(ssWWVBS::pass_trigger_ASLT2) = false;
-
       m_bools.at(ssWWVBS::PASS_TRIGGER) = false;
       m_bools.at(ssWWVBS::PASS_TWO_LEPTONS) = false;
+      m_bools.at(ssWWVBS::PASS_LEPTON_ID) = false;
       m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) = false;
       m_bools.at(ssWWVBS::TWO_SAME_CHARGE_LEPTONS) = false;
       m_bools.at(ssWWVBS::DILEPTON_MASS_THRESHOLD) = false;
       m_bools.at(ssWWVBS::DILEPTON_MASS_SIDEBAND_EE) = false;
       m_bools.at(ssWWVBS::MET) = false;
       m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) = false;
-      m_bools.at(ssWWVBS::DIJETS_MASS) = false;
+      m_bools.at(ssWWVBS::DIJETS_MASS_LOW) = false;
+      m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) = false;
       m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) = false;
       m_bools.at(ssWWVBS::BJET_VETO) = false;
       m_bools.at(ssWWVBS::pass_SR) = false;
@@ -165,32 +162,61 @@ namespace ssWWVBS
 
       setThresholds(event, sys);
 
-      // Leptons
+      // Leptons selection for leading two leptons
+
+      for (const xAOD::Electron* ele : *electrons) {
+        m_ele_selected.set(*ele, false, sys);
+      }
+
+      for (const xAOD::Muon* mu : *muons) {
+        m_mu_selected.set(*mu, false, sys);
+      }
+
       const xAOD::Electron* ele0 = nullptr;
       const xAOD::Electron* ele1 = nullptr;
       
       const xAOD::Muon* mu0 = nullptr;
       const xAOD::Muon* mu1 = nullptr;
-      
+
+      std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
       if (electrons->size() >= 2) {
-        ele0 = electrons->at(0);
-        ele1 = electrons->at(1);
-      }
-      
-      if (muons->size() >= 2) {
-        mu0 = muons->at(0);
-        mu1 = muons->at(1);
-      }
-      
-      if (electrons->size() == 1 && muons->size() == 1) {
-        ele0 = electrons->at(0);
-        mu0 = muons->at(0);
+        leptons.emplace_back(electrons->at(0), -11*electrons->at(0)->charge());
+        leptons.emplace_back(electrons->at(1), -11*electrons->at(1)->charge());
       }
 
+      if (muons->size() >= 2) {
+        leptons.emplace_back(muons->at(0), -13*muons->at(0)->charge());
+        leptons.emplace_back(muons->at(1), -13*muons->at(1)->charge());
+      }
+
+      if (electrons->size() == 1 && muons->size() == 1) {
+        leptons.emplace_back(electrons->at(0), -11*electrons->at(0)->charge());
+        leptons.emplace_back(muons->at(0), -13*muons->at(0)->charge());
+      }
+
+      std::sort(leptons.begin(), leptons.end(),
+        [](const std::pair<const xAOD::IParticle*, int>& a,
+            const std::pair<const xAOD::IParticle*, int>& b) {
+          return a.first->pt() > b.first->pt(); });
+
+      for (size_t i = 0; i < leptons.size() && i < 2; ++i) {
+        const xAOD::IParticle* lep = leptons[i].first;
+        int id = leptons[i].second;
+        if (std::abs(id) == 11) {
+        if (!ele0) ele0 = dynamic_cast<const xAOD::Electron*>(lep);
+        else       ele1 = dynamic_cast<const xAOD::Electron*>(lep);
+        }
+        else {
+        if (!mu0) mu0 = dynamic_cast<const xAOD::Muon*>(lep);
+        else      mu1 = dynamic_cast<const xAOD::Muon*>(lep);
+        }
+      }
+      
       evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_ssWWCuts, sys);
-      evaluateLeptonCuts(*electrons, *muons, m_ssWWCuts);
+      evaulateLeptonIDCuts(ele0, ele1, mu0, mu1, m_ssWWCuts, sys);
+      evaluateLeptonCuts(*electrons, *muons, ele0, ele1, mu0, mu1, m_ssWWCuts);
       evaluateMetCuts(met, m_ssWWCuts);
-      evaluateJetCuts(*nonbjets, m_ssWWCuts);
+      evaluateJetCuts(*jets, m_ssWWCuts);
       evaluateBJetLeptonCuts(*bjets, *electrons, *muons, m_ssWWCuts);
       
       bool passedall = true;
@@ -211,13 +237,14 @@ namespace ssWWVBS
       const xAOD::Muon *mu2;
 
       // std::cout<<"     ssWWSelectorAlg::execute()     : line  248"<<std::endl;
-      if(pass_baseline && m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) ){ 
-            if(m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) && m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) && m_bools.at(ssWWVBS::DIJETS_MASS) && m_bools.at(ssWWVBS::BJET_VETO) ){
+      if(pass_baseline && m_bools.at(ssWWVBS::PASS_LEPTON_ID) &&m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) ){ 
+            if(m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) && m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) && m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) && m_bools.at(ssWWVBS::BJET_VETO) ){
               if( m_bools.at(ssWWVBS::MET)){
                 m_bools.at(ssWWVBS::pass_SR)=1;
               }
             }      
       }
+      
       else if(pass_baseline && m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS)){
             if (electrons->size() == 3) {
               ele0 = electrons->at(0);
@@ -358,14 +385,8 @@ namespace ssWWVBS
 
     if (ele0 || mu0) evaluateSingleLeptonTrigger(event, ele0, mu0, sys);
     if (ele1 || mu1) evaluateSingleLeptonTrigger(event, ele1, mu1, sys);
-    if ((ele0 && ele1) || (mu0 && mu1)) evaluateDiLeptonTrigger(event, ele0, ele1, mu0, mu1, sys);
-    if (ele0 && mu0) evaluateAsymmetricLeptonTrigger(event, ele0, mu0, sys);
 
-    bool pass_trigger_ASLT = m_bools.at(ssWWVBS::pass_trigger_ASLT1_em) ||
-      m_bools.at(ssWWVBS::pass_trigger_ASLT1_me) ||
-      m_bools.at(ssWWVBS::pass_trigger_ASLT2);
-
-    if (m_bools.at(ssWWVBS::pass_trigger_SLT) || m_bools.at(ssWWVBS::pass_trigger_DLT) || pass_trigger_ASLT) m_bools.at(ssWWVBS::PASS_TRIGGER) = true;
+    if (m_bools.at(ssWWVBS::pass_trigger_SLT)) m_bools.at(ssWWVBS::PASS_TRIGGER) = true;
   }
 
   void ssWWSelectorAlg::evaluateSingleLeptonTrigger
@@ -463,177 +484,91 @@ namespace ssWWVBS
     m_bools.at(ssWWVBS::pass_trigger_SLT) |= (trigPassed_SET || trigPassed_SMT);
   }
 
-  void ssWWSelectorAlg::evaluateDiLeptonTrigger
-  (const xAOD::EventInfo *event,
-   const xAOD::Electron *ele0, const xAOD::Electron *ele1,
-   const xAOD::Muon *mu0, const xAOD::Muon *mu1,
-   const CP::SystematicSet& sys)
-  {
-    std::vector<std::string> di_ele_paths;
+  void ssWWSelectorAlg::evaulateLeptonIDCuts
+  (const xAOD::Electron*& ele0, const xAOD::Electron*& ele1,
+   const xAOD::Muon*& mu0, const xAOD::Muon*& mu1,
+   CutManager& ssWWCuts, const CP::SystematicSet& sys) {
 
-    int year = m_year.get(*event, sys);
-    if(year==2015){
-      di_ele_paths = {"HLT_2e12_lhloose_L12EM10VH"};
-    }
-    else if(year==2016){
-      di_ele_paths = {"HLT_2e17_lhvloose_nod0"};
-    }
-    else if(m_is17_periodB5_B8.get(*event, sys)){
-      di_ele_paths = {
-        "HLT_2e24_lhvloose_nod0"
-      };
-    }
-    else if(2017<=year && year<=2018){
-      di_ele_paths = {
-        "HLT_2e17_lhvloose_nod0_L12EM15VHI", "HLT_2e24_lhvloose_nod0"
-      };
-    }
-    else if(year==2022){
-      di_ele_paths = {
-        "HLT_2e17_lhvloose_L12EM15VHI",
-        "HLT_2e24_lhvloose_L12EM20VH"
-      };
-    }
-    else if(year==2023){
-      di_ele_paths = {
-        "HLT_2e17_lhvloose_L12eEM18M",
-        "HLT_2e24_lhvloose_L12eEM24L"
-      };
-    }
+    if (!ssWWCuts.exists("PASS_LEPTON_ID"))
+        return;
 
-    bool trigPassed_DET = false;
+    // A helper lambda for processing an electron.
+    auto processElectron = [&](const xAOD::Electron* ele) -> const xAOD::Electron* {
+      if (ele && m_eleWPDecorHandle.get(*ele, sys) == 1 &&
+          ele->pt() > 27. * Athena::Units::GeV &&
+          (((std::abs(ele->eta()) < 1.37) || (std::abs(ele->eta()) > 1.52)) &&
+           (ele->author() == 1))) {
+        return ele;
+      }
+      return nullptr;
+    };
+    auto processMuon = [&](const xAOD::Muon* mu) -> const xAOD::Muon* {
+      if (mu && m_muonWPDecorHandle.get(*mu, sys) == 1 &&
+          mu->pt() > 27. * Athena::Units::GeV) {
+        return mu;
+      }
+      return nullptr;
+    };
+    auto processDiLepton = [&](const xAOD::Electron* ele0, const xAOD::Electron* ele1) -> bool {
+      if (ele0 && ele1) {
+        if ((std::abs(ele0->eta()) < 1.37) && (std::abs(ele1->eta()) < 1.37)) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+      return false;
+    };
+    
+    // Check the lepton ID and pT requirements;
+    ele0 = processElectron(ele0);
+    ele1 = processElectron(ele1);
+    mu0 = processMuon(mu0);
+    mu1 = processMuon(mu1);
+
     if (ele0 && ele1) {
-      for (const auto &trig : di_ele_paths){
-        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-        if (pass) {
-          bool match = m_matchingTool->match({ele0, ele1}, trig);
-          trigPassed_DET |= match;
-        }
+      m_bools.at(ssWWVBS::PASS_LEPTON_ID) = processDiLepton(ele0, ele1);
+      if (m_bools.at(ssWWVBS::PASS_LEPTON_ID)) {
+        m_bools.at(ssWWVBS::IS_ee) = true;
       }
-      trigPassed_DET &= ele0->pt() > m_pt_threshold[ssWWVBS::DLT][ssWWVBS::leadingele];
-      trigPassed_DET &= ele1->pt() > m_pt_threshold[ssWWVBS::DLT][ssWWVBS::subleadingele];
-    }
-
-    // Check di-muon triggers
-    std::vector<std::string> di_mu_paths;
-
-    if(year==2015){
-      di_mu_paths = {"HLT_mu18_mu8noL1"};
-    }
-    else if(2016<=year && year<=2018){
-      di_mu_paths = {"HLT_mu22_mu8noL1"};
-    }
-    else if(2022<=year && year<=2023){
-      di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
-    }
-
-    bool trigPassed_DMT = false;
-    if (mu0 && mu1) {
-      for (const auto &trig : di_mu_paths){
-        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-        if (pass) {
-          bool match = m_matchingTool->match({mu0, mu1}, trig);
-          trigPassed_DMT |= match;
-        }
-      }
-      trigPassed_DMT &= mu0->pt() > m_pt_threshold[ssWWVBS::DLT][ssWWVBS::leadingmu];
-      trigPassed_DMT &= mu1->pt() > m_pt_threshold[ssWWVBS::DLT][ssWWVBS::subleadingmu];
-    }
-
-    m_bools.at(ssWWVBS::pass_trigger_DLT) = (trigPassed_DET || trigPassed_DMT);
-  }
-
-  void ssWWSelectorAlg::evaluateAsymmetricLeptonTrigger
-  (const xAOD::EventInfo *event,
-   const xAOD::Electron *ele, const xAOD::Muon *mu,
-   const CP::SystematicSet& sys)
-  {
-    int year = m_year.get(*event, sys);
-
-    bool trigPassed_ASLT1_em = false;
-    bool trigPassed_ASLT1_me = false;
-    bool trigPassed_ASLT2 = false;
-    if (ele && mu) {
-
-      std::vector<std::string> asym_lepton_paths;
-
-      if(year==2015){
-        asym_lepton_paths = {"HLT_e17_lhloose_mu14"};
-      }
-      else if(2016<=year && year<=2018){
-        asym_lepton_paths = {"HLT_e17_lhloose_nod0_mu14"};
-      }
-      else if(2022<=year && year<=2023){
-        asym_lepton_paths = {"HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
-      }
-
-      for(const auto& trig : asym_lepton_paths){
-        bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-        if (pass){
-          bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
-          trigPassed_ASLT2 |= match;
-        }
-      }
-      trigPassed_ASLT2 &= ele->pt() > m_pt_threshold[ssWWVBS::ASLT2][ssWWVBS::leadingele];
-      trigPassed_ASLT2 &= mu->pt() > m_pt_threshold[ssWWVBS::ASLT2][ssWWVBS::leadingmu];
-
-      if (ele->pt() > mu->pt()) {
-
-        asym_lepton_paths = {};
-
-        if(year==2016){
-          asym_lepton_paths = {"HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1"};
-        }
-        else if(2017<=year && year<=2018){
-          asym_lepton_paths = {"HLT_e26_lhmedium_nod0_mu8noL1"};
-        }
-        else if(2022<=year && year<=2023){
-          asym_lepton_paths = {"HLT_e26_lhmedium_mu8noL1_L1EM22VHI"};
-        }
-
-        for(const auto& trig : asym_lepton_paths){
-          bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-          if (pass){
-            bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
-            trigPassed_ASLT1_em |= match;
-          }
-        }
-        trigPassed_ASLT1_em &= ele->pt() > m_pt_threshold[ssWWVBS::ASLT1_em][ssWWVBS::leadingele];
-        trigPassed_ASLT1_em &= mu->pt() > m_pt_threshold[ssWWVBS::ASLT1_em][ssWWVBS::leadingmu];
-
-      } else {
-
-        asym_lepton_paths = {};
-
-        if(year==2015){
-          asym_lepton_paths = {"HLT_e7_lhmedium_mu24"};
-        }
-        else if(2016<=year && year<=2018){
-          asym_lepton_paths = {"HLT_e7_lhmedium_nod0_mu24"};
-        }
-        else if(2022<=year && year<=2023){
-          asym_lepton_paths = {"HLT_e7_lhmedium_mu24_L1MU14FCH"};
-        }
-
-        for(const auto& trig : asym_lepton_paths){
-          bool pass = m_triggerdecos.at("trigPassed_"+trig).get(*event, sys);
-          if (pass){
-            bool match = m_matchingTool->match(*ele, trig) && m_matchingTool->match(*mu, trig);
-            trigPassed_ASLT1_me |= match;
-          }
-        }
-        trigPassed_ASLT1_me &= ele->pt() > m_pt_threshold[ssWWVBS::ASLT1_me][ssWWVBS::leadingele];
-        trigPassed_ASLT1_me &= mu->pt() > m_pt_threshold[ssWWVBS::ASLT1_me][ssWWVBS::leadingmu];
+      else {
+        ele0 = nullptr;
+        ele1 = nullptr;
       }
     }
-
-    m_bools.at(ssWWVBS::pass_trigger_ASLT1_em) = trigPassed_ASLT1_em;
-    m_bools.at(ssWWVBS::pass_trigger_ASLT1_me) = trigPassed_ASLT1_me;
-    m_bools.at(ssWWVBS::pass_trigger_ASLT2) = trigPassed_ASLT2;
+    else if (mu0 && mu1) {
+      m_bools.at(ssWWVBS::PASS_LEPTON_ID) = true;
+      m_bools.at(ssWWVBS::IS_mm) = true;
+    }
+    else if (ele0 && mu0) {
+      m_bools.at(ssWWVBS::PASS_LEPTON_ID) = true;
+      if (ele0->pt() >= mu0->pt()) {
+        m_bools.at(ssWWVBS::IS_em) = true;
+      }
+      else {
+        m_bools.at(ssWWVBS::IS_me) = true;
+      }
+    }
+    // Set the boolean flags for the leptons
+    if (ele0) {
+      m_ele_selected.set(*ele0, true, sys);
+    }
+    if (ele1) {
+      m_ele_selected.set(*ele1, true, sys);
+    }
+    if (mu0) {
+      m_mu_selected.set(*mu0, true, sys);
+    }
+    if (mu1) {
+      m_mu_selected.set(*mu1, true, sys);
+    }
   }
 
   void ssWWSelectorAlg::evaluateLeptonCuts
   (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
+    const xAOD::Electron* ele0, const xAOD::Electron* ele1,
+    const xAOD::Muon* mu0, const xAOD::Muon* mu1,
    CutManager& ssWWCuts)
   {
     float mZ = 91 * Athena::Units::GeV;
@@ -646,26 +581,29 @@ namespace ssWWVBS
     if (electrons.size() + muons.size() == 3)
       m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS) = true;
 
-    if (electrons.size() >= 2)
+    if ((ele0 != nullptr) + (ele1 != nullptr) + (mu0 != nullptr) + (mu1 != nullptr) >= 3)
     {
-      mll = (electrons.at(0)->p4() + electrons.at(1)->p4()).M();
-      Two_Same_Sign_Leptons = electrons.at(0)->charge()*electrons.at(1)->charge() == 1;
-
+      throw std::runtime_error("More than 2 leptons in the event");
     }
-    if (muons.size() >= 2)
+    if (ele0 && ele1)
     {
-      mll = (muons.at(0)->p4() + muons.at(1)->p4()).M();
-      Two_Same_Sign_Leptons = muons.at(0)->charge()*muons.at(1)->charge() == 1;
+      mll = (ele0->p4() + ele1->p4()).M();
+      Two_Same_Sign_Leptons = ele0->charge()*ele1->charge() == 1;
     }
-    if (electrons.size() == 1 && muons.size() == 1)
+    if (mu0 && mu1)
     {
-      mll = (electrons.at(0)->p4() + muons.at(0)->p4()).M();
-      Two_Same_Sign_Leptons = electrons.at(0)->charge()*muons.at(0)->charge() == 1;
+      mll = (mu0->p4() + mu1->p4()).M();
+      Two_Same_Sign_Leptons = mu0->charge()*mu1->charge() == 1;
+    }
+    if (ele0 && mu0)
+    {
+      mll = (ele0->p4() + mu0->p4()).M();
+      Two_Same_Sign_Leptons = ele0->charge()*mu0->charge() == 1;
     }
     
     if(ssWWCuts.exists("TWO_SAME_CHARGE_LEPTONS")) m_bools.at(ssWWVBS::TWO_SAME_CHARGE_LEPTONS) = Two_Same_Sign_Leptons;
-    if(ssWWCuts.exists("DILEPTON_MASS_THRESHOLD")) m_bools.at(ssWWVBS::DILEPTON_MASS_THRESHOLD) = ( mll >= 20.*Athena::Units::GeV );
-    if(ssWWCuts.exists("DILEPTON_MASS_SIDEBAND_EE")) m_bools.at(ssWWVBS::DILEPTON_MASS_SIDEBAND_EE) = ( std::abs(mll - mZ) >= 15.*Athena::Units::GeV && electrons.size() >= 2 );
+    if(ssWWCuts.exists("DILEPTON_MASS_THRESHOLD")) m_bools.at(ssWWVBS::DILEPTON_MASS_THRESHOLD) = ( mll >  20.*Athena::Units::GeV );
+    if(ssWWCuts.exists("DILEPTON_MASS_SIDEBAND_EE")) m_bools.at(ssWWVBS::DILEPTON_MASS_SIDEBAND_EE) = ((ele0 && ele1) && std::abs(mll - mZ) > 15.*Athena::Units::GeV);
 
   }
 
@@ -675,7 +613,7 @@ namespace ssWWVBS
 
   }
 
-  void ssWWSelectorAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& ssWWCuts)
+  void ssWWSelectorAlg::evaluateJetCuts(const xAOD::JetContainer& jets, CutManager& ssWWCuts)
   {
 
     /// All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the ssWW_config file.
@@ -683,29 +621,26 @@ namespace ssWWVBS
     double mjj = -99;
     float delta_yjj = 0;
 
-    if(ssWWCuts.exists("AT_LEAST_TWO_JETS")) m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) = (nonbjets.size() >= 2);
+    if(ssWWCuts.exists("AT_LEAST_TWO_JETS")) m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) = (jets.size() >= 2 && jets.at(0)->pt() > 65*Athena::Units::GeV && jets.at(1)->pt() > 35*Athena::Units::GeV);
     
-    if (nonbjets.size() >= 2){
-      mjj = (nonbjets.at(0)->p4() + nonbjets.at(1)->p4()).M();
-      delta_yjj = std::abs((nonbjets.at(0)->p4()).Rapidity() - (nonbjets.at(1)->p4()).Rapidity());
-      if(ssWWCuts.exists("DIJETS_MASS")) m_bools.at(ssWWVBS::DIJETS_MASS) = (mjj >= 500*Athena::Units::GeV);
-      if(ssWWCuts.exists("DIJETS_DELTA_RAPIDITY")) m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) = (delta_yjj >= 2);
+    if (jets.size() >= 2){
+      mjj = (jets.at(0)->p4() + jets.at(1)->p4()).M();
+      delta_yjj = std::abs(jets.at(0)->rapidity() - jets.at(1)->rapidity());
+      if(ssWWCuts.exists("DIJETS_MASS_LOW")) m_bools.at(ssWWVBS::DIJETS_MASS_LOW) = (mjj > 200*Athena::Units::GeV);
+      if(ssWWCuts.exists("DIJETS_MASS_HIGH")) m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) = (mjj > 500*Athena::Units::GeV);
+      if(ssWWCuts.exists("DIJETS_DELTA_RAPIDITY")) m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) = (delta_yjj > 2);
     }
  
   }
 
   void ssWWSelectorAlg::evaluateBJetLeptonCuts
   (const ConstDataVector<xAOD::JetContainer>& bjets,
-   const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons, CutManager& ssWWCuts)
+   const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
+   CutManager& ssWWCuts)
   {
-
-    m_bools.at(ssWWVBS::IS_ee) = (electrons.size() >= 2);
-    m_bools.at(ssWWVBS::IS_mm) = (muons.size() >= 2);
-    m_bools.at(ssWWVBS::IS_em) = (electrons.size() > 0) && (electrons.size() < 2) && (muons.size() > 0) && (muons.size() < 2);
     if(ssWWCuts.exists("PASS_TWO_LEPTONS")) m_bools.at(ssWWVBS::PASS_TWO_LEPTONS) = (electrons.size() + muons.size() >= 2);
     if(ssWWCuts.exists("PASS_THREE_LEPTONS")) m_bools.at(ssWWVBS::PASS_THREE_LEPTONS) = (electrons.size() + muons.size() >= 3);
-    if(ssWWCuts.exists("BJET_VETO")) m_bools.at(ssWWVBS::BJET_VETO) = (bjets.size() > 0);
-
+    if(ssWWCuts.exists("BJET_VETO")) m_bools.at(ssWWVBS::BJET_VETO) = (bjets.size() == 0);
   }  
 
   void ssWWSelectorAlg::setThresholds(const xAOD::EventInfo* event,
@@ -728,35 +663,6 @@ namespace ssWWVBS
       m_pt_threshold[ssWWVBS::SLT][ssWWVBS::mu] = 27. * Athena::Units::GeV;
     else
       m_pt_threshold[ssWWVBS::SLT][ssWWVBS::mu] = 25. * Athena::Units::GeV;
-
-    //Di-lepton triggers
-    //ee
-    if(year==2015) {
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::leadingele] = 13. * Athena::Units::GeV;
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::subleadingele] = 13. * Athena::Units::GeV;
-    }
-    // prescaled periods B5-B8
-    // https://twiki.cern.ch/twiki/bin/view/Atlas/TrigEgammaRecommendedTriggers2017
-    else if(m_is17_periodB5_B8.get(*event, sys)) {
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::leadingele] = 25. * Athena::Units::GeV;
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::subleadingele] = 25. * Athena::Units::GeV;
-    } else {
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::leadingele] = 18. * Athena::Units::GeV;
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::subleadingele] = 18. * Athena::Units::GeV;
-    }
-
-    //mm
-    if(year==2015) {
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::leadingmu] = 19. * Athena::Units::GeV;
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::subleadingmu] = 10. * Athena::Units::GeV;
-    }
-    else if(year>=2016 && year<=2018) {
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::leadingmu] = 24. * Athena::Units::GeV;
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::subleadingmu] = 10. * Athena::Units::GeV;
-    } else {
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::leadingmu] = 15. * Athena::Units::GeV;
-      m_pt_threshold[ssWWVBS::DLT][ssWWVBS::subleadingmu] = 15. * Athena::Units::GeV;
-    }
 
   }
 
