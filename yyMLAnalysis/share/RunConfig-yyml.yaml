@@ -2,3 +2,5 @@ include: yyMLAnalysis/RunConfig-yyml-base.yaml
 
 CutList:
   - PASS_TRIGGER
+  - pass_matching_trigger_diphoton
+  - pass_any_subchannel

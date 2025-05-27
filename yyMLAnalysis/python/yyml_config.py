@@ -23,24 +23,21 @@ def yyml_cfg(
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=photonkey,
                                    containerOutKey="yymlAnalysisPhotons_%SYS%",
-                                   #    minPt=22. * Units.GeV,
-                                   minPt=25. * Units.GeV
+                                   minPt=flags.Analysis.Photon.min_pT * Units.MeV
                                    ))
 
     cfg.merge(ElectronSelectorAlgCfg(
         flags,
         containerInKey=electronkey,
         containerOutKey="yymlAnalysisElectrons_%SYS%",
-        # minPt=9 * Units.GeV,
-        minPt=10 * Units.GeV
+        minPt=flags.Analysis.Electron.min_pT * Units.MeV
     ))
 
     cfg.merge(MuonSelectorAlgCfg(
         flags,
         containerInKey=muonkey,
         containerOutKey="yymlAnalysisMuons_%SYS%",
-        # minPt=9 * Units.GeV,
-        minPt=10 * Units.GeV
+        minPt=flags.Analysis.Muon.min_pT * Units.MeV
     ))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
@@ -53,8 +50,7 @@ def yyml_cfg(
         containerOutKey="yymlAnalysisJets_%SYS%",
         bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
         selectBjet=False,
-        # minPt=20 * Units.GeV,
-        minPt=25 * Units.GeV
+        minPt=flags.Analysis.Small_R_jet.min_pT * Units.MeV
     ))
 
     cfg.merge(TauSelectorAlgCfg(

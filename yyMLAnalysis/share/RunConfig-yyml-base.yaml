@@ -33,6 +33,8 @@ Electron:
   max_eta: 2.37
   ID: "MediumLH"
   Iso: "Loose_VarRad" # TODO: exact WP used in Run 2 analysis is unclear from the documentation
+  extra_wps:
+    - ["MediumDNN", "Loose_VarRad"]
 
 Muon:
   min_pT: 10.0e+3
@@ -41,11 +43,9 @@ Muon:
   Iso: "PflowLoose_VarRad" # TODO: find closest WP to Loose_FixedRad used in Run 2 analysis
 
 Small_R_jet:
-  min_pT: 25.e+3
+  min_pT: 25.0e+3
   max_eta: 4.4
-  # TODO: where is JVT specified? Not mentioned in EasyjetHub/base-config.yaml
   # useFJvt: true # TODO: check if FJVT was applied in Run 2 analysis
-  # TODO: is event cleaning turned on by default? LooseBad WP used in Run 2 analysis
   # btagging nominal working point
   btag_wp: "GN2v01_FixedCutBEff_77"
 
@@ -53,6 +53,7 @@ Tau:
   min_pT: 20.e+3
   max_eta: 2.5
   ID: "RNNLoose"
+  extra_wps: ["RNNLoose_eleid"]
   # addMuonRM: true
 
 # orthogonality studies
@@ -72,6 +73,9 @@ do_overlap_removal: true
 
 OverlapRemoval:
   favourPhotonOverLepton: false # if set to true, HgamOR is applied
+
+# flag for event cleaning
+do_event_cleaning: true
 
 #Enable cutflow
 save_cutflow: true

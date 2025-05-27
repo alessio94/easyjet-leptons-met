@@ -38,6 +38,7 @@ namespace HHYYML
         pass_matching_trigger_diphoton,
         PASS_TRIGGER,
 
+        pass_any_subchannel,
         pass_1l0tau,
         pass_0l1tau,
         pass_2l0tau,
@@ -129,6 +130,7 @@ private:
         {HHYYML::pass_matching_trigger_diphoton, "pass_matching_trigger_diphoton"},
         {HHYYML::PASS_TRIGGER, "PASS_TRIGGER"},
 
+        {HHYYML::pass_any_subchannel, "pass_any_subchannel"},
         {HHYYML::pass_1l0tau, "pass_1l0tau"},
         {HHYYML::pass_0l1tau, "pass_0l1tau"},
         {HHYYML::pass_2l0tau, "pass_2l0tau"},

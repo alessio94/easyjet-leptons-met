@@ -150,16 +150,8 @@ namespace HHYYML
         pass_cuts = pass_cuts && cut.passed;
       }
 
-      bool pass_any_subchannel = m_bools.at(HHYYML::pass_1l0tau) ||
-                                 m_bools.at(HHYYML::pass_0l1tau) ||
-                                 m_bools.at(HHYYML::pass_2l0tau) ||
-                                 m_bools.at(HHYYML::pass_1l1tau) ||
-                                 m_bools.at(HHYYML::pass_0l2tau);
-
-      bool pass_event = pass_cuts && pass_any_subchannel;
-
       // write out if in bypass mode or at least this systematic passes all cuts
-      if (m_bypass || pass_event) filter.setPassed(true);
+      if (m_bypass || pass_cuts) filter.setPassed(true);
 
       //****************
       // Cutflow
@@ -380,6 +372,14 @@ namespace HHYYML
     m_bools.at(HHYYML::pass_2l0tau) = evaluate2l0tauSelection(classifier);
     m_bools.at(HHYYML::pass_1l1tau) = evaluate1l1tauSelection(classifier);
     m_bools.at(HHYYML::pass_0l2tau) = evaluate0l2tauSelection(classifier);
+
+    bool pass_any_subchannel = m_bools.at(HHYYML::pass_1l0tau) ||
+                               m_bools.at(HHYYML::pass_0l1tau) ||
+                               m_bools.at(HHYYML::pass_2l0tau) ||
+                               m_bools.at(HHYYML::pass_1l1tau) ||
+                               m_bools.at(HHYYML::pass_0l2tau);
+
+    m_bools.at(HHYYML::pass_any_subchannel) = pass_any_subchannel;
 
   }
 
