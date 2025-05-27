@@ -1,6 +1,6 @@
 include: EasyjetHub/base-config.yaml
 
-channels: ["SR","WZCR"]
+channels: ["SR","WZCR","misIDCR", "incVR", "LowDyVR", "LowMjjVR", "LowNjVR", "tFakeVR", "pass_tEWKVR", "pass_lllVR", "ZeeVR"]
 
 # Which analysis to consider
 do_ssWW_analysis: true

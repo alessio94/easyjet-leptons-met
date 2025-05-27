@@ -33,6 +33,15 @@ namespace ssWWVBS
   {
     SR,
     WZCR,
+    misIDCR,
+    incVR,
+    LowDyVR,
+    LowMjjVR,
+    LowNjVR,
+    tFakeVR,
+    tEWKVR,
+    lllVR,
+    ZeeVR,
   };
 
   enum TriggerChannel
@@ -76,6 +85,15 @@ namespace ssWWVBS
     PASS_THREE_LEPTONS,
     EXACTLY_THREE_LEPTONS,
     pass_WZCR,
+    pass_misIDCR,
+    pass_incVR,
+    pass_LowDyVR,
+    pass_LowMjjVR,
+    pass_LowNjVR,
+    pass_tFakeVR,
+    pass_tEWKVR,
+    pass_lllVR,
+    pass_ZeeVR,
 
   };
 
@@ -94,6 +112,10 @@ namespace ssWWVBS
       StatusCode finalize() override; ///I added this to write the cutflow histogram.
 
     private :
+      float Z_mass = 91.;
+      double mjj = -99;
+      float delta_yjj = 0;
+
       const std::vector<std::string> m_STANDARD_CUTS{
         "PASS_TRIGGER",
         "PASS_TWO_LEPTONS",
@@ -206,6 +228,15 @@ namespace ssWWVBS
         {ssWWVBS::EXACTLY_THREE_LEPTONS, "EXACTLY_THREE_LEPTONS"},
         {ssWWVBS::pass_WZCR, "pass_WZCR"},
         {ssWWVBS::pass_SR, "pass_SR"},
+        {ssWWVBS::pass_misIDCR, "pass_misIDCR"},
+        {ssWWVBS::pass_incVR, "pass_incVR"},
+        {ssWWVBS::pass_LowDyVR, "pass_LowDyVR"},
+        {ssWWVBS::pass_LowMjjVR, "pass_LowMjjVR"},
+        {ssWWVBS::pass_LowNjVR, "pass_LowNjVR"},
+        {ssWWVBS::pass_tFakeVR, "pass_tFakeVR"},
+        {ssWWVBS::pass_tEWKVR, "pass_tEWKVR"},
+        {ssWWVBS::pass_lllVR, "pass_lllVR"},
+        {ssWWVBS::pass_ZeeVR, "pass_ZeeVR"},
       };
 
       CutManager m_ssWWCuts;

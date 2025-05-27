@@ -83,6 +83,15 @@ namespace ssWWVBS
       //std::cout<<"name=  "<<name<<std::endl;
       if( name == "SR") m_channels.push_back(ssWWVBS::SR);
       else if ( name == "ZCR") m_channels.push_back(ssWWVBS::WZCR);
+      else if ( name == "misIDCR") m_channels.push_back(ssWWVBS::misIDCR);
+      else if ( name == "incVR") m_channels.push_back(ssWWVBS::incVR);
+      else if ( name == "LowDyVR") m_channels.push_back(ssWWVBS::LowDyVR);
+      else if ( name == "LowMjjVR") m_channels.push_back(ssWWVBS::LowMjjVR);
+      else if ( name == "LowNjVR") m_channels.push_back(ssWWVBS::LowNjVR);
+      else if ( name == "tFakeVR") m_channels.push_back(ssWWVBS::tFakeVR);
+      else if ( name == "tEWKVR") m_channels.push_back(ssWWVBS::tEWKVR);
+      else if ( name == "lllVR") m_channels.push_back(ssWWVBS::lllVR);
+      else if ( name == "ZeeVR") m_channels.push_back(ssWWVBS::ZeeVR);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -159,6 +168,15 @@ namespace ssWWVBS
       m_bools.at(ssWWVBS::PASS_THREE_LEPTONS) = false; 
       m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS) = false;
       m_bools.at(ssWWVBS::pass_WZCR) = false;
+      m_bools.at(ssWWVBS::pass_misIDCR) = false;
+      m_bools.at(ssWWVBS::pass_incVR) = false;
+      m_bools.at(ssWWVBS::pass_LowDyVR) = false;
+      m_bools.at(ssWWVBS::pass_LowMjjVR) = false;
+      m_bools.at(ssWWVBS::pass_LowNjVR) = false;
+      m_bools.at(ssWWVBS::pass_tFakeVR) = false;
+      m_bools.at(ssWWVBS::pass_tEWKVR) = false;
+      m_bools.at(ssWWVBS::pass_lllVR) = false;
+      m_bools.at(ssWWVBS::pass_ZeeVR) = false;
 
       setThresholds(event, sys);
 
@@ -231,80 +249,170 @@ namespace ssWWVBS
       bool pass_baseline=false;
       if(m_bools.at(ssWWVBS::PASS_TRIGGER) && m_bools.at(ssWWVBS::PASS_TWO_LEPTONS) && m_bools.at(ssWWVBS::DILEPTON_MASS_THRESHOLD)) pass_baseline=true;
 
-
       // definition of SR and WZCR events: eee, mmm, mme, eem
-      const xAOD::Electron *ele2;
-      const xAOD::Muon *mu2;
-
       // std::cout<<"     ssWWSelectorAlg::execute()     : line  248"<<std::endl;
-      if(pass_baseline && m_bools.at(ssWWVBS::PASS_LEPTON_ID) &&m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) ){ 
-            if(m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) && m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) && m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) && m_bools.at(ssWWVBS::BJET_VETO) ){
+      if(pass_baseline && m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) && m_bools.at(ssWWVBS::TWO_SAME_CHARGE_LEPTONS)  ){ 
+        if(m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) && m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) && m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) && m_bools.at(ssWWVBS::BJET_VETO) ){
+          if( m_bools.at(ssWWVBS::MET) ){
+              m_bools.at(ssWWVBS::pass_SR)=1;
+          }
+        }      
+      }
+      else if (pass_baseline && m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS)) {
+        // WZ control region (WZCR)
+        std::vector<std::pair<TLorentzVector, int>> leptons; // Store 4-momenta and charges
+
+        // Collect electrons 4-momenta and charges
+        for (const auto& ele : *electrons) {
+            leptons.emplace_back(ele->p4(), ele->charge());
+        }
+
+        // Collect muons 4-momenta and charges
+        for (const auto& mu : *muons) {
+            leptons.emplace_back(mu->p4(), mu->charge());
+        }
+
+        if (leptons.size() == 3) {
+            // Sort leptons by pT in descending order
+            std::sort(leptons.begin(), leptons.end(),
+                      [](const std::pair<TLorentzVector, int>& a, const std::pair<TLorentzVector, int>& b) {
+                          return a.first.Pt() > b.first.Pt();
+                      });
+                      //std::cout<<"WZCR:  "<< leptons[0].first.Pt() <<"     "<<leptons[1].first.Pt()<<"     "<<leptons[2].first.Pt()<<std::endl;
+
+            // Calculate the invariant mass of the three leptons and opposite_charges
+            TLorentzVector totalP4 = leptons[0].first + leptons[1].first + leptons[2].first;
+            double mlll = totalP4.M();
+            bool opposite_charges = (leptons[0].second * leptons[1].second < 0) ||
+                                    (leptons[0].second * leptons[2].second < 0) ||
+                                    (leptons[1].second * leptons[2].second < 0);
+
+            if (mlll > 106. * Athena::Units::GeV && opposite_charges) {
+                m_bools.at(ssWWVBS::pass_WZCR) = 1;
+            }
+        }
+      }
+      else if (pass_baseline && m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) && !( m_bools.at(ssWWVBS::TWO_SAME_CHARGE_LEPTONS) ) ) {
+        if(m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) && m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) && m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) && m_bools.at(ssWWVBS::BJET_VETO) ){
               if( m_bools.at(ssWWVBS::MET)){
-                m_bools.at(ssWWVBS::pass_SR)=1;
+                    m_bools.at(ssWWVBS::pass_misIDCR) = 1;
               }
-            }      
+            }   
       }
-      
-      else if(pass_baseline && m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS)){
-            if (electrons->size() == 3) {
-              ele0 = electrons->at(0);
-              ele1 = electrons->at(1);
-              ele2 = electrons->at(2);
-              TLorentzVector p4_ele0 = ele0->p4();
-              TLorentzVector p4_ele1 = ele1->p4();
-              TLorentzVector p4_ele2 = ele2->p4();
-              // Calculate the invariant mass
-              TLorentzVector totalP4 = p4_ele0 + p4_ele1 + p4_ele2;
-              double mlll = totalP4.M();
-              if(mlll>106.* Athena::Units::GeV  && (ele0->charge()*ele1->charge()<0 || ele0->charge()*ele2->charge()<0 || ele1->charge()*ele2->charge()<0)){
-                    m_bools.at(ssWWVBS::pass_WZCR)=1;
-              }
+  
+      // VRs
+      bool pass_ll = false ;
+      bool is_eeEvent = false;
+      if (electrons->size() == 2) is_eeEvent = true;
+
+      //inclusive VR
+      std::vector<TLorentzVector> leptons_p4;
+
+      // Collect all electrons and muons 4-momenta
+        for (const auto& ele : *electrons) {
+          leptons_p4.push_back(ele->p4());
+        }
+        for (const auto& mu : *muons) {
+          leptons_p4.push_back(mu->p4());
+        }
+
+        // Sort leptons by pT in descending order
+          std::sort(leptons_p4.begin(), leptons_p4.end(),
+                  [](const TLorentzVector& a, const TLorentzVector& b) {
+                      return a.Pt() > b.Pt();
+                  });
+
+      if ( pass_baseline && m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) ){
+          //std::cout<<"incVR:  "<< leptons_p4[0].Pt() <<"     "<<leptons_p4[1].Pt()<<std::endl;
+          TLorentzVector totalP4 = leptons_p4[0] + leptons_p4[1];
+          double mll = totalP4.M();
+          if( mll>20 * Athena::Units::GeV && (mll -Z_mass)>15.* Athena::Units::GeV ){
+            pass_ll = true;
+          }
+          if( pass_ll && m_bools.at(ssWWVBS::TWO_SAME_CHARGE_LEPTONS) ){
+                if(!m_bools.at(ssWWVBS::BJET_VETO) ){
+                  m_bools.at(ssWWVBS::pass_incVR)=1;
+                  // Zee Peak VR: this part only for Zee events
+                  if (is_eeEvent){
+                    m_bools.at(ssWWVBS::pass_ZeeVR) = 1;
+                  }
+                  // Low DYjj VR
+                  if ( m_bools.at(ssWWVBS::MET) && m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) ){
+                      if( nonbjets->at(0)->pt() > 65*Athena::Units::GeV && nonbjets->at(1)->pt() > 35*Athena::Units::GeV ){
+                          mjj = (nonbjets->at(0)->p4() + nonbjets->at(1)->p4()).M();
+                          delta_yjj = std::abs((nonbjets->at(0)->p4()).Rapidity() - (nonbjets->at(1)->p4()).Rapidity());
+                          if( mjj >= 200*Athena::Units::GeV && delta_yjj <= 2 ){
+                              m_bools.at(ssWWVBS::pass_LowDyVR) = 1;
+                          }
+                      }
+                  }
+                  if ( m_bools.at(ssWWVBS::MET) && m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) ){
+                    // Low mjj VR
+                    if( nonbjets->at(0)->pt() > 65*Athena::Units::GeV && nonbjets->at(1)->pt() > 35*Athena::Units::GeV ){
+                        mjj = (nonbjets->at(0)->p4() + nonbjets->at(1)->p4()).M();
+                        if( mjj <= 500*Athena::Units::GeV ){
+                            m_bools.at(ssWWVBS::pass_LowMjjVR) = 1;
+                        }
+                    }
+                  }
+                  if ( m_bools.at(ssWWVBS::MET) && !m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) ){
+                    // Low Njet VR
+                    if ( nonbjets->size() > 0 ){
+                      if(  nonbjets->at(0)->pt() > 35*Athena::Units::GeV ){
+                          m_bools.at(ssWWVBS::pass_LowNjVR) = 1;
+                      }
+                    }
+                    else if ( nonbjets->size() == 0 ) m_bools.at(ssWWVBS::pass_LowNjVR) = 1;
+                    
+                  }
+                }
+                else if(bjets->size()==1){
+                  // Tpo-Fakes VR 
+                  if( bjets->size() + nonbjets->size() >= 2 ){
+                    if( nonbjets->at(0)->pt() > bjets->at(0)->pt() ){
+                      if ( nonbjets->size() >= 2 ){
+                          if( jets->at(0)->pt() > 65*Athena::Units::GeV && jets->at(1)->pt() > 35*Athena::Units::GeV ){
+                              m_bools.at(ssWWVBS::pass_tFakeVR) = 1; 
+                          }
+                      }
+                      else if (nonbjets->size() == 1){
+                        if( jets->at(0)->pt() > 35*Athena::Units::GeV  ){
+                          m_bools.at(ssWWVBS::pass_tFakeVR) = 1; 
+                        }
+                      }
+                    }
+
+                  }
+                }
+                else if( bjets->size()>=2 ){
+                  // Top-EWK VR
+                  if( nonbjets->size() >= 2 ){
+                    if( jets->at(0)->pt() > 65*Athena::Units::GeV && jets->at(1)->pt() > 35*Athena::Units::GeV ){
+                      m_bools.at(ssWWVBS::pass_tEWKVR) = 1; 
+                    }
+                  }
+                }
+
+          }
+        }
+        else if (pass_baseline && m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS)) {
+          // lll inclusive VR
+          if (leptons_p4.size() == 3) {
+            //std::cout<<"WZVR:  "<< leptons_p4[0].Pt() <<"     "<<leptons_p4[1].Pt()<<"     "<<leptons_p4[2].Pt()<<std::endl;
+            // Calculate the invariant mass of the two leading leptons
+            TLorentzVector totalP4 = leptons_p4[0] + leptons_p4[1];
+            double mll = totalP4.M();
+
+            // Apply selection cuts
+            if (mll > 20 * Athena::Units::GeV &&
+                leptons_p4[0].Pt() > 27 * Athena::Units::GeV &&
+                leptons_p4[1].Pt() > 27 * Athena::Units::GeV &&
+                leptons_p4[2].Pt() > 15 * Athena::Units::GeV) {
+                  m_bools.at(ssWWVBS::pass_lllVR) = 1;
             }
-            else if (muons->size() == 3) {
-              mu0 = muons->at(0);
-              mu1 = muons->at(1);
-              mu2 = muons->at(2);
-              TLorentzVector p4_mu0 = mu0->p4();
-              TLorentzVector p4_mu1 = mu1->p4();
-              TLorentzVector p4_mu2 = mu2->p4();
-              // Calculate the invariant mass
-              TLorentzVector totalP4 = p4_mu0 + p4_mu1 + p4_mu2;
-              double mlll = totalP4.M();
-              if(mlll>106.* Athena::Units::GeV && (mu0->charge()*mu1->charge()<0 || mu0->charge()*mu2->charge()<0 || mu1->charge()*mu2->charge()<0)){
-                    m_bools.at(ssWWVBS::pass_WZCR)=1;
-              }
-            }
-            else if (muons->size() == 1 && electrons->size() == 2) {
-              mu0 = muons->at(0);
-              ele0 = electrons->at(0);
-              ele1 = electrons->at(1);
-              TLorentzVector p4_mu0 = mu0->p4();
-              TLorentzVector p4_ele1 = ele1->p4();
-              TLorentzVector p4_ele0 = ele0->p4();
-              // Calculate the invariant mass
-              TLorentzVector totalP4 = p4_ele0 + p4_ele1 + p4_mu0;
-              double mlll = totalP4.M();
-              if(mlll>106.* Athena::Units::GeV && (ele0->charge()*ele1->charge()<0)){
-                    m_bools.at(ssWWVBS::pass_WZCR)=1;
-              }
-            }
-            else if (muons->size() == 2 && electrons->size() == 1) {
-              mu0 = muons->at(0);
-              mu1 = muons->at(1);
-              ele0 = electrons->at(0);
-              TLorentzVector p4_mu0 = mu0->p4();
-              TLorentzVector p4_mu1 = mu1->p4();
-              TLorentzVector p4_ele0 = ele0->p4();
-              // Calculate the invariant mass
-              TLorentzVector totalP4 = p4_mu0 + p4_mu1 + p4_ele0;
-              double mlll = totalP4.M();
-              if(mlll>106.* Athena::Units::GeV && (mu0->charge()*mu1->charge()<0)){ 
-                    m_bools.at(ssWWVBS::pass_WZCR)=1;
-              }
-            }
-      }
-      //std::cout<<"     ssWWSelectorAlg::execute()     : line  316"<<std::endl;
-      
+          }
+        }
+            
       bool pass = false;
       for(const auto& channel : m_channels){
         if(channel == ssWWVBS::SR){
@@ -313,7 +421,11 @@ namespace ssWWVBS
         else if(channel == ssWWVBS::WZCR){
           pass |= m_bools.at(ssWWVBS::pass_WZCR);
         }
+        else if(channel == ssWWVBS::misIDCR){
+          pass |= m_bools.at(ssWWVBS::pass_misIDCR);
+        }
       }
+      
 
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()=="") {
