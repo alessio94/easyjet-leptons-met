@@ -7,6 +7,12 @@ do_resolved: true
 # Use VBFRNN tagger
 UseVBFRNN : true
 
+# VgammaORTool Setup
+do_VgammaOR: true
+bypass_VGammaOR: true 
+VGammaOR_ypT_cuts: [17.e+3] #photon pT in MeV
+VGammaOR_dR_lepton_photon_cuts: [0.3]
+
 Electron:
   maxD0Significance: 10
   maxDeltaZ0SinTheta: 0.5

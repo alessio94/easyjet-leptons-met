@@ -35,6 +35,10 @@ Truth:
     - 545784 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp6
     - 545785 # MGPy8EG_ssWWhjj_llvvbbjj_EW8_LO_k2vp8
 
+  DSID_vgammaOR:
+    - 410470 # PhPy8EG_A14_ttbar_hdamp258p75_nonallhad
+    - 410472 # PhPy8EG_A14_ttbar_hdamp258p75_dil
+
 # Toggles for object types
 do_muons: true
 do_electrons: true
