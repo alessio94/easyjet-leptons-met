@@ -2,9 +2,11 @@
 # related information
 DSID_HF_class_samples:
   - 410470 #mc20 ttbar 5FS PhPy8 ljets (nonallhad)
+  - 410471 #mc20 ttbar 5FS PhPy8 allhad
   - 410472 #mc20 ttbar 5FS PhPy8 dilep
   - 601229 #mc23 ttbar 5FS PhPy8 ljets
   - 601230 #mc23 ttbar 5FS PhPy8 dilep
+  - 601237 #mc23 ttbar 5FS PhPy8 allhad
   - 411233 #mc20 ttbar 5FS PhH7 ljets 
   - 411234 #mc20 ttbar 5FS PhH7 dilep
   - 601414 #mc23 ttbar 5FS PhH7 dilep
@@ -25,6 +27,9 @@ DSID_HF_class_samples:
   - 600738 #mc20 ttbb 4FS PhPy8 dipole recoil dilep
   - 600792 #mc20 ttbb 4FS PhPy8 bornzerodamp ljets
   - 600791 #mc20 ttbb 4FS PhPy8 bornzerodamp dilep
+  - 407342 #mc20 ttbar HT1k5 nonallhad
+  - 407343 #mc20 ttbar HT1k_1k5 nonallhad
+  - 407344 #mc20 ttbar HT6c_1k nonallhad
 
 # list of DSID of samples for which to store WLep related information
 # for overlap removal between samples

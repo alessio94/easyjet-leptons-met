@@ -48,7 +48,7 @@ def tau_sequence(flags, configAcc):
         configSeq.setOptionValue('.saveCombinedSF', True)
 
     # Anti-tau selections
-    if flags.Analysis.do_bbtt_analysis:
+    if flags.Analysis.do_bbtt_analysis or flags.Analysis.do_bbbbtt_analysis:
         configSeq.append(HHbbttAntiTauDecoratorBlock())
         configSeq.setOptionValue('.taus', output_name)
         configSeq.setOptionValue('.tauBaselineSelection', flags.Analysis.Tau.ID)

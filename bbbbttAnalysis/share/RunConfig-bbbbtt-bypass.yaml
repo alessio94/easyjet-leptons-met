@@ -1,0 +1,5 @@
+include: bbbbttAnalysis/RunConfig-bbbbtt.yaml
+
+bypass: true
+do_trigger_filtering: false
+splitOutputTree: false

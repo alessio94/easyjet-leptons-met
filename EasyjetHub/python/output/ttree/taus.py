@@ -20,8 +20,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
 
     tau_branches.add_four_mom_branches(do_mass=False)
     tau_branches.variables += ["charge", "nProng", "decayMode"]
-
-    if flags.Analysis.do_bbtt_analysis:
+    if flags.Analysis.do_bbtt_analysis or flags.Analysis.do_bbbbtt_analysis:
         tau_branches.variables += ["isIDTau", "isAntiTau",
                                    "trigMatch_Tau35", "trigMatch_Tau25"]
 
@@ -72,6 +71,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
         tau_branches.variables += [
             f"effSF_{id_wp}_%SYS%"
             for id_wp in id_wps
+            if not ("GNTau" in id_wp)
         ]
 
     # Requires TauSelectorAlg to be run

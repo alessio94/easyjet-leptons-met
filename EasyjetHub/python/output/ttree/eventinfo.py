@@ -151,6 +151,20 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
                                          "truth_HH_average_eta",
                                          "truth_HH_abs_cos_theta_star"]
 
+        if flags.Analysis.Truth.nHiggses == 3:
+            eventinfo_branches.variables += ["truth_H3_pdgId",
+                                             "truth_children_fromH3_pdgId",
+                                             "truth_initial_children_fromH3_pdgId"]
+            for truthpart in [
+                "truth_H3",
+                "truth_children_fromH3",
+                "truth_initial_children_fromH3",
+            ]:
+                eventinfo_branches.variables += [
+                    f"{truthpart}_{var}"
+                    for var in ["pt", "eta", "phi", "m"]
+                ]
+
     if flags.Analysis.GRL.store_decoration:
         from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
         for key in getGoodRunsLists().keys():

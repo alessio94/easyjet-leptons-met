@@ -13,19 +13,30 @@ def HHbbttTriggerDecoratorCfg(flags, **kwargs):
         for c in flags.Analysis.TriggerChainsDeco
     ]
 
-    cfg.addEventAlgo(
-        CompFactory.HHBBTT.TriggerDecoratorAlg(
-            "HHbbttTriggerDecoratorAlg",
-            isMC=flags.Input.isMC,
-            muons=flags.Analysis.container_names.input.muons,
-            electrons=flags.Analysis.container_names.input.electrons,
-            taus=flags.Analysis.container_names.input.taus,
-            jets=flags.Analysis.container_names.input.reco4PFlowJet,
-            triggerLists=trigger_branches,
-            trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
-            **kwargs
+    kwargs.setdefault("isMC", flags.Input.isMC)
+    kwargs.setdefault("muons", flags.Analysis.container_names.input.muons)
+    kwargs.setdefault("electrons", flags.Analysis.container_names.input.electrons)
+    kwargs.setdefault("taus", flags.Analysis.container_names.input.taus)
+    kwargs.setdefault("triggerLists", trigger_branches)
+    kwargs.setdefault("trigMatchingTool",
+                      cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)))
+
+    if flags.Analysis.do_bbtt_analysis:
+        kwargs.setdefault("jets", flags.Analysis.container_names.input.reco4PFlowJet)
+        cfg.addEventAlgo(
+            CompFactory.HHBBTT.TriggerDecoratorAlg(
+                "HHbbttTriggerDecoratorAlg",
+                **kwargs
+            )
         )
-    )
+
+    if flags.Analysis.do_bbbbtt_analysis:
+        cfg.addEventAlgo(
+            CompFactory.HHHBBBBTT.TriggerDecoratorAlg(
+                "HHHbbbbttTriggerDecoratorAlg",
+                **kwargs
+            )
+        )
 
     return cfg
 
@@ -44,7 +55,7 @@ def tau_decor_cfg(flags, **kwargs):
         )
     )
 
-    if flags.Analysis.do_bbtt_analysis:
+    if flags.Analysis.do_bbtt_analysis or flags.Analysis.do_bbbbtt_analysis:
         cfg.merge(HHbbttTriggerDecoratorCfg(flags))
 
     return cfg

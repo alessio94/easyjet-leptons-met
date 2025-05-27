@@ -54,6 +54,7 @@ def truth_particle_info_cfg(
                 flags.Analysis.container_names.output.truthHHParticles
             ),
             decayModes=flags.Analysis.Truth.decayModes,
+            nHiggses=flags.Analysis.Truth.nHiggses,
         )
     )
 

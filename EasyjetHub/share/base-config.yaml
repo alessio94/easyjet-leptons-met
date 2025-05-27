@@ -25,6 +25,7 @@ add_BadBatman_jet_cleaning: true
 #apply tight jet cleaning. Works only for ptag >= 6139!
 do_tight_jet_cleaning: false
 do_bbtt_analysis: false
+do_bbbbtt_analysis: false
 do_bbyy_analysis: false
 do_thinning: true
 # LLP1 filtering
@@ -36,6 +37,7 @@ Truth:
   decayModes: []
   do_STXS: true
   include: DSID_samples.yaml
+  nHiggses: 2
 
 # Toggles for reconstructed objects properties
 Small_R_jet:

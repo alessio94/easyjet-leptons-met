@@ -35,6 +35,7 @@ namespace Easyjet
     {"WWtt", {MC::WPLUSBOSON, -MC::WPLUSBOSON, MC::TAU, -MC::TAU}},
     {"ZZtt", {MC::Z0BOSON, MC::TAU, -MC::TAU}},
     {"ZZZZ", {MC::Z0BOSON}},
+    {"bbbbtt", {MC::BQUARK, -MC::BQUARK, MC::TAU, -MC::TAU}},
   };
 
   TruthParticleInformationAlg ::TruthParticleInformationAlg(

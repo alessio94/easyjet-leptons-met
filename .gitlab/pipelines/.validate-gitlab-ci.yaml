@@ -324,6 +324,16 @@ validator_zbbjcalib_mc20:
   script:
     - easyjet-validate zbbjcalib-mc20
 
+validator_bbbbtt_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true 
+    - job: ntupler_bbbbtt_mc20
+      artifacts: false 
+  script:
+    - easyjet-validate bbbbtt-mc20
+
 # MC20 AF3
 
 validator_mc20af3_lite:
@@ -598,3 +608,13 @@ validator_llyy_mc23:
       artifacts: false
   script:
     - easyjet-validate llyy-mc23
+
+validator_bbbbtt_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true 
+    - job: ntupler_bbbbtt_mc23
+      artifacts: false 
+  script:
+    - easyjet-validate bbbbtt-mc23

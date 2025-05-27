@@ -38,11 +38,11 @@ namespace HHBBTT
       ATH_CHECK(m_GNTau_score.initialize(m_systematicsList, m_tauHandle));
 
       if(m_tauIDWP_name.value().find("GNTauLoose")!=std::string::npos)
-	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauL_v0", this};
+	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauL_v0prune", this};
       else if(m_tauIDWP_name.value().find("GNTauMedium")!=std::string::npos)
-	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauM_v0", this};
+	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauM_v0prune", this};
       else if(m_tauIDWP_name.value().find("GNTauTight")!=std::string::npos)
-	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauT_v0", this};
+	m_GNTau_sel = CP::SysReadDecorHandle<char>{"GNTauT_v0prune", this};
       else{
 	ATH_MSG_ERROR("Unknown Tau ID WP ");
 	return StatusCode::FAILURE;
@@ -220,4 +220,3 @@ namespace HHBBTT
   }
 
 }
-

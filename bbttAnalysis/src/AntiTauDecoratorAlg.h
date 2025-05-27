@@ -71,7 +71,7 @@ namespace HHBBTT
     xAOD::TauJetParameters::IsTauFlag m_tauRNNWP;
     bool m_useGNTau = false;
     CP::SysReadDecorHandle<char> m_GNTau_sel{"", this};
-    CP::SysReadDecorHandle<float> m_GNTau_score{"GNTauScoreSigTrans_v0", this};
+    CP::SysReadDecorHandle<float> m_GNTau_score{"GNTauScoreSigTrans_v0prune", this};
 
     Gaudi::Property<double> m_antiTauScoreThreshold
       { this, "antiTauScoreThreshold", 0.,
