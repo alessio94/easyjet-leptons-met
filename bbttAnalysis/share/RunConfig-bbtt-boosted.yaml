@@ -7,6 +7,10 @@ channels: ["Boosted", "HadHad"]
 # TODO: __BOOSTED__ this is a temporary flag, as we don't want to
 # interfere with the resolved analysis.
 do_boosted_dihiggs: true
+do_ditaus: true
+
+DiTau:
+  ID: "Tight"
 
 # split output file
 splitCBK: true

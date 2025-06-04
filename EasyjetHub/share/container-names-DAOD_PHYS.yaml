@@ -10,6 +10,7 @@ input:
   photons:             Photons
   taus:                TauJets
   taus_muonRM:         TauJets_MuonRM
+  ditaus:              DiTauJets
   truthtaus:           TruthTaus
   truthelectrons:      TruthElectrons
   truthmuons:          TruthMuons
@@ -35,5 +36,6 @@ output:
   electrons:           AnalysisElectrons_%SYS%
   photons:             AnalysisPhotons_%SYS%
   taus:                AnalysisTauJets_%SYS%
+  ditaus:              AnalysisDiTauJets_%SYS%
   met:                 AnalysisMET_%SYS%
   truthHHParticles:    TruthDiHiggsParticles

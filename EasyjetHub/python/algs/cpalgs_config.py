@@ -15,6 +15,7 @@ from EasyjetHub.algs.calibration.muons import muon_sequence
 from EasyjetHub.algs.calibration.electrons import electron_sequence
 from EasyjetHub.algs.calibration.photons import photon_sequence
 from EasyjetHub.algs.calibration.taus import tau_sequence
+from EasyjetHub.algs.calibration.ditaus import ditau_sequence
 from EasyjetHub.algs.calibration.met import met_sequence
 from EasyjetHub.algs.calibration.selection_decoration import (
     selection_decoration_sequence)
@@ -37,6 +38,7 @@ analysis_seqs = {
     "electrons": electron_sequence,
     "photons": photon_sequence,
     "taus": tau_sequence,
+    "ditaus": ditau_sequence,
     "small_R_jets": jet_sequence,
 }
 
@@ -140,6 +142,7 @@ def cpalgs_cfg(flags):
             "photons",
             "muons",
             "taus",
+            "ditaus",
             "small_R_jets"
         ]:
             if flags.Analysis[f"do_{objtype}"]:

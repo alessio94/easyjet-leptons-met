@@ -7,6 +7,7 @@ do_muons: false
 do_electrons: false
 do_photons: false
 do_taus: false
+do_ditaus: false
 do_met: false
 do_mmc: false
 do_overlap_removal: false
@@ -158,6 +159,10 @@ Tau:
   variables_int: ["charge", "nProng", "decayMode"]
   extra_wps: []
   antiTauScoreThreshold: 0
+
+DiTau:
+  ID: ""
+  extra_wps: []
 
 Lepton:
   amount: 0
