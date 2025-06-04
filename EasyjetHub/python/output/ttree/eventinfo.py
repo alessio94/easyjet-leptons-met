@@ -2,6 +2,7 @@ from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from AthenaConfiguration.Enums import LHCPeriod
 from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 from EasyjetHub.steering.sample_metadata import STXS_info
+from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
 
 def get_event_info_branches(flags, tree_flags, trigger_chains):
@@ -125,6 +126,15 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             if "FixedCutBEff" in wp or "Continuous2D" in wp:
                 continue
             eventinfo_branches.variables += [f"ftag_effSF_{wp}_%SYS%"]
+
+            trigSF_flags = flags.Analysis.Trigger.scale_factor
+            if trigSF_flags.doSF and hasattr(trigSF_flags, 'bjet'):
+                triggerChainsPerYear = get_trigger_chains_scale_factor(flags, 'bjet')
+                for triggerChains in triggerChainsPerYear.values():
+                    for chain in triggerChains:
+                        eventinfo_branches.variables += [
+                            f"ftag_effSF_{wp}_{chain}_%SYS%"
+                        ]
 
         # jvt is effSF is now centrally calculated by CP tools
         eventinfo_branches.variables += ["jvt_effSF_%SYS%"]

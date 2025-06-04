@@ -4,6 +4,7 @@ from AthenaConfiguration.Enums import LHCPeriod
 from AthenaCommon.Utils.unixtools import find_datafile
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
+from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
 
 def jet_sequence(
@@ -147,6 +148,20 @@ def jet_sequence(
 
             if bTagCalibFile:
                 configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
+
+            trigSF_flags = flags.Analysis.Trigger.scale_factor
+            if trigSF_flags.doSF and hasattr(trigSF_flags, 'bjet'):
+                bTagCalibTriggerFile = None
+                if 'btagTriggerCDI' in trigSF_flags.bjet:
+                    bTagCalibTriggerFile = trigSF_flags.bjet.btagTriggerCDI
+
+                if bTagCalibTriggerFile:
+                    configSeq.setOptionValue('.bTagCalibTriggerFile',
+                                             bTagCalibTriggerFile)
+
+                configSeq.setOptionValue('.triggerChainsPerYear',
+                                         get_trigger_chains_scale_factor(flags, 'bjet'))
+                configSeq.setOptionValue('.removeHLTPrefix', False)
 
         if jet_flags.runBJetPtCalib:
             configSeq += makeConfig(
