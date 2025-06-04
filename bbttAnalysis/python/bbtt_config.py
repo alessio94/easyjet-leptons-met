@@ -22,6 +22,9 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
     if not int_variables:
         int_variables = []
 
+    if flags.Analysis.Small_R_jet.save_all_jets:
+        smalljetkey = smalljetkey.replace('_%SYS%', '_thin_%SYS%')
+
     cfg = ComponentAccumulator()
 
     # anti-iso lepton control region is not compatible with the other

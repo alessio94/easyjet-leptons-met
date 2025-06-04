@@ -44,6 +44,7 @@ Small_R_jet:
   amount_bjet: 2
   doHLTMatching: true
   doL1Matching: true
+  save_all_jets: true
 
 Electron:
   ID: "LooseBLayerLH_nottva"

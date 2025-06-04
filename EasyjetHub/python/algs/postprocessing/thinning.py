@@ -38,6 +38,13 @@ def thinning_sequence(flags):
             flags.Analysis.container_names.output[jet_type]))
         configSeq.setOptionValue('.selectionName', selection_string)
         configSeq.setOptionValue('.postfix', 'thin')
+        if flags.Analysis.Small_R_jet.save_all_jets:
+            # Dump inclusive collection
+            # Save thinned collection with a different name
+            configSeq.setOptionValue(
+                '.outputName',
+                flags.Analysis.container_names.output[jet_type].replace(
+                    '_%SYS%', '_thin'))
 
     if flags.Analysis.do_large_R_Topo_jets:
         configSeq += makeConfig('Thinning', containerName=drop_sys(

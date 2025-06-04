@@ -64,6 +64,7 @@ Small_R_jet:
   uncertToolMCType: ""
   do_parent_decoration: true
   do_thinning: true
+  save_all_jets: false
   amount: 0
   amount_bjet: 0
   amount_cjet: 0
