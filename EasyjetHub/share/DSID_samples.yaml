@@ -30,6 +30,10 @@ DSID_HF_class_samples:
   - 407342 #mc20 ttbar HT1k5 nonallhad
   - 407343 #mc20 ttbar HT1k_1k5 nonallhad
   - 407344 #mc20 ttbar HT6c_1k nonallhad
+  - 603851 #mc23 ttbar HT sliced ljets
+  - 603852 #mc23 ttbar HT sliced ljets
+  - 603853 #mc23 ttbar HT sliced ljets
+  - 603854 #mc23 ttbar HT sliced ljets
 
 # list of DSID of samples for which to store WLep related information
 # for overlap removal between samples
