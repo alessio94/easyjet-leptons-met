@@ -234,6 +234,26 @@ validator_VBSVV4q_mc20_llj1:
   script:
     - easyjet-validate VBSVV4q-mc20-llj1
 
+validator_jjjj_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_jjjj_mc20
+      artifacts: false
+  script:
+    - easyjet-validate jjjj-mc20
+
+validator_jjjj_mc20_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_jjjj_mc20_lite
+      artifacts: false
+  script:
+    - easyjet-validate jjjj-mc20-lite
+
 validator_ssWW_mc20:
   extends: .ntuple_validation
   needs:

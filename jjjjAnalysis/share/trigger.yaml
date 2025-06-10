@@ -1,0 +1,23 @@
+### we should put the single/multi-jets trigger items
+selection:
+  chains:
+    '2015':
+    - 'HLT_j380'
+    - 'HLT_j110'
+    '2016':
+    - 'HLT_j380'
+    - 'HLT_j110'
+    '2017':
+    - 'HLT_j420'
+    - 'HLT_j110'
+    '2018':
+    - 'HLT_j420'
+    - 'HLT_j110'
+    '2022': 
+    - 'HLT_j420_pf_ftf_preselj225_L1J100'
+    - 'HLT_j420_ftf_preselj225_L1J100' 
+    - 'HLT_j110'
+    '2023': 
+    - 'HLT_j420_pf_ftf_preselj225_L1J100'
+    - 'HLT_j420_ftf_preselj225_L1J100'
+    - 'HLT_j110'
