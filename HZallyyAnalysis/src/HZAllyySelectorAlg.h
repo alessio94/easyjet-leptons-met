@@ -52,7 +52,8 @@ namespace HZALLYY
       LEP1_LEP2_PT,
       DILEP_MASS,
       DILEP_PT,
-      ATLEAST_ONE_LOOSE_NonIso_PHOTON
+      ATLEAST_ONE_PHOTON
+      
     };
 
   /// \brief An algorithm for counting containers
@@ -79,8 +80,8 @@ namespace HZALLYY
       "LEP1_LEP2_PT",
       "DILEP_MASS",
       "DILEP_PT",
-      "ATLEAST_ONE_LOOSE_NonIso_PHOTON"
-    };
+      "ATLEAST_ONE_PHOTON"
+     	};
 
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
@@ -153,9 +154,8 @@ namespace HZALLYY
       {HZALLYY::LEP1_LEP2_PT, "LEP1_LEP2_PT"},
       {HZALLYY::DILEP_MASS, "DILEP_MASS"},
       {HZALLYY::DILEP_PT, "DILEP_PT"},
-      {HZALLYY::ATLEAST_ONE_LOOSE_NonIso_PHOTON, "ATLEAST_ONE_LOOSE_NonIso_PHOTON"},
-      
-     };
+      {HZALLYY::ATLEAST_ONE_PHOTON, "ATLEAST_ONE_PHOTON"},
+	};
 
     CutManager m_llyyCuts;
     Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};

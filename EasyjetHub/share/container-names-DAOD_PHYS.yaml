@@ -13,6 +13,7 @@ input:
   truthtaus:           TruthTaus
   truthelectrons:      TruthElectrons
   truthmuons:          TruthMuons
+  truthphotons:        TruthPhotons
   truthmet:            MET_Truth
   truthBSMParticles:   TruthBSMWithDecayParticles
   truthSMParticles:    TruthBosonsWithDecayParticles

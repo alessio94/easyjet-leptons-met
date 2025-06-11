@@ -87,9 +87,10 @@ namespace HZALLYY
 	
 	const xAOD::ElectronContainer *electrons = nullptr;
 	ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
-	
+
 	const xAOD::PhotonContainer *photons = nullptr;
 	ANA_CHECK (m_photonHandle.retrieve (photons, sys));    
+
 	
 	m_bools.at(HZALLYY::pass_trigger_SLT) = false;
 	m_bools.at(HZALLYY::pass_trigger_DLT) = false;
@@ -100,8 +101,8 @@ namespace HZALLYY
 	m_bools.at(HZALLYY::LEP1_LEP2_PT) = false;
 	m_bools.at(HZALLYY::DILEP_MASS) = false;
 	m_bools.at(HZALLYY::DILEP_PT) = false;
-	m_bools.at(HZALLYY::ATLEAST_ONE_LOOSE_NonIso_PHOTON) = false;
-		
+	m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON) = false;
+	
 	setThresholds(event, sys);
 	
 	// Leptons
@@ -142,8 +143,8 @@ namespace HZALLYY
 	   m_bools.at(HZALLYY::LEP1_LEP2_PT) &&
 	   m_bools.at(HZALLYY::DILEP_MASS) &&
 	   m_bools.at(HZALLYY::DILEP_PT) &&
-	   m_bools.at(HZALLYY::ATLEAST_ONE_LOOSE_NonIso_PHOTON)) pass_baseline=true;
-	
+	   m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON)) pass_baseline=true;
+		
 	if ((m_bypass or pass_baseline)) filter.setPassed(true);
 	
 	// do the CUTFLOW only with sys="" -> NOSYS
@@ -392,7 +393,7 @@ namespace HZALLYY
     
     m_bools.at(HZALLYY::pass_trigger_DLT) = (trigPassed_DET || trigPassed_DMT);
   }
-  
+
   void HZAllyySelectorAlg::evaluateLeptonCuts
   (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
    CutManager& llyyCuts)
@@ -482,15 +483,17 @@ namespace HZALLYY
       }
 
   }
-  
- void HZAllyySelectorAlg::evaluatePhotonCuts
+
+  void HZAllyySelectorAlg::evaluatePhotonCuts
   (const xAOD::PhotonContainer& photons, CutManager& llyyCuts)
     
   {
-    if (photons.size() > 0 && llyyCuts.exists("ATLEAST_ONE_LOOSE_NonIso_PHOTON"))
-      m_bools.at(HZALLYY::ATLEAST_ONE_LOOSE_NonIso_PHOTON) = true;
+    if ( ( (photons.size() >=2 && photons.at(0)->pt() > 10 * Athena::Units::GeV && photons.at(1)->pt() > 10 * Athena::Units::GeV) ||
+	   (photons.size() >=1 && photons.at(0)->pt() > 20 * Athena::Units::GeV) )
+	&& llyyCuts.exists("ATLEAST_ONE_PHOTON") )
+      m_bools.at(HZALLYY::ATLEAST_ONE_PHOTON) = true;
   }
-  
+
   void HZAllyySelectorAlg::setThresholds(const xAOD::EventInfo* event,
 					 const CP::SystematicSet& sys) {
     

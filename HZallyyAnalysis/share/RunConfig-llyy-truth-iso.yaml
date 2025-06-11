@@ -78,6 +78,15 @@ ttree_output:
     electrons: 'container_names.output.electrons'
     photons: 'container_names.output.photons'
     small_R_jets: 'container_names.output.reco4PFlowJet'
+  collection_options:
+    photons:
+      shower_shapes: true
+      truth_labels: true
+      iso_variables: true
+  truth_outputs:
+    photons: 'container_names.input.truthphotons'
+    electrons: 'container_names.input.truthelectrons'
+    muons: 'container_names.input.truthmuons'
+
 #truth_outputs:
 #  small_R_jets: 'container_names.input.truth4Jet'
-#  higgs_particle: 'container_names.output.truthHHParticles'

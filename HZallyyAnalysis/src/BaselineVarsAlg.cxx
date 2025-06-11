@@ -42,6 +42,7 @@ namespace HZALLYY {
         }
       }
     }
+    
     for (const std::string &string_var: m_fvars) {
       CP::SysReadDecorHandle<float> var {string_var+"_%SYS%", this};
       m_FDecors.emplace(string_var, var);
@@ -102,53 +103,56 @@ namespace HZALLYY {
 				  m_FDecors.at("Photon1_eta").get(*event, sys), 
 				  m_FDecors.at("Photon1_phi").get(*event, sys), 
 				  m_FDecors.at("Photon1_E").get(*event, sys));
-      
+
+   
       Subleading_photon.SetPtEtaPhiE(m_FDecors.at("Photon2_pt").get(*event, sys), 
 				     m_FDecors.at("Photon2_eta").get(*event, sys), 
 				     m_FDecors.at("Photon2_phi").get(*event, sys), 
 				     m_FDecors.at("Photon2_E").get(*event, sys));
-      
-      if(n_leptons>=2) ll = Leading_lep + Subleading_lep;
+    
+    if(n_leptons>=2) ll = Leading_lep + Subleading_lep;
       
 
       bool Is_Resolved = false;
       bool Is_Merged = false;
 
-      if ( n_photons >=2 &&
-	   Leading_photon.Pt() > 10 * Athena::Units::GeV &&
-	   Subleading_photon.Pt() > 10 * Athena::Units::GeV &&
-	   Leading_photon.DeltaR(Subleading_photon) < 1.5)
-	{
-	  Is_Resolved = true;
-	  yy = Leading_photon + Subleading_photon;
-	
-	  m_Fbranches.at("res_myy").set(*event, yy.M(), sys);
-	  m_Fbranches.at("res_pTyy").set(*event, yy.Pt(), sys);
-	  m_Fbranches.at("res_Etayy").set(*event, yy.Eta(), sys);
-	  m_Fbranches.at("res_Phiyy").set(*event, yy.Phi(), sys);
-	  m_Fbranches.at("res_dRyy").set(*event, Leading_photon.DeltaR(Subleading_photon), sys);
-	  m_Fbranches.at("res_dPhiyy").set(*event, abs(Leading_photon.DeltaPhi(Subleading_photon)), sys);
-	  m_Fbranches.at("res_dEtayy").set(*event,  abs(Leading_photon.Eta()- Subleading_photon.Eta()) , sys);
-	  m_Fbranches.at("res_Xyy").set(*event, (Leading_photon.DeltaR(Subleading_photon) * yy.Pt())/(2*yy.M()) , sys);
-	  m_Fbranches.at("res_Ph1ptOvermyy").set(*event, Leading_photon.Pt()/yy.M(), sys);
-	  m_Fbranches.at("res_Ph2ptOvermyy").set(*event, Subleading_photon.Pt()/yy.M(), sys);
+      if ( n_photons >=2&&
+       	   Leading_photon.Pt() > 10.0 * Athena::Units::GeV &&
+       	   Subleading_photon.Pt() > 10.0 * Athena::Units::GeV &&
+       	   Leading_photon.DeltaR(Subleading_photon) < 1.5)
+      
+	    {
+	      Is_Resolved = true;
 	  
-      	  // H->Za->yyll system building
-	  if (n_leptons >= 2) {
+	      yy = Leading_photon + Subleading_photon;
+	
+	      m_Fbranches.at("res_myy").set(*event, yy.M(), sys);
+	      m_Fbranches.at("res_pTyy").set(*event, yy.Pt(), sys);
+	      m_Fbranches.at("res_Etayy").set(*event, yy.Eta(), sys);
+	      m_Fbranches.at("res_Phiyy").set(*event, yy.Phi(), sys);
+	      m_Fbranches.at("res_dRyy").set(*event, Leading_photon.DeltaR(Subleading_photon), sys);
+	      m_Fbranches.at("res_dPhiyy").set(*event, abs(Leading_photon.DeltaPhi(Subleading_photon)), sys);
+	      m_Fbranches.at("res_dEtayy").set(*event,  abs(Leading_photon.Eta()- Subleading_photon.Eta()) , sys);
+	      m_Fbranches.at("res_Xyy").set(*event, (Leading_photon.DeltaR(Subleading_photon) * yy.Pt())/(2*yy.M()) , sys);
+	      m_Fbranches.at("res_Ph1ptOvermyy").set(*event, Leading_photon.Pt()/yy.M(), sys);
+	      m_Fbranches.at("res_Ph2ptOvermyy").set(*event, Subleading_photon.Pt()/yy.M(), sys);
+	  
+	      // H->Za->yyll system building
+	      if (n_leptons >= 2) {
 	    
-	    llyy  = yy + ll;
+		llyy  = yy + ll;
 	    
-	    // Set variables for the H->Za system
-	    m_Fbranches.at("res_mH_Za").set(*event, llyy.M(), sys);
-	    m_Fbranches.at("res_pTH_Za").set(*event, llyy.Pt(), sys);
-	    m_Fbranches.at("res_EtaH_Za").set(*event, llyy.Eta(), sys);
-	    m_Fbranches.at("res_PhiH_Za").set(*event, llyy.Phi(), sys);
-	    m_Fbranches.at("res_dRH_Za").set(*event, ll.DeltaR(yy), sys);
-	    m_Fbranches.at("res_dPhiH_Za").set(*event, abs(ll.DeltaPhi(yy)), sys);
-	    m_Fbranches.at("res_dEtaH_Za").set(*event, abs(ll.Eta() - yy.Eta()), sys);
-	  }
-	}
-
+		// Set variables for the H->Za system
+		m_Fbranches.at("res_mH_Za").set(*event, llyy.M(), sys);
+		m_Fbranches.at("res_pTH_Za").set(*event, llyy.Pt(), sys);
+		m_Fbranches.at("res_EtaH_Za").set(*event, llyy.Eta(), sys);
+		m_Fbranches.at("res_PhiH_Za").set(*event, llyy.Phi(), sys);
+		m_Fbranches.at("res_dRH_Za").set(*event, ll.DeltaR(yy), sys);
+		m_Fbranches.at("res_dPhiH_Za").set(*event, abs(ll.DeltaPhi(yy)), sys);
+		m_Fbranches.at("res_dEtaH_Za").set(*event, abs(ll.Eta() - yy.Eta()), sys);
+	      }
+	    }
+	
       if ( !Is_Resolved && n_photons >=1 &&
 	   Leading_photon.Pt() > 20 * Athena::Units::GeV)
 	{

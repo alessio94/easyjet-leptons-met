@@ -64,5 +64,6 @@ truth_outputs:
   electrons: ''
   muons: ''
   met: ''
+  photons: ''
 # custom extra output branches
 extra_output_branches: []
