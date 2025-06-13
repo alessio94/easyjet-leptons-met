@@ -38,6 +38,7 @@ Small_R_jet:
   # btagging nominal working point
   btag_wp: "GN2v01_FixedCutBEff_85"
   btag_extra_wps:
+    - GN2v01_FixedCutBEff_90
     - GN2v01_FixedCutBEff_77
     - GN2v01_FixedCutBEff_70
     - GN2v01_Continuous
@@ -75,6 +76,7 @@ Tau:
   amount: 2
   variables: ["RNN"]
   variables_int: ["isTauID", "isAntiTau", "truthType", "EleRNN_WP", "tauTruthJetLabel"]
+  antiTauScoreThreshold: 0.01
 
 Lepton:
   amount: 2
@@ -129,6 +131,7 @@ ttree_output:
       truth_branches: True
       truth_parent_info: true
       run_selection: true
+      score_branches: true
     electrons:
       run_selection: true
       truth_parent_info: true

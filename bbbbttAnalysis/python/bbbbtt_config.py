@@ -90,11 +90,11 @@ def bbbbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 
     # MMC decoration. Using same as bbtt
     if flags.Analysis.do_mmc:
-        # Keep 2016MC15C as default, as 2019 has higher rate of
-        # non-converging fir for bbtt
         from EasyjetHub.algs.mmc_tool_config import MissingMassToolCfg
         mmcTool = cfg.popToolsAndMerge(
-            MissingMassToolCfg(flags, CalibSet="2016MC15C"))
+            MissingMassToolCfg(
+                flags, CalibSet="2024",
+                ParamFilePath="MMC_params_v051224_angle_noLikelihoodFit.root"))
 
         cfg.addEventAlgo(
             CompFactory.HHBBTT.MMCDecoratorAlg(
@@ -157,7 +157,33 @@ def bbbbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             )
         )
 
+    # include variables for kappa-reweighting
+    if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_HHH4b2tau_KappaReweight:
+        reweightVars = get_ReweightingVars()
+        cfg.addEventAlgo(
+            CompFactory.HHHBBBBTT.KappaReweightingAlg(
+                "KappaReweighting",
+                reweightVars=reweightVars,
+            )
+        )
+
     return cfg
+
+
+def get_ReweightingVars():
+    reweightVars = [
+        "k3_0_k4_0",
+        "k3_1_k4_m1",
+        "k3_m1_k4_1",
+        "k3_1_k4_0",
+        "k3_0_k4_1",
+        "k3_m1_k4_0",
+        "k3_0_k4_m1",
+        "k3_0p5_k4_0",
+        "k3_m0p5_k4_0",
+    ]
+
+    return reweightVars
 
 
 def get_BaselineVarsbbbbttAlg_variables(flags):
@@ -277,5 +303,15 @@ def bbbbtt_branches(flags):
                 "ZCR", "TopEMuCR", "AntiIsoLepHad"]:
         branches += [f"EventInfo.pass_{cat}_%SYS% -> bbbbtt_pass_{cat}"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    for var in ["N_LEPTONS_CUT_LEPHAD", "N_LEPTONS_CUT_ANTIISOLEPHAD",
+                "N_LEPTONS_CUT_HADHAD"]:
+        branches += [f"EventInfo.{var}_%SYS% -> bbbbtt_{var.lower()}"
+                     + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    if flags.Input.MCChannelNumber in flags.Analysis.Truth.DSID_HHH4b2tau_KappaReweight:
+        reweight_vars = get_ReweightingVars()
+        for var in reweight_vars:
+            branches += [f"EventInfo.{var} -> KappaReweighting__{var}"]
 
     return branches, float_variable_names, int_variable_names

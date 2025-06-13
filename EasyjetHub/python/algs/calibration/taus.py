@@ -54,6 +54,8 @@ def tau_sequence(flags, configAcc):
         configSeq.setOptionValue('.taus', output_name)
         configSeq.setOptionValue('.tauBaselineSelection', flags.Analysis.Tau.ID)
         configSeq.setOptionValue('.tauIDSelection', flags.Analysis.Tau.extra_wps[0])
+        configSeq.setOptionValue('.antiTauScoreThreshold',
+                                 flags.Analysis.Tau.antiTauScoreThreshold)
         muons = drop_sys(flags.Analysis.container_names.output.muons)
         muons += f'.{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
         configSeq.setOptionValue('.muons', muons)

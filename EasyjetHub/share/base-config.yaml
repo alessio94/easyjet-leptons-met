@@ -155,6 +155,7 @@ Tau:
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: ["charge", "nProng", "decayMode"]
   extra_wps: []
+  antiTauScoreThreshold: 0
 
 Lepton:
   amount: 0

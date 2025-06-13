@@ -30,6 +30,7 @@ atlas_add_component(bbbbttAnalysis
   TriggerMatchingToolLib
   EventBookkeeperToolsLib
   EasyjetHubLib
+  PMGToolsLib
 )
 
 # Install python modules, joboptions, and share content

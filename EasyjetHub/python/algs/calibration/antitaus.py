@@ -17,6 +17,7 @@ class HHbbttAntiTauDecoratorBlock(ConfigBlock):
         self.addOption('electrons', '', type=str)
         self.addOption('tauBaselineSelection', 'Baseline', type=str)
         self.addOption('tauIDSelection', '', type=str)
+        self.addOption('antiTauScoreThreshold', 0, type=float)
 
     def makeAlgs(self, config):
 
@@ -30,6 +31,7 @@ class HHbbttAntiTauDecoratorBlock(ConfigBlock):
         alg.tauIDWP = self.tauIDSelection
         alg.IDTauSelection = 'isIDTau,as_char'
         alg.AntiTauSelection = 'isAntiTau,as_char'
+        alg.antiTauScoreThreshold = self.antiTauScoreThreshold
 
         config.addOutputVar(drop_sys(self.taus), 'antiTauEventCategory',
                             'antiTauEventCategory')
