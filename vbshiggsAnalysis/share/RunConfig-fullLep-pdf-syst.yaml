@@ -17,6 +17,7 @@ Electron:
   ID: "MediumLH"
   Iso: "NonIso"
   extra_wps:
+    - ["TightLH", "NonIso"]
     - ["TightLH", "Tight_VarRad"]
   do_IFF_decoration: true
   do_reco_decoration: true

@@ -54,9 +54,10 @@ def main(args):
         runConfig = args.config
 
     mc_list = []
+    # all submit all signals + bkgs
     if args.samples == "all":
-        processes = ["EWVVjj", "VH", "Wjets", "Zjets", "stop", "ttH", "ttV",
-                     "ttbar", "VVV", "Vgamma", "data", "FullLep_signal", "tty"]
+        processes = ["EWVVjj", "VH", "Wjets", "Zjets", "stop", "ttH", "ttV", "ttW",
+                     "ttbar", "VVV", "Vgamma", "FullLep_signal", "tty"]
         mc_list = get_list_files(processes)
     else:
         mc_list = get_list_files(args.samples.split())
