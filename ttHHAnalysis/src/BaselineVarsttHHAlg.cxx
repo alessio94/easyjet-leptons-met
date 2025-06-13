@@ -720,7 +720,7 @@ namespace ttHH
 
     // Easyjet properties
     m_Ibranches.at(prefix + "charge").set(*event, particle->charge(), sys);
-    if (m_storeMLBranches) m_Ibranches.at(prefix + "pdgid").set(*event, -1*lep_pdgid*particle->charge(), sys);
+    m_Ibranches.at(prefix + "pdgid").set(*event, -1*lep_pdgid*particle->charge(), sys);
     if(m_isMC) m_Fbranches.at(prefix + "effSF").set(*event, lep_sf, sys);
 
     if (lep_pdgid==13){ 
