@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
@@ -37,9 +39,8 @@ def met_sequence(flags, configAcc):
             selection = METselections[objtype]
             preMET_collections[objtype] = f'{collname}.{selection}'
 
-    configSeq += makeConfig(
-        'MissingET', containerName=drop_sys(container_names.output.met)
-    )
+    configSeq += makeConfig('MissingET')
+    configSeq.setOptionValue('.containerName', drop_sys(container_names.output.met))
     configSeq.setOptionValue(
         ".useLRT",
         flags.Analysis.Muon.MergeLRT or flags.Analysis.Electron.MergeLRT)

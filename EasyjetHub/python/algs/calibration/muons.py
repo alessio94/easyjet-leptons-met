@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 
@@ -31,7 +33,8 @@ def muon_sequence(flags, configAcc):
         configSeq += makeConfig('Muons.LRTMerging')
         configSeq.setOptionValue('.containerName', 'Muons_LRTMerged')
 
-    configSeq += makeConfig('Muons', containerName=output_name)
+    configSeq += makeConfig('Muons')
+    configSeq.setOptionValue('.containerName', output_name)
     if flags.Analysis.Muon.MergeLRT:
         configSeq.setOptionValue('.inputContainer', 'Muons_LRTMerged')
     configSeq.setOptionValue('.minPt', flags.Analysis.Muon.min_pT)
@@ -42,17 +45,20 @@ def muon_sequence(flags, configAcc):
     # PID configuration
     doBaseline = True
     for (id, iso), (maxD0Significance, maxDeltaZ0SinTheta) in zip(wps, impact_params):
-        if extra_params_concern and not doBaseline:
-            impact_params_name = str(maxD0Significance) + '_' + str(maxDeltaZ0SinTheta)
-            impact_params_name = impact_params_name.replace('.', 'p')
-            configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
-                                    selectionName=id + '_' + iso + '_'
-                                    + impact_params_name)
-        else:
-            configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
-                                    selectionName=id + '_' + iso)
-            if extra_params_concern:
+        configSeq += makeConfig('Muons.WorkingPoint')
+        configSeq.setOptionValue('.containerName', output_name)
+        selectionName = id + '_' + iso
+        if extra_params_concern:
+            if doBaseline:
                 doBaseline = False
+            else:
+                impact_params_name = (str(maxD0Significance) + '_'
+                                      + str(maxDeltaZ0SinTheta))
+                impact_params_name = impact_params_name.replace('.', 'p')
+                selectionName += '_' + impact_params_name
+        configSeq.setOptionValue('.selectionName', selectionName)
+        # To be removed with 25.2.57
+        configSeq.setOptionValue('.postfix', selectionName)
 
         if "nottva" in id:
             configSeq.setOptionValue('.trackSelection', False)
@@ -69,8 +75,9 @@ def muon_sequence(flags, configAcc):
 
     if flags.Analysis.Small_R_jet.runBJetPtCalib or \
        flags.Analysis.Large_R_jet.runMuonJetPtCorr:
-        configSeq += makeConfig('Muons.WorkingPoint', containerName=output_name,
-                                selectionName='forBJetCalib')
+        configSeq += makeConfig('Muons.WorkingPoint')
+        configSeq.setOptionValue('.containerName', output_name)
+        configSeq.setOptionValue('.selectionName', 'forBJetCalib')
         configSeq.setOptionValue('.quality', 'Medium')
         configSeq.setOptionValue('.isolation', 'NonIso')
         configSeq.setOptionValue('.trackSelection', False)
@@ -86,20 +93,23 @@ def muon_sequence(flags, configAcc):
 
     # IFF truth decoration
     if flags.Analysis.Muon.do_IFF_decoration:
-        configSeq += makeConfig('Muons.IFFClassification',
-                                containerName=output_name)
+        configSeq += makeConfig('Muons.IFFClassification')
+        configSeq.setOptionValue('.containerName', output_name)
 
     # Kinematic selection
-    configSeq += makeConfig('Muons.PtEtaSelection', containerName=output_name,
-                            selectionName='selectPtEta')
+    configSeq += makeConfig('Muons.PtEtaSelection')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', flags.Analysis.Muon.min_pT)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Muon.max_eta)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+    configSeq += makeConfig('SystObjectLink')
+    configSeq.setOptionValue('.containerName', output_name)
 
-    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq += makeConfig('Thinning')
+    configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
 
     return configSeq

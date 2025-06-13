@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 
 from AnalysisAlgorithmsConfig.ConfigBlock import ConfigBlock
 
@@ -9,7 +9,7 @@ from EasyjetHub.steering.utils.name_helper import drop_sys
 
 class HHbbttAntiTauDecoratorBlock(ConfigBlock):
 
-    def __init__(self, configName=''):
+    def __init__(self):
         super(HHbbttAntiTauDecoratorBlock, self).__init__()
 
         self.addOption('taus', '', type=str)

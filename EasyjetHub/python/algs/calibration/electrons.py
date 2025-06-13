@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AthenaConfiguration.Enums import LHCPeriod
@@ -23,7 +25,8 @@ def electron_sequence(flags, configAcc):
         configSeq += makeConfig('Electrons.LRTMerging')
         configSeq.setOptionValue('.containerName', 'Electrons_LRTMerged')
 
-    configSeq += makeConfig('Electrons', containerName=output_name)
+    configSeq += makeConfig('Electrons')
+    configSeq.setOptionValue('.containerName', output_name)
     if flags.Analysis.Electron.MergeLRT:
         configSeq.setOptionValue('.inputContainer', 'Electrons_LRTMerged')
     configSeq.setOptionValue('.crackVeto', True)
@@ -33,8 +36,9 @@ def electron_sequence(flags, configAcc):
 
     # PID configuration
     for id, iso in wps:
-        configSeq += makeConfig('Electrons.WorkingPoint', containerName=output_name,
-                                selectionName=id + '_' + iso)
+        configSeq += makeConfig('Electrons.WorkingPoint')
+        configSeq.setOptionValue('.containerName', output_name)
+        configSeq.setOptionValue('.selectionName', id + '_' + iso)
         if "nottva" in id:
             configSeq.setOptionValue('.trackSelection', False)
         else:
@@ -85,20 +89,23 @@ def electron_sequence(flags, configAcc):
 
     # IFF truth decoration
     if flags.Analysis.Electron.do_IFF_decoration:
-        configSeq += makeConfig('Electrons.IFFClassification',
-                                containerName=output_name)
+        configSeq += makeConfig('Electrons.IFFClassification')
+        configSeq.setOptionValue('.containerName', output_name)
 
     # Kinematic selection
-    configSeq += makeConfig('Electrons.PtEtaSelection', containerName=output_name,
-                            selectionName='selectPtEta')
+    configSeq += makeConfig('Electrons.PtEtaSelection')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', flags.Analysis.Electron.min_pT)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Electron.max_eta)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+    configSeq += makeConfig('SystObjectLink')
+    configSeq.setOptionValue('.containerName', output_name)
 
-    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq += makeConfig('Thinning')
+    configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
 
     return configSeq

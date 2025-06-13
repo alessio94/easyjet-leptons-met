@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AthenaConfiguration.Enums import LHCPeriod
@@ -19,7 +21,8 @@ def photon_sequence(flags, configAcc):
     # Temporary hack, we should do this in a more systematic way
     # The config sequence will deal with the systematics suffix
     output_name = drop_sys(flags.Analysis.container_names.output.photons)
-    configSeq += makeConfig('Photons', containerName=output_name)
+    configSeq += makeConfig('Photons')
+    configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.recomputeIsEM', False)
     configSeq.setOptionValue('.crackVeto', True)
     configSeq.setOptionValue('.decorrelationModel',
@@ -27,8 +30,11 @@ def photon_sequence(flags, configAcc):
 
     # PID configuration
     for id, iso in wps:
-        configSeq += makeConfig('Photons.WorkingPoint', containerName=output_name,
-                                selectionName=id + '_' + iso)
+        configSeq += makeConfig('Photons.WorkingPoint')
+        configSeq.setOptionValue('.containerName', output_name)
+        configSeq.setOptionValue('.selectionName', id + '_' + iso)
+        # To be removed with 25.2.57
+        configSeq.setOptionValue('.postfix', id + '_' + iso)
         configSeq.setOptionValue('.qualityWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
         configSeq.setOptionValue('.saveCombinedSF', True)
@@ -39,16 +45,19 @@ def photon_sequence(flags, configAcc):
             configSeq.setOptionValue('.noEffSFForIso', True)
 
     # Kinematic selection
-    configSeq += makeConfig('Photons.PtEtaSelection', containerName=output_name,
-                            selectionName='selectPtEta')
+    configSeq += makeConfig('Photons.PtEtaSelection')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', flags.Analysis.Photon.min_pT)
     configSeq.setOptionValue('.maxEta', flags.Analysis.Photon.max_eta)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+    configSeq += makeConfig('SystObjectLink')
+    configSeq.setOptionValue('.containerName', output_name)
 
-    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq += makeConfig('Thinning')
+    configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
 
     return configSeq

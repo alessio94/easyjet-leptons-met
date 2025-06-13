@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 
 # AnaAlgorithm import(s):
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
@@ -24,6 +24,7 @@ def selection_decoration_sequence(flags):
     if flags.Analysis.do_large_R_UFO_jets:
         containers += [drop_sys(flags.Analysis.container_names.output.reco10UFOJet)]
 
-    configSeq += makeConfig('SelectionDecoration', containers=containers)
+    configSeq += makeConfig('SelectionDecoration')
+    configSeq.setOptionValue('.containers', containers)
 
     return configSeq

@@ -1,3 +1,5 @@
+# Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 from AnalysisAlgorithmsConfig.ConfigFactory import ConfigFactory
 from AthenaConfiguration.Enums import LHCPeriod
@@ -85,7 +87,8 @@ def jet_sequence(
         )
 
     if jet_type != "reco4EMTopoJet":
-        configSeq += makeConfig('Jets.JVT', containerName=output_name)
+        configSeq += makeConfig('Jets.JVT')
+        configSeq.setOptionValue('.containerName', output_name)
         configSeq.setOptionValue('.enableFJvt', jet_flags.useFJvt)
 
         btag_wps = []
@@ -102,9 +105,9 @@ def jet_sequence(
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
-            configSeq += makeConfig('Jets.FlavourTagging',
-                                    containerName=output_name,
-                                    selectionName=tagger_wp)
+            configSeq += makeConfig('Jets.FlavourTagging')
+            configSeq.setOptionValue('.containerName', output_name)
+            configSeq.setOptionValue('.selectionName', tagger_wp)
             configSeq.setOptionValue('.btagger', tagger)
             configSeq.setOptionValue('.btagWP', btag_wp)
             # save pb / pc / pu / ptau
@@ -127,10 +130,9 @@ def jet_sequence(
         for tagger in tagger_set:
             tagger_wp = tagger + "_Continuous"
             # Note: this is going to run post overlap removal
-            configSeq += config.makeConfig(
-                'Jets.FlavourTaggingEventSF',
-                containerName=output_name + '.baselineJvt',
-                selectionName=tagger_wp)
+            configSeq += config.makeConfig('Jets.FlavourTaggingEventSF')
+            configSeq.setOptionValue('.containerName', output_name + '.baselineJvt')
+            configSeq.setOptionValue('.selectionName', tagger_wp)
             configSeq.setOptionValue('.btagger', tagger)
             # set the MC/MC SF to default for now, this was broken by
             # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
@@ -164,22 +166,24 @@ def jet_sequence(
                 configSeq.setOptionValue('.removeHLTPrefix', False)
 
         if jet_flags.runBJetPtCalib:
-            configSeq += makeConfig(
-                'Jets.BJetCalib',
-                containerName=output_name,
-                muonContainerName=drop_sys(flags.Analysis.container_names.output.muons))
+            configSeq += makeConfig('Jets.BJetCalib')
+            configSeq.setOptionValue('.containerName', output_name)
+            configSeq.setOptionValue('.muonContainerName', drop_sys(
+                flags.Analysis.container_names.output.muons))
             configSeq.setOptionValue('.jetPreselection', jet_flags.btag_wp)
             configSeq.setOptionValue('.muonPreselection', "forBJetCalib")
 
     # Apply kinematic selection
-    configSeq += makeConfig('Jets.PtEtaSelection', containerName=output_name,
-                            selectionName='selectPtEta')
+    configSeq += makeConfig('Jets.PtEtaSelection')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', jet_flags.min_pT)
     configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+    configSeq += makeConfig('SystObjectLink')
+    configSeq.setOptionValue('.containerName', output_name)
 
     return configSeq
 
@@ -203,13 +207,14 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 
     configSeq += makeConfig('Jets', containerName=output_name,
                             jetCollection=jetColl)
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.jetCollection', jetColl)
 
     for GN2X_wp in flags.Analysis.Large_R_jet.GN2X_hbb_wps:
         jSONCalibFile = find_datafile(
             "EasyjetHub/Xbb_lookup_table_prelim_Oct30_2024.json")
-        configSeq += config.makeConfig(
-            'Jets.XbbTagging',
-            containerName=output_name)
+        configSeq += config.makeConfig('Jets.XbbTagging')
+        configSeq.setOptionValue('.containerName', output_name)
         # no eff SF provided for the moment
         configSeq.setOptionValue('.noEffSF', True)
         configSeq.setOptionValue('.calibFile', jSONCalibFile)
@@ -218,23 +223,25 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
 
     # Optional muon-in-jet correction for large-R jets
     if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
-        configSeq += makeConfig(
-            'Jets.BJetCalib',
-            containerName=output_name,
-            muonContainerName=drop_sys(flags.Analysis.container_names.output.muons))
+        configSeq += makeConfig('Jets.BJetCalib')
+        configSeq.setOptionValue('.containerName', output_name)
+        configSeq.setOptionValue('.muonContainerName', drop_sys(
+            flags.Analysis.container_names.output.muons))
         configSeq.setOptionValue('.muonPreselection', "forBJetCalib")
         # Disable small-R b-jet pT reco
         configSeq.setOptionValue('.doPtCorr', False)
 
-    configSeq += makeConfig('Jets.PtEtaSelection', containerName=output_name,
-                            selectionName='selectPtEta')
+    configSeq += makeConfig('Jets.PtEtaSelection')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.minPt', jet_flags.min_pT)
     if jet_flags.max_pT > 0:
         configSeq.setOptionValue('.maxPt', jet_flags.max_pT)
     configSeq.setOptionValue('.maxEta', jet_flags.max_eta)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+    configSeq += makeConfig('SystObjectLink')
+    configSeq.setOptionValue('.containerName', output_name)
 
     return configSeq
 
@@ -248,12 +255,14 @@ def rc_jet_sequence(flags, configAcc):
     output_name = drop_sys(
         flags.Analysis.container_names.output["reco10RCJet"]
     )
-    configSeq += makeConfig('ReclusteredJetCalibration', containerName=output_name,
-                            jetCollection=input_name)
+    configSeq += makeConfig('ReclusteredJetCalibration')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.jetCollection', input_name)
     configSeq.setOptionValue('.jetInput', drop_sys(
         flags.Analysis.container_names.output["reco4EMTopoJet"]))
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+    configSeq += makeConfig('SystObjectLink')
+    configSeq.setOptionValue('.containerName', output_name)
 
     return configSeq

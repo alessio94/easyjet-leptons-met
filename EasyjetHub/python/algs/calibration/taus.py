@@ -30,15 +30,16 @@ def tau_sequence(flags, configAcc):
         configSeq.setOptionValue('.outputTaus', 'TauJets_MuonRmCombined')
 
     # PID configuration
-    configSeq += makeConfig('TauJets', containerName=output_name)
+    configSeq += makeConfig('TauJets')
+    configSeq.setOptionValue('.containerName', output_name)
     if flags.Analysis.Tau.addMuonRM:
         configSeq.setOptionValue('.inputContainer', 'TauJets_MuonRmCombined')
     configSeq.setOptionValue('.rerunTruthMatching', False)
     configSeq.setOptionValue('.decorateTruth', True)
     for id in wps:
-        configSeq += makeConfig('TauJets.WorkingPoint',
-                                containerName=output_name,
-                                selectionName=id)
+        configSeq += makeConfig('TauJets.WorkingPoint')
+        configSeq.setOptionValue('.containerName', output_name)
+        configSeq.setOptionValue('.selectionName', id)
         if "eleid" in id:
             configSeq.setOptionValue('.use_eVeto', True)
         if "GNTau" in id:
@@ -70,16 +71,19 @@ def tau_sequence(flags, configAcc):
                                  get_trigger_chains_scale_factor(flags, 'Tau'))
 
     # Kinematic selection
-    configSeq += makeConfig('TauJets.PtEtaSelection', containerName=output_name,
-                            selectionName='selectPtEta')
+    configSeq += makeConfig('TauJets.PtEtaSelection')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
     configSeq.setOptionValue('.maxEta', 2.5)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+    configSeq += makeConfig('SystObjectLink')
+    configSeq.setOptionValue('.containerName', output_name)
 
-    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq += makeConfig('Thinning')
+    configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
 
     return configSeq
