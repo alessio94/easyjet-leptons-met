@@ -57,6 +57,8 @@ private:
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     Gaudi::Property<bool> m_isMC { this, "isMC", false, "Is this simulation?" };
+    
+    CP::SysReadDecorHandle<int> m_PTLID = {this, "PartonTruthLabelID", "PartonTruthLabelID", "PartonTruthLabelID"};
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables {this, "floatVariableList", {}, "Name list of floating variables"};
 

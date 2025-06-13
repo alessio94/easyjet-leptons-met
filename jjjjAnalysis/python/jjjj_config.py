@@ -65,6 +65,8 @@ def get_BaselineVarsjjjjAlg_variables(flags):
     for object in ["j1", "j2", "j3", "j4"]:
         for var in ["pT", "eta", "phi", "m", "e"]:
             float_variable_names.append(f"{object}_{var}")
+        if flags.Input.isMC:
+            int_variable_names.append(f"{object}_PTLID")
     int_variable_names += ["nJets"]
 
     # event shape variables fo QG search

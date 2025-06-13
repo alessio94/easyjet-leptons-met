@@ -37,8 +37,12 @@ namespace jjjj
       m_Ibranches.emplace(var, whandle);
       ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
     };
-
-    ATH_CHECK (m_systematicsList.initialize());
+    
+    if (m_isMC){
+      ATH_CHECK (m_PTLID.initialize(m_systematicsList, m_SmallRJetsHandle));
+    }
+    
+      ATH_CHECK (m_systematicsList.initialize());
     return StatusCode::SUCCESS;
 
   }
@@ -67,13 +71,20 @@ namespace jjjj
       int index = 0;
       for ( auto jet : *SmallRJets ){
         index++;
-        if (index > 4) break; // we want only four jets
+        if (index > 4){
+          break; // we want only four jets
+        }
         jetP4s.push_back(jet->p4());
         m_Fbranches.at("j" + std::to_string(index) + "_pT").set(*event, jet->pt(), sys);
         m_Fbranches.at("j" + std::to_string(index) + "_eta").set(*event, jet->eta(), sys);
         m_Fbranches.at("j" + std::to_string(index) + "_phi").set(*event, jet->phi(), sys);
         m_Fbranches.at("j" + std::to_string(index) + "_m").set(*event, jet->m(), sys); 
         m_Fbranches.at("j" + std::to_string(index) + "_e").set(*event, jet->e(), sys); 
+        if (m_isMC){
+          int PTLID = -99;
+          PTLID = m_PTLID.get(*jet, sys);
+          m_Ibranches.at("j" + std::to_string(index) + "_PTLID").set(*event, PTLID, sys);
+        }
       }
 
       // Compute eigenvalues of normalized jet momentum tensor
