@@ -24,9 +24,7 @@ namespace ttHH
 
   enum TriggerChannel
   {
-    BJET,
     SINGLEP,
-    DILEP,
   };
 
   class TriggerDecoratorAlg final : public AthReentrantAlgorithm
@@ -43,7 +41,6 @@ namespace ttHH
     std::unordered_map<ttHH::TriggerChannel, std::string> m_triggerChannels =
       {
         {ttHH::SINGLEP, "singlep"},
-        {ttHH::DILEP, "dilep"},
       };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey

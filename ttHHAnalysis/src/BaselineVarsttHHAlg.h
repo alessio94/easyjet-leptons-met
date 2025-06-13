@@ -111,6 +111,9 @@ private:
     Gaudi::Property<bool> m_storeJetBranches
       { this, "storeJetBranches", true, "Store flat jet branches" };
 
+    Gaudi::Property<bool> m_storeMLBranches
+      { this, "storeMLBranches", false, "Store multi-lepton branches" };
+
     Gaudi::Property<bool> m_runTopness
       { this, "runTopness", false, "Store topness variables" };
 

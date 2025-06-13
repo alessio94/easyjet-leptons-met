@@ -483,12 +483,12 @@ namespace ttHH
         //-- Filling Lepton branches
         if (muonSize==1){ // mu
           const xAOD::Muon* muon0 = muons->at(0);
-          m_Ibranches.at("total_charge").set(*event, muon0->charge(), sys);
+          if (m_storeMLBranches) m_Ibranches.at("total_charge").set(*event, muon0->charge(), sys);
           updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
 	  HTall = muon0->pt();
         } else { // ele 
           const xAOD::Electron* electron0 = electrons->at(0);
-          m_Ibranches.at("total_charge").set(*event, electron0->charge(), sys);
+          if (m_storeMLBranches) m_Ibranches.at("total_charge").set(*event, electron0->charge(), sys);
           updateLeptonBranch(event, 1, electron0, 11,
 			     m_isMC && !m_saveDummy_ele_SF ?
 			     m_ele_SF.get(*electron0, sys) : 1.0 , sys);
@@ -508,8 +508,8 @@ namespace ttHH
           HTall += electron->pt();
 	}
 
-	m_Ibranches.at("total_charge").set(*event, totalCharge, sys);
-        m_Ibranches.at("dilept_type").set(*event, muonSize == 2 ? 3 : (muonSize == 1 ? 2 : 1), sys);
+	if (m_storeMLBranches) m_Ibranches.at("total_charge").set(*event, totalCharge, sys);
+        if (m_storeMLBranches) m_Ibranches.at("dilept_type").set(*event, muonSize == 2 ? 3 : (muonSize == 1 ? 2 : 1), sys);
 
         //-- Filling Lepton branches
         if (muonSize==2){ // mumu
@@ -546,11 +546,11 @@ namespace ttHH
 			     m_isMC && !m_saveDummy_ele_SF ?
 			     m_ele_SF.get(*electron1, sys) : 1.0 , sys);
         }
-      } else { //not 2l
+      } else if (m_storeMLBranches) { //not 2l
         m_Ibranches.at("dilept_type").set(*event, 0, sys);
       }
       //-- 3l
-      m_Ibranches.at("trilept_type").set(*event, (nLeptons == 3) ? 1 : 0, sys);
+      if (m_storeMLBranches) m_Ibranches.at("trilept_type").set(*event, (nLeptons == 3) ? 1 : 0, sys);
       //--
 
       int sumPCBT = 0; // sum of pcbt scores for one event
@@ -720,7 +720,7 @@ namespace ttHH
 
     // Easyjet properties
     m_Ibranches.at(prefix + "charge").set(*event, particle->charge(), sys);
-    m_Ibranches.at(prefix + "pdgid").set(*event, -1*lep_pdgid*particle->charge(), sys);
+    if (m_storeMLBranches) m_Ibranches.at(prefix + "pdgid").set(*event, -1*lep_pdgid*particle->charge(), sys);
     if(m_isMC) m_Fbranches.at(prefix + "effSF").set(*event, lep_sf, sys);
 
     if (lep_pdgid==13){ 
@@ -733,10 +733,10 @@ namespace ttHH
     if (m_isMC) {
       int lep_truthOrigin = std::abs(lep_pdgid)==11 ?
         m_ele_truthOrigin.get(*particle, sys) : m_mu_truthOrigin.get(*particle, sys);
-      m_Ibranches.at(prefix + "truthOrigin").set(*event, lep_truthOrigin, sys);
+      if (m_storeMLBranches) m_Ibranches.at(prefix + "truthOrigin").set(*event, lep_truthOrigin, sys);
       int lep_truthType = std::abs(lep_pdgid)==11 ?
         m_ele_truthType.get(*particle, sys) : m_mu_truthType.get(*particle, sys);
-      m_Ibranches.at(prefix + "truthType").set(*event, lep_truthType, sys);
+      if (m_storeMLBranches) m_Ibranches.at(prefix + "truthType").set(*event, lep_truthType, sys);
     
       int lep_isPrompt = 0;
     
@@ -746,7 +746,7 @@ namespace ttHH
         if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
       }
     
-      m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
+      if (m_storeMLBranches) m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
     }
   }
 

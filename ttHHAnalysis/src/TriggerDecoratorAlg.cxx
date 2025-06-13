@@ -65,10 +65,8 @@ namespace ttHH
     SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> year(m_yearKey);
 
     std::vector<std::string> singLepTrigPaths = m_triggerMap.at(year(*eventInfo)).at(ttHH::SINGLEP);
-    std::vector<std::string> diLepTrigPaths = m_triggerMap.at(year(*eventInfo)).at(ttHH::DILEP);
 
     if (!singLepTrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), singLepTrigPaths, triggerdecos, pass_decos, ttHH::SINGLEP);
-    if (!diLepTrigPaths.empty()) evaluateTriggerCuts(eventInfo.cptr(), diLepTrigPaths, triggerdecos, pass_decos, ttHH::DILEP);
 
     return StatusCode::SUCCESS;
   }
@@ -95,13 +93,6 @@ namespace ttHH
                 "HLT_e120_lhloose",
                 "HLT_mu20_iloose_L1MU15",
                 "HLT_mu50"
-            }},
-            {ttHH::DILEP, {
-                "HLT_2e12_lhvloose_L12EM10VH",
-                "HLT_e17_lhloose_mu14",
-                "HLT_e7_lhmedium_mu24",
-                "HLT_2mu10",
-                "HLT_mu18_mu8noL1"
             }}
         }},
         {2016, {
@@ -111,13 +102,6 @@ namespace ttHH
                 "HLT_e140_lhloose_nod0",
                 "HLT_mu26_ivarmedium",
                 "HLT_mu50"
-            }},
-            {ttHH::DILEP, {
-                "HLT_e17_lhloose_nod0_mu14",
-                "HLT_e7_lhmedium_nod0_mu24",
-                "HLT_2e17_lhvloose_nod0",
-                "HLT_2mu14",
-                "HLT_mu22_mu8noL1"
             }}
         }},
         {2017, {
@@ -127,13 +111,6 @@ namespace ttHH
                 "HLT_e140_lhloose_nod0",
                 "HLT_mu26_ivarmedium",
                 "HLT_mu50"
-            }},
-            {ttHH::DILEP, {
-                "HLT_2e24_lhvloose_nod0",
-                "HLT_e17_lhloose_nod0_mu14",
-                "HLT_e7_lhmedium_nod0_mu24",
-                "HLT_2mu14",
-                "HLT_mu22_mu8noL1"
             }}
         }},
         {2018, {
@@ -143,14 +120,6 @@ namespace ttHH
                 "HLT_e140_lhloose_nod0",
                 "HLT_mu26_ivarmedium",
                 "HLT_mu50"
-            }},
-            {ttHH::DILEP, {
-                "HLT_2e24_lhvloose_nod0",
-                "HLT_2e17_lhvloose_nod0_L12EM15VHI",
-                "HLT_e17_lhloose_nod0_mu14",
-                "HLT_e7_lhmedium_nod0_mu24",
-                "HLT_2mu14",
-                "HLT_mu22_mu8noL1"
             }}
         }},
         {2022, {
@@ -161,17 +130,6 @@ namespace ttHH
                 "HLT_e300_etcut_L1EM22VHI",
                 "HLT_mu24_ivarmedium_L1MU14FCH",
                 "HLT_mu50_L1MU14FCH",
-            }},
-            {ttHH::DILEP, {
-                "HLT_2e17_lhvloose_L12EM15VHI",
-                "HLT_2e24_lhvloose_L12EM20VH",
-                "HLT_mu22_mu8noL1_L1MU14FCH",
-                "HLT_e7_lhmedium_mu24_L1MU14FCH",
-                "HLT_e17_lhloose_mu14_L1EM15VH_MU8F",
-                "HLT_e26_lhmedium_mu8noL1_L1EM22VHI",
-                "HLT_2mu10_l2mt_L1MU10BOM",
-                "HLT_2mu14_L12MU8F",
-                "HLT_mu20_ivarmedium_mu8noL1_L1MU14FCH",
             }}
         }},
         {2023, {
@@ -181,19 +139,6 @@ namespace ttHH
                 "HLT_e140_lhloose_L1eEM26M",
                 "HLT_mu24_ivarmedium_L1MU14FCH",
                 "HLT_mu50_L1MU14FCH"
-            }},
-            {ttHH::DILEP, {
-                "HLT_2e17_lhvloose_L12eEM18M",
-                "HLT_2e17_lhvloose_L12EM15VHI",
-                "HLT_2e24_lhvloose_L12EM20VH",
-                "HLT_2e24_lhvloose_L12eEM24L",
-                "HLT_mu22_mu8noL1_L1MU14FCH",
-                "HLT_e7_lhmedium_mu24_L1MU14FCH",
-                "HLT_e17_lhloose_mu14_L1EM15VH_MU8F",
-                "HLT_e26_lhmedium_mu8noL1_L1EM22VHI",
-                "HLT_2mu10_l2mt_L1MU10BOM",
-                "HLT_2mu14_L12MU8F",
-                "HLT_mu20_ivarmedium_mu8noL1_L1MU14FCH",               
             }}
         }}
     };

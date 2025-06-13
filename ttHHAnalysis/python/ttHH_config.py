@@ -225,7 +225,6 @@ def get_BaselineVarsttHHAlg_variables(flags):
     # float_variable_names += ["topness1", "topness2"]
     int_variable_names += [
         "nJets", "nBJets85", "nBJets77", "nLeptons", "sumPCBT",
-        "dilept_type", "trilept_type", "total_charge",
     ]
 
     return float_variable_names, int_variable_names
@@ -278,16 +277,10 @@ def ttHH_branches(flags):
 
     branches += object_level_branches
 
-    branches += ["EventInfo.PassAllCuts_%SYS% -> ttHH_PassAllCuts"
-                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
-
-    branches += ["EventInfo.ttHH_pass_baseline_%SYS% -> ttHH_pass_baseline"
-                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
-
-    for trig in ["dilep", "singlep"]:
+    for trig in ["singlep"]:
         branches += [f"EventInfo.ttHH_pass_trigger_{trig} \
                              -> ttHH_pass_trigger_{trig}"]
-    for trig in ["dilep", "singlep"]:
+    for trig in ["singlep"]:
         branches += [f"EventInfo.pass_matching_trigger_{trig}_%SYS% \
                              -> ttHH_pass_matching_trigger_{trig}_%SYS%"]
 

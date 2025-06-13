@@ -31,7 +31,6 @@ namespace ttHH
 
   enum Trigger_Matching_Tool{
     pass_matching_trigger_singlep, 
-    pass_matching_trigger_dilep,
   };
 
   /// \brief An algorithm for counting containers
@@ -102,7 +101,6 @@ namespace ttHH
       CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
       CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
 
-      CP::SysReadDecorHandle<bool> m_passTriggerDilep {this, "passTriggerDilep", "ttHH_pass_trigger_dilep", "events pass any dilepton triggers"};
       CP::SysReadDecorHandle<bool> m_passTriggerSinglep {this, "passTriggerSinglep", "ttHH_pass_trigger_singlep", "events pass any singlep triggers"};
 
       CP::SysFilterReporterParams m_filterParams {this, "ttHH selection"};
@@ -122,7 +120,6 @@ namespace ttHH
       std::unordered_map < ttHH::Trigger_Matching_Tool, bool > m_triggers_matchs;
       std::unordered_map < ttHH::Trigger_Matching_Tool, std::string > m_triggermatchingnames{
           {ttHH::pass_matching_trigger_singlep, "pass_matching_trigger_singlep"},
-          {ttHH::pass_matching_trigger_dilep, "pass_matching_trigger_dilep"},
       };
 
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
