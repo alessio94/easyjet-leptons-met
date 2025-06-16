@@ -2,7 +2,6 @@
 
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
@@ -40,7 +39,6 @@ def semiLep_cfg(flags, muonkey, electronkey,
             isMC=flags.Input.isMC,
             muons=muonkey, muonWP=MuonWPLabel,
             electrons=electronkey, eleWP=ElectronWPLabel,
-            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_"
                           + flags.Analysis.Small_R_jet.btag_extra_wps[0],

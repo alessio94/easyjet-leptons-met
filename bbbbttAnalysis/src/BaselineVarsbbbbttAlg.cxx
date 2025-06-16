@@ -38,13 +38,10 @@ namespace HHHBBBBTT
     }
 
     if(m_isMC){
-      // SF access
-      if(!m_saveDummy_ele_SF){
-        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-        fillLeptonSfDecoMap(m_eleWPNames, m_ele_SF_decoMap);
-        for(auto& [k, handle] : m_ele_SF_decoMap)
-          ATH_CHECK (handle.initialize(m_systematicsList, m_electronHandle));
-      }
+      ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+      fillLeptonSfDecoMap(m_eleWPNames, m_ele_SF_decoMap);
+      for(auto& [k, handle] : m_ele_SF_decoMap)
+	ATH_CHECK (handle.initialize(m_systematicsList, m_electronHandle));
 
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       fillLeptonSfDecoMap(m_muonWPNames, m_muon_SF_decoMap);
@@ -197,7 +194,7 @@ namespace HHHBBBBTT
           float SF = 1.;
           if(std::abs(leptons[i].second)==13)
             SF = m_muon_SF_decoMap.at(idx).get(*leptons[i].first,sys);
-          else if(!m_saveDummy_ele_SF)
+          else
             SF = m_ele_SF_decoMap.at(idx).get(*leptons[i].first,sys);
           m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
         }

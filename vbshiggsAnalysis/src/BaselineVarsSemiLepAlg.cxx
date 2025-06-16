@@ -36,12 +36,9 @@ namespace VBSHIGGS{
         ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_vbsMuonHandle));
         ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_vbsMuonHandle));
 
-        // For SF access
-        if(!m_saveDummy_ele_SF){
-          ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-          m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-          ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-        }
+	ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+	m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+	ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
 
         ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
         m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
@@ -201,7 +198,7 @@ namespace VBSHIGGS{
           if(m_isMC){
             float SF = -99;
             if(std::abs(leptons[0].second)==11 ){
-              if(!m_saveDummy_ele_SF) SF = m_ele_SF.get(*leptons[0].first,sys);
+              SF = m_ele_SF.get(*leptons[0].first,sys);
 
               int ele_ECIDS = m_eleECIDS.get(*leptons[0].first, sys);
               m_Ibranches.at("Lepton_ele_ECIDS").set(*event, ele_ECIDS, sys);

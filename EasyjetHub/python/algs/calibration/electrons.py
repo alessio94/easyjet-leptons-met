@@ -68,10 +68,6 @@ def electron_sequence(flags, configAcc):
             if "DNN" in id:
                 print("WARNING! Electron DNN ID does not have SF available yet")
                 configSeq.setOptionValue('.noEffSF', True)
-            # No Run 2 SF yet
-            if flags.GeoModel.Run is LHCPeriod.Run2:
-                print("WARNING! Run 2 electron SF are not available yet")
-                configSeq.setOptionValue('.noEffSF', True)
             # No NoPix SF yet
             if "NoPix" in id:
                 print("WARNING! Electron NoPix ID does not have SF available yet")

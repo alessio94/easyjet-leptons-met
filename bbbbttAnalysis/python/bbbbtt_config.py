@@ -3,7 +3,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
@@ -132,7 +131,6 @@ def bbbbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                 isMC=flags.Input.isMC,
                 useNonIsoLeptons=use_noniso_leptons,
                 electrons=electronkey, eleWPs=ele_WPs,
-                saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
                 muons=muonkey, muonWPs=muon_WPs,
                 taus=taukey, tauWP=flags.Analysis.Tau.extra_wps[0],
                 doMMC=flags.Analysis.do_mmc,

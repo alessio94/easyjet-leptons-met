@@ -64,9 +64,6 @@ namespace VBSHIGGS{
 
         Gaudi::Property<std::string> m_eleWPName { this, "eleWP", "","Electron ID + Iso working point" };
         CP::SysReadDecorHandle<float> m_ele_SF{"", this};
-        Gaudi::Property<bool> m_saveDummy_ele_SF
-        {this, "saveDummyEleSF", false,
-	  "To be used in case no recommendations are not available"};
 
         // electron truth information
         CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};

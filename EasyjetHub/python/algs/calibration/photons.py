@@ -41,7 +41,7 @@ def photon_sequence(flags, configAcc):
 
         # No Run 2 SF yet
         if flags.GeoModel.Run is LHCPeriod.Run2 and flags.Input.isMC:
-            print("WARNING! Run 2 photon SF are not available yet")
+            print("WARNING! Run 2 photon isolation SFs are not available yet")
             configSeq.setOptionValue('.noEffSFForIso', True)
 
     # Kinematic selection

@@ -1,7 +1,6 @@
 # Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
@@ -54,7 +53,6 @@ def fullLep_cfg(flags, muonkey, electronkey, float_variables=None, int_variables
             vbsJets=VBSJetsLabel,
             isMC=flags.Input.isMC,
             electrons=electronkey, eleWP=ElectronWPLabel,
-            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             muons=muonkey, muonWP=MuonWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_"

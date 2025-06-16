@@ -31,11 +31,9 @@ namespace HHBBVV
 
     // SF access
     if(m_isMC){
-      if(!m_saveDummy_ele_SF){
-        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-      }
+      ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
       
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
@@ -182,8 +180,7 @@ namespace HHBBVV
       for(const xAOD::Electron* electron : *electrons) {
         if (m_selected_el.get(*electron, sys)){
           signal_lepton = electron->p4();
-          signal_lepton_SF = m_saveDummy_ele_SF ?
-                1. : m_ele_SF.get(*electron, sys);
+          signal_lepton_SF = m_ele_SF.get(*electron, sys);
           signal_lepton_charge = electron->charge();
           signal_lepton_id = signal_lepton_charge > 0 ? -11 : 11;
           break; // At most one lepton selected

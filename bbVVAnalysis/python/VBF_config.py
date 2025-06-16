@@ -1,6 +1,5 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg,
@@ -88,7 +87,6 @@ def vbf_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey, taukey,
             "BaselineVarsbbVVAlg",
             isMC=flags.Input.isMC,
             electrons=electronkey, eleWP=TightEleWPLabel,
-            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             muons=muonkey, muonWP=TightMuonWPLabel,
             taus=taukey, tauWP=flags.Analysis.Tau.ID,
             floatVariableList=float_variables,

@@ -1,7 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
@@ -108,7 +107,6 @@ def lltt_cfg(flags, smalljetkey, muonkey, electronkey,
             "FinalVarsllttAlg",
             isMC=flags.Input.isMC,
             electrons=electronkey, eleWP=TightElectronWPLabel,
-            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             muons=muonkey, muonWP=TightMuonWPLabel,
             taus=taukey, tauWP=flags.Analysis.Tau.extra_wps[0],
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,

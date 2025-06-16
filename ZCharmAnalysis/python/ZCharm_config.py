@@ -3,7 +3,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
@@ -89,7 +88,6 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             "BaselineVarsZCharmAlg",
             isMC=flags.Input.isMC,
             electrons=electronkey, eleWP=ElectronWPLabel,
-            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             muons=muonkey, muonWP=MuonWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],

@@ -49,11 +49,7 @@ namespace HZALLYY
 
     CP::SysReadHandle<xAOD::MuonContainer>
       m_llyymuonHandle{ this, "llyymuons", "llyyAnalysisMuons_%SYS%", "Muon container to read" };
-    
-    Gaudi::Property<bool> m_saveDummy_ele_SF
-      {this, "saveDummyEleSF", false,
-	  "To be used in case no recommendations are available"};
-     
+         
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
     

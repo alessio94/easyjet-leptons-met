@@ -67,9 +67,6 @@ private:
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
     CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
-    Gaudi::Property<bool> m_saveDummy_ele_SF
-      {this, "saveDummyEleSF", false,
-	  "To be used in case no recommendations are not available"};
 
     CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
     CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};

@@ -54,12 +54,9 @@ namespace ttHH
       ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_ttHHMuonHandle));
       ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_ttHHMuonHandle));
 
-      // For SF access
-      if(!m_saveDummy_ele_SF){
-        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-      }
+      ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
 
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
@@ -490,8 +487,7 @@ namespace ttHH
           const xAOD::Electron* electron0 = electrons->at(0);
           if (m_storeMLBranches) m_Ibranches.at("total_charge").set(*event, electron0->charge(), sys);
           updateLeptonBranch(event, 1, electron0, 11,
-			     m_isMC && !m_saveDummy_ele_SF ?
-			     m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+			     m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
 	  HTall = electron0->pt();
         }
 
@@ -526,13 +522,11 @@ namespace ttHH
           if (muon0->pt()>electron0->pt()){
             updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
             updateLeptonBranch(event, 2, electron0, 11,
-			       m_isMC && !m_saveDummy_ele_SF ?
-			       m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+			       m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
           } else {
             updateLeptonBranch(event, 2, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
             updateLeptonBranch(event, 1, electron0, 11,
-			       m_isMC && !m_saveDummy_ele_SF ?
-			       m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+			       m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
           }
 
         } else { //ee
@@ -540,11 +534,9 @@ namespace ttHH
           const xAOD::Electron* electron0 = electrons->at(0);
           const xAOD::Electron* electron1 = electrons->at(1);          
           updateLeptonBranch(event, 1, electron0, 11,
-			     m_isMC && !m_saveDummy_ele_SF ?
-			     m_ele_SF.get(*electron0, sys) : 1.0 , sys);
+			     m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
           updateLeptonBranch(event, 2, electron1, 11,
-			     m_isMC && !m_saveDummy_ele_SF ?
-			     m_ele_SF.get(*electron1, sys) : 1.0 , sys);
+			     m_isMC ? m_ele_SF.get(*electron1, sys) : 1.0 , sys);
         }
       } else if (m_storeMLBranches) { //not 2l
         m_Ibranches.at("dilept_type").set(*event, 0, sys);

@@ -57,7 +57,6 @@ Electron:
     - ["LooseBLayerLH_nottva", "Tight_VarRad"]
     - ["TightLH_nottva", "Tight_VarRad"]
   do_parent_decoration: true
-  forceFullSimConfig: true
 
 Muon:
   ID: "Loose_nottva"

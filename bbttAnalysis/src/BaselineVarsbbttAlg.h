@@ -95,9 +95,6 @@ private:
     typedef std::unordered_map<HHBBTT::LepSelWpDeco, CP::SysReadDecorHandle<float>> leptonSfDecoMap;
     leptonSfDecoMap m_ele_SF_decoMap;
     leptonSfDecoMap m_muon_SF_decoMap;
-    Gaudi::Property<bool> m_saveDummy_ele_SF
-      {this, "saveDummyEleSF", false,
-	  "To be used in case no recommendations are not available"};
 
     Gaudi::Property<std::string> m_tauWPName
       { this, "tauWP", "","Tau ID working point" };

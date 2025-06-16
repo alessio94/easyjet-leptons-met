@@ -37,11 +37,9 @@ namespace HLLTT
     ATH_CHECK (m_mmc_m.initialize(m_systematicsList, m_eventHandle));
 
     if(m_isMC){
-      if(!m_saveDummy_ele_SF){
-        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-      }
+      ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
 
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
@@ -171,7 +169,7 @@ namespace HLLTT
             p4lep[n_lep] = electron->p4();
             lepid[n_lep] = electron->charge()>0? -11:11;
             if(m_isMC){
-              lepsf[n_lep] = m_saveDummy_ele_SF ? 1. : m_ele_SF.get(*electron, sys);
+              lepsf[n_lep] = m_ele_SF.get(*electron, sys);
 	      leptruthorig[n_lep] = m_ele_truthOrigin.get(*electron,sys);
               leptruthtype[n_lep] = m_ele_truthType.get(*electron,sys);
 	    }

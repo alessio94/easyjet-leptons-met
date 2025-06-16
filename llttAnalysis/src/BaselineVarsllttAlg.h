@@ -82,9 +82,6 @@ private:
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
-    Gaudi::Property<bool> m_saveDummy_ele_SF
-      {this, "saveDummyEleSF", false,
-	  "To be used in case no recommendations are not available"};
 
     Gaudi::Property<std::string> m_muWPName
       { this, "muonWP", "","Muon ID + Iso working point" };

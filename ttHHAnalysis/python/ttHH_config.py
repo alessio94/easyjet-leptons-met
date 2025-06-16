@@ -4,7 +4,6 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 import AthenaCommon.SystemOfUnits as Units
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, JetSelectorAlgCfg)
@@ -107,7 +106,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             PCBTDecorName="ftag_quantile_"
             + flags.Analysis.Small_R_jet.btag_extra_wps[0],
             electrons=electronkey, eleWP=TightEleWPLabel,
-            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             muons=muonkey, muonWP=TightMuonWPLabel,
             isMC=flags.Input.isMC,
             floatVariableList=float_variables,

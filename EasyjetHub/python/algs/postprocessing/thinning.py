@@ -21,7 +21,8 @@ def thinning_sequence(flags):
 
     for objtype, objflag in objflags.items():
         if flags.Analysis[objflag]:
-            configSeq += makeConfig('Thinning', containerName=drop_sys(
+            configSeq += makeConfig('Thinning')
+            configSeq.setOptionValue('.containerName', drop_sys(
                 flags.Analysis.container_names.output[objtype]))
             configSeq.setOptionValue(
                 '.selectionName', 'selectPtEta&&' + selections[objtype])
@@ -34,7 +35,8 @@ def thinning_sequence(flags):
             selection_string += '&&baselineJvt'
             if flags.Analysis.Small_R_jet.useFJvt:
                 selection_string += '&&baselineFJvt'
-        configSeq += makeConfig('Thinning', containerName=drop_sys(
+        configSeq += makeConfig('Thinning')
+        configSeq.setOptionValue('.containerName', drop_sys(
             flags.Analysis.container_names.output[jet_type]))
         configSeq.setOptionValue('.selectionName', selection_string)
         configSeq.setOptionValue('.postfix', 'thin')
@@ -47,13 +49,15 @@ def thinning_sequence(flags):
                     '_%SYS%', '_thin'))
 
     if flags.Analysis.do_large_R_Topo_jets:
-        configSeq += makeConfig('Thinning', containerName=drop_sys(
+        configSeq += makeConfig('Thinning')
+        configSeq.setOptionValue('.containerName', drop_sys(
             flags.Analysis.container_names.output.reco10TopoJet))
         configSeq.setOptionValue('.selectionName', 'selectPtEta')
         configSeq.setOptionValue('.postfix', 'thin')
 
     if flags.Analysis.do_large_R_UFO_jets and flags.Analysis.Large_R_jet.do_thinning:
-        configSeq += makeConfig('Thinning', containerName=drop_sys(
+        configSeq += makeConfig('Thinning')
+        configSeq.setOptionValue('.containerName', drop_sys(
             flags.Analysis.container_names.output.reco10UFOJet))
         configSeq.setOptionValue('.selectionName', 'selectPtEta')
         configSeq.setOptionValue('.postfix', 'thin')

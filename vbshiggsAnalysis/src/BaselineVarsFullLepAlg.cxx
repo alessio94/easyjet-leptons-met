@@ -50,12 +50,9 @@ namespace VBSHIGGS{
         ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_vbsMuonHandle));
         ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_vbsMuonHandle));
 
-        // For SF access
-        if(!m_saveDummy_ele_SF){
-          ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-          m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-          ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-        }
+	ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+	m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+	ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
 
         ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
         m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
@@ -252,7 +249,7 @@ namespace VBSHIGGS{
           if(m_isMC){
             float SF = 1.;
             if(std::abs(lep_pdgid)==11){
-              if(!m_saveDummy_ele_SF) SF = m_ele_SF.get(*leptons[i].first,sys);
+              SF = m_ele_SF.get(*leptons[i].first,sys);
 
               int ele_firstEgMotherTruthType = m_ele_firstEgMotherTruthType.get(*leptons[i].first,sys);
               m_Ibranches.at(prefix+"_ele_firstEgMotherTruthType").set(*event, ele_firstEgMotherTruthType, sys);

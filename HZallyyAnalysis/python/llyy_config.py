@@ -2,7 +2,6 @@ from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 import AthenaCommon.SystemOfUnits as Units
 from itertools import chain
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
@@ -92,7 +91,6 @@ def llyy_cfg(flags, smalljetkey, muonkey, electronkey, photonkey,
             isMC=flags.Input.isMC,
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
-            saveDummyEleSF=flags.GeoModel.Run is LHCPeriod.Run2,
             muons=muonkey,
             electrons=electronkey,
             floatVariableList=float_variables['leptons'],

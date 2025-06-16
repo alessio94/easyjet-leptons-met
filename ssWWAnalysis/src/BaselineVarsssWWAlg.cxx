@@ -47,12 +47,9 @@ namespace ssWWVBS
       ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_ssWWMuonHandle));
       ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_ssWWMuonHandle));
 
-      // SF access
-      if(!m_saveDummy_ele_SF){
-        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
-      }
+      ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+      m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+      ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
 
       ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
       m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);
@@ -205,7 +202,7 @@ namespace ssWWVBS
           float SF = 1.;
           if(std::abs(lep_pdgid)==13)
             SF = m_mu_SF.get(*leptons[i].first,sys);
-          else if(!m_saveDummy_ele_SF)
+          else
             SF = m_ele_SF.get(*leptons[i].first,sys);
           m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
         }
