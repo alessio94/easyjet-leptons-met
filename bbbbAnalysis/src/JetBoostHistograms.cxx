@@ -124,7 +124,7 @@ namespace bhist {
 // JetHist definition
   template <typename T, typename F>
   JetHist<T,F>::JetHist(const std::string& name, T hist, F filler):
-    m_histogram(hist),
+    m_histogram(std::move(hist)),
     m_filler(filler),
     m_name(name)
   {

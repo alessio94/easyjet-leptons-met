@@ -456,7 +456,7 @@ namespace VBSHIGGS{
           }
           for(unsigned int i=0; i<RNNJets.size(); i++) {
             const xAOD::JetContainer *RNNJets_container = RNNJets[i];
-            std::string RNNJets_container_name = RNNJets_names[i];
+            const std::string& RNNJets_container_name = RNNJets_names[i];
 
             for(unsigned int j=0; j<std::min(size_t(2),RNNJets_container->size()); j++) {
               std::string prefix = "Jet"+std::to_string(j+1);

@@ -913,8 +913,8 @@ namespace HHBBYY
       TMatrixDSymEigen EigenValues = TMatrixDSymEigen(MomentumTensor);
       TMatrixDSymEigen EigenValuesT = TMatrixDSymEigen(MomentumTensorT);
 
-      TVectorD eigenVec = EigenValues.GetEigenValues();
-      TVectorD eigenVecT = EigenValuesT.GetEigenValues();
+      const TVectorD& eigenVec = EigenValues.GetEigenValues();
+      const TVectorD& eigenVecT = EigenValuesT.GetEigenValues();
 
       float sphericityT = 2.0 * eigenVecT[1] / (eigenVecT[0] + eigenVecT[1]);
       float planarFlow = -99;
