@@ -58,7 +58,6 @@ namespace ttHH
 		        const xAOD::JetContainer& bjets,
 			const xAOD::MuonContainer& muons,
 			const xAOD::ElectronContainer& electrons,
-      const xAOD::MissingET* met, 
 			CutManager& ttHHCuts);
       
       void evaluateTriggerMatchingCuts(const std::vector<std::string> &m_leptonTriggers, 
@@ -85,10 +84,6 @@ namespace ttHH
 
       CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "ttHHAnalysisMuons_%SYS%", "Muon container to read" };
-
-      CP::SysReadHandle<xAOD::MissingETContainer>
-      m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
-
 
       Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
