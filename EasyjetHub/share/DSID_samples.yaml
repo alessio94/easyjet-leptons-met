@@ -17,6 +17,10 @@ DSID_HF_class_samples:
   - 410482 #mc20 ttbar 5FS PhPy8 h_dump dilep
   - 601398 #mc23 ttbar 5FS PhPy8 h_dump ljets
   - 601399 #mc23 ttbar 5FS PhPy8 h_dump dilep
+  - 601228 #mc23 ttbb 4FS PhPy8 allhad
+  - 601227 #mc23 ttbb 4FS PhPy8 ljets
+  - 601226 #mc23 ttbb 4FS PhPy8 dilep
+  - 603003 #mc20 ttbb 4FS PhPy8 allhad
   - 603192 #mc20 ttbb 4FS PhPy8 ljets
   - 603190 #mc20 ttbb 4FS PhPy8 dilep
   - 603193 #mc20 ttbb 4FS PhPy8 pT_hard ljets

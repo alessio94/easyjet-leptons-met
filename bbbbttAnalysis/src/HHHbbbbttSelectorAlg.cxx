@@ -765,7 +765,7 @@ namespace HHHBBBBTT
           else if (mu1) {
             lep1_pt = mu1->pt();
           }
-          m_bools.at(HHHBBBBTT::pass_ZCR) = lep1_pt > 27. * Athena::Units::GeV && bjets->size() >= 1;
+          m_bools.at(HHHBBBBTT::pass_ZCR) = lep1_pt > 27. * Athena::Units::GeV && bjets->size() >= 2;
 
           // No subleading ele + muon = e+mu event
           m_bools.at(HHHBBBBTT::pass_TopEMuCR) = !ele1 && !mu1 && ele0->pt() > m_pt_threshold[HHHBBBBTT::SLT][HHHBBBBTT::ele] && mu0->pt() > m_pt_threshold[HHHBBBBTT::SLT][HHHBBBBTT::mu] ;

@@ -36,11 +36,9 @@ GRL:
 Small_R_jet:
   useFJvt: true
   # btagging nominal working point
-  btag_wp: "GN2v01_FixedCutBEff_85"
+  btag_wp: "GN2v01_FixedCutBEff_90"
   btag_extra_wps:
-    - GN2v01_FixedCutBEff_90
-    - GN2v01_FixedCutBEff_77
-    - GN2v01_FixedCutBEff_70
+    - GN2v01_FixedCutBEff_85
     - GN2v01_Continuous
   variables_bjets: ["uncorrPt", "muonCorrPt"]
   variables_int_bjets: ["truthLabel", "pcbt_GN2v01", "nmuons"]
