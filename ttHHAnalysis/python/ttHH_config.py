@@ -75,10 +75,14 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
         )
     )
 
+    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
+
     TightMuonWP = flags.Analysis.Muon.extra_wps[0]
     TightMuonWPLabel = f'{TightMuonWP[0]}_{TightMuonWP[1]}'
     TightEleWP = flags.Analysis.Electron.extra_wps[0]
     TightEleWPLabel = f'{TightEleWP[0]}_{TightEleWP[1]}'
+
     cfg.addEventAlgo(
         CompFactory.ttHH.ttHHSelectorAlg(
             "ttHHSelectorAlg",
@@ -105,8 +109,8 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_"
             + flags.Analysis.Small_R_jet.btag_extra_wps[0],
-            electrons=electronkey, eleWP=TightEleWPLabel,
-            muons=muonkey, muonWP=TightMuonWPLabel,
+            electrons=electronkey, eleWP=ElectronWPLabel,
+            muons=muonkey, muonWP=MuonWPLabel,
             isMC=flags.Input.isMC,
             floatVariableList=float_variables,
             intVariableList=int_variables,
@@ -120,10 +124,6 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
 def get_BaselineVarsttHHAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
-
-    for object in ["ll"]:
-        for var in ["m"]:
-            float_variable_names.append(f"{object}_{var}")
 
     H_candidate_variables = [
         "HH_m", "HH_CHI",
@@ -222,7 +222,7 @@ def get_BaselineVarsttHHAlg_variables(flags):
         ]
     # float_variable_names += ["topness1", "topness2"]
     int_variable_names += [
-        "nJets", "nBJets85", "nBJets77", "nLeptons", "sumPCBT",
+        "nJets", "nBJets85", "nBJets77", "nLeptons", "nMuons", "nElectrons", "sumPCBT",
     ]
 
     return float_variable_names, int_variable_names

@@ -43,7 +43,7 @@ public:
 
 private:
     template<typename ParticleType>
-      void updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
+      void updateLeptonBranch(const xAOD::EventInfo *event, const ParticleType* particle,  
                                        int lep_pdgid, float lep_sf, 
                                              const CP::SystematicSet& sys);
     
@@ -85,19 +85,14 @@ private:
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
 
-    CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
-    CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};
-
     Gaudi::Property<std::string> m_muWPName
       { this, "muonWP", "","Muon ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_mu_SF{"", this};
-    CP::SysReadDecorHandle<int> m_mu_truthOrigin{"truthOrigin", this};
-    CP::SysReadDecorHandle<int> m_mu_truthType{"truthType", this};
 
     CP::SysReadDecorHandle<bool> 
-      m_selected_el { this, "selected_el", "selected_el_%SYS%", "Name of input decorator for selected el"};
+      m_tight_selected_el { this, "tight_selected_el", "tight_selected_el_%SYS%", "Name of input decorator for tight selected el"};
     CP::SysReadDecorHandle<bool> 
-      m_selected_mu { this, "selected_mu", "selected_mu_%SYS%", "Name of input decorator for selected mu"};
+      m_tight_selected_mu { this, "tight_selected_mu", "tight_selected_mu_%SYS%", "Name of input decorator for tight selected mu"};
 
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
@@ -107,9 +102,6 @@ private:
 
     Gaudi::Property<bool> m_storeJetBranches
       { this, "storeJetBranches", true, "Store flat jet branches" };
-
-    Gaudi::Property<bool> m_storeMLBranches
-      { this, "storeMLBranches", false, "Store multi-lepton branches" };
 
     Gaudi::Property<bool> m_runTopness
       { this, "runTopness", false, "Store topness variables" };

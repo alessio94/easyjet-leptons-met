@@ -49,11 +49,6 @@ namespace ttHH
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
-      ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_ttHHElectronHandle));
-      ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_ttHHElectronHandle));
-      ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_ttHHMuonHandle));
-      ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_ttHHMuonHandle));
-
       ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
       m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
       ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
@@ -63,8 +58,8 @@ namespace ttHH
       ATH_CHECK (m_mu_SF.initialize(m_systematicsList, m_muonHandle));
     }
 
-    ATH_CHECK (m_selected_el.initialize(m_systematicsList, m_ttHHElectronHandle));
-    ATH_CHECK (m_selected_mu.initialize(m_systematicsList, m_ttHHMuonHandle));
+    ATH_CHECK (m_tight_selected_el.initialize(m_systematicsList, m_ttHHElectronHandle));
+    ATH_CHECK (m_tight_selected_mu.initialize(m_systematicsList, m_ttHHMuonHandle));
 
     // Intialise syst-aware output decorators
 
@@ -142,6 +137,9 @@ namespace ttHH
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_ttHHMuonHandle.retrieve (muons, sys));
 
+      const xAOD::ElectronContainer *electrons = nullptr;
+      ANA_CHECK (m_ttHHElectronHandle.retrieve (electrons, sys));
+
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
       const xAOD::MissingET* met = (*metCont)["Final"];
@@ -160,9 +158,6 @@ namespace ttHH
 
       TLorentzVector met_vector;
       met_vector.SetPtEtaPhiE(met->met(), 0, met->phi(), met->met());
-
-      const xAOD::ElectronContainer *electrons = nullptr;
-      ANA_CHECK (m_ttHHElectronHandle.retrieve (electrons, sys));
 
       if (m_isSignal)
       {
@@ -206,17 +201,13 @@ namespace ttHH
       TLorentzVector H2(0, 0, 0, 0);
       TLorentzVector e1(0.,0.,0.,0.);
       TLorentzVector e2(0.,0.,0.,0.);
-      TLorentzVector ee(0.,0.,0.,0.);
       TLorentzVector mu1(0.,0.,0.,0.);
-      TLorentzVector mu2(0.,0.,0.,0.);
-      TLorentzVector mumu(0.,0.,0.,0.);
-      TLorentzVector emu(0.,0.,0.,0.);
 
       const xAOD::JetContainer paired_jets = *pairedJets;
 
       double HT = 0; // scalar sum of jet pT
       double HTall = 0; // scalar sum of jet pT and lepton pT
-      int nBJets77 = 0; 
+      int nBJets77 = 0;
 
       if (pairedJets->size()>=4 && jets->size()>=4 && bjets->size()>=3){
         int jetsCandidateSize = (jets->size()<6) ? jets->size() : 6;
@@ -343,34 +334,14 @@ namespace ttHH
         m_Fbranches.at("Jets_DeltaRMean").set(*event, DeltaRMean, sys);
       }
 
-      if (electrons->size() >= 2) {
-        // ee
-        e1 = electrons->at(0)->p4();
-        e2 = electrons->at(1)->p4();
-        ee = e1 + e2;
-        m_Fbranches.at("ll_m").set(*event, ee.M(), sys);
-      }
-
-      if (muons->size() >= 2) {
-        // mumu
-        mu1 = muons->at(0)->p4();
-        mu2 = muons->at(1)->p4();
-        mumu = mu1 + mu2;
-        m_Fbranches.at("ll_m").set(*event, mumu.M(), sys);
-      }
-
-      if (muons->size() >= 1 and electrons->size() >= 1) {
-        mu1 = muons->at(0)->p4();
-        e1 = electrons->at(0)->p4();
-        emu = e1 + mu1;
-        m_Fbranches.at("ll_m").set(*event, emu.M(), sys);
-      }
-
       int nJets = jets->size();
       int nLeptons = muons->size() + electrons->size();
       int nJets_ttbar = top1_jet_candidates->size();
-      m_Ibranches.at("nJets").set(*event, nJets, sys);
+      
       m_Ibranches.at("nLeptons").set(*event, nLeptons, sys);
+      m_Ibranches.at("nMuons").set(*event, muons->size(), sys);
+      m_Ibranches.at("nElectrons").set(*event, electrons->size(), sys);
+      m_Ibranches.at("nJets").set(*event, nJets, sys);
       m_Ibranches.at("nBJets85").set(*event, bjets->size(), sys);
       m_Ibranches.at("nBJets77").set(*event, nBJets77, sys);
 
@@ -407,20 +378,10 @@ namespace ttHH
 
 	bool top1_had = false;
 	bool top2_had = false;
-	bool all_had = false;
 	bool semi_lep = false;
-	bool di_lep = false;
-	if (nLeptons == 0 and nJets_ttbar >= 6){ // all hadronic
-	  top1_had = true;
-	  top2_had = true;
-	  all_had = true;
-	}
 	if (nLeptons == 1 and nJets_ttbar >= 4){ // semi-leptonic
 	  top2_had = true;
 	  semi_lep = true;
-	}
-	if (nLeptons == 2 and nJets_ttbar >= 2){ // di-lepton
-	  di_lep = true;
 	}
 
 	std::vector<unsigned int> top1_jet_locations;
@@ -431,7 +392,7 @@ namespace ttHH
 	// Build top1 lepton candidates
 	std::vector<std::tuple<int, double>> top1_lepton_candidates = leptonmasses;
 	double topness1 = -99.;
-	if (all_had or semi_lep or di_lep){
+	if (semi_lep){
 	  topness1 = computeChiSquaretops(*top1_jet_candidates, top1_lepton_candidates, met_vector, top1_had, top1_jet_locations, top1_lepton_locations, electrons, muons);
 	}
 	m_Fbranches.at("topness1").set(*event, topness1, sys);
@@ -456,23 +417,13 @@ namespace ttHH
 	if (semi_lep){
 	  top2_lepton_candidates = top1_lepton_candidates;
 	}
-	if (di_lep){
-	  for (const auto& leptonmass : leptonmasses){
-	    if (leptonmass != top1_lepton_locations[0]){
-	      top2_lepton_candidates.push_back(leptonmass);
-	    }        
-	  }
-	}
 
 	double topness2 = -99.;
-	if (all_had or semi_lep or di_lep){
+	if (semi_lep){
 	  topness2 = computeChiSquaretops(*top2_jet_candidates, top2_lepton_candidates, met_vector, top2_had, top2_jet_locations, top2_lepton_locations, electrons, muons);
 	}
 	m_Fbranches.at("topness2").set(*event, topness2, sys);
       }
-
-      //----------------------------------------------------------
-      //-- Multileptons
 
       size_t muonSize = muons->size();
 
@@ -480,70 +431,15 @@ namespace ttHH
         //-- Filling Lepton branches
         if (muonSize==1){ // mu
           const xAOD::Muon* muon0 = muons->at(0);
-          if (m_storeMLBranches) m_Ibranches.at("total_charge").set(*event, muon0->charge(), sys);
-          updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
-	  HTall = muon0->pt();
+          updateLeptonBranch(event, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
+	        HTall = muon0->pt();
         } else { // ele 
           const xAOD::Electron* electron0 = electrons->at(0);
-          if (m_storeMLBranches) m_Ibranches.at("total_charge").set(*event, electron0->charge(), sys);
-          updateLeptonBranch(event, 1, electron0, 11,
+          updateLeptonBranch(event, electron0, 11,
 			     m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
-	  HTall = electron0->pt();
+	        HTall = electron0->pt();
         }
-
       }
-      else if (nLeptons == 2){
-        //-- total charge
-        int totalCharge = 0;
-        for (const auto& muon : *muons) {
-          totalCharge += muon->charge();
-	  HTall += muon->pt();
-	}
-        for (const auto& electron : *electrons) {
-          totalCharge += electron->charge();
-          HTall += electron->pt();
-	}
-
-	if (m_storeMLBranches) m_Ibranches.at("total_charge").set(*event, totalCharge, sys);
-        if (m_storeMLBranches) m_Ibranches.at("dilept_type").set(*event, muonSize == 2 ? 3 : (muonSize == 1 ? 2 : 1), sys);
-
-        //-- Filling Lepton branches
-        if (muonSize==2){ // mumu
-          
-          const xAOD::Muon* muon0 = muons->at(0);
-          const xAOD::Muon* muon1 = muons->at(1);
-          updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
-          updateLeptonBranch(event, 2, muon1, 13, m_isMC ? m_mu_SF.get(*muon1, sys) : 1.0 , sys);
-
-        } else if (muonSize==1){ // emu
-          
-          const xAOD::Muon* muon0 = muons->at(0);
-          const xAOD::Electron* electron0 = electrons->at(0);
-          if (muon0->pt()>electron0->pt()){
-            updateLeptonBranch(event, 1, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
-            updateLeptonBranch(event, 2, electron0, 11,
-			       m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
-          } else {
-            updateLeptonBranch(event, 2, muon0, 13, m_isMC ? m_mu_SF.get(*muon0, sys) : 1.0 , sys);
-            updateLeptonBranch(event, 1, electron0, 11,
-			       m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
-          }
-
-        } else { //ee
-          
-          const xAOD::Electron* electron0 = electrons->at(0);
-          const xAOD::Electron* electron1 = electrons->at(1);          
-          updateLeptonBranch(event, 1, electron0, 11,
-			     m_isMC ? m_ele_SF.get(*electron0, sys) : 1.0 , sys);
-          updateLeptonBranch(event, 2, electron1, 11,
-			     m_isMC ? m_ele_SF.get(*electron1, sys) : 1.0 , sys);
-        }
-      } else if (m_storeMLBranches) { //not 2l
-        m_Ibranches.at("dilept_type").set(*event, 0, sys);
-      }
-      //-- 3l
-      if (m_storeMLBranches) m_Ibranches.at("trilept_type").set(*event, (nLeptons == 3) ? 1 : 0, sys);
-      //--
 
       int sumPCBT = 0; // sum of pcbt scores for one event
 
@@ -695,12 +591,12 @@ namespace ttHH
   // Fill the branches Lepton*_*
   
   template<typename ParticleType>
-  void BaselineVarsttHHAlg::updateLeptonBranch(const xAOD::EventInfo *event, int leptonIndex, const ParticleType* particle,  
+  void BaselineVarsttHHAlg::updateLeptonBranch(const xAOD::EventInfo *event, const ParticleType* particle,  
                                        int lep_pdgid, float lep_sf, 
                                        const CP::SystematicSet& sys) {
   
     // Branch name using lepton index
-    std::string prefix = "Lepton" + std::to_string(leptonIndex) + "_";
+    std::string prefix = "Lepton_";
 
     TLorentzVector lep = particle->p4();
     
@@ -712,33 +608,16 @@ namespace ttHH
 
     // Easyjet properties
     m_Ibranches.at(prefix + "charge").set(*event, particle->charge(), sys);
-    m_Ibranches.at(prefix + "pdgid").set(*event, -1*lep_pdgid*particle->charge(), sys);
-    if(m_isMC) m_Fbranches.at(prefix + "effSF").set(*event, lep_sf, sys);
-
-    if (lep_pdgid==13){ 
-      m_Ibranches.at(prefix + "isTight").set(*event, m_selected_mu.get(*particle, sys), sys);
-    } else if (lep_pdgid==11){
-      m_Ibranches.at(prefix + "isTight").set(*event, m_selected_el.get(*particle, sys), sys);
+    
+    if(m_isMC) {
+      m_Ibranches.at(prefix + "pdgid").set(*event, -1*lep_pdgid*particle->charge(), sys);
+      m_Fbranches.at(prefix + "effSF").set(*event, lep_sf, sys);
     }
 
-    // Truth
-    if (m_isMC) {
-      int lep_truthOrigin = std::abs(lep_pdgid)==11 ?
-        m_ele_truthOrigin.get(*particle, sys) : m_mu_truthOrigin.get(*particle, sys);
-      if (m_storeMLBranches) m_Ibranches.at(prefix + "truthOrigin").set(*event, lep_truthOrigin, sys);
-      int lep_truthType = std::abs(lep_pdgid)==11 ?
-        m_ele_truthType.get(*particle, sys) : m_mu_truthType.get(*particle, sys);
-      if (m_storeMLBranches) m_Ibranches.at(prefix + "truthType").set(*event, lep_truthType, sys);
-    
-      int lep_isPrompt = 0;
-    
-      if (lep_pdgid==13){ // simplistic
-        if (lep_truthType==6) lep_isPrompt=1; // isolated prompts
-      } else if (lep_pdgid==11){
-        if (lep_truthType==2) lep_isPrompt=1; // isolated prompts
-      }
-    
-      if (m_storeMLBranches) m_Ibranches.at(prefix + "isPrompt").set(*event, lep_isPrompt, sys);
+    if (lep_pdgid==13){ 
+      m_Ibranches.at(prefix + "isTight").set(*event, m_tight_selected_mu.get(*particle, sys), sys);
+    } else if (lep_pdgid==11){
+      m_Ibranches.at(prefix + "isTight").set(*event, m_tight_selected_el.get(*particle, sys), sys);
     }
   }
 

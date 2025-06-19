@@ -93,8 +93,8 @@ namespace ttHH
       { this, "muonWP", "","Muon ID + Iso cuts" };
       CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
 
-      CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
-      CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
+      CP::SysWriteDecorHandle<bool> m_tight_selected_el {"tight_selected_el_%SYS%", this};
+      CP::SysWriteDecorHandle<bool> m_tight_selected_mu {"tight_selected_mu_%SYS%", this};
 
       CP::SysReadDecorHandle<bool> m_passTriggerSinglep {this, "passTriggerSinglep", "ttHH_pass_trigger_singlep", "events pass any singlep triggers"};
 

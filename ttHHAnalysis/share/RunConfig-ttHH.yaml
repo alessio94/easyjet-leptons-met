@@ -30,6 +30,9 @@ Small_R_jet:
     - GN2v01_Continuous
   amount: 6
   variables_int_allJets: ["pcbt"]
+  #btag_egReductionB: "Medium"
+  #btag_egReductionC: "Medium"
+  #btag_egReductionLight: "Medium"
 
 Electron:
   ID: "LooseBLayerLH"
@@ -45,7 +48,7 @@ Muon:
     - ["Tight", "PflowTight_VarRad"]
 
 Lepton:
-  amount: 2
+  amount: 1
   variables_int: ["isTight"]
 
 # orthogonality studies  
