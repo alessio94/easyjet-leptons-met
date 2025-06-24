@@ -67,6 +67,7 @@ def muon_sequence(flags, configAcc):
         quality = id.replace("_nottva", "")
         configSeq.setOptionValue('.quality', quality)
         configSeq.setOptionValue('.isolation', iso)
+        configSeq.setOptionValue('.isoDecSuffix', flags.Analysis.Muon.IsoDecSuffix)
         configSeq.setOptionValue('.maxD0Significance',
                                  maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',

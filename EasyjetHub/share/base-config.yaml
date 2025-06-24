@@ -137,6 +137,7 @@ Muon:
   maxDeltaZ0SinTheta: 0.5
   ID: ""
   Iso: ""
+  IsoDecSuffix: ""
   MergeLRT: false
   do_parent_decoration: false
   do_track_decoration: false
