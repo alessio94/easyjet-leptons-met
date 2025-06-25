@@ -40,16 +40,6 @@ Large_R_jet:
   max_eta: 2.0
   min_m: 40.e+3
   runMuonJetPtCorr: false
-  GN2X_hbb_wps:
-    - "FlatMassQCDEff_0p25"
-    - "FlatMassQCDEff_0p3"
-    - "FlatMassQCDEff_0p37"
-    - "FlatMassQCDEff_0p46"
-    - "FlatMassQCDEff_0p58"
-    - "FlatMassQCDEff_0p74"
-    - "FlatMassQCDEff_0p94"
-    - "FlatMassQCDEff_1p25"
-    - "FlatMassQCDEff_1p55"
 
 Photon:
   ID: "Tight" # Loose, Tight
