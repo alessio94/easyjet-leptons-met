@@ -69,11 +69,24 @@ selection:
     - 'HLT_2e24_lhvloose_L12eEM24L'
     - 'HLT_2mu14_L12MU8F'
     - 'HLT_mu22_mu8noL1_L1MU14FCH'
-
-
-
+    '2024':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M'
+    - 'HLT_e60_lhmedium_L1eEM26M'
+    - 'HLT_e140_lhloose_L1eEM26M'
+    - 'HLT_e140_lhloose_noringer_L1eEM26M'
+    - 'HLT_e300_etcut_L1eEM26M'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
+    - 'HLT_mu60_0eta105_msonly_L1MU14FCH'
+    - 'HLT_mu60_L1MU14FCH'
+    - 'HLT_mu80_msonly_3layersEC_L1MU14FCH'
+    - 'HLT_2e17_lhvloose_L12eEM18M'
+    - 'HLT_2e24_lhvloose_L12eEM24L'
+    - 'HLT_2mu14_L12MU8F'
+    - 'HLT_mu22_mu8noL1_L1MU14FCH'
+  
 scale_factor:
-  doSF: true
+  doSF: false
   chains:
     '2015':
     - 'HLT_e24_lhmedium_L1EM20VH || HLT_e60_lhmedium || HLT_e120_lhloose'
@@ -119,3 +132,7 @@ scale_factor:
     
   Muon:
     ID: "Medium"
+
+
+
+

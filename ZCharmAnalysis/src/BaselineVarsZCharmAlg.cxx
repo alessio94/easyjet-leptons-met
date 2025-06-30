@@ -358,6 +358,19 @@ namespace ZCC
         }
       }
       if (n_cjets >=2){
+        int cjet0_val = m_PCBTs.at(ftag2D_WP).get(*cjets->at(0), sys);
+        int cjet1_val = m_PCBTs.at(ftag2D_WP).get(*cjets->at(1), sys);
+        int PCFT2D2jets = 0;
+  
+          for (int i = 1; i <= 3; i++) {
+            for (int j = 1; j <= i; j++) {  // Only consider the case where j <= i.
+                PCFT2D2jets++;
+                if ((cjet0_val == i && cjet1_val == j) || (cjet0_val == j && cjet1_val == i)) {
+                    m_Ibranches.at("PCFT2D2jets").set(*event, PCFT2D2jets, sys);
+                }
+            }
+        }
+  
         TLorentzVector cc = cjets->at(0)->p4()+cjets->at(1)->p4();
         m_Fbranches.at("mcc").set(*event, cc.M(), sys);
         m_Fbranches.at("pT_over_mcc").set(*event, (cc.Pt())/(cc.M()), sys);

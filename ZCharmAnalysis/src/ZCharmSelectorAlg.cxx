@@ -317,6 +317,13 @@ namespace ZCC
         "HLT_e300_etcut_L1eEM26M"
       };
     }
+    else if(year==2024){
+      single_ele_paths = {
+        "HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M",
+        "HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
+        "HLT_e300_etcut_L1eEM26M"
+      };
+    }
 
     bool trigPassed_SET = false;
     if(ele){
@@ -343,6 +350,13 @@ namespace ZCC
 	    !m_is22_75bunches.get(*event, sys) &&
 	    !m_is23_75bunches.get(*event, sys) &&
 	    !m_is23_400bunches.get(*event, sys)){
+      single_mu_paths = {
+        "HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
+        "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
+        "HLT_mu80_msonly_3layersEC_L1MU14FCH"
+      };
+    }
+    else if( year==2024 ){
       single_mu_paths = {
         "HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
         "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
@@ -402,6 +416,12 @@ namespace ZCC
         "HLT_2e24_lhvloose_L12eEM24L"
       };
     }
+    else if(year==2024){
+      di_ele_paths = {
+        "HLT_2e17_lhvloose_L12eEM18M",
+        "HLT_2e24_lhvloose_L12eEM24L"
+      };
+    }
 
     bool trigPassed_DET = false;
     if (ele0 && ele1) {
@@ -426,6 +446,9 @@ namespace ZCC
       di_mu_paths = {"HLT_mu22_mu8noL1"};
     }
     else if(2022<=year && year<=2023){
+      di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
+    }
+    else if(year==2024){
       di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
     }
 
