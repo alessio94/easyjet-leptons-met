@@ -66,7 +66,10 @@ private:
       {"2023_75bunches", 450360, 450893},
       {"2023_400bunches", 450894, 451093},
       {"2023_from1200bunches", 451587, 456749},
-      {"2023_first_2400bunches", 451896, 456749}
+      {"2023_first_2400bunches", 451896, 456749},
+      {"2024_75bunches", 470781, 472942},
+      {"2024_400bunches_periodD", 472943, 473182},
+      {"2024_400bunches_periodL", 480146, 480161},
     };
 
     std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_runPeriodsDecor_keys;

@@ -182,7 +182,9 @@ namespace HHHBBBBTT
     
     checkDiBJetTriggers(year(*eventInfo), eventInfo.cptr(),
 		       runBoolDecos, triggerdecos, pass_decos);
-
+		
+    checkBjetTauTriggers(year(*eventInfo), eventInfo.cptr(),
+		       runBoolDecos, triggerdecos, pass_decos);
 
     return StatusCode::SUCCESS;
   }
@@ -411,10 +413,18 @@ namespace HHHBBBBTT
 	  if(channel==HHHBBBBTT::DTT_4J12)
 	    trig2 = std::regex_replace(trig, std::regex("4J12p0ETA23"),
 				      "4J12_0ETA23");
-	  else if(channel==HHHBBBBTT::DTT_L1Topo || channel==HHHBBBBTT::DTT_L1Topo_delayed)
-	    trig2 = std::regex_replace(trig,
-				       std::regex("L1DR_TAU20ITAU12I_J25"),
-				       "L1DR-TAU20ITAU12I-J25");
+	  else if(channel==HHHBBBBTT::DTT_L1Topo || channel==HHHBBBBTT::DTT_L1Topo_delayed) {
+	    if (year >= 2024) {
+	      trig2 = std::regex_replace(trig,
+				         std::regex("DR_eTAU30eTAU20_jJ55"),
+				         "DR-eTAU30eTAU20-jJ55");
+	    }
+	    else {
+	      trig2 = std::regex_replace(trig,
+				         std::regex("L1DR_TAU20ITAU12I_J25"),
+				         "L1DR-TAU20ITAU12I-J25");
+	    }
+	  }
 	  for(const xAOD::TauJet* tau : *taus){
 	    bool match = m_matchingTool->match(*tau, trig2, 0.2);
 	    tau_trigMatchDecos.at(channel)(*tau) |= match;
@@ -472,8 +482,33 @@ void TriggerDecoratorAlg::checkDiBJetTriggers
       pass_decos.at(channel)(*eventInfo) |= mapDecisions.at(channel);
       pass_decos.at(HHHBBBBTT::DBT)(*eventInfo) |= mapDecisions.at(channel);
     }
+  }
 
+void TriggerDecoratorAlg::checkBjetTauTriggers
+  (int year, const xAOD::EventInfo* eventInfo,
+   const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
+   passWriteDecoMap& pass_decos) const {
 
+    std::vector<std::string> btau_paths;
+    getBjetTauTriggers(year, eventInfo, runBoolDecos, btau_paths);
+
+    std::unordered_map<HHHBBBBTT::TriggerChannel, std::vector<std::string>> mapPaths;
+    mapPaths.emplace(HHHBBBBTT::BTT, btau_paths);
+
+    std::unordered_map<HHHBBBBTT::TriggerChannel, bool> mapDecisions;
+    mapDecisions.emplace(HHHBBBBTT::BTT, false);
+
+    for(const auto& [channel, paths] : mapPaths){
+      for(const auto& trig : paths){
+	bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+	mapDecisions.at(channel) |= pass;
+	if(pass){
+	//TO DO: implement trigger matching
+	}
+      }
+      pass_decos.at(channel)(*eventInfo) |= mapDecisions.at(channel);
+      pass_decos.at(HHHBBBBTT::BTT)(*eventInfo) |= mapDecisions.at(channel);
+    }
   }
 
 }

@@ -280,7 +280,7 @@ def bbbbtt_branches(flags):
     for var in ["_trigger_", "_baseline_"]:
         for cat in ["SR", "SLT", "LTT", "STT", "DTT",
                     "DTT_2016", "DTT_4J12", "DTT_L1Topo",
-                    "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT"]:
+                    "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT", "BTT"]:
             if (var == "_baseline_"
                     and cat in ["DTT_4J12_delayed", "DTT_L1Topo_delayed"]):
                 continue
@@ -290,7 +290,7 @@ def bbbbtt_branches(flags):
 
     for cat in ["SR", "SLT", "LTT", "STT", "DTT",
                 "DTT_2016", "DTT_4J12", "DTT_L1Topo",
-                "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT",
+                "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT", "BTT",
                 "LepHad", "HadHad"]:
         for nb in ["0B", "1B", "2B", "3B", "4B"]:
             branches += [f"EventInfo.pass_{cat}_{nb}_%SYS% ->"

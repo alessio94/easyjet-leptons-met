@@ -59,6 +59,7 @@ namespace HHHBBBBTT
 	{HHHBBBBTT::DTT_4J12_delayed, "DTT_4J12_delayed"},
 	{HHHBBBBTT::DTT_L1Topo_delayed, "DTT_L1Topo_delayed"},
 	{HHHBBBBTT::DBT, "DBT"},
+  {HHHBBBBTT::BTT, "BTT"},
 	{HHHBBBBTT::trigMatch_Tau35, "Tau35"},
 	{HHHBBBBTT::trigMatch_Tau25, "Tau25"}
       };
@@ -83,6 +84,9 @@ namespace HHHBBBBTT
 	{HHHBBBBTT::is23_400bunches, "is2023_400bunches"},
 	{HHHBBBBTT::is23_from1200bunches, "is2023_from1200bunches"},
 	{HHHBBBBTT::is23_first_2400bunches, "is2023_first_2400bunches"},
+	{HHHBBBBTT::is24_75bunches, "is2024_75bunches"},
+	{HHHBBBBTT::is24_400bunches_periodD, "is2024_400bunches_periodD"},
+	{HHHBBBBTT::is24_400bunches_periodL, "is2024_400bunches_periodL"},
 	{HHHBBBBTT::l1topo_disabled, "l1TopoDisabled"},
       };
     std::map<HHHBBBBTT::RunBooleans, SG::ReadDecorHandleKey<xAOD::EventInfo>> m_runBooleans_key;
@@ -178,6 +182,10 @@ namespace HHHBBBBTT
        const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos) const;
 
+     void checkBjetTauTriggers
+      (int year, const xAOD::EventInfo* eventInfo,
+       const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
+       passWriteDecoMap& pass_decos) const;
     
   };
 }

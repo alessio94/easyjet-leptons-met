@@ -145,6 +145,7 @@ private:
 	{HHHBBBBTT::DTT_4J12_delayed, "DTT_4J12_delayed"},
 	{HHHBBBBTT::DTT_L1Topo_delayed, "DTT_L1Topo_delayed"},
 	{HHHBBBBTT::DBT, "DBT"},
+  {HHHBBBBTT::BTT, "BTT"},
       };
 
     std::unordered_map<HHHBBBBTT::TriggerChannel,
@@ -182,6 +183,7 @@ private:
     {HHHBBBBTT::pass_trigger_DTT_4J12_delayed, "pass_trigger_DTT_4J12_delayed"},
     {HHHBBBBTT::pass_trigger_DTT_L1Topo_delayed, "pass_trigger_DTT_L1Topo_delayed"},
     {HHHBBBBTT::pass_trigger_DBT, "pass_trigger_DBT"},
+    {HHHBBBBTT::pass_trigger_BTT, "pass_trigger_BTT"},
     {HHHBBBBTT::TWO_JETS, "TWO_JETS"},
     {HHHBBBBTT::TWO_BJETS, "TWO_BJETS"},
     {HHHBBBBTT::ONE_BJET, "ONE_BJET"},
@@ -216,6 +218,7 @@ private:
     {HHHBBBBTT::pass_baseline_DTT_L1Topo, "pass_baseline_DTT_L1Topo"},
     {HHHBBBBTT::pass_baseline_DTT, "pass_baseline_DTT"},
     {HHHBBBBTT::pass_baseline_DBT, "pass_baseline_DBT"},
+    {HHHBBBBTT::pass_baseline_BTT, "pass_baseline_BTT"},
     {HHHBBBBTT::pass_baseline_SR, "pass_baseline_SR"},
     {HHHBBBBTT::pass_STT_4B, "pass_STT_4B"},
     {HHHBBBBTT::pass_DTT_2016_4B, "pass_DTT_2016_4B"},
@@ -225,6 +228,7 @@ private:
     {HHHBBBBTT::pass_DTT_L1Topo_delayed_4B, "pass_DTT_L1Topo_delayed_4B"},
     {HHHBBBBTT::pass_DTT_4B, "pass_DTT_4B"},
     {HHHBBBBTT::pass_DBT_4B, "pass_DBT_4B"},
+    {HHHBBBBTT::pass_BTT_4B, "pass_BTT_4B"},
     {HHHBBBBTT::pass_SR_4B, "pass_SR_4B"},
     {HHHBBBBTT::pass_STT_3B, "pass_STT_3B"},
     {HHHBBBBTT::pass_DTT_2016_3B, "pass_DTT_2016_3B"},
@@ -234,6 +238,7 @@ private:
     {HHHBBBBTT::pass_DTT_L1Topo_delayed_3B, "pass_DTT_L1Topo_delayed_3B"},
     {HHHBBBBTT::pass_DTT_3B, "pass_DTT_3B"},
     {HHHBBBBTT::pass_DBT_3B, "pass_DBT_3B"},
+    {HHHBBBBTT::pass_BTT_3B, "pass_BTT_3B"},
     {HHHBBBBTT::pass_SR_3B, "pass_SR_3B"},
     {HHHBBBBTT::pass_STT_2B, "pass_STT_2B"},
     {HHHBBBBTT::pass_DTT_2016_2B, "pass_DTT_2016_2B"},
@@ -243,6 +248,7 @@ private:
     {HHHBBBBTT::pass_DTT_L1Topo_delayed_2B, "pass_DTT_L1Topo_delayed_2B"},
     {HHHBBBBTT::pass_DTT_2B, "pass_DTT_2B"},
     {HHHBBBBTT::pass_DBT_2B, "pass_DBT_2B"},
+    {HHHBBBBTT::pass_BTT_2B, "pass_BTT_2B"},
     {HHHBBBBTT::pass_SR_2B, "pass_SR_2B"},
     {HHHBBBBTT::pass_STT_1B, "pass_STT_1B"},
     {HHHBBBBTT::pass_DTT_2016_1B, "pass_DTT_2016_1B"},
@@ -252,6 +258,7 @@ private:
     {HHHBBBBTT::pass_DTT_L1Topo_delayed_1B, "pass_DTT_L1Topo_delayed_1B"},
     {HHHBBBBTT::pass_DTT_1B, "pass_DTT_1B"},
     {HHHBBBBTT::pass_DBT_1B, "pass_DBT_1B"},
+    {HHHBBBBTT::pass_BTT_1B, "pass_BTT_1B"},
     {HHHBBBBTT::pass_SR_1B, "pass_SR_1B"},
     {HHHBBBBTT::pass_STT_0B, "pass_STT_0B"},
     {HHHBBBBTT::pass_DTT_2016_0B, "pass_DTT_2016_0B"},
@@ -261,6 +268,7 @@ private:
     {HHHBBBBTT::pass_DTT_L1Topo_delayed_0B, "pass_DTT_L1Topo_delayed_0B"},
     {HHHBBBBTT::pass_DTT_0B, "pass_DTT_0B"},
     {HHHBBBBTT::pass_DBT_0B, "pass_DBT_0B"},
+    {HHHBBBBTT::pass_BTT_0B, "pass_BTT_0B"},
     {HHHBBBBTT::pass_SR_0B, "pass_SR_0B"},
     {HHHBBBBTT::pass_baseline_LepHad, "pass_baseline_LepHad"},
     {HHHBBBBTT::pass_baseline_HadHad, "pass_baseline_HadHad"},
@@ -334,6 +342,9 @@ private:
     void applyDiBJetTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
        const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1);
+    void applyBjetTauTriggerSelection
+      (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+       const xAOD::TauJet* tau0, const xAOD::Jet* eta_lt2p5_jet0);
 
     void setThresholds(const xAOD::EventInfo* event,
 		       const CP::SystematicSet& sys);

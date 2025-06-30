@@ -160,6 +160,10 @@ namespace HHHBBBBTT
 			 const runBoolReadDecoMap& runBoolDecos,
 			 std::vector<std::string>& dib_paths);
 
+  void getBjetTauTriggers(int year, const xAOD::EventInfo* eventInfo,
+			 const runBoolReadDecoMap& runBoolDecos,
+			 std::vector<std::string>& btau_paths);
+
 }
 
 #endif

@@ -427,6 +427,7 @@ namespace HHHBBBBTT
         m_bools.at(HHHBBBBTT::pass_trigger_DTT_L1Topo) = true;
         m_bools.at(HHHBBBBTT::pass_trigger_DTT_4J12_delayed) = true;
         m_bools.at(HHHBBBBTT::pass_trigger_DTT_L1Topo_delayed) = true;
+        m_bools.at(HHHBBBBTT::pass_trigger_BTT) = true;
         m_bools.at(HHHBBBBTT::pass_trigger_DBT) = true;
 
       }
@@ -621,6 +622,17 @@ namespace HHHBBBBTT
             else if (m_bools.at(HHHBBBBTT::ZERO_BJETS)) m_bools.at(HHHBBBBTT::pass_DBT_0B) = true;
           }
         }
+        // BTT
+        if(!m_bools.at(HHHBBBBTT::pass_baseline_STT)){
+          m_bools.at(HHHBBBBTT::pass_baseline_BTT) = true;
+          if(m_bools.at(HHHBBBBTT::pass_trigger_BTT)){
+            if (m_bools.at(HHHBBBBTT::FOUR_BJETS)) m_bools.at(HHHBBBBTT::pass_BTT_4B) = true;
+            else if (m_bools.at(HHHBBBBTT::THREE_BJETS)) m_bools.at(HHHBBBBTT::pass_BTT_3B) = true;
+            else if (m_bools.at(HHHBBBBTT::TWO_BJETS)) m_bools.at(HHHBBBBTT::pass_BTT_2B) = true;
+            else if (m_bools.at(HHHBBBBTT::ONE_BJET)) m_bools.at(HHHBBBBTT::pass_BTT_1B) = true;
+            else if (m_bools.at(HHHBBBBTT::ZERO_BJETS)) m_bools.at(HHHBBBBTT::pass_BTT_0B) = true;
+          }
+        }
       }
 
       m_bools.at(HHHBBBBTT::pass_baseline_DTT) =
@@ -663,42 +675,48 @@ namespace HHHBBBBTT
 	 m_bools.at(HHHBBBBTT::pass_baseline_LTT) ||
 	 m_bools.at(HHHBBBBTT::pass_baseline_STT) ||
 	 m_bools.at(HHHBBBBTT::pass_baseline_DTT) ||
-         m_bools.at(HHHBBBBTT::pass_baseline_DBT));
+	 m_bools.at(HHHBBBBTT::pass_baseline_DBT) ||
+	 m_bools.at(HHHBBBBTT::pass_baseline_BTT));
 
       m_bools.at(HHHBBBBTT::pass_SR_0B) =
   (m_bools.at(HHHBBBBTT::pass_SLT_0B) ||
    m_bools.at(HHHBBBBTT::pass_LTT_0B) ||
    m_bools.at(HHHBBBBTT::pass_STT_0B) ||
    m_bools.at(HHHBBBBTT::pass_DTT_0B) ||
-   m_bools.at(HHHBBBBTT::pass_DBT_0B));
+   m_bools.at(HHHBBBBTT::pass_DBT_0B) ||
+   m_bools.at(HHHBBBBTT::pass_BTT_0B));
 
       m_bools.at(HHHBBBBTT::pass_SR_1B) =
 	(m_bools.at(HHHBBBBTT::pass_SLT_1B) ||
 	 m_bools.at(HHHBBBBTT::pass_LTT_1B) ||
 	 m_bools.at(HHHBBBBTT::pass_STT_1B) ||
 	 m_bools.at(HHHBBBBTT::pass_DTT_1B) ||
-	 m_bools.at(HHHBBBBTT::pass_DBT_1B));
+	 m_bools.at(HHHBBBBTT::pass_DBT_1B) ||
+	 m_bools.at(HHHBBBBTT::pass_BTT_1B));
 
       m_bools.at(HHHBBBBTT::pass_SR_2B) =
 	(m_bools.at(HHHBBBBTT::pass_SLT_2B) ||
 	 m_bools.at(HHHBBBBTT::pass_LTT_2B) ||
 	 m_bools.at(HHHBBBBTT::pass_STT_2B) ||
 	 m_bools.at(HHHBBBBTT::pass_DTT_2B) ||
-	 m_bools.at(HHHBBBBTT::pass_DBT_2B));
+	 m_bools.at(HHHBBBBTT::pass_DBT_2B) ||
+	 m_bools.at(HHHBBBBTT::pass_BTT_2B));
 
       m_bools.at(HHHBBBBTT::pass_SR_3B) =
 	(m_bools.at(HHHBBBBTT::pass_SLT_3B) ||
 	 m_bools.at(HHHBBBBTT::pass_LTT_3B) ||
 	 m_bools.at(HHHBBBBTT::pass_STT_3B) ||
 	 m_bools.at(HHHBBBBTT::pass_DTT_3B) ||
-	 m_bools.at(HHHBBBBTT::pass_DBT_3B));
+	 m_bools.at(HHHBBBBTT::pass_DBT_3B) ||
+	 m_bools.at(HHHBBBBTT::pass_BTT_3B));
 
       m_bools.at(HHHBBBBTT::pass_SR_4B) =
 	(m_bools.at(HHHBBBBTT::pass_SLT_4B) ||
 	 m_bools.at(HHHBBBBTT::pass_LTT_4B) ||
 	 m_bools.at(HHHBBBBTT::pass_STT_4B) ||
 	 m_bools.at(HHHBBBBTT::pass_DTT_4B) ||
-	 m_bools.at(HHHBBBBTT::pass_DBT_4B));
+	 m_bools.at(HHHBBBBTT::pass_DBT_4B) ||
+	 m_bools.at(HHHBBBBTT::pass_BTT_4B));
 
       m_bools.at(HHHBBBBTT::pass_baseline_LepHad) =
 	(m_bools.at(HHHBBBBTT::pass_baseline_SLT) ||
@@ -706,42 +724,48 @@ namespace HHHBBBBTT
       m_bools.at(HHHBBBBTT::pass_baseline_HadHad) =
 	(m_bools.at(HHHBBBBTT::pass_baseline_STT) ||
 	 m_bools.at(HHHBBBBTT::pass_baseline_DTT) ||
-	 m_bools.at(HHHBBBBTT::pass_baseline_DBT) );
+	 m_bools.at(HHHBBBBTT::pass_baseline_DBT) ||
+	 m_bools.at(HHHBBBBTT::pass_baseline_BTT) );
       m_bools.at(HHHBBBBTT::pass_LepHad_4B) =
 	(m_bools.at(HHHBBBBTT::pass_SLT_4B) ||
 	 m_bools.at(HHHBBBBTT::pass_LTT_4B) );
       m_bools.at(HHHBBBBTT::pass_HadHad_4B) =
 	(m_bools.at(HHHBBBBTT::pass_STT_4B) ||
 	 m_bools.at(HHHBBBBTT::pass_DTT_4B) ||
-	 m_bools.at(HHHBBBBTT::pass_DBT_4B) );
+	 m_bools.at(HHHBBBBTT::pass_DBT_4B) ||
+	 m_bools.at(HHHBBBBTT::pass_BTT_4B)  );
       m_bools.at(HHHBBBBTT::pass_LepHad_3B) =
 	(m_bools.at(HHHBBBBTT::pass_SLT_3B) ||
 	 m_bools.at(HHHBBBBTT::pass_LTT_3B) );
       m_bools.at(HHHBBBBTT::pass_HadHad_3B) =
 	(m_bools.at(HHHBBBBTT::pass_STT_3B) ||
 	 m_bools.at(HHHBBBBTT::pass_DTT_3B) ||
-	 m_bools.at(HHHBBBBTT::pass_DBT_3B) );
+	 m_bools.at(HHHBBBBTT::pass_DBT_3B) ||
+	 m_bools.at(HHHBBBBTT::pass_BTT_3B) );
       m_bools.at(HHHBBBBTT::pass_LepHad_2B) =
 	(m_bools.at(HHHBBBBTT::pass_SLT_2B) ||
 	 m_bools.at(HHHBBBBTT::pass_LTT_2B) );
       m_bools.at(HHHBBBBTT::pass_HadHad_2B) =
 	(m_bools.at(HHHBBBBTT::pass_STT_2B) ||
 	 m_bools.at(HHHBBBBTT::pass_DTT_2B) ||
-	 m_bools.at(HHHBBBBTT::pass_DBT_2B) );
+	 m_bools.at(HHHBBBBTT::pass_DBT_2B) ||
+	 m_bools.at(HHHBBBBTT::pass_BTT_2B) );
       m_bools.at(HHHBBBBTT::pass_LepHad_1B) =
 	(m_bools.at(HHHBBBBTT::pass_SLT_1B) ||
 	 m_bools.at(HHHBBBBTT::pass_LTT_1B) );
       m_bools.at(HHHBBBBTT::pass_HadHad_1B) =
 	(m_bools.at(HHHBBBBTT::pass_STT_1B) ||
 	 m_bools.at(HHHBBBBTT::pass_DTT_1B) ||
-	 m_bools.at(HHHBBBBTT::pass_DBT_1B) );
+	 m_bools.at(HHHBBBBTT::pass_DBT_1B) ||
+	 m_bools.at(HHHBBBBTT::pass_BTT_1B) );
       m_bools.at(HHHBBBBTT::pass_LepHad_0B) =
   (m_bools.at(HHHBBBBTT::pass_SLT_0B) ||
    m_bools.at(HHHBBBBTT::pass_LTT_0B) );
       m_bools.at(HHHBBBBTT::pass_HadHad_0B) =
   (m_bools.at(HHHBBBBTT::pass_STT_0B) ||
    m_bools.at(HHHBBBBTT::pass_DTT_0B) ||
-   m_bools.at(HHHBBBBTT::pass_DBT_0B) );
+   m_bools.at(HHHBBBBTT::pass_DBT_0B) ||
+   m_bools.at(HHHBBBBTT::pass_BTT_0B) );
       m_bools.at(HHHBBBBTT::pass_LepHad) =
 	(m_bools.at(HHHBBBBTT::pass_LepHad_4B) ||
    m_bools.at(HHHBBBBTT::pass_LepHad_3B) ||
@@ -889,6 +913,7 @@ namespace HHHBBBBTT
     bool use_STT = false;
     bool use_DTT = false;
     bool use_DBT = false;
+    bool use_BTT = false;
     for (const auto &channel : m_channels){
       if (channel == HHHBBBBTT::LepHad || channel == HHHBBBBTT::AntiIsoLepHad){
         use_SLT = true;
@@ -898,6 +923,7 @@ namespace HHHBBBBTT
         use_STT = true;
         use_DTT = true;
         use_DBT = true;
+        use_BTT = true;
       }
       else if (channel == HHHBBBBTT::ZCR || channel == HHHBBBBTT::TopEMuCR){
         use_SLT = true;
@@ -929,7 +955,10 @@ namespace HHHBBBBTT
       applyDiBJetTriggerSelection(event, triggerdecos,
          eta_lt2p5_jet0, eta_lt2p5_jet1);
     }
-
+    if(use_BTT){
+      applyBjetTauTriggerSelection(event, triggerdecos,
+         tau0, eta_lt2p5_jet0);
+    }
   }
 
   void HHHbbbbttSelectorAlg::applySingleLepTriggerSelection
@@ -1138,6 +1167,21 @@ namespace HHHBBBBTT
     m_bools.at(HHHBBBBTT::pass_trigger_DBT) = trigPassed_DBT;
   }
 
+  void HHHbbbbttSelectorAlg::applyBjetTauTriggerSelection
+  (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
+   const xAOD::TauJet* tau0, const xAOD::Jet* eta_lt2p5_jet0){
+
+    bool trigPassed_BTT = triggerdecos.at(HHHBBBBTT::BTT)(*event);
+    if(eta_lt2p5_jet0 && tau0){
+      //TO DO: implement trig-matching
+      trigPassed_BTT &=
+        (tau0->pt() > m_pt_threshold[HHHBBBBTT::BTT][HHHBBBBTT::leadingtau] &&
+         eta_lt2p5_jet0->pt() > m_pt_threshold[HHHBBBBTT::BTT][HHHBBBBTT::leadingjet]);
+    }
+    else trigPassed_BTT = false;
+
+    m_bools.at(HHHBBBBTT::pass_trigger_BTT) = trigPassed_BTT;
+  }
 
   StatusCode HHHbbbbttSelectorAlg ::initialiseCutflow()
   {
@@ -1259,6 +1303,10 @@ namespace HHHBBBBTT
     // Di-b-jets triggers
     m_pt_threshold[HHHBBBBTT::DBT][HHHBBBBTT::leadingjet] = 20. * Athena::Units::GeV;
     m_pt_threshold[HHHBBBBTT::DBT][HHHBBBBTT::subleadingjet] = 20. * Athena::Units::GeV;
+
+    // Di-b+tau triggers
+    m_pt_threshold[HHHBBBBTT::BTT][HHHBBBBTT::leadingtau] = 20. * Athena::Units::GeV;
+    m_pt_threshold[HHHBBBBTT::BTT][HHHBBBBTT::leadingjet] = 20. * Athena::Units::GeV;
     
     // Single-lepton triggers
     if(year==2015)

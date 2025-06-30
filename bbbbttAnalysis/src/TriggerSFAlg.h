@@ -107,6 +107,9 @@ private:
 	{HHHBBBBTT::is23_400bunches, "is2023_400bunches"},
 	{HHHBBBBTT::is23_from1200bunches, "is2023_from1200bunches"},
 	{HHHBBBBTT::is23_first_2400bunches, "is2023_first_2400bunches"},
+	{HHHBBBBTT::is24_75bunches, "is2024_75bunches"},
+	{HHHBBBBTT::is24_400bunches_periodD, "is2024_400bunches_periodD"},
+	{HHHBBBBTT::is24_400bunches_periodL, "is2024_400bunches_periodL"},
 	{HHHBBBBTT::l1topo_disabled, "l1TopoDisabled"},
       };
     std::map<HHHBBBBTT::RunBooleans, SG::ReadDecorHandleKey<xAOD::EventInfo>> m_runBooleans_key;

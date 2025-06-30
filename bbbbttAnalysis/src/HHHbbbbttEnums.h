@@ -25,6 +25,7 @@ namespace HHHBBBBTT
     STT,
     DTT,
     DBT,
+    BTT,
     DTT_2016,
     DTT_4J12,
     DTT_L1Topo,
@@ -60,6 +61,9 @@ namespace HHHBBBBTT
     is23_400bunches,
     is23_from1200bunches,
     is23_first_2400bunches,
+    is24_75bunches,
+    is24_400bunches_periodD,
+    is24_400bunches_periodL,
     l1topo_disabled
   };
 
@@ -76,6 +80,7 @@ namespace HHHBBBBTT
     pass_trigger_DTT_4J12_delayed,
     pass_trigger_DTT_L1Topo_delayed,
     pass_trigger_DBT,
+    pass_trigger_BTT,
 
     TWO_JETS,
     TWO_BJETS,
@@ -112,6 +117,7 @@ namespace HHHBBBBTT
     pass_baseline_DTT_L1Topo,
     pass_baseline_DTT,
     pass_baseline_DBT,
+    pass_baseline_BTT,
     pass_baseline_SR,
 
     pass_STT_4B,
@@ -122,6 +128,7 @@ namespace HHHBBBBTT
     pass_DTT_L1Topo_delayed_4B,
     pass_DTT_4B,
     pass_DBT_4B,
+    pass_BTT_4B,
     pass_SR_4B,
 
     pass_STT_3B,
@@ -132,6 +139,7 @@ namespace HHHBBBBTT
     pass_DTT_L1Topo_delayed_3B,
     pass_DTT_3B,
     pass_DBT_3B,
+    pass_BTT_3B,
     pass_SR_3B,
 
     pass_STT_2B,
@@ -142,6 +150,7 @@ namespace HHHBBBBTT
     pass_DTT_L1Topo_delayed_2B,
     pass_DTT_2B,
     pass_DBT_2B,
+    pass_BTT_2B,
     pass_SR_2B,
 
     pass_STT_1B,
@@ -152,6 +161,7 @@ namespace HHHBBBBTT
     pass_DTT_L1Topo_delayed_1B,
     pass_DTT_1B,
     pass_DBT_1B,
+    pass_BTT_1B,
     pass_SR_1B,
 
     pass_STT_0B,
@@ -162,6 +172,7 @@ namespace HHHBBBBTT
     pass_DTT_L1Topo_delayed_0B,
     pass_DTT_0B,
     pass_DBT_0B,
+    pass_BTT_0B,
     pass_SR_0B,
 
     pass_baseline_LepHad,

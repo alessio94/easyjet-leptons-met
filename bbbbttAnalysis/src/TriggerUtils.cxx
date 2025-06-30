@@ -19,16 +19,24 @@ namespace HHHBBBBTT
       single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
       single_mu_SF_path = "mu26_ivarmedium_OR_mu50";
     }
-    else if(2022<=year && year<=2023 &&
+    else if(2022<=year && year<=2024 &&
 	    !runBoolDecos.at(HHHBBBBTT::is22_75bunches)(*eventInfo) &&
 	    !runBoolDecos.at(HHHBBBBTT::is23_75bunches)(*eventInfo) &&
-	    !runBoolDecos.at(HHHBBBBTT::is23_400bunches)(*eventInfo)){
+	    !runBoolDecos.at(HHHBBBBTT::is23_400bunches)(*eventInfo) &&
+	    !runBoolDecos.at(HHHBBBBTT::is24_75bunches)(*eventInfo) &&
+	    !runBoolDecos.at(HHHBBBBTT::is24_400bunches_periodD)(*eventInfo) &&
+	    !runBoolDecos.at(HHHBBBBTT::is24_400bunches_periodL)(*eventInfo)){
       single_mu_paths = {
 	"HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
 	"HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
 	"HLT_mu80_msonly_3layersEC_L1MU14FCH"
       };
-      single_mu_SF_path = "mu24_ivarmedium_L1MU14FCH_OR_mu50_L1MU14FCH";
+      if (2022<=year && year<=2023) {
+        single_mu_SF_path = "mu24_ivarmedium_L1MU14FCH_OR_mu50_L1MU14FCH";
+      }
+      else {
+        single_mu_SF_path = ""; // no muon SF leg yet?
+      }
     }
   }
 
@@ -62,14 +70,14 @@ namespace HHHBBBBTT
 	"HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
       };
     }
-    else if(runBoolDecos.at(HHHBBBBTT::is23_75bunches)(*eventInfo)){
+    else if(runBoolDecos.at(HHHBBBBTT::is23_75bunches)(*eventInfo) || runBoolDecos.at(HHHBBBBTT::is24_75bunches)(*eventInfo)){
       single_ele_paths = {
 	"HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
 	"HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
 	"HLT_e300_etcut_L1EM22VHI"
       };
     }
-    else if(year==2023){
+    else if(year==2023 || year==2024){
       single_ele_paths = {
 	"HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M",
 	"HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
@@ -113,7 +121,7 @@ namespace HHHBBBBTT
       // No muon SF leg yet
       mu_tau_SF_path = std::make_pair("", "tau25_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA");
     }
-    else if(year>=2022 && year<=2023){
+    else if(year>=2022 && year<=2024){
       mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU12IM_3J12"};
       mu_tau_paths_high = {"HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU20IM"};
     }
@@ -157,7 +165,7 @@ namespace HHHBBBBTT
       ele_tau_paths = {"HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1EM22VHI"};
       ele_tau_paths_4J12 = {"HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1EM15VHI_2TAU12IM_4J12"};
     }
-    else if(year==2023){
+    else if(year==2023 || year==2024){
       ele_tau_paths = {"HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1eEM26M"};
       ele_tau_paths_4J12 = {"HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1EM15VHI_2TAU12IM_4J12"};
     }
@@ -196,9 +204,10 @@ namespace HHHBBBBTT
     else if(year==2022){
       single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
     }
-    else if(year==2023){
+    else if(year==2023 || year==2024){
       single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
-      if(runBoolDecos.at(HHHBBBBTT::is23_first_2400bunches)(*eventInfo)){
+      if(runBoolDecos.at(HHHBBBBTT::is23_first_2400bunches)(*eventInfo) || 
+        (!runBoolDecos.at(HHHBBBBTT::is24_75bunches)(*eventInfo) && year==2024)){
         single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"};
       }
     }
@@ -287,7 +296,7 @@ namespace HHHBBBBTT
       };
     }
 
-    else if(year>=2023){
+    else if(year==2023){
       ditau_paths_L1Topo = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
       ditau_paths_4J12 = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
       tau35_match_paths = {
@@ -303,6 +312,18 @@ namespace HHHBBBBTT
         ditau_paths_L1Topo_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
         ditau_paths_4J12_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
       }
+    }
+    else if(year==2024){
+      ditau_paths_L1Topo = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1cTAU30M_2cTAU20M_DR_eTAU30eTAU20_jJ55"};
+      ditau_paths_4J12 = {"HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
+      tau35_match_paths = {
+	"HLT_mu24_ivarmedium_tau35_mediumRNN_tracktwoMVA_probe_03dRAB_L1MU14FCH",
+	"HLT_e26_lhtight_ivarloose_tau35_mediumRNN_tracktwoMVA_probe_03dRAB_L1EM22VHI"
+      };
+      tau25_match_paths = {
+	"HLT_mu24_ivarmedium_tau25_mediumRNN_tracktwoMVA_probe_03dRAB_L1MU14FCH",
+	"HLT_e26_lhtight_ivarloose_tau25_mediumRNN_tracktwoMVA_probe_L1TAU12IM_03dRAB_L1eEM26M"
+      };
     }
   }
 
@@ -330,6 +351,17 @@ namespace HHHBBBBTT
       if (runBoolDecos.at(HHHBBBBTT::is23_from1200bunches)(*eventInfo)){
         dib_paths = {"HLT_j75c_020jvt_j50c_020jvt_j25c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bgn177_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"};
       }
+    }
+    else if(year==2024){
+      dib_paths = {"HLT_j75c_020jvt_j50c_020jvt_j25c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bgn177_pf_ftf_presel2c20XX2c20b85_L1jJ85p0ETA21_3jJ40p0ETA25"};
+    }
+  }
+
+  void getBjetTauTriggers(int year, const xAOD::EventInfo* /*eventInfo*/,
+			 const runBoolReadDecoMap& /*runBoolDecos*/,
+			 std::vector<std::string>& btau_paths){
+    if(year==2024){
+      btau_paths = {"HLT_tau25_mediumRNN_tracktwoMVA_probe_L1eTAU12_j65c_020jvt_j40c_020jvt_j25c_020jvt_j20c_020jvt_SHARED_j20c_020jvt_bgn285_pf_ftf_presel3c20XX1c20bgtwo85_L1jJ85p0ETA21_3jJ40p0ETA25"};
     }
   }
 }
