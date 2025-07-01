@@ -59,7 +59,6 @@ def main(args):
     mc_list = []
     if args.samples == "all":
         processes = [
-            "data",
             "Zbb_ptZ_200_ECMS",
             "Zbbgamma_pTZ100",
             "Zqq_ptZ_200_ECMS",
@@ -71,8 +70,7 @@ def main(args):
             "dijet_bfilt",
             "dijets",
             "ttbar_allhad",
-            "tty",
-            "yjets"]
+            "tty"]
         mc_list = get_list_files(processes, args.samplePath)
     else:
         mc_list = get_list_files(args.samples.split(), args.samplePath)
