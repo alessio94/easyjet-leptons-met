@@ -551,7 +551,7 @@ copy-ntuple(){
     mkdir -p $eostmpdir
     cp analysis.root $eostmpdir/analysis_${postfix}.root
     echo $CI_MERGE_REQUEST_TITLE > $eostmpdir/CI_MERGE_REQUEST_TITLE
-    ${PFX} xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch mkdir $eosdir/$eostmpdir/
+    ${PFX} xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch mkdir $eosdir/$eostmpdir/ > /dev/null 2>&1 || true
     ${PFX} xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $eosdir/$eostmpdir/analysis_${postfix}.root > /dev/null 2>&1 || true
     ${PFX} xrdcp $eostmpdir/analysis_${postfix}.root  root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosdir/$eostmpdir
 

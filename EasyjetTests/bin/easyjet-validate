@@ -70,7 +70,7 @@ echo $exitcode > $eostmpdir/CI_VAL_EXIT_CODE
 echo "===== ls $eostmpdir ====="
 ls $eostmpdir
 
-xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch mkdir $eosplotdir
+xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch mkdir $eosplotdir > /dev/null 2>&1 || true
 #lets cleanup properly with painful xrootd
 for rmeosfile in `xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch ls $eosplotdir/$eostmpdir | grep -v "\.sys\.v"`; do xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $rmeosfile; done > /dev/null 2>&1 || true
 xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rmdir $eosplotdir/$eostmpdir > /dev/null 2>&1 || true
