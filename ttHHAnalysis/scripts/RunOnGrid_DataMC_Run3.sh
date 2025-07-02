@@ -19,8 +19,8 @@ mc_list=(
 )
 
 #data 
-easyjet-gridsubmit --data-list "$dir_samples/nominal/data_13TeV.Run2.p6479.txt" \
-    --run-config ttHHAnalysis/RunConfig-ttHH-nominal.yaml \
+easyjet-gridsubmit --data-list "$dir_samples/nominal/data_13p6TeV.Run3.p6482.txt" \
+    --run-config ttHHAnalysis/RunConfig-ttHH.yaml \
     --exec ttHH-ntupler \
     --nGBperJob 50 \
     --campaign ${campaign} \
@@ -29,7 +29,7 @@ easyjet-gridsubmit --data-list "$dir_samples/nominal/data_13TeV.Run2.p6479.txt" 
 
 #mc
 easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
-    --run-config ttHHAnalysis/RunConfig-ttHH-nominal.yaml \
+    --run-config ttHHAnalysis/RunConfig-ttHH-syst.yaml \
     --exec ttHH-ntupler \
     --nGBperJob 3 \
     --campaign ${campaign} \

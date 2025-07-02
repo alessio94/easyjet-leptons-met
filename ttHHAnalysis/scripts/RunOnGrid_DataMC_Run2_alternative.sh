@@ -10,7 +10,7 @@ mc_list=(
 
 #mc
 easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list[@]}") \
-    --run-config ttHHAnalysis/RunConfig-ttHH-alternative.yaml \
+    --run-config ttHHAnalysis/RunConfig-ttHH.yaml \
     --exec ttHH-ntupler \
     --nGBperJob 3 \
     --campaign ${campaign} \
