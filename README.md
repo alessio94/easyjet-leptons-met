@@ -54,6 +54,8 @@ git sparse-checkout set EasyjetHub EasyjetTests YourFavouriteAnalysis
 git checkout upstream/main
 git submodule update --init --recursive
 ```
+*Warning: LFS will not work with KRB5.*
+
 
 If you need to update a large amount of packages, a full checkout is also possible
 
