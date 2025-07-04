@@ -4,6 +4,8 @@ from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
     JetSelectorAlgCfg)
+from EasyjetHub.steering.analysis_configuration import (
+    get_trigger_legs_scale_factor_list)
 
 from vbshiggsAnalysis.fullLep_config import fullLep_cfg, fullLep_branches
 from vbshiggsAnalysis.semiLep_config import semiLep_cfg, semiLep_branches
@@ -108,6 +110,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
         for c in flags.Analysis.TriggerChains
     ]
 
+    # do trigger pass and matching for each lepton for single lepton triggers
     cfg.addEventAlgo(
         CompFactory.VBSHIGGS.TriggerDecoratorAlg(
             "VBSHIGGSTriggerDecoratorAlg",
@@ -115,6 +118,8 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             electrons="vbshiggsAnalysisElectrons_%SYS%",
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             triggerLists=trigger_branches,
+            eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
+            muTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
             saveHighLevelVariables=flags.Analysis.save_high_level_variables,
         )
     )

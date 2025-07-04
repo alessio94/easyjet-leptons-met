@@ -61,6 +61,9 @@ Lepton:
 
 # apply trigger lists to filter events
 do_trigger_filtering: true
+# compute and store trigger scale factors
+do_trigsf: true
+
 do_overlap_removal: true
 OverlapRemoval:
   # Enable overlap removal between large-R jets and objects for which 

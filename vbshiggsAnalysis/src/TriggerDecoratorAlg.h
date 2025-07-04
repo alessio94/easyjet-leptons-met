@@ -55,6 +55,20 @@ namespace VBSHIGGS
       ToolHandle<Trig::IMatchingTool> m_matchingTool
       { this, "trigMatchingTool", "", "Trigger matching tool"};
 
+      Gaudi::Property<std::vector<std::string>> m_eleTrigSF
+      { this, "eleTriggerSF", {}, "List of electron trigger SF" };
+      std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_eleTriggerSF;
+
+      Gaudi::Property<std::vector<std::string>> m_muTrigSF
+      { this, "muTriggerSF", {}, "List of muon trigger SF" };
+      std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_muTriggerSF;
+
+      CP::SysWriteDecorHandle<float> m_ele0TriggerSF {this, "ele0_trigEffSF", "ele0_trigEffSF_%SYS%", "Object-level electron 0 trigger scale factor"};
+      CP::SysWriteDecorHandle<float> m_ele1TriggerSF {this, "ele1_trigEffSF", "ele1_trigEffSF_%SYS%", "Object-level electron 1 trigger scale factor"};
+      CP::SysWriteDecorHandle<float> m_mu0TriggerSF {this, "mu0_trigEffSF", "mu0_trigEffSF_%SYS%", "Object-level muon 0 trigger scale factor"};
+      CP::SysWriteDecorHandle<float> m_mu1TriggerSF {this, "mu1_trigEffSF", "mu1_trigEffSF_%SYS%", "Object-level muon 1 trigger scale factor"};
+      CP::SysWriteDecorHandle<float> m_eventTriggerSF {this, "event_trigEffSF", "event_trigEffSF_%SYS%", "Event-level trigger scale factor"};
+
       Gaudi::Property<bool> m_saveHighLevelVariables
       { this, "saveHighLevelVariables", false, "Flag to save high level variables"};
 
@@ -92,7 +106,7 @@ namespace VBSHIGGS
       CP::SysWriteDecorHandle<bool> ele0_passSET_decor {this, "ele0_passSET", "ele0_passSET_%SYS%", "Flag if Ele0 passes any Single Electron Trigger"};
       CP::SysWriteDecorHandle<bool> ele1_passSET_decor {this, "ele1_passSET", "ele1_passSET_%SYS%", "Flag if Ele1 passes any Single Electron Trigger"};
       CP::SysWriteDecorHandle<bool> mu0_passSMT_decor {this, "mu0_passSMT", "mu0_passSMT_%SYS%", "Flag if Mu0 passes any Single Muon Trigger"};
-      CP::SysWriteDecorHandle<bool> mu1_passSMT_decor {this, "mu1_passSNT", "mu1_passSMT_%SYS%", "Flag if Mu1 passes any Single Muon Trigger"};
+      CP::SysWriteDecorHandle<bool> mu1_passSMT_decor {this, "mu1_passSMT", "mu1_passSMT_%SYS%", "Flag if Mu1 passes any Single Muon Trigger"};
 
       CP::SysWriteDecorHandle<std::vector<std::string>> ele0_trigPassed_decor {this, "ele0_trigPassed", "ele0_trigPassed_%SYS%", "List of Triggers that Ele0 Passes"};
       CP::SysWriteDecorHandle<std::vector<std::string>> ele1_trigPassed_decor {this, "ele1_trigPassed", "ele1_trigPassed_%SYS%", "List of Triggers that Ele1 Passes"};
@@ -115,7 +129,7 @@ namespace VBSHIGGS
 				       const CP::SystematicSet& sys, 
                std::vector<std::string>& ele_trigPassed, std::vector<std::string>& mu_trigPassed,
                std::vector<std::string>& ele_trigMatched, std::vector<std::string>& mu_trigMatched,
-               bool& ele_passSET, bool& mu_passSMT);
+               bool& ele_passSET, bool& mu_passSMT, float& ele_trigSF, float& mu_trigSF);
       void setThresholds(const xAOD::EventInfo* event,
 			 const runBoolReadDecoMap& runBoolDecos,
 			 const CP::SystematicSet& sys);

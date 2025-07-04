@@ -15,11 +15,13 @@ namespace VBSHIGGS
 
     void getSingleEleTriggers(int year, const xAOD::EventInfo* event,
 			      const runBoolReadDecoMap& runBoolDecos,
-			      std::vector<std::string>& single_ele_paths);
+			      std::vector<std::string>& single_ele_paths,
+            std::string& single_ele_SF_path);
 
     void getSingleMuTriggers(int year, const xAOD::EventInfo* event,
 			     const runBoolReadDecoMap& runBoolDecos,
-			     std::vector<std::string>& single_mu_paths);
+			     std::vector<std::string>& single_mu_paths,
+           std::string& single_mu_SF_path);
 }
 
 #endif
