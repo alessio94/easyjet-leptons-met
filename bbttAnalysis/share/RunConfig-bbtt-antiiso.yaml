@@ -16,6 +16,9 @@ Muon:
     - ["Loose_nottva", "PflowLoose_VarRad"]
     - ["Medium_nottva", "NonIso"]
 
+Trigger:
+  selection:
+    include: bbttAnalysis/trigger_leptons.yaml
 
 # Produce separate files for CutBookKeeper, 
 # and append AntiIsoLepHad on minitree output file
