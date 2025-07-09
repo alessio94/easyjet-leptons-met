@@ -56,9 +56,9 @@ namespace ttHH
 
       void evaluateCuts(const xAOD::JetContainer& jets,
 		        const xAOD::JetContainer& bjets,
-			const xAOD::MuonContainer& muons,
-			const xAOD::ElectronContainer& electrons,
-			CutManager& ttHHCuts);
+			int nTightMuons,
+      int nTightElectrons,
+      CutManager& ttHHCuts);
       
       void evaluateTriggerMatchingCuts(const std::vector<std::string> &m_leptonTriggers, 
                                       const xAOD::MuonContainer* muons,  const xAOD::ElectronContainer* electrons,

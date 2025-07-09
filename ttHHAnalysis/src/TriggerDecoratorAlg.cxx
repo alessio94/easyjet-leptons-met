@@ -92,7 +92,7 @@ namespace ttHH
                 "HLT_e60_lhmedium",
                 "HLT_e120_lhloose",
                 "HLT_mu20_iloose_L1MU15",
-                "HLT_mu50"
+                "HLT_mu40"
             }}
         }},
         {2016, {
@@ -127,7 +127,6 @@ namespace ttHH
                 "HLT_e26_lhtight_ivarloose_L1EM22VHI",
                 "HLT_e60_lhmedium_L1EM22VHI",
                 "HLT_e140_lhloose_L1EM22VHI",
-                "HLT_e300_etcut_L1EM22VHI",
                 "HLT_mu24_ivarmedium_L1MU14FCH",
                 "HLT_mu50_L1MU14FCH",
             }}

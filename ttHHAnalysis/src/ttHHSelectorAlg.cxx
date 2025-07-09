@@ -103,15 +103,19 @@ namespace ttHH
 
 
       // lepton WP
+      int nTightElectrons=0;
       for (const xAOD::Electron *electron : *electrons)
       {
         bool passElectronWP = m_eleWPDecorHandle.get(*electron, sys);
         m_tight_selected_el.set(*electron, passElectronWP, sys);
+        nTightElectrons += passElectronWP;
       }
+      int nTightMuons=0;
       for (const xAOD::Muon *muon : *muons)
       {
         bool passMuonWP = m_muonWPDecorHandle.get(*muon, sys);
         m_tight_selected_mu.set(*muon, passMuonWP, sys);
+        nTightMuons += passMuonWP;
       }
 
       // reset all cut flags to default=false
@@ -126,7 +130,7 @@ namespace ttHH
         }
       }
 
-      evaluateCuts(*jets, *bjets, *muons, *electrons, m_ttHHCuts);
+      evaluateCuts(*jets, *bjets, nTightMuons, nTightElectrons, m_ttHHCuts);
       if (!m_leptonTriggers.empty())
         evaluateTriggerMatchingCuts(m_leptonTriggers, muons, electrons,m_ttHHCuts);
       
@@ -200,10 +204,10 @@ namespace ttHH
 
   }
 
-  void ttHHSelectorAlg::evaluateCuts(const xAOD::JetContainer& jets, const xAOD::JetContainer& bjets, const xAOD::MuonContainer& muons, const xAOD::ElectronContainer& electrons, CutManager& ttHHCuts)
+  void ttHHSelectorAlg::evaluateCuts(const xAOD::JetContainer& jets, const xAOD::JetContainer& bjets, int nTightMuons, int nTightElectrons, CutManager& ttHHCuts)
   {
 
-    int nLeptons = muons.size() + electrons.size();
+    int nLeptons = nTightMuons + nTightElectrons;
     int nBJets = bjets.size();
     int nJets = jets.size(); 
 
