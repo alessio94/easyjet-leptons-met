@@ -1,6 +1,6 @@
 ptag=p6490
 campaign=v8-1
-dir_samples="../easyjet/ttHHAnalysis/dataset/PHYSLITE"
+dir_samples="../easyjet/ttHHAnalysis/dataset/PHYS"
 mc_campaign="mc20_13TeV"
 
 mc_list=(
