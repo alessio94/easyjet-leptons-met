@@ -206,6 +206,7 @@ Trigger:
   writeOutput: True
 
 GRL:
+  runGRL: true
   # list of directories to search for files
   years:
     include: grl_years.yaml

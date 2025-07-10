@@ -115,6 +115,13 @@ GRL:
     include: bjet_grl.yaml
 ```
 
+**For running on new data or other special studies, the GRL selection can be simply disabled by setting**
+
+```yaml
+GRL:
+  runGRL: false
+```
+
 ### Illegal yaml values
 
 Some potential pitfalls in writing the `yaml` are as follows:

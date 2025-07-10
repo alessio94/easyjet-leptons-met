@@ -14,7 +14,6 @@ def event_selection_sequence(flags):
     configSeq.setOptionValue('.runPrimaryVertexSelection',
                              flags.Analysis.do_event_cleaning)
     configSeq.setOptionValue('.runEventCleaning', flags.Analysis.do_event_cleaning)
-    configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
 
     selectionFlags = ['DFCommonJets_eventClean_LooseBad']
     if flags.Analysis.do_tight_jet_cleaning:
@@ -28,14 +27,19 @@ def event_selection_sequence(flags):
     configSeq.setOptionValue('.selectionFlags', selectionFlags)
     configSeq.setOptionValue('.invertFlags', invertFlags)
 
-    # Run GRL decoration optionally, already available in PHYSLITE
-    if flags.Analysis.GRL.store_decoration and not flags.Input.isPHYSLITE:
-        from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
-        configSeq += makeConfig('EventCleaning')
-        configSeq.setOptionValue('.noFilter', True)
-        configSeq.setOptionValue('.useRandomRunNumber', flags.Input.isMC)
-        configSeq.setOptionValue('.runPrimaryVertexSelection', False)
-        configSeq.setOptionValue('.GRLDict', getGoodRunsLists())
+    configSeq.setOptionValue('.runGRL', flags.Analysis.GRL.runGRL)
+
+    if flags.Analysis.GRL.runGRL:
+        configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
+
+        # Run GRL decoration optionally, already available in PHYSLITE
+        if flags.Analysis.GRL.store_decoration and not flags.Input.isPHYSLITE:
+            from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
+            configSeq += makeConfig('EventCleaning')
+            configSeq.setOptionValue('.noFilter', True)
+            configSeq.setOptionValue('.useRandomRunNumber', flags.Input.isMC)
+            configSeq.setOptionValue('.runPrimaryVertexSelection', False)
+            configSeq.setOptionValue('.GRLDict', getGoodRunsLists())
 
     return configSeq
 
