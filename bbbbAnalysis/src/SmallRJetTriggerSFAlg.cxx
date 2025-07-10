@@ -38,7 +38,7 @@ namespace HH4B
     int year = m_years.size() == 1 ? m_years[0] : 2016; // in case of mc20a which corresponds to 2015+2016
     std::string path;
     if (year >= 2022) path = "EasyjetHub/jet_trigger_scale_factors_2223.root"; // Run 3 calibration file
-    else path = "dummy.root"; // TODO: place holder for Run 2 calibration file
+    else path = "EasyjetHub/jet_trigger_scale_factors_run2.root"; // Run 2 calibration file
     std::string resolvedPath = PathResolverFindCalibFile(path);
     if (resolvedPath=="") ATH_MSG_WARNING("Failed to load calibration file " << path << ". " + m_matchingLevel + " jet scale factor set to 1.");
     TFile* jetSFFile = new TFile(resolvedPath.c_str(), "READ");
@@ -284,12 +284,15 @@ namespace HH4B
 
               // calibration valid range
               float maxPt = 300.;
-              float minPt = 20.;
-              float maxEta = 2.4;
+	      float minPt = 20.;
+	      for (const auto& year : m_years) {
+	      	if (year < 2022) minPt = 40.;
+	      }
+	      float maxEta = 2.4;
               if (m_matchingLevelEnum == TrigMatchingLevel::L1) 
               {
                 if (legThreshold == 45) maxEta = 2.1;
-                else if (legThreshold == 15) maxEta = 2.5;
+		else if (legThreshold == 15 || legThreshold == 20 || legThreshold == 30 || legThreshold == 75 || legThreshold == 85) maxEta = 2.5;
               }
 
               // if SF exists and jet in the valid kinematic region, assign jet-level SF as a function of NoBJetCalibMomentum pt, eta and Threshold.
