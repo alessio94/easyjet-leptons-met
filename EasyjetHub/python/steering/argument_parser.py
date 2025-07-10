@@ -101,9 +101,13 @@ def fill_from_args(flags: AthConfigFlags, parser: ArgumentParser) -> Namespace:
         input_file_list = []
         for ffile in value.split(","):
             if "*" in ffile:  # handle wildcard
+                _ffile = ffile
+                if '~' in ffile:
+                    import os
+                    _ffile = os.path.expanduser(ffile)
                 import glob
-                if glob.glob(ffile) != []:
-                    input_file_list += glob.glob(ffile)
+                if glob.glob(_ffile) != []:
+                    input_file_list += glob.glob(_ffile)
                 else:
                     raise ValueError("Unknown input files " + ffile)
             else:
