@@ -1,5 +1,5 @@
 ptag=p6491
-campaign=v8-1
+campaign=v9
 dir_samples="../easyjet/ttHHAnalysis/dataset/PHYS"
 mc_campaign="mc23_13p6TeV"
 
