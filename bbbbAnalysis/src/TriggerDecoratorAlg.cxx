@@ -116,7 +116,7 @@ namespace HH4B
 
         for (const xAOD::Jet* jet : *jets)
         {
-            jetPts.push_back(jet->pt());
+            jetPts.push_back(jet->jetP4("NoBJetCalibMomentum").Pt());
         }
         std::sort(jetPts.rbegin(), jetPts.rend());
 
@@ -127,8 +127,8 @@ namespace HH4B
         }
 
         // Calculate leading and third pT
-        double lead_pt = jetPts[0]/1000.0;
-        double third_pt = jetPts[2]/1000.0;
+        double lead_pt = jetPts[0] * 1e-3;
+        double third_pt = jetPts[2] * 1e-3;
 
         // Apply kinematic cuts
         bool b1_mask = (lead_pt > 170.0) && (third_pt > 70.0);

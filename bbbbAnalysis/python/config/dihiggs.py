@@ -165,6 +165,15 @@ def dihiggs_cfg(
         )
         cfg.merge(event_counter_cfg("n_merged"))
 
+    if (flags.Analysis.do_resolved_trigger_SF
+            or flags.Analysis.do_resolved_trigger_bucket):
+        cfg.merge(
+            JetSelectorAlgCfg(flags, name="SmallJetPreSelectorAlg",
+                              containerInKey=smalljetkey.replace("%SYS%", "NOSYS"),
+                              containerOutKey="smallRJetsForTriggerMatching",
+                              minPt=20 * Units.GeV,
+                              maxEta=2.5))
+
     if flags.Analysis.do_resolved_trigger_SF:
         cfg.merge(
             resolved_trigger_SF_cfg(

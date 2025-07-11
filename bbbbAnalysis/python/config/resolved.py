@@ -15,12 +15,6 @@ def resolved_trigger_SF_cfg(flags, smalljetkey):
     if (flags.Input.isMC
             and (flags.Analysis.Small_R_jet.doHLTMatching
                  or flags.Analysis.Small_R_jet.doL1Matching)):
-        cfg.merge(
-            JetSelectorAlgCfg(flags, name="SmallJetPreSelectorAlg",
-                              containerInKey=smalljetkey.replace("%SYS%", "NOSYS"),
-                              containerOutKey="smallRJetsForTriggerMatching",
-                              minPt=20 * Units.GeV,
-                              maxEta=2.5))
         # temporary solution for boosted trigger
         resolved_chain = [t for t in flags.Analysis.TriggerChains if "_a10" not in t]
         if flags.Analysis.Small_R_jet.doL1Matching:
@@ -57,10 +51,12 @@ def resolved_trigger_bucket_cfg(flags):
     cfg = ComponentAccumulator()
 
     # calculate trigger buckets
+    jets_name = "smallRJetsForTriggerMatching"
+
     cfg.addEventAlgo(
         CompFactory.HH4B.TriggerDecoratorAlg(
             "HH4bTriggerDecoratorAlg",
-            jets=flags.Analysis.container_names.input.reco4PFlowJet,
+            jets=jets_name,
             triggerLists=flags.Analysis.TriggerChains,
         )
     )
