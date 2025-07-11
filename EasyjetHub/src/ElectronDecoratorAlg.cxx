@@ -59,7 +59,7 @@ namespace Easyjet
       SG::WriteDecorHandle<xAOD::ElectronContainer, float> radiusConvDecorHandle(m_radiusConvDecorKey);
       SG::WriteDecorHandle<xAOD::ElectronContainer, float> separationMinDCTDecorHandle(m_separationMinDCTDecorKey);
 
-      typedef ElementLink<xAOD::TrackParticleContainer> Link_track; 
+      using Link_track = ElementLink<xAOD::TrackParticleContainer>;
       SG::WriteDecorHandle<xAOD::ElectronContainer, Link_track> closestSiTrackDecorHandle(m_closestSiTrackDecorKey);
       SG::WriteDecorHandle<xAOD::ElectronContainer, Link_track> bestmatchedElTrackDecorHandle(m_bestmatchedElTrackDecorKey);
 
@@ -84,7 +84,7 @@ namespace Easyjet
         float mll_conv = -99.;
         float mll_conv_atConvV = -99.;
         float radius_conv=-99.;
-        float separationMinDCT = -99; // how good the distance between the circles is 
+        float separationMinDCT = -99; // how good the distance between the circles is
 
         const xAOD::TrackParticle *closestSiTrack(0);
         const xAOD::TrackParticle *bestmatchedElTrack = electron->trackParticle();
@@ -94,12 +94,12 @@ namespace Easyjet
         if (bestmatchedElTrack){
           for (const xAOD::TrackParticle *track : *tracksIn) {
             double dR = bestmatchedElTrack->p4().DeltaR(track->p4());
-            double dz0 = std::abs(bestmatchedElTrack->z0() - track->z0())*sin(bestmatchedElTrack->theta()); 
+            double dz0 = std::abs(bestmatchedElTrack->z0() - track->z0())*sin(bestmatchedElTrack->theta());
 
             if ( dR<0.3 && dz0<0.5 ) { // loose DeltaR cut and tight delta(z0) cut. dz0 in mm
               bool hasSi = xAOD::EgammaHelpers::numberOfSiHits(track)>=8;
-              
-              double deta=std::abs(track->eta()-bestmatchedElTrack->eta()); 
+
+              double deta=std::abs(track->eta()-bestmatchedElTrack->eta());
               if(deta<detaMin && hasSi && ((bestmatchedElTrack->charge() * track->charge()) < 0) ) {
                 detaMin=deta;
                 closestSiTrack = track;
@@ -108,12 +108,12 @@ namespace Easyjet
           } // end of loop over tracks
 
           if (closestSiTrack){
-            TLorentzVector p0,p1;  
-            p0.SetPtEtaPhiM(bestmatchedElTrack->pt(),bestmatchedElTrack->eta(),bestmatchedElTrack->phi(), m_e);   
+            TLorentzVector p0,p1;
+            p0.SetPtEtaPhiM(bestmatchedElTrack->pt(),bestmatchedElTrack->eta(),bestmatchedElTrack->phi(), m_e);
             p1.SetPtEtaPhiM(closestSiTrack->pt(),closestSiTrack->eta(),closestSiTrack->phi(), m_e);
             mll_conv=(p0+p1).M();
-            
-            p0.SetPtEtaPhiM(bestmatchedElTrack->pt(),bestmatchedElTrack->eta(),0,m_e);   
+
+            p0.SetPtEtaPhiM(bestmatchedElTrack->pt(),bestmatchedElTrack->eta(),0,m_e);
             p1.SetPtEtaPhiM(closestSiTrack->pt(),closestSiTrack->eta(),0,m_e);
             mll_conv_atConvV=(p0+p1).M();
 
@@ -132,9 +132,9 @@ namespace Easyjet
             ///////////// TrackToHelix Other Electron Track
             double helix2[5];
             assignHelixArray(closestSiTrack, helix2, pvtx);
-            
-            double dct(helix1[0]-helix2[0]); 
-                
+
+            double dct(helix1[0]-helix2[0]);
+
             /////
             double beta(0.);
             if(helix1[4] < helix2[4]) {
@@ -142,22 +142,22 @@ namespace Easyjet
             } else {
               beta = 0.5*M_PI-helix2[4];
             }
-          
-          
+
+
             /// HelixToCircle Main Track Electron
             double r1 = 1/(2.*std::abs(helix1[1]));
-          
+
             std::pair<float, float> position1 = position(helix1);
-            double x1 = position1.first, y1 = position1.second; 
-          
+            double x1 = position1.first, y1 = position1.second;
+
             /// HelixToCircle Other Electron Conv Track
             double r2 = 1/(2.*std::abs(helix2[1]));
-          
+
             std::pair<float, float> position2 = position(helix2);
-            double x2 = position2.first, y2 = position2.second; 
+            double x2 = position2.first, y2 = position2.second;
 
             //////
-          
+
             double dx(x1- x2);
             if(dx <  1e-9 && dx > 0.) dx =  1e-9;
             if(dx > -1e-9 && dx < 0.) dx = -1e-9;
@@ -171,26 +171,26 @@ namespace Easyjet
             if(x1>x2)
               {
                 cpx1 = x1-r1*cos(alpha);
-                cpx2 = x2+r2*cos(alpha); 
+                cpx2 = x2+r2*cos(alpha);
               }
             else
               {
                 cpx1 = x1+r1*cos(alpha);
                 cpx2 = x2 - r2*cos(alpha);
               }
-          
-          
+
+
             double temp1 = (cpx1+cpx2)/2;
             double temp2 = slope*temp1+b;
             double convX = cos(beta)*temp1 + sin(beta)*temp2;
             double convY = -sin(beta)*temp1+ cos(beta)*temp2;
-              
-              
+
+
             ///////
             if(std::abs(separation)<1.&& std::abs(dct)<0.02){
               separationMinDCT=separation;
               radius_conv=sqrt(convX*convX + convY*convY);
-              if( convX*cos(bestmatchedElTrack->phi()) + convY*sin(bestmatchedElTrack->phi()) < 0)	radius_conv = -radius_conv; 
+              if( convX*cos(bestmatchedElTrack->phi()) + convY*sin(bestmatchedElTrack->phi()) < 0)	radius_conv = -radius_conv;
             }
           }
         }

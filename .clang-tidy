@@ -70,20 +70,10 @@
 # -readability-redundant-string-init (optimized away by the compiler)
 # -readability-uppercase-literal-suffix (style issue)
 # -readability-use-anyofallof (expects knowledge about functions in std::ranges namespace)
-#
-# The following checks are disabled since they started creating errors when moving from version 17.0.6 to version 19.1.2 on 16 Jun 2025
-# They are disabled temporary before they can be reviewed. Meanwhile the CI can pass and not block the MRs:
-# 
-# -misc-use-internal-linkage
-# -readability-math-missing-parentheses
-# -modernize-use-ranges
-# -readability-avoid-nested-conditional-operator
-# -readability-use-std-min-max
-# -modernize-use-using
-# -bugprone-pointer-arithmetic-on-polymorphic-object
-# -modernize-use-designated-initializers
-# -bugprone-unchecked-optional-access
-# -cert-ctr56-cpp
+# -modernize-use-designated-initializers (requires C++ 20 to fix)
+# -modernize-use-ranges (requires C++ 20 to fix)
+# -readability-math-missing-parentheses (makes no sense in math-heavy code)
+# -misc-use-internal-linkage (too inconvenient)
 #
 # The remaining checks not explicitly mentioned in the above list haven't really raised any
 # errors, but they're disabled regardless because either they've already been covered by other
@@ -108,6 +98,8 @@
 # -performance-for-range-copy [VBFTagger]
 # -readability-convert-member-functions-to-static [BJetCalibrationTool,KinematicFitTool,VBFTagger]
 # -readability-string-compare [VBFTagger]
+# -readability-use-std-min-max [TruthWeightTools,KinematicFitTool]
+# -readability-avoid-nested-conditional-operator [TruthWeightTools]
 
 Checks: >
   clang-*,
@@ -223,17 +215,12 @@ Checks: >
   -performance-for-range-copy,
   -readability-convert-member-functions-to-static,
   -readability-string-compare,
-  -misc-use-internal-linkage,
-  -readability-math-missing-parentheses,
-  -modernize-use-ranges,
-  -readability-avoid-nested-conditional-operator,
   -readability-use-std-min-max,
-  -modernize-use-using,
-  -bugprone-pointer-arithmetic-on-polymorphic-object,
+  -modernize-use-ranges,
   -modernize-use-designated-initializers,
-  -bugprone-unchecked-optional-access,
-  -cert-ctr56-cpp,
-
+  -readability-avoid-nested-conditional-operator,
+  -readability-math-missing-parentheses,
+  -misc-use-internal-linkage,
 
 CheckOptions:
   - key:   cppcoreguidelines-narrowing-conversions.WarnOnIntegerToFloatingPointNarrowingConversion

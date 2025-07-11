@@ -166,29 +166,29 @@ namespace HHBBYY
     float compute_Topness(const xAOD::JetContainer *jets);
     std::vector<float> compute_EventShapes(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const std::vector<TLorentzVector>& photons, const int& n_photons);
     float compute_pTBalance(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const std::vector<TLorentzVector>& photons, const int& n_photons);
-    
+
     VBFjetsMethod stringToVBFjetsMethod(const std::string& vbfjets_method_str);
     float getVBFjets_BDT(float ht, const TLorentzVector& ph1, const TLorentzVector& ph2,
-                      const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
-                      const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
+                         const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
+                         const xAOD::JetContainer *jets, std::array<TLorentzVector, 2>& Jets_vbf);
     void getVBFjets_mjj(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
-                        const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
+                        const xAOD::JetContainer *jets, std::array<TLorentzVector, 2>& Jets_vbf);
     void getVBFjets_pTsorting(const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
-                              const xAOD::JetContainer *jets, TLorentzVector Jets_vbf[2]);
-    std::vector<float> makeXGBoostDMatrixLegacyNonres(const TLorentzVector& ph1, const TLorentzVector& ph2, 
+                              const xAOD::JetContainer *jets, std::array<TLorentzVector, 2>& Jets_vbf);
+    std::vector<float> makeXGBoostDMatrixLegacyNonres(const TLorentzVector& ph1, const TLorentzVector& ph2,
                                                       ConstDataVector<xAOD::JetContainer> &categorisation_jets,
                                                       const xAOD::MissingETContainer *met, const auto &sys,
                                                       const std::map<HHBBYY::Var, float> &m_eventFloats, bool isKFvariables, bool isGNNvariables);
-    
+
     StatusCode vbf_calculations(const TLorentzVector& ph1, const TLorentzVector& ph2,
                 const int& n_photons,
 				const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, const xAOD::JetContainer *jets,
 				double HT,const TLorentzVector& HH,
 				const std::string& prefix_j, const std::string& prefix_jj,
 				std::map<HHBBYY::Var, float> &eventFloats, const xAOD::EventInfo *event, const auto &sys);
-    
+
     void performCategorisationBDT(const TLorentzVector& ph1, const TLorentzVector& ph2,
-                                  const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2, 
+                                  const xAOD::Jet *Hbb_Jet1, const xAOD::Jet *Hbb_Jet2,
                                   const xAOD::JetContainer *jets,
                                   const xAOD::MissingETContainer *met,
                                   const auto &sys, std::map<HHBBYY::Var, float> &m_eventFloats,
@@ -213,11 +213,11 @@ namespace HHBBYY
     CP::SysReadHandle<xAOD::JetContainer>
       m_bbyyJetHandle{ this, "bbyyJets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
 
-    CP::SysReadDecorHandle<char> 
+    CP::SysReadDecorHandle<char>
     m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
     CP::SysReadDecorHandle<int> m_truthFlav{"HadronConeExclTruthLabelID", this};
 
-    CP::SysReadDecorHandle<int> 
+    CP::SysReadDecorHandle<int>
     m_PCBT {this, "PCBTDecorName", "", "Name of pseudo-continuous b-tagging decorator"};
 
     CP::SysReadDecorHandle<int>
@@ -237,29 +237,29 @@ namespace HHBBYY
 
     CP::SysReadDecorHandle<unsigned int> m_year
       {this, "year", "dataTakingYear", ""};
- 
+
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
     Gaudi::Property<bool> m_doKF
       { this, "doKF", false, "Do Kinematic Fit?" };
-    
+
     Gaudi::Property<std::vector<std::string>> m_floatVariables
       {this, "floatVariableList", {}, "Name list of float variables"};
-    
+
     Gaudi::Property<std::vector<std::string>> m_intVariables
       {this, "intVariableList", {}, "Name list of integer variables"};
 
     Gaudi::Property<bool> m_do_nonresonant_BDTs
       { this, "do_nonresonant_BDTs", false, "Do nonresonant BDT computations?" };
 
-    Gaudi::Property<std::vector<std::string>> m_bdts_path 
+    Gaudi::Property<std::vector<std::string>> m_bdts_path
       {this, "BDT_path", {}, "Path to BDT model"};
 
     Gaudi::Property<bool> m_doGNN_tagging
       { this, "doGNN_tagging", false, "Do GNN 2bjet Selection?" };
- 
-    Gaudi::Property<std::vector<std::string>> m_GNNs_path 
+
+    Gaudi::Property<std::vector<std::string>> m_GNNs_path
       {this, "GNN_path", {}, "Path to GNN model"};
 
     Gaudi::Property<std::string> m_vbfjets_method_str
@@ -282,23 +282,23 @@ namespace HHBBYY
 
     Gaudi::Property<bool> m_save_nonresonant_BDTInput_variables
       {this, "save_nonresonant_BDTInput_variables", false, "Compute quantities useful for the non-resonant BDT training"};
-    
-    CP::SysReadDecorHandle<float> m_Photon1_pt 
+
+    CP::SysReadDecorHandle<float> m_Photon1_pt
       { this, "Photon1_pt", "Photon1_pt_%SYS%", "Photon 1 pT decoration" };
-    CP::SysReadDecorHandle<float> m_Photon1_eta 
+    CP::SysReadDecorHandle<float> m_Photon1_eta
       { this, "Photon1_eta", "Photon1_eta_%SYS%", "Photon 1 eta decoration" };
-    CP::SysReadDecorHandle<float> m_Photon1_phi 
+    CP::SysReadDecorHandle<float> m_Photon1_phi
       { this, "Photon1_phi", "Photon1_phi_%SYS%", "Photon 1 phi decoration" };
-    CP::SysReadDecorHandle<float> m_Photon1_E 
+    CP::SysReadDecorHandle<float> m_Photon1_E
       { this, "Photon1_E", "Photon1_E_%SYS%", "Photon 1 Energy decoration" };
-    
-    CP::SysReadDecorHandle<float> m_Photon2_pt 
+
+    CP::SysReadDecorHandle<float> m_Photon2_pt
       { this, "Photon2_pt", "Photon2_pt_%SYS%", "Photon 2 pT decoration" };
-    CP::SysReadDecorHandle<float> m_Photon2_eta 
+    CP::SysReadDecorHandle<float> m_Photon2_eta
       { this, "Photon2_eta", "Photon2_eta_%SYS%", "Photon 2 eta decoration" };
-    CP::SysReadDecorHandle<float> m_Photon2_phi 
+    CP::SysReadDecorHandle<float> m_Photon2_phi
       { this, "Photon2_phi", "Photon2_phi_%SYS%", "Photon 2 phi decoration" };
-    CP::SysReadDecorHandle<float> m_Photon2_E 
+    CP::SysReadDecorHandle<float> m_Photon2_E
       { this, "Photon2_E", "Photon2_E_%SYS%", "Photon 2 Energy decoration" };
 
     CP::SysReadDecorHandle<int> m_nPhotons
@@ -313,7 +313,7 @@ namespace HHBBYY
 
     // Declare the GNNs
     std::vector<std::unique_ptr<Ort::Session>> m_sessions;
-    std::vector<std::unique_ptr<Ort::Env>> m_envs; 
+    std::vector<std::unique_ptr<Ort::Env>> m_envs;
 
     std::vector<std::vector<std::string>> m_input_node_names;
     std::vector<std::vector<std::string>> m_output_node_names;

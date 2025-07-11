@@ -65,8 +65,8 @@ namespace Easyjet
 
       SG::ReadDecorHandle<xAOD::JetContainer, int> truthLabelLinkedJet(m_truthLabelDecorKey);
       SG::WriteDecorHandle<xAOD::TauJetContainer, int> tauTruthJetLabelDecorHandle(m_tauTruthJetLabelDecorKey);
-    
-      typedef ElementLink< xAOD::JetContainer > Link_t; 
+
+      using Link_t = ElementLink< xAOD::JetContainer >;
       SG::ReadDecorHandle<xAOD::TauJetContainer, Link_t> tauLinkedJetLink(m_tauLinkedJetDecorKey);
 
       for(const xAOD::TauJet* tau : *tausIn) {
@@ -74,11 +74,11 @@ namespace Easyjet
 
         const Link_t& tauTruthJetLink = tauLinkedJetLink(*tau);
         const xAOD::Jet* tauTruthJet = tauTruthJetLink.isValid() ? tauTruthJetLink.cachedElement() : nullptr;
-        
+
         tauTruthJetLabelDecorHandle(*tau) = tauTruthJet ? truthLabelLinkedJet(*tauTruthJet) : -99;
       }
     }
-  
+
     return StatusCode::SUCCESS;
   }
 
