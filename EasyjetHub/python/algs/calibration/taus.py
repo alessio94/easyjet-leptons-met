@@ -44,7 +44,12 @@ def tau_sequence(flags, configAcc):
             configSeq.setOptionValue('.use_eVeto', True)
         if "GNTau" in id:
             configSeq.setOptionValue('.useGNTau', True)
+        if "lowpt" in id:
+            configSeq.setOptionValue('.useLowPt', True)
+        elif "nopt" in id:
+            configSeq.setOptionValue('.dropPtCut', True)
         quality = id.replace("_eleid", "").replace("GNTau", "").replace("RNN", "")
+        quality = quality.replace("_lowpt", "").replace("_nopt", "")
         configSeq.setOptionValue('.quality', quality)
         configSeq.setOptionValue('.saveCombinedSF', True)
 
@@ -77,7 +82,7 @@ def tau_sequence(flags, configAcc):
     configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
-    configSeq.setOptionValue('.minPt', 20e3)
+    configSeq.setOptionValue('.minPt', flags.Analysis.Tau.min_pT)
     configSeq.setOptionValue('.maxEta', 2.5)
 
     # Add systematic object links

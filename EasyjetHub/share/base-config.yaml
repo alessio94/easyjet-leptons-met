@@ -149,6 +149,7 @@ Muon:
   extra_wps: []
 
 Tau:
+  min_pT: 20.e+3
   ID: ""
   addMuonRM: false
   do_parent_decoration: false
