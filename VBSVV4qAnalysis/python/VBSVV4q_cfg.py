@@ -52,7 +52,7 @@ def VBSVV4q_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
             "JSSTaggerUtils/DisCoJetTagger",
             ContainerName=flags.Analysis.container_names.input.reco10UFOJet,
             CalibArea="Local",
-            ConfigFile="/VBSVV4qAnalysis/" + flags.Analysis.DisCoJetCfg
+            ConfigFile="VBSVV4qAnalysis/" + flags.Analysis.DisCoJetCfg
         )
 
         cfg.addEventAlgo(

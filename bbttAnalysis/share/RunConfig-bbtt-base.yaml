@@ -68,7 +68,7 @@ Muon:
 
 Tau:
   ID: "Baseline"
-  extra_wps: ["RNNLoose"]
+  extra_wps: ["RNNMedium"]
   do_parent_decoration: true
   amount: 2
   variables: ["RNN"]
