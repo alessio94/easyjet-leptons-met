@@ -101,7 +101,11 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
 
     if flags.Input.isMC and \
        flags.Analysis.Muon.do_IFF_decoration:
-        muon_branches.variables += ["IFFClass_NOSYS"]
+        muon_branches.variables += [
+            "IFFClass_NOSYS",
+            "truthType",
+            "truthOrigin"
+        ]
 
     if flags.Input.isMC and \
        tree_flags.collection_options.muons.truth_parent_info:

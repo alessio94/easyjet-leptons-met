@@ -75,7 +75,14 @@ def get_electron_branches(flags, tree_flags, input_container, output_prefix):
 
     if flags.Input.isMC and \
        flags.Analysis.Electron.do_IFF_decoration:
-        electron_branches.variables += ["IFFClass_NOSYS"]
+        electron_branches.variables += [
+            "IFFClass_NOSYS",
+            "truthType",
+            "truthOrigin",
+            "firstEgMotherTruthType",
+            "firstEgMotherTruthOrigin",
+            "firstEgMotherPdgId"
+        ]
 
     if flags.Input.isMC and \
        tree_flags.collection_options.electrons.truth_parent_info:
