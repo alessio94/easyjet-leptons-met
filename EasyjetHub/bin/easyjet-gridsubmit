@@ -114,6 +114,13 @@ def main():
         default="easyjet",
         help="The name of the framework to use during submission"
     )
+
+    parser.add_argument(
+        "--site",
+        type=str,
+        required=False,
+        help="Specific site on which the jobs should be run"
+    )
     args = parser.parse_args()
 
     # check ntupler command is available before submitting
@@ -176,6 +183,8 @@ def main():
         submit_opts["noEmail"] = True
     if args.framework:
         submit_opts["framework"] = args.framework
+    if args.site:
+        submit_opts["site"] = args.site
 
     if args.asetup is None:
         atlas_project = os.environ["AtlasProject"]
