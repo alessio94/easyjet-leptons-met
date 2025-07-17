@@ -1,4 +1,4 @@
-include: bbllAnalysis/RunConfig-bbll.yaml
+include: bbllAnalysis/RunConfig-bbll-Run2.yaml
 
 NeutrinoWeighting:
   include: NeutrinoWeighting.yaml
@@ -15,5 +15,11 @@ save_extra_vars: false
 Trigger:
   writeOutput: False
 
+Truth:
+  do_STXS: false
+
 do_CP_systematics: true
-systematics_regex: ["^(?!.*(MUON|MET|JER)).*$"] #every syst apart from these
+systematics_regex: [".*(MUON|MET|JER).*"] #exactly these systs
+
+
+

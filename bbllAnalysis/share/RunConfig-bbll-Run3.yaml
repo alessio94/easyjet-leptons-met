@@ -66,7 +66,14 @@ orthogonality:
 # list of triggers per year to consider
 Trigger:
   include: bbllAnalysis/trigger.yaml
-  writeOutput: True  
+  writeOutput: True
+  scale_factor:
+    Electron:
+      ID: "Tight"
+      Iso: "Tight_VarRad"
+    Muon:
+      ID: "Medium"
+
 # apply trigger lists to filter events
 do_trigger_filtering: true
 

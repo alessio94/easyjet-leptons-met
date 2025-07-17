@@ -1,4 +1,4 @@
-include: bbllAnalysis/RunConfig-bbll.yaml
+include: bbllAnalysis/RunConfig-bbll-Run2.yaml
 
 bypass: true #enabling Run through mode
 do_trigger_filtering: false
