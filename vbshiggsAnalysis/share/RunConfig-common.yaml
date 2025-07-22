@@ -50,6 +50,8 @@ Electron:
   ID: "MediumLH"
   Iso: "Loose_VarRad"
   amount: 0
+  ## Only correlation scheme supported
+  correlationModelId: "TOTAL"
 
 Muon:
   ID: "Medium"

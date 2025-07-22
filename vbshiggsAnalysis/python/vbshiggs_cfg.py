@@ -71,7 +71,6 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                 DecTag="_boostedCategory"
             )
         )
-
     if flags.Analysis.do_resolved:
         # set jets container labels
         if flags.Analysis.UseVBFRNN:

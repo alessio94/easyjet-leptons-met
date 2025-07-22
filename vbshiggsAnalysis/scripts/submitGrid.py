@@ -15,7 +15,7 @@ def get_args():
     parser.add_argument("-s", "--samples", required=True,
                         help="Space-delimited list of samples, \"EWVVjj VH\"")
     parser.add_argument("--tag", required=True)
-    parser.add_argument("-c", "--config")
+    parser.add_argument("-c", "--config", required=True)
     parser.add_argument("--HMBS", default=None, const=True, action='store',
                         nargs='?', help="HMBS production role")
     parser.add_argument("--nGBPerJob", default=-1, type=int)
@@ -48,16 +48,11 @@ def get_list_files(processes):
 def main(args):
 
     executable = "vbshiggs-ntupler"
-    runConfig = "vbshiggsAnalysis/RunConfig-fullLep.yaml"
-
-    if args.config:
-        runConfig = args.config
-
     mc_list = []
     # all submit all signals + bkgs
     if args.samples == "all":
         processes = ["EWVVjj", "VH", "Wjets", "Zjets", "stop", "ttH", "ttV", "ttW",
-                     "ttbar", "VVV", "Vgamma", "FullLep_signal", "tty"]
+                     "ttbar", "VVV", "Vgamma", "tty"]
         mc_list = get_list_files(processes)
     else:
         mc_list = get_list_files(args.samples.split())
@@ -65,7 +60,7 @@ def main(args):
     for mc_file in mc_list:
         base_command = (
             f"easyjet-gridsubmit --mc-list {mc_file} "
-            f"--run-config {runConfig} "
+            f"--run-config {args.config} "
             f"--exec {executable} "
             f"--campaign {args.tag} "
             f"--noTag --mergeOutput --noEmail"

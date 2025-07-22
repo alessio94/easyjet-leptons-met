@@ -54,26 +54,33 @@ def get_BaselineVarsSemiLepAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["Hjj", "VBSjj"]:
-        for var in ["dR", "dEta", "dPhi"]:
-            float_variable_names.append(f"{var}{object}")
+    obj = "LargeJet1"
+    for var in ["m", "pt", "eta", "phi", "GN2X"]:
+        float_variable_names.append(f"{obj}_{var}")
+    for var in ["phbb", "pqcd", "phcc", "ptop"]:
+        float_variable_names.append(f"{obj}_GN2X_{var}")
 
-    for object in ["VBSJ1", "VBSJ2", "LargeJet1", "Hdijet", "VBSdijet"]:
-        for var in ["m", "pt", "eta", "phi"]:
-            float_variable_names.append(f"{object}_{var}")
-
-    for object in ["Jet_Higgs_candidate1", "Jet_Higgs_candidate2"]:
+    for obj in ["Jet_Higgs_candidate1", "Jet_Higgs_candidate2"]:
         for var in ["m", "pt", "eta", "phi", "E"]:
-            float_variable_names.append(f"{object}_{var}")
+            float_variable_names.append(f"{obj}_{var}")
         for var in ["pcbt", "truthLabel"]:
-            int_variable_names.append(f"{object}_{var}")
+            int_variable_names.append(f"{obj}_{var}")
 
-    float_variable_names += ["dPhilMET", "METSig", "dRbl_min", "Lepton_MET_mT",
-                             "LargeJet1_DXbb", "LargeJet1_phbb", "LargeJet1_phcc",
-                             "LargeJet1_pqcd", "LargeJet1_ptop"]
+    for obj in ["Hdijet", "resolvedWCandidate1",
+                "resolvedWCandidate2", "boostedWCandidate1",
+                "boostedWCandidate2", "boostedWdijet", "resolvedWdijet",
+                "VBSJ1", "VBSJ2", "VBSdijet"]:
+        for var in ["m", "pt", "eta", "phi"]:
+            float_variable_names.append(f"{obj}_{var}")
 
-    int_variable_names += ["nLargeJets", "nJets", "nBJets", "nCentralJets",
-                           "nForwardJets", "nLeptons", "nElectrons", "nMuons"]
+    obj = "VBSjj"
+    for var in ["dR", "dEta", "dPhi"]:
+        float_variable_names.append(f"{var}{obj}")
+
+    float_variable_names += ["dRHjj", "dPhiHjj", "dEtaHjj", "METSig", "W_mT"]
+
+    int_variable_names += ["nLeptons", "nSigJets", "nBJets", "nCentralJets",
+                           "nForwardJets", "nJets", "nLargeJets"]
 
     return float_variable_names, int_variable_names
 

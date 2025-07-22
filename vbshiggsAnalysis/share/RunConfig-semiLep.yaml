@@ -3,6 +3,12 @@ include: vbshiggsAnalysis/RunConfig-common.yaml
 # Which analysis to consider
 channels: ["SemiLep"]
 
+## Run resolved category
+do_resolved: true
+
+# Use VBFRNN tagger
+UseVBFRNN : false
+
 # Toggles for object types
 do_muons: true
 do_electrons: true
@@ -14,41 +20,74 @@ Electron:
   Iso: "Loose_VarRad"
   amount: 2
   extra_wps:
+    - ["LooseBLayerLH", "Tight_VarRad"]
+
     - ["MediumLH", "Loose_VarRad"]
     - ["MediumLH", "Tight_VarRad"]
-    - ["MediumLH", "TightTrackOnly_VarRad"]
-    - ["MediumLH", "TightTrackOnly_FixedRad"]
+    - ["MediumLH", "NonIso"]
 
     - ["TightLH", "Loose_VarRad"]
     - ["TightLH", "Tight_VarRad"]
-    - ["TightLH", "TightTrackOnly_VarRad"]
-    - ["TightLH", "TightTrackOnly_FixedRad"]
+    - ["TightLH", "NonIso"]
 
     - ["LooseDNNElectron", "Loose_VarRad"]
     - ["LooseDNNElectron", "Tight_VarRad"]
-    - ["LooseDNNElectron", "TightTrackOnly_VarRad"]
-    - ["LooseDNNElectron", "TightTrackOnly_FixedRad"]
 
     - ["MediumDNNElectron", "Loose_VarRad"]
     - ["MediumDNNElectron", "Tight_VarRad"]
-    - ["MediumDNNElectron", "TightTrackOnly_VarRad"]
-    - ["MediumDNNElectron", "TightTrackOnly_FixedRad"]
 
     - ["TightDNNElectron", "Loose_VarRad"]
     - ["TightDNNElectron", "Tight_VarRad"]
-    - ["TightDNNElectron", "TightTrackOnly_VarRad"]
-    - ["TightDNNElectron", "TightTrackOnly_FixedRad"]
+  do_IFF_decoration: true
+  do_reco_decoration: true
+
 Muon:
   ID: "Loose"
   Iso: "PflowLoose_VarRad"
   amount: 2
   extra_wps:
+    - ["Loose", "PflowTight_VarRad"]
+    
     - ["Medium", "PflowLoose_VarRad"]
     - ["Medium", "PflowTight_VarRad"]
+    - ["Medium", "NonIso"]
 
     - ["Tight", "PflowLoose_VarRad"]
     - ["Tight", "PflowTight_VarRad"]
+    - ["Tight", "NonIso"]
 
+    - ["HighPt", "PflowLoose_VarRad"]
+    - ["HighPt", "PflowTight_VarRad"]
+    - ["HighPt", "NonIso"]
+  do_IFF_decoration: true
+  do_reco_decoration: true
+
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  # btagging working points 
+  btag_wp: "GN2v01_FixedCutBEff_90"
+  amount: 0
+  useFJvt: true
+  # to use multiple btagging WPs
+  btag_extra_wps:
+    - GN2v01_Continuous
+
+Large_R_jet:
+  min_pT: 200.e+3
+  maxEta: 2.0
+  runMuonJetPtCorr: false
+  amount_leadingjet: 1
+  GN2X_hbb_wps:
+    - "FlatMassQCDEff_0p25"
+    - "FlatMassQCDEff_0p3"
+    - "FlatMassQCDEff_0p37"
+    - "FlatMassQCDEff_0p46"
+    - "FlatMassQCDEff_0p58"
+    - "FlatMassQCDEff_0p74"
+    - "FlatMassQCDEff_0p94"
+    - "FlatMassQCDEff_1p25"
+    - "FlatMassQCDEff_1p55"
 
 Lepton:
   amount: 1
@@ -60,16 +99,3 @@ Trigger:
 
 CutList :
       - PASS_TRIGGER 
-      - PASS_ONE_LEPTON
-      - PASS_MET
-      - PASS_RES_AT_LEAST_ONE_B_JET
-      - PASS_RES_EXACTLY_ONE_B_JET
-      - PASS_RES_EXACTLY_TWO_B_JETS
-      - PASS_RES_NOADD_B_JET
-      - PASS_ONE_LARGE_JET
-      - PASS_TWO_SIGNAL_JETS
-      - PASS_DELTA_R_BB
-      - PASS_RES_H_WINDOW
-      - PASS_VBS_BASELINE
-      - PASS_RES_BASELINE
-      - PASS_MERG_BASELINE

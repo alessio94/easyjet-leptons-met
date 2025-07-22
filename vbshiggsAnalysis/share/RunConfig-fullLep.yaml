@@ -19,6 +19,7 @@ Electron:
   ID: "LooseBLayerLH"
   Iso: "NonIso"
   amount: 0
+  correlationModelId: "TOTAL"
   extra_wps:
     - ["LooseBLayerLH", "Loose_VarRad"]
     - ["LooseBLayerLH", "Tight_VarRad"]
@@ -86,7 +87,6 @@ Small_R_jet:
   # btagging working points 
   btag_wp: "GN2v01_FixedCutBEff_90"
   amount: 0
-  
   # to use multiple btagging WPs
   btag_extra_wps:
     - GN2v01_Continuous
