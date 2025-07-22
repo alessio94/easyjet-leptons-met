@@ -91,7 +91,7 @@ selection:
     - 'HLT_mu22_mu8noL1_L1MU14FCH'
 
 scale_factor:
-  doSF: false
+  doSF: true
 
   chains:
     '2015':
@@ -135,8 +135,9 @@ scale_factor:
 
     '2022':
     # No single + di-ele working point compatible with Run 2
-    #- 'HLT_e26_lhtight_ivarloose_L1EM22VHI || HLT_e60_lhmedium_L1EM22VHI || HLT_e140_lhloose_L1EM22VHI'
+    - 'HLT_e26_lhtight_ivarloose_L1EM22VHI || HLT_e60_lhmedium_L1EM22VHI || HLT_e140_lhloose_L1EM22VHI'
     - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+    - 'HLT_2e17_lhvloose_L12EM15VHI'
     #- 'HLT_2e17_lhvloose_L12EM15VHI'
     #- 'HLT_2e24_lhvloose_L12EM20VH'
     # No e+mu trigger yet for Run 3
@@ -150,8 +151,9 @@ scale_factor:
     - 'HLT_2mu14_L12MU8F'
 
     '2023':
-    #- 'HLT_e26_lhtight_ivarloose_L1EM22VHI || HLT_e60_lhmedium_L1EM22VHI || HLT_e140_lhloose_L1EM22VHI'
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
     - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+    - 'HLT_2e17_lhvloose_L12eEM18M'
     #- 'HLT_2e17_lhvloose_L12eEM18M'
     #- 'HLT_2e24_lhvloose_L12eEM24L'
     #- 'HLT_e7_lhmedium_mu24_L1MU14FCH'
