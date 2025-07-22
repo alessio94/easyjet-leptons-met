@@ -41,3 +41,5 @@ ttree_output:
   # Our overrides. All defaults are off
   reco_outputs:
     small_R_jets: 'container_names.output.reco4PFlowJet'
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
