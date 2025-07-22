@@ -111,7 +111,7 @@ namespace HHBBTT
         mu_tau_paths_high.emplace_back("HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA");
       }
       // No muon SF leg yet
-      mu_tau_SF_path = std::make_pair("", "tau25_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA");
+      mu_tau_SF_path = std::make_pair("", "tau25_medium1_tracktwoEF");
     }
     else if(year>=2022 && year<=2023){
       mu_tau_paths_low = {"HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU12IM_3J12"};
@@ -151,7 +151,7 @@ namespace HHBBTT
         ele_tau_paths_4J12.emplace_back("HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA_L1EM15VHI_2TAU12IM_4J12");
       }
       ele_tau_SF_path = std::make_pair("e17_lhmedium_nod0_AND_e17_lhvloose_nod0_L1EM15VHI",
-				       "tau25_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA");
+				       "tau25_medium1_tracktwoEF");
     }
     else if(year==2022){
       ele_tau_paths = {"HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1EM22VHI"};
@@ -190,7 +190,6 @@ namespace HHBBTT
       single_tau_SF_path = "tau160L1TAU100_medium1_tracktwoEF";
       if(runBoolDecos.at(HHBBTT::is18PeriodK_end)(*eventInfo)){
         single_tau_paths.emplace_back("HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100");
-        single_tau_SF_path = "tau160L1TAU100_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA";
       }
     }
     else if(year==2022){
@@ -273,8 +272,8 @@ namespace HHBBTT
         tau25_match_paths.emplace_back("HLT_tau25_mediumRNN_tracktwoMVA");
       }
 
-      di_tau_SF_path = std::make_pair("tau35_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA",
-				      "tau25_medium1_tracktwoEF_OR_mediumRNN_tracktwoMVA");
+      di_tau_SF_path = std::make_pair("tau35_medium1_tracktwoEF",
+				      "tau25_medium1_tracktwoEF");
     }
 
     else if(year==2022){
