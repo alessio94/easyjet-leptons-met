@@ -319,6 +319,9 @@ def minituple_cfg(
     seqname = "OutputSeq"
     cfg.addSequence(parOR(seqname))
 
+    ntuple_output_file_list = []
+    channelList = [""]
+
     if flags.Analysis.splitCBK:
         # Define output stream for cut bookkeeper
         cbk_outfile = flags.Analysis.out_file.replace(".root", "_cbk.root")
@@ -329,9 +332,8 @@ def minituple_cfg(
                 MaxFileSize=-1  # Disable file size limit as temporary workaround
             )
         )
+        ntuple_output_file_list.append(cbk_outfile)
 
-    ntuple_output_file_list = []
-    channelList = [""]
     if flags.Analysis.splitOutputTree:
         channelList = flags.Analysis.channels
 
@@ -365,12 +367,10 @@ def minituple_cfg(
     return cfg, ntuple_output_file_list
 
 
-def check_ntuple_output_file(
-        ntuple_output_file_list):
-
+def check_ntuple_output_file(ntuple_output_file_list):
     for out_file_name in ntuple_output_file_list:
         out_file = ROOT.TFile.Open(out_file_name, "READ")
         if out_file.IsZombie() or out_file.TestBit(ROOT.TFile.kRecovered):
             raise RuntimeError(
-                "Output file ", out_file_name, " not properly closed"
+                f"Output file {out_file_name} not properly closed"
             )
