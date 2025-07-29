@@ -104,15 +104,25 @@ ntupler_lltt_mc20:
   script:
     - easyjet-test lltt-mc20
 
-ntupler_vbshiggs_mc20:
+ntupler_vbshiggs_fulllep_mc20:
   extends: .ntupler
   script:
-    - easyjet-test vbshiggs-mc20
+    - easyjet-test vbshiggs-fulllep-mc20
 
-ntupler_vbshiggs_mc20_lite:
+ntupler_vbshiggs_fulllep_mc20_lite:
   extends: .ntupler
   script:
-    - easyjet-test vbshiggs-mc20-lite
+    - easyjet-test vbshiggs-fulllep-mc20-lite
+
+ntupler_vbshiggs_semilep_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test vbshiggs-semilep-mc20
+
+ntupler_vbshiggs_semilep_mc20_lite:
+  extends: .ntupler
+  script:
+    - easyjet-test vbshiggs-semilep-mc20-lite
 
 ntupler_VBSVV4q_mc20:
   extends: .ntupler
