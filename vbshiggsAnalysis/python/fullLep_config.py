@@ -179,10 +179,5 @@ def fullLep_branches(flags):
                     "ele0_trigMatched", "ele1_trigMatched",
                     "mu0_trigMatched", "mu1_trigMatched"]:
             branches += [f"EventInfo.{cat}_%SYS% -> {cat}_%SYS%"]
-        if flags.Input.isMC and flags.Analysis.do_trigsf:
-            for cat in ["ele0_trigEffSF", "ele1_trigEffSF",
-                        "mu0_trigEffSF", "mu1_trigEffSF",
-                        "event_trigEffSF"]:
-                branches += [f"EventInfo.{cat}_%SYS% -> {cat}_%SYS%"]
 
     return branches, float_variable_names, int_variable_names

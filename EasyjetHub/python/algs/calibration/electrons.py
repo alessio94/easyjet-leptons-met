@@ -50,9 +50,11 @@ def electron_sequence(flags, configAcc):
                                  flags.Analysis.Electron.maxD0Significance)
         configSeq.setOptionValue('.maxDeltaZ0SinTheta',
                                  flags.Analysis.Electron.maxDeltaZ0SinTheta)
+        # Run 2 ECIDs SFs support only Tight_VarRad wp
         configSeq.setOptionValue('.chargeIDSelectionRun2',
                                  flags.Analysis.Electron.chargeIDSelectionRun2
-                                 and flags.GeoModel.Run is LHCPeriod.Run2)
+                                 and flags.GeoModel.Run is LHCPeriod.Run2
+                                 and iso == "Tight_VarRad")
         configSeq.setOptionValue('.correlationModelId',
                                  flags.Analysis.Electron.correlationModelId)
         configSeq.setOptionValue('.correlationModelIso',

@@ -61,27 +61,6 @@ namespace VBSHIGGS
       ANA_CHECK(mu1_trigMatched_decor.initialize(m_systematicsList, m_eventHandle));
     }
 
-    // Trigger SF tool
-    for(const auto& trig : m_eleTrigSF){
-      m_eleTriggerSF.emplace
-        (trig, CP::SysReadDecorHandle<float>("el_trigEffSF_"+trig+"_%SYS%", this));
-      ATH_CHECK (m_eleTriggerSF.at(trig).initialize(m_systematicsList, m_electronHandle));
-    }
-
-    for(const auto& trig : m_muTrigSF){
-      m_muTriggerSF.emplace
-        (trig, CP::SysReadDecorHandle<float>("muon_trigEffSF_"+trig+"_%SYS%", this));
-      ATH_CHECK (m_muTriggerSF.at(trig).initialize(m_systematicsList, m_muonHandle));
-    }
-
-    ATH_CHECK(m_ele0TriggerSF.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_ele1TriggerSF.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_mu0TriggerSF.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_mu1TriggerSF.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK(m_eventTriggerSF.initialize(m_systematicsList, m_eventHandle));
-
-    ////////////////////////////////
-
     ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
@@ -162,28 +141,10 @@ namespace VBSHIGGS
     if (electrons->size() == 0 && muons->size() == 1) {
       mu0 = muons->at(0);
     }
-
-    float ele0_trigSF = 1.0;
-    float ele1_trigSF = 1.0;
-    float mu0_trigSF = 1.0;
-    float mu1_trigSF = 1.0;
-    float eventTriggerSF = 1.0;
     
     // Based on decision of group, only SLT will remain in the analysis code
-    if (ele0 || mu0) evaluateSingleLeptonTrigger(event, runBoolDecos, ele0, mu0, sys, ele0_trigPassed, mu0_trigPassed, ele0_trigMatched, mu0_trigMatched, ele0_passSET, mu0_passSMT, ele0_trigSF, mu0_trigSF);
-    if (ele1 || mu1) evaluateSingleLeptonTrigger(event, runBoolDecos, ele1, mu1, sys, ele1_trigPassed, mu1_trigPassed, ele1_trigMatched, mu1_trigMatched, ele1_passSET, mu1_passSMT, ele1_trigSF, mu1_trigSF);
-
-    // For now, turn of muon trigger SF as there are things I don't understand here
-    if (ele0_passSET) eventTriggerSF *= ele0_trigSF;
-    if (mu0_passSMT)  eventTriggerSF *= mu0_trigSF;
-    if (ele1_passSET) eventTriggerSF *= ele1_trigSF;
-    if (mu1_passSMT)  eventTriggerSF *= mu1_trigSF;
-
-    m_ele0TriggerSF.set(*event, ele0_trigSF, sys);
-    m_ele1TriggerSF.set(*event, ele1_trigSF, sys);
-    m_mu0TriggerSF.set(*event, mu0_trigSF, sys);
-    m_mu1TriggerSF.set(*event, mu1_trigSF, sys);
-    m_eventTriggerSF.set(*event, eventTriggerSF, sys);
+    if (ele0 || mu0) evaluateSingleLeptonTrigger(event, runBoolDecos, ele0, mu0, sys, ele0_trigPassed, mu0_trigPassed, ele0_trigMatched, mu0_trigMatched, ele0_passSET, mu0_passSMT);
+    if (ele1 || mu1) evaluateSingleLeptonTrigger(event, runBoolDecos, ele1, mu1, sys, ele1_trigPassed, mu1_trigPassed, ele1_trigMatched, mu1_trigMatched, ele1_passSET, mu1_passSMT);
 
     if(m_saveHighLevelVariables) {
       // Store the output as decorators which will be written into the nTuples
@@ -210,13 +171,12 @@ namespace VBSHIGGS
    const CP::SystematicSet& sys,
    std::vector<std::string>& ele_trigPassed, std::vector<std::string>& mu_trigPassed,
    std::vector<std::string>& ele_trigMatched, std::vector<std::string>& mu_trigMatched,
-   bool& ele_passSET, bool& mu_passSMT, float& ele_trigSF, float& mu_trigSF)
+   bool& ele_passSET, bool& mu_passSMT)
   {
     // Check single electron triggers
     std::vector<std::string> single_ele_paths;
-    std::string single_ele_SF_path;
     int year = m_year.get(*event, sys);
-    getSingleEleTriggers(year, event, runBoolDecos, single_ele_paths, single_ele_SF_path);
+    getSingleEleTriggers(year, event, runBoolDecos, single_ele_paths);
 
     bool trigPassed_SET = false;
     if(ele){
@@ -231,18 +191,11 @@ namespace VBSHIGGS
       }
       trigPassed_SET &= ele->pt() > m_pt_threshold[VBSHIGGS::SLT][VBSHIGGS::ele];
       ele_passSET = trigPassed_SET;
-
-      // If electron is matched to one of the single lepton triggers, then get the SF for the OR SLT chain
-      if(trigPassed_SET) {
-        if (!single_ele_SF_path.empty() && m_eleTriggerSF.contains(single_ele_SF_path)) ele_trigSF *= m_eleTriggerSF.at(single_ele_SF_path).get(*ele, sys);
-        else if (!single_ele_SF_path.empty()) ATH_MSG_WARNING("Missing trigger SF handle: " + single_ele_SF_path);
-      }
     }
 
     // Check single muon triggers
     std::vector<std::string> single_mu_paths;
-    std::string single_mu_SF_path;
-    getSingleMuTriggers(year, event, runBoolDecos, single_mu_paths, single_mu_SF_path);
+    getSingleMuTriggers(year, event, runBoolDecos, single_mu_paths);
 
     bool trigPassed_SMT = false;
     if (mu){
@@ -258,11 +211,6 @@ namespace VBSHIGGS
       trigPassed_SMT &= mu->pt() > m_pt_threshold[VBSHIGGS::SLT][VBSHIGGS::mu];
       mu_passSMT = trigPassed_SMT;
 
-      // If muon is matched to one of the single lepton triggers, then get the SF for the OR SLT chain
-      if(trigPassed_SMT) {
-        if (!single_mu_SF_path.empty() && m_muTriggerSF.contains(single_mu_SF_path)) mu_trigSF *= m_muTriggerSF.at(single_mu_SF_path).get(*mu, sys);
-        else if (!single_mu_SF_path.empty()) ATH_MSG_WARNING("Missing trigger SF handle: " + single_mu_SF_path);
-      }
     }
 
     if(trigPassed_SET || trigPassed_SMT){

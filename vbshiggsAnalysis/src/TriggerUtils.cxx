@@ -8,20 +8,18 @@ namespace VBSHIGGS
 {
   void getSingleEleTriggers(int year, const xAOD::EventInfo* event,
 			    const runBoolReadDecoMap& runBoolDecos,
-			    std::vector<std::string>& single_ele_paths, std::string& single_ele_SF_path){
+			    std::vector<std::string>& single_ele_paths){
     if(year==2015){
       single_ele_paths = {
         "HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium",
         "HLT_e120_lhloose"
       };
-      single_ele_SF_path = "e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose";
     }
     else if(2016<=year && year<=2018){
       single_ele_paths = {
         "HLT_e26_lhtight_nod0_ivarloose", "HLT_e60_lhmedium_nod0",
         "HLT_e140_lhloose_nod0"
       };
-      single_ele_SF_path = "e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0";
     }
     else if(runBoolDecos.at(VBSHIGGS::is22_75bunches)(*event)){
       single_ele_paths = {
@@ -53,14 +51,12 @@ namespace VBSHIGGS
 
   void getSingleMuTriggers(int year, const xAOD::EventInfo* event,
 			   const runBoolReadDecoMap& runBoolDecos,
-			   std::vector<std::string>& single_mu_paths, std::string& single_mu_SF_path){
+			   std::vector<std::string>& single_mu_paths){
     if(year==2015){
       single_mu_paths = {"HLT_mu20_iloose_L1MU15", "HLT_mu40"};
-      single_mu_SF_path = "mu20_iloose_L1MU15_OR_mu40";
     }
     else if(2016<=year && year<=2018){
       single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
-      single_mu_SF_path = "mu26_ivarmedium_OR_mu50";
     }
     else if(2022<=year && year<=2023 &&
 	    !runBoolDecos.at(VBSHIGGS::is22_75bunches)(*event) &&

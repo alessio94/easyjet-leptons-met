@@ -50,9 +50,9 @@ namespace VBSHIGGS{
         ATH_CHECK (m_mu_truthOrigin.initialize(m_systematicsList, m_vbsMuonHandle));
         ATH_CHECK (m_mu_truthType.initialize(m_systematicsList, m_vbsMuonHandle));
 
-	ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
-	m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
-	ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
+        ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
+        m_ele_SF = CP::SysReadDecorHandle<float>("effSF_"+m_eleWPName+"_%SYS%", this);
+        ATH_CHECK (m_ele_SF.initialize(m_systematicsList, m_electronHandle));
 
         ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
         m_mu_SF = CP::SysReadDecorHandle<float>("effSF_"+m_muWPName+"_%SYS%", this);

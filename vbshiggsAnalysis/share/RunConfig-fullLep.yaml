@@ -16,6 +16,7 @@ VGammaOR_dR_lepton_photon_cuts: [0.3]
 Electron:
   maxD0Significance: 10
   maxDeltaZ0SinTheta: 0.5
+  chargeIDSelectionRun2: true
   ID: "LooseBLayerLH"
   Iso: "NonIso"
   amount: 0
@@ -38,20 +39,6 @@ Electron:
     - ["TightLH", "TightTrackOnly_FixedRad"]
     - ["TightLH", "NonIso"]
 
-    - ["LooseDNNElectron", "Loose_VarRad"]
-    - ["LooseDNNElectron", "Tight_VarRad"]
-    - ["LooseDNNElectron", "TightTrackOnly_VarRad"]
-    - ["LooseDNNElectron", "TightTrackOnly_FixedRad"]
-
-    - ["MediumDNNElectron", "Loose_VarRad"]
-    - ["MediumDNNElectron", "Tight_VarRad"]
-    - ["MediumDNNElectron", "TightTrackOnly_VarRad"]
-    - ["MediumDNNElectron", "TightTrackOnly_FixedRad"]
-
-    - ["TightDNNElectron", "Loose_VarRad"]
-    - ["TightDNNElectron", "Tight_VarRad"]
-    - ["TightDNNElectron", "TightTrackOnly_VarRad"]
-    - ["TightDNNElectron", "TightTrackOnly_FixedRad"]
   do_IFF_decoration: true
   do_reco_decoration: true
 Muon:

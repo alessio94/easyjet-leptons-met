@@ -63,10 +63,6 @@ namespace VBSHIGGS
       { this, "muTriggerSF", {}, "List of muon trigger SF" };
       std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_muTriggerSF;
 
-      CP::SysWriteDecorHandle<float> m_ele0TriggerSF {this, "ele0_trigEffSF", "ele0_trigEffSF_%SYS%", "Object-level electron 0 trigger scale factor"};
-      CP::SysWriteDecorHandle<float> m_ele1TriggerSF {this, "ele1_trigEffSF", "ele1_trigEffSF_%SYS%", "Object-level electron 1 trigger scale factor"};
-      CP::SysWriteDecorHandle<float> m_mu0TriggerSF {this, "mu0_trigEffSF", "mu0_trigEffSF_%SYS%", "Object-level muon 0 trigger scale factor"};
-      CP::SysWriteDecorHandle<float> m_mu1TriggerSF {this, "mu1_trigEffSF", "mu1_trigEffSF_%SYS%", "Object-level muon 1 trigger scale factor"};
       CP::SysWriteDecorHandle<float> m_eventTriggerSF {this, "event_trigEffSF", "event_trigEffSF_%SYS%", "Event-level trigger scale factor"};
 
       Gaudi::Property<bool> m_saveHighLevelVariables
@@ -129,7 +125,7 @@ namespace VBSHIGGS
 				       const CP::SystematicSet& sys, 
                std::vector<std::string>& ele_trigPassed, std::vector<std::string>& mu_trigPassed,
                std::vector<std::string>& ele_trigMatched, std::vector<std::string>& mu_trigMatched,
-               bool& ele_passSET, bool& mu_passSMT, float& ele_trigSF, float& mu_trigSF);
+               bool& ele_passSET, bool& mu_passSMT);
       void setThresholds(const xAOD::EventInfo* event,
 			 const runBoolReadDecoMap& runBoolDecos,
 			 const CP::SystematicSet& sys);

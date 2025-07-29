@@ -20,6 +20,7 @@ Electron:
     - ["TightLH", "Tight_VarRad"]
   do_IFF_decoration: true
   do_reco_decoration: true
+  chargeIDSelectionRun2: true
   
 Muon:
   ID: "Loose"
