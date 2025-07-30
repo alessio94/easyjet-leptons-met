@@ -90,3 +90,5 @@ ttree_output:
   collection_options:
     small_R_jets:
       btag_info: true
+    large_R_jets:
+      truth_labels: true
