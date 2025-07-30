@@ -85,6 +85,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             muons=muonkey, muonWP=MuonWPLabel,
             floatVariableList=float_variables['leptons'],
             intVariableList=int_variables['leptons'],
+            save_extra_vars=flags.Analysis.save_extra_vars,
             doSystematics=flags.Analysis.do_CP_systematics,
         )
     )
@@ -99,6 +100,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
             PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps],
             floatVariableList=float_variables['jets'],
             intVariableList=int_variables['jets'],
+            save_extra_vars=flags.Analysis.save_extra_vars,
             doSystematics=flags.Analysis.do_CP_systematics,
         )
     )
