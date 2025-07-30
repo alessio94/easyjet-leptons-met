@@ -34,6 +34,19 @@ namespace HH4B
     J75,
     J80,
   };
+
+  enum TriggerType
+  {
+    L1,
+    HLT
+  };
+
+  enum TriggerSFSystType
+  {
+    SF_NOSYS,
+    SF_STAT,
+    SF_SYST
+  };
   
   class TriggerDecoratorAlg final : public AthReentrantAlgorithm
   {
@@ -66,13 +79,27 @@ namespace HH4B
 
     Gaudi::Property<std::vector<std::string>> m_triggers
       { this, "triggerLists", {}, "Name list of trigger" };
+    Gaudi::Property<bool> m_doL1SF{this, "doL1SF", false, "Include jet trigger L1 SF"};
+    Gaudi::Property<bool> m_doHLTSF{this, "doHLTSF", false, "Include jet trigger HLT SF"};
+    Gaudi::Property<bool> m_isMC { this, "isMC", false, "Is this simulation?" };
     std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::EventInfo> >
       m_triggerdecoKeys;
+
+    typedef std::pair<HH4B::TriggerType, HH4B::TriggerSFSystType> triggerSFType;
+    typedef std::map<triggerSFType, std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::EventInfo, float>>> triggerSFIndivReadDecoMap;
+
+    std::map<triggerSFType, std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::EventInfo> >> 
+      m_triggerSFIndivDecoKeysCont;
 
     std::unordered_map<HH4B::TriggerChannel, SG::WriteDecorHandleKey<xAOD::EventInfo> > 
       m_pass_DecorKey;
 
+    std::vector<triggerSFType> m_triggerSFTypeList;
+
+    std::string getSFDecorKeyName( const triggerSFType t) const;
+
     SG::WriteDecorHandleKey<xAOD::EventInfo> m_bucketDecoratorKey{"EventInfo.bucket"};
+    std::map<triggerSFType, SG::WriteDecorHandleKey<xAOD::EventInfo>> m_trigSFDecoratorKeys;
 
     typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::EventInfo, bool> > trigReadDecoMap;
     typedef std::unordered_map<HH4B::TriggerChannel, SG::WriteDecorHandle<xAOD::EventInfo, bool> > passWriteDecoMap;
@@ -85,8 +112,11 @@ namespace HH4B
     void evaluateTriggerBuckets(const xAOD::EventInfo* eventInfo, 
                                 const SG::ReadDecorHandle<xAOD::EventInfo, unsigned int>& year, 
                                 SG::ReadHandle<xAOD::JetContainer> jets, 
+                                const triggerSFIndivReadDecoMap& triggersf_decos,
                                 passWriteDecoMap& pass_decos, 
-                                SG::WriteDecorHandle<xAOD::EventInfo, int>& m_bucketDecorator) const;
+                                SG::WriteDecorHandle<xAOD::EventInfo, int>& bucketDecorator,
+                                std::map<triggerSFType, SG::WriteDecorHandle<xAOD::EventInfo, float>>& trigSFDecorators
+        ) const;
     
     const triggerMap m_triggerMap = {
         {2016, {
@@ -149,19 +179,11 @@ namespace HH4B
     const std::vector<std::string>& getTriggerPaths(
           const triggerMap& trigger_map,
           int year,
-          HH4B::TriggerChannel triggerType) const
-      {
-          static const std::vector<std::string> emptyVec;
-          
-          auto yearIt = trigger_map.find(year);
-          if (yearIt == trigger_map.end()) return emptyVec;
-          
-          const auto& channel_map = yearIt->second;
-          auto channelIt = channel_map.find(triggerType);
-          if (channelIt == channel_map.end()) return emptyVec;
-          
-          return channelIt->second;
-      }
+          HH4B::TriggerChannel triggerType) const;
+    const std::vector<std::string>& getTriggerPaths(
+          const triggerMap& trigger_map,
+          int year,
+          int bucket) const;
   };
 }
 

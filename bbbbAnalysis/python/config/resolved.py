@@ -58,6 +58,9 @@ def resolved_trigger_bucket_cfg(flags):
             "HH4bTriggerDecoratorAlg",
             jets=jets_name,
             triggerLists=flags.Analysis.TriggerChains,
+            doL1SF=flags.Analysis.Small_R_jet.doL1Matching,
+            doHLTSF=flags.Analysis.Small_R_jet.doHLTMatching,
+            isMC=flags.Input.isMC
         )
     )
 
@@ -190,7 +193,9 @@ def resolved_branches(flags):
 def resolved_trigger_SF_branches(flags):
     branches = []
 
-    if flags.Input.isMC:
+    if flags.Input.isMC and flags.Analysis.do_resolved_trigger_SF and (
+       flags.Analysis.triggerSFBranchSaveStrategy == "detail"
+       or flags.Analysis.triggerSFBranchSaveStrategy == "both"):
         # add trigger scale factor output
         resolved_chain = [t for t in flags.Analysis.TriggerChains if "_a10" not in t]
         for trig in resolved_chain:
@@ -240,5 +245,23 @@ def resolved_trigger_bucket_branches(flags):
             f'EventInfo.pass_trigger_{trig}'
             f' -> trigger_bucket_{trig}',
         ]
+
+    if flags.Input.isMC and flags.Analysis.do_resolved_trigger_SF and (
+       flags.Analysis.triggerSFBranchSaveStrategy == "simple"
+       or flags.Analysis.triggerSFBranchSaveStrategy == "both"):
+        matchLevels = []
+        if flags.Analysis.Small_R_jet.doL1Matching:
+            matchLevels.append("L1")
+        if flags.Analysis.Small_R_jet.doHLTMatching:
+            matchLevels.append("HLT")
+        for matchLevel in matchLevels:
+            branches += [
+                f'EventInfo.trigger_smallrjet_sf_{matchLevel.lower()}_nosys'
+                f'-> trigger_SmallRJet_{matchLevel}SF_NOSYS',
+                f'EventInfo.trigger_smallrjet_sf_{matchLevel.lower()}_stat__1up'
+                f'-> trigger_SmallRJet_{matchLevel}SF_{matchLevel}Stat__1up',
+                f'EventInfo.trigger_smallrjet_sf_{matchLevel.lower()}_syst__1up'
+                f'-> trigger_SmallRJet_{matchLevel}SF_{matchLevel}Syst__1up',
+            ]
 
     return branches

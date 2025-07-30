@@ -6,6 +6,9 @@ do_resolved_dihiggs: false
 do_boosted_dihiggs: false
 
 do_resolved_trigger_SF: true
+# detail, simple, both
+triggerSFBranchSaveStrategy: "detail"
+
 do_resolved_trigger_bucket: true
 
 pairingStrategy: "minDeltaR"
