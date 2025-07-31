@@ -104,7 +104,7 @@ private:
           {this, "charVectorVariableList", {}, "Name list of vectors of character variables"};
 
     CP::SysReadDecorHandle<float> m_met_sig
-          {this, "METSignificance", "significance", "Met Significance"};
+          {this, "METSignificance", "significance_%SYS%", "Met Significance"};
 
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;

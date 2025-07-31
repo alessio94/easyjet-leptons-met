@@ -53,7 +53,7 @@ namespace HHBBLL
     CP::SysReadDecorHandle<unsigned int> m_year
 	{this, "year", "dataTakingYear", ""};
     CP::SysReadDecorHandle<float>
-      m_met_sig {this, "METSignificance", "significance", "Met Significance"};
+      m_met_sig {this, "METSignificance", "significance_%SYS%", "Met Significance"};
 
     CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "bbllAnalysisJets_%SYS%", "Jet container to read" };

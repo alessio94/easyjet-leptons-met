@@ -102,7 +102,7 @@ private:
           {this, "intVariableList", {}, "Name list of integer variables"};
 
     CP::SysReadDecorHandle<float>
-    m_METSig {this, "METSignificance", "significance", "Met Significance"};
+    m_METSig {this, "METSignificance", "significance_%SYS%", "Met Significance"};
 
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>
