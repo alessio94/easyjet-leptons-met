@@ -92,7 +92,7 @@ def ttHH_cfg(flags, smalljetkey, muonkey, electronkey,
             saveCutFlow=flags.Analysis.save_cutflow,
             triggerLists=flags.Analysis.TriggerChains,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
-            eventDecisionOutputDecoration="ttHH_pass_baseline_%SYS%",
+            eventDecisionOutputDecoration="ttHH_pass_preselection_%SYS%",
             bypass=flags.Analysis.bypass,
         )
     )
@@ -274,6 +274,9 @@ def ttHH_branches(flags):
     int_variable_names += object_level_int_variables
 
     branches += object_level_branches
+
+    branches += \
+        ["EventInfo.ttHH_pass_preselection_%SYS% -> ttHH_pass_preselection_%SYS%"]
 
     for trig in ["singlep"]:
         branches += [f"EventInfo.ttHH_pass_trigger_{trig} \

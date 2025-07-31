@@ -143,6 +143,11 @@ namespace ttHH
       }
       m_passallcuts.set(*event, passedall, sys);
 
+
+      // Global event filter true if any syst passes and controls
+      // if event is passed to output writing or not
+      if (m_bypass || passedall) filter.setPassed(true);
+
       // do the CUTFLOW only with sys="" -> NOSYS
       if (sys.name()!="") continue;
 
@@ -174,12 +179,7 @@ namespace ttHH
         m_ttHHCuts[i].relativeCounter+=1;
       }
 
-      if (!m_bypass and (!m_ttHHCuts("PASS_BASELINE").passed or !m_ttHHCuts("PASS_TRIGGER_MATCHING").passed)) continue;
-
-      // Global event filter true if any syst passes and controls
-      // if event is passed to output writing or not
-      filter.setPassed(true);
-
+  
     }
 
     return StatusCode::SUCCESS;
