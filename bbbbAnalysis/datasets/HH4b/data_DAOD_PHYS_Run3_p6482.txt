@@ -2,3 +2,4 @@ data22_13p6TeV.periodAllYear.physics_Main.PhysCont.DAOD_PHYS.grp22_v01_p6482
 data23_13p6TeV.periodAllYear.physics_Main.PhysCont.DAOD_PHYS.grp23_v01_p6482
 data22_13p6TeV.periodAllYear.physics_VBFDelayed.PhysCont.DAOD_PHYS.grp22_v01_p6482
 data23_13p6TeV.periodAllYear.physics_VBFDelayed.PhysCont.DAOD_PHYS.grp23_v01_p6482
+data24_13p6TeV.periodAllYear.physics_Main.PhysCont.DAOD_PHYS.grp24_v01_p6515
