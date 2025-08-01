@@ -88,14 +88,17 @@ def get_large_R_jet_branches(
             )
         if flags.Analysis.Large_R_jet.GN2X_hbb_wps:
             large_R_jet_branches.variables += get_large_R_gn2_tag_branches(flags)
-    if lr_jet_type == "UFO" and is_valid_for_bjr_v01:
-        if tree_flags.collection_options.large_R_jets.btag_details:
-            large_R_jet_branches.variables += [
-                "bJR10v00_pt",
-                "bJR10v00_mass",
-                "bJR10v01_pt",
-                "bJR10v01_mass",
-            ]
+    if (
+        lr_jet_type == "UFO"
+        and is_valid_for_bjr_v01
+        and tree_flags.collection_options.large_R_jets.bjet_regression
+    ):
+        large_R_jet_branches.variables += [
+            "bJR10v00_pt",
+            "bJR10v00_mass",
+            "bJR10v01_pt",
+            "bJR10v01_mass",
+        ]
     return large_R_jet_branches.get_output_list()
 
 

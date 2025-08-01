@@ -111,6 +111,7 @@ ttree_output:
       substructure_info: true
       no_bjet_calib_p4: true
       run_selection: true
+      bjet_regression: true
     photons:
       shower_shapes: false
       truth_labels: false
