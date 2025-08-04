@@ -18,6 +18,7 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <TH2D.h>
+#include <TrigDecisionTool/TrigDecisionTool.h>
 
 namespace HH4B
 {
@@ -35,12 +36,18 @@ public:
     StatusCode execute() override;
 
 private:
+    int m_year{-1};
+    std::string m_resolvedPath{};
+    bool m_loadedTriggerSFs = false;
+    
     // sys-aware input container handles
     CP::SysListHandle m_systematicsList{this};
 
     CP::SysReadHandle<xAOD::EventInfo> m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
     CP::SysReadHandle<xAOD::JetContainer> m_inJetHandle{ this, "containerInKey", "", "Input jet container to read"};
     CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_outJetHandle{this, "containerOutKey", "", "Output jet container to write"};
+
+    PublicToolHandle<Trig::TrigDecisionTool> m_trigDecTool{this, "TrigDecisionTool", "TrigDecisionTool", "Trigger decision tool"};
 
     Gaudi::Property<std::vector<std::string>> m_triggers{ this, "triggers", {}, "List of triggers"};
     Gaudi::Property<std::vector<unsigned int>> m_years{ this, "years", {}, "List of years"};

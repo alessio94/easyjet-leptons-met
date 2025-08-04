@@ -182,7 +182,8 @@ namespace Easyjet
         {
           if (m_doL1Matching)
           {
-            std::string l1Name = ChainNameParser::HLTChainInfo(trig).l1Item();
+            const TrigConf::HLTChain* hltChain = m_trigDecTool->ExperimentalAndExpertMethods().getChainConfigurationDetails(trig);
+            const std::string& l1Name = hltChain->lower_chain_name();
             for (auto l1_jet : *l1Jets)
             {
               TLorentzVector l1_jet_p4;

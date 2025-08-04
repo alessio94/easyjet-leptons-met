@@ -35,98 +35,24 @@ namespace HH4B
       ATH_MSG_ERROR("Year is not set");
       return StatusCode::FAILURE;
     }
-    int year = m_years.size() == 1 ? m_years[0] : 2016; // in case of mc20a which corresponds to 2015+2016
+    m_year = m_years.size() == 1 ? m_years[0] : 2016; // in case of mc20a which corresponds to 2015+2016
     std::string path;
-    if (year >= 2022) path = "EasyjetHub/jet_trigger_scale_factors_2223.root"; // Run 3 calibration file
+    if (m_year >= 2022) path = "EasyjetHub/jet_trigger_scale_factors_2223.root"; // Run 3 calibration file
     else path = "EasyjetHub/jet_trigger_scale_factors_run2.root"; // Run 2 calibration file
-    std::string resolvedPath = PathResolverFindCalibFile(path);
-    if (resolvedPath=="") ATH_MSG_WARNING("Failed to load calibration file " << path << ". " + m_matchingLevel + " jet scale factor set to 1.");
-    TFile* jetSFFile = new TFile(resolvedPath.c_str(), "READ");
-
-    // get trigger leg thresholds from trigger name. Build the matching pattern and the SF map.
-    std::regex l1NameParser("(\\d*)(J)(\\d*)((p|\\.)(\\d*)ETA(\\d*))?");
+    m_resolvedPath = PathResolverFindCalibFile(path);
+    if (m_resolvedPath=="") ATH_MSG_WARNING("Failed to load calibration file " << path << ". " + m_matchingLevel + " jet scale factor set to 1.");
+  
     for (auto &trig : m_triggers)
     {
-      std::vector<int> thresholds;
-      if (m_matchingLevelEnum == TrigMatchingLevel::L1)
-      {
-        std::string l1Name = ChainNameParser::HLTChainInfo(trig).l1Item();
-        std::stringstream ss(l1Name);
-        std::string legName;
-        std::smatch match;
-        while (getline(ss, legName, '_'))
-        {
-          if (std::regex_match(legName, match, l1NameParser))
-          {
-            std::string threshold = match[3].str();
-            unsigned int multiplicity = match[1].str()=="" ? 1 : std::stoi(match[1].str());
-            std::string sfName = m_matchingLevel+"_J"+threshold;
-            std::string histName = std::to_string(year)+"/"+sfName+"/"+sfName;
-            TH2D *h(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_scale_factors").c_str())));
-            if (h)
-            {
-              m_jetTriggerSFMap.emplace(std::stoi(threshold), h);
-              TH2D *h_stats_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_stats_abs_uncertainty").c_str())));
-              TH2D *h_syst_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_systematic_abs_uncertainty").c_str())));
-              if (h_stats_unc) {m_jetTriggerSFStatsMap.emplace(std::stoi(threshold), h_stats_unc);}
-              if (h_syst_unc) {m_jetTriggerSFSystMap.emplace(std::stoi(threshold), h_syst_unc);}
-            }
-            else { ATH_MSG_WARNING("No trigger jet scale factor for L1 threshold J" << threshold); }
-            for (unsigned int i=0; i< multiplicity; i++) // flattern the multiplicity
-            {
-              thresholds.push_back(std::stoi(threshold));
-            }
-          }
-        }
-      }
-      if (m_matchingLevelEnum == TrigMatchingLevel::HLT)
-      {
-        for (const ChainNameParser::LegInfo &legInfo :
-             ChainNameParser::HLTChainInfo(trig))
-        {
-          if (legInfo.signature == "j")
-          {
-            if (jetSFFile && m_jetTriggerSFMap.find(legInfo.threshold) == m_jetTriggerSFMap.end())
-            {
-              std::string sfName = m_matchingLevel+"_j"+std::to_string(legInfo.threshold);
-              std::string histName = std::to_string(year)+"/"+sfName+"/"+sfName;
-              TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_scale_factors").c_str())));
-              if (h)
-              {
-                m_jetTriggerSFMap.emplace(legInfo.threshold, h);
-                TH2D* h_stats_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_stats_abs_uncertainty").c_str())));
-                TH2D* h_syst_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_systematic_abs_uncertainty").c_str())));
-                if (h_stats_unc) {m_jetTriggerSFStatsMap.emplace(legInfo.threshold, h_stats_unc);}
-                if (h_syst_unc) {m_jetTriggerSFSystMap.emplace(legInfo.threshold, h_syst_unc);}
-              }
-              else { ATH_MSG_WARNING("No trigger jet scale factor for HLT threshold j" << legInfo.threshold); }
-            }
-            for (unsigned int i = 0; i < legInfo.multiplicity; i++) // flattern the multiplicity
-            {
-              thresholds.push_back(legInfo.threshold);
-            }
-            if (legInfo.legName().find("SHARED") != std::string::npos)
-            { // the next leg is a SHARED leg because SHARED is parsed as part of
-              // the previous leg name. Break here to ignore the shared leg.
-              break;
-            }
-          }
-        }
-      }
-      std::ranges::sort(thresholds, std::greater<>()); // sort the thresholds into decending order
-      m_triggerLegThresholds.emplace(trig, thresholds);
-
       // convert trigger name to a valid branch name
       std::string modifiedTrigName = trig;
       std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '-', '_');
       std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '.', 'p');
-
       // initialize the read handle to read a list of matched thresholds
       m_ThresholdsDecorKey.emplace(
             trig, m_inJetHandle.getNamePattern() + ".match" +
                       modifiedTrigName + "_" + m_matchingLevel + "thresholds");
       ATH_CHECK(m_ThresholdsDecorKey.at(trig).initialize());
-
       // initialize write handle to write a single matched threshold after event-level ambiguity resolution
       m_Threshold.emplace(
           trig,
@@ -135,12 +61,10 @@ namespace HH4B
               modifiedTrigName + "_" + m_matchingLevel + "threshold_%SYS%",
                     "Trigger threshold for applying trigger SF"));
       ATH_CHECK(m_Threshold.at(trig).initialize(m_systematicsList, m_outJetHandle));
-
       // initialize read handle to read back the single matched threshold
       m_Thresholdread.emplace(
           trig, CP::SysReadDecorHandle<int>(modifiedTrigName + "_" + m_matchingLevel + "threshold_%SYS%", this));
       ATH_CHECK(m_Thresholdread.at(trig).initialize(m_systematicsList, m_inJetHandle));
-
       // initialize SF write handles
       m_jetSF.emplace(
           trig, CP::SysWriteDecorHandle<float>(
@@ -162,7 +86,6 @@ namespace HH4B
       ATH_CHECK(m_jetSF.at(trig).initialize(m_systematicsList, m_outJetHandle));
       ATH_CHECK(m_jetSFStatsUp.at(trig).initialize(m_systematicsList, m_outJetHandle));
       ATH_CHECK(m_jetSFSystUp.at(trig).initialize(m_systematicsList, m_outJetHandle));
-
       m_eventSFKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF");
       m_eventSFStatsUpKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF_stats__1up");
       m_eventSFSystUpKey.emplace(trig, m_eventHandle.getNamePattern() + ".trigSF_" + modifiedTrigName + "_" + m_matchingLevel + "SF_syst__1up");
@@ -172,6 +95,7 @@ namespace HH4B
     }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK(m_trigDecTool.retrieve());
     ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
@@ -179,6 +103,86 @@ namespace HH4B
 
   StatusCode SmallRJetTriggerSFAlg::execute()
   {
+    if (!m_loadedTriggerSFs)
+    {
+      TFile* jetSFFile = new TFile(m_resolvedPath.c_str(), "READ");
+
+      std::regex l1NameParser("(\\d*)(J)(\\d*)((p|\\.)(\\d*)ETA(\\d*))?");
+      for (auto &trig : m_triggers)
+      {
+        std::vector<int> thresholds;
+        if (m_matchingLevelEnum == TrigMatchingLevel::L1)
+        {
+          const TrigConf::HLTChain* hltChain = m_trigDecTool->ExperimentalAndExpertMethods().getChainConfigurationDetails(trig);
+          const std::string& l1Name = hltChain->lower_chain_name();
+          std::stringstream ss(l1Name);
+          std::string legName;
+          std::smatch match;
+          while (getline(ss, legName, '_'))
+          {
+            if (std::regex_match(legName, match, l1NameParser))
+            {
+              std::string threshold = match[3].str();
+              unsigned int multiplicity = match[1].str()=="" ? 1 : std::stoi(match[1].str());
+              std::string sfName = m_matchingLevel+"_J"+threshold;
+              std::string histName = std::to_string(m_year)+"/"+sfName+"/"+sfName;
+              TH2D *h(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_scale_factors").c_str())));
+              if (h)
+              {
+                m_jetTriggerSFMap.emplace(std::stoi(threshold), h);
+                TH2D *h_stats_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_stats_abs_uncertainty").c_str())));
+                TH2D *h_syst_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_systematic_abs_uncertainty").c_str())));
+                if (h_stats_unc) {m_jetTriggerSFStatsMap.emplace(std::stoi(threshold), h_stats_unc);}
+                if (h_syst_unc) {m_jetTriggerSFSystMap.emplace(std::stoi(threshold), h_syst_unc);}
+              }
+              else { ATH_MSG_WARNING("No trigger jet scale factor for L1 threshold J" << threshold); }
+              for (unsigned int i=0; i< multiplicity; i++) // flattern the multiplicity
+              {
+                thresholds.push_back(std::stoi(threshold));
+              }
+            }
+          }
+        }
+        if (m_matchingLevelEnum == TrigMatchingLevel::HLT)
+        {
+          for (const ChainNameParser::LegInfo &legInfo :
+               ChainNameParser::HLTChainInfo(trig))
+          {
+            if (legInfo.signature == "j")
+            {
+              if (jetSFFile && m_jetTriggerSFMap.find(legInfo.threshold) == m_jetTriggerSFMap.end())
+              {
+                std::string sfName = m_matchingLevel+"_j"+std::to_string(legInfo.threshold);
+                std::string histName = std::to_string(m_year)+"/"+sfName+"/"+sfName;
+                TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_scale_factors").c_str())));
+                if (h)
+                {
+                  m_jetTriggerSFMap.emplace(legInfo.threshold, h);
+                  TH2D* h_stats_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_stats_abs_uncertainty").c_str())));
+                  TH2D* h_syst_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_systematic_abs_uncertainty").c_str())));
+                  if (h_stats_unc) {m_jetTriggerSFStatsMap.emplace(legInfo.threshold, h_stats_unc);}
+                  if (h_syst_unc) {m_jetTriggerSFSystMap.emplace(legInfo.threshold, h_syst_unc);}
+                }
+                else { ATH_MSG_WARNING("No trigger jet scale factor for HLT threshold j" << legInfo.threshold); }
+              }
+              for (unsigned int i = 0; i < legInfo.multiplicity; i++) // flattern the multiplicity
+              {
+                thresholds.push_back(legInfo.threshold);
+              }
+              if (legInfo.legName().find("SHARED") != std::string::npos)
+              { // the next leg is a SHARED leg because SHARED is parsed as part of
+                // the previous leg name. Break here to ignore the shared leg.
+                break;
+              }
+            }
+          }
+        }
+        std::ranges::sort(thresholds, std::greater<>()); // sort the thresholds into decending order
+        m_triggerLegThresholds.emplace(trig, thresholds);
+      }
+      m_loadedTriggerSFs = true;
+    }
+
     std::unordered_map< std::string, SG::ReadDecorHandle<xAOD::JetContainer, std::vector<int>>> jetThresholds;
     std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::EventInfo, float>> eventSF, eventSFStatsUp, eventSFSystUp;
     for (auto &trig : m_triggers)
