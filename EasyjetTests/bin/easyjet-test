@@ -104,6 +104,7 @@ declare -A DATAFILES=(
     [zbbycalib-mc23]=${PHYS_TTBAR_MC23}
     [zbbjcalib-mc23]=${PHYS_TTBAR_MC23}
     [bbbbtt-mc23]=${PHYS_TTBAR_MC23}
+    [monojet-mc23]=${PHYS_TTBAR_MC23}
     # systematics enabled
     [syst-mc23]=${PHYS_TTBAR_MC23}
     # non-ntupler workflows
@@ -184,6 +185,7 @@ declare -A TESTS=(
     [zbbycalib-mc23]="simple xbbcalib-ntupler"
     [zbbjcalib-mc23]="simple xbbcalib-ntupler"
     [bbbbtt-mc23]="simple bbbbtt-ntupler"
+    [monojet-mc23]="simple monojet-ntupler"
     # non-ntupler
     [aod-fast-bbbb-mc23]="aod-fast bbbb-ntupler"
     [h5-fast-mc23]="h5-fast easyjet-ntupler"
@@ -254,6 +256,7 @@ declare -A CONFIGS=(
     [zbbycalib-mc23]=XbbCalib/RunConfig-ZbbyCalib-bypass.yaml
     [zbbjcalib-mc23]=XbbCalib/RunConfig_Zbbj-MC-bypass.yaml
     [bbbbtt-mc23]=bbbbttAnalysis/RunConfig-bbbbtt-bypass.yaml
+    [monojet-mc23]=monojetAnalysis/RunConfig-Monojet-bypass.yaml
     # MC23 AF3
     [mc23af3]=EasyjetHub/RunConfig-noEle.yaml
     [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml

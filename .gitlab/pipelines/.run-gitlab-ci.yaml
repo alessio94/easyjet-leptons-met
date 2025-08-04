@@ -303,6 +303,10 @@ ntupler_zbbjcalib_mc23:
   script:
     - easyjet-test zbbjcalib-mc23
 
+ntupler_monojet_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test monojet-mc23
 
 # Commented until ATLASG-2734 is solved
 #ntupler_bbtt_mc23_lite_syst:
