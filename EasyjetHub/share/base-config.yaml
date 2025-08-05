@@ -206,6 +206,8 @@ Trigger:
   # Enable writing trigger flags in AnalysisMiniTree
   writeOutput: True
 
+Exclude2015: false
+
 GRL:
   runGRL: true
   store_decoration: false

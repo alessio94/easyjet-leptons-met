@@ -134,6 +134,8 @@ def get_run_years(flags):
     years = []
     if flags.Input.isMC:
         years += MCSampleYears[flags.Input.MCCampaign]
+        if flags.Analysis.Exclude2015:
+            years = [year for year in years if year >= 2016]
     else:
         years.append(flags.Input.DataYear)
     return years

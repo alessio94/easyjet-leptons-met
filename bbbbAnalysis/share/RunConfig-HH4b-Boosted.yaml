@@ -56,6 +56,19 @@ do_overlap_removal: true
 do_CP_systematics: false
 systematics_regex: [".*"]
 
+Exclude2015: true
+
+GRL:
+  years:
+    include: EasyjetHub/grl_years_no2015.yaml
+  store_decoration: true
+
+PileupReweighting:
+  extra_prw:
+    - postfix: "boosted"
+      lumicalc_files:
+        include: EasyjetHub/lumicalc_no2015.yaml
+
 # Include the TTree configuration and update details
 ttree_output:
   # Our overrides. All defaults are off
