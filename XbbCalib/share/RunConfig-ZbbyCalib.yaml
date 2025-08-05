@@ -28,12 +28,6 @@ OverlapRemoval:
   do_large_R_jets: true
   do_small_R_jet_large_R_jet: false
 
-#PileupReweighting:
-#  prw_files:
-#    include: EasyJetHub/share/prw.yaml
-#  lumicalc_files:
-#    include: EasyJetHub/share/lumicalc.yaml
-
 # Toggles for reconstructed objects decorations
 Large_R_jet:
   min_pT: 200.e+3
