@@ -2,6 +2,8 @@ include: EasyjetHub/base-config.yaml
 
 GRL:
   # good runs lists to filter events
+  years:
+    include: ZCharmAnalysis/lepton_grl_years.yaml
   files:
     include: ZCharmAnalysis/lepton_grl.yaml
 

@@ -208,12 +208,6 @@ Trigger:
 
 GRL:
   runGRL: true
-  # list of directories to search for files
-  years:
-    include: grl_years.yaml
-  # good runs lists to filter events
-  files:
-    include: general_grl.yaml
   store_decoration: false
 
 PileupReweighting:

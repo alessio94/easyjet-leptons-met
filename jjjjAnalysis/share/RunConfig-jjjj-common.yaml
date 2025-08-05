@@ -25,13 +25,6 @@ Trigger:
 do_trigger_filtering: true
 
 save_cutflow: false
-### to double check
-grl_years:
-  include: EasyjetHub/grl_years.yaml
-
-grl_files:
-  include: EasyjetHub/general_grl.yaml
-###
 
 
 # Include the TTree configuration and update details

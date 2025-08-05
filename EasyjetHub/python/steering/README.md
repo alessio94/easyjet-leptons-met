@@ -95,10 +95,10 @@ Additionally, GRL files can be specified in the analysis config like:
 ```yaml
 GRL:
   files:
-    include: general_grl.yaml
+    include: grl.yaml
 ```
 
-where `general_grl.yaml` contains only the file names by year:
+where `grl.yaml` contains only the file names by year:
 
 ```yaml
 '2022': 'data22_13p6TeV.periodAllYear_DetStatus-v109-pro28-04_MERGED_PHYS_StandardGRL_All_Good_25ns.xml'

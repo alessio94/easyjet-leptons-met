@@ -30,7 +30,11 @@ def event_selection_sequence(flags):
     configSeq.setOptionValue('.runGRL', flags.Analysis.GRL.runGRL)
 
     if flags.Analysis.GRL.runGRL:
-        configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
+        # Only configured if explicitly set up in yaml
+        if 'files' in flags.Analysis.GRL:
+            configSeq.setOptionValue('.userGRLFiles', get_grl_files(flags))
+        # Otherwise will use default from release
+        # GoodRunsLists/GoodRunsListsDictionary.py
 
         # Run GRL decoration optionally, already available in PHYSLITE
         if flags.Analysis.GRL.store_decoration and not flags.Input.isPHYSLITE:

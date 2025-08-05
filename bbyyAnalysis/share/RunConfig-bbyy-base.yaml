@@ -138,8 +138,11 @@ GNN_path_run3:
 VBFjetsMethod: "mjj" # "mjj" "pTsorting"
 
 #Use a dedicated GRL for bbyy due to photon triggers
-grl_files:
-  include: bbyyAnalysis/photon_grl.yaml
+GRL:
+  years:
+    include: bbyyAnalysis/photon_grl_years.yaml
+  files:
+    include: bbyyAnalysis/photon_grl.yaml
 
 PileupReweighting:
   extra_prw:
