@@ -111,6 +111,10 @@ private:
       {this, "is2016_periodA", "is2016_periodA", ""};
     CP::SysReadDecorHandle<bool> m_is2016_periodB_D3
       {this, "is2016_periodB_D3", "is2016_periodB_D3", ""};
+    CP::SysReadDecorHandle<bool> m_is2017_periodB1_B4
+      {this, "is2017_periodB1_B4", "is2017_periodB1_B4", ""};
+    CP::SysReadDecorHandle<bool> m_l1topo_disabled
+      {this, "l1TopoDisabled", "l1TopoDisabled", ""};
     CP::SysReadDecorHandle<bool> m_is2022_75bunches
       {this, "is2022_75bunches", "is2022_75bunches", ""};
     CP::SysReadDecorHandle<bool> m_is2023_first_2400bunches
@@ -282,7 +286,7 @@ private:
        const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
        const xAOD::Jet* jet0, const xAOD::Jet* jet1,
        const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1,
-       const xAOD::Jet* eta_lt2p8_jet0);
+       const xAOD::Jet* eta_lt3p2_jet0);
 
     void applyCutFlow(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
     void applySingleLepTriggerSelection
@@ -303,7 +307,7 @@ private:
        const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
        const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
        const xAOD::Jet* jet0, const xAOD::Jet* eta_lt2p5_jet0, 
-       const xAOD::Jet* eta_lt2p5_jet1, const xAOD::Jet* eta_lt2p8_jet0);
+       const xAOD::Jet* eta_lt2p5_jet1, const xAOD::Jet* eta_lt3p2_jet0);
     void applyDiBJetTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
        const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
