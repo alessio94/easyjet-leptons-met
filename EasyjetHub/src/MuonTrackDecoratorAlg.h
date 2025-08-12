@@ -36,9 +36,6 @@ private:
   // Members for configurable properties
   Gaudi::Property<bool> m_isMC{this, "isMC", false, "Is this simulation?"};
 
-  Gaudi::Property<bool> m_doRetrieveTracks{
-      this, "doRetrieveTrack", false, "retrive track information for muons?"};
-
   Gaudi::Property<bool> m_doLLP1{
       this, "doLLP1", false,
       "retrive track information for muons that only exists in LLP1?"};
