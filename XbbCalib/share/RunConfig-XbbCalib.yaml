@@ -4,85 +4,75 @@ include: EasyjetHub/base-config.yaml
 do_ttbarCalib: true
 do_ZbbjCalib: false
 do_ZbbyCalib: false
-do_ZllCalib: false
-
-# Toggles to bypass event selection
 bypass: false
 
 # Toggles for object types
-do_large_R_UFO_jets: true
-do_small_R_jets: true
 do_muons: true
 do_electrons: true
+do_small_R_jets: true
+do_large_R_UFO_jets: true
 do_met: true
-
-# Toggles for reconstructed objects decorations
-Small_R_jet:
-  min_pT: 28.e+3
-  btag_wp: "GN2v01_FixedCutBEff_77"
 
 Large_R_jet:
   min_pT: 200.e+3
   max_eta: 2.0
-  runMuonJetPtCorr: false
-  GN2X_hbb_wps:
-    - "FlatMassQCDEff_0p25"
-    - "FlatMassQCDEff_0p3"
-    - "FlatMassQCDEff_0p37"
-    - "FlatMassQCDEff_0p46"
-    - "FlatMassQCDEff_0p58"
-    - "FlatMassQCDEff_0p74"
-    - "FlatMassQCDEff_0p94"
-    - "FlatMassQCDEff_1p25"
-    - "FlatMassQCDEff_1p55"
+  GN2X_hbb_wps: ["FlatMassQCDEff_1p55", "FlatMassQCDEff_1p25", "FlatMassQCDEff_0p94", "FlatMassQCDEff_0p74", "FlatMassQCDEff_0p58", "FlatMassQCDEff_0p46", "FlatMassQCDEff_0p37", "FlatMassQCDEff_0p3", "FlatMassQCDEff_0p25"]
+
+# # Toggles for reconstructed objects decorations
+Small_R_jet:
+  min_pT: 25.e+3
+  btag_wp: "GN2v01_FixedCutBEff_77"
 
 Electron:
-  min_pT: 28.e+3
+  min_pT: 70.e+3
   ID: "TightLH"
   Iso: "Tight_VarRad"
+  crackVeto: true
 
 Muon:
-  min_pT: 28.e+3
+  min_pT: 70.e+3
   ID: "Medium"
   Iso: "Tight_VarRad"
 
-# list of triggers per year to consider
+MET:
+  min_met: 70.e+3
+
+# # list of triggers per year to consider
 Trigger:
-  include: XbbCalib/trigger.yaml
+  include: trigger.yaml
 # apply trigger lists to filter events
 do_trigger_filtering: true
-
-# write objects with overlap removal applied
-# turning this on you have to decide on one large R jet collection
 do_overlap_removal: true
-
 OverlapRemoval:
-  # Enable overlap removal between large-R jets and objects for which
-  # large-R jet OR removal is implemented in Athena
   do_large_R_jets: false
-  # Enable overlap removal between small-R jets and large-R jets
-  # Athena default is true
   do_small_R_jet_large_R_jet: false
-  # Enable overlap removal for boosted muons and electrons
   do_boostedLeptons: true
+
 
 # Include the TTree configuration and update details
 ttree_output:
   include: EasyjetHub/AnalysisMiniTree-config.yaml
   # Our overrides. All defaults are off
   reco_outputs:
-    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-    small_R_jets: 'container_names.output.reco4PFlowJet'
     muons: 'container_names.output.muons'
     electrons: 'container_names.output.electrons'
-    met : 'container_names.output.met'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    met: 'container_names.output.met'
   collection_options:
+    small_R_jets:
+      run_selection: true
+      # truth_parent_info: true
+      btag_info: true
+      # JVT_details: true
+      # no_bjet_calib_p4: true
+      # btag_details: true
     large_R_jets:
       run_selection: true
-    small_R_jets:
-      btag_info: true
+      # substructure_info: true
+      # truth_labels: true
+    muons:
       run_selection: true
     electrons:
       run_selection: true
-    muons:
-      run_selection: true
+

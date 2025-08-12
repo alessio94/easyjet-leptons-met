@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
-
+/// @author Derrick Allen
 // Always protect against multiple includes!
 
 #ifndef SELECTIONFLAGSXBBCALIBALG_H
@@ -47,14 +47,14 @@ namespace XBBCALIB
       /// \brief Setup syst-aware input container handles
       CP::SysListHandle m_systematicsList {this};
 
+      CP::SysReadHandle<xAOD::EventInfo>
+      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
+
       CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "XbbCalibJets_%SYS%",   "Jet container to read" };
 
       CP::SysReadHandle<xAOD::JetContainer>
       m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Large-R jet container to read" };
-
-      CP::SysReadHandle<xAOD::EventInfo>
-      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
       CP::SysReadHandle<xAOD::ElectronContainer>
       m_electronHandle{ this, "electrons", "XbbCalibElectrons_%SYS%",   "Electron container to read" };
@@ -64,6 +64,17 @@ namespace XBBCALIB
 
       CP::SysReadHandle<xAOD::MissingETContainer>
       m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read" };
+
+      Gaudi::Property<float> m_minMet
+      {this, "minMet", 20000, "Minimum MET cut"};
+
+      Gaudi::Property<std::string> m_eleWPName
+      { this, "eleWP", "","Electron ID + Iso working point" };
+      CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
+
+      Gaudi::Property<std::string> m_muonWPName
+        { this, "muonWP", "","Muon ID + Iso cuts" };
+      CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
 
       CP::SysFilterReporterParams m_filterParams {this, "XbbCalib selection"};
 

@@ -1,4 +1,32 @@
 # Run easyjet for Xbb Calibration. (WIP)
+=======
+Analysis Package for the $Xbb$ Calibration
+=========================
+
+# Folder structure
+
+- `bin/`: Executables
+  - `xbbcalib-ntupler`
+- `datasets/`
+    - `ttbar`: Lists of data and mc samples to process
+- `python/`: Main python code to configure the components (objects, selections as well as the variables to save)
+  - `XbbCalib_config`
+  - `ZbbjCalib_config`
+  - `ZbbyCalib_config`
+  - `ZllCalib_config`
+- `scripts`
+  - `grid`: Scripts for submitting grid jobs.
+  - `XbbCalibPostProcess`: script for computing sumofweights
+- `share/`: yaml files containing configurations used by the components
+  - `RunConfig-XbbCalib`: configurations called by the executables (see below);	
+  - `trigger`: list of the triggers to use per year.
+  - `XSectionsData`: XSections for computing weights.
+- `src/`: C++ code
+  - `XbbCalibSelectorAlg`: Find if the event pass the baseline selection for $t \bar{t}$ calibration;
+  - `BaselineVarsXbbCalibAlg`: Compute the baseline variables for the $t \bar{t}$ calibration.
+
+
+# Zbby calibration (WIP)
 
 To run the Xbb calibration ntupler a sparse-checkout of `EasyjetHub`, `EasyjetTests`, `XbbCalib`is needed. After builiding easyjet, a test job can be run. First download a file locally, the example uses the Zbb+y signal sample.
 
