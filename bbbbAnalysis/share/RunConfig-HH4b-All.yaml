@@ -6,8 +6,8 @@ do_resolved_dihiggs: false
 do_boosted_dihiggs: false
 
 do_resolved_trigger_SF: true
-# detail, simple, both
-triggerSFBranchSaveStrategy: "detail"
+# Option to switch stored level of trigger SF: detail, simple, both
+triggerSFBranchSaveStrategy: "simple"
 
 do_resolved_trigger_bucket: true
 
@@ -28,7 +28,7 @@ Small_R_jet:
     - GN2v01_FixedCutBEff_65
     - GN2v01_FixedCutBEff_70
     - GN2v01_FixedCutBEff_77
-  doL1Matching: false
+  doL1Matching: true
   doHLTMatching: false
   saveTriggerInfo: false
 

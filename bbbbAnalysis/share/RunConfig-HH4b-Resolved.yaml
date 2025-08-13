@@ -6,6 +6,9 @@ include: bbbbAnalysis/RunConfig-bbbb-base.yaml
 do_resolved_dihiggs: true
 
 do_resolved_trigger_SF: true
+# Option to switch stored level of trigger SF: detail, simple, both
+triggerSFBranchSaveStrategy: "simple"
+
 do_resolved_trigger_bucket: true
 
 pairingStrategy: "minDeltaR"
