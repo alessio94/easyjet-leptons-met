@@ -62,9 +62,7 @@ def get_BaselineVarsjjjjAlg_variables(flags):
     int_variable_names = []
 
     # basic p4() of 4 jets
-    for object in ["j1", "j2", "j3", "j4"]:
-        for var in ["pT", "eta", "phi", "m", "e"]:
-            float_variable_names.append(f"{object}_{var}")
+    for object in ["jjjj_Jet1", "jjjj_Jet2", "jjjj_Jet3", "jjjj_Jet4"]:
         if flags.Input.isMC:
             int_variable_names.append(f"{object}_PTLID")
     int_variable_names += ["nJets"]

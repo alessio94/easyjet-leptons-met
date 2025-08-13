@@ -75,15 +75,14 @@ namespace jjjj
           break; // we want only four jets
         }
         jetP4s.push_back(jet->p4());
-        m_Fbranches.at("j" + std::to_string(index) + "_pT").set(*event, jet->pt(), sys);
-        m_Fbranches.at("j" + std::to_string(index) + "_eta").set(*event, jet->eta(), sys);
-        m_Fbranches.at("j" + std::to_string(index) + "_phi").set(*event, jet->phi(), sys);
-        m_Fbranches.at("j" + std::to_string(index) + "_m").set(*event, jet->m(), sys); 
-        m_Fbranches.at("j" + std::to_string(index) + "_e").set(*event, jet->e(), sys); 
+        m_Fbranches.at("Jet" + std::to_string(index) + "_pt").set(*event, jet->pt(), sys);
+        m_Fbranches.at("Jet" + std::to_string(index) + "_eta").set(*event, jet->eta(), sys);
+        m_Fbranches.at("Jet" + std::to_string(index) + "_phi").set(*event, jet->phi(), sys);
+        m_Fbranches.at("Jet" + std::to_string(index) + "_E").set(*event, jet->e(), sys); 
         if (m_isMC){
           int PTLID = -99;
           PTLID = m_PTLID.get(*jet, sys);
-          m_Ibranches.at("j" + std::to_string(index) + "_PTLID").set(*event, PTLID, sys);
+          m_Ibranches.at("jjjj_Jet" + std::to_string(index) + "_PTLID").set(*event, PTLID, sys);
         }
       }
 
