@@ -112,6 +112,7 @@ ttree_output:
       JVT_details: true
       no_bjet_calib_p4: true
       btag_details: true
+      gn3_scores: false
     large_R_jets:
       truth_labels: true
       substructure_info: true

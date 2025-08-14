@@ -141,17 +141,34 @@ def get_small_R_jet_branches(
                 ]
 
     # ftag scores pb, pc, pl
-    if tree_flags.collection_options.small_R_jets.btag_details:
-        split_tags = flags.Input.AMITag.split("_")
-        gn2v01_valid_ptag = (
-            (get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
-            or get_valid_ami_tag(split_tags, "p", "p6255"))
-        if gn2v01_valid_ptag:
+    split_tags = flags.Input.AMITag.split("_")
+    gn2v01_valid_ptag = (
+        (get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
+        or get_valid_ami_tag(split_tags, "p", "p6255"))
+    gn3_valid_ptag = (
+        (get_valid_ami_tag(split_tags, "p", "p6697") and not flags.Input.isPHYSLITE)
+        or get_valid_ami_tag(split_tags, "p", "p6697"))
+
+    if tree_flags.collection_options.small_R_jets.btag_details and gn2v01_valid_ptag:
+        small_R_jet_branches.variables += [
+            "GN2v01_pb",
+            "GN2v01_pc",
+            "GN2v01_pu",
+            "GN2v01_ptau",
+        ]
+
+    if tree_flags.collection_options.small_R_jets.gn3_scores and gn3_valid_ptag:
+        # Main models we store all the predictions:
+        # b,c,s,ud,g,tau -> 'u' = ud,s,g, 'quark' = ud,s
+        for prob in ['b', 'c', 's', 'ud', 'g', 'tau', 'u', 'quark']:
             small_R_jet_branches.variables += [
-                "GN2v01_pb",
-                "GN2v01_pc",
-                "GN2v01_pu",
-                "GN2v01_ptau",
+                f"GN3PflowMuonsV00_p{prob}"
             ]
+        # The two ablation models we store only the final 4 scores needed
+        for gn3t in ['GN3V00', 'GN3PflowV00', 'GN3MuonsV00']:
+            for prob in ['b', 'c', 'tau', 'u', ]:
+                small_R_jet_branches.variables += [
+                    f"{gn3t}_p{prob}"
+                ]
 
     return small_R_jet_branches.get_output_list()
