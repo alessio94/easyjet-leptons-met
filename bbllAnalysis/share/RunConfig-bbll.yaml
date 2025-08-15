@@ -21,7 +21,6 @@ do_mmc : false
 
 #PNN Score
 do_resonant_PNN: false
-run_Run2_train: false
 
 #NeutrinoWeighting Config
 NeutrinoWeighting:
@@ -69,8 +68,10 @@ Trigger:
   writeOutput: True
   scale_factor:
     Electron:
-      ID: "Tight"
-      Iso: "Tight_VarRad"
+      ID_Run2: "TightLH"
+      Iso_Run2: "FCTight"
+      ID_Run3: "Tight"
+      Iso_Run3: "Tight_VarRad"
     Muon:
       ID: "Medium"
 

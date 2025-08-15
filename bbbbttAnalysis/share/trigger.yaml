@@ -250,8 +250,10 @@ scale_factor:
     '2024': []
 
   Electron:
-    ID: "TightLH"
-    Iso: "FCTight"
+    ID_Run2: "TightLH"
+    Iso_Run2: "FCTight"
+    ID_Run3: "TightLH"
+    Iso_Run3: "FCTight"
 
     chains:
       '2015':

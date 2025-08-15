@@ -1,10 +1,9 @@
-include: bbllAnalysis/RunConfig-bbll-Run3.yaml
+include: bbllAnalysis/RunConfig-bbll.yaml
 
 NeutrinoWeighting:
   include: NeutrinoWeighting.yaml
 
 do_resonant_PNN: true
-run_Run2_train: false
 mX_values: [251, 260, 300, 400, 500, 600, 800, 1000, 1500, 3000]
   
 save_bbll_cutflow: false
@@ -19,4 +18,8 @@ Truth:
   do_STXS: false
 
 do_CP_systematics: true
-systematics_regex: ["^(?!.*(MUON|MET|JER)).*$"] #every syst apart from these
+systematics_regex: [".*"]
+
+
+
+

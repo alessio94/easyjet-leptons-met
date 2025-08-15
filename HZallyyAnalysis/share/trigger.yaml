@@ -169,8 +169,10 @@ scale_factor:
     # https://atlas-groupdata.web.cern.ch/atlas-groupdata/ElectronEfficiencyCorrection/2015_2018/rel21.2/Precision_Summer2020_v1/map4.txt
     # https://atlas-groupdata.web.cern.ch/atlas-groupdata/ElectronEfficiencyCorrection/2015_2025/rel22.2/2022_Summer_Prerecom_v1/map4.txt
     # Tight_Tight_VarRad only combination in common between Run 2 + Run 3
-    ID: "MediumLH"
-    Iso: "FCLoose"
+    ID_Run2: "MediumLH"
+    Iso_Run2: "FCLoose"
+    ID_Run3: "MediumLH"
+    Iso_Run3: "FCLoose"
 
   Muon:
     ID: "Medium"

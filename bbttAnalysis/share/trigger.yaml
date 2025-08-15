@@ -26,8 +26,10 @@ scale_factor:
     - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
 
   Electron:
-    ID: "TightLH"
-    Iso: "FCTight"
+    ID_Run2: "TightLH"
+    Iso_Run2: "FCTight"
+    ID_Run3: "TightLH"
+    Iso_Run3: "FCTight"
 
     chains:
       '2015':

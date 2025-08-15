@@ -1,4 +1,4 @@
-include: bbllAnalysis/RunConfig-bbll-Run3.yaml
+include: bbllAnalysis/RunConfig-bbll.yaml
 
 save_extra_vars: true
 store_high_level_variables: true
@@ -10,7 +10,5 @@ NeutrinoWeighting:
   include: NeutrinoWeighting.yaml
   
 do_resonant_PNN: true
-
-run_Run2_train: false
 
 mX_values: [251, 260, 300, 400, 500, 600, 800, 1000, 1500, 3000]

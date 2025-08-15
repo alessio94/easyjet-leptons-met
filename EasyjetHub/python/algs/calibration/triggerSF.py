@@ -1,6 +1,7 @@
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
 
 from TriggerAnalysisAlgorithms.TriggerAnalysisSFConfig import TriggerAnalysisSFBlock
+from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
@@ -26,9 +27,14 @@ def triggerSF_sequence(flags):
     configSeq.setOptionValue('.noFilter', True)
 
     if hasattr(trigSF_flags, 'Electron'):
-        configSeq.setOptionValue('.electronID',
-                                 trigSF_flags.Electron.ID.removesuffix("LH"))
-        configSeq.setOptionValue('.electronIsol', trigSF_flags.Electron.Iso)
+        electronID = (trigSF_flags.Electron.ID_Run2
+                      if flags.GeoModel.Run is LHCPeriod.Run2 else
+                      trigSF_flags.Electron.ID_Run3)
+        configSeq.setOptionValue('.electronID', electronID.removesuffix("LH"))
+        electronIso = (trigSF_flags.Electron.Iso_Run2
+                       if flags.GeoModel.Run is LHCPeriod.Run2 else
+                       trigSF_flags.Electron.Iso_Run3)
+        configSeq.setOptionValue('.electronIsol', electronIso)
         configSeq.setOptionValue(
             '.electrons', drop_sys(flags.Analysis.container_names.output.electrons))
 

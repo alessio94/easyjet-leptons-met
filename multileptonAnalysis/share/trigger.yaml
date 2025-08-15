@@ -199,8 +199,10 @@ scale_factor:
     # - 'HLT_mu22_mu8noL1_L1MU14FCH || HLT_2e24_lhvloose_L12EM20VH || HLT_e17_lhloose_mu14_L1EM15VH_MU8F'
 
   Electron:
-    ID: "MediumLH"
-    Iso: "FCLoose"
+    ID_Run2: "MediumLH"
+    Iso_Run2: "FCLoose"
+    ID_Run3: "MediumLH"
+    Iso_Run3: "FCLoose"
 
   Muon:
     ID: "Medium"

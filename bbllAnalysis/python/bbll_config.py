@@ -2,6 +2,7 @@
 
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.Enums import LHCPeriod
 import AthenaCommon.SystemOfUnits as Units
 from itertools import chain
 
@@ -151,7 +152,7 @@ def bbll_cfg(flags, smalljetkey, muonkey, electronkey,
                 bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
                 floatPNNVariables=float_PNN_variables,
                 mX_values=flags.Analysis.mX_values,
-                run_Run2_train=flags.Analysis.run_Run2_train
+                run_Run2_train=flags.GeoModel.Run is LHCPeriod.Run2
             )
         )
 

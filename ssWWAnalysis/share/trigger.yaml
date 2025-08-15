@@ -68,8 +68,10 @@ scale_factor:
     - 'HLT_mu26_ivarmedium || HLT_mu50'
   
   Electron:
-    ID: "TightLH"
-    Iso: "Tight_VarRad"
+    ID_Run2: "TightLH"
+    Iso_Run2: "Tight_VarRad"
+    ID_Run3: "TightLH"
+    Iso_Run3: "Tight_VarRad"
 
     chains:
       '2015':

@@ -69,8 +69,10 @@ scale_factor:
     - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
 
   Electron:
-    ID: "Tight"
-    Iso: "Tight_VarRad"
+    ID_Run2: "Tight"
+    Iso_Run2: "Tight_VarRad"
+    ID_Run3: "Tight"
+    Iso_Run3: "Tight_VarRad"
 
   Muon:
     ID: "Medium"

@@ -80,8 +80,14 @@ def electron_sequence(flags, configAcc):
     if trigSF_flags.doSF and hasattr(trigSF_flags, 'Electron'):
         configSeq += makeConfig('Electrons.TriggerSF')
         configSeq.setOptionValue('.containerName', output_name)
-        configSeq.setOptionValue('.electronID', trigSF_flags.Electron.ID)
-        configSeq.setOptionValue('.electronIsol', trigSF_flags.Electron.Iso)
+        configSeq.setOptionValue('.electronID',
+                                 trigSF_flags.Electron.ID_Run2
+                                 if flags.GeoModel.Run is LHCPeriod.Run2 else
+                                 trigSF_flags.Electron.ID_Run3)
+        configSeq.setOptionValue('.electronIsol',
+                                 trigSF_flags.Electron.Iso_Run2
+                                 if flags.GeoModel.Run is LHCPeriod.Run2 else
+                                 trigSF_flags.Electron.Iso_Run3)
         configSeq.setOptionValue('.triggerChainsPerYear',
                                  get_trigger_chains_scale_factor(flags, 'Electron'))
 
