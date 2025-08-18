@@ -6,6 +6,8 @@ def get_photon_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
 
+    ph_output_flags = tree_flags.collection_options.photons
+
     photon_branches = BranchManager(
         input_container,
         output_prefix,
@@ -31,7 +33,7 @@ def get_photon_branches(flags, tree_flags, input_container, output_prefix):
         for id_wp in id_wps
     ]
 
-    if tree_flags.collection_options.photons.shower_shapes:
+    if ph_output_flags.shower_shapes:
         photon_branches.variables += [
             "Rhad",
             "Rhad1",
@@ -47,14 +49,14 @@ def get_photon_branches(flags, tree_flags, input_container, output_prefix):
             "Eratio",
         ]
 
-    if tree_flags.collection_options.photons.iso_variables:
+    if ph_output_flags.iso_variables:
         photon_branches.variables += [
             "ptcone20",
             "topoetcone20",
             "topoetcone40",
         ]
 
-    if flags.Input.isMC and tree_flags.collection_options.photons.truth_labels:
+    if flags.Input.isMC and ph_output_flags.truth_labels:
         photon_branches.variables += [
             "truthType",
             "truthOrigin",
@@ -67,9 +69,13 @@ def get_photon_branches(flags, tree_flags, input_container, output_prefix):
         ]
 
     # Requires PhotonSelectorAlg to be run
-    if tree_flags.collection_options.photons.run_selection:
+    if ph_output_flags.run_selection:
         photon_branches.variables += ["isAnalysisPhoton_%SYS%"]
         for index in range(flags.Analysis.Photon.amount):
             photon_branches.variables += [f"isPhoton{index+1}_%SYS%"]
+
+    photon_branches.variables += ph_output_flags.extra_variables
+    if flags.Input.isMC:
+        photon_branches.variables += ph_output_flags.mc_extra_variables
 
     return photon_branches.get_output_list()

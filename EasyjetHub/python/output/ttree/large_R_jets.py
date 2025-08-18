@@ -13,6 +13,8 @@ def get_large_R_jet_branches(
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
 
+    jet_output_flags = tree_flags.collection_options.large_R_jets
+
     large_R_jet_branches = BranchManager(
         input_container,
         output_prefix,
@@ -31,7 +33,7 @@ def get_large_R_jet_branches(
     large_R_jet_branches.add_four_mom_branches(do_mass=True)
 
     # Similar run_selection as small_R_jets to avoid ordering issues
-    if tree_flags.collection_options.large_R_jets.run_selection:
+    if jet_output_flags.run_selection:
         large_R_jet_branches.variables += ["isAnalysisJet_%SYS%"]
         for index in range(flags.Analysis.Large_R_jet.amount_leadingjet):
             large_R_jet_branches.variables += [f"isjet{index+1}_%SYS%"]
@@ -40,7 +42,7 @@ def get_large_R_jet_branches(
             large_R_jet_branches.variables += ["passesOR_%SYS%"]
 
     if flags.Analysis.Large_R_jet.runMuonJetPtCorr:
-        if tree_flags.collection_options.large_R_jets.no_bjet_calib_p4:
+        if jet_output_flags.no_bjet_calib_p4:
             large_R_jet_branches.variables += ["n_muons_%SYS%"]
 
             large_R_jet_branches.variables += [
@@ -53,7 +55,7 @@ def get_large_R_jet_branches(
                     "NoBJetCalibMomentum_m",
                 ]
 
-    if flags.Input.isMC and tree_flags.collection_options.large_R_jets.truth_labels:
+    if flags.Input.isMC and jet_output_flags.truth_labels:
         large_R_jet_branches.variables += [
             "GhostBHadronsFinalCount",
         ] + get_large_R_jet_truth_labels(flags)
@@ -69,7 +71,7 @@ def get_large_R_jet_branches(
                 "R10TruthLabel_R22v1",
             ]
 
-    if tree_flags.collection_options.large_R_jets.substructure_info:
+    if jet_output_flags.substructure_info:
         large_R_jet_branches.variables += get_substructure_branches(flags, lr_jet_type)
 
     if lr_jet_type == "UFO" and \
@@ -82,7 +84,7 @@ def get_large_R_jet_branches(
     is_valid_for_v02 = get_valid_ami_tag(split_tags, "p", "p6490")
     is_valid_for_bjr_v01 = get_valid_ami_tag(split_tags, "p", "p6697")
     if lr_jet_type == "UFO" and is_valid_ptag:
-        if tree_flags.collection_options.large_R_jets.btag_details:
+        if jet_output_flags.btag_details:
             large_R_jet_branches.variables += get_large_R_gn2_branches(
                 is_valid_for_v02
             )
@@ -91,7 +93,7 @@ def get_large_R_jet_branches(
     if (
         lr_jet_type == "UFO"
         and is_valid_for_bjr_v01
-        and tree_flags.collection_options.large_R_jets.bjet_regression
+        and jet_output_flags.bjet_regression
     ):
         large_R_jet_branches.variables += [
             "bJR10v00_pt",
@@ -99,6 +101,11 @@ def get_large_R_jet_branches(
             "bJR10v01_pt",
             "bJR10v01_mass",
         ]
+
+    large_R_jet_branches.variables += jet_output_flags.extra_variables
+    if flags.Input.isMC:
+        large_R_jet_branches.variables += jet_output_flags.mc_extra_variables
+
     return large_R_jet_branches.get_output_list()
 
 

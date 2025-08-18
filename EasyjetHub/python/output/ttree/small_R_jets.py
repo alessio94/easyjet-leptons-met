@@ -3,12 +3,12 @@ from EasyjetHub.output.ttree.truth_jets import get_TopHiggs_jet_truth_labels
 from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 
-def get_small_R_jet_branches(
-    flags, tree_flags, input_container, output_prefix
-):
+def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
     _syst_option = SystOption.ALL_SYST
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
+
+    jet_output_flags = tree_flags.collection_options.small_R_jets
 
     small_R_jet_branches = BranchManager(
         input_container,
@@ -29,7 +29,7 @@ def get_small_R_jet_branches(
 
     # If object selector are run OR + JVT selection flags are combined into
     # isAnalysisJet
-    if tree_flags.collection_options.small_R_jets.run_selection:
+    if jet_output_flags.run_selection:
         small_R_jet_branches.variables += ["isAnalysisJet_%SYS%"]
         for index in range(flags.Analysis.Small_R_jet.amount_bjet):
             small_R_jet_branches.variables += [f"isbjet{index+1}_%SYS%"]
@@ -47,7 +47,7 @@ def get_small_R_jet_branches(
             # truth label used by Jet/Etmiss - always add it when running on MC
             small_R_jet_branches.variables += ["PartonTruthLabelID"]
 
-        if tree_flags.collection_options.small_R_jets.btag_info:
+        if jet_output_flags.btag_info:
             btag_wps = []
             if flags.Analysis.Small_R_jet.btag_wp != "":
                 btag_wps += [flags.Analysis.Small_R_jet.btag_wp]
@@ -77,7 +77,7 @@ def get_small_R_jet_branches(
                     ]
 
         if flags.Analysis.Small_R_jet.runBJetPtCalib:
-            if tree_flags.collection_options.small_R_jets.no_bjet_calib_p4:
+            if jet_output_flags.no_bjet_calib_p4:
                 small_R_jet_branches.variables += ["n_muons_%SYS%"]
                 if flags.Input.isMC:
                     small_R_jet_branches.variables += ["bJetTruthPt", "bJetTruthDR"]
@@ -98,7 +98,7 @@ def get_small_R_jet_branches(
                         "MuonCorrMomentum_m",
                     ]
 
-        if tree_flags.collection_options.small_R_jets.JVT_details:
+        if jet_output_flags.JVT_details:
             small_R_jet_branches.variables += [
                 "Jvt",
                 "JvtRpt",
@@ -113,10 +113,7 @@ def get_small_R_jet_branches(
                 if flags.Analysis.Small_R_jet.useFJvt:
                     small_R_jet_branches.variables += ["fjvt_effSF_%SYS%"]
 
-    if (
-        flags.Input.isMC
-        and (tree_flags.collection_options.small_R_jets.truth_parent_info)
-    ):
+    if flags.Input.isMC and jet_output_flags.truth_parent_info:
         small_R_jet_branches.variables += get_TopHiggs_jet_truth_labels(flags)
 
     if flags.Analysis.Small_R_jet.saveTriggerInfo:
@@ -149,7 +146,7 @@ def get_small_R_jet_branches(
         (get_valid_ami_tag(split_tags, "p", "p6697") and not flags.Input.isPHYSLITE)
         or get_valid_ami_tag(split_tags, "p", "p6697"))
 
-    if tree_flags.collection_options.small_R_jets.btag_details and gn2v01_valid_ptag:
+    if jet_output_flags.btag_details and gn2v01_valid_ptag:
         small_R_jet_branches.variables += [
             "GN2v01_pb",
             "GN2v01_pc",
@@ -157,7 +154,7 @@ def get_small_R_jet_branches(
             "GN2v01_ptau",
         ]
 
-    if tree_flags.collection_options.small_R_jets.gn3_scores and gn3_valid_ptag:
+    if jet_output_flags.gn3_scores and gn3_valid_ptag:
         # Main models we store all the predictions:
         # b,c,s,ud,g,tau -> 'u' = ud,s,g, 'quark' = ud,s
         for prob in ['b', 'c', 's', 'ud', 'g', 'tau', 'u', 'quark']:
@@ -170,5 +167,9 @@ def get_small_R_jet_branches(
                 small_R_jet_branches.variables += [
                     f"{gn3t}_p{prob}"
                 ]
+
+    small_R_jet_branches.variables += jet_output_flags.extra_variables
+    if flags.Input.isMC:
+        small_R_jet_branches.variables += jet_output_flags.mc_extra_variables
 
     return small_R_jet_branches.get_output_list()

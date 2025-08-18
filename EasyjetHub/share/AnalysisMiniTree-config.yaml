@@ -25,6 +25,8 @@ collection_options:
     btag_details: false
     run_selection: false
     gn3_scores: false
+    extra_variables: []
+    mc_extra_variables: []
 
   large_R_jets:
     substructure_info: false
@@ -33,29 +35,39 @@ collection_options:
     run_selection: false
     no_bjet_calib_p4: false
     bjet_regression: false
+    extra_variables: []
+    mc_extra_variables: []
 
   taus:
     score_branches: false
     truth_branches: false
     truth_parent_info: false
     run_selection: true
+    extra_variables: []
+    mc_extra_variables: []
 
   photons:
     shower_shapes: false
     truth_labels: false
     iso_variables: false
     run_selection: true
+    extra_variables: []
+    mc_extra_variables: []
   
   electrons:
     iso_variables: false
     id_variables: false
     run_selection: true
     truth_parent_info: false
+    extra_variables: []
+    mc_extra_variables: []
 
   muons:
     iso_variables: false
     run_selection: true
     truth_parent_info: false
+    extra_variables: []
+    mc_extra_variables: []
 
 # turned off automatically if MC
 truth_outputs:

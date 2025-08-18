@@ -6,6 +6,8 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
 
+    mu_output_flags = tree_flags.collection_options.muons
+
     muon_branches = BranchManager(
         input_container,
         output_prefix,
@@ -19,7 +21,7 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
     muon_branches.add_four_mom_branches(do_mass=False)
     muon_branches.variables += ["charge"]
 
-    if tree_flags.collection_options.muons.iso_variables:
+    if mu_output_flags.iso_variables:
         muon_branches.variables += [
             "neflowisol20",
             "neflowisol20_CloseByCorr",
@@ -107,8 +109,7 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
             "truthOrigin"
         ]
 
-    if flags.Input.isMC and \
-       tree_flags.collection_options.muons.truth_parent_info:
+    if flags.Input.isMC and mu_output_flags.truth_parent_info:
         truth_labels = []
         if not flags.Input.isPHYSLITE:
             truth_labels += [
@@ -123,11 +124,15 @@ def get_muon_branches(flags, tree_flags, input_container, output_prefix):
         ]
 
     # Requires MuonSelectorAlg to be run
-    if tree_flags.collection_options.muons.run_selection:
+    if mu_output_flags.run_selection:
         muon_branches.variables += ["isAnalysisMuon_%SYS%"]
         for index in range(flags.Analysis.Muon.amount):
             muon_branches.variables += [f"isMuon{index+1}_%SYS%"]
         for index in range(flags.Analysis.Lepton.amount):
             muon_branches.variables += [f"isLepton{index+1}_%SYS%"]
+
+    muon_branches.variables += mu_output_flags.extra_variables
+    if flags.Input.isMC:
+        muon_branches.variables += mu_output_flags.mc_extra_variables
 
     return muon_branches.get_output_list()

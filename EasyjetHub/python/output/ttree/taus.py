@@ -8,6 +8,8 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
 
+    tau_output_flags = tree_flags.collection_options.taus
+
     tau_branches = BranchManager(
         input_container,
         output_prefix,
@@ -36,7 +38,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
         for id_wp in id_wps
     ]
 
-    if tree_flags.collection_options.taus.score_branches:
+    if tau_output_flags.score_branches:
         tau_branches.variables += [
             "RNNJetScoreSigTrans",
             "RNNEleScoreSigTrans_v1"
@@ -50,7 +52,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
                 "GNTauScoreSigTrans_v0prune"
             ]
 
-    if flags.Input.isMC and tree_flags.collection_options.taus.truth_branches:
+    if flags.Input.isMC and tau_output_flags.truth_branches:
         tau_branches.variables += [
             "truth_pt_vis",
             "truth_eta_vis",
@@ -62,7 +64,7 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
             "truthOrigin"
         ]
 
-    if flags.Input.isMC and tree_flags.collection_options.taus.truth_parent_info:
+    if flags.Input.isMC and tau_output_flags.truth_parent_info:
         tau_branches.variables += get_TopHiggs_tau_truth_labels(flags)
 
     if flags.Input.isMC:
@@ -75,9 +77,13 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
         ]
 
     # Requires TauSelectorAlg to be run
-    if tree_flags.collection_options.taus.run_selection:
+    if tau_output_flags.run_selection:
         tau_branches.variables += ["isAnalysisTau_%SYS%"]
         for index in range(flags.Analysis.Tau.amount):
             tau_branches.variables += [f"isTau{index+1}_%SYS%"]
+
+    tau_branches.variables += tau_output_flags.extra_variables
+    if flags.Input.isMC:
+        tau_branches.variables += tau_output_flags.mc_extra_variables
 
     return tau_branches.get_output_list()
