@@ -55,12 +55,14 @@ namespace HHBBTT
 	"HLT_e17_lhvloose_L1EM15VHI", "HLT_e20_lhvloose_L1EM15VH",
 	"HLT_e250_etcut_L1EM22VHI"
       };
+      single_ele_SF_path = "e26_lhtight_ivarloose_L1EM22VHI_OR_e60_lhmedium_L1EM22VHI_OR_e140_lhloose_L1EM22VHI";
     }
     else if(year==2022){
       single_ele_paths = {
 	"HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
 	"HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
       };
+      single_ele_SF_path = "e26_lhtight_ivarloose_L1EM22VHI_OR_e60_lhmedium_L1EM22VHI_OR_e140_lhloose_L1EM22VHI";
     }
     else if(runBoolDecos.at(HHBBTT::is23_75bunches)(*eventInfo)){
       single_ele_paths = {
@@ -68,6 +70,7 @@ namespace HHBBTT
 	"HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
 	"HLT_e300_etcut_L1EM22VHI"
       };
+      single_ele_SF_path = "e26_lhtight_ivarloose_L1eEM26M_OR_e60_lhmedium_L1eEM26M_OR_e140_lhloose_L1eEM26M_OR_e300_etcut_L1eEM26M";
     }
     else if(year==2023){
       single_ele_paths = {
@@ -75,6 +78,7 @@ namespace HHBBTT
 	"HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
 	"HLT_e300_etcut_L1eEM26M"
       };
+      single_ele_SF_path = "e26_lhtight_ivarloose_L1eEM26M_OR_e60_lhmedium_L1eEM26M_OR_e140_lhloose_L1eEM26M_OR_e300_etcut_L1eEM26M";
     }
   }
 
