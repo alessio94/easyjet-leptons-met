@@ -60,6 +60,9 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
             channel=flags.Analysis.channel,
             cutList=(flags.Analysis.CutList
                      if hasattr(flags.Analysis, "CutList") else []),
+            saveCutFlow=(False if flags.Analysis.do_CP_systematics
+                         else flags.Analysis.save_cutflow),
+            isMC=flags.Input.isMC,
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
             GN2X_WPs=flags.Analysis.Large_R_jet.GN2X_hbb_wps
@@ -149,9 +152,5 @@ def bbVV_branches(flags):
     int_variable_names += object_level_int_variables
 
     branches += object_level_branches
-
-    # cuts in ttree
-    branches += ["EventInfo.PassAllCuts_%SYS% -> PassAllCuts"
-                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names, int_variable_names

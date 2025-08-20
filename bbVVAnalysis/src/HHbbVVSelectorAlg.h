@@ -152,6 +152,7 @@ private:
     // counter vars (for debugging)
     int Jet_evt = 0; // Need to decide whether bbVV needs AT_LEAST_TWO_JETS
     long long int n_evt = 0;
+    double m_total_mcEventWeight{0.0};
 
     const double m_Wmass = 80.379 * Athena::Units::GeV; // This is the W mass used in earlier study
     const double m_Hmass = 125.09 * Athena::Units::GeV; // This is the H mass used in earlier study
@@ -159,9 +160,12 @@ private:
 
 
     Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
-    Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", true};
+    Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
 
-    CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+    Gaudi::Property<bool> m_isMC
+        { this, "isMC", false, "Is this simulation?" };
+    CP::SysReadDecorHandle<float>
+        m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };
     
   };
 }

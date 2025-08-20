@@ -55,9 +55,8 @@ namespace HHBBVV
     ATH_CHECK(m_Whad2.initialize(m_systematicsList, m_lrjetHandle));
     ATH_CHECK(m_Hbb.initialize(m_systematicsList, m_lrjetHandle));
 
-    // special flag for all cuts
-    ATH_CHECK (m_passallcuts.initialize(m_systematicsList, m_eventHandle));
-
+    // Weight for cutflow
+    if (m_saveCutFlow) ATH_CHECK (m_generatorWeight.initialize(m_systematicsList, m_eventHandle));
 
     if (!m_isBtag.empty()) {
       ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
@@ -127,6 +126,9 @@ namespace HHBBVV
         cut.passed = false;
       }
       n_evt+=1;
+      if (m_saveCutFlow && m_isMC) {
+        m_total_mcEventWeight+= m_generatorWeight.get(*event, sys);
+      }
 
 
       // Apply selection
@@ -181,12 +183,12 @@ namespace HHBBVV
       if (m_run_lep && n_leptons == 1)
       {
         ONE_LEP = true;
-        m_bbVVCuts("EXACTLY_ONE_LEPTON").passed = true;
+        if (m_bbVVCuts.exists("EXACTLY_ONE_LEPTON")) m_bbVVCuts("EXACTLY_ONE_LEPTON").passed = true;
       }
       else if (m_run_had && n_leptons == 0)
       {
         VETO_LEP = true;
-        m_bbVVCuts("VETO_SIGNAL_LEPTON").passed = true;
+        if (m_bbVVCuts.exists("VETO_SIGNAL_LEPTON")) m_bbVVCuts("VETO_SIGNAL_LEPTON").passed = true;
       }
 
       //************
@@ -234,18 +236,18 @@ namespace HHBBVV
       if (n_lrjets >= 2)
       {
         TWO_LRJETS = true;
-        m_bbVVCuts("AT_LEAST_TWO_LRJETS").passed = true;
+        if (m_bbVVCuts.exists("AT_LEAST_TWO_LRJETS")) m_bbVVCuts("AT_LEAST_TWO_LRJETS").passed = true;
         //further selections can go here
 
         if(n_lrjets >= 3 && (std::find(m_channels.begin(), m_channels.end(),HHBBVV::SplitBoosted0Lep)!=m_channels.end())){
           THREE_LRJETS = true;
-          m_bbVVCuts("AT_LEAST_THREE_LRJETS").passed = true;
+          if (m_bbVVCuts.exists("AT_LEAST_THREE_LRJETS")) m_bbVVCuts("AT_LEAST_THREE_LRJETS").passed = true;
         }
 
         leadLRJ_pt = lrjets->get(0)->pt();
       }
 
-      if (leadLRJ_pt > 500. * Athena::Units::GeV)
+      if (leadLRJ_pt > 500. * Athena::Units::GeV && m_bbVVCuts.exists("LEAD_LRJ_PT"))
       {
         m_bbVVCuts("LEAD_LRJ_PT").passed = true;
       }
@@ -264,9 +266,9 @@ namespace HHBBVV
             distJetClassification(*lrjets, Hbb, Whad, signal_lepton, sys);
             signalBtagging(Hbb, Whad, sys, HBB_BTAG, WHAD_BTAG);
             ONELEPBOOSTED_TOPO = (Whad->p4().DeltaR(signal_lepton) < 1.0); // Run 2: < 1.0
-            if (ONELEPBOOSTED_TOPO) m_bbVVCuts("DR_CUT").passed = true;
-            if (Hbb && Hbb->pt() > 500. * Athena::Units::GeV) m_bbVVCuts("HBB_PT").passed = true;
-            if (HBB_BTAG) m_bbVVCuts("HBB_BTAG").passed = true;
+            if (ONELEPBOOSTED_TOPO && m_bbVVCuts.exists("DR_CUT")) m_bbVVCuts("DR_CUT").passed = true;
+            if (Hbb && Hbb->pt() > 500. * Athena::Units::GeV && m_bbVVCuts.exists("HBB_PT")) m_bbVVCuts("HBB_PT").passed = true;
+            if (HBB_BTAG && m_bbVVCuts.exists("HBB_BTAG")) m_bbVVCuts("HBB_BTAG").passed = true;
           }
         }
         else if(channel == HHBBVV::SplitBoosted1Lep)
@@ -276,7 +278,7 @@ namespace HHBBVV
           {
             massJetClassification(*lrjets, Hbb, Whad, sys);
             ONELEPSPLITBOOSTED_TOPO = (Whad->p4().DeltaR(signal_lepton) > 1.0); //condition split-boosted
-            if (ONELEPSPLITBOOSTED_TOPO)
+            if (ONELEPSPLITBOOSTED_TOPO && m_bbVVCuts.exists("DR_CUT"))
             {
               m_bbVVCuts("DR_CUT").passed = true;
             }
@@ -290,7 +292,7 @@ namespace HHBBVV
             SubjetnessJetClassification(*lrjets, Hbb, Whad, sys); // WHad is the lrjet with the smaller Tau42
             signalBtagging(Hbb, Whad, sys, HBB_BTAG, WHAD_BTAG);
             ZEROLEPBOOSTED_TOPO = true; // Temporary, need to figure out how to define boosted WHad
-            if (HBB_BTAG) m_bbVVCuts("HBB_BTAG").passed = true;
+            if (HBB_BTAG && m_bbVVCuts.exists("HBB_BTAG")) m_bbVVCuts("HBB_BTAG").passed = true;
           }
         }
 
@@ -302,18 +304,10 @@ namespace HHBBVV
             splitboostedJetClassification(*lrjets, Hbb, Whad, Whad2, sys); // Hbb is the lrjet with the higher Hbb score
             signalBtagging(Hbb, Whad, Whad2, sys, HBB_BTAG, WHAD_BTAG, WHAD2_BTAG);
             ZEROLEPSPLITBOOSTED_TOPO = true; // Temporary, need to figure out how to define boosted WHad
-            if (HBB_BTAG) m_bbVVCuts("HBB_BTAG").passed = true;
+            if (HBB_BTAG && m_bbVVCuts.exists("HBB_BTAG")) m_bbVVCuts("HBB_BTAG").passed = true;
           }
         }
       }
-
-      bool passedall = true;
-      for (CutEntry& cut : m_bbVVCuts) {
-        passedall = passedall && cut.passed;
-      }
-      m_passallcuts.set(*event, passedall, sys); // Mark this event all passed
-      if(passedall)m_bbVVCuts.PassAllCuts += 1; // Count all passed event N
-
 
       // Count how many cuts the event passed and increase the relative counter
       for (const auto &cut : m_STANDARD_CUTS)  {
@@ -335,6 +329,7 @@ namespace HHBBVV
       // Here we basically increment the  N_events(pass_i  AND pass_i-1  AND ... AND pass_0) for the i-cut.
       for (unsigned int i=0; i<consecutive_cuts; i++) {
         m_bbVVCuts[i].relativeCounter+=1;
+        if (m_isMC) m_bbVVCuts[i].w_relativeCounter += m_generatorWeight.get(*event, sys);
       }
 
 
@@ -372,6 +367,7 @@ namespace HHBBVV
       m_bbVVCuts.DoAbsoluteEfficiency(n_evt, efficiency("AbsoluteEfficiency"));
       m_bbVVCuts.DoRelativeEfficiency(n_evt, efficiency("RelativeEfficiency"));
       m_bbVVCuts.DoStandardCutFlow(n_evt, efficiency("StandardCutFlow"));
+      if (m_isMC) m_bbVVCuts.DoWeightedStandardCutFlow(m_total_mcEventWeight, efficiency("WeightedStandardCutFlow"));
       m_bbVVCuts.DoCutflowLabeling(n_evt, hist("EventsPassed_BinLabeling"));
     }
 
@@ -561,6 +557,7 @@ namespace HHBBVV
     ANA_CHECK (book (TEfficiency("AbsoluteEfficiency","Absolute Efficiency of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
     ANA_CHECK (book (TEfficiency("RelativeEfficiency","Relative Efficiency of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
     ANA_CHECK (book (TEfficiency("StandardCutFlow","StandardCutFlow of HH->bbVV cuts;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
+    if (m_isMC) ANA_CHECK (book (TEfficiency("WeightedStandardCutFlow","Weighted StandardCutFlow of HH->bbVV cuts. Needs rescaling to sumOfWeights.;Cuts;#epsilon", nbins, 0.5, nbins + 0.5)));
     ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
 
     return StatusCode::SUCCESS;
