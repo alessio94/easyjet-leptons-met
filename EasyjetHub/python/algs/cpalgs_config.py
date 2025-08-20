@@ -194,7 +194,9 @@ def cpalgs_cfg(flags):
         log.info("Adding thinning sequence")
         configSeq += thinning_sequence(flags)
 
-    if flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF:
+    if not flags.Analysis.disable_calib and \
+            ((flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF)
+                or flags.Analysis.Trigger.scale_factor.do_trigger_match):
         configSeq += triggerSF_sequence(flags)
 
     configSeq += selection_decoration_sequence(flags)

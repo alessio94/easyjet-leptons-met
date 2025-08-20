@@ -193,6 +193,9 @@ OverlapRemoval:
 trigger_year: Auto
 # apply trigger lists to filter event
 do_trigger_filtering: false
+# Require the events pass the global multi-leg trigger matching, using the
+# TrigGlobalEfficiencyCorrection tool/alg. Only for electron/muon/photon triggers
+do_trigger_match_filtering: false
 # list of triggers per year to consider
 Trigger:
   selection:
@@ -208,6 +211,11 @@ Trigger:
 
   scale_factor:
     doSF: False
+    
+    # Enable the electron/muon/photon multi-leg trigger-matching using
+    # the TrigGlobalEfficiencyCorrection tool/alg
+    do_trigger_match: false
+
   # Enable writing trigger flags in AnalysisMiniTree
   writeOutput: True
 

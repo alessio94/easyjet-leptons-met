@@ -7,7 +7,7 @@ from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_
 
 def get_event_info_branches(flags, tree_flags, trigger_chains):
     _syst_option = SystOption.ALL_SYST
-    if flags.Analysis.disable_calib or not flags.Input.isMC:
+    if flags.Analysis.disable_calib:
         _syst_option = SystOption.NONE
 
     eventinfo_branches = BranchManager(
@@ -23,8 +23,13 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             "averageInteractionsPerCrossing",
             "actualInteractionsPerCrossing",
             "nPrimaryVertices"
-        ]
+        ],
+        # Need syst_only_for not to be empty to avoid applying SYST on all
+        # branches, except those with %SYS% explicitly in the provided variable name
+        # (which we do for all SFs and trig-matching branches here)
+        syst_only_for=[''],
     )
+
     if flags.Analysis.do_primary_vertex_pos:
         eventinfo_branches.variables += [
             "beamPosX",
@@ -71,11 +76,6 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             if has_STXS_unc:
                 eventinfo_branches.variables += ["HTXS_Weights_Stage1_2_pTjet30"]
 
-        # Need syst_only_for not to be empty to avoid applying SYST on all
-        # other branches
-        # Any variable with %SYS% will anyway get systematics applied, so the list
-        # doesn't need to be exhaustive with the extra variables added in the config
-        eventinfo_branches.syst_only_for = ["generatorWeight_%SYS%"]
         if flags.Analysis.doPRW:
             PRW_config = [flags.Analysis.PileupReweighting]
             PRW_config += flags.Analysis.PileupReweighting.extra_prw
@@ -84,7 +84,6 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
                 postfix = ("_" + prw.postfix) if altConfig else ""
                 weight = "PileupWeight" + postfix + "_%SYS%"
                 eventinfo_branches.variables += [weight]
-                eventinfo_branches.syst_only_for += [weight]
                 altConfig = True
 
     # Replace L1Topo characters, formatting as done by the
@@ -93,19 +92,23 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
         f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
         for c in trigger_chains
     ]
+
     if flags.Analysis.Trigger.writeOutput:
         eventinfo_branches.variables += trigger_branches
 
     # Event-level scale factors
+    trg_vars = []
     if flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF:
-
-        var = ["globalTriggerEffSF_%SYS%"]
-        # Only dump trigger SF if computed before
+        trg_vars.append('globalTriggerEffSF_%SYS%')
+    if flags.Analysis.Trigger.scale_factor.do_trigger_match:
+        trg_vars.append('globalTriggerMatch_%SYS%')
+    if trg_vars:
+        # Only dump trigger SF and matching flag if computed before
         for year in flags.Analysis.Years:
             if not flags.Analysis.TriggerChainsSF[str(year)]:
-                var = []
+                trg_vars = []
 
-        eventinfo_branches.variables += var
+        eventinfo_branches.variables += trg_vars
 
     if (
         flags.Input.isMC
