@@ -32,12 +32,20 @@ Truth:
   decayModes: ["bbbb"]
   do_STXS: false
 
+splitOutputTree: false
+
 do_small_R_jets: false
 do_large_R_UFO_jets: false
 do_large_R_Topo_jets: false
 do_VR_jets: false
 do_muons: false
 do_met: false
+
+Small_R_jet:
+  useFJvt: true
+  btag_egReductionB: "Medium"
+  btag_egReductionC: "Medium"
+  btag_egReductionLight: "Medium"
 
 # orthogonality studies  
 orthogonality:

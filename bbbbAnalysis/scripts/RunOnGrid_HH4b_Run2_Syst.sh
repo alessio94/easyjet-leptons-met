@@ -1,6 +1,6 @@
 runConfig="bbbbAnalysis/RunConfig-HH4b-All.yaml"
 executable="bbbb-ntupler"
-campaignName="EJ_%Y_%m_%d_T%H%M%S_HH4b_Syst_v00"
+campaignName="EJ_v0_43_HH4b_Syst"
 
 dir_samples="../easyjet/bbbbAnalysis/datasets/HH4b/"
 mc_list=(
@@ -14,4 +14,7 @@ easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
     --exec ${executable} \
     --nGBperJob 2 \
     --campaign ${campaignName} \
-    --noTag
+    --noTag \
+    --dest-se CERN-PROD_LOCALGROUPDISK
+
+rm -rf co*
