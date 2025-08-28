@@ -150,25 +150,39 @@ namespace HH4B
           {
             if (legInfo.signature == "j")
             {
-              if (jetSFFile && m_jetTriggerSFMap.find(legInfo.threshold) == m_jetTriggerSFMap.end())
+              int legThreshold = legInfo.threshold;
+              if (legInfo.legName().find("gsc") != std::string::npos)
               {
-                std::string sfName = m_matchingLevel+"_j"+std::to_string(legInfo.threshold);
+                for (auto part : legInfo.legParts)
+                {
+                  if (part.find("gsc") != std::string::npos)
+                  {
+                    legThreshold = std::stoi(part.substr(3));
+                    ATH_MSG_DEBUG("GSC leg found. Using threshold " << legThreshold);
+                    break;
+                  }
+                }
+              }
+              if (jetSFFile && m_jetTriggerSFMap.find(legThreshold) == m_jetTriggerSFMap.end())
+              {
+                std::string sfName = m_matchingLevel+"_j"+std::to_string(legThreshold);
                 std::string histName = std::to_string(m_year)+"/"+sfName+"/"+sfName;
                 TH2D* h(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_scale_factors").c_str())));
                 if (h)
                 {
-                  m_jetTriggerSFMap.emplace(legInfo.threshold, h);
+                  m_jetTriggerSFMap.emplace(legThreshold, h);
                   TH2D* h_stats_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_stats_abs_uncertainty").c_str())));
                   TH2D* h_syst_unc(dynamic_cast<TH2D *>(jetSFFile->Get((histName+"_systematic_abs_uncertainty").c_str())));
-                  if (h_stats_unc) {m_jetTriggerSFStatsMap.emplace(legInfo.threshold, h_stats_unc);}
-                  if (h_syst_unc) {m_jetTriggerSFSystMap.emplace(legInfo.threshold, h_syst_unc);}
+                  if (h_stats_unc) {m_jetTriggerSFStatsMap.emplace(legThreshold, h_stats_unc);}
+                  if (h_syst_unc) {m_jetTriggerSFSystMap.emplace(legThreshold, h_syst_unc);}
                 }
-                else { ATH_MSG_WARNING("No trigger jet scale factor for HLT threshold j" << legInfo.threshold); }
+                else { ATH_MSG_WARNING("No trigger jet scale factor for HLT threshold j" << legThreshold); }
               }
               for (unsigned int i = 0; i < legInfo.multiplicity; i++) // flattern the multiplicity
               {
-                thresholds.push_back(legInfo.threshold);
+                thresholds.push_back(legThreshold);
               }
+              ATH_MSG_DEBUG("HLT jet leg found. Threshold: " << legThreshold << ", multiplicity: " << legInfo.multiplicity);
               if (legInfo.legName().find("SHARED") != std::string::npos)
               { // the next leg is a SHARED leg because SHARED is parsed as part of
                 // the previous leg name. Break here to ignore the shared leg.
