@@ -13,4 +13,6 @@ CutList :
   - PASS_TRIGGER 
   - PASS_ONE_LARGE_JET
 
+UseVBFRNN : true
+
 #Categories :

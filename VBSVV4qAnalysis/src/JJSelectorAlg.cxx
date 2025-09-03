@@ -63,7 +63,8 @@ namespace VBSVV4q{
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
   
       const xAOD::JetContainer *vbsjets = nullptr;
-      ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
+      if( !m_UseVBFRNN )
+	ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
 
       const xAOD::JetContainer *largeJets = nullptr;
       ANA_CHECK (m_LargeRJetsHandle.retrieve (largeJets, sys));
@@ -75,8 +76,9 @@ namespace VBSVV4q{
       if (!m_passTriggerSJT.empty() and m_passTriggerSJT.get(*event, sys)) {
         m_bools.at(VBSVV4q::PASS_TRIGGER) = true;
       } 
-      
-      vbsjetsSelection(vbsjets);
+
+      if( !m_UseVBFRNN )
+	vbsjetsSelection(vbsjets);
 
       bool pass_preselection = true;
       //bool pass_preselection = m_bools.at(VBSVV4q::PASS_RES_BASELINE) || m_bools.at(VBSVV4q::PASS_MERG_BASELINE);

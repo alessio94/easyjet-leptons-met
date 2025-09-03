@@ -103,6 +103,7 @@ namespace VBSVV4q{
       Gaudi::Property<std::vector<std::string>> m_triggers 
       { this, "triggerLists", {}, "Name list of trigger" };
 
+      Gaudi::Property<bool> m_UseVBFRNN { this, "UseVBFRNN", false, "Not use VBS tagging jets or yes (i.e. use VBF-RNN jets or not)" };
   };
 }
 #endif

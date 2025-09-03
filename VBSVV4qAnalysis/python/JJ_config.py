@@ -25,6 +25,21 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
         )
     )
 
+    # VBF-RNN tagger: boosted-boosted
+    if flags.Analysis.UseVBFRNN:
+        vbftagger = CompFactory.VBFTagger("VBFTaggerTool", modelTag="VBFRNNv1p0p0")
+        cfg.addEventAlgo(
+            CompFactory.VBFTaggerAlgSys(
+                "VBFTaggerAlg_boosted",
+                VBFTagger=vbftagger,
+                containerAllJetsKey="VBSVV4qAnalysisJets_%SYS%",
+                containerSigLargeRJetsKey="VBSVV4qAnalysisSigLargeJets_%SYS%",
+                nMaxJets=2,
+                pTCut=30.e3,
+                DecTag=""
+            )
+        )
+
     # tagging jets
     cfg.addEventAlgo(
         CompFactory.VBSVV4q.VBSJetsSelectorAlg(
@@ -62,6 +77,7 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
             LargeRJets="VBSVV4qAnalysisLargeJets_%SYS%",
             SigLargeRJets="VBSVV4qAnalysisSigLargeJets_%SYS%",
             vbsjets="VBSVV4qAnalysisVBSJets_%SYS%",
+            RNNJetsDec="RNNJets_%SYS%",
             isMC=flags.Input.isMC,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
@@ -70,6 +86,7 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
             loadGN2x=flags.Analysis.loadGN2x
         )
     )
+
     return cfg
 
 
@@ -89,6 +106,11 @@ def get_BaselineVarsJJAlg_variables(flags):
 
     for object in ["TagJets"]:
         for var in ["pT", "eta", "phi", "M", "deta", "DR", "dphi"]:
+            float_variable_names.append(f"{object}_{var}")
+
+    # VBF RNN jets
+    for object in ["RNNJets_Jet1", "RNNJets_Jet2"]:
+        for var in ["pT", "eta", "phi", "E", "M"]:
             float_variable_names.append(f"{object}_{var}")
 
     # signal large-R jets
@@ -156,5 +178,11 @@ def JJ_branches(flags):
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> pass_trigger_{cat}"
                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
+    # VBF tagger
+    if flags.Analysis.UseVBFRNN:
+        vars = ['RNNScore', 'nRNNJets']
+        for var in vars:
+            branches += [f'EventInfo.{var}_%SYS% -> {var}_%SYS%']
 
     return branches, float_variable_names, int_variable_names

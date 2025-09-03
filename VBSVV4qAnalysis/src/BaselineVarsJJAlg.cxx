@@ -24,7 +24,12 @@ namespace VBSVV4q{
       ATH_CHECK (m_SmallRJetsHandle.initialize(m_systematicsList));
       ATH_CHECK (m_LargeRJetsHandle.initialize(m_systematicsList));
       ATH_CHECK (m_SigLargeRJetsHandle.initialize(m_systematicsList));
-      ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
+      if( !m_UseVBFRNN ){
+        ATH_CHECK (m_vbsjetHandle.initialize(m_systematicsList));
+      }
+      else {
+        ATH_CHECK (m_RNNjetHandle.initialize(m_systematicsList));
+      }
       ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
       if (!m_isBtag.empty()) {
@@ -83,7 +88,13 @@ namespace VBSVV4q{
         ANA_CHECK (m_SmallRJetsHandle.retrieve (SmallRJets, sys));
 
         const xAOD::JetContainer *vbsjets = nullptr;
-        ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
+	const xAOD::JetContainer *RNNJets = nullptr;
+        if(!m_UseVBFRNN) {
+          ANA_CHECK (m_vbsjetHandle.retrieve (vbsjets, sys));
+        }
+        else {
+          ANA_CHECK (m_RNNjetHandle.retrieve (RNNJets, sys));
+        }
 
         for (const std::string &string_var: m_floatVariables) {
           m_Fbranches.at(string_var).set(*event, -99., sys);
@@ -192,33 +203,47 @@ namespace VBSVV4q{
         }
         
         // kinematics of tagging jets
-        TLorentzVector tagjet1, tagjet2, tag_jj;
-        if ( vbsjets->size() >= 2 ){
-          tagjet1 = vbsjets -> at(0) -> p4();
-          tagjet2 = vbsjets -> at(1) -> p4();
-          tag_jj = tagjet1 + tagjet2;
-          
-          m_Fbranches.at("TagJet1_pT").set(*event, tagjet1.Pt(), sys);
-          m_Fbranches.at("TagJet1_eta").set(*event, tagjet1.Eta(), sys);
-          m_Fbranches.at("TagJet1_phi").set(*event, tagjet1.Phi(), sys);
-          m_Fbranches.at("TagJet1_E").set(*event, tagjet1.E(), sys);
-
-          m_Fbranches.at("TagJet2_pT").set(*event, tagjet2.Pt(), sys);
-          m_Fbranches.at("TagJet2_eta").set(*event, tagjet2.Eta(), sys);
-          m_Fbranches.at("TagJet2_phi").set(*event, tagjet2.Phi(), sys);
-          m_Fbranches.at("TagJet2_E").set(*event, tagjet2.E(), sys);
-
-          m_Fbranches.at("TagJets_M").set(*event, tag_jj.M(), sys);
-          m_Fbranches.at("TagJets_deta").set(*event, abs(tagjet1.Eta()-tagjet2.Eta()), sys);
-
-          m_Fbranches.at("TagJets_pT").set(*event, tag_jj.Pt(), sys);
-          m_Fbranches.at("TagJets_eta").set(*event, tag_jj.Eta(), sys);
-          m_Fbranches.at("TagJets_phi").set(*event, tag_jj.Phi(), sys);
-
-          m_Fbranches.at("TagJets_DR").set(*event, tagjet1.DeltaR(tagjet2), sys);
-          m_Fbranches.at("TagJets_dphi").set(*event, tagjet1.DeltaPhi(tagjet2), sys);
+	if (!m_UseVBFRNN) {
+	  TLorentzVector tagjet1, tagjet2, tag_jj;
+	  if ( vbsjets->size() >= 2 ){
+	    tagjet1 = vbsjets -> at(0) -> p4();
+	    tagjet2 = vbsjets -> at(1) -> p4();
+	    tag_jj = tagjet1 + tagjet2;
+	    
+	    m_Fbranches.at("TagJet1_pT").set(*event, tagjet1.Pt(), sys);
+	    m_Fbranches.at("TagJet1_eta").set(*event, tagjet1.Eta(), sys);
+	    m_Fbranches.at("TagJet1_phi").set(*event, tagjet1.Phi(), sys);
+	    m_Fbranches.at("TagJet1_E").set(*event, tagjet1.E(), sys);
+	    
+	    m_Fbranches.at("TagJet2_pT").set(*event, tagjet2.Pt(), sys);
+	    m_Fbranches.at("TagJet2_eta").set(*event, tagjet2.Eta(), sys);
+	    m_Fbranches.at("TagJet2_phi").set(*event, tagjet2.Phi(), sys);
+	    m_Fbranches.at("TagJet2_E").set(*event, tagjet2.E(), sys);
+	    
+	    m_Fbranches.at("TagJets_M").set(*event, tag_jj.M(), sys);
+	    m_Fbranches.at("TagJets_deta").set(*event, abs(tagjet1.Eta()-tagjet2.Eta()), sys);
+	    
+	    m_Fbranches.at("TagJets_pT").set(*event, tag_jj.Pt(), sys);
+	    m_Fbranches.at("TagJets_eta").set(*event, tag_jj.Eta(), sys);
+	    m_Fbranches.at("TagJets_phi").set(*event, tag_jj.Phi(), sys);
+	    
+	    m_Fbranches.at("TagJets_DR").set(*event, tagjet1.DeltaR(tagjet2), sys);
+	    m_Fbranches.at("TagJets_dphi").set(*event, tagjet1.DeltaPhi(tagjet2), sys);
+	  }
+	}
+	//kinematics of RNN jets
+        else {
+	  for(unsigned int j=0; j<std::min(size_t(2),RNNJets->size()); j++) {
+	    std::string prefix = "Jet"+std::to_string(j+1);
+	    const xAOD::Jet* RNNJet = RNNJets->at(j);
+	    m_Fbranches.at("RNNJets_"+prefix+"_M").set(*event, RNNJet->m(), sys);
+	    m_Fbranches.at("RNNJets_"+prefix+"_E").set(*event, RNNJet->e(), sys);
+	    m_Fbranches.at("RNNJets_"+prefix+"_pT").set(*event, RNNJet->pt(), sys);
+	    m_Fbranches.at("RNNJets_"+prefix+"_eta").set(*event, RNNJet->eta(), sys);
+	    m_Fbranches.at("RNNJets_"+prefix+"_phi").set(*event, RNNJet->phi(), sys);
+          }
         }
-      }
+      }      
 
       return StatusCode::SUCCESS;
     }

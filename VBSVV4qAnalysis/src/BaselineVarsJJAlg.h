@@ -44,6 +44,7 @@ namespace VBSVV4q{
         CP::SysReadHandle<xAOD::JetContainer> m_SigLargeRJetsHandle{ this, "SigLargeRJets", "", "Large R Jet container to read"};
 
         CP::SysReadHandle<xAOD::JetContainer> m_vbsjetHandle{ this, "vbsjets", "",   "VBS Jet container to read" };
+        CP::SysReadHandle<xAOD::JetContainer> m_RNNjetHandle{ this, "RNNJetsDec", "RNNJets_%SYS%", "input RNN jets container for boosted-boosted" };
         
         CP::SysReadHandle<xAOD::EventInfo>
         m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
@@ -80,6 +81,8 @@ namespace VBSVV4q{
 
         std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
+        Gaudi::Property<bool> m_UseVBFRNN { this, "UseVBFRNN", true, "Not use VBS tagging jets or yes (i.e. use VBF-RNN jets or not)" };
+      
     };
 }
 #endif
