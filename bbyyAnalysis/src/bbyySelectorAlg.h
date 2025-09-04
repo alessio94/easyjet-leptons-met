@@ -168,7 +168,8 @@ namespace HHBBYY
         {"HLT_g140_loose_L1eEM26M", "single_photon"},
         {"HLT_g35_loose_g25_loose", "diphoton"},
         {"HLT_g35_medium_g25_medium_L12EM20VH", "diphoton"},
-        {"HLT_g35_medium_g25_medium_L12eEM24L", "diphoton"}
+        {"HLT_g35_medium_g25_medium_L12eEM24L", "diphoton"},
+        {"HLT_g45_medium_g20_medium_L1eEM40L_2eEM18L", "diphoton"}
     };
 
       CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
