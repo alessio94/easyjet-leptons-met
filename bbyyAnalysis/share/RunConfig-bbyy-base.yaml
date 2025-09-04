@@ -34,16 +34,19 @@ Small_R_jet:
   btag_egReductionLight: "Medium"
 
 Electron:
+  min_pT_bbyy: 10.e+3 # minimum pT of selected electons (for lepton veto). Separate from min pT of electrons used for OR.
   ID: "MediumLH"
   Iso: "Loose_VarRad"
   correlationModelId: "TOTAL"
 
 Muon:
+  min_pT_bbyy: 10.e+3 # minimum pT of selected muons (for lepton veto). Separate from min pT of muons used for OR.
   ID: "Medium"
   Iso: "PflowLoose_VarRad"
 
 # photon ID and isolation requirements
 Photon:
+  min_pT_bbyy: 22.e+3 # minimum pT of selected Photons. Separate from min pT of photons used for OR.
   ID: "Loose" # Loose, Tight
   Iso: "NonIso"
   amount: 2

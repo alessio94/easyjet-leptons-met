@@ -27,17 +27,17 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=photonkey,
                                    containerOutKey="bbyyAnalysisPhotons_%SYS%",
-                                   minPt=22. * Units.GeV))
+                                   minPt=flags.Analysis.Photon.min_pT_bbyy))
 
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
                                  containerOutKey="bbyyAnalysisMuons_%SYS%",
-                                 minPt=10 * Units.GeV))
+                                 minPt=flags.Analysis.Muon.min_pT_bbyy))
 
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="bbyyAnalysisElectrons_%SYS%",
-                                     minPt=10. * Units.GeV))
+                                     minPt=flags.Analysis.Electron.min_pT_bbyy))
 
     cfg.merge(JetSelectorAlgCfg(
         flags,
