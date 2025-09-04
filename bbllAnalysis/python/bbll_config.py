@@ -260,8 +260,6 @@ def bbll_branches(flags):
         for m_X in flags.Analysis.mX_values:
             float_PNN_variable_names += [f"PNN_Score_X{m_X}"]
             float_PNN_variable_names += [f"PNN_Score_SR2_X{m_X}"]
-        float_PNN_variable_names += ["PNN_Score_SR1_SM"]
-        float_PNN_variable_names += ["PNN_Score_SR2_SM"]
         float_PNN_variable_names += ["DNN_Score_SR1"]
     all_baseline_variable_names += [
         *chain.from_iterable(float_variable_names.values()),
