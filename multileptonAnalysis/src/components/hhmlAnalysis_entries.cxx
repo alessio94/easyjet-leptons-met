@@ -1,9 +1,7 @@
 #include "../BaselineVarsMultileptonAlg.h"
+#include "../MbbKinFitDecoratorAlg.h"
 #include "../MultileptonSelectorAlg.h"
 
-
-using namespace MULTILEPTON;
-
-DECLARE_COMPONENT(BaselineVarsMultileptonAlg)
-DECLARE_COMPONENT(MultileptonSelectorAlg)
-
+DECLARE_COMPONENT(MULTILEPTON::MbbKinFitDecoratorAlg)
+DECLARE_COMPONENT(MULTILEPTON::BaselineVarsMultileptonAlg)
+DECLARE_COMPONENT(MULTILEPTON::MultileptonSelectorAlg)

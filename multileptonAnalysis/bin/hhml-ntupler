@@ -72,7 +72,8 @@ def hhml_job_cfg():
                 float_variables=float_variable_names,
                 float_vector_variables=float_vector_variable_names,
                 int_variables=int_variable_names,
-                char_vector_variables=char_vector_variable_names
+                char_vector_variables=char_vector_variable_names,
+                save_extrabb4l_vars=flags.Analysis.save_extrabb4l_vars
             ),
             seqname
         )

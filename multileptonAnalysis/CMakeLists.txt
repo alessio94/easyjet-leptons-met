@@ -26,6 +26,7 @@ atlas_add_component(hhmlAnalysis
   TriggerMatchingToolLib
   EventBookkeeperToolsLib
   EasyjetHubLib
+  KinematicFitToolLib
 )
 
 # Install python modules, joboptions, and share content

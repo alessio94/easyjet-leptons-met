@@ -10,7 +10,7 @@ from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
 def hhml_cfg(
         flags, smalljetkey, muonkey, electronkey, taukey,
         float_variables=None, float_vector_variables=None,
-        int_variables=None, char_vector_variables=None
+        int_variables=None, char_vector_variables=None, save_extrabb4l_vars=False
 ):
     if not float_variables:
         float_variables = []
@@ -52,6 +52,24 @@ def hhml_cfg(
         minPt=flags.Analysis.Small_R_jet.min_pT * Units.MeV,
     ))
 
+    # Kinematic Fit
+    from KinematicFitTool.KinematicFit_config import KinematicFitTool_bb4l_Cfg
+    if flags.Analysis.do_KinematicFit:
+        kinematic_fit_tool = cfg.popToolsAndMerge(
+            KinematicFitTool_bb4l_Cfg(
+                flags,
+                JetMinPt=flags.Analysis.Small_R_jet.min_pT,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp
+            )
+        )
+        cfg.addEventAlgo(
+            CompFactory.MULTILEPTON.MbbKinFitDecoratorAlg(
+                "MbbKinFitDecoratorAlg",
+                KinFitTool=kinematic_fit_tool,
+                doSystematics=flags.Analysis.do_CP_systematics,
+            )
+        )
+
     # Selection
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
     trigger_branches = [
@@ -84,6 +102,7 @@ def hhml_cfg(
             muonWP=MuonWPLabel,
             eleWP=ElectronWPLabel,
             leptonAmount=flags.Analysis.Lepton.amount,
+            doKF=flags.Analysis.do_KinematicFit,
             tauAmount=flags.Analysis.Tau.amount,
             jetAmount=flags.Analysis.Small_R_jet.amount,
             lightJetAmount=(flags.Analysis.Small_R_jet.amount
@@ -93,7 +112,8 @@ def hhml_cfg(
             floatVariableList=float_variables,
             floatVectorVariableList=float_vector_variables,
             intVariableList=int_variables,
-            charVectorVariableList=char_vector_variables
+            charVectorVariableList=char_vector_variables,
+            save_extrabb4l_vars=flags.Analysis.save_extrabb4l_vars
         )
     )
 
@@ -110,6 +130,34 @@ def get_BaselineVarshhmlAlg_variables(flags):
         "totalLepCharge", "totalTauCharge",
         "subChannelID", "subChannelFlavor",
     ]
+
+    if flags.Analysis.save_extrabb4l_vars:
+        HbbCandidate_float_vars = ["pt", "phi", "eta", "E"]
+        HbbCandidate_float_vars += ["uncorrPt", "muonCorrPt"]
+        for i in range(1, 3):
+            for var in HbbCandidate_float_vars:
+                float_variable_names += [f"HbbCandidate_Jet{i}_" + var]
+            for var in ["n_muons"]:
+                int_variable_names += [f"HbbCandidate_Jet{i}_" + var]
+
+        for var in [
+            "m_bb",
+            "pt_bb",
+            "eta_bb",
+            "phi_bb",
+            "dR_bb",
+            "Jet1_pt",
+            "Jet1_eta",
+            "Jet1_phi",
+            "Jet1_m",
+            "Jet2_pt",
+            "Jet2_eta",
+            "Jet2_phi",
+                "Jet2_m"]:
+            float_variable_names += ["HbbCand_uncorr_" + var,
+                                     "HbbCand_muonCorr_" + var,
+                                     "HbbCand_PtCorr_" + var,
+                                     "HbbCand_KF_" + var]
 
     return float_variable_names, int_variable_names
 
@@ -140,6 +188,11 @@ def hhml_branches(flags):
         *int_variable_names,
         *char_vector_variable_names
     ]
+
+    if flags.Analysis.do_KinematicFit:
+        # do not append KF_mbb variables to float_variable_names['baseline']
+        # as they are stored by the KF algorithm not BaselineVarsbb4lAlg
+        all_baseline_variable_names += ["KF_mbb"]
 
     for var in all_baseline_variable_names:
         branches += [

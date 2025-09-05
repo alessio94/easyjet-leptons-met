@@ -4,6 +4,8 @@ include: EasyjetHub/base-config.yaml
 
 # Which analysis to consider
 do_hhml_analysis: true
+save_extrabb4l_vars: false
+do_KinematicFit: false
 
 # CutBookKeeper histPattern
 cbkHistPattern: "CutBookkeeper_%RUN%_%SYS%"
@@ -29,6 +31,8 @@ Small_R_jet:
   amount: 6
   min_pT: 25.0e+3
   max_eta: 4.5
+  variables_bjets: ["uncorrPt", "muonCorrPt"]
+  variables_int_bjets: ["nmuons"]
 
 Tau:
   ID: "RNNMedium_eleid"

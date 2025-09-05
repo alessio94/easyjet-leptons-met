@@ -61,6 +61,12 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
         m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
+    CP::SysReadHandle<xAOD::JetContainer> m_kfJetHandle{
+        this, "KFJets", "bb4lAnalysisKFJets_%SYS%","KF jet container to read"};
+
+    xAOD::JetFourMom_t m_jet1_uncorr, m_jet2_uncorr;
+    xAOD::JetFourMom_t m_jet1_muonCorr, m_jet2_muonCorr;
+
     Gaudi::Property<bool> m_isMC
         { this, "isMC", false, "Is this simulation?" };
 
@@ -106,6 +112,18 @@ private:
     CP::SysReadDecorHandle<float> m_met_sig
           {this, "METSignificance", "significance_%SYS%", "Met Significance"};
 
+    Gaudi::Property<bool> m_save_extrabb4l_vars
+          { this, "save_extrabb4l_vars", false, "Save extra variables for bb4l studies?" };
+    Gaudi::Property<bool> m_doKinematicFit{this, "doKF", false,
+                                           "Enable KF jets retrieval"};
+
+    CP::SysReadDecorHandle<int>
+        m_nmuons{ this, "nmuons", "n_muons_%SYS%", "Number of muons from muon-in-jet correction"};
+
+    StatusCode SaveExtrabb4lVars(const std::vector<const xAOD::Jet*> &Hbbjets,
+                            const std::vector<const xAOD::Jet*> &KFJets,
+                            const xAOD::EventInfo *event, const auto& sys);
+
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 
@@ -114,6 +132,7 @@ private:
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
     std::unordered_map<std::string, CP::SysWriteDecorHandle<std::vector<char>>> m_CVbranches;
+    
  };
 }
 #endif

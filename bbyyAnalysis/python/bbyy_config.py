@@ -1,6 +1,5 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
-from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.cpalgs_config import get_sys_weight_name
 from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
@@ -43,7 +42,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         flags,
         containerInKey=smalljetkey,
         containerOutKey="bbyyAnalysisJets_%SYS%",
-        PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0], # noqa
+        PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0],  # noqa
         minPt=float(flags.Analysis.Small_R_jet.min_pT),
         pTsort=False,
         PCBTsort=True,
@@ -86,15 +85,18 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         )
     )
 
+    from KinematicFitTool.KinematicFit_config import KinematicFitTool_bbyy_Cfg
     if flags.Analysis.do_KinematicFit:
+        kinematic_fit_tool = cfg.popToolsAndMerge(
+            KinematicFitTool_bbyy_Cfg(
+                flags,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp
+            )
+        )
         cfg.addEventAlgo(
             CompFactory.HHBBYY.MbbKinFitDecoratorAlg(
                 "MbbKinFitDecoratorAlg",
-                KinFitTool=CompFactory.KinematicFitTool(
-                    JetMinPt=25. * Units.GeV,
-                    bTagWPDecorName=(
-                        "ftag_select_" + flags.Analysis.Small_R_jet.btag_wp),
-                    isRun3=flags.GeoModel.Run is LHCPeriod.Run3),
+                KinFitTool=kinematic_fit_tool,
                 doSystematics=flags.Analysis.do_CP_systematics,
             )
         )
