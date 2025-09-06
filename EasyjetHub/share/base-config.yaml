@@ -39,6 +39,7 @@ Truth:
   do_STXS: true
   include: DSID_samples.yaml
   nHiggses: 2
+  do_truthPart_patch: true
 
 # Toggles for reconstructed objects properties
 Small_R_jet:
