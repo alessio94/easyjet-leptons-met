@@ -261,7 +261,7 @@ namespace HZALLYY
         "HLT_e300_etcut_L1EM22VHI"
       };
     }
-    else if(year==2023){
+    else if(year==2023 || year==2024){
       single_ele_paths = {
         "HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M",
         "HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
@@ -290,7 +290,7 @@ namespace HZALLYY
     else if(2016<=year && year<=2018){
       single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
     }
-    else if(2022<=year && year<=2023 &&
+    else if(2022<=year && year<=2024 &&
 	    !m_is22_75bunches.get(*event, sys) &&
 	    !m_is23_75bunches.get(*event, sys) &&
 	    !m_is23_400bunches.get(*event, sys)){
@@ -346,7 +346,7 @@ namespace HZALLYY
         "HLT_2e17_lhvloose_L12EM15VHI", "HLT_2e24_lhvloose_L12EM20VH"
       };
     }
-    else if(year==2023){
+    else if(year==2023 || year==2024){
       di_ele_paths = {
         "HLT_2e17_lhvloose_L12eEM18M", "HLT_2e24_lhvloose_L12eEM24L"
       };
@@ -374,7 +374,7 @@ namespace HZALLYY
     else if(2016<=year && year<=2018){
       di_mu_paths = {"HLT_mu22_mu8noL1"};
     }
-    else if(2022<=year && year<=2023){
+    else if(2022<=year && year<=2024){
       di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
     }
     
