@@ -55,7 +55,7 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
                 btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
             # Make sure PCBT is scheduled to get SF
-            if "GN2v01_Continuous" not in btag_wps:
+            if btag_wps and "GN2v01_Continuous" not in btag_wps:
                 btag_wps += ["GN2v01_Continuous"]
 
             small_R_jet_branches.variables += [

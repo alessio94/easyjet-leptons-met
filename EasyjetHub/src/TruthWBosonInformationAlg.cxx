@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Jordy Degens, Osama Karkout
@@ -55,7 +55,7 @@ namespace Easyjet
         const xAOD::TruthParticle* final_W =
         getFinalParticleOfType(tp, {tp->pdgId()});
         
-        if (tp->barcode() == final_W->barcode()) {
+        if (tp->uid() == final_W->uid()) {
           // the if statement makes sure that the W is the final W (avoiding repitition structure of container)
           bool isWLep = false;
           for (size_t i = 0; i < final_W->nChildren(); i++) {

@@ -278,8 +278,8 @@ def minituple_output_cfg(
 
     outputSeq = CompFactory.AthSequencer('OutputSequence' + stream_name)
     outputConfigAccumulator = ConfigAccumulator(
-        outputSeq,
-        autoconfigFromFlags=flags,
+        algSeq=outputSeq,
+        flags=flags,
     )
     outputConfigSeq = output_analysis_sequence(flags, branches=tree_branches,
                                                met_branches=met_branches,

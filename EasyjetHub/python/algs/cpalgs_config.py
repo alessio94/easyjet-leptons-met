@@ -131,8 +131,8 @@ def cpalgs_cfg(flags):
     # the ConfigBlocks with interstitial container names etc
     calibSeq = CompFactory.AthSequencer('CPAlgSequence')
     configAccumulator = ConfigAccumulator(
-        calibSeq,
-        autoconfigFromFlags=flags,
+        algSeq=calibSeq,
+        flags=flags,
     )
 
     if not flags.Analysis.disable_calib:

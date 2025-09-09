@@ -122,7 +122,7 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
         # Make sure PCBT is scheduled to get SF
-        if "GN2v01_Continuous" not in btag_wps:
+        if btag_wps and "GN2v01_Continuous" not in btag_wps:
             btag_wps += ["GN2v01_Continuous"]
 
         for wp in btag_wps:

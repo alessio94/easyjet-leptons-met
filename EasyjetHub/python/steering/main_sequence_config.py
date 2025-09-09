@@ -80,8 +80,8 @@ def preselection_cfg(flags, seqname):
 
     weightSeq = CompFactory.AthSequencer('WeightSequence')
     weightConfigAccumulator = ConfigAccumulator(
-        weightSeq,
-        autoconfigFromFlags=flags,
+        algSeq=weightSeq,
+        flags=flags,
     )
 
     if not flags.Analysis.disable_calib:
@@ -153,7 +153,7 @@ def preselection_cfg(flags, seqname):
     # Activate the full configuration, which stitches together
     # the ConfigBlocks with interstitial container names etc
     configAccumulator = ConfigAccumulator(
-        preselSeq,
+        algSeq=preselSeq,
         autoconfigFromFlags=flags,
     )
     configSeq.fullConfigure(configAccumulator)

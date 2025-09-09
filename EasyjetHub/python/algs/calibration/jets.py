@@ -98,7 +98,7 @@ def jet_sequence(
             btag_wps += jet_flags.btag_extra_wps
 
         # Make sure PCBT is scheduled to get SF
-        if "GN2v01_Continuous" not in btag_wps:
+        if btag_wps and "GN2v01_Continuous" not in btag_wps:
             btag_wps += ["GN2v01_Continuous"]
 
         tagger_set = set()
@@ -112,7 +112,9 @@ def jet_sequence(
             configSeq.setOptionValue('.btagWP', btag_wp)
             # save pb / pc / pu / ptau
             if tagger not in tagger_set:
-                configSeq.setOptionValue('.saveScores', 'All')
+                tree_flags = flags.Analysis.ttree_output
+                if tree_flags.collection_options.small_R_jets.btag_details:
+                    configSeq.setOptionValue('.saveScores', 'All')
                 tagger_set.add(tagger)
 
             bTagCalibFile = None

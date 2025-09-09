@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Victor Ruelas
@@ -270,7 +270,7 @@ namespace Easyjet
     if (counter == 100)
       return;
     ATH_MSG_VERBOSE("Particle " << p->index() << " pdgID " << p->pdgId()
-                                << ", barcode " << p->barcode()
+                                << ", uniqueID " << p->uid()
                                 << ", children " << p->nChildren());
     for (size_t i = 0; i < p->nChildren(); i++)
     {
@@ -309,7 +309,7 @@ namespace Easyjet
 
       const xAOD::TruthParticle *final_child =
           getFinalParticleOfType(p->child(i), childrenPdgIds);
-      if (!tmp || (final_child->barcode() != tmp->barcode()))
+      if (!tmp || (final_child->uid() != tmp->uid()))
       {
         tmp = final_child;
         children.push_back(final_child);
@@ -350,7 +350,7 @@ namespace Easyjet
       {
         const xAOD::TruthParticle *final_h =
 	  getFinalParticleOfType(tp, {MC::HIGGSBOSON, MC::SBOSONBSM, MC::ABOSONBSM});
-        if (!tmp || (final_h->barcode() != tmp->barcode()))
+        if (!tmp || (final_h->uid() != tmp->uid()))
         {
           TruthScalar h = final_h;
           h.children(getFinalChildren(final_h));
