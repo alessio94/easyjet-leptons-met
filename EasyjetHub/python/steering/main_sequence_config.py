@@ -154,7 +154,7 @@ def preselection_cfg(flags, seqname):
     # the ConfigBlocks with interstitial container names etc
     configAccumulator = ConfigAccumulator(
         algSeq=preselSeq,
-        autoconfigFromFlags=flags,
+        flags=flags,
     )
     configSeq.fullConfigure(configAccumulator)
 
