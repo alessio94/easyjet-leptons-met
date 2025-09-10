@@ -2,6 +2,10 @@ include: bbttAnalysis/RunConfig-bbtt-base.yaml
 
 # Toggles for object types
 do_large_R_UFO_jets: true
+do_ditaus: true
+
+DiTau:
+  ID: "Tight"
 
 # overlap removal
 OverlapRemoval:

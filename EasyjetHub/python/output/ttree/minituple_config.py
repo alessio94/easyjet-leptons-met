@@ -16,6 +16,7 @@ from EasyjetHub.output.ttree.electrons import get_electron_branches
 from EasyjetHub.output.ttree.photons import get_photon_branches
 from EasyjetHub.output.ttree.muons import get_muon_branches
 from EasyjetHub.output.ttree.taus import get_tau_branches
+from EasyjetHub.output.ttree.ditaus import get_ditau_branches
 from EasyjetHub.output.ttree.small_R_jets import (
     get_small_R_jet_branches
 )
@@ -108,6 +109,7 @@ def minituple_output_cfg(
         "photons": ("ph", get_photon_branches),
         "muons": ("mu", get_muon_branches),
         "taus": ("tau", get_tau_branches),
+        "ditaus": ("ditau", get_ditau_branches),
     }
     for objtype, (prefix, branch_getter) in objects_out.items():
         write_container_flag = tree_flags.reco_outputs[objtype]

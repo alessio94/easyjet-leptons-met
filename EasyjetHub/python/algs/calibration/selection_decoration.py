@@ -13,7 +13,7 @@ def selection_decoration_sequence(flags):
     makeConfig = config.makeConfig
 
     containers = []
-    for objtype in ["muons", "electrons", "photons", "taus"]:
+    for objtype in ["muons", "electrons", "photons", "taus", "ditaus"]:
         if flags.Analysis[f"do_{objtype}"]:
             containers += [drop_sys(flags.Analysis.container_names.output[objtype])]
     if flags.Analysis.do_small_R_jets:

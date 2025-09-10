@@ -27,16 +27,19 @@ def ditau_sequence(flags, configAcc):
         configSeq.setOptionValue('.quality', quality)
 
     # Kinematic selection
-    configSeq += makeConfig('DiTauJets.PtEtaSelection', containerName=output_name,
-                            selectionName='selectPtEta')
+    configSeq += makeConfig('DiTauJets.PtEtaSelection')
+    configSeq.setOptionValue('containerName', output_name)
+    configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
     configSeq.setOptionValue('.maxEta', 2.5)
 
     # Add systematic object links
-    configSeq += makeConfig('SystObjectLink', containerName=output_name)
+    configSeq += makeConfig('SystObjectLink')
+    configSeq.setOptionValue('.containerName', output_name)
 
-    configSeq += makeConfig('Thinning', containerName=output_name)
+    configSeq += makeConfig('Thinning')
+    configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
 
     return configSeq

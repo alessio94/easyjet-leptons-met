@@ -11,12 +11,14 @@ def thinning_sequence(flags):
 
     # Add whatever collections are active in the job to the
     # mapping of type to name
-    objflags = {x: f'do_{x}' for x in ['electrons', 'photons', 'muons', 'taus']}
+    objflags = {x: f'do_{x}' for x in ['electrons', 'photons', 'muons',
+                                       'taus', 'ditaus']}
     selections = dict(
         electrons=f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}',
         photons=f'{flags.Analysis.Photon.ID}_{flags.Analysis.Photon.Iso}',
         muons=f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}',
         taus=flags.Analysis.Tau.ID,
+        ditaus=flags.Analysis.DiTau.ID,
     )
 
     for objtype, objflag in objflags.items():

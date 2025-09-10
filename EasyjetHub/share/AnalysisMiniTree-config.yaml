@@ -13,6 +13,7 @@ reco_outputs:
   electrons: ''
   photons: ''
   taus: ''
+  ditaus: ''
   met: ''
 
 collection_options:
