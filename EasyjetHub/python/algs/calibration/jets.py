@@ -129,6 +129,14 @@ def jet_sequence(
             if bTagCalibFile:
                 configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
 
+        trigSF_flags = flags.Analysis.Trigger.scale_factor
+        if trigSF_flags.doSF and hasattr(trigSF_flags, 'bjet'):
+            configSeq += config.makeConfig('Jets.FTagTriggerMatching')
+            configSeq.setOptionValue('.containerName', output_name)
+            configSeq.setOptionValue('.triggerChainsPerYear',
+                                     get_trigger_chains_scale_factor(flags, 'bjet'))
+            configSeq.setOptionValue('.removeHLTPrefix', False)
+
         for tagger in tagger_set:
             tagger_wp = tagger + "_Continuous"
             # Note: this is going to run post overlap removal
