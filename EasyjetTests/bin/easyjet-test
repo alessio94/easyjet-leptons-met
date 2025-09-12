@@ -44,8 +44,6 @@ declare -A DATAFILES=(
     [bbyy-data22-lite]=${PHYSLITE_DATA_2022}
     [SHbbyy-data22-lite]=${PHYSLITE_DATA_2022}
     # MC20
-    [mc20]=${PHYS_TTBAR_MC20}
-    [fast-mc20]=${PHYS_TTBAR_MC20}
     [bbyy-mc20-syst]=${PHYS_BBYY_MC20}
     [bbyy-mc20-lite]=${PHYSLITE_BBYY_MC20}
     [SHbbyy-mc20]=${PHYS_BBYY_MC20}
@@ -75,16 +73,9 @@ declare -A DATAFILES=(
     [zbbjcalib-mc20]=${PHYS_TTBAR_MC20}
     [bbbbtt-mc20]=${PHYS_TTBAR_MC20}
     # MC20 AF3
-    [mc20af3-lite]=${PHYSLITE_SHBBYY_BOOSTED_MC20_AF3}
-    [fast-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
-    [fast-mc20af3-lite]=${PHYSLITE_SHBBYY_BOOSTED_MC20_AF3}
     [sh4b-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
-    [fast-awkward-mc20af3]=${PHYS_SH4B_BOOSTED_MC20_AF3}
     [SHbbyy-mc20af3-lite]=${PHYSLITE_SHBBYY_BOOSTED_MC20_AF3}
     # MC23
-    [mc23]=${PHYS_TTBAR_MC23}
-    [fast-mc23]=${PHYS_TTBAR_MC23}
-    [mc23af3]=${PHYS_JETS_MC23_AF3}
     [SHbbyy-mc23af3]=${PHYS_JETS_MC23_AF3}
     [bbbb-mc23]=${PHYS_TTBAR_MC23}
     [bbtt-mc23]=${PHYS_TTBAR_MC23}
@@ -124,8 +115,6 @@ declare -A TESTS=(
     [bbyy-data22-lite]="simple bbyy-ntupler"
     [SHbbyy-data22-lite]="simple bbyy-ntupler"
     # MC20
-    [mc20]="simple easyjet-ntupler"
-    [fast-mc20]="fast easyjet-ntupler"
     [bbyy-mc20-syst]="simple bbyy-ntupler"
     [bbyy-mc20-lite]="simple bbyy-ntupler"
     [SHbbyy-mc20]="simple bbyy-ntupler"
@@ -155,16 +144,9 @@ declare -A TESTS=(
     [zbbjcalib-mc20]="simple xbbcalib-ntupler"
     [bbbbtt-mc20]="simple bbbbtt-ntupler" 
     # MC20 AF3
-    [mc20af3-lite]="simple easyjet-ntupler"
-    [fast-mc20af3]="fast easyjet-ntupler"
-    [fast-mc20af3-lite]="fast easyjet-ntupler"
     [sh4b-mc20af3]="simple bbbb-ntupler"
-    [fast-awkward-mc20af3]="fast easyjet-ntupler"
     [SHbbyy-mc20af3-lite]="simple bbyy-ntupler"
     # MC23
-    [fast-mc23]="fast easyjet-ntupler"
-    [mc23]="simple easyjet-ntupler"
-    [mc23af3]="simple easyjet-ntupler"
     [SHbbyy-mc23af3]="simple bbyy-ntupler"
     [bbbb-mc23]="simple bbbb-ntupler"
     [bbtt-mc23]="simple bbtt-ntupler"
@@ -231,11 +213,7 @@ declare -A CONFIGS=(
     [zbbjcalib-mc20]=XbbCalib/RunConfig_Zbbj-MC-bypass.yaml
     [bbbbtt-mc20]=bbbbttAnalysis/RunConfig-bbbbtt-bypass.yaml
     # MC20 AF3
-    [fast-mc20af3]=EasyjetHub/RunConfig-noEle.yaml
-    [fast-mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE-noEle.yaml
-    [mc20af3-lite]=EasyjetHub/RunConfig-PHYSLITE-noEle.yaml
     [sh4b-mc20af3]=bbbbAnalysis/RunConfig-SH4b.yaml
-    [fast-awkward-mc20af3]=EasyjetHub/awkward-config-noEle.yaml
     [SHbbyy-mc20af3-lite]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     # MC23
     [bbbb-mc23]=bbbbAnalysis/RunConfig-HH4b-All-NoSyst-bypass.yaml
@@ -258,7 +236,6 @@ declare -A CONFIGS=(
     [bbbbtt-mc23]=bbbbttAnalysis/RunConfig-bbbbtt-bypass.yaml
     [monojet-mc23]=monojetAnalysis/RunConfig-Monojet-bypass.yaml
     # MC23 AF3
-    [mc23af3]=EasyjetHub/RunConfig-noEle.yaml
     [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     # non-ntupler
     [aod-fast-bbbb-mc23]=bbbbAnalysis/RunConfig-HH4b-Resolved.yaml

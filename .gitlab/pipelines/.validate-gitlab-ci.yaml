@@ -84,26 +84,6 @@ validator_SHbbyy_data22_lite:
 
 # MC20
 
-validator_mc20:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_mc20
-      artifacts: false
-  script:
-    - easyjet-validate mc20
-
-validator_fast_mc20:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_fast_mc20
-      artifacts: false
-  script:
-    - easyjet-validate fast-mc20
-
 validator_bbyy_mc20_syst:
   extends: .ntuple_validation
   needs:
@@ -377,36 +357,6 @@ validator_bbbbtt_mc20:
 
 # MC20 AF3
 
-validator_mc20af3_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_mc20af3_lite
-      artifacts: false
-  script:
-    - easyjet-validate mc20af3-lite
-
-validator_fast_mc20af3:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_fast_mc20af3
-      artifacts: false
-  script:
-    - easyjet-validate fast-mc20af3
-
-validator_fast_mc20af3_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_fast_mc20af3_lite
-      artifacts: false
-  script:
-    - easyjet-validate fast-mc20af3-lite
-
 validator_sh4b_mc20af3:
   extends: .ntuple_validation
   needs:
@@ -416,16 +366,6 @@ validator_sh4b_mc20af3:
       artifacts: false
   script:
     - easyjet-validate sh4b-mc20af3
-
-validator_fast_awkward_mc20af3:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_fast_awkward_mc20af3
-      artifacts: false
-  script:
-    - easyjet-validate fast-awkward-mc20af3
 
 validator_SHbbyy_mc20af3_lite:
   extends: .ntuple_validation
@@ -438,36 +378,6 @@ validator_SHbbyy_mc20af3_lite:
     - easyjet-validate SHbbyy-mc20af3-lite
 
 # MC23
-
-validator_mc23:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_mc23
-      artifacts: false
-  script:
-    - easyjet-validate mc23
-
-validator_fast_mc23:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_fast_mc23
-      artifacts: false
-  script:
-    - easyjet-validate fast-mc23
-
-validator_mc23af3:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_mc23af3
-      artifacts: false
-  script:
-    - easyjet-validate mc23af3
 
 validator_bbbb_mc23:
   extends: .ntuple_validation

@@ -54,16 +54,6 @@ ntupler_SHbbyy_data22_lite:
 
 # MC20
 
-ntupler_mc20:
-  extends: .ntupler
-  script:
-    - easyjet-test mc20
-
-ntupler_fast_mc20:
-  extends: .ntupler
-  script:
-    - easyjet-test fast-mc20
-
 ntupler_bbyy_mc20_syst:
   extends: .ntupler
   script:
@@ -201,30 +191,10 @@ ntupler_bbbbtt_mc20:
 
 # MC20 AF3
 
-ntupler_mc20af3_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test mc20af3-lite
-
-ntupler_fast_mc20af3:
-  extends: .ntupler
-  script:
-    - easyjet-test fast-mc20af3
-
-ntupler_fast_mc20af3_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test fast-mc20af3-lite
-
 ntupler_sh4b_mc20af3:
   extends: .ntupler
   script:
     - easyjet-test sh4b-mc20af3
-
-ntupler_fast_awkward_mc20af3:
-  extends: .ntupler
-  script:
-    - easyjet-test fast-awkward-mc20af3
 
 ntupler_SHbbyy_mc20af3_lite:
   extends: .ntupler
@@ -232,21 +202,6 @@ ntupler_SHbbyy_mc20af3_lite:
     - easyjet-test SHbbyy-mc20af3-lite
 
 # MC23
-
-ntupler_mc23:
-  extends: .ntupler
-  script:
-    - easyjet-test mc23
-
-ntupler_fast_mc23:
-  extends: .ntupler
-  script:
-    - easyjet-test fast-mc23
-
-ntupler_mc23af3:
-  extends: .ntupler
-  script:
-    - easyjet-test mc23af3
 
 ntupler_bbbb_mc23:
   extends: .ntupler
