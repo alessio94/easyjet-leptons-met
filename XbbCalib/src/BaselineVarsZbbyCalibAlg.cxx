@@ -96,8 +96,8 @@ namespace XBBCALIB
         float GN2Xv01_ptop = m_GN2Xv01_ptop.get(*largeJet, sys);
         // float wtag_score = m_WTag_score.get(*largeJet, sys);
         m_Fbranches.at("Zcand_GN2Xv01_phbb").set(*event, GN2Xv01_phbb, sys);
-        m_Fbranches.at("Zcand_GN2Xv01_pqcd").set(*event, GN2Xv01_phcc, sys);
-        m_Fbranches.at("Zcand_GN2Xv01_phcc").set(*event, GN2Xv01_pqcd, sys);
+        m_Fbranches.at("Zcand_GN2Xv01_phcc").set(*event, GN2Xv01_phcc, sys);
+        m_Fbranches.at("Zcand_GN2Xv01_pqcd").set(*event, GN2Xv01_pqcd, sys);
         m_Fbranches.at("Zcand_GN2Xv01_ptop").set(*event, GN2Xv01_ptop, sys);
         for(unsigned int wp=0; wp<m_GN2X_wps.size(); wp++)
           {
