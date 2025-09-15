@@ -16,7 +16,7 @@ Electron:
   min_pT: 4.5e+3
   Iso: "NonIso"
   extra_wps: 
-    - ["LooseDNN", "Loose_VarRad"]
+    - ["LooseBLayerLH", "Loose_VarRad"]
 
 Muon:
   min_pT: 3.e+3

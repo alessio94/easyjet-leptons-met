@@ -42,8 +42,9 @@ Tau:
 
 Electron:
   min_pT: 10.0e+3
-  ID: "LooseDNN"
+  ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"
+  correlationModelId: "TOTAL"
   extra_wps: 
     - ["TightDNN", "Tight_VarRad"]
     - ["TightDNN", "TightTrackOnly_VarRad"]
@@ -55,6 +56,7 @@ Electron:
     - ["MediumDNN", "TightTrackOnly_FixedRad"]
     - ["MediumDNN", "HighPtCaloOnly"]
     - ["MediumDNN", "Loose_VarRad"]
+    - ["LooseDNN", "Loose_VarRad"]
     - ["LooseDNN", "Tight_VarRad"]
     - ["LooseDNN", "TightTrackOnly_VarRad"]
     - ["LooseDNN", "TightTrackOnly_FixedRad"]
@@ -73,7 +75,7 @@ Electron:
     - ["LooseBLayerLH", "TightTrackOnly_VarRad"]
     - ["LooseBLayerLH", "TightTrackOnly_FixedRad"]
     - ["LooseBLayerLH", "HighPtCaloOnly"]
-    - ["LooseBLayerLH", "Loose_VarRad"]
+    # - ["LooseBLayerLH", "Loose_VarRad"]
     # - ["TightLH", "NonIso"]
     # - ["MediumLH", "NonIso"]
   do_parent_decoration: true

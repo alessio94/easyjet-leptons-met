@@ -19,8 +19,8 @@ Small_R_jet:
 
 # VeryLoose ID tau as antiID for fake estimation
 Tau:
-  ID: "VeryLoose_eleid"
-  do_parent_decoration: true
+  ID: "VeryLoose"
+  extra_wps: ["RNNMedium_eleid"]
   amount: 3
 
 Electron:
