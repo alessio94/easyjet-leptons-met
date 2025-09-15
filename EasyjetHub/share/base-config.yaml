@@ -164,6 +164,7 @@ Tau:
 DiTau:
   ID: ""
   extra_wps: []
+  do_score_decoration: true
 
 Lepton:
   amount: 0

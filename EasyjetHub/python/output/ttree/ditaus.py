@@ -27,4 +27,7 @@ def get_ditau_branches(flags, tree_flags, input_container, output_prefix):
         for id_wp in id_wps
     ]
 
+    if flags.Analysis.DiTau.do_score_decoration:
+        ditau_branches.variables += ["omni_score"]
+
     return ditau_branches.get_output_list()

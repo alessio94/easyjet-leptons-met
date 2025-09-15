@@ -9,6 +9,7 @@
 #include "../EventSelectorAlg.h"
 #include "../JetDeepCopyAlg.h"
 #include "../TauDecoratorAlg.h"
+#include "../DiTauDecoratorAlg.h"
 #include "../JetDecoratorAlg.h"
 #include "../TruthParticleInformationAlg.h"
 #include "../EventInfoGlobalAlg.h"
@@ -36,6 +37,7 @@ DECLARE_COMPONENT(TauSelectorAlg)
 DECLARE_COMPONENT(EventSelectorAlg)
 DECLARE_COMPONENT(JetDeepCopyAlg)
 DECLARE_COMPONENT(TauDecoratorAlg)
+DECLARE_COMPONENT(DiTauDecoratorAlg)
 DECLARE_COMPONENT(JetDecoratorAlg)
 DECLARE_COMPONENT(TruthParticleInformationAlg)
 DECLARE_COMPONENT(EventInfoGlobalAlg)

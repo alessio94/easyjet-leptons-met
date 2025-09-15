@@ -37,12 +37,12 @@ atlas_add_library( EasyjetHubLib
                    TauAnalysisToolsLib
                    TrigDecisionToolLib
                    TrigCompositeUtilsLib
-		           TruthWeightToolsLib
+		   TruthWeightToolsLib
                    ${ROOT_LIBRARIES}
                    BoostedJetTaggersLib 
                    JetAnalysisInterfacesLib
 		   EventBookkeeperToolsLib
-
+		   DiTauRecToolsLib
 )
 
 
