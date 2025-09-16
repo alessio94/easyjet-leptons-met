@@ -120,14 +120,9 @@ def get_BaselineVarsssWWAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ll", "jj", "jj_vbs"]:
-        for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
-            float_variable_names.append(f"{var}{object}")
-
     float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET"]
     float_variable_names += ["mlljjmet", "METSig", "mT_Lepton1_Met", "mT_Lepton2_Met"]
     float_variable_names += ["mlljj", "mT_L_min", "HT2", "HT2r", "mT2_jj"]
-    float_variable_names += ["MET_met", "MET_phi"]
     float_variable_names += ["mT", "epsilon_j3"]
     int_variable_names += ["nJets", "nBJets", "nCentralJets", "nForwardJets"]
     int_variable_names += ["nElectrons", "nMuons", "nLeptons", "nGapJets"]

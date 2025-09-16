@@ -15,7 +15,6 @@ mc_list=(
 easyjet-gridsubmit --data-list $dir_samples/data_Run3_p6266.txt \
     --run-config ${runConfig} \
     --exec ${executable} \
-    --nGBperJob 5 \
     --campaign ${campaignName} \
     --noTag
 
@@ -23,6 +22,5 @@ easyjet-gridsubmit --data-list $dir_samples/data_Run3_p6266.txt \
 easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \
     --run-config ${runConfig} \
     --exec ${executable} \
-    --nGBperJob 5 \
     --campaign ${campaignName} \
     --noTag

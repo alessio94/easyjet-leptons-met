@@ -338,7 +338,7 @@ namespace ssWWVBS
                   }
                   // Low DYjj VR
                   if ( m_bools.at(ssWWVBS::MET) && m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) ){
-                      if( nonbjets->at(0)->pt() > 65*Athena::Units::GeV && nonbjets->at(1)->pt() > 35*Athena::Units::GeV ){
+                    if( nonbjets->size()>1 && nonbjets->at(0)->pt() > 65*Athena::Units::GeV && nonbjets->at(1)->pt() > 35*Athena::Units::GeV ){
                           mjj = (nonbjets->at(0)->p4() + nonbjets->at(1)->p4()).M();
                           delta_yjj = std::abs((nonbjets->at(0)->p4()).Rapidity() - (nonbjets->at(1)->p4()).Rapidity());
                           if( mjj >= 200*Athena::Units::GeV && delta_yjj <= 2 ){
@@ -348,7 +348,7 @@ namespace ssWWVBS
                   }
                   if ( m_bools.at(ssWWVBS::MET) && m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) ){
                     // Low mjj VR
-                    if( nonbjets->at(0)->pt() > 65*Athena::Units::GeV && nonbjets->at(1)->pt() > 35*Athena::Units::GeV ){
+                    if( nonbjets->size()>1 &&  nonbjets->at(0)->pt() > 65*Athena::Units::GeV && nonbjets->at(1)->pt() > 35*Athena::Units::GeV ){
                         mjj = (nonbjets->at(0)->p4() + nonbjets->at(1)->p4()).M();
                         if( mjj <= 500*Athena::Units::GeV ){
                             m_bools.at(ssWWVBS::pass_LowMjjVR) = 1;
@@ -480,7 +480,6 @@ namespace ssWWVBS
       m_ssWWCuts.DoRelativeEfficiency(m_total_events, efficiency("RelativeEfficiency"));
       m_ssWWCuts.DoStandardCutFlow(m_total_events, efficiency("StandardCutFlow"));
       m_ssWWCuts.DoCutflowLabeling(m_total_events, hist("EventsPassed_BinLabeling"));
-
     }
 
     return StatusCode::SUCCESS;

@@ -252,23 +252,13 @@ namespace ssWWVBS
         Subleading_lep = leptons[1].first->p4();
         ll = Leading_lep + Subleading_lep;
 
-        m_Fbranches.at("mll").set(*event, ll.M(), sys);
-        m_Fbranches.at("pTll").set(*event, ll.Pt(), sys);
-        m_Fbranches.at("Etall").set(*event, ll.Eta(), sys);
-        m_Fbranches.at("Phill").set(*event, ll.Phi(), sys);
-
-        m_Fbranches.at("dRll").set(*event, Leading_lep.DeltaR(Subleading_lep), sys);
-        m_Fbranches.at("dPhill").set(*event, Leading_lep.DeltaPhi(Subleading_lep), sys);
-        m_Fbranches.at("dEtall").set(*event, Leading_lep.Eta() - Subleading_lep.Eta(), sys);
-
+        // dilepton + MET system
         m_Fbranches.at("dPhillMET").set(*event, ll.Vect().DeltaPhi(metVec3), sys);
         m_Fbranches.at("dPhil1MET").set(*event, Leading_lep.Vect().DeltaPhi(metVec3), sys);
         m_Fbranches.at("dPhil2MET").set(*event, Subleading_lep.Vect().DeltaPhi(metVec3), sys);
         // MET Variables;
         float mT = sqrt((abs(ll.Pt()) + met->met()) * (abs(ll.Pt()) + met->met()) - (ll.Pt() * cos(ll.Phi()) + met->met() * cos(met->phi())) * (ll.Pt() * cos(ll.Phi()) + met->met() * cos(met->phi())) - (ll.Pt() * sin(ll.Phi()) + met->met() * sin(met->phi())) * (ll.Pt() * sin(ll.Phi()) + met->met() * sin(met->phi())));
         m_Fbranches.at("mT").set(*event, mT, sys);
-        m_Fbranches.at("MET_met").set(*event, met->met(), sys);
-        m_Fbranches.at("MET_phi").set(*event, met->phi(), sys);
       }
 
       //jet sector
@@ -287,13 +277,6 @@ namespace ssWWVBS
       TLorentzVector jj;
       if (n_jets >=2){
         jj = Leading_jet + Subleading_jet;
-        m_Fbranches.at("mjj").set(*event, jj.M(), sys);
-        m_Fbranches.at("pTjj").set(*event, jj.Pt(), sys);
-        m_Fbranches.at("Etajj").set(*event, jj.Eta(), sys);
-        m_Fbranches.at("Phijj").set(*event, jj.Phi(), sys);
-        m_Fbranches.at("dRjj").set(*event, (jets->at(0)->p4()).DeltaR(jets->at(1)->p4()), sys);
-        m_Fbranches.at("dEtajj").set(*event, (jets->at(0)->eta())-(jets->at(1)->eta()), sys);
-        m_Fbranches.at("dPhijj").set(*event, (jets->at(0)->p4()).DeltaPhi(jets->at(1)->p4()), sys);
       }
       // Zeppenfeld variable
       TLorentzVector Subsubleading_jet;
@@ -316,51 +299,6 @@ namespace ssWWVBS
         }
       }
       m_Ibranches.at("nGapJets").set(*event, n_gap_jets, sys);
-      // kinematics of vbs jets
-      float max_mjj = 0.;
-      const xAOD::Jet* vbsJet1 = nullptr;
-      const xAOD::Jet* vbsJet2 = nullptr;
-
-      for(unsigned int i=0;i<nonbjets->size();i++){
-        for(unsigned int j=0;j<i;j++){
-          const xAOD::Jet* nonbjet1 = nonbjets->at(i);
-          const xAOD::Jet* nonbjet2 = nonbjets->at(j);
-
-          if (nonbjet1->eta() * nonbjet2->eta() > 0) continue; //back-to-back
-        
-          // perhaps we need a minimum pt requirement on vbs jets
-          //if (nonbjet1->pt() < 30. * Athena::Units::GeV || nonbjet2->pt() < 30. * Athena::Units::GeV) continue;
-          double mjj = (nonbjet1->p4() + nonbjet2->p4()).M();
-          if (mjj > max_mjj) {
-            max_mjj = mjj;
-            vbsJet1 = nonbjet1;
-            vbsJet2 = nonbjet2;
-          } 
-        }
-      }
-      if (vbsJet1 && vbsJet2){
-        TLorentzVector vbs_jj = vbsJet1->p4() + vbsJet2->p4();
-        
-        m_Fbranches.at("mjj_vbs").set(*event, vbs_jj.M(), sys);
-        m_Fbranches.at("pTjj_vbs").set(*event, vbs_jj.Pt(), sys);
-        m_Fbranches.at("Etajj_vbs").set(*event, vbs_jj.Eta(), sys);
-        m_Fbranches.at("Phijj_vbs").set(*event, vbs_jj.Phi(), sys);
-        m_Fbranches.at("dRjj_vbs").set(*event, (vbsJet1->p4()).DeltaR(vbsJet2->p4()), sys);
-        m_Fbranches.at("dEtajj_vbs").set(*event, (vbsJet1->eta())-vbsJet2->eta(), sys);
-        m_Fbranches.at("dPhijj_vbs").set(*event, (vbsJet1->p4()).DeltaPhi(vbsJet2->p4()), sys);
-        
-      }
-
-      //b-jet sector
-      for (int i=0; i<std::min(n_bjets, 2); i++){
-        m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_pt").set(*event, bjets->at(i)->pt(), sys);
-        m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_eta").set(*event, bjets->at(i)->eta(), sys);
-        m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_phi").set(*event, bjets->at(i)->phi(), sys);
-        m_Fbranches.at("Jet_b"+std::to_string(i+1)+"_E").set(*event, bjets->at(i)->e(), sys);
-        if (m_isMC) {
-          m_Ibranches.at("Jet_b"+std::to_string(i+1)+"_truthLabel").set(*event, m_truthFlav.get(*bjets->at(i), sys), sys);
-        }
-      }
 
       // combine jj + ll
 

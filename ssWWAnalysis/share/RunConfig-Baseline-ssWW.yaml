@@ -23,7 +23,7 @@ Small_R_jet:
   # btagging working points 
   btag_wp: "GN2v01_FixedCutBEff_85"
   amount: 2
-  amount_bjet: 2
+  amount_bjet: 0
   # to use multiple btagging WPs
   btag_extra_wps:
     - GN2v01_FixedCutBEff_77
@@ -34,7 +34,7 @@ Small_R_jet:
 Electron:
   maxD0Significance: 5 
   maxDeltaZ0SinTheta: 0.5
-  ID: "LooseLH"
+  ID: "LooseBLayerLH"
   Iso: "NonIso"
   min_pT: 4.5e+3
   min_pT_ssWW: 4.5e+3
@@ -109,5 +109,3 @@ ttree_output:
     small_R_jets:
       btag_info: true
       # JVT_details: true
-  truth_outputs:
-    small_R_jets: 'container_names.input.truth4Jet'
