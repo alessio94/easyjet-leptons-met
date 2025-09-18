@@ -156,20 +156,24 @@ namespace VBSHIGGS{
         int nLeptons = muons->size() + electrons->size();
 
         const xAOD::IParticle* signal_lepton = nullptr;
-        float signal_lepton_SF = -99.;
+        float signal_lepton_SF = 1;
         int signal_lepton_charge = -99;
         int signal_lepton_id = -99;
 
         for(const xAOD::Electron* electron : *electrons) {
           signal_lepton = electron;
-          signal_lepton_SF = m_ele_SF.get(*electron, sys);
+          if(m_isMC){
+                signal_lepton_SF = m_ele_SF.get(*electron, sys);
+          }
           signal_lepton_charge = electron->charge();
           signal_lepton_id = signal_lepton_charge > 0 ? -11 : 11;
           break; // At most one lepton selected
         }
         for(const xAOD::Muon* muon : *muons) {
           signal_lepton = muon;
-          signal_lepton_SF = m_mu_SF.get(*muon, sys);
+          if(m_isMC){
+                signal_lepton_SF = m_mu_SF.get(*muon, sys);
+          }
           signal_lepton_charge = muon->charge();
           signal_lepton_id = signal_lepton_charge > 0 ? -13 : 13;
           break; 
