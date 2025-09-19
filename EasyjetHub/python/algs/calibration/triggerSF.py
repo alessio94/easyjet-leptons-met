@@ -24,6 +24,10 @@ def triggerSF_sequence(flags):
     configSeq.setOptionValue('.triggerChainsPerYear',
                              get_trigger_chains_scale_factor(flags))
 
+    # Use toys for the SF combination
+    configSeq.setOptionValue('.numberOfToys',
+                             trigSF_flags.number_of_sf_combination_toys)
+
     # Enable trigger match event filtering
     if flags.Analysis.do_trigger_match_filtering and not trigSF_flags.do_trigger_match:
         log.error('Must enable Trigger.scale_factor.do_trigger_match if using '

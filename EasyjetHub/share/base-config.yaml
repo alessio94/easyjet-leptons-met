@@ -213,6 +213,13 @@ Trigger:
 
   scale_factor:
     doSF: False
+
+    # Number of toys to use for the global trigger SF combination (instead
+    # of using explicit formulas), for electron/muon/photon triggers only,
+    # when using the TrigGlobalEfficiencyCorrection tool/alg.
+    # It is sometimes required when combining a large number of triggers,
+    # if no explicit recipe is available.
+    number_of_sf_combination_toys: 0
     
     # Enable the electron/muon/photon multi-leg trigger-matching using
     # the TrigGlobalEfficiencyCorrection tool/alg
