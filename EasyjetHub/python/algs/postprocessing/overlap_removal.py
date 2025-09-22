@@ -77,6 +77,10 @@ def overlap_sequence(flags):
 
     # Include, and then set up the overlap analysis algorithm config:
     configSeq += makeConfig('OverlapRemoval')
+    if "innerDR" in flags.Analysis.OverlapRemoval:
+        configSeq.setOptionValue('.InnerDR', flags.Analysis.OverlapRemoval.innerDR)
+    if "outerDR" in flags.Analysis.OverlapRemoval:
+        configSeq.setOptionValue('.OuterDR', flags.Analysis.OverlapRemoval.outerDR)
     configSeq.setOptionValue('.inputLabel', 'preselectOR')
     configSeq.setOptionValue('.outputLabel', 'passesOR')
     configSeq.setOptionValue('.addToAllSelections', True)
