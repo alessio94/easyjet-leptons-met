@@ -15,6 +15,7 @@
 #include <xAODTrigger/JetRoIContainer.h>
 #include <xAODJet/JetContainer.h>
 #include <TrigDecisionTool/TrigDecisionTool.h>
+#include <TrigBtagEmulationTool/ITrigBtagEmulationTool.h>
 
 #include <AthenaKernel/Units.h>
 
@@ -47,6 +48,10 @@ namespace Easyjet
       this, "minTruthPt", 20.*Athena::Units::GeV, "minimum pT of truth jets"
     };
 
+    Gaudi::Property<int> m_LHCPeriod{
+      this, "period", 3, "LHC period: 2 for Run 2, 3 for Run 3"
+    };
+
     SG::ReadDecorHandleKey<xAOD::JetContainer> m_truthLabelDecorKey;
 
     SG::WriteDecorHandleKey<xAOD::JetContainer> m_bJetTruthPtDecorKey;
@@ -62,6 +67,8 @@ namespace Easyjet
     PublicToolHandle<Trig::TrigDecisionTool> m_trigDecTool{
       this, "TrigDecisionTool", "", "Trigger decision tool"
     };
+
+    ToolHandle<Trig::ITrigBtagEmulationTool> m_emulationTool {this, "trigBtagEmulationTool", "", ""};
 
     Gaudi::Property<std::vector<std::string>> m_triggers{
       this, "triggerList", {}, "List of triggers to match"

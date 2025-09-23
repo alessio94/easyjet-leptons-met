@@ -163,6 +163,14 @@ namespace Easyjet
 
     std::regex l1NameParser("(\\d*)(J)(\\d*)((p|\\.)(\\d*)ETA(\\d*))?");
     Trig::FeatureRequestDescriptor frd;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::pair<const xAOD::Jet*, bool>>>> emulatedJets = {};
+    if (m_doHLTMatching && m_LHCPeriod == 2) // prepare Run2 emulation results
+    {
+      for (auto &trig : m_triggers)
+      {
+        emulatedJets[trig] = m_emulationTool->getEmulatedJets(trig);
+      }
+    }
 
     for(const xAOD::Jet* jet: *jets) {
 
@@ -231,31 +239,60 @@ namespace Easyjet
                       << legInfo.type() << " " << legInfo.signature
                       << " " << legInfo.threshold);
 
-                frd.setRestrictRequestToLeg(ileg);
-                auto hlt_jets = m_trigDecTool->features<xAOD::IParticleContainer>(frd);
-                for (auto hlt_jet_link : hlt_jets)
-                {
-                  const xAOD::IParticle *hlt_jet = *hlt_jet_link.link;
-                  float dR = jet->p4().DeltaR(hlt_jet->p4());
-                  bool hasBtag = hlt_jet_link.source->hasObjectLink("btag");
-                  ATH_MSG_VERBOSE("  pt: "
-                                << hlt_jet->pt() << " eta: " << hlt_jet->eta()
-                                << " phi: " << hlt_jet->phi() << " dR: " << dR
-                                << " btag: " << hasBtag);
+                if (m_LHCPeriod == 3) {
+                  frd.setRestrictRequestToLeg(ileg);
+                  auto hlt_jets = m_trigDecTool->features<xAOD::IParticleContainer>(frd);
+                  for (auto hlt_jet_link : hlt_jets)
+                  {
+                    const xAOD::IParticle *hlt_jet = *hlt_jet_link.link;
+                    float dR = jet->p4().DeltaR(hlt_jet->p4());
+                    bool hasBtag = hlt_jet_link.source->hasObjectLink("btag");
+                    ATH_MSG_VERBOSE("  pt: "
+                                  << hlt_jet->pt() << " eta: " << hlt_jet->eta()
+                                  << " phi: " << hlt_jet->phi() << " dR: " << dR
+                                  << " btag: " << hasBtag);
 
-                  if (bestHLT && isSameJet(bestHLT, hlt_jet))
-                  {
-                    HLTThresholds.insert(legInfo.threshold);
-                    btag = btag || hasBtag; // if any leg claims b-tag, then the jet is b-tagged
+                    if (bestHLT && isSameJet(bestHLT, hlt_jet))
+                    {
+                      HLTThresholds.insert(legInfo.threshold);
+                      btag = btag || hasBtag; // if any leg claims b-tag, then the jet is b-tagged
+                    }
+                    else if (dR < minDRHLT)
+                    {
+                      minDRHLT = dR;
+                      bestHLT = hlt_jet;
+                      HLTThresholds.clear();
+                      HLTThresholds.insert(legInfo.threshold);
+                      btag = hasBtag;
+                    }
                   }
-                  else if (dR < minDRHLT)
-                  {
-                    minDRHLT = dR;
-                    bestHLT = hlt_jet;
-                    HLTThresholds.clear();
-                    HLTThresholds.insert(legInfo.threshold);
-                    btag = hasBtag;
+                }
+                else {
+                  auto hlt_emulated_jets = emulatedJets[trig][legInfo.legName()]; // use pre-fetched emulation results
+                  ATH_MSG_DEBUG(" Emulated jets for " << legInfo.legName() << ": " << hlt_emulated_jets.size());
+                  for (const auto& [hlt_jet, passBtag]: hlt_emulated_jets) {
+                    float dR = jet->p4().DeltaR(hlt_jet->p4());
+                    ATH_MSG_VERBOSE("  pt: " << hlt_jet->pt()
+                                             << " eta: " << hlt_jet->eta()
+                                             << " phi: " << hlt_jet->phi()
+                                             << " dR: " << dR
+                                             << " btag: " << passBtag);
+                    if (bestHLT && isSameJet(bestHLT, hlt_jet))
+                    {
+                      HLTThresholds.insert(legInfo.threshold);
+                      btag = btag || passBtag; // if any leg claims b-tag, then the jet is b-tagged
+                    }
+                    else if (dR < minDRHLT)
+                    {
+                      minDRHLT = dR;
+                      bestHLT = hlt_jet;
+                      HLTThresholds.clear();
+                      HLTThresholds.insert(legInfo.threshold);
+                      btag = passBtag;
+                    }
                   }
+                    
+                  ATH_MSG_DEBUG(trig << " isPassed "<<m_emulationTool->isPassed(trig));
                 }
               }
               ATH_MSG_VERBOSE(" =dRHLT: " << minDRHLT << " bestHLT pT: "
