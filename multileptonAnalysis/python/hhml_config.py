@@ -9,8 +9,7 @@ from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
 
 def hhml_cfg(
         flags, smalljetkey, muonkey, electronkey, taukey,
-        float_variables=None, float_vector_variables=None,
-        int_variables=None, char_vector_variables=None, save_extrabb4l_vars=False
+        float_variables=None, int_variables=None, save_extrabb4l_vars=False
 ):
     if not float_variables:
         float_variables = []
@@ -93,26 +92,13 @@ def hhml_cfg(
     )
 
     # calculate final hhml vars
-    MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
-    ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
         CompFactory.MULTILEPTON.BaselineVarsMultileptonAlg(
             "FinalVarshhmlAlg",
-            isMC=flags.Input.isMC,
-            muonWP=MuonWPLabel,
-            eleWP=ElectronWPLabel,
-            leptonAmount=flags.Analysis.Lepton.amount,
             doKF=flags.Analysis.do_KinematicFit,
-            tauAmount=flags.Analysis.Tau.amount,
-            jetAmount=flags.Analysis.Small_R_jet.amount,
-            lightJetAmount=(flags.Analysis.Small_R_jet.amount
-                            - flags.Analysis.Small_R_jet.amount_bjet),
-            bJetAmount=flags.Analysis.Small_R_jet.amount_bjet,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             floatVariableList=float_variables,
-            floatVectorVariableList=float_vector_variables,
             intVariableList=int_variables,
-            charVectorVariableList=char_vector_variables,
             save_extrabb4l_vars=flags.Analysis.save_extrabb4l_vars
         )
     )
@@ -169,9 +155,7 @@ def hhml_branches(flags):
     # BaselineVarshhmlAlg algorithm
     all_baseline_variable_names = []
     float_variable_names = []
-    float_vector_variable_names = []
     int_variable_names = []
-    char_vector_variable_names = []
 
     # these are the variables that will always be stored by easyjet specific to HHML
     # further below there are more high level variables which can be
@@ -184,9 +168,7 @@ def hhml_branches(flags):
 
     all_baseline_variable_names += [
         *float_variable_names,
-        *float_vector_variable_names,
-        *int_variable_names,
-        *char_vector_variable_names
+        *int_variable_names
     ]
 
     if flags.Analysis.do_KinematicFit:
@@ -225,5 +207,4 @@ def hhml_branches(flags):
                      f"hhml_{ch_cut}"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    return (branches, float_variable_names, float_vector_variable_names,
-            int_variable_names, char_vector_variable_names)
+    return (branches, float_variable_names, int_variable_names)

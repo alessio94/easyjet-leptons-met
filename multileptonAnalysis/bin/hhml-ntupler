@@ -60,8 +60,7 @@ def hhml_job_cfg():
     # custom BranchManagers
     extra_hhml_branches = []
     if flags.Analysis.do_hhml_analysis:
-        extra_hhml_branches,float_variable_names, float_vector_variable_names, \
-            int_variable_names, char_vector_variable_names = hhml_branches(flags)
+        extra_hhml_branches,float_variable_names, int_variable_names = hhml_branches(flags)
         cfg.merge(
             hhml_cfg(
                 flags,
@@ -70,9 +69,7 @@ def hhml_job_cfg():
                 electronkey=flags.Analysis.container_names.output.electrons,
                 taukey=flags.Analysis.container_names.output.taus,
                 float_variables=float_variable_names,
-                float_vector_variables=float_vector_variable_names,
                 int_variables=int_variable_names,
-                char_vector_variables=char_vector_variable_names,
                 save_extrabb4l_vars=flags.Analysis.save_extrabb4l_vars
             ),
             seqname

@@ -67,53 +67,18 @@ private:
     xAOD::JetFourMom_t m_jet1_uncorr, m_jet2_uncorr;
     xAOD::JetFourMom_t m_jet1_muonCorr, m_jet2_muonCorr;
 
-    Gaudi::Property<bool> m_isMC
-        { this, "isMC", false, "Is this simulation?" };
-
-    Gaudi::Property<std::string> m_eleWPName
-        { this, "eleWP", "","Electron ID + Iso working point" };
-
-    Gaudi::Property<std::string> m_muWPName
-        { this, "muonWP", "","Muon ID + Iso working point" };
-
-    Gaudi::Property<std::string> m_tauWPName
-        { this, "tauWP", "","Tau ID working point" };
-
-    CP::SysReadDecorHandle<char> m_isBtag 
-        {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
-
-    Gaudi::Property<unsigned int> m_leptonAmount
-        { this, "leptonAmount", 4, "Number of leptons required" };
-
-    Gaudi::Property<unsigned int> m_tauAmount
-        { this, "tauAmount", 3, "Number of taus required" };
-
-    Gaudi::Property<unsigned int> m_jetAmount
-        { this, "jetAmount", 4, "Number of jets required" };
-
-    Gaudi::Property<unsigned int> m_lightJetAmount
-        { this, "lightJetAmount", 2, "Number of light jets required" };
-
-    Gaudi::Property<unsigned int> m_bJetAmount
-        { this, "bJetAmount", 2, "Number of b-jets required" };
+    CP::SysReadDecorHandle<char> m_isBtag
+        {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};
 
-    Gaudi::Property<std::vector<std::string>> m_floatVectorVariables
-          {this, "floatVectorVariableList", {}, "Name list of vectors of floating variables"};
-
     Gaudi::Property<std::vector<std::string>> m_intVariables
           {this, "intVariableList", {}, "Name list of integer variables"};
 
-    Gaudi::Property<std::vector<std::string>> m_charVectorVariables
-          {this, "charVectorVariableList", {}, "Name list of vectors of character variables"};
-
-    CP::SysReadDecorHandle<float> m_met_sig
-          {this, "METSignificance", "significance_%SYS%", "Met Significance"};
-
     Gaudi::Property<bool> m_save_extrabb4l_vars
           { this, "save_extrabb4l_vars", false, "Save extra variables for bb4l studies?" };
+
     Gaudi::Property<bool> m_doKinematicFit{this, "doKF", false,
                                            "Enable KF jets retrieval"};
 
@@ -127,11 +92,7 @@ private:
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<std::vector<float>>> m_FVbranches;
-
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
-
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<std::vector<char>>> m_CVbranches;
     
  };
 }

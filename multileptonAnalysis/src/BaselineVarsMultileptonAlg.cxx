@@ -41,30 +41,16 @@ namespace MULTILEPTON
       m_Fbranches.emplace(var, whandle);
       ATH_CHECK(m_Fbranches.at(var).initialize(m_systematicsList, m_eventHandle));
     }
-
-    for(const std::string &var : m_floatVectorVariables){
-      CP::SysWriteDecorHandle<std::vector<float>> whandle{var+"_%SYS%", this};
-      m_FVbranches.emplace(var, whandle);
-      ATH_CHECK(m_FVbranches.at(var).initialize(m_systematicsList, m_eventHandle));
-    }
-
+    
     for(const std::string &var : m_intVariables){
       CP::SysWriteDecorHandle<int> whandle{var+"_%SYS%", this};
       m_Ibranches.emplace(var, whandle);
       ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
-    };
-
-    for(const std::string & var : m_charVectorVariables){
-      CP::SysWriteDecorHandle<std::vector<char>> whandle(var+"_%SYS%", this);
-      m_CVbranches.emplace(var, whandle);
-      ATH_CHECK(m_CVbranches.at(var).initialize(m_systematicsList, m_eventHandle));
     }
 
     if (!m_isBtag.empty()){
       ATH_CHECK(m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
-
-    ATH_CHECK(m_met_sig.initialize(m_systematicsList, m_metHandle));
 
     ATH_CHECK (m_nmuons.initialize(m_systematicsList, m_jetHandle));
 
@@ -108,14 +94,6 @@ namespace MULTILEPTON
 
       for (const auto& var: m_intVariables) {
         m_Ibranches.at(var).set(*event, -999, sys);
-      }
-
-      for (const auto& var: m_floatVectorVariables) {
-        m_FVbranches.at(var).set(*event, {}, sys);
-      }
-
-      for (const auto& var: m_charVectorVariables) {
-        m_CVbranches.at(var).set(*event, {}, sys);
       }
 
       int n_electrons = electrons->size();
