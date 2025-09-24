@@ -40,6 +40,7 @@ Truth:
   include: DSID_samples.yaml
   nHiggses: 2
   do_truthPart_patch: true
+  recordGrandchildren: false
 
 # Toggles for reconstructed objects properties
 Small_R_jet:

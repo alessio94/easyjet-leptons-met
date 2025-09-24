@@ -145,38 +145,38 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             eventinfo_branches.variables += ["fjvt_effSF_%SYS%"]
 
     if tree_flags.truth_outputs.higgs_particle and flags.Input.isMC:
-        eventinfo_branches.variables += ["truth_H1_pdgId", "truth_H2_pdgId",
-                                         "truth_children_fromH1_pdgId",
-                                         "truth_children_fromH2_pdgId",
-                                         "truth_initial_children_fromH1_pdgId",
-                                         "truth_initial_children_fromH2_pdgId"]
-        for truthpart in [
-            "truth_H1", "truth_H2",
-            "truth_children_fromH1", "truth_children_fromH2",
-            "truth_HH",
-            "truth_initial_children_fromH1", "truth_initial_children_fromH2"
-        ]:
-            eventinfo_branches.variables += [
-                f"{truthpart}_{var}"
-                for var in ["pt", "eta", "phi", "m"]
+        eventinfo_branches.variables += [
+            variable
+            for fmt in [
+                "truth_H{:d}_{:s}",
+                "truth_children_fromH{:d}_{:s}",
+                "truth_initial_children_fromH{:d}_{:s}",
             ]
+            for var in ["pt", "eta", "phi", "m", "pdgId"]
+            for i in range(flags.Analysis.Truth.nHiggses)
+            for variable in [fmt.format(i + 1, var)]
+        ]
+
+        eventinfo_branches.variables += [
+            f"truth_HH_{var}"
+            for var in ["pt", "eta", "phi", "m"]
+        ]
+
         eventinfo_branches.variables += ["truth_HH_average_pt",
                                          "truth_HH_average_eta",
                                          "truth_HH_abs_cos_theta_star"]
 
-        if flags.Analysis.Truth.nHiggses == 3:
-            eventinfo_branches.variables += ["truth_H3_pdgId",
-                                             "truth_children_fromH3_pdgId",
-                                             "truth_initial_children_fromH3_pdgId"]
-            for truthpart in [
-                "truth_H3",
-                "truth_children_fromH3",
-                "truth_initial_children_fromH3",
-            ]:
-                eventinfo_branches.variables += [
-                    f"{truthpart}_{var}"
-                    for var in ["pt", "eta", "phi", "m"]
+        if flags.Analysis.Truth.recordGrandchildren:
+            eventinfo_branches.variables += [
+                variable
+                for fmt in [
+                    "truth_grandchildren_fromH{:d}_{:s}",
+                    "truth_initial_grandchildren_fromH{:d}_{:s}",
                 ]
+                for var in ["pt", "eta", "phi", "m", "pdgId"]
+                for i in range(flags.Analysis.Truth.nHiggses)
+                for variable in [fmt.format(i + 1, var)]
+            ]
 
     if flags.Analysis.GRL.store_decoration:
         from GoodRunsLists.GoodRunsListsDictionary import getGoodRunsLists
