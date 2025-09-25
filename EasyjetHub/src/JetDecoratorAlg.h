@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 
   JetDecoratorAlg:
   An alg that copies jet information to aux decorations so can be
@@ -48,9 +48,7 @@ namespace Easyjet
       this, "minTruthPt", 20.*Athena::Units::GeV, "minimum pT of truth jets"
     };
 
-    Gaudi::Property<int> m_LHCPeriod{
-      this, "period", 3, "LHC period: 2 for Run 2, 3 for Run 3"
-    };
+    Gaudi::Property<bool> m_useEmulationTool{this, "useEmulationTool", false};
 
     SG::ReadDecorHandleKey<xAOD::JetContainer> m_truthLabelDecorKey;
 

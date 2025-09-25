@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "JetDecoratorAlg.h"
@@ -36,7 +36,7 @@ namespace Easyjet
     if (!m_triggers.empty())
     {
       ATH_CHECK(m_trigDecTool.retrieve());
-      for (auto &trig : m_triggers)
+      for (const auto &trig : m_triggers)
       {
         // convert trigger name to a valid branch name
         std::string modifiedTrigName = trig;
@@ -60,6 +60,7 @@ namespace Easyjet
           ATH_CHECK(m_jetL1DRDecorKeys.at(trig).initialize());
           ATH_CHECK(m_jetL1ThresholdsDecorKeys.at(trig).initialize());
         }
+
         if (m_doHLTMatching) {
           m_jetHLTPtDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTpt");
           m_jetHLTEtaDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTeta");
@@ -76,6 +77,8 @@ namespace Easyjet
         }
 
       }
+
+      if(m_useEmulationTool) ATH_CHECK(m_emulationTool.retrieve());
     }
 
     return StatusCode::SUCCESS;
@@ -127,13 +130,16 @@ namespace Easyjet
                        SG::WriteDecorHandle<xAOD::JetContainer, float>>
         jetHLTPt, jetHLTEta, jetHLTPhi, jetHLTDR;
     std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>>> jetHLTThresholds;
+
     std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::JetContainer, int>> jetHLTBtag;
     SG::ReadHandle<xAOD::JetRoIContainer> l1Jets;
-    for (auto &trig : m_triggers)
+
+    for (const auto &trig : m_triggers)
     {
       if (m_doL1Matching) {
         l1Jets = SG::makeHandle(m_L1JetsInKey, ctx);
         ATH_CHECK(l1Jets.isValid());
+
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_et(m_jetL1EtDecorKeys.at(trig));
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_eta(m_jetL1EtaDecorKeys.at(trig));
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_phi(m_jetL1PhiDecorKeys.at(trig));
@@ -145,6 +151,7 @@ namespace Easyjet
         jetL1DR.emplace(trig, wdh_dr);
         jetL1Thresholds.emplace(trig, wdh_thresholds);
       }
+
       if (m_doHLTMatching) {
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_pt(m_jetHLTPtDecorKeys.at(trig));
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_eta(m_jetHLTEtaDecorKeys.at(trig));
@@ -164,9 +171,9 @@ namespace Easyjet
     std::regex l1NameParser("(\\d*)(J)(\\d*)((p|\\.)(\\d*)ETA(\\d*))?");
     Trig::FeatureRequestDescriptor frd;
     std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::pair<const xAOD::Jet*, bool>>>> emulatedJets = {};
-    if (m_doHLTMatching && m_LHCPeriod == 2) // prepare Run2 emulation results
+    if (m_doHLTMatching && m_useEmulationTool) // prepare Run2 emulation results
     {
-      for (auto &trig : m_triggers)
+      for (const auto &trig : m_triggers)
       {
         emulatedJets[trig] = m_emulationTool->getEmulatedJets(trig);
       }
@@ -175,7 +182,7 @@ namespace Easyjet
     for(const xAOD::Jet* jet: *jets) {
 
       // trigger matching
-      for (auto &trig : m_triggers)
+      for (const auto &trig : m_triggers)
       {
         const xAOD::JetRoI* bestL1 = nullptr;
         float minDRL1 = 0.4; // hard-coded matching distance
@@ -192,7 +199,7 @@ namespace Easyjet
           {
             const TrigConf::HLTChain* hltChain = m_trigDecTool->ExperimentalAndExpertMethods().getChainConfigurationDetails(trig);
             const std::string& l1Name = hltChain->lower_chain_name();
-            for (auto l1_jet : *l1Jets)
+            for (const auto l1_jet : *l1Jets)
             {
               TLorentzVector l1_jet_p4;
               l1_jet_p4.SetPtEtaPhiM(l1_jet->et8x8(), l1_jet->eta(), l1_jet->phi(), 0.);
@@ -239,10 +246,10 @@ namespace Easyjet
                       << legInfo.type() << " " << legInfo.signature
                       << " " << legInfo.threshold);
 
-                if (m_LHCPeriod == 3) {
+                if (!m_useEmulationTool) {
                   frd.setRestrictRequestToLeg(ileg);
                   auto hlt_jets = m_trigDecTool->features<xAOD::IParticleContainer>(frd);
-                  for (auto hlt_jet_link : hlt_jets)
+                  for (const auto& hlt_jet_link : hlt_jets)
                   {
                     const xAOD::IParticle *hlt_jet = *hlt_jet_link.link;
                     float dR = jet->p4().DeltaR(hlt_jet->p4());
@@ -267,9 +274,12 @@ namespace Easyjet
                     }
                   }
                 }
+
+		// if m_useEmulationTool
                 else {
                   auto hlt_emulated_jets = emulatedJets[trig][legInfo.legName()]; // use pre-fetched emulation results
                   ATH_MSG_DEBUG(" Emulated jets for " << legInfo.legName() << ": " << hlt_emulated_jets.size());
+
                   for (const auto& [hlt_jet, passBtag]: hlt_emulated_jets) {
                     float dR = jet->p4().DeltaR(hlt_jet->p4());
                     ATH_MSG_VERBOSE("  pt: " << hlt_jet->pt()
@@ -277,6 +287,7 @@ namespace Easyjet
                                              << " phi: " << hlt_jet->phi()
                                              << " dR: " << dR
                                              << " btag: " << passBtag);
+
                     if (bestHLT && isSameJet(bestHLT, hlt_jet))
                     {
                       HLTThresholds.insert(legInfo.threshold);
@@ -295,6 +306,7 @@ namespace Easyjet
                   ATH_MSG_DEBUG(trig << " isPassed "<<m_emulationTool->isPassed(trig));
                 }
               }
+
               ATH_MSG_VERBOSE(" =dRHLT: " << minDRHLT << " bestHLT pT: "
                                       << (bestHLT ? bestHLT->pt() : -99.)
                                       << " btag: " << btag
@@ -311,16 +323,22 @@ namespace Easyjet
           jetL1Eta.at(trig)(*jet) = bestL1 ? bestL1->eta() : -99.;
           jetL1Phi.at(trig)(*jet) = bestL1 ? bestL1->phi() : -99.;
           jetL1DR.at(trig)(*jet) = minDRL1;
-          jetL1Thresholds.at(trig)(*jet) = bestL1 ? std::vector<int>(L1Thresholds.begin(), L1Thresholds.end()) : std::vector<int>();
+          jetL1Thresholds.at(trig)(*jet) = bestL1 ?
+	    std::vector<int>(L1Thresholds.begin(), L1Thresholds.end()) :
+	    std::vector<int>();
         }
+
         if (m_doHLTMatching) {
           // TODO: Only works for trigger chain with a single b-tagging WP. Need to save a vector of b-tagging WPs to handle multiple WPs
           jetHLTPt.at(trig)(*jet) = bestHLT ? bestHLT->pt() : -99.;
           jetHLTEta.at(trig)(*jet) = bestHLT ? bestHLT->eta() : -99.;
           jetHLTPhi.at(trig)(*jet) = bestHLT ? bestHLT->phi() : -99.;
           jetHLTDR.at(trig)(*jet) = minDRHLT;
-          jetHLTThresholds.at(trig)(*jet) = bestHLT ? std::vector<int>(HLTThresholds.begin(), HLTThresholds.end()) : std::vector<int>();
+          jetHLTThresholds.at(trig)(*jet) = bestHLT ?
+	    std::vector<int>(HLTThresholds.begin(), HLTThresholds.end()) :
+	    std::vector<int>();
           jetHLTBtag.at(trig)(*jet) = bestHLT ? btag : -1;
+
           ATH_MSG_VERBOSE("Summary " << " Trigger: " << trig << " bestHLT pT: "
                                     << (bestHLT ? bestHLT->pt() : -99.)
                                     << " btag: " << btag
