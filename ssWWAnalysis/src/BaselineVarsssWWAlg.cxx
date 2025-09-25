@@ -40,6 +40,11 @@ namespace ssWWVBS
     ATH_CHECK (m_ele_selected.initialize(m_systematicsList, m_ssWWElectronHandle));
     ATH_CHECK (m_mu_selected.initialize(m_systematicsList, m_ssWWMuonHandle));
 
+    // Charge Flip only supported for Run 2
+    if (!m_isRun3){
+        ATH_CHECK (m_eleECIDS.initialize(m_systematicsList, m_ssWWElectronHandle));
+    }
+
     if(m_isMC){
       ATH_CHECK (m_ele_truthOrigin.initialize(m_systematicsList, m_ssWWElectronHandle));
       ATH_CHECK (m_ele_truthType.initialize(m_systematicsList, m_ssWWElectronHandle));
@@ -202,10 +207,16 @@ namespace ssWWVBS
           float SF = 1.;
           if(std::abs(lep_pdgid)==13)
             SF = m_mu_SF.get(*leptons[i].first,sys);
-          else
-            SF = m_ele_SF.get(*leptons[i].first,sys);
+          else SF = m_ele_SF.get(*leptons[i].first,sys);
           m_Fbranches.at(prefix+"_effSF").set(*event, SF, sys);
         }
+        // Charge-Flip
+        int ele_ECIDS = -99;
+        if (!m_isRun3 && std::abs(lep_pdgid)==11) {
+            ele_ECIDS = m_eleECIDS.get(*leptons[i].first,sys);
+        }
+        m_Ibranches.at(prefix+"_ele_ECIDS").set(*event, ele_ECIDS, sys);
+
         int charge = lep_pdgid > 0 ? -1 : 1;
         m_Ibranches.at(prefix+"_charge").set(*event, charge, sys);
         m_Ibranches.at(prefix+"_pdgid").set(*event, lep_pdgid, sys);

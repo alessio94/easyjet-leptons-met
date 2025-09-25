@@ -2,6 +2,7 @@
 
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     MuonSelectorAlgCfg, ElectronSelectorAlgCfg, LeptonOrderingAlgCfg,
@@ -105,6 +106,7 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
         CompFactory.ssWWVBS.BaselineVarsssWWAlg(
             "FinalVarsssWWAlg",
             isMC=flags.Input.isMC,
+            isRun3=flags.GeoModel.Run is LHCPeriod.Run3,
             electrons=electronkey, eleWP=ElectronWPLabel,
             muons=muonkey, muonWP=MuonWPLabel,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,

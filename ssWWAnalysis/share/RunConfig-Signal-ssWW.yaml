@@ -14,7 +14,7 @@ Electron:
   min_pT_ssWW: 4.5e+3
   max_eta_ssWW: 2.47
   crackVeto: false
-  chargeIDSelectionRun2: false
+  chargeIDSelectionRun2: true
   do_track_decoration: true
   do_IFF_decoration: true
 

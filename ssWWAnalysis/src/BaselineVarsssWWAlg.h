@@ -63,6 +63,8 @@ private:
     Gaudi::Property<bool> m_isMC
       { this, "isMC", false, "Is this simulation?" };
 
+    Gaudi::Property<bool> m_isRun3
+      { this, "isRun3", true, "Is this Run 3?" };
     Gaudi::Property<std::string> m_eleWPName
       { this, "eleWP", "","Electron ID + Iso working point" };
     CP::SysReadDecorHandle<float> m_ele_SF{"", this};
@@ -70,6 +72,8 @@ private:
 
     CP::SysReadDecorHandle<int> m_ele_truthOrigin{"truthOrigin", this};
     CP::SysReadDecorHandle<int> m_ele_truthType{"truthType", this};
+    CP::SysReadDecorHandle<char>
+    m_eleECIDS { this, "ElectronsECIDS", "DFCommonElectronsECIDS", "Charge ID Selector" };
 
     Gaudi::Property<std::string> m_muWPName
       { this, "muonWP", "","Muon ID + Iso working point" };
