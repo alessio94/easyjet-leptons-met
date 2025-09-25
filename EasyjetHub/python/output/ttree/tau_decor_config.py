@@ -9,7 +9,7 @@ def HHbbttTriggerDecoratorCfg(flags, **kwargs):
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
     trigger_branches = [
-        f"trigPassed_{c.replace('-', '_').replace('.', 'p')}"
+        c.replace('-', '_').replace('.', 'p')
         for c in flags.Analysis.TriggerChainsDeco
     ]
 

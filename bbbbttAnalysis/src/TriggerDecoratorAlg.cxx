@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 #include "TriggerDecoratorAlg.h"
@@ -35,7 +35,7 @@ namespace HHHBBBBTT
     // make trigger decorators
     for (const auto& trig : m_triggers){
       SG::ReadDecorHandleKey<xAOD::EventInfo> deco;
-      deco = "EventInfo." + trig;
+      deco = "EventInfo.trigPassed_" + trig;
       m_triggerdecoKeys.emplace(trig, deco);
       ATH_CHECK(m_triggerdecoKeys.at(trig).initialize());
     }
@@ -202,7 +202,7 @@ namespace HHHBBBBTT
     bool trigPassed_SMT = false;
 
     for(const auto& trig : single_mu_paths){
-      bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+      bool pass = triggerdecos.at(trig)(*eventInfo);
       trigPassed_SMT |= pass;
       if(pass){
 	for(const xAOD::Muon* mu : *muons){
@@ -229,7 +229,7 @@ namespace HHHBBBBTT
     bool trigPassed_SET = false;
     
     for(const auto& trig : single_ele_paths){
-      bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+      bool pass = triggerdecos.at(trig)(*eventInfo);
       trigPassed_SET |= pass;
       if(pass){
 	for(const xAOD::Electron* ele : *electrons){
@@ -270,7 +270,7 @@ namespace HHHBBBBTT
 
     for(const auto& [channel, paths] : mapPaths){
       for(const auto& trig: paths){
-	bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+	bool pass = triggerdecos.at(trig)(*eventInfo);
 	mapDecisions.at(channel) |= pass;
 	if(pass){
 	  for(const xAOD::Muon* mu : *muons){
@@ -316,7 +316,7 @@ namespace HHHBBBBTT
 
     for(const auto& [channel, paths] : mapPaths){
       for(const auto& trig : paths){
-	bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+	bool pass = triggerdecos.at(trig)(*eventInfo);
 	mapDecisions.at(channel) |= pass;
 	if(pass){
 	  for(const xAOD::Electron* ele : *electrons){
@@ -352,7 +352,7 @@ namespace HHHBBBBTT
     bool trigPassed_STT = false;
     
     for(const auto& trig : single_tau_paths){
-      bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+      bool pass = triggerdecos.at(trig)(*eventInfo);
       trigPassed_STT |= pass;
       if(pass){
 	for(const xAOD::TauJet* tau : *taus){
@@ -404,7 +404,7 @@ namespace HHHBBBBTT
 
     for(const auto& [channel, paths] : mapPaths){
       for(const auto& trig : paths){
-	bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+	bool pass = triggerdecos.at(trig)(*eventInfo);
 	mapDecisions.at(channel) |= pass;
 	if(pass){
 	  // Naming altered for matching
@@ -444,7 +444,7 @@ namespace HHHBBBBTT
 
     for(const auto& [channel, paths] : mapMatchPaths){
       for(const auto& trig : paths){
-        bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+        bool pass = triggerdecos.at(trig)(*eventInfo);
         if(!pass) continue;
         for(const xAOD::TauJet* tau : *taus){
           bool match = m_matchingTool->match(*tau, trig, 0.2);
@@ -472,7 +472,7 @@ void TriggerDecoratorAlg::checkDiBJetTriggers
 
     for(const auto& [channel, paths] : mapPaths){
       for(const auto& trig : paths){
-	bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+	bool pass = triggerdecos.at(trig)(*eventInfo);
 	mapDecisions.at(channel) |= pass;
 	if(pass){
     //TO DO: implement b-jet matching
@@ -500,7 +500,7 @@ void TriggerDecoratorAlg::checkBjetTauTriggers
 
     for(const auto& [channel, paths] : mapPaths){
       for(const auto& trig : paths){
-	bool pass = triggerdecos.at("trigPassed_"+trig)(*eventInfo);
+	bool pass = triggerdecos.at(trig)(*eventInfo);
 	mapDecisions.at(channel) |= pass;
 	if(pass){
 	//TO DO: implement trigger matching
