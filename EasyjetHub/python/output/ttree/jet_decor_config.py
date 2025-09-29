@@ -15,13 +15,14 @@ def jet_decor_cfg(flags, **kwargs):
     if (flags.Analysis.Small_R_jet.doHLTMatching
             or flags.Analysis.Small_R_jet.doL1Matching):
 
-        if flags.GeoModel.Run not in [LHCPeriod.Run2, LHCPeriod.Run3]:
-            raise RuntimeError(
-                f"Jet trigger matching not supported in LHCPeriod \
-                    {flags.LHCPeriod.Run}. Please switch off \
-                        doL1Matching and doHLTMatching.")
+        if flags.Analysis.Small_R_jet.doHLTMatching:
+            if flags.GeoModel.Run is LHCPeriod.Run2:
+                print("WARNING! HLT jet matching is not yet supported for Run 2. ")
+                print("You should get in touch with the Trigger Core Software group ")
+                print("to contribute to the necessary developments")
+            else:
+                kwargs.setdefault("doHLTMatching", True)
 
-        kwargs.setdefault("doHLTMatching", flags.Analysis.Small_R_jet.doHLTMatching)
         kwargs.setdefault("doL1Matching", flags.Analysis.Small_R_jet.doL1Matching)
         kwargs.setdefault("triggerList", flags.Analysis.TriggerChainsDeco)
 
