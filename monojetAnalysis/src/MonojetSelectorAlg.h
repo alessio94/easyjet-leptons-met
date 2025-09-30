@@ -59,6 +59,7 @@ namespace MONOJET
         "ELECTRON_VETO",
         "MUON_VETO",
         "TAU_VETO",
+	"TIGHT_LEADING_CUT",
         "ALL_CUTS"
       };
 
@@ -84,6 +85,8 @@ namespace MONOJET
 
       CP::SysReadDecorHandle<char>
       m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+
+      CP::SysReadDecorHandle<char> m_TightClean{this,"tightclean", "DFCommonJets_jetClean_TightBad","Tight cleaning flag"};
 
       Gaudi::Property<std::vector<std::string>> m_PCBTnames
         {this, "PCBTDecorList", {}, "Name list of pseudo-continuous b-tagging decorator"};
@@ -148,6 +151,10 @@ namespace MONOJET
 
       void evaluateLARGEJETCuts
         (const xAOD::JetContainer& largeJets, CutManager& MonojetCuts);
+
+      void evaluateTIGHTCuts
+        (const xAOD::JetContainer& jets, CutManager& MonojetCuts, const CP::SystematicSet& sys);
+      
 
       CP::SysReadDecorHandle<float>
         m_generatorWeight{ this, "generatorWeight", "generatorWeight_%SYS%", "MC event weights" };

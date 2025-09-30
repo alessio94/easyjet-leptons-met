@@ -35,6 +35,8 @@ namespace MONOJET
     if (!m_isBtag.empty()) {
       ATH_CHECK(m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
+    ATH_CHECK (m_TightClean.initialize(m_systematicsList, m_jetHandle));
+
 
     ATH_CHECK(m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK(m_muonHandle.initialize(m_systematicsList));
@@ -129,6 +131,7 @@ namespace MONOJET
       evaluateElectronVeto(*electrons, m_MonojetCuts);
       evaluateMuonVeto(*muons, m_MonojetCuts);
       evaluateTauVeto(*taus, m_MonojetCuts);
+      evaluateTIGHTCuts(*jets, m_MonojetCuts, sys);
       evaluateALLcuts(m_MonojetCuts);
 
       bool passedall = true;
@@ -225,10 +228,10 @@ namespace MONOJET
       if (cut.name == "ALL_CUTS") continue; 
 
       passed &= cut.passed;
+
     }
 
     MonojetCuts("ALL_CUTS").passed = passed;
-
   }
 
   // MET trigger
@@ -252,12 +255,24 @@ namespace MONOJET
   }
 
 
-
   void MonojetSelectorAlg::evaluateJETCuts
   (const xAOD::JetContainer& jets, CutManager& MonojetCuts)
   {
     if (MonojetCuts.exists("JETCUT") && (jets.size() <= 4)) {
       MonojetCuts("JETCUT").passed = true;
+    }
+  }
+
+
+  void MonojetSelectorAlg::evaluateTIGHTCuts
+  (const xAOD::JetContainer& jets, CutManager& MonojetCuts, const CP::SystematicSet& sys)
+  {
+    if(jets.size() >= 1){
+    	const xAOD::Jet* ljet = jets.at(0);
+   	 if (MonojetCuts.exists("TIGHT_LEADING_CUT") && (std::abs(ljet->eta()) <= 2.4) && 
+	  (m_TightClean.get(*ljet,sys))) {
+        MonojetCuts("TIGHT_LEADING_CUT").passed = true;
+         }
     }
   }
 

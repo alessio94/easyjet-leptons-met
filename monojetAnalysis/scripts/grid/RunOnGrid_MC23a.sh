@@ -1,6 +1,6 @@
 runConfig="monojetAnalysis/RunConfig-Monojet.yaml"
 executable="monojet-ntupler"
-campaignName="mc23a_monojet_v0"
+campaignName="mc23a_monojet_v1"
 
 #Diboson
 easyjet-gridsubmit --mc-list ../easyjet/monojetAnalysis/datasets/PHYS/MC23a/Diboson_mc23a_p6697.txt \

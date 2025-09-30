@@ -25,7 +25,7 @@ Small_R_jet:
   btag_extra_wps:
     - GN2v01_Continuous
   monojet_btagWPs: ["90","77","65"]
-  variables_int_allJets: ["pcbt"]
+  variables_int_allJets: ["pcbt","TIGHT"]
   do_parent_decoration: false
 
 
@@ -35,7 +35,7 @@ Large_R_jet:
   max_eta: 2.5
   min_m: 40
   max_m: 600
-  variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_phbb", "GN2Xv01_phcc", "GN2Xv01_pqcd", "GN2Xv01_ptop","ECF1", "ECF2", "ECF3", "Split12", "Split23", "Tau1_wta", "Tau2_wta", "Tau3_wta", "Qw"]
+  variables_LargeRJets: ["pt", "eta", "phi", "E", "m","GN2Xv01_phbb","GN2Xv01_phcc", "GN2Xv01_pqcd", "GN2Xv01_ptop","ECF1", "ECF2", "ECF3", "Split12", "Split23", "Tau1_wta", "Tau2_wta", "Tau3_wta", "Qw"]
   do_parent_decoration: false
 
 
@@ -87,6 +87,7 @@ CutList:
   - LARGEJETCUT
   - PASS_TRIGGER
   - METCUT
+  - TIGHT_LEADING_CUT
 #  - JETCUT
   - ALL_CUTS
 

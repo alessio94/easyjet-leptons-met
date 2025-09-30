@@ -117,7 +117,8 @@ def get_BaselineVarsMonojetAlg_variables(flags):
     float_variable_names += ["METSig", "sum_pT_CentralJets", "sum_pT_ForwardJets",
                              "sum_pT_LargeRJets", "DeltaPhi_MET_jets",
                              "DeltaPhi_MET_largeJets"]
-    int_variable_names += ["nCentralJets", "nForwardJets", "nLargeRJets"]
+    int_variable_names += ["nCentralJets", "nForwardJets", "nLargeRJets",
+                           "nTightBadJets", "TIGHTBAD_event"]
 
     for wp in flags.Analysis.Small_R_jet.monojet_btagWPs:
         int_variable_names += ["nBJets" + wp]

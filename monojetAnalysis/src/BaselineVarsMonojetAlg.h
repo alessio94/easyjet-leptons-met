@@ -94,6 +94,8 @@ private:
     CP::SysReadDecorHandle<float> m_GN2Xv01_phcc{this, "phcc", "GN2Xv01_phcc", "GN2Xv01_phcc"};
     CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd{this, "pqcd", "GN2Xv01_pqcd", "GN2Xv01_pqcd"};
     CP::SysReadDecorHandle<float> m_GN2Xv01_ptop{this, "ptop", "GN2Xv01_ptop", "GN2Xv01_ptop"};
+	
+    CP::SysReadDecorHandle<char> m_TightClean{this,"tightclean", "DFCommonJets_jetClean_TightBad","Tight cleaning flag"};
 
     // jss
     std::vector<std::string> m_JSS_list = {"ECF1", "ECF2", "ECF3", "Split12", "Split23", "Tau1_wta", "Tau2_wta", "Tau3_wta", "Qw"};
@@ -106,8 +108,8 @@ private:
     Gaudi::Property<std::vector<std::string>> m_intVariables
           {this, "intVariableList", {}, "Name list of integer variables"};
 
-    CP::SysReadDecorHandle<float>
-    m_METSig {this, "METSignificance", "significance_%SYS%", "Met Significance"};
+    CP::SysReadDecorHandle<float> m_METSig 
+      {this, "METSignificance", "significance_%SYS%", "Met Significance"};
 
     Gaudi::Property<float> m_max_eta_central_jet
       {this, "max_eta_central_jet", 2.5, "Max pseudorapidity central jets / Min pseudorapidity forward jets"};

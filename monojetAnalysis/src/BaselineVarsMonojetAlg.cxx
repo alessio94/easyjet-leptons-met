@@ -30,7 +30,6 @@ namespace MONOJET
     ATH_CHECK(m_eventHandle.initialize(m_systematicsList));
 
 
-
     if (!m_isBtag.empty()) {
       ATH_CHECK(m_isBtag.initialize(m_systematicsList, m_jetHandle));
     }
@@ -63,6 +62,7 @@ namespace MONOJET
     ATH_CHECK (m_GN2Xv01_phcc.initialize(m_systematicsList, m_largejetHandle));
     ATH_CHECK (m_GN2Xv01_pqcd.initialize(m_systematicsList, m_largejetHandle));
     ATH_CHECK (m_GN2Xv01_ptop.initialize(m_systematicsList, m_largejetHandle));
+    ATH_CHECK (m_TightClean.initialize(m_systematicsList, m_jetHandle));  
 
     //jet substruture
     for(auto jss : m_JSS_list){
@@ -128,8 +128,12 @@ namespace MONOJET
       float DeltaPhi_MET_jets = 1000.;
       float DeltaPhi_MET_largeJets = 1000.;
 
+      int bad_jet_event = 0;
+      int bad_jet_number = 0;
+
       for(const xAOD::Jet* jet : *jets) {
-          // count central jets vs forward
+
+	  // count central jets vs forward
           if (std::abs(jet->eta())< m_max_eta_central_jet){ 
             nCentralJets++;
             sum_pT_CentralJets += jet->pt();
@@ -158,6 +162,13 @@ namespace MONOJET
                                jet->e());
           float a = abs(met_vector.DeltaPhi(smallJet_vector));
           if(a < DeltaPhi_MET_jets) DeltaPhi_MET_jets = a;
+
+	  //get bad tight jet flag
+	  bool tightclean = m_TightClean.get(*jet, sys);
+	  if (!tightclean) {
+		  bad_jet_event = 1;
+	  	  bad_jet_number++;
+	  }
       }
 
       
@@ -176,11 +187,13 @@ namespace MONOJET
 
       }
 
+
       // write to ttree
 
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
       m_Ibranches.at("nForwardJets").set(*event, nForwardJets, sys);
       m_Ibranches.at("nLargeRJets").set(*event, n_largeJets, sys);
+      m_Ibranches.at("nTightBadJets").set(*event, bad_jet_number, sys);
 
       for (size_t i = 0; i < m_btagWPs.size(); ++i) {
           const std::string& wp = m_btagWPs[i];
@@ -194,6 +207,8 @@ namespace MONOJET
 
       m_Fbranches.at("DeltaPhi_MET_jets").set(*event,DeltaPhi_MET_jets,sys);
       m_Fbranches.at("DeltaPhi_MET_largeJets").set(*event,DeltaPhi_MET_largeJets,sys);
+	
+      m_Ibranches.at("TIGHTBAD_event").set(*event,bad_jet_event,sys);
 
       //MET Significance
       float METSig = m_METSig.get(*met, sys);
@@ -210,6 +225,10 @@ namespace MONOJET
         m_Fbranches.at(prefix+ "_eta").set(*event, jet->eta(), sys);
         m_Fbranches.at(prefix+ "_phi").set(*event, jet->phi(), sys);
         m_Fbranches.at(prefix+ "_E").set(*event, jet->e(), sys);
+	
+	bool tightclean = m_TightClean.get(*jet, sys);
+	m_Ibranches.at(prefix+"_TIGHT").set(*event, tightclean, sys);
+
 
         if(!m_PCBT.empty())
           m_Ibranches.at(prefix+"_pcbt").set(*event,m_PCBT.get(*jet,sys),sys);
@@ -232,12 +251,13 @@ namespace MONOJET
         float phcc = m_GN2Xv01_phcc.get(*largeJet, sys);
         float pqcd = m_GN2Xv01_pqcd.get(*largeJet, sys);
         float ptop = m_GN2Xv01_ptop.get(*largeJet, sys);
+
         
         m_Fbranches.at(prefix+"GN2Xv01_phbb").set(*event, phbb, sys);
         m_Fbranches.at(prefix+"GN2Xv01_phcc").set(*event, phcc, sys);
         m_Fbranches.at(prefix+"GN2Xv01_pqcd").set(*event, pqcd, sys);
         m_Fbranches.at(prefix+"GN2Xv01_ptop").set(*event, ptop, sys);
-
+	
         // jet substrucure
         for(const auto & jss : m_JSS_list){
           float jss_var = m_JSS.at(jss).get(*largeJet, sys);
