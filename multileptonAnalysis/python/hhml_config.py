@@ -145,6 +145,7 @@ def get_BaselineVarshhmlAlg_variables(flags):
                                      "HbbCand_PtCorr_" + var,
                                      "HbbCand_KF_" + var]
 
+    float_variable_names += ["HbbCand_KF_m_bb_unconstrained"]
     return float_variable_names, int_variable_names
 
 

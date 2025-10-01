@@ -64,6 +64,8 @@ private:
     CP::SysReadHandle<xAOD::JetContainer> m_kfJetHandle{
         this, "KFJets", "bb4lAnalysisKFJets_%SYS%","KF jet container to read"};
 
+    CP::SysReadDecorHandle<float> m_KF_MBB{"KF_mbb_%SYS%", this};
+
     xAOD::JetFourMom_t m_jet1_uncorr, m_jet2_uncorr;
     xAOD::JetFourMom_t m_jet1_muonCorr, m_jet2_muonCorr;
 

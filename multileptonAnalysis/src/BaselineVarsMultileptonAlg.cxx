@@ -34,6 +34,7 @@ namespace MULTILEPTON
     ATH_CHECK(m_metHandle.initialize(m_systematicsList));
     ATH_CHECK(m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK(m_kfJetHandle.initialize(m_systematicsList));
+    ATH_CHECK(m_KF_MBB.initialize(m_systematicsList, m_eventHandle));
 
     // Initialise syst-aware output decorators
     for(const std::string &var : m_floatVariables){
@@ -338,6 +339,7 @@ namespace MULTILEPTON
     // Add kinematic fit information if available
    TLorentzVector H_bb_KF = KFJets[0]->p4() + KFJets[1]->p4();
     prefix = "HbbCand_KF_";
+    m_Fbranches.at("HbbCand_KF_m_bb_unconstrained").set(*event, m_KF_MBB.get(*event, sys), sys);
     m_Fbranches.at(prefix + "m_bb").set(*event, H_bb_KF.M(), sys);
         m_Fbranches.at(prefix + "pt_bb").set(*event, H_bb_KF.Pt(), sys);
         m_Fbranches.at(prefix + "eta_bb").set(*event, H_bb_KF.Eta(), sys);
