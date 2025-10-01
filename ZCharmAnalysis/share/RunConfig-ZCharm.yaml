@@ -47,6 +47,8 @@ Small_R_jet:
   variables_int_bjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]    
   variables_int_cjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]
 
+  variables_truthjets: ["pt", "eta", "phi", "E"]
+
 Large_R_jet:
   amount: 1
   variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_DXcc", "GN2Xv01_phbb", "GN2Xv01_phcc", "GN2Xv01_pqcd", "GN2Xv01_ptop"]
@@ -69,8 +71,8 @@ Muon:
 Lepton:
   amount: 2
   variables_int: ["isPrompt","truthOrigin", "truthType"]
+  variables_truth_Z: ["pt", "eta", "phi", "E", "m"]
 
-### MET WP?
 
 # list of triggers per year to consider
 Trigger:
@@ -91,6 +93,10 @@ OverlapRemoval:
 #Enable cutflow 
 save_cutflow: true
 
+# # Enable cutflow for the truth level
+# save_truth_cutflow: true
+
+
 CutList :
       - PASS_TRIGGER
       - EXACTLY_TWO_LEPTONS
@@ -106,6 +112,20 @@ Categories :
       - IS_ee
       - IS_mm
       - IS_em
+
+TruthCutList :
+      - EXACTLY_TWO_LEPTONS_TRUTH
+      - OPPOSITE_CHARGE_LEPTONS_TRUTH
+      - DILEPTON_MASS_WINDOW_TRUTH
+      - ONE_B_JETS_TRUTH
+      - TWO_B_JETS_TRUTH
+      - ONE_C_JETS_TRUTH
+      - TWO_C_JETS_TRUTH
+
+TruthCategories :
+      - IS_ee_TRUTH
+      - IS_mm_TRUTH
+      - IS_em_TRUTH
 
 # Include the TTree configuration and update details
 ttree_output:
@@ -128,7 +148,7 @@ ttree_output:
       truth_labels: true
       btag_details: true
   truth_outputs:
-    electrons: 'container_names.input.truthelectrons'
-    muons: 'container_names.input.truthmuons'
-    small_R_jets: 'container_names.input.truth4Jet'
-    large_R_jets: ['container_names.input.truth10SoftDropJet']
+    electrons: "ZCharmTruthElectrons"
+    muons: "ZCharmTruthMuons"
+    small_R_jets: "ZCharmTruthJets"
+    large_R_jets: ["ZCharmTruthLargeJets"]

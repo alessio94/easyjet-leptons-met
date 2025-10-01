@@ -23,6 +23,10 @@ namespace ZCC
     IS_ee,
     IS_mm,
     IS_em,
+
+    IS_ee_TRUTH,
+    IS_mm_TRUTH,
+    IS_em_TRUTH,
     
     pass_trigger_SLT,
     pass_trigger_DLT,
@@ -38,9 +42,12 @@ namespace ZCC
     TWO_C_JETS,
     ONE_LARGE_JET,
 
+
     EXACTLY_TWO_LEPTONS_TRUTH,
     OPPOSITE_CHARGE_LEPTONS_TRUTH,
     DILEPTON_MASS_WINDOW_TRUTH,
+    ONE_B_JETS_TRUTH,
+    TWO_B_JETS_TRUTH,
     ONE_C_JETS_TRUTH,
     TWO_C_JETS_TRUTH,
     ONE_LARGE_JET_TRUTH,

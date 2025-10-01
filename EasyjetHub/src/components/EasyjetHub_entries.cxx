@@ -21,6 +21,10 @@
 #include "../ElectronDecoratorAlg.h"
 #include "../MuonTrackDecoratorAlg.h"
 #include "../LeptonOrderingAlg.h"
+#include "../TruthLeptonOrderingAlg.h"
+#include "../TruthElectronSelectorAlg.h"
+#include "../TruthMuonSelectorAlg.h"
+#include "../TruthJetSelectorAlg.h"
 #include "../SecVtxFilterAlg.h"
 #include "../UIDDecoratorAlg.h"
 
@@ -49,5 +53,9 @@ DECLARE_COMPONENT(MetadataHistAlg)
 DECLARE_COMPONENT(ElectronDecoratorAlg)
 DECLARE_COMPONENT(MuonTrackDecoratorAlg)
 DECLARE_COMPONENT(LeptonOrderingAlg)
+DECLARE_COMPONENT(TruthLeptonOrderingAlg)
+DECLARE_COMPONENT(TruthElectronSelectorAlg)
+DECLARE_COMPONENT(TruthMuonSelectorAlg)
+DECLARE_COMPONENT(TruthJetSelectorAlg)
 DECLARE_COMPONENT(SecVtxFilterAlg)
 DECLARE_COMPONENT(UIDDecoratorAlg)

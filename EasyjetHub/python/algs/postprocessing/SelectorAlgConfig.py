@@ -36,12 +36,51 @@ def ElectronSelectorAlgCfg(flags, name="ElectronSelectorAlg", **kwargs):
     return cfg
 
 
+def TruthElectronSelectorAlgCfg(flags, name="TruthElectronSelectorAlg", **kwargs):
+    cfg = ComponentAccumulator()
+
+    kwargs.setdefault("decoration",
+                      flags.Analysis.container_names.input.truthelectrons
+                      + ".isTruthElectron")
+    kwargs.setdefault("decorOutName", "TruthEvents.nElectrons")
+
+    cfg.addEventAlgo(CompFactory.Easyjet.TruthElectronSelectorAlg(name, **kwargs))
+    return cfg
+
+
+def TruthMuonSelectorAlgCfg(flags, name="TruthMuonSelectorAlg", **kwargs):
+    cfg = ComponentAccumulator()
+
+    kwargs.setdefault("decoration",
+                      flags.Analysis.container_names.input.truthmuons
+                      + ".isTruthMuon")
+    kwargs.setdefault("decorOutName", "TruthEvents.nMuons")
+
+    cfg.addEventAlgo(CompFactory.Easyjet.TruthMuonSelectorAlg(name, **kwargs))
+    return cfg
+
+
 def LeptonOrderingAlgCfg(flags, name="LeptonOrderingAlg", **kwargs):
     cfg = ComponentAccumulator()
 
     kwargs.setdefault("leptonAmount", flags.Analysis.Lepton.amount)
 
     cfg.addEventAlgo(CompFactory.Easyjet.LeptonOrderingAlg(name, **kwargs))
+    return cfg
+
+
+def TruthLeptonOrderingAlgCfg(flags, name="TruthLeptonOrderingAlg", **kwargs):
+    cfg = ComponentAccumulator()
+
+    kwargs.setdefault("leptonAmount", flags.Analysis.Lepton.amount)
+    kwargs.setdefault("isTruthElectronDecoration",
+                      flags.Analysis.container_names.input.truthelectrons
+                      + ".isTruthElectron")
+    kwargs.setdefault("isTruthMuonDecoration",
+                      flags.Analysis.container_names.input.truthmuons
+                      + ".isTruthMuon")
+
+    cfg.addEventAlgo(CompFactory.Easyjet.TruthLeptonOrderingAlg(name, **kwargs))
     return cfg
 
 
@@ -85,4 +124,14 @@ def JetSelectorAlgCfg(flags, name="JetSelectorAlg", **kwargs):
         kwargs.setdefault("baselineSelectionName", "")
 
     cfg.addEventAlgo(CompFactory.Easyjet.JetSelectorAlg(name, **kwargs))
+    return cfg
+
+
+def TruthJetSelectorAlgCfg(flags, name="TruthJetSelectorAlg", **kwargs):
+    cfg = ComponentAccumulator()
+
+    kwargs.setdefault("bjetAmount", flags.Analysis.Small_R_jet.amount_bjet)
+    kwargs.setdefault("cjetAmount", flags.Analysis.Small_R_jet.amount_cjet)
+
+    cfg.addEventAlgo(CompFactory.Easyjet.TruthJetSelectorAlg(name, **kwargs))
     return cfg

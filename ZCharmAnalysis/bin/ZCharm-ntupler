@@ -18,8 +18,10 @@ from EasyjetHub.hub import (
 from EasyjetHub.output.ttree.minituple_config import check_ntuple_output_file
 
 from ZCharmAnalysis.ZCharm_config import ZCharm_branches
-from ZCharmAnalysis.ZCharm_config import ZCharm_cfg
+from ZCharmAnalysis.ZCharm_config import ZCharm_cfg 
+from ZCharmAnalysis.ZCharm_config import ZCharmTruth_cfg
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
+
 
 def ZCharm_job_cfg():
     parser = AnalysisArgumentParser()
@@ -28,6 +30,7 @@ def ZCharm_job_cfg():
     # parsed arguments
     # Returned flags are locked
     flags, args = analysis_configuration(parser)
+    
 
     # Get a standard ComponentAccumulator with the following infrastructure:
     # - basic services for event loop, messaging etc
@@ -36,13 +39,28 @@ def ZCharm_job_cfg():
     seqname = "ZCharmSeq"
     cfg = default_sequence_cfg(flags, seqname)
 
-
     # Extend the list of output branches via flags
     # For more sophistication this could be done using
     # custom BranchManagers
     extra_ZCharm_branches = []
     if flags.Analysis.do_ZCharm_analysis:
-        extra_ZCharm_branches,float_variable_names,int_variable_names = ZCharm_branches(flags)
+        extra_ZCharm_branches,float_variable_names,int_variable_names, truth_float_variable_names = ZCharm_branches(flags)
+
+        #Adding truth selection algorithm to sequence
+        if flags.Input.isMC:
+            cfg.merge(
+                ZCharmTruth_cfg(
+                    flags,
+                    truthsmalljetkey=flags.Analysis.container_names.input.truth4Jet,
+                    truthlargejetkey=flags.Analysis.container_names.input.truth10SoftDropJet,
+                    truthmuonkey=flags.Analysis.container_names.input.truthmuons,
+                    truthelectronkey=flags.Analysis.container_names.input.truthelectrons,
+                    float_variables=truth_float_variable_names
+                ),
+                seqname
+            )
+  
+        #Reco selection
         cfg.merge(
             ZCharm_cfg(
                 flags,
@@ -55,6 +73,7 @@ def ZCharm_job_cfg():
             ),
             seqname
         )
+
         if not flags.Analysis.suppress_metadata_json:
             cfg.merge(event_counter_cfg("n_ZCharm"), seqname)
 
@@ -97,6 +116,7 @@ def main():
                 f"runtime ({duration:.1f}s) exceed timeout ({args.timeout:.0f}s)"
             )
     return return_code.isSuccess()
+    
 
 
 # Execute the main function if this file was executed as a script

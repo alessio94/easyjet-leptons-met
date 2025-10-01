@@ -57,6 +57,9 @@ namespace ZCC
     
     ATH_CHECK (m_matchingTool.retrieve());
 
+    ATH_CHECK(m_passTruthCutsKey.initialize());
+
+
     for (auto& [key, value] : m_boolnames) {
       m_bools.emplace(key, false);
       CP::SysWriteDecorHandle<bool> whandle{value+"_%SYS%", this};
@@ -77,6 +80,7 @@ namespace ZCC
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
+
     if(m_saveCutFlow) ATH_CHECK (initialiseCutflow());
     return StatusCode::SUCCESS;
   }
@@ -87,6 +91,15 @@ namespace ZCC
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
+    // Find truth decision
+
+    SG::ReadDecorHandle<xAOD::TruthEventContainer, bool> m_passTruthCuts(m_passTruthCutsKey);
+    if (!m_passTruthCuts.isPresent()) {
+      ATH_MSG_ERROR("PassTruthCuts decision is not present!");
+      return StatusCode::FAILURE;
+    }
+
+
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
@@ -95,6 +108,16 @@ namespace ZCC
       // Retrive inputs
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
+      bool isMC = event->eventType(xAOD::EventInfo::IS_SIMULATION);
+      bool pass_truth_baseline = false;
+      if (isMC){
+        // Retrieve the truth decision
+        if (!m_passTruthCuts.isPresent() || m_passTruthCuts->empty()) {
+          ATH_MSG_ERROR("PassTruthCuts decision is empty or not found!");
+          return StatusCode::FAILURE;
+        }
+        pass_truth_baseline = (*m_passTruthCuts)[0];
+      }
       
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
@@ -230,7 +253,17 @@ namespace ZCC
         m_Bbranches.at(key).set(*event, var, sys);
       }
 
-      if (!m_bypass && !pass_baseline) continue;
+      ATH_MSG_VERBOSE("pass_baseline = " << pass_baseline);
+      ATH_MSG_VERBOSE("pass_truth_baseline = " << pass_truth_baseline);
+
+      if (pass_baseline != pass_truth_baseline) {
+        ATH_MSG_VERBOSE("Baseline cuts do not match truth baseline cuts! "
+                        << "pass_baseline: " << pass_baseline
+                        << " pass_truth_baseline: " << pass_truth_baseline);
+      }
+
+      if (!m_bypass && (!pass_baseline && !pass_truth_baseline )) continue;
+      ATH_MSG_VERBOSE("Saving event number: " << event->eventNumber() << " in run: " << event->runNumber());
       filter.setPassed(true);
     }
 

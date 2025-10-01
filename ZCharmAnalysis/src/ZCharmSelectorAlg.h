@@ -22,6 +22,8 @@
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMissingET/MissingETContainer.h>
+#include <xAODTruth/TruthEvent.h>
+#include <xAODTruth/TruthEventContainer.h>
 
 #include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
@@ -107,6 +109,8 @@ namespace ZCC
         {ZCC::DLT, "DLT"},
       };
 
+      SG::ReadDecorHandleKey<xAOD::TruthEventContainer> m_passTruthCutsKey {this, "PassTruthCuts", "TruthEvents.PassTruthCuts", "Name of the truth cuts decorator"};
+      
       Gaudi::Property<std::vector<std::string>> m_triggers 
       { this, "triggerLists", {}, "Name list of trigger" };
 
