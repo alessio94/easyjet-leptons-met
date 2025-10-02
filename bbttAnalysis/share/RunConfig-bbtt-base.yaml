@@ -28,6 +28,18 @@ do_mmc : true
 
 GRL:
   store_decoration: true
+  years:
+    include: bbttAnalysis/bbtt_grl_years.yaml
+  files:
+    include: bbttAnalysis/bbtt_grl.yaml
+
+PileupReweighting:
+  lumicalc_files:
+    include: bbttAnalysis/lumicalc_bbtt.yaml
+  prw_files:
+    include: bbttAnalysis/prw_bbtt.yaml
+
+
 
 # Toggles for reconstructed objects decorations
 Small_R_jet:
