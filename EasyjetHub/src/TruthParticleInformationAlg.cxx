@@ -23,6 +23,7 @@ namespace Easyjet
 {
   const std::unordered_map<std::string, std::vector<int>> decayProducts_IDs{
     {"bbbb", {MC::BQUARK, -MC::BQUARK}},
+    {"bbmm", {MC::BQUARK, -MC::BQUARK, MC::MUON, -MC::MUON}},
     {"bbtt", {MC::BQUARK, -MC::BQUARK, MC::TAU, -MC::TAU}},
     {"bbyy", {MC::BQUARK, -MC::BQUARK, MC::PHOTON}},
     {"bbWW", {MC::BQUARK, -MC::BQUARK, MC::WPLUSBOSON, -MC::WPLUSBOSON}},
