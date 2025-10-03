@@ -40,9 +40,13 @@ namespace MULTILEPTON
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
 
+    ATH_CHECK(m_is16_periodA.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is22_75bunches.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is23_75bunches.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is23_400bunches.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is24_timeframeA_C.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is24_timeframeD.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_is24_timeframeE_F.initialize(m_systematicsList, m_eventHandle));
 
     ATH_CHECK (m_matchingTool.retrieve());
 
@@ -126,7 +130,9 @@ namespace MULTILEPTON
         if (key == MULTILEPTON::PASS_TRIGGER ||
             key == pass_trigger_SLT ||
             key == pass_trigger_DLT ||
-            key == pass_baseline_tau_trigger)
+            key == pass_trigger_STT ||
+            key == pass_trigger_DTT ||
+            key == pass_trigger_LTT )
           continue;
         pass_selection |= value;
       }
@@ -272,9 +278,18 @@ namespace MULTILEPTON
       evaluateSingleLeptonTrigger(event, electrons, muons, sys);
       evaluateDiLeptonTrigger(event, electrons, muons, sys);
     }
-    if (taus) evaluateBaselineTauTrigger(event, electrons, muons, taus, sys);
+    if (taus){
+      evaluateSingleTauTrigger(event, taus, sys);
+      evaluateDiTauTrigger(event, taus, sys);
+      evaluateLeptonTauTrigger(event, electrons, muons, taus, sys);
+    }
 
-    if (m_bools.at(MULTILEPTON::pass_trigger_SLT) || m_bools.at(MULTILEPTON::pass_trigger_DLT) || m_bools.at(MULTILEPTON::pass_baseline_tau_trigger)) m_bools.at(MULTILEPTON::PASS_TRIGGER) = true;
+    if (m_bools.at(MULTILEPTON::pass_trigger_SLT) || 
+        m_bools.at(MULTILEPTON::pass_trigger_DLT) || 
+        m_bools.at(MULTILEPTON::pass_trigger_STT) || 
+        m_bools.at(MULTILEPTON::pass_trigger_DTT) || 
+        m_bools.at(MULTILEPTON::pass_trigger_LTT)) 
+      m_bools.at(MULTILEPTON::PASS_TRIGGER) = true;
   }
 
   void MultileptonSelectorAlg::evaluateSingleLeptonTrigger(
@@ -306,21 +321,41 @@ namespace MULTILEPTON
     }
     else if(year==2022){
       single_ele_paths = {
-        "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
-        "HLT_e140_lhloose_L1EM22VHI", "HLT_e300_etcut_L1EM22VHI"
+        "HLT_e26_lhtight_ivarloose_L1EM22VHI",
+        "HLT_e60_lhmedium_L1EM22VHI",
+        "HLT_e140_lhloose_L1EM22VHI",
+        "HLT_e140_lhloose_noringer_L1EM22VHI", // was affected by multiple prescale bugs. This trigger was mostly unprescaled starting from the 75b fills but only reliably unprescaled from run 430896
+        "HLT_e300_etcut_L1EM22VHI"
       };
     }
     else if(m_is23_75bunches.get(*event, sys)){
       single_ele_paths = {
-        "HLT_e26_lhtight_ivarloose_L1EM22VHI", "HLT_e60_lhmedium_L1EM22VHI",
-        "HLT_e140_lhloose_L1EM22VHI", "HLT_e140_lhloose_noringer_L1EM22VHI",
+        "HLT_e26_lhtight_ivarloose_L1EM22VHI", 
+        "HLT_e60_lhmedium_L1EM22VHI",
+        "HLT_e140_lhloose_L1EM22VHI", 
+        "HLT_e140_lhloose_noringer_L1EM22VHI",
         "HLT_e300_etcut_L1EM22VHI"
       };
     }
     else if(year==2023){
       single_ele_paths = {
-        "HLT_e26_lhtight_ivarloose_L1eEM26M", "HLT_e60_lhmedium_L1eEM26M",
-        "HLT_e140_lhloose_L1eEM26M", "HLT_e140_lhloose_noringer_L1eEM26M",
+        "HLT_e26_lhtight_ivarloose_L1eEM26M", 
+        "HLT_e60_lhmedium_L1eEM26M",
+        "HLT_e140_lhloose_L1eEM26M", 
+        "HLT_e140_lhloose_noringer_L1eEM26M",
+        "HLT_e300_etcut_L1eEM26M"
+      };
+    }
+    else if(year==2024){
+      single_ele_paths = {
+        "HLT_e26_lhtight_ivarloose_L1eEM26M", 
+        "HLT_e26_lhtight_ivarloose_L1eEM26T", 
+        "HLT_e20_lhtight_ivarloose_L1ZAFB_25DPHI_eEM18M",
+        "HLT_e26_lhtight_ivarmedium_L1eEM26M",
+        "HLT_e26_lhtight_ivartight_L1eEM26M",
+        "HLT_e60_lhmedium_L1eEM26M",
+        "HLT_e140_lhloose_L1eEM26M",
+        "HLT_e140_lhloose_noringer_L1eEM26M",
         "HLT_e300_etcut_L1eEM26M"
       };
     }
@@ -342,18 +377,20 @@ namespace MULTILEPTON
     std::vector<std::string> single_mu_paths;
 
     if(year==2015){
-      single_mu_paths = {"HLT_mu20_iloose_L1MU15", "HLT_mu50"};
+      single_mu_paths = {"HLT_mu20_iloose_L1MU15", "HLT_mu50", "HLT_mu40"};
     }
     else if(2016<=year && year<=2018){
       single_mu_paths = {"HLT_mu26_ivarmedium", "HLT_mu50"};
     }
-    else if(2022<=year && year<=2023 &&
+    else if(2022<=year && year<=2024 &&
 	    !m_is22_75bunches.get(*event, sys) &&
 	    !m_is23_75bunches.get(*event, sys) &&
 	    !m_is23_400bunches.get(*event, sys)){
       single_mu_paths = {
-        "HLT_mu24_ivarmedium_L1MU14FCH", "HLT_mu50_L1MU14FCH",
-        "HLT_mu60_0eta105_msonly_L1MU14FCH", "HLT_mu60_L1MU14FCH",
+        "HLT_mu24_ivarmedium_L1MU14FCH", 
+        "HLT_mu50_L1MU14FCH",
+        "HLT_mu60_0eta105_msonly_L1MU14FCH", 
+        "HLT_mu60_L1MU14FCH",
         "HLT_mu80_msonly_3layersEC_L1MU14FCH"
       };
     }
@@ -398,9 +435,25 @@ namespace MULTILEPTON
         "HLT_2e17_lhvloose_L12EM15VHI", "HLT_2e24_lhvloose_L12EM20VH"
       };
     }
+    else if(m_is23_75bunches.get(*event, sys)){
+      di_ele_paths = {
+        "HLT_2e17_lhvloose_L12EM15VHI",
+        "HLT_2e24_lhvloose_L12EM20VH"
+      };
+    }
     else if(year==2023){
       di_ele_paths = {
-        "HLT_2e17_lhvloose_L12eEM18M", "HLT_2e24_lhvloose_L12eEM24L"
+        "HLT_2e17_lhvloose_L12eEM18M", 
+        "HLT_2e24_lhvloose_L12eEM24L"
+      };
+    }
+    else if(year==2024){
+      di_ele_paths = {
+        "HLT_2e17_lhvloose_L12eEM18M", 
+        "HLT_2e24_lhvloose_L12eEM24L",
+        "HLT_e26_lhtight_e14_idperf_tight_probe_50invmAB130_L1eEM26M",
+        "HLT_e26_lhtight_e14_idperf_tight_nogsf_probe_50invmAB130_L1eEM26M",
+        "HLT_e26_lhtight_e14_etcut_probe_50invmAB130_L1eEM26M"
       };
     }
 
@@ -433,10 +486,19 @@ namespace MULTILEPTON
       di_mu_paths = {"HLT_mu18_mu8noL1"};
     }
     else if(2016<=year && year<=2018){
-      di_mu_paths = {"HLT_mu22_mu8noL1"};
+      if (m_is16_periodA.get(*event, sys)){
+        di_mu_paths = {"HLT_mu22_mu8noL1"};
+      } else {
+        di_mu_paths = {"HLT_mu22_mu8noL1", "HLT_2mu14"};
+      }
     }
-    else if(2022<=year && year<=2023){
-      di_mu_paths = {"HLT_mu22_mu8noL1_L1MU14FCH", "HLT_2mu14_L12MU8F"};
+    else if(2022<=year && year<=2024){
+      di_mu_paths = {
+        "HLT_2mu10_l2mt_L1MU10BOM",
+        "HLT_mu20_ivarmedium_mu8noL1_L1MU14FCH",
+        "HLT_mu22_mu8noL1_L1MU14FCH",
+        "HLT_2mu14_L12MU8F"
+      };
     }
 
     bool trigPassed_DMT = false;
@@ -469,8 +531,19 @@ namespace MULTILEPTON
     else if(2016<=year && year<=2018){
       emu_paths = {"HLT_e17_lhloose_nod0_mu14"};
     }
-    else if(2022<=year && year<=2023){
-      emu_paths = {"HLT_e17_lhloose_mu14_L1EM15VH_MU8F"};
+    else if(2022==year){
+      emu_paths = {
+        "HLT_e26_lhmedium_mu8noL1_L1EM22VHI",
+        "HLT_e17_lhloose_mu14_L1EM15VH_MU8F", // only for 2022
+        "HLT_e7_lhmedium_mu24_L1MU14FCH"
+      };
+    }
+    else if(year>=2023 && year<=2024){
+      emu_paths = {
+        "HLT_e26_lhmedium_mu8noL1_L1eEM26M",
+        "HLT_e17_lhloose_mu14_L1eEM18L_MU8F",
+        "HLT_e7_lhmedium_L1eEM5_mu24_L1MU14FCH"
+      };
     }
     bool trigPassed_EMT = false;
     if (electrons && muons){
@@ -493,9 +566,8 @@ namespace MULTILEPTON
     m_bools.at(MULTILEPTON::pass_trigger_DLT) = (trigPassed_DET || trigPassed_DMT || trigPassed_EMT);
   }
 
-  void MultileptonSelectorAlg::evaluateBaselineTauTrigger(
+  void MultileptonSelectorAlg::evaluateSingleTauTrigger(
     const xAOD::EventInfo* event,
-    const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
     const xAOD::TauJetContainer* taus,
     const CP::SystematicSet& sys){
 
@@ -529,6 +601,17 @@ namespace MULTILEPTON
         "HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100",
       };
     }
+    else if(m_is23_400bunches.get(*event, sys) || year==2024){
+      single_tau_paths = {
+        "HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"
+      };
+    }
+    else if(2022<=year && year<=2023){
+      single_tau_paths = {
+        "HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100",
+      };
+    }
+    
 
     bool trigPassed_STT = false;
     for(const auto& trig : single_tau_paths){
@@ -536,10 +619,21 @@ namespace MULTILEPTON
       if (pass){
         for(const auto& tau : *taus){
           bool match = m_matchingTool->match(*tau, trig, 0.2);
-          trigPassed_STT |= match;
+          trigPassed_STT |= match && tau->pt() > m_pt_threshold[MULTILEPTON::STT][MULTILEPTON::tau];
         }
       }
     }
+    m_bools.at(MULTILEPTON::pass_trigger_STT) = trigPassed_STT;
+  }
+
+  void MultileptonSelectorAlg::evaluateDiTauTrigger(
+    const xAOD::EventInfo* event,
+    const xAOD::TauJetContainer* taus,
+    const CP::SystematicSet& sys){
+
+    int year = m_year.get(*event, sys);
+
+    if (!taus) return;
 
     // Di-tau trigger
     std::vector<std::string> di_tau_paths;
@@ -569,6 +663,40 @@ namespace MULTILEPTON
         "HLT_tau80_mediumRNN_tracktwoMVA_L1TAU60_tau60_mediumRNN_tracktwoMVA_L1TAU40",
       };
     }
+    else if(2022<=year && year<=2023){
+      di_tau_paths = {
+        // All from 75 bunches
+        "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25",
+        "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25",
+        "HLT_tau40_mediumRNN_tracktwoMVA_tau35_mediumRNN_tracktwoMVA_03dRAB_L1TAU25IM_2TAU20IM_2J25_3J20",
+        "HLT_tau80_mediumRNN_tracktwoMVA_tau60_mediumRNN_tracktwoMVA_03dRAB_L1TAU60_2TAU40",
+        "HLT_tau80_mediumRNN_tracktwoMVA_tau35_mediumRNN_tracktwoMVA_03dRAB30_L1TAU60_DR_TAU20ITAU12I",
+        //************* In Questions: Whether should it be included?     *************//
+        // "HLT_tau80_mediumRNN_tracktwoMVA_tau60_mediumRNN_tracktwoMVA_03dRAB_L1eTAU80_2eTAU60"  // Only 2023 From 1200 bunches has it, others are from 75 bunches, should it be in m_is23_1200bunches?
+      };
+    }
+    // timeframe A-D is the early 2024 for di-tau triggers
+    else if(m_is24_timeframeA_C.get(*event, sys) || m_is24_timeframeD.get(*event, sys)){
+      di_tau_paths = {
+        "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"
+      };
+    }
+    // timeframe E-F is the late 2024 di-tau triggers
+    else if(m_is24_timeframeE_F.get(*event, sys)){
+      di_tau_paths = {
+        "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB_L1cTAU30M_2cTAU20M_4jJ30p0ETA25"
+      };
+    }
+    else if(year==2024){
+      di_tau_paths = {
+        "HLT_tau25_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_j70_j50a_j0_DJMASS900j50_L1jMJJ_500_NFF",
+        "HLT_tau35_mediumRNN_tracktwoMVA_tau25_mediumRNN_tracktwoMVA_03dRAB30_L1cTAU30M_2cTAU20M_DR_eTAU30eTAU20_jJ55",
+        "HLT_tau40_mediumRNN_tracktwoMVA_tau35_mediumRNN_tracktwoMVA_03dRAB_L1cTAU35M_2cTAU30M_2jJ55_3jJ50",
+        "HLT_tau80_mediumRNN_tracktwoMVA_tau35_mediumRNN_tracktwoMVA_03dRAB30_L1eTAU80_2cTAU30M_DR_eTAU30eTAU20",
+        "HLT_tau80_mediumRNN_tracktwoMVA_tau60_mediumRNN_tracktwoMVA_03dRAB_L1eTAU80_2eTAU60",
+      };
+    }
+  
     bool trigPassed_DTT = false;
     if (taus->size() >= 2){
       for(const auto& trig : di_tau_paths){
@@ -584,12 +712,30 @@ namespace MULTILEPTON
             for (const auto& tau1 : *taus){
               if (tau0 == tau1) continue;
               bool match = m_matchingTool->match({tau0,tau1}, trig, 0.2);
-              trigPassed_DTT |= match;
+              bool pass_cut = (
+                  (tau0->pt() > m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::leadingtau] &&
+                  tau1->pt() > m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::subleadingtau]) || 
+                  (tau1->pt() > m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::leadingtau] &&
+                  tau0->pt() > m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::subleadingtau]) 
+                );
+              trigPassed_DTT |= match && pass_cut;
             }
           }
         }
       }
     }
+    m_bools.at(MULTILEPTON::pass_trigger_DTT) = trigPassed_DTT;
+  }
+
+  void MultileptonSelectorAlg::evaluateLeptonTauTrigger(
+    const xAOD::EventInfo* event,
+    const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
+    const xAOD::TauJetContainer* taus,
+    const CP::SystematicSet& sys){
+
+    int year = m_year.get(*event, sys);
+
+    if (!taus) return;
 
     // electron-tau trigger
     std::vector<std::string> ele_tau_paths;
@@ -614,6 +760,42 @@ namespace MULTILEPTON
       ele_tau_paths = {
         "HLT_e17_lhmedium_nod0_ivarloose_tau25_medium1_tracktwoEF",
         "HLT_e17_lhmedium_nod0_ivarloose_tau25_mediumRNN_tracktwoMVA",
+      };
+    }
+    else if(year==2022){
+      ele_tau_paths = {
+        // All from 75 bunches
+        "HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1EM22VHI",
+        "HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1EM15VHI_2TAU12IM_4J12"
+      };
+    }
+    else if(m_is23_75bunches.get(*event, sys)){
+      ele_tau_paths = {
+        "HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1EM22VHI"
+      };
+    }
+    else if(year==2023){
+      ele_tau_paths = {
+        "HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1eEM26M", // From 400 bunches
+        "HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1EM15VHI_2TAU12IM_4J12" // From 75 bunches
+        // Questions: what's the difference between From 75 bunches and 75 only?
+      };
+    }
+    // timeframe A-C is early 2024 for ele-tau triggers
+    else if(m_is24_timeframeA_C.get(*event, sys)){
+      ele_tau_paths = {
+        "HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1eEM18M_2eTAU20M_4jJ30"
+      };
+    }
+    // timeframe D-F is late 2024 for ele-tau triggers
+    else if(m_is24_timeframeD.get(*event, sys) || m_is24_timeframeE_F.get(*event, sys)){
+      ele_tau_paths = {
+        "HLT_e17_lhmedium_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1eEM18M_2cTAU20M_4jJ30"
+      };
+    }
+    else if(year==2024){
+      ele_tau_paths = {
+        "HLT_e24_lhmedium_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1eEM26M"
       };
     }
 
@@ -660,6 +842,20 @@ namespace MULTILEPTON
         "HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA",
       };
     }
+    else if(2022<=year && year<=2023){
+      mu_tau_paths = {
+        "HLT_mu20_ivarloose_tau20_mediumRNN_tracktwoMVA_03dRAB_L1MU14FCH",
+        "HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU20IM",
+        "HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_TAU12IM_3J12"
+      };
+    }
+    else if(year==2024){
+      mu_tau_paths = {
+        "HLT_mu20_ivarloose_tau20_mediumRNN_tracktwoMVA_L1eTAU12_03dRAB_L1MU14FCH",
+        "HLT_mu14_ivarloose_tau35_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_cTAU30M",
+        "HLT_mu14_ivarloose_tau25_mediumRNN_tracktwoMVA_03dRAB_L1MU8F_cTAU20M_3jJ30"
+      };
+    }
     bool trigPassed_MTT = false;
     if (muons){
       for(const auto& trig : mu_tau_paths){
@@ -677,7 +873,7 @@ namespace MULTILEPTON
         }
       }
     }
-    m_bools.at(MULTILEPTON::pass_baseline_tau_trigger) = (trigPassed_STT || trigPassed_DTT || trigPassed_ETT || trigPassed_MTT);
+    m_bools.at(MULTILEPTON::pass_trigger_LTT) = (trigPassed_ETT || trigPassed_MTT);
   }
 
 
@@ -872,12 +1068,12 @@ namespace MULTILEPTON
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] = 13. * Athena::Units::GeV;
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele] = 13. * Athena::Units::GeV;
     }
-    else if(year==2016) {
-      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] = 18. * Athena::Units::GeV;
-      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele] = 18. * Athena::Units::GeV;
-    } else {
+    else if(year==2017 || year==2018) {
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] = 25. * Athena::Units::GeV;
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele] = 25. * Athena::Units::GeV;
+    } else {
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingele] = 18. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingele] = 18. * Athena::Units::GeV;
     }
 
     //mm
@@ -890,14 +1086,43 @@ namespace MULTILEPTON
       m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 9. * Athena::Units::GeV;
     } 
     else {
-      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 15. * Athena::Units::GeV;
-      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 15. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::leadingmu] = 11. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DLT][MULTILEPTON::subleadingmu] = 11. * Athena::Units::GeV;
     }
 
     //Asymmetric Lepton triggers
     m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingele] = 18. * Athena::Units::GeV;
     m_pt_threshold[MULTILEPTON::ASLT][MULTILEPTON::leadingmu] = 15. * Athena::Units::GeV;
 
+    // Single tau triggers
+    if(year>=2015 && year<=2016) {
+      m_pt_threshold[MULTILEPTON::STT][MULTILEPTON::tau] = 81. * Athena::Units::GeV;
+    }
+    else {
+      m_pt_threshold[MULTILEPTON::STT][MULTILEPTON::tau] = 161. * Athena::Units::GeV;
+    }
+
+    // Ditau triggers
+    if(year>=2015 && year<=2016) {
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::leadingtau] = 36. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::subleadingtau] = 26. * Athena::Units::GeV;
+    }
+    else if(year>=2017) {
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::leadingtau] = 81. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::subleadingtau] = 51. * Athena::Units::GeV;
+    }
+    else if(year>=2018) {
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::leadingtau] = 81. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::subleadingtau] = 61. * Athena::Units::GeV;
+    }
+    else if(year>=2022 && year<=2023) {
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::leadingtau] = 36. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::subleadingtau] = 26. * Athena::Units::GeV;
+    }
+    else {
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::leadingtau] = 26. * Athena::Units::GeV;
+      m_pt_threshold[MULTILEPTON::DTT][MULTILEPTON::subleadingtau] = 21. * Athena::Units::GeV;
+    }
 
     // Lepton tau triggers
     // electron-tau
@@ -906,7 +1131,7 @@ namespace MULTILEPTON
 
     // muon-tau
     m_pt_threshold[MULTILEPTON::MTT][MULTILEPTON::mu] = 15. * Athena::Units::GeV;
-    if (year>=2015 && year<=2017)
+    if ((year>=2015 && year<=2017) || (year>=2022 && year<=2024))
       m_pt_threshold[MULTILEPTON::MTT][MULTILEPTON::tau] = 26. * Athena::Units::GeV;
     else if (year==2018)
       m_pt_threshold[MULTILEPTON::MTT][MULTILEPTON::tau] = 36. * Athena::Units::GeV;

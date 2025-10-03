@@ -190,6 +190,9 @@ def hhml_branches(flags):
 
     for trigger in ["pass_trigger_SLT",
                     "pass_trigger_DLT",
+                    "pass_trigger_STT",
+                    "pass_trigger_DTT",
+                    "pass_trigger_LTT",
                     "PASS_TRIGGER",]:
         branches += [f"EventInfo.{trigger}_%SYS% ->"
                      f"hhml_{trigger}"
@@ -202,8 +205,7 @@ def hhml_branches(flags):
                    "pass_2l2tau",
                    "pass_1l3tau",
                    "pass_3l1tau",
-                   "pass_2lsc1tau",
-                   "pass_baseline_tau_trigger"]:
+                   "pass_2lsc1tau"]:
         branches += [f"EventInfo.{ch_cut}_%SYS% ->"
                      f"hhml_{ch_cut}"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]

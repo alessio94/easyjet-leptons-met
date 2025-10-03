@@ -33,6 +33,8 @@ namespace MULTILEPTON
         SLT,
         DLT,
         ASLT,
+        STT,
+        DTT,
         ETT,
         MTT,
     };
@@ -46,13 +48,17 @@ namespace MULTILEPTON
         subleadingele = 4,
         subleadingmu = 5,
         tau = 6,
+        leadingtau = 7,
+        subleadingtau = 8,
     };
 
     enum Booleans
     {
         pass_trigger_SLT,
         pass_trigger_DLT,
-        pass_baseline_tau_trigger,
+        pass_trigger_STT,
+        pass_trigger_DTT,
+        pass_trigger_LTT,
         PASS_TRIGGER,
 
         pass_2lsc,
@@ -117,13 +123,20 @@ private:
     CP::SysReadDecorHandle<unsigned int> m_year{
         this, "year", "dataTakingYear",""};
 
+    CP::SysReadDecorHandle<bool> m_is16_periodA{
+        this, "is2016_periodA", "is2016_periodA", ""};
     CP::SysReadDecorHandle<bool> m_is22_75bunches{
         this, "is2022_75bunches", "is2022_75bunches", ""};
     CP::SysReadDecorHandle<bool> m_is23_75bunches{
         this, "is2023_75bunches", "is2023_75bunches", ""};
     CP::SysReadDecorHandle<bool> m_is23_400bunches{
         this, "is2023_400bunches", "is2023_400bunches", ""};
-
+    CP::SysReadDecorHandle<bool> m_is24_timeframeA_C{
+        this, "is2024_timeframeA_C", "is2024_timeframeA_C", ""};
+    CP::SysReadDecorHandle<bool> m_is24_timeframeD{
+        this, "is2024_timeframeD", "is2024_timeframeD", ""};
+        CP::SysReadDecorHandle<bool> m_is24_timeframeE_F{
+        this, "is2024_timeframeE_F", "is2024_timeframeE_F", ""};
     CP::SysFilterReporterParams m_filterParams{
         this, "Multilepton selection"};
 
@@ -143,7 +156,9 @@ private:
     std::unordered_map<MULTILEPTON::Booleans, std::string> m_boolnames{
         {MULTILEPTON::pass_trigger_SLT, "pass_trigger_SLT"},
         {MULTILEPTON::pass_trigger_DLT, "pass_trigger_DLT"},
-        {MULTILEPTON::pass_baseline_tau_trigger, "pass_baseline_tau_trigger"},
+        {MULTILEPTON::pass_trigger_STT, "pass_trigger_STT"},
+        {MULTILEPTON::pass_trigger_LTT, "pass_trigger_LTT"},
+        {MULTILEPTON::pass_trigger_DTT, "pass_trigger_DTT"},
         {MULTILEPTON::PASS_TRIGGER, "PASS_TRIGGER"},
 
         {MULTILEPTON::pass_2lsc, "pass_2lsc"},
@@ -183,7 +198,15 @@ private:
         const xAOD::EventInfo* event,
         const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
         const CP::SystematicSet& sys);
-    void evaluateBaselineTauTrigger(
+    void evaluateSingleTauTrigger(
+        const xAOD::EventInfo* event,
+        const xAOD::TauJetContainer* taus,
+        const CP::SystematicSet& sys);
+    void evaluateDiTauTrigger(
+        const xAOD::EventInfo* event,
+        const xAOD::TauJetContainer* taus,
+        const CP::SystematicSet& sys);
+    void evaluateLeptonTauTrigger(
         const xAOD::EventInfo* event,
         const xAOD::ElectronContainer* electrons, const xAOD::MuonContainer *muons,
         const xAOD::TauJetContainer* taus,

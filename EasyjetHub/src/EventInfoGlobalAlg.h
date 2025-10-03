@@ -70,6 +70,10 @@ private:
       {"2024_75bunches", 470781, 472942},
       {"2024_400bunches_periodD", 472943, 473182},
       {"2024_400bunches_periodL", 480146, 480161},
+      // References: https://twiki.cern.ch/twiki/bin/viewauth/Atlas/TauTriggerChanges2024
+      {"2024_timeframeA_C", 472553, 479496},
+      {"2024_timeframeD", 479507, 480828},
+      {"2024_timeframeE_F", 480957, 486706},
     };
 
     std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_runPeriodsDecor_keys;
