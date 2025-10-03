@@ -70,9 +70,13 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             eventinfo_branches.variables += ["nWLep"]
 
         if flags.Analysis.Truth.do_STXS:
-            _, has_STXS, has_STXS_unc = STXS_info(flags.Input.MCChannelNumber)
-            if has_STXS:
-                eventinfo_branches.variables += ["HTXS_Category_Stage1_2_pTjet30"]
+            eventinfo_branches.variables += [
+                "HTXS_Category_Stage1_2_pTjet30",
+                "HTXS_Category_Stage1_2_Fine_pTjet30",
+                "HTXS_Category_Stage1_2_pTjet25",
+                "HTXS_Category_Stage1_2_Fine_pTjet25",
+            ]
+            _, _, has_STXS_unc = STXS_info(flags.Input.MCChannelNumber)
             if has_STXS_unc:
                 eventinfo_branches.variables += ["HTXS_Weights_Stage1_2_pTjet30"]
 

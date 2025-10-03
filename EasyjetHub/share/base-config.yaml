@@ -36,7 +36,7 @@ VSI_container_suffix: ""
 # Truth-related properties
 Truth:
   decayModes: []
-  do_STXS: true
+  do_STXS: false
   include: DSID_samples.yaml
   nHiggses: 2
   do_truthPart_patch: true

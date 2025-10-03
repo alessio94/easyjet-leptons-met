@@ -42,20 +42,30 @@ namespace Easyjet
       else if(twTools_prodmode=="ttH") m_prodmode = STXSProdMode::ttH;
     }
 
-    m_HTXS_Njets30_Key = m_EventInfoKey.key()+".HTXS_Njets_pTjet30";
-    m_HTXS_Stage1_Key = m_EventInfoKey.key()+".HTXS_Stage1_Category_pTjet30";
-    m_HTXS_pTH_Key = m_EventInfoKey.key()+".HTXS_Higgs_pt";
-    m_HTXS_Stage1p2_Key = m_EventInfoKey.key()+".HTXS_Stage1_2_Category_pTjet30";
-    m_HTXS_Stage1p2Fine_Key = m_EventInfoKey.key()+".HTXS_Stage1_2_Fine_Category_pTjet30";
-    ATH_CHECK(m_HTXS_Njets30_Key.initialize());
-    ATH_CHECK(m_HTXS_Stage1_Key.initialize());
+    m_HTXS_pTH_Key = m_EventInfoKey.key() + ".HTXS_Higgs_pt";
+    m_HTXS_Stage1_pTjet30_Key = m_EventInfoKey.key() + ".HTXS_Stage1_Category_pTjet30";
+    m_HTXS_Njets_pTjet30_Key = m_EventInfoKey.key() + ".HTXS_Njets_pTjet30";
+    m_HTXS_Stage1p2_pTjet30_Key = m_EventInfoKey.key() + ".HTXS_Stage1_2_Category_pTjet30";
+    m_HTXS_Stage1p2Fine_pTjet30_Key = m_EventInfoKey.key() + ".HTXS_Stage1_2_Fine_Category_pTjet30";
+    m_HTXS_Stage1p2_pTjet25_Key = m_EventInfoKey.key() + ".HTXS_Stage1_2_Category_pTjet25";
+    m_HTXS_Stage1p2Fine_pTjet25_Key = m_EventInfoKey.key() + ".HTXS_Stage1_2_Fine_Category_pTjet25"; 
     ATH_CHECK(m_HTXS_pTH_Key.initialize());
-    ATH_CHECK(m_HTXS_Stage1p2_Key.initialize());
-    ATH_CHECK(m_HTXS_Stage1p2Fine_Key.initialize());
-
-    m_HTXSBinDecorKey = m_EventInfoKey.key()+".HTXS_Category_Stage1_2_pTjet30";
-    ATH_CHECK(m_HTXSBinDecorKey.initialize());
-
+    ATH_CHECK(m_HTXS_Stage1_pTjet30_Key.initialize());
+    ATH_CHECK(m_HTXS_Njets_pTjet30_Key.initialize());
+    ATH_CHECK(m_HTXS_Stage1p2_pTjet30_Key.initialize());
+    ATH_CHECK(m_HTXS_Stage1p2Fine_pTjet30_Key.initialize());
+    ATH_CHECK(m_HTXS_Stage1p2_pTjet25_Key.initialize());
+    ATH_CHECK(m_HTXS_Stage1p2Fine_pTjet25_Key.initialize());
+ 
+    m_HTXSBin_pTjet30_DecorKey = m_EventInfoKey.key()+".HTXS_Category_Stage1_2_pTjet30";
+    m_HTXSFineBin_pTjet30_DecorKey = m_EventInfoKey.key()+".HTXS_Category_Stage1_2_Fine_pTjet30";
+    m_HTXSBin_pTjet25_DecorKey = m_EventInfoKey.key()+".HTXS_Category_Stage1_2_pTjet25";
+    m_HTXSFineBin_pTjet25_DecorKey = m_EventInfoKey.key()+".HTXS_Category_Stage1_2_Fine_pTjet25";
+    ATH_CHECK(m_HTXSBin_pTjet30_DecorKey.initialize());
+    ATH_CHECK(m_HTXSFineBin_pTjet30_DecorKey.initialize());
+    ATH_CHECK(m_HTXSBin_pTjet25_DecorKey.initialize());
+    ATH_CHECK(m_HTXSFineBin_pTjet25_DecorKey.initialize());
+    
     if (!m_twTools.empty()) {
       m_HTXSWeightsDecorKey = m_EventInfoKey.key() + ".HTXS_Weights_Stage1_2_pTjet30";
       ATH_CHECK(m_HTXSWeightsDecorKey.initialize());
@@ -70,19 +80,35 @@ namespace Easyjet
     SG::ReadHandle<xAOD::EventInfo> eventInfo(m_EventInfoKey);
     ATH_CHECK(eventInfo.isValid());
 
-    int HTXS_Njets30;
-    int HTXS_Stage1;
-    float HTXS_pTH;
-    int HTXS_Stage1p2;
-    int HTXS_Stage1p2Fine;
-    std::tie(HTXS_Njets30,HTXS_Stage1,HTXS_pTH,HTXS_Stage1p2,HTXS_Stage1p2Fine) = STXSInfo(*eventInfo);
+    float HTXS_pTH = -999;
+    int HTXS_Stage1_pTjet30 = -999;
+    int HTXS_Njets_pTjet30 = -999;
+    int HTXS_Stage1p2_pTjet30 = -999;
+    int HTXS_Stage1p2Fine_pTjet30 = -999;
+    int HTXS_Stage1p2_pTjet25 = -999;
+    int HTXS_Stage1p2Fine_pTjet25 = -999;
 
-    SG::WriteDecorHandle<xAOD::EventInfo, int> HTXSBinDecorHandle
-        (m_HTXSBinDecorKey);
-    HTXSBinDecorHandle(*eventInfo) = HTXS_Stage1p2;
+    if (m_has_STXS) {
+      std::tie(HTXS_pTH,HTXS_Njets_pTjet30,HTXS_Stage1_pTjet30,HTXS_Stage1p2_pTjet30,HTXS_Stage1p2Fine_pTjet30,
+        HTXS_Stage1p2_pTjet25,HTXS_Stage1p2Fine_pTjet25) = STXSInfo(*eventInfo);
+    }
+    
+    SG::WriteDecorHandle<xAOD::EventInfo, int> HTXSBin30DecorHandle
+        (m_HTXSBin_pTjet30_DecorKey);
+    SG::WriteDecorHandle<xAOD::EventInfo, int> HTXSBinFine30DecorHandle
+        (m_HTXSFineBin_pTjet30_DecorKey);
+    SG::WriteDecorHandle<xAOD::EventInfo, int> HTXSBin25DecorHandle
+        (m_HTXSBin_pTjet25_DecorKey);
+    SG::WriteDecorHandle<xAOD::EventInfo, int> HTXSBinFine25DecorHandle
+        (m_HTXSFineBin_pTjet25_DecorKey);
+    HTXSBin30DecorHandle(*eventInfo) = HTXS_Stage1p2_pTjet30;
+    HTXSBinFine30DecorHandle(*eventInfo) = HTXS_Stage1p2Fine_pTjet30;
+    HTXSBin25DecorHandle(*eventInfo) = HTXS_Stage1p2_pTjet25;
+    HTXSBinFine25DecorHandle(*eventInfo) = HTXS_Stage1p2Fine_pTjet25;
 
     if(!m_twTools.empty()) {
-        std::vector<double> HTXS_w = STXSWeights(*eventInfo,HTXS_Njets30,HTXS_Stage1,HTXS_pTH,HTXS_Stage1p2,HTXS_Stage1p2Fine);
+        std::vector<double> HTXS_w = STXSWeights(*eventInfo,HTXS_Njets_pTjet30,HTXS_Stage1_pTjet30,HTXS_pTH,
+          HTXS_Stage1p2_pTjet30,HTXS_Stage1p2Fine_pTjet30);
 
         SG::WriteDecorHandle <xAOD::EventInfo, std::vector<double>> HTXSWeightsDecorHandle
             (m_HTXSWeightsDecorKey);
@@ -92,18 +118,21 @@ namespace Easyjet
     return StatusCode::SUCCESS;
   }
 
-  std::tuple<int,int,float,int,int> STXSAlg::STXSInfo(
+
+  std::tuple<int,int,float,int,int,int,int> STXSAlg::STXSInfo(
     const xAOD::EventInfo &eventInfo) const
   {
-    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Njets30(m_HTXS_Njets30_Key);
-    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1(m_HTXS_Stage1_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Njets30(m_HTXS_Njets_pTjet30_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1(m_HTXS_Stage1_pTjet30_Key);
     SG::ReadDecorHandle<xAOD::EventInfo, float> HTXS_pTH(m_HTXS_pTH_Key);
-    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1p2(m_HTXS_Stage1p2_Key);
-    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1p2Fine(m_HTXS_Stage1p2Fine_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1p2(m_HTXS_Stage1p2_pTjet30_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1p2Fine(m_HTXS_Stage1p2Fine_pTjet30_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1p2_25(m_HTXS_Stage1p2_pTjet25_Key);
+    SG::ReadDecorHandle<xAOD::EventInfo, int> HTXS_Stage1p2Fine_25(m_HTXS_Stage1p2Fine_pTjet25_Key);
 
     ATH_MSG_DEBUG("++++ found HTXS_pTH (MeV) " << HTXS_pTH << " and bin " << HTXS_Stage1p2);
-    return {HTXS_Njets30(eventInfo), HTXS_Stage1(eventInfo), HTXS_pTH(eventInfo),
-      HTXS_Stage1p2(eventInfo), HTXS_Stage1p2Fine(eventInfo)};
+    return {HTXS_pTH(eventInfo), HTXS_Njets30(eventInfo), HTXS_Stage1(eventInfo), 
+      HTXS_Stage1p2(eventInfo), HTXS_Stage1p2Fine(eventInfo),HTXS_Stage1p2_25(eventInfo), HTXS_Stage1p2Fine_25(eventInfo)};
   }
 
 
