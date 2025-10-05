@@ -25,3 +25,8 @@ Muon:
 
 Lepton:
   amount: 4
+
+ttree_output:
+  collection_options:
+    taus:
+      score_branches: true
