@@ -9,6 +9,6 @@
 'mc23c': 'PileupReweighting/mc23_common/mc23c.450000.physlite.prw.v1.root'
 'mc23d': 'PileupReweighting/mc23_common/mc23d.450000.physlite.prw.v1.root'
 'mc23e': 'PileupReweighting/mc23_common/mc23e.470000.physlite.prw.v1.root'
-'2022' : 'purw.actualMu.ignoreTRIGLARroot'
+'2022' : 'purw.actualMu.ignore_TRIGLAR.root'
 '2023' : 'purw.actualMu.ignoreTRIGJETCTPIN.root'
 '2024' : 'purw.actualMu.root'

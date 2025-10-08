@@ -1,6 +1,6 @@
 '2017': 'physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root'
 '2018': 'physics_25ns_Triggerno17e33prim.actualMu.OflLumi-13TeV-010.root'
-'2022': 'purw.actualMu.ignoreTRIGLARroot'
+'2022': 'purw.actualMu.ignore_TRIGLAR.root'
 '2023': 'purw.actualMu.ignoreTRIGJETCTPIN.root'
 '2024': 'purw.actualMu.root'
 # Common MC PRW files in addition to the ones by year
