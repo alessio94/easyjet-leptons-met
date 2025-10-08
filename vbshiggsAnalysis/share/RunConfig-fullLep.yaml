@@ -14,54 +14,23 @@ VGammaOR_ypT_cuts: [17.e+3] #photon pT in MeV
 VGammaOR_dR_lepton_photon_cuts: [0.3]
 
 Electron:
-  maxD0Significance: 10
-  maxDeltaZ0SinTheta: 0.5
-  chargeIDSelectionRun2: true
-  ID: "LooseBLayerLH"
+  ID: "MediumLH"
   Iso: "NonIso"
-  amount: 0
-  correlationModelId: "TOTAL"
   extra_wps:
-    - ["LooseBLayerLH", "Loose_VarRad"]
-    - ["LooseBLayerLH", "Tight_VarRad"]
-    - ["LooseBLayerLH", "TightTrackOnly_VarRad"]
-    - ["LooseBLayerLH", "TightTrackOnly_FixedRad"]
-
-    - ["MediumLH", "Loose_VarRad"]
-    - ["MediumLH", "Tight_VarRad"]
-    - ["MediumLH", "TightTrackOnly_VarRad"]
-    - ["MediumLH", "TightTrackOnly_FixedRad"]
-    - ["MediumLH", "NonIso"]
-
-    - ["TightLH", "Loose_VarRad"]
-    - ["TightLH", "Tight_VarRad"]
-    - ["TightLH", "TightTrackOnly_VarRad"]
-    - ["TightLH", "TightTrackOnly_FixedRad"]
     - ["TightLH", "NonIso"]
-
+    - ["TightLH", "Tight_VarRad"]
   do_IFF_decoration: true
   do_reco_decoration: true
+  chargeIDSelectionRun2: true
+
 Muon:
-  maxD0Significance: 10
-  maxDeltaZ0SinTheta: 0.5
   ID: "Loose"
-  Iso: "NonIso"
-  amount: 0
+  Iso: "PflowLoose_VarRad"
+  eta_max: 2.5
+  maxD0Significance: 10
   extra_wps:
-    - ["Loose", "PflowLoose_VarRad"]
-    - ["Loose", "PflowTight_VarRad"]
-    
-    - ["Medium", "PflowLoose_VarRad"]
     - ["Medium", "PflowTight_VarRad"]
-    - ["Medium", "NonIso"]
-
-    - ["Tight", "PflowLoose_VarRad"]
-    - ["Tight", "PflowTight_VarRad"]
-    - ["Tight", "NonIso"]
-
-    - ["HighPt", "PflowLoose_VarRad"]
     - ["HighPt", "PflowTight_VarRad"]
-    - ["HighPt", "NonIso"]
   do_IFF_decoration: true
 
 Lepton:
@@ -84,14 +53,6 @@ Large_R_jet:
   runMuonJetPtCorr: false
   amount_leadingjet: 1
   GN2X_hbb_wps:
-    - "FlatMassQCDEff_0p25"
-    - "FlatMassQCDEff_0p3"
-    - "FlatMassQCDEff_0p37"
-    - "FlatMassQCDEff_0p46"
-    - "FlatMassQCDEff_0p58"
-    - "FlatMassQCDEff_0p74"
-    - "FlatMassQCDEff_0p94"
-    - "FlatMassQCDEff_1p25"
     - "FlatMassQCDEff_1p55"
     
 # list of triggers per year to consider
