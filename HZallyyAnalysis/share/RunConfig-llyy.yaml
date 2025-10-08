@@ -69,6 +69,21 @@ CutList :
 
 # Include the TTree configuration and update details
 
+GRL:
+  years:
+    include: HZallyyAnalysis/lepton_grl_years.yaml
+  files:
+    include: HZallyyAnalysis/lepton_grl.yaml
+
+PileupReweighting:
+  extra_prw:
+    - postfix: "photon"
+      lumicalc_files:
+        include: HZallyyAnalysis/lumicalc_lepton.yaml
+      prw_files:
+        include: HZallyyAnalysis/prw_lepton.yaml
+
+
 ttree_output:
   include: EasyjetHub/AnalysisMiniTree-config.yaml
   # Our overrides. All defaults are off
@@ -78,6 +93,16 @@ ttree_output:
     electrons: 'container_names.output.electrons'
     photons: 'container_names.output.photons'
     small_R_jets: 'container_names.output.reco4PFlowJet'
+  collection_options:
+    photons:
+      shower_shapes: false
+      truth_labels: true
+      iso_variables: false
+  truth_outputs:
+    photons: 'container_names.input.truthphotons'
+    electrons: 'container_names.input.truthelectrons'
+    muons: 'container_names.input.truthmuons'
+  
 #truth_outputs:
 #  small_R_jets: 'container_names.input.truth4Jet'
 #  higgs_particle: 'container_names.output.truthHHParticles'

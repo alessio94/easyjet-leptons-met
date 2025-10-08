@@ -118,8 +118,8 @@ namespace HZALLYY {
 
       if ( n_photons >=2&&
        	   Leading_photon.Pt() > 10.0 * Athena::Units::GeV &&
-       	   Subleading_photon.Pt() > 10.0 * Athena::Units::GeV &&
-       	   Leading_photon.DeltaR(Subleading_photon) < 1.5)
+       	   Subleading_photon.Pt() > 10.0 * Athena::Units::GeV)
+	//&& Leading_photon.DeltaR(Subleading_photon) < 1.5)
       
 	    {
 	      Is_Resolved = true;
