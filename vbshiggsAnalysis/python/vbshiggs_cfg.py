@@ -46,7 +46,7 @@ def vbshiggs_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey):
                                 minPt=250 * Units.GeV,
                                 maxEta=2.0,
                                 minMass=40 * Units.GeV,
-                                minimumAmount=1))
+                                minimumAmount=flags.Analysis.Large_R_jet.amount))
 
     if not flags.Analysis.UseVBFRNN:
         cfg.addEventAlgo(

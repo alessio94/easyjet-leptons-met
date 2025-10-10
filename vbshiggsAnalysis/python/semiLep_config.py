@@ -42,6 +42,8 @@ def semiLep_cfg(flags, muonkey, electronkey,
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             PCBTDecorName="ftag_quantile_"
                           + flags.Analysis.Small_R_jet.btag_extra_wps[0],
+            wtag_type=flags.Analysis.Large_R_jet.wtag_type,
+            wtag_wp=flags.Analysis.Large_R_jet.wtag_wp,
             floatVariableList=float_variables,
             intVariableList=int_variables
         )
@@ -55,10 +57,17 @@ def get_BaselineVarsSemiLepAlg_variables(flags):
     int_variable_names = []
 
     obj = "LargeJet1"
-    for var in ["m", "pt", "eta", "phi", "GN2X"]:
-        float_variable_names.append(f"{obj}_{var}")
-    for var in ["phbb", "pqcd", "phcc", "ptop"]:
-        float_variable_names.append(f"{obj}_GN2X_{var}")
+    wtag_type = flags.Analysis.Large_R_jet.wtag_type
+    wtag_wp = flags.Analysis.Large_R_jet.wtag_wp
+    for obj in ["LargeJet1", "LargeJet2"]:
+        for var in ["m", "pt", "eta", "phi", "GN2X"]:
+            float_variable_names.append(f"{obj}_{var}")
+        for var in ["phbb", "pqcd", "phcc", "ptop"]:
+            float_variable_names.append(f"{obj}_GN2X_{var}")
+
+        float_variable_names += [obj + "_" + wtag_type + wtag_wp + "Tagger_Score"]
+        int_variable_names += [obj + "_Pass_" + wtag_type
+                                   + wtag_wp]
 
     for obj in ["Jet_Higgs_candidate1", "Jet_Higgs_candidate2"]:
         for var in ["m", "pt", "eta", "phi", "E"]:

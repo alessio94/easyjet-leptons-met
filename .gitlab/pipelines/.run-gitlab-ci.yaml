@@ -114,11 +114,6 @@ ntupler_vbshiggs_semilep_mc20:
   script:
     - easyjet-test vbshiggs-semilep-mc20
 
-ntupler_vbshiggs_semilep_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test vbshiggs-semilep-mc20-lite
-
 ntupler_VBSVV4q_mc20:
   extends: .ntupler
   script:

@@ -51,7 +51,7 @@ Large_R_jet:
   min_pT: 200.e+3
   maxEta: 2.0
   runMuonJetPtCorr: false
-  amount_leadingjet: 1
+  amount: 1
   GN2X_hbb_wps:
     - "FlatMassQCDEff_1p55"
     

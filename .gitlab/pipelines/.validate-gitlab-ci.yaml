@@ -204,17 +204,6 @@ validator_vbshiggs_semilep_mc20:
   script:
     - easyjet-validate vbshiggs-semilep-mc20
 
-validator_vbshiggs_semilep_mc20_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_vbshiggs_semilep_mc20_lite
-      artifacts: false
-  script:
-    - easyjet-validate vbshiggs-semilep-mc20-lite
-
-
 validator_VBSVV4q_mc20:
   extends: .ntuple_validation
   needs:

@@ -56,9 +56,6 @@ Muon:
     - ["Tight", "PflowTight_VarRad"]
     - ["Tight", "NonIso"]
 
-    - ["HighPt", "PflowLoose_VarRad"]
-    - ["HighPt", "PflowTight_VarRad"]
-    - ["HighPt", "NonIso"]
   do_IFF_decoration: true
   do_reco_decoration: true
 
@@ -74,10 +71,8 @@ Small_R_jet:
     - GN2v01_Continuous
 
 Large_R_jet:
-  min_pT: 200.e+3
   maxEta: 2.0
-  runMuonJetPtCorr: false
-  amount_leadingjet: 1
+  amount: 2
   GN2X_hbb_wps:
     - "FlatMassQCDEff_0p25"
     - "FlatMassQCDEff_0p3"
@@ -88,10 +83,20 @@ Large_R_jet:
     - "FlatMassQCDEff_0p94"
     - "FlatMassQCDEff_1p25"
     - "FlatMassQCDEff_1p55"
+  wtag_type: "ANN" # ANN, DNN
+  wtag_wp: "50"
+  wtag_extra_wps: ["50","60","80","90"]
+
 
 Lepton:
   amount: 1
   variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS"]
+
+OverlapRemoval:
+  # Enable overlap removal between large-R jets and objects for which 
+  # large-R jet OR removal is implemented in Athena
+  do_large_R_jets: true
+  do_small_R_jet_large_R_jet: true
 
 # list of triggers per year to consider
 Trigger:
