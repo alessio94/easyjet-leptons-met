@@ -7,6 +7,7 @@ systematics_suffix_separator: "___"
 do_bbtt_analysis: true
 do_antiID_regions: true
 do_1B_regions: true
+do_LTT: false # triggers need also to be uncommented in trigger_leptons.yaml
 enable_MMC_cut: false
 do_boosted_dihiggs: false
 

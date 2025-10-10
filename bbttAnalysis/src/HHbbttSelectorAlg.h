@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 // Always protect against multiple includes!
@@ -63,6 +63,8 @@ private:
       { this, "doAntiIDRegions", false, "Select anti-ID taus for fake estimates" };
     Gaudi::Property<bool> m_do1BRegions
       { this, "do1BRegions", false, "Add 1B signal regions" };
+    Gaudi::Property<bool> m_doLTT
+      { this, "doLTT", false, "Add LTT signal regions" };
     Gaudi::Property<bool> m_useNonIsoLeptons
       { this, "useNonIsoLeptons", false, "use NonIso lepton wps" };
 
@@ -140,12 +142,6 @@ private:
     std::unordered_map<HHBBTT::TriggerChannel, std::string> m_triggerChannels =
       {
 	{HHBBTT::SLT, "SLT"},
-	{HHBBTT::LTT, "LTT"},
-	{HHBBTT::ETT, "ETT"},
-	{HHBBTT::ETT_4J12, "ETT_4J12"},
-	{HHBBTT::MTT_2016, "MTT_2016"},
-	{HHBBTT::MTT_high, "MTT_high"},
-	{HHBBTT::MTT_low, "MTT_low"},
 	{HHBBTT::STT, "STT"},
 	{HHBBTT::DTT, "DTT"},
 	{HHBBTT::DTT_2016, "DTT_2016"},
@@ -187,7 +183,6 @@ private:
     std::unordered_map < HHBBTT::Booleans, std::string > m_boolnames{
     {HHBBTT::pass_trigger_SR, "pass_trigger_SR"},
     {HHBBTT::pass_trigger_SLT, "pass_trigger_SLT"},
-    {HHBBTT::pass_trigger_LTT, "pass_trigger_LTT"},
     {HHBBTT::pass_trigger_STT, "pass_trigger_STT"},
     {HHBBTT::pass_trigger_DTT, "pass_trigger_DTT"},
     {HHBBTT::pass_trigger_DTT_2016, "pass_trigger_DTT_2016"},
@@ -208,11 +203,7 @@ private:
     {HHBBTT::OS_CHARGE_LEPHAD, "OS_CHARGE_LEPHAD"},
     {HHBBTT::OS_CHARGE_LEPTONS, "OS_CHARGE_LEPTONS"},
     {HHBBTT::pass_baseline_SLT, "pass_baseline_SLT"},
-    {HHBBTT::pass_baseline_LTT, "pass_baseline_LTT"},
     {HHBBTT::pass_SLT_2B, "pass_SLT_2B"},
-    {HHBBTT::pass_LTT_2B, "pass_LTT_2B"},
-    {HHBBTT::pass_SLT_1B, "pass_SLT_1B"},
-    {HHBBTT::pass_LTT_1B, "pass_LTT_1B"},
     {HHBBTT::MTAUTAU_VIS_MASS_CUT_HADHAD, "MTAUTAU_VIS_MASS_CUT_HADHAD"},
     {HHBBTT::N_LEPTONS_CUT_HADHAD, "N_LEPTONS_CUT_HADHAD"},
     {HHBBTT::TWO_TAU, "TWO_TAU"},
@@ -233,21 +224,10 @@ private:
     {HHBBTT::pass_DTT_2B, "pass_DTT_2B"},
     {HHBBTT::pass_DBT_2B, "pass_DBT_2B"},
     {HHBBTT::pass_SR_2B, "pass_SR_2B"},
-    {HHBBTT::pass_STT_1B, "pass_STT_1B"},
-    {HHBBTT::pass_DTT_2016_1B, "pass_DTT_2016_1B"},
-    {HHBBTT::pass_DTT_4J12_1B, "pass_DTT_4J12_1B"},
-    {HHBBTT::pass_DTT_L1Topo_1B, "pass_DTT_L1Topo_1B"},
-    {HHBBTT::pass_DTT_4J12_delayed_1B, "pass_DTT_4J12_delayed_1B"},
-    {HHBBTT::pass_DTT_L1Topo_delayed_1B, "pass_DTT_L1Topo_delayed_1B"},
-    {HHBBTT::pass_DTT_1B, "pass_DTT_1B"},
-    {HHBBTT::pass_DBT_1B, "pass_DBT_1B"},
-    {HHBBTT::pass_SR_1B, "pass_SR_1B"},
     {HHBBTT::pass_baseline_LepHad, "pass_baseline_LepHad"},
     {HHBBTT::pass_baseline_HadHad, "pass_baseline_HadHad"},
     {HHBBTT::pass_LepHad_2B, "pass_LepHad_2B"},
     {HHBBTT::pass_HadHad_2B, "pass_HadHad_2B"},
-    {HHBBTT::pass_LepHad_1B, "pass_LepHad_1B"},
-    {HHBBTT::pass_HadHad_1B, "pass_HadHad_1B"},
     {HHBBTT::pass_LepHad, "pass_LepHad"},
     {HHBBTT::pass_HadHad, "pass_HadHad"},
     {HHBBTT::pass_ZCR, "pass_ZCR"},

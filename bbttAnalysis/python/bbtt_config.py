@@ -98,6 +98,7 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             isMC=flags.Input.isMC,
             doAntiIDRegions=flags.Analysis.do_antiID_regions,
             do1BRegions=flags.Analysis.do_1B_regions,
+            doLTT=flags.Analysis.do_LTT,
             useTriggerSelections=flags.Analysis.do_trigger_offline_filtering,
             bypass=flags.Analysis.bypass,
             saveCutFlow=flags.Analysis.save_cutflow,
@@ -181,7 +182,8 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                 tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),
                 electrons=electronkey,
                 muons=muonkey,
-                taus=taukey
+                taus=taukey,
+                doLTT=flags.Analysis.do_LTT
             )
         )
 
@@ -308,13 +310,17 @@ def bbtt_branches(flags):
             + flags.Analysis.systematics_suffix_separator + "%SYS%"
         ]
 
+    categories = ["SR", "SLT", "STT", "DTT",
+                  "DTT_2016", "DTT_4J12", "DTT_L1Topo",
+                  "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT"]
+    if flags.Analysis.do_LTT:
+        categories += ["LTT"]
+
     # trigger variables do not need to be added to variable_names
     # as it is written out in HHbbttSelectorAlg
     if flags.Analysis.store_high_level_variables:
         for var in ["_trigger_", "_baseline_"]:
-            for cat in ["SR", "SLT", "LTT", "STT", "DTT",
-                        "DTT_2016", "DTT_4J12", "DTT_L1Topo",
-                        "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT"]:
+            for cat in categories:
                 if (var == "_baseline_"
                         and cat in ["DTT_4J12_delayed", "DTT_L1Topo_delayed"]):
                     continue
@@ -322,11 +328,10 @@ def bbtt_branches(flags):
                              f"bbtt_pass{var}{cat}"
                              + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
-    for cat in ["SR", "SLT", "LTT", "STT", "DTT",
-                "DTT_2016", "DTT_4J12", "DTT_L1Topo",
-                "DTT_4J12_delayed", "DTT_L1Topo_delayed", "DBT",
-                "LepHad", "HadHad"]:
-        for nb in ["1B", "2B"]:
+    cat_b = ["1B", "2B"] if flags.Analysis.do_1B_regions else ["2B"]
+
+    for cat in categories + ["LepHad", "HadHad"]:
+        for nb in cat_b:
             branches += [f"EventInfo.pass_{cat}_{nb}_%SYS% ->"
                          f"bbtt_pass_{cat}_{nb}"
                          + flags.Analysis.systematics_suffix_separator + "%SYS%"]

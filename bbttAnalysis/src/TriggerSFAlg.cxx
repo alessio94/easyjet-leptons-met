@@ -64,6 +64,9 @@ namespace HHBBTT
       ATH_CHECK(m_runBooleans_key.at(runBool).initialize());
     }
 
+    if(m_doLTT)
+      m_boolnames.emplace(HHBBTT::pass_baseline_LTT, "pass_baseline_LTT");
+
     for (auto& [key, value] : m_boolnames) {
       CP::SysReadDecorHandle<bool> whandle{value+"_%SYS%", this};
       m_categoryBranches.emplace(key, whandle);
@@ -173,7 +176,8 @@ namespace HHBBTT
       }
     }
 
-    else if(m_categoryBranches.at(HHBBTT::pass_baseline_LTT).get(*event, sys)){
+    else if(m_doLTT &&
+            m_categoryBranches.at(HHBBTT::pass_baseline_LTT).get(*event, sys)){
       if(ele0){
 	std::pair<std::string, std::string> ele_tau_SF_path;
 	getEleTauTriggers(year, event, runBoolDecos, ele_tau_SF_path);

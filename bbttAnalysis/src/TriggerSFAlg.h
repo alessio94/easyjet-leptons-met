@@ -74,6 +74,9 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
+    Gaudi::Property<bool> m_doLTT
+      { this, "doLTT", false, "Add LTT signal regions" };
+
     Gaudi::Property<std::vector<std::string>> m_eleTrigSF
       {this, "eleTriggerSF", {}, "List of electron trigger SF"};
     std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_eleTriggerSF;
@@ -115,7 +118,6 @@ private:
     categoryReadDecoMap m_categoryBranches;
     std::unordered_map < HHBBTT::Booleans, std::string > m_boolnames{
       {HHBBTT::pass_baseline_SLT, "pass_baseline_SLT"},
-      {HHBBTT::pass_baseline_LTT, "pass_baseline_LTT"},
       {HHBBTT::pass_baseline_STT, "pass_baseline_STT"},
       {HHBBTT::pass_baseline_DTT, "pass_baseline_DTT"},
       {HHBBTT::pass_ZCR, "pass_ZCR"},

@@ -55,6 +55,35 @@ namespace HHBBTT
     ATH_CHECK(m_l1topo_disabled.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is2022_75bunches.initialize(m_systematicsList, m_eventHandle));
     ATH_CHECK(m_is2023_first_2400bunches.initialize(m_systematicsList, m_eventHandle));
+
+    if(m_doLTT){
+      m_triggerChannels.emplace(HHBBTT::LTT, "LTT");
+      m_triggerChannels.emplace(HHBBTT::ETT, "ETT");
+      m_triggerChannels.emplace(HHBBTT::ETT_4J12, "ETT_4J12");
+      m_triggerChannels.emplace(HHBBTT::MTT_2016, "MTT_2016");
+      m_triggerChannels.emplace(HHBBTT::MTT_high, "MTT_high");
+      m_triggerChannels.emplace(HHBBTT::MTT_low, "MTT_low");
+
+      m_boolnames.emplace(HHBBTT::pass_trigger_LTT, "pass_trigger_LTT");
+      m_boolnames.emplace(HHBBTT::pass_baseline_LTT, "pass_baseline_LTT");
+      m_boolnames.emplace(HHBBTT::pass_LTT_2B, "pass_LTT_2B");
+      if(m_do1BRegions) m_boolnames.emplace(HHBBTT::pass_LTT_1B, "pass_LTT_1B");
+    }
+
+    if(m_do1BRegions){
+      m_boolnames.emplace(HHBBTT::pass_SLT_1B, "pass_SLT_1B");
+      m_boolnames.emplace(HHBBTT::pass_STT_1B, "pass_STT_1B");
+      m_boolnames.emplace(HHBBTT::pass_DTT_2016_1B, "pass_DTT_2016_1B");
+      m_boolnames.emplace(HHBBTT::pass_DTT_4J12_1B, "pass_DTT_4J12_1B");
+      m_boolnames.emplace(HHBBTT::pass_DTT_L1Topo_1B, "pass_DTT_L1Topo_1B");
+      m_boolnames.emplace(HHBBTT::pass_DTT_4J12_delayed_1B, "pass_DTT_4J12_delayed_1B");
+      m_boolnames.emplace(HHBBTT::pass_DTT_L1Topo_delayed_1B, "pass_DTT_L1Topo_delayed_1B");
+      m_boolnames.emplace(HHBBTT::pass_DTT_1B, "pass_DTT_1B");
+      m_boolnames.emplace(HHBBTT::pass_DBT_1B, "pass_DBT_1B");
+      m_boolnames.emplace(HHBBTT::pass_SR_1B, "pass_SR_1B");
+      m_boolnames.emplace(HHBBTT::pass_LepHad_1B, "pass_LepHad_1B");
+      m_boolnames.emplace(HHBBTT::pass_HadHad_1B, "pass_HadHad_1B");
+    }
     
     // Intialise booleans with value false. Also initialise syst-aware output decorators
     for (auto& [key, value] : m_boolnames) {
@@ -95,18 +124,20 @@ namespace HHBBTT
     SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_SLT;
     mu_SLT = m_muonHandle.getNamePattern() + ".trigMatch_SLT";
     m_mu_trigMatch_DecorKey.emplace(HHBBTT::SLT, mu_SLT);
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_LTT;
-    mu_LTT = m_muonHandle.getNamePattern() + ".trigMatch_LTT";
-    m_mu_trigMatch_DecorKey.emplace(HHBBTT::LTT, mu_LTT);
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_MTT_2016;
-    mu_MTT_2016 = m_muonHandle.getNamePattern() + ".trigMatch_MTT_2016";
-    m_mu_trigMatch_DecorKey.emplace(HHBBTT::MTT_2016, mu_MTT_2016);
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_MTT_high;
-    mu_MTT_high = m_muonHandle.getNamePattern() + ".trigMatch_MTT_high";
-    m_mu_trigMatch_DecorKey.emplace(HHBBTT::MTT_high, mu_MTT_high);
-    SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_MTT_low;
-    mu_MTT_low = m_muonHandle.getNamePattern() + ".trigMatch_MTT_low";
-    m_mu_trigMatch_DecorKey.emplace(HHBBTT::MTT_low, mu_MTT_low);
+    if(m_doLTT){
+      SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_LTT;
+      mu_LTT = m_muonHandle.getNamePattern() + ".trigMatch_LTT";
+      m_mu_trigMatch_DecorKey.emplace(HHBBTT::LTT, mu_LTT);
+      SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_MTT_2016;
+      mu_MTT_2016 = m_muonHandle.getNamePattern() + ".trigMatch_MTT_2016";
+      m_mu_trigMatch_DecorKey.emplace(HHBBTT::MTT_2016, mu_MTT_2016);
+      SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_MTT_high;
+      mu_MTT_high = m_muonHandle.getNamePattern() + ".trigMatch_MTT_high";
+      m_mu_trigMatch_DecorKey.emplace(HHBBTT::MTT_high, mu_MTT_high);
+      SG::ReadDecorHandleKey<xAOD::MuonContainer> mu_MTT_low;
+      mu_MTT_low = m_muonHandle.getNamePattern() + ".trigMatch_MTT_low";
+      m_mu_trigMatch_DecorKey.emplace(HHBBTT::MTT_low, mu_MTT_low);
+    }
 
     for (const auto& [channel, key] : m_mu_trigMatch_DecorKey){
       ATH_CHECK(m_mu_trigMatch_DecorKey.at(channel).initialize());
@@ -115,15 +146,17 @@ namespace HHBBTT
     SG::ReadDecorHandleKey<xAOD::ElectronContainer> ele_SLT;
     ele_SLT = m_electronHandle.getNamePattern() + ".trigMatch_SLT";
     m_ele_trigMatch_DecorKey.emplace(HHBBTT::SLT, ele_SLT);
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> ele_LTT;
-    ele_LTT = m_electronHandle.getNamePattern() + ".trigMatch_LTT";
-    m_ele_trigMatch_DecorKey.emplace(HHBBTT::LTT, ele_LTT);
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> ele_ETT;
-    ele_ETT = m_electronHandle.getNamePattern() + ".trigMatch_ETT";
-    m_ele_trigMatch_DecorKey.emplace(HHBBTT::ETT, ele_ETT);
-    SG::ReadDecorHandleKey<xAOD::ElectronContainer> ele_ETT_4J12;
-    ele_ETT_4J12 = m_electronHandle.getNamePattern() + ".trigMatch_ETT_4J12";
-    m_ele_trigMatch_DecorKey.emplace(HHBBTT::ETT_4J12, ele_ETT_4J12);
+    if(m_doLTT){
+      SG::ReadDecorHandleKey<xAOD::ElectronContainer> ele_LTT;
+      ele_LTT = m_electronHandle.getNamePattern() + ".trigMatch_LTT";
+      m_ele_trigMatch_DecorKey.emplace(HHBBTT::LTT, ele_LTT);
+      SG::ReadDecorHandleKey<xAOD::ElectronContainer> ele_ETT;
+      ele_ETT = m_electronHandle.getNamePattern() + ".trigMatch_ETT";
+      m_ele_trigMatch_DecorKey.emplace(HHBBTT::ETT, ele_ETT);
+      SG::ReadDecorHandleKey<xAOD::ElectronContainer> ele_ETT_4J12;
+      ele_ETT_4J12 = m_electronHandle.getNamePattern() + ".trigMatch_ETT_4J12";
+      m_ele_trigMatch_DecorKey.emplace(HHBBTT::ETT_4J12, ele_ETT_4J12);
+    }
     
     for (const auto& [channel, key] : m_ele_trigMatch_DecorKey){
       ATH_CHECK(m_ele_trigMatch_DecorKey.at(channel).initialize());
@@ -376,9 +409,11 @@ namespace HHBBTT
 
       n_veto_leptons = n_leptons_looseId_iso - n_leptons_tightId_iso;
 
-      if (n_leptons_tightId_iso == 1 && n_veto_leptons == 0 && n_leptons_tightId_antiiso == 0)
+      if (n_leptons_tightId_iso == 1 && n_veto_leptons == 0 &&
+	  n_leptons_tightId_antiiso == 0)
         m_bools.at(HHBBTT::N_LEPTONS_CUT_LEPHAD) = true;
-      else if(n_leptons_tightId_iso == 0 && n_veto_leptons == 0 && n_leptons_tightId_antiiso == 1)
+      else if(n_leptons_tightId_iso == 0 && n_veto_leptons == 0 &&
+	      n_leptons_tightId_antiiso == 1)
         m_bools.at(HHBBTT::N_LEPTONS_CUT_ANTIISOLEPHAD) = true;
 
       if (n_leptons_tightId_iso == 0 && n_veto_leptons == 0)
@@ -420,8 +455,6 @@ namespace HHBBTT
 	tau1->pt() > m_pt_threshold[HHBBTT::DTT][HHBBTT::subleadingtau];
       bool tau_ptcut_STT = tau_ptcut_STT_lead && tau_ptcut_STT_sublead;
       bool tau_ptcut_DTT = tau_ptcut_DTT_lead && tau_ptcut_DTT_sublead;
-
-
 
       if (n_taus == 1)
         m_bools.at(HHBBTT::ONE_TAU) = true;
@@ -484,7 +517,7 @@ namespace HHBBTT
       }
       else{
         m_bools.at(HHBBTT::pass_trigger_SLT) = true;
-        m_bools.at(HHBBTT::pass_trigger_LTT) = true;
+        if(m_doLTT) m_bools.at(HHBBTT::pass_trigger_LTT) = true;
         m_bools.at(HHBBTT::pass_trigger_STT) = true;
         m_bools.at(HHBBTT::pass_trigger_DTT) = true;
         m_bools.at(HHBBTT::pass_trigger_DTT_2016) = true;
@@ -499,11 +532,11 @@ namespace HHBBTT
 
       m_bools.at(HHBBTT::pass_trigger_SR) =
 	(m_bools.at(HHBBTT::pass_trigger_SLT) ||
-	 m_bools.at(HHBBTT::pass_trigger_LTT) ||
 	 m_bools.at(HHBBTT::pass_trigger_STT) ||
 	 m_bools.at(HHBBTT::pass_trigger_DTT) ||
 	 m_bools.at(HHBBTT::pass_trigger_DBT));
-
+      if(m_doLTT)
+	m_bools.at(HHBBTT::pass_trigger_SR) |= m_bools.at(HHBBTT::pass_trigger_LTT);
 
       bool jet_ptcut_DTT_2016 = false;
       bool jet_ptcut_DTT_4J12 = false;
@@ -534,8 +567,6 @@ namespace HHBBTT
         }
       }
 
-
-
       //****************
       // event level info
       //****************
@@ -555,21 +586,22 @@ namespace HHBBTT
           if (m_bools.at(HHBBTT::pass_trigger_SLT)){
             if (m_bools.at(HHBBTT::TWO_BJETS))
               m_bools.at(HHBBTT::pass_SLT_2B) = true;
-            else if (m_bools.at(HHBBTT::ONE_BJET))
+            else if (m_do1BRegions && m_bools.at(HHBBTT::ONE_BJET))
               m_bools.at(HHBBTT::pass_SLT_1B) = true;
           }
         }
 
         // LTT
-        if (lep_ptcut_LTT && tau_ptcut_LTT && two_central_jets_lead45){
-          m_bools.at(HHBBTT::pass_baseline_LTT) = true;
-          if (m_bools.at(HHBBTT::pass_trigger_LTT)){
-            if (!m_bools.at(HHBBTT::pass_SLT_2B) &&
-                m_bools.at(HHBBTT::TWO_BJETS))
-              m_bools.at(HHBBTT::pass_LTT_2B) = true;
-            else if(!m_bools.at(HHBBTT::pass_SLT_1B) &&
-                    m_bools.at(HHBBTT::ONE_BJET))
-              m_bools.at(HHBBTT::pass_LTT_1B) = true;
+        if (m_doLTT) {
+          if (lep_ptcut_LTT && tau_ptcut_LTT && two_central_jets_lead45){
+            m_bools.at(HHBBTT::pass_baseline_LTT) = true;
+            if (m_bools.at(HHBBTT::pass_trigger_LTT)){
+              if (!m_bools.at(HHBBTT::pass_SLT_2B) && m_bools.at(HHBBTT::TWO_BJETS))
+                m_bools.at(HHBBTT::pass_LTT_2B) = true;
+              else if(m_do1BRegions &&
+                      !m_bools.at(HHBBTT::pass_SLT_1B) && m_bools.at(HHBBTT::ONE_BJET))
+                m_bools.at(HHBBTT::pass_LTT_1B) = true;
+            }
           }
         }
       }
@@ -651,65 +683,73 @@ namespace HHBBTT
                m_bools.at(HHBBTT::pass_DTT_L1Topo_2B)  ||
                m_bools.at(HHBBTT::pass_DTT_4J12_delayed_2B)  ||
                m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_2B));
-      m_bools.at(HHBBTT::pass_DTT_1B) = 
-              (m_bools.at(HHBBTT::pass_DTT_2016_1B)  ||
-               m_bools.at(HHBBTT::pass_DTT_4J12_1B)  ||
-               m_bools.at(HHBBTT::pass_DTT_L1Topo_1B)  ||
-               m_bools.at(HHBBTT::pass_DTT_4J12_delayed_1B)  ||
-               m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_1B));
+      if(m_do1BRegions){
+        m_bools.at(HHBBTT::pass_DTT_1B) = 
+          (m_bools.at(HHBBTT::pass_DTT_2016_1B)  ||
+           m_bools.at(HHBBTT::pass_DTT_4J12_1B)  ||
+           m_bools.at(HHBBTT::pass_DTT_L1Topo_1B)  ||
+           m_bools.at(HHBBTT::pass_DTT_4J12_delayed_1B)  ||
+           m_bools.at(HHBBTT::pass_DTT_L1Topo_delayed_1B));
+      }
 
       m_bools.at(HHBBTT::pass_baseline_SR) =
 	(m_bools.at(HHBBTT::pass_baseline_SLT) ||
-	 m_bools.at(HHBBTT::pass_baseline_LTT) ||
 	 m_bools.at(HHBBTT::pass_baseline_STT) ||
 	 m_bools.at(HHBBTT::pass_baseline_DTT) ||
          m_bools.at(HHBBTT::pass_baseline_DBT));
-
-      m_bools.at(HHBBTT::pass_SR_1B) =
-	(m_bools.at(HHBBTT::pass_SLT_1B) ||
-	 m_bools.at(HHBBTT::pass_LTT_1B) ||
-	 m_bools.at(HHBBTT::pass_STT_1B) ||
-	 m_bools.at(HHBBTT::pass_DTT_1B) ||
-	 m_bools.at(HHBBTT::pass_DBT_1B));
+      if(m_doLTT) m_bools.at(HHBBTT::pass_baseline_SR) |= m_bools.at(HHBBTT::pass_baseline_LTT);
 
       m_bools.at(HHBBTT::pass_SR_2B) =
 	(m_bools.at(HHBBTT::pass_SLT_2B) ||
-	 m_bools.at(HHBBTT::pass_LTT_2B) ||
 	 m_bools.at(HHBBTT::pass_STT_2B) ||
 	 m_bools.at(HHBBTT::pass_DTT_2B) ||
 	 m_bools.at(HHBBTT::pass_DBT_2B));
+      if(m_doLTT) m_bools.at(HHBBTT::pass_SR_2B) |= m_bools.at(HHBBTT::pass_LTT_2B);
+      if(m_do1BRegions){
+        m_bools.at(HHBBTT::pass_SR_1B) =
+          (m_bools.at(HHBBTT::pass_SLT_1B) ||
+           m_bools.at(HHBBTT::pass_STT_1B) ||
+           m_bools.at(HHBBTT::pass_DTT_1B) ||
+           m_bools.at(HHBBTT::pass_DBT_1B));
+        if(m_doLTT) m_bools.at(HHBBTT::pass_SR_1B) |= m_bools.at(HHBBTT::pass_LTT_1B);
+      }
 
-      m_bools.at(HHBBTT::pass_baseline_LepHad) =
-	(m_bools.at(HHBBTT::pass_baseline_SLT) ||
-	 m_bools.at(HHBBTT::pass_baseline_LTT) );
+      m_bools.at(HHBBTT::pass_baseline_LepHad) = m_bools.at(HHBBTT::pass_baseline_SLT);
+      if(m_doLTT)
+        m_bools.at(HHBBTT::pass_baseline_LepHad) |= m_bools.at(HHBBTT::pass_baseline_LTT);
       m_bools.at(HHBBTT::pass_baseline_HadHad) =
 	(m_bools.at(HHBBTT::pass_baseline_STT) ||
 	 m_bools.at(HHBBTT::pass_baseline_DTT) ||
 	 m_bools.at(HHBBTT::pass_baseline_DBT) );
-      m_bools.at(HHBBTT::pass_LepHad_2B) =
-	(m_bools.at(HHBBTT::pass_SLT_2B) ||
-	 m_bools.at(HHBBTT::pass_LTT_2B) );
+
+      m_bools.at(HHBBTT::pass_LepHad_2B) = m_bools.at(HHBBTT::pass_SLT_2B);
+      if(m_doLTT)
+        m_bools.at(HHBBTT::pass_LepHad_2B) |= m_bools.at(HHBBTT::pass_LTT_2B);
       m_bools.at(HHBBTT::pass_HadHad_2B) =
 	(m_bools.at(HHBBTT::pass_STT_2B) ||
 	 m_bools.at(HHBBTT::pass_DTT_2B) ||
 	 m_bools.at(HHBBTT::pass_DBT_2B) );
-      m_bools.at(HHBBTT::pass_LepHad_1B) =
-	(m_bools.at(HHBBTT::pass_SLT_1B) ||
-	 m_bools.at(HHBBTT::pass_LTT_1B) );
-      m_bools.at(HHBBTT::pass_HadHad_1B) =
-	(m_bools.at(HHBBTT::pass_STT_1B) ||
-	 m_bools.at(HHBBTT::pass_DTT_1B) ||
-	 m_bools.at(HHBBTT::pass_DBT_1B) );
-      m_bools.at(HHBBTT::pass_LepHad) =
-	(m_bools.at(HHBBTT::pass_LepHad_2B) ||
-	 m_bools.at(HHBBTT::pass_LepHad_1B) );
-      m_bools.at(HHBBTT::pass_HadHad) =
-	(m_bools.at(HHBBTT::pass_HadHad_2B) ||
-	 m_bools.at(HHBBTT::pass_HadHad_1B) );
+      if(m_do1BRegions){
+        m_bools.at(HHBBTT::pass_LepHad_1B) = m_bools.at(HHBBTT::pass_SLT_1B);
+        if(m_doLTT)
+          m_bools.at(HHBBTT::pass_LepHad_1B) |= m_bools.at(HHBBTT::pass_LTT_1B);
+        m_bools.at(HHBBTT::pass_HadHad_1B) =
+          (m_bools.at(HHBBTT::pass_STT_1B) ||
+           m_bools.at(HHBBTT::pass_DTT_1B) ||
+           m_bools.at(HHBBTT::pass_DBT_1B) );
+      }
+
+      m_bools.at(HHBBTT::pass_LepHad) = m_bools.at(HHBBTT::pass_LepHad_2B);
+      m_bools.at(HHBBTT::pass_HadHad) = m_bools.at(HHBBTT::pass_HadHad_2B);
+      if(m_do1BRegions){
+	m_bools.at(HHBBTT::pass_LepHad) |= m_bools.at(HHBBTT::pass_LepHad_1B);
+	m_bools.at(HHBBTT::pass_HadHad) |= m_bools.at(HHBBTT::pass_HadHad_1B);
+      }
 
       // Z+HF and top (e+mu) control regions
       if (m_bools.at(HHBBTT::pass_trigger_SLT) && m_bools.at(HHBBTT::TWO_BJETS)){
-        if(jets->at(0)->pt() > 45. * Athena::Units::GeV && n_leptons_tightId_iso == 2 && n_veto_leptons == 0) {
+        if(jets->at(0)->pt() > 45. * Athena::Units::GeV &&
+	   n_leptons_tightId_iso == 2 && n_veto_leptons == 0) {
           float mll = -999.;
           float lep1_pt = -999.;
           if (ele1) {
@@ -720,29 +760,24 @@ namespace HHBBTT
             mll = (mu0->p4() + mu1->p4()).M();
             lep1_pt = mu1->pt();
           }
-          m_bools.at(HHBBTT::pass_ZCR) = mll > 75. * Athena::Units::GeV && mll < 110. * Athena::Units::GeV &&
+          m_bools.at(HHBBTT::pass_ZCR) =
+            mll > 75. * Athena::Units::GeV && mll < 110. * Athena::Units::GeV &&
             lep1_pt > 40. * Athena::Units::GeV;
 
           // No subleading ele + muon = e+mu event
-          m_bools.at(HHBBTT::pass_TopEMuCR) = !ele1 && !mu1 && ele0->pt() > 40. * Athena::Units::GeV && mu0->pt() > 40. * Athena::Units::GeV;
+          m_bools.at(HHBBTT::pass_TopEMuCR) = !ele1 && !mu1 &&
+	    ele0->pt() > 40. * Athena::Units::GeV && mu0->pt() > 40. * Athena::Units::GeV;
         }
       }
 
       // fake enriched antiiso-lephad region check:
-      m_bools.at(HHBBTT::pass_AntiIsoLepHad) = m_bools.at(HHBBTT::pass_SLT_1B) || m_bools.at(pass_SLT_2B) 
-                                               || m_bools.at(HHBBTT::pass_LTT_1B) || m_bools.at(pass_LTT_2B);
-      m_bools.at(HHBBTT::pass_AntiIsoLepHad) &= m_bools.at(HHBBTT::N_LEPTONS_CUT_ANTIISOLEPHAD);
+      m_bools.at(HHBBTT::pass_AntiIsoLepHad) =
+	m_bools.at(HHBBTT::pass_LepHad) && m_bools.at(HHBBTT::N_LEPTONS_CUT_ANTIISOLEPHAD);
 
       bool pass = false;
       for(const auto& channel : m_channels){
-        if(channel == HHBBTT::LepHad){
-          pass |= m_bools.at(HHBBTT::pass_LepHad_2B);
-          if(m_do1BRegions) pass |= m_bools.at(HHBBTT::pass_LepHad_1B);
-        }
-        else if(channel == HHBBTT::HadHad){
-          pass |= m_bools.at(HHBBTT::pass_HadHad_2B);
-          if(m_do1BRegions) pass |= m_bools.at(HHBBTT::pass_HadHad_1B);
-        }
+        if(channel == HHBBTT::LepHad) pass |= m_bools.at(HHBBTT::pass_LepHad);
+        else if(channel == HHBBTT::HadHad) pass |= m_bools.at(HHBBTT::pass_HadHad);
         else if(channel == HHBBTT::ZCR) pass |= m_bools.at(HHBBTT::pass_ZCR);
         else if(channel == HHBBTT::TopEMuCR) pass |= m_bools.at(HHBBTT::pass_TopEMuCR);
         else if(channel == HHBBTT::AntiIsoLepHad) pass |= m_bools.at(HHBBTT::pass_AntiIsoLepHad);
@@ -847,7 +882,7 @@ namespace HHBBTT
     for (const auto &channel : m_channels){
       if (channel == HHBBTT::LepHad || channel == HHBBTT::AntiIsoLepHad){
         use_SLT = true;
-        use_LTT = true;
+        if(m_doLTT) use_LTT = true;
       }
       else if (channel == HHBBTT::HadHad){
         use_STT = true;
