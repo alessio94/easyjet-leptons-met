@@ -76,7 +76,7 @@ namespace ZCC
 
     for (auto [var, key] : m_FbranchesKeys){
       SG::WriteDecorHandle<xAOD::TruthEventContainer, float> floatDecorator(key);
-      m_Fbranches.emplace(var, std::move(floatDecorator));
+      m_Fbranches.insert_or_assign(var, std::move(floatDecorator));
     }
 
     const xAOD::TruthEvent* truthevent = truthEvents->at(0);
