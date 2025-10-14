@@ -27,7 +27,10 @@ def JJ_cfg(flags, float_variables=None, int_variables=None):
 
     # VBF-RNN tagger: boosted-boosted
     if flags.Analysis.UseVBFRNN:
-        vbftagger = CompFactory.VBFTagger("VBFTaggerTool", modelTag="VBFRNNv1p0p0")
+        vbftagger = CompFactory.VBFTagger(
+            "VBFTaggerTool",
+            modelTag=flags.Analysis.VerVBFRNN
+        )
         cfg.addEventAlgo(
             CompFactory.VBFTaggerAlgSys(
                 "VBFTaggerAlg_boosted",

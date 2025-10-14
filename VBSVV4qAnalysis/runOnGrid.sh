@@ -3,10 +3,12 @@ executable="VBSVV4q-ntupler"
 campaignName="VBSVV4q_$1"
 
 mc_list=(
+    "../easyjet/VBSVV4qAnalysis/datasets/LLJ1/mc20_resonant_p6453.txt"
+    "../easyjet/VBSVV4qAnalysis/datasets/LLJ1/mc20_aQGC_QUAD_p6453.txt"
+    "../easyjet/VBSVV4qAnalysis/datasets/LLJ1/mc20_ewkvv_p6453.txt"    
     "../easyjet/VBSVV4qAnalysis/datasets/LLJ1/mc20_dijets_p6453.txt"
-    "../easyjet/VBSVV4qAnalysis/datasets/LLJ1/mc20_ewkvv_p6453.txt"
     "../easyjet/VBSVV4qAnalysis/datasets/LLJ1/mc20_ttbar_p6453.txt"
-    "../easyjet/VBSVV4qAnalysis/datasets/LLJ1/mc20_vjets_p6453.txt"
+    "../easyjet/VBSVV4qAnalysis/datasets/LLJ1/mc20_vjets_p6453.txt"    
 )
 
 easyjet-gridsubmit --mc-list <(cat "${mc_list[@]}") \

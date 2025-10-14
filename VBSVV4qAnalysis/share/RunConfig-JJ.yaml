@@ -14,5 +14,6 @@ CutList :
   - PASS_ONE_LARGE_JET
 
 UseVBFRNN : true
+VerVBFRNN : VBFRNNv1p0p0
 
 #Categories :
