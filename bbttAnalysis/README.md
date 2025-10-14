@@ -47,6 +47,12 @@ Additional config options:
 - `bbttAnalysis/share/trigger.yaml`: List of all triggers used in the analysis
 - `bbttAnalysis/share/trigger.yaml`: Configuration for trigger scale factors
 
+## GRLs
+- `bbttAnalysis/share/bbtt_grl.yaml`: List of XML files for good run lists, divided by year
+- `bbttAnalysis/share/bbtt_grl_years.yaml`: directories hosting GRLs and pile-up reweighting files.
+- `bbttAnalysis/lumicalc_bbtt.yaml`: List of lumicalc output files, divided by year
+- `bbttAnalysis/prw_bbtt.yaml`: List of pile-up reweighting files, divided by year, includes campaign specific ones
+
 # Analysis config files
 
 - `RunConfig-bbtt-base.yaml`: Baseline bbττ config (imported into othere configs)
@@ -56,7 +62,8 @@ Additional config options:
 Similarly, configs (to run single or multiple channels with or without systematics) are available for:
 
 - `all-channels`: `HadHad`, `LepHad`, `ZCR`, `TopEMuCR`, `Boosted`
-- `lep`: `LepHad`, `ZCR`, `TopEMuCR`
+- `lep`: `LepHad`
+- `cr`: `ZCR`, `TopEMuCR`
 - `antiiso`: `AntiIsoLepHad` (must always be run alone, no systematics needed)
 - `boosted`: `Boosted`, `HadHad` (under development)
 

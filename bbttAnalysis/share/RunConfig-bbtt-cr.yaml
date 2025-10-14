@@ -1,6 +1,6 @@
 include: bbttAnalysis/RunConfig-bbtt-base.yaml
 
-channels: ["LepHad"]
+channels: ["ZCR","TopEMuCR"]
 
 Trigger:
   selection:
