@@ -37,11 +37,6 @@ ntupler_bbtt_data22:
   script:
     - easyjet-test bbtt-data22
 
-ntupler_ttHH_data22_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test ttHH-data22-lite
-
 ntupler_bbyy_data22_lite:
   extends: .ntupler
   script:
@@ -79,11 +74,6 @@ ntupler_ttHH_mc20:
   script:
     - easyjet-test ttHH-mc20
 
-ntupler_ttHH_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test ttHH-mc20-lite
-
 ntupler_bbll_mc20:
   extends: .ntupler
   script:
@@ -104,11 +94,6 @@ ntupler_vbshiggs_fulllep_mc20:
   script:
     - easyjet-test vbshiggs-fulllep-mc20
 
-ntupler_vbshiggs_fulllep_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test vbshiggs-fulllep-mc20-lite
-
 ntupler_vbshiggs_semilep_mc20:
   extends: .ntupler
   script:
@@ -118,11 +103,6 @@ ntupler_VBSVV4q_mc20:
   extends: .ntupler
   script:
     - easyjet-test VBSVV4q-mc20
-
-ntupler_VBSVV4q_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test VBSVV4q-mc20-lite
 
 ntupler_VBSVV4q_mc20_llj1:
   extends: .ntupler
@@ -134,30 +114,15 @@ ntupler_jjjj_mc20:
   script:
     - easyjet-test jjjj-mc20
 
-ntupler_jjjj_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test jjjj-mc20-lite
-
 ntupler_ssWW_mc20:
   extends: .ntupler
   script:
     - easyjet-test ssWW-mc20
 
-ntupler_ssWW_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test ssWW-mc20-lite
-
 ntupler_ZCharm_mc20:
   extends: .ntupler
   script:
     - easyjet-test ZCharm-mc20
-
-ntupler_ZCharm_mc20_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test ZCharm-mc20-lite
 
 ntupler_llyy_mc20:
   extends: .ntupler
@@ -288,16 +253,6 @@ ntupler_hhml_mc23:
   extends: .ntupler
   script:
     - easyjet-test hhml-mc23
-
-ntupler_hhml_mc23_lite:
-  extends: .ntupler
-  script:
-    - easyjet-test hhml-mc23-lite
-
-ntupler_yyml_mc23:
-  extends: .ntupler
-  script:
-    - easyjet-test yyml-mc23
 
 ntupler_yyml_mc23_lite:
   extends: .ntupler

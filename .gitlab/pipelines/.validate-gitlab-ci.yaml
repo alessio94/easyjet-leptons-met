@@ -52,16 +52,6 @@ validator_bbtt_data22:
   script:
     - easyjet-validate bbtt-data22
 
-validator_ttHH_data22_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_ttHH_data22_lite
-      artifacts: false
-  script:
-    - easyjet-validate ttHH-data22-lite
-
 validator_bbyy_data22_lite:
   extends: .ntuple_validation
   needs:
@@ -134,16 +124,6 @@ validator_ttHH_mc20:
   script:
     - easyjet-validate ttHH-mc20
 
-validator_ttHH_mc20_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_ttHH_mc20_lite
-      artifacts: false
-  script:
-    - easyjet-validate ttHH-mc20-lite
-
 validator_bbll_mc20:
   extends: .ntuple_validation
   needs:
@@ -184,16 +164,6 @@ validator_vbshiggs_fulllep_mc20:
   script:
     - easyjet-validate vbshiggs-fulllep-mc20
 
-validator_vbshiggs_fulllep_mc20_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_vbshiggs_fulllep_mc20_lite
-      artifacts: false
-  script:
-    - easyjet-validate vbshiggs-fulllep-mc20-lite
-
 validator_vbshiggs_semilep_mc20:
   extends: .ntuple_validation
   needs:
@@ -213,16 +183,6 @@ validator_VBSVV4q_mc20:
       artifacts: false
   script:
     - easyjet-validate VBSVV4q-mc20
-
-validator_VBSVV4q_mc20_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_VBSVV4q_mc20_lite
-      artifacts: false
-  script:
-    - easyjet-validate VBSVV4q-mc20-lite
 
 validator_VBSVV4q_mc20_llj1:
   extends: .ntuple_validation
@@ -244,16 +204,6 @@ validator_jjjj_mc20:
   script:
     - easyjet-validate jjjj-mc20
 
-validator_jjjj_mc20_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_jjjj_mc20_lite
-      artifacts: false
-  script:
-    - easyjet-validate jjjj-mc20-lite
-
 validator_ssWW_mc20:
   extends: .ntuple_validation
   needs:
@@ -264,16 +214,6 @@ validator_ssWW_mc20:
   script:
     - easyjet-validate ssWW-mc20
 
-validator_ssWW_mc20_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_ssWW_mc20_lite
-      artifacts: false
-  script:
-    - easyjet-validate ssWW-mc20-lite
-
 validator_ZCharm_mc20:
   extends: .ntuple_validation
   needs:
@@ -283,16 +223,6 @@ validator_ZCharm_mc20:
       artifacts: false
   script:
     - easyjet-validate ZCharm-mc20
-
-validator_ZCharm_mc20_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_ZCharm_mc20_lite
-      artifacts: false
-  script:
-    - easyjet-validate ZCharm-mc20-lite
 
 validator_llyy_mc20:
   extends: .ntuple_validation
@@ -467,26 +397,6 @@ validator_hhml_mc23:
       artifacts: false
   script:
     - easyjet-validate hhml-mc23
-
-validator_hhml_mc23_lite:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_hhml_mc23_lite
-      artifacts: false
-  script:
-    - easyjet-validate hhml-mc23-lite
-
-validator_yyml_mc23:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_yyml_mc23
-      artifacts: false
-  script:
-    - easyjet-validate yyml-mc23
 
 validator_xbbcalib_mc23:
   extends: .ntuple_validation
