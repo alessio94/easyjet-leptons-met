@@ -5,8 +5,8 @@
 
 // Always protect against multiple includes!
 
-#ifndef XBBCALIB_FINALVARSXBBCALIBALG
-#define XBBCALIB_FINALVARSXBBCALIBALG
+#ifndef TTCALIB_FINALVARSXBBCALIBALG
+#define TTCALIB_FINALVARSXBBCALIBALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
@@ -25,11 +25,11 @@ namespace XBBCALIB
 {
 
   /// \brief An algorithm for counting containers
-  class BaselineVarsXbbCalibAlg final : public AthHistogramAlgorithm
+  class BaselineVarsttCalibAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
 public:
-    BaselineVarsXbbCalibAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    BaselineVarsttCalibAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -47,16 +47,16 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "XbbCalibJets_%SYS%",   "Jet container to read" };
+    m_jetHandle{ this, "jets", "ttCalibJets_%SYS%",   "Jet container to read" };
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Large-R jet container to read" };
+    m_lrjetHandle{ this, "lrjets", "ttCalibLRJets_%SYS%",   "Large-R jet container to read" };
 
     CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "XbbCalibElectrons_%SYS%",   "Electron container to read" };
+    m_electronHandle{ this, "electrons", "ttCalibElectrons_%SYS%",   "Electron container to read" };
 
     CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "XbbCalibMuons_%SYS%",   "Muon container to read" };
+    m_muonHandle{ this, "muons", "ttCalibMuons_%SYS%",   "Muon container to read" };
     
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
@@ -76,7 +76,7 @@ private:
     CP::SysReadDecorHandle<float> m_mu_SF{"", this};
 
     Gaudi::Property<std::vector<std::string>> m_GN2X_wps
-      { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the XbbCalib config" };
+      { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the ttCalib config" };
     std::vector<CP::SysReadDecorHandle<int>> m_GN2X_wp_Handles;
 
     Gaudi::Property<float> m_minMet

@@ -234,15 +234,15 @@ validator_llyy_mc20:
   script:
     - easyjet-validate llyy-mc20
 
-validator_xbbcalib_mc20:
+validator_ttcalib_mc20:
   extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
-    - job: ntupler_xbbcalib_mc20
+    - job: ntupler_ttcalib_mc20
       artifacts: false
   script:
-    - easyjet-validate xbbcalib-mc20
+    - easyjet-validate ttcalib-mc20
 
 validator_zllcalib_mc20:
   extends: .ntuple_validation
@@ -398,15 +398,15 @@ validator_hhml_mc23:
   script:
     - easyjet-validate hhml-mc23
 
-validator_xbbcalib_mc23:
+validator_ttcalib_mc23:
   extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
-    - job: ntupler_xbbcalib_mc23
+    - job: ntupler_ttcalib_mc23
       artifacts: false
   script:
-    - easyjet-validate xbbcalib-mc23
+    - easyjet-validate ttcalib-mc23
 
 validator_zllcalib_mc23:
   extends: .ntuple_validation

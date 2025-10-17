@@ -1,7 +1,7 @@
 include: EasyjetHub/base-config.yaml
 
 # Which analysis to consider
-do_ttbarCalib: true
+do_ttCalib: true
 do_ZbbjCalib: false
 do_ZbbyCalib: false
 bypass: false

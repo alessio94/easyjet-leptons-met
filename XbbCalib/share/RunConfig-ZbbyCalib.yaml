@@ -3,7 +3,7 @@ include: EasyjetHub/base-config.yaml
 # Which analysis to consider
 do_ZbbyCalib: true
 do_ZbbjCalib: false
-do_ttbarCalib: false
+do_ttCalib: false
 do_ZllCalib: false
 
 # Toggles to bypass event selection

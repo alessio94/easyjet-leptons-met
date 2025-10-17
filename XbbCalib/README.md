@@ -1,5 +1,5 @@
 # Run easyjet for Xbb Calibration. (WIP)
-=======
+
 Analysis Package for the $Xbb$ Calibration
 =========================
 
@@ -10,20 +10,20 @@ Analysis Package for the $Xbb$ Calibration
 - `datasets/`
     - `ttbar`: Lists of data and mc samples to process
 - `python/`: Main python code to configure the components (objects, selections as well as the variables to save)
-  - `XbbCalib_config`
+  - `ttCalib_config`
   - `ZbbjCalib_config`
   - `ZbbyCalib_config`
   - `ZllCalib_config`
 - `scripts`
   - `grid`: Scripts for submitting grid jobs.
-  - `XbbCalibPostProcess`: script for computing sumofweights
+  - `ttCalibPostProcess`: script for computing sumofweights
 - `share/`: yaml files containing configurations used by the components
-  - `RunConfig-XbbCalib`: configurations called by the executables (see below);	
+  - `RunConfig-ttCalib`: configurations called by the executables (see below);	
   - `trigger`: list of the triggers to use per year.
   - `XSectionsData`: XSections for computing weights.
 - `src/`: C++ code
-  - `XbbCalibSelectorAlg`: Find if the event pass the baseline selection for $t \bar{t}$ calibration;
-  - `BaselineVarsXbbCalibAlg`: Compute the baseline variables for the $t \bar{t}$ calibration.
+  - `ttCalibSelectorAlg`: Find if the event pass the baseline selection for $t \bar{t}$ calibration;
+  - `BaselineVarsttCalibAlg`: Compute the baseline variables for the $t \bar{t}$ calibration.
 
 
 # Zbby calibration (WIP)
@@ -66,3 +66,42 @@ Nominal production can be run as:
 ```
 python3 ../easyjet/XbbCalib/scripts/XbbCalib-submitGrid.py -c ../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml --tag <NameAndDateOfProdcution> -s "all" --nGBPerJob 2 --memory 4000 
 ```
+
+
+# ttbar calibration
+
+## Installation
+
+```
+setupATLAS
+lsetup git
+git lfs install
+git clone --recursive --no-checkout --origin upstream ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+cd easyjet
+git sparse-checkout init --cone
+git sparse-checkout set EasyjetHub EasyjetTests EasyjetPlus XbbCalib
+git checkout upstream/main
+git submodule update --init --recursive
+```
+
+## Running Locally
+
+From the run directory
+
+```xbb-ntupler ttbar_PHYS_10evt.root --run-config XbbCalib/RunConfig-ttCalib.yaml --out-file calibration-vars.root```
+
+## Running on Grid
+
+Configure ```RunOnGrid_ttCalib.sh``` to match the corresponding datasets in ```datasets/ttbar```, then run 
+```source ../easyjet/XbbCalib/scripts/grid/RunOnGrid_ttCalib.sh```
+
+Once your grid jobs have ran succesfully and you retrived the outputs, you will need to hadd the outputs before reweighting. Theres is a problem with hadding files which contain empty trees; For this, there is a custom mergeRootFiles.C macro. <https://gitlab.cern.ch/dallen/gn2x_calibration/-/blob/master/mergeRootFiles.C?ref_type=heads>
+
+## Reweighting MC
+
+Using the ttCalibPostProcess.py script will add a 'weight' branch to your analyis tree.
+
+```../easyjet/XbbCalib/scripts/ttCalibPostProcess.py --xSectionsConfig ../easyjet/XbbCalib/share/XSectionsData.yaml --mergeMyFiles --mergeToOutput --inFile calibration-vars.root --ouFile reweighted.root```
+
+
+

@@ -3,7 +3,7 @@ include: EasyjetHub/base-config.yaml
 # Which analysis to consider
 do_ZbbjCalib: true
 do_ZbbyCalib: false
-do_ttbarCalib: false
+do_ttCalib: false
 do_ZllCalib: false
 # We would use Alg in src/ZbbjCalibSelectionAlg
 

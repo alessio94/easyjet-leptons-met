@@ -9,12 +9,12 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(XbbCalib
-  src/BaselineVarsXbbCalibAlg.cxx
+  src/BaselineVarsttCalibAlg.cxx
   src/BaselineVarsZbbjCalibAlg.cxx
   src/BaselineVarsZllCalibAlg.cxx
   src/ZbbjCalibSelectorAlg.cxx
   src/ZllCalibSelectorAlg.cxx
-  src/XbbCalibSelectorAlg.cxx
+  src/ttCalibSelectorAlg.cxx
   src/components/XbbCalib_entries.cxx
   src/ZbbyCalibSelectorAlg.cxx
   src/BaselineVarsZbbyCalibAlg.cxx 
@@ -40,7 +40,7 @@ atlas_install_scripts(
   bin/xbbcalib-ntupler
 )
 atlas_install_python_modules(
-  python/XbbCalib_config.py
+  python/ttCalib_config.py
   python/ZbbyCalib_config.py
   python/ZbbjCalib_config.py
   python/ZllCalib_config.py

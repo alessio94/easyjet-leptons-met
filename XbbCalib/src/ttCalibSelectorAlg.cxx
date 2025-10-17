@@ -4,7 +4,7 @@
 
 /// @author Derrick Allen
 
-#include "XbbCalibSelectorAlg.h"
+#include "ttCalibSelectorAlg.h"
 #include "xAODEgamma/Electron.h"
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
@@ -13,12 +13,12 @@
 
 namespace XBBCALIB {
 
-  XbbCalibSelectorAlg::XbbCalibSelectorAlg(const std::string &name,
+  ttCalibSelectorAlg::ttCalibSelectorAlg(const std::string &name,
                                 ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator) {
   }
 
-  StatusCode XbbCalibSelectorAlg::initialize() {
+  StatusCode ttCalibSelectorAlg::initialize() {
     // Initialise global event filter
     ATH_CHECK (m_filterParams.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
@@ -41,7 +41,7 @@ namespace XBBCALIB {
   }
 
 
-  StatusCode XbbCalibSelectorAlg::execute() {
+  StatusCode ttCalibSelectorAlg::execute() {
 
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
@@ -124,7 +124,7 @@ namespace XBBCALIB {
     return StatusCode::SUCCESS;
   }
 
-  StatusCode XbbCalibSelectorAlg::finalize() {
+  StatusCode ttCalibSelectorAlg::finalize() {
     ANA_CHECK (m_filterParams.finalize());
     return StatusCode::SUCCESS;
   }

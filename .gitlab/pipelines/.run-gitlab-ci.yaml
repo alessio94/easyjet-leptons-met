@@ -129,10 +129,10 @@ ntupler_llyy_mc20:
   script:
     - easyjet-test llyy-mc20
 
-ntupler_xbbcalib_mc20:
+ntupler_ttcalib_mc20:
   extends: .ntupler
   script:
-    - easyjet-test xbbcalib-mc20
+    - easyjet-test ttcalib-mc20
 
 ntupler_zllcalib_mc20:
   extends: .ntupler
@@ -203,10 +203,10 @@ ntupler_llyy_mc23:
   script:
     - easyjet-test llyy-mc23
 
-ntupler_xbbcalib_mc23:
+ntupler_ttcalib_mc23:
   extends: .ntupler
   script:
-    - easyjet-test xbbcalib-mc23
+    - easyjet-test ttcalib-mc23
 
 ntupler_zllcalib_mc23:
   extends: .ntupler

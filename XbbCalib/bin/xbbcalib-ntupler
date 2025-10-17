@@ -20,8 +20,8 @@ from EasyjetHub.hub import (
 )
 from EasyjetHub.output.ttree.minituple_config import check_ntuple_output_file
 
-from XbbCalib.XbbCalib_config import XbbCalib_branches
-from XbbCalib.XbbCalib_config import XbbCalib_cfg
+from XbbCalib.ttCalib_config import ttCalib_branches
+from XbbCalib.ttCalib_config import ttCalib_cfg
 from XbbCalib.ZbbyCalib_config import ZbbyCalib_branches
 from XbbCalib.ZbbyCalib_config import ZbbyCalib_cfg
 from XbbCalib.ZbbjCalib_config import ZbbjCalib_branches
@@ -50,11 +50,11 @@ def XbbCalib_job_cfg():
     # For more sophistication this could be done using
     # custom BranchManagers
     extra_XbbCalib_branches = []
-    if flags.Analysis.do_ttbarCalib:
-        extra_XbbCalib_branches,float_variable_names,int_variable_names = XbbCalib_branches(flags)
+    if flags.Analysis.do_ttCalib:
+        extra_XbbCalib_branches,float_variable_names,int_variable_names = ttCalib_branches(flags)
 
         cfg.merge(
-            XbbCalib_cfg(
+            ttCalib_cfg(
                 flags,
                 smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
                 largejetkey=flags.Analysis.container_names.output.reco10UFOJet,
@@ -65,7 +65,7 @@ def XbbCalib_job_cfg():
             ),
             seqname
         )
-        cfg.merge(event_counter_cfg("n_XbbCalib"), seqname)
+        cfg.merge(event_counter_cfg("n_ttCalib"), seqname)
 
     elif flags.Analysis.do_ZbbyCalib:
         extra_XbbCalib_branches,float_variable_names,int_variable_names = ZbbyCalib_branches(flags)

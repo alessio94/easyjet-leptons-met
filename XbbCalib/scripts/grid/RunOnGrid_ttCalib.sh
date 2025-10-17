@@ -1,5 +1,5 @@
 ptag="p6266"
-runConfig="XbbCalib/RunConfig-XbbCalib.yaml"
+runConfig="XbbCalib/RunConfig-ttCalib.yaml"
 executable="xbbcalib-ntupler"
 campaignName="001"
 

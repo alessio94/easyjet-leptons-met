@@ -3,17 +3,17 @@
 */
 /// @author Derrick Allen
 
-#include "BaselineVarsXbbCalibAlg.h"
+#include "BaselineVarsttCalibAlg.h"
 #include "AthenaBaseComps/AthMsgStreamMacros.h"
 
 namespace XBBCALIB
 {
-  BaselineVarsXbbCalibAlg::BaselineVarsXbbCalibAlg(const std::string &name,
+  BaselineVarsttCalibAlg::BaselineVarsttCalibAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   { }
 
-  StatusCode BaselineVarsXbbCalibAlg::initialize()
+  StatusCode BaselineVarsttCalibAlg::initialize()
   {
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
@@ -62,7 +62,7 @@ namespace XBBCALIB
     return StatusCode::SUCCESS;
   }
 
-  StatusCode BaselineVarsXbbCalibAlg::execute()
+  StatusCode BaselineVarsttCalibAlg::execute()
   {
     //Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())

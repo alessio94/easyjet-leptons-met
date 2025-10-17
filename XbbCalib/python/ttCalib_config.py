@@ -8,8 +8,8 @@ from EasyjetHub.output.ttree.selected_objects import (
 )
 
 
-def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
-                 float_variables=None, int_variables=None):
+def ttCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
+                float_variables=None, int_variables=None):
     if not float_variables:
         float_variables = []
     if not int_variables:
@@ -20,7 +20,7 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     cfg.merge(JetSelectorAlgCfg(flags,
                                 name="LargeJetSelectorAlg",
                                 containerInKey=largejetkey,
-                                containerOutKey="XbbCalibLRJets_%SYS%",
+                                containerOutKey="ttCalibLRJets_%SYS%",
                                 minPt=flags.Analysis.Large_R_jet.min_pT,
                                 maxEta=flags.Analysis.Large_R_jet.max_eta,
                                 minimumAmount=1,
@@ -29,7 +29,7 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     cfg.merge(JetSelectorAlgCfg(flags,
                                 name="SmallRJet_SelectorAlg",
                                 containerInKey=smalljetkey,
-                                containerOutKey="XbbCalibJets_%SYS%",
+                                containerOutKey="ttCalibJets_%SYS%",
                                 minPt=flags.Analysis.Small_R_jet.min_pT,
                                 maxEta=2.5,
                                 minimumAmount=1,
@@ -40,14 +40,14 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
 
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
-                                     containerOutKey="XbbCalibElectrons_%SYS%",
+                                     containerOutKey="ttCalibElectrons_%SYS%",
                                      minPt=flags.Analysis.Electron.min_pT,
                                      maxEta=2.47
                                      ))
 
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
-                                 containerOutKey="XbbCalibMuons_%SYS%",
+                                 containerOutKey="ttCalibMuons_%SYS%",
                                  minPt=flags.Analysis.Muon.min_pT,
                                  maxEta=2.5,
                                  ))
@@ -55,9 +55,9 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     ElectronWPLabel = f'{flags.Analysis.Electron.ID}_{flags.Analysis.Electron.Iso}'
     cfg.addEventAlgo(
-        CompFactory.XBBCALIB.XbbCalibSelectorAlg(
-            "XbbCalibSelectorAlg",
-            eventDecisionOutputDecoration="XbbCalib_pass_sr_%SYS%",
+        CompFactory.XBBCALIB.ttCalibSelectorAlg(
+            "ttCalibSelectorAlg",
+            eventDecisionOutputDecoration="ttCalib_pass_sr_%SYS%",
             bypass=flags.Analysis.bypass,
             minMet=flags.Analysis.MET.min_met,
             muonWP=MuonWPLabel,
@@ -66,8 +66,8 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     )
 
     cfg.addEventAlgo(
-        CompFactory.XBBCALIB.BaselineVarsXbbCalibAlg(
-            "BaselineVarsXbbCalibAlg",
+        CompFactory.XBBCALIB.BaselineVarsttCalibAlg(
+            "BaselineVarsttCalibAlg",
             floatVariableList=float_variables,
             intVariableList=int_variables,
             isMC=flags.Input.isMC,
@@ -81,7 +81,7 @@ def XbbCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     return cfg
 
 
-def get_BaselineVarsXbbCalibAlg_variables(flags):
+def get_BaselineVarsttCalibAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
@@ -114,7 +114,7 @@ def get_BaselineVarsXbbCalibAlg_variables(flags):
     return float_variable_names, int_variable_names
 
 
-def XbbCalib_branches(flags):
+def ttCalib_branches(flags):
     branches = []
 
     all_baseline_variable_names = []
@@ -122,7 +122,7 @@ def XbbCalib_branches(flags):
     int_variable_names = []
 
     baseline_float_variables, baseline_int_variables \
-        = get_BaselineVarsXbbCalibAlg_variables(flags)
+        = get_BaselineVarsttCalibAlg_variables(flags)
 
     float_variable_names += baseline_float_variables
     int_variable_names += baseline_int_variables
@@ -130,17 +130,17 @@ def XbbCalib_branches(flags):
     all_baseline_variable_names += [*float_variable_names, *int_variable_names]
 
     for var in all_baseline_variable_names:
-        branches += [f"EventInfo.{var}_%SYS% -> XbbCalib_{var}"
+        branches += [f"EventInfo.{var}_%SYS% -> ttCalib_{var}"
                      + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     object_level_branches, object_level_float_variables, object_level_int_variables \
-        = get_selected_objects_branches_variables(flags, "XbbCalib")
+        = get_selected_objects_branches_variables(flags, "ttCalib")
 
     float_variable_names += object_level_float_variables
     int_variable_names += object_level_int_variables
 
     branches += object_level_branches
-    branches += ["EventInfo.XbbCalib_pass_sr_%SYS% -> XbbCalib_pass_SR"
+    branches += ["EventInfo.ttCalib_pass_sr_%SYS% -> ttCalib_pass_SR"
                  + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     branches += [flags.Analysis.container_names.output.reco10UFOJet

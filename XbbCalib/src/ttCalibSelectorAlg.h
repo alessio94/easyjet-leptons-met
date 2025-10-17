@@ -4,8 +4,8 @@
 /// @author Derrick Allen
 // Always protect against multiple includes!
 
-#ifndef SELECTIONFLAGSXBBCALIBALG_H
-#define SELECTIONFLAGSXBBCALIBALG_H
+#ifndef SELECTIONFLAGSTTCALIBALG_H
+#define SELECTIONFLAGSTTCALIBALG_H
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
@@ -25,10 +25,10 @@ namespace XBBCALIB
 {
 
   /// \brief An algorithm for counting containers
-  class XbbCalibSelectorAlg final : public AthHistogramAlgorithm {
+  class ttCalibSelectorAlg final : public AthHistogramAlgorithm {
 
     public:
-      XbbCalibSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
+      ttCalibSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
       /// \brief Initialisation method, for setting up tools and other persistent
       /// configs
@@ -51,16 +51,16 @@ namespace XBBCALIB
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
       CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "XbbCalibJets_%SYS%",   "Jet container to read" };
+      m_jetHandle{ this, "jets", "ttCalibJets_%SYS%",   "Jet container to read" };
 
       CP::SysReadHandle<xAOD::JetContainer>
-      m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Large-R jet container to read" };
+      m_lrjetHandle{ this, "lrjets", "ttCalibLRJets_%SYS%",   "Large-R jet container to read" };
 
       CP::SysReadHandle<xAOD::ElectronContainer>
-      m_electronHandle{ this, "electrons", "XbbCalibElectrons_%SYS%",   "Electron container to read" };
+      m_electronHandle{ this, "electrons", "ttCalibElectrons_%SYS%",   "Electron container to read" };
 
       CP::SysReadHandle<xAOD::MuonContainer>
-      m_muonHandle{ this, "muons", "XbbCalibMuons_%SYS%",   "Muon container to read" };
+      m_muonHandle{ this, "muons", "ttCalibMuons_%SYS%",   "Muon container to read" };
 
       CP::SysReadHandle<xAOD::MissingETContainer>
       m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read" };
@@ -76,7 +76,7 @@ namespace XBBCALIB
         { this, "muonWP", "","Muon ID + Iso cuts" };
       CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
 
-      CP::SysFilterReporterParams m_filterParams {this, "XbbCalib selection"};
+      CP::SysFilterReporterParams m_filterParams {this, "ttCalib selection"};
 
   };
 
