@@ -71,7 +71,6 @@ ttree_output:
   # Our overrides. All defaults are off
   reco_outputs:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-    # small_R_jets: 'container_names.output.reco4PFlowJet'
   truth_outputs:
     # small_R_jets: 'container_names.output.truth4Jet'
     large_R_jets: 'container_names.output.truth10SoftDropJet'
@@ -79,7 +78,7 @@ ttree_output:
     large_R_jets:
       run_selection: true
     small_R_jets:
-      btag_info: true
+      btag_info: false
       run_selection: true
     electrons:
       run_selection: true
