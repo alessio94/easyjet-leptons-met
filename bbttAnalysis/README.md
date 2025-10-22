@@ -99,7 +99,7 @@ easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/shar
 > Don't do this alone, coorinate with the analysis team and analysis contacts
 
 > **⚠️ Important:**
-> Note that the `--channels` argument must be provided in the run command even if it is already defined in the config file
+> Note that the `--channels` argument must be provided in the run command when using the grid submission script to configure the retrieval of the output files, which cannot be done parsing the yaml file. When running things locally, this argument cannot be present as it is already defined in the YAML file.
 
 > **⚠️ Important:**  
 > Setting `--nGBperJob 3` results in a very large number of output files with few events per file, which significantly slows down HHARD. This option should only be used when running with systematics.  
@@ -140,7 +140,7 @@ voms-proxy-init -voms atlas
 for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-syst-hadhad.yaml --channels HadHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --mc-list $f; done
 
 # For LepHad + ZCR + TopEMuCR (MC20 with systematics, similar for MC23)
-for f in #../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-syst-lep.yaml --channels LepHad ZCR TopEMuCR --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --mc-list $f; done
+for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-syst-lep.yaml --channels LepHad ZCR TopEMuCR --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --mc-list $f; done
 
 # !!! Important !!! Cleanup your run directory with rm -f ./* before launching the data submission
 
