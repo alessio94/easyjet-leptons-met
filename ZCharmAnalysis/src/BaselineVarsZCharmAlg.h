@@ -58,8 +58,6 @@ private:
     CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "AnalysisMuons_%SYS%", "Original muon container to read" };
 
-    CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
@@ -101,8 +99,6 @@ private:
     Gaudi::Property<std::vector<std::string>> m_intVariables
           {this, "intVariableList", {}, "Name list of integer variables"};
 
-    CP::SysReadDecorHandle<float>
-    m_METSig {this, "METSignificance", "significance_%SYS%", "Met Significance"};
 
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>>

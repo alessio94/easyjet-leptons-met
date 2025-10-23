@@ -97,11 +97,17 @@ def jet_sequence(
         if 'btag_extra_wps' in jet_flags:
             btag_wps += jet_flags.btag_extra_wps
 
-        # Make sure PCBT is scheduled to get SF
-        if btag_wps and "GN2v01_Continuous" not in btag_wps:
+        # Make sure PCBT/PCFT is scheduled to get SF
+        if (
+            btag_wps
+            and "GN2v01_Continuous2D" not in btag_wps
+            and "GN2v01_Continuous" not in btag_wps
+        ):
             btag_wps += ["GN2v01_Continuous"]
 
         tagger_set = set()
+
+        has_continuous2d = any("Continuous2D" in wp for wp in btag_wps)
 
         for tagger_wp in btag_wps:
             tagger, btag_wp = tagger_wp.split("_", 1)
@@ -121,11 +127,6 @@ def jet_sequence(
             if 'btagCDI' in jet_flags:
                 bTagCalibFile = jet_flags.btagCDI
 
-            if tagger_wp == "GN2v01_Continuous2D":
-                from AthenaCommon.Utils.unixtools import find_datafile
-                bTagCalibFile = find_datafile(
-                    'EasyjetHub/2023-22-13p6TeV-MC21-CDI_GN2v01_Test_2024-07-ctag_noSF_NewCutValues_fTau_Ctag.root')  # noqa
-
             if bTagCalibFile:
                 configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
 
@@ -138,42 +139,59 @@ def jet_sequence(
             configSeq.setOptionValue('.removeHLTPrefix', False)
 
         for tagger in tagger_set:
-            tagger_wp = tagger + "_Continuous"
-            # Note: this is going to run post overlap removal
-            configSeq += config.makeConfig('Jets.FlavourTaggingEventSF')
-            configSeq.setOptionValue('.containerName', output_name + '.baselineJvt')
-            configSeq.setOptionValue('.selectionName', tagger_wp)
-            configSeq.setOptionValue('.btagger', tagger)
-            # set the MC/MC SF to default for now, this was broken by
-            # https://gitlab.cern.ch/atlas/athena/-/merge_requests/66729
-            configSeq.setOptionValue('.generator', 'default')
-            configSeq.setOptionValue('.eigenvectorReductionB',
-                                     jet_flags.btag_egReductionB)
-            configSeq.setOptionValue('.eigenvectorReductionC',
-                                     jet_flags.btag_egReductionC)
-            configSeq.setOptionValue('.eigenvectorReductionLight',
-                                     jet_flags.btag_egReductionLight)
+            PCBT = ["Continuous"]
+            if has_continuous2d:
+                PCBT.append("Continuous2D")
 
-            bTagCalibFile = None
-            if 'btagCDI' in jet_flags:
-                bTagCalibFile = jet_flags.btagCDI
+            for pcbt in PCBT:
+                tagger_wp = tagger + "_" + pcbt
+                # Note: this is going to run post overlap removal
+                configSeq += config.makeConfig('Jets.FlavourTaggingEventSF')
+                configSeq.setOptionValue(
+                    '.containerName', output_name + '.baselineJvt'
+                )
+                configSeq.setOptionValue('.selectionName', tagger_wp)
+                configSeq.setOptionValue('.btagger', tagger)
+                configSeq.setOptionValue('.btagWP', pcbt)
+                configSeq.setOptionValue(
+                    '.eigenvectorReductionB',
+                    jet_flags.btag_egReductionB
+                )
+                configSeq.setOptionValue(
+                    '.eigenvectorReductionC',
+                    jet_flags.btag_egReductionC
+                )
+                configSeq.setOptionValue(
+                    '.eigenvectorReductionLight',
+                    jet_flags.btag_egReductionLight
+                )
 
-            if bTagCalibFile:
-                configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
+                bTagCalibFile = None
+                if 'btagCDI' in jet_flags:
+                    bTagCalibFile = jet_flags.btagCDI
 
-            trigSF_flags = flags.Analysis.Trigger.scale_factor
-            if trigSF_flags.doSF and hasattr(trigSF_flags, 'bjet'):
-                bTagCalibTriggerFile = None
-                if 'btagTriggerCDI' in trigSF_flags.bjet:
-                    bTagCalibTriggerFile = trigSF_flags.bjet.btagTriggerCDI
+                if bTagCalibFile:
+                    configSeq.setOptionValue('.bTagCalibFile', bTagCalibFile)
 
-                if bTagCalibTriggerFile:
-                    configSeq.setOptionValue('.bTagCalibTriggerFile',
-                                             bTagCalibTriggerFile)
+                trigSF_flags = flags.Analysis.Trigger.scale_factor
+                if trigSF_flags.doSF and hasattr(trigSF_flags, 'bjet'):
+                    bTagCalibTriggerFile = None
+                    if 'btagTriggerCDI' in trigSF_flags.bjet:
+                        bTagCalibTriggerFile = trigSF_flags.bjet.btagTriggerCDI
 
-                configSeq.setOptionValue('.triggerChainsPerYear',
-                                         get_trigger_chains_scale_factor(flags, 'bjet'))
-                configSeq.setOptionValue('.removeHLTPrefix', False)
+                    if bTagCalibTriggerFile:
+                        configSeq.setOptionValue(
+                            '.bTagCalibTriggerFile',
+                            bTagCalibTriggerFile
+                        )
+
+                    configSeq.setOptionValue(
+                        '.triggerChainsPerYear',
+                        get_trigger_chains_scale_factor(
+                            flags, 'bjet'
+                        )
+                    )
+                    configSeq.setOptionValue('.removeHLTPrefix', False)
 
         if jet_flags.runBJetPtCalib:
             configSeq += makeConfig('Jets.BJetCalib')

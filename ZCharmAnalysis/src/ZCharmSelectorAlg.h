@@ -21,9 +21,9 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
-#include <xAODMissingET/MissingETContainer.h>
 #include <xAODTruth/TruthEvent.h>
 #include <xAODTruth/TruthEventContainer.h>
+
 
 #include "TriggerMatchingTool/IMatchingTool.h"
 #include <EasyjetHub/CutManager.h>
@@ -53,7 +53,6 @@ namespace ZCC
         "EXACTLY_TWO_LEPTONS",
         "OPPOSITE_CHARGE_LEPTONS",
         "DILEPTON_MASS_WINDOW",
-        "MET",
       };
 
       Gaudi::Property<bool> m_bypass
@@ -84,8 +83,6 @@ namespace ZCC
       CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "ZCharmAnalysisMuons_%SYS%", "Muon container to read" };
 
-      CP::SysReadHandle<xAOD::MissingETContainer>
-      m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
 
       CP::SysReadDecorHandle<unsigned int> m_year
 	{this, "year", "dataTakingYear", ""};
@@ -136,7 +133,6 @@ namespace ZCC
         {ZCC::OPPOSITE_CHARGE_LEPTONS, "OPPOSITE_CHARGE_LEPTONS"},
         {ZCC::DILEPTON_MASS_WINDOW, "DILEPTON_MASS_WINDOW"},
 
-        {ZCC::MET, "MET"},
         {ZCC::ONE_B_JETS, "ONE_B_JETS"},
         {ZCC::TWO_B_JETS, "TWO_B_JETS"},
         {ZCC::ONE_C_JETS, "ONE_C_JETS"},
@@ -175,7 +171,7 @@ namespace ZCC
 	 const CP::SystematicSet& sys);
 
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
-                          const xAOD::MuonContainer& muons, const xAOD::MissingET* met, CutManager& ZCharmCuts);
+                          const xAOD::MuonContainer& muons, CutManager& ZCharmCuts);
       void evaluateBJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, CutManager& ZCharmCuts);
       void evaluateCJetCuts(const ConstDataVector<xAOD::JetContainer>& cjets, CutManager& ZCharmCuts);
       void evaluateLargeJetCuts(const xAOD::JetContainer *largeJets);

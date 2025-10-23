@@ -25,7 +25,6 @@ namespace ZCC
     ATH_CHECK (m_ZCharmLRJetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_ZCharmElectronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_ZCharmMuonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
     if(m_isMC){
@@ -54,7 +53,6 @@ namespace ZCC
       ATH_CHECK(m_PCBTs.at(var).initialize(m_systematicsList, m_ZCharmJetHandle));
     };
 
-    ATH_CHECK (m_METSig.initialize(m_systematicsList, m_metHandle));
 
     if (m_isMC) {
       ATH_CHECK (m_truthFlav.initialize(m_systematicsList, m_ZCharmJetHandle));
@@ -108,13 +106,6 @@ namespace ZCC
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_ZCharmElectronHandle.retrieve (electrons, sys));
 
-      const xAOD::MissingETContainer *metCont = nullptr;
-      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
-      const xAOD::MissingET* met = (*metCont)["Final"];
-      if (!met) {
-        ATH_MSG_ERROR("Could not retrieve MET");
-        return StatusCode::FAILURE;	
-      }
 
       for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
@@ -132,17 +123,18 @@ namespace ZCC
       int n_jets = jets->size();
 
       // b-jet sector
-      bool WPgiven = !m_isBtag.empty();
+      std::string ftag2D_WP = "ftag_quantile_GN2v01_Continuous2D";
+      std::vector<int> btag_values = {4,5,6};
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       for(const xAOD::Jet* jet : *jets) {
-        if (WPgiven) {
-          if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
-        }
+          int pcbt = m_PCBTs.at(ftag2D_WP).get(*jet, sys);
+          if (std::find(btag_values.begin(), btag_values.end(), pcbt)!=btag_values.end() && std::abs(jet->eta())<2.5) {
+            bjets->push_back(jet);
+          }
       }
       int n_bjets = bjets->size();
 
       // c-jet sector
-      std::string ftag2D_WP = "ftag_quantile_GN2v01_Continuous2D";
       std::vector<int> ctag_values = {1,2,3};
       auto cjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       if(std::find(m_PCBTnames.begin(), m_PCBTnames.end(), ftag2D_WP)!=m_PCBTnames.end())
@@ -239,9 +231,6 @@ namespace ZCC
         }
       }
 
-      //MET Significance 
-      float METSig = m_METSig.get(*met, sys);
-      m_Fbranches.at("METSig").set(*event, METSig, sys);
 
       // dilepton kinematics
       TLorentzVector ll;

@@ -126,11 +126,15 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
         # Make sure PCBT is scheduled to get SF
-        if btag_wps and "GN2v01_Continuous" not in btag_wps:
+        if (
+            btag_wps
+            and "GN2v01_Continuous2D" not in btag_wps
+            and "GN2v01_Continuous" not in btag_wps
+        ):
             btag_wps += ["GN2v01_Continuous"]
 
         for wp in btag_wps:
-            if "FixedCutBEff" in wp or "Continuous2D" in wp:
+            if "FixedCutBEff" in wp:
                 continue
             eventinfo_branches.variables += [f"ftag_effSF_{wp}_%SYS%"]
 

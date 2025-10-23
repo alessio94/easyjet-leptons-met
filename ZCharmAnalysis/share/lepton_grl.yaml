@@ -2,6 +2,6 @@
 '2016': 'data16_13TeV.periodAllYear_DetStatus-v89-pro21-01_DQDefects-00-02-04_PHYS_StandardGRL_All_Good_25ns.xml'
 '2017': 'data17_13TeV.periodAllYear_DetStatus-v99-pro22-01_Unknown_PHYS_StandardGRL_All_Good_25ns_Triggerno17e33prim.xml'
 '2018': 'data18_13TeV.periodAllYear_DetStatus-v102-pro22-04_Unknown_PHYS_StandardGRL_All_Good_25ns_Triggerno17e33prim.xml'
-'2022': 'physics_25ns_data22_ignoreTRIGLAR.xml'
-'2023': 'physics_25ns_data23_ignoreTRIG_JETCTPIN.xml'
+'2022': 'data22_13p6TeV.periodAllYear_DetStatus-v134-pro28-10_MERGED_PHYS_StandardGRL_All_Good_25ns_ignore_TRIGLAR.xml'
+'2023': 'data23_13p6TeV.periodAllYear_DetStatus-v133-pro31-11_MERGED_PHYS_StandardGRL_All_Good_25ns_ignoreTRIG_JETCTPIN.xml'
 '2024': 'physics_25ns_data24.xml'

@@ -22,8 +22,8 @@ bypass: false
 do_small_R_jets: true
 do_muons: true
 do_electrons: true
-do_met : true 
 do_large_R_UFO_jets: true
+do_met: true
 
 # Toggles for reconstructed objects decorations
 Small_R_jet:
@@ -32,17 +32,16 @@ Small_R_jet:
   min_pT_ZCharm: 20000 # for the jet selection
   max_eta_ZCharm: 2.5
   # btagging working points 
-  btag_wp: "GN2v01_FixedCutBEff_85"
+  btag_wp: "GN2v01_FixedCutBEff_77"
+  runBJetPtCalib: true
   amount: 2
   amount_bjet: 2
   amount_cjet: 2
   # to use multiple btagging WPs
   btag_extra_wps:
     - GN2v01_Continuous2D
-    - GN2v01_Continuous
-    - GN2v01_FixedCutBEff_77
-    - GN2v01_FixedCutBEff_70
   useFJvt: true
+
   
   variables_int_bjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]    
   variables_int_cjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]
@@ -73,7 +72,6 @@ Lepton:
   variables_int: ["isPrompt","truthOrigin", "truthType"]
   variables_truth_Z: ["pt", "eta", "phi", "E", "m"]
 
-
 # list of triggers per year to consider
 Trigger:
   include: ZCharmAnalysis/trigger.yaml
@@ -102,7 +100,6 @@ CutList :
       - EXACTLY_TWO_LEPTONS
       - OPPOSITE_CHARGE_LEPTONS
       - DILEPTON_MASS_WINDOW
-      - MET
       - ONE_B_JETS
       - TWO_B_JETS
       - ONE_C_JETS

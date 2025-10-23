@@ -32,9 +32,9 @@ namespace ZCC
     
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_largejetHandle.initialize(m_systematicsList));
-    if (!m_isBtag.empty()) {
-      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
-    }
+    // if (!m_isBtag.empty()) {
+    //   ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_jetHandle));
+    // }
 
     for (const std::string &var : m_PCBTnames){
       ATH_MSG_DEBUG("initializing PCBT: " << var);
@@ -45,7 +45,6 @@ namespace ZCC
 
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
-    ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));    
 
     ATH_CHECK(m_year.initialize(m_systematicsList, m_eventHandle));
@@ -91,15 +90,6 @@ namespace ZCC
     // Global filter originally false
     CP::SysFilterReporterCombiner filterCombiner (m_filterParams, false);
 
-    // Find truth decision
-
-    SG::ReadDecorHandle<xAOD::TruthEventContainer, bool> m_passTruthCuts(m_passTruthCutsKey);
-    if (!m_passTruthCuts.isPresent()) {
-      ATH_MSG_ERROR("PassTruthCuts decision is not present!");
-      return StatusCode::FAILURE;
-    }
-
-
     // Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
     {
@@ -111,6 +101,8 @@ namespace ZCC
       bool isMC = event->eventType(xAOD::EventInfo::IS_SIMULATION);
       bool pass_truth_baseline = false;
       if (isMC){
+        // Find truth decision
+        SG::ReadDecorHandle<xAOD::TruthEventContainer, bool> m_passTruthCuts(m_passTruthCutsKey);
         // Retrieve the truth decision
         if (!m_passTruthCuts.isPresent() || m_passTruthCuts->empty()) {
           ATH_MSG_ERROR("PassTruthCuts decision is empty or not found!");
@@ -122,24 +114,17 @@ namespace ZCC
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-      bool WPgiven = !m_isBtag.empty();
-      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
-      auto nonbjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
-      for(const xAOD::Jet* jet : *jets) {
-        if (WPgiven) {
-          if (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5) bjets->push_back(jet);
-          else nonbjets->push_back(jet);
-        }
-      }
-
       std::string ftag2D_WP = "ftag_quantile_GN2v01_Continuous2D";
       std::vector<int> ctag_values = {1,2,3};
+      std::vector<int> btag_values = {4,5,6};
       auto cjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
+      auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
       if(std::find(m_PCBTnames.begin(), m_PCBTnames.end(), ftag2D_WP)!=m_PCBTnames.end())
       {
         for(const xAOD::Jet* jet : *jets) {
           int pcbt = m_PCBTs.at(ftag2D_WP).get(*jet, sys);
           if (std::find(ctag_values.begin(), ctag_values.end(), pcbt)!=ctag_values.end() && std::abs(jet->eta())<2.5) cjets->push_back(jet);
+          if (std::find(btag_values.begin(), btag_values.end(), pcbt)!=btag_values.end() && std::abs(jet->eta())<2.5) bjets->push_back(jet);
         }
       }
 
@@ -152,13 +137,6 @@ namespace ZCC
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
-      const xAOD::MissingETContainer *metCont = nullptr;
-      ANA_CHECK (m_metHandle.retrieve (metCont, sys));
-      const xAOD::MissingET* met = (*metCont)["Final"]; // To check
-      if (!met) {
-        ATH_MSG_ERROR("Could not retrieve MET");
-        return StatusCode::FAILURE;
-      }
 
       m_bools.at(ZCC::IS_ee) = false;
       m_bools.at(ZCC::IS_mm) = false;
@@ -172,7 +150,6 @@ namespace ZCC
       m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS) = false;
       m_bools.at(ZCC::DILEPTON_MASS_WINDOW) = false;
 
-      m_bools.at(ZCC::MET) = false;
       m_bools.at(ZCC::ONE_B_JETS) = false;
       m_bools.at(ZCC::TWO_B_JETS) = false;
       m_bools.at(ZCC::ONE_C_JETS) = false;
@@ -204,7 +181,7 @@ namespace ZCC
       }
 
       evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_ZCharmCuts, sys);
-      evaluateLeptonCuts(*electrons, *muons, met, m_ZCharmCuts);
+      evaluateLeptonCuts(*electrons, *muons, m_ZCharmCuts);
       evaluateBJetCuts(*bjets, m_ZCharmCuts);
       evaluateCJetCuts(*cjets, m_ZCharmCuts);
       evaluateLargeJetCuts(largeJets);
@@ -503,12 +480,11 @@ namespace ZCC
 
 
   void ZCharmSelectorAlg::evaluateLeptonCuts
-  (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons, const xAOD::MissingET* met,
+  (const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
    CutManager& ZCharmCuts)
   {
     TLorentzVector ll;
     double mll = -99;
-    double pTll = -99;
 
     bool OPPOSITE_CHARGE_LEPTONS = false;
 
@@ -537,14 +513,10 @@ namespace ZCC
     }
 
     mll = ll.M();
-    pTll = ll.Pt();
     
     if(ZCharmCuts.exists("OPPOSITE_CHARGE_LEPTONS")) m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS) = OPPOSITE_CHARGE_LEPTONS;
     if(ZCharmCuts.exists("DILEPTON_MASS_WINDOW")) m_bools.at(ZCC::DILEPTON_MASS_WINDOW) = ( mll >= 76.*Athena::Units::GeV && mll <= 106.*Athena::Units::GeV );
 
-    if( (pTll < 150 * Athena::Units::GeV && pTll != -99 && met->met() < 60 * Athena::Units::GeV) || pTll >= 150 * Athena::Units::GeV ){
-      if(ZCharmCuts.exists("MET")) m_bools.at(ZCC::MET) = true;
-    }
 
   }
 

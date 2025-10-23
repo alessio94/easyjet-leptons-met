@@ -55,7 +55,11 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
                 btag_wps += flags.Analysis.Small_R_jet.btag_extra_wps
 
             # Make sure PCBT is scheduled to get SF
-            if btag_wps and "GN2v01_Continuous" not in btag_wps:
+            if (
+                btag_wps
+                and "GN2v01_Continuous2D" not in btag_wps
+                and "GN2v01_Continuous" not in btag_wps
+            ):
                 btag_wps += ["GN2v01_Continuous"]
 
             small_R_jet_branches.variables += [
@@ -66,11 +70,12 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
                 f"ftag_quantile_{btag_wp}"
                 for btag_wp in btag_wps if "Continuous" in btag_wp
             ]
+
             if flags.Input.isMC:
                 # always add btag truth label if btag is used, when running on MC
                 small_R_jet_branches.variables += ["HadronConeExclTruthLabelID"]
                 for wp in btag_wps:
-                    if "FixedCutBEff" in wp or "Continuous2D" in wp:
+                    if "FixedCutBEff" in wp:
                         continue
                     small_R_jet_branches.variables += [
                         f"ftag_effSF_{wp}_%SYS%"
