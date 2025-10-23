@@ -2,12 +2,11 @@
 
 set -Eeu
 
-
 ################################################
 # mode-based switches
 ################################################
 
-INPUT_EOS_DIR=root://${EOS_ACCOUNT_PROJECT}.cern.ch//${EOS_ACCOUNT_PATH}/gitlab_ci_input
+INPUT_EOS_DIR=root://${EOS_ACCOUNT_PROJECT-example}.cern.ch//${EOS_ACCOUNT_PATH-example}/gitlab_ci_input
 
 # standard samples
 # Data
@@ -95,6 +94,13 @@ declare -A DATAFILES=(
     [hist-syst-bbbb-mc23]=${PHYS_TTBAR_MC23}
     # test mode
     [fail]=${PHYS_TTBAR_MC23}
+)
+
+# fallback if we don't have EOS
+SMALL_TTBAR_MC23=p6697v3/daod/DAOD_PHYS.601229.e8514_e8528_s4159_s4114_r15530_r15514_p6697.small.pool.root
+declare -A SMALL_DATAFILES=(
+    [zbbjcalib-mc23]=${SMALL_TTBAR_MC23}
+    [zbbycalib-mc23]=${SMALL_TTBAR_MC23}
 )
 
 declare -A TESTS=(
@@ -216,7 +222,7 @@ declare -A CONFIGS=(
 )
 
 # some common variables in the tests
-COMMON="-O -e $TEST_RUN_NEVENTS"
+COMMON="-O -e ${TEST_RUN_NEVENTS-10}"
 
 # specific tests
 simple() {
@@ -344,6 +350,7 @@ Notes on environment variables:
  - EASYJET_TESTDIR: default for -d, currently ${DIRECTORY:-/tmp/<random>}
  - EASYJET_NPROCS: number of processes with "all", currently ${NPROCS}
  - EASYJET_METATEST: set to run a test test, currently ${METASTATUS}
+ - EASYJET_FAKE_MISSING_EOS: pretend no eos, pull files with wget
 
 EOF
     exit 1
@@ -457,16 +464,57 @@ error-handler() {
     echo "$1 failed with exit code $?" >> test_results.log
 }
 
-run-test() {
-
-    if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x}  || -z ${TEST_RUN_NEVENTS} ]]; then
-        echo "eos env not defined, will not run on input files"
+has-eos() {
+    if [[ ${EOS_ACCOUNT_PASSWORD+x} && ${EOS_ACCOUNT_USERNAME+x} && ${EOS_ACCOUNT_PATH+x} && ${EOS_ACCOUNT_PROJECT+x} && ${TEST_RUN_NEVENTS+x} && ! ${EASYJET_FAKE_MISSING_EOS+x} ]];
+    then
         return 0
     fi
-    echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME
-    klist
+    return 1
+}
+
+pull-remote-file() {
+
     local mode=$1
-    local file=${DATAFILES[$mode]}
+    if ! [[ -v SMALL_DATAFILES[$mode] ]]; then
+        echo "no small file found for mode $mode" 1>&2
+        echo ""
+        return
+    fi
+    local base_url=https://gitlab.cern.ch/easyjet/test-files/-/raw
+    local full_url=${base_url}/${SMALL_DATAFILES[$mode]}
+    local local_name=${full_url##*/}
+    if ! [[ -f ${local_name} ]]; then
+        wget -q ${full_url} -O ${local_name}
+    fi
+    echo ${local_name}
+}
+
+run-test() {
+
+    local mode=$1
+
+    # we try to pull a small file using wget if either:
+    # - there's no eos access (i.e. in containers or outside cern)
+    # - the large file isn't listed as existing on eos
+    if ! has-eos; then
+        echo "eos env not defined, will download test file (could be slow)"
+        local file=$(pull-remote-file $mode)
+        echo "file loaded: '${file}'"
+    else
+        if ! [[ -v DATAFILES[$mode] ]]; then
+            local file=$(pull-remote-file $mode)
+        else
+            echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME
+            klist
+            local file=${DATAFILES[$mode]}
+        fi
+    fi
+
+    # the above might have an empty file if something went wrong
+    if [[ -z ${file} ]]; then
+        echo "aborting!"
+        return 1
+    fi
     local config=${CONFIGS[$mode]-$DEFAULT_CONFIG}
 
     local testcmd="${PFX} ${TESTS[$mode]} $file $config"
@@ -485,7 +533,7 @@ copy-ntuple(){
     local mode=$1
     local postfix="${mode//-/_}"
 
-    if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x}  || -z ${TEST_RUN_NEVENTS} ]]; then
+    if ! has-eos; then
         echo "eos env not defined, will not copy root output to eos"
         return 0
     fi

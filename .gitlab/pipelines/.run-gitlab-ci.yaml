@@ -297,6 +297,19 @@ hist_syst_bbbb_mc23:
   script:
     - easyjet-test hist-syst-bbbb-mc23
 
+# test without eos or cvmfs run, intentionally doesn't include cvmfs
+# and pretends not to have EOS credentials
+
+test_eos_free:
+  # note: cvmfs is included until we have a release with ATLASG-2948
+  # resolved
+  tags:
+    - cvmfs
+  stage: run
+  needs: [compile]
+  script:
+    - EASYJET_FAKE_MISSING_EOS=1 easyjet-test zbbjcalib-mc23
+
 # metatests
 
 test_fail:
