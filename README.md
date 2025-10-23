@@ -171,8 +171,8 @@ When changing branches with `git checkout` or `git switch`, also be sure to use 
 The first step to run on some test files is:
 ### Getting test MC files
 Most of test can be done, as for the pipelines, with $t\bar{t}$ events:
-- <span style="color: #F2385A">PHYS</span>: ``` curl -s -o ttbar_PHYS_10evt.root https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw/p6266/mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYS_10evts.e8514_s4162_r14622_p6266.pool.root```
-- <span style="color: #4BD9D9;">PHYSLITE</span>: ``` curl -s -o ttbar_PHYSLITE_10evt.root https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw/p6266/mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYSLITE_10evts.e6337_s3681_r13144_p6266.pool.root```
+- PHYS: ``` curl -L -s -o ttbar_PHYS_10evt.root https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw/p6266/mc23_13p6TeV.601229.PhPy8EG_A14_ttbar_hdamp258p75_SingleLep.DAOD_PHYS_10evts.e8514_s4162_r14622_p6266.pool.root```
+- PHYSLITE: ``` curl -L -s -o ttbar_PHYSLITE_10evt.root https://gitlab.cern.ch/easyjet/hh4b-test-files/-/raw/p6266/mc20_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.DAOD_PHYSLITE_10evts.e6337_s3681_r13144_p6266.pool.root```
 
 The next step is:
 ### Running some local jobs
