@@ -16,6 +16,8 @@ For larger changes or general questions about the code, please open an issue on 
 
 Merge requests require successful pipelines and an approval by one of the project developers. If you are adding a new top-level script we encourage you to add a regression test in `EasyjetTests`. See the README in that package for more details.
 
+The merge requests will run some validation pipelines. The resulting plots are stored in https://easyjet-validation.web.cern.ch/.
+
 ## Extending the ntupler with analysis-specific algorithms
 
 We expose functions for generating the sequences used in `easyjet-ntupler` via the `hub.py` module, such that a custom executable can be defined that extends the basic job with analysis-specific operations. An annotated example for this can be found in [`bbbbAnalysis/bin/bbbb-ntupler`](./bbbbAnalysis/bin/bbbb-ntupler). See [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md) and [`EasyjetHub/python/hub.py`](./EasyjetHub/python/hub.py) directly for guidance.
