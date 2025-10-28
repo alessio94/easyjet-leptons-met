@@ -1,5 +1,9 @@
 include: bbyyAnalysis/RunConfig-bbyy-base.yaml
 
+# setting this to warning until the team decides they want to be using
+# expert mode
+expert_mode_warning_level: default
+
 do_resonant_PNN: false # compute PNN scores using stored xml files
 # flag that toggles single photon trigger in the cutflow
 # so that PASS_TRIGGER = single || diphoton

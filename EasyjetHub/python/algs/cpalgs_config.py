@@ -1,6 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AnalysisAlgorithmsConfig.ConfigAccumulator import ConfigAccumulator
 from AnalysisAlgorithmsConfig.ConfigSequence import ConfigSequence
+from AnalysisAlgorithmsConfig.ConfigAccumulator import ExpertModeWarning
 
 from AthenaConfiguration.ComponentFactory import CompFactory
 from EasyjetHub.algs.calibration.jets import (
@@ -32,6 +33,7 @@ from EasyjetHub.algs.event_info_global_alg_config import event_info_global_alg_c
 import pathlib
 import os
 import yaml
+import warnings
 
 # Map object types to sequence configurators
 analysis_seqs = {
@@ -47,6 +49,10 @@ analysis_seqs = {
 def cpalgs_cfg(flags):
 
     log.debug(f"Containers available in dataset: {flags.Input.Collections}")
+
+    # Set the warning level for expert mode options
+    if level := flags.Analysis.expert_mode_warning_level:
+        warnings.simplefilter(level, ExpertModeWarning)
 
     cfg = ComponentAccumulator()
     if not flags.Analysis.suppress_metadata_json:

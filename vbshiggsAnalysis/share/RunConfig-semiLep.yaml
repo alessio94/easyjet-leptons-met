@@ -1,5 +1,9 @@
 include: vbshiggsAnalysis/RunConfig-common.yaml 
 
+# setting this to warning until the team decides they want to be using
+# expert mode
+expert_mode_warning_level: default
+
 # Which analysis to consider
 channels: ["SemiLep"]
 

@@ -32,6 +32,11 @@ do_thinning: true
 # LLP1 filtering
 do_vertex_filtering: false
 VSI_container_suffix: ""
+# Common cp algs have "Expert" variables. These will potentially throw
+# a warning if used. Allowed values are explained in the python docs
+# https://docs.python.org/3/library/warnings.html#warning-filter
+# A value of false or an empty string will keep the default value.
+expert_mode_warning_level: error
 
 # Truth-related properties
 Truth:

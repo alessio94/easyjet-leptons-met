@@ -1,5 +1,7 @@
 include: EasyjetHub/base-config.yaml
 
+expert_mode_warning_level: default
+
 # Use triple underscore to separate variable and systematics
 systematics_suffix_separator: "___"
 

@@ -1,5 +1,7 @@
 include: EasyjetHub/base-config.yaml
 
+expert_mode_warning_level: default
+
 # Which analysis to consider
 do_bbyy_analysis: true
 # Decay mode considered for truth decoration

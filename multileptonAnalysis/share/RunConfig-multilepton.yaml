@@ -1,5 +1,9 @@
 include: EasyjetHub/base-config.yaml
 
+# setting this to warning until the team decides they want to be using
+# expert mode
+expert_mode_warning_level: default
+
 # Which analysis to consider
 do_hhml_analysis: true
 save_extrabb4l_vars: false
