@@ -1,6 +1,7 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from EasyjetHub.output.ttree.truth_jets import get_TopHiggs_jet_truth_labels
 from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
+from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
 
 def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
@@ -80,6 +81,17 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
                     small_R_jet_branches.variables += [
                         f"ftag_effSF_{wp}_%SYS%"
                     ]
+
+                    # Add trigger SF
+                    trigSF_flags = flags.Analysis.Trigger.scale_factor
+                    if trigSF_flags.doSF and hasattr(trigSF_flags, 'bjet'):
+                        triggerChainsPerYear = get_trigger_chains_scale_factor(flags,
+                                                                               'bjet')
+                        for triggerChains in triggerChainsPerYear.values():
+                            for chain in triggerChains:
+                                small_R_jet_branches.variables += [
+                                    f"ftag_jetTrigMatching_{chain}_%SYS%",
+                                    f"ftag_bTagTrigMatching_{chain}_%SYS%"]
 
         if flags.Analysis.Small_R_jet.runBJetPtCalib:
             if jet_output_flags.no_bjet_calib_p4:

@@ -133,11 +133,13 @@ private:
 
     CP::SysWriteDecorHandle<bool> m_selected_el {"selected_el_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_el_isIso {"selected_el_isIso_%SYS%", this};
-   
+
     CP::SysWriteDecorHandle<bool> m_selected_mu {"selected_mu_%SYS%", this};
     CP::SysWriteDecorHandle<bool> m_selected_mu_isIso {"selected_mu_isIso_%SYS%", this};
-   
+
     CP::SysWriteDecorHandle<bool> m_selected_tau {"selected_tau_%SYS%", this};
+
+    CP::SysReadDecorHandle<bool> bjet_trigMatchDeco{"passTrigMatch_DBT_%SYS%", this};
 
     std::unordered_map<HHBBTT::TriggerChannel, std::string> m_triggerChannels =
       {
@@ -257,6 +259,7 @@ private:
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::MuonContainer, bool> > muTrigMatchReadDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::ElectronContainer, bool> > eleTrigMatchReadDecoMap;
     typedef std::unordered_map<HHBBTT::TriggerChannel, SG::ReadDecorHandle<xAOD::TauJetContainer, bool> > tauTrigMatchReadDecoMap;
+    typedef CP::SysReadDecorHandle<bool> bjetTrigMatchReadDeco;
 
     void applyTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
@@ -266,7 +269,8 @@ private:
        const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
        const xAOD::Jet* jet0, const xAOD::Jet* jet1,
        const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1,
-       const xAOD::Jet* eta_lt3p2_jet0);
+       const xAOD::Jet* eta_lt3p2_jet0, const xAOD::Jet* eta_lt2p5_bjet0,
+       const xAOD::Jet* eta_lt2p5_bjet1);
 
     void applyCutFlow(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
     void applySingleLepTriggerSelection
@@ -291,7 +295,7 @@ private:
     void applyDiBJetTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
        const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
-       const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1);
+       const xAOD::Jet* eta_lt2p5_bjet0, const xAOD::Jet* eta_lt2p5_bjet1);
     void applyLargeRJetsTriggerSelection
       (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos);
 

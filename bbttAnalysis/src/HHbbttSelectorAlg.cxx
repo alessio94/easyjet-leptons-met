@@ -12,6 +12,8 @@
 #include <AthContainers/ConstDataVector.h>
 #include <AthenaKernel/Units.h>
 
+#include <algorithm>
+
 namespace HHBBTT
 {
   HHbbttSelectorAlg ::HHbbttSelectorAlg(const std::string &name,
@@ -113,7 +115,9 @@ namespace HHBBTT
     ATH_CHECK(m_selected_el_isIso.initialize(m_systematicsList, m_electronHandle));
     ATH_CHECK(m_selected_mu.initialize(m_systematicsList, m_muonHandle));
     ATH_CHECK(m_selected_mu_isIso.initialize(m_systematicsList, m_muonHandle));
-    
+
+    ATH_CHECK(bjet_trigMatchDeco.initialize(m_systematicsList, m_jetHandle));
+
     for (const auto& [channel, name] : m_triggerChannels){
       SG::ReadDecorHandleKey<xAOD::EventInfo> deco;
       deco = "EventInfo.pass_trigger_"+name;
@@ -480,40 +484,61 @@ namespace HHBBTT
       const xAOD::Jet* jet0 = jets->size()>0 ? jets->at(0) : nullptr;
       const xAOD::Jet* jet1 = jets->size()>1 ? jets->at(1) : nullptr;
 
-      auto eta_lt3p2_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
-          SG::VIEW_ELEMENTS);
-      auto eta_lt2p5_jets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
-          SG::VIEW_ELEMENTS);
-
-      for (const xAOD::Jet *jet : *jets)
-      {
-        if(std::abs(jet->eta()) < 3.2)
-          eta_lt3p2_jets->push_back(jet);
-
-        if(std::abs(jet->eta()) < 2.5)
-          eta_lt2p5_jets->push_back(jet);
-      }
-
       const xAOD::Jet* eta_lt3p2_jet0 = nullptr;
       const xAOD::Jet* eta_lt2p5_jet0 = nullptr;
       const xAOD::Jet* eta_lt2p5_jet1 = nullptr;
+      const xAOD::Jet* eta_lt2p5_bjet0 = nullptr;
+      const xAOD::Jet* eta_lt2p5_bjet1 = nullptr;
 
-      if(eta_lt3p2_jets->size() > 0)
-        eta_lt3p2_jet0=eta_lt3p2_jets->at(0);
+      for (const xAOD::Jet *jet : *jets){
+        if(std::abs(jet->eta()) < 3.2){
+          eta_lt3p2_jet0 = jet;
+          break;
+        }
+      }
 
-      if(eta_lt2p5_jets->size() > 0)
-        eta_lt2p5_jet0 = eta_lt2p5_jets->at(0);
-      
-      if(eta_lt2p5_jets->size() > 1)
-        eta_lt2p5_jet1 = eta_lt2p5_jets->at(1);
-      
+      for (const xAOD::Jet *jet : *jets) {
+        if(std::abs(jet->eta()) < 2.5) {
+          if (! eta_lt2p5_jet0) eta_lt2p5_jet0 = jet;
+          else {
+            eta_lt2p5_jet1 = jet;
+            break;
+          }
+        }
+      }
+
+      for (const xAOD::Jet *jet : *bjets) {
+        if (!bjet_trigMatchDeco.get(*jet, sys)) continue;
+        if (!eta_lt2p5_bjet0) eta_lt2p5_bjet0 = jet;
+        else {
+          eta_lt2p5_bjet1 = jet;
+          break;
+        }
+      }
+
+      if (!eta_lt2p5_bjet1 && eta_lt2p5_bjet0){
+        for (const xAOD::Jet *jet : *jets){
+          if (jet == eta_lt2p5_bjet0) continue;
+          if (!bjet_trigMatchDeco.get(*jet, sys)) continue;
+          eta_lt2p5_bjet1 = jet;
+          break;
+        }
+      }
+
+      // Make sure the bjets are pT-ordered
+      if (eta_lt2p5_bjet0 && eta_lt2p5_bjet1) {
+        if (eta_lt2p5_bjet1->pt() > eta_lt2p5_bjet0->pt())
+          std::swap(eta_lt2p5_bjet0, eta_lt2p5_bjet1);
+      }
+
       if(m_useTriggerSel){
         applyTriggerSelection(event, trigPass_decos,
                               ele0, ele_trigMatchDecos,
                               mu0, mu_trigMatchDecos,
                               tau0, tau1, tau_trigMatchDecos,
                               jet0, jet1, eta_lt2p5_jet0,
-                              eta_lt2p5_jet1,  eta_lt3p2_jet0);
+                              eta_lt2p5_jet1, eta_lt3p2_jet0,
+                              eta_lt2p5_bjet0, eta_lt2p5_bjet1);
       }
       else{
         m_bools.at(HHBBTT::pass_trigger_SLT) = true;
@@ -870,7 +895,8 @@ namespace HHBBTT
    const tauTrigMatchReadDecoMap& tau_trigMatchDecos,
    const xAOD::Jet* jet0, const xAOD::Jet* jet1, 
    const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1,
-   const xAOD::Jet* eta_lt3p2_jet0){
+   const xAOD::Jet* eta_lt3p2_jet0, const xAOD::Jet* eta_lt2p5_bjet0,
+   const xAOD::Jet* eta_lt2p5_bjet1){
 
     // only run trigger selection if in channel
     bool use_SLT = false;
@@ -920,7 +946,7 @@ namespace HHBBTT
     }
     if(use_DBT){
       applyDiBJetTriggerSelection(event, triggerdecos, tau0, tau1,
-         eta_lt2p5_jet0, eta_lt2p5_jet1);
+         eta_lt2p5_bjet0, eta_lt2p5_bjet1);
     }
     if(use_LARGE_R_JETS){
       applyLargeRJetsTriggerSelection(event, triggerdecos);
@@ -1121,19 +1147,18 @@ namespace HHBBTT
   void HHbbttSelectorAlg::applyDiBJetTriggerSelection
   (const xAOD::EventInfo* event, const trigPassReadDecoMap& triggerdecos,
    const xAOD::TauJet* tau0, const xAOD::TauJet* tau1,
-   const xAOD::Jet* eta_lt2p5_jet0, const xAOD::Jet* eta_lt2p5_jet1){
+   const xAOD::Jet* eta_lt2p5_bjet0, const xAOD::Jet* eta_lt2p5_bjet1){
 
     bool trigPassed_DBT = triggerdecos.at(HHBBTT::DBT)(*event);
-    if(tau0 && tau1 && eta_lt2p5_jet0 && eta_lt2p5_jet1){
-      //TO DO: implement bjet trig-matching
+    if(tau0 && tau1 && eta_lt2p5_bjet0 && eta_lt2p5_bjet1){
       //Option: We could collect pt values in a vector, sort them in a descending order
       //and check against a vector of trigger thresholds. Leaving like this for now
       //in case we want to go below the thresholds
       trigPassed_DBT &=
         (tau0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingtau] &&
          tau1->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingtau] &&
-         eta_lt2p5_jet0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] &&
-         eta_lt2p5_jet1->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet]);
+         eta_lt2p5_bjet0->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::leadingjet] &&
+         eta_lt2p5_bjet1->pt() > m_pt_threshold[HHBBTT::DBT][HHBBTT::subleadingjet]);
     }
     else trigPassed_DBT = false;
 

@@ -12,7 +12,7 @@ from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 from EasyjetHub.steering.analysis_configuration import (
-    get_trigger_legs_scale_factor_list)
+    get_trigger_legs_scale_factor_list, get_trigger_chains_scale_factor)
 
 
 def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
@@ -80,6 +80,24 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         )
         # Use the loosest working point for selection here.
         GN2X_WP = f"xbb_select_GN2Xv01_{flags.Analysis.Large_R_jet.GN2X_hbb_wps[0]}"
+
+    # b-jet matching decoration
+    triggers = []
+    config = flags.Analysis.Trigger.scale_factor
+    if config.doSF and hasattr(config, 'bjet'):
+        triggerChainsPerYear = get_trigger_chains_scale_factor(
+            flags, 'bjet')
+        for triggerChains in triggerChainsPerYear.values():
+            for chain in triggerChains:
+                triggers.append(chain)
+
+    if flags.Analysis.do_bbtt_analysis:
+        cfg.addEventAlgo(
+            CompFactory.HHBBTT.BJetTriggerDecoratorAlg(
+                "BJetTriggerDecoratorAlg",
+                triggerLists=triggers,
+            )
+        )
 
     muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
     ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
