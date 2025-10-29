@@ -552,6 +552,7 @@ namespace HHBBTT
         m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed) = true;
         m_bools.at(HHBBTT::pass_trigger_DBT) = true;
         m_bools.at(HHBBTT::pass_trigger_LARGE_R_JETS) = true;
+        m_bools.at(HHBBTT::pass_trigger_uniqueRNNTauTrig18) = true;
 
       }
 
@@ -1061,6 +1062,9 @@ namespace HHBBTT
     else trigPassed_STT = false;
 
     m_bools.at(HHBBTT::pass_trigger_STT) = trigPassed_STT;
+
+    bool trigPassed_uniqueRNNTauTrig18 = triggerdecos.at(HHBBTT::RNNTauTrig18)(*event);
+    m_bools.at(HHBBTT::pass_trigger_uniqueRNNTauTrig18) = trigPassed_uniqueRNNTauTrig18;
   }
 
   void HHbbttSelectorAlg::applyDiTauTriggerSelection
@@ -1141,6 +1145,9 @@ namespace HHBBTT
        m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo) ||
        m_bools.at(HHBBTT::pass_trigger_DTT_4J12_delayed) ||
        m_bools.at(HHBBTT::pass_trigger_DTT_L1Topo_delayed));
+
+    bool trigPassed_uniqueRNNTauTrig18 = triggerdecos.at(HHBBTT::RNNTauTrig18)(*event);
+    m_bools.at(HHBBTT::pass_trigger_uniqueRNNTauTrig18) = trigPassed_uniqueRNNTauTrig18;
   }
 
   

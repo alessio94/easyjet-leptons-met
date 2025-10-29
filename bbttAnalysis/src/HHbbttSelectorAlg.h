@@ -152,7 +152,8 @@ private:
 	{HHBBTT::DTT_4J12_delayed, "DTT_4J12_delayed"},
 	{HHBBTT::DTT_L1Topo_delayed, "DTT_L1Topo_delayed"},
 	{HHBBTT::DBT, "DBT"},
-        {HHBBTT::LARGE_R_JETS, "LARGE_R_JETS"}
+        {HHBBTT::LARGE_R_JETS, "LARGE_R_JETS"},
+        {HHBBTT::RNNTauTrig18, "uniqueRNNTauTrig18"},
       };
 
     std::unordered_map<HHBBTT::TriggerChannel,
@@ -194,6 +195,7 @@ private:
     {HHBBTT::pass_trigger_DTT_L1Topo_delayed, "pass_trigger_DTT_L1Topo_delayed"},
     {HHBBTT::pass_trigger_DBT, "pass_trigger_DBT"},
     {HHBBTT::pass_trigger_LARGE_R_JETS, "pass_trigger_LARGE_R_JETS"},
+    {HHBBTT::pass_trigger_uniqueRNNTauTrig18, "pass_trigger_uniqueRNNTauTrig18"},
     {HHBBTT::TWO_JETS, "TWO_JETS"},
     {HHBBTT::AT_LEAST_TWO_LRJETS, "AT_LEAST_TWO_LRJETS"},
     {HHBBTT::TWO_BJETS, "TWO_BJETS"},

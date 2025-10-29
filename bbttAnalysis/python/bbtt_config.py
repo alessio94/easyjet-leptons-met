@@ -346,6 +346,10 @@ def bbtt_branches(flags):
                              f"bbtt_pass{var}{cat}"
                              + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
+    branches += ["EventInfo.pass_trigger_uniqueRNNTauTrig18_%SYS% -> "
+                 "bbtt_pass_trigger_uniqueRNNTauTrig18"
+                 + flags.Analysis.systematics_suffix_separator + "%SYS%"]
+
     cat_b = ["1B", "2B"] if flags.Analysis.do_1B_regions else ["2B"]
 
     for cat in categories + ["LepHad", "HadHad"]:

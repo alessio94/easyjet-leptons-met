@@ -63,7 +63,8 @@ namespace HHBBTT
 	{HHBBTT::trigMatch_Tau25, "Tau25"},
 	{HHBBTT::L1, "L1"},
 	{HHBBTT::HLT, "HLT"},
-        {HHBBTT::LARGE_R_JETS, "LARGE_R_JETS"}
+        {HHBBTT::LARGE_R_JETS, "LARGE_R_JETS"},
+        {HHBBTT::RNNTauTrig18, "uniqueRNNTauTrig18"}
       };
 
     SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
@@ -219,6 +220,10 @@ namespace HHBBTT
       const xAOD::EventInfo* eventInfo,
       const trigReadDecoMap& triggerdecos,
       passWriteDecoMap& pass_decos) const;
+
+    void checkRNNTauTriggers
+      (int year, const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+       passWriteDecoMap& pass_decos) const; 
     
   };
 }

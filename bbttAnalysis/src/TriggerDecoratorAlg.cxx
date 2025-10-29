@@ -443,7 +443,8 @@ namespace HHBBTT
     }
 
     pass_decos.at(HHBBTT::STT)(*eventInfo) |= trigPassed_STT;
-     
+
+    checkRNNTauTriggers(year, eventInfo, triggerdecos, pass_decos);
   }
 
 
@@ -516,6 +517,7 @@ namespace HHBBTT
 
       pass_decos.at(channel)(*eventInfo) |= mapDecisions.at(channel);
       pass_decos.at(HHBBTT::DTT)(*eventInfo) |= mapDecisions.at(channel);
+
     }
 
     // Save specifically tau35 + tau25 independent trigger matching
@@ -533,8 +535,32 @@ namespace HHBBTT
       }
     }
 
+    checkRNNTauTriggers(year, eventInfo, triggerdecos, pass_decos);
   }
 
+void TriggerDecoratorAlg::checkRNNTauTriggers
+    (int year, const xAOD::EventInfo* eventInfo, const trigReadDecoMap& triggerdecos,
+    passWriteDecoMap& pass_decos) const {
+
+    if (year != 2018) return;
+
+    bool passedRNNTau = false; bool passedOther  = false;
+    for (const auto& [trigName, trigDeco] : triggerdecos) {
+	if (trigName.find("tau") == std::string::npos) continue;
+
+        bool pass = trigDeco(*eventInfo);
+        if (!pass) continue;
+
+	bool isRNNTau = (trigName.find("RNN") != std::string::npos);
+
+        if (isRNNTau) passedRNNTau = true;
+        else passedOther = true;
+    }
+
+    bool pass_RNNTau_only = (passedRNNTau && !passedOther);
+    pass_decos.at(HHBBTT::RNNTauTrig18)(*eventInfo) |= pass_RNNTau_only;
+
+    }
 
 void TriggerDecoratorAlg::checkDiBJetTriggers
   (int year, const xAOD::EventInfo* eventInfo,

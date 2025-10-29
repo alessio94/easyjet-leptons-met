@@ -35,7 +35,8 @@ namespace HHBBTT
     trigMatch_Tau25,
     L1,
     HLT,
-    LARGE_R_JETS
+    LARGE_R_JETS,
+    RNNTauTrig18
   };
 
   enum Var
@@ -84,6 +85,7 @@ namespace HHBBTT
     pass_trigger_DTT_L1Topo_delayed,
     pass_trigger_DBT,
     pass_trigger_LARGE_R_JETS,
+    pass_trigger_uniqueRNNTauTrig18,
     
     AT_LEAST_TWO_LRJETS,
     TWO_JETS,
