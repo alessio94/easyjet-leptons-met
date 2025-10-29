@@ -356,6 +356,16 @@ EOF
     exit 1
 }
 
+# We need to be able to check if this is an EOS system to decide what
+# tests we can run and how to run them.
+has-eos() {
+    if [[ ${EOS_ACCOUNT_PASSWORD+x} && ${EOS_ACCOUNT_USERNAME+x} && ${EOS_ACCOUNT_PATH+x} && ${EOS_ACCOUNT_PROJECT+x} && ${TEST_RUN_NEVENTS+x} && ! ${EASYJET_FAKE_MISSING_EOS+x} ]];
+    then
+        return 0
+    fi
+    return 1
+}
+
 # Terminal magic: if stdout is set to go to a terminal we'll add
 # colors to the help output below. Otherwise we strip this stuff
 # out. Note that you have to check the interactivity here: within the
@@ -387,7 +397,12 @@ dump-modes() {
 
 OPT_KEYS=":d:hl:L:"
 dump-complete() {
-    printf "%s " ${ALL_MODES[*]} all all-exit-early
+    if has-eos; then
+        local modes=${ALL_MODES[*]}
+    else
+        local modes=${!SMALL_DATAFILES[*]}
+    fi
+    printf "%s " ${modes} all all-exit-early
     local char
     echo -n ${OPT_KEYS//:} | while read -n 1 char
     do
@@ -462,14 +477,6 @@ cd $DIRECTORY
 
 error-handler() {
     echo "$1 failed with exit code $?" >> test_results.log
-}
-
-has-eos() {
-    if [[ ${EOS_ACCOUNT_PASSWORD+x} && ${EOS_ACCOUNT_USERNAME+x} && ${EOS_ACCOUNT_PATH+x} && ${EOS_ACCOUNT_PROJECT+x} && ${TEST_RUN_NEVENTS+x} && ! ${EASYJET_FAKE_MISSING_EOS+x} ]];
-    then
-        return 0
-    fi
-    return 1
 }
 
 pull-remote-file() {
