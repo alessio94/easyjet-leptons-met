@@ -83,6 +83,7 @@ def get_large_R_jet_branches(
     is_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5834")
     is_valid_for_v02 = get_valid_ami_tag(split_tags, "p", "p6490")
     is_valid_for_bjr_v01 = get_valid_ami_tag(split_tags, "p", "p6697")
+    is_valid_for_gn3x = get_valid_ami_tag(split_tags, "p", "p7017")
     if lr_jet_type == "UFO" and is_valid_ptag:
         if jet_output_flags.btag_details:
             large_R_jet_branches.variables += get_large_R_gn2_branches(
@@ -102,6 +103,21 @@ def get_large_R_jet_branches(
             "bJR10v01_mass",
         ]
 
+    if (
+        lr_jet_type == "UFO"
+        and is_valid_for_gn3x
+        and jet_output_flags.btag_details
+    ):
+        large_R_jet_branches.variables += [
+            "GN3XPV01_ptop",
+            "GN3XPV01_pqcdbx",
+            "GN3XPV01_phcc",
+            "GN3XPV01_pqcdcx",
+            "GN3XPV01_pWqq",
+            "GN3XPV01_phbb",
+            "GN3XPV01_pqcdll",
+            "GN3XPV01_pqcdbb",
+        ]
     large_R_jet_branches.variables += jet_output_flags.extra_variables
     if flags.Input.isMC:
         large_R_jet_branches.variables += jet_output_flags.mc_extra_variables
