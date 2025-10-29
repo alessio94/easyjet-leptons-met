@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
 # Yassine El Ghazali
 # Modified for XbbClaib use by Iza Veliscek
 # script helps with grid submission
 # to run:
-# all samples: python3 submitGrid.py --tag {}  -c {config} -s all
-# A specific samples: python3 submitGrid.py --tag {}  -c {config} -s "Wjets"
+# all samples: XbbCalib-submitGrid.py --tag {}  -c {config} -s all --samplePath Zbby
+# A specific samples:
+# python3 XbbCalib-submitGrid.py --tag {}  -c {config} -s "Wjets --samplePath Zbby"
 
 
 import os
@@ -32,10 +34,16 @@ def get_list_files(processes, samplePath):
 
     for process in processes:
         file_name = ""
-        if process == "data":
-            file_name = "data/data_Run2_p6490.txt"
-        else:
+        if process == "run2":
+            file_name = "data/data_Run2.txt"
+        elif process == "run3":
+            file_name = "data/data_Run3.txt"
+        elif process == "mc20":
             file_name = f"{samplePath}/MC/mc20_{process}.txt"
+        elif process == "mc23":
+            file_name = f"{samplePath}/MC/mc23_{process}.txt"
+        else:
+            print(f"ERROR : Invalid Process Name : {process}")
         f_base_path = os.path.abspath(
             "../easyjet/XbbCalib/datasets/"
         )
@@ -51,13 +59,19 @@ def get_list_files(processes, samplePath):
 def main(args):
 
     executable = "xbbcalib-ntupler"
-    runConfig = "../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml "
-
-    if args.config:
-        runConfig = args.config
-
     mc_list = []
-    if args.samples == "all":
+    if args.samplePath == "Zbbj":
+        runConfig = "../easyjet/XbbCalib/share/RunConfig_ZbbjCalib.yaml"
+        processes = [
+            "dijets",
+            "Zbb_ptZ_200_ECMS",
+            "Zqq_ptZ_200_ECMS",
+            "Zqq_ptZ_200_ECMS",
+            "Wqq_ptW_200_ECMS",
+            "ttbar_allhad"
+        ]
+    else:
+        runConfig = "../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml"
         processes = [
             "Zbb_ptZ_200_ECMS",
             "Zbbgamma_pTZ100",
@@ -70,14 +84,22 @@ def main(args):
             "dijet_bfilt",
             "dijets",
             "ttbar_allhad",
-            "tty"]
+            "tty"
+        ]
+    if args.config:
+        runConfig = args.config
+
+    if args.samples == "all":
         mc_list = get_list_files(processes, args.samplePath)
     else:
         mc_list = get_list_files(args.samples.split(), args.samplePath)
+    data_list_name = "--mc-list"
+    if "run" in args.samples or "data" in args.samples:
+        data_list_name = "--data-list"
 
     for mc_file in mc_list:
         base_command = (
-            f"easyjet-gridsubmit --mc-list {mc_file} "
+            f"easyjet-gridsubmit {data_list_name} {mc_file} "
             f"--run-config {runConfig} "
             f"--exec {executable} "
             f"--campaign {args.tag} "

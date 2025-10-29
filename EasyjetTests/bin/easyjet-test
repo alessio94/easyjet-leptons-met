@@ -191,7 +191,7 @@ declare -A CONFIGS=(
     [ttcalib-mc20]=XbbCalib/RunConfig-ttCalib-bypass.yaml
     [zllcalib-mc20]=XbbCalib/RunConfig_Zll-bypass.yaml
     [zbbycalib-mc20]=XbbCalib/RunConfig-ZbbyCalib-bypass.yaml
-    [zbbjcalib-mc20]=XbbCalib/RunConfig_Zbbj-MC-bypass.yaml
+    [zbbjcalib-mc20]=XbbCalib/RunConfig_ZbbjCalib-bypass.yaml
     [bbbbtt-mc20]=bbbbttAnalysis/RunConfig-bbbbtt-bypass.yaml
     # MC20 AF3
     [sh4b-mc20af3]=bbbbAnalysis/RunConfig-SH4b.yaml
@@ -211,7 +211,7 @@ declare -A CONFIGS=(
     [ttcalib-mc23]=XbbCalib/RunConfig-ttCalib-bypass.yaml
     [zllcalib-mc23]=XbbCalib/RunConfig_Zll-bypass.yaml
     [zbbycalib-mc23]=XbbCalib/RunConfig-ZbbyCalib-bypass.yaml
-    [zbbjcalib-mc23]=XbbCalib/RunConfig_Zbbj-MC-bypass.yaml
+    [zbbjcalib-mc23]=XbbCalib/RunConfig_ZbbjCalib-bypass.yaml
     [bbbbtt-mc23]=bbbbttAnalysis/RunConfig-bbbbtt-bypass.yaml
     [monojet-mc23]=monojetAnalysis/RunConfig-Monojet-bypass.yaml
     # MC23 AF3

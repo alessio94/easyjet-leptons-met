@@ -14,5 +14,16 @@ selection:
       # boosted
     - 'HLT_j420_a10t_lcw_jes_35smcINF_L1J100'
     - 'HLT_j460_a10r_L1J100'
-    '2022': []
-    '2023': []
+    '2022':
+    - 'HLT_j420_35smcINF_a10sd_cssk_pf_jes_ftf_preselj225_L1J100'
+    - 'HLT_2j330_35smcINF_a10sd_cssk_pf_jes_ftf_presel2j225_L1J100'
+    '2023':
+    - 'HLT_j420_35smcINF_a10sd_cssk_pf_jes_ftf_preselj225_L1J100'
+    - 'HLT_2j330_35smcINF_a10sd_cssk_pf_jes_ftf_presel2j225_L1J100'
+    '2024':
+    - 'HLT_j420_35smcINF_a10sd_cssk_pf_jes_ftf_preselj225_L1SC111_CjJ40'
+    - 'HLT_2j330_35smcINF_a10sd_cssk_pf_jes_ftf_presel2j225_L1SC111_CjJ40'
+    - 'HLT_j420_35smcINF_a10sd_cssk_pf_jes_ftf_preselj225_L1jJ160'
+    - 'HLT_2j330_35smcINF_a10sd_cssk_pf_jes_ftf_presel2j225_L1jJ160'
+    - 'HLT_j420_35smcINF_a10sd_cssk_pf_jes_ftf_preselj225_L1gLJ140p0ETA25'
+    - 'HLT_2j330_35smcINF_a10sd_cssk_pf_jes_ftf_presel2j225_L1gLJ140p0ETA25'

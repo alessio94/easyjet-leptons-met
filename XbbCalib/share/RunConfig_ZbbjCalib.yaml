@@ -19,7 +19,6 @@ do_muons: true
 Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_77"
   maxEta: 2.5
-  selectBjet: false
 
 Large_R_jet:
   min_pT: 200.e+3
