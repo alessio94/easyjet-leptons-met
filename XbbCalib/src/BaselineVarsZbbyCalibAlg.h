@@ -20,12 +20,16 @@
 namespace XBBCALIB
 {
 
+  // forward declare, define in the Cxx file
+  class FourVectorOutBlock;
+
   /// \brief An algorithm for counting containers
   class BaselineVarsZbbyCalibAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
 public:
     BaselineVarsZbbyCalibAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    ~BaselineVarsZbbyCalibAlg();
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -34,7 +38,6 @@ public:
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
-    
 private:
     // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
     // "someInfo"};
@@ -54,31 +57,38 @@ private:
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
+    CP::SysWriteDecorHandle<int> m_nLRJetsHandle {
+      "lrjets_n_%SYS%", this
+    };
+    CP::SysWriteDecorHandle<int> m_nPhotonsHandle {
+      "photons_n_%SYS%", this
+    };
 
-    Gaudi::Property<std::vector<std::string>> m_floatVariables
-          {this, "floatVariableList", {}, "Name list of floating variables"};
+    // copy variables from the jet to the eventInfo
+    template <typename T>
+    using SRDH_t = CP::SysReadDecorHandle<T>;
+    template <typename T>
+    using SWDH_t = CP::SysWriteDecorHandle<T>;
+    template <typename T>
+    using rw_pair_t = std::pair<SRDH_t<T>, SWDH_t<T>>;
 
-    Gaudi::Property<std::vector<std::string>> m_intVariables
-          {this, "intVariableList", {}, "Name list of integer variables"};
+    Gaudi::Property<std::string> m_copied_variable_prefix{
+      this, "copiedVariablePrefix", "", "prefix for copied variables"
+    };
 
-    //GN2X
-    Gaudi::Property<std::vector<std::string>> m_GN2X_wps
-      { this, "GN2X_WPs", {}, "GN2X_hbb_wps from the Zbb+y config" };
-    std::vector<CP::SysReadDecorHandle<int>> m_GN2X_wp_Handles;
+    // floats
+    Gaudi::Property<std::vector<std::string>> m_floats_to_copy{
+      this, "floatsToCopy", {}, "floats to copy to eventinfo"};
+    std::vector<std::unique_ptr<rw_pair_t<float>>> m_float_copy_pairs;
 
-    CP::SysReadDecorHandle<float> m_WTag_score{"", this};
-    CP::SysReadDecorHandle<float> m_GN2Xv01_phbb{"GN2Xv01_phbb", this};
-    CP::SysReadDecorHandle<float> m_GN2Xv01_phcc{"GN2Xv01_phcc", this};
-    CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd{"GN2Xv01_pqcd", this};
-    CP::SysReadDecorHandle<float> m_GN2Xv01_ptop{"GN2Xv01_ptop", this};
+    // ints
+    Gaudi::Property<std::vector<std::string>> m_ints_to_copy{
+      this, "intsToCopy", {}, "intss to copy to eventinfo"};
+    std::vector<std::unique_ptr<rw_pair_t<int>>> m_int_copy_pairs;
 
     /// \brief Setup sys-aware output decorations
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
-
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
-
+    std::unique_ptr<FourVectorOutBlock> m_photon_4vec;
+    std::unique_ptr<FourVectorOutBlock> m_z_candidate_4vec;
   };
 }
 

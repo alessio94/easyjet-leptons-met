@@ -8,6 +8,27 @@ from EasyjetHub.output.ttree.selected_objects import (
     get_selected_objects_branches_variables,
 )
 
+# TODO: this should probably be a configurable flag but we're putting
+# it here just to get some consistent lists
+floatsToCopy = [
+    "GN2Xv01_phbb",
+    "GN2Xv01_pqcd",
+    "GN2Xv01_phcc",
+    "GN2Xv01_ptop",
+]
+intsToCopy = [
+    "xbb_select_GN2Xv01_FlatMassQCDEff_0p25",
+    "xbb_select_GN2Xv01_FlatMassQCDEff_0p3",
+    "xbb_select_GN2Xv01_FlatMassQCDEff_0p37",
+    "xbb_select_GN2Xv01_FlatMassQCDEff_0p46",
+    "xbb_select_GN2Xv01_FlatMassQCDEff_0p58",
+    "xbb_select_GN2Xv01_FlatMassQCDEff_0p74",
+    "xbb_select_GN2Xv01_FlatMassQCDEff_0p94",
+    "xbb_select_GN2Xv01_FlatMassQCDEff_1p25",
+    "xbb_select_GN2Xv01_FlatMassQCDEff_1p55",
+]
+copiedVariablePrefix = "Zcand_"
+
 
 def ZbbyCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey, photonkey,
                   float_variables=None, int_variables=None):
@@ -76,11 +97,9 @@ def ZbbyCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey, photonk
     cfg.addEventAlgo(
         CompFactory.XBBCALIB.BaselineVarsZbbyCalibAlg(
             "BaselineVarsZbbyCalibAlg",
-            floatVariableList=float_variables,
-            intVariableList=int_variables,
-            GN2X_WPs=flags.Analysis.Large_R_jet.GN2X_hbb_wps
-
-
+            floatsToCopy=floatsToCopy,
+            intsToCopy=intsToCopy,
+            copiedVariablePrefix=copiedVariablePrefix,
         )
     )
 
@@ -94,16 +113,14 @@ def get_BaselineVarsZbbyCalibAlg_variables(flags):
     for object in ["Zcand", "photon"]:
         for var in ["pt", "eta", "phi", "m"]:
             float_variable_names.append(f"{object}_{var}")
-    for object in ["Zcand"]:
-        for var in ["GN2Xv01_phbb", "GN2Xv01_pqcd", "GN2Xv01_phcc", "GN2Xv01_ptop"]:
-            float_variable_names.append(f"{object}_{var}")
-    for object in ["Zcand"]:
-        for var in ["Pass_GN2X_FlatMassQCDEff_0p25", "Pass_GN2X_FlatMassQCDEff_0p3",
-                    "Pass_GN2X_FlatMassQCDEff_0p37", "Pass_GN2X_FlatMassQCDEff_0p46",
-                    "Pass_GN2X_FlatMassQCDEff_0p58", "Pass_GN2X_FlatMassQCDEff_0p74",
-                    "Pass_GN2X_FlatMassQCDEff_0p94", "Pass_GN2X_FlatMassQCDEff_1p25",
-                    "Pass_GN2X_FlatMassQCDEff_1p55"]:
-            int_variable_names.append(f"{object}_{var}")
+
+    float_variable_names += [
+        f'{copiedVariablePrefix}{x}' for x in floatsToCopy
+    ]
+
+    int_variable_names += [
+        f'{copiedVariablePrefix}{x}' for x in intsToCopy
+    ]
 
     return float_variable_names, int_variable_names
 

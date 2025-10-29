@@ -6,12 +6,67 @@
 
 #include "BaselineVarsZbbyCalibAlg.h"
 
+namespace {
+  // To do: make this somethig more standard like NAN
+  const float def_float = -99;
+  // To do: make this something more standard like -1
+  const int def_int = -99;
+}
+
 namespace XBBCALIB
 {
+
+  class FourVectorOutBlock
+  {
+  private:
+    CP::SysWriteDecorHandle<float> m_pt;
+    CP::SysWriteDecorHandle<float> m_eta;
+    CP::SysWriteDecorHandle<float> m_phi;
+    CP::SysWriteDecorHandle<float> m_m;
+  public:
+    template <typename T>
+    FourVectorOutBlock(
+      T* owner,
+      const std::string& prefix,
+      CP::SysListHandle& syst_list,
+      CP::SysReadHandle<xAOD::EventInfo>& event_handle):
+      m_pt{prefix + "pt_%SYS%", owner},
+      m_eta{prefix + "eta_%SYS%", owner},
+      m_phi{prefix + "phi_%SYS%", owner},
+      m_m{prefix + "m_%SYS%", owner}
+    {
+      auto init = [&syst_list, &event_handle] (auto& handle) {
+        auto sc = handle.initialize(syst_list, event_handle);
+        if (sc.isFailure()) throw std::logic_error("initialization failure");
+      };
+      init(m_pt);
+      init(m_eta);
+      init(m_phi);
+      init(m_m);
+    }
+    void set(const xAOD::EventInfo& event, const xAOD::IParticle& part,
+             const CP::SystematicSet& sys) {
+      m_pt.set(event, part.pt(), sys);
+      m_eta.set(event, part.eta(), sys);
+      m_phi.set(event, part.phi(), sys);
+      m_m.set(event, part.m(), sys);
+    }
+    void setDefault(const xAOD::EventInfo& event,
+                    const CP::SystematicSet& sys) {
+      m_pt.set(event, def_float, sys);
+      m_eta.set(event, def_float, sys);
+      m_phi.set(event, def_float, sys);
+      m_m.set(event, def_float, sys);
+    }
+  };
+
+
   BaselineVarsZbbyCalibAlg::BaselineVarsZbbyCalibAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   { }
+
+  BaselineVarsZbbyCalibAlg::~BaselineVarsZbbyCalibAlg() = default;
 
   StatusCode BaselineVarsZbbyCalibAlg::initialize()
   {
@@ -20,33 +75,34 @@ namespace XBBCALIB
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
 
-    ATH_CHECK(m_GN2Xv01_phbb.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_GN2Xv01_phcc.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_GN2Xv01_pqcd.initialize(m_systematicsList, m_lrjetHandle));
-    ATH_CHECK(m_GN2Xv01_ptop.initialize(m_systematicsList, m_lrjetHandle));
+    ATH_CHECK(m_nLRJetsHandle.initialize(m_systematicsList, m_eventHandle));
+    ATH_CHECK(m_nPhotonsHandle.initialize(m_systematicsList, m_eventHandle));
 
+    m_photon_4vec = std::make_unique<FourVectorOutBlock>(
+      this, "photon_", m_systematicsList, m_eventHandle);
+    m_z_candidate_4vec = std::make_unique<FourVectorOutBlock>(
+      this, "Zcand_", m_systematicsList, m_eventHandle);
 
-    for(const auto& wp: m_GN2X_wps)
-      m_GN2X_wp_Handles.emplace_back("xbb_select_GN2Xv01_" + wp, this);
-
-    for(auto& handle : m_GN2X_wp_Handles)
-      ATH_CHECK(handle.initialize(m_systematicsList, m_lrjetHandle));
-
-
-    // Intialise syst-aware output decorators
-    for (const std::string &var : m_floatVariables) {
-      CP::SysWriteDecorHandle<float> whandle{var+"_%SYS%", this};
-      // std::cout<< "In Base Vars Zbb y: "<<var <<std::endl;
-      m_Fbranches.emplace(var, whandle);
-      ATH_CHECK (m_Fbranches.at(var).initialize(m_systematicsList, m_eventHandle));
+    // set up the generic float copying
+    for (const auto& var: m_floats_to_copy) {
+      auto& rwpair = m_float_copy_pairs.emplace_back(
+        std::make_unique<rw_pair_t<float>>(
+          SRDH_t<float>{var, this},
+          SWDH_t<float>{m_copied_variable_prefix + var + "_%SYS%", this})
+        );
+      ATH_CHECK(rwpair->first.initialize(m_systematicsList, m_lrjetHandle));
+      ATH_CHECK(rwpair->second.initialize(m_systematicsList, m_eventHandle));
     }
-
-    for (const std::string &var : m_intVariables){
-      ATH_MSG_DEBUG("initializing integer variable: " << var);
-      CP::SysWriteDecorHandle<int> whandle{var+"_%SYS%", this};
-      m_Ibranches.emplace(var, whandle);
-      ATH_CHECK(m_Ibranches.at(var).initialize(m_systematicsList, m_eventHandle));
-    };
+    // set up the generic int copying
+    for (const auto& var: m_ints_to_copy) {
+      auto& rwpair = m_int_copy_pairs.emplace_back(
+        std::make_unique<rw_pair_t<int>>(
+          SRDH_t<int>{var, this},
+          SWDH_t<int>{m_copied_variable_prefix + var + "_%SYS%", this})
+        );
+      ATH_CHECK(rwpair->first.initialize(m_systematicsList, m_lrjetHandle));
+      ATH_CHECK(rwpair->second.initialize(m_systematicsList, m_eventHandle));
+    }
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
@@ -71,56 +127,35 @@ namespace XBBCALIB
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-      for (const std::string &string_var: m_floatVariables) {
-        m_Fbranches.at(string_var).set(*event, -99., sys);
-      }
-
-      for (const auto& var: m_intVariables) {
-        m_Ibranches.at(var).set(*event, -99, sys);
-      }
-      // Calculate vars
-
       // selected Probe Jet ;
       if (lrjets->size() >= 1)
       {
         const xAOD::Jet* largeJet = lrjets->at(0);
-        m_Fbranches.at("Zcand_pt").set(*event, largeJet->pt(), sys);
-        m_Fbranches.at("Zcand_eta").set(*event, largeJet->eta(), sys);
-        m_Fbranches.at("Zcand_phi").set(*event, largeJet->phi(), sys);
-        m_Fbranches.at("Zcand_m").set(*event, largeJet->m(), sys);
-
-        //construct GN2X score
-        float GN2Xv01_phbb = m_GN2Xv01_phbb.get(*largeJet, sys);
-        float GN2Xv01_phcc = m_GN2Xv01_phcc.get(*largeJet, sys);
-        float GN2Xv01_pqcd = m_GN2Xv01_pqcd.get(*largeJet, sys);
-        float GN2Xv01_ptop = m_GN2Xv01_ptop.get(*largeJet, sys);
-        // float wtag_score = m_WTag_score.get(*largeJet, sys);
-        m_Fbranches.at("Zcand_GN2Xv01_phbb").set(*event, GN2Xv01_phbb, sys);
-        m_Fbranches.at("Zcand_GN2Xv01_phcc").set(*event, GN2Xv01_phcc, sys);
-        m_Fbranches.at("Zcand_GN2Xv01_pqcd").set(*event, GN2Xv01_pqcd, sys);
-        m_Fbranches.at("Zcand_GN2Xv01_ptop").set(*event, GN2Xv01_ptop, sys);
-        for(unsigned int wp=0; wp<m_GN2X_wps.size(); wp++)
-          {
-            int pass_GN2X = m_GN2X_wp_Handles.at(wp).get(*largeJet, sys);
-            m_Ibranches.at("Zcand_Pass_GN2X_"+m_GN2X_wps[wp]).set(*event, pass_GN2X, sys);
-          }
-
-
+        m_z_candidate_4vec->set(*event, *largeJet, sys);
+        // copy configurable variables
+        for (const auto& pair: m_float_copy_pairs) {
+          pair->second.set(*event, pair->first.get(*largeJet, sys), sys);
+        }
+        for (const auto& pair: m_int_copy_pairs) {
+          pair->second.set(*event, pair->first.get(*largeJet, sys), sys);
+        }
+      } else {
+        m_z_candidate_4vec->setDefault(*event, sys);
+        for (const auto& pair: m_float_copy_pairs) {
+          pair->second.set(*event, def_float, sys);
+        }
+        for (const auto& pair: m_int_copy_pairs) {
+          pair->second.set(*event, def_int, sys);
+        }
       }
-      m_Ibranches.at("lrjets_n").set(*event, lrjets->size(), sys);
+      m_nLRJetsHandle.set(*event, lrjets->size(), sys);
+      m_nPhotonsHandle.set(*event, photons->size(), sys);
       // This should be ok, as exactly one photon req.
-      if (photons->size() >= 1)
-      {
-        m_Fbranches.at("photon_pt").set(*event, photons->at(0)->pt(), sys);
-        m_Fbranches.at("photon_eta").set(*event, photons->at(0)->eta(), sys);
-        m_Fbranches.at("photon_phi").set(*event, photons->at(0)->phi(), sys);
-        m_Fbranches.at("photon_m").set(*event, photons->at(0)->m(), sys);
+      if (photons->size() >= 1) {
+        m_photon_4vec->set(*event, *photons->at(0), sys);
+      } else {
+        m_photon_4vec->setDefault(*event, sys);
       }
-      m_Ibranches.at("photons_n").set(*event, photons->size(), sys);
-
-
-      // Calculate vars
-
 
     }
     return StatusCode::SUCCESS;
