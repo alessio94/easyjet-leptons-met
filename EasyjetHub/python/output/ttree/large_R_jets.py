@@ -117,7 +117,14 @@ def get_large_R_jet_branches(
             "GN3XPV01_phbb",
             "GN3XPV01_pqcdll",
             "GN3XPV01_pqcdbb",
+            "GN3XPV01_phtautauhad",
+            "GN2XTauV00_phtautauhad",
+            "GN2XTauV00_phbb",
+            "GN2XTauV00_phcc",
+            "GN2XTauV00_ptop",
+            "GN2XTauV00_pqcd",
         ]
+
     large_R_jet_branches.variables += jet_output_flags.extra_variables
     if flags.Input.isMC:
         large_R_jet_branches.variables += jet_output_flags.mc_extra_variables
