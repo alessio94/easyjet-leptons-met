@@ -1,6 +1,9 @@
 # GitLab CODEOWNERS file
 # Format:  <directory>  <owner(s)>
-# The most specific match applies. If no match, falls back to the default rule at the bottom.
+# The most specific match applies. If no match, falls back to the default rule at the top
+
+# Default owner for everything else
+*                    @tstreble @mfujimot @aad @fcurcio @sizhang 
 
 # Analysis packages
 /bbbbAnalysis/        @caiyi
@@ -15,12 +18,11 @@
 /vbshiggsAnalysis/    @yelghaza
 /VBSVV4qAnalysis/     @angianni
 /ZCharmAnalysis/      @yiyu
-/XbbCalib/            @hschwart @eschopf @izvelisc
+/XbbCalib/            @eschopf @izvelisc
 /HZallyyAnalysis/     @mashamim @shahzad
 /yyMLAnalysis/        @dshope
 /bbbbttAnalysis/      @mvgonzal @oliveirg
 /jjjjAnalysis/        @zhijie
-/monojetAnalysis/     @aberti @rcostaba
+# /monojetAnalysis/     @aberti @rcostaba # <--- commented because they are apparently invalid
 
-# Default owner for everything else
-*                    @tstreble @mfujimot @aad @fcurcio @sizhang 
+
