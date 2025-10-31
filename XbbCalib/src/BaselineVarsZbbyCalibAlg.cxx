@@ -6,6 +6,8 @@
 
 #include "BaselineVarsZbbyCalibAlg.h"
 
+#include <format>
+
 namespace {
   // To do: make this somethig more standard like NAN
   const float def_float = -99;
@@ -127,8 +129,15 @@ namespace XBBCALIB
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
-      // selected Probe Jet ;
-      if (lrjets->size() >= 1)
+      // selected Probe Jet
+      size_t n_lrjets = lrjets->size();
+      ATH_MSG_VERBOSE(
+        std::format(
+          "Found {} large-R jets running syst {}",
+          n_lrjets,
+          sys.name()));
+      m_nLRJetsHandle.set(*event, n_lrjets, sys);
+      if (n_lrjets >= 1)
       {
         const xAOD::Jet* largeJet = lrjets->at(0);
         m_z_candidate_4vec->set(*event, *largeJet, sys);
@@ -148,10 +157,16 @@ namespace XBBCALIB
           pair->second.set(*event, def_int, sys);
         }
       }
-      m_nLRJetsHandle.set(*event, lrjets->size(), sys);
-      m_nPhotonsHandle.set(*event, photons->size(), sys);
+
+      size_t n_photons = photons->size();
+      ATH_MSG_VERBOSE(
+        std::format(
+          "Found {} photons jets running syst {}",
+          n_photons,
+          sys.name()));
+      m_nPhotonsHandle.set(*event, n_photons, sys);
       // This should be ok, as exactly one photon req.
-      if (photons->size() >= 1) {
+      if (n_photons >= 1) {
         m_photon_4vec->set(*event, *photons->at(0), sys);
       } else {
         m_photon_4vec->setDefault(*event, sys);

@@ -82,7 +82,6 @@ declare -A DATAFILES=(
     [llyy-mc23]=${PHYS_TTBAR_MC23}
     [ttcalib-mc23]=${PHYS_TTBAR_MC23}
     [zllcalib-mc23]=${PHYS_TTBAR_MC23}
-    [zbbycalib-mc23]=${PHYS_TTBAR_MC23}
     [zbbjcalib-mc23]=${PHYS_TTBAR_MC23}
     [bbbbtt-mc23]=${PHYS_TTBAR_MC23}
     [monojet-mc23]=${PHYS_TTBAR_MC23}
@@ -97,10 +96,12 @@ declare -A DATAFILES=(
 )
 
 # fallback if we don't have EOS
-SMALL_TTBAR_MC23=p6697v3/daod/DAOD_PHYS.601229.e8514_e8528_s4159_s4114_r15530_r15514_p6697.small.pool.root
+SMALL_TTBAR_MC23=p6697v4/daod/DAOD_PHYS.601229.e8514_e8528_s4159_s4114_r15530_r15514_p6697.small.pool.root
+SMALL_ZBBY_MC23=p6697v4/daod/DAOD_PHYS.701286.e8582_e8586_s4369_s4370_r16083_r15970_p6697.small.pool.root
 declare -A SMALL_DATAFILES=(
-    [zbbjcalib-mc23]=${SMALL_TTBAR_MC23}
-    [zbbycalib-mc23]=${SMALL_TTBAR_MC23}
+    # this zbby sample also works fine to pass the jet selection
+    [zbbjcalib-mc23]=${SMALL_ZBBY_MC23}
+    [zbbycalib-mc23]=${SMALL_ZBBY_MC23}
 )
 
 declare -A TESTS=(
@@ -210,7 +211,7 @@ declare -A CONFIGS=(
     [llyy-mc23]=HZallyyAnalysis/RunConfig-llyy-bypass.yaml
     [ttcalib-mc23]=XbbCalib/RunConfig-ttCalib-bypass.yaml
     [zllcalib-mc23]=XbbCalib/RunConfig_Zll-bypass.yaml
-    [zbbycalib-mc23]=XbbCalib/RunConfig-ZbbyCalib-bypass.yaml
+    [zbbycalib-mc23]=XbbCalib/RunConfig-ZbbyCalib.yaml
     [zbbjcalib-mc23]=XbbCalib/RunConfig_ZbbjCalib-bypass.yaml
     [bbbbtt-mc23]=bbbbttAnalysis/RunConfig-bbbbtt-bypass.yaml
     [monojet-mc23]=monojetAnalysis/RunConfig-Monojet-bypass.yaml
@@ -222,7 +223,7 @@ declare -A CONFIGS=(
 )
 
 # some common variables in the tests
-COMMON="-O -e ${TEST_RUN_NEVENTS-10}"
+COMMON="-O -e ${TEST_RUN_NEVENTS-50}"
 
 # specific tests
 simple() {
@@ -444,8 +445,15 @@ COMMON+=" -l ${LOG_LEVEL}"
 #
 
 verify-test() {
-    if [[ ! ${DATAFILES[$1]+x} ]]; then usage; fi
-    if [[ ! ${TESTS[$1]+x} ]]; then usage; fi
+    if ! [[ -v DATAFILES[$1] || -v SMALL_DATAFILES[$1] ]]; then
+        print-usage
+        echo "Error: no input datafiles found for $1" 1>&2
+        exit 1
+    fi
+    if [[ ! ${TESTS[$1]+x} ]]; then
+        print-usage
+        echo "Error: no test defined for $1" 1>&2
+    fi
 }
 
 if [[ ${MODE} == "all" ]]; then
@@ -479,8 +487,10 @@ error-handler() {
     echo "$1 failed with exit code $?" >> test_results.log
 }
 
-pull-remote-file() {
+pull-remote-file() (
 
+    set -eu
+    trap - ERR
     local mode=$1
     if ! [[ -v SMALL_DATAFILES[$mode] ]]; then
         echo "no small file found for mode $mode" 1>&2
@@ -491,10 +501,13 @@ pull-remote-file() {
     local full_url=${base_url}/${SMALL_DATAFILES[$mode]}
     local local_name=${full_url##*/}
     if ! [[ -f ${local_name} ]]; then
-        wget -q ${full_url} -O ${local_name}
+        if ! wget -q ${full_url} -O ${local_name} ; then
+            rm ${local_name}
+            return 0
+        fi
     fi
     echo ${local_name}
-}
+)
 
 run-test() {
 
@@ -504,11 +517,12 @@ run-test() {
     # - there's no eos access (i.e. in containers or outside cern)
     # - the large file isn't listed as existing on eos
     if ! has-eos; then
-        echo "eos env not defined, will download test file (could be slow)"
+        echo "eos env not defined, will try to find small test file"
         local file=$(pull-remote-file $mode)
         echo "file loaded: '${file}'"
     else
         if ! [[ -v DATAFILES[$mode] ]]; then
+            echo "downloading small test file"
             local file=$(pull-remote-file $mode)
         else
             echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME

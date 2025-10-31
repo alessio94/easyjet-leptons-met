@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+# from AthenaCommon.Constants import VERBOSE
 import AthenaCommon.SystemOfUnits as Units
 
 from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
@@ -16,18 +17,12 @@ floatsToCopy = [
     "GN2Xv01_phcc",
     "GN2Xv01_ptop",
 ]
-intsToCopy = [
-    "xbb_select_GN2Xv01_FlatMassQCDEff_0p25",
-    "xbb_select_GN2Xv01_FlatMassQCDEff_0p3",
-    "xbb_select_GN2Xv01_FlatMassQCDEff_0p37",
-    "xbb_select_GN2Xv01_FlatMassQCDEff_0p46",
-    "xbb_select_GN2Xv01_FlatMassQCDEff_0p58",
-    "xbb_select_GN2Xv01_FlatMassQCDEff_0p74",
-    "xbb_select_GN2Xv01_FlatMassQCDEff_0p94",
-    "xbb_select_GN2Xv01_FlatMassQCDEff_1p25",
-    "xbb_select_GN2Xv01_FlatMassQCDEff_1p55",
-]
 copiedVariablePrefix = "Zcand_"
+
+
+def intsToCopy(flags):
+    wps = flags.Analysis.Large_R_jet.GN2X_hbb_wps
+    return [f"xbb_select_GN2Xv01_{x}" for x in wps]
 
 
 def ZbbyCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey, photonkey,
@@ -98,7 +93,7 @@ def ZbbyCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey, photonk
         CompFactory.XBBCALIB.BaselineVarsZbbyCalibAlg(
             "BaselineVarsZbbyCalibAlg",
             floatsToCopy=floatsToCopy,
-            intsToCopy=intsToCopy,
+            intsToCopy=intsToCopy(flags),
             copiedVariablePrefix=copiedVariablePrefix,
         )
     )
@@ -119,7 +114,7 @@ def get_BaselineVarsZbbyCalibAlg_variables(flags):
     ]
 
     int_variable_names += [
-        f'{copiedVariablePrefix}{x}' for x in intsToCopy
+        f'{copiedVariablePrefix}{x}' for x in intsToCopy(flags)
     ]
 
     return float_variable_names, int_variable_names
