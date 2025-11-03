@@ -2,19 +2,22 @@
   Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 /// @author Derrick Allen
+/// @author Jason Oliver - systematics, scale factors, handle aliasing
 // Always protect against multiple includes!
 
-#ifndef SELECTIONFLAGSTTCALIBALG_H
-#define SELECTIONFLAGSTTCALIBALG_H
+#ifndef SELECTIONFLAGSXBBCALIBALG_H
+#define SELECTIONFLAGSXBBCALIBALG_H
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
+// Systematics aware handles for retreiving object containers
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 #include <SystematicsHandles/SysReadDecorHandle.h>
 #include <SystematicsHandles/SysFilterReporterParams.h>
 
+// Once containers are retreived, we need xAOD object class
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
@@ -24,61 +27,66 @@
 namespace XBBCALIB
 {
 
-  /// \brief An algorithm for counting containers
-  class ttCalibSelectorAlg final : public AthHistogramAlgorithm {
+    using GaudiBool_t = Gaudi::Property<bool>;
+    using GaudiFloat_t = Gaudi::Property<float>;
+    using GaudiString_t = Gaudi::Property<std::string>;
 
-    public:
-      ttCalibSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
-      /// \brief Initialisation method, for setting up tools and other persistent
-      /// configs
-      StatusCode initialize() override;
-      /// \brief Execute method, for actions to be taken in the event loop
-      StatusCode execute() override;
-      /// \brief This is the mirror of initialize() and is called after all events are processed.
-      StatusCode finalize() override; ///I added this to write the cutflow histogram.
+    using listHandle_t = CP::SysListHandle;
 
-    private :
-      // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-      // "someInfo"};
-      Gaudi::Property<bool> m_bypass
-        { this, "bypass", false, "Run selector algorithm in pass-through mode" };
+    using EventInfoHandle_t  = CP::SysReadHandle<xAOD::EventInfo>;
+    using JetHandle_t        = CP::SysReadHandle<xAOD::JetContainer>;
+    using ElectronHandle_t   = CP::SysReadHandle<xAOD::ElectronContainer>;
+    using MuonHandle_t       = CP::SysReadHandle<xAOD::MuonContainer>;
+    using METHandle_t        = CP::SysReadHandle<xAOD::MissingETContainer>;
 
-      /// \brief Setup syst-aware input container handles
-      CP::SysListHandle m_systematicsList {this};
+    using charHandle_t = CP::SysReadDecorHandle<char>;
 
-      CP::SysReadHandle<xAOD::EventInfo>
-      m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
-      CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "ttCalibJets_%SYS%",   "Jet container to read" };
 
-      CP::SysReadHandle<xAOD::JetContainer>
-      m_lrjetHandle{ this, "lrjets", "ttCalibLRJets_%SYS%",   "Large-R jet container to read" };
+    /// \brief An algorithm for counting containers
+    class ttCalibSelectorAlg final : public AthHistogramAlgorithm {
 
-      CP::SysReadHandle<xAOD::ElectronContainer>
-      m_electronHandle{ this, "electrons", "ttCalibElectrons_%SYS%",   "Electron container to read" };
+        public:
+            ttCalibSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
+            /// \brief Initialisation method, for setting up tools and other persistent
+            /// configs
+            StatusCode initialize() override;
+            /// \brief Execute method, for actions to be taken in the event loop
+            StatusCode execute() override;
+            /// \brief This is the mirror of initialize() and is called after all events are processed.
+            StatusCode finalize() override; ///I added this to write the cutflow histogram.
 
-      CP::SysReadHandle<xAOD::MuonContainer>
-      m_muonHandle{ this, "muons", "ttCalibMuons_%SYS%",   "Muon container to read" };
+        private :
 
-      CP::SysReadHandle<xAOD::MissingETContainer>
-      m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read" };
+        // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
+        // "someInfo"};
 
-      Gaudi::Property<float> m_minMet
-      {this, "minMet", 20000, "Minimum MET cut"};
+        GaudiBool_t m_bypass { this, "bypass", false, "Run selector algorithm in pass-through mode" };
+        listHandle_t  m_systematicsList {this};
 
-      Gaudi::Property<std::string> m_eleWPName
-      { this, "eleWP", "","Electron ID + Iso working point" };
-      CP::SysReadDecorHandle<char> m_eleWPDecorHandle{"", this};
+        /// \brief Setup syst-aware input container handles
 
-      Gaudi::Property<std::string> m_muonWPName
-        { this, "muonWP", "","Muon ID + Iso cuts" };
-      CP::SysReadDecorHandle<char> m_muonWPDecorHandle{"", this};
+        EventInfoHandle_t  m_eventHandle            {this, "event",     "EventInfo",              "EventInfo container to read"};
+        JetHandle_t        m_ttcalib_jetHandle     {this, "ttcalib_jets",      "ttCalibJets_%SYS%",     "Jet container to read"};
+        JetHandle_t        m_ttcalib_lrjetHandle   {this, "ttcalib_lrjets",    "ttCalibLRJets_%SYS%",   "Large-R jet container to read"};
+        ElectronHandle_t   m_ttcalib_electronHandle{this, "ttcalib_electrons", "ttCalibElectrons_%SYS%","Electron container to read"};
+        MuonHandle_t       m_ttcalib_muonHandle    {this, "ttcalib_muons",     "ttCalibMuons_%SYS%",    "Muon container to read"};
+        METHandle_t        m_metHandle              {this, "met",       "AnalysisMET_%SYS%",      "MET container to read"};
 
-      CP::SysFilterReporterParams m_filterParams {this, "ttCalib selection"};
 
-  };
+
+        GaudiFloat_t m_minMet {this, "minMet", 20000, "Minimum MET cut"};
+
+        GaudiString_t m_eleWPName { this, "eleWP", "","Electron ID + Iso working point" };
+        GaudiString_t m_muonWPName { this, "muonWP", "","Muon ID + Iso cuts" };
+
+        charHandle_t m_eleWPDecorHandle{"", this};
+        charHandle_t m_muonWPDecorHandle{"", this};
+
+        CP::SysFilterReporterParams m_filterParams {this, "ttCalib selection"};
+
+    };
 
 }
 
