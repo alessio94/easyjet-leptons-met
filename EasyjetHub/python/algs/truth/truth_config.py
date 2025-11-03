@@ -4,6 +4,7 @@ from EasyjetHub.steering.utils.log_helper import log
 from EasyjetHub.algs.truth.parent_decorator_config import parent_decorator_cfg
 from EasyjetHub.algs.truth.truth_particle_info_config import truth_particle_info_cfg
 from EasyjetHub.algs.truth.UIDDecoratorAlgConfig import UIDDecoratorAlgCfg
+from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
 
 import pathlib
 import os
@@ -14,7 +15,10 @@ def truth_info_cfg(
 ):
     cfg = ComponentAccumulator()
 
-    if flags.Analysis.Truth.do_truthPart_patch:
+    split_tags = flags.Input.AMITag.split("_")
+    has_uid = get_valid_ami_tag(split_tags, "p", "p7017")
+
+    if not has_uid:
         cfg.merge(UIDDecoratorAlgCfg(flags))
 
     if not flags.Input.isPHYSLITE:
