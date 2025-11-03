@@ -55,9 +55,9 @@ Small_R_jet:
     - GN2v01_Continuous
   variables_bjets: ["uncorrPt", "muonCorrPt"]
   variables_int_bjets: ["truthLabel", "pcbt_GN2v01", "nmuons"]
-  btag_egReductionB: "Medium"
-  btag_egReductionC: "Medium"
-  btag_egReductionLight: "Medium"
+  btag_egReductionB: "Loose"
+  btag_egReductionC: "Loose"
+  btag_egReductionLight: "Loose"
   amount_bjet: 2
   doHLTMatching: true
   doL1Matching: true
