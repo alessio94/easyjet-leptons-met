@@ -6,23 +6,21 @@
 *                    @tstreble @mfujimot @aad @fcurcio @sizhang 
 
 # Analysis packages
-/bbbbAnalysis/        @caiyi
-/bbllAnalysis/        @gcallea
-/bbttAnalysis/        @mfujimot @sdahbi @pbokan @bmoser
-/bbVVAnalysis/        @jjhong
-/bbyyAnalysis/        @fcurcio @gdigrego @alwang @atishelm @pusharma @elmazzeo @chugli
-/llttAnalysis/        @weiming @jbeaucam
-/multileptonAnalysis/ @cmo @shudong
-/ssWWAnalysis/        @yiyu
-/ttHHAnalysis/        @lfaldaul @losanti
-/vbshiggsAnalysis/    @yelghaza
-/VBSVV4qAnalysis/     @angianni
-/ZCharmAnalysis/      @yiyu
-/XbbCalib/            @eschopf @izvelisc
-/HZallyyAnalysis/     @mashamim @shahzad
-/yyMLAnalysis/        @dshope
-/bbbbttAnalysis/      @mvgonzal @oliveirg
-/jjjjAnalysis/        @zhijie
-# /monojetAnalysis/     @aberti @rcostaba # <--- commented because they are apparently invalid
-
-
+/bbbbAnalysis        @caiyi
+/bbllAnalysis        @gcallea
+/bbttAnalysis        @mfujimot @sdahbi @pbokan @bmoser
+/bbVVAnalysis        @jjhong
+/bbyyAnalysis        @fcurcio @gdigrego @alwang @atishelm @pusharma @elmazzeo @chugli
+/llttAnalysis        @weiming @jbeaucam
+/multileptonAnalysis @cmo @shudong
+/ssWWAnalysis        @yiyu
+/ttHHAnalysis        @lfaldaul @losanti
+/vbshiggsAnalysis    @yelghaza
+/VBSVV4qAnalysis     @angianni
+/ZCharmAnalysis      @yiyu
+/XbbCalib            @eschopf @izvelisc
+/HZallyyAnalysis     @mashamim @shahzad
+/yyMLAnalysis        @dshope
+/bbbbttAnalysis      @mvgonzal @oliveirg
+/jjjjAnalysis        @zhijie
+/monojetAnalysis     @aberti @rcostaba
