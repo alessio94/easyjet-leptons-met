@@ -32,6 +32,7 @@ namespace Easyjet
 
     // trigger matching
     ATH_CHECK(m_L1JetsInKey.initialize(m_doL1Matching));
+    ATH_CHECK(m_HLTJetsInKey.initialize(m_doHLTMatching));
 
     if (!m_triggers.empty())
     {
@@ -66,13 +67,11 @@ namespace Easyjet
           m_jetHLTEtaDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTeta");
           m_jetHLTPhiDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTphi");
           m_jetHLTDRDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTdr");
-          m_jetHLTBtagDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTbtag");
           m_jetHLTThresholdsDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTthresholds");
           ATH_CHECK(m_jetHLTPtDecorKeys.at(trig).initialize());
           ATH_CHECK(m_jetHLTEtaDecorKeys.at(trig).initialize());
           ATH_CHECK(m_jetHLTPhiDecorKeys.at(trig).initialize());
           ATH_CHECK(m_jetHLTDRDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetHLTBtagDecorKeys.at(trig).initialize());
           ATH_CHECK(m_jetHLTThresholdsDecorKeys.at(trig).initialize());
         }
 
@@ -131,9 +130,12 @@ namespace Easyjet
         jetHLTPt, jetHLTEta, jetHLTPhi, jetHLTDR;
     std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>>> jetHLTThresholds;
 
-    std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::JetContainer, int>> jetHLTBtag;
     SG::ReadHandle<xAOD::JetRoIContainer> l1Jets;
-
+    SG::ReadHandle<xAOD::JetContainer> hltJetsFromCont;
+    static const std::unordered_set<std::string> trigger_navigation_bug = {
+      "HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25",
+      "HLT_j75c_020jvt_j50c_020jvt_j25c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bgn177_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"
+    };
     for (const auto &trig : m_triggers)
     {
       if (m_doL1Matching) {
@@ -153,18 +155,18 @@ namespace Easyjet
       }
 
       if (m_doHLTMatching) {
+        hltJetsFromCont = SG::makeHandle(m_HLTJetsInKey, ctx);
+        ATH_CHECK(hltJetsFromCont.isValid());
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_pt(m_jetHLTPtDecorKeys.at(trig));
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_eta(m_jetHLTEtaDecorKeys.at(trig));
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_phi(m_jetHLTPhiDecorKeys.at(trig));
         SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_dr(m_jetHLTDRDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, int> wdh_btag(m_jetHLTBtagDecorKeys.at(trig));
         SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>> wdh_thresholds(m_jetHLTThresholdsDecorKeys.at(trig));
         jetHLTPt.emplace(trig, wdh_pt);
         jetHLTEta.emplace(trig, wdh_eta);
         jetHLTPhi.emplace(trig, wdh_phi);
         jetHLTDR.emplace(trig, wdh_dr);
         jetHLTThresholds.emplace(trig, wdh_thresholds);
-        jetHLTBtag.emplace(trig, wdh_btag);
       }
     }
 
@@ -191,7 +193,6 @@ namespace Easyjet
         const xAOD::IParticle* bestHLT = nullptr;
         float minDRHLT = 0.4; // hard-coded matching distance
         std::set<int> HLTThresholds = {};
-        bool btag = false;
 
         if (m_trigDecTool->isPassed(trig))
         {
@@ -248,21 +249,54 @@ namespace Easyjet
 
                 if (!m_useEmulationTool) {
                   frd.setRestrictRequestToLeg(ileg);
-                  auto hlt_jets = m_trigDecTool->features<xAOD::IParticleContainer>(frd);
-                  for (const auto& hlt_jet_link : hlt_jets)
-                  {
-                    const xAOD::IParticle *hlt_jet = *hlt_jet_link.link;
+
+                  auto hlt_jetsFromtrigDec = m_trigDecTool->features<xAOD::IParticleContainer>(frd);
+
+                  std::vector<const xAOD::IParticle*> allHLTJets;
+
+                  for (const auto& hlt_jet_link : hlt_jetsFromtrigDec) {
+                    const xAOD::IParticle *hlt_jetFromtrigDec = *hlt_jet_link.link;
+                    if (!hlt_jetFromtrigDec) continue;
+                    allHLTJets.push_back(hlt_jetFromtrigDec);
+                  }
+                  // Start adding missing HLT jets -- only for buggy triggers
+                  // These extra jets are added because of bug in trigger navigation
+                  // Will be removed once bug fixed at DAOD level
+                  if (trigger_navigation_bug.contains(trig)) {
+                    for (const xAOD::Jet* jetFromCont : *hltJetsFromCont) {
+                      bool alreadyIn = false;
+                      for (const xAOD::IParticle* seenJet : allHLTJets) {
+                        if (isSameJet(seenJet, jetFromCont)) {
+                          alreadyIn = true;
+                          break;
+                        }
+                      }
+                      if (alreadyIn) continue;
+                      allHLTJets.push_back(jetFromCont);
+                      ATH_MSG_DEBUG("Added missing HLT jet from container: pt="
+                                    << jetFromCont->pt() << " eta=" << jetFromCont->eta()
+                                    << " phi=" << jetFromCont->phi());
+                    }
+                  }
+                  for (const xAOD::IParticle* hlt_jet : allHLTJets) {
                     float dR = jet->p4().DeltaR(hlt_jet->p4());
-                    bool hasBtag = hlt_jet_link.source->hasObjectLink("btag");
+
+                    bool fromtrigDec = false;
+                    for (const auto& hlt_jet_link : hlt_jetsFromtrigDec) {
+                      if (*hlt_jet_link.link == hlt_jet) {
+                        fromtrigDec = true;
+                        break;
+                      }
+                    }
+
                     ATH_MSG_VERBOSE("  pt: "
                                   << hlt_jet->pt() << " eta: " << hlt_jet->eta()
                                   << " phi: " << hlt_jet->phi() << " dR: " << dR
-                                  << " btag: " << hasBtag);
+                                  << " (fromContainer=" << !fromtrigDec << ")");
 
                     if (bestHLT && isSameJet(bestHLT, hlt_jet))
                     {
                       HLTThresholds.insert(legInfo.threshold);
-                      btag = btag || hasBtag; // if any leg claims b-tag, then the jet is b-tagged
                     }
                     else if (dR < minDRHLT)
                     {
@@ -270,7 +304,6 @@ namespace Easyjet
                       bestHLT = hlt_jet;
                       HLTThresholds.clear();
                       HLTThresholds.insert(legInfo.threshold);
-                      btag = hasBtag;
                     }
                   }
                 }
@@ -285,13 +318,11 @@ namespace Easyjet
                     ATH_MSG_VERBOSE("  pt: " << hlt_jet->pt()
                                              << " eta: " << hlt_jet->eta()
                                              << " phi: " << hlt_jet->phi()
-                                             << " dR: " << dR
-                                             << " btag: " << passBtag);
+                                             << " dR: " << dR);
 
                     if (bestHLT && isSameJet(bestHLT, hlt_jet))
                     {
                       HLTThresholds.insert(legInfo.threshold);
-                      btag = btag || passBtag; // if any leg claims b-tag, then the jet is b-tagged
                     }
                     else if (dR < minDRHLT)
                     {
@@ -299,7 +330,6 @@ namespace Easyjet
                       bestHLT = hlt_jet;
                       HLTThresholds.clear();
                       HLTThresholds.insert(legInfo.threshold);
-                      btag = passBtag;
                     }
                   }
                     
@@ -309,7 +339,6 @@ namespace Easyjet
 
               ATH_MSG_VERBOSE(" =dRHLT: " << minDRHLT << " bestHLT pT: "
                                       << (bestHLT ? bestHLT->pt() : -99.)
-                                      << " btag: " << btag
                                       << " thresholds: " << std::vector<int>(HLTThresholds.begin(), HLTThresholds.end()));
               ileg++;
             }
@@ -337,11 +366,9 @@ namespace Easyjet
           jetHLTThresholds.at(trig)(*jet) = bestHLT ?
 	    std::vector<int>(HLTThresholds.begin(), HLTThresholds.end()) :
 	    std::vector<int>();
-          jetHLTBtag.at(trig)(*jet) = bestHLT ? btag : -1;
 
           ATH_MSG_VERBOSE("Summary " << " Trigger: " << trig << " bestHLT pT: "
                                     << (bestHLT ? bestHLT->pt() : -99.)
-                                    << " btag: " << btag
                                     << " thresholds: " << std::vector<int>(HLTThresholds.begin(), HLTThresholds.end()));
         }
       }

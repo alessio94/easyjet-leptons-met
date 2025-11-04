@@ -145,7 +145,6 @@ namespace HHBBTT
     typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::JetContainer, std::vector<int>> > jetReadTrigMatchThresholdMap;
     typedef std::unordered_map<std::string, SG::ReadDecorHandle<xAOD::JetContainer, float> > jetReadTrigMatchfloatMap;
 
-    std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_HLTThresholdsDecorKey;
     std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_HLTPTDecorKey;
 
     std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_L1ETDecorKey;
@@ -207,10 +206,8 @@ namespace HHBBTT
        const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
        passWriteDecoMap& pass_decos,
        const xAOD::JetContainer* jets,
-       jetTrigMatchThresholdMap& jet_trigMatchThresholds,
        jetTrigMatchOnlineFloatMap& jet_trigMatchOnlinePt,
        jetTrigMatchOnlineFloatMap& jet_trigMatchOnlineEta,
-       jetReadTrigMatchThresholdMap& jetHLTThresholds,
        jetReadTrigMatchfloatMap& jetHLTPT,
        jetReadTrigMatchfloatMap& jetL1ET,
        jetReadTrigMatchfloatMap& jetL1Eta) const;

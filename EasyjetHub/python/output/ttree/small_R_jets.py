@@ -150,8 +150,7 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
                     f'match{trig}_HLTeta',
                     f'match{trig}_HLTphi',
                     f'match{trig}_HLTdr',
-                    f'match{trig}_HLTthresholds',
-                    f'match{trig}_HLTbtag'
+                    f'match{trig}_HLTthresholds'
                 ]
 
     # ftag scores pb, pc, pl

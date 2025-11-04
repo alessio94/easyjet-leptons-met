@@ -320,9 +320,6 @@ def bbtt_branches(flags):
     ]
     if flags.GeoModel.Run is LHCPeriod.Run3:
         branches += [
-            f'{smalljetkey}.trigMatch_HLT_threshold'
-            f'->{small_R_prefix}_trigMatch_HLT_threshold'
-            + flags.Analysis.systematics_suffix_separator + "%SYS%",
             f'{smalljetkey}.trigMatch_HLT_onlinept'
             f'->{small_R_prefix}_trigMatch_HLT_onlinept'
             + flags.Analysis.systematics_suffix_separator + "%SYS%"

@@ -76,6 +76,10 @@ namespace Easyjet
       this, "L1Jets", "LVL1JetRoIs", "L1 jet container"
     };
 
+    SG::ReadHandleKey<xAOD::JetContainer> m_HLTJetsInKey {
+      this, "HLTJets", "HLT_AntiKt4EMPFlowJets_subresjesgscIS_ftf_bJets", "HLT jet container"
+    };
+
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1EtDecorKeys;
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1EtaDecorKeys;
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1PhiDecorKeys;
@@ -87,7 +91,6 @@ namespace Easyjet
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTPhiDecorKeys;
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTDRDecorKeys;
     std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTThresholdsDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTBtagDecorKeys;
 
     bool isSameJet(const xAOD::IParticle *jet1, const xAOD::IParticle *jet2) const;
 

@@ -44,13 +44,10 @@ namespace HHBBTT
             trig, m_jetsKey.key() + ".match" + trig + "_L1et");
       m_L1EtaDecorKey.emplace(
             trig, m_jetsKey.key() + ".match" + trig + "_L1eta");
-      m_HLTThresholdsDecorKey.emplace(
-            trig, m_jetsKey.key() + ".match" + trig + "_HLTthresholds");
       m_HLTPTDecorKey.emplace(
             trig, m_jetsKey.key() + ".match" + trig + "_HLTpt");
       ATH_CHECK(m_L1ETDecorKey.at(trig).initialize());
       ATH_CHECK(m_L1EtaDecorKey.at(trig).initialize());
-      ATH_CHECK(m_HLTThresholdsDecorKey.at(trig).initialize());
       ATH_CHECK(m_HLTPTDecorKey.at(trig).initialize());
     }
 
@@ -114,12 +111,6 @@ namespace HHBBTT
         m_jet_trigMatch_OnlinePtKey.emplace(channel, deco_pt);
         ATH_CHECK(m_jet_trigMatch_OnlinePtKey.at(channel).initialize());
       }
-      if(name == "HLT" ){
-        SG::WriteDecorHandleKey<xAOD::JetContainer> deco_th;
-        deco_th = m_jetsKey.key() + ".trigMatch_"+name+"_threshold";
-        m_jet_trigMatch_ThresholdKey.emplace(channel, deco_th);
-        ATH_CHECK(m_jet_trigMatch_ThresholdKey.at(channel).initialize());
-      }
       if(name == "L1" ){
         SG::WriteDecorHandleKey<xAOD::JetContainer> deco_eta;
         deco_eta = m_jetsKey.key() + ".trigMatch_"+name+"_onlineeta";
@@ -134,13 +125,11 @@ namespace HHBBTT
 
   StatusCode TriggerDecoratorAlg::execute(const EventContext& ctx) const
   {
-    jetReadTrigMatchThresholdMap jetHLTThresholds;
     jetReadTrigMatchfloatMap jetHLTPT;
     jetReadTrigMatchfloatMap jetL1ET;
     jetReadTrigMatchfloatMap jetL1Eta;
     for (auto &trig : m_triggers)
     {
-      jetHLTThresholds.emplace(trig, m_HLTThresholdsDecorKey.at(trig));
       jetHLTPT.emplace(trig, m_HLTPTDecorKey.at(trig));
       jetL1ET.emplace(trig, m_L1ETDecorKey.at(trig));
       jetL1Eta.emplace(trig, m_L1EtaDecorKey.at(trig));
@@ -201,14 +190,6 @@ namespace HHBBTT
       }
     }
 
-    jetTrigMatchThresholdMap jet_trigMatchThresholds;
-    for (const auto& [channel, key] : m_jet_trigMatch_ThresholdKey){
-      jet_trigMatchThresholds.emplace(channel, key);
-      for(const xAOD::Jet* jet : *jets){
-	jet_trigMatchThresholds.at(channel)(*jet) = std::vector<int>{-99};
-      }
-    }
-
     jetTrigMatchOnlineFloatMap jet_trigMatchOnlinePt;
     for (const auto& [channel, key] : m_jet_trigMatch_OnlinePtKey){
       jet_trigMatchOnlinePt.emplace(channel, key);
@@ -257,9 +238,8 @@ namespace HHBBTT
     
     checkDiBJetTriggers(year(*eventInfo), eventInfo.cptr(),
 		       runBoolDecos, triggerdecos, pass_decos,
-		       jets.cptr(), jet_trigMatchThresholds,
-			jet_trigMatchOnlinePt, jet_trigMatchOnlineEta,
-			jetHLTThresholds, jetHLTPT,
+		       jets.cptr(),
+			jet_trigMatchOnlinePt, jet_trigMatchOnlineEta, jetHLTPT,
 			jetL1ET, jetL1Eta);
 
     checkLargeRJetsTriggers(year(*eventInfo), eventInfo.cptr(),
@@ -567,10 +547,8 @@ void TriggerDecoratorAlg::checkDiBJetTriggers
    const runBoolReadDecoMap& runBoolDecos, const trigReadDecoMap& triggerdecos,
    passWriteDecoMap& pass_decos,
    const xAOD::JetContainer* jets,
-   jetTrigMatchThresholdMap& jet_trigMatchThresholds,
    jetTrigMatchOnlineFloatMap& jet_trigMatchOnlinePt,
    jetTrigMatchOnlineFloatMap& jet_trigMatchOnlineEta,
-   jetReadTrigMatchThresholdMap& jetHLTThresholds,
    jetReadTrigMatchfloatMap& jetHLTPT,
    jetReadTrigMatchfloatMap& jetL1ET,
    jetReadTrigMatchfloatMap& jetL1Eta) const {
@@ -592,7 +570,6 @@ void TriggerDecoratorAlg::checkDiBJetTriggers
 	  for (const xAOD::Jet *jet : *jets){
 	    jet_trigMatchOnlinePt.at(HHBBTT::L1)(*jet) = jetL1ET.at(trig)(*jet);
 	    jet_trigMatchOnlineEta.at(HHBBTT::L1)(*jet) = jetL1Eta.at(trig)(*jet);
-	    jet_trigMatchThresholds.at(HHBBTT::HLT)(*jet) = jetHLTThresholds.at(trig)(*jet);
 	    jet_trigMatchOnlinePt.at(HHBBTT::HLT)(*jet) = jetHLTPT.at(trig)(*jet);
 	  }
 	}
