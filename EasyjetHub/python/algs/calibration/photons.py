@@ -33,8 +33,6 @@ def photon_sequence(flags, configAcc):
         configSeq += makeConfig('Photons.WorkingPoint')
         configSeq.setOptionValue('.containerName', output_name)
         configSeq.setOptionValue('.selectionName', id + '_' + iso)
-        # To be removed with 25.2.57
-        configSeq.setOptionValue('.postfix', id + '_' + iso)
         configSeq.setOptionValue('.qualityWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
         configSeq.setOptionValue('.saveCombinedSF', True)
