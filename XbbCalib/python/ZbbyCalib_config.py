@@ -44,14 +44,6 @@ def ZbbyCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey, photonk
             minimumAmount=1,
         )
     )
-    cfg.merge(JetSelectorAlgCfg(flags, name="SmallRJet_SelectorAlg",
-                                containerInKey=smalljetkey,
-                                containerOutKey="XbbCalibJets_%SYS%",
-                                minPt=flags.Analysis.Small_R_jet.min_pT,
-                                maxEta=2.5,
-                                minimumAmount=1,
-                                selectBjet=False,
-                                ))
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="XbbCalibElectrons_%SYS%",

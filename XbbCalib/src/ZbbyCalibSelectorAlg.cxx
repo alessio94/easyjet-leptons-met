@@ -24,7 +24,6 @@ namespace XBBCALIB
 
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
 
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
 

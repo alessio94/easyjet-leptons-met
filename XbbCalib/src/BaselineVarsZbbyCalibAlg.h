@@ -46,9 +46,6 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_jetHandle{ this, "jets", "XbbCalibJets_%SYS%",   "Jet container to read" };
-
-    CP::SysReadHandle<xAOD::JetContainer>
     m_lrjetHandle{ this, "lrjets", "ZcandLRJets_%SYS%",   "Large-R jet container to read" };
 
     CP::SysReadHandle<xAOD::PhotonContainer>

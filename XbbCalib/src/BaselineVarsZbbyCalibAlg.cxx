@@ -72,7 +72,6 @@ namespace XBBCALIB
 
   StatusCode BaselineVarsZbbyCalibAlg::initialize()
   {
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
@@ -125,9 +124,6 @@ namespace XBBCALIB
 
       const xAOD::PhotonContainer *photons = nullptr;
       ANA_CHECK (m_photonHandle.retrieve(photons, sys));
-
-      const xAOD::JetContainer *jets = nullptr;
-      ANA_CHECK (m_jetHandle.retrieve (jets, sys));
 
       // selected Probe Jet
       size_t n_lrjets = lrjets->size();

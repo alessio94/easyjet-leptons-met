@@ -20,10 +20,8 @@ VGammaOR_ypT_cuts: [20.e+3] #photon
 VGammaOR_dR_lepton_photon_cuts: [0.1]
 # Toggles for object types
 do_large_R_UFO_jets: true
-do_small_R_jets: true
 do_muons: true
 do_electrons: true
-do_met: true
 do_photons: true
 
 do_overlap_removal: true
@@ -44,8 +42,6 @@ Photon:
   Iso: "FixedCutTight"
   min_pT: 150.e+3
 
-Small_R_jet:
-  btag_wp: "GN2v01_FixedCutBEff_77"
 
 Electron:
   min_pT: 28.e+3
@@ -69,7 +65,6 @@ ttree_output:
   # Our overrides. All defaults are off
   reco_outputs:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-    met : 'container_names.output.met'
     photons : 'container_names.output.photons'
   truth_outputs:
     large_R_jets: 'container_names.input.truth10SoftDropJet'
