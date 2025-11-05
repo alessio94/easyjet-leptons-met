@@ -16,7 +16,7 @@ def get_ditau_branches(flags, tree_flags, input_container, output_prefix):
     if tree_flags.slim_variables_with_syst:
         ditau_branches.syst_only_for = ["pt"]
 
-    ditau_branches.add_four_mom_branches(do_mass=False)
+    ditau_branches.add_four_mom_branches(do_mass=True)
 
     id_wps = [flags.Analysis.DiTau.ID]
     if 'extra_wps' in flags.Analysis.DiTau:
