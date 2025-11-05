@@ -42,11 +42,13 @@ namespace ssWWVBS
     tEWKVR,
     lllVR,
     ZeeVR,
+    DijetsCR,
   };
 
   enum TriggerChannel
   {
-    SLT
+    SLT,
+    prescaleSLT
   };
 
   enum Var {
@@ -66,6 +68,7 @@ namespace ssWWVBS
     IS_me,
     
     pass_trigger_SLT,
+    pass_trigger_prescaleSLT,
 
     PASS_TRIGGER,
     PASS_TWO_LEPTONS,
@@ -94,6 +97,9 @@ namespace ssWWVBS
     pass_tEWKVR,
     pass_lllVR,
     pass_ZeeVR,
+    pass_DijetsCR,
+
+    EXACTLY_ONE_LEPTON,
 
   };
 
@@ -133,7 +139,7 @@ namespace ssWWVBS
       };
 
       Gaudi::Property<std::vector<std::string>> m_channel_names
-      { this, "channel", {}, "Which channel to run" };
+      { this, "channels", {}, "Which channel to run" };
 
       std::vector<ssWWVBS::Channel> m_channels;
 
@@ -190,7 +196,8 @@ namespace ssWWVBS
 
       std::unordered_map<ssWWVBS::TriggerChannel, std::string> m_triggerChannels = 
       {
-        {ssWWVBS::SLT, "SLT"}
+        {ssWWVBS::SLT, "SLT"},
+        {ssWWVBS::prescaleSLT, "prescaleSLT"}
       };
 
       Gaudi::Property<std::vector<std::string>> m_triggers 
@@ -211,6 +218,7 @@ namespace ssWWVBS
         {ssWWVBS::IS_em, "IS_em"},
         {ssWWVBS::IS_me, "IS_me"},
         {ssWWVBS::pass_trigger_SLT, "pass_trigger_SLT"},
+        {ssWWVBS::pass_trigger_prescaleSLT, "pass_trigger_prescaleSLT"},
         {ssWWVBS::PASS_TRIGGER, "PASS_TRIGGER"},
         {ssWWVBS::PASS_TWO_LEPTONS, "PASS_TWO_LEPTONS"},
         {ssWWVBS::PASS_LEPTON_ID, "PASS_LEPTON_ID"},
@@ -237,6 +245,8 @@ namespace ssWWVBS
         {ssWWVBS::pass_tEWKVR, "pass_tEWKVR"},
         {ssWWVBS::pass_lllVR, "pass_lllVR"},
         {ssWWVBS::pass_ZeeVR, "pass_ZeeVR"},
+        {ssWWVBS::pass_DijetsCR, "pass_DijetsCR"},
+        {ssWWVBS::EXACTLY_ONE_LEPTON, "EXACTLY_ONE_LEPTON"},
       };
 
       CutManager m_ssWWCuts;
@@ -270,12 +280,14 @@ namespace ssWWVBS
                           const xAOD::Muon* mu0, const xAOD::Muon* mu1,
                           CutManager& ssWWCuts);
       void evaluateMetCuts(const xAOD::MissingET* met, CutManager& ssWWCuts);
-      void evaluateJetCuts(const xAOD::JetContainer& jets, CutManager& ssWWCuts);
+      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& ssWWCuts);
       void evaluateBJetLeptonCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                           const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
                           CutManager& ssWWCuts);
       void setThresholds(const xAOD::EventInfo* event,
 			 const CP::SystematicSet& sys);
+      void evaluatePrescaleTriggerCuts(const xAOD::EventInfo *event, const xAOD::ElectronContainer& electrons,
+                         const xAOD::MuonContainer& muons, const CP::SystematicSet& sys);
 
       StatusCode initialiseCutflow();
   };

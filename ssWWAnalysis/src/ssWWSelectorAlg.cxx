@@ -82,7 +82,7 @@ namespace ssWWVBS
     for ( auto name : m_channel_names){
       //std::cout<<"name=  "<<name<<std::endl;
       if( name == "SR") m_channels.push_back(ssWWVBS::SR);
-      else if ( name == "ZCR") m_channels.push_back(ssWWVBS::WZCR);
+      else if ( name == "WZCR") m_channels.push_back(ssWWVBS::WZCR);
       else if ( name == "misIDCR") m_channels.push_back(ssWWVBS::misIDCR);
       else if ( name == "incVR") m_channels.push_back(ssWWVBS::incVR);
       else if ( name == "LowDyVR") m_channels.push_back(ssWWVBS::LowDyVR);
@@ -92,6 +92,7 @@ namespace ssWWVBS
       else if ( name == "tEWKVR") m_channels.push_back(ssWWVBS::tEWKVR);
       else if ( name == "lllVR") m_channels.push_back(ssWWVBS::lllVR);
       else if ( name == "ZeeVR") m_channels.push_back(ssWWVBS::ZeeVR);
+      else if ( name == "DijetsCR") m_channels.push_back(ssWWVBS::DijetsCR);
       else{
         ATH_MSG_ERROR("Unknown channel");
         return StatusCode::FAILURE;
@@ -119,6 +120,7 @@ namespace ssWWVBS
       
       const xAOD::JetContainer *jets = nullptr;
       ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+      
 
       bool WPgiven = !m_isBtag.empty();
       auto bjets = std::make_unique<ConstDataVector<xAOD::JetContainer>> (SG::VIEW_ELEMENTS);
@@ -129,6 +131,15 @@ namespace ssWWVBS
           else nonbjets->push_back(jet);
         }
       }
+ 
+      //Jet ordering
+      std::sort(nonbjets->begin(), nonbjets->end(),
+        [](const xAOD::Jet* a, const xAOD::Jet* b) {
+          return a->pt() > b->pt(); });
+
+      std::sort(bjets->begin(), bjets->end(),
+        [](const xAOD::Jet* a, const xAOD::Jet* b) {
+          return a->pt() > b->pt(); });
 
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
@@ -136,11 +147,18 @@ namespace ssWWVBS
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
+      //All Met containner names={"RefEle","Muons","MuonEloss","RefJet","PVSoftTrk","Final"}
+      //The sum of the former 5 turns is the "Final"
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
       const xAOD::MissingET* met = (*metCont)["Final"]; // To check
+      const xAOD::MissingET* met_track = (*metCont)["PVSoftTrk"];
       if (!met) {
         ATH_MSG_ERROR("Could not retrieve MET");
+        return StatusCode::FAILURE;
+      }
+      if (!met_track) {
+        ATH_MSG_ERROR("Could not retrieve PVSoftTrk MET");
         return StatusCode::FAILURE;
       }
 
@@ -150,6 +168,7 @@ namespace ssWWVBS
       m_bools.at(ssWWVBS::IS_me) = false;
 
       m_bools.at(ssWWVBS::pass_trigger_SLT) = false;
+      m_bools.at(ssWWVBS::pass_trigger_prescaleSLT) = false;
       m_bools.at(ssWWVBS::PASS_TRIGGER) = false;
       m_bools.at(ssWWVBS::PASS_TWO_LEPTONS) = false;
       m_bools.at(ssWWVBS::PASS_LEPTON_ID) = false;
@@ -177,6 +196,9 @@ namespace ssWWVBS
       m_bools.at(ssWWVBS::pass_tEWKVR) = false;
       m_bools.at(ssWWVBS::pass_lllVR) = false;
       m_bools.at(ssWWVBS::pass_ZeeVR) = false;
+      m_bools.at(ssWWVBS::pass_DijetsCR) = false;
+
+      m_bools.at(ssWWVBS::EXACTLY_ONE_LEPTON) = false;
 
       setThresholds(event, sys);
 
@@ -212,6 +234,14 @@ namespace ssWWVBS
         leptons.emplace_back(muons->at(0), -13*muons->at(0)->charge());
       }
 
+      //Add the single lepton events for DijetsCR
+      if (electrons->size() == 1 && muons->size() == 0) {
+        leptons.emplace_back(electrons->at(0), -11*electrons->at(0)->charge());
+      }
+      if (electrons->size() == 0 && muons->size() == 1) {
+        leptons.emplace_back(muons->at(0), -13*muons->at(0)->charge());
+      }
+
       std::sort(leptons.begin(), leptons.end(),
         [](const std::pair<const xAOD::IParticle*, int>& a,
             const std::pair<const xAOD::IParticle*, int>& b) {
@@ -231,10 +261,12 @@ namespace ssWWVBS
       }
       
       evaluateTriggerCuts(event, ele0, ele1, mu0, mu1, m_ssWWCuts, sys);
+      //Prescale trigger SLT used to select the events for Dijest CR, and does not go into the nominal PASS_TRIGGER
+      evaluatePrescaleTriggerCuts(event, *electrons, *muons, sys);
       evaulateLeptonIDCuts(ele0, ele1, mu0, mu1, m_ssWWCuts, sys);
       evaluateLeptonCuts(*electrons, *muons, ele0, ele1, mu0, mu1, m_ssWWCuts);
       evaluateMetCuts(met, m_ssWWCuts);
-      evaluateJetCuts(*jets, m_ssWWCuts);
+      evaluateJetCuts(*nonbjets, m_ssWWCuts);
       evaluateBJetLeptonCuts(*bjets, *electrons, *muons, m_ssWWCuts);
       
       bool passedall = true;
@@ -412,6 +444,30 @@ namespace ssWWVBS
             }
           }
         }
+
+      //DijetsCR part used for Fake Factor determination
+      // Region requirement: exactly one lepton, at least one jet
+      // Collect by the prescale SLT 'HLT_mu14' and 'HLT_e12_lhvloose_nod0_L1EM10VH'
+      // |Delta phi(l,j)|>2.8, ET_miss_track+ mT(l,met)<50
+      else if (m_bools.at(pass_trigger_prescaleSLT) && m_bools.at(ssWWVBS::EXACTLY_ONE_LEPTON)){
+              if (electrons->size()==1 && nonbjets->size()>=1){
+                ele0=electrons->at(0);
+                float mT_lepMET = std::sqrt(2*ele0->pt()*met->met()*(1-std::cos(ele0->phi()-met->phi())));
+		float DPhi_lepjet= std::numbers::pi-std::abs(std::numbers::pi-std::abs(ele0->phi()-nonbjets->at(0)->phi()));
+                if (ele0->pt() > 27. * Athena::Units::GeV && nonbjets->at(0)->pt() > 25. * Athena::Units::GeV && DPhi_lepjet>2.8 && (mT_lepMET + met_track->met()) < 50. * Athena::Units::GeV && bjets->size()==0 ){
+                  m_bools.at(ssWWVBS::pass_DijetsCR)=1;
+                }
+              }
+
+              else if (muons->size()==1 && nonbjets->size()>=1){
+                mu0=muons->at(0);
+                float mT_lepMET = std::sqrt(2*mu0->pt()*met->met()*(1-std::cos(mu0->phi()-met->phi())));
+		float DPhi_lepjet= std::numbers::pi-std::abs(std::numbers::pi-std::abs(mu0->phi()-nonbjets->at(0)->phi()));
+                if (mu0->pt() > 27. * Athena::Units::GeV && nonbjets->at(0)->pt() > 30. * Athena::Units::GeV && DPhi_lepjet>2.8 && (mT_lepMET + met_track->met()) < 50. * Athena::Units::GeV && bjets->size()==0){
+                  m_bools.at(ssWWVBS::pass_DijetsCR)=1;
+                }
+              }
+      }
             
       bool pass = false;
       for(const auto& channel : m_channels){
@@ -423,6 +479,9 @@ namespace ssWWVBS
         }
         else if(channel == ssWWVBS::misIDCR){
           pass |= m_bools.at(ssWWVBS::pass_misIDCR);
+        }
+        else if(channel == ssWWVBS::DijetsCR){
+          pass |= m_bools.at(ssWWVBS::pass_DijetsCR);
         }
       }
       
@@ -661,6 +720,14 @@ namespace ssWWVBS
         m_bools.at(ssWWVBS::IS_me) = true;
       }
     }
+    //Add the single electron condition for DijetsCR
+    else if (ele0){
+      m_bools.at(ssWWVBS::PASS_LEPTON_ID) = true;
+    }
+    //Add the single muon condition for DijetsCR
+    else if (mu0){
+      m_bools.at(ssWWVBS::PASS_LEPTON_ID) = true;
+    }
     // Set the boolean flags for the leptons
     if (ele0) {
       m_ele_selected.set(*ele0, true, sys);
@@ -685,6 +752,9 @@ namespace ssWWVBS
     float mZ = 91 * Athena::Units::GeV;
     double mll = -99;
     bool Two_Same_Sign_Leptons = false;
+
+    if (electrons.size() + muons.size() == 1)
+      m_bools.at(ssWWVBS::EXACTLY_ONE_LEPTON) = true;
 
     if (electrons.size() + muons.size() == 2)
       m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) = true;
@@ -724,7 +794,7 @@ namespace ssWWVBS
 
   }
 
-  void ssWWSelectorAlg::evaluateJetCuts(const xAOD::JetContainer& jets, CutManager& ssWWCuts)
+  void ssWWSelectorAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& ssWWCuts)
   {
 
     /// All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the ssWW_config file.
@@ -732,11 +802,11 @@ namespace ssWWVBS
     double mjj = -99;
     float delta_yjj = 0;
 
-    if(ssWWCuts.exists("AT_LEAST_TWO_JETS")) m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) = (jets.size() >= 2 && jets.at(0)->pt() > 65*Athena::Units::GeV && jets.at(1)->pt() > 35*Athena::Units::GeV);
+    if(ssWWCuts.exists("AT_LEAST_TWO_JETS")) m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) = (nonbjets.size() >= 2 && nonbjets.at(0)->pt() > 65*Athena::Units::GeV && nonbjets.at(1)->pt() > 35*Athena::Units::GeV);
     
-    if (jets.size() >= 2){
-      mjj = (jets.at(0)->p4() + jets.at(1)->p4()).M();
-      delta_yjj = std::abs(jets.at(0)->rapidity() - jets.at(1)->rapidity());
+    if (nonbjets.size() >= 2){
+      mjj = (nonbjets.at(0)->p4() + nonbjets.at(1)->p4()).M();
+      delta_yjj = std::abs(nonbjets.at(0)->rapidity() - nonbjets.at(1)->rapidity());
       if(ssWWCuts.exists("DIJETS_MASS_LOW")) m_bools.at(ssWWVBS::DIJETS_MASS_LOW) = (mjj > 200*Athena::Units::GeV);
       if(ssWWCuts.exists("DIJETS_MASS_HIGH")) m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) = (mjj > 500*Athena::Units::GeV);
       if(ssWWCuts.exists("DIJETS_DELTA_RAPIDITY")) m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) = (delta_yjj > 2);
@@ -816,6 +886,49 @@ namespace ssWWVBS
     ANA_CHECK (book (TH1F("EventsPassed_BinLabeling", "Events passed by each cut / Bin labeling", nbins, 0.5, nbins + 0.5)));
 
     return StatusCode::SUCCESS;
+  }
+
+  //Only give this prescale SLT to one lepton events
+    void ssWWSelectorAlg::evaluatePrescaleTriggerCuts(const xAOD::EventInfo *event, const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons, const CP::SystematicSet& sys){
+      std::vector<std::string> prescale_trigger_paths;
+      int year=m_year.get(*event,sys);
+      bool Pass_Prescale_Trig = false;
+      if (year==2015 || year==2016){
+          if (electrons.size()==1 && muons.size()==0 ){
+              const xAOD::Electron* ele_preTrig=nullptr;
+              ele_preTrig=electrons.at(0);
+              prescale_trigger_paths={
+              "HLT_e12_lhvloose_nod0_L1EM10VH",
+              };
+              for (const auto& prescale_trigger : prescale_trigger_paths){
+                  bool pass=m_triggerdecos.at("trigPassed_"+prescale_trigger).get(*event,sys);
+                  if (pass){
+                      bool match = m_matchingTool->match(*ele_preTrig,prescale_trigger);
+                      Pass_Prescale_Trig |= match;
+                  }
+              }
+              //Here could add a threshold cut for the lepton pass the Prescale SLT
+              //Pass_Prescale_Trig &= (ele_preTrig->pt() > 12. * Athena::Units::GeV; )
+          }
+
+          else if(electrons.size()==0 && muons.size()==1){
+              const xAOD::Muon* muon_preTrig=nullptr;
+              muon_preTrig=muons.at(0);
+              prescale_trigger_paths={
+              "HLT_mu14",
+              };
+              for (const auto& prescale_trigger : prescale_trigger_paths ){
+                  bool pass=m_triggerdecos.at("trigPassed_"+prescale_trigger).get(*event,sys);
+                  if (pass){
+                      bool match = m_matchingTool->match(*muon_preTrig,prescale_trigger);
+                      Pass_Prescale_Trig |= match;
+                  }
+              }
+              //Here could add a threshold cut for the lepton pass the Prescale SLT
+              //Pass_Prescale_Trig &= (muon_preTrig->pt() > 14. * Athena::Units::GeV; )
+          }
+      }
+      m_bools.at(ssWWVBS::pass_trigger_prescaleSLT)=Pass_Prescale_Trig;
   }
 
 }

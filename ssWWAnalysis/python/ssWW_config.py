@@ -52,6 +52,11 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
         for c in flags.Analysis.TriggerChains
     ]
 
+    # The "ID" and "ISO" will be used for lepton definition.
+    # The first one of "extra_wps" will be used to
+    # define the pass-ID region for the CI test.
+    # If the "extra_wps" does not exist (e.g. RunConfig-Baseline-ssWW.yaml),
+    # using the "ID" and "ISO" as the substitute.
     if "extra_wps" in flags.Analysis.Electron:
         el_exps = flags.Analysis.Electron.extra_wps
         if len(el_exps) > 0:
@@ -84,6 +89,7 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
             MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
     else:
         MuonWPLabel = f'{flags.Analysis.Muon.ID}_{flags.Analysis.Muon.Iso}'
+
     cfg.addEventAlgo(
         CompFactory.ssWWVBS.ssWWSelectorAlg(
             "ssWWSelectorAlg",
@@ -95,6 +101,7 @@ def ssWW_cfg(flags, smalljetkey, muonkey, electronkey,
             muonWP=MuonWPLabel,
             isMC=flags.Input.isMC,
             triggerLists=trigger_branches,
+            channels=flags.Analysis.channels,
             trigMatchingTool=cfg.popToolsAndMerge(TriggerMatchingToolCfg(flags)),
             bypass=(flags.Analysis.bypass if hasattr(flags.Analysis, 'bypass')
                     else False),
@@ -125,6 +132,7 @@ def get_BaselineVarsssWWAlg_variables(flags):
     float_variable_names += ["dPhillMET", "dPhil1MET", "dPhil2MET"]
     float_variable_names += ["mlljjmet", "METSig", "mT_Lepton1_Met", "mT_Lepton2_Met"]
     float_variable_names += ["mlljj", "mT_L_min", "HT2", "HT2r", "mT2_jj"]
+    float_variable_names += ["MET_Track_met", "MET_Track_phi"]
     float_variable_names += ["mT", "epsilon_j3"]
     int_variable_names += ["nJets", "nBJets", "nCentralJets", "nForwardJets"]
     int_variable_names += ["nElectrons", "nMuons", "nLeptons", "nGapJets"]
@@ -185,6 +193,7 @@ def ssWW_branches(flags):
         "LowDyVR", "LowMjjVR", "LowNjVR",
         "tFakeVR", "tEWKVR", "lllVR",
         "ZeeVR",
+        "DijetsCR",
     ]:
         branches += [f"EventInfo.pass_{region}_%SYS% -> ssWW_pass_{region}_%SYS%"]
 
@@ -195,7 +204,7 @@ def ssWW_branches(flags):
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in ssWWSelectorAlg
-    for cat in ["SLT"]:
+    for cat in ["SLT", "prescaleSLT",]:
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> ssWW_pass_trigger_{cat}_%SYS%"]
 

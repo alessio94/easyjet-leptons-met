@@ -114,9 +114,15 @@ namespace ssWWVBS
       const xAOD::MissingETContainer *metCont = nullptr;
       ANA_CHECK (m_metHandle.retrieve (metCont, sys));
       const xAOD::MissingET* met = (*metCont)["Final"];
+      const xAOD::MissingET* met_track = (*metCont)["PVSoftTrk"];
       if (!met) {
         ATH_MSG_ERROR("Could not retrieve MET");
         return StatusCode::FAILURE;	
+      }
+
+      if (!met_track) {
+        ATH_MSG_ERROR("Could not retrieve MET_PVSoftTrk");
+        return StatusCode::FAILURE;
       }
 
       for (const std::string &string_var: m_floatVariables) {
@@ -151,6 +157,16 @@ namespace ssWWVBS
           else nonbjets->push_back(jet);
         }
       }
+    
+      //Jet ordering 
+      std::sort(nonbjets->begin(), nonbjets->end(),
+        [](const xAOD::Jet* a, const xAOD::Jet* b) {
+          return a->pt() > b->pt(); });
+
+      std::sort(bjets->begin(), bjets->end(),
+        [](const xAOD::Jet* a, const xAOD::Jet* b) {
+          return a->pt() > b->pt(); });
+
       int n_bjets = bjets->size();
 
       m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
@@ -257,7 +273,12 @@ namespace ssWWVBS
       TLorentzVector ll;
       TLorentzVector Leading_lep;
       TLorentzVector Subleading_lep;
-      if (nLeptons >=1) Leading_lep = leptons[0].first->p4();
+      if (nLeptons >=1){ 
+	Leading_lep = leptons[0].first->p4();
+	m_Fbranches.at("MET_Track_met").set(*event, met_track->met(), sys);
+	m_Fbranches.at("MET_Track_phi").set(*event, met_track->phi(), sys);
+      }
+
       if (nLeptons >= 2){
 
         Subleading_lep = leptons[1].first->p4();
