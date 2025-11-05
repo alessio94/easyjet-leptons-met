@@ -1,6 +1,6 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from EasyjetHub.output.ttree.truth_jets import get_TopHiggs_jet_truth_labels
-from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
+from EasyjetHub.steering.sample_metadata import is_at_least
 
 
 def get_large_R_jet_branches(
@@ -79,11 +79,10 @@ def get_large_R_jet_branches(
             flags.Analysis.Large_R_jet.wtag_wp:
         large_R_jet_branches.variables += get_wtag_branches(flags)
 
-    split_tags = flags.Input.AMITag.split("_")
-    is_valid_ptag = get_valid_ami_tag(split_tags, "p", "p5834")
-    is_valid_for_v02 = get_valid_ami_tag(split_tags, "p", "p6490")
-    is_valid_for_bjr_v01 = get_valid_ami_tag(split_tags, "p", "p6697")
-    is_valid_for_gn3x = get_valid_ami_tag(split_tags, "p", "p7017")
+    is_valid_ptag = is_at_least(flags, "p5834")
+    is_valid_for_v02 = is_at_least(flags, "p6490")
+    is_valid_for_bjr_v01 = is_at_least(flags, "p6697")
+    is_valid_for_gn3x = is_at_least(flags, "p7017")
     if lr_jet_type == "UFO" and is_valid_ptag:
         if jet_output_flags.btag_details:
             large_R_jet_branches.variables += get_large_R_gn2_branches(
@@ -108,22 +107,8 @@ def get_large_R_jet_branches(
         and is_valid_for_gn3x
         and jet_output_flags.btag_details
     ):
-        large_R_jet_branches.variables += [
-            "GN3XPV01_ptop",
-            "GN3XPV01_pqcdbx",
-            "GN3XPV01_phcc",
-            "GN3XPV01_pqcdcx",
-            "GN3XPV01_pWqq",
-            "GN3XPV01_phbb",
-            "GN3XPV01_pqcdll",
-            "GN3XPV01_pqcdbb",
-            "GN3XPV01_phtautauhad",
-            "GN2XTauV00_phtautauhad",
-            "GN2XTauV00_phbb",
-            "GN2XTauV00_phcc",
-            "GN2XTauV00_ptop",
-            "GN2XTauV00_pqcd",
-        ]
+        taggers = flags.Analysis.Large_R_jet.variables_in_ptag.p7017
+        large_R_jet_branches.variables += taggers
 
     large_R_jet_branches.variables += jet_output_flags.extra_variables
     if flags.Input.isMC:

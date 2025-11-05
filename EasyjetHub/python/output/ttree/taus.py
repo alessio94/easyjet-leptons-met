@@ -1,5 +1,5 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
-from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
+from EasyjetHub.steering.sample_metadata import is_at_least
 from EasyjetHub.output.ttree.truth_taus import get_TopHiggs_tau_truth_labels
 
 
@@ -44,9 +44,8 @@ def get_tau_branches(flags, tree_flags, input_container, output_prefix):
             "RNNEleScoreSigTrans_v1"
         ]
 
-        split_tags = flags.Input.AMITag.split("_")
         gntau_valid_ptag = (
-            get_valid_ami_tag(split_tags, "p", "p6479") and not flags.Input.isPHYSLITE)
+            is_at_least(flags, "p6479") and not flags.Input.isPHYSLITE)
         if gntau_valid_ptag:
             tau_branches.variables += [
                 "GNTauScoreSigTrans_v0prune"

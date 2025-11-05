@@ -1,6 +1,6 @@
 from EasyjetHub.output.ttree.branch_manager import BranchManager, SystOption
 from EasyjetHub.output.ttree.truth_jets import get_TopHiggs_jet_truth_labels
-from EasyjetHub.steering.sample_metadata import get_valid_ami_tag
+from EasyjetHub.steering.sample_metadata import is_at_least
 from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
 
@@ -154,13 +154,12 @@ def get_small_R_jet_branches(flags, tree_flags, input_container, output_prefix):
                 ]
 
     # ftag scores pb, pc, pl
-    split_tags = flags.Input.AMITag.split("_")
     gn2v01_valid_ptag = (
-        (get_valid_ami_tag(split_tags, "p", "p6026") and not flags.Input.isPHYSLITE)
-        or get_valid_ami_tag(split_tags, "p", "p6255"))
+        (is_at_least(flags, "p6026") and not flags.Input.isPHYSLITE)
+        or is_at_least(flags, "p6255"))
     gn3_valid_ptag = (
-        (get_valid_ami_tag(split_tags, "p", "p6697") and not flags.Input.isPHYSLITE)
-        or get_valid_ami_tag(split_tags, "p", "p6697"))
+        (is_at_least(flags, "p6697") and not flags.Input.isPHYSLITE)
+        or is_at_least(flags, "p6697"))
 
     if jet_output_flags.btag_details and gn2v01_valid_ptag:
         small_R_jet_branches.variables += [

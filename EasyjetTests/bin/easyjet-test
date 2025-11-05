@@ -96,12 +96,13 @@ declare -A DATAFILES=(
 )
 
 # fallback if we don't have EOS
-SMALL_TTBAR_MC23=p6697v4/daod/DAOD_PHYS.601229.e8514_e8528_s4159_s4114_r15530_r15514_p6697.small.pool.root
-SMALL_ZBBY_MC23=p6697v4/daod/DAOD_PHYS.701286.e8582_e8586_s4369_s4370_r16083_r15970_p6697.small.pool.root
+SMALL_TTBAR_MC23=p7017/daod/DAOD_PHYS.601229.e8514_e8528_s4159_s4114_r15530_r15514_p6697.small.pool.root
+SMALL_ZBBY_MC23=p7017/daod/DAOD_PHYS.701286.e8582_e8586_s4369_s4370_r16083_r15970_p6697.small.pool.root
+SMALL_ZBBY_MC23_P7017=p7017/daod/DAOD_PHYS.701286.e8582_e8586_s4369_s4370_r16083_r15970_p7017.small.pool.root
 declare -A SMALL_DATAFILES=(
     # this zbby sample also works fine to pass the jet selection
-    [zbbjcalib-mc23]=${SMALL_ZBBY_MC23}
-    [zbbycalib-mc23]=${SMALL_ZBBY_MC23}
+    [zbbjcalib-mc23]=${SMALL_ZBBY_MC23_P7017}
+    [zbbycalib-mc23]=${SMALL_ZBBY_MC23_P7017}
 )
 
 declare -A TESTS=(

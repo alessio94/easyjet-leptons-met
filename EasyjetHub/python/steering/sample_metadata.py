@@ -76,12 +76,15 @@ def has_metadata(flags, path=None):
     return True
 
 
-def get_valid_ami_tag(tags, check_tag="p", min_valid_tag="p5657"):
-    is_valid_tag = False
+def is_at_least(flags, min_valid_tag, check_tag=None):
+    tags = flags.Input.AMITag.split("_")
+    if check_tag is None:
+        check_tag = min_valid_tag[0]
     for tag in tags:
-        if check_tag in tag:
-            is_valid_tag = int(tag[1:]) >= int(min_valid_tag[1:])
-    return is_valid_tag
+        if tag.startswith(check_tag):
+            if int(tag[1:]) >= int(min_valid_tag[1:]):
+                return True
+    return False
 
 
 def get_lumicalc_files(flags, prw_flags):

@@ -103,6 +103,8 @@ Large_R_jet:
   wtag_type: ""
   wtag_wp: ""
   wtag_extra_wps: []
+  variables_in_ptag:
+    include: xbb-vars-in-ptag.yaml
 
 Photon:
   min_pT: 10.e+3
