@@ -3,7 +3,7 @@
 # The most specific match applies. If no match, falls back to the default rule at the top
 
 # Default owner for everything else
-*                    @tstreble @mfujimot @aad @fcurcio @sizhang 
+*                    @mfujimot @fcurcio @sizhang 
 
 # Analysis packages
 /bbbbAnalysis/        @caiyi
