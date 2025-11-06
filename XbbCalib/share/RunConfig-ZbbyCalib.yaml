@@ -78,6 +78,7 @@ ttree_output:
       run_selection: true
       btag_details: true
       truth_labels: true
+      bjet_regression: true
     photons:
       run_selection: true
 

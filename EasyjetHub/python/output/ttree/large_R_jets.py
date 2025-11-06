@@ -95,12 +95,23 @@ def get_large_R_jet_branches(
         and is_valid_for_bjr_v01
         and jet_output_flags.bjet_regression
     ):
-        large_R_jet_branches.variables += [
-            "bJR10v00_pt",
-            "bJR10v00_mass",
-            "bJR10v01_pt",
-            "bJR10v01_mass",
-        ]
+        # p6697 introduced some bjr variables, but by p7017 one was switched our for
+        # the ext version. Here we check if we're between those two p-tags to decide
+        # which to use.
+        if is_valid_for_gn3x:
+            large_R_jet_branches.variables += [
+                "bJR10v00Ext_pt",
+                "bJR10v00Ext_mass",
+                "bJR10v01_pt",
+                "bJR10v01_mass",
+            ]
+        else:
+            large_R_jet_branches.variables += [
+                "bJR10v00_pt",
+                "bJR10v00_mass",
+                "bJR10v01_pt",
+                "bJR10v01_mass",
+            ]
 
     if (
         lr_jet_type == "UFO"
