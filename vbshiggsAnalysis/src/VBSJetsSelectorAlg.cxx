@@ -18,7 +18,7 @@ namespace VBSHIGGS{
 
         // Read syst-aware input handles
         ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
-
+        ATH_CHECK (m_vbsLRJetHandle.initialize(m_systematicsList));
         // Intialise syst-aware output decorators
         ATH_CHECK (m_VBSjetOutHandle.initialize(m_systematicsList));
         ATH_CHECK (m_NonVBsjetOutHandle.initialize(m_systematicsList));
@@ -49,6 +49,10 @@ namespace VBSHIGGS{
             // Retrieve inputs
             const xAOD::JetContainer *jets = nullptr;
             ANA_CHECK (m_jetHandle.retrieve (jets, sys));
+
+            const xAOD::JetContainer *largeJets = nullptr;
+            ANA_CHECK (m_vbsLRJetHandle.retrieve (largeJets, sys));
+
             
             auto VBSJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer> >(SG::VIEW_ELEMENTS);
             auto nonVBSJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>(
@@ -60,6 +64,12 @@ namespace VBSHIGGS{
 
             for(unsigned int i=0; i<jets->size(); i++){
                 const xAOD::Jet* jet1 = jets->at(i);
+
+                for (const xAOD::Jet* largeJet : *largeJets){
+                    if( jet1->p4().DeltaR(largeJet->p4()) < m_mindR ) 
+                        continue;
+                }
+                
                 // non b-tagged jets
                 if ( !m_isBtag.empty() && m_isBtag.get(*jet1, sys) ) continue;
 

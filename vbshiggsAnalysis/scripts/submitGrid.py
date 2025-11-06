@@ -30,11 +30,11 @@ def get_list_files(processes):
     for process in processes:
         file_name = ""
         if process == "data":
-            file_name = "data_Run2_p6490.txt"
+            file_name = "data_Run2_p6697.txt"
         else:
-            file_name = f"mc20_{process}_DAOD_PHYS_p6490.txt"
+            file_name = f"mc20_{process}_DAOD_PHYS_p6697.txt"
         f_base_path = os.path.abspath(
-            "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6490/"
+            "../easyjet/vbshiggsAnalysis/datasets/PHYS/p6697/"
         )
         path_to_file = os.path.join(f_base_path, file_name)
         if os.path.exists(path_to_file):

@@ -46,7 +46,14 @@ namespace VBSHIGGS{
             //non VBS jets to write
             CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_NonVBsjetOutHandle{ this, "SignaljetContainerOutKey", "vbshiggsAnalysisSignalJets_%SYS%", "Non VBS Jet container to write" };
             
+            // btagging
             CP::SysReadDecorHandle<char>  m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
+
+            // Large-R jet container (needed for analysis OR between large-small jets)
+            CP::SysReadHandle<xAOD::JetContainer> m_vbsLRJetHandle{ this, "vbsLRJets", "vbshiggsAnalysisLargeJets_%SYS%", "Large R Jet container to read"};
+
+            // Delta R cut (value taken based on Small-R - Large-R jet OR implemented in athena https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/AsgAnalysisAlgorithms/python/OverlapAnalysisConfig.py#L490 )
+            Gaudi::Property<float> m_mindR{this, "minDR", 1., "Min Angular distance between large-R and small-R jets"};
     };
 }
 
