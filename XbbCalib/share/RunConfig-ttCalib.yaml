@@ -70,7 +70,7 @@ ttree_output:
     large_R_jets:
       run_selection: true
       # substructure_info: true
-      # truth_labels: true
+      truth_labels: true
     muons:
       run_selection: true
     electrons:
