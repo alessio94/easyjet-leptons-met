@@ -22,6 +22,7 @@ namespace XBBCALIB
 
   // forward declare, define in the Cxx file
   class FourVectorOutBlock;
+  template <typename T> class Muel;
 
   /// \brief An algorithm for counting containers
   class BaselineVarsZbbyCalibAlg final : public AthHistogramAlgorithm
@@ -61,14 +62,6 @@ private:
       "photons_n_%SYS%", this
     };
 
-    // copy variables from the jet to the eventInfo
-    template <typename T>
-    using SRDH_t = CP::SysReadDecorHandle<T>;
-    template <typename T>
-    using SWDH_t = CP::SysWriteDecorHandle<T>;
-    template <typename T>
-    using rw_pair_t = std::pair<SRDH_t<T>, SWDH_t<T>>;
-
     Gaudi::Property<std::string> m_copied_variable_prefix{
       this, "copiedVariablePrefix", "", "prefix for copied variables"
     };
@@ -76,12 +69,11 @@ private:
     // floats
     Gaudi::Property<std::vector<std::string>> m_floats_to_copy{
       this, "floatsToCopy", {}, "floats to copy to eventinfo"};
-    std::vector<std::unique_ptr<rw_pair_t<float>>> m_float_copy_pairs;
-
+    std::unique_ptr<Muel<float>> m_float_muel;
     // ints
     Gaudi::Property<std::vector<std::string>> m_ints_to_copy{
       this, "intsToCopy", {}, "intss to copy to eventinfo"};
-    std::vector<std::unique_ptr<rw_pair_t<int>>> m_int_copy_pairs;
+    std::unique_ptr<Muel<int>> m_int_muel;
 
     /// \brief Setup sys-aware output decorations
     std::unique_ptr<FourVectorOutBlock> m_photon_4vec;

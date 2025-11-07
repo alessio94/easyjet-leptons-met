@@ -9,6 +9,7 @@ add_compile_options(-Werror)
 
 # Build the Athena component library
 atlas_add_component(XbbCalib
+  src/FourVectorOutBlock.cxx
   src/BaselineVarsttCalibAlg.cxx
   src/BaselineVarsZbbjCalibAlg.cxx
   src/BaselineVarsZllCalibAlg.cxx
@@ -17,7 +18,7 @@ atlas_add_component(XbbCalib
   src/ttCalibSelectorAlg.cxx
   src/components/XbbCalib_entries.cxx
   src/ZbbyCalibSelectorAlg.cxx
-  src/BaselineVarsZbbyCalibAlg.cxx 
+  src/BaselineVarsZbbyCalibAlg.cxx
   src/ZcandSelectorAlg.cxx
 
   LINK_LIBRARIES
