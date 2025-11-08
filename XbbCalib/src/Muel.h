@@ -3,23 +3,10 @@
 
 #include "DefaultOutputs.h"
 
-#include <concepts>
-
-namespace defaults {
-  template <typename T>
-  auto get_default();
-  template <std::integral T>
-  auto get_default() {
-    return def_int;
-  }
-  template <std::floating_point T>
-  auto get_default() {
-    return def_float;
-  }
-}
-
 namespace XBBCALIB {
 
+  // Each Muel can copy one type T of variable. Likely choices are
+  // float and int.
   template <typename T>
   class Muel
   {
@@ -29,9 +16,9 @@ namespace XBBCALIB {
     using rw_pair_t = std::pair<SRDH_t, SWDH_t>;
     std::vector<std::unique_ptr<rw_pair_t>> m_copy_pairs;
   public:
-    template <typename R, typename I, typename O>
+    template <typename I, typename O>
     Muel(Gaudi::Algorithm* owner,
-         const R& range,
+         const std::vector<std::string>& range,
          CP::SysListHandle& syst_list,
          I& input,
          O& output,
