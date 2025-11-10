@@ -107,12 +107,13 @@ namespace HHBBVV
       else if ( channel == "SplitBoosted1Lep") m_channels.push_back(HHBBVV::SplitBoosted1Lep);
       else if( channel == "Boosted0Lep") m_channels.push_back(HHBBVV::Boosted0Lep);
       else if ( channel == "SplitBoosted0Lep") m_channels.push_back(HHBBVV::SplitBoosted0Lep);
+      else if ( channel == "Common0Lep") m_channels.push_back(HHBBVV::Common0Lep);
       else if ( channel == "VBFBoosted1Lep") m_channels.push_back(HHBBVV::VBFboosted1Lep);
       else if ( channel == "VBFSplitboosted1Lep") m_channels.push_back(HHBBVV::VBFsplitboosted1Lep);
       else{
         ATH_MSG_ERROR("Unknown channel: "
           << channel << std::endl
-          << "Available are: [\"Boosted1Lep\", \"SplitBoosted1Lep\", \"Boosted0Lep\", \"SplitBoosted0lep\", \"VBFSplitboosted1Lep\", \"VBFBoosted1Lep\"]");
+          << "Available are: [\"Boosted1Lep\", \"SplitBoosted1Lep\", \"Boosted0Lep\", \"SplitBoosted0lep\", \"Common0lep\", \"VBFSplitboosted1Lep\", \"VBFBoosted1Lep\"]");
         return StatusCode::FAILURE;
       }
       ATH_MSG_DEBUG("Running Channel: " << channel);
@@ -231,7 +232,9 @@ namespace HHBBVV
         if (m_Whad.get(*lrjet, sys))
         {
           prefix = "Whad_Jet";
-          m_Fbranches.at(prefix+"_DeltaR").set(*event, lrjet->p4().DeltaR(signal_lepton), sys);
+          if(m_run_lep){
+            m_Fbranches.at(prefix+"_DeltaR").set(*event, lrjet->p4().DeltaR(signal_lepton), sys);
+          }
 
           for(auto channel: m_channels){
             if(channel == HHBBVV::Boosted0Lep){
@@ -289,8 +292,10 @@ namespace HHBBVV
       }
 
       m_Ibranches.at("lrjets_n").set(*event, lrjets->size(), sys);
-      m_Ibranches.at("srjets_n").set(*event, jets->size(), sys);
-      m_Ibranches.at("Selected_Lepton_n").set(*event, (electrons->size()+muons->size()), sys);      
+      if(m_run_lep){
+        m_Ibranches.at("srjets_n").set(*event, jets->size(), sys);
+        m_Ibranches.at("Selected_Lepton_n").set(*event, (electrons->size()+muons->size()), sys);      
+      }
 
       // DiHiggs mass 
       TLorentzVector bb(0,0,0,0);

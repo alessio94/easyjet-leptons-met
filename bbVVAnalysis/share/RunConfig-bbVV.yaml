@@ -68,7 +68,6 @@ save_cutflow: false
 CutList : # Only include general cuts
       - AT_LEAST_TWO_LRJETS
       - LEAD_LRJ_PT
-      - HBB_BTAG
 
 # Include the TTree configuration and update details
 ttree_output:
@@ -76,16 +75,9 @@ ttree_output:
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:
-    small_R_jets: 'container_names.output.reco4PFlowJet'
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-    muons: 'container_names.output.muons'
-    electrons: 'container_names.output.electrons'
-    met : 'container_names.output.met'
   collection_options:
-    small_R_jets:
-      btag_info: true
     large_R_jets:
       truth_labels: true
   truth_outputs:
-    small_R_jets: 'container_names.input.truth4Jet'
     higgs_particle: 'container_names.output.truthHHParticles'

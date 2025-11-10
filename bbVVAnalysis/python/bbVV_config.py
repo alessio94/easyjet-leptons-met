@@ -90,8 +90,12 @@ def bbVV_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
 
 def get_BaselineVarshhbbVVAlg_variables(flags):
 
-    int_variable_names = ["lrjets_n", "srjets_n", "Selected_Lepton_n"]
-    float_variable_names = ["Whad_Jet_DeltaR"]
+    int_variable_names = []
+    float_variable_names = []
+
+    if any("1Lep" in ch for ch in flags.Analysis.channel):
+        int_variable_names += ["srjets_n", "Selected_Lepton_n"]
+        float_variable_names += ["Whad_Jet_DeltaR"]
 
     objects = ["Hbb", "Whad"]
     if "SplitBoosted0Lep" in flags.Analysis.channel:
@@ -127,13 +131,14 @@ def bbVV_branches(flags):
     branches = []
 
     float_variable_names = []
-    int_variable_names = []
+    int_variable_names = ["lrjets_n"]
     all_baseline_variable_names = []
 
-    baseline_float_variables, baseline_int_variables \
-        = get_BaselineVarshhbbVVAlg_variables(flags)
-    float_variable_names += baseline_float_variables
-    int_variable_names += baseline_int_variables
+    if "Common0Lep" not in flags.Analysis.channel:
+        baseline_float_variables, baseline_int_variables \
+            = get_BaselineVarshhbbVVAlg_variables(flags)
+        float_variable_names += baseline_float_variables
+        int_variable_names += baseline_int_variables
 
     all_baseline_variable_names += [
         *float_variable_names,

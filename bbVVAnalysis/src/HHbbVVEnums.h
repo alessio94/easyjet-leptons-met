@@ -12,6 +12,7 @@ namespace HHBBVV
     SplitBoosted0Lep = 3,
     VBFboosted1Lep = 4,
     VBFsplitboosted1Lep = 5,
+    Common0Lep = 6,
   };
   enum Var
   {

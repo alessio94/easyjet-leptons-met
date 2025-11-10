@@ -75,10 +75,11 @@ namespace HHBBVV
       else if ( name == "SplitBoosted1Lep") m_channels.push_back(HHBBVV::SplitBoosted1Lep);
       else if( name == "Boosted0Lep") m_channels.push_back(HHBBVV::Boosted0Lep);
       else if ( name == "SplitBoosted0Lep") m_channels.push_back(HHBBVV::SplitBoosted0Lep);
+      else if ( name == "Common0Lep") m_channels.push_back(HHBBVV::Common0Lep);
       else{
         ATH_MSG_ERROR("Unknown channel: "
           << name << std::endl
-          << "Available are: [\"Boosted1Lep\", \"SplitBoosted1Lep\", \"Boosted0Lep\", \"SplitBoosted0Lep\"]");
+          << "Available are: [\"Boosted1Lep\", \"SplitBoosted1Lep\", \"Boosted0Lep\", \"SplitBoosted0Lep\", \"Common0Lep\"]");
         return StatusCode::FAILURE;
       }
     }
@@ -346,6 +347,7 @@ namespace HHBBVV
       else if(channel == HHBBVV::SplitBoosted1Lep) pass |= (TWO_LRJETS && ONE_LEP && ONELEPSPLITBOOSTED_TOPO);
       else if(channel == HHBBVV::Boosted0Lep) pass |= (leadLRJ_pt > 500. * Athena::Units::GeV && TWO_LRJETS && VETO_LEP && ZEROLEPBOOSTED_TOPO);
       else if(channel == HHBBVV::SplitBoosted0Lep) pass |= (leadLRJ_pt > 500. * Athena::Units::GeV && THREE_LRJETS && VETO_LEP && ZEROLEPSPLITBOOSTED_TOPO);
+      else if (channel == HHBBVV::Common0Lep) pass |= (leadLRJ_pt > 500. * Athena::Units::GeV && TWO_LRJETS && VETO_LEP);
       }
       ATH_MSG_DEBUG("pass:" << pass);
       ATH_MSG_DEBUG("NEXT EVENT");

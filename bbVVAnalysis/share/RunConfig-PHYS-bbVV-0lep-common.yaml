@@ -1,0 +1,18 @@
+include: bbVVAnalysis/RunConfig-bbVV.yaml
+
+channel: ["Common0Lep"]
+
+CutList : # Channel specific cuts here
+      - VETO_SIGNAL_LEPTON
+
+Large_R_jet:
+  wtag_type: "DNN"
+
+save_cutflow: true
+
+ttree_output:
+  collection_options:
+    large_R_jets:
+      substructure_info: true
+      bjet_regression: true
+      extra_variables: ["Tau4_wta"]

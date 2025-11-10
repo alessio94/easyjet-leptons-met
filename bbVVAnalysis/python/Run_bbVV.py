@@ -33,18 +33,19 @@ def get_sample_dir(path, dsid_str):
 
 
 def io_manager(
-        process="signal", boosted=False, mass=2000, lepton=True,
+        process="bbWW0lep", boosted="", mass=2000, lepton=True, systematics=False,
         sample_dir="/eos/atlas/atlascerngroupdisk/phys-higp/higgs-pairs/bbVV/"):
 
     outFile = "ejOutput_PHYS_bbVV_"  # Add substrings below
 
     lep_channel = "1lep" if lepton else "0lep"
-    boosted_channel = "boosted" if boosted else "splitboosted"
+    boosted_channel = boosted
+    sys = "-sys" if systematics else ""
     configFile = "bbVVAnalysis/RunConfig-PHYS-bbVV-" + lep_channel + \
-                 "-" + boosted_channel + ".yaml"
+                 "-" + boosted_channel + sys + ".yaml"
     outFile += lep_channel + "_" + boosted_channel + "_"
 
-    if process == "signal":
+    if process == "bbWW0lep":
         mass_key = "X" + str(mass)
         if (not lepton and not boosted):
             mass_key += "_S" + str(int(mass / 2))
@@ -60,11 +61,11 @@ def io_manager(
 
 
 def run_local(
-        process="signal", boosted=False, mass=2000, lepton=True,
+        process="bbWW0lep", boosted="", mass=2000, lepton=True, systematics=False,
         sample_dir="/eos/atlas/atlascerngroupdisk/phys-higp/higgs-pairs/bbVV/"):
 
     inputFile, outputFile, configFile = io_manager(
-        process, boosted, mass, lepton, sample_dir)
+        process, boosted, mass, lepton, systematics, sample_dir)
     input = '"' + inputFile + '*"'
     command = ("bbVV-ntupler --loglevel " + dbg_level + " --evtMax=10000 "
                + input + " --run-config " + configFile + " --out-file " + outputFile)
@@ -78,7 +79,10 @@ def run_local(
         os.path.realpath(outputFile))
 
 
-def run_grid(process="top", boosted=False, lepton=True, campaign="mc23a", tag="NONE"):
+def run_grid(
+        process="top", boosted="", lepton=True, campaign="mc23a",
+        tag="NONE", systematics=False):
+
     executable = "bbVV-ntupler"
     ListDir = easyjet_build_dir + "/data/bbVVAnalysis/PHYS/nominal/" + campaign + "/"
     if process == "data":
@@ -87,9 +91,10 @@ def run_grid(process="top", boosted=False, lepton=True, campaign="mc23a", tag="N
         List = ListDir + campaign + "_" + process + "_p6697.txt"
 
     lep_channel = "1lep" if lepton else "0lep"
-    boosted_channel = "boosted" if boosted else "splitboosted"
+    boosted_channel = boosted
+    sys = "-sys" if systematics else ""
     configFile = "bbVVAnalysis/RunConfig-PHYS-bbVV-" + lep_channel + \
-                 "-" + boosted_channel + ".yaml"
+                 "-" + boosted_channel + sys + ".yaml"
 
     if tag != "NONE":
         ej_gittag = tag
@@ -99,11 +104,11 @@ def run_grid(process="top", boosted=False, lepton=True, campaign="mc23a", tag="N
     if process == "data":
         command = ("easyjet-gridsubmit --data-list " + List
                    + " --run-config " + configFile + " --exec " + executable
-                   + " --campaign " + ej_gittag + "_%Y_%m_%d")
+                   + " --campaign " + ej_gittag)
     else:
         command = ("easyjet-gridsubmit --mc-list "
                    + List + " --run-config " + configFile + " --exec " + executable
-                   + " --campaign " + ej_gittag + "_%Y_%m_%d")
+                   + " --campaign " + ej_gittag)
     print(command)
     subprocess.run(command, shell=True)
     print("End of Run_bbVV.py, check your BigPanda!")
@@ -119,7 +124,8 @@ if __name__ == "__main__":
         "data",
         default="bbWW0lep")
     parser.add_argument(
-        "--Boost", help="Boosted: True, SplitBoosted: False", action='store_true')
+        "--Boost", help="Option: boosted, splitboosted, common (0Lep only).",
+        default="boosted")
     parser.add_argument(
         "--Lepton", help="Run bbVV 1lep channel", action='store_true')
     parser.add_argument(
@@ -136,6 +142,8 @@ if __name__ == "__main__":
         "--campaign", help="mc23a, mc23d, mc23e", default="mc23a")
     parser.add_argument(
         "--tag", help="Custom tag pattern", default="NONE")
+    parser.add_argument(
+        "--sys", help="Run systematics", action='store_true')
     args = parser.parse_args()
     process = args.Process
     boost = args.Boost
@@ -145,15 +153,16 @@ if __name__ == "__main__":
     sample_dir = args.SampleDir
     campaign = args.campaign
     tag = args.tag
+    systematics = args.sys
     print(
         "Process:", process, "\tLepton:", lepton, "\tBoost:", boost,
         "\tMass: ", mass, "\tGrid:", grid, "\tSampleDir:", sample_dir,
-        "\tCampaign:", campaign, "\tTag:", tag)
+        "\tCampaign:", campaign, "\tTag:", tag, "\tSys:", systematics)
 
     # Need to synchronize with io_manager / run_grid
     if grid:
         print("Running on Grid.")
-        run_grid(process, boost, lepton, campaign, tag)
+        run_grid(process, boost, lepton, campaign, tag, systematics)
     else:
         print("Running locally.")
-        run_local(process, boost, mass, lepton, sample_dir)
+        run_local(process, boost, mass, lepton, systematics, sample_dir)

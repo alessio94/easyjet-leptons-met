@@ -8,3 +8,4 @@ Large_R_jet:
 CutList : # Channel specific cuts here
       - VETO_SIGNAL_LEPTON
       - AT_LEAST_THREE_LRJETS
+      - HBB_BTAG
