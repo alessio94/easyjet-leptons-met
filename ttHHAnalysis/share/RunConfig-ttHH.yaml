@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # Which analysis to consider
 do_ttHH_analysis: true
@@ -53,12 +53,12 @@ Lepton:
 
 # orthogonality studies  
 orthogonality:
-  include: EasyjetHub/orth-config.yaml 
+  include: [EasyjetHub/orth-config.yaml ]
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
 # list of triggers per year to consider
 Trigger:
-  include: ttHHAnalysis/trigger.yaml
+  include: [ttHHAnalysis/trigger.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
@@ -84,7 +84,7 @@ CutList:
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   reco_outputs:
     #small_R_jets: 'container_names.output.reco4PFlowJet'

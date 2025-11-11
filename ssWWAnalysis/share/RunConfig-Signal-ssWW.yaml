@@ -1,4 +1,4 @@
-include: ssWWAnalysis/RunConfig-Baseline-ssWW.yaml
+include: [ssWWAnalysis/RunConfig-Baseline-ssWW.yaml]
 
 Electron:
   extra_wps:

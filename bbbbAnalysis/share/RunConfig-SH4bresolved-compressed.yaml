@@ -1,4 +1,4 @@
-include: bbbbAnalysis/RunConfig-SH4b.yaml
+include: [bbbbAnalysis/RunConfig-SH4b.yaml]
 
 # do the bbbb resolved analysis
 do_resolved_dihiggs: true

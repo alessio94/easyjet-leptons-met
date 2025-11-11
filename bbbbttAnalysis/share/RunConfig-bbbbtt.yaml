@@ -1,4 +1,4 @@
-include: bbbbttAnalysis/RunConfig-bbbbtt-base.yaml
+include: [bbbbttAnalysis/RunConfig-bbbbtt-base.yaml]
 
 channels: ["HadHad","LepHad","ZCR","TopEMuCR"]
 

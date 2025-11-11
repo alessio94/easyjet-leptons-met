@@ -1,4 +1,4 @@
-include: yyMLAnalysis/RunConfig-yyml-base.yaml
+include: [yyMLAnalysis/RunConfig-yyml-base.yaml]
 
 CutList:
   - PASS_TRIGGER

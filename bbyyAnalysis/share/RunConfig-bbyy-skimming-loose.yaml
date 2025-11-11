@@ -1,4 +1,4 @@
-include: bbyyAnalysis/RunConfig-bbyy-base.yaml
+include: [bbyyAnalysis/RunConfig-bbyy-base.yaml]
 
 # flag that toggles run-through mode in the SelectorAlg
 bypass: false

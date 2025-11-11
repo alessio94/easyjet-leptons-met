@@ -1,4 +1,4 @@
-include: multileptonAnalysis/RunConfig-multilepton.yaml
+include: [multileptonAnalysis/RunConfig-multilepton.yaml]
 
 save_extrabb4l_vars: true
 do_KinematicFit: true

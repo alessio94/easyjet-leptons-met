@@ -1,4 +1,4 @@
-include: bbyyAnalysis/RunConfig-bbyy-base.yaml
+include: [bbyyAnalysis/RunConfig-bbyy-base.yaml]
 
 CutList :
       - PASS_TRIGGER

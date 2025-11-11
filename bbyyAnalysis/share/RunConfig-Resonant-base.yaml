@@ -1,4 +1,4 @@
-include: bbyyAnalysis/RunConfig-bbyy-base.yaml
+include: [bbyyAnalysis/RunConfig-bbyy-base.yaml]
 
 # setting this to warning until the team decides they want to be using
 # expert mode

@@ -1,4 +1,4 @@
-include: multileptonAnalysis/RunConfig-multilepton.yaml
+include: [multileptonAnalysis/RunConfig-multilepton.yaml]
 
 # Decay mode considered for truth decoration
 Truth:

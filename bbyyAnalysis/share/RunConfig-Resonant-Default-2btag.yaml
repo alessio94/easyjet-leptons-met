@@ -1,4 +1,4 @@
-include: bbyyAnalysis/RunConfig-Resonant-base.yaml
+include: [bbyyAnalysis/RunConfig-Resonant-base.yaml]
 
 CutList :
       - PASS_TRIGGER
@@ -14,4 +14,4 @@ do_CP_systematics: true
 systematics_regex: [".*"]
         
 ttree_output:
-  include: bbyy-base-output.yaml
+  include: [bbyy-base-output.yaml]

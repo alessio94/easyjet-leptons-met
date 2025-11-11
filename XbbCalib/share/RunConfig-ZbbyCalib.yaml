@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # setting this to warning until the team decides they want to be using
 # expert mode
@@ -54,14 +54,14 @@ Muon:
   Iso: "Tight_VarRad"
 # list of triggers per year to consider
 Trigger:
-  include: XbbCalib/trigger_Zbby.yaml
+  include: [XbbCalib/trigger_Zbby.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: false
 
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   reco_outputs:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'

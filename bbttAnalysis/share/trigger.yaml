@@ -1,5 +1,5 @@
 decoration:
-  include: bbttAnalysis/trigger_full.yaml
+  include: [bbttAnalysis/trigger_full.yaml]
 
 scale_factor:
   doSF: true

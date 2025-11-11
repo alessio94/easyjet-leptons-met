@@ -1,4 +1,4 @@
-include: bbVVAnalysis/RunConfig-bbVV.yaml
+include: [bbVVAnalysis/RunConfig-bbVV.yaml]
 
 channel: ["SplitBoosted0Lep"]
 

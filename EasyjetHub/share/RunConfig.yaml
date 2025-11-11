@@ -1,4 +1,4 @@
-include: base-config.yaml
+include: [base-config.yaml]
 
 # Decay mode considered for truth decoration
 Truth:
@@ -29,7 +29,7 @@ Muon:
 
 # list of triggers per year to consider
 Trigger:
-  include: trigger.yaml
+  include: [trigger.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
@@ -42,7 +42,7 @@ do_overlap_removal: true
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: AnalysisMiniTree-config.yaml
+  include: [AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   reco_outputs:
     muons: 'container_names.output.muons'

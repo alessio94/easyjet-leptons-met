@@ -1,5 +1,5 @@
 selection:
-  include: llttAnalysis/trigger_full.yaml
+  include: [llttAnalysis/trigger_full.yaml]
 
 scale_factor:
   doSF: true

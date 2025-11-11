@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # Which analysis and channels to consider
 do_bbVV_analysis: true
@@ -49,12 +49,12 @@ Muon:
 
 # orthogonality studies  
 orthogonality:
-  include: EasyjetHub/orth-config.yaml 
+  include: [EasyjetHub/orth-config.yaml ]
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
 # list of triggers per year to consider
 Trigger:
-  include: bbVVAnalysis/trigger.yaml
+  include: [bbVVAnalysis/trigger.yaml]
 
 # write objects with overlap removal applied
 # turning this on you have to decide on one large R jet collection
@@ -71,7 +71,7 @@ CutList : # Only include general cuts
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:

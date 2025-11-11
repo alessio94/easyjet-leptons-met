@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 expert_mode_warning_level: default
 
@@ -65,12 +65,12 @@ OverlapRemoval:
 
 # orthogonality studies  
 orthogonality:
-  include: EasyjetHub/orth-config.yaml 
+  include: [EasyjetHub/orth-config.yaml ]
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
 # list of triggers per year to consider
 Trigger:
-  include: bbyyAnalysis/trigger.yaml
+  include: [bbyyAnalysis/trigger.yaml]
 # flag for trigger filtering
 do_trigger_filtering: false
 
@@ -145,17 +145,17 @@ VBFjetsMethod: "mjj" # "mjj" "pTsorting"
 #Use a dedicated GRL for bbyy due to photon triggers
 GRL:
   years:
-    include: bbyyAnalysis/photon_grl_years.yaml
+    include: [bbyyAnalysis/photon_grl_years.yaml]
   files:
-    include: bbyyAnalysis/photon_grl.yaml
+    include: [bbyyAnalysis/photon_grl.yaml]
 
 PileupReweighting:
   extra_prw:
     - postfix: "photon"
       lumicalc_files:
-        include: bbyyAnalysis/lumicalc_photon.yaml
+        include: [bbyyAnalysis/lumicalc_photon.yaml]
       prw_files:
-        include: bbyyAnalysis/prw_photon.yaml
+        include: [bbyyAnalysis/prw_photon.yaml]
 
 ttree_output:
-  include: bbyy-base-output.yaml
+  include: [bbyy-base-output.yaml]

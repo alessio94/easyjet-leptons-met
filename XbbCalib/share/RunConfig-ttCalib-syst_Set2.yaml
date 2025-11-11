@@ -1,4 +1,4 @@
-include: XbbCalib/RunConfig-ZbbyCalib.yaml
+include: [XbbCalib/RunConfig-ZbbyCalib.yaml]
 # Run all CP syst
 do_CP_systematics: true
 systematics_regex: [".*(MUON|MET|JER).*"] # systematics to be included

@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 channels: ["SR","WZCR","misIDCR", "incVR", "LowDyVR", "LowMjjVR", "LowNjVR", "tFakeVR", "tEWKVR", "lllVR", "ZeeVR", "DijetsCR"]
 
@@ -58,7 +58,7 @@ Lepton:
 
 # list of triggers per year to consider
 Trigger:
-  include: ssWWAnalysis/trigger.yaml
+  include: [ssWWAnalysis/trigger.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
@@ -97,7 +97,7 @@ Categories :
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:

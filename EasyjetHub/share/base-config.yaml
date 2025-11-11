@@ -42,7 +42,7 @@ expert_mode_warning_level: error
 Truth:
   decayModes: []
   do_STXS: false
-  include: DSID_samples.yaml
+  include: [DSID_samples.yaml]
   nHiggses: 2
   recordGrandchildren: false
 
@@ -104,7 +104,7 @@ Large_R_jet:
   wtag_wp: ""
   wtag_extra_wps: []
   variables_in_ptag:
-    include: xbb-vars-in-ptag.yaml
+    include: [xbb-vars-in-ptag.yaml]
 
 Photon:
   min_pT: 10.e+3
@@ -271,9 +271,9 @@ store_high_level_variables: false
 # Definition of container names
 full_container_names:
   phys:
-    include: container-names-DAOD_PHYS.yaml
+    include: [container-names-DAOD_PHYS.yaml]
   physlite:
-    include: container-names-DAOD_PHYSLITE.yaml
+    include: [container-names-DAOD_PHYSLITE.yaml]
 
 channels: []
 splitOutputTree: false

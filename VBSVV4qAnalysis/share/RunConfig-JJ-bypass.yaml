@@ -1,4 +1,4 @@
-include: VBSVV4qAnalysis/RunConfig-JJ.yaml
+include: [VBSVV4qAnalysis/RunConfig-JJ.yaml]
 
 # retrieve DisCoJet tagger (yes only on LLJ1)
 # set it false for the CI pipeline test

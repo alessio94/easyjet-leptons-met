@@ -1,4 +1,4 @@
-include: bbyyAnalysis/RunConfig-bbyy-base.yaml
+include: [bbyyAnalysis/RunConfig-bbyy-base.yaml]
 
 do_large_R_UFO_jets: true
 do_Boosted: true
@@ -31,7 +31,7 @@ Large_R_jet:
 
 
 ttree_output:
-  include: bbyy-base-output.yaml
+  include: [bbyy-base-output.yaml]
   # Extra large-R jets config
   reco_outputs:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'

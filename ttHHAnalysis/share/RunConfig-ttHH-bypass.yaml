@@ -1,4 +1,4 @@
-include: ttHHAnalysis/RunConfig-ttHH.yaml
+include: [ttHHAnalysis/RunConfig-ttHH.yaml]
 
 bypass: true
 do_trigger_filtering: false

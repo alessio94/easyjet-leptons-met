@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 do_example_analysis: true
 
@@ -28,7 +28,7 @@ Small_R_jet:
   btag_wp: "GN2v01_FixedCutBEff_85"
 
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
 
   reco_outputs:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'

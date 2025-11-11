@@ -1,4 +1,4 @@
-include: vbshiggsAnalysis/RunConfig-common.yaml 
+include: [vbshiggsAnalysis/RunConfig-common.yaml ]
 
 # Which analysis to consider
 channels: ["FullHad"]

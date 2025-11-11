@@ -1,4 +1,4 @@
-include: bbbbAnalysis/RunConfig-bbbb-base.yaml
+include: [bbbbAnalysis/RunConfig-bbbb-base.yaml]
 
 # Which analysis to consider
 do_resolved_dihiggs: false
@@ -27,7 +27,7 @@ Muon:
 
 # list of triggers per year to consider
 Trigger:
-  include: bbbbAnalysis/triggers.yaml
+  include: [bbbbAnalysis/triggers.yaml]
 
 do_CP_systematics: true
 systematics_regex: [".*"]

@@ -1,4 +1,4 @@
-include: bbllAnalysis/RunConfig-bbll.yaml
+include: [bbllAnalysis/RunConfig-bbll.yaml]
 
 save_extra_vars: true
 store_high_level_variables: true
@@ -7,7 +7,7 @@ Small_R_jet:
   variables_bjets: ["uncorrPt", "muonCorrPt"]
 
 NeutrinoWeighting:
-  include: NeutrinoWeighting.yaml
+  include: [NeutrinoWeighting.yaml]
   
 do_resonant_PNN: true
 

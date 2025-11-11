@@ -1,4 +1,4 @@
-include: bbbbAnalysis/RunConfig-bbbb-base.yaml
+include: [bbbbAnalysis/RunConfig-bbbb-base.yaml]
 
 # Which analysis to consider
 do_resolved_dihiggs: false
@@ -25,7 +25,7 @@ Muon:
 
 # list of triggers per year to consider
 Trigger:
-  include: bbbbAnalysis/triggers.yaml
+  include: [bbbbAnalysis/triggers.yaml]
 
 # apply loose jet cleaning only
 add_BadBatman_jet_cleaning: false

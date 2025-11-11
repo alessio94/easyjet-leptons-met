@@ -1,4 +1,4 @@
-include: RunConfig-noEle.yaml
+include: [RunConfig-noEle.yaml]
 h5:
   # 0 jets in array means save as an awkward array
   n_jets: 0

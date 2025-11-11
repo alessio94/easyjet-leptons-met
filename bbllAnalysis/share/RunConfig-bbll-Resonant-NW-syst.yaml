@@ -1,7 +1,7 @@
-include: bbllAnalysis/RunConfig-bbll.yaml
+include: [bbllAnalysis/RunConfig-bbll.yaml]
 
 NeutrinoWeighting:
-  include: NeutrinoWeighting.yaml
+  include: [NeutrinoWeighting.yaml]
 
 do_resonant_PNN: true
 mX_values: [251, 260, 300, 400, 500, 600, 800, 1000, 1500, 3000]

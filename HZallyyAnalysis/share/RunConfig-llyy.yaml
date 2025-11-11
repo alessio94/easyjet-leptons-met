@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # setting this to warning until the team decides they want to be using
 # expert mode
@@ -48,12 +48,12 @@ Photon:
 
 # orthogonality studies  
 orthogonality:
-  include: EasyjetHub/orth-config.yaml 
+  include: [EasyjetHub/orth-config.yaml ]
   do_orth_check: false 
 
 # list of triggers per year to consider
 Trigger:
-  include: HZallyyAnalysis/trigger.yaml
+  include: [HZallyyAnalysis/trigger.yaml]
 
 do_trigger_filtering: true
 do_overlap_removal: true
@@ -75,21 +75,21 @@ CutList :
 
 GRL:
   years:
-    include: HZallyyAnalysis/lepton_grl_years.yaml
+    include: [HZallyyAnalysis/lepton_grl_years.yaml]
   files:
-    include: HZallyyAnalysis/lepton_grl.yaml
+    include: [HZallyyAnalysis/lepton_grl.yaml]
 
 PileupReweighting:
   extra_prw:
     - postfix: "photon"
       lumicalc_files:
-        include: HZallyyAnalysis/lumicalc_lepton.yaml
+        include: [HZallyyAnalysis/lumicalc_lepton.yaml]
       prw_files:
-        include: HZallyyAnalysis/prw_lepton.yaml
+        include: [HZallyyAnalysis/prw_lepton.yaml]
 
 
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:

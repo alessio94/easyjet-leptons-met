@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # Which analysis to consider
 do_jjjj: true
@@ -20,7 +20,7 @@ Small_R_jet:
 systematics_regex: [".*"]
 # list of triggers per year to consider
 Trigger:
-  include: jjjjAnalysis/trigger.yaml
+  include: [jjjjAnalysis/trigger.yaml]
 
 do_trigger_filtering: true
 
@@ -29,7 +29,7 @@ save_cutflow: false
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   slim_variables_with_syst: true
   # Our overrides. All defaults are off
   reco_outputs:

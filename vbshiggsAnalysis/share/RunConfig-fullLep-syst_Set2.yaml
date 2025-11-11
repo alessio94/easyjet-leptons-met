@@ -1,4 +1,4 @@
-include: vbshiggsAnalysis/RunConfig-common.yaml 
+include: [vbshiggsAnalysis/RunConfig-common.yaml ]
 save_cutflow: false # set to true
 do_resolved: false
 do_CP_systematics: true # set it to true
@@ -56,7 +56,7 @@ Large_R_jet:
 
 # list of triggers per year to consider
 Trigger:
-  include: vbshiggsAnalysis/trigger-lep.yaml
+  include: [vbshiggsAnalysis/trigger-lep.yaml]
   writeOutput: False
 
 ttree_output:

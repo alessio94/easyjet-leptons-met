@@ -1,4 +1,4 @@
-include: bbttAnalysis/RunConfig-bbtt-base.yaml
+include: [bbttAnalysis/RunConfig-bbtt-base.yaml]
 
 channels: ["AntiIsoLepHad"]
 
@@ -18,7 +18,7 @@ Muon:
 
 Trigger:
   selection:
-    include: bbttAnalysis/trigger_leptons.yaml
+    include: [bbttAnalysis/trigger_leptons.yaml]
 
 # Produce separate files for CutBookKeeper, 
 # and append AntiIsoLepHad on minitree output file

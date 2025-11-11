@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # setting this to warning until the team decides they want to be using
 # expert mode
@@ -127,12 +127,12 @@ Lepton:
 
 # orthogonality studies  
 orthogonality:
-  include: EasyjetHub/orth-config.yaml 
+  include: [EasyjetHub/orth-config.yaml ]
   do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
 
 # list of triggers per year to consider
 Trigger:
-  include: multileptonAnalysis/trigger.yaml
+  include: [multileptonAnalysis/trigger.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
@@ -148,7 +148,7 @@ CutList :
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:

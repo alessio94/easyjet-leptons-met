@@ -1,4 +1,4 @@
-include: bbyyAnalysis/RunConfig-Resonant-base.yaml
+include: [bbyyAnalysis/RunConfig-Resonant-base.yaml]
 
 do_resonant_onebtag: true
 enable_single_photon_trigger: true
@@ -24,4 +24,4 @@ do_CP_systematics: true
 systematics_regex: [".*"]
         
 ttree_output:
-  include: bbyy-base-output.yaml
+  include: [bbyy-base-output.yaml]

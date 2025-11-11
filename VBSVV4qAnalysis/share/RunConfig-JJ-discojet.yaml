@@ -1,4 +1,4 @@
-include: VBSVV4qAnalysis/RunConfig-JJ.yaml
+include: [VBSVV4qAnalysis/RunConfig-JJ.yaml]
 
 # CI pipeline test for LLJ1 files
 loadDisCoJet: True

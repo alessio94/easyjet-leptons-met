@@ -1,4 +1,4 @@
-include: bbbbAnalysis/RunConfig-HH4b-All-NoSyst-Run3.yaml
+include: [bbbbAnalysis/RunConfig-HH4b-All-NoSyst-Run3.yaml]
 
 Small_R_jet:
   doHLTMatching: false

@@ -1,4 +1,4 @@
-include: bbbbAnalysis/RunConfig-bbbb-base.yaml
+include: [bbbbAnalysis/RunConfig-bbbb-base.yaml]
 
 # Current strategy could lead to super large output
 # with all syst on
@@ -60,7 +60,7 @@ Photon:
 
 # list of triggers per year to consider
 Trigger:
-  include: bbbbAnalysis/triggers-HH4b.yaml
+  include: [bbbbAnalysis/triggers-HH4b.yaml]
 
 # can alternatively use the CutList to filter events to get trigger eff
 do_trigger_filtering: true
@@ -82,19 +82,19 @@ Exclude2015: true
 
 GRL:
   years:
-    include: EasyjetHub/bjet_grl_years.yaml
+    include: [EasyjetHub/bjet_grl_years.yaml]
   store_decoration: true
 
 PileupReweighting:
   extra_prw:
     - postfix: "bjet"
       lumicalc_files:
-        include: EasyjetHub/lumicalc_bjet.yaml
+        include: [EasyjetHub/lumicalc_bjet.yaml]
       prw_files:
-        include: EasyjetHub/prw_bjet.yaml
+        include: [EasyjetHub/prw_bjet.yaml]
     - postfix: "boosted"
       lumicalc_files:
-        include: EasyjetHub/lumicalc_no2015.yaml
+        include: [EasyjetHub/lumicalc_no2015.yaml]
 
 
 # Include the TTree configuration and update details

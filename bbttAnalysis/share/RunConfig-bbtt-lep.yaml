@@ -1,10 +1,10 @@
-include: bbttAnalysis/RunConfig-bbtt-base.yaml
+include: [bbttAnalysis/RunConfig-bbtt-base.yaml]
 
 channels: ["LepHad"]
 
 Trigger:
   selection:
-    include: bbttAnalysis/trigger_leptons.yaml
+    include: [bbttAnalysis/trigger_leptons.yaml]
 
 # Produce separate files per channel + CutBookKeeper
 splitOutputTree: true

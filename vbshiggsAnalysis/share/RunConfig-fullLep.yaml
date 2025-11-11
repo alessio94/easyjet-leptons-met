@@ -1,4 +1,4 @@
-include: vbshiggsAnalysis/RunConfig-common.yaml 
+include: [vbshiggsAnalysis/RunConfig-common.yaml ]
 
 # Which analysis to consider
 channels: ["FullLep"]
@@ -57,7 +57,7 @@ Large_R_jet:
     
 # list of triggers per year to consider
 Trigger:
-  include: vbshiggsAnalysis/trigger-lep.yaml
+  include: [vbshiggsAnalysis/trigger-lep.yaml]
   writeOutput: False
 
 CutList :

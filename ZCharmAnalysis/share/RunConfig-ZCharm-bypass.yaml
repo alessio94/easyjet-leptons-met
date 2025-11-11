@@ -1,4 +1,4 @@
-include: ZCharmAnalysis/RunConfig-ZCharm.yaml
+include: [ZCharmAnalysis/RunConfig-ZCharm.yaml]
 
 bypass: true #enabling Run through mode
 do_trigger_filtering: false

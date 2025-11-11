@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # Which analysis and channels to consider
 do_lltt_analysis: true
@@ -64,7 +64,7 @@ Lepton:
 
 # list of triggers per year to consider
 Trigger:
-  include: llttAnalysis/trigger.yaml
+  include: [llttAnalysis/trigger.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 # use trigger selections in offline algorithms
@@ -78,7 +78,7 @@ do_overlap_removal: false
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:

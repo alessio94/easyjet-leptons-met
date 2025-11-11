@@ -1,5 +1,5 @@
 
-include: XbbCalib/RunConfig-ZbbyCalib.yaml
+include: [XbbCalib/RunConfig-ZbbyCalib.yaml]
 
 # Toggles to bypass event selection
 bypass: true

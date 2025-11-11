@@ -1,4 +1,4 @@
-include: bbttAnalysis/RunConfig-bbtt-base.yaml
+include: [bbttAnalysis/RunConfig-bbtt-base.yaml]
 
 # Toggles for object types
 do_large_R_UFO_jets: true

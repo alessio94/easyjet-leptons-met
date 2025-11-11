@@ -1,4 +1,4 @@
-include: bbttAnalysis/RunConfig-bbtt-base-largeR-jets.yaml
+include: [bbttAnalysis/RunConfig-bbtt-base-largeR-jets.yaml]
 
 # Which analysis and channels to consider
 # TODO: __BOOSTED__ boosted analysis is only HadHad
@@ -15,14 +15,14 @@ splitOutputTree: true
 # Triggers
 Trigger:
   selection:
-    include: trigger_boosted.yaml
+    include: [trigger_boosted.yaml]
   # TODO: __BOOSTED__ for the moment no SF are avalailable
   scale_factor:
     doSF: false
 
 # Update output configs for large-R jets
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   slim_variables_with_syst: true
   reco_outputs:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'

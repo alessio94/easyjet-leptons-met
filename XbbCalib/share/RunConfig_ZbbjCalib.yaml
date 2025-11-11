@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # Which analysis to consider
 do_ZbbjCalib: true
@@ -49,7 +49,7 @@ Muon:
 
 # list of triggers per year to consider
 Trigger:
-  include: XbbCalib/trigger_Zbbj.yaml
+  include: [XbbCalib/trigger_Zbbj.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
@@ -67,7 +67,7 @@ OverlapRemoval:
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   reco_outputs:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'

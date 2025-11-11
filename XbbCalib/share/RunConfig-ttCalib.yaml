@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 # Which analysis to consider
 do_ttCalib: true
@@ -39,7 +39,7 @@ MET:
 
 # # list of triggers per year to consider
 Trigger:
-  include: trigger.yaml
+  include: [trigger.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 do_overlap_removal: true
@@ -51,7 +51,7 @@ OverlapRemoval:
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   reco_outputs:
     muons: 'container_names.output.muons'

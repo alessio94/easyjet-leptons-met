@@ -1,4 +1,4 @@
-include: llttAnalysis/RunConfig-lltt.yaml
+include: [llttAnalysis/RunConfig-lltt.yaml]
 
 bypass: true #enabling Run through mode
 doAntiTau: true

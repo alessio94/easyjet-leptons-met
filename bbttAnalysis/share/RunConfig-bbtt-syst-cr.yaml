@@ -1,4 +1,4 @@
-include: bbttAnalysis/RunConfig-bbtt-cr.yaml
+include: [bbttAnalysis/RunConfig-bbtt-cr.yaml]
 
 do_CP_systematics: true
 systematics_regex: [".*"]

@@ -1,4 +1,4 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 do_Monojet_analysis: true
 bypass: false
@@ -68,7 +68,7 @@ Tau:
 
 
 Trigger:
-  include: monojetAnalysis/trigger_MET.yaml
+  include: [monojetAnalysis/trigger_MET.yaml]
 
 do_trigger_filtering: false
 
@@ -92,7 +92,7 @@ CutList:
   - ALL_CUTS
 
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   reco_outputs:
     met : 'container_names.output.met'
 

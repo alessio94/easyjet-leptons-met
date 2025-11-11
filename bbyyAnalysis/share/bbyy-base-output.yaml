@@ -1,4 +1,4 @@
-    include: EasyjetHub/AnalysisMiniTree-config.yaml
+    include: [EasyjetHub/AnalysisMiniTree-config.yaml]
     # Our overrides. All defaults are off
     reco_outputs:
       small_R_jets: 'container_names.output.reco4PFlowJet'

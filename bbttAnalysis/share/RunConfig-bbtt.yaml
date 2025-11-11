@@ -1,10 +1,10 @@
-include: bbttAnalysis/RunConfig-bbtt-base.yaml
+include: [bbttAnalysis/RunConfig-bbtt-base.yaml]
 
 channels: ["HadHad","LepHad","ZCR","TopEMuCR"]
 
 Trigger:
   selection:
-    include: bbttAnalysis/trigger_full.yaml
+    include: [bbttAnalysis/trigger_full.yaml]
 
 # Produce separate files per channel + CutBookKeeper
 splitOutputTree: true

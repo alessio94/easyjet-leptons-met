@@ -1,17 +1,17 @@
-include: EasyjetHub/base-config.yaml
+include: [EasyjetHub/base-config.yaml]
 
 GRL:
   # good runs lists to filter events
   years:
-    include: ZCharmAnalysis/lepton_grl_years.yaml
+    include: [ZCharmAnalysis/lepton_grl_years.yaml]
   files:
-    include: ZCharmAnalysis/lepton_grl.yaml
+    include: [ZCharmAnalysis/lepton_grl.yaml]
 
 PileupReweighting:
   lumicalc_files:
-    include: ZCharmAnalysis/lumicalc_lepton.yaml
+    include: [ZCharmAnalysis/lumicalc_lepton.yaml]
   prw_files:
-    include: ZCharmAnalysis/prw_lepton.yaml
+    include: [ZCharmAnalysis/prw_lepton.yaml]
 
 # Which analysis to consider
 do_ZCharm_analysis: true
@@ -74,7 +74,7 @@ Lepton:
 
 # list of triggers per year to consider
 Trigger:
-  include: ZCharmAnalysis/trigger.yaml
+  include: [ZCharmAnalysis/trigger.yaml]
 # apply trigger lists to filter events
 do_trigger_filtering: true
 
@@ -126,7 +126,7 @@ TruthCategories :
 
 # Include the TTree configuration and update details
 ttree_output:
-  include: EasyjetHub/AnalysisMiniTree-config.yaml
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:

@@ -1,4 +1,4 @@
-include: yyMLAnalysis/RunConfig-yyml.yaml
+include: [yyMLAnalysis/RunConfig-yyml.yaml]
 
 # flag that toggles run-through mode in SelectorAlg
 bypass: true

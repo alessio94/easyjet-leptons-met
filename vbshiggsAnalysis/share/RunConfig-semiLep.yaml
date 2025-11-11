@@ -1,4 +1,4 @@
-include: vbshiggsAnalysis/RunConfig-common.yaml 
+include: [vbshiggsAnalysis/RunConfig-common.yaml ]
 
 # setting this to warning until the team decides they want to be using
 # expert mode
@@ -104,7 +104,7 @@ OverlapRemoval:
 
 # list of triggers per year to consider
 Trigger:
-  include: vbshiggsAnalysis/trigger-lep.yaml
+  include: [vbshiggsAnalysis/trigger-lep.yaml]
 
 CutList :
       - PASS_TRIGGER 
