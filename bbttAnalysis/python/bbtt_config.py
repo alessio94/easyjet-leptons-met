@@ -15,23 +15,8 @@ from EasyjetHub.steering.analysis_configuration import (
     get_trigger_legs_scale_factor_list, get_trigger_chains_scale_factor)
 
 
-def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
-             taukey, float_variables=None, int_variables=None):
-    if not float_variables:
-        float_variables = []
-    if not int_variables:
-        int_variables = []
-
-    if flags.Analysis.Small_R_jet.save_all_jets:
-        smalljetkey = smalljetkey.replace('_%SYS%', '_thin_%SYS%')
-
+def bbtt_ObjectSelectorAlgCfg(flags, smalljetkey, muonkey, electronkey, taukey):
     cfg = ComponentAccumulator()
-
-    # anti-iso lepton control region is not compatible with the other
-    # regions at the moment:
-    use_noniso_leptons = "AntiIsoLepHad" in flags.Analysis.channels
-    if (use_noniso_leptons and len(flags.Analysis.channels) > 1):
-        raise ValueError("Cannot run 'antiiso-lephad' with any other channels")
 
     # muons:
     cfg.merge(MuonSelectorAlgCfg(flags,
@@ -61,7 +46,6 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         selectBjet=False,
         minimumAmount=2))
 
-    GN2X_WP = ""
     if flags.Analysis.do_large_R_UFO_jets:
         cfg.merge(
             JetSelectorAlgCfg(
@@ -78,29 +62,46 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
                 jetAmount=flags.Analysis.Large_R_jet.amount_leadingjet,
             )
         )
-        # Use the loosest working point for selection here.
-        GN2X_WP = f"xbb_select_GN2Xv01_{flags.Analysis.Large_R_jet.GN2X_hbb_wps[0]}"
+
+    return cfg
+
+
+def bbtt_BJetTriggerDecoratorAlgCfg(flags):
+    cfg = ComponentAccumulator()
 
     # b-jet matching decoration
-    triggers = []
-    config = flags.Analysis.Trigger.scale_factor
-    if config.doSF and hasattr(config, 'bjet'):
+    bjet_triggers = []
+    sf_config = flags.Analysis.Trigger.scale_factor
+    if sf_config.doSF and hasattr(sf_config, 'bjet'):
         triggerChainsPerYear = get_trigger_chains_scale_factor(
             flags, 'bjet')
         for triggerChains in triggerChainsPerYear.values():
             for chain in triggerChains:
-                triggers.append(chain)
+                bjet_triggers.append(chain)
 
-    if flags.Analysis.do_bbtt_analysis:
-        cfg.addEventAlgo(
-            CompFactory.HHBBTT.BJetTriggerDecoratorAlg(
-                "BJetTriggerDecoratorAlg",
-                triggerLists=triggers,
-            )
+    cfg.addEventAlgo(
+        CompFactory.HHBBTT.BJetTriggerDecoratorAlg(
+            "BJetTriggerDecoratorAlg",
+            triggerLists=bjet_triggers,
         )
+    )
+
+    return cfg
+
+
+def bbtt_SelectorAlgCfg(flags):
+    cfg = ComponentAccumulator()
+
+    # anti-iso lepton control region is not compatible with the other
+    # regions at the moment:
+    use_noniso_leptons = "AntiIsoLepHad" in flags.Analysis.channels
+    if (use_noniso_leptons and len(flags.Analysis.channels) > 1):
+        raise ValueError("Cannot run 'antiiso-lephad' with any other channels")
 
     muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
     ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
+    GN2X_WP = (f"xbb_select_GN2Xv01_{flags.Analysis.Large_R_jet.GN2X_hbb_wps[0]}"
+               if flags.Analysis.do_large_R_UFO_jets else "")
     cfg.addEventAlgo(
         CompFactory.HHBBTT.HHbbttSelectorAlg(
             "HHbbttSelectorAlg",
@@ -129,81 +130,134 @@ def bbtt_cfg(flags, smalljetkey, muonkey, electronkey,
         )
     )
 
-    # MMC decoration
-    if flags.Analysis.do_mmc:
-        from EasyjetHub.algs.mmc_tool_config import MissingMassToolCfg
-        mmcTool = cfg.popToolsAndMerge(
-            MissingMassToolCfg(
-                flags, CalibSet="2024",
-                ParamFilePath="MMC_params_v051224_angle_noLikelihoodFit.root"))
+    return cfg
 
+
+def bbtt_MMC_Cfg(flags):
+    cfg = ComponentAccumulator()
+
+    from EasyjetHub.algs.mmc_tool_config import MissingMassToolCfg
+    mmcTool = cfg.popToolsAndMerge(
+        MissingMassToolCfg(
+            flags, CalibSet="2024",
+            ParamFilePath="MMC_params_v051224_angle_noLikelihoodFit.root"))
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBTT.MMCDecoratorAlg(
+            "MMCDecoratorAlg",
+            channel=flags.Analysis.channels,
+            bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+            mmcTool=mmcTool
+        )
+    )
+
+    if flags.Analysis.enable_MMC_cut:
         cfg.addEventAlgo(
-            CompFactory.HHBBTT.MMCDecoratorAlg(
-                "MMCDecoratorAlg",
+            CompFactory.HHBBTT.MMCSelectorAlg(
+                "MMCSelectorAlg",
                 channel=flags.Analysis.channels,
-                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-                mmcTool=mmcTool
+                MMC_min=60 * Units.GeV,
+                eventDecisionOutputDecoration="bbtt_pass_presel_%SYS%",
+                bypass=flags.Analysis.bypass,
             )
         )
 
-        if flags.Analysis.enable_MMC_cut:
-            cfg.addEventAlgo(
-                CompFactory.HHBBTT.MMCSelectorAlg(
-                    "MMCSelectorAlg",
-                    channel=flags.Analysis.channels,
-                    MMC_min=60 * Units.GeV,
-                    eventDecisionOutputDecoration="bbtt_pass_presel_%SYS%",
-                    bypass=flags.Analysis.bypass,
-                )
-            )
+    return cfg
 
-    btag_pcbt_wps \
-        = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp] # noqa
+
+def bbtt_BaselineVarsAlgCfg(flags, muonkey, electronkey, taukey,
+                            float_variables=None, int_variables=None):
+    cfg = ComponentAccumulator()
+
+    if flags.Analysis.do_boosted_dihiggs:
+        GN2X_WP = (f"xbb_select_GN2Xv01_{flags.Analysis.Large_R_jet.GN2X_hbb_wps[0]}"
+                   if flags.Analysis.do_large_R_UFO_jets else "")
+        cfg.addEventAlgo(
+            CompFactory.HHBBTT.BaselineVarsBoostedbbttAlg(
+                "BaselineVarsBoostedbbttAlg",
+                isMC=flags.Input.isMC,
+                floatVariableList=float_variables,
+                GN2X_WP=GN2X_WP,
+            )
+        )
+
+    else:
+        use_noniso_leptons = "AntiIsoLepHad" in flags.Analysis.channels
+        muon_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Muon.extra_wps]
+        ele_WPs = [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
+        btag_pcbt_wps \
+            = [wp for wp in flags.Analysis.Small_R_jet.btag_extra_wps if "Continuous" in wp] # noqa
+
+        cfg.addEventAlgo(
+            CompFactory.HHBBTT.BaselineVarsbbttAlg(
+                "FinalVarsbbttAlg",
+                isMC=flags.Input.isMC,
+                useNonIsoLeptons=use_noniso_leptons,
+                electrons=electronkey, eleWPs=ele_WPs,
+                muons=muonkey, muonWPs=muon_WPs,
+                taus=taukey, tauWP=flags.Analysis.Tau.extra_wps[0],
+                doMMC=flags.Analysis.do_mmc,
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+                PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
+                floatVariableList=float_variables,
+                intVariableList=int_variables
+            )
+        )
+
+    return cfg
+
+
+def bbtt_TriggerSFAlgCfg(flags, muonkey, electronkey, taukey):
+    cfg = ComponentAccumulator()
+
+    cfg.addEventAlgo(
+        CompFactory.HHBBTT.TriggerSFAlg(
+            "TriggerSFAlg",
+            eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
+            muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
+            tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),
+            electrons=electronkey,
+            muons=muonkey,
+            taus=taukey,
+            doLTT=flags.Analysis.do_LTT
+        )
+    )
+
+    return cfg
+
+
+def bbtt_cfg(flags, smalljetkey, muonkey, electronkey, taukey,
+             float_variables=None, int_variables=None):
+    if not float_variables:
+        float_variables = []
+    if not int_variables:
+        int_variables = []
+
+    if flags.Analysis.Small_R_jet.save_all_jets:
+        smalljetkey = smalljetkey.replace('_%SYS%', '_thin_%SYS%')
+
+    cfg = ComponentAccumulator()
+
+    cfg.merge(bbtt_ObjectSelectorAlgCfg(
+        flags, smalljetkey, muonkey, electronkey, taukey))
+
+    cfg.merge(bbtt_BJetTriggerDecoratorAlgCfg(flags))
+
+    cfg.merge(bbtt_SelectorAlgCfg(flags))
+
+    # MMC decoration
+    if flags.Analysis.do_mmc:
+        cfg.merge(bbtt_MMC_Cfg(flags))
 
     # calculate final bbtt vars
     if flags.Analysis.store_high_level_variables:
-
-        if flags.Analysis.do_boosted_dihiggs:
-            cfg.addEventAlgo(
-                CompFactory.HHBBTT.BaselineVarsBoostedbbttAlg(
-                    "BaselineVarsBoostedbbttAlg",
-                    isMC=flags.Input.isMC,
-                    floatVariableList=float_variables,
-                    GN2X_WP=GN2X_WP,
-                )
-            )
-        else:
-            cfg.addEventAlgo(
-                CompFactory.HHBBTT.BaselineVarsbbttAlg(
-                    "FinalVarsbbttAlg",
-                    isMC=flags.Input.isMC,
-                    useNonIsoLeptons=use_noniso_leptons,
-                    electrons=electronkey, eleWPs=ele_WPs,
-                    muons=muonkey, muonWPs=muon_WPs,
-                    taus=taukey, tauWP=flags.Analysis.Tau.extra_wps[0],
-                    doMMC=flags.Analysis.do_mmc,
-                    bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
-                    PCBTDecorList=["ftag_quantile_" + pcbt_wp for pcbt_wp in btag_pcbt_wps], # noqa
-                    floatVariableList=float_variables,
-                    intVariableList=int_variables
-                )
-            )
+        cfg.merge(bbtt_BaselineVarsAlgCfg(flags, muonkey, electronkey, taukey,
+                                          float_variables, int_variables))
 
     # calculate event trigger SF
     # TODO: __BOOSTED__ for the moment we don't have SF for boosted Jets
     if flags.Input.isMC and not flags.Analysis.do_boosted_dihiggs:
-        cfg.addEventAlgo(
-            CompFactory.HHBBTT.TriggerSFAlg(
-                "TriggerSFAlg",
-                eleTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Electron'),
-                muonTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Muon'),
-                tauTriggerSF=get_trigger_legs_scale_factor_list(flags, 'Tau'),
-                electrons=electronkey,
-                muons=muonkey,
-                taus=taukey,
-                doLTT=flags.Analysis.do_LTT
-            )
-        )
+        cfg.merge(bbtt_TriggerSFAlgCfg(flags, muonkey, electronkey, taukey))
 
     return cfg
 
