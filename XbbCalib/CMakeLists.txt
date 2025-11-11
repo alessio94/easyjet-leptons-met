@@ -12,9 +12,11 @@ atlas_add_component(XbbCalib
   src/FourVectorOutBlock.cxx
   src/BaselineVarsttCalibAlg.cxx
   src/BaselineVarsZbbjCalibAlg.cxx
-  src/BaselineVarsZllCalibAlg.cxx
+  src/BaselineVarsZlljCalibAlg.cxx
+  src/BaselineVarsZllyCalibAlg.cxx
   src/ZbbjCalibSelectorAlg.cxx
-  src/ZllCalibSelectorAlg.cxx
+  src/ZlljCalibSelectorAlg.cxx
+  src/ZllyCalibSelectorAlg.cxx
   src/ttCalibSelectorAlg.cxx
   src/components/XbbCalib_entries.cxx
   src/ZbbyCalibSelectorAlg.cxx
@@ -44,7 +46,8 @@ atlas_install_python_modules(
   python/ttCalib_config.py
   python/ZbbyCalib_config.py
   python/ZbbjCalib_config.py
-  python/ZllCalib_config.py
+  python/ZlljCalib_config.py
+  python/ZllyCalib_config.py
 )
 atlas_install_runtime( scripts/*.py POST_BUILD_CMD ${ATLAS_FLAKE8} )
 atlas_install_data(

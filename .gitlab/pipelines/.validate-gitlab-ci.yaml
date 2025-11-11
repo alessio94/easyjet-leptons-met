@@ -244,15 +244,25 @@ validator_ttcalib_mc20:
   script:
     - easyjet-validate ttcalib-mc20
 
-validator_zllcalib_mc20:
+validator_zllycalib_mc20:
   extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
-    - job: ntupler_zllcalib_mc20
+    - job: ntupler_zllycalib_mc20
       artifacts: false
   script:
-    - easyjet-validate zllcalib-mc20
+    - easyjet-validate zllycalib-mc20
+    
+validator_zlljcalib_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zlljcalib_mc20
+      artifacts: false
+  script:
+    - easyjet-validate zlljcalib-mc20
 
 validator_zbbycalib_mc20:
   extends: .ntuple_validation
@@ -408,15 +418,25 @@ validator_ttcalib_mc23:
   script:
     - easyjet-validate ttcalib-mc23
 
-validator_zllcalib_mc23:
+validator_zllycalib_mc23:
   extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
-    - job: ntupler_zllcalib_mc23
+    - job: ntupler_zllycalib_mc23
       artifacts: false
   script:
-    - easyjet-validate zllcalib-mc23
+    - easyjet-validate zllycalib-mc23
+    
+validator_zlljcalib_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zlljcalib_mc23
+      artifacts: false
+  script:
+    - easyjet-validate zlljcalib-mc23
 
 validator_zbbycalib_mc23:
   extends: .ntuple_validation

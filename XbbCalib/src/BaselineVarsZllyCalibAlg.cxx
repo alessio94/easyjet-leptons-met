@@ -4,22 +4,23 @@
 
 /// @author 
 
-#include "BaselineVarsZllCalibAlg.h"
+#include "BaselineVarsZllyCalibAlg.h"
 
 namespace XBBCALIB
 {
-  BaselineVarsZllCalibAlg::BaselineVarsZllCalibAlg(const std::string &name,
+  BaselineVarsZllyCalibAlg::BaselineVarsZllyCalibAlg(const std::string &name,
                                            ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   { }
 
-  StatusCode BaselineVarsZllCalibAlg::initialize()
+  StatusCode BaselineVarsZllyCalibAlg::initialize()
   {
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_metHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
 
     // Intialise syst-aware output decorators
     for (const std::string &var : m_floatVariables) {
@@ -41,7 +42,7 @@ namespace XBBCALIB
     return StatusCode::SUCCESS;
   }
 
-  StatusCode BaselineVarsZllCalibAlg::execute()
+  StatusCode BaselineVarsZllyCalibAlg::execute()
   {
     //Loop over all systs
     for (const auto& sys : m_systematicsList.systematicsVector())
@@ -51,6 +52,7 @@ namespace XBBCALIB
       int n_jets = 0;
       int n_electrons = 0;
       int n_muons = 0;
+      int n_photons = 0;
 
       const xAOD::EventInfo *event = nullptr;
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
@@ -63,6 +65,9 @@ namespace XBBCALIB
 
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
+      
+      const xAOD::PhotonContainer *photons = nullptr;
+      ANA_CHECK (m_photonHandle.retrieve(photons, sys));
 
       for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var).set(*event, -99., sys);
@@ -82,10 +87,14 @@ namespace XBBCALIB
 
       // Count jets
       n_jets = lrjets->size();
+      
+      // Count photons
+      n_photons = photons->size();
 
       m_Ibranches.at("nJets").set(*event, n_jets, sys);
       m_Ibranches.at("nElectrons").set(*event, n_electrons, sys);
       m_Ibranches.at("nMuons").set(*event, n_muons, sys);
+      m_Ibranches.at("nPhotons").set(*event, n_photons, sys);
       
 
     }

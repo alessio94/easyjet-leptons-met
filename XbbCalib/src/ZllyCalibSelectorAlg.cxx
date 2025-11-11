@@ -2,7 +2,7 @@
   Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
 */
 
-#include "ZllCalibSelectorAlg.h"
+#include "ZllyCalibSelectorAlg.h"
 #include <SystematicsHandles/SysFilterReporter.h>
 #include <SystematicsHandles/SysFilterReporterCombiner.h>
 #include <AthenaKernel/Units.h>
@@ -10,14 +10,14 @@
 namespace XBBCALIB
 {
 
-  ZllCalibSelectorAlg::ZllCalibSelectorAlg(const std::string &name,
+  ZllyCalibSelectorAlg::ZllyCalibSelectorAlg(const std::string &name,
                                 ISvcLocator *pSvcLocator)
       : AthHistogramAlgorithm(name, pSvcLocator)
   {
 
   }
 
-  StatusCode ZllCalibSelectorAlg::initialize()
+  StatusCode ZllyCalibSelectorAlg::initialize()
   {
     // Initialise global event filter
     ATH_CHECK (m_filterParams.initialize(m_systematicsList));
@@ -28,6 +28,7 @@ namespace XBBCALIB
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_electronHandle.initialize(m_systematicsList));
     ATH_CHECK (m_muonHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize()); 
@@ -36,7 +37,7 @@ namespace XBBCALIB
   }
 
 
-  StatusCode ZllCalibSelectorAlg::execute()
+  StatusCode ZllyCalibSelectorAlg::execute()
   {
 
     // Global filter originally false
@@ -63,15 +64,18 @@ namespace XBBCALIB
       const xAOD::ElectronContainer *electrons = nullptr;
       ANA_CHECK (m_electronHandle.retrieve (electrons, sys));
 
+      const xAOD::PhotonContainer *photons = nullptr;
+      ANA_CHECK (m_photonHandle.retrieve(photons, sys));
+
       //************
       // Apply Selection
       //************
 
       // flags
       //************
-      // Large-R Jet
+      // Photons
       //************
-      pass_baseline = (lrjets->size() != 0);
+      pass_baseline = (photons->size() != 0);
 
       //************
       // Leptons
@@ -92,7 +96,7 @@ namespace XBBCALIB
     return StatusCode::SUCCESS;
   }
 
-  StatusCode ZllCalibSelectorAlg::finalize()
+  StatusCode ZllyCalibSelectorAlg::finalize()
   {
     ANA_CHECK (m_filterParams.finalize());
     return StatusCode::SUCCESS;

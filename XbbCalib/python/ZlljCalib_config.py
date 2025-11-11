@@ -10,8 +10,8 @@ from EasyjetHub.output.ttree.selected_objects import (
 )
 
 
-def ZllCalib_cfg(flags, largejetkey, muonkey, electronkey,
-                 float_variables=None, int_variables=None):
+def ZlljCalib_cfg(flags, largejetkey, muonkey, electronkey,
+                  float_variables=None, int_variables=None):
     if not float_variables:
         float_variables = []
     if not int_variables:
@@ -47,16 +47,16 @@ def ZllCalib_cfg(flags, largejetkey, muonkey, electronkey,
     )
 
     cfg.addEventAlgo(
-        CompFactory.XBBCALIB.ZllCalibSelectorAlg(
-            "ZllCalibSelectorAlg",
+        CompFactory.XBBCALIB.ZlljCalibSelectorAlg(
+            "ZlljCalibSelectorAlg",
             eventDecisionOutputDecoration="XbbCalib_pass_sr_%SYS%",
             bypass=flags.Analysis.bypass,
         )
     )
 
     cfg.addEventAlgo(
-        CompFactory.XBBCALIB.BaselineVarsZllCalibAlg(
-            "BaselineVarsZllCalibAlg",
+        CompFactory.XBBCALIB.BaselineVarsZlljCalibAlg(
+            "BaselineVarsZlljCalibAlg",
             isMC=flags.Input.isMC,
             floatVariableList=float_variables,
             intVariableList=int_variables
@@ -66,7 +66,7 @@ def ZllCalib_cfg(flags, largejetkey, muonkey, electronkey,
     return cfg
 
 
-def ZllCalib_branches(flags):
+def ZlljCalib_branches(flags):
     branches = []
 
     # this will be all the variables that are calculated by the

@@ -4,6 +4,8 @@ include: [EasyjetHub/base-config.yaml]
 do_ttCalib: true
 do_ZbbjCalib: false
 do_ZbbyCalib: false
+do_ZlljCalib: false
+do_ZllyCalib: false
 bypass: false
 
 # Toggles for object types

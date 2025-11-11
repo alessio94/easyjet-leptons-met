@@ -4,8 +4,8 @@
 
 // Always protect against multiple includes!
 
-#ifndef SELECTIONFLAGSZLLCALIBALG_H
-#define SELECTIONFLAGSZLLCALIBALG_H
+#ifndef SELECTIONFLAGSZllyCaLIBALG_H
+#define SELECTIONFLAGSZllyCaLIBALG_H
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
@@ -19,16 +19,17 @@
 #include <xAODJet/JetContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
+#include <xAODEgamma/PhotonContainer.h>
 
 #include "TriggerMatchingTool/IMatchingTool.h"
 
 namespace XBBCALIB
 {
   /// \brief An algorithm for counting containers
-  class ZllCalibSelectorAlg final : public AthHistogramAlgorithm {
+  class ZllyCalibSelectorAlg final : public AthHistogramAlgorithm {
 
     public:
-      ZllCalibSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
+      ZllyCalibSelectorAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
       /// \brief Initialisation method, for setting up tools and other persistent
       /// configs
@@ -59,6 +60,9 @@ namespace XBBCALIB
       CP::SysReadHandle<xAOD::MuonContainer>
       m_muonHandle{ this, "muons", "XbbCalibMuons_%SYS%", "Muon container to read" };
 
+      CP::SysReadHandle<xAOD::PhotonContainer>
+      m_photonHandle{ this, "photons", "XbbCalibPhotons_%SYS%", "Photon container to read" };
+
       CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
@@ -68,4 +72,4 @@ namespace XBBCALIB
 
 }
 
-#endif // SELECTIONFLAGSZllCALIBALG_H
+#endif // SELECTIONFLAGSZllyCaLIBALG_H

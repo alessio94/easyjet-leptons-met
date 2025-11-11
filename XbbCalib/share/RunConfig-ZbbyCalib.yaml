@@ -8,7 +8,8 @@ expert_mode_warning_level: default
 do_ZbbyCalib: true
 do_ZbbjCalib: false
 do_ttCalib: false
-do_ZllCalib: false
+do_ZlljCalib: false
+do_ZllyCalib: false
 
 # Toggles to bypass event selection
 bypass: false

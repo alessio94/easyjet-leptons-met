@@ -3,8 +3,8 @@
 */
 
 // Always protect against multiple includes!
-#ifndef ZLLCALIB_FINALVARSXBBCALIBALG
-#define ZLLCALIB_FINALVARSXBBCALIBALG
+#ifndef ZlljCaLIB_FINALVARSXBBCALIBALG
+#define ZlljCaLIB_FINALVARSXBBCALIBALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
@@ -23,11 +23,11 @@ namespace XBBCALIB
 {
 
   /// \brief An algorithm for counting containers
-  class BaselineVarsZllCalibAlg final : public AthHistogramAlgorithm
+  class BaselineVarsZlljCalibAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
 public:
-    BaselineVarsZllCalibAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    BaselineVarsZlljCalibAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
