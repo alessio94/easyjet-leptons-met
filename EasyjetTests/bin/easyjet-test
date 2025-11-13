@@ -84,8 +84,6 @@ declare -A DATAFILES=(
     [ttcalib-mc23]=${PHYS_TTBAR_MC23}
     [zllycalib-mc23]=${PHYS_TTBAR_MC23}
     [zlljcalib-mc23]=${PHYS_TTBAR_MC23}
-    [zbbycalib-mc23]=${PHYS_TTBAR_MC23}
-    [zbbjcalib-mc23]=${PHYS_TTBAR_MC23}
     [bbbbtt-mc23]=${PHYS_TTBAR_MC23}
     [monojet-mc23]=${PHYS_TTBAR_MC23}
     # systematics enabled
@@ -222,8 +220,8 @@ declare -A CONFIGS=(
     [ttcalib-mc23]=XbbCalib/RunConfig-ttCalib-bypass.yaml
     [zllycalib-mc23]=XbbCalib/RunConfig_Zlly-bypass.yaml
     [zlljcalib-mc23]=XbbCalib/RunConfig_Zllj-bypass.yaml
-    [zbbycalib-mc23]=XbbCalib/RunConfig-ZbbyCalib-bypass.yaml
-    [zbbjcalib-mc23]=XbbCalib/RunConfig_ZbbjCalib-bypass.yaml
+    [zbbycalib-mc23]=XbbCalib/RunConfig-ZbbyCalib.yaml
+    [zbbjcalib-mc23]=XbbCalib/RunConfig_ZbbjCalib.yaml
     [bbbbtt-mc23]=bbbbttAnalysis/RunConfig-bbbbtt-bypass.yaml
     [monojet-mc23]=monojetAnalysis/RunConfig-Monojet-bypass.yaml
     # MC23 AF3
