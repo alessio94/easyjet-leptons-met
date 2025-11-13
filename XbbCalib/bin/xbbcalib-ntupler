@@ -10,6 +10,9 @@
 
 import sys
 import time
+import warnings
+
+from AnalysisAlgorithmsConfig.ConfigText import TextConfigWarning
 
 from EasyjetHub.hub import (
     AnalysisArgumentParser,
@@ -34,6 +37,9 @@ from EasyjetHub.algs.event_counter_config import event_counter_cfg
 
 def XbbCalib_job_cfg():
     parser = AnalysisArgumentParser()
+
+    # Require that the input files have no warnings
+    warnings.simplefilter("error", TextConfigWarning)
 
     # Fill the configuration flags from the
     # parsed arguments
