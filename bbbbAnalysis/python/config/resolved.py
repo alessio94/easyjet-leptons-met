@@ -109,7 +109,6 @@ def resolved_cfg(flags, smalljetkey, float_variables=None):
         cfg.addEventAlgo(
             CompFactory.HH4B.BaselineVarsResolvedAlg(
                 "FinalVarsResolvedAlg_" + btag_wp,
-                UseVBFRNN=flags.Analysis.UseVBFRNN,
                 smallRContainerInKey="pairedResolvedAnalysisJets_" + btag_sys,
                 bTagWP=btag_wp,
                 floatVariableList=float_variables,
@@ -123,8 +122,6 @@ def get_BaselineVarsResolvedAlg_variables(flags):
     float_variable_names = []
 
     objects = []
-    if flags.Analysis.UseVBFRNN:
-        objects += ["resolved_RNNJets_Jet1", "resolved_RNNJets_Jet2"]
 
     for object in objects:
         for var in ["m", "pt", "eta", "phi"]:
@@ -178,14 +175,6 @@ def resolved_branches(flags):
                 + f" -> bbbb_resolved_{deco_suffix}{btag_wp}_{var}"
                 + flags.Analysis.systematics_suffix_separator + "%SYS%"
             ]
-
-    # VBF tagger
-    if flags.Analysis.UseVBFRNN:
-        vars = ['RNNScore', 'nRNNJets']
-        reg = 'resolved'
-        for var in vars:
-            branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}'
-                         + flags.Analysis.systematics_suffix_separator + "%SYS%"]
 
     return branches, float_variable_names
 

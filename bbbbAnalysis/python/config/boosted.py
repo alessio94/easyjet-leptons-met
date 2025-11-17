@@ -15,7 +15,6 @@ def boosted_cfg(flags, largejetkey, float_variables=None):
     cfg.addEventAlgo(
         CompFactory.HH4B.BaselineVarsBoostedAlg(
             "BaselineVarsBoostedAlg",
-            UseVBFRNN=flags.Analysis.UseVBFRNN,
             isMC=flags.Input.isMC,
             floatVariableList=float_variables,
         )
@@ -44,14 +43,6 @@ def get_BaselineVarsBoostedAlg_variables(flags):
     boosted_vars = [f"boosted_{var}" for var in boosted_vars]
     float_variable_names += boosted_vars
 
-    objects = []
-    if flags.Analysis.UseVBFRNN:
-        objects += ["boosted_RNNJets_Jet1", "boosted_RNNJets_Jet2"]
-
-    for object in objects:
-        for var in ["m", "pt", "eta", "phi"]:
-            float_variable_names.append(f"{object}_{var}")
-
     return float_variable_names
 
 
@@ -75,13 +66,5 @@ def boosted_branches(flags):
             + f" -> bbbb_{var}"
             + flags.Analysis.systematics_suffix_separator + "%SYS%"
         ]
-
-    # VBF tagger
-    if flags.Analysis.UseVBFRNN:
-        vars = ['RNNScore', 'nRNNJets']
-        reg = 'boosted'
-        for var in vars:
-            branches += [f'EventInfo.{var}_{reg}_%SYS% -> {var}_{reg}'
-                         + flags.Analysis.systematics_suffix_separator + '%SYS%']
 
     return branches, float_variable_names

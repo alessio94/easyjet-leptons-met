@@ -17,10 +17,15 @@ import AthenaCommon.SystemOfUnits as Units
 
 def dihiggs_cfg(
     flags,
+    float_variables=None
 ):
+    if not float_variables:
+        float_variables = []
+
     cfg = ComponentAccumulator()
 
     couting_jet_container = ""
+    couting_rnnjet_container = ""
     couting_bjet_container = ""
     btag_name = ""
     if flags.Analysis.do_small_R_jets:
@@ -93,35 +98,27 @@ def dihiggs_cfg(
     if flags.Analysis.UseVBFRNN:
         vbftagger = CompFactory.VBFTagger("VBFTaggerTool", modelTag="VBFRNNv0")
 
-        # VBF-RNN tagger: resolved
-        if flags.Analysis.do_resolved_dihiggs:
-            cfg.addEventAlgo(
-                CompFactory.VBFTaggerAlgSys(
-                    "VBFTaggerAlg_resolved",
-                    VBFTagger=vbftagger,
-                    containerAllJetsKey=couting_rnnjet_container,
-                    containerSigJetsKey=couting_bjet_container,
-                    OnlyFirstLargeRJet=False,
-                    pTCut=20.e3,
-                    nMaxJets=2,
-                    DecTag="_resolved"
-                )
-            )
-
         # VBF-RNN tagger: boosted
-        if flags.Analysis.do_boosted_dihiggs:
-            cfg.addEventAlgo(
-                CompFactory.VBFTaggerAlgSys(
-                    "VBFTaggerAlg_boosted",
-                    VBFTagger=vbftagger,
-                    containerAllJetsKey=couting_rnnjet_container,
-                    containerSigLargeRJetsKey=couting_lRjet_container,
-                    OnlyFirstLargeRJet=False,
-                    pTCut=20.e3,
-                    nMaxJets=2,
-                    DecTag="_boosted"
-                )
+        cfg.addEventAlgo(
+            CompFactory.VBFTaggerAlgSys(
+                "VBFTaggerAlg_boosted",
+                VBFTagger=vbftagger,
+                containerAllJetsKey=couting_rnnjet_container,
+                containerSigLargeRJetsKey=couting_lRjet_container,
+                OnlyFirstLargeRJet=False,
+                pTCut=20.e3,
+                nMaxJets=2,
+                DecTag="_boosted"
             )
+        )
+
+        cfg.addEventAlgo(
+            CompFactory.HH4B.VBFRNNVarsAlg(
+                "VBFRNNVarsAlg",
+                UseVBFRNN=flags.Analysis.UseVBFRNN,
+                floatVariableList=float_variables,
+            )
+        )
 
     selection_name = flags.Analysis.selection_name
     triggers = flags.Analysis.TriggerChains
@@ -191,6 +188,49 @@ def dihiggs_cfg(
         cfg.merge(histograms_cfg(flags))
 
     return cfg
+
+
+def get_RNNJets_variables(flags):
+    float_variable_names = []
+
+    objects = []
+    if flags.Analysis.UseVBFRNN:
+        objects += ["boosted_RNNJets_Jet1", "boosted_RNNJets_Jet2"]
+
+    for object in objects:
+        for var in ["m", "pt", "eta", "phi"]:
+            float_variable_names.append(f"{object}_{var}")
+
+    return float_variable_names
+
+
+def dihiggs_branches(flags):
+    branches = []
+    float_variable_names = []
+
+    branches += get_selected_objects_branches(flags, "bbbb")
+
+    baseline_float_variables = get_RNNJets_variables(flags)
+    float_variable_names += baseline_float_variables
+
+    for var in float_variable_names:
+        if flags.Input.isMC and "truthLabel" in var:
+            continue
+        branches += [
+            f"EventInfo.{var}_%SYS%"
+            + f" -> bbbb_{var}"
+            + flags.Analysis.systematics_suffix_separator + "%SYS%"
+        ]
+
+    # VBF tagger
+    if flags.Analysis.UseVBFRNN:
+        vars = ['RNNScore', 'nRNNJets']
+        reg = 'boosted'
+        for var in vars:
+            branches += [f'EventInfo.{var}_{reg}_%SYS% -> bbbb_{reg}_{var}'
+                         + flags.Analysis.systematics_suffix_separator + '%SYS%']
+
+    return branches, float_variable_names
 
 
 def pass_branches(flags):

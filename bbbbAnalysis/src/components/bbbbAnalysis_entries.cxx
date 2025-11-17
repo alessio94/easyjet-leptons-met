@@ -6,6 +6,7 @@
 #include "../MassPlaneBoostHistogramsAlg.h"
 #include "../SmallRJetTriggerSFAlg.h"
 #include "../TriggerDecoratorAlg.h"
+#include "../VBFRNNVarsAlg.h"
 
 using namespace HH4B;
 
@@ -17,3 +18,4 @@ DECLARE_COMPONENT(JetBoostHistogramsAlg)
 DECLARE_COMPONENT(MassPlaneBoostHistogramsAlg)
 DECLARE_COMPONENT(SmallRJetTriggerSFAlg)
 DECLARE_COMPONENT(TriggerDecoratorAlg)
+DECLARE_COMPONENT(VBFRNNVarsAlg)

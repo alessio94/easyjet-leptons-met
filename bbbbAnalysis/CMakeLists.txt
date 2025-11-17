@@ -16,6 +16,7 @@ atlas_add_component(bbbbAnalysis
   src/JetPairingAlg.cxx
   src/BaselineVarsResolvedAlg.cxx
   src/BaselineVarsBoostedAlg.cxx
+  src/VBFRNNVarsAlg.cxx
   src/bbbbSelectorAlg.cxx
   src/JetBoostHistograms.cxx
   src/JetBoostHistogramsAlg.cxx

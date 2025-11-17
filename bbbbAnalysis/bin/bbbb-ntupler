@@ -28,7 +28,7 @@ from bbbbAnalysis.utils.option_validation import validate_hh4b_analysis_prerequi
 from bbbbAnalysis.config.dihiggs import dihiggs_cfg
 from bbbbAnalysis.config.boosted import boosted_branches
 from bbbbAnalysis.config.resolved import resolved_branches, resolved_trigger_SF_branches, resolved_trigger_bucket_branches
-from bbbbAnalysis.config.dihiggs import pass_branches
+from bbbbAnalysis.config.dihiggs import dihiggs_branches, pass_branches
 from EasyjetHub.algs.orthogonality.orth_config import orth_branches
 from EasyjetHub.algs.orthogonality.orth_config import orth_cfg
 
@@ -62,8 +62,14 @@ def hh4b_job_cfg():
     seqname = "HH4bSeq"
     cfg = default_sequence_cfg(flags, seqname)
 
+    bbbb_branches = []
+    bbbb_extra_branches, float_variable_names = dihiggs_branches(flags)
+    bbbb_branches += bbbb_extra_branches
     cfg.merge(
-        dihiggs_cfg(flags),
+        dihiggs_cfg(
+            flags,
+            float_variables=float_variable_names,
+        ),
         seqname,
     )
 
@@ -84,7 +90,6 @@ def hh4b_job_cfg():
     # Determine the list of output branches
     # For more sophistication this could be done using
     # custom BranchManagers
-    bbbb_branches = []
     if flags.Analysis.do_boosted_dihiggs:
         bbbb_extra_branches, float_variable_names = boosted_branches(flags)
         bbbb_branches += bbbb_extra_branches
