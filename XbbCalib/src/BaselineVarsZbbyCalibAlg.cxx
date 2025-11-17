@@ -7,7 +7,7 @@
 #include "BaselineVarsZbbyCalibAlg.h"
 #include "FourVectorOutBlock.h"
 #include "DefaultOutputs.h"
-#include "Muel.h"
+#include "SystVariableCopier.h"
 
 #include <format>
 
@@ -36,7 +36,7 @@ namespace XBBCALIB
       this, "Zcand_", m_systematicsList, m_eventHandle);
 
     // set up the generic float copying
-    m_float_muel = std::make_unique<Muel<float>> (
+    m_float_copier = std::make_unique<SystVariableCopier<float>> (
       this,
       m_floats_to_copy,
       m_systematicsList,
@@ -44,7 +44,7 @@ namespace XBBCALIB
       m_eventHandle,
       m_copied_variable_prefix);
 
-    m_int_muel = std::make_unique<Muel<int>> (
+    m_int_copier = std::make_unique<SystVariableCopier<int>> (
       this,
       m_ints_to_copy,
       m_systematicsList,
@@ -84,12 +84,12 @@ namespace XBBCALIB
       {
         const xAOD::Jet* largeJet = lrjets->at(0);
         m_z_candidate_4vec->set(*event, *largeJet, sys);
-        m_float_muel->set(*event, *largeJet, sys);
-        m_int_muel->set(*event, *largeJet, sys);
+        m_float_copier->set(*event, *largeJet, sys);
+        m_int_copier->set(*event, *largeJet, sys);
       } else {
         m_z_candidate_4vec->setDefault(*event, sys);
-        m_float_muel->setDefault(*event, sys);
-        m_int_muel->setDefault(*event, sys);
+        m_float_copier->setDefault(*event, sys);
+        m_int_copier->setDefault(*event, sys);
       }
 
       size_t n_photons = photons->size();

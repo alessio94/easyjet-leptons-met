@@ -1,14 +1,14 @@
-#ifndef MUEL_H
-#define MUEL_H
+#ifndef SYSTVARIABLECOPIER_H
+#define SYSTVARIABLECOPIER_H
 
 #include "DefaultOutputs.h"
 
 namespace XBBCALIB {
 
-  // Each Muel can copy one type T of variable. Likely choices are
-  // float and int.
+  // Each SystVariableCopier can copy one type T of variable. Likely
+  // choices are float and int.
   template <typename T>
-  class Muel
+  class SystVariableCopier
   {
   private:
     using SRDH_t = CP::SysReadDecorHandle<T>;
@@ -17,12 +17,12 @@ namespace XBBCALIB {
     std::vector<std::unique_ptr<rw_pair_t>> m_copy_pairs;
   public:
     template <typename I, typename O>
-    Muel(Gaudi::Algorithm* owner,
-         const std::vector<std::string>& range,
-         CP::SysListHandle& syst_list,
-         I& input,
-         O& output,
-         const std::string& prefix = "")
+    SystVariableCopier(Gaudi::Algorithm* owner,
+                       const std::vector<std::string>& range,
+                       CP::SysListHandle& syst_list,
+                       I& input,
+                       O& output,
+                       const std::string& prefix = "")
     {
       for (const auto& var: range) {
         auto& rwpair = m_copy_pairs.emplace_back(

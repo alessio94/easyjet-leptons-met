@@ -22,7 +22,7 @@ namespace XBBCALIB
 
   // forward declare, define in the Cxx file
   class FourVectorOutBlock;
-  template <typename T> class Muel;
+  template <typename T> class SystVariableCopier;
 
   /// \brief An algorithm for counting containers
   class BaselineVarsZbbyCalibAlg final : public AthHistogramAlgorithm
@@ -69,11 +69,11 @@ private:
     // floats
     Gaudi::Property<std::vector<std::string>> m_floats_to_copy{
       this, "floatsToCopy", {}, "floats to copy to eventinfo"};
-    std::unique_ptr<Muel<float>> m_float_muel;
+    std::unique_ptr<SystVariableCopier<float>> m_float_copier;
     // ints
     Gaudi::Property<std::vector<std::string>> m_ints_to_copy{
       this, "intsToCopy", {}, "intss to copy to eventinfo"};
-    std::unique_ptr<Muel<int>> m_int_muel;
+    std::unique_ptr<SystVariableCopier<int>> m_int_copier;
 
     /// \brief Setup sys-aware output decorations
     std::unique_ptr<FourVectorOutBlock> m_photon_4vec;
