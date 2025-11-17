@@ -134,15 +134,15 @@ validator_bbll_mc20:
   script:
     - easyjet-validate bbll-mc20
 
-validator_bbll_mc20_lite_syst:
+validator_bbll_mc20_syst:
   extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
-    - job: ntupler_bbll_mc20_lite_syst
+    - job: ntupler_bbll_mc20_syst
       artifacts: false
   script:
-    - easyjet-validate bbll-mc20-lite-syst
+    - easyjet-validate bbll-mc20-syst
 
 validator_lltt_mc20:
   extends: .ntuple_validation
