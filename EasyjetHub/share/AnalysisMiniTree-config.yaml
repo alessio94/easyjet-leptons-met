@@ -33,6 +33,7 @@ collection_options:
     substructure_info: false
     truth_labels: false
     btag_details: true
+    tautag_details: false
     run_selection: false
     no_bjet_calib_p4: false
     bjet_regression: false

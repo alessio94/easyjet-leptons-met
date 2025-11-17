@@ -1,6 +1,7 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
 from AthenaConfiguration.Enums import LHCPeriod
+from EasyjetHub.steering.sample_metadata import is_at_least
 
 
 def jet_decor_cfg(flags, **kwargs):
@@ -50,5 +51,25 @@ def jet_decor_cfg(flags, **kwargs):
             **kwargs
         )
     )
+
+    return cfg
+
+
+def large_R_jet_decor_cfg(flags, **kwargs):
+
+    cfg = ComponentAccumulator()
+
+    is_valid_for_gn3x = is_at_least(flags, "p7017")
+    jet_output_flags = flags.Analysis.ttree_output.collection_options.large_R_jets
+
+    # compute discriminants
+    if is_valid_for_gn3x and jet_output_flags.tautag_details:
+
+        jetcoll = flags.Analysis.container_names.input['reco10UFOJet']
+        cfg.addEventAlgo(
+            CompFactory.Easyjet.GNXLargeJetDecoratorAlg(
+                f"JetDecor_{jetcoll}", jetsIn=jetcoll, **kwargs
+            )
+        )
 
     return cfg

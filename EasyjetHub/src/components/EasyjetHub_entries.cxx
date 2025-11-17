@@ -26,6 +26,7 @@
 #include "../TruthJetSelectorAlg.h"
 #include "../SecVtxFilterAlg.h"
 #include "../UIDDecoratorAlg.h"
+#include "../GNXLargeJetDecoratorAlg.h"
 
 using namespace Easyjet;
 
@@ -57,3 +58,4 @@ DECLARE_COMPONENT(TruthMuonSelectorAlg)
 DECLARE_COMPONENT(TruthJetSelectorAlg)
 DECLARE_COMPONENT(SecVtxFilterAlg)
 DECLARE_COMPONENT(UIDDecoratorAlg)
+DECLARE_COMPONENT(GNXLargeJetDecoratorAlg)

@@ -116,9 +116,13 @@ def get_large_R_jet_branches(
     if (
         lr_jet_type == "UFO"
         and is_valid_for_gn3x
-        and jet_output_flags.btag_details
+        and (
+            jet_output_flags.btag_details or jet_output_flags.tautag_details
+        )
     ):
         taggers = flags.Analysis.Large_R_jet.variables_in_ptag.p7017
+        if jet_output_flags.tautag_details:
+            taggers += ('GN2XTauV00_htt_score', 'GN3XPV01_htt_score')
         large_R_jet_branches.variables += taggers
 
     large_R_jet_branches.variables += jet_output_flags.extra_variables
