@@ -40,9 +40,6 @@ def jet_sequence(
     # Forward JVT
     configSeq.setOptionValue(".runFJvtSelection", jet_flags.useFJvt)
     configSeq.setOptionValue(".runFJvtEfficiency", jet_flags.useFJvt)
-    # JES/JER scheme
-    configSeq.setOptionValue(".systematicsModelJES", jet_flags.systModelJES)
-    configSeq.setOptionValue(".systematicsModelJER", jet_flags.systModelJER)
 
     # Set options for calibration tool if given
     if jet_flags.calibToolConfigFile and jet_flags.calibToolCalibArea:
@@ -69,6 +66,15 @@ def jet_sequence(
             ".recalibratePhyslite",
             False
         )
+
+    # Needs to be added manually for now
+    configSeq += makeConfig('Jets.Uncertainties')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.jetInput',
+                             "EMTopo" if jet_type == "reco4EMTopoJet" else "EMPflow")
+    # JES/JER scheme
+    configSeq.setOptionValue(".systematicsModelJES", jet_flags.systModelJES)
+    configSeq.setOptionValue(".systematicsModelJER", jet_flags.systModelJER)
 
     # Set options for uncertainties tool if given
     if jet_flags.uncertToolConfigPath and jet_flags.uncertToolCalibArea:
@@ -237,6 +243,11 @@ def lr_jet_sequence(flags, lr_jet_type, configAcc):
                             jetCollection=jetColl)
     configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.jetCollection', jetColl)
+
+    # Needs to be added manually for now
+    configSeq += makeConfig('Jets.Uncertainties')
+    configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.jetInput', "UFO")
 
     for GN2X_wp in flags.Analysis.Large_R_jet.GN2X_hbb_wps:
         jSONCalibFile = find_datafile(
