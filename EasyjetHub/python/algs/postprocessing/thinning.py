@@ -11,6 +11,12 @@ def thinning_sequence(flags):
 
     # Add whatever collections are active in the job to the
     # mapping of type to name
+    objmap = {'electrons': 'Electron',
+              'photons': 'Photon',
+              'muons': 'Muon',
+              'taus': 'Tau',
+              'ditaus': 'DiTau'}
+
     objflags = {x: f'do_{x}' for x in ['electrons', 'photons', 'muons',
                                        'taus', 'ditaus']}
     selections = dict(
@@ -22,7 +28,9 @@ def thinning_sequence(flags):
     )
 
     for objtype, objflag in objflags.items():
-        if flags.Analysis[objflag]:
+        # Get name of object configuration
+        objname = objmap[objtype]
+        if flags.Analysis[objflag] and flags.Analysis[objname].do_thinning:
             configSeq += makeConfig('Thinning')
             configSeq.setOptionValue('.containerName', drop_sys(
                 flags.Analysis.container_names.output[objtype]))

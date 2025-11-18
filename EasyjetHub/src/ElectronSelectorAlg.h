@@ -47,7 +47,7 @@ private:
       m_inHandle{ this, "containerInKey", "",   "Electron container to read" };
 
     CP::SysReadDecorHandle<char> m_select
-      {"baselineSelection_outputSelect_thin_%SYS%", this};
+      {this, "baselineSelectionName", "baselineSelection_outputSelect_thin_%SYS%", "Name of baseline selection decorator"};
     
     Gaudi::Property<std::vector<std::string>> m_eleWPs
       { this, "eleWPs", {},

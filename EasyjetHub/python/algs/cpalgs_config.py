@@ -201,15 +201,12 @@ def cpalgs_cfg(flags):
 
         configSeq += overlap_sequence(flags)
 
-    if flags.Analysis.do_thinning:
-        log.info("Adding thinning sequence")
-        configSeq += thinning_sequence(flags)
-
     if not flags.Analysis.disable_calib and \
             ((flags.Input.isMC and flags.Analysis.Trigger.scale_factor.doSF)
                 or flags.Analysis.Trigger.scale_factor.do_trigger_match):
         configSeq += triggerSF_sequence(flags)
 
+    configSeq += thinning_sequence(flags)
     configSeq += selection_decoration_sequence(flags)
 
     configSeq.fullConfigure(configAccumulator)

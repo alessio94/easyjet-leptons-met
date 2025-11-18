@@ -23,8 +23,10 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
-    
+    if (!m_select.empty()) {
+      ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
+    }
+
     for (int i = 0; i < m_muonAmount; i++){
       std::string index = std::to_string(i + 1);
       CP::SysWriteDecorHandle<bool> whandle{"isMuon" + index + "_%SYS%", this};
@@ -73,9 +75,9 @@ namespace Easyjet
         m_isSelectedMuon.set(*muon, false, sys);
 
         // pT and eta cuts
-	if(!m_select.get(*muon, sys))
-	  continue;
-	
+        if(!m_select.empty() && !m_select.get(*muon, sys))
+	        continue;
+          
         if (muon->pt() < m_minPt || std::abs(muon->eta()) > m_maxEta)
           continue;
 

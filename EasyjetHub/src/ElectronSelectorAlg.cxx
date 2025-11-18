@@ -22,7 +22,9 @@ namespace Easyjet
     // Intialise syst-aware input/output decorators    
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
+    if (!m_select.empty()) {
+      ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
+    }
 
     for (int i = 0; i < m_electronAmount; i++){
       std::string index = std::to_string(i + 1);
@@ -72,8 +74,8 @@ namespace Easyjet
         m_isSelectedElectron.set(*electron, false, sys);
 
         // cuts
-	if(!m_select.get(*electron, sys))
-	  continue;
+        if(!m_select.empty() && !m_select.get(*electron, sys))
+	        continue;
 	
         if (electron->pt() < m_minPt || std::abs(electron->eta()) > m_maxEta)
           continue;

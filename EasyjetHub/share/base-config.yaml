@@ -28,7 +28,6 @@ do_tight_jet_cleaning: false
 do_bbtt_analysis: false
 do_bbbbtt_analysis: false
 do_bbyy_analysis: false
-do_thinning: true
 # LLP1 filtering
 do_vertex_filtering: false
 VSI_container_suffix: ""
@@ -111,6 +110,7 @@ Photon:
   max_eta: 100
   ID: ""
   Iso: ""
+  do_thinning: true
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: []
@@ -125,6 +125,7 @@ Electron:
   chargeIDSelectionRun2: false
   ID: ""
   Iso: ""
+  do_thinning: true
   MergeLRT: false
   do_parent_decoration: false
   do_track_decoration: false
@@ -146,6 +147,7 @@ Muon:
   maxDeltaZ0SinTheta: 0.5
   ID: ""
   Iso: ""
+  do_thinning: true
   IsoDecSuffix: ""
   MergeLRT: false
   do_parent_decoration: false
@@ -160,6 +162,7 @@ Muon:
 Tau:
   min_pT: 20.e+3
   ID: ""
+  do_thinning: true
   addMuonRM: false
   do_parent_decoration: false
   amount: 0
@@ -170,6 +173,7 @@ Tau:
 
 DiTau:
   ID: ""
+  do_thinning: true
   # Activate when DiTau decoration is needed with samples < p7017 
   do_score_decoration: false
   score_branches: false

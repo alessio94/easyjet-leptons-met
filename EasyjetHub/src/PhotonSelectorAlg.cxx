@@ -22,7 +22,9 @@ namespace Easyjet
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     ATH_CHECK (m_outHandle.initialize(m_systematicsList));
 
-     ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
+    if (!m_select.empty()) {
+      ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
+    }
 
     for (int i = 0; i < m_photonAmount; i++){
       std::string index = std::to_string(i + 1);
@@ -72,11 +74,11 @@ namespace Easyjet
       for (const xAOD::Photon *photon : *inContainer)
       {
 
-	// selected photons for systematics
+	      // selected photons for systematics
         m_isSelectedPhoton.set(*photon, false, sys);
 
-	if(!m_select.get(*photon, sys))
-	  continue;
+        if(!m_select.empty() && !m_select.get(*photon, sys))
+	        continue;
 	
         if (photon->pt() < m_minPt)
           continue;

@@ -20,6 +20,9 @@ def MuonSelectorAlgCfg(flags, name="MuonSelectorAlg", **kwargs):
     kwargs.setdefault("muonWPs", muon_WPs)
     kwargs.setdefault("muonAmount", flags.Analysis.Muon.amount)
 
+    if not flags.Analysis.Muon.do_thinning:
+        kwargs.setdefault("baselineSelectionName", "")
+
     cfg.addEventAlgo(CompFactory.Easyjet.MuonSelectorAlg(name, **kwargs))
     return cfg
 
@@ -31,6 +34,9 @@ def ElectronSelectorAlgCfg(flags, name="ElectronSelectorAlg", **kwargs):
     ele_WPs += [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Electron.extra_wps]
     kwargs.setdefault("eleWPs", ele_WPs)
     kwargs.setdefault("electronAmount", flags.Analysis.Electron.amount)
+
+    if not flags.Analysis.Electron.do_thinning:
+        kwargs.setdefault("baselineSelectionName", "")
 
     cfg.addEventAlgo(CompFactory.Easyjet.ElectronSelectorAlg(name, **kwargs))
     return cfg
@@ -94,6 +100,9 @@ def TauSelectorAlgCfg(flags, name="TauSelectorAlg", **kwargs):
                       flags.Analysis.OverlapRemoval.doTauAntiTauJet)
     kwargs.setdefault("tauAmount", flags.Analysis.Tau.amount)
 
+    if not flags.Analysis.Tau.do_thinning:
+        kwargs.setdefault("baselineSelectionName", "")
+
     cfg.addEventAlgo(CompFactory.Easyjet.TauSelectorAlg(name, **kwargs))
     return cfg
 
@@ -105,6 +114,9 @@ def PhotonSelectorAlgCfg(flags, name="PhotonSelectorAlg", **kwargs):
     ph_WPs += [f'{wp[0]}_{wp[1]}' for wp in flags.Analysis.Photon.extra_wps]
     kwargs.setdefault("photonWPs", ph_WPs)
     kwargs.setdefault("photonAmount", flags.Analysis.Photon.amount)
+
+    if not flags.Analysis.Photon.do_thinning:
+        kwargs.setdefault("baselineSelectionName", "")
 
     cfg.addEventAlgo(CompFactory.Easyjet.PhotonSelectorAlg(name, **kwargs))
     return cfg

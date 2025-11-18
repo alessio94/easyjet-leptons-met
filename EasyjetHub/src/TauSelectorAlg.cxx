@@ -48,8 +48,10 @@ namespace Easyjet
     // Initialise syst-aware input/output decorators 
     ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
 
-    ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
-    
+    if (!m_select.empty()) {
+      ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
+    }
+
     // Initialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
 
@@ -80,8 +82,8 @@ namespace Easyjet
         // selected taus for systematics
         m_isSelectedTau.set(*tau, false, sys);
 
-	if(!m_select.get(*tau, sys))
-	  continue;
+        if(!m_select.empty() && !m_select.get(*tau, sys))
+	        continue;
 	
         // If not ID tau nor anti tau, skip
         if(m_keepAntiTaus){
