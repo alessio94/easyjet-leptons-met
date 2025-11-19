@@ -21,7 +21,6 @@ def pileup_sequence(flags):
         configSeq += makeConfig('PileupReweighting')
         configSeq.setOptionValue('.postfix', postfix)
         configSeq.setOptionValue('.campaign', flags.Input.MCCampaign)
-        configSeq.setOptionValue('.files', flags.Input.Files)
         configSeq.setOptionValue('.alternativeConfig', altConfig)
         if 'prw_files' in prw:
             configSeq.setOptionValue('.userPileupConfigs', get_prw_files(flags, prw))
