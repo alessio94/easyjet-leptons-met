@@ -48,19 +48,15 @@ namespace XBBCALIB
       CP::SysListHandle m_systematicsList {this};
 
       CP::SysReadHandle<xAOD::JetContainer>
-      m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Large-R jet container to read" };
+      m_lrjetHandle{ this, "lrjets", "",   "Large-R jet container to read" };
 
       CP::SysReadHandle<xAOD::PhotonContainer>
-      m_photonHandle{ this, "photons", "XbbCalibPhotons_%SYS%", "Photon container to read" };
+      m_photonHandle{ this, "photons", "", "Photon container to read" };
 
       CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
       CP::SysFilterReporterParams m_filterParams {this, "Zbb+y Calib selection"};
-
-      std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
-
-      std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
 
   };
 

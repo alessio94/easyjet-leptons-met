@@ -32,56 +32,66 @@ def ZbbyCalib_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey, photonk
 
     cfg = ComponentAccumulator()
 
+    selected_large_r_jets = "XbbCalibLRJets_%SYS%"
     cfg.merge(
         JetSelectorAlgCfg(
             flags,
             name="LargeJetSelectorAlg",
             containerInKey=largejetkey,
-            containerOutKey="XbbCalibLRJets_%SYS%",
+            containerOutKey=selected_large_r_jets,
             minPt=flags.Analysis.Large_R_jet.min_pT,
             maxEta=flags.Analysis.Large_R_jet.max_eta,
             minMass=flags.Analysis.Large_R_jet.min_m,
             minimumAmount=1,
         )
     )
+    selected_electrons = "XbbCalibElectrons_%SYS%"
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
-                                     containerOutKey="XbbCalibElectrons_%SYS%",
+                                     containerOutKey=selected_electrons,
                                      minPt=70 * Units.GeV,
                                      ))
 
+    selected_muons = "XbbCalibMuons_%SYS%"
     cfg.merge(MuonSelectorAlgCfg(flags,
                                  containerInKey=muonkey,
-                                 containerOutKey="XbbCalibMuons_%SYS%",
+                                 containerOutKey=selected_muons,
                                  minPt=70 * Units.GeV,
                                  maxEta=2.5,
                                  ))
 
+    selected_photons = "XbbCalibPhotons_%SYS%"
     cfg.merge(PhotonSelectorAlgCfg(flags,
                                    containerInKey=photonkey,
-                                   containerOutKey="XbbCalibPhotons_%SYS%",
+                                   containerOutKey=selected_photons,
                                    minPt=150. * Units.GeV
                                    ))
 
     cfg.addEventAlgo(
         CompFactory.XBBCALIB.ZbbyCalibSelectorAlg(
             "ZbbyCalibSelectorAlg",
+            lrjets=selected_large_r_jets,
+            photons=selected_photons,
             eventDecisionOutputDecoration="XbbCalib_pass_sr_%SYS%",
             bypass=flags.Analysis.bypass,
         )
     )
     # signal jets selection
+    z_candidate_jets = "ZcandLRJets_%SYS%"
     cfg.addEventAlgo(
         CompFactory.XBBCALIB.ZcandSelectorAlg(
             "ZcandSelectorAlg",
-            lrjets="XbbCalibLRJets_%SYS%",
-            photons="XbbCalibPhotons_%SYS%"
+            lrjets=selected_large_r_jets,
+            photons=selected_photons,
+            zCandidateJets=z_candidate_jets,
         )
     )
 
     cfg.addEventAlgo(
         CompFactory.XBBCALIB.BaselineVarsZbbyCalibAlg(
             "BaselineVarsZbbyCalibAlg",
+            lrjets=z_candidate_jets,
+            photons=selected_photons,
             floatsToCopy=_taggers(flags),
             intsToCopy=_working_points(flags),
             copiedVariablePrefix=copiedVariablePrefix,

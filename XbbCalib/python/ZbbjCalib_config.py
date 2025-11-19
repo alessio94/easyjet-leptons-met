@@ -17,12 +17,14 @@ def ZbbjCalib_cfg(flags, largejetkey,
 
     cfg = ComponentAccumulator()
 
+    selected_large_r = "XbbCalibLRJets_%SYS%"
+
     cfg.merge(
         JetSelectorAlgCfg(
             flags,
             name="LargeJetSelectorAlg",
             containerInKey=largejetkey,
-            containerOutKey="XbbCalibLRJets_%SYS%",
+            containerOutKey=selected_large_r,
             minPt=flags.Analysis.Large_R_jet.min_pT,
             maxEta=flags.Analysis.Large_R_jet.maxEta,
             minimumAmount=1,
@@ -32,6 +34,7 @@ def ZbbjCalib_cfg(flags, largejetkey,
     cfg.addEventAlgo(
         CompFactory.XBBCALIB.ZbbjCalibSelectorAlg(
             "ZbbjCalibSelectorAlg",
+            largeRJets=selected_large_r,
             eventDecisionOutputDecoration="XbbCalib_pass_sr_%SYS%",
             bypass=flags.Analysis.bypass,
         )
@@ -40,8 +43,7 @@ def ZbbjCalib_cfg(flags, largejetkey,
     cfg.addEventAlgo(
         CompFactory.XBBCALIB.BaselineVarsZbbjCalibAlg(
             "BaselineVarsZbbjCalibAlg",
-            floatVariableList=float_variables,
-            intVariableList=int_variables
+            largeRJets=selected_large_r
         )
     )
 

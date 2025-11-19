@@ -36,43 +36,16 @@ public:
     StatusCode execute() override;
     /// We use default finalize() -- this is for cleanup, and we don't do any
 
-    
-private:
-    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
-    // "someInfo"};
 
-    /// \brief Setup syst-aware input container handles
+private:
+
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Large-R jet container to read" };
-
-    CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "XbbCalibMuons_%SYS%",   "Muon container to read" };
-
-    CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "XbbCalibElectrons_%SYS%",   "Electron container to read" };
-
-    CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "AnalysisMET_%SYS%",   "MET container to read" };
+    m_lrjetHandle{ this, "largeRJets", "",   "Large-R jet container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
-
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
-
-    Gaudi::Property<std::vector<std::string>> m_floatVariables
-          {this, "floatVariableList", {}, "Name list of floating variables"};
-
-    Gaudi::Property<std::vector<std::string>> m_intVariables
-          {this, "intVariableList", {}, "Name list of integer variables"};
-
-    /// \brief Setup sys-aware output decorations
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
-
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
-
   };
 }
 

@@ -19,17 +19,12 @@ namespace XBBCALIB
 
   StatusCode ZbbjCalibSelectorAlg::initialize()
   {
-    // Initialise global event filter
     ATH_CHECK (m_filterParams.initialize(m_systematicsList));
-
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
-
-    ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_lrjetHandle.initialize(m_systematicsList));
 
-
     // Intialise syst list (must come after all syst-aware inputs and outputs)
-    ATH_CHECK (m_systematicsList.initialize()); 
+    ATH_CHECK (m_systematicsList.initialize());
 
     return StatusCode::SUCCESS;
   }

@@ -47,10 +47,7 @@ namespace XBBCALIB
       CP::SysListHandle m_systematicsList {this};
 
       CP::SysReadHandle<xAOD::JetContainer>
-      m_jetHandle{ this, "jets", "XbbCalibJets_%SYS%",   "Jet container to read" };
-
-      CP::SysReadHandle<xAOD::JetContainer>
-      m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Large-R jet container to read" };
+      m_lrjetHandle{ this, "largeRJets", "",   "Large-R jet container to read" };
 
       CP::SysReadHandle<xAOD::EventInfo>
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };

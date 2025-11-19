@@ -47,10 +47,10 @@ private:
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::JetContainer>
-    m_lrjetHandle{ this, "lrjets", "ZcandLRJets_%SYS%",   "Large-R jet container to read" };
+    m_lrjetHandle{ this, "lrjets", "",   "Large-R jet container to read" };
 
     CP::SysReadHandle<xAOD::PhotonContainer>
-    m_photonHandle{ this, "photons", "XbbCalibPhotons_%SYS%", "Photon container to read" };
+    m_photonHandle{ this, "photons", "", "Photon container to read" };
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };

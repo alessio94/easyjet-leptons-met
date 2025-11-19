@@ -20,27 +20,29 @@
 #include <AthContainers/ConstDataVector.h>
 
 namespace XBBCALIB{
-    class ZcandSelectorAlg final : public EL::AnaAlgorithm{
-        /// \brief The standard constructor
-        public:
-        ZcandSelectorAlg(const std::string& name, ISvcLocator *pSvcLocator);
+  class ZcandSelectorAlg final : public EL::AnaAlgorithm{
+    /// \brief The standard constructor
+  public:
+    ZcandSelectorAlg(const std::string& name, ISvcLocator *pSvcLocator);
 
-            /// \brief Initialisation method, for setting up tools and other persistent
-            /// configs
-            StatusCode initialize() override;
-            /// \brief Execute method, for actions to be taken in the event loop
-            StatusCode execute() override;
+    /// \brief Initialisation method, for setting up tools and other persistent
+    /// configs
+    StatusCode initialize() override;
+    /// \brief Execute method, for actions to be taken in the event loop
+    StatusCode execute() override;
 
-        private:
-            /// \brief Setup syst-aware input container handles
-            CP::SysListHandle m_systematicsList {this};
+  private:
+    /// \brief Setup syst-aware input container handles
+    CP::SysListHandle m_systematicsList {this};
 
-            CP::SysReadHandle<xAOD::JetContainer> m_lrjetHandle{ this, "lrjets", "XbbCalibLRJets_%SYS%",   "Large-R jet container to read" };
-            CP::SysReadHandle<xAOD::PhotonContainer> m_photonHandle{ this, "photons", "XbbCalibPhotons_%SYS%",   "Photon container to read" };
-            //Z cand jets to write
-            CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_ZcandjetOutHandle{ this, "ZcandjetOutHandleContainer", "ZcandLRJets_%SYS%", "Z Jets candidates container to write"};
-            
+    CP::SysReadHandle<xAOD::JetContainer> m_lrjetHandle{
+      this, "lrjets", "",   "Large-R jet container to read" };
+    CP::SysReadHandle<xAOD::PhotonContainer> m_photonHandle{
+      this, "photons", "",   "Photon container to read" };
+    //Z cand jets to write
+    CP::SysWriteHandle<ConstDataVector<xAOD::JetContainer>> m_ZcandjetOutHandle{ this, "zCandidateJets", "", "Z Jets candidates container to write"};
 
-    };
+
+  };
 }
 #endif
