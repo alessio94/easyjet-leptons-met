@@ -154,6 +154,16 @@ for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/data*.txt; do easyjet-g
 for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-antiiso.yaml --channels AntiIsoLepHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --mc-list $f; done
 ```
 
+## Bulk downloading from the grid
+A simple downloader script is provided in `/scripts/downloader.sh`. This will check a regex pattern against the user's list of jobs from pbook and automatically download all outputs for a specific channel in a specified time frame. Example usage:
+
+
+```bash
+./downloader.sh 'user.lesplend.EJ_0_35_0_v7_VBF*' LepHad 45
+
+```
+Downloads all LepHad ntuples from jobs matching the given pattern from the last 45 days.
+
 # Input files
 
 The list of PHYS files used in the bbττ analysis is maintained in `bbttAnalysis/datasets/PHYS/prod` for nominal samples and in `bbttAnalysis/datasets/PHYS/prod_sys` for alternative samples
