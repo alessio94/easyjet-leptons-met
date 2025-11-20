@@ -26,12 +26,13 @@ namespace Easyjet
       ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
     }
 
-    for (int i = 0; i < m_electronAmount; i++){
-      std::string index = std::to_string(i + 1);
-      CP::SysWriteDecorHandle<bool> whandle{"isElectron" + index + "_%SYS%", this};
-      m_leadBranches.emplace("isElectron" + index, whandle);
-      ATH_CHECK(m_leadBranches.at("isElectron" + index).initialize(m_systematicsList, m_inHandle));
+    std::vector<std::string> leadBranches_keys{};
+    for(int i=0; i< m_electronAmount; i++){
+      leadBranches_keys.emplace_back("isElectron"+std::to_string(i+1)+"_%SYS%");
     }
+    m_leadBranches = CP::SysWriteDecorHandleArray<bool>(leadBranches_keys, this);
+    ATH_CHECK(m_leadBranches.initialize(m_systematicsList, m_inHandle));
+
     ANA_CHECK (m_isSelectedElectron.initialize(m_systematicsList, m_inHandle));
 
     // Select flags
@@ -129,8 +130,8 @@ namespace Easyjet
       if(m_electronAmount > 0){
         int nElectron = 0;
         for (const xAOD::Electron *electron : *workContainer) {
+          m_leadBranches.at(nElectron).set(*electron, true, sys);
           nElectron++;
-          m_leadBranches.at("isElectron"+std::to_string(nElectron)).set(*electron, true, sys);
           if ( nElectron == m_electronAmount ) break;
         }
       }

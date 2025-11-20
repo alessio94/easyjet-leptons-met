@@ -25,12 +25,12 @@ namespace Easyjet
     ATH_CHECK (m_antiTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
     ATH_CHECK (m_IDTau.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
 
-    for (int i = 0; i < m_tauAmount; i++){
-      std::string index = std::to_string(i + 1);
-      CP::SysWriteDecorHandle<bool> whandle{"isTau" + index + "_%SYS%", this};
-      m_leadBranches.emplace("isTau" + index, whandle);
-      ATH_CHECK(m_leadBranches.at("isTau" + index).initialize(m_systematicsList, m_inHandle));
+    std::vector<std::string> leadBranches_keys{};
+    for(int i=0; i< m_tauAmount; i++){
+      leadBranches_keys.emplace_back("isTau"+std::to_string(i+1)+"_%SYS%");
     }
+    m_leadBranches = CP::SysWriteDecorHandleArray<bool>(leadBranches_keys, this);
+    ATH_CHECK(m_leadBranches.initialize(m_systematicsList, m_inHandle));
 
     ANA_CHECK (m_isSelectedTau.initialize(m_systematicsList, m_inHandle));
 
@@ -141,10 +141,9 @@ namespace Easyjet
 
       //lead/sublead tau
       if(m_tauAmount > 0){	
-        int nTau = 0;
-        for (const xAOD::TauJet *tau : *workContainer) {
+        for (int nTau{0};const xAOD::TauJet *tau : *workContainer) {
+          m_leadBranches.at(nTau).set(*tau, true, sys);
           nTau++;
-          m_leadBranches.at("isTau"+std::to_string(nTau)).set(*tau, true, sys);
           if ( nTau == m_tauAmount ) break;
         }
       }

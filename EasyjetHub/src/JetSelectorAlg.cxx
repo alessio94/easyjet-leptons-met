@@ -32,19 +32,19 @@ namespace Easyjet
       ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_inHandle));
     }
 
+    std::vector<std::string> bleadBranches_keys{};
     for(int i=0; i<m_bjetAmount; i++){
-      std::string index = std::to_string(i+1);
-      CP::SysWriteDecorHandle<bool> wbhandle{"isbjet"+index+"_%SYS%", this};
-      m_bleadBranches.emplace("isbjet"+index, wbhandle);
-      ATH_CHECK(m_bleadBranches.at("isbjet"+index).initialize(m_systematicsList, m_inHandle));
+      bleadBranches_keys.emplace_back("isbjet"+std::to_string(i+1)+"_%SYS%");
     }
+    m_bleadBranches = CP::SysWriteDecorHandleArray<bool>(bleadBranches_keys, this);
+    ATH_CHECK(m_bleadBranches.initialize(m_systematicsList,m_inHandle));
 
+    std::vector<std::string> jleadBranches_keys{};
     for(int i=0; i<m_jetAmount; i++){
-      std::string index = std::to_string(i+1);
-      CP::SysWriteDecorHandle<bool> whandle{"isjet"+index+"_%SYS%", this};
-      m_leadBranches.emplace("isjet"+index, whandle);
-      ATH_CHECK(m_leadBranches.at("isjet"+index).initialize(m_systematicsList, m_inHandle));
+      jleadBranches_keys.emplace_back("isjet"+std::to_string(i+1)+"_%SYS%");
     }
+    m_jleadBranches = CP::SysWriteDecorHandleArray<bool> (jleadBranches_keys, this);
+    ATH_CHECK(m_jleadBranches.initialize(m_systematicsList,m_inHandle));
 
     ANA_CHECK (m_isSelectedJet.initialize (m_systematicsList, m_inHandle));
 
@@ -79,7 +79,6 @@ namespace Easyjet
       ATH_MSG_ERROR("required bjet amount is positive but btag wp is empty");
       return StatusCode::FAILURE;
     }
-
     return StatusCode::SUCCESS;
   }
 
@@ -172,26 +171,22 @@ namespace Easyjet
         workContainer->erase(workContainer->begin() + nKeep, workContainer->end());
       }
 
-      //lead/sublead bjet
-      if(m_bjetAmount > 0){
-         int njet = 0;
-         for (const xAOD::Jet *jet : *workContainer) {
-            if (WPgiven &&  m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5){
-               njet++;
-               m_bleadBranches.at("isbjet"+std::to_string(njet)).set(*jet, true, sys);
-            }
-            if ( njet == m_bjetAmount ) break;
-         }
-      }
-
-      //lead/sublead jet
-      if(m_jetAmount > 0){
-         int njet = 0;
-         for (const xAOD::Jet *jet : *workContainer) {
-            njet++;
-            m_leadBranches.at("isjet"+std::to_string(njet)).set(*jet, true, sys);
-            if ( njet == m_jetAmount ) break;
-         }
+      for (int njet{0}, nbjet{0}; const xAOD::Jet *jet : *workContainer) {
+        bool dojet = m_jetAmount > 0 && njet<m_jetAmount;
+        bool dobjet = m_bjetAmount > 0 && nbjet<m_bjetAmount;
+        if(!dojet && !dobjet) {break;}
+        //lead/sublead jet
+        if(dojet){
+          m_jleadBranches.at(njet).set(*jet, true, sys);
+        }
+        //lead/sublead bjet
+        if(dobjet){
+          if (WPgiven &&  m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5){
+              m_bleadBranches.at(nbjet).set(*jet, true, sys);
+              nbjet++;
+          }
+        }
+        njet++;
       }
 
       // Write to eventstore

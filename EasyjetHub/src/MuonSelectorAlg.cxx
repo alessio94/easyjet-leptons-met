@@ -27,12 +27,13 @@ namespace Easyjet
       ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
     }
 
-    for (int i = 0; i < m_muonAmount; i++){
-      std::string index = std::to_string(i + 1);
-      CP::SysWriteDecorHandle<bool> whandle{"isMuon" + index + "_%SYS%", this};
-      m_leadBranches.emplace("isMuon" + index, whandle);
-      ATH_CHECK(m_leadBranches.at("isMuon" + index).initialize(m_systematicsList, m_inHandle));
+    std::vector<std::string> leadBranches_keys{};
+    for(int i=0; i< m_muonAmount; i++){
+      leadBranches_keys.emplace_back("isMuon"+std::to_string(i+1)+"_%SYS%");
     }
+    m_leadBranches = CP::SysWriteDecorHandleArray<bool>(leadBranches_keys, this);
+    ATH_CHECK(m_leadBranches.initialize(m_systematicsList, m_inHandle));
+
     ANA_CHECK (m_isSelectedMuon.initialize(m_systematicsList, m_inHandle));
 
     // Select flags
@@ -124,10 +125,9 @@ namespace Easyjet
       }
 
       if(m_muonAmount > 0){
-        int nMuon = 0;
-        for (const xAOD::Muon *muon : *workContainer) {
+        for (int nMuon = 0; const xAOD::Muon *muon : *workContainer) {
+          m_leadBranches.at(nMuon).set(*muon, true, sys);
           nMuon++;
-          m_leadBranches.at("isMuon"+std::to_string(nMuon)).set(*muon, true, sys);
           if ( nMuon == m_muonAmount ) break;
         }
       }

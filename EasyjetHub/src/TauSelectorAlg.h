@@ -81,7 +81,7 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra taus after pT sorting"}; // -1 means keep them all
 
     Gaudi::Property<int>   m_tauAmount       {this, "tauAmount", -1, "Number of taus to consider for isTauXX decoration"};
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
+    CP::SysWriteDecorHandleArray<bool> m_leadBranches {{}, this}; // Declared w/o property
 
 
   };

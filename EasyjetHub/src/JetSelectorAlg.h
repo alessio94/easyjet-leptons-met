@@ -83,10 +83,10 @@ private:
 
     Gaudi::Property<bool>  m_selectBjet       {this, "selectBjet", false, "Apply bjet selection"};
     Gaudi::Property<int>   m_bjetAmount       {this, "bjetAmount", -1, "Number of jets to consider for isbjetXX decoration"};
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_bleadBranches;
+    CP::SysWriteDecorHandleArray<bool> m_bleadBranches {{}, this};
 
     Gaudi::Property<int>   m_jetAmount        {this, "jetAmount", -1, "Number of jets to consider for isjetXX decoration"};
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
+    CP::SysWriteDecorHandleArray<bool> m_jleadBranches {{}, this};
 
   };
 }

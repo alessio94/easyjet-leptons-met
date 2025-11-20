@@ -75,7 +75,7 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra muons after pT sorting"}; // -1 means keep them all
 
     Gaudi::Property<int>   m_muonAmount       {this, "muonAmount", -1, "Number of muons to consider for isMuonXX decoration"};
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
+    CP::SysWriteDecorHandleArray<bool> m_leadBranches {{}, this}; // Declared w/o property
   };
 }
 

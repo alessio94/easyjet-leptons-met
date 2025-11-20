@@ -5,9 +5,9 @@
 #include <xAODEventInfo/EventInfo.h>
 #include "xAODTracking/VertexContainer.h"
 
-#include <StoreGate/WriteDecorHandle.h>
-#include <StoreGate/ReadDecorHandle.h>
-
+#include <StoreGate/WriteDecorHandleKey.h>
+#include <StoreGate/ReadDecorHandleKey.h>
+#include <StoreGate/WriteDecorHandleKeyArray.h>
 
 namespace Easyjet
 {
@@ -76,7 +76,7 @@ private:
       {"2024_timeframeE_F", 480957, 486706},
     };
 
-    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_runPeriodsDecor_keys;
+    SG::WriteDecorHandleKeyArray<xAOD::EventInfo> m_runPeriodsDecor_keys;
 
     SG::WriteDecorHandleKey<xAOD::EventInfo> m_L1TopoDisabledDecorKey;
 

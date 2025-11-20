@@ -1,5 +1,8 @@
 #include "EventInfoGlobalAlg.h"
 
+#include <StoreGate/WriteDecorHandle.h>
+#include <StoreGate/ReadDecorHandle.h>
+
 namespace Easyjet
 {
 

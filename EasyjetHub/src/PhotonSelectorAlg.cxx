@@ -26,12 +26,12 @@ namespace Easyjet
       ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
     }
 
-    for (int i = 0; i < m_photonAmount; i++){
-      std::string index = std::to_string(i + 1);
-      CP::SysWriteDecorHandle<bool> whandle{"isPhoton" + index + "_%SYS%", this};
-      m_leadBranches.emplace("isPhoton" + index, whandle);
-      ATH_CHECK(m_leadBranches.at("isPhoton" + index).initialize(m_systematicsList, m_inHandle));
+    std::vector<std::string> leadBranches_keys{};
+    for(int i=0; i< m_photonAmount; i++){
+      leadBranches_keys.emplace_back("isPhoton"+std::to_string(i+1)+"_%SYS%");
     }
+    m_leadBranches = CP::SysWriteDecorHandleArray<bool>(leadBranches_keys, this);
+    ATH_CHECK(m_leadBranches.initialize(m_systematicsList, m_inHandle));
 
     ATH_CHECK (m_isSelectedPhoton.initialize(m_systematicsList, m_inHandle));
 
@@ -130,10 +130,9 @@ namespace Easyjet
 
       //lead/sublead photon
       if(m_photonAmount > 0){
-        int nPhoton = 0;
-        for (const xAOD::Photon *photon : *workContainer) {
+        for (int nPhoton{0}; const xAOD::Photon *photon : *workContainer) {
+          m_leadBranches.at(nPhoton).set(*photon, true, sys);
           nPhoton++;
-          m_leadBranches.at("isPhoton"+std::to_string(nPhoton)).set(*photon, true, sys);
           if ( nPhoton == m_photonAmount ) break;
         }
       }

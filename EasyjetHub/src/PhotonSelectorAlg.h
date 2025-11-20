@@ -74,7 +74,7 @@ private:
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra photons after pT sorting"}; // -1 means keep them all
 
     Gaudi::Property<int>   m_photonAmount     {this, "photonAmount", -1, "Number of photons to consider for isPhotonXX decoration"};
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool>> m_leadBranches;
+    CP::SysWriteDecorHandleArray<bool> m_leadBranches { {}, this}; // Declared w/o property
 
   };
 }
