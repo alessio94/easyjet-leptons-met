@@ -85,7 +85,12 @@ def main():
     parser.add_argument(
         "--mergeOutput",
         action="store_true",
-        help="Merge outputs (TEfficiency merging for CutFlow not supported)",
+        help="Merge outputs (TEfficiency merging requires --mergeWithHadd)",
+    )
+    parser.add_argument(
+        "--mergeWithHadd",
+        action="store_true",
+        help="Merge outputs with hadd to handle TEfficiency",
     )
     parser.add_argument(
         "--nGBPerMergeJob", default=None, help="The maximum input size in GB to be processed by a single merge job.",
@@ -150,6 +155,7 @@ def main():
     # Prepare some of the prun options here
     submit_opts = {
         "mergeOutput": False,
+        "mergeWithHadd": False,
         "outputs": "TREE:output-tree.root",
         "writeInputToTxt": "IN:in.txt",
         "useAthenaPackages": True,
@@ -184,6 +190,8 @@ def main():
         submit_opts["memory"] = args.memory
     if args.mergeOutput:
         submit_opts["mergeOutput"] = True
+        if args.mergeWithHadd:
+            submit_opts["mergeScript"] = "merge-with-hadd %OUT %IN"
     if args.noEmail:
         submit_opts["noEmail"] = True
     if args.framework:

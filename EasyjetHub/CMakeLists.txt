@@ -59,6 +59,7 @@ atlas_install_scripts(
   bin/easyjet-gridsubmit
   bin/easyjet-merge-configs
   bin/easyjet-create-git-tag
+  bin/merge-with-hadd
 )
 atlas_install_python_modules(
   python/*.py
