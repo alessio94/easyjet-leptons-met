@@ -280,7 +280,7 @@ namespace ssWWVBS
                           const xAOD::Muon* mu0, const xAOD::Muon* mu1,
                           CutManager& ssWWCuts);
       void evaluateMetCuts(const xAOD::MissingET* met, CutManager& ssWWCuts);
-      void evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& ssWWCuts);
+      void evaluateJetCuts(const xAOD::JetContainer& jets, CutManager& ssWWCuts);
       void evaluateBJetLeptonCuts(const ConstDataVector<xAOD::JetContainer>& bjets,
                           const xAOD::ElectronContainer& electrons, const xAOD::MuonContainer& muons,
                           CutManager& ssWWCuts);

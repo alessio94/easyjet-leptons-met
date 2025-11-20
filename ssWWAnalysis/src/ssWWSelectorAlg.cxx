@@ -132,15 +132,6 @@ namespace ssWWVBS
         }
       }
  
-      //Jet ordering
-      std::sort(nonbjets->begin(), nonbjets->end(),
-        [](const xAOD::Jet* a, const xAOD::Jet* b) {
-          return a->pt() > b->pt(); });
-
-      std::sort(bjets->begin(), bjets->end(),
-        [](const xAOD::Jet* a, const xAOD::Jet* b) {
-          return a->pt() > b->pt(); });
-
       const xAOD::MuonContainer *muons = nullptr;
       ANA_CHECK (m_muonHandle.retrieve (muons, sys));
       
@@ -266,7 +257,7 @@ namespace ssWWVBS
       evaulateLeptonIDCuts(ele0, ele1, mu0, mu1, m_ssWWCuts, sys);
       evaluateLeptonCuts(*electrons, *muons, ele0, ele1, mu0, mu1, m_ssWWCuts);
       evaluateMetCuts(met, m_ssWWCuts);
-      evaluateJetCuts(*nonbjets, m_ssWWCuts);
+      evaluateJetCuts(*jets, m_ssWWCuts);
       evaluateBJetLeptonCuts(*bjets, *electrons, *muons, m_ssWWCuts);
       
       bool passedall = true;
@@ -794,7 +785,7 @@ namespace ssWWVBS
 
   }
 
-  void ssWWSelectorAlg::evaluateJetCuts(const ConstDataVector<xAOD::JetContainer>& nonbjets, CutManager& ssWWCuts)
+  void ssWWSelectorAlg::evaluateJetCuts(const xAOD::JetContainer& jets, CutManager& ssWWCuts)
   {
 
     /// All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the ssWW_config file.
@@ -802,11 +793,11 @@ namespace ssWWVBS
     double mjj = -99;
     float delta_yjj = 0;
 
-    if(ssWWCuts.exists("AT_LEAST_TWO_JETS")) m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) = (nonbjets.size() >= 2 && nonbjets.at(0)->pt() > 65*Athena::Units::GeV && nonbjets.at(1)->pt() > 35*Athena::Units::GeV);
+    if(ssWWCuts.exists("AT_LEAST_TWO_JETS")) m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) = (jets.size() >= 2 && jets.at(0)->pt() > 65*Athena::Units::GeV && jets.at(1)->pt() > 35*Athena::Units::GeV);
     
-    if (nonbjets.size() >= 2){
-      mjj = (nonbjets.at(0)->p4() + nonbjets.at(1)->p4()).M();
-      delta_yjj = std::abs(nonbjets.at(0)->rapidity() - nonbjets.at(1)->rapidity());
+    if (jets.size() >= 2){
+      mjj = (jets.at(0)->p4() + jets.at(1)->p4()).M();
+      delta_yjj = std::abs(jets.at(0)->rapidity() - jets.at(1)->rapidity());
       if(ssWWCuts.exists("DIJETS_MASS_LOW")) m_bools.at(ssWWVBS::DIJETS_MASS_LOW) = (mjj > 200*Athena::Units::GeV);
       if(ssWWCuts.exists("DIJETS_MASS_HIGH")) m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) = (mjj > 500*Athena::Units::GeV);
       if(ssWWCuts.exists("DIJETS_DELTA_RAPIDITY")) m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) = (delta_yjj > 2);
