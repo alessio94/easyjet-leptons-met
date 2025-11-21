@@ -3,8 +3,8 @@
 */
 
 // Always protect against multiple includes!
-#ifndef HHBBYYANALYSIS_LEPTONVARSYYBBALG
-#define HHBBYYANALYSIS_LEPTONVARSYYBBALG
+#ifndef YYANALYSIS_JETVARSALG
+#define YYANALYSIS_JETVARSALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 
@@ -16,16 +16,17 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/ElectronContainer.h>
-#include <xAODMissingET/MissingETContainer.h>
+#include <xAODJet/JetContainer.h>
+
 
 namespace HHBBYY
 {
   /// \brief An algorithm for counting containers
-  class LeptonVarsbbyyAlg final : public AthHistogramAlgorithm
+  class JetVarsAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
   public:
-    LeptonVarsbbyyAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    JetVarsAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -40,17 +41,15 @@ namespace HHBBYY
     /// \brief Setup syst-aware input container handles
     CP::SysListHandle m_systematicsList {this};
 
-    CP::SysReadHandle<xAOD::ElectronContainer>
-    m_electronHandle{ this, "electrons", "bbyyAnalysisElectrons_%SYS%", "Electron container to read" };
-
-    CP::SysReadHandle<xAOD::MuonContainer>
-    m_muonHandle{ this, "muons", "bbyyAnalysisMuons_%SYS%", "Muon container to read" };
-
-    CP::SysReadHandle<xAOD::MissingETContainer>
-    m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_jetHandle{ this, "jets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
+    
 
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
+
+    // B-tagging decorator
+    CP::SysReadDecorHandle<char> m_isBtag {this, "bTagWPDecorName", "", "Name of input decorator for b-tagging"};
 
     Gaudi::Property<bool> m_doSystematics
       { this, "doSystematics", false, "Run on all systematics" };
@@ -58,12 +57,9 @@ namespace HHBBYY
     Gaudi::Property<std::vector<std::string>> m_intVariables
       {this, "intVariableList", {}, "Name list of integer variables"};
 
-    Gaudi::Property<std::vector<std::string>> m_floatVariables
+      Gaudi::Property<std::vector<std::string>> m_floatVariables
       {this, "floatVariableList", {}, "Name list of integer variables"};
-    
-    Gaudi::Property<bool> m_do_HHbbyy_Hyy_Analysis
-      { this, "do_HHbbyy_Hyy_Analysis", false, "Save additional input variables for HH_H analysis"};
-    
+
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
     std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;  

@@ -3,10 +3,11 @@
 */
 
 // Always protect against multiple includes!
-#ifndef HHBBYYANALYSIS_PHOTONVARSYYBBALG
-#define HHBBYYANALYSIS_PHOTONVARSYYBBALG
+#ifndef YYANALYSIS_PHOTONJETVARSALG
+#define YYANALYSIS_PHOTONJETVARSALG
 
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
+#include <FourMomUtils/xAODP4Helpers.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
@@ -14,16 +15,20 @@
 #include <SystematicsHandles/SysReadDecorHandle.h>
 
 #include <xAODEventInfo/EventInfo.h>
+#include <xAODMuon/MuonContainer.h>
+#include <xAODEgamma/ElectronContainer.h>
+#include <xAODJet/JetContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
+
 
 namespace HHBBYY
 {
   /// \brief An algorithm for counting containers
-  class PhotonVarsbbyyAlg final : public AthHistogramAlgorithm
+  class PhotonJetVarsAlg final : public AthHistogramAlgorithm
   {
     /// \brief The standard constructor
   public:
-    PhotonVarsbbyyAlg(const std::string &name, ISvcLocator *pSvcLocator);
+    PhotonJetVarsAlg(const std::string &name, ISvcLocator *pSvcLocator);
 
     /// \brief Initialisation method, for setting up tools and other persistent
     /// configs
@@ -39,43 +44,26 @@ namespace HHBBYY
     CP::SysListHandle m_systematicsList {this};
 
     CP::SysReadHandle<xAOD::PhotonContainer>
-      m_bbyyPhotonHandle{ this, "bbyyPhotons", "bbyyAnalysisPhotons_%SYS%", "Photons container to read" };
+    m_photonHandle{ this, "photons", "bbyyAnalysisPhotons_%SYS%", "Photon container to read" };
 
-    CP::SysReadHandle<xAOD::PhotonContainer>
-      m_photonHandle{ this, "photons", "AnalysisPhotons_%SYS%", "Original photon container to read" };
+    CP::SysReadHandle<xAOD::JetContainer>
+    m_jetHandle{ this, "jets", "bbyyAnalysisJets_%SYS%", "Jet container to read" };
 
-    CP::SysReadDecorHandle<unsigned int> m_isEMTight
-      {"DFCommonPhotonsIsEMTightIsEMValue", this};
-
-    Gaudi::Property<std::string> m_photonWPName
-      { this, "photonWP", "", "Photon ID + Iso working point" };
-    
-    CP::SysReadDecorHandle<float> m_ph_SF{"", this};
-    
     CP::SysReadHandle<xAOD::EventInfo>
     m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
 
     Gaudi::Property<bool> m_doSystematics
       { this, "doSystematics", false, "Run on all systematics" };
-
-    Gaudi::Property<bool> m_isMC
-      { this, "isMC", false, "Is this simulation?" };
+    
+    Gaudi::Property<std::vector<std::string>> m_intVariables
+      {this, "intVariableList", {}, "Name list of integer variables"};
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
       {this, "floatVariableList", {}, "Name list of float variables"};
 
-    Gaudi::Property<std::vector<std::string>> m_intVariables
-        {this, "intVariableList", {}, "Name list of integer variables"};
-    
-    Gaudi::Property<bool> m_do_HHbbyy_Hyy_Analysis
-      { this, "do_HHbbyy_Hyy_Analysis", false, "Save additional input variables for HH_H analysis"};
-
     /// \brief Setup sys-aware output decorations
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
-    
-    CP::SysReadDecorHandle<bool> 
-    m_selected_ph { this, "selected_ph", "selected_ph_%SYS%", "Name of input decorator for selected ph"};
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;  
   };
 }
 #endif

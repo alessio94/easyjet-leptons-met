@@ -88,19 +88,22 @@ namespace HHBBYY
       ANA_MSG_ERROR("do_nonresonant_BDTs set to false, but VBF jets method set to BDT. getVBFjets_BDT only works if BDTs are loaded.");
       return StatusCode::FAILURE;
     }
+    
+    for (const std::string &string_var : m_intVariables_photons) {
+      CP::SysReadDecorHandle<int> var { string_var + "_%SYS%", this };
+      m_Ibranches_photons.emplace(string_var, var);
+      ATH_CHECK(m_Ibranches_photons.at(string_var)
+                  .initialize(m_systematicsList, m_eventHandle));
+    }
 
-    ATH_CHECK (m_Photon1_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_Photon1_eta.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_Photon1_phi.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_Photon1_E.initialize(m_systematicsList, m_eventHandle));
-
-    ATH_CHECK (m_Photon2_pt.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_Photon2_eta.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_Photon2_phi.initialize(m_systematicsList, m_eventHandle));
-    ATH_CHECK (m_Photon2_E.initialize(m_systematicsList, m_eventHandle));
-
-    ATH_CHECK (m_nPhotons.initialize(m_systematicsList, m_eventHandle));
-
+    // Setup decorations for photon variables (float)
+    for (const std::string &string_var : m_floatVariables_photons) {
+      CP::SysReadDecorHandle<float> var { string_var + "_%SYS%", this };
+      m_Fbranches_photons.emplace(string_var, var);
+      ATH_CHECK(m_Fbranches_photons.at(string_var)
+                  .initialize(m_systematicsList, m_eventHandle));
+    }
+    
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());
 
@@ -182,7 +185,6 @@ namespace HHBBYY
       }
 
       eventFloats.at(HHBBYY::Var::jets_HT) = HT;
-
       // inclusive jet sector
       if (m_save_nonresonant_BDTInput_variables){
         for (std::size_t i=0; i<std::min(jets->size(),(std::size_t)4); i++){
@@ -207,6 +209,7 @@ namespace HHBBYY
         }
       }
 
+
       const xAOD::Jet *Hbb_Jet1 = nullptr;
       const xAOD::Jet *Hbb_Jet2 = nullptr;
       if (jets->size() >= 2) {
@@ -228,16 +231,16 @@ namespace HHBBYY
       std::vector<const xAOD::Jet*> Hbb_jets = {Hbb_Jet1, Hbb_Jet2};
 
       TLorentzVector ph1(0.,0.,0.,0.);
-      ph1.SetPtEtaPhiE(m_Photon1_pt.get(*event, sys),
-                       m_Photon1_eta.get(*event, sys),
-                       m_Photon1_phi.get(*event, sys),
-                       m_Photon1_E.get(*event, sys));
+      ph1.SetPtEtaPhiE(m_Fbranches_photons.at("Photon1_pt").get(*event, sys),
+                       m_Fbranches_photons.at("Photon1_eta").get(*event, sys),
+                       m_Fbranches_photons.at("Photon1_phi").get(*event, sys),
+                       m_Fbranches_photons.at("Photon1_E").get(*event, sys));
       TLorentzVector ph2(0.,0.,0.,0.);
-        ph2.SetPtEtaPhiE(m_Photon2_pt.get(*event, sys),
-                         m_Photon2_eta.get(*event, sys),
-                         m_Photon2_phi.get(*event, sys),
-                         m_Photon2_E.get(*event, sys));
-      int n_photons = m_nPhotons.get(*event, sys);
+      ph2.SetPtEtaPhiE(m_Fbranches_photons.at("Photon2_pt").get(*event, sys),
+                       m_Fbranches_photons.at("Photon2_eta").get(*event, sys),
+                       m_Fbranches_photons.at("Photon2_phi").get(*event, sys),
+                       m_Fbranches_photons.at("Photon2_E").get(*event, sys));
+      int n_photons =  m_Ibranches_photons.at("nPhotons").get(*event, sys);
 
       std::vector<TLorentzVector> Hyy_photons = {ph1, ph2};
 
@@ -273,7 +276,6 @@ namespace HHBBYY
         m_Fbranches.at("pTBalance").set(*event, pTBalance, sys);
         m_Fbranches.at("HT").set(*event, HT, sys);
       }
-
       m_Ibranches.at("nJets").set(*event, jets->size(), sys);
       m_Ibranches.at("nCentralJets").set(*event, nCentralJets, sys);
       m_Ibranches.at("nBJets").set(*event, bjets->size(), sys);
@@ -475,9 +477,9 @@ namespace HHBBYY
           }
         }
       }
+      
     }
-
-    return StatusCode::SUCCESS;
+      return StatusCode::SUCCESS;
   }
 
   void BaselineVarsbbyyAlg::fill_bb_branches(const std::vector<const xAOD::Jet*> &Hbb_jets, const std::string &prefix, const xAOD::EventInfo *event, const auto& sys) {
@@ -1966,6 +1968,7 @@ namespace HHBBYY
 
     return vec_angular_variables_CM;
   }
+
   //#######################################################################################################################################################################################################
 
 }

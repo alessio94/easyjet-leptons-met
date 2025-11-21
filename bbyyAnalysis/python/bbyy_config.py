@@ -100,12 +100,20 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
                 doSystematics=flags.Analysis.do_CP_systematics,
             )
         )
+    # central variable function calls
+    floatVariableList_jets, intVariableList_jets \
+        = get_JetVarsAlg_variables(flags)
+    floatVariableList_photonjets, intVariableList_photonjets \
+        = get_PhotonJetVarsAlg_variables(flags)
 
     cfg.addEventAlgo(
         CompFactory.HHBBYY.LeptonVarsbbyyAlg(
             "LeptonVarsbbyyAlg",
+            floatVariableList=float_variables['leptons'],
             intVariableList=int_variables['leptons'],
             doSystematics=flags.Analysis.do_CP_systematics,
+            do_HHbbyy_Hyy_Analysis=(
+                flags.Analysis.do_HHbbyy_Hyy_Analysis),
         )
     )
 
@@ -118,6 +126,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             intVariableList=int_variables['photons'],
             doSystematics=flags.Analysis.do_CP_systematics,
             isMC=flags.Input.isMC,
+            do_HHbbyy_Hyy_Analysis=(
+                flags.Analysis.do_HHbbyy_Hyy_Analysis),
         )
     )
 
@@ -136,6 +146,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             save_VBF_vars=flags.Analysis.save_VBF_vars,
             isMC=flags.Input.isMC,
             doKF=flags.Analysis.do_KinematicFit,
+            floatVariableList_photons=float_variables['photons'],
+            intVariableList_photons=int_variables['photons'],
             floatVariableList=float_variables['baseline'],
             intVariableList=int_variables['baseline'],
             doSystematics=flags.Analysis.do_CP_systematics,
@@ -172,6 +184,26 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             )
         )
 
+    if flags.Analysis.do_HHbbyy_Hyy_Analysis:
+        cfg.addEventAlgo(
+            CompFactory.HHBBYY.JetVarsAlg(
+                "JetVarsAlg",
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+                floatVariableList=floatVariableList_jets,
+                intVariableList=intVariableList_jets,
+                doSystematics=flags.Analysis.do_CP_systematics
+            )
+        )
+
+        cfg.addEventAlgo(
+            CompFactory.HHBBYY.PhotonJetVarsAlg(
+                "PhotonJetVarsAlg",
+                floatVariableList=floatVariableList_photonjets,
+                intVariableList=intVariableList_photonjets,
+                doSystematics=flags.Analysis.do_CP_systematics
+            )
+        )
+
     return cfg
 
 
@@ -183,6 +215,9 @@ def get_PhotonVarsbbyyAlg_variables(flags):
     int_variable_names += ["nPhotons"]
     float_variable_names += ["myy", "pTyy", "Etayy", "Phiyy", "dRyy"]
 
+    if (flags.Analysis.do_HHbbyy_Hyy_Analysis):
+        float_variable_names += ["yAbs_yy", "Dy_y_y", "pTt_yy", "phiStar_yy"]
+
     return float_variable_names, int_variable_names
 
 
@@ -192,6 +227,37 @@ def get_LeptonVarsbbyyAlg_variables(flags):
 
     # Lepton variables
     int_variable_names += ["nLeptons"]
+
+    if (flags.Analysis.do_HHbbyy_Hyy_Analysis):
+        int_variable_names += ["nMuons", "nElectrons"]
+        float_variable_names += ["m_ee_os", "m_mumu_os", "pT_ee_os", "pT_mumu_os",
+                                 "pT_ll_os_max", "mTlepMET", "pTlepMET",
+                                 "metTST_HVTST_flag"]
+
+    return float_variable_names, int_variable_names
+
+
+def get_JetVarsAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    # Jet variables
+    int_variable_names += ["nJets_30", "nCentralJets_30", "nBJets_30"]
+    float_variable_names += ["m_jj", "pT_jj", "m_jj_30", "pT_j1_30",
+                             "Dy_j_j", "Dphi_j_j", "Deta_j_j",
+                             "m_alljets", "HT_30"]
+
+    return float_variable_names, int_variable_names
+
+
+def get_PhotonJetVarsAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    # Photon-Jet variables
+    float_variable_names += ["pT_yyjj", "pT_yyjj_30", "m_yyjj", "pT_yyj",
+                             "m_yyj", "Dphi_yy_jj", "Dy_yy_jj", "DRmin_y_j",
+                             "cosTS_yyjj", "Zepp", "fwdJet_eta", "m_fwdJet_yy"]
 
     return float_variable_names, int_variable_names
 
@@ -368,7 +434,7 @@ def bbyy_branches(flags):
     # this will be all the variables that are calculated by the
     # BaselineVarsbbllAlg algorithm
     all_baseline_variable_names = []
-    keys = ["baseline", "photons", "leptons", "jets"]
+    keys = ["baseline", "photons", "jets", "leptons", "photonjets"]
     float_variable_names = {key: [] for key in keys}
     int_variable_names = {key: [] for key in keys}
 
@@ -377,6 +443,10 @@ def bbyy_branches(flags):
         = get_BaselineVarsbbyyAlg_variables(flags)
     photon_float_variables, photon_int_variables \
         = get_PhotonVarsbbyyAlg_variables(flags)
+    jet_float_variables, jet_int_variables \
+        = get_JetVarsAlg_variables(flags)
+    photonjet_float_variables, photonjet_int_variables \
+        = get_PhotonJetVarsAlg_variables(flags)
     lepton_float_variables, lepton_int_variables \
         = get_LeptonVarsbbyyAlg_variables(flags)
 
@@ -386,6 +456,13 @@ def bbyy_branches(flags):
     int_variable_names['photons'] += photon_int_variables
     float_variable_names['leptons'] += lepton_float_variables
     int_variable_names['leptons'] += lepton_int_variables
+
+    if flags.Analysis.do_HHbbyy_Hyy_Analysis:
+        if flags.Analysis.save_detailed_Input_variables:
+            float_variable_names['jets'] += jet_float_variables
+            int_variable_names['jets'] += jet_int_variables
+            float_variable_names['photonjets'] += photonjet_float_variables
+            int_variable_names['photonjets'] += photonjet_int_variables
 
     if flags.Analysis.do_KinematicFit:
         # do not append KF_mbb variables to float_variable_names['baseline']

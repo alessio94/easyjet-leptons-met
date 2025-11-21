@@ -32,13 +32,13 @@ namespace HHBBYY
     }
     
     for (const std::string &string_var: m_floatVariables) {
-      CP::SysWriteDecorHandle<float> var {string_var+"_%SYS%", this};
+      CP::SysWriteDecorHandle<float> var { string_var+"_%SYS%", this};
       m_Fbranches.emplace(string_var, var);
       ATH_CHECK (m_Fbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
 
     for (const std::string &string_var: m_intVariables) {
-      CP::SysWriteDecorHandle<int> var {string_var+"_%SYS%", this};
+      CP::SysWriteDecorHandle<int> var { string_var+"_%SYS%", this};
       m_Ibranches.emplace(string_var, var);
       ATH_CHECK (m_Ibranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
     }
@@ -118,6 +118,30 @@ namespace HHBBYY
 
         m_Fbranches.at("Photon1_ptOvermyy").set(*event, ph1->pt()/H_yy.M(), sys);
         m_Fbranches.at("Photon2_ptOvermyy").set(*event, ph2->pt()/H_yy.M(), sys);
+
+        if (m_do_HHbbyy_Hyy_Analysis)
+        {
+          // yAbs_yy
+          float yAbs_yy = std::fabs(H_yy.Rapidity());
+          m_Fbranches.at("yAbs_yy").set(*event, yAbs_yy, sys);
+          
+          // Dy_y_y
+          float Dy_y_y = std::fabs(ph1->rapidity() - ph2->rapidity());
+          m_Fbranches.at("Dy_y_y").set(*event, Dy_y_y, sys);
+          
+          // pTt_yy
+          TLorentzVector ph1_tlv = ph1->p4();
+          TLorentzVector ph2_tlv = ph2->p4();
+          float pTt_yy =  std::fabs(ph1_tlv.Px() * ph2_tlv.Py() - ph2_tlv.Px() * ph1_tlv.Py()) / (ph1_tlv - ph2_tlv).Pt() * 2.0;
+          
+          m_Fbranches.at("pTt_yy").set(*event, pTt_yy, sys);
+          
+          // phiStar_yy
+          float phiStar_yy = tan((TMath::Pi() - fabs(ph1_tlv.DeltaPhi(ph2_tlv))) / 2.0) *
+            sqrt(1.0 - pow(tanh((ph1_tlv.Eta() - ph2_tlv.Eta()) / 2.0), 2.0));
+          m_Fbranches.at("phiStar_yy").set(*event, phiStar_yy, sys);
+          
+        }
       }
 
       m_Ibranches.at("nPhotons").set(*event, photons->size(), sys);

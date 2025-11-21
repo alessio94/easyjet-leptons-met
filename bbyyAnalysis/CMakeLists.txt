@@ -16,6 +16,8 @@ atlas_add_component(bbyyAnalysis
   src/PhotonVarsbbyyAlg.cxx
   src/bbyySelectorAlg.cxx
   src/bbyyFilterDalitzAlg.cxx
+  src/JetVarsAlg.cxx
+  src/PhotonJetVarsAlg.cxx
   src/components/bbyyAnalysis_entries.cxx
   src/ResonantPNNbbyyAlg.cxx
   src/BoostedVarsbbyyAlg.cxx

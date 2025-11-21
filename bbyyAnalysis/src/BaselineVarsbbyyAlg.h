@@ -148,6 +148,7 @@ namespace HHBBYY
     invalid
   };
 
+
   /// \brief An algorithm for counting containers
   class BaselineVarsbbyyAlg final : public AthHistogramAlgorithm
   {
@@ -228,6 +229,7 @@ namespace HHBBYY
 
     CP::SysReadDecorHandle<float> m_KF_MBB
       {"KF_mbb_%SYS%", this};
+  
 
     CP::SysReadHandle<xAOD::MissingETContainer>
     m_metHandle{ this, "met", "AnalysisMET_%SYS%", "MET container to read" };
@@ -282,31 +284,21 @@ namespace HHBBYY
 
     Gaudi::Property<bool> m_save_nonresonant_BDTInput_variables
       {this, "save_nonresonant_BDTInput_variables", false, "Compute quantities useful for the non-resonant BDT training"};
+  
+    // Dynamic decoration variable lists: photons
+    Gaudi::Property<std::vector<std::string>> m_intVariables_photons
+      { this, "intVariableList_photons", {}, "Name list of integer variables for photons" };
 
-    CP::SysReadDecorHandle<float> m_Photon1_pt
-      { this, "Photon1_pt", "Photon1_pt_%SYS%", "Photon 1 pT decoration" };
-    CP::SysReadDecorHandle<float> m_Photon1_eta
-      { this, "Photon1_eta", "Photon1_eta_%SYS%", "Photon 1 eta decoration" };
-    CP::SysReadDecorHandle<float> m_Photon1_phi
-      { this, "Photon1_phi", "Photon1_phi_%SYS%", "Photon 1 phi decoration" };
-    CP::SysReadDecorHandle<float> m_Photon1_E
-      { this, "Photon1_E", "Photon1_E_%SYS%", "Photon 1 Energy decoration" };
+    Gaudi::Property<std::vector<std::string>> m_floatVariables_photons
+      { this, "floatVariableList_photons", {}, "Name list of float variables for photons" };
 
-    CP::SysReadDecorHandle<float> m_Photon2_pt
-      { this, "Photon2_pt", "Photon2_pt_%SYS%", "Photon 2 pT decoration" };
-    CP::SysReadDecorHandle<float> m_Photon2_eta
-      { this, "Photon2_eta", "Photon2_eta_%SYS%", "Photon 2 eta decoration" };
-    CP::SysReadDecorHandle<float> m_Photon2_phi
-      { this, "Photon2_phi", "Photon2_phi_%SYS%", "Photon 2 phi decoration" };
-    CP::SysReadDecorHandle<float> m_Photon2_E
-      { this, "Photon2_E", "Photon2_E_%SYS%", "Photon 2 Energy decoration" };
-
-    CP::SysReadDecorHandle<int> m_nPhotons
-      { this, "nPhotons", "nPhotons_%SYS%", "Number of photons decoration" };
+    /// \brief Setup sys-aware read decorations photons
+    std::unordered_map<std::string, CP::SysReadDecorHandle<int>>   m_Ibranches_photons;
+    std::unordered_map<std::string, CP::SysReadDecorHandle<float>> m_Fbranches_photons;
 
     /// \brief Setup sys-aware output decorations
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
     std::unordered_map<std::string, CP::SysWriteDecorHandle<int>> m_Ibranches;
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_Fbranches;
 
     // Declare the BDTs
     std::vector<std::unique_ptr<MVAUtils::BDT>> m_bdts;
@@ -324,6 +316,7 @@ namespace HHBBYY
 
     // Declare the enum of m_vbfjets_method
     VBFjetsMethod m_vbfjets_method {VBFjetsMethod::invalid};
+
   };
 }
 #endif

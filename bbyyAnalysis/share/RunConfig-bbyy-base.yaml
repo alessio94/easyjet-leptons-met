@@ -159,3 +159,6 @@ PileupReweighting:
 
 ttree_output:
   include: [bbyy-base-output.yaml]
+
+do_HHbbyy_Hyy_Analysis: false
+save_detailed_Input_variables: false
