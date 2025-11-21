@@ -10,7 +10,7 @@ workflow:
     - if: '$CI_PIPELINE_SOURCE =~ /(schedule|web)/'
 
 # get an ath analysis image
-image: gitlab-registry.cern.ch/atlas/athena/athanalysis:25.2.74
+image: gitlab-registry.cern.ch/atlas/athena/athanalysis:25.2.75
 
 stages:
   - linting
