@@ -82,7 +82,7 @@ Similarly, configs (to run single or multiple channels with or without systemati
 
 2. Run the ntupler on those files:
 ```
-bbtt-ntupler ttbar_PHYS_10evt.root --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-hadhad.yaml --channels HadHad --out-file output_PHYS_bbtt.root
+bbtt-ntupler ttbar_PHYS_10evt.root --run-config bbttAnalysis/RunConfig-bbtt-hadhad.yaml --out-file output_PHYS_bbtt.root
 ```
 
 3. Grid submission
@@ -90,10 +90,10 @@ bbtt-ntupler ttbar_PHYS_10evt.root --run-config ../easyjet/bbttAnalysis/share/Ru
 lsetup rucio 
 voms-proxy-init -voms atlas 
 lsetup panda
-easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-hadhad.yaml --channels HadHad --noTag --framework easyjet --campaign FancyCampaignName --mc-list ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc23/mc23_13p6TeV.HH_bbtt.prod.txt
+easyjet-gridsubmit --exec bbtt-ntupler --run-config bbttAnalysis/RunConfig-bbtt-hadhad.yaml --channels HadHad --noTag --framework easyjet --campaign FancyCampaignName --mc-list ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc23/mc23_13p6TeV.HH_bbtt.prod.txt
 ```
 
-# nTuple production (instructions based on v7)
+# nTuple production (instructions based on v8)
 
 > **⚠️ Important:**
 > Don't do this alone, coorinate with the analysis team and analysis contacts
@@ -111,10 +111,12 @@ easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/shar
 setupATLAS
 lsetup git
 git lfs install
-git clone --recursive -b 0.35.0 ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
+git clone --recursive --no-checkout ssh://git@gitlab.cern.ch:7999/easyjet/easyjet.git
 cd easyjet
-git fetch --tags
+git sparse-checkout init --cone
+git sparse-checkout set EasyjetHub EasyjetTests bbttAnalysis
 git checkout 0.35.0
+git submodule update --init --recursive
 ```
 2. Compile the code
 ```
@@ -137,21 +139,27 @@ voms-proxy-init -voms atlas
 4. Submit from the run directory
 ```
 # For HadHad (MC20 with systematics, similar for MC23)
-for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-syst-hadhad.yaml --channels HadHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --mc-list $f; done
+for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config bbttAnalysis/RunConfig-bbtt-syst-hadhad.yaml --channels HadHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --mergeOutput --campaign HHbbtt_HH_v8 --mc-list $f; done
 
-# For LepHad + ZCR + TopEMuCR (MC20 with systematics, similar for MC23)
-for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-syst-lep.yaml --channels LepHad ZCR TopEMuCR --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --mc-list $f; done
+# For LepHad (MC20 with systematics, similar for MC23)
+for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config bbttAnalysis/RunConfig-bbtt-syst-lep.yaml --channels LepHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --mergeOutput --campaign HHbbtt_LH_v8 --mc-list $f; done
+
+# ZCR + TopEMuCR (MC20 with systematics, similar for MC23)
+for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config bbttAnalysis/RunConfig-bbtt-syst-cr.yaml --channels ZCR TopEMuCR --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --mergeOutput --campaign HHbbtt_CR_v8 --mc-list $f; done
 
 # !!! Important !!! Cleanup your run directory with rm -f ./* before launching the data submission
 
 # For HadHad (Data Run 2, similar for Run 3)
-for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/data*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-syst-hadhad.yaml --channels HadHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --data-list $f; done
+for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/data*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config bbttAnalysis/RunConfig-bbtt-hadhad.yaml --channels HadHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --mergeOutput --campaign HHbbtt_HH_v8 --data-list $f; done
 
-# For LepHad + ZCR + TopEMuCR (Data Run 2, similar for Run 3)
-for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/data*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-syst-lep.yaml --channels LepHad ZCR TopEMuCR --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --data-list $f; done
+# For LepHad (Data Run 2, similar for Run 3)
+for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/data*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config bbttAnalysis/RunConfig-bbtt-lep.yaml --channels LepHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --mergeOutput --campaign HHbbtt_LH_v8 --data-list $f; done
+
+# For ZCR + TopEMuCR (Data Run 2, similar for Run 3)
+for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/data*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config bbttAnalysis/RunConfig-bbtt-cr.yaml --channels ZCR TopEMuCR --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --mergeOutput --campaign HHbbtt_CR_v8 --data-list $f; done
 
 # AntiIsoLepHad (MC20, similar for MC23, no systematics)
-for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config ../easyjet/bbttAnalysis/share/RunConfig-bbtt-antiiso.yaml --channels AntiIsoLepHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --campaign EJ_0_35_0_v7 --mc-list $f; done
+for f in ../easyjet/bbttAnalysis/datasets/PHYS/prod/mc20/mc*.txt; do easyjet-gridsubmit --exec bbtt-ntupler --run-config bbttAnalysis/RunConfig-bbtt-antiiso.yaml --channels AntiIsoLepHad --noTag --framework easyjet --excluded-site AGLT2,NIKHEF,SWT2_CPB,BNL,CERN-T0,BNL_OPP --nGBperJob 3 --mergeOutput --campaign HHbbtt_AI_v8 --mc-list $f; done
 ```
 
 ## Bulk downloading from the grid
