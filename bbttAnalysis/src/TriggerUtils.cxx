@@ -198,9 +198,11 @@ namespace HHBBTT
     }
     else if(year==2022){
       single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
+      single_tau_SF_path = "tau160_mediumRNN_tracktwoMVA";
     }
     else if(year==2023){
       single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1TAU100"};
+      single_tau_SF_path = "tau160_mediumRNN_tracktwoMVA";
       if(runBoolDecos.at(HHBBTT::is23_first_2400bunches)(*eventInfo)){
         single_tau_paths = {"HLT_tau160_mediumRNN_tracktwoMVA_L1eTAU140"};
       }
@@ -293,6 +295,9 @@ namespace HHBBTT
 	"HLT_mu24_ivarmedium_tau25_mediumRNN_tracktwoMVA_probe_03dRAB_L1MU14FCH",
 	"HLT_e26_lhtight_ivarloose_tau25_mediumRNN_tracktwoMVA_probe_03dRAB_L1EM22VHI"
       };
+      di_tau_SF_path = std::make_pair("tau35_mediumRNN_tracktwoMVA",
+              "tau25_mediumRNN_tracktwoMVA");
+
     }
 
     else if(year>=2023){
@@ -311,6 +316,8 @@ namespace HHBBTT
         ditau_paths_L1Topo_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB30_L1DR_TAU20ITAU12I_J25"};
         ditau_paths_4J12_delayed = {"HLT_tau30_mediumRNN_tracktwoMVA_tau20_mediumRNN_tracktwoMVA_03dRAB_L1TAU20IM_2TAU12IM_4J12p0ETA25"};
       }
+       di_tau_SF_path = std::make_pair("tau35_mediumRNN_tracktwoMVA",
+             "tau25_mediumRNN_tracktwoMVA");
     }
   }
 
