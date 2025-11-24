@@ -1,0 +1,6 @@
+
+include: [XbbCalib/RunConfig_Zllj.yaml]
+
+# Run all CP syst
+do_CP_systematics: true
+systematics_regex: ["^(?!.*(MUON|MET|JER)).*$"] 
