@@ -14,9 +14,11 @@ atlas_add_component(XbbCalib
   src/BaselineVarsZbbjCalibAlg.cxx
   src/BaselineVarsZlljCalibAlg.cxx
   src/BaselineVarsZllyCalibAlg.cxx
+  src/BaselineVarsZtautauCalibAlg.cxx
   src/ZbbjCalibSelectorAlg.cxx
   src/ZlljCalibSelectorAlg.cxx
   src/ZllyCalibSelectorAlg.cxx
+  src/ZtautauCalibSelectorAlg.cxx
   src/ttCalibSelectorAlg.cxx
   src/components/XbbCalib_entries.cxx
   src/ZbbyCalibSelectorAlg.cxx
@@ -48,6 +50,7 @@ atlas_install_python_modules(
   python/ZbbjCalib_config.py
   python/ZlljCalib_config.py
   python/ZllyCalib_config.py
+  python/ZtautauCalib_config.py
 )
 atlas_install_runtime( scripts/*.py POST_BUILD_CMD ${ATLAS_FLAKE8} )
 atlas_install_data(

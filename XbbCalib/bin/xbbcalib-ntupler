@@ -33,6 +33,8 @@ from XbbCalib.ZlljCalib_config import ZlljCalib_branches
 from XbbCalib.ZlljCalib_config import ZlljCalib_cfg
 from XbbCalib.ZllyCalib_config import ZllyCalib_branches
 from XbbCalib.ZllyCalib_config import ZllyCalib_cfg
+from XbbCalib.ZtautauCalib_config import ZtautauCalib_branches
+from XbbCalib.ZtautauCalib_config import ZtautauCalib_cfg
 from EasyjetHub.algs.event_counter_config import event_counter_cfg
 
 def XbbCalib_job_cfg():
@@ -137,7 +139,24 @@ def XbbCalib_job_cfg():
             seqname
         )
         cfg.merge(event_counter_cfg("n_ZllyCalib"), seqname)
-        
+
+    elif flags.Analysis.do_ZtautauCalib:
+        extra_XbbCalib_branches,float_variable_names,int_variable_names = ZtautauCalib_branches(flags)
+
+        cfg.merge(
+            ZtautauCalib_cfg(
+                flags,
+                largejetkey=flags.Analysis.container_names.output.reco10UFOJet,
+                taukey=flags.Analysis.container_names.output.taus,
+                photonkey=flags.Analysis.container_names.output.photons,
+                muonkey=flags.Analysis.container_names.output.muons,
+                electronkey=flags.Analysis.container_names.output.electrons,
+                float_variables=float_variable_names,
+                int_variables=int_variable_names,
+            ),
+            seqname
+        )
+        cfg.merge(event_counter_cfg("n_ZtautauCalib"), seqname)
     # Explicitly call the minituple config because we want to provide
     # additional branches, the list of which is generated dynamically
     # rather than statically in the yaml

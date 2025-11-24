@@ -6,6 +6,7 @@ do_ZbbyCalib: false
 do_ZbbjCalib: false
 do_ZlljCalib: true
 do_ZllyCalib: false
+do_ZtautauCalib: false
 # We would use Alg in src/ZllCalibSelectionAlg
 
 # Toggles to bypass event selection

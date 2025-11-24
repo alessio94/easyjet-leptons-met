@@ -10,6 +10,7 @@ do_ZbbjCalib: false
 do_ttCalib: false
 do_ZlljCalib: false
 do_ZllyCalib: false
+do_ZtautauCalib: false
 
 # Toggles to bypass event selection
 bypass: false

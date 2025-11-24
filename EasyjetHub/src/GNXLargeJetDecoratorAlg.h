@@ -85,7 +85,7 @@ namespace Easyjet
         float pqcdbx_score, float pqcdbb_score, float pqcdcx_score, float pqcdll_score,
         float f_Hbb=0.02, float f_Hcc=0.02, float f_Wqq=0.02, float f_top=0.15
       ) const {
-        float f_qcd = (1.0f - f_top - f_Hcc - f_Hbb);
+        float f_qcd = (1.0f - f_top - f_Hcc - f_Hbb - f_Wqq);
         float pqcd_score =  (pqcdbx_score + pqcdbb_score + pqcdcx_score + pqcdll_score);
         return std::log(
           phtautauhad_score / (

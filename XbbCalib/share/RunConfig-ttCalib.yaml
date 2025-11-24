@@ -6,6 +6,8 @@ do_ZbbjCalib: false
 do_ZbbyCalib: false
 do_ZlljCalib: false
 do_ZllyCalib: false
+do_ZtautauCalib: false
+
 bypass: false
 
 # Toggles for object types
