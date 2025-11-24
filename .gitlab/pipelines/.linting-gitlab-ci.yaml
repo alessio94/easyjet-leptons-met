@@ -54,3 +54,11 @@ cppcheck:
 
 mypy:
   <<: *mypy_check_template
+
+lfs:
+  stage: linting
+  script:
+    - git config --global --add safe.directory '*'
+    - git fetch origin ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}:${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+    - git fetch --unshallow
+    - EasyjetTests/bin/check-lfs -v ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}...${CI_COMMIT_SHA}
