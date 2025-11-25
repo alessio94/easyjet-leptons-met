@@ -35,6 +35,9 @@ Small_R_jet:
   btag_egReductionC: "Medium"
   btag_egReductionLight: "Medium"
 
+TopReconstruction:
+  BDT_path: "bbyyAnalysis/model_topRecoBDT.root"
+
 Electron:
   min_pT_bbyy: 10.e+3 # minimum pT of selected electons (for lepton veto). Separate from min pT of electrons used for OR.
   ID: "MediumLH"

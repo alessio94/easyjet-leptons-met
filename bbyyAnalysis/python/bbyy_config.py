@@ -105,6 +105,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
         = get_JetVarsAlg_variables(flags)
     floatVariableList_photonjets, intVariableList_photonjets \
         = get_PhotonJetVarsAlg_variables(flags)
+    floatVariableList_top, intVariableList_top \
+        = get_TopRecoAlg_variables(flags)
 
     cfg.addEventAlgo(
         CompFactory.HHBBYY.LeptonVarsbbyyAlg(
@@ -204,6 +206,18 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             )
         )
 
+        cfg.addEventAlgo(
+            CompFactory.HHBBYY.TopRecoAlg(
+                "TopRecoAlg",
+                bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
+                PCBTDecorName="ftag_quantile_" + flags.Analysis.Small_R_jet.btag_extra_wps[0],  # noqa
+                floatVariableList=floatVariableList_top,
+                intVariableList=intVariableList_top,
+                BDT_path=flags.Analysis.TopReconstruction.BDT_path,
+                doSystematics=flags.Analysis.do_CP_systematics
+            )
+        )
+
     return cfg
 
 
@@ -258,6 +272,21 @@ def get_PhotonJetVarsAlg_variables(flags):
     float_variable_names += ["pT_yyjj", "pT_yyjj_30", "m_yyjj", "pT_yyj",
                              "m_yyj", "Dphi_yy_jj", "Dy_yy_jj", "DRmin_y_j",
                              "cosTS_yyjj", "Zepp", "fwdJet_eta", "m_fwdJet_yy"]
+
+    return float_variable_names, int_variable_names
+
+
+def get_TopRecoAlg_variables(flags):
+    float_variable_names = []
+    int_variable_names = []
+    # Top reconstruction variables
+    float_variable_names += ["score_recotop1", "recotop1_pT", "recotop1_eta",
+                             "recotop1_phi", "recotop1_m", "score_recotop2",
+                             "recotop2_pT", "recotop2_eta", "recotop2_phi",
+                             "recotop2_m", "hybrtop_pT", "hybrtop_eta",
+                             "hybrtop_phi", "hybrtop_m", "dR_Wb_t2"]
+
+    int_variable_names += ["is_top1_had", "is_top1_lep", "has_top2", "is_hybridtop2",]
 
     return float_variable_names, int_variable_names
 
@@ -434,7 +463,12 @@ def bbyy_branches(flags):
     # this will be all the variables that are calculated by the
     # BaselineVarsbbllAlg algorithm
     all_baseline_variable_names = []
-    keys = ["baseline", "photons", "jets", "leptons", "photonjets"]
+    keys = ["baseline",
+            "photons",
+            "jets",
+            "leptons",
+            "photonjets",
+            "top"]
     float_variable_names = {key: [] for key in keys}
     int_variable_names = {key: [] for key in keys}
 
@@ -449,6 +483,8 @@ def bbyy_branches(flags):
         = get_PhotonJetVarsAlg_variables(flags)
     lepton_float_variables, lepton_int_variables \
         = get_LeptonVarsbbyyAlg_variables(flags)
+    top_float_variables, top_int_variables \
+        = get_TopRecoAlg_variables(flags)
 
     float_variable_names['baseline'] += baseline_float_variables
     int_variable_names['baseline'] += baseline_int_variables
@@ -463,6 +499,8 @@ def bbyy_branches(flags):
             int_variable_names['jets'] += jet_int_variables
             float_variable_names['photonjets'] += photonjet_float_variables
             int_variable_names['photonjets'] += photonjet_int_variables
+            float_variable_names['top'] += top_float_variables
+            int_variable_names['top'] += top_int_variables
 
     if flags.Analysis.do_KinematicFit:
         # do not append KF_mbb variables to float_variable_names['baseline']
