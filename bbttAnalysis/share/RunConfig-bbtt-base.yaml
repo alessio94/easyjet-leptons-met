@@ -70,6 +70,7 @@ Electron:
     - ["TightLH_nottva", "Loose_VarRad"]
     - ["LooseBLayerLH", "Loose_VarRad"]
     - ["TightLH", "Loose_VarRad"]
+    - ["TightLH_nottva", "Tight_VarRad"]
   do_parent_decoration: true
   correlationModelId: "TOTAL"
 
