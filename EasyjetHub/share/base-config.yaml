@@ -177,6 +177,7 @@ DiTau:
   # Activate when DiTau decoration is needed with samples < p7017 
   do_score_decoration: false
   score_branches: false
+  truth_branches: false
 
 Lepton:
   amount: 0

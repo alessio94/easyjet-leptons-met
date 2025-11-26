@@ -30,4 +30,22 @@ def get_ditau_branches(flags, tree_flags, input_container, output_prefix):
     if flags.Analysis.DiTau.score_branches:
         ditau_branches.variables += ["omni_score"]
 
+    if flags.Analysis.DiTau.truth_branches:
+        ditau_branches.variables += [
+            "IsTruthHadronic",
+            "IsTruthMatched",
+            "TruthVisMass",
+            "TruthVisDeltaR",
+            "TruthLeadPdgID",
+            "TruthVisLeadPt",
+            "TruthVisLeadEta",
+            "TruthVisLeadPhi",
+            "TruthVisLeadM",
+            "TruthSubleadPdgID",
+            "TruthVisSubleadPt",
+            "TruthVisSubleadEta",
+            "TruthVisSubleadPhi",
+            "TruthVisSubleadM",
+        ]
+
     return ditau_branches.get_output_list()

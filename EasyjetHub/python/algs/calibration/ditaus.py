@@ -19,6 +19,7 @@ def ditau_sequence(flags, configAcc):
 
     configSeq += makeConfig('DiTauJets',)
     configSeq.setOptionValue('.containerName', output_name)
+    configSeq.setOptionValue('.decorateTruth', True)
 
     for quality in wps:
         configSeq += makeConfig('DiTauJets.WorkingPoint')
@@ -28,7 +29,7 @@ def ditau_sequence(flags, configAcc):
 
     # Kinematic selection
     configSeq += makeConfig('DiTauJets.PtEtaSelection')
-    configSeq.setOptionValue('containerName', output_name)
+    configSeq.setOptionValue('.containerName', output_name)
     configSeq.setOptionValue('.selectionName', 'selectPtEta')
     configSeq.setOptionValue('.selectionDecoration', 'selectPtEta')
     configSeq.setOptionValue('.minPt', 20e3)
