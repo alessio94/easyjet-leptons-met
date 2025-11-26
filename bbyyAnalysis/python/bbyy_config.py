@@ -16,7 +16,7 @@ from itertools import chain
 
 def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
              float_variables=None, int_variables=None):
-    keys = ["baseline", "photons", "leptons"]
+    keys = ["baseline", "photons", "leptons", "HyyMVA"]
     if not float_variables:
         float_variables = {key: [] for key in keys}
     if not int_variables:
@@ -218,6 +218,35 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             )
         )
 
+        if flags.Analysis.do_Hyy_multiclass:
+            floatVariableList_HHyyMVAInput = (
+                floatVariableList_top
+                + floatVariableList_jets
+                + floatVariableList_photonjets
+                + float_variables['photons']
+                + float_variables['leptons']
+            )
+
+            intVariableList_HHyyMVAInput = (
+                intVariableList_top
+                + intVariableList_jets
+                + intVariableList_photonjets
+                + int_variables['photons']
+                + int_variables['leptons']
+            )
+
+            cfg.addEventAlgo(
+                CompFactory.HHBBYY.HyyHHbbyyMVAAlg(
+                    "HyyHHbbyyMVAAlg",
+                    doSystematics=flags.Analysis.do_CP_systematics,
+                    floatVariableList_BDTInput=floatVariableList_HHyyMVAInput,
+                    intVariableList_BDTInput=intVariableList_HHyyMVAInput,
+                    floatVariableList=float_variables['HyyMVA'],
+                    intVariableList=int_variables['HyyMVA'],
+                    HyyMultiBDT_folder=flags.Analysis.HyyMultiBDT_folder
+                )
+            )
+
     return cfg
 
 
@@ -287,6 +316,18 @@ def get_TopRecoAlg_variables(flags):
                              "hybrtop_phi", "hybrtop_m", "dR_Wb_t2"]
 
     int_variable_names += ["is_top1_had", "is_top1_lep", "has_top2", "is_hybridtop2",]
+
+    return float_variable_names, int_variable_names
+
+
+def get_BaselineVarsHyyHHbbyyMVAAlg(flags):
+    float_variable_names = []
+    int_variable_names = []
+
+    float_variable_names += ["HyyMultiBDT_binary_score"]
+    int_variable_names += ["HyyMultiBDT_multiclass_index", "HyyMultiBDT_binary_index"]
+
+    float_variable_names += list(flags.Analysis.Hyy_multiclass_bins)
 
     return float_variable_names, int_variable_names
 
@@ -468,7 +509,9 @@ def bbyy_branches(flags):
             "jets",
             "leptons",
             "photonjets",
-            "top"]
+            "top",
+            "HyyMVA"]
+
     float_variable_names = {key: [] for key in keys}
     int_variable_names = {key: [] for key in keys}
 
@@ -485,6 +528,8 @@ def bbyy_branches(flags):
         = get_LeptonVarsbbyyAlg_variables(flags)
     top_float_variables, top_int_variables \
         = get_TopRecoAlg_variables(flags)
+    hyyMVA_float_variables, hyyMVA_int_variables \
+        = get_BaselineVarsHyyHHbbyyMVAAlg(flags)
 
     float_variable_names['baseline'] += baseline_float_variables
     int_variable_names['baseline'] += baseline_int_variables
@@ -501,6 +546,9 @@ def bbyy_branches(flags):
             int_variable_names['photonjets'] += photonjet_int_variables
             float_variable_names['top'] += top_float_variables
             int_variable_names['top'] += top_int_variables
+            if flags.Analysis.do_Hyy_multiclass:
+                float_variable_names['HyyMVA'] += hyyMVA_float_variables
+                int_variable_names['HyyMVA'] += hyyMVA_int_variables
 
     if flags.Analysis.do_KinematicFit:
         # do not append KF_mbb variables to float_variable_names['baseline']

@@ -165,3 +165,35 @@ ttree_output:
 
 do_HHbbyy_Hyy_Analysis: false
 save_detailed_Input_variables: false
+do_Hyy_multiclass: false
+
+HyyMultiBDT_folder: "bbyyAnalysis/HyyMultiBDT"
+
+Hyy_multiclass_bins: ["GG2H_0J_PTH_0_10", "GG2H_0J_PTH_GT10",
+                      "GG2H_1J_PTH_0_60", "GG2H_1J_PTH_60_120", 
+                      "GG2H_1J_PTH_120_200", "GG2H_GE2J_MJJ_0_350_PTH_0_60", 
+                      "GG2H_GE2J_MJJ_0_350_PTH_60_120", "GG2H_GE2J_MJJ_0_350_PTH_120_200", 
+                      "GG2H_GE2J_MJJ_350_700_PTH_0_200", "GG2H_GE2J_MJJ_700_1000_PTH_0_200",
+                      "GG2H_GE2J_MJJ_GT1000_PTH_0_200", "GG2H_PTH_200_300", 
+                      "GG2H_PTH_300_450", "GG2H_PTH_450_650", 
+                      "GG2H_PTH_GT650",
+
+                      "QQ2HQQ_0J", "QQ2HQQ_1J", 
+                      "QQ2HQQ_GE2J_MJJ_0_60", "QQ2HQQ_GE2J_MJJ_60_120",
+                      "QQ2HQQ_GE2J_MJJ_120_350",  "QQ2HQQ_GE2J_MJJ_350_700_PTH_0_200",
+                      "QQ2HQQ_GE2J_MJJ_700_1000_PTH_0_200", "QQ2HQQ_GE2J_MJJ_GT1000_PTH_0_200",
+                      "QQ2HQQ_GE2J_MJJ_350_700_PTH_GT200", "QQ2HQQ_GE2J_MJJ_700_1000_PTH_GT200",
+                      "QQ2HQQ_GE2J_MJJ_GT1000_PTH_GT200", 
+                      
+                      "QQ2HLNU_PTV_0_75", "QQ2HLNU_PTV_75_150", 
+                      "QQ2HLNU_PTV_150_250", "QQ2HLNU_PTV_GT250",
+                      
+                      "QQ2HLL_PTV_0_75", "QQ2HLL_PTV_75_150",
+                      "QQ2HLL_PTV_150_250", "QQ2HLL_PTV_GT250",
+                      
+                      "QQ2HNUNU_PTV_0_75", "QQ2HNUNU_PTV_75_150",
+                      "QQ2HNUNU_PTV_150_250", "QQ2HNUNU_PTV_GT250",
+                      
+                      "TTH_PTH_0_60", "TTH_PTH_60_120",
+                      "TTH_PTH_120_200", "TTH_PTH_200_300", "TTH_PTH_GT300",
+                      "THJB", "THW"]
