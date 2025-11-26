@@ -60,43 +60,44 @@ def main(args):
 
     executable = "xbbcalib-ntupler"
     mc_list = []
-    if args.samplePath == "Zbbj":
-        runConfig = "../easyjet/XbbCalib/share/RunConfig_ZbbjCalib.yaml"
-        processes = [
-            "dijets",
-            "Zbb_ptZ_200_ECMS",
-            "Zqq_ptZ_200_ECMS",
-            "Zqq_ptZ_200_ECMS",
-            "Wqq_ptW_200_ECMS",
-            "ttbar_allhad"
-        ]
-    else:
-        runConfig = "../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml"
-        processes = [
-            "Zbb_ptZ_200_ECMS",
-            "Zbbgamma_pTZ100",
-            "Zqq_ptZ_200_ECMS",
-            "Zqqgamma_pTZ100",
-            "SinglePhoton",
-            "Vgamma_Vgammagamma",
-            "Wqq_ptW_200_ECMS",
-            "Wqqgamma_pTW140",
-            "dijet_bfilt",
-            "dijets",
-            "ttbar_allhad",
-            "tty"
-        ]
-    if args.config:
-        runConfig = args.config
-
     if args.samples == "all":
+        if args.samplePath == 'Zbby':
+            runConfig = "../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml"
+            processes = [
+                "Zbb_ptZ_200_ECMS",
+                "Zbbgamma_pTZ100",
+                "Zqq_ptZ_200_ECMS",
+                "Zqqgamma_pTZ100",
+                "SinglePhoton",
+                "Vgamma_Vgammagamma",
+                "Wqq_ptW_200_ECMS",
+                "Wqqgamma_pTW140",
+                "dijet_bfilt",
+                "dijets",
+                "ttbar_allhad",
+                "tty"]
+        elif args.samplePath == 'Zlly':
+            runConfig = "../easyjet/XbbCalib/share/RunConfig_Zlly.yaml"
+            processes = [
+                "mc20_Sh_2211_Zjets.txt",
+                "mc20_Sh_2214_Vll_yy.txt",
+                "mc20_Sh_2214_eegamma.txt",
+                "mc20_Sh_2214_enugamma.txt",
+                "mc20_Sh_2214_llgammajj.txt",
+                "mc20_Sh_2214_lvgammajj.txt",
+                "mc20_Sh_2214_mumugamma.txt",
+                "mc20_Sh_2214_munugamma.txt",
+                "mc20_Sh_2214_taunugamma.txt",
+                "mc20_Sh_2214_tautaugamma.txt"
+            ]
         mc_list = get_list_files(processes, args.samplePath)
     else:
         mc_list = get_list_files(args.samples.split(), args.samplePath)
     data_list_name = "--mc-list"
     if "run" in args.samples or "data" in args.samples:
         data_list_name = "--data-list"
-
+    if args.config:
+        runConfig = args.config
     for mc_file in mc_list:
         base_command = (
             f"easyjet-gridsubmit {data_list_name} {mc_file} "

@@ -7,7 +7,10 @@
 #ifndef SELECTIONFLAGSZllyCaLIBALG_H
 #define SELECTIONFLAGSZllyCaLIBALG_H
 
+#include <memory>
+
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
+#include <AsgDataHandles/ReadDecorHandleKey.h>
 
 #include <SystematicsHandles/SysReadHandle.h>
 #include <SystematicsHandles/SysListHandle.h>
@@ -20,8 +23,9 @@
 #include <xAODEgamma/ElectronContainer.h>
 #include <xAODMuon/MuonContainer.h>
 #include <xAODEgamma/PhotonContainer.h>
-
+#include <EasyjetHub/CutManager.h>
 #include "TriggerMatchingTool/IMatchingTool.h"
+#include "XbbCalibEnums.h"
 
 namespace XBBCALIB
 {
@@ -42,6 +46,13 @@ namespace XBBCALIB
     private :
       // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
       // "someInfo"};
+      const std::vector<std::string> m_STANDARD_CUTS{
+        "PASS_EXACTLY_ONE_PHOTON",
+        "PASS_TWO_SF_LEPTONS",
+      };
+      StatusCode initialiseCutflow();
+
+      CutManager m_ZllyCalibCuts; 
       Gaudi::Property<bool> m_bypass
         { this, "bypass", false, "Run selector algorithm in pass-through mode" };
 
@@ -67,6 +78,21 @@ namespace XBBCALIB
       m_eventHandle{ this, "event", "EventInfo",   "EventInfo container to read" };
 
       CP::SysFilterReporterParams m_filterParams {this, "XbbCalib selection"};
+
+      Gaudi::Property<std::vector<std::string>> m_inputCutList{this, "cutList", {}};
+      std::vector<XBBCALIB::Booleans> m_inputCutKeys;
+      Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
+
+      long long int m_total_events{0};
+
+      std::unordered_map<XBBCALIB::Booleans, CP::SysWriteDecorHandle<bool> > m_Bbranches;
+      std::unordered_map<XBBCALIB::Booleans, bool> m_bools;
+      CP::SysWriteDecorHandle<bool> m_passallcuts {"PassAllCuts_%SYS%", this};
+      std::unordered_map<XBBCALIB::Booleans, std::string> m_boolnames{
+      // {XBBCALIB::PASS_TRIGGER, "PASS_TRIGGER"},
+      {XBBCALIB::PASS_EXACTLY_ONE_PHOTON, "PASS_EXACTLY_ONE_PHOTON"},
+      {XBBCALIB::PASS_TWO_SF_LEPTONS, "PASS_TWO_SF_LEPTONS"},
+      };
 
   };
 

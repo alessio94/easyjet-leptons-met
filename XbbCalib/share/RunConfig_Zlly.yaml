@@ -11,9 +11,10 @@ do_ZbbjCalib: false
 do_ZlljCalib: false
 do_ZllyCalib: true
 # We would use Alg in src/ZllCalibSelectionAlg
-
 # Toggles to bypass event selection
 bypass: false
+save_cutflow: true
+
 # VgammaORTool Setup
 do_VgammaOR: false
 bypass_VGammaOR: true
@@ -37,36 +38,26 @@ Large_R_jet:
   min_pT: 200.e+3
   maxEta: 2.0
   runMuonJetPtCorr: false
-  GN2X_hbb_wps:
-    - "FlatMassQCDEff_0p25"
-    - "FlatMassQCDEff_0p3"
-    - "FlatMassQCDEff_0p37"
-    - "FlatMassQCDEff_0p46"
-    - "FlatMassQCDEff_0p58"
-    - "FlatMassQCDEff_0p74"
-    - "FlatMassQCDEff_0p94"
-    - "FlatMassQCDEff_1p25"
-    - "FlatMassQCDEff_1p55"
 
 Photon:
-  ID: "Tight" # Loose, Tight
+  ID: "Tight"
   Iso: "FixedCutTight"
   min_pT: 150.e+3
 
 Electron:
   min_pT: 7.e+3
-  ID: "MediumLH"
-  Iso: "TightTrackOnly_VarRad"
+  ID: "LooseBLayerLH"
+  Iso: "NonIso"
   extra_wps:
-    - ["LooseBLayerLH", "NonIso"]
+    - ["MediumLH", "TightTrackOnly_VarRad"]
 
 Muon:
   min_pT: 7.e+3
-  ID: "HighPt"
+  ID: "Loose"
   maxEta: 2.7
-  Iso: "Tight_VarRad"
+  Iso: "PflowLoose_VarRad"
   extra_wps:
-    - ["Loose", "PflowLoose_VarRad"]
+    - ["Medium", "Tight_VarRad","HighPt"]
 
 # list of triggers per year to consider
 Trigger:
@@ -94,16 +85,9 @@ ttree_output:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'
     muons: 'container_names.output.muons'
     electrons: 'container_names.output.electrons'
-    small_R_jets: 'container_names.output.reco4PFlowJet'
     photons : 'container_names.output.photons'
-  # truth_outputs:
-  #   # small_R_jets: 'container_names.output.truth4Jet'
-  #   large_R_jets: 'container_names.output.truth10SoftDropJet'
   collection_options:
     large_R_jets:
-      run_selection: true
-    small_R_jets:
-      btag_info: true
       run_selection: true
     electrons:
       run_selection: true
@@ -111,3 +95,7 @@ ttree_output:
       run_selection: true
     photons:
       run_selection: true
+
+CutList:
+  - PASS_TWO_SF_LEPTONS
+  - PASS_EXACTLY_ONE_PHOTON

@@ -3,6 +3,7 @@
 
 #include <SystematicsHandles/SysWriteDecorHandle.h>
 
+#include "TLorentzVector.h"
 #include <string>
 #include <memory>
 
@@ -31,6 +32,8 @@ namespace XBBCALIB
       CP::SysListHandle& syst_list,
       CP::SysReadHandle<xAOD::EventInfo>& event_handle);
     void set(const xAOD::EventInfo& event, const xAOD::IParticle& part,
+             const CP::SystematicSet& sys);
+     void set(const xAOD::EventInfo& event, const TLorentzVector &lv,
              const CP::SystematicSet& sys);
     void setDefault(const xAOD::EventInfo& event,
                     const CP::SystematicSet& sys);
