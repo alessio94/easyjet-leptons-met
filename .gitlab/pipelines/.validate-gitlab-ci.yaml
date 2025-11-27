@@ -2,21 +2,11 @@ variables:
   # needed to propagate the exit code from the script to the CI
   FF_USE_NEW_BASH_EVAL_STRATEGY: true
 
-.to_central: &to_central
-  if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_PROJECT_PATH == 'easyjet/easyjet'
-
-.core_pkgs: &core_pkgs
-  <<: *to_central
-  changes:
-    - EasyjetHub/**
-    - EasyjetPlus/**
-    - EasyjetTests/**
-
 .ntuple_validation:
   variables:
     GIT_STRATEGY: none
   rules:
-    - <<: *to_central
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_PROJECT_PATH == 'easyjet/easyjet'
   stage: validate
   tags:
     - k8s-eos
@@ -29,151 +19,6 @@ variables:
       - 22 # branch diff
       - 23 # branch removed
       - 24 # branch added
-
-# Analysis Validators
-.ntuple_validation_bbyy:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [bbyyAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_bbbb:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [bbbbAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_bbtt:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [bbttAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_bbVV:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [bbVVAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_yyML:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [yyMLAnalysis/**]
-    - <<: *core_pkgs
-    - when: never 
-
-.ntuple_validation_ZCharm:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [ZCharmAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_xbb_calib:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [XbbCalib/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_ttHH:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [ttHHAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_vbshiggs:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [vbshiggsAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_VBSVV4q:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [VBSVV4qAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_bbll:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [bbllAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_HZallyy:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [HZallyyAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_bbbbtt:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [bbbbttAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_jjjj:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [jjjjAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_ssWW:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [ssWWAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_lltt:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [llttAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_monojet:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [monojetAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
-
-.ntuple_validation_multilepton:
-  extends: .ntuple_validation
-  rules:
-    - <<: *to_central
-      changes: [multileptonAnalysis/**]
-    - <<: *core_pkgs
-    - when: never
 
 # Data
 
@@ -198,7 +43,7 @@ validator_fast_data22:
     - easyjet-validate fast-data22
 
 validator_bbtt_data22:
-  extends: .ntuple_validation_bbtt
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -208,7 +53,7 @@ validator_bbtt_data22:
     - easyjet-validate bbtt-data22
 
 validator_bbyy_data22_lite:
-  extends: .ntuple_validation_bbyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -218,7 +63,7 @@ validator_bbyy_data22_lite:
     - easyjet-validate bbyy-data22-lite
 
 validator_SHbbyy_data22_lite:
-  extends: .ntuple_validation_bbyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -230,7 +75,7 @@ validator_SHbbyy_data22_lite:
 # MC20
 
 validator_bbyy_mc20_syst:
-  extends: .ntuple_validation_bbyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -240,7 +85,7 @@ validator_bbyy_mc20_syst:
     - easyjet-validate bbyy-mc20-syst
 
 validator_SHbbyy_mc20:
-  extends: .ntuple_validation_bbyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -250,7 +95,7 @@ validator_SHbbyy_mc20:
     - easyjet-validate SHbbyy-mc20
 
 validator_bbyy_mc20_lite:
-  extends: .ntuple_validation_bbyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -260,7 +105,7 @@ validator_bbyy_mc20_lite:
     - easyjet-validate bbyy-mc20-lite
 
 validator_bbtt_mc20:
-  extends: .ntuple_validation_bbtt
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -270,7 +115,7 @@ validator_bbtt_mc20:
     - easyjet-validate bbtt-mc20
 
 validator_ttHH_mc20:
-  extends: .ntuple_validation_ttHH
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -280,7 +125,7 @@ validator_ttHH_mc20:
     - easyjet-validate ttHH-mc20
 
 validator_bbll_mc20:
-  extends: .ntuple_validation_bbll
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -290,7 +135,7 @@ validator_bbll_mc20:
     - easyjet-validate bbll-mc20
 
 validator_bbll_mc20_syst:
-  extends: .ntuple_validation_bbll
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -300,7 +145,7 @@ validator_bbll_mc20_syst:
     - easyjet-validate bbll-mc20-syst
 
 validator_lltt_mc20:
-  extends: .ntuple_validation_lltt
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -310,7 +155,7 @@ validator_lltt_mc20:
     - easyjet-validate lltt-mc20
 
 validator_vbshiggs_fulllep_mc20:
-  extends: .ntuple_validation_vbshiggs
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -320,7 +165,7 @@ validator_vbshiggs_fulllep_mc20:
     - easyjet-validate vbshiggs-fulllep-mc20
 
 validator_vbshiggs_semilep_mc20:
-  extends: .ntuple_validation_vbshiggs
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -330,7 +175,7 @@ validator_vbshiggs_semilep_mc20:
     - easyjet-validate vbshiggs-semilep-mc20
 
 validator_VBSVV4q_mc20:
-  extends: .ntuple_validation_VBSVV4q
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -340,7 +185,7 @@ validator_VBSVV4q_mc20:
     - easyjet-validate VBSVV4q-mc20
 
 validator_VBSVV4q_mc20_llj1:
-  extends: .ntuple_validation_VBSVV4q
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -350,7 +195,7 @@ validator_VBSVV4q_mc20_llj1:
     - easyjet-validate VBSVV4q-mc20-llj1
 
 validator_jjjj_mc20:
-  extends: .ntuple_validation_jjjj
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -360,7 +205,7 @@ validator_jjjj_mc20:
     - easyjet-validate jjjj-mc20
 
 validator_ssWW_mc20:
-  extends: .ntuple_validation_ssWW
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -370,7 +215,7 @@ validator_ssWW_mc20:
     - easyjet-validate ssWW-mc20
 
 validator_ZCharm_mc20:
-  extends: .ntuple_validation_ZCharm
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -380,7 +225,7 @@ validator_ZCharm_mc20:
     - easyjet-validate ZCharm-mc20
 
 validator_llyy_mc20:
-  extends: .ntuple_validation_HZallyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -390,7 +235,7 @@ validator_llyy_mc20:
     - easyjet-validate llyy-mc20
 
 validator_ttcalib_mc20:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -400,7 +245,7 @@ validator_ttcalib_mc20:
     - easyjet-validate ttcalib-mc20
 
 validator_zllycalib_mc20:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -410,7 +255,7 @@ validator_zllycalib_mc20:
     - easyjet-validate zllycalib-mc20
     
 validator_zlljcalib_mc20:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -420,7 +265,7 @@ validator_zlljcalib_mc20:
     - easyjet-validate zlljcalib-mc20
 
 validator_zbbycalib_mc20:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -430,7 +275,7 @@ validator_zbbycalib_mc20:
     - easyjet-validate zbbycalib-mc20
 
 validator_zbbjcalib_mc20:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -440,7 +285,7 @@ validator_zbbjcalib_mc20:
     - easyjet-validate zbbjcalib-mc20
 
 validator_bbbbtt_mc20:
-  extends: .ntuple_validation_bbbbtt
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true 
@@ -452,7 +297,7 @@ validator_bbbbtt_mc20:
 # MC20 AF3
 
 validator_sh4b_mc20af3:
-  extends: .ntuple_validation_bbbb
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -462,7 +307,7 @@ validator_sh4b_mc20af3:
     - easyjet-validate sh4b-mc20af3
 
 validator_SHbbyy_mc20af3_lite:
-  extends: .ntuple_validation_bbyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -474,7 +319,7 @@ validator_SHbbyy_mc20af3_lite:
 # MC23
 
 validator_bbbb_mc23:
-  extends: .ntuple_validation_bbbb
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -484,7 +329,7 @@ validator_bbbb_mc23:
     - easyjet-validate bbbb-mc23
 
 validator_bbtt_mc23:
-  extends: .ntuple_validation_bbtt
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -494,7 +339,7 @@ validator_bbtt_mc23:
     - easyjet-validate bbtt-mc23
 
 validator_bbVV_mc23:
-  extends: .ntuple_validation_bbVV
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -504,7 +349,7 @@ validator_bbVV_mc23:
     - easyjet-validate bbVV-mc23
 
 validator_bbVVVBF_mc23:
-  extends: .ntuple_validation_bbVV
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -514,7 +359,7 @@ validator_bbVVVBF_mc23:
     - easyjet-validate bbVVVBF-mc23
 
 validator_SHbbyy_mc23af3:
-  extends: .ntuple_validation_bbyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -524,7 +369,7 @@ validator_SHbbyy_mc23af3:
     - easyjet-validate SHbbyy-mc23af3
 
 validator_bbtt_mc23_syst:
-  extends: .ntuple_validation_bbtt
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -534,7 +379,7 @@ validator_bbtt_mc23_syst:
     - easyjet-validate bbtt-mc23-syst
 
 validator_bbll_mc23_lite:
-  extends: .ntuple_validation_bbll
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -554,7 +399,7 @@ validator_EMTopo_mc23:
     - easyjet-validate emtopo-mc23
 
 validator_hhml_mc23:
-  extends: .ntuple_validation_multilepton
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -564,7 +409,7 @@ validator_hhml_mc23:
     - easyjet-validate hhml-mc23
 
 validator_ttcalib_mc23:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -574,7 +419,7 @@ validator_ttcalib_mc23:
     - easyjet-validate ttcalib-mc23
 
 validator_zllycalib_mc23:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -584,7 +429,7 @@ validator_zllycalib_mc23:
     - easyjet-validate zllycalib-mc23
     
 validator_zlljcalib_mc23:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -594,7 +439,7 @@ validator_zlljcalib_mc23:
     - easyjet-validate zlljcalib-mc23
 
 validator_zbbycalib_mc23:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -604,7 +449,7 @@ validator_zbbycalib_mc23:
     - easyjet-validate zbbycalib-mc23
 
 validator_zbbjcalib_mc23:
-  extends: .ntuple_validation_xbb_calib
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -615,7 +460,7 @@ validator_zbbjcalib_mc23:
 
 
 validator_yyml_mc23_lite:
-  extends: .ntuple_validation_yyML
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -625,7 +470,7 @@ validator_yyml_mc23_lite:
     - easyjet-validate yyml-mc23-lite
 
 validator_bbyy_mc23_lite:
-  extends: .ntuple_validation_bbyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -635,7 +480,7 @@ validator_bbyy_mc23_lite:
     - easyjet-validate bbyy-mc23-lite
 
 validator_llyy_mc23:
-  extends: .ntuple_validation_HZallyy
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true
@@ -645,7 +490,7 @@ validator_llyy_mc23:
     - easyjet-validate llyy-mc23
 
 validator_bbbbtt_mc23:
-  extends: .ntuple_validation_bbbbtt
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true 
@@ -655,7 +500,7 @@ validator_bbbbtt_mc23:
     - easyjet-validate bbbbtt-mc23
 
 validator_monojet_mc23:
-  extends: .ntuple_validation_monojet
+  extends: .ntuple_validation
   needs:
     - job: compile
       artifacts: true 
