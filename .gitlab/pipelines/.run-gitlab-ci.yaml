@@ -4,9 +4,19 @@ variables:
   # default test directory for easyjet-test, can be overridden by -d
   EASYJET_TESTDIR: ci_testdir
 
+.to_central: &to_central
+  if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_PROJECT_PATH == 'easyjet/easyjet'
+
+.core_pkgs: &core_pkgs
+  <<: *to_central
+  changes:
+    - EasyjetHub/**
+    - EasyjetPlus/**
+    - EasyjetTests/**
+
 .ntupler:
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_PROJECT_PATH == 'easyjet/easyjet'
+    - <<: *to_central
   variables:
     GIT_STRATEGY: none
   stage: run
@@ -19,6 +29,150 @@ variables:
       - $EASYJET_TESTDIR/output-branches-analysis.txt
       - $EASYJET_TESTDIR/userJobMetadata.json
     expire_in: 1 week
+  
+.ntupler_bbbb:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [bbbbAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_bbbbtt:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [bbbbttAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_bbll:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [bbllAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_bbtt:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [bbttAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_bbVV:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [bbVVAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_bbyy:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [bbyyAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_HZallyy:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [HZallyyAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_jjjj:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [jjjjAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_lltt:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [llttAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_monojet:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [monojetAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_multilepton:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [multileptonAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_ssWW:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [ssWWAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_ttHH:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [ttHHAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_vbshiggs:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [vbshiggsAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_VBSVV4q:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [VBSVV4qAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_yyML:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [yyMLAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_ZCharm:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [ZCharmAnalysis/**]
+    - <<: *core_pkgs
+    - when: never
+
+.ntupler_xbb_calib:
+  extends: .ntupler
+  rules:
+    - <<: *to_central
+      changes: [XbbCalib/**]
+    - <<: *core_pkgs
+    - when: never
 
 # Data
 
@@ -33,208 +187,208 @@ ntupler_fast_data22:
     - easyjet-test fast-data22
 
 ntupler_bbtt_data22:
-  extends: .ntupler
+  extends: .ntupler_bbtt
   script:
     - easyjet-test bbtt-data22
 
 ntupler_bbyy_data22_lite:
-  extends: .ntupler
+  extends: .ntupler_bbyy
   script:
     - easyjet-test bbyy-data22-lite
 
 ntupler_SHbbyy_data22_lite:
-  extends: .ntupler
+  extends: .ntupler_bbyy
   script:
     - easyjet-test SHbbyy-data22-lite
 
 # MC20
 
 ntupler_bbyy_mc20_syst:
-  extends: .ntupler
+  extends: .ntupler_bbyy
   script:
     - easyjet-test bbyy-mc20-syst
 
 ntupler_SHbbyy_mc20:
-  extends: .ntupler
+  extends: .ntupler_bbyy
   script:
     - easyjet-test SHbbyy-mc20
 
 ntupler_bbyy_mc20_lite:
-  extends: .ntupler
+  extends: .ntupler_bbyy
   script:
     - easyjet-test bbyy-mc20-lite
 
 ntupler_bbtt_mc20:
-  extends: .ntupler
+  extends: .ntupler_bbtt
   script:
     - easyjet-test bbtt-mc20
 
 ntupler_ttHH_mc20:
-  extends: .ntupler
+  extends: .ntupler_ttHH
   script:
     - easyjet-test ttHH-mc20
 
 ntupler_bbll_mc20:
-  extends: .ntupler
+  extends: .ntupler_bbll
   script:
     - easyjet-test bbll-mc20
 
 ntupler_bbll_mc20_syst:
-  extends: .ntupler
+  extends: .ntupler_bbll
   script:
     - easyjet-test bbll-mc20-syst
 
 ntupler_lltt_mc20:
-  extends: .ntupler
+  extends: .ntupler_lltt
   script:
     - easyjet-test lltt-mc20
 
 ntupler_vbshiggs_fulllep_mc20:
-  extends: .ntupler
+  extends: .ntupler_vbshiggs
   script:
     - easyjet-test vbshiggs-fulllep-mc20
 
 ntupler_vbshiggs_semilep_mc20:
-  extends: .ntupler
+  extends: .ntupler_vbshiggs
   script:
     - easyjet-test vbshiggs-semilep-mc20
 
 ntupler_VBSVV4q_mc20:
-  extends: .ntupler
+  extends: .ntupler_VBSVV4q
   script:
     - easyjet-test VBSVV4q-mc20
 
 ntupler_VBSVV4q_mc20_llj1:
-  extends: .ntupler
+  extends: .ntupler_VBSVV4q
   script:
     - easyjet-test VBSVV4q-mc20-llj1
     
 ntupler_jjjj_mc20:
-  extends: .ntupler
+  extends: .ntupler_jjjj
   script:
     - easyjet-test jjjj-mc20
 
 ntupler_ssWW_mc20:
-  extends: .ntupler
+  extends: .ntupler_ssWW
   script:
     - easyjet-test ssWW-mc20
 
 ntupler_ZCharm_mc20:
-  extends: .ntupler
+  extends: .ntupler_ZCharm
   script:
     - easyjet-test ZCharm-mc20
 
 ntupler_llyy_mc20:
-  extends: .ntupler
+  extends: .ntupler_HZallyy
   script:
     - easyjet-test llyy-mc20
 
 ntupler_ttcalib_mc20:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test ttcalib-mc20
 
 ntupler_zllycalib_mc20:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test zllycalib-mc20
     
 ntupler_zlljcalib_mc20:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test zlljcalib-mc20
 
 ntupler_zbbycalib_mc20:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test zbbycalib-mc20
 
 ntupler_zbbjcalib_mc20:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test zbbjcalib-mc20
 
 ntupler_bbbbtt_mc20:
-  extends: .ntupler
+  extends: .ntupler_bbbbtt
   script:
     - easyjet-test bbbbtt-mc20
 
 # MC20 AF3
 
 ntupler_sh4b_mc20af3:
-  extends: .ntupler
+  extends: .ntupler_bbbb
   script:
     - easyjet-test sh4b-mc20af3
 
 ntupler_SHbbyy_mc20af3_lite:
-  extends: .ntupler
+  extends: .ntupler_bbyy
   script:
     - easyjet-test SHbbyy-mc20af3-lite
 
 # MC23
 
 ntupler_bbbb_mc23:
-  extends: .ntupler
+  extends: .ntupler_bbbb
   script:
     - easyjet-test bbbb-mc23
 
 ntupler_bbtt_mc23:
-  extends: .ntupler
+  extends: .ntupler_bbtt
   script:
     - easyjet-test bbtt-mc23
 
 ntupler_bbVV_mc23:
-  extends: .ntupler
+  extends: .ntupler_bbVV
   script:
     - easyjet-test bbVV-mc23
 
 ntupler_bbVVVBF_mc23:
-  extends: .ntupler
+  extends: .ntupler_bbVV
   script:
     - easyjet-test bbVVVBF-mc23
 
 ntupler_SHbbyy_mc23af3:
-  extends: .ntupler
+  extends: .ntupler_bbyy
   script:
     - easyjet-test SHbbyy-mc23af3
 
 ntupler_bbyy_mc23_lite:
-  extends: .ntupler
+  extends: .ntupler_bbyy
   script:
     - easyjet-test bbyy-mc23-lite
 
 ntupler_llyy_mc23:
-  extends: .ntupler
+  extends: .ntupler_HZallyy
   script:
     - easyjet-test llyy-mc23
 
 ntupler_ttcalib_mc23:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test ttcalib-mc23
 
 ntupler_zllycalib_mc23:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test zllycalib-mc23
     
 ntupler_zlljcalib_mc23:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test zlljcalib-mc23
 
 ntupler_zbbycalib_mc23:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test zbbycalib-mc23
 
 ntupler_zbbjcalib_mc23:
-  extends: .ntupler
+  extends: .ntupler_xbb_calib
   script:
     - easyjet-test zbbjcalib-mc23
 
 ntupler_monojet_mc23:
-  extends: .ntupler
+  extends: .ntupler_monojet
   script:
     - easyjet-test monojet-mc23
 
@@ -245,12 +399,12 @@ ntupler_monojet_mc23:
 #    - easyjet-test bbtt-mc23-lite-syst
 
 ntupler_bbtt_mc23_syst:
-  extends: .ntupler
+  extends: .ntupler_bbtt
   script:
     - easyjet-test bbtt-mc23-syst
 
 ntupler_bbll_mc23_lite:
-  extends: .ntupler
+  extends: .ntupler_bbll
   script:
     - easyjet-test bbll-mc23-lite
 
@@ -260,17 +414,17 @@ ntupler_EMTopo_mc23:
     - easyjet-test emtopo-mc23
 
 ntupler_hhml_mc23:
-  extends: .ntupler
+  extends: .ntupler_multilepton
   script:
     - easyjet-test hhml-mc23
 
 ntupler_yyml_mc23_lite:
-  extends: .ntupler
+  extends: .ntupler_yyML
   script:
     - easyjet-test yyml-mc23-lite
 
 ntupler_bbbbtt_mc23:
-  extends: .ntupler
+  extends: .ntupler_bbbbtt
   script:
     - easyjet-test bbbbtt-mc23
 
@@ -290,6 +444,10 @@ aod_fast_bbbb_mc23:
   needs: [compile]
   script:
     - easyjet-test aod-fast-bbbb-mc23
+  rules:
+    - <<: *to_central
+      changes: [bbbbAnalysis/**]
+    - <<: *core_pkgs
 
 h5_fast_mc23:
   tags:
@@ -306,6 +464,10 @@ hist_syst_bbbb_mc23:
   needs: [compile]
   script:
     - easyjet-test hist-syst-bbbb-mc23
+  rules:
+    - <<: *to_central
+      changes: [bbbbAnalysis/**]
+    - <<: *core_pkgs
 
 # test without eos or cvmfs run, intentionally doesn't include cvmfs
 # and pretends not to have EOS credentials
