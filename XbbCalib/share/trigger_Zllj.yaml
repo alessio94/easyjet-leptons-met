@@ -55,3 +55,9 @@ selection:
     - 'HLT_e140_lhloose_L1eEM26M'
     - 'HLT_mu24_ivarmedium_L1MU14FCH'
     - 'HLT_mu50_L1MU14FCH'
+    '2024':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M'
+    - 'HLT_e60_lhmedium_L1eEM26M'
+    - 'HLT_e140_lhloose_L1eEM26M'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
