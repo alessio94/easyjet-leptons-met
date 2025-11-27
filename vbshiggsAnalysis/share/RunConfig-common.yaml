@@ -92,3 +92,4 @@ ttree_output:
       btag_info: true
     large_R_jets:
       truth_labels: true
+      WTransformer_details: true

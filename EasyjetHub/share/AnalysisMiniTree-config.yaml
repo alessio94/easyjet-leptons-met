@@ -39,6 +39,7 @@ collection_options:
     bjet_regression: false
     extra_variables: []
     mc_extra_variables: []
+    WTransformer_details: false
 
   taus:
     score_branches: false

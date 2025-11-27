@@ -74,15 +74,27 @@ def get_large_R_jet_branches(
     if jet_output_flags.substructure_info:
         large_R_jet_branches.variables += get_substructure_branches(flags, lr_jet_type)
 
-    if lr_jet_type == "UFO" and \
-        flags.Analysis.Large_R_jet.wtag_type and \
-            flags.Analysis.Large_R_jet.wtag_wp:
+    if (
+        lr_jet_type == "UFO"
+        and flags.Analysis.Large_R_jet.wtag_type
+        and flags.Analysis.Large_R_jet.wtag_wp
+    ):
         large_R_jet_branches.variables += get_wtag_branches(flags)
 
     is_valid_ptag = is_at_least(flags, "p5834")
     is_valid_for_v02 = is_at_least(flags, "p6490")
     is_valid_for_bjr_v01 = is_at_least(flags, "p6697")
     is_valid_for_gn3x = is_at_least(flags, "p7017")
+    if (
+        lr_jet_type == "UFO"
+        and is_valid_for_gn3x
+        and jet_output_flags.WTransformer_details
+    ):
+        large_R_jet_branches.variables += [
+            "WTransformer_massdec_ConstScore",
+            "WTransformer_ConstScore"
+        ]
+
     if lr_jet_type == "UFO" and is_valid_ptag:
         if jet_output_flags.btag_details:
             large_R_jet_branches.variables += get_large_R_gn2_branches(
