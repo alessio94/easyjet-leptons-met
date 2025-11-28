@@ -71,6 +71,7 @@ namespace ZCC
     SG::ReadHandle<xAOD::TruthParticleContainer> truthMuons(m_truthmuonInKey);
     SG::ReadDecorHandle<xAOD::JetContainer, int> truthFlavour(m_jetTruthFlavourKey);
 
+    auto jets_after_overlap = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
     auto truthbjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
     auto truthcjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
 
@@ -85,7 +86,9 @@ namespace ZCC
         m_Fbranches.at(string_var)(*truthevent) = -99.;
     }
 
-    for (const xAOD::Jet *jet : *truthJets){
+    truthOverlapRemoval(*truthJets, *truthElectrons, *truthMuons, *jets_after_overlap);
+
+    for (const xAOD::Jet *jet : *jets_after_overlap){
       bool isbjet=false;
       bool iscjet=false;
       int truthlabel = truthFlavour(*jet);
@@ -224,6 +227,34 @@ namespace ZCC
     return StatusCode::SUCCESS;
   }
 
+
+  void ZCharmTruthSelectorAlg::truthOverlapRemoval(const xAOD::JetContainer& truthJets, const xAOD::TruthParticleContainer& truthElectrons, const xAOD::TruthParticleContainer& truthMuons, ConstDataVector<xAOD::JetContainer>& jetsAfterOverlap){
+
+    float dRcut = 0.4;
+    for (const xAOD::Jet* jet : truthJets){
+      TLorentzVector jet_p4 = jet->p4();
+      bool keep = true;
+      for (const xAOD::TruthParticle* ele : truthElectrons){
+        TLorentzVector ele_p4 = ele->p4();
+        if (jet_p4.DeltaR(ele_p4) < dRcut){
+          keep = false;
+          break;
+        }
+      }
+      if (!keep) continue;
+      for (const xAOD::TruthParticle* mu : truthMuons){
+        TLorentzVector mu_p4 = mu->p4();
+        if (jet_p4.DeltaR(mu_p4) < dRcut){
+          keep = false;
+          break;
+        }
+      }
+      if (keep){
+        jetsAfterOverlap.push_back(jet);
+      }
+    }
+
+  }
 
   void ZCharmTruthSelectorAlg::evaluateTruthLeptonCuts(const xAOD::TruthEvent& truthevent, const xAOD::TruthParticleContainer& truthelectrons, const xAOD::TruthParticleContainer& truthmuons, CutManager& ZCharmTruthCuts)
   {
