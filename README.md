@@ -286,6 +286,8 @@ lsetup panda
 
 Note: if you want to retrieve CutFlows saved as `TEfficiency`, you will need to activate the `--mergeWithHadd` option in addition to activating the `--mergeOutput` one in [easyjet-gridsubmit](https://gitlab.cern.ch/easyjet/easyjet/-/blame/main/EasyjetHub/bin/easyjet-gridsubmit), as the default merge script doesn't support `TEfficiency` merging. This will use a wrapper script to run `hadd` for the merging step instead.
 
+Some useful advices to run efficiently on the grid can be found in this [presentation](https://indico.cern.ch/event/1505006/#3-feedback-on-grid-submission) and in the easyjet [tutorial](https://indico.cern.ch/event/1513462/).
+
 # Editing with VSCode support
 
 You may already be using VSCode to edit easyjet -- if you aren't, this is a remarkably convenient tool with which to get helpful hints in your coding.
