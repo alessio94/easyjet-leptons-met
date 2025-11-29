@@ -116,6 +116,8 @@ Photon:
   variables_int: []
   correlationModelScale: "1NP_v1"
   extra_wps: []
+  forceFullSimConfigForID: false
+  forceFullSimConfigForIso: false
 
 Electron:
   min_pT: 4.5e+3
@@ -139,6 +141,7 @@ Electron:
   correlationModelIso: "SIMPLIFIED"
   correlationModelReco: "SIMPLIFIED"
   extra_wps: []
+  forceFullSimConfig: false
 
 Muon:
   min_pT: 3.e+3

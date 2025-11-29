@@ -7,6 +7,8 @@ from AthenaConfiguration.Enums import LHCPeriod
 from EasyjetHub.steering.utils.name_helper import drop_sys
 from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
+from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
+
 
 def electron_sequence(flags, configAcc):
 
@@ -64,6 +66,10 @@ def electron_sequence(flags, configAcc):
         configSeq.setOptionValue('.correlationModelReco',
                                  flags.Analysis.Electron.correlationModelReco)
         configSeq.setOptionValue('.saveCombinedSF', True)
+        configSeq.setOptionValue('.forceFullSimConfig',
+                                 flags.Analysis.Electron.forceFullSimConfig
+                                 or (flags.Analysis.DataType is DataType.FastSim
+                                     and flags.GeoModel.Run is LHCPeriod.Run3))
 
         if flags.Input.isMC:
             # No DNN SF yet

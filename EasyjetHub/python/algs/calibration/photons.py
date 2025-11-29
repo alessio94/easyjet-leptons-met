@@ -6,6 +6,8 @@ from AthenaConfiguration.Enums import LHCPeriod
 
 from EasyjetHub.steering.utils.name_helper import drop_sys
 
+from AnalysisAlgorithmsConfig.ConfigAccumulator import DataType
+
 
 def photon_sequence(flags, configAcc):
 
@@ -35,6 +37,14 @@ def photon_sequence(flags, configAcc):
         configSeq.setOptionValue('.selectionName', id + '_' + iso)
         configSeq.setOptionValue('.qualityWP', id)
         configSeq.setOptionValue('.isolationWP', iso)
+        configSeq.setOptionValue('.forceFullSimConfigForID',
+                                 flags.Analysis.Photon.forceFullSimConfigForID
+                                 or (flags.Analysis.DataType is DataType.FastSim
+                                     and flags.GeoModel.Run is LHCPeriod.Run3))
+        configSeq.setOptionValue('.forceFullSimConfigForIso',
+                                 flags.Analysis.Photon.forceFullSimConfigForIso
+                                 or (flags.Analysis.DataType is DataType.FastSim
+                                     and flags.GeoModel.Run is LHCPeriod.Run3))
         configSeq.setOptionValue('.saveCombinedSF', True)
 
         # No Run 2 SF yet

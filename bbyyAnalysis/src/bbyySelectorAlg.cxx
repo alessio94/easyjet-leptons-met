@@ -391,6 +391,9 @@ namespace HHBBYY
       bbyyCuts("PASS_RELPT").passed = true;
     if (myy >= 105. * Athena::Units::GeV && myy < 160. * Athena::Units::GeV && bbyyCuts.exists("DIPHOTON_MASS"))
       bbyyCuts("DIPHOTON_MASS").passed = true;
+    if (myy >= 90. * Athena::Units::GeV && myy < 175. * Athena::Units::GeV && bbyyCuts.exists("DIPHOTON_MASS_LOOSE"))
+      bbyyCuts("DIPHOTON_MASS_LOOSE").passed = true;
+
   }
 
 

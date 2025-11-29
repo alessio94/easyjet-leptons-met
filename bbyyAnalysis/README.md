@@ -65,10 +65,4 @@ The main developments have been performed by (non extensive list, feel free to a
 Giulia Di Gregorio, Sayuka Kita, Spyros Merianos, Lorenzo Santi, Abraham Tishelman-Charny, Francesco Curcio.
 
 # Post processing
-To run the post-processing, the following command needs to be executed:
-
-`bbyyPostProcess.py --inFile name_easyJet_ntuple.root --xSectionsConfig bbyyAnalysis/XSectionData_Run2.yaml --outFile name_PostProcessed_ntuple.root`
-or replace with `XSectionData_Run3` for Run3 samples.
-
-The output file (`name_PostProcessed_ntuple.root`) contains the final weight (`weight`) which is evaluated considering the final sum of weights, cross-section, luminosity, MC weight and the different scale factors (`SF = weight_ftag_effSF_GN2v01_FixedCutBEff_77_NOSYS * weight_jvt_effSF_NOSYS * bbyy_Photon1_effSF_NOSYS * bbyy_Photon2_effSF_NOSYS`):
-`weight = generatorWeight_%SYS * PileupWeight * Luminosity * AMIXsection * kFactor * FilterEff * SF / sumOfWeights`
+Performed with FastFrames

@@ -69,6 +69,7 @@ namespace HHBBYY
           "TWO_ISO_PHOTONS",
           "PASS_RELPT",
           "DIPHOTON_MASS",
+          "DIPHOTON_MASS_LOOSE",
           "EXACTLY_ZERO_LEPTONS",
           "AT_LEAST_TWO_JETS",
           "LESS_THAN_SIX_CENTRAL_JETS",
