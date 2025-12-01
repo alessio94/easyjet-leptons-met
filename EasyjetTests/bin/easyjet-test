@@ -6,7 +6,7 @@ set -Eeu
 # mode-based switches
 ################################################
 
-INPUT_EOS_DIR=root://${EOS_ACCOUNT_PROJECT-example}.cern.ch//${EOS_ACCOUNT_PATH-example}/gitlab_ci_input
+INPUT_EOS_DIR=root://${EOS_ACCOUNT_PROJECT-eosproject}.cern.ch//${EOS_ACCOUNT_PATH-/eos/project/a/atlas-hhframework/}/gitlab_ci_input
 
 # standard samples
 # Data
@@ -360,7 +360,8 @@ Notes on environment variables:
  - EASYJET_TESTDIR: default for -d, currently ${DIRECTORY:-/tmp/<random>}
  - EASYJET_NPROCS: number of processes with "all", currently ${NPROCS}
  - EASYJET_METATEST: set to run a test test, currently ${METASTATUS}
- - EASYJET_FAKE_MISSING_EOS: pretend no eos, pull files with wget
+ - EASYJET_USE_SMALL_FILE: pull small input files with wget
+ - EASYJET_STREAM_XROOTD: read files remotely with xrootd, by default will xrdcp
 
 EOF
     exit 1
@@ -369,11 +370,16 @@ EOF
 # We need to be able to check if this is an EOS system to decide what
 # tests we can run and how to run them.
 has-eos() {
-    if [[ ${EOS_ACCOUNT_PASSWORD+x} && ${EOS_ACCOUNT_USERNAME+x} && ${EOS_ACCOUNT_PATH+x} && ${EOS_ACCOUNT_PROJECT+x} && ${TEST_RUN_NEVENTS+x} && ! ${EASYJET_FAKE_MISSING_EOS+x} ]];
+    if [[ ${EOS_ACCOUNT_PASSWORD+x} && ${EOS_ACCOUNT_USERNAME+x} && ${EOS_ACCOUNT_PATH+x} && ${EOS_ACCOUNT_PROJECT+x} && ${TEST_RUN_NEVENTS+x} && ! ${EASYJET_USE_SMALL_FILE+x} ]];
     then
         return 0
     fi
     return 1
+}
+
+# Check for the existence of a valid grid proxy, which allows reading via xrootd without the eos credentials
+has-grid-proxy() {
+    return `voms-proxy-info -acexists atlas`
 }
 
 # Terminal magic: if stdout is set to go to a terminal we'll add
@@ -400,14 +406,14 @@ dump-modes() {
     do
         local func=${TESTS[$mode]}
         local config=${CONFIGS[$mode]-$DEFAULT_CONFIG}
-        local data=${DATAFILES[$mode]}
+        local data=${DATAFILES[$mode]-N/A}
         printf "${FMT}" $mode "$func" $config $data
     done
 }
 
 OPT_KEYS=":d:hl:L:"
 dump-complete() {
-    if has-eos; then
+    if has-eos || has-grid-proxy; then
         local modes=${ALL_MODES[*]}
     else
         local modes=${!SMALL_DATAFILES[*]}
@@ -522,22 +528,37 @@ run-test() {
 
     local mode=$1
 
-    # we try to pull a small file using wget if either:
-    # - there's no eos access (i.e. in containers or outside cern)
+    # we try to pull a small file using wget if either of the below are true:
     # - the large file isn't listed as existing on eos
-    if ! has-eos; then
+    # - there's neither eos access (i.e. in containers or outside cern) nor a grid proxy for xrootd
+    if ! [[ -v DATAFILES[$mode] ]] || [[ -v EASYJET_USE_SMALL_FILE ]]; then
+        echo "downloading small test file"
+        local file=$(pull-remote-file $mode)
+    elif has-eos; then
+        # priority to direct read from eos mount
+        echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME
+        klist
+        local file=${DATAFILES[$mode]}
+    elif has-grid-proxy; then
+        FILEBASE=$(basename -- ${DATAFILES[$mode]})
+        if [[ -v EASYJET_STREAM_XROOTD ]] && ! [[ -e $FILEBASE ]]; then
+            # if no eos but grid proxy is valid, can opt to read remotely with xrootd
+            echo "reading input via xrootd"
+            local file=${DATAFILES[$mode]}
+        else
+            # copy the file to the local area
+            if [[ -e $FILEBASE ]]; then
+                echo "retrieving input via xrdcp"
+                xrdcp ${DATAFILES[$mode]} $DIRECTORY/$FILEBASE
+            else
+                echo "file already present"
+            fi
+            local file=$FILEBASE
+        fi
+    else
         echo "eos env not defined, will try to find small test file"
         local file=$(pull-remote-file $mode)
         echo "file loaded: '${file}'"
-    else
-        if ! [[ -v DATAFILES[$mode] ]]; then
-            echo "downloading small test file"
-            local file=$(pull-remote-file $mode)
-        else
-            echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME
-            klist
-            local file=${DATAFILES[$mode]}
-        fi
     fi
 
     # the above might have an empty file if something went wrong

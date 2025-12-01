@@ -18,6 +18,25 @@ Merge requests require successful pipelines and an approval by one of the projec
 
 The merge requests will run some validation pipelines. The resulting plots are stored in https://easyjet-validation.web.cern.ch/.
 
+### Testing changes
+
+Please use the `easyjet-test` utility to run the CI tests before committing changes and especially for debugging pipeline errors.
+```sh
+> easyjet-test
+usage: easyjet-test [-h] [-l <level>] [-L <log-file>] [-d <dir>] <mode>
+```
+You can get detailed help with `easyjet-test -h`, and should at least run the modes (analysis + dataset) that you have touched with your changes.
+For a comprehensive test, run `easyjet-test all-exit-early`, but this may take time and some computing power.
+
+#### Input file access
+
+- If you have a local EOS mount, the input file access does not need any extra input.
+- You can also access the input files with `XRootD` if you have a valid grid certificate.
+  - By default, the files will be downloaded with `xrdcp` but note that you should specify a target directory to avoid redownloading to `/tmp` on each run.
+Future runs on the same file will not repeat the download.
+  - Alternatively, you can run with `EASYJET_STREAM_XROOTD=1 easyjet-test [mode]` to read the input files directly over the remote connection.
+- If neither of these is available, or the input file is not on EOS, then the script will try to retrieve a small input file with `wget`.
+
 ## Extending the ntupler with analysis-specific algorithms
 
 We expose functions for generating the sequences used in `easyjet-ntupler` via the `hub.py` module, such that a custom executable can be defined that extends the basic job with analysis-specific operations. An annotated example for this can be found in [`bbbbAnalysis/bin/bbbb-ntupler`](./bbbbAnalysis/bin/bbbb-ntupler). See [`EasyjetHub/python/README.md`](./EasyjetHub/python/README.md) and [`EasyjetHub/python/hub.py`](./EasyjetHub/python/hub.py) directly for guidance.
