@@ -1,119 +1,231 @@
 #!/usr/bin/env python3
 # Yassine El Ghazali
-# Modified for XbbClaib use by Iza Veliscek
+# Modified for XbbClaib use by Iza Veliscek and Nikita Pond
 # script helps with grid submission
 # to run:
-# all samples: XbbCalib-submitGrid.py --tag {}  -c {config} -s all --samplePath Zbby
+# all samples: XbbCalib-submitGrid.py --tag {}  --analysis Zbbj --ptag p7018 \
+# --mc mc20 mc23  --data run2 run3
 # A specific samples:
-# python3 XbbCalib-submitGrid.py --tag {}  -c {config} -s "Wjets --samplePath Zbby"
-
+# python3 XbbCalib-submitGrid.py --tag {}  -s "Wjets --samplePath Zbby" --ptag p7018 \
+#  --mc mc20 mc23
+# By default will use:
+# All samples for a specific analysis, as defined in MC_PROCESSES_BY_ANALYSIS
+# Default config for a specific analysis, as defined in CONFIG_BY_ANALYSIS
+# Any additional arguments not covered here will be passed to easyjet-gridsubmit,
+# e.g. --nFilesPerJob, --maxFiles, --mergeOutput, --noSubmit, etc.
 
 import os
+import tempfile
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from pathlib import Path
+
+MC_PROCESSES_BY_ANALYSIS = {
+    "Zbbj": [
+        "dijets",
+        # "dijet_bfilt",
+        "Zbb_ptZ_200_ECMS",
+        "Zqq_ptZ_200_ECMS",
+        "Zqq_ptZ_200_ECMS",
+        "Wqq_ptW_200_ECMS",
+        "ttbar_allhad"
+    ],
+    "Zbby": [
+        "dijets",
+        # "dijet_bfilt",
+        "Zbb_ptZ_200_ECMS",
+        "Zbbgamma_pTZ100",
+        "Zqq_ptZ_200_ECMS",
+        "Zqqgamma_pTZ100",
+        "SinglePhoton",
+        "Vgamma_Vgammagamma",
+        "Wqq_ptW_200_ECMS",
+        "Wqqgamma_pTW140",
+        "ttbar_allhad",
+        "tty"
+    ],
+    "Zll": [
+        "Diboson",
+        "Zll"
+    ],
+    "tt": [
+        "Diboson",
+        "Wjet",
+        "singletop",
+        "ttbar_nonallhad",
+    ],
+}
+
+# Define the default config to use for a given analysis
+CONFIG_BY_ANALYSIS = {
+    "Zbbj": "../easyjet/XbbCalib/share/RunConfig_ZbbjCalib.yaml",
+    "Zbby": "../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml",
+    "Zll": "../easyjet/XbbCalib/share/RunConfig-Zll.yaml",
+    "tt": "../easyjet/XbbCalib/share/RunConfig-ttCalib.yaml"
+}
+
+SAMPLES_BASE_PATH = Path(
+    "../easyjet/XbbCalib/datasets/"
+).resolve()
 
 
 def get_args():
     parser = ArgumentParser(description="",
                             formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument(
+        "--tag",
+        required=True,
+        help="A tag to identify the submission - will be included in the output names"
+    )
+    parser.add_argument(
+        "--ptag",
+        type=str,
+        required=True,
+        help="Production tag to use, e.g. p7018, p6490"
+    )
+    parser.add_argument(
+        "--data",
+        nargs="+",
+        choices=["run2", "run3"],
+        help="Space seperated list of data periods to process"
+    )
+    parser.add_argument(
+        "--mc",
+        nargs="+",
+        choices=["mc20", "mc23"],
+        help="Space seperated list of mc campaigns to process"
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        help="Use this config instead of the default one")
+    parser.add_argument(
         "-s",
         "--samples",
+        nargs="+",
+        required=False,
+        help="Space-delimited list of samples, \"MG_Zqqgamma SinglePhoton\" If "
+        "none are given, all samples for a given analysis are run",)
+    parser.add_argument(
+        "--analysis",
+        type=str,
         required=True,
-        help="Space-delimited list of samples, \"MG_Zqqgamma SinglePhoton\"")
-    parser.add_argument("--tag", required=True)
-    parser.add_argument("-c", "--config")
-    parser.add_argument("--nGBPerJob", default=-1, type=int)
-    parser.add_argument("--memory", default=-1, type=int)
-    parser.add_argument("--samplePath", default="Zbby")
+        choices=["Zbby", "Zbbj", "Zll", "tt"],
+        help="Which analysis to run - defines the default config and samples"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="If set, will only print the commands that would be run, without executing"
+    )
+    return parser.parse_known_args()
 
-    return parser.parse_args()
+
+def make_temp_file_with_containers(mc_list):
+    '''Creates a temporary file containing all of the unique containers found by
+    reading all the text files in mc_list'''
+    containers = set()
+    for mc_file in mc_list:
+        with open(mc_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    containers.add(line)
+    containers = list(containers)
+    with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp_file:
+        for container in containers:
+            temp_file.write(f"{container}\n")
+
+    return temp_file.name
 
 
-def get_list_files(processes, samplePath):
+def get_all_mc_samples(
+    analysis,
+    campaign,
+    ptag,
+    samples=None,
+):
+    '''
+    Get all the relevent samples.txt files for a given analysis, mc campaign, and ptag
+
+    Parameters
+    ----------
+    analysis : str
+        Analysis name, e.g. Zbbj, Zbby
+    campaign : str
+        MC campaign, e.g. mc20, mc23
+    ptag : str
+        Production tag, e.g. p7018, p6490, etc
+    '''
+    assert analysis in MC_PROCESSES_BY_ANALYSIS, \
+        f"Analysis {analysis} not found in MC_PROCESSES_BY_ANALYSIS"
+    assert campaign in ["mc20", "mc23"], f"Campaign {campaign} not supported"
+    if samples is None:
+        samples = MC_PROCESSES_BY_ANALYSIS[analysis]
     mc_list = []
+    missing_files = []
 
-    for process in processes:
-        file_name = ""
-        if process == "run2":
-            file_name = "data/data_Run2.txt"
-        elif process == "run3":
-            file_name = "data/data_Run3.txt"
-        elif process == "mc20":
-            file_name = f"{samplePath}/MC/mc20_{process}.txt"
-        elif process == "mc23":
-            file_name = f"{samplePath}/MC/mc23_{process}.txt"
+    for process in samples:
+        sample_file = SAMPLES_BASE_PATH / process / ptag / f"{campaign}.txt"
+        if sample_file.exists():
+            mc_list.append(str(sample_file))
         else:
-            print(f"ERROR : Invalid Process Name : {process}")
-        f_base_path = os.path.abspath(
-            "../easyjet/XbbCalib/datasets/"
+            missing_files.append(str(sample_file))
+
+    if missing_files:
+        raise ValueError(
+            f"For analysis {analysis}, campaign {campaign}, ptag {ptag}, the following "
+            f"sample files are missing: {missing_files}"
         )
-        path_to_file = os.path.join(f_base_path, file_name)
-        if os.path.exists(path_to_file):
-            mc_list.append(path_to_file)
-        else:
-            print(f"\tfile {path_to_file} does not exist")
-
     return mc_list
 
 
-def main(args):
+def submit(command, dry_run):
+    command_str = " ".join(command)
+    if dry_run:
+        print(f"Dry run: {command_str}")
+    else:
+        os.system(command_str)
+
+
+def main(args, ej_grid_submit_args):
 
     executable = "xbbcalib-ntupler"
-    mc_list = []
-    if args.samples == "all":
-        if args.samplePath == 'Zbby':
-            runConfig = "../easyjet/XbbCalib/share/RunConfig-ZbbyCalib.yaml"
-            processes = [
-                "Zbb_ptZ_200_ECMS",
-                "Zbbgamma_pTZ100",
-                "Zqq_ptZ_200_ECMS",
-                "Zqqgamma_pTZ100",
-                "SinglePhoton",
-                "Vgamma_Vgammagamma",
-                "Wqq_ptW_200_ECMS",
-                "Wqqgamma_pTW140",
-                "dijet_bfilt",
-                "dijets",
-                "ttbar_allhad",
-                "tty"]
-        elif args.samplePath == 'Zlly':
-            runConfig = "../easyjet/XbbCalib/share/RunConfig_Zlly.yaml"
-            processes = [
-                "mc20_Sh_2211_Zjets.txt",
-                "mc20_Sh_2214_Vll_yy.txt",
-                "mc20_Sh_2214_eegamma.txt",
-                "mc20_Sh_2214_enugamma.txt",
-                "mc20_Sh_2214_llgammajj.txt",
-                "mc20_Sh_2214_lvgammajj.txt",
-                "mc20_Sh_2214_mumugamma.txt",
-                "mc20_Sh_2214_munugamma.txt",
-                "mc20_Sh_2214_taunugamma.txt",
-                "mc20_Sh_2214_tautaugamma.txt"
-            ]
-        mc_list = get_list_files(processes, args.samplePath)
-    else:
-        mc_list = get_list_files(args.samples.split(), args.samplePath)
-    data_list_name = "--mc-list"
-    if "run" in args.samples or "data" in args.samples:
-        data_list_name = "--data-list"
-    if args.config:
-        runConfig = args.config
-    for mc_file in mc_list:
-        base_command = (
-            f"easyjet-gridsubmit {data_list_name} {mc_file} "
-            f"--run-config {runConfig} "
-            f"--exec {executable} "
-            f"--campaign {args.tag} "
-            f"--noTag --mergeOutput --noEmail"
+    analysis = args.analysis
+    runConfig = args.config or CONFIG_BY_ANALYSIS[analysis]
+    if not args.mc and not args.data:
+        raise ValueError("At least one of --mc or --data must be provided")
+
+    # All the defaults
+    ej_command = [
+        "easyjet-gridsubmit",
+        "--run-config", runConfig,
+        "--exec", executable,
+        "--campaign", args.tag,
+        "--mergeOutput",
+    ] + ej_grid_submit_args
+
+    # Run all mc campaigns
+    for campaign in args.mc or []:
+        mc_list = get_all_mc_samples(
+            analysis,
+            campaign,
+            args.ptag,
+            args.samples
         )
 
-        if args.nGBPerJob != -1:
-            base_command += f" --nGBperJob {args.nGBPerJob}"
-        if args.memory != -1:
-            base_command += f" --memory {args.memory}"
+        submit(
+            ej_command + ['--mc-list', make_temp_file_with_containers(mc_list)],
+            args.dry_run
+        )
 
-        print(f'Executing {base_command}')
-        os.system(base_command)
+    # Run all data periods
+    for data_period in args.data or []:
+        data_file = SAMPLES_BASE_PATH / "data" / args.ptag / f"{data_period}.txt"
+        assert data_file.exists(), f"Data file {data_file} does not exist"
+        submit(
+            ej_command + ['--data-list', str(data_file)],
+            args.dry_run
+        )
 
 
 if __name__ == "__main__":
@@ -121,6 +233,5 @@ if __name__ == "__main__":
     if os.path.basename(current_dir) != "run":
         raise ValueError("you need to submit from run directory")
 
-    args = get_args()
-
-    main(args)
+    this_args, ej_grid_submit_args = get_args()
+    main(this_args, ej_grid_submit_args)
