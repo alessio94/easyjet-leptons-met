@@ -113,7 +113,7 @@ def main():
     parser.add_argument(
         "--ProductionRole",
         type=str,
-        choices=["HMBS", "HIGP"],
+        choices=["HMBS", "HIGP", "FLAVTAG"],
         help="Run with production role",
     )
     parser.add_argument(
@@ -258,7 +258,10 @@ def main():
             dsid = f"{ds_name_split[0]}.{ds_name_split[1]}"
         output_ds_name = ""
         if args.ProductionRole:
-            output_ds_name = "group.phys-{0}.{1}.{2}.{3}".format(args.ProductionRole.lower(), campaign, dsid, ds_tags)
+            if args.ProductionRole.lower() in ["flavtag"]:
+                output_ds_name = "group.perf-{0}.{1}.{2}.{3}".format(args.ProductionRole.lower(), campaign, dsid, ds_tags)
+            else:
+                output_ds_name = "group.phys-{0}.{1}.{2}.{3}".format(args.ProductionRole.lower(), campaign, dsid, ds_tags)
         else:
             if 'Delayed' in ds_name:
                 output_ds_name = "user.{0}.{1}.delayed_{2}.{3}".format(grid_nickname, campaign, dsid, ds_tags)
@@ -290,10 +293,16 @@ def main():
             "--exec", exec_cmd,
         ]
         if args.ProductionRole:
-            cmd += [
-                "--voms", "atlas:/atlas/phys-{0}/Role=production".format(args.ProductionRole.lower()),
-                "--official",
-            ]
+            if args.ProductionRole.lower() in ["flavtag"]:
+                cmd += [
+                    "--voms", "atlas:/atlas/perf-{0}/Role=production".format(args.ProductionRole.lower()),
+                    "--official",
+                ]
+            else:
+                cmd += [
+                    "--voms", "atlas:/atlas/phys-{0}/Role=production".format(args.ProductionRole.lower()),
+                    "--official",
+                ]
 
         for k, v in submit_opts.items():
             if isinstance(v, bool):
