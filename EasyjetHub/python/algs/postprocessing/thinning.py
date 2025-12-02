@@ -72,4 +72,11 @@ def thinning_sequence(flags):
         configSeq.setOptionValue('.selectionName', 'selectPtEta')
         configSeq.setOptionValue('.postfix', 'thin')
 
+    if flags.Analysis.do_tracks and flags.Analysis.Track.do_thinning:
+        configSeq += makeConfig('Thinning')
+        configSeq.setOptionValue('.containerName', drop_sys(
+            flags.Analysis.container_names.output.tracks))
+        configSeq.setOptionValue('.selectionName', 'selectPt')
+        configSeq.setOptionValue('.postfix', 'thin')
+
     return configSeq

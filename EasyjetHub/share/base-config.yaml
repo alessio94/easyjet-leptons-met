@@ -12,6 +12,7 @@ do_met: false
 do_mmc: false
 do_overlap_removal: false
 do_primary_vertex_pos: false
+do_tracks: false
 
 # Other global event configs
 bypass: false
@@ -186,6 +187,17 @@ Lepton:
   amount: 0
   variables: ["pt", "eta", "phi", "E", "effSF"]
   variables_int: ["charge", "pdgid"]
+
+Track:
+  min_pT: 0.5e+3  # 500 MeV
+  max_eta: 2.5
+  working_points: []  # Can be ["Loose", "TightPrimary"] if needed
+  outputTrackSummaryInfo: false  # Set to true to get hit counts # not sure if true will make this work, but manual retrieval works.
+  do_thinning: true  # Added for consistency
+  amount: 0  # Number of leading tracks (0 = all passing selection)
+  variables: []  # Not needed with automatic filling - left for compatibility
+  variables_int: []  # Not needed with automatic filling - left for compatibility
+
 
 OverlapRemoval:
   # Enable specific TauAntiTauJet overlap removal, mostly for bbtt analysis

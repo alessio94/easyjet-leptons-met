@@ -15,6 +15,7 @@ reco_outputs:
   taus: ''
   ditaus: ''
   met: ''
+  tracks: ''
 
 collection_options:
 
@@ -69,6 +70,10 @@ collection_options:
     iso_variables: false
     run_selection: true
     truth_parent_info: false
+    extra_variables: []
+    mc_extra_variables: []
+
+  tracks:
     extra_variables: []
     mc_extra_variables: []
 

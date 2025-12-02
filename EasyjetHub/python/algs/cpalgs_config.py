@@ -21,6 +21,7 @@ from EasyjetHub.algs.calibration.photons import photon_sequence
 from EasyjetHub.algs.calibration.taus import tau_sequence
 from EasyjetHub.algs.calibration.ditaus import ditau_sequence
 from EasyjetHub.algs.calibration.met import met_sequence
+from EasyjetHub.algs.calibration.tracks import track_sequence
 from EasyjetHub.algs.calibration.selection_decoration import (
     selection_decoration_sequence)
 from EasyjetHub.algs.postprocessing.overlap_removal import overlap_sequence
@@ -45,6 +46,7 @@ analysis_seqs = {
     "taus": tau_sequence,
     "ditaus": ditau_sequence,
     "small_R_jets": jet_sequence,
+    "tracks": track_sequence
 }
 
 
@@ -154,7 +156,8 @@ def cpalgs_cfg(flags):
             "muons",
             "taus",
             "ditaus",
-            "small_R_jets"
+            "small_R_jets",
+            "tracks"
         ]:
             if flags.Analysis[f"do_{objtype}"]:
                 log.info(f"Adding {objtype} seq")
