@@ -62,6 +62,9 @@ do_overlap_removal: true
 
 do_CP_systematics: false
 systematics_regex: [".*"]
+# Use triple underscore to separate variable and systematics
+systematics_suffix_separator: "___"
+
 
 save_cutflow: false
 
