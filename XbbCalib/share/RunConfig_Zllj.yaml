@@ -28,16 +28,6 @@ Large_R_jet:
   min_pT: 200.e+3
   maxEta: 2.0
   runMuonJetPtCorr: false
-  GN2X_hbb_wps:
-    - "FlatMassQCDEff_0p25"
-    - "FlatMassQCDEff_0p3"
-    - "FlatMassQCDEff_0p37"
-    - "FlatMassQCDEff_0p46"
-    - "FlatMassQCDEff_0p58"
-    - "FlatMassQCDEff_0p74"
-    - "FlatMassQCDEff_0p94"
-    - "FlatMassQCDEff_1p25"
-    - "FlatMassQCDEff_1p55"
 
 
 Electron:
@@ -83,15 +73,11 @@ ttree_output:
     large_R_UFO_jets: 'container_names.output.reco10UFOJet'
     muons: 'container_names.output.muons'
     electrons: 'container_names.output.electrons'
-    small_R_jets: 'container_names.output.reco4PFlowJet'
   # truth_outputs:
   #   # small_R_jets: 'container_names.output.truth4Jet'
   #   large_R_jets: 'container_names.output.truth10SoftDropJet'
   collection_options:
     large_R_jets:
-      run_selection: true
-    small_R_jets:
-      btag_info: true
       run_selection: true
     electrons:
       run_selection: true

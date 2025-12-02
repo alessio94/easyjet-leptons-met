@@ -49,7 +49,6 @@ namespace XBBCALIB {
     m_phi.set(event, lv.Phi(), sys);
     m_m.set(event, lv.M(), sys);
   }
-
   void FourVectorOutBlock::setDefault(const xAOD::EventInfo& event,
                                       const CP::SystematicSet& sys) {
     using namespace defaults;
