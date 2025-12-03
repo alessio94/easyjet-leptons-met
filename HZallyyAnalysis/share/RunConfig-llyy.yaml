@@ -21,7 +21,7 @@ do_met : false
 do_photons : true
 
 # Toggles for reconstructed objects decorations
-
+# added do_thinning:false to keep photon without LooseID
 Small_R_jet:
   min_pT: 20.e+3
   max_eta: 4.4
@@ -43,6 +43,7 @@ Photon:
   ID: "Loose"
   Iso: "NonIso"
   amount: 2
+  do_thinning: false
   extra_wps: 
     - ["Loose", "FixedCutLoose"]
 
