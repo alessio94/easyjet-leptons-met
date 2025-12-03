@@ -23,3 +23,10 @@ Muon:
   Iso: "NonIso"
   extra_wps:
     - ["Loose", "Loose_VarRad"]
+
+ttree_output:
+  collection_options:
+    electrons:
+      iso_variables: true
+    muons:
+      iso_variables: true

@@ -26,6 +26,15 @@ namespace MULTILEPTON
         ATH_CHECK(m_jetOutHandle.initialize(m_systematicsList));
         ATH_CHECK(m_KF_MBB.initialize(m_systematicsList, m_eventHandle));
 
+        ATH_CHECK(m_iter1_pt.initialize(m_systematicsList, m_eventHandle));
+        ATH_CHECK(m_iter1_eta.initialize(m_systematicsList, m_eventHandle));
+        ATH_CHECK(m_iter1_phi.initialize(m_systematicsList, m_eventHandle));
+        ATH_CHECK(m_iter1_m.initialize(m_systematicsList, m_eventHandle));
+        ATH_CHECK(m_iter2_pt.initialize(m_systematicsList, m_eventHandle));
+        ATH_CHECK(m_iter2_eta.initialize(m_systematicsList, m_eventHandle));
+        ATH_CHECK(m_iter2_phi.initialize(m_systematicsList, m_eventHandle));
+        ATH_CHECK(m_iter2_m.initialize(m_systematicsList, m_eventHandle));
+
         ANA_CHECK(m_systematicsList.initialize());
 
         ATH_CHECK(m_KFTool.retrieve());
@@ -75,6 +84,33 @@ namespace MULTILEPTON
                     *electrons, *muons, *workJetContainer, KF1_Mbb));
             auto constDataWorkJetContainer = std::make_unique<ConstDataVector<xAOD::JetContainer>>();
             constDataWorkJetContainer->reserve(workJetContainer->size());
+
+            const auto &iter1_jets = m_KFTool->getIter1Jets();
+            const auto &iter2_jets = m_KFTool->getIter2Jets();
+            std::vector<float> iter1_pt, iter1_eta, iter1_phi, iter1_m;
+            std::vector<float> iter2_pt, iter2_eta, iter2_phi, iter2_m;
+            for (const auto &jet : iter1_jets)
+            {
+                iter1_pt.push_back(jet.Pt());
+                iter1_eta.push_back(jet.Eta());
+                iter1_phi.push_back(jet.Phi());
+                iter1_m.push_back(jet.M());
+            }
+            for (const auto &jet : iter2_jets)
+            {
+                iter2_pt.push_back(jet.Pt());
+                iter2_eta.push_back(jet.Eta());
+                iter2_phi.push_back(jet.Phi());
+                iter2_m.push_back(jet.M());
+            }
+            m_iter1_pt.set(*event, iter1_pt, sys);
+            m_iter1_eta.set(*event, iter1_eta, sys);
+            m_iter1_phi.set(*event, iter1_phi, sys);
+            m_iter1_m.set(*event, iter1_m, sys);
+            m_iter2_pt.set(*event, iter2_pt, sys);
+            m_iter2_eta.set(*event, iter2_eta, sys);
+            m_iter2_phi.set(*event, iter2_phi, sys);
+            m_iter2_m.set(*event, iter2_m, sys);
 
             for (xAOD::Jet *jet : *workJetContainer)
             {

@@ -67,7 +67,18 @@ namespace MULTILEPTON
         /// \brief Steerable properties
         Gaudi::Property<bool> m_doSystematics{this, "doSystematics", false, "Run on all systematics"};
 
+        CP::SysWriteDecorHandle<std::vector<float>> m_iter1_pt{"iter1_jet_pt_%SYS%", this};
+        CP::SysWriteDecorHandle<std::vector<float>> m_iter1_eta{"iter1_jet_eta_%SYS%", this};
+        CP::SysWriteDecorHandle<std::vector<float>> m_iter1_phi{"iter1_jet_phi_%SYS%", this};
+        CP::SysWriteDecorHandle<std::vector<float>> m_iter1_m{"iter1_jet_m_%SYS%", this};
+
+        CP::SysWriteDecorHandle<std::vector<float>> m_iter2_pt{"iter2_jet_pt_%SYS%", this};
+        CP::SysWriteDecorHandle<std::vector<float>> m_iter2_eta{"iter2_jet_eta_%SYS%", this};
+        CP::SysWriteDecorHandle<std::vector<float>> m_iter2_phi{"iter2_jet_phi_%SYS%", this};
+        CP::SysWriteDecorHandle<std::vector<float>> m_iter2_m{"iter2_jet_m_%SYS%", this};
+  
         ToolHandle<KinematicFitTool> m_KFTool{this, "KinFitTool", ""};
-    };
+        // Add decorators for iteration vectors
+          };
 }
 #endif
