@@ -22,6 +22,11 @@ stages:
 
 # and source it
 before_script:
+  # limit lfs use to avoid abusing cern resources
+  # See https://gitlab.cern.ch/easyjet/easyjet/-/issues/463
+  - git config --global lfs.concurrenttransfers 3 # Default is 8.
+  - git config --global lfs.transfer.maxretries 3 # Default is 8.
+  # other easyjet stuff
   - set -e # exits the pipeline if one of the jobs don't return 0
   - source ~/release_setup.sh
   - if [[ -d build ]]; then source build/**/setup.sh; fi
