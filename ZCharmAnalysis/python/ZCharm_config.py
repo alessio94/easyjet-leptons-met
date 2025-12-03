@@ -32,7 +32,8 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
     cfg.merge(ElectronSelectorAlgCfg(flags,
                                      containerInKey=electronkey,
                                      containerOutKey="ZCharmAnalysisElectrons_%SYS%",
-                                     minPt=flags.Analysis.Electron.min_pT_ZCharm
+                                     minPt=flags.Analysis.Electron.min_pT_ZCharm,
+                                     maxEta=2.5
                                      ))
 
     cfg.merge(LeptonOrderingAlgCfg(flags,
@@ -121,7 +122,9 @@ def ZCharmTruth_cfg(flags, truthsmalljetkey, truthlargejetkey, truthmuonkey,
     cfg.merge(TruthElectronSelectorAlgCfg(flags,
                                           containerInKey=truthelectronkey,
                                           containerOutKey="ZCharmTruthElectrons",
-                                          minPt=25 * Units.GeV))
+                                          minPt=25 * Units.GeV,
+                                          maxEta=2.5
+                                          ))
 
     cfg.merge(TruthLeptonOrderingAlgCfg(flags,
                                         containerInTruthElectronKey=truthelectronkey,
@@ -202,13 +205,13 @@ def get_ZCharmTruthSelectorAlg_variables(flags):
             # Store the float variables
             if var in flags.Analysis.Small_R_jet.variables_truthjets:
                 float_variable_names += [f"TruthJet_c{index+1}_{var}"]
-            branches += [f"TruthEvents.TruthJet_c{index+1}_{var} \
+            branches += [f"EventInfo.TruthJet_c{index+1}_{var} \
                         -> ZCharm_TruthJet_c{index+1}_{var}"]
 
     # Dilepton
     for var in [*flags.Analysis.Lepton.variables_truth_Z]:
         float_variable_names += [f"Truth_ll_{var}"]
-        branches += [f"TruthEvents.Truth_ll_{var} \
+        branches += [f"EventInfo.Truth_ll_{var} \
                     -> ZCharm_Truth_ll_{var}"]
 
     return branches, float_variable_names
@@ -269,9 +272,9 @@ def ZCharm_branches(flags):
             )
             branches += truth_branches
             for cut in truthcutList:
-                branches += [f"TruthEvents.{cut} \
+                branches += [f"EventInfo.{cut} \
                             -> ZCharm_{cut}"]
-                branches += ["TruthEvents.PassTruthCuts \
+                branches += ["EventInfo.PassTruthCuts \
                             -> ZCharm_PassTruthCuts"]
 
     # trigger variables do not need to be added to variable_names

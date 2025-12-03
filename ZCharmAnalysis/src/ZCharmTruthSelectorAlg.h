@@ -20,8 +20,6 @@
 #include <xAODJet/JetAuxContainer.h>
 #include <xAODTruth/TruthParticleContainer.h> 
 #include <xAODTruth/TruthParticleAuxContainer.h>
-#include <xAODTruth/TruthEvent.h>
-#include <xAODTruth/TruthEventContainer.h>
 #include <xAODTruth/TruthParticle.h>
 
 
@@ -64,8 +62,8 @@ namespace ZCC
       SG::ReadHandleKey<xAOD::JetContainer>
       m_truthlargejetInKey{ this, "truthLargeJetInContainer", "", "Truth large R Jet container to read" };
 
-      SG::ReadHandleKey<xAOD::TruthEventContainer>
-      m_eventInKey{ this, "event", "TruthEvents", "TruthEvent container to read" };
+      SG::ReadHandleKey<xAOD::EventInfo>
+      m_eventInKey{ this, "event", "EventInfo", "EventInfo container to read" };
 
       SG::ReadHandleKey<xAOD::TruthParticleContainer>
       m_truthelectronInKey{ this, "truthElectronInContainer", "", "Truth electron container to read" };
@@ -73,15 +71,15 @@ namespace ZCC
       SG::ReadHandleKey<xAOD::TruthParticleContainer>
       m_truthmuonInKey{ this, "truthMuonInContainer", "", "Truth muon container to read" };
 
-      std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_bjetDecorHandleKeys;
+      // std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_bjetDecorHandleKeys;
 
-      std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_cjetDecorHandleKeys;
+      // std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::JetContainer>> m_cjetDecorHandleKeys;
 
       SG::ReadDecorHandleKey<xAOD::JetContainer> m_jetTruthFlavourKey{this, "jetTruthFlavourDecoration", "", "Name of jet truth flavour decoration"};
 
       long long int m_total_events{0};
 
-      std::unordered_map<ZCC::Booleans, SG::WriteDecorHandleKey<xAOD::TruthEventContainer>> m_BbranchKeys;
+      std::unordered_map<ZCC::Booleans, SG::WriteDecorHandleKey<xAOD::EventInfo>> m_BbranchKeys;
       std::unordered_map<ZCC::Booleans, bool> m_bools;
       std::unordered_map<ZCC::Booleans, std::string> m_boolnames{
         {ZCC::IS_ee_TRUTH, "IS_ee_TRUTH"},
@@ -103,8 +101,8 @@ namespace ZCC
       Gaudi::Property<bool> m_saveCutFlow{this, "saveCutFlow", false};
       
       
-      SG::WriteDecorHandleKey<xAOD::TruthEventContainer> m_passTruthCutsKey{
-        this, "PassTruthCutsKey", "TruthEvents.PassTruthCuts", "Decorate event with pass/fail flag"
+      SG::WriteDecorHandleKey<xAOD::EventInfo> m_passTruthCutsKey{
+        this, "PassTruthCutsKey", "EventInfo.PassTruthCuts", "Decorate event with pass/fail flag"
       };
 
 
@@ -112,17 +110,17 @@ namespace ZCC
       Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};
 
-      std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::TruthEventContainer>>
+      std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::EventInfo>>
         m_FbranchesKeys;
 
-      std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::TruthEventContainer, float>> m_Fbranches;
+      std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::EventInfo, float>> m_Fbranches;
 
       void truthOverlapRemoval(const xAOD::JetContainer& truthJets, const xAOD::TruthParticleContainer& truthElectrons, const xAOD::TruthParticleContainer& truthMuons, ConstDataVector<xAOD::JetContainer>& jetsAfterOverlap);
-      void evaluateTruthLeptonCuts(const xAOD::TruthEvent& truthevent, const xAOD::TruthParticleContainer& truthElectrons, const xAOD::TruthParticleContainer& truthMuons, CutManager& ZCharmTruthCuts);
+      void evaluateTruthLeptonCuts(const xAOD::EventInfo& truthevent, const xAOD::TruthParticleContainer& truthElectrons, const xAOD::TruthParticleContainer& truthMuons, CutManager& ZCharmTruthCuts);
       void evaluateTruthBJetCuts(const ConstDataVector<xAOD::JetContainer>& truthBjets, CutManager& ZCharmTruthCuts);
       void evaluateTruthCJetCuts(const ConstDataVector<xAOD::JetContainer>& truthCjets, CutManager& ZCharmTruthCuts);
       void evaluateTruthLargeJetCuts(const xAOD::JetContainer& truthLargeJets);
-      void setThresholds(const xAOD::TruthEvent* event);
+      void setThresholds(const xAOD::EventInfo* event);
       StatusCode initialiseCutflow(); 
   };
 

@@ -38,7 +38,7 @@ namespace ZCC
     for (auto& [boolKey, boolName] : m_boolnames) {   
       m_bools.emplace(boolKey, false);
       std::string fullKey = m_eventInKey.key() + "." + boolName;
-      SG::WriteDecorHandleKey<xAOD::TruthEventContainer> handleKey(fullKey);
+      SG::WriteDecorHandleKey<xAOD::EventInfo> handleKey(fullKey);
       ATH_CHECK(handleKey.initialize());
       m_BbranchKeys.emplace(boolKey, std::move(handleKey));
       ATH_CHECK(m_BbranchKeys.at(boolKey).initialize());
@@ -47,10 +47,12 @@ namespace ZCC
 
     for (const std::string &var : m_floatVariables) {
       std::string varkey = m_eventInKey.key() + "." + var;
-      SG::WriteDecorHandleKey<xAOD::TruthEventContainer> floatVarKey(varkey);
+      SG::WriteDecorHandleKey<xAOD::EventInfo> floatVarKey(varkey);
       m_FbranchesKeys.emplace(var, std::move(floatVarKey));
       ATH_CHECK (m_FbranchesKeys.at(var).initialize());
     }
+
+    ATH_MSG_INFO("Decorating object: " << m_eventInKey.key());
     
     if(m_saveCutFlow) ATH_CHECK (initialiseCutflow());
 
@@ -64,7 +66,7 @@ namespace ZCC
 
     // FilterReporter filter(m_filterParams, false);
 
-    SG::ReadHandle<xAOD::TruthEventContainer> truthEvents(m_eventInKey);
+    SG::ReadHandle<xAOD::EventInfo> truthEvents(m_eventInKey);
     SG::ReadHandle<xAOD::JetContainer> truthJets(m_truthjetsInKey);
     SG::ReadHandle<xAOD::JetContainer> truthLargeJets(m_truthlargejetInKey);
     SG::ReadHandle<xAOD::TruthParticleContainer> truthElectrons(m_truthelectronInKey);
@@ -76,11 +78,11 @@ namespace ZCC
     auto truthcjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
 
     for (auto [var, key] : m_FbranchesKeys){
-      SG::WriteDecorHandle<xAOD::TruthEventContainer, float> floatDecorator(key);
+      SG::WriteDecorHandle<xAOD::EventInfo, float> floatDecorator(key);
       m_Fbranches.insert_or_assign(var, std::move(floatDecorator));
     }
 
-    const xAOD::TruthEvent* truthevent = truthEvents->at(0);
+    const xAOD::EventInfo* truthevent = truthEvents.get();
 
     for (const std::string &string_var: m_floatVariables) {
         m_Fbranches.at(string_var)(*truthevent) = -99.;
@@ -200,11 +202,11 @@ namespace ZCC
     }
 
     ATH_MSG_VERBOSE("pass_truth_baseline = " << pass_truth_baseline);
-    SG::WriteDecorHandle<xAOD::TruthEventContainer, bool> passTruthCutsHandle(m_passTruthCutsKey);
+    SG::WriteDecorHandle<xAOD::EventInfo, bool> passTruthCutsHandle(m_passTruthCutsKey);
     passTruthCutsHandle(*truthevent) = pass_truth_baseline;
 
     for (auto& [key, handleKey] : m_BbranchKeys) {
-      SG::WriteDecorHandle<xAOD::TruthEventContainer, bool> handle(handleKey);
+      SG::WriteDecorHandle<xAOD::EventInfo, bool> handle(handleKey);
       handle(*truthevent) = m_bools.at(key);
     }
 
@@ -256,7 +258,7 @@ namespace ZCC
 
   }
 
-  void ZCharmTruthSelectorAlg::evaluateTruthLeptonCuts(const xAOD::TruthEvent& truthevent, const xAOD::TruthParticleContainer& truthelectrons, const xAOD::TruthParticleContainer& truthmuons, CutManager& ZCharmTruthCuts)
+  void ZCharmTruthSelectorAlg::evaluateTruthLeptonCuts(const xAOD::EventInfo& truthevent, const xAOD::TruthParticleContainer& truthelectrons, const xAOD::TruthParticleContainer& truthmuons, CutManager& ZCharmTruthCuts)
   {
   
     TLorentzVector ll;

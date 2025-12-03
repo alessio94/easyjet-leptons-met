@@ -106,7 +106,7 @@ namespace ZCC
         {ZCC::DLT, "DLT"},
       };
 
-      SG::ReadDecorHandleKey<xAOD::TruthEventContainer> m_passTruthCutsKey {this, "PassTruthCuts", "TruthEvents.PassTruthCuts", "Name of the truth cuts decorator"};
+      SG::ReadDecorHandleKey<xAOD::EventInfo> m_passTruthCutsKey {this, "PassTruthCuts", "EventInfo.PassTruthCuts", "Name of the truth cuts decorator"};
       
       Gaudi::Property<std::vector<std::string>> m_triggers 
       { this, "triggerLists", {}, "Name list of trigger" };

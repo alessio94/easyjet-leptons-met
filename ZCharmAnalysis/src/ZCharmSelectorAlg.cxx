@@ -102,13 +102,13 @@ namespace ZCC
       bool pass_truth_baseline = false;
       if (isMC){
         // Find truth decision
-        SG::ReadDecorHandle<xAOD::TruthEventContainer, bool> m_passTruthCuts(m_passTruthCutsKey);
+        SG::ReadDecorHandle<xAOD::EventInfo, bool> m_passTruthCuts(m_passTruthCutsKey);
         // Retrieve the truth decision
-        if (!m_passTruthCuts.isPresent() || m_passTruthCuts->empty()) {
+        if (!m_passTruthCuts.isPresent()) {
           ATH_MSG_ERROR("PassTruthCuts decision is empty or not found!");
           return StatusCode::FAILURE;
         }
-        pass_truth_baseline = (*m_passTruthCuts)[0];
+        pass_truth_baseline = m_passTruthCuts(*event);
       }
       
       const xAOD::JetContainer *jets = nullptr;
