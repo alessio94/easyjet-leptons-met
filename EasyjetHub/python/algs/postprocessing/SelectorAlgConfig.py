@@ -1,5 +1,6 @@
 from AthenaConfiguration.ComponentAccumulator import ComponentAccumulator
 from AthenaConfiguration.ComponentFactory import CompFactory
+from EasyjetHub.steering.analysis_configuration import get_trigger_chains_scale_factor
 
 
 def MuonSelectorAlgCfg(flags, name="MuonSelectorAlg", **kwargs):
@@ -132,6 +133,19 @@ def JetSelectorAlgCfg(flags, name="JetSelectorAlg", **kwargs):
     if (isSmallRJet and flags.Analysis.Small_R_jet.runBJetPtCalib) or \
        (not isSmallRJet and flags.Analysis.Large_R_jet.runMuonJetPtCorr):
         kwargs.setdefault("nmuons", "n_muons_%SYS%")
+
+    # b-jet matching decoration
+    if isSmallRJet:
+        bjet_triggers = []
+        sf_config = flags.Analysis.Trigger.scale_factor
+        if sf_config.doSF and hasattr(sf_config, 'bjet'):
+            triggerChainsPerYear = get_trigger_chains_scale_factor(
+                flags, 'bjet')
+            for triggerChains in triggerChainsPerYear.values():
+                for chain in triggerChains:
+                    bjet_triggers.append(chain)
+        kwargs.setdefault("bJetTriggerLists", bjet_triggers)
+
     if isLargeRJet and not flags.Analysis.Large_R_jet.do_thinning:
         kwargs.setdefault("baselineSelectionName", "")
 

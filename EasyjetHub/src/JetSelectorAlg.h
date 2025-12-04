@@ -70,6 +70,12 @@ private:
     CP::SysWriteDecorHandle<bool> m_isSelectedJet {this, "decoration", "isAnalysisJet_%SYS%", 
         "decoration for per-object if jet is selected"};
 
+    std::vector<CP::SysReadDecorHandle<char>> m_bTagTrigMatching_in;
+    std::vector<CP::SysWriteDecorHandle<char>> m_bTagTrigMatching_out;
+    
+    Gaudi::Property<std::vector<std::string>> m_triggers
+      { this, "bJetTriggerLists", {}, "Name list of trigger" };
+
     Gaudi::Property<float> m_minPt            {this, "minPt", 25e3, "Minimum pT of jets"};
     Gaudi::Property<float> m_maxPt            {this, "maxPt", -1, "Maximum pT of jets"};
     Gaudi::Property<float> m_maxEta           {this, "maxEta", 4.5, "Maximum eta of jets"}; // default is central jets

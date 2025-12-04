@@ -46,6 +46,16 @@ namespace Easyjet
     m_jleadBranches = CP::SysWriteDecorHandleArray<bool> (jleadBranches_keys, this);
     ATH_CHECK(m_jleadBranches.initialize(m_systematicsList,m_inHandle));
 
+    for (const auto& trig : m_triggers) {
+      m_bTagTrigMatching_in.emplace_back("ftag_bTagTrigMatching_" + trig + "_%SYS%", this);
+      m_bTagTrigMatching_out.emplace_back("ftag_bTagTrigMatching_" + trig + "_%SYS%", this);
+    }
+
+    for(auto& handle : m_bTagTrigMatching_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_bTagTrigMatching_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+
     ANA_CHECK (m_isSelectedJet.initialize (m_systematicsList, m_inHandle));
 
     if(!m_nmuons_in.empty()){
@@ -133,6 +143,11 @@ namespace Easyjet
         if (PCBTaggiven) workContainer_pcbt[jet] = m_PCBT.get(*jet, sys);
         if(!m_nmuons_in.empty()) m_nmuons_out.set(*jet, m_nmuons_in.get(*jet, sys), sys);
         m_isSelectedJet.set(*jet, isSelected, sys);
+
+        // For some reason this decoration needs to be explicitly copied
+        for(unsigned int i=0; i<m_triggers.size(); i++){
+          m_bTagTrigMatching_out[i].set(*jet, m_bTagTrigMatching_in[i].get(*jet,sys), sys);
+        }
       }
       
       int nJets = workContainer->size();
