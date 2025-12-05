@@ -62,9 +62,10 @@ namespace HHBBYY
     private:
       const std::vector<std::string> m_STANDARD_CUTS{
           "PASS_TRIGGER",
+          "PASS_CLEANING",
           "TWO_LOOSE_PHOTONS",
           "PASS_TRIGGER_MATCHING",
-	  "TWO_TIGHTID_ISO_PHOTONS",
+	        "TWO_TIGHTID_ISO_PHOTONS",
           "TWO_TIGHTID_PHOTONS",
           "TWO_ISO_PHOTONS",
           "PASS_RELPT",
@@ -80,6 +81,9 @@ namespace HHBBYY
           "EXACTLY_ONE_OR_TWO_B_JETS",
       };
 
+      void evaluateEventCleaningCuts(const xAOD::EventInfo& event, 
+        const bool do_eventCleaning_BadBatman,
+        CutManager& bbyyCuts);
       void evaluateTriggerCuts(const xAOD::EventInfo& eventInfo, 
                           const std::vector<std::string> &photonTriggers, CutManager& bbyyCuts);
       void evaluateTriggerMatchingCuts(const std::vector<std::string> &photonTriggers, 
@@ -136,6 +140,10 @@ namespace HHBBYY
 
       std::unordered_map<std::string,  SG::ReadDecorHandleKey<xAOD::EventInfo>> m_triggerDecorKeys;
 
+      std::unordered_map<std::string, SG::ReadDecorHandleKey<xAOD::EventInfo>> m_eventCleaningDecorKeys;
+
+      SG::ReadDecorHandleKey< xAOD::EventInfo > m_nPVDecorKey;
+
       bool m_saveCutFlow;
       bool m_saveTriggerInfo;
       long long int m_total_events{0};
@@ -149,6 +157,12 @@ namespace HHBBYY
         { this, "bypass", false, "Run the selector algorithm in run-through mode" };
       Gaudi::Property<bool> m_enableSinglePhotonTrigger
         { this, "enableSinglePhotonTrigger", false, "Enable single photon trigger in the CutFlow" };
+
+      Gaudi::Property<bool> m_dump_eventCleaning_flags
+        { this, "dump_eventCleaning_flags", false, "Save event cleaning flags" };
+      Gaudi::Property<bool> m_eventCleaning_BadBatman
+        { this, "do_eventCleaning_BadBatman", false, "Use BadBatman event cleaning" };
+
 
       std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
       std::unordered_map < HHBBYY::Booleans, bool > m_bools;

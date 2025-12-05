@@ -82,6 +82,8 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
             enableSinglePhotonTrigger=flags.Analysis.enable_single_photon_trigger,
             specialSysWeight=get_sys_weight_name(flags),
             saveTriggerInfo=flags.Analysis.save_pass_trigger_info,
+            dump_eventCleaning_flags=flags.Analysis.dump_event_cleaning_info,
+            do_eventCleaning_BadBatman=flags.Analysis.add_BadBatman_jet_cleaning
         )
     )
 

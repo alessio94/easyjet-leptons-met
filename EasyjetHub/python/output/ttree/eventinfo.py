@@ -39,6 +39,12 @@ def get_event_info_branches(flags, tree_flags, trigger_chains):
             "PrimaryVertexPosY",
             "PrimaryVertexPosZ",
         ]
+
+    if flags.Analysis.dump_event_cleaning_info:
+        eventinfo_branches.variables += ["DFCommonJets_eventClean_LooseBad"]
+        if flags.Analysis.add_BadBatman_jet_cleaning:
+            eventinfo_branches.variables += ['DFCommonJets_isBadBatman']
+
     if flags.Input.isMC:
         eventinfo_branches.variables += [
             "mcChannelNumber",

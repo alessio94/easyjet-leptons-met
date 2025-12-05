@@ -17,6 +17,7 @@ do_tracks: false
 # Other global event configs
 bypass: false
 do_event_cleaning: true
+dump_event_cleaning_info: false
 # VgammaOR settings
 do_VgammaOR: false
 bypass_VGammaOR: false

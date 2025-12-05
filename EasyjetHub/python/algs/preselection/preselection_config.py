@@ -16,8 +16,6 @@ def event_selection_sequence(flags):
     configSeq.setOptionValue('.runEventCleaning', flags.Analysis.do_event_cleaning)
 
     selectionFlags = ['DFCommonJets_eventClean_LooseBad']
-    if flags.Analysis.do_tight_jet_cleaning:
-        selectionFlags = ['DFCommonJets_eventClean_TightBad']
     invertFlags = [False]
 
     if flags.Analysis.add_BadBatman_jet_cleaning:

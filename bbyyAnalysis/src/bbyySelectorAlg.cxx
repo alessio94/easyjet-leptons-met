@@ -59,6 +59,19 @@ namespace HHBBYY
     ATH_CHECK(m_photonLIWPDecorHandle.initialize(m_systematicsList, m_photonHandle));
 
     ATH_CHECK(m_selected_ph.initialize(m_systematicsList, m_photonHandle));
+
+    // Initialize event cleaning decorations
+    m_eventCleaningDecorKeys.emplace("LooseBad", SG::ReadDecorHandleKey< xAOD::EventInfo >(m_eventHandle.getNamePattern() + ".DFCommonJets_eventClean_LooseBad"));
+    ATH_CHECK(m_eventCleaningDecorKeys.at("LooseBad").initialize());
+    // Add the BadBatman flag if requested
+    if (m_eventCleaning_BadBatman) {
+      m_eventCleaningDecorKeys.emplace("BadBatman", SG::ReadDecorHandleKey< xAOD::EventInfo >(m_eventHandle.getNamePattern() + ".DFCommonJets_isBadBatman"));
+      ATH_CHECK(m_eventCleaningDecorKeys.at("BadBatman").initialize());
+    }
+    // Add the number of primary vertices decoration
+    m_nPVDecorKey = SG::ReadDecorHandleKey< xAOD::EventInfo >(m_eventHandle.getNamePattern() + ".nPrimaryVertices");
+    ATH_CHECK(m_nPVDecorKey.initialize());
+
     //Initialize trigger decorations
     for (const std::string &trig : m_photonTriggers)
     {
@@ -140,7 +153,15 @@ namespace HHBBYY
         cut.passed = false;
         m_Bbranches.at(cut.name).set(*event, cut.passed, sys);
       }
-    
+      // Evaluate event cleaning cuts
+      if (m_dump_eventCleaning_flags) {
+        evaluateEventCleaningCuts(*event, m_eventCleaning_BadBatman, m_bbyyCuts);
+      } else {
+        // If we don't have the event cleaning information, set flag to true
+        // We have the number of PV in the output anyway that we can check
+        m_bbyyCuts("PASS_CLEANING").passed = true;
+      }
+
       if (!m_photonTriggers.empty()) {
         evaluateTriggerCuts(*event, m_photonTriggers, m_bbyyCuts);
         evaluateTriggerMatchingCuts(m_photonTriggers, photons, m_bbyyCuts);
@@ -289,6 +310,34 @@ namespace HHBBYY
 
     return StatusCode::SUCCESS;
 
+  }
+
+  void bbyySelectorAlg::evaluateEventCleaningCuts(const xAOD::EventInfo& event, 
+    const bool do_eventCleaning_BadBatman,
+    CutManager& bbyyCuts) {
+
+    if (!bbyyCuts.exists("PASS_CLEANING"))
+        return;
+
+    // boolean
+    bool pass_event_cleaning = false;
+
+    // Prepare the DecorHandles for the event cleaning flags
+    // Always check LooseBad
+    SG::ReadDecorHandle<xAOD::EventInfo, char> eventCleaning_LooseBad_DecorHandle(m_eventCleaningDecorKeys.at("LooseBad"));
+    pass_event_cleaning = eventCleaning_LooseBad_DecorHandle(event);
+    if (do_eventCleaning_BadBatman) {
+      SG::ReadDecorHandle<xAOD::EventInfo, char> eventCleaning_isBadBatman_DecorHandle(m_eventCleaningDecorKeys.at("BadBatman"));
+      pass_event_cleaning = pass_event_cleaning && !eventCleaning_isBadBatman_DecorHandle(event);
+    }
+
+    // Also check that we have at least one primary vertex
+    SG::ReadDecorHandle<xAOD::EventInfo, unsigned int> nPVDecorHandle(m_nPVDecorKey);
+    bool has_primary_vertex = (nPVDecorHandle(event) > 0);
+
+    // Save the flag in the CutManager
+    bbyyCuts("PASS_CLEANING").passed = pass_event_cleaning && has_primary_vertex;
+    return;
   }
 
   void bbyySelectorAlg::evaluateTriggerCuts(const xAOD::EventInfo& event, const std::vector<std::string> &photonTriggers, 

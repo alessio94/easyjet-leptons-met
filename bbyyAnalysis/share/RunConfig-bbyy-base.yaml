@@ -8,6 +8,9 @@ do_bbyy_analysis: true
 Truth:
   decayModes: ["bbyy"]
 
+# event cleaning flags
+dump_event_cleaning_info: true
+
 # Toggles for object types
 do_small_R_jets: true
 do_muons: true
