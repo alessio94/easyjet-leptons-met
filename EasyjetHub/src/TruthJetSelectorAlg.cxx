@@ -30,18 +30,16 @@ namespace Easyjet
     for(int i=0; i<m_bjetAmount; i++){ // For b-jets
       std::string index = std::to_string(i+1);
       std::string key = m_inHandleKey.key() + ".istruthbjet" + index;
-      SG::WriteDecorHandleKey<xAOD::JetContainer> DecorKey(key);
-      m_bleadBranchesKeys.emplace("istruthbjet"+index, std::move(DecorKey));
-      ATH_CHECK(m_bleadBranchesKeys.at("istruthbjet"+index).initialize());
+      m_bleadBranchesKeys.emplace_back(key);
     }
+    ATH_CHECK(m_bleadBranchesKeys.initialize());
 
     for(int i=0; i<m_cjetAmount; i++){ // For c-jets
       std::string index = std::to_string(i+1);
       std::string key = m_inHandleKey.key() + ".istruthcjet" + index;
-      SG::WriteDecorHandleKey<xAOD::JetContainer> DecorKey(key);
-      m_cleadBranchesKeys.emplace("istruthcjet"+index, std::move(DecorKey));
-      ATH_CHECK(m_cleadBranchesKeys.at("istruthcjet"+index).initialize());
+      m_cleadBranchesKeys.emplace_back(key);
     }
+    ATH_CHECK(m_cleadBranchesKeys.initialize());
 
     ATH_CHECK (m_isSelectedJetKey.initialize());
 
@@ -124,16 +122,13 @@ namespace Easyjet
     //lead/sublead bjet
     if(m_bjetAmount > 0 && m_hasTruthLabel){
       // Create WriteDecorHandles for each key
-      std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::JetContainer, bool>> m_bleadBranches;
-      for (const auto& kv : m_bleadBranchesKeys) {
-          m_bleadBranches.emplace(kv.first, SG::WriteDecorHandle<xAOD::JetContainer, bool>(kv.second));
-      }
       int njet = 0;
       for (const xAOD::Jet *jet : *workContainer) {
         int truthLabel = (*m_truthLabel)(*jet);
         if (truthLabel == 5 && std::abs(jet->eta())<2.5){
-            njet++;
-            m_bleadBranches.at("istruthbjet"+std::to_string(njet))(*jet) = true;
+          SG::WriteDecorHandle<xAOD::JetContainer, bool> handle(m_bleadBranchesKeys.at(njet));
+          handle(*jet) = true;
+          njet++;
         }
         if ( njet == m_bjetAmount ) break;
       }
@@ -141,16 +136,13 @@ namespace Easyjet
 
     //lead/sublead cjet
     if(m_cjetAmount > 0 && m_hasTruthLabel){
-      std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::JetContainer, bool>> m_cleadBranches;
-      for (const auto& kv : m_cleadBranchesKeys) {
-          m_cleadBranches.emplace(kv.first, SG::WriteDecorHandle<xAOD::JetContainer, bool>(kv.second));
-      }
       int njet = 0;
       for (const xAOD::Jet *jet : *workContainer) {
         int truthLabel = (*m_truthLabel)(*jet);
         if (truthLabel == 4 && std::abs(jet->eta())<2.5){
-            njet++;
-            m_cleadBranches.at("istruthcjet"+std::to_string(njet))(*jet) = true;
+          SG::WriteDecorHandle<xAOD::JetContainer, bool> handle(m_cleadBranchesKeys.at(njet));
+          handle(*jet) = true;
+          njet++;
         }
         if ( njet == m_cjetAmount ) break;
       }

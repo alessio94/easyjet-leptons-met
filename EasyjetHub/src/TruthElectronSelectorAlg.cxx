@@ -6,7 +6,6 @@
 #include "TruthElectronSelectorAlg.h"
 #include <AsgDataHandles/ReadHandle.h>
 #include <AsgDataHandles/WriteHandle.h>
-#include <AsgDataHandles/ReadDecorHandle.h>
 #include <AsgDataHandles/WriteDecorHandle.h>
 
 namespace Easyjet

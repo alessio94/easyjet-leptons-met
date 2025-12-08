@@ -8,7 +8,6 @@
 #include <AthenaBaseComps/AthHistogramAlgorithm.h>
 #include <AsgDataHandles/ReadHandleKey.h>
 #include <AsgDataHandles/WriteHandleKey.h>
-#include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <AsgDataHandles/WriteDecorHandleKey.h>
 
 #include <AthContainers/ConstDataVector.h>
@@ -60,7 +59,6 @@ private:
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort electrons by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra electrons after pT sorting"}; // -1 means keep them all
 
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::TruthParticleContainer>> m_leadBranchesKey;
   };
 }
 

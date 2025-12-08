@@ -63,7 +63,6 @@ private:
     Gaudi::Property<bool>  m_pTsort           {this, "pTsort", true, "Sort muons by pT"};
     Gaudi::Property<int>   m_truncateAtAmount {this, "truncateAtAmount", -1, "Remove extra muons after pT sorting"}; // -1 means keep them all
 
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::TruthParticleContainer>> m_leadBranchesKey;
   };
 }
 

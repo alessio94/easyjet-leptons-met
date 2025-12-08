@@ -26,16 +26,11 @@ namespace Easyjet
     ATH_CHECK (m_isSelectedMuonKey.initialize());
 
     for (int i = 0; i < m_leptonAmount; i++){
-      std::string index = std::to_string(i + 1);
-      std::string elekey = m_inTruthElectronHandleKey.key() + ".isTruthLepton" + index;
-      std::string mukey = m_inTruthMuonHandleKey.key() + ".isTruthLepton" + index;
-      SG::WriteDecorHandleKey<xAOD::TruthParticleContainer> EleDecorKey(elekey);
-      SG::WriteDecorHandleKey<xAOD::TruthParticleContainer> MuDecorKey(mukey);
-      m_leadBranchesEleKey.emplace("isTruthLepton" + index, std::move(EleDecorKey));
-      ATH_CHECK(m_leadBranchesEleKey.at("isTruthLepton" + index).initialize());
-      m_leadBranchesMuKey.emplace("isTruthLepton" + index, std::move(MuDecorKey));
-      ATH_CHECK(m_leadBranchesMuKey.at("isTruthLepton" + index).initialize());
+      m_leadBranchesEleKey.emplace_back(m_inTruthElectronHandleKey, "isTruthLepton" + std::to_string(i + 1));
+      m_leadBranchesMuKey.emplace_back(m_inTruthMuonHandleKey, "isTruthLepton" + std::to_string(i + 1));
     }
+    ATH_CHECK(m_leadBranchesEleKey.initialize());
+    ATH_CHECK(m_leadBranchesMuKey.initialize());
 
     return StatusCode::SUCCESS;
   }
@@ -75,15 +70,14 @@ namespace Easyjet
     if(m_leptonAmount > 0){
     int nLepton = 0;
     for (auto lepton : leptons) {
-        nLepton++;
-        std::string key = "isTruthLepton"+std::to_string(nLepton);
         if (std::abs(lepton.second) == 11){ //ele
-            SG::WriteDecorHandle<xAOD::TruthParticleContainer, bool> eledecor(m_leadBranchesEleKey.at(key));
+            SG::WriteDecorHandle<xAOD::TruthParticleContainer, bool> eledecor(m_leadBranchesEleKey.at(nLepton));
             eledecor(*lepton.first) = true;
-    } else if (std::abs(lepton.second) == 13) { //mu
-            SG::WriteDecorHandle<xAOD::TruthParticleContainer, bool> mudecor(m_leadBranchesMuKey.at(key));
+        } else if (std::abs(lepton.second) == 13) { //mu
+            SG::WriteDecorHandle<xAOD::TruthParticleContainer, bool> mudecor(m_leadBranchesMuKey.at(nLepton));
             mudecor(*lepton.first) = true;
-    }
+        }
+        nLepton++;
         if ( nLepton == m_leptonAmount ) break;
     }
     }

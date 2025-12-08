@@ -11,6 +11,7 @@
 #include <AsgDataHandles/WriteHandleKey.h>
 #include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <AsgDataHandles/WriteDecorHandleKey.h>
+#include <AsgDataHandles/WriteDecorHandleKeyArray.h>
 
 
 #include <AthContainers/ConstDataVector.h>
@@ -71,8 +72,8 @@ private:
     Gaudi::Property<bool>  m_hasTruthLabel    {this, "hasTruthLabel", false, "Does input container have a truth label for flavour selection?"};
     Gaudi::Property<int>   m_bjetAmount       {this, "bjetAmount", -1, "Number of jets to consider for isbjetXX decoration"};
     Gaudi::Property<int>   m_cjetAmount       {this, "cjetAmount", -1, "Number of jets to consider for iscjetXX decoration"};
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_bleadBranchesKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_cleadBranchesKeys;
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_bleadBranchesKeys;
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_cleadBranchesKeys;
 
   };
 }

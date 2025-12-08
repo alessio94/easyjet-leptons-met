@@ -102,6 +102,66 @@ this will return an undefined value if `something` does not exist! Instead you s
 We discourage any string access within the `execute` method. Not only is it slow, it also pushes configuration errors which should be caught in initialization back to the execution loop.
 Instead you should parse the in initialization and use `enum` or other primitive types within the `execute`.
 
+This includes the use of `std::unordered_map<std::string, T>` for keyed access to anything (e.g. `Read/WriteDecorHandles`) in the event loop.
+In almost all cases it suffices to use parallel lists of string and `Handle(Key)`.
+Specifically, for lists of `DecorHandleKey`, use [`SG::Read/WriteDecorHandleKeyArray`](https://gitlab.cern.ch/atlas/athena/-/blob/main/Control/StoreGate/StoreGate/WriteDecorHandleKey.h) which makes it easier to initialise:
+```c++
+/// In the header
+// For direct configuration
+SG::WriteDecorHandleKeyArray<xAOD::SomethingContainer, float> m_decorKeysA{this, "SomethingKeys", {}, "List of decorations on something"};
+// For construction using a loop with reference to other properties
+Gaudi::Property<int> m_number_of_objects = {this, "NSomething", 0, "The number of things to decorate"}; // or generate from any other source
+// Strictly speaking initialising as follows makes the Athena scheduler blind to this, so use
+// the syntax above if the existence of this decoration could be relevant for
+// deciding if downstream algorithms run.
+SG::WriteDecorHandleKeyArray<xAOD::SomethingContainer, float> m_decorKeysB{{}, this};
+
+/// In the initialize() method:
+// No need to iterate over all keys
+ATH_CHECK(m_decorKeysA.initialize());
+// Construct from loop
+for(int i, i<m_number_of_objects, ++i) {
+  m_decorKeysB.emplace_back(m_inputContainer, "thing_at_" + std::to_string(i));
+}
+ TH_CHECK(m_decorKeysB.initialize());
+
+/// In the execute() method:
+// Same for both cases, you likely want to create a vector of handles at event scope.
+// The decorations will be locked as soon as a handle goes out of scope.
+// In AthReentrantAlgorithm the EventContext is available directly as `ctx`.
+// In AthAlgorithm it can be retrieved with `getContext()`.
+std::vector<SG::WriteDecorHandle<xAOD::SomethingContainer, float> > decorHandlesA = m_decorKeysA.makeHandles(ctx);
+// It is also acceptable to create individual handles in a loop
+// and this may be more convenient in non-reentrant algorithms,
+// but be careful not to do this inside a loop over a container.
+for(int i, i<m_number_of_objects, ++i) {
+  SG::WriteDecorHandle<xAOD::SomethingContainer, float> > handle(m_decorKeysB);
+}
+```
+
+This syntax is similar for `CPP:SysWriteDecorHandleArray`, but initialisation is from a list of strings and there is no key/handle separation:
+```c++
+/// In the header
+// For construction using a loop with reference to other properties
+Gaudi::Property<int> m_number_of_objects = {this, "NSomething", 0, "The number of things to decorate"}; // or generate from any other source
+CP::SysWriteDecorHandleArray<float> m_decorHandles{{}, this};
+
+/// In the initialize() method:
+// Construct from loop
+std::vector<std::string> decor_keys;
+for(int i, i<m_number_of_objects, ++i) {
+  decor_keys.emplace_back("thing_at_" + std::to_string(i));
+}
+m_decorHandles = CP::SysWriteDecorHandleArray<float>(list_of_keys, this);
+ATH_CHECK(m_decorHandles.initialize());
+
+/// In the execute() method:
+for(int i, i<m_number_of_objects, ++i) {
+  m_decorHandles.at(i).set(*collection, value, sys);
+}
+```
+
+
 ## Event Selection
 
 Each analysis in EasyJet uses it own custom selector algorithm, e.g. [`XbbCalibSelectorAlg.cxx`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/src/XbbCalibSelectorAlg.cxx). The [`CP::SysFilterReporterCombiner`](https://gitlab.cern.ch/atlas/athena/-/blob/main/PhysicsAnalysis/Algorithms/SystematicsHandles/SystematicsHandles/SysFilterReporterCombiner.h) is the Athena object that controls if the event passes selection and is propagated to the output dumping algorithm. It has to be [set to false at the beginning of each event processing](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/src/XbbCalibSelectorAlg.cxx#L44) and [set to true](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/src/XbbCalibSelectorAlg.cxx#L98) if the event passes the required selections. The selector algorithm is scheduled in analyses specific python configuration  e.g. in [`XbbCalib_config.py`](https://gitlab.cern.ch/easyjet/easyjet/-/blob/d10059f7606d20ae018509fc233d6df677d14b3e/XbbCalib/python/XbbCalib_config.py#L45-51).

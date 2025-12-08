@@ -88,9 +88,9 @@ git checkout -b YourNewFavoriteBranch
 ```
  - Alternatively you can checkout an existing branch on your fork by doing
 ```
-git checkout YourExisitingBranch
+git checkout YourExistingBranch
 ```
-(don't use origin/YourExisitingBranch).
+(don't use origin/YourExistingBranch).
 
 5bis. Optional: in case you need to install Athena to test some changes in the Athena code
 

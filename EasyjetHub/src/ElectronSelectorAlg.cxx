@@ -128,8 +128,7 @@ namespace Easyjet
       }
 
       if(m_electronAmount > 0){
-        int nElectron = 0;
-        for (const xAOD::Electron *electron : *workContainer) {
+        for (int nElectron = 0; const xAOD::Electron *electron : *workContainer) {
           m_leadBranches.at(nElectron).set(*electron, true, sys);
           nElectron++;
           if ( nElectron == m_electronAmount ) break;

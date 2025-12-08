@@ -10,6 +10,7 @@
 #include <AsgDataHandles/WriteHandleKey.h>
 #include <AsgDataHandles/ReadDecorHandleKey.h>
 #include <AsgDataHandles/WriteDecorHandleKey.h>
+#include <AsgDataHandles/WriteDecorHandleKeyArray.h>
 
 #include <AthContainers/ConstDataVector.h>
 #include <xAODTruth/TruthEvent.h>
@@ -50,8 +51,8 @@ private:
     SG::ReadDecorHandleKey<xAOD::TruthParticleContainer> m_isSelectedMuonKey{this, "isTruthMuonDecoration", "isTruthMuon", "Decoration for selected truth muons"};
 
     /// \brief Setup  output decorations
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::TruthParticleContainer>> m_leadBranchesEleKey;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::TruthParticleContainer>> m_leadBranchesMuKey;
+    SG::WriteDecorHandleKeyArray<xAOD::TruthParticleContainer, float> m_leadBranchesEleKey;
+    SG::WriteDecorHandleKeyArray<xAOD::TruthParticleContainer, float> m_leadBranchesMuKey;
   };
 }
 

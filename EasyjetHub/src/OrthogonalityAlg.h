@@ -48,10 +48,7 @@ private:
     CP::SysReadHandle<xAOD::JetContainer>
     m_jetHandle{ this, "bjets", "",   "Jet container to read" };
 
-    std::unordered_map<std::string, CP::SysWriteDecorHandle<bool> > m_Bbranches;
-    std::vector<std::string> m_Bvarnames{
-      "orth_pass_bbyy", "orth_pass_bbbb", "orth_pass_bbtt"
-    };
+    CP::SysWriteDecorHandleArray<bool> m_Bbranches{{}, this};
 
   };
 }

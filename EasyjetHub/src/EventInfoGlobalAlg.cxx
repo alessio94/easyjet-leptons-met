@@ -33,8 +33,8 @@ namespace Easyjet
 
     for(const auto& period : m_runPeriods){
       m_runPeriodsDecor_keys.emplace_back("EventInfo.is"+std::get<0>(period));
-      ATH_CHECK(m_runPeriodsDecor_keys.back().initialize());
     }
+    ATH_CHECK(m_runPeriodsDecor_keys.initialize());
 
     m_L1TopoDisabledDecorKey = "EventInfo.l1TopoDisabled";
     ATH_CHECK(m_L1TopoDisabledDecorKey.initialize());

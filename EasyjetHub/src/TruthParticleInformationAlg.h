@@ -21,6 +21,8 @@
 #include <xAODEventInfo/EventInfo.h>
 #include <xAODTruth/TruthParticleContainer.h>
 #include <AsgDataHandles/WriteDecorHandleKey.h>
+#include <AsgDataHandles/WriteDecorHandleKeyArray.h>
+
 
 namespace MC
 {
@@ -30,207 +32,11 @@ namespace MC
 
 namespace Easyjet
 {
-  class TruthScalar
-  {
-private:
-    using P4 = ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>;
-    int m_pdgId;
-    P4 m_p4;
-    const xAOD::TruthParticle *m_source = nullptr;
-    // final children
-    std::vector<P4> m_children_p4;
-    std::vector<P4> m_initial_children_p4;
-    std::vector<std::vector<P4>> m_grandchildren_p4;
-    std::vector<std::vector<P4>> m_initial_grandchildren_p4;
-    std::vector<const xAOD::TruthParticle *> m_children;
-    std::vector<const xAOD::TruthParticle *> m_initial_children;
-    std::vector<std::vector<const xAOD::TruthParticle *>> m_grandchildren;
-    std::vector<std::vector<const xAOD::TruthParticle *>> m_initial_grandchildren;
 
-public:
-    TruthScalar() { m_pdgId = 0; };
-    TruthScalar(const xAOD::TruthParticle *h) : m_source(h)
-    {
-      m_pdgId = h->pdgId();
-      m_p4.SetCoordinates(h->pt(), h->eta(), h->phi(), h->m());
-    };
-
-    operator const xAOD::TruthParticle *() { return m_source; };
-
-    const xAOD::TruthParticle *source() { return m_source; };
-
-    int pdgId() { return m_pdgId; };
-
-    float p4(int coordIdx)
-    {
-      std::array<float, 4> coords;
-      m_p4.GetCoordinates(coords.begin());
-      return coords[coordIdx];
-    }
-
-    void children(std::vector<const xAOD::TruthParticle *> children)
-    {
-      for (const xAOD::TruthParticle *child : children)
-      {
-        P4 child_p4{child->pt(), child->eta(), child->phi(), child->m()};
-        m_children_p4.push_back(child_p4);
-      }
-      m_children = std::move(children);
-    }
-
-    void initial_children(std::vector<const xAOD::TruthParticle *> initial_children)
-    {
-      for (const xAOD::TruthParticle *initial_child : initial_children)
-      {
-        P4 initial_child_p4{initial_child->pt(), initial_child->eta(), initial_child->phi(), initial_child->m()};
-        m_initial_children_p4.push_back(initial_child_p4);
-      }
-      m_initial_children = std::move(initial_children);
-    }
-
-    void grandchildren(
-      std::vector<std::vector<const xAOD::TruthParticle *>> grandchildren)
-    {
-      for (const std::vector<const xAOD::TruthParticle *>& 
-          partial_grandchildren : grandchildren)
-      { 
-        std::vector<P4> partial_grandchildren_p4;
-        for (const xAOD::TruthParticle *grandchild : partial_grandchildren)
-        {
-          P4 grandchild_p4{grandchild->pt(), grandchild->eta(), 
-                            grandchild->phi(), grandchild->m()};
-          partial_grandchildren_p4.push_back(grandchild_p4);
-        }
-        m_grandchildren_p4.push_back(partial_grandchildren_p4);
-      }
-      m_grandchildren = std::move(grandchildren);
-    }
-
-    void initial_grandchildren(
-      std::vector<std::vector<const xAOD::TruthParticle *>> initial_grandchildren)
-    {
-      for (const std::vector<const xAOD::TruthParticle *>& 
-        partial_initial_grandchildren : initial_grandchildren)
-      { 
-        std::vector<P4> partial_initial_grandchildren_p4;
-        for (const xAOD::TruthParticle 
-          *initial_grandchild : partial_initial_grandchildren)
-        {
-          P4 initial_grandchild_p4{initial_grandchild->pt(), initial_grandchild->eta(),
-                                    initial_grandchild->phi(), initial_grandchild->m()};
-          partial_initial_grandchildren_p4.push_back(initial_grandchild_p4);
-        }
-        m_initial_grandchildren_p4.push_back(partial_initial_grandchildren_p4);
-      }
-      m_initial_grandchildren = std::move(initial_grandchildren);
-    }
-
-    std::vector<int> children_pdgId(){
-      std::vector<int> pdgId_pair;
-      for (const xAOD::TruthParticle *child : m_children)
-      {
-        pdgId_pair.push_back(child->pdgId());
-      }
-      return pdgId_pair;
-    }
-
-    std::vector<int> initial_children_pdgId(){
-      std::vector<int> pdgId_pair;
-      for (const xAOD::TruthParticle *initial_child : m_initial_children)
-      {
-        pdgId_pair.push_back(initial_child->pdgId());
-      }
-      return pdgId_pair;
-    }
-
-    std::vector<std::vector<int>> grandchildren_pdgId(){
-      std::vector<std::vector<int>> pdgIds;
-      for (const std::vector<const xAOD::TruthParticle *>& 
-        partial_grandchildren : m_grandchildren)
-      { 
-        std::vector<int> partial_grandchildren_pdgId;
-        for (const xAOD::TruthParticle *grandchild : partial_grandchildren)
-        {
-          partial_grandchildren_pdgId.push_back(grandchild->pdgId());
-        }
-        pdgIds.push_back(partial_grandchildren_pdgId);
-      }
-      return pdgIds;
-    }
-
-    std::vector<std::vector<int>> initial_grandchildren_pdgId(){
-      std::vector<std::vector<int>> pdgIds;
-      for (const std::vector<const xAOD::TruthParticle *>& 
-        partial_initial_grandchildren : m_initial_grandchildren)
-      { 
-        std::vector<int> partial_initial_grandchildren_pdgId;
-        for (const xAOD::TruthParticle *grandchild : partial_initial_grandchildren)
-        {
-          partial_initial_grandchildren_pdgId.push_back(grandchild->pdgId());
-        }
-        pdgIds.push_back(partial_initial_grandchildren_pdgId);
-      }
-      return pdgIds;
-    }
-
-    std::vector<float> children_p4(int coordIdx)
-    {
-      std::vector<float> coords_pair;
-      for (P4 child_p4 : m_children_p4)
-      {
-        std::array<float, 4> coords;
-        child_p4.GetCoordinates(coords.begin());
-        coords_pair.push_back(coords[coordIdx]);
-      }
-      return coords_pair;
-    }
-
-    std::vector<float> initial_children_p4(int coordIdx)
-    {
-      std::vector<float> coords_pair;
-      for (P4 initial_child_p4 : m_initial_children_p4)
-      {
-        std::array<float, 4> coords;
-        initial_child_p4.GetCoordinates(coords.begin());
-        coords_pair.push_back(coords[coordIdx]);
-      }
-      return coords_pair;
-    }
-
-    std::vector<std::vector<float>> grandchildren_p4(int coordIdx)
-    {
-      std::vector<std::vector<float>> coords;
-      for (std::vector<P4>& partial_grandchildren_p4 : m_grandchildren_p4)
-      {
-        std::vector<float> partial_grandchildren_coords;
-        for ( P4 grandchild_p4 : partial_grandchildren_p4)
-        {
-          std::array<float, 4> grandchild_coords;
-          grandchild_p4.GetCoordinates(grandchild_coords.begin());
-          partial_grandchildren_coords.push_back(grandchild_coords[coordIdx]);
-        }
-        coords.push_back(partial_grandchildren_coords);
-      }
-      return coords;
-    }
-
-    std::vector<std::vector<float>> initial_grandchildren_p4(int coordIdx)
-    {
-      std::vector<std::vector<float>> coords;
-      for (std::vector<P4>& partial_initial_grandchildren_p4 : m_initial_grandchildren_p4)
-      {
-        std::vector<float> partial_initial_grandchildren_coords;
-        for ( P4 initial_grandchild_p4 : partial_initial_grandchildren_p4)
-        {
-          std::array<float, 4> initial_grandchild_coords;
-          initial_grandchild_p4.GetCoordinates(initial_grandchild_coords.begin());
-          partial_initial_grandchildren_coords.push_back(initial_grandchild_coords[coordIdx]);
-        }
-        coords.push_back(partial_initial_grandchildren_coords);
-      }
-      return coords;
-    }
-  };
+  class TruthScalar;
+  namespace DecayMode {
+    enum DecayMode :int8_t;
+  }
 
   /// \brief An algorithm for dumping variables
   class TruthParticleInformationAlg final : public AthAlgorithm
@@ -302,42 +108,44 @@ private:
         "Truth particle information container to write"};
 
     Gaudi::Property<unsigned int> m_nHiggses                {this, "nHiggses", 2, "Number of Higgses to record"};
-    Gaudi::Property<std::vector<std::string>> m_decayModes  {this, "decayModes", {""}, "HH decay modes to consider"};
     Gaudi::Property<bool> m_recordGrandchildren{
       this, "recordGrandchildren", false, "Record HH grandchildren or not"};
 
-    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> 
+    Gaudi::Property<std::vector<std::string>> m_decayModes  {this, "decayModes", {""}, "HH decay modes to consider"};
+    std::set<int> m_targetPdgIDs;
+
+    SG::WriteDecorHandleKeyArray<xAOD::EventInfo, int>
       m_truthHiggsesPdgIdDecorKeys;
 
-    std::vector<std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>>
+    std::vector<SG::WriteDecorHandleKeyArray<xAOD::EventInfo, float>>
       m_truthHiggsesKinDecorKeys;
 
-    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>
+    SG::WriteDecorHandleKeyArray<xAOD::EventInfo, int>
       m_truthChildrenPdgIdFromHiggsesDecorKeys;
 
-    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>
+    SG::WriteDecorHandleKeyArray<xAOD::EventInfo, int>
       m_truthInitialChildrenPdgIdFromHiggsesDecorKeys;
 
-    std::vector<std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>>
+    std::vector<SG::WriteDecorHandleKeyArray<xAOD::EventInfo, float>>
       m_truthChildrenKinFromHiggsesDecorKeys;
 
-    std::vector<std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>>
+    std::vector<SG::WriteDecorHandleKeyArray<xAOD::EventInfo, float>>
       m_truthInitialChildrenKinFromHiggsesDecorKeys;
 
-    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>
+    SG::WriteDecorHandleKeyArray<xAOD::EventInfo, int>
       m_truthGrandchildrenPdgIdFromHiggsesDecorKeys;
 
-    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>
+    SG::WriteDecorHandleKeyArray<xAOD::EventInfo, int>
       m_truthInitialGrandchildrenPdgIdFromHiggsesDecorKeys;
 
-    std::vector<std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>>
+    std::vector<SG::WriteDecorHandleKeyArray<xAOD::EventInfo, float>>
       m_truthGrandchildrenKinFromHiggsesDecorKeys;
 
-    std::vector<std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>>>
+    std::vector<SG::WriteDecorHandleKeyArray<xAOD::EventInfo, float>>
       m_truthInitialGrandchildrenKinFromHiggsesDecorKeys;
 
-    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_truthHHKinDecorKeys;
-    std::vector<SG::WriteDecorHandleKey<xAOD::EventInfo>> m_truthHHAverageKinDecorKeys;
+    SG::WriteDecorHandleKeyArray<xAOD::EventInfo, float> m_truthHHKinDecorKeys;
+    SG::WriteDecorHandleKeyArray<xAOD::EventInfo, float> m_truthHHAverageKinDecorKeys;
     SG::WriteDecorHandleKey<xAOD::EventInfo> m_absCosThetaStarDecorKey;
 
     std::array<std::string, 4> m_kinVars{"pt", "eta", "phi", "m"};

@@ -7,6 +7,8 @@
 #ifndef EASYJET_SUMOFWEIGHTSALG
 #define EASYJET_SUMOFWEIGHTSALG
 
+#include <memory>
+
 #include <AsgDataHandles/ReadHandleKey.h>
 #include <AsgDataHandles/ReadDecorHandleKey.h>
 
@@ -42,12 +44,6 @@ namespace Easyjet
       SG::ReadHandleKey<xAOD::EventInfo> m_eventInfoKey
       { this, "event", "EventInfo", "EventInfo to read" };
 
-      // for systematics 
-      std::unordered_map<CP::SystematicSet,TH1*> m_hist_sys;
-      std::unordered_map<CP::SystematicSet,long long int> m_total_mcEvent_sys;
-      std::unordered_map<CP::SystematicSet,double> m_total_mcEventWeight_sys;
-      std::unordered_map<CP::SystematicSet,double> m_total_mcEventWeight_squared_sys;
-     
       Gaudi::Property<std::string> m_histPattern 
       {this, "histPattern", "SumOfWeights_%SYS%", "the pattern for histogram names"};
       
@@ -62,6 +58,14 @@ namespace Easyjet
 
       CP::SysListHandle m_systematicsList {this};
 
+      struct SystInfo{
+        std::unique_ptr<TH1> hist{nullptr};
+        long long int total_mcEvents{0};
+        double total_mcEventWeight{0};
+        double total_mcEventWeight_squared{0};
+      };
+
+      std::vector<SystInfo> m_syst_info_vec;
   };
 
 }

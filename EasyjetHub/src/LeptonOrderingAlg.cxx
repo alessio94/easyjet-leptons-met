@@ -22,14 +22,15 @@ namespace Easyjet
     ATH_CHECK (m_isSelectedElectron.initialize(m_systematicsList, m_inEleHandle));
     ATH_CHECK (m_isSelectedMuon.initialize(m_systematicsList, m_inMuHandle));
 
+    std::vector<std::string> leadBranchesEle_keys{}, leadBranchesMu_keys{};
     for (int i = 0; i < m_leptonAmount; i++){
-      std::string index = std::to_string(i + 1);
-      CP::SysWriteDecorHandle<bool> whandle{"isLepton" + index + "_%SYS%", this};
-      m_leadBranchesEle.emplace("isLepton" + index, whandle);
-      ATH_CHECK(m_leadBranchesEle.at("isLepton" + index).initialize(m_systematicsList, m_inEleHandle));
-      m_leadBranchesMu.emplace("isLepton" + index, whandle);
-      ATH_CHECK(m_leadBranchesMu.at("isLepton" + index).initialize(m_systematicsList, m_inMuHandle));
+      leadBranchesEle_keys.emplace_back("isLepton" + std::to_string(i + 1) + "_%SYS%");
+      leadBranchesMu_keys.emplace_back("isLepton" + std::to_string(i + 1) + "_%SYS%");
     }
+    m_leadBranchesEle = CP::SysWriteDecorHandleArray<bool>(leadBranchesEle_keys,this);
+    m_leadBranchesMu = CP::SysWriteDecorHandleArray<bool>(leadBranchesMu_keys,this);
+    ATH_CHECK( m_leadBranchesEle.initialize(m_systematicsList, m_inEleHandle) );
+    ATH_CHECK( m_leadBranchesMu.initialize(m_systematicsList, m_inMuHandle) );
 
     // Intialise syst list (must come after all syst-aware inputs and outputs)
     ATH_CHECK (m_systematicsList.initialize());    
@@ -72,14 +73,13 @@ namespace Easyjet
 
       // decorate ele/mu
       if(m_leptonAmount > 0){
-        int nLepton = 0;
-        for (auto lepton : leptons) {
-           nLepton++;
+        for (int nLepton = 0;auto lepton : leptons) {
            if (std::abs(lepton.second) == 11){ //ele
-              m_leadBranchesEle.at("isLepton"+std::to_string(nLepton)).set(*lepton.first, true, sys);
-	   } else if (std::abs(lepton.second) == 13) { //mu
-              m_leadBranchesMu.at("isLepton"+std::to_string(nLepton)).set(*lepton.first, true, sys);
-	   } 
+              m_leadBranchesEle.at(nLepton).set(*lepton.first, true, sys);
+	         } else if (std::abs(lepton.second) == 13) { //mu
+              m_leadBranchesMu.at(nLepton).set(*lepton.first, true, sys);
+	         } 
+           nLepton++;
            if ( nLepton == m_leptonAmount ) break;
         }
       }

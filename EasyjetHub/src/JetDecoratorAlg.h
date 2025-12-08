@@ -17,6 +17,8 @@
 #include <TrigDecisionTool/TrigDecisionTool.h>
 #include <TrigBtagEmulationTool/ITrigBtagEmulationTool.h>
 
+#include <StoreGate/WriteDecorHandleKeyArray.h>
+
 #include <AthenaKernel/Units.h>
 
 
@@ -80,17 +82,17 @@ namespace Easyjet
       this, "HLTJets", "HLT_AntiKt4EMPFlowJets_subresjesgscIS_ftf_bJets", "HLT jet container"
     };
 
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1EtDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1EtaDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1PhiDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1DRDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetL1ThresholdsDecorKeys;
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, std::vector<int>> m_jetL1ThresholdsDecorKeys{this,"L1ThresholdKeys",{},"DO NOT CONFIGURE"};
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_jetL1EtDecorKeys{this,"L1EtKeys",{},"DO NOT CONFIGURE"};
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_jetL1EtaDecorKeys{this,"L1EtaKeys",{},"DO NOT CONFIGURE"};
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_jetL1PhiDecorKeys{this,"L1PhiKeys",{},"DO NOT CONFIGURE"};
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_jetL1DRDecorKeys{this,"L1DRKeys",{},"DO NOT CONFIGURE"};
 
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTPtDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTEtaDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTPhiDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTDRDecorKeys;
-    std::unordered_map<std::string, SG::WriteDecorHandleKey<xAOD::JetContainer>> m_jetHLTThresholdsDecorKeys;
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, std::vector<int> > m_jetHLTThresholdsDecorKeys{this,"HLTThresholdKeys",{},"DO NOT CONFIGURE"};
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_jetHLTPtDecorKeys{this,"HLTPtKeys",{},"DO NOT CONFIGURE"};
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_jetHLTEtaDecorKeys{this,"HLTEtaKeys",{},"DO NOT CONFIGURE"};
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_jetHLTPhiDecorKeys{this,"HLTPhiKeys",{},"DO NOT CONFIGURE"};
+    SG::WriteDecorHandleKeyArray<xAOD::JetContainer, float> m_jetHLTDRDecorKeys{this,"HLTDRKeys",{},"DO NOT CONFIGURE"};
 
     bool isSameJet(const xAOD::IParticle *jet1, const xAOD::IParticle *jet2) const;
 

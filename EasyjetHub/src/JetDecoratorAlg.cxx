@@ -45,37 +45,34 @@ namespace Easyjet
         std::replace(modifiedTrigName.begin(), modifiedTrigName.end(), '.', 'p');
 
         if (m_doL1Matching) {
-          m_jetL1EtDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                               modifiedTrigName + "_L1et");
-          m_jetL1EtaDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                                modifiedTrigName + "_L1eta");
-          m_jetL1PhiDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                                modifiedTrigName + "_L1phi");
-          m_jetL1DRDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                               modifiedTrigName + "_L1dr");
-          m_jetL1ThresholdsDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" +
-                                                    modifiedTrigName + "_L1thresholds");
-          ATH_CHECK(m_jetL1EtDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetL1EtaDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetL1PhiDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetL1DRDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetL1ThresholdsDecorKeys.at(trig).initialize());
+          m_jetL1EtDecorKeys.emplace_back(m_jetsInKey, "match" +modifiedTrigName + "_L1et");
+          m_jetL1EtaDecorKeys.emplace_back(m_jetsInKey, "match" +modifiedTrigName + "_L1eta");
+          m_jetL1PhiDecorKeys.emplace_back(m_jetsInKey, "match" +modifiedTrigName + "_L1phi");
+          m_jetL1DRDecorKeys.emplace_back(m_jetsInKey, "match" +modifiedTrigName + "_L1dr");
+          m_jetL1ThresholdsDecorKeys.emplace_back(m_jetsInKey, "match" +modifiedTrigName + "_L1thresholds");
         }
 
         if (m_doHLTMatching) {
-          m_jetHLTPtDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTpt");
-          m_jetHLTEtaDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTeta");
-          m_jetHLTPhiDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTphi");
-          m_jetHLTDRDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTdr");
-          m_jetHLTThresholdsDecorKeys.emplace(trig, m_jetsInKey.key() + ".match" + modifiedTrigName + "_HLTthresholds");
-          ATH_CHECK(m_jetHLTPtDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetHLTEtaDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetHLTPhiDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetHLTDRDecorKeys.at(trig).initialize());
-          ATH_CHECK(m_jetHLTThresholdsDecorKeys.at(trig).initialize());
+          m_jetHLTPtDecorKeys.emplace_back(m_jetsInKey, "match" + modifiedTrigName + "_HLTpt");
+          m_jetHLTEtaDecorKeys.emplace_back(m_jetsInKey, "match" + modifiedTrigName + "_HLTeta");
+          m_jetHLTPhiDecorKeys.emplace_back(m_jetsInKey, "match" + modifiedTrigName + "_HLTphi");
+          m_jetHLTDRDecorKeys.emplace_back(m_jetsInKey, "match" + modifiedTrigName + "_HLTdr");
+          m_jetHLTThresholdsDecorKeys.emplace_back(m_jetsInKey, "match" + modifiedTrigName + "_HLTthresholds");
         }
 
       }
+
+      ATH_CHECK(m_jetL1EtDecorKeys.initialize(m_doL1Matching));
+      ATH_CHECK(m_jetL1EtaDecorKeys.initialize(m_doL1Matching));
+      ATH_CHECK(m_jetL1PhiDecorKeys.initialize(m_doL1Matching));
+      ATH_CHECK(m_jetL1DRDecorKeys.initialize(m_doL1Matching));
+      ATH_CHECK(m_jetL1ThresholdsDecorKeys.initialize(m_doL1Matching));
+
+      ATH_CHECK(m_jetHLTPtDecorKeys.initialize(m_doHLTMatching));
+      ATH_CHECK(m_jetHLTEtaDecorKeys.initialize(m_doHLTMatching));
+      ATH_CHECK(m_jetHLTPhiDecorKeys.initialize(m_doHLTMatching));
+      ATH_CHECK(m_jetHLTDRDecorKeys.initialize(m_doHLTMatching));
+      ATH_CHECK(m_jetHLTThresholdsDecorKeys.initialize(m_doHLTMatching));
 
       if(m_useEmulationTool) ATH_CHECK(m_emulationTool.retrieve());
     }
@@ -120,55 +117,12 @@ namespace Easyjet
       }
     }
 
-    std::unordered_map<std::string,
-                       SG::WriteDecorHandle<xAOD::JetContainer, float>>
-        jetL1Et, jetL1Eta, jetL1Phi, jetL1DR;
-    std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>>> jetL1Thresholds;
-
-    std::unordered_map<std::string,
-                       SG::WriteDecorHandle<xAOD::JetContainer, float>>
-        jetHLTPt, jetHLTEta, jetHLTPhi, jetHLTDR;
-    std::unordered_map<std::string, SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>>> jetHLTThresholds;
-
     SG::ReadHandle<xAOD::JetRoIContainer> l1Jets;
     SG::ReadHandle<xAOD::JetContainer> hltJetsFromCont;
     static const std::unordered_set<std::string> trigger_navigation_bug = {
       "HLT_j80c_020jvt_j55c_020jvt_j28c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bdl1d77_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25",
       "HLT_j75c_020jvt_j50c_020jvt_j25c_020jvt_j20c_020jvt_SHARED_2j20c_020jvt_bgn177_pf_ftf_presel2c20XX2c20b85_L1J45p0ETA21_3J15p0ETA25"
     };
-    for (const auto &trig : m_triggers)
-    {
-      if (m_doL1Matching) {
-        l1Jets = SG::makeHandle(m_L1JetsInKey, ctx);
-        ATH_CHECK(l1Jets.isValid());
-
-        SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_et(m_jetL1EtDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_eta(m_jetL1EtaDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_phi(m_jetL1PhiDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_dr(m_jetL1DRDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>> wdh_thresholds(m_jetL1ThresholdsDecorKeys.at(trig));
-        jetL1Et.emplace(trig, wdh_et);
-        jetL1Eta.emplace(trig, wdh_eta);
-        jetL1Phi.emplace(trig, wdh_phi);
-        jetL1DR.emplace(trig, wdh_dr);
-        jetL1Thresholds.emplace(trig, wdh_thresholds);
-      }
-
-      if (m_doHLTMatching) {
-        hltJetsFromCont = SG::makeHandle(m_HLTJetsInKey, ctx);
-        ATH_CHECK(hltJetsFromCont.isValid());
-        SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_pt(m_jetHLTPtDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_eta(m_jetHLTEtaDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_phi(m_jetHLTPhiDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, float> wdh_dr(m_jetHLTDRDecorKeys.at(trig));
-        SG::WriteDecorHandle<xAOD::JetContainer, std::vector<int>> wdh_thresholds(m_jetHLTThresholdsDecorKeys.at(trig));
-        jetHLTPt.emplace(trig, wdh_pt);
-        jetHLTEta.emplace(trig, wdh_eta);
-        jetHLTPhi.emplace(trig, wdh_phi);
-        jetHLTDR.emplace(trig, wdh_dr);
-        jetHLTThresholds.emplace(trig, wdh_thresholds);
-      }
-    }
 
     std::regex l1NameParser("(\\d*)(J)(\\d*)((p|\\.)(\\d*)ETA(\\d*))?");
     Trig::FeatureRequestDescriptor frd;
@@ -181,10 +135,37 @@ namespace Easyjet
       }
     }
 
+    // The handles need to be in event scope so they are only locked after writing all jets
+    std::vector<SG::WriteDecorHandle<xAOD::JetContainer,float> > wdh_L1et, wdh_L1eta, wdh_L1phi, wdh_L1dr;
+    std::vector<SG::WriteDecorHandle<xAOD::JetContainer,std::vector<int> > > wdh_L1thresholds;
+
+    if (m_doL1Matching) {
+      l1Jets = SG::makeHandle(m_L1JetsInKey, ctx);
+      ATH_CHECK(l1Jets.isValid());
+      wdh_L1et = m_jetL1EtDecorKeys.makeHandles(ctx);
+      wdh_L1eta = m_jetL1EtaDecorKeys.makeHandles(ctx);
+      wdh_L1phi = m_jetL1PhiDecorKeys.makeHandles(ctx);
+      wdh_L1dr = m_jetL1DRDecorKeys.makeHandles(ctx);
+      wdh_L1thresholds = m_jetL1ThresholdsDecorKeys.makeHandles(ctx);
+    }
+
+    std::vector<SG::WriteDecorHandle<xAOD::JetContainer,float> > wdh_HLTpt, wdh_HLTeta, wdh_HLTphi, wdh_HLTdr;
+    std::vector<SG::WriteDecorHandle<xAOD::JetContainer,std::vector<int>> > wdh_HLTthresholds;
+    if (m_doHLTMatching) {
+      hltJetsFromCont = SG::makeHandle(m_HLTJetsInKey, ctx);
+      ATH_CHECK(hltJetsFromCont.isValid());
+
+      wdh_HLTpt = m_jetHLTPtDecorKeys.makeHandles(ctx);
+      wdh_HLTeta = m_jetHLTEtaDecorKeys.makeHandles(ctx);
+      wdh_HLTphi = m_jetHLTPhiDecorKeys.makeHandles(ctx);
+      wdh_HLTdr = m_jetHLTDRDecorKeys.makeHandles(ctx);
+      wdh_HLTthresholds = m_jetHLTThresholdsDecorKeys.makeHandles(ctx);
+    }
+
     for(const xAOD::Jet* jet: *jets) {
 
       // trigger matching
-      for (const auto &trig : m_triggers)
+      for (size_t itrig{0}; const auto &trig : m_triggers)
       {
         const xAOD::JetRoI* bestL1 = nullptr;
         float minDRL1 = 0.4; // hard-coded matching distance
@@ -198,6 +179,7 @@ namespace Easyjet
         {
           if (m_doL1Matching)
           {
+
             const TrigConf::HLTChain* hltChain = m_trigDecTool->ExperimentalAndExpertMethods().getChainConfigurationDetails(trig);
             const std::string& l1Name = hltChain->lower_chain_name();
             for (const auto l1_jet : *l1Jets)
@@ -236,6 +218,7 @@ namespace Easyjet
             frd.setChainGroup(trig);
 
             ATH_MSG_VERBOSE("Trigger: " << trig);
+
             int ileg = 0;
             for (const ChainNameParser::LegInfo &legInfo :
                  ChainNameParser::HLTChainInfo(trig))
@@ -348,31 +331,32 @@ namespace Easyjet
         if (m_doL1Matching)
         {
           // TODO: Only save pT thresholds but not eta thresholds. May not provide enough info in the case of same pT threshold but different eta ranges.
-          jetL1Et.at(trig)(*jet) = bestL1 ? bestL1->et8x8() : -99.;
-          jetL1Eta.at(trig)(*jet) = bestL1 ? bestL1->eta() : -99.;
-          jetL1Phi.at(trig)(*jet) = bestL1 ? bestL1->phi() : -99.;
-          jetL1DR.at(trig)(*jet) = minDRL1;
-          jetL1Thresholds.at(trig)(*jet) = bestL1 ?
-	    std::vector<int>(L1Thresholds.begin(), L1Thresholds.end()) :
-	    std::vector<int>();
-        }
+          wdh_L1et[itrig](*jet) = bestL1 ? bestL1->et8x8() : -99.;
+          wdh_L1eta[itrig](*jet) = bestL1 ? bestL1->eta() : -99.;
+          wdh_L1phi[itrig](*jet) = bestL1 ? bestL1->phi() : -99.;
+          wdh_L1dr[itrig](*jet) = minDRL1;
+          wdh_L1thresholds[itrig](*jet) = bestL1 ?
+            std::vector<int>(L1Thresholds.begin(), L1Thresholds.end()) :
+            std::vector<int>();
+        } // L1 matching
 
         if (m_doHLTMatching) {
           // TODO: Only works for trigger chain with a single b-tagging WP. Need to save a vector of b-tagging WPs to handle multiple WPs
-          jetHLTPt.at(trig)(*jet) = bestHLT ? bestHLT->pt() : -99.;
-          jetHLTEta.at(trig)(*jet) = bestHLT ? bestHLT->eta() : -99.;
-          jetHLTPhi.at(trig)(*jet) = bestHLT ? bestHLT->phi() : -99.;
-          jetHLTDR.at(trig)(*jet) = minDRHLT;
-          jetHLTThresholds.at(trig)(*jet) = bestHLT ?
-	    std::vector<int>(HLTThresholds.begin(), HLTThresholds.end()) :
-	    std::vector<int>();
+          wdh_HLTpt[itrig](*jet) = bestHLT ? bestHLT->pt() : -99.;
+          wdh_HLTeta[itrig](*jet) = bestHLT ? bestHLT->eta() : -99.;
+          wdh_HLTphi[itrig](*jet) = bestHLT ? bestHLT->phi() : -99.;
+          wdh_HLTdr[itrig](*jet) = minDRHLT;
+          wdh_HLTthresholds[itrig](*jet) = bestHLT ?
+	          std::vector<int>(HLTThresholds.begin(), HLTThresholds.end()) :
+	          std::vector<int>();
 
           ATH_MSG_VERBOSE("Summary " << " Trigger: " << trig << " bestHLT pT: "
                                     << (bestHLT ? bestHLT->pt() : -99.)
                                     << " thresholds: " << std::vector<int>(HLTThresholds.begin(), HLTThresholds.end()));
-        }
-      }
-    }
+        } // HLT matching
+        ++itrig; // Increment iteration index for handles
+      } // Trigger loop
+    } // Jet loop
 
     return StatusCode::SUCCESS;
   }

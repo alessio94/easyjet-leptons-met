@@ -21,22 +21,258 @@
 //
 namespace Easyjet
 {
-  const std::unordered_map<std::string, std::vector<int>> decayProducts_IDs{
-    {"bbbb", {MC::BQUARK, -MC::BQUARK}},
-    {"bbmm", {MC::BQUARK, -MC::BQUARK, MC::MUON, -MC::MUON}},
-    {"bbtt", {MC::BQUARK, -MC::BQUARK, MC::TAU, -MC::TAU}},
-    {"bbyy", {MC::BQUARK, -MC::BQUARK, MC::PHOTON}},
-    {"bbWW", {MC::BQUARK, -MC::BQUARK, MC::WPLUSBOSON, -MC::WPLUSBOSON}},
-    {"bbZZ", {MC::BQUARK, -MC::BQUARK, MC::Z0BOSON}},
-    {"mmtt", {MC::MUON, -MC::MUON, MC::TAU, -MC::TAU}},
-    {"eett", {MC::ELECTRON, -MC::ELECTRON, MC::TAU, -MC::TAU}},
-    {"tttt", {MC::TAU, -MC::TAU}},
-    {"WWWW", {MC::WPLUSBOSON, -MC::WPLUSBOSON}},
-    {"WWZZ", {MC::WPLUSBOSON, -MC::WPLUSBOSON, MC::Z0BOSON}},
-    {"WWtt", {MC::WPLUSBOSON, -MC::WPLUSBOSON, MC::TAU, -MC::TAU}},
-    {"ZZtt", {MC::Z0BOSON, MC::TAU, -MC::TAU}},
-    {"ZZZZ", {MC::Z0BOSON}},
-    {"bbbbtt", {MC::BQUARK, -MC::BQUARK, MC::TAU, -MC::TAU}},
+  namespace DecayMode {
+    enum DecayMode : int8_t {
+      bbbb=0, bbmm, bbtt, bbyy, bbWW, bbZZ,
+      mmtt, eett, tttt,
+      WWWW, WWZZ, WWtt,
+      ZZtt, ZZZZ,
+      bbbbtt,
+      // Insert any new entries before this
+      NMODES
+    };
+  }
+
+  // Has to be kept updated in parallel with DecayMode
+  // No good way to assert at compile time?
+  const std::unordered_map<std::string, DecayMode::DecayMode> decayModes_str_to_enum{
+    {"bbbb",    DecayMode::bbbb},
+    {"bbmm",    DecayMode::bbmm},
+    {"bbtt",    DecayMode::bbtt},
+    {"bbyy",    DecayMode::bbyy},
+    {"bbWW",    DecayMode::bbWW},
+    {"bbZZ",    DecayMode::bbZZ},
+    {"mmtt",    DecayMode::mmtt},
+    {"eett",    DecayMode::eett},
+    {"tttt",    DecayMode::tttt},
+    {"WWWW",    DecayMode::WWWW},
+    {"WWZZ",   DecayMode::WWZZ},
+    {"WWtt",   DecayMode::WWtt},
+    {"ZZtt",   DecayMode::ZZtt},
+    {"ZZZZ",   DecayMode::ZZZZ},
+    {"bbbbtt", DecayMode::bbbbtt},
+  };
+
+  // Using an array allows us to verify the size to check that all cases are covered
+  const std::set<int> decayProducts_IDs[DecayMode::NMODES] {
+    {MC::BQUARK, -MC::BQUARK}, // bbbb
+    {MC::BQUARK, -MC::BQUARK, MC::MUON, -MC::MUON}, // bbmm
+    {MC::BQUARK, -MC::BQUARK, MC::TAU, -MC::TAU}, //bbtt
+    {MC::BQUARK, -MC::BQUARK, MC::PHOTON}, //bbyy
+    {MC::BQUARK, -MC::BQUARK, MC::WPLUSBOSON, -MC::WPLUSBOSON}, // bbWW
+    {MC::BQUARK, -MC::BQUARK, MC::Z0BOSON}, // bbZZ
+    {MC::MUON, -MC::MUON, MC::TAU, -MC::TAU}, // mmtt
+    {MC::ELECTRON, -MC::ELECTRON, MC::TAU, -MC::TAU}, //eett
+    {MC::TAU, -MC::TAU}, //tttt
+    {MC::WPLUSBOSON, -MC::WPLUSBOSON}, // WWWW
+    {MC::WPLUSBOSON, -MC::WPLUSBOSON, MC::Z0BOSON}, // WWZZ
+    {MC::WPLUSBOSON, -MC::WPLUSBOSON, MC::TAU, -MC::TAU}, // WWtt
+    {MC::Z0BOSON, MC::TAU, -MC::TAU}, // ZZtt
+    {MC::Z0BOSON}, // ZZZZ
+    // The following one is not differentiable from bbtt
+    {MC::BQUARK, -MC::BQUARK, MC::TAU, -MC::TAU}, // bbbbtt
+  };
+
+  class TruthScalar
+  {
+private:
+    using P4 = ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>;
+    int m_pdgId;
+    P4 m_p4;
+    const xAOD::TruthParticle *m_source = nullptr;
+    // final children
+    std::vector<P4> m_children_p4;
+    std::vector<P4> m_initial_children_p4;
+    std::vector<std::vector<P4>> m_grandchildren_p4;
+    std::vector<std::vector<P4>> m_initial_grandchildren_p4;
+    std::vector<const xAOD::TruthParticle *> m_children;
+    std::vector<const xAOD::TruthParticle *> m_initial_children;
+    std::vector<std::vector<const xAOD::TruthParticle *>> m_grandchildren;
+    std::vector<std::vector<const xAOD::TruthParticle *>> m_initial_grandchildren;
+
+public:
+    TruthScalar() : m_pdgId{0} {};
+    explicit TruthScalar(const xAOD::TruthParticle *h): 
+    m_pdgId{h->pdgId()}, m_source(h)
+    {
+      m_p4.SetCoordinates(h->pt(), h->eta(), h->phi(), h->m());
+    } ;
+
+    bool valid() const {return m_source!=nullptr;}
+
+    const xAOD::TruthParticle *source() { return m_source; };
+
+    int pdgId() const { return m_pdgId; };
+
+    float p4(int coordIdx)
+    {
+      std::array<float, 4> coords;
+      m_p4.GetCoordinates(coords.begin());
+      return coords[coordIdx];
+    }
+
+    void children(std::vector<const xAOD::TruthParticle *> children)
+    {
+      for (const xAOD::TruthParticle *child : children)
+      {
+        P4 child_p4{child->pt(), child->eta(), child->phi(), child->m()};
+        m_children_p4.push_back(child_p4);
+      }
+      m_children = std::move(children);
+    }
+
+    void initial_children(std::vector<const xAOD::TruthParticle *> initial_children)
+    {
+      for (const xAOD::TruthParticle *initial_child : initial_children)
+      {
+        P4 initial_child_p4{initial_child->pt(), initial_child->eta(), initial_child->phi(), initial_child->m()};
+        m_initial_children_p4.push_back(initial_child_p4);
+      }
+      m_initial_children = std::move(initial_children);
+    }
+
+    void grandchildren(
+      std::vector<std::vector<const xAOD::TruthParticle *>> grandchildren)
+    {
+      for (const std::vector<const xAOD::TruthParticle *>& 
+          partial_grandchildren : grandchildren)
+      { 
+        std::vector<P4> partial_grandchildren_p4;
+        for (const xAOD::TruthParticle *grandchild : partial_grandchildren)
+        {
+          P4 grandchild_p4{grandchild->pt(), grandchild->eta(), 
+                            grandchild->phi(), grandchild->m()};
+          partial_grandchildren_p4.push_back(grandchild_p4);
+        }
+        m_grandchildren_p4.push_back(partial_grandchildren_p4);
+      }
+      m_grandchildren = std::move(grandchildren);
+    }
+
+    void initial_grandchildren(
+      std::vector<std::vector<const xAOD::TruthParticle *>> initial_grandchildren)
+    {
+      for (const std::vector<const xAOD::TruthParticle *>& 
+        partial_initial_grandchildren : initial_grandchildren)
+      { 
+        std::vector<P4> partial_initial_grandchildren_p4;
+        for (const xAOD::TruthParticle 
+          *initial_grandchild : partial_initial_grandchildren)
+        {
+          P4 initial_grandchild_p4{initial_grandchild->pt(), initial_grandchild->eta(),
+                                    initial_grandchild->phi(), initial_grandchild->m()};
+          partial_initial_grandchildren_p4.push_back(initial_grandchild_p4);
+        }
+        m_initial_grandchildren_p4.push_back(partial_initial_grandchildren_p4);
+      }
+      m_initial_grandchildren = std::move(initial_grandchildren);
+    }
+
+    std::vector<int> children_pdgId(){
+      std::vector<int> pdgId_pair;
+      for (const xAOD::TruthParticle *child : m_children)
+      {
+        pdgId_pair.push_back(child->pdgId());
+      }
+      return pdgId_pair;
+    }
+
+    std::vector<int> initial_children_pdgId(){
+      std::vector<int> pdgId_pair;
+      for (const xAOD::TruthParticle *initial_child : m_initial_children)
+      {
+        pdgId_pair.push_back(initial_child->pdgId());
+      }
+      return pdgId_pair;
+    }
+
+    std::vector<std::vector<int>> grandchildren_pdgId(){
+      std::vector<std::vector<int>> pdgIds;
+      for (const std::vector<const xAOD::TruthParticle *>& 
+        partial_grandchildren : m_grandchildren)
+      { 
+        std::vector<int> partial_grandchildren_pdgId;
+        for (const xAOD::TruthParticle *grandchild : partial_grandchildren)
+        {
+          partial_grandchildren_pdgId.push_back(grandchild->pdgId());
+        }
+        pdgIds.push_back(partial_grandchildren_pdgId);
+      }
+      return pdgIds;
+    }
+
+    std::vector<std::vector<int>> initial_grandchildren_pdgId(){
+      std::vector<std::vector<int>> pdgIds;
+      for (const std::vector<const xAOD::TruthParticle *>& 
+        partial_initial_grandchildren : m_initial_grandchildren)
+      { 
+        std::vector<int> partial_initial_grandchildren_pdgId;
+        for (const xAOD::TruthParticle *grandchild : partial_initial_grandchildren)
+        {
+          partial_initial_grandchildren_pdgId.push_back(grandchild->pdgId());
+        }
+        pdgIds.push_back(partial_initial_grandchildren_pdgId);
+      }
+      return pdgIds;
+    }
+
+    std::vector<float> children_p4(int coordIdx)
+    {
+      std::vector<float> coords_pair;
+      for (P4 child_p4 : m_children_p4)
+      {
+        std::array<float, 4> coords;
+        child_p4.GetCoordinates(coords.begin());
+        coords_pair.push_back(coords[coordIdx]);
+      }
+      return coords_pair;
+    }
+
+    std::vector<float> initial_children_p4(int coordIdx)
+    {
+      std::vector<float> coords_pair;
+      for (P4 initial_child_p4 : m_initial_children_p4)
+      {
+        std::array<float, 4> coords;
+        initial_child_p4.GetCoordinates(coords.begin());
+        coords_pair.push_back(coords[coordIdx]);
+      }
+      return coords_pair;
+    }
+
+    std::vector<std::vector<float>> grandchildren_p4(int coordIdx)
+    {
+      std::vector<std::vector<float>> coords;
+      for (std::vector<P4>& partial_grandchildren_p4 : m_grandchildren_p4)
+      {
+        std::vector<float> partial_grandchildren_coords;
+        for ( P4 grandchild_p4 : partial_grandchildren_p4)
+        {
+          std::array<float, 4> grandchild_coords;
+          grandchild_p4.GetCoordinates(grandchild_coords.begin());
+          partial_grandchildren_coords.push_back(grandchild_coords[coordIdx]);
+        }
+        coords.push_back(partial_grandchildren_coords);
+      }
+      return coords;
+    }
+
+    std::vector<std::vector<float>> initial_grandchildren_p4(int coordIdx)
+    {
+      std::vector<std::vector<float>> coords;
+      for (std::vector<P4>& partial_initial_grandchildren_p4 : m_initial_grandchildren_p4)
+      {
+        std::vector<float> partial_initial_grandchildren_coords;
+        for ( P4 initial_grandchild_p4 : partial_initial_grandchildren_p4)
+        {
+          std::array<float, 4> initial_grandchild_coords;
+          initial_grandchild_p4.GetCoordinates(initial_grandchild_coords.begin());
+          partial_initial_grandchildren_coords.push_back(initial_grandchild_coords[coordIdx]);
+        }
+        coords.push_back(partial_initial_grandchildren_coords);
+      }
+      return coords;
+    }
   };
 
   TruthParticleInformationAlg ::TruthParticleInformationAlg(
@@ -65,36 +301,35 @@ namespace Easyjet
     {
       // decorator will show up as "truth_Hx_pdgId", where x is the x higgs
       m_truthHiggsesPdgIdDecorKeys.emplace_back
-      (m_EventInfoKey.key()+
-        ".truth_H" + std::to_string(h + 1) + "_" + "pdgId");
+      (m_EventInfoKey,
+        "truth_H" + std::to_string(h + 1) + "_" + "pdgId");
       m_truthChildrenPdgIdFromHiggsesDecorKeys.emplace_back
-      (m_EventInfoKey.key()+
-        ".truth_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
+      (m_EventInfoKey,
+        "truth_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
       m_truthInitialChildrenPdgIdFromHiggsesDecorKeys.emplace_back
-      (m_EventInfoKey.key()+
-        ".truth_initial_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
-
-      ATH_CHECK(m_truthHiggsesPdgIdDecorKeys.back().initialize());
-      ATH_CHECK(m_truthChildrenPdgIdFromHiggsesDecorKeys.back().initialize());
-      ATH_CHECK(m_truthInitialChildrenPdgIdFromHiggsesDecorKeys.back().initialize());
+      (m_EventInfoKey,
+        "truth_initial_children_fromH" + std::to_string(h + 1) + "_" + "pdgId");
 
       for (const std::string &var : m_kinVars)
       {
         m_truthHiggsesKinDecorKeys[h].emplace_back
-        (m_EventInfoKey.key()+
-          ".truth_H" + std::to_string(h + 1) + "_" + var);
+        (m_EventInfoKey,
+          "truth_H" + std::to_string(h + 1) + "_" + var);
         m_truthChildrenKinFromHiggsesDecorKeys[h].emplace_back
-        (m_EventInfoKey.key()+
-          ".truth_children_fromH" + std::to_string(h + 1) + "_" + var);
+        (m_EventInfoKey,
+          "truth_children_fromH" + std::to_string(h + 1) + "_" + var);
         m_truthInitialChildrenKinFromHiggsesDecorKeys[h].emplace_back
-        (m_EventInfoKey.key()+ 
-          ".truth_initial_children_fromH" + std::to_string(h + 1) + "_" + var);
-
-        ATH_CHECK(m_truthHiggsesKinDecorKeys[h].back().initialize());
-        ATH_CHECK(m_truthChildrenKinFromHiggsesDecorKeys[h].back().initialize());
-        ATH_CHECK(m_truthInitialChildrenKinFromHiggsesDecorKeys[h].back().initialize());
+        (m_EventInfoKey, 
+          "truth_initial_children_fromH" + std::to_string(h + 1) + "_" + var);
       }
+      ATH_CHECK(m_truthHiggsesKinDecorKeys[h].initialize());
+      ATH_CHECK(m_truthChildrenKinFromHiggsesDecorKeys[h].initialize());
+      ATH_CHECK(m_truthInitialChildrenKinFromHiggsesDecorKeys[h].initialize());
     }
+
+    ATH_CHECK(m_truthHiggsesPdgIdDecorKeys.initialize());
+    ATH_CHECK(m_truthChildrenPdgIdFromHiggsesDecorKeys.initialize());
+    ATH_CHECK(m_truthInitialChildrenPdgIdFromHiggsesDecorKeys.initialize());
 
     if (m_recordGrandchildren)
     {
@@ -103,46 +338,48 @@ namespace Easyjet
       for (unsigned int h = 0; h < m_nHiggses; h++)
       {
         m_truthGrandchildrenPdgIdFromHiggsesDecorKeys.emplace_back
-        (m_EventInfoKey.key()+
-          ".truth_grandchildren_fromH" + std::to_string(h + 1) + "_" + "pdgId");
+        (m_EventInfoKey,
+          "truth_grandchildren_fromH" + std::to_string(h + 1) + "_" + "pdgId");
         m_truthInitialGrandchildrenPdgIdFromHiggsesDecorKeys.emplace_back
-        (m_EventInfoKey.key()+
-          ".truth_initial_grandchildren_fromH" + std::to_string(h + 1) + "_" + "pdgId");
-
-        ATH_CHECK(m_truthGrandchildrenPdgIdFromHiggsesDecorKeys.back().initialize());
-        ATH_CHECK(m_truthInitialGrandchildrenPdgIdFromHiggsesDecorKeys.back().initialize());
+        (m_EventInfoKey,
+          "truth_initial_grandchildren_fromH" + std::to_string(h + 1) + "_" + "pdgId");
 
         for (const std::string &var : m_kinVars)
         {
           m_truthGrandchildrenKinFromHiggsesDecorKeys[h].emplace_back
-          (m_EventInfoKey.key()+
-            ".truth_grandchildren_fromH" + std::to_string(h + 1) + "_" + var);
+          (m_EventInfoKey,
+            "truth_grandchildren_fromH" + std::to_string(h + 1) + "_" + var);
           m_truthInitialGrandchildrenKinFromHiggsesDecorKeys[h].emplace_back
-          (m_EventInfoKey.key()+
-            ".truth_initial_grandchildren_fromH" + std::to_string(h + 1) + "_" + var);
-          ATH_CHECK(m_truthGrandchildrenKinFromHiggsesDecorKeys[h].back().initialize());
-          ATH_CHECK(m_truthInitialGrandchildrenKinFromHiggsesDecorKeys[h].back().initialize());
+          (m_EventInfoKey,
+            "truth_initial_grandchildren_fromH" + std::to_string(h + 1) + "_" + var);
         }
+        ATH_CHECK(m_truthGrandchildrenKinFromHiggsesDecorKeys[h].initialize());
+        ATH_CHECK(m_truthInitialGrandchildrenKinFromHiggsesDecorKeys[h].initialize());
       }
     }
+    ATH_CHECK(m_truthGrandchildrenPdgIdFromHiggsesDecorKeys.initialize(m_recordGrandchildren));
+    ATH_CHECK(m_truthInitialGrandchildrenPdgIdFromHiggsesDecorKeys.initialize(m_recordGrandchildren));
+
 
     for (const auto& decayMode : m_decayModes)
     {
-      if(decayProducts_IDs.find(decayMode)==decayProducts_IDs.end())
+      if(decayModes_str_to_enum.find(decayMode)==decayModes_str_to_enum.end())
         ATH_MSG_ERROR("Decay mode "<<decayMode<<" is not supported");
+      const auto& childParticles = decayProducts_IDs[decayModes_str_to_enum.at(decayMode)];
+      m_targetPdgIDs.insert(childParticles.begin(),childParticles.end());
     }
 
     for (const std::string &var : m_kinVars)
     {
-      m_truthHHKinDecorKeys.emplace_back(m_EventInfoKey.key()+".truth_HH_" + var);
-      ATH_CHECK(m_truthHHKinDecorKeys.back().initialize());
+      m_truthHHKinDecorKeys.emplace_back(m_EventInfoKey, "truth_HH_" + var);
     }
+    ATH_CHECK(m_truthHHKinDecorKeys.initialize());
 
     for (const std::string &average_var : m_kinAverageVars)
     {
-      m_truthHHAverageKinDecorKeys.emplace_back(m_EventInfoKey.key()+".truth_HH_" + average_var);
-      ATH_CHECK(m_truthHHAverageKinDecorKeys.back().initialize());
+      m_truthHHAverageKinDecorKeys.emplace_back(m_EventInfoKey, "truth_HH_" + average_var);
     }
+    ATH_CHECK(m_truthHHAverageKinDecorKeys.initialize());
 
     m_absCosThetaStarDecorKey = m_EventInfoKey.key()+".truth_HH_" + m_absCosThetaStar;
     ATH_CHECK(m_absCosThetaStarDecorKey.initialize());
@@ -210,9 +447,9 @@ namespace Easyjet
         SG::VIEW_ELEMENTS);
     for (TruthScalar h : higgses)
     {
-      if(!h) continue;
-      debugPrintParticleKinematics(h);
-      higgsesTruthParticles->push_back(h);
+      if(!h.valid()) continue;
+      debugPrintParticleKinematics(h.source());
+      higgsesTruthParticles->push_back(h.source());
     }
     SG::WriteHandle<ConstDataVector<xAOD::TruthParticleContainer>> 
       writeHandle(m_truthParticleInfoOutKey);
@@ -305,11 +542,11 @@ namespace Easyjet
     std::array<float, 4> coords = {-999., -999., -999., -999.};
     std::array<float, 2> ave_coords = {-999., -999.};
     float abs_cos_theta_star = -999.;
-    if(higgses.size()>=2 && higgses[0] && higgses[1]) 
+    if(higgses.size()>=2 && higgses[0].valid() && higgses[1].valid())
     {
-        coords = calcHHKinematics(higgses[0], higgses[1]);
-        ave_coords = calcHHAverageKinematics(higgses[0], higgses[1]);
-        abs_cos_theta_star = calcHHCosThetaStar(higgses[0], higgses[1]);
+        coords = calcHHKinematics(higgses[0].source(), higgses[1].source());
+        ave_coords = calcHHAverageKinematics(higgses[0].source(), higgses[1].source());
+        abs_cos_theta_star = calcHHCosThetaStar(higgses[0].source(), higgses[1].source());
     }
     ATH_MSG_DEBUG("got abs_cos_theta_star" << abs_cos_theta_star);
 
@@ -370,14 +607,10 @@ namespace Easyjet
 
       std::unordered_set<int> childrenPdgIds;
       int child_pdg = p->child(i)->pdgId();
-      for (const auto& decayMode : m_decayModes)
-      {
-        const auto& decays = decayProducts_IDs.at(decayMode);
-        if(std::find(decays.begin(), decays.end(), child_pdg) != decays.end())
+      if(m_targetPdgIDs.contains(child_pdg))
         {
           childrenPdgIds.emplace(child_pdg);
         }
-      }
 
       const xAOD::TruthParticle *final_child =
         getFinalParticleOfType(p->child(i), childrenPdgIds);
@@ -491,7 +724,7 @@ namespace Easyjet
           getFinalParticleOfType(tp, {MC::HIGGSBOSON, MC::SBOSONBSM, MC::ABOSONBSM});
         if (!tmp || (final_h->uid() != tmp->uid()))
         {
-          TruthScalar h = final_h;
+          TruthScalar h{final_h};
           if (m_recordGrandchildren)
           {
             auto children = getFinalChildren(final_h);

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
 */
 
 /// @author Abraham Tishelman-Charny
@@ -8,9 +8,16 @@
 
 namespace Easyjet
 {
+
+  // 
+  enum ORTH_CHANNEL : uint8_t {BBYY, BBBB, BBTT, N_CHANNELS};
+  std::vector<std::string> Bvarnames = {"orth_pass_bbyy", "orth_pass_bbbb", "orth_pass_bbtt"};
+
   OrthogonalityAlg::OrthogonalityAlg(const std::string &name,
                                        ISvcLocator *pSvcLocator)
-      : AthHistogramAlgorithm(name, pSvcLocator) { }
+      : AthHistogramAlgorithm(name, pSvcLocator),
+      m_Bbranches{Bvarnames,this}
+      { }
 
   StatusCode OrthogonalityAlg::initialize()
   {
@@ -18,16 +25,14 @@ namespace Easyjet
     ATH_MSG_INFO("*********************************\n");
     ATH_MSG_INFO("       OrthogonalityAlg       \n");
     ATH_MSG_INFO("*********************************\n");
-    
+
+    ATH_CHECK( Bvarnames.size() == N_CHANNELS );
+
     ATH_CHECK (m_photonHandle.initialize(m_systematicsList));
     ATH_CHECK (m_jetHandle.initialize(m_systematicsList));
     ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
     
-    for (const std::string &string_var: m_Bvarnames) {
-      CP::SysWriteDecorHandle<bool> var {string_var+"_%SYS%", this};
-      m_Bbranches.emplace(string_var, var);
-      ATH_CHECK (m_Bbranches.at(string_var).initialize(m_systematicsList, m_eventHandle));
-    } 
+    ATH_CHECK (m_Bbranches.initialize(m_systematicsList, m_eventHandle)); 
     
     ATH_CHECK (m_systematicsList.initialize()); // Initialise syst list (must come after all syst-aware inputs and outputs)
     
@@ -46,8 +51,8 @@ namespace Easyjet
       ANA_CHECK (m_eventHandle.retrieve (event, sys));
       
       // Initialize variable values to 0
-      for (const std::string &string_var: m_Bvarnames) {
-        m_Bbranches.at(string_var).set(*event, false, sys);
+      for (uint8_t ivar=0; ivar<N_CHANNELS; ++ivar) {
+        m_Bbranches.at(ivar).set(*event, false, sys);
       }
 
       // Retrive inputs
@@ -61,9 +66,9 @@ namespace Easyjet
       N_HHBjets = bjets->size();
 
       // check if event falls into each analysis' loose selections, save variables to event info
-      if(N_HHBjets == 2 and N_HHPhotons >= 2) m_Bbranches.at("orth_pass_bbyy").set(*event,1,sys);
-      else if(N_HHBjets >= 3) m_Bbranches.at("orth_pass_bbbb").set(*event,1,sys);
-      else if(N_HHBjets == 2 and N_HHPhotons < 2) m_Bbranches.at("orth_pass_bbtt").set(*event,1,sys);
+      if(N_HHBjets == 2 and N_HHPhotons >= 2) m_Bbranches.at(BBYY).set(*event,1,sys);
+      else if(N_HHBjets >= 3) m_Bbranches.at(BBBB).set(*event,1,sys);
+      else if(N_HHBjets == 2 and N_HHPhotons < 2) m_Bbranches.at(BBTT).set(*event,1,sys);
       
     }
     
