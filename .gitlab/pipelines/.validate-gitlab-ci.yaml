@@ -508,3 +508,13 @@ validator_monojet_mc23:
       artifacts: false 
   script:
     - easyjet-validate monojet-mc23
+
+validator_ssWW_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ssWW_mc23
+      artifacts: false
+  script:
+    - easyjet-validate ssWW-mc23

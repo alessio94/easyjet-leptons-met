@@ -41,27 +41,22 @@ selection:
     - 'HLT_e26_lhtight_ivarloose_L1EM22VHI'
     - 'HLT_e60_lhmedium_L1EM22VHI'
     - 'HLT_e140_lhloose_L1EM22VHI'
-    - 'HLT_e17_lhvloose_L1EM15VHI'
-    - 'HLT_e20_lhvloose_L1EM15VH'
-    - 'HLT_e140_lhloose_noringer_L1EM22VHI'
-    - 'HLT_e250_etcut_L1EM22VHI'
-    - 'HLT_e300_etcut_L1EM22VHI'
     - 'HLT_mu24_ivarmedium_L1MU14FCH'
     - 'HLT_mu50_L1MU14FCH'
-    - 'HLT_mu60_0eta105_msonly_L1MU14FCH'
-    - 'HLT_mu60_L1MU14FCH'
-    - 'HLT_mu80_msonly_3layersEC_L1MU14FCH'
     '2023':
     - 'HLT_e26_lhtight_ivarloose_L1eEM26M'
     - 'HLT_e60_lhmedium_L1eEM26M'
-    - 'HLT_e140_lhloose_L1eEM26M'
-    - 'HLT_e140_lhloose_noringer_L1eEM26M'
     - 'HLT_e300_etcut_L1eEM26M'
+    - 'HLT_e140_lhloose_L1eEM26M'
     - 'HLT_mu24_ivarmedium_L1MU14FCH'
     - 'HLT_mu50_L1MU14FCH'
-    - 'HLT_mu60_0eta105_msonly_L1MU14FCH'
-    - 'HLT_mu60_L1MU14FCH'
-    - 'HLT_mu80_msonly_3layersEC_L1MU14FCH'
+    '2024':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M'
+    - 'HLT_e60_lhmedium_L1eEM26M'
+    - 'HLT_e140_lhloose_L1eEM26M'
+    # For muon, no recommendation for 2024, use 2023 triggers recommendation
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
 
 scale_factor:
   doSF: true
@@ -78,6 +73,14 @@ scale_factor:
     '2018':
     - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
     - 'HLT_mu26_ivarmedium || HLT_mu50'
+    '2022':
+    - 'HLT_e26_lhtight_ivarloose_L1EM22VHI || HLT_e60_lhmedium_L1EM22VHI || HLT_e140_lhloose_L1EM22VHI'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+    '2023':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+    '2024':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
   
   Electron:
     ID_Run2: "TightLH"
@@ -94,6 +97,12 @@ scale_factor:
       - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
       '2018':
       - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+      '2022':
+      - 'HLT_e26_lhtight_ivarloose_L1EM22VHI || HLT_e60_lhmedium_L1EM22VHI || HLT_e140_lhloose_L1EM22VHI'
+      '2023':
+      - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M || HLT_e300_etcut_L1eEM26M'
+      '2024':
+      - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
 
   Moun:
     ID: "Medium"
@@ -107,3 +116,8 @@ scale_factor:
       - 'HLT_mu26_ivarmedium || HLT_mu50'
       '2018':
       - 'HLT_mu26_ivarmedium || HLT_mu50'
+      '2022':
+      - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+      '2023':
+      - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+      '2024': []

@@ -274,6 +274,11 @@ ntupler_bbbbtt_mc23:
   script:
     - easyjet-test bbbbtt-mc23
 
+ntupler_ssWW_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test ssWW-mc23
+
 # systematics enabled
 
 syst_mc23:
