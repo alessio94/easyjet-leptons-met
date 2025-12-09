@@ -76,7 +76,7 @@ Small_R_jet:
 
 Large_R_jet:
   maxEta: 2.0
-  amount: 2
+  amount: 1
   GN2X_hbb_wps:
     - "FlatMassQCDEff_0p25"
     - "FlatMassQCDEff_0p3"
