@@ -57,7 +57,6 @@ Electron:
   Iso: Tight_VarRad
   min_pT: 27.e+3
   min_pT_ZCharm: 27.e+3
-  crackVeto: true
 
 Muon:
   ID: "Medium"

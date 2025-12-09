@@ -41,7 +41,6 @@ Large_R_jet:
 
 Electron:
   amount: 0
-  crackVeto: true
   trackSelection: true
   ID: "LooseBLayerLH"
   Iso: "Loose_VarRad"
@@ -64,7 +63,6 @@ Tau:
   ID: "Loose"
   min_pT: 20.e+3
   max_eta: 2.5
-  crackVeto: true
 
 
 Trigger:

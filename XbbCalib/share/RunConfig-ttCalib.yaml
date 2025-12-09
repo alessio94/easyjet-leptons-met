@@ -31,7 +31,6 @@ Electron:
   min_pT: 70.e+3
   ID: "TightLH"
   Iso: "Tight_VarRad"
-  crackVeto: true
 
 Muon:
   min_pT: 70.e+3
