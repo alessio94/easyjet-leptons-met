@@ -59,7 +59,6 @@ declare -A DATAFILES=(
     [VBSVV4q-mc20-llj1]=${LLJ1_TTBAR_MC20}
     [jjjj-mc20]=${PHYS_TTBAR_MC20}
     [ssWW-mc20]=${PHYS_TTBAR_MC20}
-    [ZQG-mc20]=${PHYS_TTBAR_MC20}
     [ZCharm-mc20]=${PHYS_TTBAR_MC20}
     [llyy-mc20]=${PHYS_TTBAR_MC20}
     [ttcalib-mc20]=${PHYS_TTBAR_MC20}
@@ -91,7 +90,6 @@ declare -A DATAFILES=(
     [bbbbtt-mc23]=${PHYS_TTBAR_MC23}
     [monojet-mc23]=${PHYS_TTBAR_MC23}
     [ssWW-mc23]=${PHYS_TTBAR_MC23}
-    [ZQG-mc23]=${PHYS_TTBAR_MC23}
     # systematics enabled
     [syst-mc23]=${PHYS_TTBAR_MC23}
     # non-ntupler workflows
@@ -140,7 +138,6 @@ declare -A TESTS=(
     [VBSVV4q-mc20-llj1]="simple VBSVV4q-ntupler"
     [jjjj-mc20]="simple jjjj-ntupler"
     [ssWW-mc20]="simple ssWW-ntupler"
-    [ZQG-mc20]="simple ZQG-ntupler"
     [ZCharm-mc20]="simple ZCharm-ntupler"
     [llyy-mc20]="simple llyy-ntupler"
     [ttcalib-mc20]="simple xbbcalib-ntupler"
@@ -175,7 +172,6 @@ declare -A TESTS=(
     [bbbbtt-mc23]="simple bbbbtt-ntupler"
     [monojet-mc23]="simple monojet-ntupler"
     [ssWW-mc23]="simple ssWW-ntupler"
-    [ZQG-mc23]="simple ZQG-ntupler"
     # non-ntupler
     [aod-fast-bbbb-mc23]="aod-fast bbbb-ntupler"
     [h5-fast-mc23]="h5-fast easyjet-ntupler"
@@ -208,7 +204,6 @@ declare -A CONFIGS=(
     [VBSVV4q-mc20-llj1]=VBSVV4qAnalysis/RunConfig-JJ-discojet.yaml
     [jjjj-mc20]=jjjjAnalysis/RunConfig-jjjj-bypass.yaml
     [ssWW-mc20]=ssWWAnalysis/RunConfig-Signal-ssWW-bypass.yaml
-    [ZQG-mc20]=ZQGAnalysis/RunConfig-ZQG-bypass.yaml
     [ZCharm-mc20]=ZCharmAnalysis/RunConfig-ZCharm-bypass.yaml
     [llyy-mc20]=HZallyyAnalysis/RunConfig-llyy-bypass.yaml
     [ttcalib-mc20]=XbbCalib/RunConfig-ttCalib-bypass.yaml
@@ -241,7 +236,6 @@ declare -A CONFIGS=(
     [bbbbtt-mc23]=bbbbttAnalysis/RunConfig-bbbbtt-bypass.yaml
     [monojet-mc23]=monojetAnalysis/RunConfig-Monojet-bypass.yaml
     [ssWW-mc23]=ssWWAnalysis/RunConfig-Signal-ssWW-bypass.yaml
-    [ZQG-mc23]=ZQGAnalysis/RunConfig-ZQG-bypass.yaml
     # MC23 AF3
     [SHbbyy-mc23af3]=bbyyAnalysis/RunConfig-Resonant-bypass.yaml
     # non-ntupler

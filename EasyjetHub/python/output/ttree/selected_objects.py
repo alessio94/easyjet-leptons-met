@@ -13,7 +13,6 @@ def get_selected_objects_branches_variables(flags, analysis):
         "Jet": get_selected_jet_branches_variables,
         "Jet_b": get_selected_jet_b_tagged_branches_variables,
         "Jet_c": get_selected_jet_c_tagged_branches_variables,
-        "Jet_l": get_selected_jet_untagged_branches_variables,
         "LargeRJet": get_selected_largeR_jet_branches_variables,
         "Photon": get_selected_photon_branches_variables,
         "Electron": get_selected_electron_branches_variables,
@@ -56,35 +55,6 @@ def get_selected_jet_branches_variables(flags, analysis):
             # Translate the name to an analysis specific convention
             branches += [f"EventInfo.Jet{index+1}_{var}_{sys_suffix} \
                         -> {analysis}_Jet{index+1}_{var}"
-                         + flags.Analysis.systematics_suffix_separator + sys_suffix]
-
-    return branches, float_variable_names, int_variable_names
-
-
-def get_selected_jet_untagged_branches_variables(flags, analysis):
-    branches = []
-    float_variable_names = []
-    int_variable_names = []
-
-    if not flags.Analysis.do_CP_systematics:
-        sys_suffix = "NOSYS"
-    else:
-        sys_suffix = "%SYS%"
-
-    # All jets
-    for var in [*flags.Analysis.Small_R_jet.variables_int_ljets,
-                *flags.Analysis.Small_R_jet.variables_ljets]:
-        if not flags.Input.isMC and "SF" in var:
-            continue
-        for index in range(flags.Analysis.Small_R_jet.amount):
-            # Store the float and int variables
-            if var in flags.Analysis.Small_R_jet.variables_ljets:
-                float_variable_names += [f"Jet_l{index+1}_{var}"]
-            if var in flags.Analysis.Small_R_jet.variables_int_ljets:
-                int_variable_names += [f"Jet_l{index+1}_{var}"]
-            # Translate the name to an analysis specific convention
-            branches += [f"EventInfo.Jet_l{index+1}_{var}_{sys_suffix} \
-                        -> {analysis}_Jet_l{index+1}_{var}"
                          + flags.Analysis.systematics_suffix_separator + sys_suffix]
 
     return branches, float_variable_names, int_variable_names

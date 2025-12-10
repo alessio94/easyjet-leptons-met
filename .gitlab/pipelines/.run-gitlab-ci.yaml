@@ -129,11 +129,6 @@ ntupler_ssWW_mc20:
   script:
     - easyjet-test ssWW-mc20
 
-ntupler_ZQG_mc20:
-  extends: .ntupler
-  script:
-    - easyjet-test ZQG-mc20
-
 ntupler_ZCharm_mc20:
   extends: .ntupler
   script:
@@ -298,11 +293,6 @@ ntupler_ssWW_mc23:
   extends: .ntupler
   script:
     - easyjet-test ssWW-mc23
-
-ntupler_ZQG_mc23:
-  extends: .ntupler
-  script:
-    - easyjet-test ZQG-mc23
 
 # systematics enabled
 

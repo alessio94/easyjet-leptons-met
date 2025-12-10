@@ -234,16 +234,6 @@ validator_ssWW_mc20:
   script:
     - easyjet-validate ssWW-mc20
 
-validator_ZQG_mc20:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_ZQG_mc20
-      artifacts: false
-  script:
-    - easyjet-validate ZQG-mc20
-
 validator_ZCharm_mc20:
   extends: .ntuple_validation
   needs:
@@ -558,13 +548,3 @@ validator_ssWW_mc23:
       artifacts: false
   script:
     - easyjet-validate ssWW-mc23
-
-validator_ZQG_mc23:
-  extends: .ntuple_validation
-  needs:
-    - job: compile
-      artifacts: true
-    - job: ntupler_ZQG_mc23
-      artifacts: false
-  script:
-    - easyjet-validate ZQG-mc23
