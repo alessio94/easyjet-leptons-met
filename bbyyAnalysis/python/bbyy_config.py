@@ -245,6 +245,7 @@ def bbyy_cfg(flags, smalljetkey, photonkey, muonkey, electronkey, largeRjetkey,
                     intVariableList_BDTInput=intVariableList_HHyyMVAInput,
                     floatVariableList=float_variables['HyyMVA'],
                     intVariableList=int_variables['HyyMVA'],
+                    doHyy_multiclass=flags.Analysis.do_Hyy_multiclass,
                     HyyMultiBDT_folder=flags.Analysis.HyyMultiBDT_folder
                 )
             )

@@ -42,6 +42,11 @@ ntupler_bbyy_data22_lite:
   script:
     - easyjet-test bbyy-data22-lite
 
+ntupler_HHandHyy_data22:
+  extends: .ntupler
+  script:
+    - easyjet-test HHandHyy-data22
+
 ntupler_SHbbyy_data22_lite:
   extends: .ntupler
   script:
@@ -63,6 +68,11 @@ ntupler_bbyy_mc20_lite:
   extends: .ntupler
   script:
     - easyjet-test bbyy-mc20-lite
+
+ntupler_HHandHyy_mc20:
+  extends: .ntupler
+  script:
+    - easyjet-test HHandHyy-mc20
 
 ntupler_bbtt_mc20:
   extends: .ntupler
@@ -202,6 +212,11 @@ ntupler_bbyy_mc23_lite:
   extends: .ntupler
   script:
     - easyjet-test bbyy-mc23-lite
+
+ntupler_HHandHyy_mc23:
+  extends: .ntupler
+  script:
+    - easyjet-test HHandHyy-mc23
 
 ntupler_llyy_mc23:
   extends: .ntupler

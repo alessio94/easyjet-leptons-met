@@ -62,6 +62,16 @@ validator_bbyy_data22_lite:
   script:
     - easyjet-validate bbyy-data22-lite
 
+validator_HHandHyy_data22:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_HHandHyy_data22
+      artifacts: false
+  script:
+    - easyjet-validate HHandHyy-data22
+
 validator_SHbbyy_data22_lite:
   extends: .ntuple_validation
   needs:
@@ -103,6 +113,16 @@ validator_bbyy_mc20_lite:
       artifacts: false
   script:
     - easyjet-validate bbyy-mc20-lite
+
+validator_HHandHyy_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_HHandHyy_mc20
+      artifacts: false
+  script:
+    - easyjet-validate HHandHyy-mc20
 
 validator_bbtt_mc20:
   extends: .ntuple_validation
@@ -478,6 +498,16 @@ validator_bbyy_mc23_lite:
       artifacts: false
   script:
     - easyjet-validate bbyy-mc23-lite
+
+validator_HHandHyy_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_HHandHyy_mc23
+      artifacts: false
+  script:
+    - easyjet-validate HHandHyy-mc23
 
 validator_llyy_mc23:
   extends: .ntuple_validation
