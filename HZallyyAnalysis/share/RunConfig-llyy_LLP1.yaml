@@ -1,0 +1,113 @@
+include: [EasyjetHub/base-config.yaml]
+
+# setting this to warning until the team decides they want to be using
+# expert mode
+expert_mode_warning_level: default
+
+# Which analysis to consider
+do_llyy_analysis: true
+
+bypass: false
+
+# Decay mode considered for truth decoration
+#Truth:
+#  decayModes: ["bbtt", "bbWW", "bbZZ", "bbyy"]
+
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_met : false
+do_photons : true
+
+# Toggles for reconstructed objects decorations
+# added do_thinning:false to keep photon without LooseID
+Small_R_jet:
+  min_pT: 20.e+3
+  max_eta: 4.4
+  runBJetPtCalib: false
+
+Electron:
+  ID: "MediumLH"
+  Iso: "Loose_VarRad"
+
+Muon:
+  ID: "Medium"
+  Iso: "PflowLoose_VarRad"
+
+Lepton:
+  amount: 2
+  variables_int: ["isPrompt","truthOrigin", "truthType"]
+
+Photon:
+  ID: "Loose"
+  Iso: "NonIso"
+  amount: 2
+  do_thinning: false
+  extra_wps: 
+    - ["Loose", "FixedCutLoose"]
+
+# orthogonality studies  
+orthogonality:
+  include: [EasyjetHub/orth-config.yaml ]
+  do_orth_check: false 
+
+# list of triggers per year to consider
+Trigger:
+  include: [HZallyyAnalysis/trigger.yaml]
+
+do_trigger_filtering: true
+do_overlap_removal: true
+
+#Enable cutflow 
+save_cutflow: true
+
+CutList :
+      - PASS_TRIGGER
+      - EXACTLY_TWO_LEPTONS
+      - TWO_OPPOSITE_CHARGE_LEPTONS
+      - LEP1_LEP2_DR
+      - LEP1_LEP2_PT
+      - DILEP_MASS
+      - DILEP_PT
+      - ATLEAST_ONE_PHOTON
+
+# Include the TTree configuration and update details
+
+GRL:
+  years:
+    include: [HZallyyAnalysis/lepton_grl_years.yaml]
+  files:
+    include: [HZallyyAnalysis/lepton_grl.yaml]
+
+PileupReweighting:
+  extra_prw:
+    - postfix: "photon"
+      lumicalc_files:
+        include: [HZallyyAnalysis/lumicalc_lepton.yaml]
+      prw_files:
+        include: [HZallyyAnalysis/prw_lepton.yaml]
+
+
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  slim_variables_with_syst: true
+  reco_outputs:
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    photons: 'container_names.output.photons'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+  collection_options:
+    photons:
+      shower_shapes: true
+      truth_labels: true
+      iso_variables: true
+  truth_outputs:
+    photons: 'container_names.input.truthphotons'
+    electrons: 'container_names.input.truthelectrons'
+    muons: 'container_names.input.truthmuons'
+  
+#truth_outputs:
+#  small_R_jets: 'container_names.input.truth4Jet'
+#  higgs_particle: 'container_names.output.truthHHParticles'
