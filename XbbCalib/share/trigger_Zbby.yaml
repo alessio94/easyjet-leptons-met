@@ -13,7 +13,9 @@ selection:
     '2023':
     - 'HLT_g140_loose_L1EM22VHI'
     - 'HLT_g140_loose_L1eEM26M'
-
+    '2024':
+    - 'HLT_g140_loose_L1eEM26M'
+    - 'HLT_g140_loose_L1EM22VHI'
 
 # scale_factor:
 #   doSF: True
