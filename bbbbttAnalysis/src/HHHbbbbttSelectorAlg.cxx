@@ -334,7 +334,7 @@ namespace HHHBBBBTT
           passTauWP |= m_antiTauDecorHandle.get(*tau, sys) > 0;
         }
         m_selected_tau.set(*tau, false, sys);
-        if (passTauWP && tau->pt() > 20. * Athena::Units::GeV)
+        if (passTauWP && tau->pt() > m_minTauPt)
         {
           m_selected_tau.set(*tau, true, sys);
           n_taus += 1;
@@ -1277,7 +1277,7 @@ namespace HHHBBBBTT
     int year = m_year.get(*event, sys);
 
     // Single-tau trigger
-    m_pt_threshold[HHHBBBBTT::STT][HHHBBBBTT::subleadingtau] = 20. * Athena::Units::GeV;
+    m_pt_threshold[HHHBBBBTT::STT][HHHBBBBTT::subleadingtau] = 13. * Athena::Units::GeV;
     float min_tau_STT = 180. * Athena::Units::GeV;
     if(year==2015 || m_is2016_periodA.get(*event, sys))
       min_tau_STT = 100. * Athena::Units::GeV;

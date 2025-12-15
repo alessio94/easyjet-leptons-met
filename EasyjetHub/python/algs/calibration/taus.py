@@ -40,6 +40,10 @@ def tau_sequence(flags, configAcc):
         configSeq += makeConfig('TauJets.WorkingPoint')
         configSeq.setOptionValue('.containerName', output_name)
         configSeq.setOptionValue('.selectionName', id)
+        if "Custom" in id:
+            manualMinTauPt = flags.Analysis.Tau.min_pT * 0.001
+            configSeq.setOptionValue('.useSelectionConfigFile', False)
+            configSeq.setOptionValue('.manual_sel_minpt', manualMinTauPt)
         if "eleid" in id:
             configSeq.setOptionValue('.use_eVeto', True)
         if "GNTau" in id:
@@ -50,6 +54,7 @@ def tau_sequence(flags, configAcc):
             configSeq.setOptionValue('.dropPtCut', True)
         quality = id.replace("_eleid", "").replace("GNTau", "").replace("RNN", "")
         quality = quality.replace("_lowpt", "").replace("_nopt", "")
+        quality = quality.replace("Custom", "")
         configSeq.setOptionValue('.quality', quality)
         configSeq.setOptionValue('.saveCombinedSF', True)
 

@@ -45,6 +45,7 @@ def bbbbtt_cfg(flags, smalljetkey, muonkey, electronkey,
 
     cfg.merge(TauSelectorAlgCfg(flags,
                                 # Baseline always needed for anti-taus
+                                minPt=flags.Analysis.Tau.min_pT,
                                 containerInKey=taukey,
                                 containerOutKey="bbbbttAnalysisTaus_%SYS%"))
 
@@ -64,6 +65,7 @@ def bbbbtt_cfg(flags, smalljetkey, muonkey, electronkey,
             "HHHbbbbttSelectorAlg",
             bTagWPDecorName="ftag_select_" + flags.Analysis.Small_R_jet.btag_wp,
             tauWP=flags.Analysis.Tau.extra_wps[0],
+            minTauPt=flags.Analysis.Tau.min_pT,
             muonWPs=muon_WPs,
             eleWPs=ele_WPs,
             useNonIsoLeptons=use_noniso_leptons,

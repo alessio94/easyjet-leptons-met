@@ -1,4 +1,4 @@
-include: [bbbbttAnalysis/RunConfig-bbbbtt.yaml]
+include: [bbbbttAnalysis/RunConfig-bbbbtt-lowTauPt.yaml]
 
 bypass: true
 do_trigger_filtering: false

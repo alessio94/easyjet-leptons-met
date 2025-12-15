@@ -98,6 +98,9 @@ private:
     CP::SysReadDecorHandle<char> m_tauWPDecorHandle{"", this};
     CP::SysReadDecorHandle<char> m_antiTauDecorHandle{"isAntiTau", this};
 
+    Gaudi::Property<float> m_minTauPt
+      {this, "minTauPt", 20e3, "Minimum pT of taus"};
+
     CP::SysReadDecorHandle<char> 
     m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
 
