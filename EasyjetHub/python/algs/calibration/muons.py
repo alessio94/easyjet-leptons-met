@@ -57,8 +57,6 @@ def muon_sequence(flags, configAcc):
                 impact_params_name = impact_params_name.replace('.', 'p')
                 selectionName += '_' + impact_params_name
         configSeq.setOptionValue('.selectionName', selectionName)
-        # To be removed with 25.2.57
-        configSeq.setOptionValue('.postfix', selectionName)
 
         if "nottva" in id:
             configSeq.setOptionValue('.trackSelection', False)
