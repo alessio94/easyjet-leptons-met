@@ -2,7 +2,7 @@ ptag_mc=p6697
 ptag_data=p6700
 campaign=v1p999bgt
 dir_samples="../easyjet/bbyyAnalysis/datasets/PHYS/nominal/"
-yaml="RunConfig-HHandHyy-skimming-loosest.yaml"
+yaml="RunConfig-HH_H-skimming-loosest.yaml"
 mc_campaign="mc23_13p6TeV"
 mc_list_sample_names=(
     "$mc_campaign.HH_bbyy_SM.$ptag_mc.txt"
@@ -12,13 +12,11 @@ mc_list_sample_names=(
     "$mc_campaign.yyBkg.$ptag_mc.txt"
 )
 
-# --nFiles 200 to avoid gigantic yyjets
 easyjet-gridsubmit --mc-list <(sed -e '$a\' "${mc_list_sample_names[@]/#/${dir_samples}}") \
     --run-config bbyyAnalysis/${yaml} \
     --exec bbyy-ntupler \
     --nGBperJob 20 \
     --campaign ${campaign} \
-    --nFiles 200 \
     --noEmail
 
 easyjet-gridsubmit --data-list ${dir_samples}/data_13p6TeV.Run3.${ptag_data}.txt \
