@@ -7,8 +7,9 @@ Electron:
   - ["MediumLH", "Tight_VarRad"]  
   - ["MediumLH", "Loose_VarRad"]  
   - ["MediumLH", "NonIso"]  # The last one is used for Fake Factor method antiID region 
+  
   max_eta_ssWW: 2.47
-  chargeIDSelectionRun2: true
+  chargeIDSelectionRun2: false #Set to false for investigating charge MisID 
   do_track_decoration: true
   do_IFF_decoration: true
 

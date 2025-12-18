@@ -281,40 +281,81 @@ namespace ssWWVBS
           }
         }      
       }
-      else if (pass_baseline && m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS)) {
+      else if (pass_baseline && m_bools.at(ssWWVBS::EXACTLY_THREE_LEPTONS)) 
+      {
         // WZ control region (WZCR)
-        std::vector<std::pair<TLorentzVector, int>> leptons; // Store 4-momenta and charges
+        std::vector<std::pair<const xAOD::IParticle*, int>> leptons; // Store leptons
+        std::vector<std::pair<TLorentzVector, int>> selected_leptons; //store 4-momenta and charges of 3 selected leptons
 
         // Collect electrons 4-momenta and charges
-        for (const auto& ele : *electrons) {
-            leptons.emplace_back(ele->p4(), ele->charge());
+        for (const auto& ele : *electrons) 
+        {
+            leptons.emplace_back(ele, -11*ele->charge());
         }
 
         // Collect muons 4-momenta and charges
-        for (const auto& mu : *muons) {
-            leptons.emplace_back(mu->p4(), mu->charge());
+        for (const auto& mu : *muons) 
+        {
+            leptons.emplace_back(mu, -13*mu->charge());
         }
 
-        if (leptons.size() == 3) {
+        if (leptons.size() >= 3) 
+        {
             // Sort leptons by pT in descending order
-            std::sort(leptons.begin(), leptons.end(),
-                      [](const std::pair<TLorentzVector, int>& a, const std::pair<TLorentzVector, int>& b) {
-                          return a.first.Pt() > b.first.Pt();
-                      });
+          std::sort(leptons.begin(), leptons.end(),
+              [](const std::pair<const xAOD::IParticle*, int>& a,
+              const std::pair<const xAOD::IParticle*, int>& b) {
+              return a.first->pt() > b.first->pt(); });
+
+          selected_leptons.emplace_back(leptons[0].first->p4(), leptons[0].second);
+          selected_leptons.emplace_back(leptons[1].first->p4(), leptons[1].second);
+            
+            //Checking that 3rd lepton passes ID cuts
+          for (size_t i = 2; i < leptons.size() && selected_leptons.size()<3; ++i) 
+          {
+            const xAOD::IParticle* lep = leptons[i].first;
+            int id = leptons[i].second;
+            if (std::abs(id) == 11) 
+            {
+              const xAOD::Electron* lep3 = dynamic_cast<const xAOD::Electron*>(lep);
+              if (lep3 && m_eleWPDecorHandle.get(*lep3, sys) == 1 &&
+                lep3->pt() > 15. * Athena::Units::GeV &&
+                (((std::abs(lep3->eta()) < 1.37) || (std::abs(lep3->eta()) > 1.52)) &&
+                (lep3->author() == 1))) 
+              {  
+                m_ele_selected.set(*lep3, true, sys);
+                selected_leptons.emplace_back(lep3->p4(), id);
+              } 
+            }
+            if(std::abs(id) == 13)
+            {
+              const xAOD::Muon* lep3 = dynamic_cast<const xAOD::Muon*>(lep);
+              if (lep3 && m_muonWPDecorHandle.get(*lep3, sys) == 1 &&
+              lep3->pt() > 15. * Athena::Units::GeV) 
+              {
+                m_mu_selected.set(*lep3, true, sys);
+                selected_leptons.emplace_back(lep3->p4(), id);
+              }
+            }
+          }
+        }
+
+        if(selected_leptons.size()==3)
+        {
                       //std::cout<<"WZCR:  "<< leptons[0].first.Pt() <<"     "<<leptons[1].first.Pt()<<"     "<<leptons[2].first.Pt()<<std::endl;
-
             // Calculate the invariant mass of the three leptons and opposite_charges
-            TLorentzVector totalP4 = leptons[0].first + leptons[1].first + leptons[2].first;
+            TLorentzVector totalP4 = selected_leptons[0].first + selected_leptons[1].first + selected_leptons[2].first;
             double mlll = totalP4.M();
-            bool opposite_charges = (leptons[0].second * leptons[1].second < 0) ||
-                                    (leptons[0].second * leptons[2].second < 0) ||
-                                    (leptons[1].second * leptons[2].second < 0);
+            bool opposite_charges_same_flav = (selected_leptons[0].second + selected_leptons[1].second == 0) ||
+                                    (selected_leptons[0].second + selected_leptons[2].second == 0) ||
+                                    (selected_leptons[1].second + selected_leptons[2].second == 0); //Checking that at least two leptons are sf/os
 
-            if (mlll > 106. * Athena::Units::GeV && opposite_charges) {
+            if (mlll > 106. * Athena::Units::GeV && opposite_charges_same_flav) {
                 m_bools.at(ssWWVBS::pass_WZCR) = 1;
             }
         }
       }
+
       else if (pass_baseline && m_bools.at(ssWWVBS::EXACTLY_TWO_LEPTONS) && !( m_bools.at(ssWWVBS::TWO_SAME_CHARGE_LEPTONS) ) ) {
         if(m_bools.at(ssWWVBS::AT_LEAST_TWO_JETS) && m_bools.at(ssWWVBS::DIJETS_DELTA_RAPIDITY) && m_bools.at(ssWWVBS::DIJETS_MASS_HIGH) && m_bools.at(ssWWVBS::BJET_VETO) ){
               if( m_bools.at(ssWWVBS::MET)){

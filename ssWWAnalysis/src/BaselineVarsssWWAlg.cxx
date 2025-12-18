@@ -177,33 +177,25 @@ namespace ssWWVBS
       m_Ibranches.at("nForwardJets").set(*event, nForwardJets, sys);
 
       // selected leptons;
-      const xAOD::Electron* ele0 = nullptr;
-      const xAOD::Electron* ele1 = nullptr;
-      for(const xAOD::Electron* electron : *electrons) {
-        if(!ele0 && m_ele_selected.get(*electron, sys)) ele0 = electron;
-        else if(ele0 && m_ele_selected.get(*electron, sys)) {
-          ele1 = electron;
-          break;
-        }
-      }
-      
-      const xAOD::Muon* mu0 = nullptr;
-      const xAOD::Muon* mu1 = nullptr;
-      for(const xAOD::Muon* muon : *muons) {
-        if(!mu0 && m_mu_selected.get(*muon, sys)) mu0 = muon;
-        else if(mu0 && m_mu_selected.get(*muon, sys)) {
-          mu1 = muon;
-          break;
-        }
-      }
-      
-      std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
-      if(ele0) leptons.emplace_back(ele0, -11*ele0->charge());
-      if(mu0) leptons.emplace_back(mu0, -13*mu0->charge());
-      if(ele1) leptons.emplace_back(ele1, -11*ele1->charge());
-      if(mu1) leptons.emplace_back(mu1, -13*mu1->charge());
 
+      std::vector<std::pair<const xAOD::IParticle*, int>> leptons;
+      
+      for(const xAOD::Electron* electron : *electrons) {
+        if(m_ele_selected.get(*electron, sys))
+        {
+          leptons.emplace_back(electron, -11*electron->charge());
+        }
+      }
+
+      for(const xAOD::Muon* muon : *muons) {
+        if(m_mu_selected.get(*muon, sys))
+        {
+          leptons.emplace_back(muon, -13*muon->charge());
+        }
+      }
+      
       int nLeptons = leptons.size();
+
       m_Ibranches.at("nLeptons").set(*event, nLeptons, sys);
 
       std::sort(leptons.begin(), leptons.end(),
@@ -211,7 +203,7 @@ namespace ssWWVBS
               const std::pair<const xAOD::IParticle*, int>& b) {
             return a.first->pt() > b.first->pt(); });
 
-      for(int i=0; i<std::min(nLeptons, 2); i++){
+      for(int i=0; i<std::min(nLeptons, 3); i++){
         std::string prefix = "Lepton"+std::to_string(i+1);
         TLorentzVector tlv = leptons[i].first->p4();
         int lep_pdgid = leptons[i].second;
