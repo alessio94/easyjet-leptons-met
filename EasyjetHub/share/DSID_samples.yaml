@@ -130,3 +130,24 @@ DSID_vgammaOR:
  
 DSID_HHH4b2tau_KappaReweight:
   - 561760 #MGPy8EG_A14NNPDF30NLO_HHH_4b2tau_k3k4_1_1
+
+
+DSID_ICPDF_Reweight:
+  - 513105 #mc23: MGPy8EG_Zee_FxFx3jHT2bias_SW_BFilter
+  - 513106 #mc23: MGPy8EG_Zee_FxFx3jHT2bias_SW_CFilterBVeto
+  - 513107 #mc23: MGPy8EG_Zee_FxFx3jHT2bias_SW_CVetoBVeto
+  - 513108 #mc23: MGPy8EG_Zmumu_FxFx3jHT2bias_SW_BFilter
+  - 513109 #mc23: MGPy8EG_Zmumu_FxFx3jHT2bias_SW_CFilterBVeto
+  - 513110 #mc23: MGPy8EG_Zmumu_FxFx3jHT2bias_SW_CVetoBVeto
+  - 513111 #mc23: MGPy8EG_Ztautau_FxFx3jHT2bias_SW_BFilter
+  - 513112 #mc23: MGPy8EG_Ztautau_FxFx3jHT2bias_SW_CFilterBVeto
+  - 513113 #mc23: MGPy8EG_Ztautau_FxFx3jHT2bias_SW_CVetoBVeto
+  - 506193 #mc20: MGPy8EG_Zee_FxFx_3jets_HT2bias_BFilter
+  - 506194 #mc20: MGPy8EG_Zee_FxFx_3jets_HT2bias_CFilterBVeto
+  - 506195 #mc20: MGPy8EG_Zee_FxFx_3jets_HT2bias_CVetoBVeto
+  - 506196 #mc20: MGPy8EG_Zmumu_FxFx_3jets_HT2bias_BFilter
+  - 506197 #mc20: MGPy8EG_Zmumu_FxFx_3jets_HT2bias_CFilterBVeto
+  - 506198 #mc20: MGPy8EG_Zmumu_FxFx_3jets_HT2bias_CVetoBVeto
+  - 512198 #mc20: MGPy8EG_FxFx_Ztautau_3jets_HT2bias_BFilter
+  - 512199 #mc20: MGPy8EG_FxFx_Ztautau_3jets_HT2bias_CFilterBVeto
+  - 512200 #mc20: MGPy8EG_FxFx_Ztautau_3jets_HT2bias_CVetoBVeto

@@ -11,7 +11,7 @@ from EasyjetHub.algs.postprocessing.SelectorAlgConfig import (
     JetSelectorAlgCfg)
 from EasyjetHub.output.ttree.selected_objects import (
     get_selected_lepton_branches_variables,
-    get_selected_jet_b_tagged_branches_variables,
+    get_selected_jet_tagged_branches_variables,
 
 )
 
@@ -289,7 +289,7 @@ def bbll_branches(flags):
     (object_level_branches['jets'],
      object_level_float_variables['jets'],
      object_level_int_variables['jets']) = \
-        get_selected_jet_b_tagged_branches_variables(flags, "bbll")
+        get_selected_jet_tagged_branches_variables(flags, "bbll", 'b')
 
     float_variable_names['jets'] += object_level_float_variables['jets']
     int_variable_names['jets'] += object_level_int_variables["jets"]

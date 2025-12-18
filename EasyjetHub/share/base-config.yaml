@@ -76,6 +76,7 @@ Small_R_jet:
   amount: 0
   amount_bjet: 0
   amount_cjet: 0
+  amount_ljet: 0
   amount_leadingjet: 0
   systModelJES: "Category"
   systModelJER: "Full"
@@ -84,9 +85,11 @@ Small_R_jet:
   btag_egReductionLight: "Loose"
   variables_bjets: ["pt", "eta", "phi", "E"]
   variables_cjets: ["pt", "eta", "phi", "E"]
+  variables_ljets: ["pt", "eta", "phi", "E"]
   variables_allJets: ["pt", "eta", "phi", "E"]
   variables_int_bjets: []
   variables_int_cjets: []
+  variables_int_ljets: []
   variables_int_allJets: []
 
 Large_R_jet:
@@ -198,7 +201,6 @@ Track:
   amount: 0  # Number of leading tracks (0 = all passing selection)
   variables: []  # Not needed with automatic filling - left for compatibility
   variables_int: []  # Not needed with automatic filling - left for compatibility
-
 
 OverlapRemoval:
   # Enable specific TauAntiTauJet overlap removal, mostly for bbtt analysis
