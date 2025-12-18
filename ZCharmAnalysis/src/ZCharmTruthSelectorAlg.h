@@ -59,9 +59,6 @@ namespace ZCC
       SG::ReadHandleKey<xAOD::JetContainer>
       m_truthjetsInKey{ this, "truthSmallJetInContainer", "", "Truth jet container to read" };
 
-      SG::ReadHandleKey<xAOD::JetContainer>
-      m_truthlargejetInKey{ this, "truthLargeJetInContainer", "", "Truth large R Jet container to read" };
-
       SG::ReadHandleKey<xAOD::EventInfo>
       m_eventInKey{ this, "event", "EventInfo", "EventInfo container to read" };
 
@@ -88,11 +85,8 @@ namespace ZCC
         {ZCC::EXACTLY_TWO_LEPTONS_TRUTH, "EXACTLY_TWO_LEPTONS_TRUTH"},
         {ZCC::OPPOSITE_CHARGE_LEPTONS_TRUTH, "OPPOSITE_CHARGE_LEPTONS_TRUTH"},
         {ZCC::DILEPTON_MASS_WINDOW_TRUTH, "DILEPTON_MASS_WINDOW_TRUTH"},
-        {ZCC::ONE_B_JETS_TRUTH, "ONE_B_JETS_TRUTH"},
-        {ZCC::TWO_B_JETS_TRUTH, "TWO_B_JETS_TRUTH"},
         {ZCC::ONE_C_JETS_TRUTH, "ONE_C_JETS_TRUTH"},
         {ZCC::TWO_C_JETS_TRUTH, "TWO_C_JETS_TRUTH"},
-        {ZCC::ONE_LARGE_JET_TRUTH, "ONE_LARGE_JET_TRUTH"},
       };
 
       CutManager m_ZCharmTruthCuts;
@@ -117,9 +111,7 @@ namespace ZCC
 
       void truthOverlapRemoval(const xAOD::JetContainer& truthJets, const xAOD::TruthParticleContainer& truthElectrons, const xAOD::TruthParticleContainer& truthMuons, ConstDataVector<xAOD::JetContainer>& jetsAfterOverlap);
       void evaluateTruthLeptonCuts(const xAOD::EventInfo& truthevent, const xAOD::TruthParticleContainer& truthElectrons, const xAOD::TruthParticleContainer& truthMuons, CutManager& ZCharmTruthCuts);
-      void evaluateTruthBJetCuts(const ConstDataVector<xAOD::JetContainer>& truthBjets, CutManager& ZCharmTruthCuts);
       void evaluateTruthCJetCuts(const ConstDataVector<xAOD::JetContainer>& truthCjets, CutManager& ZCharmTruthCuts);
-      void evaluateTruthLargeJetCuts(const xAOD::JetContainer& truthLargeJets);
       void setThresholds(const xAOD::EventInfo* event);
       StatusCode initialiseCutflow(); 
   };

@@ -22,7 +22,6 @@ bypass: false
 do_small_R_jets: true
 do_muons: true
 do_electrons: true
-do_large_R_UFO_jets: true
 do_met: true
 
 # Toggles for reconstructed objects decorations
@@ -47,10 +46,6 @@ Small_R_jet:
   variables_int_cjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]
 
   variables_truthjets: ["pt", "eta", "phi", "E"]
-
-Large_R_jet:
-  amount: 1
-  variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_DXcc", "GN2Xv01_phbb", "GN2Xv01_phcc", "GN2Xv01_pqcd", "GN2Xv01_ptop"]
 
 Electron:
   ID: "TightLH"
@@ -99,8 +94,6 @@ CutList :
       - EXACTLY_TWO_LEPTONS
       - OPPOSITE_CHARGE_LEPTONS
       - DILEPTON_MASS_WINDOW
-      - ONE_B_JETS
-      - TWO_B_JETS
       - ONE_C_JETS
       - TWO_C_JETS
 
@@ -113,8 +106,6 @@ TruthCutList :
       - EXACTLY_TWO_LEPTONS_TRUTH
       - OPPOSITE_CHARGE_LEPTONS_TRUTH
       - DILEPTON_MASS_WINDOW_TRUTH
-      - ONE_B_JETS_TRUTH
-      - TWO_B_JETS_TRUTH
       - ONE_C_JETS_TRUTH
       - TWO_C_JETS_TRUTH
 
@@ -129,22 +120,8 @@ ttree_output:
   # Our overrides. All defaults are off
   slim_variables_with_syst: true
   reco_outputs:
-    small_R_jets: 'container_names.output.reco4PFlowJet'
-    muons: 'container_names.output.muons'
-    electrons: 'container_names.output.electrons'
     met : 'container_names.output.met'
-    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
-  collection_options:
-    small_R_jets:
-      btag_info: true
-      btag_details: true
-      # JVT_details: true
-    large_R_jets:
-      substructure_info: true
-      truth_labels: true
-      btag_details: true
   truth_outputs:
     electrons: "ZCharmTruthElectrons"
     muons: "ZCharmTruthMuons"
     small_R_jets: "ZCharmTruthJets"
-    large_R_jets: ["ZCharmTruthLargeJets"]

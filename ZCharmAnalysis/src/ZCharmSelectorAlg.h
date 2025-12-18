@@ -64,9 +64,6 @@ namespace ZCC
       CP::SysReadHandle<xAOD::JetContainer>
       m_jetHandle{ this, "jets", "ZCharmAnalysisJets_%SYS%", "Jet container to read" };
 
-      CP::SysReadHandle<xAOD::JetContainer> 
-      m_largejetHandle{ this, "largejets", "ZCharmAnalysisLargeJets_%SYS%", "Large R Jet container to read"};
-
       CP::SysReadDecorHandle<char> 
       m_isBtag {this, "bTagWPDecorName", "", "Name of input dectorator for b-tagging"};
  
@@ -102,8 +99,7 @@ namespace ZCC
 
       std::unordered_map<ZCC::TriggerChannel, std::string> m_triggerChannels = 
       {
-        {ZCC::SLT, "SLT"},
-        {ZCC::DLT, "DLT"},
+        {ZCC::SLT, "SLT"}
       };
 
       SG::ReadDecorHandleKey<xAOD::EventInfo> m_passTruthCutsKey {this, "PassTruthCuts", "EventInfo.PassTruthCuts", "Name of the truth cuts decorator"};
@@ -126,18 +122,14 @@ namespace ZCC
         {ZCC::IS_em, "IS_em"},
 
         {ZCC::pass_trigger_SLT, "pass_trigger_SLT"},
-        {ZCC::pass_trigger_DLT, "pass_trigger_DLT"},
 
         {ZCC::PASS_TRIGGER, "PASS_TRIGGER"},
         {ZCC::EXACTLY_TWO_LEPTONS, "EXACTLY_TWO_LEPTONS"},
         {ZCC::OPPOSITE_CHARGE_LEPTONS, "OPPOSITE_CHARGE_LEPTONS"},
         {ZCC::DILEPTON_MASS_WINDOW, "DILEPTON_MASS_WINDOW"},
 
-        {ZCC::ONE_B_JETS, "ONE_B_JETS"},
-        {ZCC::TWO_B_JETS, "TWO_B_JETS"},
         {ZCC::ONE_C_JETS, "ONE_C_JETS"},
         {ZCC::TWO_C_JETS, "TWO_C_JETS"},
-        {ZCC::ONE_LARGE_JET, "ONE_LARGE_JET"},
       };
 
       CutManager m_ZCharmCuts;
@@ -172,9 +164,7 @@ namespace ZCC
 
       void evaluateLeptonCuts(const xAOD::ElectronContainer& electrons,
                           const xAOD::MuonContainer& muons, CutManager& ZCharmCuts);
-      void evaluateBJetCuts(const ConstDataVector<xAOD::JetContainer>& bjets, CutManager& ZCharmCuts);
       void evaluateCJetCuts(const ConstDataVector<xAOD::JetContainer>& cjets, CutManager& ZCharmCuts);
-      void evaluateLargeJetCuts(const xAOD::JetContainer *largeJets);
       void setThresholds(const xAOD::EventInfo* event, const CP::SystematicSet& sys);
       StatusCode initialiseCutflow();
   };

@@ -28,7 +28,6 @@ namespace ZCC
 
 
     ATH_CHECK (m_truthjetsInKey.initialize());
-    ATH_CHECK (m_truthlargejetInKey.initialize());
     ATH_CHECK (m_truthelectronInKey.initialize());
     ATH_CHECK (m_truthmuonInKey.initialize());
     ATH_CHECK (m_eventInKey.initialize());   
@@ -63,18 +62,15 @@ namespace ZCC
 
   StatusCode ZCharmTruthSelectorAlg::execute()
   {
-
     // FilterReporter filter(m_filterParams, false);
 
     SG::ReadHandle<xAOD::EventInfo> truthEvents(m_eventInKey);
     SG::ReadHandle<xAOD::JetContainer> truthJets(m_truthjetsInKey);
-    SG::ReadHandle<xAOD::JetContainer> truthLargeJets(m_truthlargejetInKey);
     SG::ReadHandle<xAOD::TruthParticleContainer> truthElectrons(m_truthelectronInKey);
     SG::ReadHandle<xAOD::TruthParticleContainer> truthMuons(m_truthmuonInKey);
     SG::ReadDecorHandle<xAOD::JetContainer, int> truthFlavour(m_jetTruthFlavourKey);
 
     auto jets_after_overlap = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
-    auto truthbjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
     auto truthcjets = std::make_unique<ConstDataVector<xAOD::JetContainer>>(SG::VIEW_ELEMENTS);
 
     for (auto [var, key] : m_FbranchesKeys){
@@ -91,18 +87,14 @@ namespace ZCC
     truthOverlapRemoval(*truthJets, *truthElectrons, *truthMuons, *jets_after_overlap);
 
     for (const xAOD::Jet *jet : *jets_after_overlap){
-      bool isbjet=false;
       bool iscjet=false;
       int truthlabel = truthFlavour(*jet);
-      if (truthlabel == 5){
-        isbjet = true;
-      } else if (truthlabel == 4){
+
+      if (truthlabel == 4){
         iscjet = true;
       }
-      if(isbjet) truthbjets->push_back(jet);
       if(iscjet) truthcjets->push_back(jet);
     }
-
 
     int n_cjets = truthcjets->size();
     for (int i=0; i<std::min(n_cjets, 2); ++i){
@@ -147,7 +139,6 @@ namespace ZCC
         const xAOD::TruthParticle*& b) {
       return a->pt() > b->pt(); });
 
-
     m_bools.at(ZCC::IS_ee_TRUTH) = false;
     m_bools.at(ZCC::IS_mm_TRUTH) = false;
     m_bools.at(ZCC::IS_em_TRUTH) = false;
@@ -156,16 +147,11 @@ namespace ZCC
     m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS_TRUTH) = false;
     m_bools.at(ZCC::DILEPTON_MASS_WINDOW_TRUTH) = false;
 
-    m_bools.at(ZCC::ONE_B_JETS_TRUTH) = false;
-    m_bools.at(ZCC::TWO_B_JETS_TRUTH) = false;
     m_bools.at(ZCC::ONE_C_JETS_TRUTH) = false;
     m_bools.at(ZCC::TWO_C_JETS_TRUTH) = false;
-    m_bools.at(ZCC::ONE_LARGE_JET_TRUTH) = false;
 
     evaluateTruthLeptonCuts(*truthevent, *truthElectrons, *truthMuons, m_ZCharmTruthCuts);
-    evaluateTruthBJetCuts(*truthbjets, m_ZCharmTruthCuts);
     evaluateTruthCJetCuts(*truthcjets, m_ZCharmTruthCuts);
-    evaluateTruthLargeJetCuts(*truthLargeJets);
     
     bool pass_truth_baseline=true;
     for (const auto& [key, value] : m_boolnames) {
@@ -202,6 +188,7 @@ namespace ZCC
     }
 
     ATH_MSG_VERBOSE("pass_truth_baseline = " << pass_truth_baseline);
+    
     SG::WriteDecorHandle<xAOD::EventInfo, bool> passTruthCutsHandle(m_passTruthCutsKey);
     passTruthCutsHandle(*truthevent) = pass_truth_baseline;
 
@@ -210,7 +197,7 @@ namespace ZCC
       handle(*truthevent) = m_bools.at(key);
     }
 
-  return StatusCode::SUCCESS;
+    return StatusCode::SUCCESS;
   }
 
   StatusCode ZCharmTruthSelectorAlg::finalize()
@@ -233,6 +220,7 @@ namespace ZCC
   void ZCharmTruthSelectorAlg::truthOverlapRemoval(const xAOD::JetContainer& truthJets, const xAOD::TruthParticleContainer& truthElectrons, const xAOD::TruthParticleContainer& truthMuons, ConstDataVector<xAOD::JetContainer>& jetsAfterOverlap){
 
     float dRcut = 0.4;
+    
     for (const xAOD::Jet* jet : truthJets){
       TLorentzVector jet_p4 = jet->p4();
       bool keep = true;
@@ -260,16 +248,13 @@ namespace ZCC
 
   void ZCharmTruthSelectorAlg::evaluateTruthLeptonCuts(const xAOD::EventInfo& truthevent, const xAOD::TruthParticleContainer& truthelectrons, const xAOD::TruthParticleContainer& truthmuons, CutManager& ZCharmTruthCuts)
   {
-  
     TLorentzVector ll;
     double mll = -99;
 
     bool OPPOSITE_CHARGE_LEPTONS_TRUTH = false;
 
     if (truthelectrons.size() + truthmuons.size() == 2) {
-    
       m_bools.at(ZCC::EXACTLY_TWO_LEPTONS_TRUTH) = true;
-
     }
       
     if (truthelectrons.size() >= 2 && truthmuons.size() == 0)
@@ -293,9 +278,7 @@ namespace ZCC
       OPPOSITE_CHARGE_LEPTONS_TRUTH = truthelectrons.at(0)->charge()*truthmuons.at(0)->charge() == -1;
     }
     
-
     mll = ll.M();
-
 
     std::string prefix = "Truth_ll";
     m_Fbranches.at(prefix+"_pt")(truthevent) = ll.Pt();
@@ -304,31 +287,18 @@ namespace ZCC
     m_Fbranches.at(prefix+"_E")(truthevent) = ll.E();
     m_Fbranches.at(prefix+"_m")(truthevent) = mll;
 
-
-    if(ZCharmTruthCuts.exists("OPPOSITE_CHARGE_LEPTONS_TRUTH")) m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS_TRUTH) = OPPOSITE_CHARGE_LEPTONS_TRUTH;
-    if(ZCharmTruthCuts.exists("DILEPTON_MASS_WINDOW_TRUTH")) m_bools.at(ZCC::DILEPTON_MASS_WINDOW_TRUTH) = ( mll >= 76.*Athena::Units::GeV && mll <= 106.*Athena::Units::GeV );
-
-  }
-
-  void ZCharmTruthSelectorAlg::evaluateTruthBJetCuts
-  (const ConstDataVector<xAOD::JetContainer>& truthbjets, CutManager& ZCharmTruthCuts)
-  { 
-
-    ///All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the ZCharm_config file.
-    if (truthbjets.size() >= 1 && ZCharmTruthCuts.exists("ONE_B_JETS_TRUTH")){
-      m_bools.at(ZCC::ONE_B_JETS_TRUTH) = true;
+    if(ZCharmTruthCuts.exists("OPPOSITE_CHARGE_LEPTONS_TRUTH")) {
+      m_bools.at(ZCC::OPPOSITE_CHARGE_LEPTONS_TRUTH) = OPPOSITE_CHARGE_LEPTONS_TRUTH;
     }
-
-    if (truthbjets.size() >= 2 && ZCharmTruthCuts.exists("TWO_B_JETS_TRUTH")){
-      m_bools.at(ZCC::TWO_B_JETS_TRUTH) = true;
+    
+    if(ZCharmTruthCuts.exists("DILEPTON_MASS_WINDOW_TRUTH")) {
+      m_bools.at(ZCC::DILEPTON_MASS_WINDOW_TRUTH) = ( mll >= 76.*Athena::Units::GeV && mll <= 106.*Athena::Units::GeV );
     }
-
-  }  
+  } 
   
   void ZCharmTruthSelectorAlg::evaluateTruthCJetCuts
   (const ConstDataVector<xAOD::JetContainer>& truthcjets, CutManager& ZCharmTruthCuts)
   { 
-
     ///All jets in the containers should have pT>20GeV. Check minPt of your JetSelectorAlg in the ZCharm_config file.
     if (truthcjets.size() >= 1 && ZCharmTruthCuts.exists("ONE_C_JETS_TRUTH")){
       m_bools.at(ZCC::ONE_C_JETS_TRUTH) = true;
@@ -337,14 +307,7 @@ namespace ZCC
     if (truthcjets.size() >= 2 && ZCharmTruthCuts.exists("TWO_C_JETS_TRUTH")){
       m_bools.at(ZCC::TWO_C_JETS_TRUTH) = true;
     }
-
   }  
-
-  void ZCharmTruthSelectorAlg::evaluateTruthLargeJetCuts
-  (const xAOD::JetContainer& truthlargeJets)
-  {
-    m_bools.at(ZCC::ONE_LARGE_JET_TRUTH) = (truthlargeJets.size() >= 1);
-  }
 
 
   StatusCode ZCharmTruthSelectorAlg::initialiseCutflow(){
@@ -394,4 +357,3 @@ namespace ZCC
   }
 
 }
-

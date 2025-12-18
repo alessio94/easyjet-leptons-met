@@ -45,9 +45,6 @@ private:
     CP::SysReadHandle<xAOD::JetContainer>
       m_ZCharmJetHandle{ this, "ZCharmJets", "ZCharmAnalysisJets_%SYS%", "Jet container to read" };
     
-    CP::SysReadHandle<xAOD::JetContainer>
-      m_ZCharmLRJetHandle{ this, "ZCharmLRJets", "ZCharmAnalysisLargeJets_%SYS%", "Jet container to read" };
-    
     CP::SysReadHandle<xAOD::ElectronContainer>
       m_ZCharmElectronHandle{ this, "ZCharmElectrons", "ZCharmAnalysisElectrons_%SYS%", "Electron container to read" };
     CP::SysReadHandle<xAOD::ElectronContainer>
@@ -87,11 +84,6 @@ private:
 
 
     CP::SysReadDecorHandle<int> m_truthFlav{ this, "truthFlav", "HadronConeExclTruthLabelID", "Jet truth flavor" };
-
-    CP::SysReadDecorHandle<float> m_GN2Xv01_phbb = {this, "phbb", "GN2Xv01_phbb", "GN2Xv01_phbb"};
-    CP::SysReadDecorHandle<float> m_GN2Xv01_phcc = {this, "phcc", "GN2Xv01_phcc", "GN2Xv01_phcc"};
-    CP::SysReadDecorHandle<float> m_GN2Xv01_pqcd = {this, "pqcd", "GN2Xv01_pqcd", "GN2Xv01_pqcd"};
-    CP::SysReadDecorHandle<float> m_GN2Xv01_ptop = {this, "ptop", "GN2Xv01_ptop", "GN2Xv01_ptop"};
 
     Gaudi::Property<std::vector<std::string>> m_floatVariables
           {this, "floatVariableList", {}, "Name list of floating variables"};

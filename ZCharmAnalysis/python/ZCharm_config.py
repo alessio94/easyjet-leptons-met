@@ -48,14 +48,6 @@ def ZCharm_cfg(flags, smalljetkey, largejetkey, muonkey, electronkey,
                                 maxEta=flags.Analysis.Small_R_jet.max_eta_ZCharm
                                 ))
 
-    cfg.merge(JetSelectorAlgCfg(flags, name="LargeRJet_SelectorAlg",
-                                containerInKey=largejetkey,
-                                containerOutKey="ZCharmAnalysisLargeJets_%SYS%",
-                                minPt=250 * Units.GeV,
-                                maxEta=2.5,
-                                selectBjet=False
-                                ))
-
     from EasyjetHub.algs.postprocessing.trigger_matching import TriggerMatchingToolCfg
 
     # Selection
@@ -141,22 +133,12 @@ def ZCharmTruth_cfg(flags, truthsmalljetkey, truthlargejetkey, truthmuonkey,
                                      decorOutName="TruthEvents.nSmallJets",
                                      decoration=truthsmalljetkey + ".isTruthJet"))
 
-    cfg.merge(TruthJetSelectorAlgCfg(flags, name="TruthLargeRJet_SelectorAlg",
-                                     containerInKey=truthlargejetkey,
-                                     containerOutKey="ZCharmTruthLargeJets",
-                                     minPt=250 * Units.GeV,
-                                     maxEta=2.5,
-                                     hasTruthLabel=False,
-                                     decorOutName="TruthEvents.nLargeJets",
-                                     decoration=truthlargejetkey + ".isTruthJet"))
-
     cfg.addEventAlgo(
         CompFactory.ZCC.ZCharmTruthSelectorAlg(
             "ZCharmTruthSelectorAlg",
             truthcutList=flags.Analysis.TruthCutList,
             saveCutFlow=flags.Analysis.save_cutflow,
             truthSmallJetInContainer="ZCharmTruthJets",
-            truthLargeJetInContainer="ZCharmTruthLargeJets",
             truthElectronInContainer="ZCharmTruthElectrons",
             truthMuonInContainer="ZCharmTruthMuons",
             jetTruthFlavourDecoration="ZCharmTruthJets.HadronConeExclTruthLabelID",
@@ -171,18 +153,12 @@ def get_BaselineVarsZCharmAlg_variables(flags):
     float_variable_names = []
     int_variable_names = []
 
-    for object in ["ll", "jj", "bb", "cc"]:
-        for var in ["m", "pT", "Eta", "Phi", "dR", "dEta", "dPhi"]:
+    for object in ["ll"]:
+        for var in ["m", "pT", "Eta", "Phi"]:
             float_variable_names.append(f"{var}{object}")
 
-    for object in ["Zj", "Zb", "Zc"]:
-        for var in ["dR", "dPhi"]:
-            float_variable_names.append(f"{var}{object}")
-
-    float_variable_names += ["pT_over_mbb", "pT_over_mcc"]
-    int_variable_names += ["nJets", "nBJets", "nCJets", "nLargeRJets"]
+    int_variable_names += ["nJets", "nCJets"]
     int_variable_names += ["nElectrons", "nMuons", "nLeptons"]
-    int_variable_names += ["PCFT2D2jets"]
 
     return float_variable_names, int_variable_names
 
@@ -279,7 +255,7 @@ def ZCharm_branches(flags):
 
     # trigger variables do not need to be added to variable_names
     # as it is written out in ZCharmSelectorAlg
-    for cat in ["SLT", "DLT"]:
+    for cat in ["SLT"]:
         branches += \
             [f"EventInfo.pass_trigger_{cat}_%SYS% -> ZCharm_pass_trigger_{cat}_%SYS%"]
 
