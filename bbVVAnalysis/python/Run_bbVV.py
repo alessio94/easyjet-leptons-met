@@ -81,7 +81,7 @@ def run_local(
 
 def run_grid(
         process="top", boosted="", lepton=True, campaign="mc23a",
-        tag="NONE", systematics=False):
+        tag="NONE", systematics=False, nFile=3):
 
     executable = "bbVV-ntupler"
     ListDir = easyjet_build_dir + "/data/bbVVAnalysis/PHYS/nominal/" + campaign + "/"
@@ -93,6 +93,7 @@ def run_grid(
     lep_channel = "1lep" if lepton else "0lep"
     boosted_channel = boosted
     sys = "-sys" if systematics else ""
+    nfile = f" --maxNFilesPerJob {nFile}" if systematics else ""
     configFile = "bbVVAnalysis/RunConfig-PHYS-bbVV-" + lep_channel + \
                  "-" + boosted_channel + sys + ".yaml"
 
@@ -104,11 +105,11 @@ def run_grid(
     if process == "data":
         command = ("easyjet-gridsubmit --data-list " + List
                    + " --run-config " + configFile + " --exec " + executable
-                   + " --campaign " + ej_gittag)
+                   + " --campaign " + ej_gittag + nfile)
     else:
         command = ("easyjet-gridsubmit --mc-list "
                    + List + " --run-config " + configFile + " --exec " + executable
-                   + " --campaign " + ej_gittag)
+                   + " --campaign " + ej_gittag + nfile)
     print(command)
     subprocess.run(command, shell=True)
     print("End of Run_bbVV.py, check your BigPanda!")
@@ -144,6 +145,9 @@ if __name__ == "__main__":
         "--tag", help="Custom tag pattern", default="NONE")
     parser.add_argument(
         "--sys", help="Run systematics", action='store_true')
+    parser.add_argument(
+        "--nFile", help="Set maxNFilesPerJob for systematics production",
+        type=int, default=3)
     args = parser.parse_args()
     process = args.Process
     boost = args.Boost
@@ -154,15 +158,17 @@ if __name__ == "__main__":
     campaign = args.campaign
     tag = args.tag
     systematics = args.sys
+    nFile = args.nFile
     print(
         "Process:", process, "\tLepton:", lepton, "\tBoost:", boost,
         "\tMass: ", mass, "\tGrid:", grid, "\tSampleDir:", sample_dir,
-        "\tCampaign:", campaign, "\tTag:", tag, "\tSys:", systematics)
+        "\tCampaign:", campaign, "\tTag:", tag, "\tSys:", systematics,
+        "\tNFile:", nFile)
 
     # Need to synchronize with io_manager / run_grid
     if grid:
         print("Running on Grid.")
-        run_grid(process, boost, lepton, campaign, tag, systematics)
+        run_grid(process, boost, lepton, campaign, tag, systematics, nFile)
     else:
         print("Running locally.")
         run_local(process, boost, mass, lepton, systematics, sample_dir)
