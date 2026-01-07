@@ -127,12 +127,12 @@ namespace XBBCALIB {
 
             if (! tag_jet) continue;
 
-            // probe jet selection - deltaR(tag, largeRjet) > 1.0
+            // probe jet selection - deltaPhi(tag, largeRjet) > 1.0
             const xAOD::Jet* leadLargeRJet = lrjets->at(0);
-            float deltaR_tag_largeR = tag_jet->p4().DeltaR(leadLargeRJet->p4());
+            float deltaPhi_tag_largeR = tag_jet->p4().DeltaPhi(leadLargeRJet->p4());
 
-            bool pass_deltaR_probe_selection = std::abs(deltaR_tag_largeR) > 1.0;
-            if ( !pass_deltaR_probe_selection) continue;
+            bool pass_deltaPhi_probe_selection = std::abs(deltaPhi_tag_largeR) > 1.0;
+            if ( !pass_deltaPhi_probe_selection) continue;
 
 
             // if we reach this point, event has passed selection
