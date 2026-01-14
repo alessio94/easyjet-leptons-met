@@ -1,0 +1,129 @@
+# Trigger configuration for Leptons + MET analysis
+# Combines lepton triggers (for e/mu channels) with MET triggers
+# Based on bbllAnalysis and monojetAnalysis trigger configurations
+
+selection:
+  chains:
+    '2015':
+    # Single electron triggers
+    - 'HLT_e24_lhmedium_L1EM20VH'
+    - 'HLT_e60_lhmedium'
+    - 'HLT_e120_lhloose'
+    # Single muon triggers
+    - 'HLT_mu20_iloose_L1MU15'
+    - 'HLT_mu50'
+    # MET triggers
+    - 'HLT_xe70_mht'
+
+    '2016':
+    # Single electron triggers
+    - 'HLT_e26_lhtight_nod0_ivarloose'
+    - 'HLT_e60_lhmedium_nod0'
+    - 'HLT_e140_lhloose_nod0'
+    # Single muon triggers
+    - 'HLT_mu26_ivarmedium'
+    - 'HLT_mu50'
+    # MET triggers
+    - 'HLT_xe90_mht_L1XE50'
+    - 'HLT_xe110_mht_L1XE50'
+
+    '2017':
+    # Single electron triggers
+    - 'HLT_e26_lhtight_nod0_ivarloose'
+    - 'HLT_e60_lhmedium_nod0'
+    - 'HLT_e140_lhloose_nod0'
+    # Single muon triggers
+    - 'HLT_mu26_ivarmedium'
+    - 'HLT_mu50'
+    # MET triggers
+    - 'HLT_xe90_pufit_L1XE50'
+    - 'HLT_xe110_pufit_L1XE55'
+    - 'HLT_xe100_pufit_L1XE50'
+    - 'HLT_xe110_pufit_L1XE50'
+
+    '2018':
+    # Single electron triggers
+    - 'HLT_e26_lhtight_nod0_ivarloose'
+    - 'HLT_e60_lhmedium_nod0'
+    - 'HLT_e140_lhloose_nod0'
+    # Single muon triggers
+    - 'HLT_mu26_ivarmedium'
+    - 'HLT_mu50'
+    # MET triggers
+    - 'HLT_xe110_pufit_xe70_L1XE50'
+    - 'HLT_xe120_pufit_L1XE50'
+    - 'HLT_xe110_pufit_xe65_L1XE50'
+
+    '2022':
+    # Single electron triggers
+    - 'HLT_e26_lhtight_ivarloose_L1EM22VHI'
+    - 'HLT_e60_lhmedium_L1EM22VHI'
+    - 'HLT_e140_lhloose_L1EM22VHI'
+    # Single muon triggers
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
+    - 'HLT_mu60_L1MU14FCH'
+    # MET triggers
+    - 'HLT_xe75_cell_xe65_tcpufit_xe90_trkmht_L1XE50'
+    - 'HLT_xe55_cell_xe70_tcpufit_L1XE50'
+    - 'HLT_xe80_cell_xe115_tcpufit_L1XE50'
+
+    '2023':
+    # Single electron triggers
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M'
+    - 'HLT_e60_lhmedium_L1eEM26M'
+    - 'HLT_e140_lhloose_L1eEM26M'
+    # Single muon triggers
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
+    - 'HLT_mu60_L1MU14FCH'
+    # MET triggers
+    - 'HLT_xe65_cell_xe100_mhtpufit_pf_L1XE50'
+    - 'HLT_xe65_cell_xe90_pfopufit_L1XE50'
+    - 'HLT_xe80_cell_xe115_tcpufit_L1XE50'
+
+    '2024':
+    # Single electron triggers
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M'
+    - 'HLT_e60_lhmedium_L1eEM26M'
+    - 'HLT_e140_lhloose_L1eEM26M'
+    # Single muon triggers
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
+    - 'HLT_mu60_L1MU14FCH'
+    # MET triggers
+    - 'HLT_xe65_cell_xe100_mhtpufit_pf_L1XE50'
+    - 'HLT_xe65_cell_xe90_pfopufit_L1XE50'
+    - 'HLT_xe80_cell_xe115_tcpufit_L1XE50'
+
+scale_factor:
+  doSF: true
+
+  chains:
+    '2015':
+    - 'HLT_e24_lhmedium_L1EM20VH || HLT_e60_lhmedium || HLT_e120_lhloose'
+    - 'HLT_mu20_iloose_L1MU15 || HLT_mu40'
+
+    '2016':
+    - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium || HLT_mu50'
+
+    '2017':
+    - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium || HLT_mu50'
+
+    '2018':
+    - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium || HLT_mu50'
+
+    '2022':
+    - 'HLT_e26_lhtight_ivarloose_L1EM22VHI || HLT_e60_lhmedium_L1EM22VHI || HLT_e140_lhloose_L1EM22VHI'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+
+    '2023':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+
+    '2024':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'

@@ -1,0 +1,94 @@
+# RunConfig for Z' -> leptons + MET analysis
+# This configuration enables leptons, jets, and MET reconstruction
+# suitable for BSM searches with leptons and missing transverse energy
+
+include: [base-config.yaml]
+
+# Decay mode for truth decoration (adjust as needed for your signal)
+Truth:
+  decayModes: []  # Add your decay modes if analyzing specific signals
+
+# ====================================
+# Enable object types
+# ====================================
+do_muons: true
+do_electrons: true
+do_small_R_jets: true
+do_met: true  # CRITICAL: Enable MET reconstruction
+do_overlap_removal: true
+
+# ====================================
+# Small-R jet configuration
+# ====================================
+Small_R_jet:
+  min_pT: 20.e+3
+  # Nominal b-tagging working point
+  btag_wp: "GN2v01_FixedCutBEff_77"
+  # Additional b-tagging working points
+  btag_extra_wps:
+    - GN2v01_FixedCutBEff_70
+    - GN2v01_FixedCutBEff_85
+
+# ====================================
+# Electron configuration
+# ====================================
+Electron:
+  min_pT: 7.e+3  # Lower pT threshold for leptons+MET analysis
+  ID: "LooseBLayerLH"
+  Iso: "NonIso"
+
+# ====================================
+# Muon configuration
+# ====================================
+Muon:
+  min_pT: 7.e+3  # Lower pT threshold for leptons+MET analysis
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+
+# ====================================
+# Trigger configuration
+# ====================================
+Trigger:
+  include: [trigger.yaml]
+
+# Apply trigger filtering
+do_trigger_filtering: true
+
+# ====================================
+# Disable BadBatman jet cleaning for Run 3
+# ====================================
+add_BadBatman_jet_cleaning: false
+
+# ====================================
+# TTree output configuration
+# ====================================
+ttree_output:
+  include: [AnalysisMiniTree-config.yaml]
+
+  # Reco object outputs
+  reco_outputs:
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    met: 'container_names.output.met'
+
+  # Collection-specific options
+  collection_options:
+    small_R_jets:
+      truth_parent_info: true
+      btag_info: true
+      JVT_details: true
+      btag_details: true
+    muons:
+      run_selection: false
+    electrons:
+      run_selection: false
+    met:
+      save_all_components: true
+
+  # Truth object outputs (for MC)
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
+    electrons: 'container_names.input.truthelectrons'
+    muons: 'container_names.input.truthmuons'
+    met: 'container_names.input.truthmet'
