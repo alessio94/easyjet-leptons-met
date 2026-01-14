@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+set -Eeu
+
+
+mode=$1
+postfix="${mode//-/_}"
+  
+if [[ -z ${EOS_ACCOUNT_PASSWORD+x} || -z ${EOS_ACCOUNT_USERNAME+x} || -z ${EOS_ACCOUNT_PATH+x} || -z ${EOS_ACCOUNT_PROJECT+x} ]]; then
+    echo "eos env not defined, cannot validate ntuple"
+    exit 1
+fi
+ 
+if [[ -z "${CI_MERGE_REQUEST_IID:-}" ]]; then
+    echo "merge request ID not defined, cannot validate ntuple"
+    exit 1
+fi
+
+if [[ -z "${VALIDATION_REFERENCE_MR:-}" ]]; then
+    echo "reference merge request not defined, cannot validate ntuple"
+    exit 1
+fi
+
+### quick hack for libtiff missing in rel 25.2.60 release to get the CI going, proper fix after discussion with experts
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/cvmfs/atlas.cern.ch/repo/sw/software/25.2/sw/lcg/releases/LCG_108_ATLAS_1/tiff/4.7.0/x86_64-el9-gcc14-opt/lib64
+echo $LD_LIBRARY_PATH
+
+eosplotdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/plots/$CI_MERGE_REQUEST_IID/
+eostmpdir=$postfix
+eosfile=$EOS_ACCOUNT_PATH/gitlab_ci_output/ntuples/$CI_MERGE_REQUEST_IID/analysis_${postfix}.root
+refeosdir=$EOS_ACCOUNT_PATH/gitlab_ci_output/ntuples/$VALIDATION_REFERENCE_MR
+refeosfile=$refeosdir/analysis_${postfix}.root
+
+echo $EOS_ACCOUNT_PASSWORD | kinit -l 1h $EOS_ACCOUNT_USERNAME 
+klist
+
+echo "compareOutputNtuples root://${EOS_ACCOUNT_PROJECT}.cern.ch//$refeosfile root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosfile"
+compareOutputNtuples root://${EOS_ACCOUNT_PROJECT}.cern.ch//$refeosfile root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosfile 2>&1 | tee branch-diff-log.txt
+echo "comparing ntuples succeeded"
+
+mkdir -p $eostmpdir
+echo $CI_MERGE_REQUEST_TITLE > $eostmpdir/CI_MERGE_REQUEST_TITLE
+echo $VALIDATION_REFERENCE_MR > $eostmpdir/VALIDATION_REFERENCE_MR
+xrdcp root://${EOS_ACCOUNT_PROJECT}.cern.ch//$refeosdir/CI_MERGE_REQUEST_TITLE $eostmpdir/VALIDATION_MERGE_REQUEST_TITLE
+echo $CI_COMMIT_MESSAGE > $eostmpdir/CI_COMMIT_MESSAGE
+echo $CI_COMMIT_SHA > $eostmpdir/CI_COMMIT_SHA
+echo $CI_COMMIT_SHORT_SHA > $eostmpdir/CI_COMMIT_SHORT_SHA
+
+cp branch-diff-log.txt $eostmpdir
+if [[ ! -z "$(ls -A compare_output/)" ]]; then
+    echo "compare_output folder not empty, copying figures to eos"
+    cp compare_output/* $eostmpdir
+fi
+
+ndiff=`\grep  -- '----> .* branches are different'  branch-diff-log.txt | awk '{print $2}'`
+nadd=`\grep  -- '----> .* branches are added'  branch-diff-log.txt | awk '{print $2}'`
+nrm=`\grep  -- '----> .* branches are removed' branch-diff-log.txt | awk '{print $2}'`
+
+exitcode=0
+if [[ ! "$nadd" == 0 ]]; then
+    echo "$nadd branches are added, please check branch-diff-log"
+    exitcode=24
+fi
+if [[ ! "$nrm" == 0 ]]; then
+    echo "$nrm branches are removed, please check branch-diff-log"
+    exitcode=23
+fi
+if [[ ! "$ndiff" == 0 ]]; then
+    echo "$ndiff branches are different, please check plots"
+    exitcode=22
+fi
+echo "$ndiff branches are different, $nrm are removed, and $nadd are added" > $eostmpdir/CI_VAL_SUMMARY
+echo $exitcode > $eostmpdir/CI_VAL_EXIT_CODE
+echo "===== ls $eostmpdir ====="
+ls $eostmpdir
+
+xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch mkdir $eosplotdir > /dev/null 2>&1 || true
+#lets cleanup properly with painful xrootd
+for rmeosfile in `xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch ls $eosplotdir/$eostmpdir | grep -v "\.sys\.v"`; do xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rm $rmeosfile; done > /dev/null 2>&1 || true
+xrdfs root://${EOS_ACCOUNT_PROJECT}.cern.ch rmdir $eosplotdir/$eostmpdir > /dev/null 2>&1 || true
+xrdcp -rf $eostmpdir root://${EOS_ACCOUNT_PROJECT}.cern.ch//$eosplotdir
+
+echo "exit $exitcode"
+
+exit $exitcode

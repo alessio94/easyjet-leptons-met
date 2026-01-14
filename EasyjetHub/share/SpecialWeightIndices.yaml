@@ -1,0 +1,56 @@
+- DSID: 346525 ## ttH(yy) mc20
+  weightIndex: 109
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 345318 # WpH(yy) mc20
+  weightIndex: 109
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 345317 # WmH(yy) mc20
+  weightIndex: 109
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 343981 # ggFH(yy) mc20
+  weightIndex: 151
+  weightName: " nnlops-nominal-pdflhc "
+  sysWeightName: "GEN_nnlopsminusnominalminuspdflhc"
+- DSID: 346214 # VBFH(yy) mc20
+  weightIndex: 109
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 345319 # qqZH(yy) mc20
+  weightIndex: 109
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 345061 # ggZH(yy) mc20
+  weightIndex: 109
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 602421 # ggFH(yy) mc23
+  weightIndex: 88
+  weightName: "combine_nnlo_and_0"
+  sysWeightName: "GEN_combine_nnlo_and_0"
+- DSID: 346797 # ggFH(yy) Herwig mc20
+  weightIndex: 179
+  weightName: " nnlops-nominal-pdflhc "
+  sysWeightName: "GEN_nnlopsminusnominalminuspdflhc"
+- DSID: 346881 # W+H(yy) Herwig mc20
+  weightIndex: 101
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 346880 # W-H(yy) Herwig mc20
+  weightIndex: 101
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 346879 # qqZH(yy) Herwig mc20
+  weightIndex: 101
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 346882 # ggZH(yy) Herwig mc20
+  weightIndex: 101
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"
+- DSID: 346526 # ttH(yy) Herwig mc20
+  weightIndex: 105
+  weightName: " PDF set = 90400 "
+  sysWeightName: "GEN_PDF_90400"

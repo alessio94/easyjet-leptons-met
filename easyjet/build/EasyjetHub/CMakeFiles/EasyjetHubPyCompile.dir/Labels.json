@@ -1,0 +1,22 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/EasyjetHub/CMakeFiles/EasyjetHubPyCompile"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/EasyjetHub/CMakeFiles/EasyjetHubPyCompile.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/EasyjetHub/CMakeFiles/pyCompile.stamp.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"EasyjetHub"
+		],
+		"name" : "EasyjetHubPyCompile"
+	}
+}

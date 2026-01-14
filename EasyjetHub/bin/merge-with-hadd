@@ -1,0 +1,56 @@
+#!/bin/env python
+
+# Utility for grid merging
+# Translate prun %IN to hadd
+
+from argparse import ArgumentParser
+import pathlib, os
+from pprint import pprint
+import subprocess
+
+
+parser = ArgumentParser(
+    prog='merge-with-hadd',
+    description='Merger script using hadd mainly for ROOT files containing TEfficiency'
+)
+parser.add_argument(
+    'outfile',
+    type=pathlib.Path,
+    help='Target merged ROOT file',
+)
+parser.add_argument(
+    'infiles',
+    type=str,
+    nargs='+',
+    help='List of input files, automatically handles shell wildcard/space or Panda comma-separated list'
+)
+
+args = parser.parse_args()
+
+input_file_list = []
+if ',' in args.infiles[0]:
+    # Assume comma-separated list a la panda
+    for f in args.infiles:
+        input_file_list += f.split(',')
+else:
+    # Local job with shell style inputs
+    _infiles = [f for f in args.infiles]
+    for f in _infiles:
+        if '*' in f:
+            if '~' in f:
+                import os
+                _f = os.path.expanduser(f)
+            import glob
+            if glob.glob(f) != []:
+                input_file_list += glob.glob(f)
+            else:
+                raise ValueError("Unknown input files " + f)
+        else:
+            input_file_list.append(f)
+
+print("Extracted input file list:")
+pprint(input_file_list)
+
+subprocess.run(
+    ['hadd',args.outfile]+input_file_list
+)

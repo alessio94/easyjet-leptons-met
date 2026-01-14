@@ -1,0 +1,6 @@
+
+include: [XbbCalib/RunConfig-ttCalib.yaml]
+
+# Run all CP syst
+do_CP_systematics: true
+systematics_regex: ["^(?!.*(MUON|MET|JER)).*$"]

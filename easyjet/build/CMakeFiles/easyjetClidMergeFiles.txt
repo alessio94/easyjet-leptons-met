@@ -1,0 +1,4 @@
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/EasyjetHub/EasyjetHub_clid.db
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/KinematicFitTool/KinematicFitTool_clid.db
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/TruthWeightTools/TruthWeightTools_clid.db
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/VBFTagger/VBFTagger_clid.db

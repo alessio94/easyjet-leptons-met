@@ -1,0 +1,26 @@
+from EasyjetHub.output.ttree.branch_manager import BranchManager
+
+
+def get_TopHiggs_tau_truth_labels(flags):
+    truth_labels = []
+    if not flags.Input.isPHYSLITE:
+        truth_labels += [
+            *[f"parent{p}ParentsMask" for p in ["Higgs", "Z", "Top"]],
+        ]
+
+    return truth_labels
+
+
+def get_truthtau_branches(flags, input_container, output_prefix):
+    truthtau_branches = BranchManager(
+        input_container,
+        output_prefix,
+    )
+
+    truthtau_branches.variables = \
+        ["px", "py", "pz", "e", "m", "numCharged", "IsHadronicTau"] \
+        + [var + "_vis" for var in ["pt", "eta", "phi", "m"]] \
+        + ["decay_vertex_" + var for var in ["x", "y", "z"]] \
+        + ["classifierParticleOrigin", "classifierParticleType"]
+
+    return truthtau_branches.get_output_list()

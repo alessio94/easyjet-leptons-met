@@ -1,0 +1,20 @@
+include: [multileptonAnalysis/RunConfig-multilepton.yaml]
+
+# Decay mode considered for truth decoration
+Truth:
+  decayModes: ["WWWW", "WWZZ","WWtt", "ZZtt", "tttt", "ZZZZ"]
+
+CutList :
+  - pass_3l
+
+Small_R_jet:
+  amount_bjet: 0
+
+Electron:
+  min_pT: 10.0e+3
+
+Muon:
+  min_pT: 10.0e+3
+
+Lepton:
+  amount: 3

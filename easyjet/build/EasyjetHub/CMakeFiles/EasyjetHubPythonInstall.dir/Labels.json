@@ -1,0 +1,55 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/__init__.py"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/hub.py"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/algs"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/output"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/steering"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/test"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/python/__init__.py"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/python/hub.py"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/__init__.py.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/hub.py.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/algs.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/output.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/steering.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/EasyjetHub/test.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"EasyjetHub"
+		],
+		"name" : "EasyjetHubPythonInstall"
+	}
+}

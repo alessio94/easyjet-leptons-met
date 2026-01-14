@@ -1,0 +1,9 @@
+include: [VBSVV4qAnalysis/RunConfig-JJ.yaml]
+
+# retrieve DisCoJet tagger (yes only on LLJ1)
+# set it false for the CI pipeline test
+# maybe, we can consider to add a test LLJ1 file for future
+loadDisCoJet: False
+
+bypass: true #enabling Run through mode
+do_trigger_filtering: false

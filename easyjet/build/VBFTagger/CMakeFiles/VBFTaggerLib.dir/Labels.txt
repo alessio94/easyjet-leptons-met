@@ -1,0 +1,11 @@
+# Target labels
+ VBFTagger
+# Source files and their labels
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/VBFTagger/IVBFTagger.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/VBFTagger/VBFTagger.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/VBFTagger/VBFTaggerAlg.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/VBFTagger/VBFTaggerAlgSys.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/VBFTagger/VBFTaggerDict.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/Root/VBFTagger.cxx
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/Root/VBFTaggerAlg.cxx
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/Root/VBFTaggerAlgSys.cxx

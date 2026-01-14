@@ -1,0 +1,312 @@
+# Toggles for object types
+do_small_R_jets: false
+do_large_R_Topo_jets: false
+do_large_R_UFO_jets: false
+do_large_R_RC_jets: false
+do_muons: false
+do_electrons: false
+do_photons: false
+do_taus: false
+do_ditaus: false
+do_met: false
+do_mmc: false
+do_overlap_removal: false
+do_primary_vertex_pos: false
+do_tracks: false
+
+# Other global event configs
+bypass: false
+do_event_cleaning: true
+dump_event_cleaning_info: false
+# VgammaOR settings
+do_VgammaOR: false
+bypass_VGammaOR: false
+VGammaOR_ypT_cuts: [] # Default photon_pT_cuts = [10e3]
+VGammaOR_dR_lepton_photon_cuts: [] # Default dR_lepton_photon_cuts = [0.0, 0.05, 0.075, 0.1, 0.125, 0.15, 0.2]
+# apply loose jet cleaning + BadBatman
+add_BadBatman_jet_cleaning: true
+#apply tight jet cleaning. Works only for ptag >= 6139!
+do_tight_jet_cleaning: false
+do_bbtt_analysis: false
+do_bbbbtt_analysis: false
+do_bbyy_analysis: false
+# LLP1 filtering
+do_vertex_filtering: false
+VSI_container_suffix: ""
+# Common cp algs have "Expert" variables. These will potentially throw
+# a warning if used. Allowed values are explained in the python docs
+# https://docs.python.org/3/library/warnings.html#warning-filter
+# A value of false or an empty string will keep the default value.
+expert_mode_warning_level: error
+
+# Truth-related properties
+Truth:
+  decayModes: []
+  do_STXS: false
+  include: [DSID_samples.yaml]
+  nHiggses: 2
+  recordGrandchildren: false
+
+# Toggles for reconstructed objects properties
+Small_R_jet:
+  min_pT: 20.e+3
+  max_eta: 100
+  # nominal btagging working point, used for b-jet pT calibration in particular
+  btag_wp: ""
+  # additional btagging working points, available for selections and per-jet SFs
+  btag_extra_wps: []
+  runBJetPtCalib: true
+  useFJvt: False
+  doL1Matching: False
+  doHLTMatching: False
+  saveTriggerInfo: False
+  # select jet type
+  jet_type: 'reco4PFlowJet'
+  # calib tool options
+  calibToolCalibArea: ""
+  calibToolConfigFile: ""
+  calibToolCalibSeq: ""
+  # uncertainties tool options
+  uncertToolCalibArea: ""
+  uncertToolConfigPath: ""
+  uncertToolMCType: ""
+  do_parent_decoration: true
+  do_thinning: true
+  save_all_jets: false
+  amount: 0
+  amount_bjet: 0
+  amount_cjet: 0
+  amount_ljet: 0
+  amount_leadingjet: 0
+  systModelJES: "Category"
+  systModelJER: "Full"
+  btag_egReductionB: "Loose"
+  btag_egReductionC: "Loose"
+  btag_egReductionLight: "Loose"
+  variables_bjets: ["pt", "eta", "phi", "E"]
+  variables_cjets: ["pt", "eta", "phi", "E"]
+  variables_ljets: ["pt", "eta", "phi", "E"]
+  variables_allJets: ["pt", "eta", "phi", "E"]
+  variables_int_bjets: []
+  variables_int_cjets: []
+  variables_int_ljets: []
+  variables_int_allJets: []
+
+Large_R_jet:
+  GN2X_hbb_wps: []
+  min_pT: 200.e+3
+  max_pT: -1
+  max_eta: 100
+  runMuonJetPtCorr: false
+  do_thinning: true
+  do_parent_decoration: true
+  amount: 0
+  amount_leadingjet: 0
+  variables_LargeRJets: []
+  variables_int_LargeRJets: []
+  wtag_type: ""
+  wtag_wp: ""
+  wtag_extra_wps: []
+  variables_in_ptag:
+    include: [xbb-vars-in-ptag.yaml]
+
+Photon:
+  min_pT: 10.e+3
+  max_eta: 100
+  ID: ""
+  Iso: ""
+  do_thinning: true
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: []
+  correlationModelScale: "1NP_v1"
+  extra_wps: []
+  forceFullSimConfigForID: false
+  forceFullSimConfigForIso: false
+
+Electron:
+  min_pT: 4.5e+3
+  max_eta: 100
+  maxD0Significance: 5.
+  maxDeltaZ0SinTheta: 0.5
+  chargeIDSelectionRun2: false
+  ID: ""
+  Iso: ""
+  do_thinning: true
+  MergeLRT: false
+  do_parent_decoration: false
+  do_track_decoration: false
+  do_IFF_decoration: false
+  do_reco_decoration: false
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: []
+  correlationModelScale: "1NP_v1"
+  correlationModelId: "SIMPLIFIED"
+  correlationModelIso: "SIMPLIFIED"
+  correlationModelReco: "SIMPLIFIED"
+  extra_wps: []
+  forceFullSimConfig: false
+
+Muon:
+  min_pT: 3.e+3
+  max_eta: 2.5
+  maxD0Significance: 3
+  maxDeltaZ0SinTheta: 0.5
+  ID: ""
+  Iso: ""
+  do_thinning: true
+  IsoDecSuffix: ""
+  MergeLRT: false
+  do_parent_decoration: false
+  do_track_decoration: false
+  do_IFF_decoration: false
+  do_reco_decoration: false
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: []
+  extra_wps: []
+
+Tau:
+  min_pT: 20.e+3
+  ID: ""
+  do_thinning: true
+  addMuonRM: false
+  do_parent_decoration: false
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: ["charge", "nProng", "decayMode"]
+  extra_wps: []
+  antiTauScoreThreshold: 0
+
+DiTau:
+  ID: ""
+  do_thinning: true
+  # Activate when DiTau decoration is needed with samples < p7017 
+  do_score_decoration: false
+  score_branches: false
+  truth_branches: false
+
+Lepton:
+  amount: 0
+  variables: ["pt", "eta", "phi", "E", "effSF"]
+  variables_int: ["charge", "pdgid"]
+
+Track:
+  min_pT: 0.5e+3  # 500 MeV
+  max_eta: 2.5
+  working_points: []  # Can be ["Loose", "TightPrimary"] if needed
+  outputTrackSummaryInfo: false  # Set to true to get hit counts # not sure if true will make this work, but manual retrieval works.
+  do_thinning: true  # Added for consistency
+  amount: 0  # Number of leading tracks (0 = all passing selection)
+  variables: []  # Not needed with automatic filling - left for compatibility
+  variables_int: []  # Not needed with automatic filling - left for compatibility
+
+OverlapRemoval:
+  # Enable specific TauAntiTauJet overlap removal, mostly for bbtt analysis
+  doTauAntiTauJet: false
+  # Enable overlap removal between large-R jets and objects for which 
+  # large-R jet OR removal is implemented in Athena
+  do_large_R_jets: true
+  # Enable overlap removal between small-R jets and large-R jets
+  # Athena default is true
+  do_small_R_jet_large_R_jet: true
+  # Switch priority in the overlap removal between photons and leptons
+  # Athena default is false
+  favourPhotonOverLepton: false
+  # Enable overlap removal for boosted leptons
+  # Athena default is false
+  do_boostedLeptons: false
+  # Enable overlap removal between jet and photon
+  # Athena default is true
+  do_photon_jet: true
+
+# list of triggers to apply
+# "Auto" configures mc from the r-tag, data from year, e.g. data22
+trigger_year: Auto
+# apply trigger lists to filter event
+do_trigger_filtering: false
+# Require the events pass the global multi-leg trigger matching, using the
+# TrigGlobalEfficiencyCorrection tool/alg. Only for electron/muon/photon triggers
+do_trigger_match_filtering: false
+# list of triggers per year to consider
+Trigger:
+  selection:
+    chains:
+      "2015": []
+      "2016": []
+      "2017": []
+      "2018": []
+      "2022": []
+      "2023": []
+      "2024": []
+      "2029": []
+
+  scale_factor:
+    doSF: False
+
+    # Number of toys to use for the global trigger SF combination (instead
+    # of using explicit formulas), for electron/muon/photon triggers only,
+    # when using the TrigGlobalEfficiencyCorrection tool/alg.
+    # It is sometimes required when combining a large number of triggers,
+    # if no explicit recipe is available.
+    number_of_sf_combination_toys: 0
+    
+    # Enable the electron/muon/photon multi-leg trigger-matching using
+    # the TrigGlobalEfficiencyCorrection tool/alg
+    do_trigger_match: false
+
+  # Enable writing trigger flags in AnalysisMiniTree
+  writeOutput: True
+
+Exclude2015: false
+
+GRL:
+  runGRL: true
+  store_decoration: false
+
+PileupReweighting:
+  prw_files: {}
+  lumicalc_files: {}
+  extra_prw: []
+
+  # In general we should not need custom Pileup Reweighting
+  # postfix: "yourSuffix"
+  # Uses grl_years to find files
+  # prw_files: {}
+  # We may need special LumiCalc files depending on triggers
+  # Uses grl_years to find files
+  # lumicalc_files: {}
+
+# disable CP Algs for calibration
+disable_calib: false
+# Whether to activate CP alg systematic variations
+do_CP_systematics: false
+systematics_regex: []
+systematics_suffix_separator: "_"
+# CutBookKeeper histPattern
+cbkHistPattern: "CutBookkeeper_%DSID%_%RUN%_%SYS%"
+
+# Store high level variables by default 
+# when the config file set the high level variables
+store_high_level_variables: false
+
+# Definition of container names
+full_container_names:
+  phys:
+    include: [container-names-DAOD_PHYS.yaml]
+  physlite:
+    include: [container-names-DAOD_PHYSLITE.yaml]
+
+channels: []
+splitOutputTree: false
+splitCBK: false
+
+#Enable cutflow
+save_cutflow: false
+
+histograms: false
+h5:
+  n_jets: 10
+
+ttree_output: {}

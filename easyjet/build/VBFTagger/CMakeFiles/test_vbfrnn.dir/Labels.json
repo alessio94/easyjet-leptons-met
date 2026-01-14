@@ -1,0 +1,16 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/util/test_vbfrnn.cxx"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"VBFTagger"
+		],
+		"name" : "test_vbfrnn"
+	}
+}

@@ -1,0 +1,22 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/tab-complete.bash"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetTests/tab-complete.bash"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/tab-complete.bash.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"EasyjetTests"
+		],
+		"name" : "EasyjetTestsGenericInstall"
+	}
+}

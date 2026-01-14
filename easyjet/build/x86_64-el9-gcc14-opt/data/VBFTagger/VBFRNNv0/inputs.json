@@ -1,0 +1,38 @@
+{
+  "input_sequences": [
+    {
+      "name": "node_0",
+      "variables": [
+        {
+          "name": "variable_0",
+          "offset": 0,
+          "scale": 1
+        },
+        {
+          "name": "variable_1",
+          "offset": 0,
+          "scale": 1
+        },
+        {
+          "name": "variable_2",
+          "offset": 0,
+          "scale": 1
+        },
+        {
+          "name": "variable_3",
+          "offset": 0,
+          "scale": 1
+        }
+      ]
+    }
+  ],
+  "inputs": [],
+  "outputs": [
+    {
+      "labels": [
+        "out_0"
+      ],
+      "name": "activation_1_0"
+    }
+  ]
+}

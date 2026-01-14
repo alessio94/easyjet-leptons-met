@@ -1,0 +1,184 @@
+include: [EasyjetHub/base-config.yaml]
+
+# setting this to warning until the team decides they want to be using
+# expert mode
+expert_mode_warning_level: default
+
+# Which analysis to consider
+do_hhml_analysis: true
+save_extrabb4l_vars: false
+do_KinematicFit: false
+
+# CutBookKeeper histPattern
+cbkHistPattern: "CutBookkeeper_%RUN%_%SYS%"
+
+bypass: false
+
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_taus: true
+do_met : true
+
+Truth:
+  do_STXS: false
+  nHiggses: 2
+  recordGrandchildren: true
+
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  useFJvt: true
+  # btagging nominal working point
+  btag_wp: "GN2v01_FixedCutBEff_85"
+  btag_extra_wps:
+    - GN2v01_Continuous
+  amount_bjet: 2
+  amount: 6
+  min_pT: 20.0e+3
+  max_eta: 4.5
+  variables_bjets: ["uncorrPt", "muonCorrPt"]
+  variables_int_bjets: ["nmuons"]
+
+Tau:
+  ID: "RNNMedium_eleid"
+  extra_wps: ["RNNTight"]
+  amount: 0
+  do_parent_decoration: true
+
+Electron:
+  min_pT: 10.0e+3
+  ID: "LooseBLayerLH"
+  Iso: "Loose_VarRad"
+  correlationModelId: "TOTAL"
+  extra_wps: 
+    - ["TightDNN", "Tight_VarRad"]
+    - ["TightDNN", "TightTrackOnly_VarRad"]
+    - ["TightDNN", "TightTrackOnly_FixedRad"]
+    - ["TightDNN", "HighPtCaloOnly"]
+    - ["TightDNN", "Loose_VarRad"]
+    - ["MediumDNN", "Tight_VarRad"]
+    - ["MediumDNN", "TightTrackOnly_VarRad"]
+    - ["MediumDNN", "TightTrackOnly_FixedRad"]
+    - ["MediumDNN", "HighPtCaloOnly"]
+    - ["MediumDNN", "Loose_VarRad"]
+    - ["LooseDNN", "Loose_VarRad"]
+    - ["LooseDNN", "Tight_VarRad"]
+    - ["LooseDNN", "TightTrackOnly_VarRad"]
+    - ["LooseDNN", "TightTrackOnly_FixedRad"]
+    - ["LooseDNN", "HighPtCaloOnly"]
+    - ["TightLH", "Tight_VarRad"]
+    - ["TightLH", "TightTrackOnly_VarRad"]
+    - ["TightLH", "TightTrackOnly_FixedRad"]
+    - ["TightLH", "HighPtCaloOnly"]
+    - ["TightLH", "Loose_VarRad"]
+    - ["MediumLH", "Tight_VarRad"]
+    - ["MediumLH", "TightTrackOnly_VarRad"]
+    - ["MediumLH", "TightTrackOnly_FixedRad"]
+    - ["MediumLH", "HighPtCaloOnly"]
+    - ["MediumLH", "Loose_VarRad"]
+    - ["LooseBLayerLH", "Tight_VarRad"]
+    - ["LooseBLayerLH", "TightTrackOnly_VarRad"]
+    - ["LooseBLayerLH", "TightTrackOnly_FixedRad"]
+    - ["LooseBLayerLH", "HighPtCaloOnly"]
+    # - ["LooseBLayerLH", "Loose_VarRad"]
+    # - ["TightLH", "NonIso"]
+    # - ["MediumLH", "NonIso"]
+  do_parent_decoration: true
+  do_track_decoration: true
+  do_IFF_decoration: true
+  chargeIDSelectionRun2: false
+
+Muon:
+  min_pT: 10.0e+3
+  ID: "Loose"
+  Iso: "Loose_VarRad"
+  extra_wps:
+    - ["Tight", "PflowLoose_VarRad"]
+    - ["Tight", "PflowTight_VarRad"]
+    - ["Tight", "Loose_VarRad"]
+    - ["Tight", "Tight_VarRad"]
+    - ["Medium", "PflowLoose_VarRad"]
+    - ["Medium", "PflowTight_VarRad"]
+    - ["Medium", "Loose_VarRad"]
+    - ["Medium", "Tight_VarRad"]
+    - ["HighPt", "PflowLoose_VarRad"]
+    - ["HighPt", "PflowTight_VarRad"]
+    - ["HighPt", "Loose_VarRad"]
+    - ["HighPt", "Tight_VarRad"]
+    - ["Loose", "PflowLoose_VarRad"]
+    - ["Loose", "PflowTight_VarRad"]
+    - ["Loose", "Tight_VarRad"]
+    # - ["Loose", "Loose_VarRad"]
+    # - ["Tight", "NonIso"]
+    # - ["Medium", "NonIso"]
+    # - ["HighPt", "NonIso"]
+    # - ["LowPt", "PflowLoose_VarRad"]
+    # - ["LowPt", "PflowTight_VarRad"]
+    # - ["LowPt", "Loose_VarRad"]
+    # - ["LowPt", "Tight_VarRad"]
+  do_parent_decoration: true
+  do_IFF_decoration: true
+  max_eta: 2.5
+
+Lepton:
+  amount: 4
+
+# orthogonality studies  
+orthogonality:
+  include: [EasyjetHub/orth-config.yaml ]
+  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
+
+# list of triggers per year to consider
+Trigger:
+  include: [multileptonAnalysis/trigger.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+
+#Enable cutflow 
+save_cutflow: true
+
+CutList :
+  - PASS_TRIGGER
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  slim_variables_with_syst: true
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    taus: 'container_names.output.taus'
+    met : 'container_names.output.met'
+  collection_options:
+    small_R_jets:
+      btag_info: true
+      truth_parent_info: true
+      run_selection: true
+    taus:
+      score_branches: false
+      truth_branches: true
+      truth_parent_info: true
+      run_selection: true
+    electrons:
+      id_variables: false
+      iso_variables: false
+      run_selection: true
+      truth_parent_info: true
+    muons:
+      iso_variables: false
+      run_selection: true
+      truth_parent_info: true
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
+    higgs_particle: 'container_names.output.truthHHParticles'
+    taus: 'container_names.input.truthtaus'
+    electrons: 'container_names.input.truthelectrons'
+    muons: 'container_names.input.truthmuons'

@@ -1,0 +1,7 @@
+*.icc gitlab-language=c++
+bbyyAnalysis/data/*.json filter=lfs diff=lfs merge=lfs -text
+bbyyAnalysis/data/*.onnx filter=lfs diff=lfs merge=lfs -text
+EasyjetHub/data/*.json filter=lfs diff=lfs merge=lfs -text
+bbllAnalysis/data/*.json filter=lfs diff=lfs merge=lfs -text
+VBSVV4qAnalysis/data/* filter=lfs diff=lfs merge=lfs -text
+*.root filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,144 @@
+include: [EasyjetHub/base-config.yaml]
+
+expert_mode_warning_level: default
+
+# Use triple underscore to separate variable and systematics
+systematics_suffix_separator: "___"
+
+# Which analysis and channels to consider
+do_bbbbtt_analysis: true
+do_antiID_regions: true
+do_0B_regions: true
+do_1B_regions: true
+do_2B_regions: true
+do_3B_regions: true
+enable_MMC_cut: false
+
+# Toggles to bypass event selection
+bypass: false
+splitOutputTree: false
+
+# Decay mode considered for truth decoration
+Truth:
+  decayModes: ["bbbbtt"]
+  nHiggses: 3
+
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_taus: true
+do_met : true
+do_mmc : true
+
+GRL:
+  store_decoration: true
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  useFJvt: true
+  # btagging nominal working point
+  btag_wp: "GN2v01_FixedCutBEff_90"
+  btag_extra_wps:
+    - GN2v01_FixedCutBEff_85
+    - GN2v01_Continuous
+  variables_bjets: ["uncorrPt", "muonCorrPt"]
+  variables_int_bjets: ["truthLabel", "pcbt_GN2v01", "nmuons"]
+  btag_egReductionB: "Loose"
+  btag_egReductionC: "Loose"
+  btag_egReductionLight: "Loose"
+  amount_bjet: 4
+
+Electron:
+  ID: "LooseBLayerLH_nottva"
+  Iso: "Loose_VarRad"
+  extra_wps:
+    - ["TightLH_nottva", "Loose_VarRad"]
+    - ["LooseBLayerLH_nottva", "Tight_VarRad"]
+    - ["TightLH_nottva", "Tight_VarRad"]
+  do_parent_decoration: true
+  correlationModelId: "TOTAL"
+
+Muon:
+  ID: "Loose_nottva"
+  Iso: "PflowLoose_VarRad"
+  extra_wps:
+    - ["Medium_nottva", "PflowLoose_VarRad"]
+    - ["Loose_nottva", "PflowTight_VarRad"]
+    - ["Medium_nottva", "PflowTight_VarRad"]
+  do_parent_decoration: true
+
+
+Tau:
+  ID: "Baseline"
+  extra_wps: ["GNTauLoose", "GNTauMedium", "GNTauTight", "RNNLoose", "RNNMedium", "RNNTight"]
+  do_parent_decoration: true
+  amount: 2
+  variables: ["RNN"]
+  variables_int: ["isTauID", "isAntiTau", "truthType", "EleRNN_WP", "tauTruthJetLabel"]
+  antiTauScoreThreshold: 0.01
+
+Lepton:
+  amount: 2
+  variables_int: ["isIso"]
+
+# orthogonality studies  
+orthogonality:
+  include: [EasyjetHub/orth-config.yaml ]
+  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
+  
+# list of triggers per year to consider
+Trigger:
+  include: [bbbbttAnalysis/trigger.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+# use trigger selections in offline algorithms
+do_trigger_offline_filtering: true
+
+#Enable cutflow 
+save_cutflow: true
+
+# list of cuts in cutflow
+CutList :
+  - TWO_JETS
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+OverlapRemoval:
+  doTauAntiTauJet: true
+
+store_high_level_variables: false #true statement is WIP, but unlikely to be used due to very large output. 
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  slim_variables_with_syst: true
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    taus: 'container_names.output.taus'
+    met : 'container_names.output.met'
+  collection_options:
+    small_R_jets:
+      btag_info: true
+      truth_parent_info: true
+      no_bjet_calib_p4: True
+      run_selection: true
+    taus:
+      truth_branches: True
+      truth_parent_info: true
+      run_selection: true
+      score_branches: true
+    electrons:
+      run_selection: true
+      truth_parent_info: true
+    muons:
+      run_selection: true
+      truth_parent_info: true
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
+    higgs_particle: 'container_names.output.truthHHParticles'
+    taus: 'container_names.input.truthtaus'

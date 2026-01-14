@@ -1,0 +1,22 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/KinematicFitTool/KinematicFit_config.py"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/python/KinematicFit_config.py"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/KinematicFitTool/KinematicFit_config.py.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"KinematicFitTool"
+		],
+		"name" : "KinematicFitToolPythonInstall"
+	}
+}

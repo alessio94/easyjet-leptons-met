@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+# This script should not be sourced, we don't need anything in here to
+# propigate to the surrounding environment.
+if [[ $- == *i* ]] ; then
+    echo "Don't source me!" >&2
+    return 1
+else
+  # set the shell to exit if there's an error (-e), and to error if
+  # there's an unset variable (-u)
+    set -eu
+fi
+
+PUSH_TAG=true
+TAG=""
+
+help() {
+    echo "This script is used to create the given tag and push it to the remote repository."
+    echo "Usage: $(basename $0) <tag> [-p|--push]"
+}
+
+while (( "$#" )); do
+  case "$1" in
+    *) # preserve positional arguments
+      if [ -z "$TAG" ]; then
+        TAG="$1"
+      else
+        echo "Error: Multiple tags provided"
+        help
+        exit 1
+      fi
+      shift
+      ;;
+  esac
+done
+
+# if no tag is given, print the help message
+if [ -z "$TAG" ]; then
+    help
+    exit 1
+fi
+
+REPO_BASE=$(realpath --relative-to=$PWD $(dirname $(readlink -e ${BASH_SOURCE[0]}))/../..)
+USER_GRID_NAME=${RUCIO_ACCOUNT-${USER}}
+
+cd ${REPO_BASE}
+
+# Check if the repository is dirty
+if ! git diff --quiet; then
+    echo "There are uncommitted changes. Please commit your changes before proceeding."
+    exit 1
+fi
+
+# Check if the tag already exists
+if git rev-parse "$TAG" >/dev/null 2>&1; then
+    echo "Reusing tag: $TAG"
+else
+    if [[ "$(git remote get-url origin)" != *"$USER_GRID_NAME"* ]]; then
+        echo "WARNING: Remote URL for \"origin\" is not a fork and you're not working from an existing tag. Please set up a fork first for instance with "
+        echo "git remote add origin ssh://git@gitlab.cern.ch:7999/$(git config user.name)/easyjet.git"
+        exit 1
+    fi
+    git tag $TAG
+    # push the tag to the remote repository if the PUSH_TAG flag is set
+    if "$PUSH_TAG" = true; then
+        git push origin $TAG
+    fi
+fi

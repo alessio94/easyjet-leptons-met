@@ -1,0 +1,18 @@
+include: [bbllAnalysis/RunConfig-bbll.yaml]
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  # btagging working points 
+  btag_wp: "GN2v01_FixedCutBEff_90"
+  amount: 2
+  amount_bjet: 2
+
+  # to use multiple btagging WPs
+  btag_extra_wps:
+    - GN2v01_FixedCutBEff_65
+    - GN2v01_FixedCutBEff_70
+    - GN2v01_FixedCutBEff_85
+    - GN2v01_Continuous
+  
+  variables_int_bjets: ["pcbt_GN2v01"]
+

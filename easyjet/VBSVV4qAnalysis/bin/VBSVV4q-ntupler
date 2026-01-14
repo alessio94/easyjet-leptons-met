@@ -1,0 +1,117 @@
+#!/bin/env python
+
+#
+# Copyright (C) 2002-2023 CERN for the benefit of the ATLAS collaboration
+#
+
+#
+# Extends easyjet-ntupler with dihiggs-specific algorithms
+#
+
+import sys
+import time
+
+from EasyjetHub.hub import (
+    AnalysisArgumentParser,
+    analysis_configuration,
+    run_job,
+    default_sequence_cfg,
+    output_cfg
+)
+from EasyjetHub.output.ttree.minituple_config import check_ntuple_output_file
+
+from VBSVV4qAnalysis.JJ_config import JJ_branches
+#from VBSVV4qAnalysis.Jjj_config import Jjj_branches
+#from VBSVV4qAnalysis.jjjj_config import jjjj_branches
+from VBSVV4qAnalysis.VBSVV4q_cfg import VBSVV4q_cfg
+from EasyjetHub.algs.event_counter_config import event_counter_cfg
+
+
+def VBSVV4q_job_cfg():
+    parser = AnalysisArgumentParser()
+
+    # Fill the configuration flags from the
+    # parsed arguments
+    # Returned flags are locked
+    flags, args = analysis_configuration(parser)
+
+    for channel in flags.Analysis.channels:
+        if not channel in ["JJ", "Jjj", "jjjj"]:
+            raise RuntimeError("Invalid channel {}, 'JJ', 'Jjj' or \
+                            'jjjj'".format(channel))
+    # Get a standard ComponentAccumulator with the following infrastructure:
+    # - basic services for event loop, messaging etc
+    # - apply preselection on triggers and data quality
+    # - build event info with calibrations etc
+    seqname = "VBSVV4qSeq"
+    cfg = default_sequence_cfg(flags, seqname)
+    
+    # Extend the list of output branches via flags
+    # For more sophistication this could be done using
+    # custom BranchManagers
+    
+    cfg.merge(
+        VBSVV4q_cfg(flags,
+                     smalljetkey=flags.Analysis.container_names.output.reco4PFlowJet,
+                     largejetkey=flags.Analysis.container_names.output.reco10UFOJet,
+                     muonkey=flags.Analysis.container_names.output.muons,
+                     electronkey=flags.Analysis.container_names.output.electrons,
+                     ), seqname
+    )
+    if not flags.Analysis.suppress_metadata_json:
+        cfg.merge(event_counter_cfg("n_VBSVV4q"), seqname)
+
+    # Explicitly call the minituple config because we want to provide
+    # additional branches, the list of which is generated dynamically
+    # rather than statically in the yaml
+    extra_VBSVV4q_branches = []
+    for channel in flags.Analysis.channels:
+        if channel == "JJ":
+            extra_VBSVV4q_branches, float_variable_names, int_variable_names = JJ_branches(flags)
+        if channel == "Jjj":
+            extra_VBSVV4q_branches, float_variable_names, int_variable_names = Jjj_branches(flags)
+        if channel == "jjjj":
+            extra_VBSVV4q_branches, float_variable_names, int_variable_names = jjjj_branches(flags)
+
+    extra_branches = extra_VBSVV4q_branches
+    outcfg, ntuple_output_file_list = output_cfg(
+        flags,
+        seqname,
+        extra_branches)
+    cfg.merge(outcfg)
+    
+    # Record the number of events for logging and tests
+    if not flags.Analysis.suppress_metadata_json:
+        cfg.merge(event_counter_cfg("n_events"), seqname)
+    return cfg, flags, args, ntuple_output_file_list
+
+
+def main():
+    # record the total run time
+    starttime = time.process_time()
+
+    cfg, flags, args, ntuple_output_file_list = VBSVV4q_job_cfg()
+
+    if args.dry_run:
+        return_code = BootstrapHelper.StatusCode(True)
+    else:
+        return_code = run_job(flags, args, cfg)
+        from os import environ
+        outpklfile = environ.get("PICKLECAFILE", None) # check if --stop-after-config
+        if return_code and outpklfile is None:
+            check_ntuple_output_file(ntuple_output_file_list)
+
+    # this is for unit tests: if jobs run too long something is wrong
+    if args.timeout:
+        duration = time.process_time() - starttime
+        if duration > args.timeout:
+            raise RuntimeError(
+                f"runtime ({duration:.1f}s) exceed timeout ({args.timeout:.0f}s)"
+            )
+    return return_code.isSuccess()
+
+
+# Execute the main function if this file was executed as a script
+if __name__ == "__main__":
+    is_successful = main()
+    sys.exit(0 if is_successful else 1)

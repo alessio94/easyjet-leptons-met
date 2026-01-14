@@ -1,0 +1,89 @@
+include: [EasyjetHub/base-config.yaml]
+
+# Which analysis to consider
+do_ZbbjCalib: true
+do_ZbbyCalib: false
+do_ttCalib: false
+do_ZlljCalib: false
+do_ZllyCalib: false
+do_ZtautauCalib: false
+# We would use Alg in src/ZbbjCalibSelectionAlg
+
+# Toggles to bypass event selection
+bypass: false
+
+# Toggles for object types
+do_large_R_UFO_jets: true
+do_small_R_jets: true
+do_muons: true
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  btag_wp: "GN2v01_FixedCutBEff_77"
+  maxEta: 2.5
+
+Large_R_jet:
+  min_pT: 200.e+3
+  maxEta: 2.0
+  runMuonJetPtCorr: false
+  GN2X_hbb_wps:
+    - "FlatMassQCDEff_0p25"
+    - "FlatMassQCDEff_0p3"
+    - "FlatMassQCDEff_0p37"
+    - "FlatMassQCDEff_0p46"
+    - "FlatMassQCDEff_0p58"
+    - "FlatMassQCDEff_0p74"
+    - "FlatMassQCDEff_0p94"
+    - "FlatMassQCDEff_1p25"
+    - "FlatMassQCDEff_1p55"
+
+
+Electron:
+  min_pT: 7.e+3
+  ID: "MediumLH"
+  Iso: "TightTrackOnly_VarRad"
+
+Muon:
+  min_pT: 7.e+3
+  ID: "Medium"
+  maxEta: 2.7
+  Iso: "Tight_VarRad"
+
+# list of triggers per year to consider
+Trigger:
+  include: [XbbCalib/trigger_Zbbj.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: false
+
+OverlapRemoval:
+  # Enable overlap removal between large-R jets and objects for which
+  # large-R jet OR removal is implemented in Athena
+  do_large_R_jets: true
+  # Enable overlap removal between small-R jets and large-R jets
+  # Athena default is true
+  do_small_R_jet_large_R_jet: false
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  reco_outputs:
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+  truth_outputs:
+    large_R_jets: 'container_names.input.truth10SoftDropJet'
+  collection_options:
+    large_R_jets:
+      run_selection: true
+      btag_details: true
+      truth_labels: true
+      bjet_regression: true
+    small_R_jets:
+      run_selection: true
+    electrons:
+      run_selection: true
+    muons:
+      run_selection: true

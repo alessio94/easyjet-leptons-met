@@ -1,0 +1,153 @@
+# list of DSID of samples for which to store HF classification 
+# related information
+DSID_HF_class_samples:
+  - 410470 #mc20 ttbar 5FS PhPy8 ljets (nonallhad)
+  - 410471 #mc20 ttbar 5FS PhPy8 allhad
+  - 410472 #mc20 ttbar 5FS PhPy8 dilep
+  - 601229 #mc23 ttbar 5FS PhPy8 ljets
+  - 601230 #mc23 ttbar 5FS PhPy8 dilep
+  - 601237 #mc23 ttbar 5FS PhPy8 allhad
+  - 411233 #mc20 ttbar 5FS PhH7 ljets 
+  - 411234 #mc20 ttbar 5FS PhH7 dilep
+  - 601414 #mc23 ttbar 5FS PhH7 dilep
+  - 601415 #mc23 ttbar 5FS PhH7 dilep
+  - 601497 #mc20 and mc23 ttbar 5FS PhPy8 pT_hard ljets
+  - 601491 #mc20 and mc23 ttbar 5FS PhPy8 pT_hard dilep
+  - 410480 #mc20 ttbar 5FS PhPy8 h_dump ljets
+  - 410482 #mc20 ttbar 5FS PhPy8 h_dump dilep
+  - 601398 #mc23 ttbar 5FS PhPy8 h_dump ljets
+  - 601399 #mc23 ttbar 5FS PhPy8 h_dump dilep
+  - 601228 #mc23 ttbb 4FS PhPy8 allhad
+  - 601227 #mc23 ttbb 4FS PhPy8 ljets
+  - 601226 #mc23 ttbb 4FS PhPy8 dilep
+  - 603003 #mc20 ttbb 4FS PhPy8 allhad
+  - 603192 #mc20 ttbb 4FS PhPy8 ljets
+  - 603190 #mc20 ttbb 4FS PhPy8 dilep
+  - 603193 #mc20 ttbb 4FS PhPy8 pT_hard ljets
+  - 603191 #mc20 ttbb 4FS PhPy8 pT_hard dilep
+  - 603905 #mc20 ttbb PhH7 ljets
+  - 603906 #mc20 ttbb PhH7 dilep
+  - 600737 #mc20 ttbb 4FS PhPy8 dipole recoil ljets
+  - 600738 #mc20 ttbb 4FS PhPy8 dipole recoil dilep
+  - 600792 #mc20 ttbb 4FS PhPy8 bornzerodamp ljets
+  - 600791 #mc20 ttbb 4FS PhPy8 bornzerodamp dilep
+  - 407342 #mc20 ttbar HT1k5 nonallhad
+  - 407343 #mc20 ttbar HT1k_1k5 nonallhad
+  - 407344 #mc20 ttbar HT6c_1k nonallhad
+  - 603851 #mc23 ttbar HT sliced ljets
+  - 603852 #mc23 ttbar HT sliced ljets
+  - 603853 #mc23 ttbar HT sliced ljets
+  - 603854 #mc23 ttbar HT sliced ljets
+
+# list of DSID of samples for which to store WLep related information
+# for overlap removal between samples
+DSID_nWLep_samples:
+  - 410470 #nonallhad ttbar
+  - 601352 #dyn scale Wt DR
+  - 601355 #dyn scale Wt DR
+  - 601627 #dyn scale Wt DS
+  - 601631 #dyn scale Wt DS
+  - 601626 #hdamp variations DS
+  - 601630 #hdamp variations DS
+  - 601460 #hdamp variations DR
+  - 601462 #hdamp variations DR
+  - 602235 #PS variation
+  - 602236 #PS variation
+  - 602689 #pThard variation
+  - 602690 #pThard variation
+
+DSID_HSTP_samples:
+  - 801165 #Py8EG_A14 JZ0
+  - 801166 #Py8EG_A14 JZ1
+  - 801167 #Py8EG_A14 JZ2
+  - 801168 #Py8EG_A14 JZ3
+  - 801169 #Py8EG_A14 JZ4
+  - 801170 #Py8EG_A14 JZ5
+  - 801171 #Py8EG_A14 JZ6
+  - 801172 #Py8EG_A14 JZ7
+  - 801173 #Py8EG_A14 JZ8
+  - 801174 #Py8EG_A14 JZ9incl
+
+DSID_vgammaOR:
+  - 700320 #Sh_2211, Zee_maxHTpTV2_BFilter
+  - 700321 #Sh_2211, Zee_maxHTpTV2_CFilterBVeto
+  - 700322 #Sh_2211, Zee_maxHTpTV2_CVetoBVeto
+  - 700323 #Sh_2211, Zmumu_maxHTpTV2_BFilter
+  - 700324 #Sh_2211, Zmumu_maxHTpTV2_CFilterBVeto
+  - 700325 #Sh_2211, Zmumu_maxHTpTV2_CVetoBVeto
+  - 700326
+  - 700327
+  - 700328
+  - 700329
+  - 700330
+  - 700331
+  - 700332
+  - 700333 
+  - 700334
+  - 700338
+  - 700339
+  - 700340
+  - 700341
+  - 700342
+  - 700343
+  - 700344
+  - 700345
+  - 700346
+  - 700347
+  - 700348
+  - 700349
+  - 700358 #Sh_2211, Zee2jets_Min_N_TChannel
+  - 700359 #Sh_2211, Zmm2jets_Min_N_TChannel.deriv
+  - 700360 #Sh_2211,Ztt2jets_Min_N_TChannel
+  - 700439
+  - 700440
+  - 700441
+  - 700467 #Sh_2211, Zee_maxHTpTV2_m10_40_pT5_BFilte
+  - 700468 #Sh_2211, Zee_maxHTpTV2_m10_40_pT5_CFilterBVeto
+  - 700469 #Sh_2211, Zee_maxHTpTV2_m10_40_pT5_CVetoBVeto
+  - 700470 #Sh_2211, Zmumu_maxHTpTV2_m10_40_pT5_BFilte
+  - 700471 #Sh_2211, Zmumu_maxHTpTV2_m10_40_pT5_CFilterBVeto
+  - 700472 #Sh_2211, Zmumu_maxHTpTV2_m10_40_pT5_CVetoBVeto
+  - 700473
+  - 700474
+  - 700475
+  - 700476
+  - 700477
+  - 700478
+  - 700479
+  - 700480
+  - 700481
+  - 700598
+  - 700599
+  - 700792 #Sh_2211, Ztautau_maxHTpTV2_BFilter.
+  - 700793 #Sh_2211, Ztautau_maxHTpTV2_CFilterBVeto
+  - 700794 #Sh_2211, Ztautau_maxHTpTV2_CVetoBVeto
+  - 700849 #Sh_2214, Zqq_ptZ_200_ECMS
+  - 700855 #Sh_2214, Zbb_ptZ_200_ECMS
+  - 601237 #PhPy8EG_A14_ttbar_hdamp258p75_allhad
+  - 700843 #Sh_2214, Wqq_ptW_200_ECMS
+
+ 
+DSID_HHH4b2tau_KappaReweight:
+  - 561760 #MGPy8EG_A14NNPDF30NLO_HHH_4b2tau_k3k4_1_1
+
+
+DSID_ICPDF_Reweight:
+  - 513105 #mc23: MGPy8EG_Zee_FxFx3jHT2bias_SW_BFilter
+  - 513106 #mc23: MGPy8EG_Zee_FxFx3jHT2bias_SW_CFilterBVeto
+  - 513107 #mc23: MGPy8EG_Zee_FxFx3jHT2bias_SW_CVetoBVeto
+  - 513108 #mc23: MGPy8EG_Zmumu_FxFx3jHT2bias_SW_BFilter
+  - 513109 #mc23: MGPy8EG_Zmumu_FxFx3jHT2bias_SW_CFilterBVeto
+  - 513110 #mc23: MGPy8EG_Zmumu_FxFx3jHT2bias_SW_CVetoBVeto
+  - 513111 #mc23: MGPy8EG_Ztautau_FxFx3jHT2bias_SW_BFilter
+  - 513112 #mc23: MGPy8EG_Ztautau_FxFx3jHT2bias_SW_CFilterBVeto
+  - 513113 #mc23: MGPy8EG_Ztautau_FxFx3jHT2bias_SW_CVetoBVeto
+  - 506193 #mc20: MGPy8EG_Zee_FxFx_3jets_HT2bias_BFilter
+  - 506194 #mc20: MGPy8EG_Zee_FxFx_3jets_HT2bias_CFilterBVeto
+  - 506195 #mc20: MGPy8EG_Zee_FxFx_3jets_HT2bias_CVetoBVeto
+  - 506196 #mc20: MGPy8EG_Zmumu_FxFx_3jets_HT2bias_BFilter
+  - 506197 #mc20: MGPy8EG_Zmumu_FxFx_3jets_HT2bias_CFilterBVeto
+  - 506198 #mc20: MGPy8EG_Zmumu_FxFx_3jets_HT2bias_CVetoBVeto
+  - 512198 #mc20: MGPy8EG_FxFx_Ztautau_3jets_HT2bias_BFilter
+  - 512199 #mc20: MGPy8EG_FxFx_Ztautau_3jets_HT2bias_CFilterBVeto
+  - 512200 #mc20: MGPy8EG_FxFx_Ztautau_3jets_HT2bias_CVetoBVeto

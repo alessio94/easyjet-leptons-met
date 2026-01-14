@@ -1,0 +1,31 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/TruthWeightTools/HiggsWeightTool.h"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/TruthWeightTools/HiggsWeights.h"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/TruthWeightTools/IHiggsWeightTool.h"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/TruthWeightTools/TruthWeightToolsDict.h"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/Root/HiggsWeightTool.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/Root/HiggsWeights.cxx"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"TruthWeightTools"
+		],
+		"name" : "TruthWeightToolsLib"
+	}
+}

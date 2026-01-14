@@ -1,0 +1,67 @@
+6675975; std::vector<long>; std::vector<long,std::allocator<long> >
+16133813; long long; long long
+16428258; SG::AuxStoreInternal; SG::AuxStoreInternal
+18868981; std::vector<unsigned long>; std::vector<unsigned long,std::allocator<unsigned long> >
+22592129; std::vector<int>; std::vector<int,std::allocator<int> >
+23262399; std::vector<std::vector<int> >; std::vector<std::vector<int,std::allocator<int> >,std::allocator<std::vector<int,std::allocator<int> > > >
+24204906; std::vector<std::vector<short> >; std::vector<std::vector<short,std::allocator<short> >,std::allocator<std::vector<short,std::allocator<short> > > >
+25884436; std::vector<std::string>; std::vector<std::string,std::allocator<std::string> >
+33347479; SG::AuxVectorBase; SG::AuxVectorBase
+34480459; CondContBase; CondContBase
+35119468; std::vector<unsigned long long>; std::vector<unsigned long long,std::allocator<unsigned long long> >
+35706084; std::vector<short>; std::vector<short,std::allocator<short> >
+40774348; AthenaAttributeList; AthenaAttributeList
+45822813; std::vector<bool>; std::vector<bool,std::allocator<bool> >
+45903698; xAOD::EventInfo; xAOD::EventInfo_v1
+47413844; unsigned long; unsigned long
+55596997; EventContext; EventContext
+55879233; SG::IAuxStoreIO; SG::IAuxStoreIO
+70698075; std::vector<std::vector<char> >; std::vector<std::vector<char,std::allocator<char> >,std::allocator<std::vector<char,std::allocator<char> > > >
+70769527; unsigned long long; unsigned long long
+74079355; SG::ThinningDecision; SG::ThinningDecision
+76977490; std::vector<std::vector<unsigned long long> >; std::vector<std::vector<unsigned long long,std::allocator<unsigned long long> >,std::allocator<std::vector<unsigned long long,std::allocator<unsigned long long> > > >
+78410462; unsigned int; unsigned int
+78422682; std::map<std::string,std::vector<double> >; std::map<std::string,std::vector<double,std::allocator<double> >,std::less<std::string>,std::allocator<std::pair<std::string const,std::vector<double,std::allocator<double> > > > >
+81926032; char; char
+82469196; std::vector<std::vector<std::vector<float> > >; std::vector<std::vector<std::vector<float,std::allocator<float> >,std::allocator<std::vector<float,std::allocator<float> > > >,std::allocator<std::vector<std::vector<float,std::allocator<float> >,std::allocator<std::vector<float,std::allocator<float> > > > > >
+85220325; std::vector<std::vector<std::vector<int> > >; std::vector<std::vector<std::vector<int,std::allocator<int> >,std::allocator<std::vector<int,std::allocator<int> > > >,std::allocator<std::vector<std::vector<int,std::allocator<int> >,std::allocator<std::vector<int,std::allocator<int> > > > > >
+101141770; std::vector<std::vector<std::string> >; std::vector<std::vector<std::string,std::allocator<std::string> >,std::allocator<std::vector<std::string,std::allocator<std::string> > > >
+103402598; std::map<int,int>; std::map<int,int,std::less<int>,std::allocator<std::pair<int const,int> > >
+113556225; std::map<std::string,unsigned int>; std::map<std::string,unsigned int,std::less<std::string>,std::allocator<std::pair<std::string const,unsigned int> > >
+116449351; std::string; std::string
+126048273; std::vector<std::vector<uint8_t> >; std::vector<std::vector<unsigned char,std::allocator<unsigned char> >,std::allocator<std::vector<unsigned char,std::allocator<unsigned char> > > >
+134610868; bool; bool
+136869678; long; long
+143489258; std::map<std::string,std::string>; std::map<std::string,std::string,std::less<std::string>,std::allocator<std::pair<std::string const,std::string> > >
+154043868; std::vector<std::vector<double> >; std::vector<std::vector<double,std::allocator<double> >,std::allocator<std::vector<double,std::allocator<double> > > >
+170542827; std::map<std::string,int>; std::map<std::string,int,std::less<std::string>,std::allocator<std::pair<std::string const,int> > >
+177480351; std::vector<unsigned int>; std::vector<unsigned int,std::allocator<unsigned int> >
+178378299; SG::IAuxStore; SG::IAuxStore
+181049313; std::map<std::string,std::vector<int> >; std::map<std::string,std::vector<int,std::allocator<int> >,std::less<std::string>,std::allocator<std::pair<std::string const,std::vector<int,std::allocator<int> > > > >
+187169987; SG::IConstAuxStore; SG::IConstAuxStore
+193758082; std::map<std::string,float>; std::map<std::string,float,std::less<std::string>,std::allocator<std::pair<std::string const,float> > >
+196927374; xAOD::ShallowAuxInfo; xAOD::ShallowAuxInfo
+199376827; std::map<std::string,std::vector<unsigned int> >; std::map<std::string,std::vector<unsigned int,std::allocator<unsigned int> >,std::less<std::string>,std::allocator<std::pair<std::string const,std::vector<unsigned int,std::allocator<unsigned int> > > > >
+202242136; std::vector<float>; std::vector<float,std::allocator<float> >
+205717523; std::vector<std::vector<unsigned long> >; std::vector<std::vector<unsigned long,std::allocator<unsigned long> >,std::allocator<std::vector<unsigned long,std::allocator<unsigned long> > > >
+206378829; std::vector<char>; std::vector<char,std::allocator<char> >
+211215482; CondCont<AthenaAttributeList>; CondCont<AthenaAttributeList>
+213985193; std::vector<std::vector<unsigned int> >; std::vector<std::vector<unsigned int,std::allocator<unsigned int> >,std::allocator<std::vector<unsigned int,std::allocator<unsigned int> > > >
+219400222; std::vector<double>; std::vector<double,std::allocator<double> >
+222376821; DataHeader; DataHeader
+225182422; SG::AuxElement; SG::AuxElement
+225912587; float; float
+226113180; xAOD::AuxInfoBase; xAOD::AuxInfoBase
+235483215; std::map<int,double>; std::map<int,double,std::less<int>,std::allocator<std::pair<int const,double> > >
+238793770; std::vector<unsigned short>; std::vector<unsigned short,std::allocator<unsigned short> >
+239989609; double; double
+244260744; int; int
+247252788; std::vector<std::vector<unsigned short> >; std::vector<std::vector<unsigned short,std::allocator<unsigned short> >,std::allocator<std::vector<unsigned short,std::allocator<unsigned short> > > >
+252602412; std::map<std::string,double>; std::map<std::string,double,std::less<std::string>,std::allocator<std::pair<std::string const,double> > >
+255356807; std::vector<std::vector<bool> >; std::vector<std::vector<bool,std::allocator<bool> >,std::allocator<std::vector<bool,std::allocator<bool> > > >
+256222847; std::map<int,float>; std::map<int,float,std::less<int>,std::allocator<std::pair<int const,float> > >
+258753314; std::vector<std::vector<float> >; std::vector<std::vector<float,std::allocator<float> >,std::allocator<std::vector<float,std::allocator<float> > > >
+259112316; std::map<std::string,std::vector<float> >; std::map<std::string,std::vector<float,std::allocator<float> >,std::less<std::string>,std::allocator<std::pair<std::string const,std::vector<float,std::allocator<float> > > > >
+1111823638; xAOD::ShallowAuxContainer; xAOD::ShallowAuxContainer
+1225080690; xAOD::AuxContainerBase; xAOD::AuxContainerBase
+1320594112; xAOD::EventInfoContainer; DataVector<xAOD::EventInfo_v1>

@@ -1,0 +1,74 @@
+include: [EasyjetHub/base-config.yaml]
+
+systematics_suffix_separator: "_"
+
+# Which analysis to consider
+do_resolved_dihiggs: false
+do_boosted_dihiggs: false
+
+do_resolved_trigger_bucket: false
+
+# Note: to actually derive trigger SF,
+# you need to enable Small_R_Jet.doL1Matching and/or Small_R_Jet.doHLTMatching
+do_resolved_trigger_SF: false
+
+# Option to switch stored level of trigger SF: detail, simple, both
+# Supporting: SF for all triggers, and SF deducted with trigger bucket.
+# "detail": saving SF for all triggers, for bucket optimization etc
+# "simple": saving SF after trigger bucket
+# "both": saving both
+triggerSFBranchSaveStrategy: "detail"
+
+### tagging jets vs RNN strategy
+### false: will not select vbf jets 
+### true : will select vbf jets (load VBF-RNN)
+UseVBFRNN : false
+
+pairingStrategy: "minDeltaR"
+kinematicGroup: "compressed"
+
+# Decay mode considered for truth decoration
+Truth:
+  decayModes: ["bbbb"]
+  do_STXS: false
+
+splitOutputTree: false
+
+do_small_R_jets: false
+do_large_R_UFO_jets: false
+do_large_R_Topo_jets: false
+do_VR_jets: false
+do_muons: false
+do_met: false
+
+Small_R_jet:
+  useFJvt: true
+  btag_egReductionB: "Medium"
+  btag_egReductionC: "Medium"
+  btag_egReductionLight: "Medium"
+
+# orthogonality studies  
+orthogonality:
+  include: [EasyjetHub/orth-config.yaml ]
+  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
+
+do_CP_systematics: false
+systematics_regex: []
+
+# apply loose jet cleaning only
+add_BadBatman_jet_cleaning: false
+do_overlap_removal: false
+
+do_trigger_filtering: false
+save_cutflow: true
+bypass: true
+selection_name: "nothing"
+CutList: []
+
+GRL:
+  store_decoration: true
+
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  slim_variables_with_syst: true
+

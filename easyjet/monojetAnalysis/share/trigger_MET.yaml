@@ -1,0 +1,30 @@
+## Run2 analysis use the single lepton trigger only
+selection:
+  chains:
+    '2015': 
+    - 'HLT_xe70_mht'
+    '2016': 
+    - 'HLT_noalg_L1J400'
+    - 'HLT_xe90_mht_L1XE50'
+    - 'HLT_xe110_mht_L1XE50'
+    '2017': 
+    - 'HLT_noalg_L1J400'
+    - 'HLT_xe90_pufit_L1XE50'
+    - 'HLT_xe110_pufit_L1XE55'
+    - 'HLT_xe100_pufit_L1XE50'
+    - 'HLT_xe100_pufit_L1XE55'
+    - 'HLT_xe110_pufit_L1XE50'
+    '2018': 
+    - 'HLT_xe110_pufit_xe70_L1XE50'
+    - 'HLT_xe120_pufit_L1XE50'
+    - 'HLT_xe110_pufit_xe65_L1XE50'
+    '2022': 
+    - 'HLT_xe75_cell_xe65_tcpufit_xe90_trkmht_L1XE50'
+    - 'HLT_xe55_cell_xe70_tcpufit_L1XE50'
+    - 'HLT_xe80_cell_xe115_tcpufit_L1XE50'
+    '2023': 
+    - HLT_xe65_cell_xe100_mhtpufit_pf_L1XE50
+    - HLT_xe65_cell_xe90_pfopufit_L1XE50
+    - HLT_xe80_cell_xe115_tcpufit_L1XE50
+#    - 'HLT_xe75_cell_xe65_tcpufit_xe90_trkmht_L1XE50'
+#    - 'HLT_xe80_cell_xe115_tcpufit_L1XE50'

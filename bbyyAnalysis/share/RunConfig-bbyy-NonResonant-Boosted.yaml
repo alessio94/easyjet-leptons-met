@@ -1,0 +1,43 @@
+include: [bbyyAnalysis/RunConfig-bbyy-base.yaml]
+
+do_large_R_UFO_jets: true
+do_Boosted: true
+
+# temporarily disable OR for large R jets
+OverlapRemoval:
+  do_large_R_jets: false
+  do_small_R_jet_large_R_jet: false
+
+# flag that toggles run-through mode in the SelectorAlg
+bypass: true
+
+# name that will go in the tree bbyy_pass_<selection_name>_%SYS%
+selection_name: "loose"
+
+CutList :
+    - PASS_TRIGGER
+    - TWO_LOOSE_PHOTONS
+    - PASS_TRIGGER_MATCHING
+    - TWO_TIGHTID_ISO_PHOTONS
+    - DIPHOTON_MASS
+    - AT_LEAST_TWO_JETS
+    - EXACTLY_ZERO_LEPTONS
+
+# Toggles for reconstructed objects decorations
+Large_R_jet:
+  amount: 2
+  variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_phbb", "GN2Xv01_pqcd", "GN2Xv01_phcc", "GN2Xv01_ptop"]
+  variables_int_LargeRJets: ["truthLabel"]
+
+
+ttree_output:
+  include: [bbyy-base-output.yaml]
+  # Extra large-R jets config
+  reco_outputs:
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+  collection_options:
+    large_R_jets:
+      substructure_info: true
+      truth_labels: true
+  truth_outputs:
+    large_R_jets: 'container_names.input.truth10SoftDropJet'

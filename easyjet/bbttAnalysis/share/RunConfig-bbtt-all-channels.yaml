@@ -1,0 +1,11 @@
+include: [bbttAnalysis/RunConfig-bbtt-base-largeR-jets.yaml]
+
+channels: ["HadHad","LepHad","ZCR","TopEMuCR","Boosted"]
+
+Trigger:
+  selection:
+    include: [bbttAnalysis/trigger_full.yaml]
+
+# Produce separate files per channel + CutBookKeeper
+splitOutputTree: true
+splitCBK: true

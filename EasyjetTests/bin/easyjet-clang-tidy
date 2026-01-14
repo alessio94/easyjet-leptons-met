@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+set -Ee
+
+print-usage() {
+    echo "usage: ${0##*/} <easyjet source directory>"
+}
+
+usage() {
+    print-usage
+    exit 1;
+}
+
+help() {
+    echo "The ${0##*/} utility will run clang-tidy to check the source code. It requires cmake to be run beforehand."
+    print-usage
+    exit 0
+}
+
+
+while getopts "h" o; do
+    case "${o}" in
+        h) help ;;
+        *) usage ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if (( $# != 1 )) ; then
+    usage
+fi
+
+easyjetsource=$1
+
+source $(find /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/Clang/current/ -mindepth 3 -maxdepth 3 -type f -name setup.sh)
+
+if [[ ! -z ${TestArea+x} ]]; then
+   cd $TestArea
+fi
+echo "I am in $PWD"
+ls
+
+cleanupRestore() {
+  echo "Caught Ctrl+C! restore compile_commands.json"
+  kill -TERM $sub_pid
+  mv compile_commands_back.json compile_commands.json
+  cd -
+  exit 1
+}
+
+# restore compile_commands.json on Ctrl+C
+# for some reason the trapping is not working on the CI, do it only when CI variables are not defined
+if [[ -z "${CI_PROJECT_NAME:-}" ]]; then
+    trap cleanupRestore SIGINT
+ fi
+
+# exclude auto-generated files from clang check (only way I found to do it).
+mv compile_commands.json compile_commands_back.json
+jq -M 'map(select(.file | test("build/") | not))' compile_commands_back.json > compile_commands.json
+
+if [[ -z "${CI_PROJECT_NAME:-}" ]]; then
+    # prevent run-clang-tidy from catching the Ctrl+C signal
+    bash -c run-clang-tidy -j8 -use-color -config-file $easyjetsource/.clang-tidy -warnings-as-errors '*'  &
+    sub_pid=$!
+    wait $sub_pid
+else
+    run-clang-tidy -j8 -use-color -config-file $easyjetsource/.clang-tidy -warnings-as-errors '*'
+fi
+echo "clang-tidy done; restore compile_commands.json"
+mv compile_commands_back.json compile_commands.json
+cd -
+#exit 0
+

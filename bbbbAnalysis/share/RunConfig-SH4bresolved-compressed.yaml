@@ -1,0 +1,8 @@
+include: [bbbbAnalysis/RunConfig-SH4b.yaml]
+
+# do the bbbb resolved analysis
+do_resolved_dihiggs: true
+
+# Resolved pairing selections
+pairingStrategy: "BDT"
+kinematicGroup: "compressed"

@@ -1,0 +1,16 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetTests/util/compareOutputNtuples.cxx"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"EasyjetTests"
+		],
+		"name" : "compareOutputNtuples"
+	}
+}

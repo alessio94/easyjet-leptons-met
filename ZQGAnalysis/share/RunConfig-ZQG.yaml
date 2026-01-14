@@ -1,0 +1,178 @@
+include: [EasyjetHub/base-config.yaml]
+
+# Definition of container names
+full_container_names:
+  phys:
+    include: ZQGAnalysis/container-names-DAOD_PHYS.yaml
+
+GRL:
+  # good runs lists to filter events
+  years:
+    include: [ZQGAnalysis/lepton_grl_years.yaml]
+  files:
+    include: [ZQGAnalysis/lepton_grl.yaml]
+
+PileupReweighting:
+  lumicalc_files:
+    include: [ZQGAnalysis/lumicalc_lepton.yaml]
+  prw_files:
+    include: [ZQGAnalysis/prw_lepton.yaml]
+
+# Which analysis to consider
+do_ZQG_analysis: true
+
+bypass: false
+
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_large_R_UFO_jets: true
+do_met: true
+do_tracks: false
+
+# Truth-related properties
+Truth:
+  do_IC: false
+
+# # Track-specific settings
+# Track:
+#   min_pT: 1000.  # MeV (1 GeV minimum)
+#   max_eta: 2.5
+#   working_points: []  # Disable for initial testing
+#   runBiasing: true
+#   runTruthFilter: true
+#   outputTrackSummaryInfo: false  # Temporarily disable to test basic automation
+#   amount: 5     # Number of leading tracks to store in ntuples
+#   variables: ["pt", "eta", "phi", "charge", "qOverP", "d0", "z0", "vz"]
+#   variables_int: []
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  min_pT: 20000  # for the jets entering the MET computation and the overlap removal
+  max_eta: 2.5
+  min_pT_ZQG: 20000 # for the jet selection
+  max_eta_ZQG: 2.5
+  # btagging working points 
+  btag_wp: "GN2v01_FixedCutBEff_77"
+  runBJetPtCalib: true
+  amount: 2
+  amount_bjet: 2
+  amount_cjet: 2
+  amount_ljet: 2
+  # to use multiple btagging WPs
+  btag_extra_wps:
+    - GN2v01_Continuous2D
+  useFJvt: true
+
+  variables_int_bjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]    
+  variables_int_cjets: ["truthLabel", "pcbt2D_GN2v01", "pcbt_GN2v01"]
+  variables_int_ljets: ["truthLabel"]
+
+  variables_truthjets: ["pt", "eta", "phi", "E"]
+
+Large_R_jet:
+  amount: 1
+  variables_LargeRJets: ["pt", "eta", "phi", "E", "m", "GN2Xv01_DXcc", "GN2Xv01_phbb", "GN2Xv01_phcc", "GN2Xv01_pqcd", "GN2Xv01_ptop"]
+
+Electron:
+  ID: "TightLH"
+  Iso: Tight_VarRad
+  min_pT: 27.e+3
+  min_pT_ZQG: 27.e+3
+  crackVeto: true
+
+Muon:
+  ID: "Medium"
+  Iso: PflowTight_VarRad
+  min_pT: 27.e+3
+  max_eta: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
+  min_pT_ZQG: 27.e+3
+  max_eta_ZQG: 2.5 # no recommendation yet for forward muons with eta between 2.5 and 2.7.
+
+Lepton:
+  amount: 2
+  variables_int: ["isPrompt","truthOrigin", "truthType"]
+  variables_truth_Z: ["pt", "eta", "phi", "E", "m"]
+
+# list of triggers per year to consider
+Trigger:
+  include: [ZQGAnalysis/trigger.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+OverlapRemoval:
+  # Enable overlap removal between large-R jets and objects for which 
+  # large-R jet OR removal is implemented in Athena
+  do_large_R_jets: false
+  do_small_R_jet_large_R_jet: false
+
+
+#Enable cutflow 
+save_cutflow: true
+
+# # Enable cutflow for the truth level
+# save_truth_cutflow: true
+
+
+CutList :
+      - PASS_TRIGGER
+      - EXACTLY_TWO_LEPTONS
+      - OPPOSITE_CHARGE_LEPTONS
+      - DILEPTON_MASS_WINDOW
+      - ONE_B_JETS
+      - TWO_B_JETS
+      - ONE_C_JETS
+      - TWO_C_JETS
+
+Categories :
+      - IS_ee
+      - IS_mm
+      - IS_em
+
+TruthCutList :
+      - EXACTLY_TWO_LEPTONS_TRUTH
+      - OPPOSITE_CHARGE_LEPTONS_TRUTH
+      - DILEPTON_MASS_WINDOW_TRUTH
+      - ONE_B_JETS_TRUTH
+      - TWO_B_JETS_TRUTH
+      - ONE_C_JETS_TRUTH
+      - TWO_C_JETS_TRUTH
+
+TruthCategories :
+      - IS_ee_TRUTH
+      - IS_mm_TRUTH
+      - IS_em_TRUTH
+
+additionalPdf : ["CT14nnloIC/0", "CT14nnloIC/1", "CT14nnloIC/2", "CT18FC/0", "CT18FC/3", "CT18FC/6", "CT18FC/9", "CT18NNLO/0", "CT18XNNLO/0", "NNPDF40_nnlo_pch_as_01180/0", "NNPDF40_nnlo_as_01180/0"]
+additionalPdfPath : ""
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  slim_variables_with_syst: true
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    met : 'container_names.output.met'
+    # tracks: 'container_names.output.tracks'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+  collection_options:
+    small_R_jets:
+      btag_info: true
+      btag_details: true
+      # JVT_details: true
+    large_R_jets:
+      substructure_info: true
+      truth_labels: true
+      btag_details: true
+  truth_outputs:
+    electrons: "ZQGTruthElectrons"
+    muons: "ZQGTruthMuons"
+    small_R_jets: "ZQGTruthJets"
+    large_R_jets: ["ZQGTruthLargeJets"]

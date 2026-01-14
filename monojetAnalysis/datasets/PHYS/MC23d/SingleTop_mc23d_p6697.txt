@@ -1,0 +1,10 @@
+# SingleTop
+## s-channel
+mc23_13p6TeV.601348.PhPy8EG_tb_lep_antitop.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697
+mc23_13p6TeV.601349.PhPy8EG_tb_lep_top.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697
+## t-channel
+mc23_13p6TeV.601350.PhPy8EG_tqb_lep_antitop.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697
+mc23_13p6TeV.601351.PhPy8EG_tqb_lep_top.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697
+## Wt-channel
+mc23_13p6TeV.601352.PhPy8EG_tW_dyn_DR_incl_antitop.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697
+mc23_13p6TeV.601355.PhPy8EG_tW_dyn_DR_incl_top.deriv.DAOD_PHYS.e8514_s4159_r15224_p6697

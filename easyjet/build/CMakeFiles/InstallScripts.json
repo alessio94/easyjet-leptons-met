@@ -1,0 +1,12 @@
+{
+	"InstallScripts" : 
+	[
+		"/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/cmake_install.cmake",
+		"/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/EasyjetHub/cmake_install.cmake",
+		"/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/EasyjetTests/cmake_install.cmake",
+		"/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/KinematicFitTool/cmake_install.cmake",
+		"/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/TruthWeightTools/cmake_install.cmake",
+		"/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/VBFTagger/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

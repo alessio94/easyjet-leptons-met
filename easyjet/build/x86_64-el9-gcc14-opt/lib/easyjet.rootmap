@@ -1,0 +1,9 @@
+{ decls }
+namespace TruthWeightTools {  }
+
+[ libTruthWeightToolsDict.so ]
+# List of selected classes
+class TruthWeightTools::HiggsWeightTool
+class TruthWeightTools::IHiggsWeightTool
+header TruthWeightTools/HiggsWeightTool.h
+header TruthWeightTools/IHiggsWeightTool.h

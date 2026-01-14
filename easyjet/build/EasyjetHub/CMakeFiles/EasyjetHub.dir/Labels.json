@@ -1,0 +1,109 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/CutManager.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/DiTauDecoratorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/DijetHSTPFilter.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/ElectronDecoratorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/ElectronSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/EventCounterAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/EventInfoGlobalAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/EventSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/GNXLargeJetDecoratorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/JetDecoratorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/JetDeepCopyAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/JetSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/LeptonOrderingAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/MetadataHistAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/MuonSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/MuonTrackDecoratorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/OrthogonalityAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/PhotonSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/SecVtxFilterAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/SumOfWeightsAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TauDecoratorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TauSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TruthElectronSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TruthJetSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TruthLeptonOrderingAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TruthMuonSelectorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TruthParticleInformationAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TruthUtils.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/TruthWBosonInformationAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/UIDDecoratorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/WTaggingDecoratorAlg.cxx"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/EasyjetHub/src/components/EasyjetHub_entries.cxx"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"EasyjetHub"
+		],
+		"name" : "EasyjetHub"
+	}
+}

@@ -1,0 +1,68 @@
+#!/bin/env python
+
+#
+# Copyright (C) 2002-2022 CERN for the benefit of the ATLAS collaboration
+#
+
+#
+# A simple CA file to create a tree of variables
+#
+
+import sys
+import time
+
+from EasyjetHub import hub
+from EasyjetHub.output.ttree.minituple_config import check_ntuple_output_file
+
+
+def minimal_job_cfg():
+
+    # Fill the configuration flags from the
+    # parsed arguments
+    # Returned flags are locked
+    flags, args = hub.analysis_configuration()
+
+    # Get a standard ComponentAccumulator with the following infrastructure:
+    # - basic services for event loop, messaging etc
+    # - apply preselection on triggers and data quality
+    # - build event info with calibrations etc
+    seqname = "EasyjetSeq"
+    cfg = hub.default_sequence_cfg(flags, seqname)
+    outcfg, ntuple_output_file_list = hub.output_cfg(flags, seqname)
+    cfg.merge(outcfg)
+    
+    return cfg, flags, args, ntuple_output_file_list
+
+
+def main():
+    # record the total run time
+    starttime = time.process_time()
+    cfg, flags, args, ntuple_output_file_list = minimal_job_cfg()
+
+    # Exit after full configuration purely for testing
+    if args.dry_run:
+        # Need to explicitly set the config as merged to avoid errors
+        # because we didn't execute it
+        cfg._wasMerged = True
+        return_code = 1
+    else:
+        return_code = hub.run_job(flags, args, cfg).isSuccess()
+        from os import environ
+        outpklfile = environ.get("PICKLECAFILE", None) # check if --stop-after-config
+        if return_code and outpklfile is None:
+            check_ntuple_output_file(ntuple_output_file_list)
+
+    # this is for unit tests: if jobs run too long something is wrong
+    if args.timeout:
+        duration = time.process_time() - starttime
+        if duration > args.timeout:
+            raise RuntimeError(
+                f"runtime ({duration:.1f}s) exceed timeout ({args.timeout:.0f}s)"
+            )
+    return return_code
+
+
+# Execute the main function if this file was executed as a script
+if __name__ == "__main__":
+    is_successful = main()
+    sys.exit(0 if is_successful else 1)

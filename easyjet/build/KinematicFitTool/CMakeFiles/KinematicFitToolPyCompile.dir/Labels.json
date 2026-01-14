@@ -1,0 +1,22 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/KinematicFitTool/CMakeFiles/KinematicFitToolPyCompile"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/KinematicFitTool/CMakeFiles/KinematicFitToolPyCompile.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/KinematicFitTool/CMakeFiles/pyCompile.stamp.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"KinematicFitTool"
+		],
+		"name" : "KinematicFitToolPyCompile"
+	}
+}

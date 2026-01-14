@@ -1,0 +1,11 @@
+include: [bbttAnalysis/RunConfig-bbtt-base.yaml]
+
+channels: ["ZCR","TopEMuCR"]
+
+Trigger:
+  selection:
+    include: [bbttAnalysis/trigger_leptons.yaml]
+
+# Produce separate files per channel + CutBookKeeper
+splitOutputTree: true
+splitCBK: true

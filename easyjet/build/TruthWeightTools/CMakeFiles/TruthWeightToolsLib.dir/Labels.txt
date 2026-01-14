@@ -1,0 +1,9 @@
+# Target labels
+ TruthWeightTools
+# Source files and their labels
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/TruthWeightTools/HiggsWeightTool.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/TruthWeightTools/HiggsWeights.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/TruthWeightTools/IHiggsWeightTool.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/TruthWeightTools/TruthWeightToolsDict.h
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/Root/HiggsWeightTool.cxx
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/TruthWeightTools/Root/HiggsWeights.cxx

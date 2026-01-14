@@ -1,0 +1,109 @@
+include: [EasyjetHub/base-config.yaml]
+
+# setting this to warning until the team decides they want to be using
+# expert mode
+expert_mode_warning_level: default
+
+# Which analysis to consider
+do_ZbbyCalib: false
+do_ZbbjCalib: false
+do_ZlljCalib: false
+do_ZllyCalib: false
+do_ttCalib: false
+do_ZtautauCalib: true
+
+# Toggles to bypass event selection
+bypass: false
+
+# Toggles for object types
+do_large_R_UFO_jets: true
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_taus: true
+do_met: true
+do_photons: true
+
+
+# Toggles for reconstructed objects decorations
+Tau:
+  ID: "Baseline"
+  extra_wps: ["RNNLoose"]
+  do_parent_decoration: true
+  min_pT: 20.e+3
+
+Large_R_jet:
+  min_pT: 200.e+3
+  maxEta: 2.0
+  runMuonJetPtCorr: false
+
+Photon:
+  ID: "Loose"
+  Iso: "FixedCutLoose"
+
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "Loose_VarRad"
+  min_pT: 7.e+3
+  maxEta: 2.47
+  do_parent_decoration: true
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+  min_pT: 7.e+3
+  maxEta: 2.5
+  do_parent_decoration: true
+
+Small_R_jet:
+  runBJetPtCalib: false
+
+# list of triggers per year to consider
+Trigger:
+  include: [XbbCalib/trigger_Ztautau.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# write objects with overlap removal applied
+do_overlap_removal: true
+OverlapRemoval:
+  doTauAntiTauJet: false
+  # disable overlap with photons and small-R jets
+  do_small_R_jet_large_R_jet: false
+  do_photon_jet: false
+  # TODO: __TauTauCalib__ try this option ? 
+  # do_boostedLeptons: false  # make the dR exclusion cone pt dependent, get less large-R jets (false)
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  reco_outputs:
+    taus: 'container_names.output.taus'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    met: 'container_names.output.met'
+    photons: 'container_names.output.photons'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+  collection_options:
+    taus:
+      truth_branches: True
+      truth_parent_info: true
+      run_selection: true
+    large_R_jets:
+      run_selection: true
+      truth_parent_info: true
+      substructure_info: true
+      truth_labels: true
+      tautag_details: true
+    photons:
+      run_selection: true
+    electrons:
+      run_selection: true
+    muons:
+      run_selection: true
+  truth_outputs:
+    large_R_jets: 'container_names.input.truth10SoftDropJet'
+    taus: 'container_names.input.truthtaus'
+    met: 'container_names.input.truthmet'
+    photons: 'container_names.input.truthphotons'

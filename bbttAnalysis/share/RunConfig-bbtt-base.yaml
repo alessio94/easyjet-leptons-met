@@ -1,0 +1,165 @@
+include: [EasyjetHub/base-config.yaml]
+
+# setting this to warning until the team decides they want to be using
+# expert mode
+expert_mode_warning_level: default
+
+# Use triple underscore to separate variable and systematics
+systematics_suffix_separator: "___"
+
+# Which analysis and channels to consider
+do_bbtt_analysis: true
+do_antiID_regions: true
+do_1B_regions: true
+do_LTT: false # triggers need also to be uncommented in trigger_leptons.yaml
+enable_MMC_cut: false
+do_boosted_dihiggs: false
+
+# Toggles to bypass event selection
+bypass: false
+splitOutputTree: false
+
+# Decay mode considered for truth decoration
+Truth:
+  decayModes: ["bbtt"]
+
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_taus: true
+do_met : true
+do_mmc : true
+
+GRL:
+  store_decoration: true
+  years:
+    include: [bbttAnalysis/bbtt_grl_years.yaml]
+  files:
+    include: [bbttAnalysis/bbtt_grl.yaml]
+
+PileupReweighting:
+  lumicalc_files:
+    include: [bbttAnalysis/lumicalc_bbtt.yaml]
+  prw_files:
+    include: [bbttAnalysis/prw_bbtt.yaml]
+
+
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  useFJvt: true
+  # btagging nominal working point
+  btag_wp: "GN2v01_FixedCutBEff_85"
+  btag_extra_wps:
+    - GN2v01_Continuous
+  variables_bjets: ["uncorrPt", "muonCorrPt"]
+  variables_int_bjets: ["truthLabel", "pcbt_GN2v01", "nmuons"]
+  btag_egReductionB: "Loose"
+  btag_egReductionC: "Loose"
+  btag_egReductionLight: "Loose"
+  amount_bjet: 2
+  doHLTMatching: true
+  doL1Matching: true
+  save_all_jets: true
+
+Electron:
+  ID: "LooseBLayerLH_nottva"
+  Iso: "Loose_VarRad"
+  extra_wps:
+    - ["TightLH_nottva", "Loose_VarRad"]
+    - ["LooseBLayerLH", "Loose_VarRad"]
+    - ["TightLH", "Loose_VarRad"]
+    - ["TightLH_nottva", "Tight_VarRad"]
+  do_parent_decoration: true
+  correlationModelId: "TOTAL"
+
+Muon:
+  ID: "Loose_nottva"
+  Iso: "PflowLoose_VarRad"
+  extra_wps:
+    - ["Medium_nottva", "PflowLoose_VarRad"]
+    - ["Loose", "PflowLoose_VarRad"]
+    - ["Medium", "PflowLoose_VarRad"]
+  do_parent_decoration: true
+
+
+Tau:
+  ID: "Baseline"
+  extra_wps: ["RNNLoose", "RNNLoose_eleid"]
+  do_parent_decoration: true
+  amount: 2
+  variables: ["RNN"]
+  variables_int: ["isTauID", "isAntiTau", "truthType", "EleRNN_WP", "tauTruthJetLabel"]
+
+Lepton:
+  amount: 2
+  variables_int: ["isIso"]
+
+# orthogonality studies  
+orthogonality:
+  include: [EasyjetHub/orth-config.yaml ]
+  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
+  
+# list of triggers per year to consider
+Trigger:
+  include: [bbttAnalysis/trigger.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+# use trigger selections in offline algorithms
+do_trigger_offline_filtering: true
+
+# Enable cutflow 
+save_cutflow: true
+
+# list of cuts in cutflow
+CutList :
+  - pass_trigger_DTT
+  - pass_baseline_DTT
+  - pass_DTT_2B
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+OverlapRemoval:
+  doTauAntiTauJet: true
+
+# Compute high level variables as HH mass etc.
+store_high_level_variables: true
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  slim_variables_with_syst: true
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    taus: 'container_names.output.taus'
+    met : 'container_names.output.met'
+  collection_options:
+    small_R_jets:
+      btag_info: true
+      truth_parent_info: true
+      no_bjet_calib_p4: True
+      run_selection: true
+    taus:
+      truth_branches: True
+      truth_parent_info: true
+      run_selection: true
+      score_branches: true
+    electrons:
+      run_selection: true
+      truth_parent_info: true
+    muons:
+      run_selection: true
+      truth_parent_info: true
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'
+    higgs_particle: 'container_names.output.truthHHParticles'
+    taus: 'container_names.input.truthtaus'
+    electrons: 'container_names.input.truthelectrons'
+    muons: 'container_names.input.truthmuons'
+    met: 'container_names.input.truthmet'
+

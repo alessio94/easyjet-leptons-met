@@ -1,0 +1,81 @@
+include: [EasyjetHub/base-config.yaml]
+
+# Which analysis to consider
+do_ttCalib: true
+do_ZbbjCalib: false
+do_ZbbyCalib: false
+do_ZlljCalib: false
+do_ZllyCalib: false
+do_ZtautauCalib: false
+
+bypass: false
+
+# Toggles for object types
+do_muons: true
+do_electrons: true
+do_small_R_jets: true
+do_large_R_UFO_jets: true
+do_met: true
+
+Large_R_jet:
+  min_pT: 200.e+3
+  max_eta: 2.0
+  GN2X_hbb_wps: ["FlatMassQCDEff_1p55", "FlatMassQCDEff_1p25", "FlatMassQCDEff_0p94", "FlatMassQCDEff_0p74", "FlatMassQCDEff_0p58", "FlatMassQCDEff_0p46", "FlatMassQCDEff_0p37", "FlatMassQCDEff_0p3", "FlatMassQCDEff_0p25"]
+
+# # Toggles for reconstructed objects decorations
+Small_R_jet:
+  min_pT: 25.e+3
+  btag_wp: "GN2v01_FixedCutBEff_77"
+
+Electron:
+  min_pT: 70.e+3
+  ID: "TightLH"
+  Iso: "Tight_VarRad"
+
+Muon:
+  min_pT: 70.e+3
+  ID: "Medium"
+  Iso: "Tight_VarRad"
+
+MET:
+  min_met: 70.e+3
+
+# # list of triggers per year to consider
+Trigger:
+  include: [trigger.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+do_overlap_removal: true
+OverlapRemoval:
+  do_large_R_jets: false
+  do_small_R_jet_large_R_jet: false
+  do_boostedLeptons: true
+
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  reco_outputs:
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    large_R_UFO_jets: 'container_names.output.reco10UFOJet'
+    met: 'container_names.output.met'
+  collection_options:
+    small_R_jets:
+      run_selection: true
+      # truth_parent_info: true
+      btag_info: true
+      # JVT_details: true
+      # no_bjet_calib_p4: true
+      # btag_details: true
+    large_R_jets:
+      run_selection: true
+      # substructure_info: true
+      truth_labels: true
+    muons:
+      run_selection: true
+    electrons:
+      run_selection: true
+

@@ -1,0 +1,27 @@
+include: [ssWWAnalysis/RunConfig-Baseline-ssWW.yaml]
+
+Electron:
+  extra_wps:
+  - ["TightLH", "Tight_VarRad"]  # previously Gradient. The fisrt one is used to define the pass-ID region
+  - ["TightLH", "Loose_VarRad"]  
+  - ["MediumLH", "Tight_VarRad"]  
+  - ["MediumLH", "Loose_VarRad"]  
+  - ["MediumLH", "NonIso"]  # The last one is used for Fake Factor method antiID region 
+  
+  max_eta_ssWW: 2.47
+  chargeIDSelectionRun2: false #Set to false for investigating charge MisID 
+  do_track_decoration: true
+  do_IFF_decoration: true
+
+
+Muon:
+  maxD0Significance: 15
+  maxDeltaZ0SinTheta: 1.5
+  extra_wps:
+  - ["Medium", "PflowTight_VarRad", 3, 0.5] # previously FixedCutPflowTight. The fisrt one is used to define the pass-ID region
+  - ["Medium", "PflowLoose_VarRad", 3, 0.5] 
+  - ["Medium", "PflowLoose_VarRad", 10, 0.5] # The last one is used for Fake Factor method antiID region
+  do_IFF_decoration: true
+
+Lepton:
+  amount: 3 #if 2 the WZCR will be emty

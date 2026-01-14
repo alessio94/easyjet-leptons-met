@@ -1,0 +1,19 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/include/VBFTagger"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/include/VBFTagger.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"VBFTagger"
+		],
+		"name" : "VBFTaggerHeaderInstall"
+	}
+}

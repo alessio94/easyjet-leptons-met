@@ -1,0 +1,7 @@
+include: [XbbCalib/RunConfig-ZbbyCalib.yaml]
+
+# Run all CP syst
+do_CP_systematics: true
+systematics_regex: ["^(?!.*(MUON)).*$"]
+# Toggles to bypass event selection
+bypass: false

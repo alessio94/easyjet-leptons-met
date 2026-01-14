@@ -1,0 +1,11 @@
+include: [bbVVAnalysis/RunConfig-bbVV.yaml]
+
+channel: ["SplitBoosted0Lep"]
+
+Large_R_jet:
+  amount: 3
+
+CutList : # Channel specific cuts here
+      - VETO_SIGNAL_LEPTON
+      - AT_LEAST_THREE_LRJETS
+      - HBB_BTAG

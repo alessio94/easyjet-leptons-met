@@ -1,0 +1,36 @@
+include: [bbyyAnalysis/RunConfig-bbyy-base.yaml]
+
+# flag that toggles run-through mode in the SelectorAlg
+bypass: false
+
+# name that will go in the tree bbyy_pass_<selection_name>_%SYS%
+selection_name: "loose"
+
+CutList :
+      - PASS_TRIGGER
+      - TWO_LOOSE_PHOTONS
+      - PASS_TRIGGER_MATCHING
+      - TWO_TIGHTID_PHOTONS
+      - TWO_TIGHTID_ISO_PHOTONS
+      - PASS_RELPT
+      - DIPHOTON_MASS
+      - EXACTLY_ZERO_LEPTONS
+      - AT_LEAST_TWO_JETS
+
+do_CP_systematics: true
+systematics_regex: [".*(MUON|MET|JER).*"]
+
+save_cutflow: false
+save_extra_vars: false
+do_GNN2bjetSelection: false
+save_HbbCand_vars: false
+save_pass_trigger_info: false
+
+
+ttree_output:
+  collection_options:
+    small_R_jets:
+      btag_details: false
+      
+Truth:
+  do_STXS: false

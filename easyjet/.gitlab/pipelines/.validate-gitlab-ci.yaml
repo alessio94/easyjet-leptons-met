@@ -1,0 +1,570 @@
+variables:
+  # needed to propagate the exit code from the script to the CI
+  FF_USE_NEW_BASH_EVAL_STRATEGY: true
+
+.ntuple_validation:
+  variables:
+    GIT_STRATEGY: none
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_PROJECT_PATH == 'easyjet/easyjet'
+  stage: validate
+  tags:
+    - k8s-eos
+  artifacts:
+    paths:
+      - branch-diff-log.txt
+    expire_in: 1 week
+  allow_failure:
+    exit_codes: # in order of severity
+      - 22 # branch diff
+      - 23 # branch removed
+      - 24 # branch added
+
+# Data
+
+validator_fast_data18:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_fast_data18
+      artifacts: false
+  script:
+    - easyjet-validate fast-data18
+
+validator_fast_data22:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_fast_data22
+      artifacts: false
+  script:
+    - easyjet-validate fast-data22
+
+validator_bbtt_data22:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbtt_data22
+      artifacts: false
+  script:
+    - easyjet-validate bbtt-data22
+
+validator_bbyy_data22_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbyy_data22_lite
+      artifacts: false
+  script:
+    - easyjet-validate bbyy-data22-lite
+
+validator_HHandHyy_data22:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_HHandHyy_data22
+      artifacts: false
+  script:
+    - easyjet-validate HHandHyy-data22
+
+validator_SHbbyy_data22_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_SHbbyy_data22_lite
+      artifacts: false
+  script:
+    - easyjet-validate SHbbyy-data22-lite
+
+# MC20
+
+validator_bbyy_mc20_syst:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbyy_mc20_syst
+      artifacts: false
+  script:
+    - easyjet-validate bbyy-mc20-syst
+
+validator_SHbbyy_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_SHbbyy_mc20
+      artifacts: false
+  script:
+    - easyjet-validate SHbbyy-mc20
+
+validator_bbyy_mc20_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbyy_mc20_lite
+      artifacts: false
+  script:
+    - easyjet-validate bbyy-mc20-lite
+
+validator_HHandHyy_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_HHandHyy_mc20
+      artifacts: false
+  script:
+    - easyjet-validate HHandHyy-mc20
+
+validator_bbtt_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbtt_mc20
+      artifacts: false
+  script:
+    - easyjet-validate bbtt-mc20
+
+validator_ttHH_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ttHH_mc20
+      artifacts: false
+  script:
+    - easyjet-validate ttHH-mc20
+
+validator_bbll_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbll_mc20
+      artifacts: false
+  script:
+    - easyjet-validate bbll-mc20
+
+validator_bbll_mc20_syst:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbll_mc20_syst
+      artifacts: false
+  script:
+    - easyjet-validate bbll-mc20-syst
+
+validator_lltt_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_lltt_mc20
+      artifacts: false
+  script:
+    - easyjet-validate lltt-mc20
+
+validator_vbshiggs_fulllep_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_vbshiggs_fulllep_mc20
+      artifacts: false
+  script:
+    - easyjet-validate vbshiggs-fulllep-mc20
+
+validator_vbshiggs_semilep_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_vbshiggs_semilep_mc20
+      artifacts: false
+  script:
+    - easyjet-validate vbshiggs-semilep-mc20
+
+validator_VBSVV4q_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_VBSVV4q_mc20
+      artifacts: false
+  script:
+    - easyjet-validate VBSVV4q-mc20
+
+validator_VBSVV4q_mc20_llj1:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_VBSVV4q_mc20_llj1
+      artifacts: false
+  script:
+    - easyjet-validate VBSVV4q-mc20-llj1
+
+validator_jjjj_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_jjjj_mc20
+      artifacts: false
+  script:
+    - easyjet-validate jjjj-mc20
+
+validator_ssWW_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ssWW_mc20
+      artifacts: false
+  script:
+    - easyjet-validate ssWW-mc20
+
+validator_ZQG_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ZQG_mc20
+      artifacts: false
+  script:
+    - easyjet-validate ZQG-mc20
+
+validator_ZCharm_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ZCharm_mc20
+      artifacts: false
+  script:
+    - easyjet-validate ZCharm-mc20
+
+validator_llyy_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_llyy_mc20
+      artifacts: false
+  script:
+    - easyjet-validate llyy-mc20
+
+validator_ttcalib_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ttcalib_mc20
+      artifacts: false
+  script:
+    - easyjet-validate ttcalib-mc20
+
+validator_zllycalib_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zllycalib_mc20
+      artifacts: false
+  script:
+    - easyjet-validate zllycalib-mc20
+    
+validator_zlljcalib_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zlljcalib_mc20
+      artifacts: false
+  script:
+    - easyjet-validate zlljcalib-mc20
+
+validator_zbbycalib_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zbbycalib_mc20
+      artifacts: false
+  script:
+    - easyjet-validate zbbycalib-mc20
+
+validator_zbbjcalib_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zbbjcalib_mc20
+      artifacts: false
+  script:
+    - easyjet-validate zbbjcalib-mc20
+
+validator_bbbbtt_mc20:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true 
+    - job: ntupler_bbbbtt_mc20
+      artifacts: false 
+  script:
+    - easyjet-validate bbbbtt-mc20
+
+# MC20 AF3
+
+validator_sh4b_mc20af3:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_sh4b_mc20af3
+      artifacts: false
+  script:
+    - easyjet-validate sh4b-mc20af3
+
+validator_SHbbyy_mc20af3_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_SHbbyy_mc20af3_lite
+      artifacts: false
+  script:
+    - easyjet-validate SHbbyy-mc20af3-lite
+
+# MC23
+
+validator_bbbb_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbbb_mc23
+      artifacts: false
+  script:
+    - easyjet-validate bbbb-mc23
+
+validator_bbtt_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbtt_mc23
+      artifacts: false
+  script:
+    - easyjet-validate bbtt-mc23
+
+validator_bbVV_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbVV_mc23
+      artifacts: false
+  script:
+    - easyjet-validate bbVV-mc23
+
+validator_bbVVVBF_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbVVVBF_mc23
+      artifacts: false
+  script:
+    - easyjet-validate bbVVVBF-mc23
+
+validator_SHbbyy_mc23af3:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_SHbbyy_mc23af3
+      artifacts: false
+  script:
+    - easyjet-validate SHbbyy-mc23af3
+
+validator_bbtt_mc23_syst:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbtt_mc23_syst
+      artifacts: false
+  script:
+    - easyjet-validate bbtt-mc23-syst
+
+validator_bbll_mc23_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbll_mc23_lite
+      artifacts: false
+  script:
+    - easyjet-validate bbll-mc23-lite
+
+validator_EMTopo_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_EMTopo_mc23
+      artifacts: false
+  script:
+    - easyjet-validate emtopo-mc23
+
+validator_hhml_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_hhml_mc23
+      artifacts: false
+  script:
+    - easyjet-validate hhml-mc23
+
+validator_ttcalib_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ttcalib_mc23
+      artifacts: false
+  script:
+    - easyjet-validate ttcalib-mc23
+
+validator_zllycalib_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zllycalib_mc23
+      artifacts: false
+  script:
+    - easyjet-validate zllycalib-mc23
+    
+validator_zlljcalib_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zlljcalib_mc23
+      artifacts: false
+  script:
+    - easyjet-validate zlljcalib-mc23
+
+validator_zbbycalib_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zbbycalib_mc23
+      artifacts: false
+  script:
+    - easyjet-validate zbbycalib-mc23
+
+validator_zbbjcalib_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_zbbjcalib_mc23
+      artifacts: false
+  script:
+    - easyjet-validate zbbjcalib-mc23
+
+
+validator_yyml_mc23_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_yyml_mc23_lite
+      artifacts: false
+  script:
+    - easyjet-validate yyml-mc23-lite
+
+validator_bbyy_mc23_lite:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_bbyy_mc23_lite
+      artifacts: false
+  script:
+    - easyjet-validate bbyy-mc23-lite
+
+validator_HHandHyy_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_HHandHyy_mc23
+      artifacts: false
+  script:
+    - easyjet-validate HHandHyy-mc23
+
+validator_llyy_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_llyy_mc23
+      artifacts: false
+  script:
+    - easyjet-validate llyy-mc23
+
+validator_bbbbtt_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true 
+    - job: ntupler_bbbbtt_mc23
+      artifacts: false 
+  script:
+    - easyjet-validate bbbbtt-mc23
+
+validator_monojet_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true 
+    - job: ntupler_monojet_mc23
+      artifacts: false 
+  script:
+    - easyjet-validate monojet-mc23
+
+validator_ssWW_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ssWW_mc23
+      artifacts: false
+  script:
+    - easyjet-validate ssWW-mc23
+
+validator_ZQG_mc23:
+  extends: .ntuple_validation
+  needs:
+    - job: compile
+      artifacts: true
+    - job: ntupler_ZQG_mc23
+      artifacts: false
+  script:
+    - easyjet-validate ZQG-mc23

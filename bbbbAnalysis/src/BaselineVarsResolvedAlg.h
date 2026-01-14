@@ -1,0 +1,79 @@
+/*
+  Copyright (C) 2002-2024 CERN for the benefit of the ATLAS collaboration
+*/
+
+// Always protect against multiple includes!
+#ifndef HH4BANALYSIS_FINALVARSRESOLVEDALG
+#define HH4BANALYSIS_FINALVARSRESOLVEDALG
+
+#include <AthenaBaseComps/AthHistogramAlgorithm.h>
+
+#include <SystematicsHandles/SysReadHandle.h>
+#include <SystematicsHandles/SysListHandle.h>
+#include <SystematicsHandles/SysWriteDecorHandle.h>
+
+#include <xAODEventInfo/EventInfo.h>
+#include <xAODJet/JetContainer.h>
+
+namespace HH4B
+{
+
+  /// \brief An algorithm for counting containers
+  class BaselineVarsResolvedAlg final : public AthHistogramAlgorithm
+  {
+    /// \brief The standard constructor
+public:
+    BaselineVarsResolvedAlg(const std::string &name, ISvcLocator *pSvcLocator);
+
+    /// \brief Initialisation method, for setting up tools and other persistent
+    /// configs
+    StatusCode initialize() override;
+    /// \brief Execute method, for actions to be taken in the event loop
+    StatusCode execute() override;
+    /// We use default finalize() -- this is for cleanup, and we don't do any
+
+private:
+    // ToolHandle<whatever> handle {this, "pythonName", "defaultValue",
+    // "someInfo"};
+
+    CP::SysListHandle m_systematicsList {this};
+    CP::SysReadHandle<xAOD::JetContainer>
+      m_jetHandle{ this, "smallRContainerInKey", "", "Jet container to read" };
+    CP::SysReadHandle<xAOD::JetContainer> 
+      m_RNNjetResolvedHandle{ this, "RNNJets_resolved", "RNNJets_resolved_%SYS%", "input RNN jets container for resolved 20 GeV" };
+    CP::SysReadHandle<xAOD::EventInfo>
+      m_eventHandle{ this, "event", "EventInfo", "EventInfo container to read" };
+
+    Gaudi::Property<std::string> m_bTagWP {this, "bTagWP", "", "B-tagging working point."};
+
+    std::unordered_map<std::string, CP::SysWriteDecorHandle<float>> m_decos;
+    // clang-format off
+    std::vector<std::string> m_vars{
+      "resolved_DeltaR12_",
+      "resolved_DeltaR13_",
+      "resolved_DeltaR14_",
+      "resolved_DeltaR23_",
+      "resolved_DeltaR24_",
+      "resolved_DeltaR34_",
+      "resolved_h1_m_",
+      "resolved_h1_pt_",
+      "resolved_h1_eta_",
+      "resolved_h1_phi_",
+      "resolved_h2_m_",
+      "resolved_h2_pt_",
+      "resolved_h2_eta_",
+      "resolved_h2_phi_",
+      "resolved_hh_m_",
+      "resolved_hh_pt_",
+      "resolved_DeltaEtaHH_",
+    };
+    // clang-format on
+  
+    Gaudi::Property<std::vector<std::string>> m_Fvars_RNN
+      {this, "floatVariableList", {}, "Name list of floating variables"};
+    
+  Gaudi::Property<bool> m_UseVBFRNN { this, "UseVBFRNN", false, "Add VBF-RNN jets in ntuples or not" };
+  };
+}
+
+#endif

@@ -1,0 +1,4 @@
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/EasyjetHub/genConf/EasyjetHub.confdb2_part
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/KinematicFitTool/genConf/KinematicFitTool.confdb2_part
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/TruthWeightTools/genConf/TruthWeightTools.confdb2_part
+/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/VBFTagger/genConf/VBFTagger.confdb2_part

@@ -1,0 +1,202 @@
+include: [EasyjetHub/base-config.yaml]
+
+expert_mode_warning_level: default
+
+# Which analysis to consider
+do_bbyy_analysis: true
+# Decay mode considered for truth decoration
+Truth:
+  decayModes: ["bbyy"]
+
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_photons: true
+do_met: true
+do_KinematicFit: true
+do_Boosted: false
+do_GNN2bjetSelection: true
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  min_pT: 25.e+3
+  useFJvt: true
+  # btagging nominal working point
+  btag_wp: "GN2v01_FixedCutBEff_85"
+  # to use multiple btagging WPs
+  btag_extra_wps:
+    - GN2v01_Continuous
+
+  amount: 4
+  variables_int_allJets: ["truthLabel", "PassWP", "pcbt"]
+
+  btag_egReductionB: "Medium"
+  btag_egReductionC: "Medium"
+  btag_egReductionLight: "Medium"
+
+TopReconstruction:
+  BDT_path: "bbyyAnalysis/model_topRecoBDT.root"
+
+Electron:
+  min_pT_bbyy: 10.e+3 # minimum pT of selected electons (for lepton veto). Separate from min pT of electrons used for OR.
+  ID: "MediumLH"
+  Iso: "Loose_VarRad"
+  correlationModelId: "TOTAL"
+
+Muon:
+  min_pT_bbyy: 10.e+3 # minimum pT of selected muons (for lepton veto). Separate from min pT of muons used for OR.
+  ID: "Medium"
+  Iso: "PflowLoose_VarRad"
+
+# photon ID and isolation requirements
+Photon:
+  min_pT_bbyy: 22.e+3 # minimum pT of selected Photons. Separate from min pT of photons used for OR.
+  ID: "Loose" # Loose, Tight
+  Iso: "NonIso"
+  amount: 2
+  variables: ["ptOvermyy"]
+  variables_int: ["isEMTight"]
+  # The first extra wp is used for the final photon selections
+  extra_wps: 
+    - ["Tight", "FixedCutLoose"]
+    - ["Tight", "NonIso"]
+    - ["Loose", "FixedCutLoose"]
+
+OverlapRemoval:
+  favourPhotonOverLepton: false # if set to true, HgamOR is applied
+
+# orthogonality studies  
+orthogonality:
+  include: [EasyjetHub/orth-config.yaml ]
+  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
+
+# list of triggers per year to consider
+Trigger:
+  include: [bbyyAnalysis/trigger.yaml]
+# flag for trigger filtering
+do_trigger_filtering: false
+
+# apply loose jet cleaning only
+add_BadBatman_jet_cleaning: false
+
+# write objects with overlap removal applied
+do_overlap_removal: true
+
+# Store high level variables by default 
+# when the config file set the high level variables
+store_high_level_variables: false
+
+#Enable cutflow 
+save_cutflow: true
+do_resonant_PNN: false
+do_resonant_onebtag: false
+
+# flag that toggles single photon trigger in the cutflow
+# so that PASS_TRIGGER = single || diphoton
+enable_single_photon_trigger: false
+
+# flag that toggles run-through mode in SelectorAlg
+bypass: false
+
+# flag for event cleaning
+do_event_cleaning: true
+
+# event cleaning flags
+dump_event_cleaning_info: true
+
+# name that will go in the tree bbyy_pass_<selection_name>_%SYS%
+selection_name: "allcuts"
+
+# bdt models used for categorisation and VBF jets selection
+# They should appear in this order lowMass / highMass / VBF jets
+
+do_nonresonant_BDTs: true
+save_VBF_vars: true
+save_extra_vars: true
+save_nonresonant_BDTInput_variables: true
+save_HbbCand_vars: true
+save_pass_trigger_info: true
+
+BDT_path:
+  - "bbyyAnalysis/bdt_legacy_lowMass.root"
+  - "bbyyAnalysis/bdt_legacy_highMass.root"
+  - "bbyyAnalysis/bdt_legacy_vbf_jets.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_no_corr_no_Data2024_run2_lowMass.root" #For Higgs Pairs 2025 version with KF
+  - "bbyyAnalysis/bdt_HH2025_KF_no_corr_no_Data2024_run2_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_no_corr_no_Data2024_run3_lowMass.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_no_corr_no_Data2024_run3_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_no_corr_Data2024_run3_lowMass.root" #Run 3 model with 2024 included
+  - "bbyyAnalysis/bdt_HH2025_KF_no_corr_Data2024_run3_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_corr_no_Data2024_lowMass.root" #Run 2 and 3 combined model
+  - "bbyyAnalysis/bdt_HH2025_KF_corr_no_Data2024_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_KF_corr_Data2024_lowMass.root" #Run 2 and 3 combined model with 2024
+  - "bbyyAnalysis/bdt_HH2025_KF_corr_Data2024_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_no_KF_no_corr_no_Data2024_run2_lowMass.root" #For Higgs Pairs 2025 version without KF
+  - "bbyyAnalysis/bdt_HH2025_no_KF_no_corr_no_Data2024_run2_highMass.root"
+  - "bbyyAnalysis/bdt_HH2025_no_KF_no_corr_no_Data2024_run3_lowMass.root"
+  - "bbyyAnalysis/bdt_HH2025_no_KF_no_corr_no_Data2024_run3_highMass.root"
+
+GNN_path_run2:
+  - "bbyyAnalysis/GNN_ggFTarget_run2.onnx"
+  - "bbyyAnalysis/GNN_VBFTarget_run2.onnx"
+
+GNN_path_run3:
+  - "bbyyAnalysis/GNN_ggFTarget_run3.onnx"
+  - "bbyyAnalysis/GNN_VBFTarget_run3.onnx"
+
+#  choose VBF jets selection method
+VBFjetsMethod: "mjj" # "mjj" "pTsorting"
+
+#Use a dedicated GRL for bbyy due to photon triggers
+GRL:
+  years:
+    include: [bbyyAnalysis/photon_grl_years.yaml]
+  files:
+    include: [bbyyAnalysis/photon_grl.yaml]
+
+PileupReweighting:
+  extra_prw:
+    - postfix: "photon"
+      lumicalc_files:
+        include: [bbyyAnalysis/lumicalc_photon.yaml]
+      prw_files:
+        include: [bbyyAnalysis/prw_photon.yaml]
+
+ttree_output:
+  include: [bbyy-base-output.yaml]
+
+do_HHbbyy_Hyy_Analysis: true
+save_detailed_Input_variables: true
+do_Hyy_multiclass: true
+
+HyyMultiBDT_folder: "bbyyAnalysis/HyyMultiBDT"
+
+Hyy_multiclass_bins: ["GG2H_0J_PTH_0_10", "GG2H_0J_PTH_GT10",
+                      "GG2H_1J_PTH_0_60", "GG2H_1J_PTH_60_120", 
+                      "GG2H_1J_PTH_120_200", "GG2H_GE2J_MJJ_0_350_PTH_0_60", 
+                      "GG2H_GE2J_MJJ_0_350_PTH_60_120", "GG2H_GE2J_MJJ_0_350_PTH_120_200", 
+                      "GG2H_GE2J_MJJ_350_700_PTH_0_200", "GG2H_GE2J_MJJ_700_1000_PTH_0_200",
+                      "GG2H_GE2J_MJJ_GT1000_PTH_0_200", "GG2H_PTH_200_300", 
+                      "GG2H_PTH_300_450", "GG2H_PTH_450_650", 
+                      "GG2H_PTH_GT650",
+
+                      "QQ2HQQ_0J", "QQ2HQQ_1J", 
+                      "QQ2HQQ_GE2J_MJJ_0_60", "QQ2HQQ_GE2J_MJJ_60_120",
+                      "QQ2HQQ_GE2J_MJJ_120_350",  "QQ2HQQ_GE2J_MJJ_350_700_PTH_0_200",
+                      "QQ2HQQ_GE2J_MJJ_700_1000_PTH_0_200", "QQ2HQQ_GE2J_MJJ_GT1000_PTH_0_200",
+                      "QQ2HQQ_GE2J_MJJ_350_700_PTH_GT200", "QQ2HQQ_GE2J_MJJ_700_1000_PTH_GT200",
+                      "QQ2HQQ_GE2J_MJJ_GT1000_PTH_GT200", 
+                      
+                      "QQ2HLNU_PTV_0_75", "QQ2HLNU_PTV_75_150", 
+                      "QQ2HLNU_PTV_150_250", "QQ2HLNU_PTV_GT250",
+                      
+                      "QQ2HLL_PTV_0_75", "QQ2HLL_PTV_75_150",
+                      "QQ2HLL_PTV_150_250", "QQ2HLL_PTV_GT250",
+                      
+                      "QQ2HNUNU_PTV_0_75", "QQ2HNUNU_PTV_75_150",
+                      "QQ2HNUNU_PTV_150_250", "QQ2HNUNU_PTV_GT250",
+                      
+                      "TTH_PTH_0_60", "TTH_PTH_60_120",
+                      "TTH_PTH_120_200", "TTH_PTH_200_300", "TTH_PTH_GT300",
+                      "THJB", "THW"]

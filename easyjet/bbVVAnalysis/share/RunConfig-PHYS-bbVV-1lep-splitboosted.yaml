@@ -1,0 +1,25 @@
+include: [bbVVAnalysis/RunConfig-bbVV.yaml]
+
+channel: ["SplitBoosted1Lep"]
+
+Lepton:
+  amount: 1
+
+CutList : # Channel specific cuts here
+      - EXACTLY_ONE_LEPTON
+      - DR_CUT
+      - HBB_PT
+      - HBB_BTAG
+
+# Include the TTree configuration and update details
+ttree_output:
+  reco_outputs:
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    muons: 'container_names.output.muons'
+    electrons: 'container_names.output.electrons'
+    met : 'container_names.output.met'
+  collection_options:
+    small_R_jets:
+      btag_info: true
+  truth_outputs:
+    small_R_jets: 'container_names.input.truth4Jet'

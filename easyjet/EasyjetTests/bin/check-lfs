@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DEFRANGE=main...
+DEFEXT=".root .json .onnx"
+
+usage() {
+  cat <<EOF
+Usage: ${0##*/} [-v] <range> [<extensions>]
+
+Checks every commit in <range> (e.g., main..HEAD or base...feature)
+and verifies that any file whose extension matches <extensions> is
+stored in Git LFS.
+
+Arguments:
+  <range>           A git revision range (default $DEFRANGE)
+  <extensions>      Space-separated list of extensions (default $DEFEXT)
+
+Options:
+  -v                Verbose mode
+  -h, --help        Show this help message
+
+EOF
+}
+
+# ---------------- parse options ----------------
+VERBOSE=/dev/null
+POSITIONAL=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -v)
+      VERBOSE=/dev/stdout
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -*)
+      echo "Unknown option: $1"
+      echo
+      usage
+      exit 1
+      ;;
+    *)
+      POSITIONAL+=("$1")
+      shift
+      ;;
+  esac
+done
+
+set -- "${POSITIONAL[@]}"
+
+RANGE=${1:-$DEFRANGE}
+EXTENSIONS=${2-$DEFEXT}
+
+# Construct regex for grep from extensions list
+ext_regex=$(echo "$EXTENSIONS" | sed 's/ /|/g' | sed 's/\./\\./g')
+
+echo "Checking commits in range: $RANGE" > $VERBOSE
+echo "Extensions: $EXTENSIONS" > $VERBOSE
+
+
+bad_files=0
+
+# move to the project
+cd $(dirname $(readlink -f ${BASH_SOURCE[0]}))
+cd $(git rev-parse --show-toplevel)
+
+# check to make sure the rev list is valid
+if ! git rev-list "$RANGE" --quiet ; then
+    echo "error in rev list!"
+    exit 1
+fi
+
+# Iterate over commits
+for commit in $(git rev-list "$RANGE"); do
+    echo "Checking commit: $commit" > $VERBOSE
+
+    changed_files=$(git diff-tree --no-commit-id --name-only -r "$commit")
+    relevant_files=$(echo "$changed_files" | grep -E "($ext_regex)$" || true)
+
+    for file in $relevant_files; do
+        oid=$(git ls-tree -r "$commit" -- "$file" | awk '{print $3}')
+        if [[ -z $oid ]]; then
+            echo $oid
+            echo "no OID for $file in this commit, maybe deleted?" > $VERBOSE
+            continue
+        fi
+
+        # files stored in git lfs should have a second line that
+        # starts with "oid sha256"
+        second_line=$(git cat-file -p $oid | head -n 2 | tail -n 1)
+        if ! echo $second_line | grep -q "^oid sha256:"; then
+            echo "Non LFS file: $commit: $file"
+            bad_files=$((bad_files + 1))
+        else
+            echo "OK: $file" > $VERBOSE
+        fi
+    done
+done
+
+if (( "$bad_files" > 0 )); then
+    echo "$bad_files violations found!"
+    cat <<EOF
+
+You need to check these files into git lfs and then squash the commits
+in which the files were added.
+EOF
+    exit 1
+else
+    echo "All matching changed files stored in Git LFS"
+fi

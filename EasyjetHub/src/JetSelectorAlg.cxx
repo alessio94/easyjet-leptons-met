@@ -1,0 +1,213 @@
+/*
+  Copyright (C) 2002-2025 CERN for the benefit of the ATLAS collaboration
+*/
+
+/// @author Frederic Renner
+
+#include "JetSelectorAlg.h"
+
+namespace Easyjet
+{
+  JetSelectorAlg ::JetSelectorAlg(const std::string &name,
+                                  ISvcLocator *pSvcLocator)
+      : AthHistogramAlgorithm(name, pSvcLocator) { }
+
+  StatusCode JetSelectorAlg ::initialize()
+  {
+    // Read syst-aware input/output handles
+    ATH_CHECK (m_inHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_eventHandle.initialize(m_systematicsList));
+    ATH_CHECK (m_outHandle.initialize(m_systematicsList));
+
+    // Intialise syst-aware input/output decorators  
+    ATH_CHECK (m_nSelPart.initialize(m_systematicsList, m_eventHandle));
+
+    if (!m_select.empty()) {
+      ATH_CHECK (m_select.initialize(m_systematicsList, m_inHandle));
+    }
+    if (!m_isBtag.empty()) {
+      ATH_CHECK (m_isBtag.initialize(m_systematicsList, m_inHandle));
+    }
+    if (!m_PCBT.empty()) {
+      ATH_CHECK (m_PCBT.initialize(m_systematicsList, m_inHandle));
+    }
+
+    std::vector<std::string> bleadBranches_keys{};
+    for(int i=0; i<m_bjetAmount; i++){
+      bleadBranches_keys.emplace_back("isbjet"+std::to_string(i+1)+"_%SYS%");
+    }
+    m_bleadBranches = CP::SysWriteDecorHandleArray<bool>(bleadBranches_keys, this);
+    ATH_CHECK(m_bleadBranches.initialize(m_systematicsList,m_inHandle));
+
+    std::vector<std::string> jleadBranches_keys{};
+    for(int i=0; i<m_jetAmount; i++){
+      jleadBranches_keys.emplace_back("isjet"+std::to_string(i+1)+"_%SYS%");
+    }
+    m_jleadBranches = CP::SysWriteDecorHandleArray<bool> (jleadBranches_keys, this);
+    ATH_CHECK(m_jleadBranches.initialize(m_systematicsList,m_inHandle));
+
+    for (const auto& trig : m_triggers) {
+      m_bTagTrigMatching_in.emplace_back("ftag_bTagTrigMatching_" + trig + "_%SYS%", this);
+      m_bTagTrigMatching_out.emplace_back("ftag_bTagTrigMatching_" + trig + "_%SYS%", this);
+    }
+
+    for(auto& handle : m_bTagTrigMatching_in)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_inHandle, SG::AllowEmpty));
+    for(auto& handle : m_bTagTrigMatching_out)
+      ATH_CHECK(handle.initialize(m_systematicsList, m_outHandle, SG::AllowEmpty));
+
+    ANA_CHECK (m_isSelectedJet.initialize (m_systematicsList, m_inHandle));
+
+    if(!m_nmuons_in.empty()){
+      ATH_CHECK (m_nmuons_in.initialize(m_systematicsList, m_inHandle));
+      ATH_CHECK (m_nmuons_out.initialize(m_systematicsList, m_outHandle));
+    }
+
+    // Intialise syst list (must come after all syst-aware inputs and outputs)
+    ATH_CHECK (m_systematicsList.initialize());
+
+    // check that m_PCBTsort and m_PCBT are both set or not set
+    if (m_PCBTsort && m_PCBT.empty()) {
+      ATH_MSG_ERROR("PCBT sorting configured but no PCBT decorator given!");
+      return StatusCode::FAILURE;
+    }
+
+    // check that pTsort and PCBTSort are not both set
+    if(m_pTsort && m_PCBTsort){
+      ATH_MSG_ERROR("pT sorting and PCBT sorting are configured simultaneously!");
+      return StatusCode::FAILURE;
+    }
+
+    // check if m_isBtag is empty and m_selectBjet is true 
+    if(m_isBtag.empty() && m_selectBjet){
+      ATH_MSG_ERROR("btag wp is empty but selectBjet is true");
+      return StatusCode::FAILURE;
+    }
+
+    // check if if m_bjetAmount is positive and there is no WPgiven
+    if(m_bjetAmount>0 && m_isBtag.empty()){
+      ATH_MSG_ERROR("required bjet amount is positive but btag wp is empty");
+      return StatusCode::FAILURE;
+    }
+    return StatusCode::SUCCESS;
+  }
+
+  StatusCode JetSelectorAlg ::execute()
+  {
+    // Loop over all systs
+    for (const auto& sys : m_systematicsList.systematicsVector()) {
+
+      // Retrive inputs
+      const xAOD::JetContainer *inContainer = nullptr;
+      ANA_CHECK (m_inHandle.retrieve (inContainer, sys));      
+
+      const xAOD::EventInfo *event = nullptr;
+      ANA_CHECK (m_eventHandle.retrieve (event, sys));
+
+      // Setup output 
+      auto workContainer =
+        std::make_unique<ConstDataVector<xAOD::JetContainer> >(
+            SG::VIEW_ELEMENTS);
+
+      // check if a btag wp is given
+      bool WPgiven = !m_isBtag.empty();
+      bool PCBTaggiven = !m_PCBT.empty();
+
+      // define jets_pcbt as a map of jets to their pcbt
+      std::map<const xAOD::IParticle *, int> workContainer_pcbt;
+      
+      // loop over jets
+      for (const xAOD::Jet *jet : *inContainer)
+      {
+        // cuts
+        if (!m_select.empty() && !m_select.get(*jet, sys))
+          continue;
+        if (jet->pt() < m_minPt || std::abs(jet->eta()) > m_maxEta)
+          continue;
+        // cuts for calibrated large-R jet
+        if (m_maxPt > 0 && jet->pt() > m_maxPt)
+          continue;
+        if (m_maxMass > 0 && jet->m() > m_maxMass)
+          continue;
+        if (m_minMass > 0 && jet->m() < m_minMass)
+          continue;
+
+        bool isSelected = false;
+        // select btagging wp if given and select_bjet flag is on. if not given always push back
+        // check if want to apply btagging
+        if (!m_selectBjet || (m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5)) 
+        {
+          workContainer->push_back(jet);
+          isSelected = true;
+        }
+        if (PCBTaggiven) workContainer_pcbt[jet] = m_PCBT.get(*jet, sys);
+        if(!m_nmuons_in.empty()) m_nmuons_out.set(*jet, m_nmuons_in.get(*jet, sys), sys);
+        m_isSelectedJet.set(*jet, isSelected, sys);
+
+        // For some reason this decoration needs to be explicitly copied
+        for(unsigned int i=0; i<m_triggers.size(); i++){
+          m_bTagTrigMatching_out[i].set(*jet, m_bTagTrigMatching_in[i].get(*jet,sys), sys);
+        }
+      }
+      
+      int nJets = workContainer->size();
+      m_nSelPart.set(*event, nJets, sys);
+      
+      // if we have more or less than the requested numbers, empty the workcontainer to write
+      // defaults/return empty container
+      bool over_maximum = m_maximumAmount > 0 && nJets > m_maximumAmount;
+      if ( nJets < m_minimumAmount || over_maximum)
+      {
+        workContainer->clear();
+        nJets = 0;
+      }
+      
+      // sort and truncate
+      int nKeep;
+      if (nJets < m_truncateAtAmount) nKeep = nJets;
+      else nKeep = m_truncateAtAmount;
+      
+      if (m_pTsort || m_PCBTsort) {
+        // if we give -1, sort the whole container
+        if (m_truncateAtAmount == -1) nKeep = nJets;
+        std::partial_sort(
+          workContainer->begin(), // Iterator from which to start sorting
+          workContainer->begin() + nKeep, // Use begin + N to sort first N
+          workContainer->end(), // Iterator marking the end of range to sort
+            [&](const xAOD::IParticle *left, const xAOD::IParticle *right) {
+              // sort by pT if pTsort or as tiebreaker if PCBTSort
+              if (m_pTsort || (m_PCBTsort && workContainer_pcbt[left] == workContainer_pcbt[right]))
+                return left->pt() > right->pt();
+              // else sort by PCBT
+              else
+                return workContainer_pcbt[left] > workContainer_pcbt[right];
+            });
+        // keep only the requested amount
+        workContainer->erase(workContainer->begin() + nKeep, workContainer->end());
+      }
+
+      for (int njet{0}, nbjet{0}; const xAOD::Jet *jet : *workContainer) {
+        bool dojet = m_jetAmount > 0 && njet<m_jetAmount;
+        bool dobjet = m_bjetAmount > 0 && nbjet<m_bjetAmount;
+        if(!dojet && !dobjet) {break;}
+        //lead/sublead jet
+        if(dojet){
+          m_jleadBranches.at(njet).set(*jet, true, sys);
+        }
+        //lead/sublead bjet
+        if(dobjet){
+          if (WPgiven &&  m_isBtag.get(*jet, sys) && std::abs(jet->eta())<2.5){
+              m_bleadBranches.at(nbjet).set(*jet, true, sys);
+              nbjet++;
+          }
+        }
+        njet++;
+      }
+
+      // Write to eventstore
+      ATH_CHECK(m_outHandle.record(std::move(workContainer), sys));   
+    }
+
+    return StatusCode::SUCCESS;
+  }
+}

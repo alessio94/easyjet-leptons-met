@@ -1,0 +1,16 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/src/components/KinematicFitTool_entries.cxx"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"KinematicFitTool"
+		],
+		"name" : "KinematicFitTool"
+	}
+}

@@ -1,0 +1,76 @@
+include: [vbshiggsAnalysis/RunConfig-common.yaml ]
+save_cutflow: false # set to true
+do_resolved: false
+do_CP_systematics: true # set it to true
+save_high_level_variables: false
+# systematics_regex: ["^(?!.*(MUON|MET|JER)).*$"] # systematics to be excluded
+systematics_regex: ["GEN*"]
+
+
+# Which analysis to consider
+channels: ["FullLep"]
+
+# Use VBFRNN tagger
+UseVBFRNN : true
+
+Electron:
+  ID: "MediumLH"
+  Iso: "NonIso"
+  extra_wps:
+    - ["TightLH", "NonIso"]
+    - ["TightLH", "Tight_VarRad"]
+  do_IFF_decoration: true
+  do_reco_decoration: true
+  
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+  eta_max: 2.5
+  maxD0Significance: 10
+  extra_wps:
+    - ["Medium", "PflowTight_VarRad"]
+    - ["HighPt", "PflowTight_VarRad"]
+  do_IFF_decoration: true
+Lepton:
+  amount: 2
+  variables_int: ["isPrompt","truthOrigin", "truthType", "ele_ECIDS", 
+                  "ele_firstEgMotherTruthType", "ele_firstEgMotherTruthOrigin", "ele_firstEgMotherPdgId"]
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  # btagging working points 
+  btag_wp: "GN2v01_FixedCutBEff_90"
+  amount: 0
+  # to use multiple btagging WPs
+  btag_extra_wps:
+    - GN2v01_Continuous
+
+Large_R_jet:
+  min_pT: 200.e+3
+  maxEta: 2.0
+  runMuonJetPtCorr: false
+  amount: 1
+  GN2X_hbb_wps:
+    - "FlatMassQCDEff_1p25"
+    - "FlatMassQCDEff_1p55"
+
+# list of triggers per year to consider
+Trigger:
+  include: [vbshiggsAnalysis/trigger-lep.yaml]
+  writeOutput: False
+
+ttree_output:
+  collection_options:
+    small_R_jets:
+      btag_info: false
+
+    large_R_jets:
+      btag_details: true
+
+CutList :
+      - PASS_EXACTLY_TWO_LEPTONS
+      - PASS_TRIGGER 
+      - PASS_TWO_SS_CHARGE_LEPTONS
+      - PASS_TWO_OS_CHARGE_LEPTONS
+      - PASS_ONE_LARGE_JET
+      - PASS_TWO_SIGNAL_JETS

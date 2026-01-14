@@ -1,0 +1,124 @@
+
+include: [EasyjetHub/base-config.yaml]
+
+# setting this to warning until the team decides they want to be using
+# expert mode
+expert_mode_warning_level: default
+
+# Which analysis to consider
+do_yyml_analysis: true
+
+# CutBookKeeper histPattern
+cbkHistPattern: "CutBookkeeper_%RUN%_%SYS%"
+
+# Toggles for object types
+do_photons: true
+do_electrons: true
+do_muons: true
+do_small_R_jets: true
+do_taus: true
+do_met: true
+
+# Toggles for reconstructed objects decorations
+Photon:
+  min_pT: 25.0e+3
+  max_eta: 2.37
+  ID: "Loose" # Loose, Tight
+  Iso: "NonIso"
+  amount: 2
+  # The first extra wp is used for the final photon selections
+  extra_wps:
+    - ["Tight", "FixedCutLoose"]
+    - ["Tight", "NonIso"]
+    - ["Loose", "FixedCutLoose"]
+
+Electron:
+  min_pT: 10.0e+3
+  max_eta: 2.37
+  ID: "MediumLH"
+  Iso: "Loose_VarRad" # TODO: exact WP used in Run 2 analysis is unclear from the documentation
+  extra_wps:
+    - ["MediumDNN", "Loose_VarRad"]
+
+Muon:
+  min_pT: 10.0e+3
+  max_eta: 2.7
+  ID: "Medium"
+  Iso: "PflowLoose_VarRad" # TODO: find closest WP to Loose_FixedRad used in Run 2 analysis
+
+Small_R_jet:
+  min_pT: 25.0e+3
+  max_eta: 4.4
+  # useFJvt: true # TODO: check if FJVT was applied in Run 2 analysis
+  # btagging nominal working point
+  btag_wp: "GN2v01_FixedCutBEff_77"
+
+Tau:
+  min_pT: 20.e+3
+  max_eta: 2.5
+  ID: "RNNLoose"
+  extra_wps: ["RNNLoose_eleid"]
+  # addMuonRM: true
+
+# orthogonality studies
+orthogonality:
+  include: [EasyjetHub/orth-config.yaml]
+  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
+
+# list of triggers per year to consider
+Trigger:
+  include: [yyMLAnalysis/trigger.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+
+OverlapRemoval:
+  favourPhotonOverLepton: false # if set to true, HgamOR is applied
+
+# flag for event cleaning
+do_event_cleaning: true
+
+#Enable cutflow
+save_cutflow: true
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  # slim_variables_with_syst: true
+  reco_outputs:
+    photons: 'container_names.output.photons'
+    electrons: 'container_names.output.electrons'
+    muons: 'container_names.output.muons'
+    small_R_jets: 'container_names.output.reco4PFlowJet'
+    taus: 'container_names.output.taus'
+    met : 'container_names.output.met'
+  collection_options:
+    photons:
+      shower_shapes: false
+      truth_labels: false
+      iso_variables: false
+    electrons:
+      # run_selection: true
+      truth_parent_info: true
+    muons:
+      # run_selection: true
+      truth_parent_info: true
+    small_R_jets:
+      btag_info: true
+      truth_parent_info: true
+      # run_selection: true
+    taus:
+      truth_branches: True
+      truth_parent_info: true
+      # run_selection: true
+  truth_outputs:
+    higgs_particle: 'container_names.output.truthHHParticles'
+    # electrons: 'container_names.input.truthelectrons'
+    # muons: 'container_names.input.truthmuons'
+    # small_R_jets: 'container_names.input.truth4Jet'
+    # taus: 'container_names.input.truthtaus'
+    # met: 'container_names.input.truthmet'

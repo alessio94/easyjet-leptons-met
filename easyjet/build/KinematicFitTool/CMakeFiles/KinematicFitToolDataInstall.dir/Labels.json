@@ -1,0 +1,139 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/E_AntiKt4EMPFlow_TaOgataParameters_Run2_FastSim_PeakCentered.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/E_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/E_AntiKt4EMPFlow_TaOgataParameters_Run3_FastSim_PeakCentered.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/E_AntiKt4EMPFlow_TaOgataParameters_Run3_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/lnE_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/ln_pT_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pT_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pT_AntiKt4EMPFlow_TaOgataParameters_Run3_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pXconstr_AntiKt4EMPFlow_DSCBParameters.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pXconstr_AntiKt4EMPFlow_DSCBParameters_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pXconstr_AntiKt4EMPFlow_TaOTaParameters_updated0925.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pYconstr_AntiKt4EMPFlow_DSCBParameters.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pYconstr_AntiKt4EMPFlow_DSCBParameters_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pYconstr_AntiKt4EMPFlow_TaOTaParameters_updated0925.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/E_AntiKt4EMPFlow_TaOgataParameters_Run2_FastSim_PeakCentered.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/E_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/E_AntiKt4EMPFlow_TaOgataParameters_Run3_FastSim_PeakCentered.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/E_AntiKt4EMPFlow_TaOgataParameters_Run3_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/lnE_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/ln_pT_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/pT_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/pT_AntiKt4EMPFlow_TaOgataParameters_Run3_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/pXconstr_AntiKt4EMPFlow_DSCBParameters.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/pXconstr_AntiKt4EMPFlow_DSCBParameters_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/pXconstr_AntiKt4EMPFlow_TaOTaParameters_updated0925.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/pYconstr_AntiKt4EMPFlow_DSCBParameters.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/pYconstr_AntiKt4EMPFlow_DSCBParameters_bb4l.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/data/pYconstr_AntiKt4EMPFlow_TaOTaParameters_updated0925.root"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/E_AntiKt4EMPFlow_TaOgataParameters_Run2_FastSim_PeakCentered.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/E_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/E_AntiKt4EMPFlow_TaOgataParameters_Run3_FastSim_PeakCentered.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/E_AntiKt4EMPFlow_TaOgataParameters_Run3_bb4l.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/lnE_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/ln_pT_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pT_AntiKt4EMPFlow_TaOgataParameters_Run2_bb4l.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pT_AntiKt4EMPFlow_TaOgataParameters_Run3_bb4l.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pXconstr_AntiKt4EMPFlow_DSCBParameters.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pXconstr_AntiKt4EMPFlow_DSCBParameters_bb4l.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pXconstr_AntiKt4EMPFlow_TaOTaParameters_updated0925.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pYconstr_AntiKt4EMPFlow_DSCBParameters.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pYconstr_AntiKt4EMPFlow_DSCBParameters_bb4l.root.rule"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/data/KinematicFitTool/pYconstr_AntiKt4EMPFlow_TaOTaParameters_updated0925.root.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"KinematicFitTool"
+		],
+		"name" : "KinematicFitToolDataInstall"
+	}
+}

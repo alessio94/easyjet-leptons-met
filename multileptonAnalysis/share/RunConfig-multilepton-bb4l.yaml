@@ -1,0 +1,32 @@
+include: [multileptonAnalysis/RunConfig-multilepton.yaml]
+
+save_extrabb4l_vars: true
+do_KinematicFit: true
+
+Truth:
+  decayModes: ["bbZZ"]
+
+CutList :
+  - pass_bb4l
+
+Small_R_jet:
+  amount_bjet: 3
+
+Electron:
+  min_pT: 4.5e+3
+  Iso: "NonIso"
+  extra_wps: 
+    - ["LooseBLayerLH", "Loose_VarRad"]
+
+Muon:
+  min_pT: 3.e+3
+  Iso: "NonIso"
+  extra_wps:
+    - ["Loose", "Loose_VarRad"]
+
+ttree_output:
+  collection_options:
+    electrons:
+      iso_variables: true
+    muons:
+      iso_variables: true

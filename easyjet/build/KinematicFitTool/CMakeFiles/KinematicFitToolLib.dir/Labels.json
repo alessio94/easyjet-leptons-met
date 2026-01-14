@@ -1,0 +1,19 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/KinematicFitTool/KinematicFitTool.h"
+		},
+		{
+			"file" : "/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/Root/KinematicFitTool.cxx"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"KinematicFitTool"
+		],
+		"name" : "KinematicFitToolLib"
+	}
+}

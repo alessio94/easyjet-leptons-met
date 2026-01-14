@@ -1,0 +1,123 @@
+## Run2 analysis use the single lepton trigger only
+selection:
+  chains:
+    '2015':
+    - 'HLT_e24_lhmedium_L1EM20VH'
+    - 'HLT_e60_lhmedium'
+    - 'HLT_e120_lhloose'
+    - 'HLT_mu20_iloose_L1MU15'
+    - 'HLT_mu50'
+    #Add this two prescale trigger for RUN2 Dijets CR
+    - 'HLT_mu14'
+    - 'HLT_e12_lhvloose_nod0_L1EM10VH'
+    '2016':
+    - 'HLT_e26_lhtight_nod0_ivarloose'
+    - 'HLT_e60_lhmedium_nod0'
+    - 'HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium'
+    - 'HLT_mu50'
+    #Add this two prescale trigger for RUN2 Dijets CR
+    - 'HLT_mu14'
+    - 'HLT_e12_lhvloose_nod0_L1EM10VH'
+    '2017':
+    - 'HLT_e26_lhtight_nod0_ivarloose'
+    - 'HLT_e60_lhmedium_nod0'
+    - 'HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium'
+    - 'HLT_mu50'
+    #Add this two prescale trigger for RUN2 Dijets CR
+    - 'HLT_mu14'
+    - 'HLT_e12_lhvloose_nod0_L1EM10VH'
+    '2018':
+    - 'HLT_e26_lhtight_nod0_ivarloose'
+    - 'HLT_e60_lhmedium_nod0'
+    - 'HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium'
+    - 'HLT_mu50'
+    #Add this two prescale trigger for RUN2 Dijets CR
+    - 'HLT_mu14'
+    - 'HLT_e12_lhvloose_nod0_L1EM10VH'
+    '2022':
+    - 'HLT_e26_lhtight_ivarloose_L1EM22VHI'
+    - 'HLT_e60_lhmedium_L1EM22VHI'
+    - 'HLT_e140_lhloose_L1EM22VHI'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
+    '2023':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M'
+    - 'HLT_e60_lhmedium_L1eEM26M'
+    - 'HLT_e300_etcut_L1eEM26M'
+    - 'HLT_e140_lhloose_L1eEM26M'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
+    '2024':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M'
+    - 'HLT_e60_lhmedium_L1eEM26M'
+    - 'HLT_e140_lhloose_L1eEM26M'
+    # For muon, no recommendation for 2024, use 2023 triggers recommendation
+    - 'HLT_mu24_ivarmedium_L1MU14FCH'
+    - 'HLT_mu50_L1MU14FCH'
+
+scale_factor:
+  doSF: true
+  chains:
+    '2015':
+    - 'HLT_e24_lhmedium_L1EM20VH || HLT_e60_lhmedium || HLT_e120_lhloose'
+    - 'HLT_mu20_iloose_L1MU15 || HLT_mu50'
+    '2016':
+    - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium || HLT_mu50'
+    '2017':
+    - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium || HLT_mu50'
+    '2018':
+    - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+    - 'HLT_mu26_ivarmedium || HLT_mu50'
+    '2022':
+    - 'HLT_e26_lhtight_ivarloose_L1EM22VHI || HLT_e60_lhmedium_L1EM22VHI || HLT_e140_lhloose_L1EM22VHI'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+    '2023':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
+    - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+    '2024':
+    - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
+  
+  Electron:
+    ID_Run2: "TightLH"
+    Iso_Run2: "Tight_VarRad"
+    ID_Run3: "TightLH"
+    Iso_Run3: "Tight_VarRad"
+
+    chains:
+      '2015':
+      - 'HLT_e24_lhmedium_L1EM20VH || HLT_e60_lhmedium || HLT_e120_lhloose'
+      '2016':
+      - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+      '2017':
+      - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+      '2018':
+      - 'HLT_e26_lhtight_nod0_ivarloose || HLT_e60_lhmedium_nod0 || HLT_e140_lhloose_nod0'
+      '2022':
+      - 'HLT_e26_lhtight_ivarloose_L1EM22VHI || HLT_e60_lhmedium_L1EM22VHI || HLT_e140_lhloose_L1EM22VHI'
+      '2023':
+      - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M || HLT_e300_etcut_L1eEM26M'
+      '2024':
+      - 'HLT_e26_lhtight_ivarloose_L1eEM26M || HLT_e60_lhmedium_L1eEM26M || HLT_e140_lhloose_L1eEM26M'
+
+  Moun:
+    ID: "Medium"
+    Iso: "PflowTight_VarRad"
+    chains:
+      '2015':
+      - 'HLT_mu20_iloose_L1MU15 || HLT_mu50'
+      '2016':
+      - 'HLT_mu26_ivarmedium || HLT_mu50'
+      '2017':
+      - 'HLT_mu26_ivarmedium || HLT_mu50'
+      '2018':
+      - 'HLT_mu26_ivarmedium || HLT_mu50'
+      '2022':
+      - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+      '2023':
+      - 'HLT_mu24_ivarmedium_L1MU14FCH || HLT_mu50_L1MU14FCH'
+      '2024': []

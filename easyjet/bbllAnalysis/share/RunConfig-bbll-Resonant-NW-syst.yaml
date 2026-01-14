@@ -1,0 +1,25 @@
+include: [bbllAnalysis/RunConfig-bbll.yaml]
+
+NeutrinoWeighting:
+  include: [NeutrinoWeighting.yaml]
+
+do_resonant_PNN: true
+mX_values: [251, 260, 300, 400, 500, 600, 800, 1000, 1500, 3000]
+  
+save_bbll_cutflow: false
+
+store_high_level_variables: false
+save_extra_vars: false
+
+Trigger:
+  writeOutput: False
+
+Truth:
+  do_STXS: false
+
+do_CP_systematics: true
+systematics_regex: [".*"]
+
+
+
+

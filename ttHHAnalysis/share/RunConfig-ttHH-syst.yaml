@@ -1,0 +1,95 @@
+include: [EasyjetHub/base-config.yaml]
+
+# Which analysis to consider
+do_ttHH_analysis: true
+
+# Toggles to bypass event selection
+bypass: false
+
+# Decay mode considered for truth decoration
+Truth:
+  decayModes: ["bbbb"]
+  DSID_ttHH_samples:
+    - 523072 # MGPy8EG_A14NNPDF23LO_ttHH_semilep*
+    - 523073 # MGPy8EG_A14NNPDF23LO_ttHH_dilep*
+    - 523074 # MGPy8EG_A14NNPDF23LO_ttHH_fullhad*
+    - 525963 # MGPy8EG_A14NNPDF23LO_ttHH_orth4b_SSML*
+    - 545837 # MGPy8EG_A14NNPDF23LO_ttHH_bbyy*
+
+# Toggles for object types
+do_small_R_jets: true
+do_muons: true
+do_electrons: true
+do_met: true
+do_photons: false
+
+# Toggles for reconstructed objects decorations
+Small_R_jet:
+  btag_wp: GN2v01_FixedCutBEff_85
+  btag_extra_wps:
+    - GN2v01_Continuous
+  amount: 6
+  variables_int_allJets: ["pcbt"]
+  #btag_egReductionB: "Medium"
+  #btag_egReductionC: "Medium"
+  #btag_egReductionLight: "Medium"
+
+Electron:
+  ID: "LooseBLayerLH"
+  Iso: "Loose_VarRad"
+  extra_wps:
+    - ["TightLH", "Tight_VarRad"]
+  correlationModelId: "TOTAL"
+
+Muon:
+  ID: "Loose"
+  Iso: "PflowLoose_VarRad"
+  extra_wps:
+    - ["Tight", "PflowTight_VarRad"]
+
+Lepton:
+  amount: 1
+  variables_int: ["isTight"]
+
+# orthogonality studies  
+orthogonality:
+  include: [EasyjetHub/orth-config.yaml ]
+  do_orth_check: false # if set to true, this will just add more information to your output ntuple on whether events fall into HH-like categories - it will not remove events (assuming overlap removal including all objects does not have an impact on your analysis)
+
+# list of triggers per year to consider
+Trigger:
+  include: [ttHHAnalysis/trigger.yaml]
+# apply trigger lists to filter events
+do_trigger_filtering: true
+
+# apply loose jet cleaning only
+add_BadBatman_jet_cleaning: false
+
+# if you want to truth match (is MC protected)
+# Whether to activate CP alg systematic variations
+do_CP_systematics: true
+systematics_regex: [".*"]
+
+# write objects with overlap removal applied
+# turning this on you have to decide on one large R jet collection
+do_overlap_removal: true
+
+#Enable cutflow 
+save_cutflow: false
+
+CutList:
+  - PASS_TRIGGER
+  - PASS_BASELINE
+  - PASS_TRIGGER_MATCHING
+
+# Include the TTree configuration and update details
+ttree_output:
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
+  # Our overrides. All defaults are off
+  reco_outputs:
+    #small_R_jets: 'container_names.output.reco4PFlowJet'
+    met: 'container_names.output.met'
+      # collection_options:
+      #   small_R_jets:
+      #     btag_info: true
+      #     run_selection: true

@@ -1,0 +1,348 @@
+#!/bin/env python
+
+import os
+import re
+import yaml
+import argparse
+import datetime
+import subprocess
+from shutil import which
+from EasyjetHub.steering.utils.config_files import run_config_arg
+
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    in_list = parser.add_mutually_exclusive_group(required=True)
+    in_list.add_argument(
+        "--mc-list",
+        help="Text file containing MC datasets")
+    in_list.add_argument(
+        "--data-list",
+        help="Text file containing data datasets"
+    )
+
+    parser.add_argument(
+        "--run-config",
+        type=str,
+        required=True,
+        help="file path to the runConfig",
+    )
+    parser.add_argument(
+        "--exec",
+        type=str,
+        default="easyjet-ntupler",
+        help="The name of the executable",
+    )
+    parser.add_argument(
+        "--campaign",
+        default="EJ_%Y_%m_%d_T%H%M%S",
+        help=(
+            "The name of the campaign. Will be prepended to the output dataset"
+            " name. Can include datetime.strftime replacement fields"
+        ),
+    )
+    parser.add_argument(
+        "--channels",
+        nargs='+',
+        default=[],
+        help="The list of channels to process. Only relevant if splitOutputTree is used in "
+        "the config"
+    )
+    parser.add_argument(
+        "--splitCBK",
+        action="store_true",
+        help="Store CutBookKeeper in separate file. Only relevant if splitCBK is used in "
+        "the config"
+    )    
+    parser.add_argument(
+        "--asetup",
+        help="The asetup command, in case it cannot be read from the environment",
+    )
+    parser.add_argument(
+        "--dest-se",
+        default=None,
+        help="An RSE to duplicate the results to, for example 'DESY-ZN_LOCALGROUPDISK'",
+    )
+    parser.add_argument(
+        "--excluded-site", default=None, help="Any sites to exclude when running"
+    )
+    parser.add_argument(
+        "--nGBperJob", default=None, help="How many GB required per job"
+    )
+    parser.add_argument(
+        "--nFilesPerJob", default=None, help="How many files to process per job"
+    )
+    parser.add_argument(
+        "--maxNFilesPerJob", default=None, help="Max files per job"
+    )
+    parser.add_argument(
+        "--nFiles", default=None, help="How many files to run on"
+    )
+    parser.add_argument(
+        "--memory", default=None, help="How many MB of memory per core to request"
+    )
+    parser.add_argument(
+        "--mergeOutput",
+        action="store_true",
+        help="Merge outputs (TEfficiency merging requires --mergeWithHadd)",
+    )
+    parser.add_argument(
+        "--mergeWithHadd",
+        action="store_true",
+        help="Merge outputs with hadd to handle TEfficiency",
+    )
+    parser.add_argument(
+        "--nGBPerMergeJob", default=None, help="The maximum input size in GB to be processed by a single merge job.",
+    )
+    parser.add_argument(
+        "--noSubmit",
+        action="store_true",
+        help="Don't submit the jobs, just create the tarball",
+    )
+    parser.add_argument(
+        "--noTag",
+        action="store_true",
+        help="Skip git tag creation",
+    )
+    parser.add_argument(
+        "--noEmail",
+        action="store_true",
+        help="Don't send panda emails",
+    )
+    parser.add_argument(
+        "--ProductionRole",
+        type=str,
+        choices=["HMBS", "HIGP", "FLAVTAG"],
+        help="Run with production role",
+    )
+    parser.add_argument(
+        "--framework",
+        type=str,
+        default="easyjet",
+        help="The name of the framework to use during submission"
+    )
+
+    parser.add_argument(
+        "--site",
+        type=str,
+        required=False,
+        help="Specific site on which the jobs should be run"
+    )
+    args = parser.parse_args()
+
+    # check ntupler command is available before submitting
+    if not which(args.exec):
+        raise RuntimeError(f"Failed to find `{args.exec}`. Check that it is installed")
+
+    # check prun is available before submitting
+    if not which("prun"):
+        raise RuntimeError("You have not set up panda, run `lsetup panda`")
+    
+    grid_nickname = check_grid_credentials(return_nickname=True)
+
+    now = datetime.datetime.now()
+
+    # will just return the args.campaign if it doesn't contain any strftime fields (%Y, %m, etc.)
+    campaign = now.strftime(args.campaign)
+
+    if not args.noSubmit and not args.noTag:
+        create_git_tag(campaign)
+        campaign_is_default = args.campaign == parser.get_default("campaign")
+        # Avoid creating same dataset names which will cause failing grid jobs
+        campaign = campaign if campaign_is_default else f"{campaign}.{now.strftime('%Y_%m_%d_T%H%M%S')}"
+
+    # Prepare some of the prun options here
+    submit_opts = {
+        "mergeOutput": False,
+        "mergeWithHadd": False,
+        "outputs": "TREE:output-tree.root",
+        "writeInputToTxt": "IN:in.txt",
+        "useAthenaPackages": True,
+    }
+
+    if len(args.channels)>0:
+        outputs = ""
+        for channel in args.channels:
+            outputs += "output-tree_"+channel+".root,"
+        outputs += "output-tree_cbk.root"
+        submit_opts["outputs"] = outputs
+    elif args.splitCBK:
+        outputs = ["output-tree.root", "output-tree_cbk.root"]
+        submit_opts["outputs"] = outputs
+    if args.noSubmit:
+        submit_opts["noSubmit"] = True
+    if args.dest_se is not None:
+        submit_opts["destSE"] = args.dest_se
+    if args.excluded_site is not None:
+        submit_opts["excludedSite"] = args.excluded_site
+    if args.nGBperJob is not None:
+        submit_opts["nGBPerJob"] = args.nGBperJob
+    if args.nGBPerMergeJob is not None:
+        submit_opts["nGBPerMergeJob"] = args.nGBPerMergeJob
+    if args.nFilesPerJob is not None:
+        submit_opts["nFilesPerJob"] = args.nFilesPerJob
+    if args.maxNFilesPerJob is not None:
+        submit_opts["maxNFilesPerJob"] = args.maxNFilesPerJob   
+    if args.nFiles is not None:
+        submit_opts["nFiles"] = args.nFiles
+    if args.memory is not None:
+        submit_opts["memory"] = args.memory
+    if args.mergeOutput:
+        submit_opts["mergeOutput"] = True
+        if args.mergeWithHadd:
+            submit_opts["mergeScript"] = "merge-with-hadd %OUT %IN"
+    if args.noEmail:
+        submit_opts["noEmail"] = True
+    if args.framework:
+        submit_opts["framework"] = args.framework
+    if args.site:
+        submit_opts["site"] = args.site
+
+    if args.asetup is None:
+        atlas_project = os.environ["AtlasProject"]
+
+        project_dir = os.environ["{0}_DIR".format(atlas_project)]
+        project_version = os.environ["{0}_VERSION".format(atlas_project)]
+
+        if project_dir.startswith("/cvmfs/atlas-nightlies.cern.ch"):
+            raise ValueError(
+                "Cannot deduce the asetup command for a nightly!"
+                + " Use the --asetup option"
+            )
+        submit_opts["athenaTag"] = ",".join([atlas_project, project_version])
+    else:
+        submit_opts["athenaTag"] = args.asetup
+
+    # copy the runconfig to the submit dir to be available for the exec cmd
+    try:
+        with open('config.yaml','w') as cfg:
+            cfg.write(yaml.dump(run_config_arg(args.run_config)))
+    except subprocess.CalledProcessError as e:
+        raise OSError(e.returncode, "Failed to copy run config files.")
+
+    proc = subprocess.Popen(
+        [
+            "prun",
+            "--outDS",
+            "user.{0}.NONE".format(grid_nickname),
+            "--exec",
+            "NONE",
+            "--noSubmit",
+            "--useAthenaPackages",
+            "--outTarBall",
+            "code.tar.gz",
+        ]
+    )
+
+    if proc.wait() != 0:
+        raise OSError(proc.returncode, "Failed to create tarball")
+
+    submit_opts["inTarBall"] = "code.tar.gz"
+
+    io_list = []
+    with open(args.mc_list or args.data_list) as fp:
+        ds_list = fp.readlines()
+    for ds in ds_list:
+        ds = ds.strip()
+        if ds.startswith("*") or ds.startswith("#"):
+            continue
+        if not ds:
+            continue
+        ds_name = ds.rpartition(":")[2]
+        ds_name_split = ds_name.split(".")
+        ds_tags = ds_name_split[-1]
+        if args.mc_list is not None:
+            dsid = ds_name_split[1]
+        else:
+            dsid = f"{ds_name_split[0]}.{ds_name_split[1]}"
+        output_ds_name = ""
+        if args.ProductionRole:
+            if args.ProductionRole.lower() in ["flavtag"]:
+                output_ds_name = "group.perf-{0}.{1}.{2}.{3}".format(args.ProductionRole.lower(), campaign, dsid, ds_tags)
+            else:
+                output_ds_name = "group.phys-{0}.{1}.{2}.{3}".format(args.ProductionRole.lower(), campaign, dsid, ds_tags)
+        else:
+            if 'Delayed' in ds_name:
+                output_ds_name = "user.{0}.{1}.delayed_{2}.{3}".format(grid_nickname, campaign, dsid, ds_tags)
+            else:
+                output_ds_name = "user.{0}.{1}.{2}.{3}".format(grid_nickname, campaign, dsid, ds_tags)
+        io_list.append(
+            {
+                "inDS": ds_name,
+                "outDS": output_ds_name,
+            }
+        )
+
+    if not io_list:
+        raise ValueError("No inputs defined")
+
+    for io in io_list:
+        exec_cmd = "{0} %IN -l --run-config {1} --out-file {2}".format(
+            args.exec,
+            "config.yaml",
+            "output-tree.root" if (len(args.channels)>0 or args.splitCBK) else
+            submit_opts["outputs"].removeprefix("TREE:"),
+        )
+
+        cmd = [
+            "prun",
+            "--inDS", io["inDS"],
+            "--outDS", io["outDS"],
+            "--notExpandInDS",
+            "--exec", exec_cmd,
+        ]
+        if args.ProductionRole:
+            if args.ProductionRole.lower() in ["flavtag"]:
+                cmd += [
+                    "--voms", "atlas:/atlas/perf-{0}/Role=production".format(args.ProductionRole.lower()),
+                    "--official",
+                ]
+            else:
+                cmd += [
+                    "--voms", "atlas:/atlas/phys-{0}/Role=production".format(args.ProductionRole.lower()),
+                    "--official",
+                ]
+
+        for k, v in submit_opts.items():
+            if isinstance(v, bool):
+                if v:
+                    cmd.append(f"--{k}")
+            else:
+                if isinstance(v, (list, tuple)):
+                    v = ",".join(map(str, v))
+
+                cmd += [f"--{k}", v]
+
+        print(" ".join(cmd))
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = proc.communicate()
+        print(out.decode("utf-8"), err.decode("utf-8"))
+        if proc.returncode != 0:
+            raise OSError(proc.returncode, err)
+
+
+def check_grid_credentials(return_nickname=False):
+    result = subprocess.run(["voms-proxy-info", "--all"], capture_output=True)
+    result_output = (result.stdout or result.stderr).decode("utf-8").strip()
+    if result.returncode != 0:
+        raise RuntimeError(result_output)
+
+    if return_nickname:
+        nickname_re = re.search(r'nickname = (\w+)', result_output)
+        return nickname_re.group(1) if nickname_re else None
+
+
+def create_git_tag(tag_name: str, return_tag_exists: bool = False):
+    result = subprocess.run(["easyjet-create-git-tag", tag_name], capture_output=True)
+    result_message = (result.stderr or result.stdout).decode("utf-8").strip()
+    if result.returncode != 0:
+        raise RuntimeError(result_message)
+    else:
+        print(result_message)
+        if return_tag_exists:
+            return "reusing tag" in result_message.lower()
+
+
+if __name__ == "__main__":
+    main()
