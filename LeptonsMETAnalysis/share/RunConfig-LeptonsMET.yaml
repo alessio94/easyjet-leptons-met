@@ -50,9 +50,13 @@ Muon:
 # ====================================
 Trigger:
   include: [trigger.yaml]
-  # Enable object types for trigger SF calculation
-  use_electrons: true
-  use_muons: true
+  scale_factor:
+    Electron:
+      container: 'container_names.output.electrons'
+      ID: "LooseBLayerLH"  # Match our Electron config above
+    Muon:
+      container: 'container_names.output.muons'
+      ID: "Loose"  # Match our Muon config above
 
 # Apply trigger filtering
 do_trigger_filtering: true
