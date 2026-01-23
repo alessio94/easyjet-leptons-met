@@ -1,7 +1,0 @@
-include: [bbVVAnalysis/RunConfig-VBF.yaml]
-
-channel: ["VBFSplitboosted1Lep"]
-
-Lepton:
-  amount: 1
-

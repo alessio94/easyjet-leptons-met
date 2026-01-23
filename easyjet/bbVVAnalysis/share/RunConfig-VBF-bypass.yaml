@@ -1,4 +1,0 @@
-include: [bbVVAnalysis/RunConfig-VBF.yaml]
-
-bypass: true
-do_trigger_filtering: false

@@ -1,2 +1,0 @@
-mc23_13p6TeV.701005.Sh_2214_lllvjj.deriv.DAOD_PHYS.e8543_s4162_r14622_p6266
-## previously use MGPyEG EW6, might the avove is wrong for our analysis

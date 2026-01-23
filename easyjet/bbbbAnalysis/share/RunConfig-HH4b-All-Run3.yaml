@@ -1,4 +1,0 @@
-include: [bbbbAnalysis/RunConfig-HH4b-All.yaml]
-
-Small_R_jet:
-  doHLTMatching: true

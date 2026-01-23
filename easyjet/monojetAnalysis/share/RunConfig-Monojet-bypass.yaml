@@ -1,3 +1,0 @@
-include: [RunConfig-Monojet.yaml]
-bypass: true #enabling Run through mode
-do_trigger_filtering: false

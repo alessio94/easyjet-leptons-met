@@ -1,3 +1,0 @@
-mc20_13TeV.525378.MGPy8EG_hh_bbyy_vbf_novhh_l2cvv1cv1_5fns.deriv.DAOD_PHYSLITE.e8555_a907_r14859_p6490
-mc20_13TeV.525378.MGPy8EG_hh_bbyy_vbf_novhh_l2cvv1cv1_5fns.deriv.DAOD_PHYSLITE.e8555_a907_r14860_p6490
-mc20_13TeV.525378.MGPy8EG_hh_bbyy_vbf_novhh_l2cvv1cv1_5fns.deriv.DAOD_PHYSLITE.e8555_a907_r14861_p6490

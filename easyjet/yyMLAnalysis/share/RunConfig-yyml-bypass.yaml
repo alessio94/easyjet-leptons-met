@@ -1,7 +1,0 @@
-include: [yyMLAnalysis/RunConfig-yyml.yaml]
-
-# flag that toggles run-through mode in SelectorAlg
-bypass: true
-
-# flag that toggles trigger filtering, before any cuts
-do_trigger_filtering: false

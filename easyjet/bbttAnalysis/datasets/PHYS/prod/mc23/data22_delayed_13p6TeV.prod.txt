@@ -1,1 +1,0 @@
-data22_13p6TeV.periodAllYear.physics_VBFDelayed.PhysCont.DAOD_PHYS.grp22_v01_p6700

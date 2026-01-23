@@ -1,4 +1,0 @@
-/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/lib/libEasyjetHub.confdb
-/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/lib/libKinematicFitTool.confdb
-/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/lib/libTruthWeightTools.confdb
-/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/lib/libVBFTagger.confdb

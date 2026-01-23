@@ -1,4 +1,0 @@
-# Target labels
- VBFTagger
-# Source files and their labels
-/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/VBFTagger/src/components/VBFTagger_entries.cxx

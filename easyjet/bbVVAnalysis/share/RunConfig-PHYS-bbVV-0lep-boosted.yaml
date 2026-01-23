@@ -1,7 +1,0 @@
-include: [bbVVAnalysis/RunConfig-bbVV.yaml]
-
-channel: ["Boosted0Lep"]
-
-CutList : # Channel specific cuts here
-      - VETO_SIGNAL_LEPTON
-      - HBB_BTAG

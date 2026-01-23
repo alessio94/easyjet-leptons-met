@@ -1,6 +1,0 @@
-include: [llttAnalysis/RunConfig-lltt.yaml]
-
-doAntiTau: true
-
-Tau:
-  ID: "RNNVeryLoose_eleid"

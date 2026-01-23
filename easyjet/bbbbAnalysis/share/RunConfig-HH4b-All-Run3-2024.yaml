@@ -1,5 +1,0 @@
-include: [bbbbAnalysis/RunConfig-HH4b-All-Run3.yaml]
-
-Small_R_jet:
-  doHLTMatching: false
-  doL1Matching: false

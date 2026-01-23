@@ -1,7 +1,0 @@
-include: [VBSVV4qAnalysis/RunConfig-JJ.yaml]
-
-# CI pipeline test for LLJ1 files
-loadDisCoJet: True
-SigJetsCriteria: "HighestScore"
-
-do_trigger_filtering: false

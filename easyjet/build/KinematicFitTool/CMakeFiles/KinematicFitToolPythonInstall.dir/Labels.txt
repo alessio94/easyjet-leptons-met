@@ -1,6 +1,0 @@
-# Target labels
- KinematicFitTool
-# Source files and their labels
-/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/KinematicFitTool/KinematicFit_config.py
-/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/easyjet/KinematicFitTool/python/KinematicFit_config.py
-/afs/cern.ch/user/a/alpizzin/private/easyjet/easyjet/build/x86_64-el9-gcc14-opt/python/KinematicFitTool/KinematicFit_config.py.rule

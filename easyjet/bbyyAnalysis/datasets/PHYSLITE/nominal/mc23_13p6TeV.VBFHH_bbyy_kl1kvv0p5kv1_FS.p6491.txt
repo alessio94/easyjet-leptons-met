@@ -1,2 +1,0 @@
-mc23_13p6TeV.525381.MGPy8EG_hh_bbyy_vbf_novhh_l1cvv0p5cv1_5fns.deriv.DAOD_PHYSLITE.e8529_s4162_r14622_p6491
-mc23_13p6TeV.525381.MGPy8EG_hh_bbyy_vbf_novhh_l1cvv0p5cv1_5fns.deriv.DAOD_PHYSLITE.e8529_s4159_r15224_p6491

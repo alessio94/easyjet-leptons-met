@@ -1,6 +1,0 @@
-XSection_paths:
-    - "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/2024-04-17/PMGxsecDB_mc16.txt"
-    - "/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/PMGTools/2024-04-17/PMGxsecDB_mc23.txt"
-    - "bbllAnalysis/CustomXsections_mc20.txt"
-    - "bbllAnalysis/CustomXsections_mc23.txt"
-

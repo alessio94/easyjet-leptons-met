@@ -1,7 +1,0 @@
-# to migrate 506202 MGPy8_ssWWjj_lep_EW6_LO
-# to migrate 506207 MGPy8_ssWWjj_lep_TT_EW6_LO
-# to migrate 506201 MGPy8_ssWWjj_lep_TT_EW6_WWcmf_LO
-# to migrate 506203 MGPy8_ssWWjj_lep_LL_EW6_LO
-# to migrate 506204 MGPy8_ssWWjj_lep_LL_EW6_WWcmf_LO
-# to migrate 506205 MGPy8_ssWWjj_lep_TL_EW6_LO
-# to migrate 506206 MgPy8_ssWWjj_lep_TL_EW6_WWcmf_LO
