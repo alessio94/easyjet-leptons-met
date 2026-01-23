@@ -2,7 +2,7 @@
 # This configuration enables leptons, jets, and MET reconstruction
 # suitable for BSM searches with leptons and missing transverse energy
 
-include: [base-config.yaml]
+include: [EasyjetHub/base-config.yaml]
 
 # Decay mode for truth decoration (adjust as needed for your signal)
 Truth:
