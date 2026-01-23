@@ -50,6 +50,9 @@ Muon:
 # ====================================
 Trigger:
   include: [trigger.yaml]
+  # Specify object collections for trigger SF calculation
+  electrons: 'container_names.output.electrons'
+  muons: 'container_names.output.muons'
 
 # Apply trigger filtering
 do_trigger_filtering: true
