@@ -63,7 +63,7 @@ add_BadBatman_jet_cleaning: false
 # TTree output configuration
 # ====================================
 ttree_output:
-  include: [AnalysisMiniTree-config.yaml]
+  include: [EasyjetHub/AnalysisMiniTree-config.yaml]
 
   # Reco object outputs
   reco_outputs:
