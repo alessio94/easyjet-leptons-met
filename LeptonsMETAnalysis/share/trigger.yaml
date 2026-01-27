@@ -97,7 +97,7 @@ selection:
     - 'HLT_xe80_cell_xe115_tcpufit_L1XE50'
 
 scale_factor:
-  doSF: true
+  doSF: false  # Disable trigger SFs - loose leptons don't have SF files available
 
   chains:
     '2015':
