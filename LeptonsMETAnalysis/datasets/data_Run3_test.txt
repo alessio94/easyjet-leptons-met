@@ -1,0 +1,16 @@
+# Example data list for Run 3 - TEST ONLY (2 periods)
+# Format: scope:dataset_name
+# Lines starting with # are comments
+
+# Run 3 2023 data, p6026 derivation, physics_Main stream
+# Replace these with actual dataset names from your analysis
+
+# Example format (you need to find actual datasets):
+# data23_13p6TeV:data23_13p6TeV.00450975.physics_Main.deriv.DAOD_PHYS.r15116_p6026
+# data23_13p6TeV:data23_13p6TeV.00450976.physics_Main.deriv.DAOD_PHYS.r15116_p6026
+
+# To find dataset names, use:
+# rucio list-dids "data23_13p6TeV:*physics_Main*DAOD_PHYS*p6026*" --filter type=CONTAINER
+
+# REPLACE THE LINES BELOW WITH YOUR ACTUAL DATASETS
+# data23_13p6TeV:YOUR_DATASET_HERE

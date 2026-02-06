@@ -1,0 +1,19 @@
+# Example MC list for Z' signal samples - TEST ONLY
+# Format: scope:dataset_name
+# Lines starting with # are comments
+
+# Z' → ee and μμ signal samples at different mass points
+# mc23a campaign, 13.6 TeV, p6026 derivation
+
+# Example format (you need to find actual Z' signal datasets):
+# mc23_13p6TeV:mc23_13p6TeV.700001.Sh_2210_Zprime_ee_mZp1000.deriv.DAOD_PHYS.e8514_s4162_r14622_p6026
+# mc23_13p6TeV:mc23_13p6TeV.700002.Sh_2210_Zprime_mumu_mZp1000.deriv.DAOD_PHYS.e8514_s4162_r14622_p6026
+# mc23_13p6TeV:mc23_13p6TeV.700003.Sh_2210_Zprime_ee_mZp2000.deriv.DAOD_PHYS.e8514_s4162_r14622_p6026
+# mc23_13p6TeV:mc23_13p6TeV.700004.Sh_2210_Zprime_mumu_mZp2000.deriv.DAOD_PHYS.e8514_s4162_r14622_p6026
+
+# To find your Z' signal samples, use:
+# rucio list-dids "mc23_13p6TeV:*Zprime*DAOD_PHYS*p6026*" --filter type=CONTAINER
+# OR ask your signal contact for the dataset list
+
+# REPLACE THE LINES BELOW WITH YOUR ACTUAL Z' SIGNAL DATASETS
+# mc23_13p6TeV:YOUR_ZPRIME_DATASET_HERE
